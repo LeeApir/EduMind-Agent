@@ -38,3 +38,7 @@ VERIFIED 表示验证通过并准备提交，完成以 Git 中的 Task-Completed
 [2026-09-17T00:01:18+08:00] [MVP-0.1-T007] START | 领取“建立前端测试与静态检查入口”。 | 已确认 T006 完成提交；Web 工程可构建但尚无测试、lint 或独立 typecheck 脚本。 | 添加 Vitest 组件测试、ESLint 和 TypeScript 检查入口。
 
 [2026-09-17T00:05:55+08:00] [MVP-0.1-T007] VERIFIED | 添加 Vitest/jsdom 组件测试、ESLint、独立 typecheck 与构建脚本；锁文件已同步，生成目录仍被 Git 忽略。 | `pnpm --dir web test --run`：1 passed；`typecheck`：通过；`lint`：0 errors、32 个非阻塞模板排版 warnings；`build`：通过；`git diff --check`：通过。 | 提交 T007；下一依赖满足任务为 T008（PostgreSQL 与 Alembic）。
+
+[2026-09-17T00:07:24+08:00] [MVP-0.1-T008] START | 领取“接入 PostgreSQL 与 Alembic”。 | T005 已完成，Docker CLI 和 Compose 可用。 | 检查隔离 PostgreSQL 验证运行条件。
+
+[2026-09-17T00:07:38+08:00] [MVP-0.1-T008] BLOCKED | 无法建立验收要求的隔离 PostgreSQL 环境。 | `docker info --format '{{.ServerVersion}}'`：无法连接 `/Users/apir/.orbstack/run/docker.sock`；`command -v postgres`、`pg_isready`、`psql`：均不可用。 | 请启动 Docker Desktop 或 Orbstack（或提供可访问的隔离 PostgreSQL URL）；恢复后执行 RESUME、完成 Alembic 迁移与连接测试。
