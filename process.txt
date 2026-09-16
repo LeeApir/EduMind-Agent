@@ -42,3 +42,5 @@ VERIFIED 表示验证通过并准备提交，完成以 Git 中的 Task-Completed
 [2026-09-17T00:07:24+08:00] [MVP-0.1-T008] START | 领取“接入 PostgreSQL 与 Alembic”。 | T005 已完成，Docker CLI 和 Compose 可用。 | 检查隔离 PostgreSQL 验证运行条件。
 
 [2026-09-17T00:07:38+08:00] [MVP-0.1-T008] BLOCKED | 无法建立验收要求的隔离 PostgreSQL 环境。 | `docker info --format '{{.ServerVersion}}'`：无法连接 `/Users/apir/.orbstack/run/docker.sock`；`command -v postgres`、`pg_isready`、`psql`：均不可用。 | 请启动 Docker Desktop 或 Orbstack（或提供可访问的隔离 PostgreSQL URL）；恢复后执行 RESUME、完成 Alembic 迁移与连接测试。
+
+[2026-09-17T00:08:54+08:00] [MVP-0.1-T008] BLOCKED | 复核 Docker daemon 后，同一环境阻塞仍存在。 | `docker info --format '{{.ServerVersion}}'` 仍无法连接 `/Users/apir/.orbstack/run/docker.sock`。 | 等待 Docker Desktop/Orbstack 启动或提供隔离 PostgreSQL URL；不跳过 T008 或继续依赖该任务的实现。
