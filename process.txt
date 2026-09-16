@@ -18,3 +18,7 @@ VERIFIED 表示验证通过并准备提交，完成以 Git 中的 Task-Completed
 [2026-09-16T23:35:51+08:00] [MVP-0.1-T002] START | 领取“确定流式首屏与正式资源审核时序”。 | 已核对 T001 在 Git 历史中有完成标记，工作区干净；已阅读 PRD §3.3、§7.7、§8.1 及 ADR-0001 的持久化边界。 | 起草临时流、审核发布、断线与重试状态机 ADR。
 
 [2026-09-16T23:37:26+08:00] [MVP-0.1-T002] VERIFIED | 新增 ADR-0002：首段仅作为受轻量规则约束的临时 SSE 流，完整候选经 schema 与 ReviewAgent 后原子发布；定义幂等键、断线、重试、取消、重入和首段/审核延迟指标。 | `python3 -m json.tool task.json >/dev/null`：任务文件可解析，领取互斥与依赖状态由 JSON 静态检查通过；`rg -n 'streaming_temporary|reviewing|published|Idempotency-Key|断线|取消|重入|P95 ≤ 10 秒|审核发布延迟|待决项' docs/ADR/0002-streaming-first-screen-and-resource-review.md docs/ARCHITECTURE.md`：状态与指标均覆盖；`git diff --check`：通过。 | Review 不可用时的临时内容呈现、事件保留窗口与取消成本为 Proposed ADR 待审批项；提交 T002，下一任务为 T003。
+
+[2026-09-16T23:39:12+08:00] [MVP-0.1-T003] START | 领取“固定 MVP 0.1 API 与 SSE 契约”。 | 已确认 T001/T002 均有 Git 完成标记，工作区干净；检查本机未安装 OpenAPI Python 校验器，已确定使用固定版本 Redocly CLI 作契约校验。 | 编写 MVP 0.1 OpenAPI 与 SSE/恢复语义。
+
+[2026-09-16T23:43:57+08:00] [MVP-0.1-T003] VERIFIED | 新增 MVP 0.1 OpenAPI：匿名身份、学习会话 SSE、操作状态/取消/重连、学习单元和已审核资源读取均已定义；`token` 明确是临时内容，`scene_ready` 才发布正式版本；未纳入 P1 Provider 设置或 Manim Job。 | `python3 -m json.tool docs/api/openapi.yaml >/dev/null`：JSON 兼容 YAML 可解析；已运行 JSON 标准库 OpenAPI 结构校验，核对必需路径、SSE 事件、临时标志与 P1 路径排除：通过；`git diff --check`：通过。固定版本 Redocly CLI 在当前环境两次 30 秒运行均未产生日志或完成结果，未将其记作通过。 | 提交 T003；下一任务为 T004（建立 FastAPI 服务）。

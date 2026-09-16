@@ -15,3 +15,7 @@
 首段讲解以受轻量规则约束的临时 SSE token 尽快显示，但不属于正式资源。完整候选必须经 schema 校验和 ReviewAgent 后，才以原子提交的不可变版本发布，并发出 `scene_ready`。断线恢复操作状态和已审核版本，不保证回放临时 token；相同幂等键不得重复创建学习单元或资源版本。
 
 首段 10 秒指标从服务端完成认证和请求校验开始，到客户端收到可渲染的完整教学段落结束；审核发布延迟单独度量。完整状态机、失败策略及待审批项见 [ADR-0002](ADR/0002-streaming-first-screen-and-resource-review.md)。
+
+## API 与 SSE 契约（MVP 0.1）
+
+最小 API 契约在 [OpenAPI](api/openapi.yaml) 中维护。创建学习会话必须带 `Idempotency-Key`；POST SSE 断线后先读取持久化操作状态，再按需重新附着后续事件，且不承诺回放临时 token。资源读取端点只返回当前用户拥有、审核通过的不可变版本；P1 的 Provider 设置与 Manim Job 不在此契约中。

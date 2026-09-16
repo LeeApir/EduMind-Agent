@@ -1,0 +1,175 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "EduMind MVP 0.1 API",
+    "version": "0.1.0",
+    "description": "MVP 0.1 的匿名学习、流式首屏和已审核资源读取契约。JSON 是 YAML 1.2 的合法子集，使用 .yaml 扩展名以便 OpenAPI 工具读取。"
+  },
+  "servers": [{"url": "/"}],
+  "tags": [
+    {"name": "Authentication"},
+    {"name": "Learning"},
+    {"name": "Resources"}
+  ],
+  "paths": {
+    "/api/auth/guest": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "创建匿名身份",
+        "operationId": "createGuestSession",
+        "responses": {
+          "201": {
+            "description": "匿名用户已创建；服务端通过 Secure、HttpOnly Cookie 建立会话。",
+            "headers": {"Set-Cookie": {"schema": {"type": "string"}, "description": "不透明的会话 Cookie；浏览器 JavaScript 不可读取。"}},
+            "content": {"application/json": {"schema": {"$ref": "#/components/schemas/GuestSession"}}}
+          },
+          "429": {"$ref": "#/components/responses/RateLimited"}
+        }
+      }
+    },
+    "/api/auth/register": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "将当前匿名身份升级为新账号",
+        "operationId": "registerGuestAccount",
+        "security": [{"sessionCookie": []}],
+        "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/RegisterRequest"}}}},
+        "responses": {
+          "200": {"description": "同一用户记录已绑定账号，服务端已轮换会话 Cookie。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/User"}}}},
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "409": {"$ref": "#/components/responses/AccountConflict"}
+        }
+      }
+    },
+    "/api/learning-sessions": {
+      "post": {
+        "tags": ["Learning"],
+        "summary": "创建学习会话并流式返回临时首段",
+        "description": "首段 `token` 是待审核的临时内容。只有 `scene_ready` 指向的版本可作为正式资源读取、恢复或导出。相同匿名用户、相同 Idempotency-Key 和相同请求摘要必须返回同一操作，不能创建重复资源。",
+        "operationId": "startLearningSession",
+        "security": [{"sessionCookie": []}],
+        "parameters": [{"$ref": "#/components/parameters/IdempotencyKey"}],
+        "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/StartLearningRequest"}}}},
+        "responses": {
+          "200": {"$ref": "#/components/responses/LearningEventStream"},
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "409": {"$ref": "#/components/responses/IdempotencyConflict"},
+          "422": {"$ref": "#/components/responses/ValidationError"},
+          "429": {"$ref": "#/components/responses/RateLimited"}
+        }
+      }
+    },
+    "/api/learning-operations/{operationId}": {
+      "get": {
+        "tags": ["Learning"],
+        "summary": "读取可恢复的学习操作状态",
+        "description": "用于 POST SSE 断线或服务重启后的恢复。不会回放临时 token；若已发布，响应提供正式学习单元和场景版本。",
+        "operationId": "getLearningOperation",
+        "security": [{"sessionCookie": []}],
+        "parameters": [{"$ref": "#/components/parameters/OperationId"}],
+        "responses": {
+          "200": {"description": "当前持久化状态。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/LearningOperation"}}}},
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "404": {"$ref": "#/components/responses/NotFound"}
+        }
+      },
+      "delete": {
+        "tags": ["Learning"],
+        "summary": "取消未终结的学习操作",
+        "description": "取消意图被持久化，重复取消为幂等成功。已发布版本不会删除；未发布候选不得被读取。",
+        "operationId": "cancelLearningOperation",
+        "security": [{"sessionCookie": []}],
+        "parameters": [{"$ref": "#/components/parameters/OperationId"}],
+        "responses": {
+          "202": {"description": "已接受取消。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/LearningOperation"}}}},
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "404": {"$ref": "#/components/responses/NotFound"}
+        }
+      }
+    },
+    "/api/learning-operations/{operationId}/events": {
+      "get": {
+        "tags": ["Learning"],
+        "summary": "重新附着正在运行的学习操作事件流",
+        "description": "仅发送连接建立后的事件；客户端应先读取操作状态。临时 token 不保证回放，已发布资源通过 learning unit API 读取。",
+        "operationId": "subscribeLearningOperation",
+        "security": [{"sessionCookie": []}],
+        "parameters": [{"$ref": "#/components/parameters/OperationId"}],
+        "responses": {
+          "200": {"$ref": "#/components/responses/LearningEventStream"},
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "404": {"$ref": "#/components/responses/NotFound"}
+        }
+      }
+    },
+    "/api/learning-units/{learningUnitId}": {
+      "get": {
+        "tags": ["Learning"],
+        "summary": "读取学生可见的学习单元",
+        "description": "只返回所有者拥有且已审核发布的场景与资源版本；不得泄露临时候选。",
+        "operationId": "getLearningUnit",
+        "security": [{"sessionCookie": []}],
+        "parameters": [{"$ref": "#/components/parameters/LearningUnitId"}],
+        "responses": {
+          "200": {"description": "学习单元。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/LearningUnit"}}}},
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "404": {"$ref": "#/components/responses/NotFound"}
+        }
+      }
+    },
+    "/api/resources/{resourceId}": {
+      "get": {
+        "tags": ["Resources"],
+        "summary": "读取已审核的学习资源",
+        "operationId": "getResource",
+        "security": [{"sessionCookie": []}],
+        "parameters": [{"$ref": "#/components/parameters/ResourceId"}],
+        "responses": {
+          "200": {"description": "正式资源。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/PublishedResource"}}}},
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "404": {"$ref": "#/components/responses/NotFound"}
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {"sessionCookie": {"type": "apiKey", "in": "cookie", "name": "edumind_session", "description": "服务端签发的不透明会话令牌。"}},
+    "parameters": {
+      "IdempotencyKey": {"name": "Idempotency-Key", "in": "header", "required": true, "schema": {"type": "string", "minLength": 16, "maxLength": 128}, "description": "客户端为一次创建操作生成的随机键；与认证身份和请求摘要绑定。"},
+      "OperationId": {"name": "operationId", "in": "path", "required": true, "schema": {"$ref": "#/components/schemas/Identifier"}},
+      "LearningUnitId": {"name": "learningUnitId", "in": "path", "required": true, "schema": {"$ref": "#/components/schemas/Identifier"}},
+      "ResourceId": {"name": "resourceId", "in": "path", "required": true, "schema": {"$ref": "#/components/schemas/Identifier"}}
+    },
+    "responses": {
+      "LearningEventStream": {"description": "text/event-stream；事件定义见 x-sse-events。", "content": {"text/event-stream": {"schema": {"type": "string"}, "examples": {"temporaryToken": {"value": "event: token\\ndata: {\\\"operation_id\\\":\\\"op_123\\\",\\\"temporary\\\":true,\\\"delta\\\":\\\"链表插入先要保存...\\\"}\\n\\n"}}}}},
+      "Unauthorized": {"description": "会话缺失、失效或不属于当前用户。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},
+      "NotFound": {"description": "资源不存在，或不属于当前用户。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},
+      "ValidationError": {"description": "请求未通过 schema 校验。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},
+      "IdempotencyConflict": {"description": "同一幂等键被用于不同请求摘要。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},
+      "AccountConflict": {"description": "目标账号已存在；MVP 不自动合并匿名数据。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},
+      "RateLimited": {"description": "请求受限。", "headers": {"Retry-After": {"schema": {"type": "integer", "minimum": 1}}}, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}}
+    },
+    "schemas": {
+      "Identifier": {"type": "string", "pattern": "^[A-Za-z0-9_-]{8,64}$"},
+      "GuestSession": {"type": "object", "required": ["user"], "properties": {"user": {"$ref": "#/components/schemas/User"}}},
+      "User": {"type": "object", "required": ["id", "is_guest"], "properties": {"id": {"$ref": "#/components/schemas/Identifier"}, "is_guest": {"type": "boolean"}}},
+      "RegisterRequest": {"type": "object", "additionalProperties": false, "required": ["email", "password"], "properties": {"email": {"type": "string", "format": "email"}, "password": {"type": "string", "minLength": 12, "writeOnly": true}}},
+      "StartLearningRequest": {"type": "object", "additionalProperties": false, "required": ["goal"], "properties": {"goal": {"type": "string", "minLength": 1, "maxLength": 2000, "description": "学生的一句话学习目标或困难。"}, "preferred_language": {"type": "string", "enum": ["c"], "default": "c"}}},
+      "LearningOperation": {"type": "object", "required": ["id", "status", "attempt", "created_at"], "properties": {"id": {"$ref": "#/components/schemas/Identifier"}, "status": {"type": "string", "enum": ["accepted", "preparing", "streaming_temporary", "temporary_complete", "reviewing", "regenerating", "published", "failed", "canceled"]}, "attempt": {"type": "integer", "minimum": 1, "maximum": 3}, "learning_unit_id": {"$ref": "#/components/schemas/Identifier"}, "published_scene_version": {"type": "integer", "minimum": 1}, "error": {"$ref": "#/components/schemas/Error"}, "created_at": {"type": "string", "format": "date-time"}, "updated_at": {"type": "string", "format": "date-time"}}},
+      "LearningUnit": {"type": "object", "required": ["id", "status", "scenes"], "properties": {"id": {"$ref": "#/components/schemas/Identifier"}, "status": {"type": "string", "enum": ["active", "completed"]}, "scenes": {"type": "array", "items": {"$ref": "#/components/schemas/PublishedScene"}}}},
+      "PublishedScene": {"type": "object", "required": ["id", "version", "resources", "review_status"], "properties": {"id": {"$ref": "#/components/schemas/Identifier"}, "version": {"type": "integer", "minimum": 1}, "review_status": {"const": "passed"}, "resources": {"type": "array", "items": {"$ref": "#/components/schemas/PublishedResource"}}}},
+      "PublishedResource": {"type": "object", "required": ["id", "type", "version", "content", "review_status"], "properties": {"id": {"$ref": "#/components/schemas/Identifier"}, "type": {"type": "string", "enum": ["explanation", "code", "exercise"]}, "version": {"type": "integer", "minimum": 1}, "content": {"type": "object", "description": "按资源类型定义的已清洗结构化内容。"}, "review_status": {"const": "passed"}}},
+      "Error": {"type": "object", "additionalProperties": false, "required": ["code", "message", "retryable"], "properties": {"code": {"type": "string", "enum": ["UNAUTHORIZED", "NOT_FOUND", "VALIDATION_ERROR", "IDEMPOTENCY_CONFLICT", "ACCOUNT_CONFLICT", "RATE_LIMITED", "PROVIDER_UNAVAILABLE", "REVIEW_REJECTED", "OPERATION_CANCELED"]}, "message": {"type": "string"}, "retryable": {"type": "boolean"}, "operation_id": {"$ref": "#/components/schemas/Identifier"}}}
+    }
+  },
+  "x-sse-events": {
+    "agent_start": {"data": {"operation_id": "string", "stage": "preparing"}},
+    "token": {"description": "临时首段文本，绝不是正式资源。", "data": {"operation_id": "string", "temporary": true, "delta": "string"}},
+    "stage_changed": {"data": {"operation_id": "string", "stage": "reviewing|regenerating"}},
+    "review_pass": {"data": {"operation_id": "string", "attempt": "integer"}},
+    "review_reject": {"data": {"operation_id": "string", "attempt": "integer", "retry": "boolean"}},
+    "scene_ready": {"description": "唯一允许客户端读取为正式资源的信号。", "data": {"operation_id": "string", "learning_unit_id": "string", "scene_id": "string", "version": "integer", "resource_ids": ["string"]}},
+    "error": {"data": {"code": "string", "message": "string", "retryable": "boolean", "operation_id": "string"}},
+    "done": {"data": {"operation_id": "string", "status": "published|failed|canceled"}}
+  }
+}
