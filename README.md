@@ -25,3 +25,18 @@ curl http://127.0.0.1:8000/health
 cd backend
 uv run --python 3.11 pytest
 ```
+
+## Web（MVP 0.1）
+
+首次安装并启动学习入口：
+
+```bash
+pnpm --dir web install --frozen-lockfile
+pnpm --dir web dev
+```
+
+生产构建：
+
+```bash
+pnpm --dir web build
+```
