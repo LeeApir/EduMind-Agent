@@ -1,0 +1,9 @@
+EduMind Agent 开发执行日志
+任务状态来源：task.json；产品范围来源：docs/PRD.md。
+格式：[ISO 8601 时间（含时区）] [任务 ID] EVENT | 摘要 | 验证证据 | 下一步
+只追加，不覆盖历史；禁止记录密钥和敏感学习内容。
+VERIFIED 表示验证通过并准备提交，完成以 Git 中的 Task-Completed 标记为准。
+查找完成提交：git log --fixed-strings --grep='Task-Completed: <任务 ID>'
+
+[2026-09-16T22:18:54+08:00] [WORKFLOW-SETUP] VERIFIED | 建立任务驱动协议、6 阶段索引与 MVP 0.1 的 11 个任务，业务任务均为 todo；尚未开始业务开发。 | Python 标准库校验 JSON、ID 唯一性、依赖存在性/无环/顺序、状态和验收字段通过；git diff --check 通过；业务验证命令仅为计划，未执行。 | 提交治理文件；后续从 MVP-0.1-001 开始。
+[2026-09-16T22:18:54+08:00] [WORKFLOW-SETUP] VERIFIED | 核对 PRD §9.1：Phase 3 已定义，纠正此前讨论中的误述。原有 maic-ui-document-9.png 移动改动属于用户，保留且不纳入此次提交。 | 审查 AGENTS.md diff 与任务范围，无需运行业务测试。 | 本次治理提交标题：chore(workflow): define task-driven development protocol；以 Git 历史确认实际提交结果。
