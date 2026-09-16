@@ -34,3 +34,7 @@ VERIFIED 表示验证通过并准备提交，完成以 Git 中的 Task-Completed
 [2026-09-16T23:55:29+08:00] [MVP-0.1-T006] START | 领取“建立 Vue 3 页面骨架”。 | T003 已完成，工作区干净；本机 pnpm 10.33.0、Node 25.9.0 可用。 | 创建带 Naive UI 与 Pinia 的 Vite 单页学习入口并锁定依赖。
 
 [2026-09-17T00:00:11+08:00] [MVP-0.1-T006] VERIFIED | 建立 Vue 3 + Vite + TypeScript + Naive UI + Pinia 页面骨架，首页提供“一句话开始学习”输入与本地提交反馈；pnpm 锁文件已生成。 | `pnpm --dir web build`：vue-tsc 与 Vite 构建通过；通过 webapp-testing 的 `with_server.py` 启动 Vite 后，`curl --fail --silent --show-error http://127.0.0.1:5173/` 返回首页 HTML。尝试 Playwright 冒烟交互时，系统 Python 缺少 Playwright，未将其视为通过，留给 T007 的组件测试环境。 | 提交 T006；下一任务为 T007（前端测试与静态检查入口）。
+
+[2026-09-17T00:01:18+08:00] [MVP-0.1-T007] START | 领取“建立前端测试与静态检查入口”。 | 已确认 T006 完成提交；Web 工程可构建但尚无测试、lint 或独立 typecheck 脚本。 | 添加 Vitest 组件测试、ESLint 和 TypeScript 检查入口。
+
+[2026-09-17T00:05:55+08:00] [MVP-0.1-T007] VERIFIED | 添加 Vitest/jsdom 组件测试、ESLint、独立 typecheck 与构建脚本；锁文件已同步，生成目录仍被 Git 忽略。 | `pnpm --dir web test --run`：1 passed；`typecheck`：通过；`lint`：0 errors、32 个非阻塞模板排版 warnings；`build`：通过；`git diff --check`：通过。 | 提交 T007；下一依赖满足任务为 T008（PostgreSQL 与 Alembic）。

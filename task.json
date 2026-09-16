@@ -310,7 +310,7 @@
       "phase": "MVP 0.1",
       "parent_work_package": "MVP-0.1-003",
       "title": "建立前端测试与静态检查入口",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.1-T006"
@@ -330,9 +330,14 @@
         "pnpm --dir web lint",
         "pnpm --dir web build"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {"command": "pnpm --dir web test --run", "result": "passed", "evidence": "1 个基础学习入口组件测试通过。"},
+        {"command": "pnpm --dir web typecheck", "result": "passed", "evidence": "vue-tsc 成功。"},
+        {"command": "pnpm --dir web lint", "result": "passed_with_warnings", "evidence": "0 errors；32 个非阻塞 Vue 模板排版建议。"},
+        {"command": "pnpm --dir web build", "result": "passed", "evidence": "Vite 生产构建成功。"}
+      ],
+      "started_at": "2026-09-17T00:01:18+08:00",
+      "completed_at": "2026-09-17T00:05:55+08:00",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.1-T007"
     },
