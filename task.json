@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "product_source": "docs/PRD.md v2.1 §9.1",
   "active_phase": "MVP 0.1",
   "execution_policy": {
@@ -8,6 +8,7 @@
     "auto_push": false,
     "auto_merge": false,
     "phase_gate": "完成当前阶段验收并报告；后续阶段细化后按用户授权执行。",
+    "task_granularity": "一个可独立验证的行为，包含实现、对应测试和必要文档；验收通过后一个本地完成提交。",
     "completion_rule": "验收通过，且 Git 历史存在 Task-Completed 标记的提交。工作区 done 仅是待提交状态。",
     "verification_note": "以下为计划验证入口，尚未执行；领取任务时建立必要命令，结果写入 verification_results。"
   },
@@ -43,80 +44,212 @@
       "goal": "按真实使用数据决定 iOS、PPTX/离线 HTML、更多课程和模板市场。"
     }
   ],
+  "superseded_work_packages": {
+    "note": "v1 的 11 项均为 todo，从未领取或完成；v2 用 parent_work_package 保留来源映射，旧 ID 不再作为可执行任务。",
+    "ids": [
+      "MVP-0.1-001",
+      "MVP-0.1-002",
+      "MVP-0.1-003",
+      "MVP-0.1-004",
+      "MVP-0.1-005",
+      "MVP-0.1-006",
+      "MVP-0.1-007",
+      "MVP-0.1-008",
+      "MVP-0.1-009",
+      "MVP-0.1-010",
+      "MVP-0.1-011"
+    ]
+  },
   "tasks": [
     {
-      "id": "MVP-0.1-001",
+      "id": "MVP-0.1-T001",
       "phase": "MVP 0.1",
-      "title": "确定 MVP 0.1 实现契约与关键 ADR",
+      "parent_work_package": "MVP-0.1-001",
+      "title": "确定匿名身份与持久化边界",
       "status": "todo",
       "priority": "P0",
       "depends_on": [],
       "scope": [
         "docs/ADR/",
+        "docs/ARCHITECTURE.md"
+      ],
+      "acceptance_criteria": [
+        "明确匿名会话身份、学习数据归属和服务重启后的保存边界。",
+        "记录方案、替代方案及与 PRD §2.3、§7.1、§10.4 的对应关系。",
+        "涉及未获批准的产品或安全选择时记录待决项，不假定已通过。"
+      ],
+      "verification": [
+        "逐项核对 PRD 对匿名进入、隔离和恢复的要求；记录 ADR 审批依据。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T001"
+    },
+    {
+      "id": "MVP-0.1-T002",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-001",
+      "title": "确定流式首屏与正式资源审核时序",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T001"
+      ],
+      "scope": [
+        "docs/ADR/",
+        "docs/ARCHITECTURE.md"
+      ],
+      "acceptance_criteria": [
+        "明确首段临时流式内容、正式审核资源和发布时机的状态转换。",
+        "定义断线、重试、取消和重入的最小恢复策略，不允许未审核资源成为正式版本。",
+        "记录首段 10 秒目标可能受审核延迟影响的测量口径。"
+      ],
+      "verification": [
+        "逐项核对 PRD §3.3、§7.7、§8.1 的流式与审核约束；记录 ADR 审批依据。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T002"
+    },
+    {
+      "id": "MVP-0.1-T003",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-001",
+      "title": "固定 MVP 0.1 API 与 SSE 契约",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T001",
+        "MVP-0.1-T002"
+      ],
+      "scope": [
         "docs/api/openapi.yaml",
         "docs/ARCHITECTURE.md"
       ],
       "acceptance_criteria": [
-        "依据 PRD §3.2、§3.3、§7、§8、§9 明确匿名身份、持久化边界、SSE 重试/恢复与审核发布时机。",
-        "明确临时流式内容与正式审核资源的区别，不允许未审核正式资源发布。",
-        "为后续任务定义可执行验证入口；有产品歧义或重大未批准决策时求助，相关 ADR 批准后方可完成。"
+        "定义匿名会话、学习会话、学习单元与资源读取的请求/响应。",
+        "列明 SSE 事件、错误码、幂等键及恢复行为，区分临时内容和已审核正式资源。",
+        "契约不提前引入 P1 Provider 设置或 Manim Job。"
       ],
       "verification": [
-        "核对契约与 PRD 一致性，并记录 ADR 审批依据；对 OpenAPI 执行选定的校验命令。"
+        "执行并记录 OpenAPI 校验命令；核对 PRD §7 和两份 ADR。"
       ],
       "verification_results": [],
       "started_at": null,
       "completed_at": null,
       "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.1-001"
+      "commit_lookup": "Task-Completed: MVP-0.1-T003"
     },
     {
-      "id": "MVP-0.1-002",
+      "id": "MVP-0.1-T004",
       "phase": "MVP 0.1",
-      "title": "建立 FastAPI 骨架及后端验证入口",
+      "parent_work_package": "MVP-0.1-002",
+      "title": "建立 FastAPI 可启动服务",
       "status": "todo",
       "priority": "P0",
       "depends_on": [
-        "MVP-0.1-001"
+        "MVP-0.1-T003"
       ],
       "scope": [
         "backend/",
-        "README.md",
-        ".gitignore",
-        ".env.example"
+        "README.md"
       ],
       "acceptance_criteria": [
-        "Python 3.11 环境、依赖锁文件、配置加载和健康检查可用。",
-        "建立 pytest 与 ruff 入口，健康检查和配置缺失场景有测试。",
-        "环境示例只有占位符，敏感文件与缓存被忽略。"
+        "固定 Python 3.11 及依赖锁定方式，FastAPI 应用和健康检查可启动。",
+        "健康检查在无 Provider 凭据时仍可用。"
       ],
       "verification": [
         "cd backend && python -m pytest",
-        "cd backend && ruff check ."
+        "按 README 启动 API 并请求健康检查；记录实际命令和结果。"
       ],
       "verification_results": [],
       "started_at": null,
       "completed_at": null,
       "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.1-002"
+      "commit_lookup": "Task-Completed: MVP-0.1-T004"
     },
     {
-      "id": "MVP-0.1-003",
+      "id": "MVP-0.1-T005",
       "phase": "MVP 0.1",
-      "title": "建立 Vue 客户端与前端验证入口",
+      "parent_work_package": "MVP-0.1-002",
+      "title": "建立后端配置与检查入口",
       "status": "todo",
       "priority": "P0",
       "depends_on": [
-        "MVP-0.1-001"
+        "MVP-0.1-T004"
       ],
       "scope": [
-        "web/",
-        "README.md",
+        "backend/pyproject.toml",
+        "backend/app/core/",
+        "backend/tests/",
+        ".env.example",
         ".gitignore"
       ],
       "acceptance_criteria": [
-        "Vue 3、Vite、TypeScript、Naive UI、Pinia 和 pnpm 锁文件就绪。",
-        "页面可启动，建立 test、typecheck、lint、build 脚本，并有基础组件测试。"
+        "建立 pytest、ruff 和类型检查入口，配置缺失返回明确错误。",
+        "真实 .env、密钥、缓存和生成文件被忽略，示例仅使用占位符。"
+      ],
+      "verification": [
+        "cd backend && python -m pytest",
+        "cd backend && ruff check .",
+        "运行本任务建立的类型检查命令。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T005"
+    },
+    {
+      "id": "MVP-0.1-T006",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-003",
+      "title": "建立 Vue 3 页面骨架",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T003"
+      ],
+      "scope": [
+        "web/",
+        "README.md"
+      ],
+      "acceptance_criteria": [
+        "Vue 3、Vite、TypeScript、Naive UI、Pinia 与 pnpm 锁文件就绪。",
+        "单页应用可启动并显示基础学习入口。"
+      ],
+      "verification": [
+        "pnpm --dir web build",
+        "按 README 启动 Web 并检查首页。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T006"
+    },
+    {
+      "id": "MVP-0.1-T007",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-003",
+      "title": "建立前端测试与静态检查入口",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T006"
+      ],
+      "scope": [
+        "web/package.json",
+        "web/tests/",
+        "web/src/"
+      ],
+      "acceptance_criteria": [
+        "建立组件测试、lint、typecheck 和 build 命令，基础页面测试可运行。",
+        "锁文件与脚本保持一致，不把生成目录纳入 Git。"
       ],
       "verification": [
         "pnpm --dir web test --run",
@@ -128,81 +261,419 @@
       "started_at": null,
       "completed_at": null,
       "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.1-003"
+      "commit_lookup": "Task-Completed: MVP-0.1-T007"
     },
     {
-      "id": "MVP-0.1-004",
+      "id": "MVP-0.1-T008",
       "phase": "MVP 0.1",
-      "title": "建立 PostgreSQL 持久化与匿名会话",
+      "parent_work_package": "MVP-0.1-004",
+      "title": "接入 PostgreSQL 与 Alembic",
       "status": "todo",
       "priority": "P0",
       "depends_on": [
-        "MVP-0.1-002"
+        "MVP-0.1-T005"
+      ],
+      "scope": [
+        "backend/app/core/",
+        "backend/alembic/",
+        "backend/tests/"
+      ],
+      "acceptance_criteria": [
+        "异步数据库连接与迁移入口可用，测试数据库与开发数据库隔离。",
+        "空库升级至 head 后应用可连接，失败时给出清晰配置错误。"
+      ],
+      "verification": [
+        "在隔离测试 PostgreSQL 上执行 alembic upgrade head 并运行数据库连接测试；记录完整命令。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T008"
+    },
+    {
+      "id": "MVP-0.1-T009",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-004",
+      "title": "实现匿名会话创建",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T008"
       ],
       "scope": [
         "backend/app/models/",
         "backend/app/api/",
-        "backend/alembic/",
         "backend/tests/",
-        "docs/api/openapi.yaml"
+        "backend/alembic/"
       ],
       "acceptance_criteria": [
-        "按已批准 ADR 创建学习所需匿名身份、画像、学习单元及资源模型与 Alembic 迁移。",
-        "匿名会话创建和资源归属校验可用，不要求注册才开始学习。",
-        "用真实测试 PostgreSQL 验证迁移、持久化、隔离与服务重启后的读取。"
+        "POST /api/auth/guest 创建匿名会话并提供后续请求可验证的身份。",
+        "会话凭据不泄露到 URL 或日志，用户无需注册即可开始学习。"
       ],
       "verification": [
-        "cd backend && python -m pytest",
-        "cd backend && ruff check .",
-        "按 README 启动隔离测试 PostgreSQL；运行 Alembic upgrade head 和数据库集成测试，记录具体命令。"
+        "运行匿名会话接口及迁移集成测试；记录实际命令。"
       ],
       "verification_results": [],
       "started_at": null,
       "completed_at": null,
       "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.1-004"
+      "commit_lookup": "Task-Completed: MVP-0.1-T009"
     },
     {
-      "id": "MVP-0.1-005",
+      "id": "MVP-0.1-T010",
       "phase": "MVP 0.1",
-      "title": "实现单 Provider Gateway 与安全配置",
+      "parent_work_package": "MVP-0.1-004",
+      "title": "持久化画像、学习单元和资源版本",
       "status": "todo",
       "priority": "P0",
       "depends_on": [
-        "MVP-0.1-002"
+        "MVP-0.1-T008"
+      ],
+      "scope": [
+        "backend/app/models/",
+        "backend/alembic/",
+        "backend/tests/"
+      ],
+      "acceptance_criteria": [
+        "按 ADR 建模画像、学习单元、资源版本和审核状态，并生成 Alembic 迁移。",
+        "持久化记录能在关闭并重新建立数据库连接后读取，正式资源具有版本与审核标记。"
+      ],
+      "verification": [
+        "在隔离 PostgreSQL 上运行迁移和模型集成测试；记录实际命令。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T010"
+    },
+    {
+      "id": "MVP-0.1-T011",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-004",
+      "title": "限制匿名数据访问范围",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T009",
+        "MVP-0.1-T010"
+      ],
+      "scope": [
+        "backend/app/api/",
+        "backend/app/services/",
+        "backend/tests/"
+      ],
+      "acceptance_criteria": [
+        "画像、学习单元和资源按匿名身份隔离；跨用户读取返回统一拒绝响应。",
+        "覆盖不存在资源和过期/无效身份，错误响应不泄露他人数据。"
+      ],
+      "verification": [
+        "运行授权与跨用户访问集成测试；记录实际命令。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T011"
+    },
+    {
+      "id": "MVP-0.1-T012",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-005",
+      "title": "定义 Provider Gateway 内部接口",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T005"
       ],
       "scope": [
         "backend/app/services/",
+        "backend/tests/",
+        "docs/PROVIDERS.md"
+      ],
+      "acceptance_criteria": [
+        "定义生成、结构化输出与流式生成接口，业务模块只依赖内部类型。",
+        "以测试替身证明可替换适配器，错误类型与重试责任明确。"
+      ],
+      "verification": [
+        "cd backend && python -m pytest",
+        "cd backend && ruff check ."
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T012"
+    },
+    {
+      "id": "MVP-0.1-T013",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-005",
+      "title": "安全加载 Provider 配置与凭据",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T012"
+      ],
+      "scope": [
         "backend/app/core/",
         "backend/tests/",
-        "docs/PROVIDERS.md",
-        ".env.example"
+        ".env.example",
+        "docs/PROVIDERS.md"
       ],
       "acceptance_criteria": [
-        "业务只依赖内部接口；一个服务端配置的 OpenAI-compatible Provider 支持结构化输出与流式适配。",
-        "超时、鉴权失败、限流、格式异常使用统一错误；同一 Provider 有界重试，无静默跨厂商回退。",
-        "API Key 不进入数据库、日志、响应或前端；Base URL、DNS 解析与重定向路径符合 SSRF 规则。",
-        "自动化测试覆盖成功、失败、脱敏和 SSRF；真实凭据仅从服务端环境提供。"
+        "服务端环境变量提供 Base URL、模型及 API Key；无凭据时生成调用明确失败。",
+        "配置、异常和日志不输出 Key，客户端接口不返回凭据。"
       ],
       "verification": [
-        "cd backend && python -m pytest",
-        "cd backend && ruff check ."
+        "运行配置缺失、凭据脱敏和日志检查测试。"
       ],
       "verification_results": [],
       "started_at": null,
       "completed_at": null,
       "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.1-005"
+      "commit_lookup": "Task-Completed: MVP-0.1-T013"
     },
     {
-      "id": "MVP-0.1-006",
+      "id": "MVP-0.1-T014",
       "phase": "MVP 0.1",
-      "title": "实现有证据的临时画像",
+      "parent_work_package": "MVP-0.1-005",
+      "title": "校验 Provider Base URL 和目标地址",
       "status": "todo",
       "priority": "P0",
       "depends_on": [
-        "MVP-0.1-004",
-        "MVP-0.1-005"
+        "MVP-0.1-T013"
+      ],
+      "scope": [
+        "backend/app/core/",
+        "backend/app/services/",
+        "backend/tests/",
+        "docs/PROVIDERS.md"
+      ],
+      "acceptance_criteria": [
+        "遵循 PRD 的 HTTPS 默认、DNS 解析、私网/回环/链路本地/元数据地址拦截及本地白名单规则。",
+        "重定向目标与 DNS 变化仍受校验，非法目标在发起网络请求前拒绝。"
+      ],
+      "verification": [
+        "运行 SSRF 与重定向回归测试；记录实际命令。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T014"
+    },
+    {
+      "id": "MVP-0.1-T015",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-005",
+      "title": "接入单一 OpenAI-compatible 请求适配器",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T012",
+        "MVP-0.1-T013",
+        "MVP-0.1-T014"
+      ],
+      "scope": [
+        "backend/app/services/",
+        "backend/tests/",
+        "docs/PROVIDERS.md"
+      ],
+      "acceptance_criteria": [
+        "接通一个由服务端配置的 OpenAI-compatible Provider，非流式请求转换为内部结果。",
+        "测试成功、鉴权失败及格式异常；业务层不使用厂商 SDK 类型。"
+      ],
+      "verification": [
+        "运行使用 mock HTTP 的适配器测试和后端静态检查。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T015"
+    },
+    {
+      "id": "MVP-0.1-T016",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-005",
+      "title": "接入 Provider 流式响应适配",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T015"
+      ],
+      "scope": [
+        "backend/app/services/",
+        "backend/tests/"
+      ],
+      "acceptance_criteria": [
+        "将 Provider 分片转换为内部流式事件，正确处理 Unicode 与跨分片边界。",
+        "上游中断或非法帧返回统一错误并及时释放连接。"
+      ],
+      "verification": [
+        "运行流式分片、中断和连接清理测试。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T016"
+    },
+    {
+      "id": "MVP-0.1-T017",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-005",
+      "title": "统一 Provider 错误与有界重试",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T015",
+        "MVP-0.1-T016"
+      ],
+      "scope": [
+        "backend/app/services/",
+        "backend/tests/",
+        "docs/PROVIDERS.md"
+      ],
+      "acceptance_criteria": [
+        "区分限流、超时、鉴权、能力不兼容和上游故障，映射稳定错误码。",
+        "仅对可安全重试的同一 Provider 请求做有界重试；不静默切换厂商。"
+      ],
+      "verification": [
+        "运行错误映射、重试次数和无自动回退测试。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T017"
+    },
+    {
+      "id": "MVP-0.1-T018",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-006",
+      "title": "定义临时画像结构与证据规则",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T010"
+      ],
+      "scope": [
+        "backend/app/agents/",
+        "backend/tests/",
+        "docs/agents/prompts/"
+      ],
+      "acceptance_criteria": [
+        "定义目标、困难和显式偏好的最小 schema；未知字段保持空值。",
+        "每个推断字段可记录证据、置信度和版本，未提供信息不得臆测。"
+      ],
+      "verification": [
+        "运行画像 schema、未知字段与证据校验测试。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T018"
+    },
+    {
+      "id": "MVP-0.1-T019",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-006",
+      "title": "从一句话提取并保存临时画像",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T011",
+        "MVP-0.1-T017",
+        "MVP-0.1-T018"
+      ],
+      "scope": [
+        "backend/app/agents/",
+        "backend/app/services/",
+        "backend/tests/"
+      ],
+      "acceptance_criteria": [
+        "一句话生成临时画像并关联匿名会话；不要求问卷或计划确认。",
+        "模型输出非法时安全降级或给出可理解错误，不以补全画像阻塞首段学习。"
+      ],
+      "verification": [
+        "运行显式/缺失信息、异常输出及匿名隔离测试。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T019"
+    },
+    {
+      "id": "MVP-0.1-T020",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-007",
+      "title": "定义学习资源结构与版本化 Prompt",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T019"
+      ],
+      "scope": [
+        "backend/app/agents/",
+        "backend/tests/",
+        "docs/agents/prompts/"
+      ],
+      "acceptance_criteria": [
+        "为讲解、单语言代码与约 3 道练习定义输出 schema 和版本化 Prompt。",
+        "代码资源仅展示，不在服务端执行；内容与 Prompt 版本可追踪。"
+      ],
+      "verification": [
+        "运行三类资源 schema 与非法输出测试。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T020"
+    },
+    {
+      "id": "MVP-0.1-T021",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-007",
+      "title": "生成讲解、代码和练习资源",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T020",
+        "MVP-0.1-T017"
+      ],
+      "scope": [
+        "backend/app/agents/",
+        "backend/app/services/",
+        "backend/tests/"
+      ],
+      "acceptance_criteria": [
+        "针对一个知识点生成讲解、单语言代码和约 3 道练习，结构化结果符合 schema。",
+        "生成失败保留可理解错误；生成结果处于待审核状态。"
+      ],
+      "verification": [
+        "运行三类资源成功、缺失字段与 Provider 故障测试。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T021"
+    },
+    {
+      "id": "MVP-0.1-T022",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-007",
+      "title": "实现正式资源 ReviewAgent",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T021"
       ],
       "scope": [
         "backend/app/agents/",
@@ -211,59 +682,59 @@
         "docs/agents/prompts/"
       ],
       "acceptance_criteria": [
-        "一句话可提取当前目标及显式偏好；未知字段保持空值，不增加问卷或大纲确认。",
-        "画像通过 schema 校验，推断字段含证据与置信度；Prompt 与 schema 版本可追踪。",
-        "缺失信息与不合法模型输出有测试，匿名用户画像互相隔离。"
+        "审核事实、难度、易错点和代码安全；规则/Prompt 版本化。",
+        "审核拒绝时返回问题清单，最多定向修正两次；失败内容不得通过。"
       ],
       "verification": [
-        "cd backend && python -m pytest",
-        "cd backend && ruff check ."
+        "运行通过、拒绝、重试上限与严重错误基准测试。"
       ],
       "verification_results": [],
       "started_at": null,
       "completed_at": null,
       "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.1-006"
+      "commit_lookup": "Task-Completed: MVP-0.1-T022"
     },
     {
-      "id": "MVP-0.1-007",
+      "id": "MVP-0.1-T023",
       "phase": "MVP 0.1",
-      "title": "实现学习资源生成与最小审核门禁",
+      "parent_work_package": "MVP-0.1-007",
+      "title": "发布并读取已审核资源版本",
       "status": "todo",
       "priority": "P0",
       "depends_on": [
-        "MVP-0.1-006"
+        "MVP-0.1-T010",
+        "MVP-0.1-T011",
+        "MVP-0.1-T022"
       ],
       "scope": [
-        "backend/app/agents/",
         "backend/app/services/",
-        "backend/tests/",
-        "docs/agents/prompts/"
+        "backend/tests/"
       ],
       "acceptance_criteria": [
-        "生成一个知识点的讲解、单语言代码和约 3 道练习；输出经过 schema 校验。",
-        "正式资源经独立 ReviewAgent 调用审核后才发布，审核规则版本化；可使用同一个系统模型。",
-        "拒绝时最多定向修正两次，不发布失败资源；成功与拒绝流程有测试。",
-        "保存 Provider、模型及内容/Prompt/Review 版本；不在服务端执行模型生成代码。"
+        "只有通过 schema 和 ReviewAgent 的资源版本可以成为正式可见版本。",
+        "保存 Provider、模型、Prompt、Review 与内容版本；审核拒绝不覆盖原有可见资源。"
       ],
       "verification": [
-        "cd backend && python -m pytest",
-        "cd backend && ruff check ."
+        "运行发布门禁、版本保留和跨用户读取测试。"
       ],
       "verification_results": [],
       "started_at": null,
       "completed_at": null,
       "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.1-007"
+      "commit_lookup": "Task-Completed: MVP-0.1-T023"
     },
     {
-      "id": "MVP-0.1-008",
+      "id": "MVP-0.1-T024",
       "phase": "MVP 0.1",
-      "title": "接通学习会话 SSE 与资源恢复",
+      "parent_work_package": "MVP-0.1-008",
+      "title": "实现学习会话 POST SSE 首段链路",
       "status": "todo",
       "priority": "P0",
       "depends_on": [
-        "MVP-0.1-007"
+        "MVP-0.1-T019",
+        "MVP-0.1-T021",
+        "MVP-0.1-T022",
+        "MVP-0.1-T003"
       ],
       "scope": [
         "backend/app/api/",
@@ -272,125 +743,343 @@
         "docs/api/openapi.yaml"
       ],
       "acceptance_criteria": [
-        "POST /api/learning-sessions 串联画像、首段流式内容与审核资源，并遵循 PRD SSE 事件协议。",
-        "GET 学习单元读取已审核资源；断流、重试、取消连接与恢复按 ADR 处理，避免重复资源和跨用户读取。",
-        "Provider 故障保留已完成资源；普通生成不依赖 Manim Job 或 Redis/Celery。",
-        "覆盖事件顺序、审核失败、Provider 失败、重复请求和断线恢复。"
+        "POST /api/learning-sessions 串联匿名身份、临时画像和首段内容，并遵循 ADR 的临时流式标记。",
+        "SSE 事件顺序、结束和错误格式符合契约；模型生成不进入 Manim Job。"
       ],
       "verification": [
-        "cd backend && python -m pytest",
-        "cd backend && ruff check ."
+        "运行 SSE 事件顺序、首段输出和 Provider 故障接口测试。"
       ],
       "verification_results": [],
       "started_at": null,
       "completed_at": null,
       "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.1-008"
+      "commit_lookup": "Task-Completed: MVP-0.1-T024"
     },
     {
-      "id": "MVP-0.1-009",
+      "id": "MVP-0.1-T025",
       "phase": "MVP 0.1",
-      "title": "实现一句话到讲解/代码/练习页面",
+      "parent_work_package": "MVP-0.1-008",
+      "title": "接通审核发布与学习单元读取",
       "status": "todo",
       "priority": "P0",
       "depends_on": [
-        "MVP-0.1-003",
-        "MVP-0.1-008"
+        "MVP-0.1-T023",
+        "MVP-0.1-T024"
+      ],
+      "scope": [
+        "backend/app/api/",
+        "backend/app/services/",
+        "backend/tests/",
+        "docs/api/openapi.yaml"
+      ],
+      "acceptance_criteria": [
+        "首段之后按审核结果发布正式资源；GET 学习单元及资源接口只返回已审核版本。",
+        "新请求可读取已保存内容，审核失败时不暴露待审版本。"
+      ],
+      "verification": [
+        "运行审核通过/拒绝与 GET 资源接口集成测试。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T025"
+    },
+    {
+      "id": "MVP-0.1-T026",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-008",
+      "title": "实现 SSE 断线恢复与幂等",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T024",
+        "MVP-0.1-T025"
+      ],
+      "scope": [
+        "backend/app/api/",
+        "backend/app/services/",
+        "backend/tests/",
+        "docs/api/openapi.yaml"
+      ],
+      "acceptance_criteria": [
+        "按 ADR 处理客户端断线、重复 POST、服务重启后读取与可恢复错误。",
+        "同一幂等键不创建重复资源；中断后保留已发布版本。"
+      ],
+      "verification": [
+        "运行断线、重试、重启恢复与重复请求集成测试。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T026"
+    },
+    {
+      "id": "MVP-0.1-T027",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-009",
+      "title": "实现一句话输入与请求状态界面",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T007",
+        "MVP-0.1-T024"
       ],
       "scope": [
         "web/src/",
         "web/tests/"
       ],
       "acceptance_criteria": [
-        "用户输入目标后直接看到渐进内容，可切换讲解、代码和练习并完成本地作答交互。",
-        "POST 使用 fetch + ReadableStream，处理分片边界、错误、重试和恢复；正式资源只采用已审核版本。",
-        "Markdown/模型输出默认转义并清洗，有 XSS 回归测试；浏览器不持有 Provider Key。",
-        "专注首屏与加载/空/失败状态可用；掌握度评分与路径推荐留到 MVP 0.2。"
+        "首页输入一句学习目标即可开始，呈现加载、错误和重试状态。",
+        "不要求画像问卷或内部大纲确认，不在浏览器保存 Provider Key。"
       ],
       "verification": [
         "pnpm --dir web test --run",
         "pnpm --dir web typecheck",
-        "pnpm --dir web lint",
         "pnpm --dir web build"
       ],
       "verification_results": [],
       "started_at": null,
       "completed_at": null,
       "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.1-009"
+      "commit_lookup": "Task-Completed: MVP-0.1-T027"
     },
     {
-      "id": "MVP-0.1-010",
+      "id": "MVP-0.1-T028",
       "phase": "MVP 0.1",
-      "title": "建立 Compose 可复现启动与验证文档",
+      "parent_work_package": "MVP-0.1-009",
+      "title": "封装 POST SSE 的 fetch 客户端",
       "status": "todo",
       "priority": "P0",
       "depends_on": [
-        "MVP-0.1-004",
-        "MVP-0.1-005",
-        "MVP-0.1-009"
+        "MVP-0.1-T007",
+        "MVP-0.1-T024",
+        "MVP-0.1-T026"
       ],
       "scope": [
-        "docker-compose.yml",
-        "backend/Dockerfile",
-        "web/Dockerfile",
-        "README.md",
-        ".env.example"
+        "web/src/api/",
+        "web/tests/"
       ],
       "acceptance_criteria": [
-        "PostgreSQL、API、Web 可按 README 启动，服务健康检查与迁移流程明确。",
-        "依赖锁文件与固定镜像版本/摘要可复现，真实凭据不写入镜像或仓库。",
-        "记录测试环境、启动、备份注意事项和已知限制；重启保留学习资源。"
+        "使用 fetch + ReadableStream 解析 POST SSE，正确处理跨块边界、Unicode、多事件和连接结束。",
+        "断线和错误按 API 契约提示重试，避免重复显示事件。"
       ],
       "verification": [
-        "docker compose config --quiet",
-        "docker compose build",
-        "按 README 启动服务并执行健康检查与重启恢复验证；记录实际命令，不删除用户数据卷。"
+        "运行 SSE 解析、断线和重复事件单元测试及类型检查。"
       ],
       "verification_results": [],
       "started_at": null,
       "completed_at": null,
       "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.1-010"
+      "commit_lookup": "Task-Completed: MVP-0.1-T028"
     },
     {
-      "id": "MVP-0.1-011",
+      "id": "MVP-0.1-T029",
       "phase": "MVP 0.1",
-      "title": "完成 MVP 0.1 集成验收与交接",
+      "parent_work_package": "MVP-0.1-009",
+      "title": "展示首段讲解与正式资源状态",
       "status": "todo",
       "priority": "P0",
       "depends_on": [
-        "MVP-0.1-010"
+        "MVP-0.1-T027",
+        "MVP-0.1-T028",
+        "MVP-0.1-T025"
+      ],
+      "scope": [
+        "web/src/views/",
+        "web/src/components/",
+        "web/tests/"
+      ],
+      "acceptance_criteria": [
+        "用户在首段到达时看到内容，明确区分临时流式内容与已审核正式资源。",
+        "正式资源可重新加载，空态与审核失败状态可理解。"
+      ],
+      "verification": [
+        "运行首段/审核状态组件测试、类型检查与构建。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T029"
+    },
+    {
+      "id": "MVP-0.1-T030",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-009",
+      "title": "展示代码与练习并支持本地作答",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T029"
+      ],
+      "scope": [
+        "web/src/components/",
+        "web/tests/"
+      ],
+      "acceptance_criteria": [
+        "可在讲解、代码和约 3 道练习间切换；答题交互可完成一个知识点。",
+        "MVP 0.1 只提供本地作答反馈，不伪造 MVP 0.2 掌握度或路径推荐。"
+      ],
+      "verification": [
+        "运行资源切换、练习交互组件测试及前端构建。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T030"
+    },
+    {
+      "id": "MVP-0.1-T031",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-009",
+      "title": "清洗模型内容并验证前端安全",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T029",
+        "MVP-0.1-T030"
+      ],
+      "scope": [
+        "web/src/",
+        "web/tests/"
+      ],
+      "acceptance_criteria": [
+        "Markdown 和模型输出默认转义并清洗，危险 HTML、链接与代码片段不可执行。",
+        "安全处理不破坏正常代码展示与练习文本。"
+      ],
+      "verification": [
+        "运行 XSS 回归测试、类型检查、lint 与构建。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T031"
+    },
+    {
+      "id": "MVP-0.1-T032",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-010",
+      "title": "建立 Compose 开发启动",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T008",
+        "MVP-0.1-T015",
+        "MVP-0.1-T031"
+      ],
+      "scope": [
+        "docker-compose.yml",
+        "backend/Dockerfile",
+        "web/Dockerfile",
+        ".env.example",
+        "README.md"
+      ],
+      "acceptance_criteria": [
+        "PostgreSQL、API、Web 可使用锁定依赖和固定镜像版本启动；健康检查可用。",
+        "README 记录迁移与启动命令，真实凭据不进入镜像或仓库。"
+      ],
+      "verification": [
+        "docker compose config --quiet",
+        "docker compose build",
+        "按 README 启动并检查三项服务健康状态；记录实际命令。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T032"
+    },
+    {
+      "id": "MVP-0.1-T033",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-010",
+      "title": "验证容器重启与数据恢复",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T032",
+        "MVP-0.1-T026"
+      ],
+      "scope": [
+        "README.md",
+        "backend/tests/",
+        "docs/"
+      ],
+      "acceptance_criteria": [
+        "重启容器后可读取此前审核通过的资源，迁移与数据卷配置保持有效。",
+        "记录测试环境、备份注意事项和已知限制，不清理用户数据卷。"
+      ],
+      "verification": [
+        "在隔离 Compose 环境执行重启恢复测试；记录命令与证据。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T033"
+    },
+    {
+      "id": "MVP-0.1-T034",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-011",
+      "title": "完成 MVP 0.1 自动化 E2E",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T031",
+        "MVP-0.1-T033"
       ],
       "scope": [
         "web/tests/",
         "backend/tests/",
+        "README.md"
+      ],
+      "acceptance_criteria": [
+        "浏览器 E2E 覆盖一句话开始、首段讲解、代码/练习交互、Provider 故障、审核拒绝和 SSE 恢复。",
+        "mock 测试与真实 Provider 验证明确区分，E2E 命令可重复执行。"
+      ],
+      "verification": [
+        "运行本任务建立的 E2E 命令、后端相关测试及前端构建。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T034"
+    },
+    {
+      "id": "MVP-0.1-T035",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-011",
+      "title": "完成真实 Provider 与性能退出验收",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T034"
+      ],
+      "scope": [
         "docs/",
         "README.md",
         "task.json",
         "process.txt"
       ],
       "acceptance_criteria": [
-        "关键 E2E 覆盖一句话学习、资源切换、练习交互、Provider 故障、审核拒绝与 SSE 恢复。",
-        "mock 自动化与真实 Provider 验收分开记录；无真实凭据时不得宣称阶段完成。",
-        "以基准模型和正常网络测量首段可学习内容 P95 ≤ 10s，记录样本量、模型、环境、失败率与实际结果；不以 mock 延迟替代。",
-        "记录阶段退出证据和限制；MVP 0.2 任务在阶段验收后再拆分。"
+        "真实 Provider 能完成一个知识点学习；无真实凭据时记录阻塞，不宣称阶段完成。",
+        "按 PRD 测量首段可学习内容 P95 ≤ 10s，记录基准模型、环境、样本量、失败率和脱敏证据。",
+        "核对 MVP 0.1 退出标准、已知限制与后续阶段交接；必要时更新相关文档。"
       ],
       "verification": [
-        "cd backend && python -m pytest",
-        "cd backend && ruff check .",
-        "pnpm --dir web test --run",
-        "pnpm --dir web typecheck",
-        "pnpm --dir web lint",
-        "pnpm --dir web build",
-        "pnpm --dir web test:e2e（本任务建立该脚本并实际执行）",
-        "执行真实 Provider 端到端和延迟基准，记录可复现命令及脱敏报告路径。"
+        "执行真实 Provider 端到端与性能基准；记录可复现命令和脱敏报告路径。"
       ],
       "verification_results": [],
       "started_at": null,
       "completed_at": null,
       "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.1-011"
+      "commit_lookup": "Task-Completed: MVP-0.1-T035"
     }
   ]
 }

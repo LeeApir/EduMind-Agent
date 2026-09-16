@@ -123,6 +123,7 @@ EduMind-Agent/
 - `docs/PRD.md` 定义产品范围；根目录 `task.json` 是开发任务状态的唯一事实来源；`process.txt` 是只追加的执行日志。任务文件中的开发状态不是产品中的异步 Job 状态。
 - 先细化当前阶段；后续阶段保留 PRD 目标，阶段验收后再拆任务。不得自行扩展产品范围或降低验收标准。
 - 一个任务对应一个可独立验证、可审查的结果，包含 ID、依赖、范围、验收标准和验证步骤。复杂任务先拆分；实现、必要测试、迁移和相关文档应一起交付。
+- MVP 0.1 使用 `MVP-0.1-T001` 格式的可执行任务；`task.json` 的 `superseded_work_packages` 仅用于追溯初版 11 个工作包，不可领取。一个可执行任务只交付一个明确行为，通常有 2–5 条验收条件；若出现多个独立行为、需要多个完成提交或无法一次验证，先拆分任务并更新依赖。
 - `status` 只允许 `todo`、`in_progress`、`blocked`、`done`，不另维护容易失步的完成布尔值。验证步骤中的命令属于待建立的工程接口，任务完成前必须存在且实际执行。
 
 ### 领取、执行与恢复
@@ -140,13 +141,14 @@ EduMind-Agent/
 - 用户已授权：每个通过验收的开发任务自动创建本地 commit，无需逐次询问。默认不 push、不 merge、不发布；这些操作需用户另行指示。权限审批仍遵循工具实际要求。
 - 提交前检查 `git diff`、`git diff --check`、暂存区 diff 和状态，只使用明确文件路径暂存本任务改动，禁止 `git add .` / `git add -A`。已有无关暂存改动不得带入、撤销或覆盖；无法安全隔离时求助。
 - 不提交密钥、真实 `.env`、缓存、生成媒体、日志中的敏感数据或无关改动。不使用 `--no-verify`、强制推送、破坏性 reset 或擅自 amend 历史提交。
-- 提交标题为 `type(scope): description`，如 `feat(learning): stream reviewed learning resources`；正文增加 `Task-ID: MVP-0.1-007`。同一任务若确需多个提交，只有最终完成提交包含 `Task-Completed: <id>`。
+- 提交标题为 `type(scope): description`，如 `feat(learning): stream reviewed learning resources`；正文增加当前任务 ID，例如 `Task-ID: MVP-0.1-T024`。同一任务若确需多个提交，只有最终完成提交包含 `Task-Completed: <id>`。
 - `task.json` 以 `commit_lookup` 保存上述完成标记，可通过 `git log --fixed-strings --grep='Task-Completed: <id>'` 查找。不要把当前提交的哈希写进它自身的文件；最终回复报告实际 hash 与验证结果。
 - 治理文件维护可使用 `chore(workflow)` 提交，不伪造业务任务完成。任务失败时可以保留日志及未提交修改，但不能创建冒充成功的完成提交。
 
 ### 日志与人工求助
 
 - `process.txt` 使用带时区的 ISO 8601 时间，按事件追加：时间、任务 ID、START/VERIFIED/BLOCKED/RESUME/COMMIT_FAILED、改动摘要、验证结果、遗留问题、下一步。历史错误通过新记录纠正，不覆盖历史。
+- 每个任务提交前写好简短交接记录，与代码、状态一起提交。交接包含完成内容、关键决定、验证证据、遗留问题、下一任务及相关文件；提交后在回复中报告实际 hash。上下文压缩或开启新对话后，优先从这些文件及 Git 恢复，不依赖聊天记忆。
 - 同一问题两轮有实质区别的修复仍失败、缺少凭据/权限、需付费或破坏性操作、验收含糊、PRD/ADR 冲突、涉及尚未批准的重大 API/数据/安全决策时，及时标记 `blocked` 并向用户求助。普通实现细节按已有约定自主决定。
 - 求助必须给出具体问题、证据、已尝试方案、影响、建议及需要用户决定的事项；未获答案不得自行推测决策或继续依赖该任务的工作。
 - `blocked` 只有在阻塞原因确实解除后才能恢复为 `in_progress`，并追加 RESUME。用户提出范围修改时先同步任务与必要的 PRD/ADR。
