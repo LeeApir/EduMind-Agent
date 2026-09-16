@@ -26,3 +26,7 @@ VERIFIED 表示验证通过并准备提交，完成以 Git 中的 Task-Completed
 [2026-09-16T23:45:50+08:00] [MVP-0.1-T004] START | 领取“建立 FastAPI 可启动服务”。 | T003 已在 Git 历史确认完成；当前系统 Python 为 3.13.2，项目要求 Python 3.11，准备检查 uv 是否已有 3.11 运行时。 | 建立后端骨架、锁定依赖并验证无 Provider 凭据健康检查。
 
 [2026-09-16T23:50:02+08:00] [MVP-0.1-T004] VERIFIED | 新增 Python 3.11 约束、uv.lock、FastAPI 应用、`/health` 与测试；健康检查不读取或要求 Provider 凭据。 | `cd backend && uv run --python 3.11 pytest`：1 passed；以 `uvicorn app.main:app --host 127.0.0.1 --port 8000` 启动后，`curl --fail --silent --show-error http://127.0.0.1:8000/health` 返回 `{\"status\":\"ok\"}`；验证服务 PID 77613/77624 已停止；`git diff --check`：通过。 | 提交 T004；下一任务为 T005（后端配置与检查入口）。
+
+[2026-09-16T23:52:34+08:00] [MVP-0.1-T005] START | 领取“建立后端配置与检查入口”。 | 已确认 T004 的完成提交，工作区干净；现有 pyproject 仅含 pytest，健康检查不依赖 Provider。 | 添加 Provider 配置校验、Ruff/Mypy 入口、示例环境变量和测试。
+
+[2026-09-16T23:54:32+08:00] [MVP-0.1-T005] VERIFIED | 增加仅服务端读取的 Provider 配置校验、`.env.example` 占位符、Ruff/Mypy 配置与测试；缺失配置错误不含秘密值。 | `cd backend && uv run --python 3.11 pytest`：3 passed；`ruff check .`：通过；`mypy app`：4 个源文件无问题；`git check-ignore -v .env backend/.venv data/videos/example.mp4`：均被忽略。 | 提交 T005；下一依赖满足任务为 T006（Vue 页面骨架）。
