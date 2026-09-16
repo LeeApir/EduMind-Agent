@@ -66,7 +66,7 @@
       "phase": "MVP 0.1",
       "parent_work_package": "MVP-0.1-001",
       "title": "确定匿名身份与持久化边界",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [],
       "scope": [
@@ -81,9 +81,25 @@
       "verification": [
         "逐项核对 PRD 对匿名进入、隔离和恢复的要求；记录 ADR 审批依据。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "python3 -m json.tool task.json >/dev/null",
+          "result": "passed",
+          "evidence": "task.json 可解析；T001 已领取，其他 34 项仍为 todo。"
+        },
+        {
+          "command": "rg -n 'POST /api/auth/guest|POST /api/auth/register|is_guest|PostgreSQL|服务重启|待决项' docs/ADR/0001-anonymous-identity-and-persistence-boundary.md docs/ARCHITECTURE.md",
+          "result": "passed",
+          "evidence": "ADR 覆盖匿名进入、数据归属、重启恢复、注册升级、替代方案与待审批项；架构摘要引用 ADR。"
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed",
+          "evidence": "无空白错误。"
+        }
+      ],
+      "started_at": "2026-09-16T23:08:59+08:00",
+      "completed_at": "2026-09-16T23:10:23+08:00",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.1-T001"
     },
