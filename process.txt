@@ -14,3 +14,7 @@ VERIFIED 表示验证通过并准备提交，完成以 Git 中的 Task-Completed
 [2026-09-16T23:08:59+08:00] [MVP-0.1-T001] START | 领取“确定匿名身份与持久化边界”；仅处理 ADR 与架构文档，保留用户已有的 maic-ui-document-9.png 移动改动。 | 已核对 task.json：无依赖且为首个 todo；已阅读 PRD §2.3、§3.2、§5、§7.1、§10.4 与 Git 状态。 | 起草匿名身份、数据归属与重启恢复边界的 ADR。
 
 [2026-09-16T23:10:23+08:00] [MVP-0.1-T001] VERIFIED | 新增 ADR-0001 和架构摘要：匿名身份由受保护 Cookie 认证，所有学习数据按服务端 user_id 归属并持久化至 PostgreSQL；注册升级同一记录并轮换令牌；进程重启仅恢复已提交快照。 | `python3 -m json.tool task.json >/dev/null`：task.json 可解析；`rg -n 'POST /api/auth/guest|POST /api/auth/register|is_guest|PostgreSQL|服务重启|待决项' docs/ADR/0001-anonymous-identity-and-persistence-boundary.md docs/ARCHITECTURE.md`：关键边界均有证据；`git diff --check`：通过。 | 数据 TTL、会话过期/CSRF、已有账号合并仍为 Proposed ADR 的待审批项；提交 T001 完成记录，下一任务为 T002。
+
+[2026-09-16T23:35:51+08:00] [MVP-0.1-T002] START | 领取“确定流式首屏与正式资源审核时序”。 | 已核对 T001 在 Git 历史中有完成标记，工作区干净；已阅读 PRD §3.3、§7.7、§8.1 及 ADR-0001 的持久化边界。 | 起草临时流、审核发布、断线与重试状态机 ADR。
+
+[2026-09-16T23:37:26+08:00] [MVP-0.1-T002] VERIFIED | 新增 ADR-0002：首段仅作为受轻量规则约束的临时 SSE 流，完整候选经 schema 与 ReviewAgent 后原子发布；定义幂等键、断线、重试、取消、重入和首段/审核延迟指标。 | `python3 -m json.tool task.json >/dev/null`：任务文件可解析，领取互斥与依赖状态由 JSON 静态检查通过；`rg -n 'streaming_temporary|reviewing|published|Idempotency-Key|断线|取消|重入|P95 ≤ 10 秒|审核发布延迟|待决项' docs/ADR/0002-streaming-first-screen-and-resource-review.md docs/ARCHITECTURE.md`：状态与指标均覆盖；`git diff --check`：通过。 | Review 不可用时的临时内容呈现、事件保留窗口与取消成本为 Proposed ADR 待审批项；提交 T002，下一任务为 T003。

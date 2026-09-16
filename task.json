@@ -108,7 +108,7 @@
       "phase": "MVP 0.1",
       "parent_work_package": "MVP-0.1-001",
       "title": "确定流式首屏与正式资源审核时序",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.1-T001"
@@ -125,9 +125,25 @@
       "verification": [
         "逐项核对 PRD §3.3、§7.7、§8.1 的流式与审核约束；记录 ADR 审批依据。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "python3 -c 'import json; tasks=json.load(open(\"task.json\"))[\"tasks\"]; by_id={task[\"id\"]: task for task in tasks}; assert by_id[\"MVP-0.1-T001\"][\"status\"] == \"done\"; assert by_id[\"MVP-0.1-T002\"][\"status\"] == \"in_progress\"; assert all(task[\"status\"] != \"in_progress\" for task in tasks if task[\"id\"] != \"MVP-0.1-T002\")'",
+          "result": "passed",
+          "evidence": "依赖 T001 已完成，且 T002 是唯一领取中的任务。"
+        },
+        {
+          "command": "rg -n 'streaming_temporary|reviewing|published|Idempotency-Key|断线|取消|重入|P95 ≤ 10 秒|审核发布延迟|待决项' docs/ADR/0002-streaming-first-screen-and-resource-review.md docs/ARCHITECTURE.md",
+          "result": "passed",
+          "evidence": "状态转换、恢复策略和首段/审核延迟测量口径均有明确证据。"
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed",
+          "evidence": "无空白错误。"
+        }
+      ],
+      "started_at": "2026-09-16T23:35:51+08:00",
+      "completed_at": "2026-09-16T23:37:26+08:00",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.1-T002"
     },
