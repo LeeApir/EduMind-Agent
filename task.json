@@ -346,7 +346,7 @@
       "phase": "MVP 0.1",
       "parent_work_package": "MVP-0.1-004",
       "title": "接入 PostgreSQL 与 Alembic",
-      "status": "blocked",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.1-T005"
@@ -363,10 +363,14 @@
       "verification": [
         "在隔离测试 PostgreSQL 上执行 alembic upgrade head 并运行数据库连接测试；记录完整命令。"
       ],
-      "verification_results": [],
+      "verification_results": [
+        {"command": "EDUMIND_DATABASE_URL=postgresql+asyncpg://... uv run --python 3.11 alembic upgrade head", "result": "passed", "evidence": "临时隔离 PostgreSQL 已从空库升级至 0001_initial。"},
+        {"command": "EDUMIND_DATABASE_URL=postgresql+asyncpg://... uv run --python 3.11 python -c '...check_database_connection()...'", "result": "passed", "evidence": "异步 SELECT 1 连接探针返回 database connection: ok。"},
+        {"command": "cd backend && uv run --python 3.11 pytest && uv run --python 3.11 ruff check . && uv run --python 3.11 mypy app", "result": "passed", "evidence": "5 passed；Ruff 与 Mypy 通过。"}
+      ],
       "started_at": "2026-09-17T00:07:24+08:00",
-      "completed_at": null,
-      "blocker": "本机未安装 PostgreSQL，且 Docker daemon/Orbstack 未启动，无法按验收在隔离 PostgreSQL 上执行 Alembic upgrade head 和连接测试。",
+      "completed_at": "2026-09-17T07:31:48+08:00",
+      "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.1-T008"
     },
     {

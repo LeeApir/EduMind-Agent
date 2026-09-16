@@ -44,3 +44,8 @@ VERIFIED 表示验证通过并准备提交，完成以 Git 中的 Task-Completed
 [2026-09-17T00:07:38+08:00] [MVP-0.1-T008] BLOCKED | 无法建立验收要求的隔离 PostgreSQL 环境。 | `docker info --format '{{.ServerVersion}}'`：无法连接 `/Users/apir/.orbstack/run/docker.sock`；`command -v postgres`、`pg_isready`、`psql`：均不可用。 | 请启动 Docker Desktop 或 Orbstack（或提供可访问的隔离 PostgreSQL URL）；恢复后执行 RESUME、完成 Alembic 迁移与连接测试。
 
 [2026-09-17T00:08:54+08:00] [MVP-0.1-T008] BLOCKED | 复核 Docker daemon 后，同一环境阻塞仍存在。 | `docker info --format '{{.ServerVersion}}'` 仍无法连接 `/Users/apir/.orbstack/run/docker.sock`。 | 等待 Docker Desktop/Orbstack 启动或提供隔离 PostgreSQL URL；不跳过 T008 或继续依赖该任务的实现。
+[2026-09-17T03:01:10+08:00] [MVP-0.1-T008] BLOCKED | 定时恢复时复核，隔离 PostgreSQL 验证环境仍不可用，未领取任何后续依赖任务。 | `docker info --format '{{.ServerVersion}}'` 无法连接 `/Users/apir/.orbstack/run/docker.sock`（socket 不存在）；`postgres`、`pg_isready`、`psql` 均未找到。 | 请启动 Orbstack/Docker Desktop，或提供可访问的隔离 PostgreSQL URL；环境恢复后从 T008 RESUME。
+
+[2026-09-17T07:25:30+08:00] [MVP-0.1-T008] RESUME | Orbstack 已启动，Docker daemon 恢复可用。 | `docker info --format '{{.ServerVersion}}'` 返回 29.4.0；Docker Compose 5.1.2 可用。 | 建立异步数据库、Alembic 迁移与隔离 PostgreSQL 验证。
+
+[2026-09-17T07:31:48+08:00] [MVP-0.1-T008] VERIFIED | 新增 asyncpg SQLAlchemy 引擎、数据库 URL 校验、Alembic 异步迁移入口与初始 revision；开发/测试数据库通过显式 URL 隔离。 | 临时容器 `edumind-t008-postgres`（127.0.0.1:55432）上 `alembic upgrade head` 成功升级至 0001_initial，异步 `SELECT 1` 探针返回 `database connection: ok`；容器已停止；pytest 5 passed、Ruff/Mypy 通过。 | 提交 T008；下一任务为 T009（匿名会话创建）。
