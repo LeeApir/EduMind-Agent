@@ -49,3 +49,6 @@ VERIFIED 表示验证通过并准备提交，完成以 Git 中的 Task-Completed
 [2026-09-17T07:25:30+08:00] [MVP-0.1-T008] RESUME | Orbstack 已启动，Docker daemon 恢复可用。 | `docker info --format '{{.ServerVersion}}'` 返回 29.4.0；Docker Compose 5.1.2 可用。 | 建立异步数据库、Alembic 迁移与隔离 PostgreSQL 验证。
 
 [2026-09-17T07:31:48+08:00] [MVP-0.1-T008] VERIFIED | 新增 asyncpg SQLAlchemy 引擎、数据库 URL 校验、Alembic 异步迁移入口与初始 revision；开发/测试数据库通过显式 URL 隔离。 | 临时容器 `edumind-t008-postgres`（127.0.0.1:55432）上 `alembic upgrade head` 成功升级至 0001_initial，异步 `SELECT 1` 探针返回 `database connection: ok`；容器已停止；pytest 5 passed、Ruff/Mypy 通过。 | 提交 T008；下一任务为 T009（匿名会话创建）。
+
+[2026-09-17T07:34:17+08:00] [MVP-0.1-T009] START | 领取“实现匿名会话创建”。 | T008 完成标记 fc08d17 已确认，工作区仅有此前定时复核追加的 process.txt 日志；已核对 PRD §7.1、§8.3、ADR-0001 与 OpenAPI。 | 核对认证安全边界后实现。
+[2026-09-17T07:34:17+08:00] [MVP-0.1-T009] BLOCKED | 发现尚未批准的认证契约冲突，未实现会话或变更 PRD。 | PRD §8.3 明确“CSRF | Token Header 模式，无 cookie”；ADR-0001 第 20 行提议 Secure/HttpOnly/SameSite Cookie，且仍为 Proposed；OpenAPI 第 136 行定义 cookie security scheme。 | 请决定沿用 PRD 的 Header Token，或批准修改 PRD 为 Cookie + CSRF 防护；决策后同步 ADR/OpenAPI，恢复 T009。
