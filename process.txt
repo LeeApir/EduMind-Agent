@@ -88,3 +88,7 @@ VERIFIED 表示验证通过并准备提交，完成以 Git 中的 Task-Completed
 [2026-09-17T09:15:51+08:00] [MVP-0.1-T017] START | T015/T016 完成提交已确认，工作区干净；领取“统一 Provider 错误与有界重试”。 | 现有适配器仅粗分 401/403、跳转和其他失败；Gateway 目前单次调用。 | 细分 HTTP/网络错误，添加只有调用方明确声明安全时才启用的同 Provider 有界重试；流式输出不自动重试。
 
 [2026-09-17T14:15:37+08:00] [MVP-0.1-T017] VERIFIED | 统一映射鉴权、限流、超时、能力不兼容与上游故障；Gateway 默认单次，只有显式 retry_safe 的无副作用调用在同一适配器上最多重试三次，流式不自动重放。 | 错误/重试专项 14 passed；完整后端 77 passed、7 个数据库用例按环境跳过；Ruff/Mypy、JSON 和 diff 检查通过。 | 真实 Provider 连通未验证；下一依赖已满足任务为 T018（临时画像 schema）。关键文件：backend/app/services/openai_compatible.py、backend/app/services/provider_gateway.py、backend/tests/test_provider_retry.py、docs/PROVIDERS.md。
+
+[2026-09-17T14:17:57+08:00] [MVP-0.1-T018] START | T010 完成提交已确认，工作区干净；领取“定义临时画像结构与证据规则”。 | 按 PRD §3.2、§5.2 核对六个渐进维度及首次只提取有证据内容的要求；现有 student_profiles JSONB 列可承载 schema。 | 定义可校验的临时画像/证据模型和版本化 Prompt，覆盖目标、困难、显式偏好与未知字段。
+
+[2026-09-17T14:21:27+08:00] [MVP-0.1-T018] VERIFIED | 新增临时画像 schema、版本化 evidence 规则与 ProfileAgent prompt：六个维度未知即 null；非空维度需允许来源、0–1 置信度、带时区时间和匹配画像版本的证据。 | 画像专项 13 passed；完整后端 90 passed、7 个数据库用例按环境跳过；Ruff/Mypy、JSON 和 diff 检查通过。 | T019 将以该 schema 读取结构化输出并写入匿名用户版本快照；不做真实模型调用。关键文件：backend/app/agents/profile_schema.py、backend/tests/test_profile_schema.py、docs/agents/prompts/profile-v1.md。
