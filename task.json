@@ -710,7 +710,7 @@
       "phase": "MVP 0.1",
       "parent_work_package": "MVP-0.1-006",
       "title": "从一句话提取并保存临时画像",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.1-T011",
@@ -729,9 +729,25 @@
       "verification": [
         "运行显式/缺失信息、异常输出及匿名隔离测试。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "cd backend && EDUMIND_TEST_DATABASE_URL='postgresql+asyncpg://edumind:edumind_test_password@127.0.0.1:55433/edumind' uv run --python 3.11 python -m pytest -q tests/test_transient_profiles.py",
+          "result": "passed",
+          "evidence": "隔离 PostgreSQL 上 1 passed；覆盖每个匿名 owner 独立版本、跨 owner 查询隔离，以及非法结构化输出降级为空画像后仍持久化。"
+        },
+        {
+          "command": "cd backend && EDUMIND_TEST_DATABASE_URL='postgresql+asyncpg://edumind:edumind_test_password@127.0.0.1:55433/edumind' uv run --python 3.11 ruff check . && uv run --python 3.11 mypy app && uv run --python 3.11 python -m pytest -q",
+          "result": "passed",
+          "evidence": "Ruff 通过，Mypy 22 个源文件无问题，完整后端 102 passed；仅现有 Starlette TestClient deprecation warnings。"
+        },
+        {
+          "command": "python3 -m json.tool task.json >/dev/null && git diff --check",
+          "result": "passed",
+          "evidence": "任务 JSON 可解析，工作树差异无空白错误。"
+        }
+      ],
+      "started_at": "2026-09-17T14:25:15+08:00",
+      "completed_at": "2026-09-17T14:34:23+08:00",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.1-T019"
     },

@@ -43,7 +43,7 @@ class StudentProfile(Base):
     knowledge_base: Mapped[dict[str, object] | None] = mapped_column(JSONB)
     cognitive_style: Mapped[dict[str, object] | None] = mapped_column(JSONB)
     learning_goals: Mapped[dict[str, object] | None] = mapped_column(JSONB)
-    error_preferences: Mapped[dict[str, object] | None] = mapped_column(JSONB)
+    error_preferences: Mapped[list[object] | None] = mapped_column(JSONB)
     engineering_preference: Mapped[dict[str, object] | None] = mapped_column(JSONB)
     extended_dimensions: Mapped[dict[str, object] | None] = mapped_column(JSONB)
     evidence: Mapped[dict[str, object] | None] = mapped_column(JSONB)
