@@ -800,7 +800,7 @@
       "phase": "MVP 0.1",
       "parent_work_package": "MVP-0.1-007",
       "title": "生成讲解、代码和练习资源",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.1-T020",
@@ -818,9 +818,25 @@
       "verification": [
         "运行三类资源成功、缺失字段与 Provider 故障测试。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "cd backend && uv run --python 3.11 python -m pytest -q tests/test_learning_unit_generator.py tests/test_learning_resource_schema.py",
+          "result": "passed",
+          "evidence": "12 passed；覆盖单知识点的讲解/单语言代码/三道练习候选、pending 审核状态、缺失字段与 Provider 故障的逐项安全错误。"
+        },
+        {
+          "command": "cd backend && uv run --python 3.11 ruff check . && uv run --python 3.11 mypy app && uv run --python 3.11 python -m pytest -q",
+          "result": "passed",
+          "evidence": "Ruff 通过，Mypy 25 个源文件无问题，完整后端 106 passed、8 个隔离数据库用例按环境跳过。"
+        },
+        {
+          "command": "python3 -m json.tool task.json >/dev/null && git diff --check",
+          "result": "passed",
+          "evidence": "任务 JSON 可解析，工作树差异无空白错误。"
+        }
+      ],
+      "started_at": "2026-09-17T14:45:09+08:00",
+      "completed_at": "2026-09-17T14:48:23+08:00",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.1-T021"
     },
