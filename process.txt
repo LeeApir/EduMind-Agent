@@ -72,3 +72,7 @@ VERIFIED 表示验证通过并准备提交，完成以 Git 中的 Task-Completed
 [2026-09-17T08:28:20+08:00] [MVP-0.1-T013] START | T012 完成提交 dcd0873 已确认，工作区干净；领取“安全加载 Provider 配置与凭据”。 | 现有配置从环境读取三项值但 dataclass repr 会暴露 API Key，且无受控的生产 Gateway 组装入口。 | 隐藏凭据展示，建立服务端组装入口并测试缺失凭据、错误脱敏、日志及客户端响应。
 
 [2026-09-17T08:31:49+08:00] [MVP-0.1-T013] VERIFIED | API Key 从服务端环境加载且不进入普通配置展示；服务端 Gateway 组装在缺失/空白配置时安全失败，适配器不会启动。 | 配置专项 4 passed；完整后端 10 passed、7 个数据库用例按环境跳过；Ruff/Mypy 和 JSON/diff 检查通过。 | 无真实 Provider 调用（后续 T015）；提交 T013 后领取 T014。关键文件：backend/app/core/config.py、backend/app/core/provider_factory.py、backend/tests/test_config.py、.env.example。
+
+[2026-09-17T08:42:31+08:00] [MVP-0.1-T014] START | T013 完成提交 00e623a 已确认，工作区干净；领取“校验 Provider Base URL 和目标地址”。 | 对照 PRD §8.3/§9.4、任务验收和现有 Gateway/配置边界。 | 实现 HTTPS 默认、解析后全地址校验、本地显式白名单，以及重定向和 DNS 变化的网络前校验；加入无真实网络的回归测试。
+
+[2026-09-17T08:51:32+08:00] [MVP-0.1-T014] VERIFIED | 新增 ProviderTargetGuard：Factory 在交出凭据前拒绝非法 Base URL；每次出站尝试重新解析并返回可固定连接的 IP；云端仅 HTTPS 公网，本地需部署模式和精确 IP:port 白名单；重定向同源重新校验。 | SSRF/配置专项 35 passed；Ruff 通过，Mypy 17 个源文件通过；完整后端 41 passed、7 个数据库用例按环境跳过；JSON 与 diff 检查通过。 | 未做真实 Provider 调用（T015）；T015 网络适配器必须使用 Guard 返回的 IP、原 Host/SNI，禁用代理和自动重定向。关键文件：backend/app/core/provider_target.py、backend/app/core/provider_factory.py、backend/tests/test_provider_target.py、docs/PROVIDERS.md。

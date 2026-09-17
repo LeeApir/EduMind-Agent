@@ -6,6 +6,7 @@ from fastapi.testclient import TestClient
 
 from app.core.config import ConfigurationError, ProviderSettings, get_provider_settings
 from app.core.provider_factory import build_server_provider_gateway
+from app.core.provider_target import ProviderTargetGuard
 from app.main import app
 from app.services.provider_gateway import (
     ChatMessage,
@@ -54,7 +55,9 @@ def test_server_gateway_refuses_missing_key_before_adapter_is_built(
     monkeypatch.setenv("EDUMIND_PROVIDER_API_KEY", " ")
     built = 0
 
-    def forbidden_factory(_settings: ProviderSettings) -> ProviderAdapter:
+    def forbidden_factory(
+        _settings: ProviderSettings, _guard: ProviderTargetGuard
+    ) -> ProviderAdapter:
         nonlocal built
         built += 1
         raise AssertionError("adapter must not be built")
@@ -80,7 +83,7 @@ def test_server_only_key_is_not_exposed_by_repr_error_log_or_client_response(
     monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
 ) -> None:
     secret = "test-secret-that-must-stay-server-side"
-    monkeypatch.setenv("EDUMIND_PROVIDER_BASE_URL", "https://provider.example/v1")
+    monkeypatch.setenv("EDUMIND_PROVIDER_BASE_URL", "https://8.8.8.8/v1")
     monkeypatch.setenv("EDUMIND_PROVIDER_MODEL", "server-model")
     monkeypatch.setenv("EDUMIND_PROVIDER_API_KEY", secret)
     settings = get_provider_settings()
@@ -98,8 +101,11 @@ def test_server_only_key_is_not_exposed_by_repr_error_log_or_client_response(
         async def stream_text(self, request: TextRequest) -> AsyncIterator[TextDelta]:
             yield TextDelta(text="safe-answer")
 
-    def adapter_factory(configured_settings: ProviderSettings) -> ConfiguredFakeAdapter:
+    def adapter_factory(
+        configured_settings: ProviderSettings, guard: ProviderTargetGuard
+    ) -> ConfiguredFakeAdapter:
         assert configured_settings.api_key == secret
+        assert guard.approve_base().connect_ip == "8.8.8.8"
         return ConfiguredFakeAdapter()
 
     gateway = build_server_provider_gateway(adapter_factory)

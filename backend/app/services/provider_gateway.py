@@ -68,6 +68,7 @@ class TextDelta:
 
 class ProviderErrorCode(StrEnum):
     CONFIGURATION_MISSING = "CONFIGURATION_MISSING"
+    INVALID_TARGET = "INVALID_TARGET"
     AUTHENTICATION_FAILED = "AUTHENTICATION_FAILED"
     CAPABILITY_UNAVAILABLE = "CAPABILITY_UNAVAILABLE"
     RATE_LIMITED = "RATE_LIMITED"
@@ -78,6 +79,7 @@ class ProviderErrorCode(StrEnum):
 
 _SAFE_MESSAGES: dict[ProviderErrorCode, str] = {
     ProviderErrorCode.CONFIGURATION_MISSING: "Provider configuration is unavailable.",
+    ProviderErrorCode.INVALID_TARGET: "Provider target is not permitted.",
     ProviderErrorCode.AUTHENTICATION_FAILED: "Provider authentication failed.",
     ProviderErrorCode.CAPABILITY_UNAVAILABLE: "Requested provider capability is unavailable.",
     ProviderErrorCode.RATE_LIMITED: "Provider rate limit reached.",

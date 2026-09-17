@@ -3,6 +3,11 @@
 from collections.abc import Callable
 
 from app.core.config import ConfigurationError, ProviderSettings, get_provider_settings
+from app.core.provider_target import (
+    ProviderTargetGuard,
+    TargetValidationError,
+    target_policy_from_environment,
+)
 from app.services.provider_gateway import (
     ProviderAdapter,
     ProviderError,
@@ -12,11 +17,16 @@ from app.services.provider_gateway import (
 
 
 def build_server_provider_gateway(
-    adapter_factory: Callable[[ProviderSettings], ProviderAdapter],
+    adapter_factory: Callable[[ProviderSettings, ProviderTargetGuard], ProviderAdapter],
 ) -> ProviderGateway:
-    """Require complete server credentials before constructing a generation gateway."""
+    """Reject unsafe targets before handing credentials to a network adapter."""
     try:
         settings = get_provider_settings()
     except ConfigurationError:
         raise ProviderError(ProviderErrorCode.CONFIGURATION_MISSING) from None
-    return ProviderGateway(adapter_factory(settings))
+    try:
+        guard = ProviderTargetGuard(settings.base_url, target_policy_from_environment())
+        guard.approve_base()
+    except TargetValidationError:
+        raise ProviderError(ProviderErrorCode.INVALID_TARGET) from None
+    return ProviderGateway(adapter_factory(settings, guard))
