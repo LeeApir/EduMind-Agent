@@ -40,6 +40,19 @@
         }
       }
     },
+    "/api/profile/me": {
+      "get": {
+        "tags": ["Learning"],
+        "summary": "读取当前用户的最新画像版本",
+        "operationId": "getMyProfile",
+        "security": [{"sessionCookie": []}],
+        "responses": {
+          "200": {"description": "仅当前用户的最新画像快照。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/StudentProfile"}}}},
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "404": {"$ref": "#/components/responses/NotFound"}
+        }
+      }
+    },
     "/api/auth/register": {
       "post": {
         "tags": ["Authentication"],
@@ -134,11 +147,26 @@
         }
       }
     },
-    "/api/resources/{resourceId}": {
+    "/api/resource/{resourceId}": {
       "get": {
         "tags": ["Resources"],
         "summary": "读取已审核的学习资源",
         "operationId": "getResource",
+        "security": [{"sessionCookie": []}],
+        "parameters": [{"$ref": "#/components/parameters/ResourceId"}],
+        "responses": {
+          "200": {"description": "正式资源。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/PublishedResource"}}}},
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "404": {"$ref": "#/components/responses/NotFound"}
+        }
+      }
+    },
+    "/api/resources/{resourceId}": {
+      "get": {
+        "tags": ["Resources"],
+        "summary": "兼容路径：读取已审核学习资源",
+        "deprecated": true,
+        "operationId": "getResourceLegacyAlias",
         "security": [{"sessionCookie": []}],
         "parameters": [{"$ref": "#/components/parameters/ResourceId"}],
         "responses": {
@@ -172,10 +200,11 @@
       "Identifier": {"type": "string", "pattern": "^[A-Za-z0-9_-]{8,64}$"},
       "GuestSession": {"type": "object", "required": ["user", "csrf_token", "expires_at"], "properties": {"user": {"$ref": "#/components/schemas/User"}, "csrf_token": {"type": "string", "description": "只放在内存，用于 X-CSRF-Token；不得持久化到浏览器存储。"}, "expires_at": {"type": "string", "format": "date-time"}}},
       "User": {"type": "object", "required": ["id", "is_guest"], "properties": {"id": {"$ref": "#/components/schemas/Identifier"}, "is_guest": {"type": "boolean"}}},
+      "StudentProfile": {"type": "object", "required": ["id", "version", "updated_at"], "properties": {"id": {"$ref": "#/components/schemas/Identifier"}, "version": {"type": "integer", "minimum": 1}, "initial_query": {"type": ["string", "null"]}, "professional_background": {"type": ["object", "null"]}, "knowledge_base": {"type": ["object", "null"]}, "cognitive_style": {"type": ["object", "null"]}, "learning_goals": {"type": ["object", "null"]}, "error_preferences": {"type": ["object", "null"]}, "engineering_preference": {"type": ["object", "null"]}, "extended_dimensions": {"type": ["object", "null"]}, "evidence": {"type": ["object", "null"]}, "updated_at": {"type": "string", "format": "date-time"}}},
       "RegisterRequest": {"type": "object", "additionalProperties": false, "required": ["email", "password"], "properties": {"email": {"type": "string", "format": "email"}, "password": {"type": "string", "minLength": 12, "writeOnly": true}}},
       "StartLearningRequest": {"type": "object", "additionalProperties": false, "required": ["goal"], "properties": {"goal": {"type": "string", "minLength": 1, "maxLength": 2000, "description": "学生的一句话学习目标或困难。"}, "preferred_language": {"type": "string", "enum": ["c"], "default": "c"}}},
       "LearningOperation": {"type": "object", "required": ["id", "status", "attempt", "created_at"], "properties": {"id": {"$ref": "#/components/schemas/Identifier"}, "status": {"type": "string", "enum": ["accepted", "preparing", "streaming_temporary", "temporary_complete", "reviewing", "regenerating", "published", "failed", "canceled"]}, "attempt": {"type": "integer", "minimum": 1, "maximum": 3}, "learning_unit_id": {"$ref": "#/components/schemas/Identifier"}, "published_scene_version": {"type": "integer", "minimum": 1}, "error": {"$ref": "#/components/schemas/Error"}, "created_at": {"type": "string", "format": "date-time"}, "updated_at": {"type": "string", "format": "date-time"}}},
-      "LearningUnit": {"type": "object", "required": ["id", "status", "scenes"], "properties": {"id": {"$ref": "#/components/schemas/Identifier"}, "status": {"type": "string", "enum": ["active", "completed"]}, "scenes": {"type": "array", "items": {"$ref": "#/components/schemas/PublishedScene"}}}},
+      "LearningUnit": {"type": "object", "required": ["id", "status", "scenes"], "properties": {"id": {"$ref": "#/components/schemas/Identifier"}, "status": {"const": "ready"}, "scenes": {"type": "array", "items": {"$ref": "#/components/schemas/PublishedScene"}}}},
       "PublishedScene": {"type": "object", "required": ["id", "version", "resources", "review_status"], "properties": {"id": {"$ref": "#/components/schemas/Identifier"}, "version": {"type": "integer", "minimum": 1}, "review_status": {"const": "passed"}, "resources": {"type": "array", "items": {"$ref": "#/components/schemas/PublishedResource"}}}},
       "PublishedResource": {"type": "object", "required": ["id", "type", "version", "content", "review_status"], "properties": {"id": {"$ref": "#/components/schemas/Identifier"}, "type": {"type": "string", "enum": ["explanation", "code", "exercise"]}, "version": {"type": "integer", "minimum": 1}, "content": {"type": "object", "description": "按资源类型定义的已清洗结构化内容。"}, "review_status": {"const": "passed"}}},
       "Error": {"type": "object", "additionalProperties": false, "required": ["code", "message", "retryable"], "properties": {"code": {"type": "string", "enum": ["UNAUTHORIZED", "CSRF_FAILED", "NOT_FOUND", "VALIDATION_ERROR", "IDEMPOTENCY_CONFLICT", "ACCOUNT_CONFLICT", "RATE_LIMITED", "PROVIDER_UNAVAILABLE", "REVIEW_REJECTED", "OPERATION_CANCELED"]}, "message": {"type": "string"}, "retryable": {"type": "boolean"}, "operation_id": {"$ref": "#/components/schemas/Identifier"}}}

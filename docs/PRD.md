@@ -1070,6 +1070,8 @@ services:
 | DELETE | `/api/jobs/{job_id}` | 取消尚未完成的任务 |
 | POST | `/api/jobs/{job_id}/retry` | 从可恢复阶段幂等重试失败任务 |
 
+MVP 0.1 的正式资源读取以 `/api/resource/{id}` 为规范路径；已发布 OpenAPI 中的 `/api/resources/{id}` 暂作兼容别名，使用相同的身份和审核过滤。
+
 ### 7.4 知识图谱与路径 API
 
 | Method | Path | 描述 |

@@ -447,7 +447,7 @@
       "phase": "MVP 0.1",
       "parent_work_package": "MVP-0.1-004",
       "title": "限制匿名数据访问范围",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.1-T009",
@@ -465,9 +465,13 @@
       "verification": [
         "运行授权与跨用户访问集成测试；记录实际命令。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {"command": "EDUMIND_TEST_DATABASE_URL=<isolated PostgreSQL URL> uv run --python 3.11 pytest -q tests/test_owner_reads.py", "result": "passed", "evidence": "1 passed；双匿名用户的画像、学习单元和资源隔离，跨用户/不存在/草稿/未发布统一 404，无效或过期会话 401。"},
+        {"command": "EDUMIND_TEST_DATABASE_URL=<isolated PostgreSQL URL> uv run --python 3.11 pytest -q && uv run --python 3.11 ruff check . && uv run --python 3.11 mypy app", "result": "passed", "evidence": "完整后端 12 passed；Ruff 全通过；Mypy 14 个源文件无问题。"},
+        {"command": "python3 -m json.tool docs/api/openapi.yaml >/dev/null && python3 -m json.tool task.json >/dev/null && git diff --check", "result": "passed", "evidence": "OpenAPI 和任务 JSON 可解析，diff 无空白错误；PRD 规范路径与兼容别名已同步。"}
+      ],
+      "started_at": "2026-09-17T08:15:40+08:00",
+      "completed_at": "2026-09-17T08:20:58+08:00",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.1-T011"
     },

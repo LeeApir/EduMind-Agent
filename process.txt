@@ -60,3 +60,7 @@ VERIFIED 表示验证通过并准备提交，完成以 Git 中的 Task-Completed
 [2026-09-17T08:06:50+08:00] [MVP-0.1-T010] START | T009 完成提交 3940c7e 已确认，工作区干净；领取“持久化画像、学习单元和资源版本”。 | 已核对 PRD §5.2–5.3、§3.3 与 ADR-0001/0002；沿用 PostgreSQL、版本化和审核状态边界。 | 建模、迁移，并在隔离 PostgreSQL 验证断开后读取及版本约束。
 
 [2026-09-17T08:13:48+08:00] [MVP-0.1-T010] VERIFIED | 新增版本化画像、学习单元、场景、资源的 ORM 与 Alembic 迁移；资源以审核状态和发布时间区分候选/正式版本，正式版本禁止原地更新。 | 隔离 PostgreSQL 上升级、回滚/重升、跨连接读回和发布约束测试通过；pytest 11 passed；Ruff/Mypy 通过。 | 提交 T010 后领取 T011（按匿名身份隔离读取）；关键文件：backend/app/models/learning.py、backend/alembic/versions/0003_learning_snapshots.py、backend/tests/test_learning_persistence.py。
+
+[2026-09-17T08:15:40+08:00] [MVP-0.1-T011] START | T009/T010 完成标记已确认，工作区干净；领取“限制匿名数据访问范围”。 | PRD §7.2/7.3 与 OpenAPI 路径核对发现资源单复数差异，PRD 单数为正式路径，保留既有 OpenAPI 复数作为同权限兼容别名。 | 实现按 Cookie 身份派生 owner_id 的只读端点，外部用户与不存在记录统一 404，并做跨用户集成测试。
+
+[2026-09-17T08:20:58+08:00] [MVP-0.1-T011] VERIFIED | 新增画像、学习单元和资源的所有者过滤读取；仅返回审核通过且已发布资源；对跨用户、不存在及未发布统一 404。 | 隔离 PostgreSQL 双用户集成测试通过；后端 pytest 12 passed，Ruff/Mypy 通过；OpenAPI/任务 JSON 与 diff 检查通过。 | 提交 T011 后领取 T012（Provider Gateway 接口）；关键文件：backend/app/services/owned_learning.py、backend/app/api/learning_reads.py、backend/tests/test_owner_reads.py。
