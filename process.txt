@@ -68,3 +68,7 @@ VERIFIED 表示验证通过并准备提交，完成以 Git 中的 Task-Completed
 [2026-09-17T08:23:55+08:00] [MVP-0.1-T012] START | T011 完成提交 0990f12 已确认，工作区干净；领取“定义 Provider Gateway 内部接口”。 | 核对 PRD §3.8、配置和任务边界：P0 仅服务端单一 OpenAI-compatible Provider，T012 不实现网络适配器。 | 定义内部请求/结果/错误类型与可替换协议，建立测试替身并写 docs/PROVIDERS.md。
 
 [2026-09-17T08:26:48+08:00] [MVP-0.1-T012] VERIFIED | 定义文本、结构化与流式内部接口；Gateway 可注入适配器且不静默重试/切换；错误码标注可重试性并只输出安全固定文案。 | 替身证明两种适配器可替换、失败只调用一次；pytest 8 passed、7 个数据库用例按环境跳过；Ruff/Mypy 通过。 | 无真实 Provider 连通性验证（后续适配器任务）；提交 T012 后领取 T013。关键文件：backend/app/services/provider_gateway.py、backend/tests/test_provider_gateway.py、docs/PROVIDERS.md。
+
+[2026-09-17T08:28:20+08:00] [MVP-0.1-T013] START | T012 完成提交 dcd0873 已确认，工作区干净；领取“安全加载 Provider 配置与凭据”。 | 现有配置从环境读取三项值但 dataclass repr 会暴露 API Key，且无受控的生产 Gateway 组装入口。 | 隐藏凭据展示，建立服务端组装入口并测试缺失凭据、错误脱敏、日志及客户端响应。
+
+[2026-09-17T08:31:49+08:00] [MVP-0.1-T013] VERIFIED | API Key 从服务端环境加载且不进入普通配置展示；服务端 Gateway 组装在缺失/空白配置时安全失败，适配器不会启动。 | 配置专项 4 passed；完整后端 10 passed、7 个数据库用例按环境跳过；Ruff/Mypy 和 JSON/diff 检查通过。 | 无真实 Provider 调用（后续 T015）；提交 T013 后领取 T014。关键文件：backend/app/core/config.py、backend/app/core/provider_factory.py、backend/tests/test_config.py、.env.example。

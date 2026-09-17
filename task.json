@@ -513,7 +513,7 @@
       "phase": "MVP 0.1",
       "parent_work_package": "MVP-0.1-005",
       "title": "安全加载 Provider 配置与凭据",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.1-T012"
@@ -531,9 +531,13 @@
       "verification": [
         "运行配置缺失、凭据脱敏和日志检查测试。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {"command": "cd backend && uv run --python 3.11 python -m pytest -q tests/test_config.py", "result": "passed", "evidence": "4 passed；缺失/空白 API Key 生成尝试被阻止，配置展示、异常、日志和客户端健康/OpenAPI 响应无测试凭据。"},
+        {"command": "cd backend && uv run --python 3.11 python -m pytest -q && uv run --python 3.11 ruff check . && uv run --python 3.11 mypy app", "result": "passed", "evidence": "完整后端 10 passed、7 个隔离数据库用例按环境跳过；Ruff 全通过，Mypy 16 个源文件无问题。"},
+        {"command": "python3 -m json.tool task.json >/dev/null && git diff --check", "result": "passed", "evidence": "任务 JSON 可解析，工作区 diff 无空白错误；.env.example 仅保留占位符。"}
+      ],
+      "started_at": "2026-09-17T08:28:20+08:00",
+      "completed_at": "2026-09-17T08:31:49+08:00",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.1-T013"
     },

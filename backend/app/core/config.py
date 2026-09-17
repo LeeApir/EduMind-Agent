@@ -1,6 +1,6 @@
 """Server-only configuration helpers."""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from os import getenv
 
 
@@ -13,7 +13,7 @@ class ProviderSettings:
     """The minimum P0 OpenAI-compatible provider configuration."""
 
     base_url: str
-    api_key: str
+    api_key: str = field(repr=False)
     model: str
 
 
@@ -24,7 +24,7 @@ def get_provider_settings() -> ProviderSettings:
         "EDUMIND_PROVIDER_API_KEY": getenv("EDUMIND_PROVIDER_API_KEY"),
         "EDUMIND_PROVIDER_MODEL": getenv("EDUMIND_PROVIDER_MODEL"),
     }
-    missing = [name for name, value in required_values.items() if not value]
+    missing = [name for name, value in required_values.items() if not value or not value.strip()]
     if missing:
         raise ConfigurationError(
             "Missing required provider configuration: " + ", ".join(missing) + ". "

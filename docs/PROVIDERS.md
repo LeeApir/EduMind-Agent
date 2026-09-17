@@ -20,4 +20,10 @@ PRD §3.8 是产品范围来源。P0 只连接一个由服务端配置的 OpenAI
 
 Gateway 与 Adapter **每次调用只尝试一次**，均不自行重试或切换 Provider。上层编排依据幂等性、阶段状态和预算决定是否在同一 Provider 上限次重试；流已经输出文本后不得在同一流里静默重新生成。P0 不做跨 Provider 回退。Provider 故障不能删除已发布资源或覆盖学习进度。
 
-后续实现仍需完成服务端凭据保护、Base URL/目标地址 SSRF 校验、超时与限流映射、网络连接关闭、真实 Provider 验证。测试替身只证明接口可替换，不代表真实供应商连通性。
+后续实现仍需完成 Base URL/目标地址 SSRF 校验、超时与限流映射、网络连接关闭、真实 Provider 验证。测试替身只证明接口可替换，不代表真实供应商连通性。
+
+## 服务端配置组装
+
+生产生成路径通过 `backend/app/core/provider_factory.py` 的 `build_server_provider_gateway` 组装适配器。它在调用适配器工厂前读取 `EDUMIND_PROVIDER_BASE_URL`、`EDUMIND_PROVIDER_MODEL`、`EDUMIND_PROVIDER_API_KEY`；任一缺失或仅为空白时返回固定 `CONFIGURATION_MISSING` 错误，不能开始生成。此组装入口只在服务端使用，不提供读取凭据的客户端端点。
+
+`ProviderSettings` 的普通 `repr`/`str` 隐藏 API Key，配置失败消息只列变量名，不包含值；适配器收到 Key 后仍须遵守不记录原始请求、响应或异常的约束。`.env.example` 只能放占位符，真实 `.env` 不进入 Git。T014 再验证 URL 与目标地址，T015 才接真实网络适配器。
