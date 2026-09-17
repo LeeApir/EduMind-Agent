@@ -134,5 +134,11 @@ class ProviderGateway:
         return await self._adapter.generate_structured(request)
 
     async def stream_text(self, request: TextRequest) -> AsyncIterator[TextDelta]:
-        async for delta in self._adapter.stream_text(request):
-            yield delta
+        stream = self._adapter.stream_text(request)
+        try:
+            async for delta in stream:
+                yield delta
+        finally:
+            close = getattr(stream, "aclose", None)
+            if close is not None:
+                await close()

@@ -80,3 +80,7 @@ VERIFIED 表示验证通过并准备提交，完成以 Git 中的 Task-Completed
 [2026-09-17T08:56:46+08:00] [MVP-0.1-T015] START | T012/T013/T014 完成标记已核对，工作区干净；领取“接入单一 OpenAI-compatible 请求适配器”。 | 官方 Chat Completions 与 HTTPX SNI 文档已核对；固定采用 P0 Chat Completions 非流式调用，结构化输出使用 JSON Schema。 | 实现使用 T014 Guard 固定 IP 的服务端适配器、MockTransport 回归测试和配置组装。
 
 [2026-09-17T09:04:25+08:00] [MVP-0.1-T015] VERIFIED | 接入服务端单一 Chat Completions 非流式适配器：文本/结构化转换、固定 IP 与原 Host/SNI、禁用代理/跳转、结果与 schema 校验；默认 Gateway 可组装。 | Mock HTTP 专项 12 passed；完整后端 53 passed、7 个隔离数据库用例按环境跳过；Ruff/Mypy 与锁文件解析通过，JSON/diff 检查通过。 | 未使用真实 Provider 凭据或网络验证；T016 增加流式适配，T017 细化错误/有界重试。关键文件：backend/app/services/openai_compatible.py、backend/tests/test_openai_compatible.py、backend/app/core/provider_factory.py、backend/uv.lock、docs/PROVIDERS.md。
+
+[2026-09-17T09:07:23+08:00] [MVP-0.1-T016] START | T015 完成提交 9c55d66 已确认，工作区干净；领取“接入 Provider 流式响应适配”。 | 官方 Chat Completions SSE `stream=true`、delta 与 `[DONE]` 语义已核对；沿用 T015 的固定 IP、Host/SNI、禁用代理/跳转边界。 | 增量解码 UTF-8/SSE 帧，处理跨分片、非法帧与上游中断；验证关闭和取消释放连接。
+
+[2026-09-17T09:11:17+08:00] [MVP-0.1-T016] VERIFIED | 将 Chat Completions SSE 分片转换为内部 TextDelta；逐字节 UTF-8/CRLF 跨界解析，要求 stop + [DONE] 完整结束；错误、EOF 与取消均关闭上游响应，Gateway 关闭外层流时关闭适配器流。 | 流式专项 10 passed；完整后端 63 passed、7 个数据库用例按环境跳过；Ruff/Mypy、JSON 和 diff 检查通过。 | 真实 Provider 流式连通未验证；T017 再细化错误与重试。关键文件：backend/app/services/openai_compatible.py、backend/app/services/provider_gateway.py、backend/tests/test_provider_stream.py、docs/PROVIDERS.md。

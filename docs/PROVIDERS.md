@@ -20,7 +20,7 @@ PRD §3.8 是产品范围来源。P0 只连接一个由服务端配置的 OpenAI
 
 Gateway 与 Adapter **每次调用只尝试一次**，均不自行重试或切换 Provider。上层编排依据幂等性、阶段状态和预算决定是否在同一 Provider 上限次重试；流已经输出文本后不得在同一流里静默重新生成。P0 不做跨 Provider 回退。Provider 故障不能删除已发布资源或覆盖学习进度。
 
-后续实现仍需完成完整的错误与有界重试策略、流式响应适配、真实 Provider 验证。测试替身和 Mock HTTP 只证明协议转换，不代表真实供应商连通性。
+后续实现仍需完成完整的错误与有界重试策略、真实 Provider 验证。测试替身和 Mock HTTP 只证明协议转换，不代表真实供应商连通性。
 
 ## 服务端配置组装
 
@@ -40,4 +40,8 @@ Gateway 与 Adapter **每次调用只尝试一次**，均不自行重试或切�
 
 `build_default_provider_gateway()` 组装唯一服务端适配器 `OpenAICompatibleAdapter`。P0 选择 Chat Completions 的 `POST /chat/completions`；服务端配置的 Base URL 作为 API 前缀（例如 `/v1`），模型 ID 和 API Key 只从服务端配置注入。请求携带消息、可选 `max_completion_tokens` 与 `temperature`；结构化请求携带 `response_format.type=json_schema`。适配器将第一条已正常结束的文本结果、模型 ID 和可选用量转换成内部类型；缺失、截断或无效数据返回固定 `INVALID_OUTPUT`，不会发布结果。结构化结果再用本地 JSON Schema 验证，拒绝需要远程读取的 schema 引用。
 
-HTTPX 0.28.1 连接到 Guard 批准的 IP，同时设置原始 Host 和 `sni_hostname` 来保持 TLS 证书验证；禁用环境代理与自动重定向，单次响应限 2 MiB，并在结束时关闭连接。鉴权失败映射为不含原始响应的 `AUTHENTICATION_FAILED`；其他 HTTP 错误的细分、有界重试和流式行为分别在 T017/T016 完成。当前没有真实 Provider 凭据或连通性证明，不能据此宣称完整生成链路已可用。依据：[OpenAI Chat Completions API](https://developers.openai.com/api/reference/resources/chat/subresources/completions/methods/create)、[HTTPX SNI extension](https://www.python-httpx.org/advanced/extensions/)。
+HTTPX 0.28.1 连接到 Guard 批准的 IP，同时设置原始 Host 和 `sni_hostname` 来保持 TLS 证书验证；禁用环境代理与自动重定向，单次非流式响应限 2 MiB，并在结束时关闭连接。鉴权失败映射为不含原始响应的 `AUTHENTICATION_FAILED`；其他 HTTP 错误的细分和有界重试在 T017 完成。当前没有真实 Provider 凭据或连通性证明，不能据此宣称完整生成链路已可用。依据：[OpenAI Chat Completions API](https://developers.openai.com/api/reference/resources/chat/subresources/completions/methods/create)、[HTTPX SNI extension](https://www.python-httpx.org/advanced/extensions/)。
+
+## P0 Provider 流式适配
+
+`stream_text` 对同一 Chat Completions 路径发送 `stream=true`，以增量 SSE `data:` 帧解出 `choices[0].delta.content`，只向业务层给出 `TextDelta`。解析器按原始字节拼齐 UTF-8 行，容忍 CRLF 和任意网络分片边界；注释心跳与无文本的角色/用量分片不会误报为内容。必须见到正常 `finish_reason=stop` 与 `[DONE]` 才算完整；非法 UTF-8/JSON/帧返回安全的 `INVALID_OUTPUT`，上游提前 EOF 或读取中断返回安全的 Provider 错误。每帧限制 1 MiB；3xx 不自动跟随。正常完成、异常与消费者取消都会关闭上游响应。`ProviderGateway.stream_text` 在关闭外层流时也会关闭内层适配器流；已输出部分 token 后，上层不得静默重试同一流。

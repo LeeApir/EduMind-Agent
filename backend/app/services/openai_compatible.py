@@ -24,6 +24,7 @@ from app.services.provider_gateway import (
 )
 
 _MAX_RESPONSE_BYTES = 2 * 1024 * 1024
+_MAX_SSE_FRAME_BYTES = 1024 * 1024
 _TIMEOUT = httpx.Timeout(connect=5.0, read=60.0, write=10.0, pool=5.0)
 
 
@@ -108,6 +109,67 @@ def _result(payload: object) -> TextResult:
     if not isinstance(content, str) or not content:
         raise ProviderError(ProviderErrorCode.INVALID_OUTPUT)
     return TextResult(text=content, model_id=model, usage=_usage(payload))
+
+
+async def _sse_data(chunks: AsyncIterator[bytes]) -> AsyncIterator[str]:
+    """Assemble UTF-8 SSE data frames across arbitrary network byte boundaries."""
+    line = bytearray()
+    data_lines: list[str] = []
+    frame_size = 0
+    after_cr = False
+    async for chunk in chunks:
+        for byte in chunk:
+            if byte == 10 and after_cr:
+                after_cr = False
+                continue
+            if byte in (10, 13):
+                after_cr = byte == 13
+                try:
+                    text = line.decode("utf-8")
+                except UnicodeError:
+                    raise ProviderError(ProviderErrorCode.INVALID_OUTPUT) from None
+                line.clear()
+                if not text:
+                    if data_lines:
+                        yield "\n".join(data_lines)
+                        data_lines.clear()
+                        frame_size = 0
+                elif not text.startswith(":"):
+                    field, separator, value = text.partition(":")
+                    if field == "data":
+                        data_lines.append(
+                            value[1:] if separator and value.startswith(" ") else value
+                        )
+                        frame_size += len(text.encode("utf-8"))
+                        if frame_size > _MAX_SSE_FRAME_BYTES:
+                            raise ProviderError(ProviderErrorCode.INVALID_OUTPUT)
+                continue
+            after_cr = False
+            line.append(byte)
+            if len(line) + frame_size > _MAX_SSE_FRAME_BYTES:
+                raise ProviderError(ProviderErrorCode.INVALID_OUTPUT)
+    if line or data_lines:
+        raise ProviderError(ProviderErrorCode.INVALID_OUTPUT)
+
+
+def _stream_chunk(data: str) -> tuple[str | None, bool]:
+    try:
+        payload = json.loads(data)
+    except (UnicodeError, ValueError):
+        raise ProviderError(ProviderErrorCode.INVALID_OUTPUT) from None
+    if not isinstance(payload, dict) or not isinstance(payload.get("choices"), list):
+        raise ProviderError(ProviderErrorCode.INVALID_OUTPUT)
+    choices = payload["choices"]
+    if not choices:  # optional terminal usage-only chunk
+        return None, False
+    choice = choices[0]
+    if not isinstance(choice, dict) or not isinstance(choice.get("delta"), dict):
+        raise ProviderError(ProviderErrorCode.INVALID_OUTPUT)
+    content = choice["delta"].get("content")
+    reason = choice.get("finish_reason")
+    if (content is not None and not isinstance(content, str)) or reason not in (None, "stop"):
+        raise ProviderError(ProviderErrorCode.INVALID_OUTPUT)
+    return content, reason == "stop"
 
 
 class OpenAICompatibleAdapter:
@@ -201,6 +263,58 @@ class OpenAICompatibleAdapter:
             raise ProviderError(ProviderErrorCode.INVALID_OUTPUT) from None
         return StructuredResult(value=value, model_id=result.model_id, usage=result.usage)
 
-    async def stream_text(self, _request: TextRequest) -> AsyncIterator[TextDelta]:
-        raise ProviderError(ProviderErrorCode.CAPABILITY_UNAVAILABLE)
-        yield  # pragma: no cover - T016 supplies streaming implementation
+    async def stream_text(self, request: TextRequest) -> AsyncIterator[TextDelta]:
+        try:
+            target = self._guard.approve_base()
+        except TargetValidationError:
+            raise ProviderError(ProviderErrorCode.INVALID_TARGET) from None
+        url, host_header = _wire_target(target)
+        body = _request_body(request)
+        body["model"] = self._settings.model
+        body["stream"] = True
+        headers = {
+            "Authorization": f"Bearer {self._settings.api_key}",
+            "Host": host_header,
+            "Accept": "text/event-stream",
+        }
+        try:
+            async with httpx.AsyncClient(
+                transport=self._transport,
+                trust_env=False,
+                follow_redirects=False,
+                timeout=_TIMEOUT,
+            ) as client:
+                wire_request = client.build_request("POST", url, headers=headers, json=body)
+                wire_request.extensions["sni_hostname"] = target.hostname
+                response = await client.send(wire_request, stream=True, follow_redirects=False)
+                try:
+                    if response.status_code in {401, 403}:
+                        raise ProviderError(ProviderErrorCode.AUTHENTICATION_FAILED)
+                    if response.is_redirect:
+                        raise ProviderError(ProviderErrorCode.INVALID_TARGET)
+                    if not response.is_success:
+                        raise ProviderError(ProviderErrorCode.TEMPORARILY_UNAVAILABLE)
+                    finished = False
+                    done = False
+                    async for data in _sse_data(response.aiter_bytes()):
+                        if data == "[DONE]":
+                            done = True
+                            break
+                        content, stopped = _stream_chunk(data)
+                        if finished and content:
+                            raise ProviderError(ProviderErrorCode.INVALID_OUTPUT)
+                        if content:
+                            yield TextDelta(text=content)
+                        finished = finished or stopped
+                    if not done:
+                        raise ProviderError(ProviderErrorCode.TEMPORARILY_UNAVAILABLE)
+                    if not finished:
+                        raise ProviderError(ProviderErrorCode.INVALID_OUTPUT)
+                finally:
+                    await response.aclose()
+        except ProviderError:
+            raise
+        except httpx.TimeoutException:
+            raise ProviderError(ProviderErrorCode.TIMEOUT) from None
+        except httpx.RequestError:
+            raise ProviderError(ProviderErrorCode.TEMPORARILY_UNAVAILABLE) from None
