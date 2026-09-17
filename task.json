@@ -378,7 +378,7 @@
       "phase": "MVP 0.1",
       "parent_work_package": "MVP-0.1-004",
       "title": "实现匿名会话创建",
-      "status": "blocked",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.1-T008"
@@ -396,10 +396,16 @@
       "verification": [
         "运行匿名会话接口及迁移集成测试；记录实际命令。"
       ],
-      "verification_results": [],
+      "verification_results": [
+        {"command": "EDUMIND_DATABASE_URL=<isolated PostgreSQL URL> uv run --python 3.11 alembic upgrade head", "result": "passed", "evidence": "空库从 0001_initial 升级到 0002_auth_sessions；users 与 auth_sessions 表已创建。"},
+        {"command": "EDUMIND_TEST_DATABASE_URL=<isolated PostgreSQL URL> uv run --python 3.11 pytest -q", "result": "passed", "evidence": "10 passed；覆盖 Cookie 安全属性、身份恢复、令牌哈希、过期、Origin 与 CSRF。"},
+        {"command": "uv run --python 3.11 ruff check . && uv run --python 3.11 mypy app", "result": "passed", "evidence": "Ruff 全通过；Mypy 10 个源文件无问题。"},
+        {"command": "EDUMIND_DATABASE_URL=<isolated PostgreSQL URL> uv run --python 3.11 alembic downgrade 0001_initial && EDUMIND_DATABASE_URL=<isolated PostgreSQL URL> uv run --python 3.11 alembic upgrade head", "result": "passed", "evidence": "0002_auth_sessions 可回滚并重新升级。"},
+        {"command": "python3 -m json.tool docs/api/openapi.yaml >/dev/null && python3 -m json.tool task.json >/dev/null && git diff --check", "result": "passed", "evidence": "契约及任务 JSON 可解析，工作区 diff 无空白错误。"}
+      ],
       "started_at": "2026-09-17T07:34:17+08:00",
-      "completed_at": null,
-      "blocker": "认证契约冲突：PRD §8.3 要求 Token Header 模式、无 cookie；ADR-0001 与 docs/api/openapi.yaml 指定 HttpOnly Cookie。匿名会话实现依赖产品与安全决策。",
+      "completed_at": "2026-09-17T08:05:06+08:00",
+      "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.1-T009"
     },
     {

@@ -52,3 +52,7 @@ VERIFIED 表示验证通过并准备提交，完成以 Git 中的 Task-Completed
 
 [2026-09-17T07:34:17+08:00] [MVP-0.1-T009] START | 领取“实现匿名会话创建”。 | T008 完成标记 fc08d17 已确认，工作区仅有此前定时复核追加的 process.txt 日志；已核对 PRD §7.1、§8.3、ADR-0001 与 OpenAPI。 | 核对认证安全边界后实现。
 [2026-09-17T07:34:17+08:00] [MVP-0.1-T009] BLOCKED | 发现尚未批准的认证契约冲突，未实现会话或变更 PRD。 | PRD §8.3 明确“CSRF | Token Header 模式，无 cookie”；ADR-0001 第 20 行提议 Secure/HttpOnly/SameSite Cookie，且仍为 Proposed；OpenAPI 第 136 行定义 cookie security scheme。 | 请决定沿用 PRD 的 Header Token，或批准修改 PRD 为 Cookie + CSRF 防护；决策后同步 ADR/OpenAPI，恢复 T009。
+
+[2026-09-17T07:40:37+08:00] [MVP-0.1-T009] RESUME | 用户选择 HttpOnly Cookie + CSRF 防护；解除认证契约阻塞。 | 同步 PRD、ADR、OpenAPI；其他匿名数据留存等未决项仍保持待定。 | 实现不透明数据库会话、同源校验与 CSRF 请求头，并运行接口及迁移集成测试。
+
+[2026-09-17T08:05:06+08:00] [MVP-0.1-T009] VERIFIED | 实现匿名用户与数据库会话、Secure/HttpOnly/SameSite=Lax Cookie、会话恢复及可复用 CSRF 校验；同步 PRD、ADR 与 OpenAPI。 | 隔离 PostgreSQL 上 Alembic 升级及回滚/重升通过；pytest 10 passed；Ruff/Mypy、JSON 解析及 diff check 通过。 | 用户数据留存等 ADR 待决项未实施；提交 T009 后领取 T010。关键文件：backend/app/api/auth.py、backend/app/core/auth.py、backend/alembic/versions/0002_auth_sessions.py、backend/tests/test_auth.py。

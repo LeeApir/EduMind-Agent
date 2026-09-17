@@ -44,4 +44,8 @@ async def check_database_connection(database_url: str | None = None) -> None:
 
 async def database_session_factory() -> AsyncIterator[async_sessionmaker[AsyncSession]]:
     """Provide a session factory for API dependencies after configuration succeeds."""
-    yield async_sessionmaker(create_database_engine(), expire_on_commit=False)
+    engine = create_database_engine()
+    try:
+        yield async_sessionmaker(engine, expire_on_commit=False)
+    finally:
+        await engine.dispose()

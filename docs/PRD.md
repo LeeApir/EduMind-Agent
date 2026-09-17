@@ -928,7 +928,7 @@ CREATE TABLE model_preferences (
                                 ▼
 ┌────────────────────────────────────────────────────────────────┐
 │                     API 网关层 (FastAPI)                         │
-│  - JWT 认证          - SSE 流式             - OpenAPI 自动文档   │
+│  - 会话认证          - SSE 流式             - OpenAPI 自动文档   │
 │  - 限流              - CORS                 - Pydantic 校验      │
 └─────────────────────┬──────────────────────────────────────────┘
                       ▼
@@ -1029,9 +1029,10 @@ services:
 
 | Method | Path | 描述 |
 |---|---|---|
-| POST | `/api/auth/guest` | 创建匿名学习会话，不阻塞首次学习 |
+| POST | `/api/auth/guest` | 创建匿名学习会话，设置 Secure/HttpOnly 会话 Cookie，返回 CSRF token；不阻塞首次学习 |
+| GET | `/api/auth/session` | 用现有 Cookie 校验身份并获取新的请求用 CSRF token |
 | POST | `/api/auth/register` | 将匿名会话升级为账号并保留学习数据 |
-| POST | `/api/auth/login` | 邮箱密码登录，返回 JWT |
+| POST | `/api/auth/login` | 邮箱密码登录，建立服务端会话 Cookie |
 | GET | `/api/auth/me` | 获取当前用户信息 |
 | POST | `/api/auth/logout` | 登出 |
 
@@ -1176,7 +1177,7 @@ API 响应仅返回凭据是否已配置及脱敏标识，任何接口均不得�
 | 维度 | 措施 |
 |---|---|
 | 用户密码 | bcrypt + salt |
-| API 鉴权 | JWT (RS256)，2h 过期，refresh token |
+| API 鉴权 | 服务端存储的不透明会话令牌；Secure、HttpOnly、SameSite=Lax、Host-only Cookie，2h 绝对过期；MVP 0.1 不发 JWT 或 refresh token |
 | 速率限制 | P0 应用中间件；P1 多实例部署改用 Redis 计数器 |
 | API Key | P0 服务端环境变量/密钥管理；P1 BYOK 加密存储、响应脱敏、日志禁止记录明文 |
 | 自定义 Base URL | 默认 HTTPS；阻止云端部署访问回环、链路本地和云元数据地址，防止 SSRF |
@@ -1184,7 +1185,7 @@ API 响应仅返回凭据是否已配置及脱敏标识，任何接口均不得�
 | 代码生成安全 | Manim 代码沙箱化，禁用危险 API |
 | SQL 注入 | SQLAlchemy 参数化查询 |
 | XSS | 前端 Markdown 渲染默认转义 |
-| CSRF | Token Header 模式，无 cookie |
+| CSRF | Cookie 会话的写请求必须携带 `X-CSRF-Token`；服务端验证同源 `Origin` 和 token；匿名会话创建也验证 `Origin`。读取请求不要求 token |
 
 ### 8.4 可观测性
 
@@ -1336,7 +1337,7 @@ EduMind-Agent/
 │   │   ├── agents/               ← LangGraph Agent
 │   │   ├── models/               ← SQLAlchemy
 │   │   ├── services/             ← 业务逻辑与 Provider Gateway
-│   │   ├── core/                 ← 配置/JWT/中间件
+│   │   ├── core/                 ← 配置/会话鉴权/中间件
 │   │   └── workers/              ← P1 Celery + 完整 Manim Worker
 │   ├── tests/
 │   ├── alembic/

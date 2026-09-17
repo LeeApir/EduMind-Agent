@@ -19,11 +19,24 @@
         "operationId": "createGuestSession",
         "responses": {
           "201": {
-            "description": "匿名用户已创建；服务端通过 Secure、HttpOnly Cookie 建立会话。",
+            "description": "匿名用户已创建；服务端通过 Secure、HttpOnly、SameSite=Lax、Host-only Cookie 建立 2h 会话。请求有 Origin 时必须同源。",
             "headers": {"Set-Cookie": {"schema": {"type": "string"}, "description": "不透明的会话 Cookie；浏览器 JavaScript 不可读取。"}},
             "content": {"application/json": {"schema": {"$ref": "#/components/schemas/GuestSession"}}}
           },
+          "403": {"$ref": "#/components/responses/CsrfFailed"},
           "429": {"$ref": "#/components/responses/RateLimited"}
+        }
+      }
+    },
+    "/api/auth/session": {
+      "get": {
+        "tags": ["Authentication"],
+        "summary": "验证会话并获取 CSRF token",
+        "operationId": "getCurrentSession",
+        "security": [{"sessionCookie": []}],
+        "responses": {
+          "200": {"description": "当前身份与写请求用 CSRF token。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/GuestSession"}}}},
+          "401": {"$ref": "#/components/responses/Unauthorized"}
         }
       }
     },
@@ -33,10 +46,12 @@
         "summary": "将当前匿名身份升级为新账号",
         "operationId": "registerGuestAccount",
         "security": [{"sessionCookie": []}],
+        "parameters": [{"$ref": "#/components/parameters/CsrfToken"}],
         "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/RegisterRequest"}}}},
         "responses": {
           "200": {"description": "同一用户记录已绑定账号，服务端已轮换会话 Cookie。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/User"}}}},
           "401": {"$ref": "#/components/responses/Unauthorized"},
+          "403": {"$ref": "#/components/responses/CsrfFailed"},
           "409": {"$ref": "#/components/responses/AccountConflict"}
         }
       }
@@ -48,11 +63,12 @@
         "description": "首段 `token` 是待审核的临时内容。只有 `scene_ready` 指向的版本可作为正式资源读取、恢复或导出。相同匿名用户、相同 Idempotency-Key 和相同请求摘要必须返回同一操作，不能创建重复资源。",
         "operationId": "startLearningSession",
         "security": [{"sessionCookie": []}],
-        "parameters": [{"$ref": "#/components/parameters/IdempotencyKey"}],
+        "parameters": [{"$ref": "#/components/parameters/IdempotencyKey"}, {"$ref": "#/components/parameters/CsrfToken"}],
         "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/StartLearningRequest"}}}},
         "responses": {
           "200": {"$ref": "#/components/responses/LearningEventStream"},
           "401": {"$ref": "#/components/responses/Unauthorized"},
+          "403": {"$ref": "#/components/responses/CsrfFailed"},
           "409": {"$ref": "#/components/responses/IdempotencyConflict"},
           "422": {"$ref": "#/components/responses/ValidationError"},
           "429": {"$ref": "#/components/responses/RateLimited"}
@@ -79,10 +95,11 @@
         "description": "取消意图被持久化，重复取消为幂等成功。已发布版本不会删除；未发布候选不得被读取。",
         "operationId": "cancelLearningOperation",
         "security": [{"sessionCookie": []}],
-        "parameters": [{"$ref": "#/components/parameters/OperationId"}],
+        "parameters": [{"$ref": "#/components/parameters/OperationId"}, {"$ref": "#/components/parameters/CsrfToken"}],
         "responses": {
           "202": {"description": "已接受取消。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/LearningOperation"}}}},
           "401": {"$ref": "#/components/responses/Unauthorized"},
+          "403": {"$ref": "#/components/responses/CsrfFailed"},
           "404": {"$ref": "#/components/responses/NotFound"}
         }
       }
@@ -133,8 +150,9 @@
     }
   },
   "components": {
-    "securitySchemes": {"sessionCookie": {"type": "apiKey", "in": "cookie", "name": "edumind_session", "description": "服务端签发的不透明会话令牌。"}},
+    "securitySchemes": {"sessionCookie": {"type": "apiKey", "in": "cookie", "name": "edumind_session", "description": "Secure、HttpOnly、SameSite=Lax、Host-only Cookie，2h 绝对有效期；数据库只存令牌哈希。"}},
     "parameters": {
+      "CsrfToken": {"name": "X-CSRF-Token", "in": "header", "required": true, "schema": {"type": "string", "minLength": 64, "maxLength": 64}, "description": "写请求必须提供；服务端同时验证同源 Origin。"},
       "IdempotencyKey": {"name": "Idempotency-Key", "in": "header", "required": true, "schema": {"type": "string", "minLength": 16, "maxLength": 128}, "description": "客户端为一次创建操作生成的随机键；与认证身份和请求摘要绑定。"},
       "OperationId": {"name": "operationId", "in": "path", "required": true, "schema": {"$ref": "#/components/schemas/Identifier"}},
       "LearningUnitId": {"name": "learningUnitId", "in": "path", "required": true, "schema": {"$ref": "#/components/schemas/Identifier"}},
@@ -143,6 +161,7 @@
     "responses": {
       "LearningEventStream": {"description": "text/event-stream；事件定义见 x-sse-events。", "content": {"text/event-stream": {"schema": {"type": "string"}, "examples": {"temporaryToken": {"value": "event: token\\ndata: {\\\"operation_id\\\":\\\"op_123\\\",\\\"temporary\\\":true,\\\"delta\\\":\\\"链表插入先要保存...\\\"}\\n\\n"}}}}},
       "Unauthorized": {"description": "会话缺失、失效或不属于当前用户。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},
+      "CsrfFailed": {"description": "Origin 或 CSRF token 校验失败。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},
       "NotFound": {"description": "资源不存在，或不属于当前用户。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},
       "ValidationError": {"description": "请求未通过 schema 校验。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},
       "IdempotencyConflict": {"description": "同一幂等键被用于不同请求摘要。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},
@@ -151,7 +170,7 @@
     },
     "schemas": {
       "Identifier": {"type": "string", "pattern": "^[A-Za-z0-9_-]{8,64}$"},
-      "GuestSession": {"type": "object", "required": ["user"], "properties": {"user": {"$ref": "#/components/schemas/User"}}},
+      "GuestSession": {"type": "object", "required": ["user", "csrf_token", "expires_at"], "properties": {"user": {"$ref": "#/components/schemas/User"}, "csrf_token": {"type": "string", "description": "只放在内存，用于 X-CSRF-Token；不得持久化到浏览器存储。"}, "expires_at": {"type": "string", "format": "date-time"}}},
       "User": {"type": "object", "required": ["id", "is_guest"], "properties": {"id": {"$ref": "#/components/schemas/Identifier"}, "is_guest": {"type": "boolean"}}},
       "RegisterRequest": {"type": "object", "additionalProperties": false, "required": ["email", "password"], "properties": {"email": {"type": "string", "format": "email"}, "password": {"type": "string", "minLength": 12, "writeOnly": true}}},
       "StartLearningRequest": {"type": "object", "additionalProperties": false, "required": ["goal"], "properties": {"goal": {"type": "string", "minLength": 1, "maxLength": 2000, "description": "学生的一句话学习目标或困难。"}, "preferred_language": {"type": "string", "enum": ["c"], "default": "c"}}},
@@ -159,7 +178,7 @@
       "LearningUnit": {"type": "object", "required": ["id", "status", "scenes"], "properties": {"id": {"$ref": "#/components/schemas/Identifier"}, "status": {"type": "string", "enum": ["active", "completed"]}, "scenes": {"type": "array", "items": {"$ref": "#/components/schemas/PublishedScene"}}}},
       "PublishedScene": {"type": "object", "required": ["id", "version", "resources", "review_status"], "properties": {"id": {"$ref": "#/components/schemas/Identifier"}, "version": {"type": "integer", "minimum": 1}, "review_status": {"const": "passed"}, "resources": {"type": "array", "items": {"$ref": "#/components/schemas/PublishedResource"}}}},
       "PublishedResource": {"type": "object", "required": ["id", "type", "version", "content", "review_status"], "properties": {"id": {"$ref": "#/components/schemas/Identifier"}, "type": {"type": "string", "enum": ["explanation", "code", "exercise"]}, "version": {"type": "integer", "minimum": 1}, "content": {"type": "object", "description": "按资源类型定义的已清洗结构化内容。"}, "review_status": {"const": "passed"}}},
-      "Error": {"type": "object", "additionalProperties": false, "required": ["code", "message", "retryable"], "properties": {"code": {"type": "string", "enum": ["UNAUTHORIZED", "NOT_FOUND", "VALIDATION_ERROR", "IDEMPOTENCY_CONFLICT", "ACCOUNT_CONFLICT", "RATE_LIMITED", "PROVIDER_UNAVAILABLE", "REVIEW_REJECTED", "OPERATION_CANCELED"]}, "message": {"type": "string"}, "retryable": {"type": "boolean"}, "operation_id": {"$ref": "#/components/schemas/Identifier"}}}
+      "Error": {"type": "object", "additionalProperties": false, "required": ["code", "message", "retryable"], "properties": {"code": {"type": "string", "enum": ["UNAUTHORIZED", "CSRF_FAILED", "NOT_FOUND", "VALIDATION_ERROR", "IDEMPOTENCY_CONFLICT", "ACCOUNT_CONFLICT", "RATE_LIMITED", "PROVIDER_UNAVAILABLE", "REVIEW_REJECTED", "OPERATION_CANCELED"]}, "message": {"type": "string"}, "retryable": {"type": "boolean"}, "operation_id": {"$ref": "#/components/schemas/Identifier"}}}
     }
   },
   "x-sse-events": {
