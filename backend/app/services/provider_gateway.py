@@ -1,11 +1,14 @@
 """Provider-neutral generation contract for P0 business services."""
 
+import asyncio
+import math
 from collections.abc import AsyncIterator, Mapping
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Literal, Protocol
+from typing import Awaitable, Callable, Literal, Protocol, TypeVar
 
 MessageRole = Literal["system", "user", "assistant"]
+_Result = TypeVar("_Result")
 
 
 class TaskProfile(StrEnum):
@@ -121,17 +124,79 @@ class ProviderAdapter(Protocol):
     def stream_text(self, request: TextRequest) -> AsyncIterator[TextDelta]: ...
 
 
+@dataclass(frozen=True, slots=True)
+class RetryPolicy:
+    """Bounded retry budget; explicit caller safety opt-in is still required."""
+
+    max_attempts: int = 3
+    base_delay_seconds: float = 0.25
+    max_delay_seconds: float = 2.0
+
+    def __post_init__(self) -> None:
+        if (
+            not 1 <= self.max_attempts <= 3
+            or not math.isfinite(self.base_delay_seconds)
+            or not math.isfinite(self.max_delay_seconds)
+            or self.base_delay_seconds < 0
+            or self.max_delay_seconds < self.base_delay_seconds
+            or self.max_delay_seconds > 5
+        ):
+            raise ValueError("Invalid Provider retry policy.")
+
+
 class ProviderGateway:
-    """Business-facing facade; delegates once and never silently switches providers."""
+    """Business-facing facade; explicit safe retries never switch providers."""
 
-    def __init__(self, adapter: ProviderAdapter) -> None:
+    def __init__(
+        self,
+        adapter: ProviderAdapter,
+        *,
+        retry_policy: RetryPolicy | None = None,
+        sleep: Callable[[float], Awaitable[None]] = asyncio.sleep,
+    ) -> None:
         self._adapter = adapter
+        self._retry_policy = retry_policy or RetryPolicy()
+        self._sleep = sleep
 
-    async def generate_text(self, request: TextRequest) -> TextResult:
-        return await self._adapter.generate_text(request)
+    async def _retry_call(
+        self, operation: Callable[[], Awaitable[_Result]], *, retry_safe: bool
+    ) -> _Result:
+        for attempt in range(self._retry_policy.max_attempts):
+            try:
+                return await operation()
+            except ProviderError as error:
+                if (
+                    not retry_safe
+                    or not error.retryable
+                    or attempt + 1 >= self._retry_policy.max_attempts
+                ):
+                    raise
+                delay = error.retry_after_seconds
+                if delay is None:
+                    delay = min(
+                        self._retry_policy.base_delay_seconds * (2**attempt),
+                        self._retry_policy.max_delay_seconds,
+                    )
+                if (
+                    not math.isfinite(delay)
+                    or delay < 0
+                    or delay > self._retry_policy.max_delay_seconds
+                ):
+                    raise
+                await self._sleep(delay)
+        raise AssertionError("unreachable retry state")
 
-    async def generate_structured(self, request: StructuredRequest) -> StructuredResult:
-        return await self._adapter.generate_structured(request)
+    async def generate_text(self, request: TextRequest, *, retry_safe: bool = False) -> TextResult:
+        return await self._retry_call(
+            lambda: self._adapter.generate_text(request), retry_safe=retry_safe
+        )
+
+    async def generate_structured(
+        self, request: StructuredRequest, *, retry_safe: bool = False
+    ) -> StructuredResult:
+        return await self._retry_call(
+            lambda: self._adapter.generate_structured(request), retry_safe=retry_safe
+        )
 
     async def stream_text(self, request: TextRequest) -> AsyncIterator[TextDelta]:
         stream = self._adapter.stream_text(request)

@@ -16,11 +16,11 @@ PRD §3.8 是产品范围来源。P0 只连接一个由服务端配置的 OpenAI
 
 ## 错误与重试责任
 
-适配器将厂商错误转换为稳定的 `ProviderErrorCode`，只抛出安全的固定文案；原始响应、凭据、完整学生画像和消息正文不得进入异常或日志。`RATE_LIMITED`、`TEMPORARILY_UNAVAILABLE`、`TIMEOUT` 标记为可重试；配置/鉴权/能力缺失和无效结构化输出不可作为通用网络重试。限流可附带 `retry_after_seconds`。
+适配器将厂商错误转换为稳定的 `ProviderErrorCode`，只抛出安全的固定文案；原始响应、凭据、完整学生画像和消息正文不得进入异常或日志。401/403 映射 `AUTHENTICATION_FAILED`；429 为 `RATE_LIMITED`（解析秒数或 HTTP 日期 `Retry-After`）；408/504 为 `TIMEOUT`；其余 4xx 与 501 为 `CAPABILITY_UNAVAILABLE`；其他非 2xx 为 `TEMPORARILY_UNAVAILABLE`。配置、鉴权、能力缺失、非法目标和无效输出均不可重试。
 
-Gateway 与 Adapter **每次调用只尝试一次**，均不自行重试或切换 Provider。上层编排依据幂等性、阶段状态和预算决定是否在同一 Provider 上限次重试；流已经输出文本后不得在同一流里静默重新生成。P0 不做跨 Provider 回退。Provider 故障不能删除已发布资源或覆盖学习进度。
+`ProviderGateway` 默认**只调用一次**。只有调用方确认请求尚未产生可见副作用并显式传入 `retry_safe=True`，才会在同一个适配器（同一个 Provider）上重试 `RATE_LIMITED`、`TEMPORARILY_UNAVAILABLE` 或 `TIMEOUT`；重试最多 3 次，指数退避不超过 2 秒。超过本地等待上限、无效或负数的 `Retry-After` 会停止重试，避免忽略上游限流窗口；不会静默切换厂商。流式调用永不自动重试，特别是已经输出 token 后。Provider 故障不能删除已发布资源或覆盖学习进度。
 
-后续实现仍需完成完整的错误与有界重试策略、真实 Provider 验证。测试替身和 Mock HTTP 只证明协议转换，不代表真实供应商连通性。
+真实 Provider 验证仍未完成；测试替身和 Mock HTTP 只证明协议转换，不代表真实供应商连通性。
 
 ## 服务端配置组装
 

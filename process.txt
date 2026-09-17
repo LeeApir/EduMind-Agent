@@ -84,3 +84,7 @@ VERIFIED 表示验证通过并准备提交，完成以 Git 中的 Task-Completed
 [2026-09-17T09:07:23+08:00] [MVP-0.1-T016] START | T015 完成提交 9c55d66 已确认，工作区干净；领取“接入 Provider 流式响应适配”。 | 官方 Chat Completions SSE `stream=true`、delta 与 `[DONE]` 语义已核对；沿用 T015 的固定 IP、Host/SNI、禁用代理/跳转边界。 | 增量解码 UTF-8/SSE 帧，处理跨分片、非法帧与上游中断；验证关闭和取消释放连接。
 
 [2026-09-17T09:11:17+08:00] [MVP-0.1-T016] VERIFIED | 将 Chat Completions SSE 分片转换为内部 TextDelta；逐字节 UTF-8/CRLF 跨界解析，要求 stop + [DONE] 完整结束；错误、EOF 与取消均关闭上游响应，Gateway 关闭外层流时关闭适配器流。 | 流式专项 10 passed；完整后端 63 passed、7 个数据库用例按环境跳过；Ruff/Mypy、JSON 和 diff 检查通过。 | 真实 Provider 流式连通未验证；T017 再细化错误与重试。关键文件：backend/app/services/openai_compatible.py、backend/app/services/provider_gateway.py、backend/tests/test_provider_stream.py、docs/PROVIDERS.md。
+
+[2026-09-17T09:15:51+08:00] [MVP-0.1-T017] START | T015/T016 完成提交已确认，工作区干净；领取“统一 Provider 错误与有界重试”。 | 现有适配器仅粗分 401/403、跳转和其他失败；Gateway 目前单次调用。 | 细分 HTTP/网络错误，添加只有调用方明确声明安全时才启用的同 Provider 有界重试；流式输出不自动重试。
+
+[2026-09-17T14:15:37+08:00] [MVP-0.1-T017] VERIFIED | 统一映射鉴权、限流、超时、能力不兼容与上游故障；Gateway 默认单次，只有显式 retry_safe 的无副作用调用在同一适配器上最多重试三次，流式不自动重放。 | 错误/重试专项 14 passed；完整后端 77 passed、7 个数据库用例按环境跳过；Ruff/Mypy、JSON 和 diff 检查通过。 | 真实 Provider 连通未验证；下一依赖已满足任务为 T018（临时画像 schema）。关键文件：backend/app/services/openai_compatible.py、backend/app/services/provider_gateway.py、backend/tests/test_provider_retry.py、docs/PROVIDERS.md。

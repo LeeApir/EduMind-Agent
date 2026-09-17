@@ -2,7 +2,10 @@
 
 import ipaddress
 import json
+import math
 from collections.abc import AsyncIterator, Mapping
+from datetime import datetime, timezone
+from email.utils import parsedate_to_datetime
 from typing import Any
 from urllib.parse import urlsplit, urlunsplit
 
@@ -26,6 +29,39 @@ from app.services.provider_gateway import (
 _MAX_RESPONSE_BYTES = 2 * 1024 * 1024
 _MAX_SSE_FRAME_BYTES = 1024 * 1024
 _TIMEOUT = httpx.Timeout(connect=5.0, read=60.0, write=10.0, pool=5.0)
+
+
+def _retry_after_seconds(raw: str | None) -> float | None:
+    if raw is None:
+        return None
+    try:
+        seconds = float(raw)
+    except ValueError:
+        try:
+            date = parsedate_to_datetime(raw)
+        except (TypeError, ValueError):
+            return None
+        if date.tzinfo is None:
+            date = date.replace(tzinfo=timezone.utc)
+        seconds = max(0.0, (date - datetime.now(timezone.utc)).total_seconds())
+    return seconds if math.isfinite(seconds) and seconds >= 0 else None
+
+
+def _check_status(response: httpx.Response) -> None:
+    status = response.status_code
+    if status in {401, 403}:
+        raise ProviderError(ProviderErrorCode.AUTHENTICATION_FAILED)
+    if response.is_redirect:
+        raise ProviderError(ProviderErrorCode.INVALID_TARGET)
+    if status == 429:
+        retry_after = _retry_after_seconds(response.headers.get("Retry-After"))
+        raise ProviderError(ProviderErrorCode.RATE_LIMITED, retry_after_seconds=retry_after)
+    if status in {408, 504}:
+        raise ProviderError(ProviderErrorCode.TIMEOUT)
+    if 400 <= status < 500 or status == 501:
+        raise ProviderError(ProviderErrorCode.CAPABILITY_UNAVAILABLE)
+    if not response.is_success:
+        raise ProviderError(ProviderErrorCode.TEMPORARILY_UNAVAILABLE)
 
 
 def _wire_target(target: ApprovedTarget) -> tuple[str, str]:
@@ -209,12 +245,7 @@ class OpenAICompatibleAdapter:
                 request.extensions["sni_hostname"] = target.hostname
                 response = await client.send(request, stream=True, follow_redirects=False)
                 try:
-                    if response.status_code in {401, 403}:
-                        raise ProviderError(ProviderErrorCode.AUTHENTICATION_FAILED)
-                    if response.is_redirect:
-                        raise ProviderError(ProviderErrorCode.INVALID_TARGET)
-                    if not response.is_success:
-                        raise ProviderError(ProviderErrorCode.TEMPORARILY_UNAVAILABLE)
+                    _check_status(response)
                     chunks: list[bytes] = []
                     size = 0
                     async for chunk in response.aiter_bytes():
@@ -288,12 +319,7 @@ class OpenAICompatibleAdapter:
                 wire_request.extensions["sni_hostname"] = target.hostname
                 response = await client.send(wire_request, stream=True, follow_redirects=False)
                 try:
-                    if response.status_code in {401, 403}:
-                        raise ProviderError(ProviderErrorCode.AUTHENTICATION_FAILED)
-                    if response.is_redirect:
-                        raise ProviderError(ProviderErrorCode.INVALID_TARGET)
-                    if not response.is_success:
-                        raise ProviderError(ProviderErrorCode.TEMPORARILY_UNAVAILABLE)
+                    _check_status(response)
                     finished = False
                     done = False
                     async for data in _sse_data(response.aiter_bytes()):
