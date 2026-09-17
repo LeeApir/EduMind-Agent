@@ -20,7 +20,7 @@ PRD §3.8 是产品范围来源。P0 只连接一个由服务端配置的 OpenAI
 
 Gateway 与 Adapter **每次调用只尝试一次**，均不自行重试或切换 Provider。上层编排依据幂等性、阶段状态和预算决定是否在同一 Provider 上限次重试；流已经输出文本后不得在同一流里静默重新生成。P0 不做跨 Provider 回退。Provider 故障不能删除已发布资源或覆盖学习进度。
 
-后续实现仍需完成超时与限流映射、网络连接关闭、真实 Provider 验证。测试替身只证明接口可替换，不代表真实供应商连通性。
+后续实现仍需完成完整的错误与有界重试策略、流式响应适配、真实 Provider 验证。测试替身和 Mock HTTP 只证明协议转换，不代表真实供应商连通性。
 
 ## 服务端配置组装
 
@@ -34,4 +34,10 @@ Gateway 与 Adapter **每次调用只尝试一次**，均不自行重试或切�
 
 本地模型必须**同时**设 `EDUMIND_PROVIDER_DEPLOYMENT=local` 与 `EDUMIND_PROVIDER_LOCAL_ALLOWLIST`；后者是逗号分隔的精确 `IP:port` 条目（IPv6 用 `[::1]:port`），例如 `127.0.0.1:11434`。仅被列出的非公网、非链路本地、非元数据 IP 与端口可使用 HTTP；云端模式提供白名单会直接配置失败。DNS 名称解析出多个地址时，必须全部满足同一条目标策略，不能只挑安全的一条。
 
-适配器工厂收到 `ProviderTargetGuard`，而不是可以永久信任的启动时 DNS 结果。**每次出站尝试**必须调用 `approve_base()`，只连接返回的 `ApprovedTarget.connect_ip`（或其 `addresses` 中另一已批准 IP），同时保留原始主机名用于 HTTP Host 与 HTTPS TLS SNI/证书验证；禁止让 HTTP 客户端再次解析原始主机名、使用环境代理绕过目标 IP，或自动跟随重定向。默认拒绝 3xx；若确需处理跳转，只可通过 `approve_redirect(previous, location)` 在下一次请求前重新解析并校验同源目标，不得把 Key 发送到其他源。连接失败后的每次重试也必须重新调用 Guard。T014 的测试用受控 DNS 答案验证 DNS 变更、混合地址、重定向和白名单，不进行真实网络请求；T015 的适配器测试须证明这些连接约束被实际遵守。
+适配器工厂收到 `ProviderTargetGuard`，而不是可以永久信任的启动时 DNS 结果。**每次出站尝试**必须调用 `approve_base()`，只连接返回的 `ApprovedTarget.connect_ip`（或其 `addresses` 中另一已批准 IP），同时保留原始主机名用于 HTTP Host 与 HTTPS TLS SNI/证书验证；禁止让 HTTP 客户端再次解析原始主机名、使用环境代理绕过目标 IP，或自动跟随重定向。默认拒绝 3xx；若确需处理跳转，只可通过 `approve_redirect(previous, location)` 在下一次请求前重新解析并校验同源目标，不得把 Key 发送到其他源。连接失败后的每次重试也必须重新调用 Guard。T014/T015 使用受控 DNS 与 Mock HTTP 覆盖这些边界，不进行真实网络请求。
+
+## P0 非流式适配器
+
+`build_default_provider_gateway()` 组装唯一服务端适配器 `OpenAICompatibleAdapter`。P0 选择 Chat Completions 的 `POST /chat/completions`；服务端配置的 Base URL 作为 API 前缀（例如 `/v1`），模型 ID 和 API Key 只从服务端配置注入。请求携带消息、可选 `max_completion_tokens` 与 `temperature`；结构化请求携带 `response_format.type=json_schema`。适配器将第一条已正常结束的文本结果、模型 ID 和可选用量转换成内部类型；缺失、截断或无效数据返回固定 `INVALID_OUTPUT`，不会发布结果。结构化结果再用本地 JSON Schema 验证，拒绝需要远程读取的 schema 引用。
+
+HTTPX 0.28.1 连接到 Guard 批准的 IP，同时设置原始 Host 和 `sni_hostname` 来保持 TLS 证书验证；禁用环境代理与自动重定向，单次响应限 2 MiB，并在结束时关闭连接。鉴权失败映射为不含原始响应的 `AUTHENTICATION_FAILED`；其他 HTTP 错误的细分、有界重试和流式行为分别在 T017/T016 完成。当前没有真实 Provider 凭据或连通性证明，不能据此宣称完整生成链路已可用。依据：[OpenAI Chat Completions API](https://developers.openai.com/api/reference/resources/chat/subresources/completions/methods/create)、[HTTPX SNI extension](https://www.python-httpx.org/advanced/extensions/)。

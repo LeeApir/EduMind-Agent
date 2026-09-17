@@ -30,3 +30,10 @@ def build_server_provider_gateway(
     except TargetValidationError:
         raise ProviderError(ProviderErrorCode.INVALID_TARGET) from None
     return ProviderGateway(adapter_factory(settings, guard))
+
+
+def build_default_provider_gateway() -> ProviderGateway:
+    """Compose the one configured P0 network adapter behind the neutral Gateway."""
+    from app.services.openai_compatible import OpenAICompatibleAdapter
+
+    return build_server_provider_gateway(OpenAICompatibleAdapter)

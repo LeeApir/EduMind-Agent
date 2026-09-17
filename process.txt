@@ -76,3 +76,7 @@ VERIFIED 表示验证通过并准备提交，完成以 Git 中的 Task-Completed
 [2026-09-17T08:42:31+08:00] [MVP-0.1-T014] START | T013 完成提交 00e623a 已确认，工作区干净；领取“校验 Provider Base URL 和目标地址”。 | 对照 PRD §8.3/§9.4、任务验收和现有 Gateway/配置边界。 | 实现 HTTPS 默认、解析后全地址校验、本地显式白名单，以及重定向和 DNS 变化的网络前校验；加入无真实网络的回归测试。
 
 [2026-09-17T08:51:32+08:00] [MVP-0.1-T014] VERIFIED | 新增 ProviderTargetGuard：Factory 在交出凭据前拒绝非法 Base URL；每次出站尝试重新解析并返回可固定连接的 IP；云端仅 HTTPS 公网，本地需部署模式和精确 IP:port 白名单；重定向同源重新校验。 | SSRF/配置专项 35 passed；Ruff 通过，Mypy 17 个源文件通过；完整后端 41 passed、7 个数据库用例按环境跳过；JSON 与 diff 检查通过。 | 未做真实 Provider 调用（T015）；T015 网络适配器必须使用 Guard 返回的 IP、原 Host/SNI，禁用代理和自动重定向。关键文件：backend/app/core/provider_target.py、backend/app/core/provider_factory.py、backend/tests/test_provider_target.py、docs/PROVIDERS.md。
+
+[2026-09-17T08:56:46+08:00] [MVP-0.1-T015] START | T012/T013/T014 完成标记已核对，工作区干净；领取“接入单一 OpenAI-compatible 请求适配器”。 | 官方 Chat Completions 与 HTTPX SNI 文档已核对；固定采用 P0 Chat Completions 非流式调用，结构化输出使用 JSON Schema。 | 实现使用 T014 Guard 固定 IP 的服务端适配器、MockTransport 回归测试和配置组装。
+
+[2026-09-17T09:04:25+08:00] [MVP-0.1-T015] VERIFIED | 接入服务端单一 Chat Completions 非流式适配器：文本/结构化转换、固定 IP 与原 Host/SNI、禁用代理/跳转、结果与 schema 校验；默认 Gateway 可组装。 | Mock HTTP 专项 12 passed；完整后端 53 passed、7 个隔离数据库用例按环境跳过；Ruff/Mypy 与锁文件解析通过，JSON/diff 检查通过。 | 未使用真实 Provider 凭据或网络验证；T016 增加流式适配，T017 细化错误/有界重试。关键文件：backend/app/services/openai_compatible.py、backend/tests/test_openai_compatible.py、backend/app/core/provider_factory.py、backend/uv.lock、docs/PROVIDERS.md。

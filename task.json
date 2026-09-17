@@ -579,7 +579,7 @@
       "phase": "MVP 0.1",
       "parent_work_package": "MVP-0.1-005",
       "title": "接入单一 OpenAI-compatible 请求适配器",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.1-T012",
@@ -598,9 +598,14 @@
       "verification": [
         "运行使用 mock HTTP 的适配器测试和后端静态检查。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {"command": "cd backend && uv run --python 3.11 python -m pytest -q tests/test_openai_compatible.py", "result": "passed", "evidence": "12 passed；MockTransport 验证成功、JSON Schema 结果、401、格式异常、SSRF 预拒绝、Host/SNI 固定 IP、重定向拒绝和默认 Gateway 组装；无真实 Provider 请求。"},
+        {"command": "cd backend && uv run --python 3.11 ruff check . && uv run --python 3.11 mypy app && uv run --python 3.11 python -m pytest -q", "result": "passed", "evidence": "Ruff 全通过，Mypy 18 个源文件无问题；完整后端 53 passed、7 个隔离数据库用例按环境跳过。"},
+        {"command": "cd backend && uv lock --python 3.11", "result": "passed", "evidence": "生产 HTTPX 0.28.1 与 jsonschema 4.25.1 已由 uv.lock 固定；依赖解析通过。"},
+        {"command": "python3 -m json.tool task.json >/dev/null && git diff --check", "result": "passed", "evidence": "任务 JSON 可解析且 diff 无空白错误；提交前复核 staged 文件与状态。"}
+      ],
+      "started_at": "2026-09-17T08:56:46+08:00",
+      "completed_at": "2026-09-17T09:04:25+08:00",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.1-T015"
     },
