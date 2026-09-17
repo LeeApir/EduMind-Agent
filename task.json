@@ -480,7 +480,7 @@
       "phase": "MVP 0.1",
       "parent_work_package": "MVP-0.1-005",
       "title": "定义 Provider Gateway 内部接口",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.1-T005"
@@ -498,9 +498,13 @@
         "cd backend && python -m pytest",
         "cd backend && ruff check ."
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {"command": "cd backend && uv run --python 3.11 python -m pytest", "result": "passed", "evidence": "8 passed、7 skipped（仅需隔离 PostgreSQL 的既有集成测试跳过）；新增 Gateway 替身测试 3 passed。"},
+        {"command": "cd backend && uv run --python 3.11 ruff check . && uv run --python 3.11 mypy app", "result": "passed", "evidence": "Ruff 全通过；Mypy 15 个源文件无问题。"},
+        {"command": "python3 -m json.tool task.json >/dev/null && git diff --check", "result": "passed", "evidence": "任务 JSON 可解析，diff 无空白错误；docs/PROVIDERS.md 已核对 PRD §3.8。"}
+      ],
+      "started_at": "2026-09-17T08:23:55+08:00",
+      "completed_at": "2026-09-17T08:26:48+08:00",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.1-T012"
     },

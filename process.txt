@@ -64,3 +64,7 @@ VERIFIED 表示验证通过并准备提交，完成以 Git 中的 Task-Completed
 [2026-09-17T08:15:40+08:00] [MVP-0.1-T011] START | T009/T010 完成标记已确认，工作区干净；领取“限制匿名数据访问范围”。 | PRD §7.2/7.3 与 OpenAPI 路径核对发现资源单复数差异，PRD 单数为正式路径，保留既有 OpenAPI 复数作为同权限兼容别名。 | 实现按 Cookie 身份派生 owner_id 的只读端点，外部用户与不存在记录统一 404，并做跨用户集成测试。
 
 [2026-09-17T08:20:58+08:00] [MVP-0.1-T011] VERIFIED | 新增画像、学习单元和资源的所有者过滤读取；仅返回审核通过且已发布资源；对跨用户、不存在及未发布统一 404。 | 隔离 PostgreSQL 双用户集成测试通过；后端 pytest 12 passed，Ruff/Mypy 通过；OpenAPI/任务 JSON 与 diff 检查通过。 | 提交 T011 后领取 T012（Provider Gateway 接口）；关键文件：backend/app/services/owned_learning.py、backend/app/api/learning_reads.py、backend/tests/test_owner_reads.py。
+
+[2026-09-17T08:23:55+08:00] [MVP-0.1-T012] START | T011 完成提交 0990f12 已确认，工作区干净；领取“定义 Provider Gateway 内部接口”。 | 核对 PRD §3.8、配置和任务边界：P0 仅服务端单一 OpenAI-compatible Provider，T012 不实现网络适配器。 | 定义内部请求/结果/错误类型与可替换协议，建立测试替身并写 docs/PROVIDERS.md。
+
+[2026-09-17T08:26:48+08:00] [MVP-0.1-T012] VERIFIED | 定义文本、结构化与流式内部接口；Gateway 可注入适配器且不静默重试/切换；错误码标注可重试性并只输出安全固定文案。 | 替身证明两种适配器可替换、失败只调用一次；pytest 8 passed、7 个数据库用例按环境跳过；Ruff/Mypy 通过。 | 无真实 Provider 连通性验证（后续适配器任务）；提交 T012 后领取 T013。关键文件：backend/app/services/provider_gateway.py、backend/tests/test_provider_gateway.py、docs/PROVIDERS.md。
