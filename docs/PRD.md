@@ -728,6 +728,9 @@ CREATE TABLE learning_units (
     outline JSONB,              -- 系统内部学习计划，不要求学生编辑
     outline_version INT DEFAULT 1,
     agent_profiles JSONB,
+    profile_snapshot JSONB,
+    review_summary JSONB,
+    version INT DEFAULT 1,
     status VARCHAR(30),       -- draft/generating/ready/failed/archived
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()
@@ -761,11 +764,16 @@ CREATE TABLE generated_resources (
     generated_by VARCHAR(50),   -- Agent 名
     review_score FLOAT,         -- ReviewAgent 评分
     review_comments JSONB,
+    review_status VARCHAR(20),  -- pending/passed/rejected
     version INT DEFAULT 1,
     supersedes_id UUID REFERENCES generated_resources(id),
     metadata JSONB,             -- token 用量、生成耗时等
+    published_at TIMESTAMPTZ,   -- 仅审核通过后赋值；正式版本不可原地修改
     created_at TIMESTAMP DEFAULT NOW()
 );
+
+-- 正式资源读取只接受 review_status='passed' 且 published_at 非空的不可变版本。
+-- 实际迁移还约束版本号为正，并阻止已发布资源被原地 UPDATE。
 
 CREATE TABLE generation_jobs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

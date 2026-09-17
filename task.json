@@ -413,7 +413,7 @@
       "phase": "MVP 0.1",
       "parent_work_package": "MVP-0.1-004",
       "title": "持久化画像、学习单元和资源版本",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.1-T008"
@@ -430,9 +430,15 @@
       "verification": [
         "在隔离 PostgreSQL 上运行迁移和模型集成测试；记录实际命令。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {"command": "EDUMIND_DATABASE_URL=<isolated PostgreSQL URL> uv run --python 3.11 alembic upgrade head", "result": "passed", "evidence": "0003_learning_snapshots 已升级，创建画像、学习单元、场景和资源版本表。"},
+        {"command": "EDUMIND_TEST_DATABASE_URL=<isolated PostgreSQL URL> uv run --python 3.11 pytest -q", "result": "passed", "evidence": "11 passed；新模型测试覆盖断开后重连读取、JSONB 画像证据、场景/资源版本及未审核发布拒绝。"},
+        {"command": "EDUMIND_DATABASE_URL=<isolated PostgreSQL URL> uv run --python 3.11 alembic downgrade 0002_auth_sessions && EDUMIND_DATABASE_URL=<isolated PostgreSQL URL> uv run --python 3.11 alembic upgrade head && EDUMIND_TEST_DATABASE_URL=<isolated PostgreSQL URL> uv run --python 3.11 pytest -q tests/test_learning_persistence.py", "result": "passed", "evidence": "含正式资源不可变触发器的迁移可回滚/重升；专项模型测试 1 passed。"},
+        {"command": "uv run --python 3.11 ruff check . && uv run --python 3.11 mypy app", "result": "passed", "evidence": "Ruff 全通过；Mypy 11 个源文件无问题。"},
+        {"command": "python3 -m json.tool task.json >/dev/null && git diff --check", "result": "passed", "evidence": "任务 JSON 可解析，工作区 diff 无空白错误；PRD/ADR 已同步。"}
+      ],
+      "started_at": "2026-09-17T08:06:50+08:00",
+      "completed_at": "2026-09-17T08:13:48+08:00",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.1-T010"
     },

@@ -33,6 +33,7 @@ accepted
 - `temporary_complete`：完整候选生成结束；它可留在受限的操作工作区供审核，但不可通过资源读取 API、导出或新会话恢复直接访问。
 - `reviewing`：先 schema 校验，再调用 ReviewAgent。审核拒绝时携带问题清单定向重生成，最多两次；每个候选保持独立 `attempt` 与内容摘要。
 - `published`：原子写入正式资源版本、审核摘要和场景版本引用；事务提交后才发 `review_pass` 与 `scene_ready`。后续读取、导出和恢复只能使用此状态的版本。
+- 持久化层以 `review_status='passed'` 且 `published_at` 非空识别正式资源；数据库约束禁止未审核发布，并拒绝已发布版本的原地更新。重新解释须创建新版本。
 - `terminal`：失败、取消或审核重试耗尽。已发布的旧版本不受影响；任何未发布候选都不能被提升为正式版本。
 
 ## SSE 与持久化边界
