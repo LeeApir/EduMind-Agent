@@ -845,7 +845,7 @@
       "phase": "MVP 0.1",
       "parent_work_package": "MVP-0.1-007",
       "title": "实现正式资源 ReviewAgent",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.1-T021"
@@ -863,9 +863,25 @@
       "verification": [
         "运行通过、拒绝、重试上限与严重错误基准测试。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "cd backend && uv run --python 3.11 python -m pytest -q tests/test_review_agent.py",
+          "result": "passed",
+          "evidence": "4 passed；覆盖审核通过、一次定向修正后通过、危险代码本地严重拒绝且不调用 Provider、两次修正上限后拒绝。"
+        },
+        {
+          "command": "cd backend && uv run --python 3.11 ruff check . && uv run --python 3.11 mypy app && uv run --python 3.11 python -m pytest -q",
+          "result": "passed",
+          "evidence": "Ruff 通过，Mypy 27 个源文件无问题，完整后端 110 passed、8 个隔离数据库用例按环境跳过。"
+        },
+        {
+          "command": "python3 -m json.tool task.json >/dev/null && git diff --check",
+          "result": "passed",
+          "evidence": "任务 JSON 可解析，工作树差异无空白错误。"
+        }
+      ],
+      "started_at": "2026-09-17T14:49:40+08:00",
+      "completed_at": "2026-09-17T14:55:02+08:00",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.1-T022"
     },
