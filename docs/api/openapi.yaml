@@ -72,8 +72,8 @@
     "/api/learning-sessions": {
       "post": {
         "tags": ["Learning"],
-        "summary": "创建学习会话并流式返回临时首段",
-        "description": "首段 `token` 是待审核的临时内容。只有 `scene_ready` 指向的版本可作为正式资源读取、恢复或导出。相同匿名用户、相同 Idempotency-Key 和相同请求摘要必须返回同一操作，不能创建重复资源。",
+        "summary": "创建学习会话，流式返回临时首段并审核发布正式资源",
+        "description": "首段 `token` 是待审核的临时内容；流结束后服务依次发送 `stage_changed(reviewing)`，再按审核结果发送 `review_pass` 和 `scene_ready`，或 `review_reject`。只有 `scene_ready` 指向的版本可作为正式资源读取、恢复或导出。相同匿名用户、相同 Idempotency-Key 和相同请求摘要必须返回同一操作，不能创建重复资源。",
         "operationId": "startLearningSession",
         "security": [{"sessionCookie": []}],
         "parameters": [{"$ref": "#/components/parameters/IdempotencyKey"}, {"$ref": "#/components/parameters/CsrfToken"}],

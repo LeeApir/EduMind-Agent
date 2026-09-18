@@ -1,5 +1,6 @@
 """POST learning sessions persist a profile and stream only temporary first-screen text."""
 
+import json
 import os
 from collections.abc import AsyncIterator, Iterator
 
@@ -47,17 +48,75 @@ def profile_value(goal: str) -> dict[str, object]:
 
 
 class FakeAdapter:
-    def __init__(self, *, fail_stream: bool = False) -> None:
+    def __init__(self, *, fail_stream: bool = False, reject_review: bool = False) -> None:
         self.fail_stream = fail_stream
+        self.reject_review = reject_review
         self.calls: list[str] = []
 
     async def generate_text(self, request: TextRequest) -> TextResult:
         raise AssertionError(f"unexpected non-stream request: {request}")
 
     async def generate_structured(self, request: StructuredRequest) -> StructuredResult:
-        self.calls.append("profile")
+        properties = request.json_schema["properties"]
+        assert isinstance(properties, dict)
+        if "profile_version" in properties:
+            self.calls.append("profile")
+            return StructuredResult(
+                value=profile_value(request.prompt.messages[-1].content), model_id="test"
+            )
+        if "review_version" in properties:
+            self.calls.append("review")
+            return StructuredResult(
+                value={
+                    "review_version": "resource-review-v1",
+                    "verdict": "reject" if self.reject_review else "pass",
+                    "issues": (
+                        [{"area": "fact", "severity": "major", "message": "Needs correction."}]
+                        if self.reject_review
+                        else []
+                    ),
+                },
+                model_id="review-test",
+            )
+        resource_type = properties["resource_type"]
+        assert isinstance(resource_type, dict)
+        kind = resource_type["const"]
+        self.calls.append(f"resource:{kind}")
+        content: dict[str, object]
+        if kind == "explanation":
+            content = {"markdown": "# 链表\n节点通过 next 指针连接。"}
+        elif kind == "code":
+            content = {
+                "language": "c",
+                "source": "int main(void) { return 0; }",
+                "expected_output": "程序结束。",
+                "key_steps": ["定义节点"],
+                "display_only": True,
+            }
+        else:
+            content = {
+                "items": [
+                    {
+                        "id": "q1",
+                        "question": "next 是什么？",
+                        "answer": "后继指针",
+                        "explanation": "连接节点。",
+                    },
+                    {
+                        "id": "q2",
+                        "question": "头节点作用？",
+                        "answer": "起点",
+                        "explanation": "从它遍历。",
+                    },
+                ]
+            }
         return StructuredResult(
-            value=profile_value(request.prompt.messages[-1].content), model_id="test"
+            value={
+                "resource_type": kind,
+                "prompt_version": "learning-resources-v1",
+                "content": content,
+            },
+            model_id="generation-test",
         )
 
     async def stream_text(self, request: TextRequest) -> AsyncIterator[TextDelta]:
@@ -85,7 +144,13 @@ def create_authenticated_client(adapter: FakeAdapter) -> tuple[TestClient, str]:
     return client, created.json()["csrf_token"]
 
 
-def test_session_event_order_persists_profile_and_keeps_tokens_temporary(database_url: str) -> None:
+def event_data(event: str) -> dict[str, object]:
+    return json.loads(event.split("data: ", 1)[1])
+
+
+def test_session_publishes_only_reviewed_resources_after_temporary_tokens(
+    database_url: str,
+) -> None:
     adapter = FakeAdapter()
     client, csrf = create_authenticated_client(adapter)
     try:
@@ -101,15 +166,40 @@ def test_session_event_order_persists_profile_and_keeps_tokens_temporary(databas
             "event: agent_start",
             "event: token",
             "event: token",
+            "event: stage_changed",
+            "event: review_pass",
+            "event: scene_ready",
             "event: done",
         ]
         assert '"temporary": true' in events[1]
-        assert "scene_ready" not in response.text
-        assert '"status": "temporary_complete"' in events[-1]
+        ready = event_data(events[-2])
+        unit_id = ready["learning_unit_id"]
+        resource_ids = ready["resource_ids"]
+        assert isinstance(unit_id, str)
+        assert isinstance(resource_ids, list)
+        assert len(resource_ids) == 3
+        assert '"status": "published"' in events[-1]
         profile = client.get("/api/profile/me")
         assert profile.status_code == 200
         assert profile.json()["initial_query"] == "讲解链表"
-        assert adapter.calls == ["profile", "stream"]
+        formal = client.get(f"/api/learning-units/{unit_id}")
+        assert formal.status_code == 200
+        assert formal.json()["status"] == "ready"
+        assert len(formal.json()["scenes"][0]["resources"]) == 3
+        for resource_id in resource_ids:
+            resource = client.get(f"/api/resource/{resource_id}")
+            assert resource.status_code == 200
+            assert resource.json()["review_status"] == "passed"
+        assert adapter.calls == [
+            "profile",
+            "stream",
+            "resource:explanation",
+            "resource:code",
+            "resource:exercise",
+            "review",
+            "review",
+            "review",
+        ]
     finally:
         client.close()
         app.dependency_overrides.clear()
@@ -130,6 +220,30 @@ def test_provider_failure_emits_error_then_failed_done(database_url: str) -> Non
             "event: done",
         ]
         assert '"code": "PROVIDER_UNAVAILABLE"' in events[1]
+        assert '"status": "failed"' in events[-1]
+    finally:
+        client.close()
+        app.dependency_overrides.clear()
+
+
+def test_rejected_review_never_emits_readable_scene_or_resource(database_url: str) -> None:
+    client, csrf = create_authenticated_client(FakeAdapter(reject_review=True))
+    try:
+        response = client.post(
+            "/api/learning-sessions",
+            json={"goal": "讲解队列", "preferred_language": "c"},
+            headers={"Origin": "https://testserver", "X-CSRF-Token": csrf},
+        )
+        events = [part for part in response.text.split("\n\n") if part]
+        assert [event.split("\n", 1)[0] for event in events] == [
+            "event: agent_start",
+            "event: token",
+            "event: token",
+            "event: stage_changed",
+            "event: review_reject",
+            "event: done",
+        ]
+        assert "scene_ready" not in response.text
         assert '"status": "failed"' in events[-1]
     finally:
         client.close()

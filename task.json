@@ -983,7 +983,7 @@
       "phase": "MVP 0.1",
       "parent_work_package": "MVP-0.1-008",
       "title": "接通审核发布与学习单元读取",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.1-T023",
@@ -1002,9 +1002,25 @@
       "verification": [
         "运行审核通过/拒绝与 GET 资源接口集成测试。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "EDUMIND_DATABASE_URL='postgresql+asyncpg://edumind:edumind@127.0.0.1:55436/edumind_test' uv run --directory backend --group dev alembic upgrade head && EDUMIND_TEST_DATABASE_URL='postgresql+asyncpg://edumind:edumind@127.0.0.1:55436/edumind_test' uv run --directory backend --group dev pytest tests/test_learning_sessions.py tests/test_resource_publication.py tests/test_owner_reads.py -q",
+          "result": "passed",
+          "evidence": "隔离 PostgreSQL 上 6 passed：临时 token 后成功流发送 review_pass/scene_ready，并可 GET 三个 passed 正式资源；审核 reject 时不发送 scene_ready，原有 owner/unpublished 隔离读取仍通过。"
+        },
+        {
+          "command": "EDUMIND_TEST_DATABASE_URL='postgresql+asyncpg://edumind:edumind@127.0.0.1:55436/edumind_test' uv run --directory backend --group dev pytest -q",
+          "result": "passed",
+          "evidence": "完整后端 123 passed；仅既有 Starlette TestClient deprecation warnings。"
+        },
+        {
+          "command": "uv run --directory backend --group dev ruff check app tests && uv run --directory backend --group dev mypy app && python -c \"import json; json.load(open('docs/api/openapi.yaml')); json.load(open('task.json'))\" && git diff --check",
+          "result": "passed",
+          "evidence": "Ruff 通过，Mypy 31 个源文件无问题，OpenAPI/任务 JSON 可解析，差异无空白错误。"
+        }
+      ],
+      "started_at": "2026-09-17T15:26:05+08:00",
+      "completed_at": "2026-09-18T21:32:08+08:00",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.1-T025"
     },
