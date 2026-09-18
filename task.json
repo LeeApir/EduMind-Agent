@@ -1029,7 +1029,7 @@
       "phase": "MVP 0.1",
       "parent_work_package": "MVP-0.1-008",
       "title": "实现 SSE 断线恢复与幂等",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.1-T024",
@@ -1048,9 +1048,20 @@
       "verification": [
         "运行断线、重试、重启恢复与重复请求集成测试。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "EDUMIND_DATABASE_URL='postgresql+asyncpg://edumind:edumind@127.0.0.1:55437/edumind_test' uv run --directory backend --group dev alembic upgrade head && EDUMIND_TEST_DATABASE_URL='postgresql+asyncpg://edumind:edumind@127.0.0.1:55437/edumind_test' uv run --directory backend --group dev pytest -q",
+          "result": "passed",
+          "evidence": "迁移 0004 成功；完整后端 125 passed，覆盖重复 POST 复用已发布操作、操作读取与重启中断安全失败。"
+        },
+        {
+          "command": "uv run --directory backend --group dev ruff check app tests alembic/versions/0004_learning_operations.py && uv run --directory backend --group dev mypy app && git diff --check",
+          "result": "passed",
+          "evidence": "Ruff 通过，Mypy 32 个源文件无问题，差异无空白错误。"
+        }
+      ],
+      "started_at": "2026-09-18T21:34:00+08:00",
+      "completed_at": "2026-09-18T21:47:00+08:00",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.1-T026"
     },

@@ -77,6 +77,38 @@ class LearningUnit(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
 
 
+class LearningOperation(Base):
+    """Durable operation metadata; temporary token text is deliberately absent."""
+
+    __tablename__ = "learning_operations"
+    __table_args__ = (
+        UniqueConstraint("user_id", "idempotency_key", name="uq_learning_operations_user_key"),
+        CheckConstraint("attempt >= 1", name="ck_learning_operations_attempt_positive"),
+    )
+
+    id: Mapped[UUID] = mapped_column(PostgreSQLUUID(as_uuid=True), primary_key=True, default=uuid4)
+    user_id: Mapped[UUID] = mapped_column(
+        PostgreSQLUUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
+    idempotency_key: Mapped[str] = mapped_column(String(128), nullable=False)
+    request_digest: Mapped[str] = mapped_column(String(64), nullable=False)
+    goal: Mapped[str] = mapped_column(Text, nullable=False)
+    preferred_language: Mapped[str] = mapped_column(String(32), nullable=False)
+    status: Mapped[str] = mapped_column(String(30), nullable=False, default="accepted")
+    attempt: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    learning_unit_id: Mapped[UUID | None] = mapped_column(
+        PostgreSQLUUID(as_uuid=True), ForeignKey("learning_units.id", ondelete="SET NULL")
+    )
+    scene_id: Mapped[UUID | None] = mapped_column(
+        PostgreSQLUUID(as_uuid=True), ForeignKey("learning_scenes.id", ondelete="SET NULL")
+    )
+    published_scene_version: Mapped[int | None] = mapped_column(Integer)
+    error: Mapped[dict[str, object] | None] = mapped_column(JSONB)
+    canceled_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
+
+
 class LearningScene(Base):
     """A versioned scene; review state does not imply publication."""
 

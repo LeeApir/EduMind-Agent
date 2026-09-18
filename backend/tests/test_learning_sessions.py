@@ -1,14 +1,19 @@
 """POST learning sessions persist a profile and stream only temporary first-screen text."""
 
+import asyncio
 import json
 import os
 from collections.abc import AsyncIterator, Iterator
+from uuid import UUID
 
 import pytest
 from fastapi.testclient import TestClient
+from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from app.api.learning_sessions import provider_gateway
+from app.core.database import create_database_engine
 from app.main import app
+from app.models.learning import LearningOperation
 from app.services.provider_gateway import (
     ProviderError,
     ProviderErrorCode,
@@ -141,6 +146,7 @@ def create_authenticated_client(adapter: FakeAdapter) -> tuple[TestClient, str]:
     client = TestClient(app, base_url="https://testserver")
     created = client.post("/api/auth/guest", headers={"Origin": "https://testserver"})
     assert created.status_code == 201
+    client.headers["Idempotency-Key"] = "test-learning-operation-key"
     return client, created.json()["csrf_token"]
 
 
@@ -250,16 +256,87 @@ def test_rejected_review_never_emits_readable_scene_or_resource(database_url: st
         app.dependency_overrides.clear()
 
 
+def test_same_idempotency_key_reuses_published_operation(database_url: str) -> None:
+    adapter = FakeAdapter()
+    client, csrf = create_authenticated_client(adapter)
+    try:
+        headers = {"Origin": "https://testserver", "X-CSRF-Token": csrf}
+        first = client.post("/api/learning-sessions", json={"goal": "讲解栈"}, headers=headers)
+        first_events = [part for part in first.text.split("\n\n") if part]
+        operation_id = event_data(first_events[-2])["operation_id"]
+        calls_after_first = list(adapter.calls)
+        second = client.post("/api/learning-sessions", json={"goal": "讲解栈"}, headers=headers)
+        second_events = [part for part in second.text.split("\n\n") if part]
+        assert event_data(second_events[0])["operation_id"] == operation_id
+        assert event_data(second_events[-1])["status"] == "published"
+        assert adapter.calls == calls_after_first
+        recovered = client.get(f"/api/learning-operations/{operation_id}")
+        assert recovered.status_code == 200
+        assert recovered.json()["status"] == "published"
+        assert recovered.json()["learning_unit_id"] is not None
+    finally:
+        client.close()
+        app.dependency_overrides.clear()
+
+
+def test_operation_read_marks_pre_restart_active_operation_failed(
+    database_url: str,
+) -> None:
+    client, _csrf = create_authenticated_client(FakeAdapter())
+    try:
+        guest = client.get("/api/auth/session")
+        owner_id = UUID(guest.json()["user"]["id"])
+
+        async def seed() -> str:
+            engine = create_database_engine(database_url)
+            try:
+                async with async_sessionmaker(engine, expire_on_commit=False)() as db:
+                    operation = LearningOperation(
+                        user_id=owner_id,
+                        idempotency_key="interrupted-operation-key",
+                        request_digest="0" * 64,
+                        goal="讲解队列",
+                        preferred_language="c",
+                        status="reviewing",
+                    )
+                    db.add(operation)
+                    await db.commit()
+                    return str(operation.id)
+            finally:
+                await engine.dispose()
+
+        operation_id = asyncio.run(seed())
+        recovered = client.get(f"/api/learning-operations/{operation_id}")
+        assert recovered.status_code == 200
+        assert recovered.json()["status"] == "failed"
+        assert recovered.json()["error"]["code"] == "INTERRUPTED"
+    finally:
+        client.close()
+        app.dependency_overrides.clear()
+
+
 def test_session_post_requires_authenticated_csrf_write_protection(database_url: str) -> None:
     with TestClient(app, base_url="https://testserver") as client:
-        missing = client.post("/api/learning-sessions", json={"goal": "链表"})
+        missing = client.post(
+            "/api/learning-sessions",
+            json={"goal": "链表"},
+            headers={"Idempotency-Key": "test-learning-operation-key"},
+        )
         created = client.post("/api/auth/guest")
         csrf = created.json()["csrf_token"]
-        missing_csrf = client.post("/api/learning-sessions", json={"goal": "链表"})
+        missing_csrf = client.post(
+            "/api/learning-sessions",
+            json={"goal": "链表"},
+            headers={"Idempotency-Key": "test-learning-operation-key"},
+        )
         foreign = client.post(
             "/api/learning-sessions",
             json={"goal": "链表"},
-            headers={"Origin": "https://evil.example", "X-CSRF-Token": csrf},
+            headers={
+                "Origin": "https://evil.example",
+                "X-CSRF-Token": csrf,
+                "Idempotency-Key": "test-learning-operation-key",
+            },
         )
     assert missing.status_code == 401
     assert missing_csrf.status_code == foreign.status_code == 403
