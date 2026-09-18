@@ -1176,7 +1176,7 @@
       "phase": "MVP 0.1",
       "parent_work_package": "MVP-0.1-009",
       "title": "展示首段讲解与正式资源状态",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.1-T027",
@@ -1195,9 +1195,25 @@
       "verification": [
         "运行首段/审核状态组件测试、类型检查与构建。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "pnpm --dir web test --run",
+          "result": "passed",
+          "evidence": "Vitest 通过 10 项；新组件覆盖临时首段/审核中、空态/审核拒绝、已发布资源与重载失败重试。"
+        },
+        {
+          "command": "pnpm --dir web typecheck && pnpm --dir web build",
+          "result": "passed",
+          "evidence": "vue-tsc -b 与 Vite 生产构建通过。"
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed",
+          "evidence": "未发现空白错误。"
+        }
+      ],
+      "started_at": "2026-09-18T22:07:00+08:00",
+      "completed_at": "2026-09-18T22:10:10+08:00",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.1-T029"
     },
