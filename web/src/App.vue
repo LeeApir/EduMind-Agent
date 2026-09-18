@@ -1,12 +1,44 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { NButton, NInput, NTag } from "naive-ui";
+
+type StartLearningRequest = (goal: string) => Promise<void>;
+
+const props = defineProps<{
+  startLearningRequest?: StartLearningRequest;
+}>();
 
 const goal = ref("");
 const submittedGoal = ref("");
+const requestState = ref<"idle" | "loading" | "error">("idle");
+const requestError = ref("");
+const canSubmit = computed(() => Boolean(goal.value.trim()) && requestState.value !== "loading");
 
-function startLearning(): void {
+async function startLearning(): Promise<void> {
   submittedGoal.value = goal.value.trim();
+  await submitLearningRequest();
+}
+
+async function retryLearning(): Promise<void> {
+  await submitLearningRequest();
+}
+
+async function submitLearningRequest(): Promise<void> {
+  requestError.value = "";
+  requestState.value = "loading";
+
+  if (!props.startLearningRequest) {
+    return;
+  }
+
+  try {
+    await props.startLearningRequest(submittedGoal.value);
+  } catch (error: unknown) {
+    requestError.value = error instanceof Error && error.message
+      ? error.message
+      : "暂时无法开始学习，请检查网络后重试。";
+    requestState.value = "error";
+  }
 }
 </script>
 
@@ -36,7 +68,7 @@ function startLearning(): void {
         />
         <div class="form-footer">
           <span>不需要先填写画像</span>
-          <NButton type="primary" attr-type="submit" :disabled="!goal.trim()">开始学习 →</NButton>
+          <NButton type="primary" attr-type="submit" :disabled="!canSubmit">开始学习 →</NButton>
         </div>
       </form>
     </section>
@@ -47,8 +79,12 @@ function startLearning(): void {
       <NTag round :bordered="false">补 C 指针</NTag>
     </section>
 
-    <aside v-if="submittedGoal" class="next-state" aria-live="polite">
-      已收到：{{ submittedGoal }}。下一步将建立临时画像并流式显示第一段讲解。
+    <aside v-if="requestState === 'loading'" class="next-state" aria-live="polite" data-testid="loading-state">
+      正在为“{{ submittedGoal }}”准备第一段讲解。无需先填写画像。
+    </aside>
+    <aside v-else-if="requestState === 'error'" class="next-state error-state" aria-live="assertive">
+      {{ requestError }}
+      <NButton size="small" @click="retryLearning">重试</NButton>
     </aside>
   </main>
 </template>
