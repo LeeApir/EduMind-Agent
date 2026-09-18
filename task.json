@@ -1253,7 +1253,7 @@
       "phase": "MVP 0.1",
       "parent_work_package": "MVP-0.1-009",
       "title": "清洗模型内容并验证前端安全",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.1-T029",
@@ -1270,9 +1270,13 @@
       "verification": [
         "运行 XSS 回归测试、类型检查、lint 与构建。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {"command": "pnpm --dir web test --run", "result": "passed", "evidence": "Vitest 通过 13 项；XSS 回归覆盖危险 HTML、javascript: 链接、事件属性与脚本型代码文本。"},
+        {"command": "pnpm --dir web typecheck && pnpm --dir web lint && pnpm --dir web build", "result": "passed_with_warnings", "evidence": "类型检查和构建通过；eslint 无 error，100 条 Vue 格式 warning。"},
+        {"command": "git diff --check", "result": "passed", "evidence": "未发现空白错误。"}
+      ],
+      "started_at": "2026-09-18T22:26:00+08:00",
+      "completed_at": "2026-09-18T22:28:48+08:00",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.1-T031"
     },

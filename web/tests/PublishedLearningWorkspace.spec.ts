@@ -34,4 +34,23 @@ describe("PublishedLearningWorkspace", () => {
     await wrapper.get("article button").trigger("click");
     expect(wrapper.text()).toContain("回答正确");
   });
+
+  it("renders model markdown, links, and code as inert text", async () => {
+    const hostileResources = [
+      { type: "explanation" as const, content: { markdown: '<img src=x onerror="window.pwned=1"><a href="javascript:alert(1)">链接</a>' } },
+      { type: "code" as const, content: { source: '</code><script>window.pwned=1</script>' } },
+      { type: "exercise" as const, content: { items: [{ id: "q1", question: '<a href="javascript:alert(1)">题目</a>', answer: "a", explanation: "正常解释" }] } },
+    ];
+    const wrapper = mount(PublishedLearningWorkspace, { props: { resources: hostileResources }, global: { stubs } });
+
+    expect(wrapper.find("script").exists()).toBe(false);
+    expect(wrapper.find("img").exists()).toBe(false);
+    expect(wrapper.find("a").exists()).toBe(false);
+    expect(wrapper.get('[data-testid="explanation-tab"] p').attributes("onerror")).toBeUndefined();
+    expect(wrapper.text()).toContain("javascript:alert(1)");
+    await wrapper.get("button:nth-child(2)").trigger("click");
+    expect(wrapper.get("code").text()).toContain("<script>window.pwned=1</script>");
+    await wrapper.get("button:nth-child(3)").trigger("click");
+    expect(wrapper.get("label").text()).toContain("javascript:alert(1)");
+  });
 });
