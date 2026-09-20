@@ -1285,7 +1285,7 @@
       "phase": "MVP 0.1",
       "parent_work_package": "MVP-0.1-010",
       "title": "建立 Compose 开发启动",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.1-T008",
@@ -1308,9 +1308,14 @@
         "docker compose build",
         "按 README 启动并检查三项服务健康状态；记录实际命令。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {"command": "docker compose config --quiet", "result": "passed", "evidence": "Compose 配置可解析；固定镜像与服务依赖有效。"},
+        {"command": "docker compose build", "result": "passed", "evidence": "edumind_agent-api 与 edumind_agent-web 镜像均已构建；固定 Python、Node、uv 镜像摘要已核对。"},
+        {"command": "docker compose up -d && docker compose ps && curl --fail http://127.0.0.1:8000/health && curl --fail http://127.0.0.1:5173/", "result": "passed", "evidence": "postgres、api、web 均 healthy；API 返回 {status: ok}，Web 返回 Vite HTML。"},
+        {"command": "git diff --check", "result": "passed", "evidence": "未发现空白错误。"}
+      ],
+      "started_at": "2026-09-18T22:30:00+08:00",
+      "completed_at": "2026-09-21T00:12:08+08:00",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.1-T032"
     },
