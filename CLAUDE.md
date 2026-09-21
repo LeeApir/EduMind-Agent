@@ -117,4 +117,4 @@ EduMind-Agent/
 
 ## 当前状态
 
-项目处于 MVP 0.1，已完成 PRD v2.1 和参考项目分析，尚未开始主体编码。下一步是搭建 Vue/FastAPI/PostgreSQL 骨架，接通一个服务端 OpenAI-compatible Provider，并跑通“一句话 → 首段讲解 → 代码/练习”的最小链路。
+MVP 0.1 已通过真实 DeepSeek Provider、浏览器主链路和首段性能退出验收。项目进入 MVP 0.2，当前重点是 10 节点知识结构、渐进画像、服务端测验评分、掌握度更新与可解释下一步推荐；活动任务以根目录 `task.json` 为准，已结束阶段快照保存在 `docs/tasks/`。
