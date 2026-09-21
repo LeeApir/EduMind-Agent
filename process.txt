@@ -169,3 +169,7 @@ VERIFIED 表示验证通过并准备提交，完成以 Git 中的 Task-Completed
 领取“实现知识结构校验与 Repository” | T003 完成提交已确认，种子文件通过 schema、引用、DAG 校验 | 暂无 | 实现本地 YAML Repository、确定性查询与针对非法种子的单元测试，不引入 Neo4j
 [2026-09-21T22:54:29] [MVP-0.2-T004] VERIFIED | executor=Lee
 新增只读、不可变的本地知识结构 Repository：加载 JSON 兼容 YAML，校验 schema、节点、关系、前置一致性和 DAG，并提供稳定查询 | 7 个单元测试、Ruff、Mypy（33 个 source）与 `git diff --check` 均通过 | 暂无；T005 需将 Repository 注入只读图谱 API | 创建含 Task-Completed 标记的本地提交；继续 T005 图谱只读 API
+[2026-09-21T22:56:30] [MVP-0.2-T005] START | executor=Lee | branch=codex/mvp-0.2-t005
+领取“提供知识结构只读 API” | T002、T004 完成提交已确认，OpenAPI 契约和 Repository 校验边界已存在 | 暂无 | 注入图谱 Repository，新增稳定排序的公共读端点、未知节点安全错误和 API 集成测试
+[2026-09-21T22:59:56] [MVP-0.2-T005] VERIFIED | executor=Lee
+新增 `GET /api/graph` 和 `GET /api/graph/node/{nodeId}`，注入已校验 Repository，稳定返回公共图谱并以 `GRAPH_NODE_NOT_FOUND` 隐藏未知节点的内部细节 | 图谱 API/Repository 9 测试、Ruff、Mypy（34 个 source）、全量后端 122 passed/15 skipped、OpenAPI JSON 和 `git diff --check` 均通过 | 仅 JSON 兼容 YAML 受 P0 支持；通用 YAML 语法解析需新的明确依赖决策 | 创建含 Task-Completed 标记的本地提交；T001–T005 已完成，下一个可领取任务为 T006

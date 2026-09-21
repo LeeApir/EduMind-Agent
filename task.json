@@ -260,7 +260,7 @@
       "phase": "MVP 0.2",
       "parent_work_package": "MVP-0.2-002",
       "title": "提供知识结构只读 API",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.2-T002",
@@ -280,9 +280,26 @@
       "verification": [
         "运行图谱 API 集成测试、OpenAPI 检查和后端静态检查。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "cd backend && uv run --group dev python -m pytest -q tests/test_knowledge_graph.py tests/test_knowledge_graph_api.py",
+          "result": "passed: 9 tests cover Repository behavior, public graph/node responses, stable ordering, OpenAPI response schemas and safe unknown-node errors"
+        },
+        {
+          "command": "cd backend && uv run --group dev ruff check app/api/knowledge_graph.py app/main.py tests/test_knowledge_graph.py tests/test_knowledge_graph_api.py && uv run --group dev mypy app",
+          "result": "passed: Ruff clean; Mypy reports no issues in 34 application source files"
+        },
+        {
+          "command": "cd backend && uv run --group dev python -m pytest -q",
+          "result": "passed: 122 passed, 15 existing database-dependent skips, 1 dependency deprecation warning"
+        },
+        {
+          "command": "python3 -m json.tool docs/api/openapi.yaml >/dev/null && git diff --check",
+          "result": "passed"
+        }
+      ],
+      "started_at": "2026-09-21T22:56:30",
+      "completed_at": "2026-09-21T22:59:56",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.2-T005"
     },
