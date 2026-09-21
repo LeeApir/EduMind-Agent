@@ -1,0 +1,1643 @@
+{
+  "schema_version": 2,
+  "product_source": "docs/PRD.md v2.1 §9.1",
+  "active_phase": "MVP 0.1",
+  "execution_policy": {
+    "max_in_progress": 1,
+    "auto_commit": true,
+    "auto_push": false,
+    "auto_merge": false,
+    "phase_gate": "完成当前阶段验收并报告；后续阶段细化后按用户授权执行。",
+    "task_granularity": "一个可独立验证的行为，包含实现、对应测试和必要文档；验收通过后一个本地完成提交。",
+    "completion_rule": "验收通过，且 Git 历史存在 Task-Completed 标记的提交。工作区 done 仅是待提交状态。",
+    "verification_note": "以下为计划验证入口，尚未执行；领取任务时建立必要命令，结果写入 verification_results。"
+  },
+  "phases": [
+    {
+      "id": "MVP 0.1",
+      "planning": "detailed",
+      "goal": "一句话进入学习；首段内容 10 秒内可见并完成一个知识点学习。"
+    },
+    {
+      "id": "MVP 0.2",
+      "planning": "deferred",
+      "goal": "8-10 节点、渐进画像、测验评分、掌握度与下一步推荐、完善正式资源审核。"
+    },
+    {
+      "id": "MVP 0.3",
+      "planning": "deferred",
+      "goal": "2-3 个 Manim 模板、专注/互动模式、数组 vs 链表演示、Markdown 笔记。"
+    },
+    {
+      "id": "Phase 1",
+      "planning": "deferred",
+      "goal": "Ollama/BYOK、多 Provider、持久化队列、完整 Manim DSL、约 30 节点与按需 Neo4j。"
+    },
+    {
+      "id": "Phase 2",
+      "planning": "deferred",
+      "goal": "真并行辩论、更多角色策略、RAG、学习报告、更多课程及真实用户测试。"
+    },
+    {
+      "id": "Phase 3",
+      "planning": "deferred",
+      "goal": "按真实使用数据决定 iOS、PPTX/离线 HTML、更多课程和模板市场。"
+    }
+  ],
+  "superseded_work_packages": {
+    "note": "v1 的 11 项均为 todo，从未领取或完成；v2 用 parent_work_package 保留来源映射，旧 ID 不再作为可执行任务。",
+    "ids": [
+      "MVP-0.1-001",
+      "MVP-0.1-002",
+      "MVP-0.1-003",
+      "MVP-0.1-004",
+      "MVP-0.1-005",
+      "MVP-0.1-006",
+      "MVP-0.1-007",
+      "MVP-0.1-008",
+      "MVP-0.1-009",
+      "MVP-0.1-010",
+      "MVP-0.1-011"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "MVP-0.1-T001",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-001",
+      "title": "确定匿名身份与持久化边界",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [],
+      "scope": [
+        "docs/ADR/",
+        "docs/ARCHITECTURE.md"
+      ],
+      "acceptance_criteria": [
+        "明确匿名会话身份、学习数据归属和服务重启后的保存边界。",
+        "记录方案、替代方案及与 PRD §2.3、§7.1、§10.4 的对应关系。",
+        "涉及未获批准的产品或安全选择时记录待决项，不假定已通过。"
+      ],
+      "verification": [
+        "逐项核对 PRD 对匿名进入、隔离和恢复的要求；记录 ADR 审批依据。"
+      ],
+      "verification_results": [
+        {
+          "command": "python3 -m json.tool task.json >/dev/null",
+          "result": "passed",
+          "evidence": "task.json 可解析；T001 已领取，其他 34 项仍为 todo。"
+        },
+        {
+          "command": "rg -n 'POST /api/auth/guest|POST /api/auth/register|is_guest|PostgreSQL|服务重启|待决项' docs/ADR/0001-anonymous-identity-and-persistence-boundary.md docs/ARCHITECTURE.md",
+          "result": "passed",
+          "evidence": "ADR 覆盖匿名进入、数据归属、重启恢复、注册升级、替代方案与待审批项；架构摘要引用 ADR。"
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed",
+          "evidence": "无空白错误。"
+        }
+      ],
+      "started_at": "2026-09-16T23:08:59+08:00",
+      "completed_at": "2026-09-16T23:10:23+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T001"
+    },
+    {
+      "id": "MVP-0.1-T002",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-001",
+      "title": "确定流式首屏与正式资源审核时序",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T001"
+      ],
+      "scope": [
+        "docs/ADR/",
+        "docs/ARCHITECTURE.md"
+      ],
+      "acceptance_criteria": [
+        "明确首段临时流式内容、正式审核资源和发布时机的状态转换。",
+        "定义断线、重试、取消和重入的最小恢复策略，不允许未审核资源成为正式版本。",
+        "记录首段 10 秒目标可能受审核延迟影响的测量口径。"
+      ],
+      "verification": [
+        "逐项核对 PRD §3.3、§7.7、§8.1 的流式与审核约束；记录 ADR 审批依据。"
+      ],
+      "verification_results": [
+        {
+          "command": "python3 -c 'import json; tasks=json.load(open(\"task.json\"))[\"tasks\"]; by_id={task[\"id\"]: task for task in tasks}; assert by_id[\"MVP-0.1-T001\"][\"status\"] == \"done\"; assert by_id[\"MVP-0.1-T002\"][\"status\"] == \"in_progress\"; assert all(task[\"status\"] != \"in_progress\" for task in tasks if task[\"id\"] != \"MVP-0.1-T002\")'",
+          "result": "passed",
+          "evidence": "依赖 T001 已完成，且 T002 是唯一领取中的任务。"
+        },
+        {
+          "command": "rg -n 'streaming_temporary|reviewing|published|Idempotency-Key|断线|取消|重入|P95 ≤ 10 秒|审核发布延迟|待决项' docs/ADR/0002-streaming-first-screen-and-resource-review.md docs/ARCHITECTURE.md",
+          "result": "passed",
+          "evidence": "状态转换、恢复策略和首段/审核延迟测量口径均有明确证据。"
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed",
+          "evidence": "无空白错误。"
+        }
+      ],
+      "started_at": "2026-09-16T23:35:51+08:00",
+      "completed_at": "2026-09-16T23:37:26+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T002"
+    },
+    {
+      "id": "MVP-0.1-T003",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-001",
+      "title": "固定 MVP 0.1 API 与 SSE 契约",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T001",
+        "MVP-0.1-T002"
+      ],
+      "scope": [
+        "docs/api/openapi.yaml",
+        "docs/ARCHITECTURE.md"
+      ],
+      "acceptance_criteria": [
+        "定义匿名会话、学习会话、学习单元与资源读取的请求/响应。",
+        "列明 SSE 事件、错误码、幂等键及恢复行为，区分临时内容和已审核正式资源。",
+        "契约不提前引入 P1 Provider 设置或 Manim Job。"
+      ],
+      "verification": [
+        "执行并记录 OpenAPI 校验命令；核对 PRD §7 和两份 ADR。"
+      ],
+      "verification_results": [
+        {
+          "command": "python3 -m json.tool docs/api/openapi.yaml >/dev/null",
+          "result": "passed",
+          "evidence": "OpenAPI 文件为 JSON 兼容 YAML，语法可解析。"
+        },
+        {
+          "command": "python3 -c 'import json; spec=json.load(open(\"docs/api/openapi.yaml\")); assert spec[\"openapi\"] == \"3.1.0\"; assert {\"/api/auth/guest\", \"/api/learning-sessions\", \"/api/learning-operations/{operationId}\", \"/api/learning-units/{learningUnitId}\", \"/api/resources/{resourceId}\"} <= set(spec[\"paths\"]); assert {\"token\", \"scene_ready\", \"error\", \"done\"} <= set(spec[\"x-sse-events\"]); assert spec[\"x-sse-events\"][\"token\"][\"data\"][\"temporary\"] is True; assert not any(\"jobs\" in path or \"providers\" in path for path in spec[\"paths\"]); print(\"OpenAPI structural contract: valid\")'",
+          "result": "passed",
+          "evidence": "核对 OpenAPI 版本、匿名/学习/资源路径、SSE 事件、临时标志与 P1 路径排除。"
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed",
+          "evidence": "无空白错误。"
+        }
+      ],
+      "started_at": "2026-09-16T23:39:12+08:00",
+      "completed_at": "2026-09-16T23:43:57+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T003"
+    },
+    {
+      "id": "MVP-0.1-T004",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-002",
+      "title": "建立 FastAPI 可启动服务",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T003"
+      ],
+      "scope": [
+        "backend/",
+        "README.md"
+      ],
+      "acceptance_criteria": [
+        "固定 Python 3.11 及依赖锁定方式，FastAPI 应用和健康检查可启动。",
+        "健康检查在无 Provider 凭据时仍可用。"
+      ],
+      "verification": [
+        "cd backend && python -m pytest",
+        "按 README 启动 API 并请求健康检查；记录实际命令和结果。"
+      ],
+      "verification_results": [
+        {
+          "command": "cd backend && uv run --python 3.11 pytest",
+          "result": "passed",
+          "evidence": "1 passed；健康检查测试未注入 Provider 凭据。"
+        },
+        {
+          "command": "cd backend && uv run --python 3.11 uvicorn app.main:app --host 127.0.0.1 --port 8000; curl --fail --silent --show-error http://127.0.0.1:8000/health",
+          "result": "passed",
+          "evidence": "返回 {\"status\":\"ok\"}。"
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed",
+          "evidence": "无空白错误。"
+        }
+      ],
+      "started_at": "2026-09-16T23:45:50+08:00",
+      "completed_at": "2026-09-16T23:50:02+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T004"
+    },
+    {
+      "id": "MVP-0.1-T005",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-002",
+      "title": "建立后端配置与检查入口",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T004"
+      ],
+      "scope": [
+        "backend/pyproject.toml",
+        "backend/app/core/",
+        "backend/tests/",
+        ".env.example",
+        ".gitignore"
+      ],
+      "acceptance_criteria": [
+        "建立 pytest、ruff 和类型检查入口，配置缺失返回明确错误。",
+        "真实 .env、密钥、缓存和生成文件被忽略，示例仅使用占位符。"
+      ],
+      "verification": [
+        "cd backend && python -m pytest",
+        "cd backend && ruff check .",
+        "运行本任务建立的类型检查命令。"
+      ],
+      "verification_results": [
+        {"command": "cd backend && uv run --python 3.11 pytest", "result": "passed", "evidence": "3 passed；覆盖 Provider 配置缺失与正常读取。"},
+        {"command": "cd backend && uv run --python 3.11 ruff check .", "result": "passed", "evidence": "All checks passed!"},
+        {"command": "cd backend && uv run --python 3.11 mypy app", "result": "passed", "evidence": "Success: no issues found in 4 source files."},
+        {"command": "git check-ignore -v .env backend/.venv data/videos/example.mp4", "result": "passed", "evidence": "真实环境变量、虚拟环境和生成媒体均被忽略。"}
+      ],
+      "started_at": "2026-09-16T23:52:34+08:00",
+      "completed_at": "2026-09-16T23:54:32+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T005"
+    },
+    {
+      "id": "MVP-0.1-T006",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-003",
+      "title": "建立 Vue 3 页面骨架",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T003"
+      ],
+      "scope": [
+        "web/",
+        "README.md"
+      ],
+      "acceptance_criteria": [
+        "Vue 3、Vite、TypeScript、Naive UI、Pinia 与 pnpm 锁文件就绪。",
+        "单页应用可启动并显示基础学习入口。"
+      ],
+      "verification": [
+        "pnpm --dir web build",
+        "按 README 启动 Web 并检查首页。"
+      ],
+      "verification_results": [
+        {"command": "pnpm --dir web build", "result": "passed", "evidence": "vue-tsc 与 Vite 均通过；产出 dist 资源。"},
+        {"command": "python3 /Users/apir/.agents/skills/webapp-testing/scripts/with_server.py --server 'pnpm --dir web dev --host 127.0.0.1' --port 5173 -- curl --fail --silent --show-error http://127.0.0.1:5173/", "result": "passed", "evidence": "Vite 监听 5173 后首页返回 HTML。"},
+        {"command": "python3 /private/tmp/edumind_frontend_smoke.py", "result": "not_run", "evidence": "当前 Python 环境缺少 Playwright；T007 将建立前端组件测试环境。"}
+      ],
+      "started_at": "2026-09-16T23:55:29+08:00",
+      "completed_at": "2026-09-17T00:00:11+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T006"
+    },
+    {
+      "id": "MVP-0.1-T007",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-003",
+      "title": "建立前端测试与静态检查入口",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T006"
+      ],
+      "scope": [
+        "web/package.json",
+        "web/tests/",
+        "web/src/"
+      ],
+      "acceptance_criteria": [
+        "建立组件测试、lint、typecheck 和 build 命令，基础页面测试可运行。",
+        "锁文件与脚本保持一致，不把生成目录纳入 Git。"
+      ],
+      "verification": [
+        "pnpm --dir web test --run",
+        "pnpm --dir web typecheck",
+        "pnpm --dir web lint",
+        "pnpm --dir web build"
+      ],
+      "verification_results": [
+        {"command": "pnpm --dir web test --run", "result": "passed", "evidence": "1 个基础学习入口组件测试通过。"},
+        {"command": "pnpm --dir web typecheck", "result": "passed", "evidence": "vue-tsc 成功。"},
+        {"command": "pnpm --dir web lint", "result": "passed_with_warnings", "evidence": "0 errors；32 个非阻塞 Vue 模板排版建议。"},
+        {"command": "pnpm --dir web build", "result": "passed", "evidence": "Vite 生产构建成功。"}
+      ],
+      "started_at": "2026-09-17T00:01:18+08:00",
+      "completed_at": "2026-09-17T00:05:55+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T007"
+    },
+    {
+      "id": "MVP-0.1-T008",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-004",
+      "title": "接入 PostgreSQL 与 Alembic",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T005"
+      ],
+      "scope": [
+        "backend/app/core/",
+        "backend/alembic/",
+        "backend/tests/"
+      ],
+      "acceptance_criteria": [
+        "异步数据库连接与迁移入口可用，测试数据库与开发数据库隔离。",
+        "空库升级至 head 后应用可连接，失败时给出清晰配置错误。"
+      ],
+      "verification": [
+        "在隔离测试 PostgreSQL 上执行 alembic upgrade head 并运行数据库连接测试；记录完整命令。"
+      ],
+      "verification_results": [
+        {"command": "EDUMIND_DATABASE_URL=postgresql+asyncpg://... uv run --python 3.11 alembic upgrade head", "result": "passed", "evidence": "临时隔离 PostgreSQL 已从空库升级至 0001_initial。"},
+        {"command": "EDUMIND_DATABASE_URL=postgresql+asyncpg://... uv run --python 3.11 python -c '...check_database_connection()...'", "result": "passed", "evidence": "异步 SELECT 1 连接探针返回 database connection: ok。"},
+        {"command": "cd backend && uv run --python 3.11 pytest && uv run --python 3.11 ruff check . && uv run --python 3.11 mypy app", "result": "passed", "evidence": "5 passed；Ruff 与 Mypy 通过。"}
+      ],
+      "started_at": "2026-09-17T00:07:24+08:00",
+      "completed_at": "2026-09-17T07:31:48+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T008"
+    },
+    {
+      "id": "MVP-0.1-T009",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-004",
+      "title": "实现匿名会话创建",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T008"
+      ],
+      "scope": [
+        "backend/app/models/",
+        "backend/app/api/",
+        "backend/tests/",
+        "backend/alembic/"
+      ],
+      "acceptance_criteria": [
+        "POST /api/auth/guest 创建匿名会话并提供后续请求可验证的身份。",
+        "会话凭据不泄露到 URL 或日志，用户无需注册即可开始学习。"
+      ],
+      "verification": [
+        "运行匿名会话接口及迁移集成测试；记录实际命令。"
+      ],
+      "verification_results": [
+        {"command": "EDUMIND_DATABASE_URL=<isolated PostgreSQL URL> uv run --python 3.11 alembic upgrade head", "result": "passed", "evidence": "空库从 0001_initial 升级到 0002_auth_sessions；users 与 auth_sessions 表已创建。"},
+        {"command": "EDUMIND_TEST_DATABASE_URL=<isolated PostgreSQL URL> uv run --python 3.11 pytest -q", "result": "passed", "evidence": "10 passed；覆盖 Cookie 安全属性、身份恢复、令牌哈希、过期、Origin 与 CSRF。"},
+        {"command": "uv run --python 3.11 ruff check . && uv run --python 3.11 mypy app", "result": "passed", "evidence": "Ruff 全通过；Mypy 10 个源文件无问题。"},
+        {"command": "EDUMIND_DATABASE_URL=<isolated PostgreSQL URL> uv run --python 3.11 alembic downgrade 0001_initial && EDUMIND_DATABASE_URL=<isolated PostgreSQL URL> uv run --python 3.11 alembic upgrade head", "result": "passed", "evidence": "0002_auth_sessions 可回滚并重新升级。"},
+        {"command": "python3 -m json.tool docs/api/openapi.yaml >/dev/null && python3 -m json.tool task.json >/dev/null && git diff --check", "result": "passed", "evidence": "契约及任务 JSON 可解析，工作区 diff 无空白错误。"}
+      ],
+      "started_at": "2026-09-17T07:34:17+08:00",
+      "completed_at": "2026-09-17T08:05:06+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T009"
+    },
+    {
+      "id": "MVP-0.1-T010",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-004",
+      "title": "持久化画像、学习单元和资源版本",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T008"
+      ],
+      "scope": [
+        "backend/app/models/",
+        "backend/alembic/",
+        "backend/tests/"
+      ],
+      "acceptance_criteria": [
+        "按 ADR 建模画像、学习单元、资源版本和审核状态，并生成 Alembic 迁移。",
+        "持久化记录能在关闭并重新建立数据库连接后读取，正式资源具有版本与审核标记。"
+      ],
+      "verification": [
+        "在隔离 PostgreSQL 上运行迁移和模型集成测试；记录实际命令。"
+      ],
+      "verification_results": [
+        {"command": "EDUMIND_DATABASE_URL=<isolated PostgreSQL URL> uv run --python 3.11 alembic upgrade head", "result": "passed", "evidence": "0003_learning_snapshots 已升级，创建画像、学习单元、场景和资源版本表。"},
+        {"command": "EDUMIND_TEST_DATABASE_URL=<isolated PostgreSQL URL> uv run --python 3.11 pytest -q", "result": "passed", "evidence": "11 passed；新模型测试覆盖断开后重连读取、JSONB 画像证据、场景/资源版本及未审核发布拒绝。"},
+        {"command": "EDUMIND_DATABASE_URL=<isolated PostgreSQL URL> uv run --python 3.11 alembic downgrade 0002_auth_sessions && EDUMIND_DATABASE_URL=<isolated PostgreSQL URL> uv run --python 3.11 alembic upgrade head && EDUMIND_TEST_DATABASE_URL=<isolated PostgreSQL URL> uv run --python 3.11 pytest -q tests/test_learning_persistence.py", "result": "passed", "evidence": "含正式资源不可变触发器的迁移可回滚/重升；专项模型测试 1 passed。"},
+        {"command": "uv run --python 3.11 ruff check . && uv run --python 3.11 mypy app", "result": "passed", "evidence": "Ruff 全通过；Mypy 11 个源文件无问题。"},
+        {"command": "python3 -m json.tool task.json >/dev/null && git diff --check", "result": "passed", "evidence": "任务 JSON 可解析，工作区 diff 无空白错误；PRD/ADR 已同步。"}
+      ],
+      "started_at": "2026-09-17T08:06:50+08:00",
+      "completed_at": "2026-09-17T08:13:48+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T010"
+    },
+    {
+      "id": "MVP-0.1-T011",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-004",
+      "title": "限制匿名数据访问范围",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T009",
+        "MVP-0.1-T010"
+      ],
+      "scope": [
+        "backend/app/api/",
+        "backend/app/services/",
+        "backend/tests/"
+      ],
+      "acceptance_criteria": [
+        "画像、学习单元和资源按匿名身份隔离；跨用户读取返回统一拒绝响应。",
+        "覆盖不存在资源和过期/无效身份，错误响应不泄露他人数据。"
+      ],
+      "verification": [
+        "运行授权与跨用户访问集成测试；记录实际命令。"
+      ],
+      "verification_results": [
+        {"command": "EDUMIND_TEST_DATABASE_URL=<isolated PostgreSQL URL> uv run --python 3.11 pytest -q tests/test_owner_reads.py", "result": "passed", "evidence": "1 passed；双匿名用户的画像、学习单元和资源隔离，跨用户/不存在/草稿/未发布统一 404，无效或过期会话 401。"},
+        {"command": "EDUMIND_TEST_DATABASE_URL=<isolated PostgreSQL URL> uv run --python 3.11 pytest -q && uv run --python 3.11 ruff check . && uv run --python 3.11 mypy app", "result": "passed", "evidence": "完整后端 12 passed；Ruff 全通过；Mypy 14 个源文件无问题。"},
+        {"command": "python3 -m json.tool docs/api/openapi.yaml >/dev/null && python3 -m json.tool task.json >/dev/null && git diff --check", "result": "passed", "evidence": "OpenAPI 和任务 JSON 可解析，diff 无空白错误；PRD 规范路径与兼容别名已同步。"}
+      ],
+      "started_at": "2026-09-17T08:15:40+08:00",
+      "completed_at": "2026-09-17T08:20:58+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T011"
+    },
+    {
+      "id": "MVP-0.1-T012",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-005",
+      "title": "定义 Provider Gateway 内部接口",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T005"
+      ],
+      "scope": [
+        "backend/app/services/",
+        "backend/tests/",
+        "docs/PROVIDERS.md"
+      ],
+      "acceptance_criteria": [
+        "定义生成、结构化输出与流式生成接口，业务模块只依赖内部类型。",
+        "以测试替身证明可替换适配器，错误类型与重试责任明确。"
+      ],
+      "verification": [
+        "cd backend && python -m pytest",
+        "cd backend && ruff check ."
+      ],
+      "verification_results": [
+        {"command": "cd backend && uv run --python 3.11 python -m pytest", "result": "passed", "evidence": "8 passed、7 skipped（仅需隔离 PostgreSQL 的既有集成测试跳过）；新增 Gateway 替身测试 3 passed。"},
+        {"command": "cd backend && uv run --python 3.11 ruff check . && uv run --python 3.11 mypy app", "result": "passed", "evidence": "Ruff 全通过；Mypy 15 个源文件无问题。"},
+        {"command": "python3 -m json.tool task.json >/dev/null && git diff --check", "result": "passed", "evidence": "任务 JSON 可解析，diff 无空白错误；docs/PROVIDERS.md 已核对 PRD §3.8。"}
+      ],
+      "started_at": "2026-09-17T08:23:55+08:00",
+      "completed_at": "2026-09-17T08:26:48+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T012"
+    },
+    {
+      "id": "MVP-0.1-T013",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-005",
+      "title": "安全加载 Provider 配置与凭据",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T012"
+      ],
+      "scope": [
+        "backend/app/core/",
+        "backend/tests/",
+        ".env.example",
+        "docs/PROVIDERS.md"
+      ],
+      "acceptance_criteria": [
+        "服务端环境变量提供 Base URL、模型及 API Key；无凭据时生成调用明确失败。",
+        "配置、异常和日志不输出 Key，客户端接口不返回凭据。"
+      ],
+      "verification": [
+        "运行配置缺失、凭据脱敏和日志检查测试。"
+      ],
+      "verification_results": [
+        {"command": "cd backend && uv run --python 3.11 python -m pytest -q tests/test_config.py", "result": "passed", "evidence": "4 passed；缺失/空白 API Key 生成尝试被阻止，配置展示、异常、日志和客户端健康/OpenAPI 响应无测试凭据。"},
+        {"command": "cd backend && uv run --python 3.11 python -m pytest -q && uv run --python 3.11 ruff check . && uv run --python 3.11 mypy app", "result": "passed", "evidence": "完整后端 10 passed、7 个隔离数据库用例按环境跳过；Ruff 全通过，Mypy 16 个源文件无问题。"},
+        {"command": "python3 -m json.tool task.json >/dev/null && git diff --check", "result": "passed", "evidence": "任务 JSON 可解析，工作区 diff 无空白错误；.env.example 仅保留占位符。"}
+      ],
+      "started_at": "2026-09-17T08:28:20+08:00",
+      "completed_at": "2026-09-17T08:31:49+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T013"
+    },
+    {
+      "id": "MVP-0.1-T014",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-005",
+      "title": "校验 Provider Base URL 和目标地址",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T013"
+      ],
+      "scope": [
+        "backend/app/core/",
+        "backend/app/services/",
+        "backend/tests/",
+        "docs/PROVIDERS.md"
+      ],
+      "acceptance_criteria": [
+        "遵循 PRD 的 HTTPS 默认、DNS 解析、私网/回环/链路本地/元数据地址拦截及本地白名单规则。",
+        "重定向目标与 DNS 变化仍受校验，非法目标在发起网络请求前拒绝。"
+      ],
+      "verification": [
+        "运行 SSRF 与重定向回归测试；记录实际命令。"
+      ],
+      "verification_results": [
+        {"command": "cd backend && uv run --python 3.11 python -m pytest -q tests/test_provider_target.py tests/test_config.py", "result": "passed", "evidence": "35 passed；覆盖 HTTPS、全 DNS 答案、私网/回环/链路本地/云元数据、本地 IP:port 白名单、DNS 变更和重定向；仅使用受控 DNS 与假适配器，无真实网络请求。"},
+        {"command": "cd backend && uv run --python 3.11 ruff check . && uv run --python 3.11 mypy app && uv run --python 3.11 python -m pytest -q", "result": "passed", "evidence": "Ruff 全通过，Mypy 17 个源文件无问题；完整后端 41 passed、7 个隔离数据库用例按环境跳过。"},
+        {"command": "python3 -m json.tool task.json >/dev/null && git diff --check", "result": "passed", "evidence": "任务 JSON 可解析且 diff 无空白错误；验证时检查 T014 新增文件、暂存区与任务状态。"}
+      ],
+      "started_at": "2026-09-17T08:42:31+08:00",
+      "completed_at": "2026-09-17T08:51:32+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T014"
+    },
+    {
+      "id": "MVP-0.1-T015",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-005",
+      "title": "接入单一 OpenAI-compatible 请求适配器",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T012",
+        "MVP-0.1-T013",
+        "MVP-0.1-T014"
+      ],
+      "scope": [
+        "backend/app/services/",
+        "backend/tests/",
+        "docs/PROVIDERS.md"
+      ],
+      "acceptance_criteria": [
+        "接通一个由服务端配置的 OpenAI-compatible Provider，非流式请求转换为内部结果。",
+        "测试成功、鉴权失败及格式异常；业务层不使用厂商 SDK 类型。"
+      ],
+      "verification": [
+        "运行使用 mock HTTP 的适配器测试和后端静态检查。"
+      ],
+      "verification_results": [
+        {"command": "cd backend && uv run --python 3.11 python -m pytest -q tests/test_openai_compatible.py", "result": "passed", "evidence": "12 passed；MockTransport 验证成功、JSON Schema 结果、401、格式异常、SSRF 预拒绝、Host/SNI 固定 IP、重定向拒绝和默认 Gateway 组装；无真实 Provider 请求。"},
+        {"command": "cd backend && uv run --python 3.11 ruff check . && uv run --python 3.11 mypy app && uv run --python 3.11 python -m pytest -q", "result": "passed", "evidence": "Ruff 全通过，Mypy 18 个源文件无问题；完整后端 53 passed、7 个隔离数据库用例按环境跳过。"},
+        {"command": "cd backend && uv lock --python 3.11", "result": "passed", "evidence": "生产 HTTPX 0.28.1 与 jsonschema 4.25.1 已由 uv.lock 固定；依赖解析通过。"},
+        {"command": "python3 -m json.tool task.json >/dev/null && git diff --check", "result": "passed", "evidence": "任务 JSON 可解析且 diff 无空白错误；提交前复核 staged 文件与状态。"}
+      ],
+      "started_at": "2026-09-17T08:56:46+08:00",
+      "completed_at": "2026-09-17T09:04:25+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T015"
+    },
+    {
+      "id": "MVP-0.1-T016",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-005",
+      "title": "接入 Provider 流式响应适配",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T015"
+      ],
+      "scope": [
+        "backend/app/services/",
+        "backend/tests/"
+      ],
+      "acceptance_criteria": [
+        "将 Provider 分片转换为内部流式事件，正确处理 Unicode 与跨分片边界。",
+        "上游中断或非法帧返回统一错误并及时释放连接。"
+      ],
+      "verification": [
+        "运行流式分片、中断和连接清理测试。"
+      ],
+      "verification_results": [
+        {"command": "cd backend && uv run --python 3.11 python -m pytest -q tests/test_provider_stream.py", "result": "passed", "evidence": "10 passed；逐字节 UTF-8/CRLF 分片、用量帧、非法 JSON/UTF-8/结束原因、缺失 DONE、上游读取错误及直接/Gateway 取消时连接关闭均通过。"},
+        {"command": "cd backend && uv run --python 3.11 ruff check . && uv run --python 3.11 mypy app && uv run --python 3.11 python -m pytest -q", "result": "passed", "evidence": "Ruff 全通过，Mypy 18 个源文件无问题；完整后端 63 passed、7 个隔离数据库用例按环境跳过。"},
+        {"command": "python3 -m json.tool task.json >/dev/null && git diff --check", "result": "passed", "evidence": "任务 JSON 可解析且 diff 无空白错误；提交前复核 staged 文件与状态。"}
+      ],
+      "started_at": "2026-09-17T09:07:23+08:00",
+      "completed_at": "2026-09-17T09:11:17+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T016"
+    },
+    {
+      "id": "MVP-0.1-T017",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-005",
+      "title": "统一 Provider 错误与有界重试",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T015",
+        "MVP-0.1-T016"
+      ],
+      "scope": [
+        "backend/app/services/",
+        "backend/tests/",
+        "docs/PROVIDERS.md"
+      ],
+      "acceptance_criteria": [
+        "区分限流、超时、鉴权、能力不兼容和上游故障，映射稳定错误码。",
+        "仅对可安全重试的同一 Provider 请求做有界重试；不静默切换厂商。"
+      ],
+      "verification": [
+        "运行错误映射、重试次数和无自动回退测试。"
+      ],
+      "verification_results": [
+        {"command": "cd backend && uv run --python 3.11 python -m pytest -q tests/test_provider_retry.py", "result": "passed", "evidence": "14 passed；验证 HTTP 400/401/403/408/429/5xx 分类、敏感错误脱敏、同适配器安全重试、最多三次、退避/Retry-After 边界以及流式不重试。"},
+        {"command": "cd backend && uv run --python 3.11 ruff check . && uv run --python 3.11 mypy app && uv run --python 3.11 python -m pytest -q", "result": "passed", "evidence": "Ruff 全通过，Mypy 18 个源文件无问题；完整后端 77 passed、7 个隔离数据库用例按环境跳过。"},
+        {"command": "python3 -m json.tool task.json >/dev/null && git diff --check", "result": "passed", "evidence": "任务 JSON 可解析且 diff 无空白错误；提交前复核 staged 文件与状态。"}
+      ],
+      "started_at": "2026-09-17T09:15:51+08:00",
+      "completed_at": "2026-09-17T14:15:37+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T017"
+    },
+    {
+      "id": "MVP-0.1-T018",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-006",
+      "title": "定义临时画像结构与证据规则",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T010"
+      ],
+      "scope": [
+        "backend/app/agents/",
+        "backend/tests/",
+        "docs/agents/prompts/"
+      ],
+      "acceptance_criteria": [
+        "定义目标、困难和显式偏好的最小 schema；未知字段保持空值。",
+        "每个推断字段可记录证据、置信度和版本，未提供信息不得臆测。"
+      ],
+      "verification": [
+        "运行画像 schema、未知字段与证据校验测试。"
+      ],
+      "verification_results": [
+        {"command": "cd backend && uv run --python 3.11 python -m pytest -q tests/test_profile_schema.py", "result": "passed", "evidence": "13 passed；覆盖未知字段 null、目标/困难/显式偏好、未跟踪字段、证据来源/置信度/时间/版本和版本化输出 schema。"},
+        {"command": "cd backend && uv run --python 3.11 ruff check . && uv run --python 3.11 mypy app && uv run --python 3.11 python -m pytest -q", "result": "passed", "evidence": "Ruff 全通过，Mypy 20 个源文件无问题；完整后端 90 passed、7 个隔离数据库用例按环境跳过。"},
+        {"command": "python3 -m json.tool task.json >/dev/null && git diff --check", "result": "passed", "evidence": "任务 JSON 可解析且 diff 无空白错误；提交前复核 staged 文件与状态。"}
+      ],
+      "started_at": "2026-09-17T14:17:57+08:00",
+      "completed_at": "2026-09-17T14:21:27+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T018"
+    },
+    {
+      "id": "MVP-0.1-T019",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-006",
+      "title": "从一句话提取并保存临时画像",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T011",
+        "MVP-0.1-T017",
+        "MVP-0.1-T018"
+      ],
+      "scope": [
+        "backend/app/agents/",
+        "backend/app/services/",
+        "backend/tests/"
+      ],
+      "acceptance_criteria": [
+        "一句话生成临时画像并关联匿名会话；不要求问卷或计划确认。",
+        "模型输出非法时安全降级或给出可理解错误，不以补全画像阻塞首段学习。"
+      ],
+      "verification": [
+        "运行显式/缺失信息、异常输出及匿名隔离测试。"
+      ],
+      "verification_results": [
+        {
+          "command": "cd backend && EDUMIND_TEST_DATABASE_URL='postgresql+asyncpg://edumind:edumind_test_password@127.0.0.1:55433/edumind' uv run --python 3.11 python -m pytest -q tests/test_transient_profiles.py",
+          "result": "passed",
+          "evidence": "隔离 PostgreSQL 上 1 passed；覆盖每个匿名 owner 独立版本、跨 owner 查询隔离，以及非法结构化输出降级为空画像后仍持久化。"
+        },
+        {
+          "command": "cd backend && EDUMIND_TEST_DATABASE_URL='postgresql+asyncpg://edumind:edumind_test_password@127.0.0.1:55433/edumind' uv run --python 3.11 ruff check . && uv run --python 3.11 mypy app && uv run --python 3.11 python -m pytest -q",
+          "result": "passed",
+          "evidence": "Ruff 通过，Mypy 22 个源文件无问题，完整后端 102 passed；仅现有 Starlette TestClient deprecation warnings。"
+        },
+        {
+          "command": "python3 -m json.tool task.json >/dev/null && git diff --check",
+          "result": "passed",
+          "evidence": "任务 JSON 可解析，工作树差异无空白错误。"
+        }
+      ],
+      "started_at": "2026-09-17T14:25:15+08:00",
+      "completed_at": "2026-09-17T14:34:23+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T019"
+    },
+    {
+      "id": "MVP-0.1-T020",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-007",
+      "title": "定义学习资源结构与版本化 Prompt",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T019"
+      ],
+      "scope": [
+        "backend/app/agents/",
+        "backend/tests/",
+        "docs/agents/prompts/"
+      ],
+      "acceptance_criteria": [
+        "为讲解、单语言代码与约 3 道练习定义输出 schema 和版本化 Prompt。",
+        "代码资源仅展示，不在服务端执行；内容与 Prompt 版本可追踪。"
+      ],
+      "verification": [
+        "运行三类资源 schema 与非法输出测试。"
+      ],
+      "verification_results": [
+        {
+          "command": "cd backend && uv run --python 3.11 python -m pytest -q tests/test_learning_resource_schema.py",
+          "result": "passed",
+          "evidence": "8 passed；覆盖讲解、单语言显示代码、约三道练习的合法 schema，及额外字段、错误版本、重复题号和非显示代码的拒绝。"
+        },
+        {
+          "command": "cd backend && uv run --python 3.11 ruff check . && uv run --python 3.11 mypy app && uv run --python 3.11 python -m pytest -q",
+          "result": "passed",
+          "evidence": "Ruff 通过，Mypy 24 个源文件无问题，完整后端 102 passed、8 个隔离数据库用例按环境跳过。"
+        },
+        {
+          "command": "python3 -m json.tool task.json >/dev/null && git diff --check",
+          "result": "passed",
+          "evidence": "任务 JSON 可解析，工作树差异无空白错误。"
+        }
+      ],
+      "started_at": "2026-09-17T14:37:17+08:00",
+      "completed_at": "2026-09-17T14:43:01+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T020"
+    },
+    {
+      "id": "MVP-0.1-T021",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-007",
+      "title": "生成讲解、代码和练习资源",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T020",
+        "MVP-0.1-T017"
+      ],
+      "scope": [
+        "backend/app/agents/",
+        "backend/app/services/",
+        "backend/tests/"
+      ],
+      "acceptance_criteria": [
+        "针对一个知识点生成讲解、单语言代码和约 3 道练习，结构化结果符合 schema。",
+        "生成失败保留可理解错误；生成结果处于待审核状态。"
+      ],
+      "verification": [
+        "运行三类资源成功、缺失字段与 Provider 故障测试。"
+      ],
+      "verification_results": [
+        {
+          "command": "cd backend && uv run --python 3.11 python -m pytest -q tests/test_learning_unit_generator.py tests/test_learning_resource_schema.py",
+          "result": "passed",
+          "evidence": "12 passed；覆盖单知识点的讲解/单语言代码/三道练习候选、pending 审核状态、缺失字段与 Provider 故障的逐项安全错误。"
+        },
+        {
+          "command": "cd backend && uv run --python 3.11 ruff check . && uv run --python 3.11 mypy app && uv run --python 3.11 python -m pytest -q",
+          "result": "passed",
+          "evidence": "Ruff 通过，Mypy 25 个源文件无问题，完整后端 106 passed、8 个隔离数据库用例按环境跳过。"
+        },
+        {
+          "command": "python3 -m json.tool task.json >/dev/null && git diff --check",
+          "result": "passed",
+          "evidence": "任务 JSON 可解析，工作树差异无空白错误。"
+        }
+      ],
+      "started_at": "2026-09-17T14:45:09+08:00",
+      "completed_at": "2026-09-17T14:48:23+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T021"
+    },
+    {
+      "id": "MVP-0.1-T022",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-007",
+      "title": "实现正式资源 ReviewAgent",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T021"
+      ],
+      "scope": [
+        "backend/app/agents/",
+        "backend/app/services/",
+        "backend/tests/",
+        "docs/agents/prompts/"
+      ],
+      "acceptance_criteria": [
+        "审核事实、难度、易错点和代码安全；规则/Prompt 版本化。",
+        "审核拒绝时返回问题清单，最多定向修正两次；失败内容不得通过。"
+      ],
+      "verification": [
+        "运行通过、拒绝、重试上限与严重错误基准测试。"
+      ],
+      "verification_results": [
+        {
+          "command": "cd backend && uv run --python 3.11 python -m pytest -q tests/test_review_agent.py",
+          "result": "passed",
+          "evidence": "4 passed；覆盖审核通过、一次定向修正后通过、危险代码本地严重拒绝且不调用 Provider、两次修正上限后拒绝。"
+        },
+        {
+          "command": "cd backend && uv run --python 3.11 ruff check . && uv run --python 3.11 mypy app && uv run --python 3.11 python -m pytest -q",
+          "result": "passed",
+          "evidence": "Ruff 通过，Mypy 27 个源文件无问题，完整后端 110 passed、8 个隔离数据库用例按环境跳过。"
+        },
+        {
+          "command": "python3 -m json.tool task.json >/dev/null && git diff --check",
+          "result": "passed",
+          "evidence": "任务 JSON 可解析，工作树差异无空白错误。"
+        }
+      ],
+      "started_at": "2026-09-17T14:49:40+08:00",
+      "completed_at": "2026-09-17T14:55:02+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T022"
+    },
+    {
+      "id": "MVP-0.1-T023",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-007",
+      "title": "发布并读取已审核资源版本",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T010",
+        "MVP-0.1-T011",
+        "MVP-0.1-T022"
+      ],
+      "scope": [
+        "backend/app/services/",
+        "backend/tests/"
+      ],
+      "acceptance_criteria": [
+        "只有通过 schema 和 ReviewAgent 的资源版本可以成为正式可见版本。",
+        "保存 Provider、模型、Prompt、Review 与内容版本；审核拒绝不覆盖原有可见资源。"
+      ],
+      "verification": [
+        "运行发布门禁、版本保留和跨用户读取测试。"
+      ],
+      "verification_results": [
+        {
+          "command": "cd backend && EDUMIND_TEST_DATABASE_URL='postgresql+asyncpg://edumind:edumind_test_password@127.0.0.1:55434/edumind' uv run --python 3.11 python -m pytest -q tests/test_resource_publication.py",
+          "result": "passed",
+          "evidence": "隔离 PostgreSQL 上 1 passed；覆盖 schema/Review 通过门禁、拒绝候选不可见、正式版本保留与 supersede、版本元数据和跨匿名 owner 读取隔离。"
+        },
+        {
+          "command": "cd backend && uv run --python 3.11 ruff check . && uv run --python 3.11 mypy app && EDUMIND_TEST_DATABASE_URL='postgresql+asyncpg://edumind:edumind_test_password@127.0.0.1:55434/edumind' uv run --python 3.11 python -m pytest -q",
+          "result": "passed",
+          "evidence": "Ruff 通过，Mypy 28 个源文件无问题，完整后端 119 passed；仅既有 Starlette TestClient deprecation warnings。"
+        },
+        {
+          "command": "python3 -m json.tool task.json >/dev/null && git diff --check",
+          "result": "passed",
+          "evidence": "任务 JSON 可解析，工作树差异无空白错误。"
+        }
+      ],
+      "started_at": "2026-09-17T14:56:17+08:00",
+      "completed_at": "2026-09-17T15:02:03+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T023"
+    },
+    {
+      "id": "MVP-0.1-T024",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-008",
+      "title": "实现学习会话 POST SSE 首段链路",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T019",
+        "MVP-0.1-T021",
+        "MVP-0.1-T022",
+        "MVP-0.1-T003"
+      ],
+      "scope": [
+        "backend/app/api/",
+        "backend/app/services/",
+        "backend/tests/",
+        "docs/api/openapi.yaml"
+      ],
+      "acceptance_criteria": [
+        "POST /api/learning-sessions 串联匿名身份、临时画像和首段内容，并遵循 ADR 的临时流式标记。",
+        "SSE 事件顺序、结束和错误格式符合契约；模型生成不进入 Manim Job。"
+      ],
+      "verification": [
+        "运行 SSE 事件顺序、首段输出和 Provider 故障接口测试。"
+      ],
+      "verification_results": [
+        {
+          "command": "cd backend && EDUMIND_TEST_DATABASE_URL='postgresql+asyncpg://edumind:edumind_test_password@127.0.0.1:55435/edumind' uv run --python 3.11 python -m pytest -q tests/test_learning_sessions.py",
+          "result": "passed",
+          "evidence": "隔离 PostgreSQL 上 3 passed；覆盖匿名 Cookie+CSRF、agent_start/token/done 临时事件顺序、画像关联、Provider 流故障的 error/failed 结束。"
+        },
+        {
+          "command": "cd backend && uv run --python 3.11 ruff check . && uv run --python 3.11 mypy app && EDUMIND_TEST_DATABASE_URL='postgresql+asyncpg://edumind:edumind_test_password@127.0.0.1:55435/edumind' uv run --python 3.11 python -m pytest -q",
+          "result": "passed",
+          "evidence": "Ruff 通过，Mypy 30 个源文件无问题，完整后端 122 passed；仅既有 Starlette TestClient deprecation warnings。"
+        },
+        {
+          "command": "python3 -m json.tool docs/api/openapi.yaml >/dev/null && python3 -m json.tool task.json >/dev/null && git diff --check",
+          "result": "passed",
+          "evidence": "OpenAPI/任务 JSON 可解析，临时 done 状态和画像 array 契约同步，工作树差异无空白错误。"
+        }
+      ],
+      "started_at": "2026-09-17T15:06:22+08:00",
+      "completed_at": "2026-09-17T15:24:27+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T024"
+    },
+    {
+      "id": "MVP-0.1-T025",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-008",
+      "title": "接通审核发布与学习单元读取",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T023",
+        "MVP-0.1-T024"
+      ],
+      "scope": [
+        "backend/app/api/",
+        "backend/app/services/",
+        "backend/tests/",
+        "docs/api/openapi.yaml"
+      ],
+      "acceptance_criteria": [
+        "首段之后按审核结果发布正式资源；GET 学习单元及资源接口只返回已审核版本。",
+        "新请求可读取已保存内容，审核失败时不暴露待审版本。"
+      ],
+      "verification": [
+        "运行审核通过/拒绝与 GET 资源接口集成测试。"
+      ],
+      "verification_results": [
+        {
+          "command": "EDUMIND_DATABASE_URL='postgresql+asyncpg://edumind:edumind@127.0.0.1:55436/edumind_test' uv run --directory backend --group dev alembic upgrade head && EDUMIND_TEST_DATABASE_URL='postgresql+asyncpg://edumind:edumind@127.0.0.1:55436/edumind_test' uv run --directory backend --group dev pytest tests/test_learning_sessions.py tests/test_resource_publication.py tests/test_owner_reads.py -q",
+          "result": "passed",
+          "evidence": "隔离 PostgreSQL 上 6 passed：临时 token 后成功流发送 review_pass/scene_ready，并可 GET 三个 passed 正式资源；审核 reject 时不发送 scene_ready，原有 owner/unpublished 隔离读取仍通过。"
+        },
+        {
+          "command": "EDUMIND_TEST_DATABASE_URL='postgresql+asyncpg://edumind:edumind@127.0.0.1:55436/edumind_test' uv run --directory backend --group dev pytest -q",
+          "result": "passed",
+          "evidence": "完整后端 123 passed；仅既有 Starlette TestClient deprecation warnings。"
+        },
+        {
+          "command": "uv run --directory backend --group dev ruff check app tests && uv run --directory backend --group dev mypy app && python -c \"import json; json.load(open('docs/api/openapi.yaml')); json.load(open('task.json'))\" && git diff --check",
+          "result": "passed",
+          "evidence": "Ruff 通过，Mypy 31 个源文件无问题，OpenAPI/任务 JSON 可解析，差异无空白错误。"
+        }
+      ],
+      "started_at": "2026-09-17T15:26:05+08:00",
+      "completed_at": "2026-09-18T21:32:08+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T025"
+    },
+    {
+      "id": "MVP-0.1-T026",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-008",
+      "title": "实现 SSE 断线恢复与幂等",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T024",
+        "MVP-0.1-T025"
+      ],
+      "scope": [
+        "backend/app/api/",
+        "backend/app/services/",
+        "backend/tests/",
+        "docs/api/openapi.yaml"
+      ],
+      "acceptance_criteria": [
+        "按 ADR 处理客户端断线、重复 POST、服务重启后读取与可恢复错误。",
+        "同一幂等键不创建重复资源；中断后保留已发布版本。"
+      ],
+      "verification": [
+        "运行断线、重试、重启恢复与重复请求集成测试。"
+      ],
+      "verification_results": [
+        {
+          "command": "EDUMIND_DATABASE_URL='postgresql+asyncpg://edumind:edumind@127.0.0.1:55437/edumind_test' uv run --directory backend --group dev alembic upgrade head && EDUMIND_TEST_DATABASE_URL='postgresql+asyncpg://edumind:edumind@127.0.0.1:55437/edumind_test' uv run --directory backend --group dev pytest -q",
+          "result": "passed",
+          "evidence": "迁移 0004 成功；完整后端 125 passed，覆盖重复 POST 复用已发布操作、操作读取与重启中断安全失败。"
+        },
+        {
+          "command": "uv run --directory backend --group dev ruff check app tests alembic/versions/0004_learning_operations.py && uv run --directory backend --group dev mypy app && git diff --check",
+          "result": "passed",
+          "evidence": "Ruff 通过，Mypy 32 个源文件无问题，差异无空白错误。"
+        }
+      ],
+      "started_at": "2026-09-18T21:34:00+08:00",
+      "completed_at": "2026-09-18T21:47:00+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T026"
+    },
+    {
+      "id": "MVP-0.1-T027",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-009",
+      "title": "实现一句话输入与请求状态界面",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T007",
+        "MVP-0.1-T024"
+      ],
+      "scope": [
+        "web/src/",
+        "web/tests/"
+      ],
+      "acceptance_criteria": [
+        "首页输入一句学习目标即可开始，呈现加载、错误和重试状态。",
+        "不要求画像问卷或内部大纲确认，不在浏览器保存 Provider Key。"
+      ],
+      "verification": [
+        "pnpm --dir web test --run",
+        "pnpm --dir web typecheck",
+        "pnpm --dir web build"
+      ],
+      "verification_results": [
+        {
+          "command": "pnpm --dir web test --run",
+          "result": "passed",
+          "evidence": "Vitest 通过 3 项：首页入口、单句提交加载状态、请求错误后的同目标重试。"
+        },
+        {
+          "command": "pnpm --dir web typecheck",
+          "result": "passed",
+          "evidence": "vue-tsc -b 通过。"
+        },
+        {
+          "command": "pnpm --dir web build",
+          "result": "passed",
+          "evidence": "Vite 生产构建通过。"
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed",
+          "evidence": "未发现空白错误。"
+        }
+      ],
+      "started_at": "2026-09-18T21:48:00+08:00",
+      "completed_at": "2026-09-18T21:59:50+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T027"
+    },
+    {
+      "id": "MVP-0.1-T028",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-009",
+      "title": "封装 POST SSE 的 fetch 客户端",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T007",
+        "MVP-0.1-T024",
+        "MVP-0.1-T026"
+      ],
+      "scope": [
+        "web/src/api/",
+        "web/tests/"
+      ],
+      "acceptance_criteria": [
+        "使用 fetch + ReadableStream 解析 POST SSE，正确处理跨块边界、Unicode、多事件和连接结束。",
+        "断线和错误按 API 契约提示重试，避免重复显示事件。"
+      ],
+      "verification": [
+        "运行 SSE 解析、断线和重复事件单元测试及类型检查。"
+      ],
+      "verification_results": [
+        {
+          "command": "pnpm --dir web test --run",
+          "result": "passed",
+          "evidence": "Vitest 通过 7 项：跨块 UTF-8 Unicode、多事件、连接完成、生命周期事件去重、HTTP/SSE/断线错误和畸形 SSE 拒绝。"
+        },
+        {
+          "command": "pnpm --dir web typecheck",
+          "result": "passed",
+          "evidence": "vue-tsc -b 通过。"
+        },
+        {
+          "command": "pnpm --dir web build",
+          "result": "passed",
+          "evidence": "Vite 生产构建通过。"
+        },
+        {
+          "command": "pnpm --dir web lint",
+          "result": "passed_with_existing_warnings",
+          "evidence": "无 error；现有 App.vue 格式规则产生 38 条 warning，本任务新增 API 与测试无 lint error。"
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed",
+          "evidence": "未发现空白错误。"
+        }
+      ],
+      "started_at": "2026-09-18T22:00:00+08:00",
+      "completed_at": "2026-09-18T22:06:11+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T028"
+    },
+    {
+      "id": "MVP-0.1-T029",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-009",
+      "title": "展示首段讲解与正式资源状态",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T027",
+        "MVP-0.1-T028",
+        "MVP-0.1-T025"
+      ],
+      "scope": [
+        "web/src/views/",
+        "web/src/components/",
+        "web/tests/"
+      ],
+      "acceptance_criteria": [
+        "用户在首段到达时看到内容，明确区分临时流式内容与已审核正式资源。",
+        "正式资源可重新加载，空态与审核失败状态可理解。"
+      ],
+      "verification": [
+        "运行首段/审核状态组件测试、类型检查与构建。"
+      ],
+      "verification_results": [
+        {
+          "command": "pnpm --dir web test --run",
+          "result": "passed",
+          "evidence": "Vitest 通过 10 项；新组件覆盖临时首段/审核中、空态/审核拒绝、已发布资源与重载失败重试。"
+        },
+        {
+          "command": "pnpm --dir web typecheck && pnpm --dir web build",
+          "result": "passed",
+          "evidence": "vue-tsc -b 与 Vite 生产构建通过。"
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed",
+          "evidence": "未发现空白错误。"
+        }
+      ],
+      "started_at": "2026-09-18T22:07:00+08:00",
+      "completed_at": "2026-09-18T22:10:10+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T029"
+    },
+    {
+      "id": "MVP-0.1-T030",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-009",
+      "title": "展示代码与练习并支持本地作答",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T029"
+      ],
+      "scope": [
+        "web/src/components/",
+        "web/tests/"
+      ],
+      "acceptance_criteria": [
+        "可在讲解、代码和约 3 道练习间切换；答题交互可完成一个知识点。",
+        "MVP 0.1 只提供本地作答反馈，不伪造 MVP 0.2 掌握度或路径推荐。"
+      ],
+      "verification": [
+        "运行资源切换、练习交互组件测试及前端构建。"
+      ],
+      "verification_results": [
+        {"command": "pnpm --dir web test --run", "result": "passed", "evidence": "Vitest 通过 12 项；覆盖讲解/代码/三题练习切换与本地答题反馈。"},
+        {"command": "pnpm --dir web typecheck && pnpm --dir web build", "result": "passed", "evidence": "vue-tsc -b 与 Vite 生产构建通过。"},
+        {"command": "git diff --check", "result": "passed", "evidence": "未发现空白错误。"}
+      ],
+      "started_at": "2026-09-18T22:11:00+08:00",
+      "completed_at": "2026-09-18T22:25:39+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T030"
+    },
+    {
+      "id": "MVP-0.1-T031",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-009",
+      "title": "清洗模型内容并验证前端安全",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T029",
+        "MVP-0.1-T030"
+      ],
+      "scope": [
+        "web/src/",
+        "web/tests/"
+      ],
+      "acceptance_criteria": [
+        "Markdown 和模型输出默认转义并清洗，危险 HTML、链接与代码片段不可执行。",
+        "安全处理不破坏正常代码展示与练习文本。"
+      ],
+      "verification": [
+        "运行 XSS 回归测试、类型检查、lint 与构建。"
+      ],
+      "verification_results": [
+        {"command": "pnpm --dir web test --run", "result": "passed", "evidence": "Vitest 通过 13 项；XSS 回归覆盖危险 HTML、javascript: 链接、事件属性与脚本型代码文本。"},
+        {"command": "pnpm --dir web typecheck && pnpm --dir web lint && pnpm --dir web build", "result": "passed_with_warnings", "evidence": "类型检查和构建通过；eslint 无 error，100 条 Vue 格式 warning。"},
+        {"command": "git diff --check", "result": "passed", "evidence": "未发现空白错误。"}
+      ],
+      "started_at": "2026-09-18T22:26:00+08:00",
+      "completed_at": "2026-09-18T22:28:48+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T031"
+    },
+    {
+      "id": "MVP-0.1-T032",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-010",
+      "title": "建立 Compose 开发启动",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T008",
+        "MVP-0.1-T015",
+        "MVP-0.1-T031"
+      ],
+      "scope": [
+        "docker-compose.yml",
+        "backend/Dockerfile",
+        "web/Dockerfile",
+        ".env.example",
+        "README.md"
+      ],
+      "acceptance_criteria": [
+        "PostgreSQL、API、Web 可使用锁定依赖和固定镜像版本启动；健康检查可用。",
+        "README 记录迁移与启动命令，真实凭据不进入镜像或仓库。"
+      ],
+      "verification": [
+        "docker compose config --quiet",
+        "docker compose build",
+        "按 README 启动并检查三项服务健康状态；记录实际命令。"
+      ],
+      "verification_results": [
+        {"command": "docker compose config --quiet", "result": "passed", "evidence": "Compose 配置可解析；固定镜像与服务依赖有效。"},
+        {"command": "docker compose build", "result": "passed", "evidence": "edumind_agent-api 与 edumind_agent-web 镜像均已构建；固定 Python、Node、uv 镜像摘要已核对。"},
+        {"command": "docker compose up -d && docker compose ps && curl --fail http://127.0.0.1:8000/health && curl --fail http://127.0.0.1:5173/", "result": "passed", "evidence": "postgres、api、web 均 healthy；API 返回 {status: ok}，Web 返回 Vite HTML。"},
+        {"command": "git diff --check", "result": "passed", "evidence": "未发现空白错误。"}
+      ],
+      "started_at": "2026-09-18T22:30:00+08:00",
+      "completed_at": "2026-09-21T00:12:08+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T032"
+    },
+    {
+      "id": "MVP-0.1-T033",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-010",
+      "title": "验证容器重启与数据恢复",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T032",
+        "MVP-0.1-T026"
+      ],
+      "scope": [
+        "README.md",
+        "backend/tests/",
+        "docs/"
+      ],
+      "acceptance_criteria": [
+        "重启容器后可读取此前审核通过的资源，迁移与数据卷配置保持有效。",
+        "记录测试环境、备份注意事项和已知限制，不清理用户数据卷。"
+      ],
+      "verification": [
+        "在隔离 Compose 环境执行重启恢复测试；记录命令与证据。"
+      ],
+      "verification_results": [
+        {
+          "command": "docker compose build api && docker compose up -d api; docker compose exec -T api ./.venv/bin/python tests/compose_recovery_check.py seed; docker compose restart postgres; docker compose restart api; docker compose exec -T api ./.venv/bin/python tests/compose_recovery_check.py check",
+          "result": "passed: reviewed resource was read after PostgreSQL and API restarts with owner-scoped learning-unit/resource endpoints"
+        },
+        {
+          "command": "docker compose ps; curl --fail --silent http://127.0.0.1:8000/health; curl --fail --silent http://127.0.0.1:5173/",
+          "result": "passed: postgres, api, and web healthy; API health returned status ok; Web responded successfully"
+        },
+        {
+          "command": "cd backend && uv run --no-sync ruff check tests/compose_recovery_check.py && uv run --no-sync python -m compileall -q tests/compose_recovery_check.py && git diff --check",
+          "result": "passed"
+        }
+      ],
+      "started_at": "2026-09-21T00:13:00+08:00",
+      "completed_at": "2026-09-21T00:28:39+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T033"
+    },
+    {
+      "id": "MVP-0.1-T034",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-011",
+      "title": "完成 MVP 0.1 自动化 E2E",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T031",
+        "MVP-0.1-T033"
+      ],
+      "scope": [
+        "web/src/",
+        "web/tests/",
+        "web/package.json",
+        "web/pnpm-lock.yaml",
+        "web/vite.config.ts",
+        "docker-compose.yml",
+        "backend/pyproject.toml",
+        "backend/uv.lock",
+        "backend/tests/",
+        "README.md"
+      ],
+      "acceptance_criteria": [
+        "浏览器 E2E 覆盖一句话开始、首段讲解、代码/练习交互、Provider 故障、审核拒绝和 SSE 恢复。",
+        "mock 测试与真实 Provider 验证明确区分，E2E 命令可重复执行。"
+      ],
+      "verification": [
+        "运行本任务建立的 E2E 命令、后端相关测试及前端构建。"
+      ],
+      "verification_results": [
+        {
+          "command": "pnpm --dir web e2e",
+          "result": "passed: headless Chromium covered one-sentence start, temporary first content, reviewed explanation/code/three exercises, Provider failure, review rejection, and persisted-operation recovery after malformed SSE"
+        },
+        {
+          "command": "EDUMIND_DATABASE_URL=<isolated-postgres> uv run alembic upgrade head && EDUMIND_TEST_DATABASE_URL=<isolated-postgres> uv run pytest",
+          "result": "passed: all migrations applied and 125 backend tests passed against an ephemeral PostgreSQL container; container removed after verification"
+        },
+        {
+          "command": "pnpm --dir web test --run && pnpm --dir web typecheck && pnpm --dir web lint --quiet && pnpm --dir web build",
+          "result": "passed: 13 tests, typecheck, zero lint errors, and production build"
+        },
+        {
+          "command": "docker compose config --quiet && docker compose build web && docker compose up -d web && docker compose ps; curl http://127.0.0.1:5173/api/auth/session",
+          "result": "passed: postgres/api/web healthy and Web API proxy returned the backend structured 401 response for an unauthenticated session"
+        },
+        {
+          "command": "cd backend && uv lock --check && uv run --no-sync ruff check ../web/tests/e2e && git diff --check",
+          "result": "passed"
+        }
+      ],
+      "started_at": "2026-09-21T08:44:05+08:00",
+      "completed_at": "2026-09-21T09:12:17+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T034"
+    },
+    {
+      "id": "MVP-0.1-T035",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-011",
+      "title": "完成真实 Provider 与性能退出验收",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T034",
+        "MVP-0.1-T035-2",
+        "MVP-0.1-T035-3",
+        "MVP-0.1-T035-4"
+      ],
+      "scope": [
+        "backend/tests/",
+        "docs/",
+        "README.md",
+        "web/vite.config.ts",
+        "task.json",
+        "process.txt"
+      ],
+      "acceptance_criteria": [
+        "真实 Provider 能完成一个知识点学习；无真实凭据时记录阻塞，不宣称阶段完成。",
+        "按 PRD 测量首段可学习内容 P95 ≤ 10s，记录基准模型、环境、样本量、失败率和脱敏证据。",
+        "核对 MVP 0.1 退出标准、已知限制与后续阶段交接；必要时更新相关文档。"
+      ],
+      "verification": [
+        "执行真实 Provider 端到端与性能基准；记录可复现命令和脱敏报告路径。"
+      ],
+      "verification_results": [
+        {
+          "command": "docker compose exec -T api <safe Provider presence check>",
+          "result": "blocked: EDUMIND_PROVIDER_BASE_URL, EDUMIND_PROVIDER_API_KEY, and EDUMIND_PROVIDER_MODEL are all empty; no secret values were printed"
+        },
+        {
+          "command": "docker compose exec -T api <redacted 8-token real Provider stream check>",
+          "result": "passed: deepseek-flash returned a non-empty first stream chunk in 1637 ms; response content, Base URL, and API key were not printed"
+        },
+        {
+          "command": "docker compose exec -T api <redacted strict JSON Schema capability probe>",
+          "result": "blocked: the configured deepseek-flash model returned the standardized CAPABILITY_UNAVAILABLE code for response_format.type=json_schema with strict=true; no response content or credentials were printed"
+        },
+        {
+          "command": "cd backend && uv run --python 3.11 python tests/manual_provider_acceptance.py --samples 20 --confirm-billable",
+          "result": "partial pass: 20/20 first-content samples succeeded with 0% failure rate, P50 4922 ms, P95 6968 ms, and max 7405 ms; the full learning flow was not published because structured generation is unavailable"
+        },
+        {
+          "command": "docker compose exec -T api <redacted DeepSeek Responses JSON Schema probe>",
+          "result": "passed: deepseek-flash returned a local-schema-valid object through the DeepSeek Responses adapter; no content, Base URL, or credentials were printed"
+        },
+        {
+          "command": "cd backend && uv run --python 3.11 python tests/manual_provider_acceptance.py --samples 1 --confirm-billable",
+          "result": "passed: full flow published explanation, code and exercise resources; first content 3428 ms, total 22860 ms; one subsequent sample was 2646 ms"
+        },
+        {
+          "command": "<headless Chromium real browser flow at http://127.0.0.1:5173>",
+          "result": "passed: same-origin guest session, temporary first explanation, reviewed publication, code tab and exercise tab all visible; 3 resource types present"
+        },
+        {
+          "command": "cd backend && uv run --python 3.11 python tests/manual_provider_acceptance.py --samples 20 --confirm-billable",
+          "result": "passed: final DeepSeek Responses P0 benchmark had 20/20 successful samples, 0% failures, P50 3002 ms, P95 4199 ms, max 4689 ms; full flow published 3 resources in 21122 ms"
+        },
+        {
+          "command": "pnpm --dir web test --run && pnpm --dir web typecheck && pnpm --dir web lint && pnpm --dir web build && cd backend && uv run --python 3.11 ruff check . && uv run --python 3.11 mypy app && uv run --python 3.11 python -m pytest -q",
+          "result": "passed: web 13 tests, typecheck, lint 0 errors/62 existing warnings and build passed; backend Ruff/mypy passed; 113 passed, 15 existing database-dependent skips, 1 dependency deprecation warning"
+        },
+        {
+          "command": "docker compose config --quiet && docker compose ps && python3 -m json.tool task.json >/dev/null && git diff --check",
+          "result": "passed: Compose postgres/api/web all healthy; task ledger has no todo/in-progress/blocked tasks after this completion; JSON and diff checks passed"
+        }
+      ],
+      "started_at": "2026-09-21T09:14:17+08:00",
+      "completed_at": "2026-09-21T15:42:30+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T035"
+    },
+    {
+      "id": "MVP-0.1-T035-2",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-011",
+      "title": "适配 DeepSeek Responses 作为 P0 默认模型",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T017"
+      ],
+      "scope": [
+        "backend/app/core/provider_factory.py",
+        "backend/app/services/",
+        "backend/tests/",
+        ".env.example",
+        "docs/PROVIDERS.md",
+        "task.json",
+        "process.txt"
+      ],
+      "acceptance_criteria": [
+        "P0 的唯一服务端网络适配器调用 DeepSeek `POST /responses`，将内部文本与结构化请求映射为 DeepSeek Responses 格式；结构化资源使用 `text.format.type=json_schema`、`name` 和 `schema`，并保留本地 JSON Schema 校验。",
+        "将 DeepSeek 非流式 `output` 和用量转换为既有内部结果；`response.output_text.delta`、完成、不完整与失败等语义 SSE 事件转换为既有 `TextDelta`/安全错误，不依赖 Chat Completions 的 `choices` 或 `[DONE]`。",
+        "Factory 仅组装该 DeepSeek 适配器；模型仍只从服务端 `EDUMIND_PROVIDER_MODEL` 配置注入，不新增 BYOK、Provider 选择、自动跨厂商回退或浏览器凭据。",
+        "以 MockTransport 覆盖文本、JSON Schema、无效/不完整输出、错误映射、任意字节分片 SSE、取消关闭与无凭据安全失败；文档说明 Chat Completions 与 DeepSeek Responses 的协议差异及 P0 默认模型配置。"
+      ],
+      "verification": [
+        "cd backend && uv run --python 3.11 python -m pytest -q tests/test_deepseek_responses.py tests/test_provider_stream.py tests/test_provider_retry.py tests/test_config.py",
+        "cd backend && uv run --python 3.11 ruff check . && uv run --python 3.11 mypy app && uv run --python 3.11 python -m pytest -q",
+        "python3 -m json.tool task.json >/dev/null && git diff --check"
+      ],
+      "verification_results": [
+        {
+          "command": "cd backend && uv run --python 3.11 python -m pytest -q tests/test_deepseek_responses.py tests/test_provider_stream.py tests/test_provider_retry.py tests/test_config.py",
+          "result": "passed: 41 passed; MockTransport covers Responses text, JSON Schema, semantic SSE byte fragmentation, incomplete/failed events, cancellation, error mapping, retry and missing configuration"
+        },
+        {
+          "command": "docker compose exec -T api <redacted DeepSeek Responses JSON Schema probe>",
+          "result": "passed: deepseek-flash returned a local-schema-valid object through POST /responses; only model id and field names were printed"
+        },
+        {
+          "command": "cd backend && uv lock --check && uv run --python 3.11 ruff check . && uv run --python 3.11 mypy app && uv run --python 3.11 python -m pytest -q",
+          "result": "passed: lock check, Ruff and mypy passed; 111 passed, 15 existing database-dependent skips, 1 dependency deprecation warning"
+        },
+        {
+          "command": "python3 -m json.tool task.json >/dev/null && git diff --check",
+          "result": "passed"
+        }
+      ],
+      "started_at": "2026-09-21T10:20:00+08:00",
+      "completed_at": "2026-09-21T14:04:10+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T035-2"
+    },
+    {
+      "id": "MVP-0.1-T035-3",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-011",
+      "title": "约束 DeepSeek P0 推理与输出预算",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T035-2"
+      ],
+      "scope": [
+        "backend/app/services/deepseek_responses.py",
+        "backend/tests/test_deepseek_responses.py",
+        "docs/PROVIDERS.md",
+        "task.json",
+        "process.txt"
+      ],
+      "acceptance_criteria": [
+        "DeepSeek Responses 的 P0 请求显式发送 `reasoning.effort=none`，避免服务端默认长思考阻塞首段和正式资源生成。",
+        "未指定输出上限的内部文本请求使用固定 P0 上限 4096；调用方显式指定的上限保持不变。",
+        "MockTransport 覆盖这两项映射，且既有 JSON Schema、SSE、安全错误、类型检查和全量测试保持通过。"
+      ],
+      "verification": [
+        "cd backend && uv run --python 3.11 python -m pytest -q tests/test_deepseek_responses.py tests/test_provider_stream.py",
+        "cd backend && uv run --python 3.11 ruff check . && uv run --python 3.11 mypy app && uv run --python 3.11 python -m pytest -q",
+        "python3 -m json.tool task.json >/dev/null && git diff --check"
+      ],
+      "verification_results": [
+        {
+          "command": "cd backend && uv run --python 3.11 python -m pytest -q tests/test_deepseek_responses.py tests/test_provider_stream.py",
+          "result": "passed: 24 passed; direct request assertions cover reasoning.effort=none, explicit and default output budgets, JSON Schema, semantic SSE, failure and cancellation"
+        },
+        {
+          "command": "cd backend && uv lock --check && uv run --python 3.11 ruff check . && uv run --python 3.11 mypy app && uv run --python 3.11 python -m pytest -q",
+          "result": "passed: lock check, Ruff and mypy passed; 112 passed, 15 existing database-dependent skips, 1 dependency deprecation warning"
+        },
+        {
+          "command": "python3 -m json.tool task.json >/dev/null && git diff --check",
+          "result": "passed"
+        }
+      ],
+      "started_at": "2026-09-21T14:20:00+08:00",
+      "completed_at": "2026-09-21T14:25:00+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T035-3"
+    },
+    {
+      "id": "MVP-0.1-T035-4",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-011",
+      "title": "稳定 DeepSeek P0 结构化采样",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T035-3"
+      ],
+      "scope": [
+        "backend/app/services/deepseek_responses.py",
+        "backend/tests/test_deepseek_responses.py",
+        "docs/PROVIDERS.md",
+        "task.json",
+        "process.txt"
+      ],
+      "acceptance_criteria": [
+        "未指定温度的 DeepSeek `generate_structured` 请求发送 `temperature=0.0`，降低正式 JSON Schema 资源的随机性；显式温度保持不变。",
+        "非结构化文本和现有内部 Gateway 契约不受该默认值影响。",
+        "MockTransport 覆盖默认与显式温度映射，且既有 JSON Schema、SSE、安全错误、类型检查和全量测试保持通过。"
+      ],
+      "verification": [
+        "cd backend && uv run --python 3.11 python -m pytest -q tests/test_deepseek_responses.py tests/test_provider_stream.py",
+        "cd backend && uv run --python 3.11 ruff check . && uv run --python 3.11 mypy app && uv run --python 3.11 python -m pytest -q",
+        "python3 -m json.tool task.json >/dev/null && git diff --check"
+      ],
+      "verification_results": [
+        {
+          "command": "cd backend && uv run --python 3.11 python -m pytest -q tests/test_deepseek_responses.py tests/test_provider_stream.py",
+          "result": "passed: 25 passed; covers non-thinking/bounded P0 requests, default structured temperature 0.0, explicit temperature passthrough, JSON Schema and semantic SSE"
+        },
+        {
+          "command": "cd backend && uv lock --check && uv run --python 3.11 ruff check . && uv run --python 3.11 mypy app && uv run --python 3.11 python -m pytest -q",
+          "result": "passed: lock check, Ruff and mypy passed; 113 passed, 15 existing database-dependent skips, 1 dependency deprecation warning"
+        },
+        {
+          "command": "python3 -m json.tool task.json >/dev/null && git diff --check",
+          "result": "passed"
+        }
+      ],
+      "started_at": "2026-09-21T14:35:00+08:00",
+      "completed_at": "2026-09-21T14:40:00+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T035-4"
+    }
+  ]
+}

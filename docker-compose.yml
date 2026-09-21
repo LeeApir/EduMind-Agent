@@ -1,0 +1,50 @@
+services:
+  postgres:
+    image: postgres@sha256:cf78e76683b9ca8c5733cbbdce6c9262b45b6767934dd0a95e671f9a0fc20685
+    environment:
+      POSTGRES_DB: edumind_dev
+      POSTGRES_USER: edumind
+      POSTGRES_PASSWORD: ${EDUMIND_POSTGRES_PASSWORD:-edumind_dev_password}
+    volumes:
+      - edumind_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U edumind -d edumind_dev"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  api:
+    build: ./backend
+    environment:
+      EDUMIND_DATABASE_URL: postgresql+asyncpg://edumind:${EDUMIND_POSTGRES_PASSWORD:-edumind_dev_password}@postgres:5432/edumind_dev
+      EDUMIND_PROVIDER_BASE_URL: ${EDUMIND_PROVIDER_BASE_URL:-}
+      EDUMIND_PROVIDER_API_KEY: ${EDUMIND_PROVIDER_API_KEY:-}
+      EDUMIND_PROVIDER_MODEL: ${EDUMIND_PROVIDER_MODEL:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health').read()"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  web:
+    build: ./web
+    environment:
+      EDUMIND_API_PROXY_TARGET: http://api:8000
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "5173:5173"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:5173').then(r => { if (!r.ok) process.exit(1) })"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  edumind_postgres_data:
