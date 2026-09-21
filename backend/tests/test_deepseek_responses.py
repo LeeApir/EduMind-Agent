@@ -78,6 +78,7 @@ def test_text_request_uses_responses_pinned_ip_host_sni_and_neutral_result() -> 
             "model": "deepseek-flash",
             "input": [{"role": "user", "content": "Explain a linked list"}],
             "stream": False,
+            "reasoning": {"effort": "none"},
             "max_output_tokens": 300,
             "temperature": 0.4,
         }
@@ -88,6 +89,18 @@ def test_text_request_uses_responses_pinned_ip_host_sni_and_neutral_result() -> 
     assert result.model_id == "deepseek-flash"
     assert result.usage == TokenUsage(input_tokens=8, output_tokens=9)
     assert calls == 1
+
+
+def test_unspecified_output_limit_uses_bounded_p0_nonthinking_defaults() -> None:
+    def respond(request: httpx.Request) -> httpx.Response:
+        body = json.loads(request.content)
+        assert body["reasoning"] == {"effort": "none"}
+        assert body["max_output_tokens"] == 4096
+        return httpx.Response(200, json=response())
+
+    request = TextRequest(messages=(ChatMessage(role="user", content="Explain a queue"),))
+    result = asyncio.run(adapter(httpx.MockTransport(respond)).generate_text(request))
+    assert result.model_id == "deepseek-flash"
 
 
 def test_structured_request_uses_text_json_schema_and_validates_result() -> None:

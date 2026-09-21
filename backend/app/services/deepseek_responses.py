@@ -28,6 +28,7 @@ from app.services.provider_gateway import (
 
 _MAX_RESPONSE_BYTES = 2 * 1024 * 1024
 _MAX_SSE_FRAME_BYTES = 1024 * 1024
+_P0_DEFAULT_MAX_OUTPUT_TOKENS = 4096
 _TIMEOUT = httpx.Timeout(connect=5.0, read=60.0, write=10.0, pool=5.0)
 _IGNORED_STREAM_EVENTS = frozenset(
     {
@@ -110,9 +111,16 @@ def _request_body(request: TextRequest) -> dict[str, object]:
             for message in request.messages
         ],
         "stream": False,
+        # DeepSeek enables thinking by default. P0 requires a fast first screen
+        # and bounded formal-resource calls, so its sole configured model is used
+        # in non-thinking mode unless a later product phase adds a distinct policy.
+        "reasoning": {"effort": "none"},
+        "max_output_tokens": (
+            request.max_output_tokens
+            if request.max_output_tokens is not None
+            else _P0_DEFAULT_MAX_OUTPUT_TOKENS
+        ),
     }
-    if request.max_output_tokens is not None:
-        body["max_output_tokens"] = request.max_output_tokens
     if request.temperature is not None:
         body["temperature"] = request.temperature
     return body
