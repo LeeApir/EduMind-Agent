@@ -172,7 +172,7 @@
       "phase": "MVP 0.2",
       "parent_work_package": "MVP-0.2-002",
       "title": "建立 10 节点数据结构种子知识结构",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.2-T001"
@@ -190,9 +190,26 @@
       "verification": [
         "运行 schema、引用完整性、环检测和 10 节点断言。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "python3 -m json.tool data/knowledge_graph.yaml >/dev/null",
+          "result": "passed: JSON-compatible YAML parsed successfully"
+        },
+        {
+          "command": "seed graph structural check with graphlib.TopologicalSorter",
+          "result": "passed: exactly 10 PRD Appendix B IDs, legal relation types, no dangling/duplicate relations, node prerequisites match DEPENDS_ON edges, and prerequisite graph is acyclic"
+        },
+        {
+          "command": "cd backend && uv run --group dev python <JSON Schema node/relation validation>",
+          "result": "passed: all seed nodes and relations conform to the public OpenAPI component schemas"
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed"
+        }
+      ],
+      "started_at": "2026-09-21T22:39:06",
+      "completed_at": "2026-09-21T22:45:50",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.2-T003"
     },
