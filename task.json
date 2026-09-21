@@ -1423,7 +1423,7 @@
       "phase": "MVP 0.1",
       "parent_work_package": "MVP-0.1-011",
       "title": "完成真实 Provider 与性能退出验收",
-      "status": "blocked",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.1-T034",
@@ -1463,11 +1463,35 @@
         {
           "command": "cd backend && uv run --python 3.11 python tests/manual_provider_acceptance.py --samples 20 --confirm-billable",
           "result": "partial pass: 20/20 first-content samples succeeded with 0% failure rate, P50 4922 ms, P95 6968 ms, and max 7405 ms; the full learning flow was not published because structured generation is unavailable"
+        },
+        {
+          "command": "docker compose exec -T api <redacted DeepSeek Responses JSON Schema probe>",
+          "result": "passed: deepseek-flash returned a local-schema-valid object through the DeepSeek Responses adapter; no content, Base URL, or credentials were printed"
+        },
+        {
+          "command": "cd backend && uv run --python 3.11 python tests/manual_provider_acceptance.py --samples 1 --confirm-billable",
+          "result": "passed: full flow published explanation, code and exercise resources; first content 3428 ms, total 22860 ms; one subsequent sample was 2646 ms"
+        },
+        {
+          "command": "<headless Chromium real browser flow at http://127.0.0.1:5173>",
+          "result": "passed: same-origin guest session, temporary first explanation, reviewed publication, code tab and exercise tab all visible; 3 resource types present"
+        },
+        {
+          "command": "cd backend && uv run --python 3.11 python tests/manual_provider_acceptance.py --samples 20 --confirm-billable",
+          "result": "passed: final DeepSeek Responses P0 benchmark had 20/20 successful samples, 0% failures, P50 3002 ms, P95 4199 ms, max 4689 ms; full flow published 3 resources in 21122 ms"
+        },
+        {
+          "command": "pnpm --dir web test --run && pnpm --dir web typecheck && pnpm --dir web lint && pnpm --dir web build && cd backend && uv run --python 3.11 ruff check . && uv run --python 3.11 mypy app && uv run --python 3.11 python -m pytest -q",
+          "result": "passed: web 13 tests, typecheck, lint 0 errors/62 existing warnings and build passed; backend Ruff/mypy passed; 113 passed, 15 existing database-dependent skips, 1 dependency deprecation warning"
+        },
+        {
+          "command": "docker compose config --quiet && docker compose ps && python3 -m json.tool task.json >/dev/null && git diff --check",
+          "result": "passed: Compose postgres/api/web all healthy; task ledger has no todo/in-progress/blocked tasks after this completion; JSON and diff checks passed"
         }
       ],
       "started_at": "2026-09-21T09:14:17+08:00",
-      "completed_at": null,
-      "blocker": "The new non-thinking/bounded DeepSeek Responses path still produced intermittent INVALID_OUTPUT for formal structured resources at the provider default temperature. MVP-0.1-T035-4 must lock unspecified structured generation temperature to 0.0 before acceptance is rerun.",
+      "completed_at": "2026-09-21T15:42:30+08:00",
+      "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.1-T035"
     },
     {

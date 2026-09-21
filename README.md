@@ -56,6 +56,8 @@ curl --fail http://127.0.0.1:5173/
 
 PostgreSQL 仅在 Compose 内部网络开放；API、Web 分别暴露为 8000、5173。Compose 会先等待数据库与 API 健康检查，API 启动时自动执行 `alembic upgrade head`。仅检查健康状态时不需要 Provider 凭据；实际学习生成需要在 `.env` 设置三项 `EDUMIND_PROVIDER_*`。开发停止但保留数据卷：
 
+MVP 0.1 默认使用 DeepSeek Responses API 和 `deepseek-flash`；推荐 `.env` 中使用 `EDUMIND_PROVIDER_BASE_URL=https://api.deepseek.com`。API Key 只留在 `.env`，不要提交或放入浏览器。当前真实验收与可复现性能命令见 [Provider 验收报告](docs/acceptance/mvp-0.1-provider-acceptance.md)。
+
 ```bash
 docker compose down
 ```
