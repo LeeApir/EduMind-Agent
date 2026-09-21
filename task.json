@@ -92,7 +92,7 @@
       "phase": "MVP 0.2",
       "parent_work_package": "MVP-0.2-001",
       "title": "确定学习证据、掌握度与路径版本边界",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [],
       "scope": [
@@ -107,9 +107,22 @@
       "verification": [
         "核对 PRD §3.2、§3.4、§3.7、§5 与 §9.1，完成 ADR 自查。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "jq -e '<MVP 0.2 ledger invariants>' task.json",
+          "result": "passed: schema/active phase valid, task IDs unique, and T001 was the only in-progress task during verification"
+        },
+        {
+          "command": "ADR required-boundary term check and documentation link target check",
+          "result": "passed: four evidence types, ownership, idempotency, mastery/profile/path rule versions, durable replanning and PostgreSQL restart boundary are present; referenced local documents exist"
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed"
+        }
+      ],
+      "started_at": "2026-09-21T20:36:01",
+      "completed_at": "2026-09-21T20:41:10",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.2-T001"
     },
