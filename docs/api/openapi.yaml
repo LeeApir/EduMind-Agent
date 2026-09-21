@@ -1,15 +1,18 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "EduMind MVP 0.1 API",
-    "version": "0.1.0",
-    "description": "MVP 0.1 的匿名学习、流式首屏和已审核资源读取契约。JSON 是 YAML 1.2 的合法子集，使用 .yaml 扩展名以便 OpenAPI 工具读取。"
+    "title": "EduMind MVP 0.2 API",
+    "version": "0.2.0",
+    "description": "MVP 0.2 的匿名学习闭环契约：保留 MVP 0.1 流式首屏与正式资源边界，新增版本化知识结构、渐进画像、服务端测验评分、掌握度与可解释路径。JSON 是 YAML 1.2 的合法子集，使用 .yaml 扩展名以便 OpenAPI 工具读取。"
   },
   "servers": [{"url": "/"}],
   "tags": [
     {"name": "Authentication"},
     {"name": "Learning"},
-    {"name": "Resources"}
+    {"name": "Resources"},
+    {"name": "Knowledge Graph"},
+    {"name": "Assessment"},
+    {"name": "Learning Path"}
   ],
   "paths": {
     "/api/auth/guest": {
@@ -50,6 +53,54 @@
           "200": {"description": "仅当前用户的最新画像快照。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/StudentProfile"}}}},
           "401": {"$ref": "#/components/responses/Unauthorized"},
           "404": {"$ref": "#/components/responses/NotFound"}
+        }
+      },
+      "patch": {
+        "tags": ["Learning"],
+        "summary": "手动修正当前画像的白名单字段",
+        "description": "只接受 `ProfileCorrectionRequest` 中的可修正字段。服务端从 Cookie 推导 owner，忽略任何客户端用户标识；每次有效修正创建带 `manual_correction` 证据的新不可变画像版本。",
+        "operationId": "correctMyProfile",
+        "security": [{"sessionCookie": []}],
+        "parameters": [{"$ref": "#/components/parameters/CsrfToken"}, {"$ref": "#/components/parameters/IdempotencyKey"}, {"$ref": "#/components/parameters/IfMatchProfileVersion"}],
+        "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ProfileCorrectionRequest"}}}},
+        "responses": {
+          "200": {"description": "已创建或重放画像版本。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/StudentProfile"}}}},
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "403": {"$ref": "#/components/responses/CsrfFailed"},
+          "409": {"$ref": "#/components/responses/ProfileVersionConflict"},
+          "422": {"$ref": "#/components/responses/ValidationError"}
+        }
+      }
+    },
+    "/api/profile/me/history": {
+      "get": {
+        "tags": ["Learning"],
+        "summary": "读取当前 owner 的画像版本历史",
+        "description": "按版本降序稳定返回去敏画像快照；不返回其他 owner、完整原始行为或 Provider 输入。",
+        "operationId": "getMyProfileHistory",
+        "security": [{"sessionCookie": []}],
+        "parameters": [{"$ref": "#/components/parameters/HistoryLimit"}, {"$ref": "#/components/parameters/ProfileBeforeVersion"}],
+        "responses": {
+          "200": {"description": "画像历史页。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ProfileHistoryPage"}}}},
+          "401": {"$ref": "#/components/responses/Unauthorized"}
+        }
+      }
+    },
+    "/api/profile/events": {
+      "post": {
+        "tags": ["Learning"],
+        "summary": "记录允许影响画像的学习行为",
+        "description": "仅接受白名单行为摘要；测验作答必须使用专用测验提交端点，客户端不能写入得分、掌握状态或画像字段。事件持久化后才允许异步画像更新，Provider 失败不回滚事件。",
+        "operationId": "recordProfileEvent",
+        "security": [{"sessionCookie": []}],
+        "parameters": [{"$ref": "#/components/parameters/CsrfToken"}, {"$ref": "#/components/parameters/IdempotencyKey"}],
+        "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ProfileEventRequest"}}}},
+        "responses": {
+          "202": {"description": "事件已持久化；画像更新可能仍在处理。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ProfileEventReceipt"}}}},
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "403": {"$ref": "#/components/responses/CsrfFailed"},
+          "409": {"$ref": "#/components/responses/IdempotencyConflict"},
+          "422": {"$ref": "#/components/responses/ValidationError"}
         }
       }
     },
@@ -175,6 +226,114 @@
           "404": {"$ref": "#/components/responses/NotFound"}
         }
       }
+    },
+    "/api/graph": {
+      "get": {
+        "tags": ["Knowledge Graph"],
+        "summary": "读取当前版本的公共知识结构",
+        "description": "公共种子图谱不包含任何用户掌握度、画像或学习记录；节点和关系均按稳定 ID 排序。",
+        "operationId": "getKnowledgeGraph",
+        "responses": {
+          "200": {"description": "已校验的版本化图谱。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/KnowledgeGraph"}}}}
+        }
+      }
+    },
+    "/api/graph/node/{nodeId}": {
+      "get": {
+        "tags": ["Knowledge Graph"],
+        "summary": "读取公共知识节点详情",
+        "operationId": "getKnowledgeNode",
+        "parameters": [{"$ref": "#/components/parameters/NodeId"}],
+        "responses": {
+          "200": {"description": "节点及其稳定排序的入/出关系。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/KnowledgeNodeDetail"}}}},
+          "404": {"$ref": "#/components/responses/GraphNodeNotFound"}
+        }
+      }
+    },
+    "/api/quiz-submissions": {
+      "post": {
+        "tags": ["Assessment"],
+        "summary": "提交已发布练习并由服务端评分",
+        "description": "请求必须引用当前 owner 可读取的已发布练习资源及版本。服务端使用资源中受审核的标准答案确定性评分，持久化不可变作答证据和错误模式；不信任客户端的分数、正确性、题干或答案键。",
+        "operationId": "submitQuiz",
+        "security": [{"sessionCookie": []}],
+        "parameters": [{"$ref": "#/components/parameters/CsrfToken"}, {"$ref": "#/components/parameters/IdempotencyKey"}],
+        "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/QuizSubmissionRequest"}}}},
+        "responses": {
+          "200": {"description": "逐题评分、持久化证据和本次掌握度变化。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/QuizSubmissionResult"}}}},
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "403": {"$ref": "#/components/responses/CsrfFailed"},
+          "404": {"$ref": "#/components/responses/NotFound"},
+          "409": {"$ref": "#/components/responses/IdempotencyConflict"},
+          "422": {"$ref": "#/components/responses/QuizSubmissionInvalid"}
+        }
+      }
+    },
+    "/api/mastery": {
+      "get": {
+        "tags": ["Assessment"],
+        "summary": "读取当前 owner 的节点掌握度",
+        "description": "仅返回当前投影、规则版本和去敏证据摘要；按知识节点 ID 稳定排序。",
+        "operationId": "getMyMastery",
+        "security": [{"sessionCookie": []}],
+        "responses": {
+          "200": {"description": "当前掌握度投影。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/MasteryList"}}}},
+          "401": {"$ref": "#/components/responses/Unauthorized"}
+        }
+      }
+    },
+    "/api/path/plan": {
+      "post": {
+        "tags": ["Learning Path"],
+        "summary": "为目标节点创建初始学习路径版本",
+        "description": "规划只使用已提交的图谱、画像与掌握度快照，不调用 Provider。服务端从 Cookie 推导 owner，固定输入及规则版本后创建不可变路径版本。",
+        "operationId": "planLearningPath",
+        "security": [{"sessionCookie": []}],
+        "parameters": [{"$ref": "#/components/parameters/CsrfToken"}, {"$ref": "#/components/parameters/IdempotencyKey"}],
+        "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/PathPlanRequest"}}}},
+        "responses": {
+          "201": {"description": "已创建或重放路径版本。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/LearningPath"}}}},
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "403": {"$ref": "#/components/responses/CsrfFailed"},
+          "404": {"$ref": "#/components/responses/GraphNodeNotFound"},
+          "409": {"$ref": "#/components/responses/IdempotencyConflict"},
+          "422": {"$ref": "#/components/responses/PathUnreachable"}
+        }
+      }
+    },
+    "/api/path/current": {
+      "get": {
+        "tags": ["Learning Path"],
+        "summary": "读取当前 owner 的指定目标路径",
+        "description": "响应包含当前路径版本及是否落后于最新证据；不存在、属于其他 owner 的路径一律返回 NOT_FOUND。",
+        "operationId": "getCurrentLearningPath",
+        "security": [{"sessionCookie": []}],
+        "parameters": [{"$ref": "#/components/parameters/TargetNodeId"}],
+        "responses": {
+          "200": {"description": "当前路径版本。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/LearningPath"}}}},
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "404": {"$ref": "#/components/responses/NotFound"}
+        }
+      }
+    },
+    "/api/path/replan": {
+      "post": {
+        "tags": ["Learning Path"],
+        "summary": "按最新持久化输入重规划路径",
+        "description": "请求必须携带客户端看到的当前路径版本。若输入水位已变，服务端以最新快照重算并创建新版本；若指定版本已被其他请求取代，返回明确版本冲突，不静默覆盖。",
+        "operationId": "replanLearningPath",
+        "security": [{"sessionCookie": []}],
+        "parameters": [{"$ref": "#/components/parameters/CsrfToken"}, {"$ref": "#/components/parameters/IdempotencyKey"}, {"$ref": "#/components/parameters/IfMatchPathVersion"}],
+        "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/PathReplanRequest"}}}},
+        "responses": {
+          "200": {"description": "已创建或重放新路径版本，包含变化理由。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/LearningPath"}}}},
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "403": {"$ref": "#/components/responses/CsrfFailed"},
+          "404": {"$ref": "#/components/responses/NotFound"},
+          "409": {"$ref": "#/components/responses/PathVersionConflict"},
+          "422": {"$ref": "#/components/responses/PathUnreachable"}
+        }
+      }
     }
   },
   "components": {
@@ -184,7 +343,13 @@
       "IdempotencyKey": {"name": "Idempotency-Key", "in": "header", "required": true, "schema": {"type": "string", "minLength": 16, "maxLength": 128}, "description": "客户端为一次创建操作生成的随机键；与认证身份和请求摘要绑定。"},
       "OperationId": {"name": "operationId", "in": "path", "required": true, "schema": {"$ref": "#/components/schemas/Identifier"}},
       "LearningUnitId": {"name": "learningUnitId", "in": "path", "required": true, "schema": {"$ref": "#/components/schemas/Identifier"}},
-      "ResourceId": {"name": "resourceId", "in": "path", "required": true, "schema": {"$ref": "#/components/schemas/Identifier"}}
+      "ResourceId": {"name": "resourceId", "in": "path", "required": true, "schema": {"$ref": "#/components/schemas/Identifier"}},
+      "NodeId": {"name": "nodeId", "in": "path", "required": true, "schema": {"$ref": "#/components/schemas/KnowledgeNodeId"}},
+      "TargetNodeId": {"name": "target_node_id", "in": "query", "required": true, "schema": {"$ref": "#/components/schemas/KnowledgeNodeId"}},
+      "HistoryLimit": {"name": "limit", "in": "query", "required": false, "schema": {"type": "integer", "minimum": 1, "maximum": 50, "default": 20}},
+      "ProfileBeforeVersion": {"name": "before_version", "in": "query", "required": false, "schema": {"type": "integer", "minimum": 1}},
+      "IfMatchProfileVersion": {"name": "If-Match-Profile-Version", "in": "header", "required": true, "schema": {"type": "integer", "minimum": 1}, "description": "客户端读取到的最新画像版本；不匹配时返回 PROFILE_VERSION_CONFLICT。"},
+      "IfMatchPathVersion": {"name": "If-Match-Path-Version", "in": "header", "required": true, "schema": {"type": "integer", "minimum": 1}, "description": "客户端读取到的当前路径版本；不匹配时返回 PATH_VERSION_CONFLICT。"}
     },
     "responses": {
       "LearningEventStream": {"description": "text/event-stream；事件定义见 x-sse-events。", "content": {"text/event-stream": {"schema": {"type": "string"}, "examples": {"temporaryToken": {"value": "event: token\\ndata: {\\\"operation_id\\\":\\\"op_123\\\",\\\"temporary\\\":true,\\\"delta\\\":\\\"链表插入先要保存...\\\"}\\n\\n"}}}}},
@@ -194,7 +359,12 @@
       "ValidationError": {"description": "请求未通过 schema 校验。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},
       "IdempotencyConflict": {"description": "同一幂等键被用于不同请求摘要。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},
       "AccountConflict": {"description": "目标账号已存在；MVP 不自动合并匿名数据。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},
-      "RateLimited": {"description": "请求受限。", "headers": {"Retry-After": {"schema": {"type": "integer", "minimum": 1}}}, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}}
+      "RateLimited": {"description": "请求受限。", "headers": {"Retry-After": {"schema": {"type": "integer", "minimum": 1}}}, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},
+      "ProfileVersionConflict": {"description": "画像版本已被其他有效更新推进；客户端必须重新读取后再提交。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},
+      "PathVersionConflict": {"description": "当前路径版本已改变；客户端必须重新读取最新路径。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},
+      "GraphNodeNotFound": {"description": "公共图谱中不存在该稳定节点 ID。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},
+      "QuizSubmissionInvalid": {"description": "练习不是已发布资源、版本/题目不匹配，或答案不符合题目 schema。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},
+      "PathUnreachable": {"description": "目标节点不存在有效可达路径，或图谱前置关系不满足。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}}
     },
     "schemas": {
       "Identifier": {"type": "string", "pattern": "^[A-Za-z0-9_-]{8,64}$"},
@@ -207,7 +377,26 @@
       "LearningUnit": {"type": "object", "required": ["id", "status", "scenes"], "properties": {"id": {"$ref": "#/components/schemas/Identifier"}, "status": {"const": "ready"}, "scenes": {"type": "array", "items": {"$ref": "#/components/schemas/PublishedScene"}}}},
       "PublishedScene": {"type": "object", "required": ["id", "version", "resources", "review_status"], "properties": {"id": {"$ref": "#/components/schemas/Identifier"}, "version": {"type": "integer", "minimum": 1}, "review_status": {"const": "passed"}, "resources": {"type": "array", "items": {"$ref": "#/components/schemas/PublishedResource"}}}},
       "PublishedResource": {"type": "object", "required": ["id", "type", "version", "content", "review_status"], "properties": {"id": {"$ref": "#/components/schemas/Identifier"}, "type": {"type": "string", "enum": ["explanation", "code", "exercise"]}, "version": {"type": "integer", "minimum": 1}, "content": {"type": "object", "description": "按资源类型定义的已清洗结构化内容。"}, "review_status": {"const": "passed"}}},
-      "Error": {"type": "object", "additionalProperties": false, "required": ["code", "message", "retryable"], "properties": {"code": {"type": "string", "enum": ["UNAUTHORIZED", "CSRF_FAILED", "NOT_FOUND", "VALIDATION_ERROR", "IDEMPOTENCY_CONFLICT", "ACCOUNT_CONFLICT", "RATE_LIMITED", "PROVIDER_UNAVAILABLE", "REVIEW_REJECTED", "OPERATION_CANCELED"]}, "message": {"type": "string"}, "retryable": {"type": "boolean"}, "operation_id": {"$ref": "#/components/schemas/Identifier"}}}
+      "ProfileCorrectionRequest": {"type": "object", "additionalProperties": false, "minProperties": 1, "properties": {"professional_background": {"type": "object"}, "learning_goals": {"type": "object"}, "error_preferences": {"type": "array"}, "engineering_preference": {"type": "object"}}},
+      "ProfileHistoryPage": {"type": "object", "additionalProperties": false, "required": ["items", "next_before_version"], "properties": {"items": {"type": "array", "items": {"$ref": "#/components/schemas/StudentProfile"}}, "next_before_version": {"type": ["integer", "null"], "minimum": 1}}},
+      "ProfileEventRequest": {"type": "object", "additionalProperties": false, "required": ["event_type", "knowledge_node_id"], "properties": {"event_type": {"type": "string", "enum": ["hint_used", "reexplanation_requested", "resource_selected", "explicit_feedback"]}, "knowledge_node_id": {"$ref": "#/components/schemas/KnowledgeNodeId"}, "learning_unit_id": {"$ref": "#/components/schemas/Identifier"}, "scene_id": {"$ref": "#/components/schemas/Identifier"}, "action": {"type": "string", "enum": ["hint_level_1", "hint_level_2", "simpler", "deeper", "different_example", "code", "exercise", "too_easy", "too_hard", "liked_explanation", "skip", "mark_known"]}}},
+      "ProfileEventReceipt": {"type": "object", "additionalProperties": false, "required": ["evidence_id", "event_type", "profile_update_status"], "properties": {"evidence_id": {"$ref": "#/components/schemas/Identifier"}, "event_type": {"type": "string"}, "profile_update_status": {"type": "string", "enum": ["queued", "updated", "no_change", "provider_failed"]}}},
+      "KnowledgeNodeId": {"type": "string", "pattern": "^[a-z][a-z0-9-]{1,63}$"},
+      "KnowledgeNode": {"type": "object", "additionalProperties": false, "required": ["id", "name", "chapter", "difficulty", "description", "learning_objectives", "common_misconceptions", "ai_context", "mastery_rule_key"], "properties": {"id": {"$ref": "#/components/schemas/KnowledgeNodeId"}, "name": {"type": "string"}, "chapter": {"type": "string"}, "difficulty": {"type": "integer", "minimum": 1, "maximum": 5}, "description": {"type": "string"}, "learning_objectives": {"type": "array", "minItems": 1, "items": {"type": "string"}}, "common_misconceptions": {"type": "array", "items": {"type": "string"}}, "ai_context": {"type": "string"}, "mastery_rule_key": {"type": "string"}}},
+      "KnowledgeRelation": {"type": "object", "additionalProperties": false, "required": ["from", "to", "type"], "properties": {"from": {"$ref": "#/components/schemas/KnowledgeNodeId"}, "to": {"$ref": "#/components/schemas/KnowledgeNodeId"}, "type": {"type": "string", "enum": ["DEPENDS_ON", "SIMILAR_TO", "EXTENDS"]}}},
+      "KnowledgeGraph": {"type": "object", "additionalProperties": false, "required": ["schema_version", "graph_version", "nodes", "relations"], "properties": {"schema_version": {"type": "integer", "minimum": 1}, "graph_version": {"type": "string"}, "nodes": {"type": "array", "items": {"$ref": "#/components/schemas/KnowledgeNode"}}, "relations": {"type": "array", "items": {"$ref": "#/components/schemas/KnowledgeRelation"}}}},
+      "KnowledgeNodeDetail": {"type": "object", "additionalProperties": false, "required": ["graph_version", "node", "incoming_relations", "outgoing_relations"], "properties": {"graph_version": {"type": "string"}, "node": {"$ref": "#/components/schemas/KnowledgeNode"}, "incoming_relations": {"type": "array", "items": {"$ref": "#/components/schemas/KnowledgeRelation"}}, "outgoing_relations": {"type": "array", "items": {"$ref": "#/components/schemas/KnowledgeRelation"}}}},
+      "QuizAnswer": {"type": "object", "additionalProperties": false, "required": ["question_id", "answer"], "properties": {"question_id": {"type": "string", "minLength": 1, "maxLength": 128}, "answer": {"type": ["string", "integer", "number", "boolean", "array"]}}},
+      "QuizSubmissionRequest": {"type": "object", "additionalProperties": false, "required": ["resource_id", "resource_version", "answers"], "properties": {"resource_id": {"$ref": "#/components/schemas/Identifier"}, "resource_version": {"type": "integer", "minimum": 1}, "answers": {"type": "array", "minItems": 1, "maxItems": 10, "items": {"$ref": "#/components/schemas/QuizAnswer"}}}},
+      "QuizQuestionResult": {"type": "object", "additionalProperties": false, "required": ["question_id", "correct", "explanation", "error_patterns"], "properties": {"question_id": {"type": "string"}, "correct": {"type": "boolean"}, "explanation": {"type": "string"}, "error_patterns": {"type": "array", "items": {"type": "string"}}}},
+      "MasteryChange": {"type": "object", "additionalProperties": false, "required": ["knowledge_node_id", "previous_score", "score", "status", "revision", "rule_version"], "properties": {"knowledge_node_id": {"$ref": "#/components/schemas/KnowledgeNodeId"}, "previous_score": {"type": "number", "minimum": 0, "maximum": 1}, "score": {"type": "number", "minimum": 0, "maximum": 1}, "status": {"type": "string", "enum": ["unseen", "learning", "weak", "mastered"]}, "revision": {"type": "integer", "minimum": 1}, "rule_version": {"type": "string"}, "evidence_summary": {"type": "array", "items": {"type": "string"}}}},
+      "QuizSubmissionResult": {"type": "object", "additionalProperties": false, "required": ["evidence_id", "resource_id", "resource_version", "question_results", "mastery_changes", "path_replan_required"], "properties": {"evidence_id": {"$ref": "#/components/schemas/Identifier"}, "resource_id": {"$ref": "#/components/schemas/Identifier"}, "resource_version": {"type": "integer", "minimum": 1}, "question_results": {"type": "array", "items": {"$ref": "#/components/schemas/QuizQuestionResult"}}, "mastery_changes": {"type": "array", "items": {"$ref": "#/components/schemas/MasteryChange"}}, "path_replan_required": {"type": "boolean"}}},
+      "MasteryList": {"type": "object", "additionalProperties": false, "required": ["graph_version", "items"], "properties": {"graph_version": {"type": "string"}, "items": {"type": "array", "items": {"$ref": "#/components/schemas/MasteryChange"}}}},
+      "PathPlanRequest": {"type": "object", "additionalProperties": false, "required": ["target_node_id"], "properties": {"target_node_id": {"$ref": "#/components/schemas/KnowledgeNodeId"}}},
+      "PathReplanRequest": {"type": "object", "additionalProperties": false, "required": ["target_node_id"], "properties": {"target_node_id": {"$ref": "#/components/schemas/KnowledgeNodeId"}, "reason": {"type": "string", "enum": ["learner_request", "mastery_changed", "profile_changed"]}}},
+      "PathReason": {"type": "object", "additionalProperties": false, "required": ["kind", "summary"], "properties": {"kind": {"type": "string", "enum": ["prerequisite", "mastery_evidence", "profile_field", "goal"]}, "summary": {"type": "string"}, "knowledge_node_id": {"$ref": "#/components/schemas/KnowledgeNodeId"}}},
+      "LearningPath": {"type": "object", "additionalProperties": false, "required": ["version", "target_node_id", "graph_version", "profile_version", "mastery_revision_watermark", "planner_rule_version", "nodes", "current_node_id", "prerequisite_node_ids", "next_node_id", "reasons", "is_stale"], "properties": {"version": {"type": "integer", "minimum": 1}, "target_node_id": {"$ref": "#/components/schemas/KnowledgeNodeId"}, "graph_version": {"type": "string"}, "profile_version": {"type": "integer", "minimum": 1}, "mastery_revision_watermark": {"type": "integer", "minimum": 0}, "planner_rule_version": {"type": "string"}, "nodes": {"type": "array", "items": {"$ref": "#/components/schemas/KnowledgeNodeId"}}, "current_node_id": {"type": ["string", "null"]}, "prerequisite_node_ids": {"type": "array", "items": {"$ref": "#/components/schemas/KnowledgeNodeId"}}, "next_node_id": {"type": ["string", "null"]}, "reasons": {"type": "array", "minItems": 1, "items": {"$ref": "#/components/schemas/PathReason"}}, "is_stale": {"type": "boolean"}}},
+      "Error": {"type": "object", "additionalProperties": false, "required": ["code", "message", "retryable"], "properties": {"code": {"type": "string", "enum": ["UNAUTHORIZED", "CSRF_FAILED", "NOT_FOUND", "VALIDATION_ERROR", "IDEMPOTENCY_CONFLICT", "PROFILE_VERSION_CONFLICT", "PATH_VERSION_CONFLICT", "GRAPH_NODE_NOT_FOUND", "QUIZ_SUBMISSION_INVALID", "PATH_UNREACHABLE", "ACCOUNT_CONFLICT", "RATE_LIMITED", "PROVIDER_UNAVAILABLE", "REVIEW_REJECTED", "OPERATION_CANCELED"]}, "message": {"type": "string"}, "retryable": {"type": "boolean"}, "operation_id": {"$ref": "#/components/schemas/Identifier"}}}
     }
   },
   "x-sse-events": {

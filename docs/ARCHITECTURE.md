@@ -29,3 +29,9 @@
 影响掌握度的命令在一个 PostgreSQL 事务中追加证据、创建 mastery revision、替换当前投影并标记待重规划。路径以已提交输入在独立短事务中重算；Provider 画像推断也不占用证据事务。幂等记录、版本水位与待重规划标记均存于 PostgreSQL，因此并发、重复提交和服务重启后可安全恢复。
 
 完整的证据含义、归属、事务边界、并发策略和重算规则见 [ADR-0003](ADR/0003-learning-evidence-mastery-and-path-versioning.md)。
+
+## 学习闭环 API 契约（MVP 0.2）
+
+[OpenAPI](api/openapi.yaml) 将 MVP 0.2 固定为一组可演进而不泄露所有者的端点：公共 `GET /api/graph` 与 `GET /api/graph/node/{nodeId}` 仅返回版本化知识结构；其他画像、测验、掌握度和路径端点从会话 Cookie 推导 owner。不存在可以由客户端写入的 `user_id`、正确性、分数、掌握状态或规则版本字段。
+
+所有 MVP 0.2 写请求都需要会话 Cookie、同源 CSRF 令牌和 owner-scoped `Idempotency-Key`。画像修正和路径重规划另带显式的当前版本头，并发时返回稳定的 409 而非最后写入者覆盖。测验只接收已发布资源版本的答案，由服务端确定性评分；路径只使用已提交的快照，不调用 Provider。

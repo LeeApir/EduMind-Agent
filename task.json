@@ -131,7 +131,7 @@
       "phase": "MVP 0.2",
       "parent_work_package": "MVP-0.2-001",
       "title": "固定 MVP 0.2 学习闭环 API 契约",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.2-T001"
@@ -148,9 +148,22 @@
       "verification": [
         "解析 OpenAPI 3.1 并核对 MVP 0.2 路径、鉴权和错误响应。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "python3 -m json.tool docs/api/openapi.yaml >/dev/null",
+          "result": "passed: OpenAPI JSON-compatible YAML parsed successfully"
+        },
+        {
+          "command": "OpenAPI MVP 0.2 path, write-security and local-reference structural checks",
+          "result": "passed: required profile/graph/quiz/mastery/path routes exist; every MVP 0.2 write operation declares Cookie authentication, CSRF and idempotency; all local component references resolve"
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed"
+        }
+      ],
+      "started_at": "2026-09-21T22:29:14",
+      "completed_at": "2026-09-21T22:36:58",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.2-T002"
     },
