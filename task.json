@@ -1423,7 +1423,7 @@
       "phase": "MVP 0.1",
       "parent_work_package": "MVP-0.1-011",
       "title": "完成真实 Provider 与性能退出验收",
-      "status": "todo",
+      "status": "blocked",
       "priority": "P0",
       "depends_on": [
         "MVP-0.1-T034"
@@ -1442,10 +1442,15 @@
       "verification": [
         "执行真实 Provider 端到端与性能基准；记录可复现命令和脱敏报告路径。"
       ],
-      "verification_results": [],
-      "started_at": null,
+      "verification_results": [
+        {
+          "command": "docker compose exec -T api <safe Provider presence check>",
+          "result": "blocked: EDUMIND_PROVIDER_BASE_URL, EDUMIND_PROVIDER_API_KEY, and EDUMIND_PROVIDER_MODEL are all empty; no secret values were printed"
+        }
+      ],
+      "started_at": "2026-09-21T09:14:17+08:00",
       "completed_at": null,
-      "blocker": null,
+      "blocker": "A real OpenAI-compatible Provider base URL, API key, and model are not configured in the API container. Real end-to-end learning and P95 first-content measurement cannot run until the user adds them to the ignored root .env and recreates the API container.",
       "commit_lookup": "Task-Completed: MVP-0.1-T035"
     }
   ]
