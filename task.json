@@ -218,7 +218,7 @@
       "phase": "MVP 0.2",
       "parent_work_package": "MVP-0.2-002",
       "title": "实现知识结构校验与 Repository",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.2-T003"
@@ -236,9 +236,22 @@
       "verification": [
         "运行知识 Repository 单元测试、Ruff 和 Mypy。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "cd backend && uv run --group dev python -m pytest -q tests/test_knowledge_graph.py",
+          "result": "passed: 7 tests cover seed loading, stable query order, duplicate IDs, unknown/illegal relations, illegal difficulty, prerequisite drift and DEPENDS_ON cycles"
+        },
+        {
+          "command": "cd backend && uv run --group dev ruff check app/services/knowledge_graph.py tests/test_knowledge_graph.py && uv run --group dev mypy app",
+          "result": "passed: Ruff clean; Mypy reports no issues in 33 application source files"
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed"
+        }
+      ],
+      "started_at": "2026-09-21T22:48:02",
+      "completed_at": "2026-09-21T22:54:29",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.2-T004"
     },

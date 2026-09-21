@@ -165,3 +165,7 @@ VERIFIED 表示验证通过并准备提交，完成以 Git 中的 Task-Completed
 领取“建立 10 节点数据结构种子知识结构” | T001 完成提交已确认；已核对 PRD 附录 B 的 10 个节点、关系类型与知识结构约束 | 暂无 | 创建版本化、可稳定加载的知识结构种子并运行人工事实和引用完整性自查
 [2026-09-21T22:45:50] [MVP-0.2-T003] VERIFIED | executor=Lee
 创建 `data/knowledge_graph.yaml`，包含 PRD 附录 B 的 10 个稳定节点、知识元数据、前置、学习目标、误区、教学上下文和版本事实核对记录 | JSON/YAML、10 节点、引用完整性、关系类型、前置 DAG、OpenAPI schema 和 `git diff --check` 均通过 | 暂无；后续 Repository 需将种子的审核元数据与对外图谱响应分开 | 创建含 Task-Completed 标记的本地提交；继续 T004 实现知识结构 Repository
+[2026-09-21T22:48:02] [MVP-0.2-T004] START | executor=Lee | branch=codex/mvp-0.2-t004
+领取“实现知识结构校验与 Repository” | T003 完成提交已确认，种子文件通过 schema、引用、DAG 校验 | 暂无 | 实现本地 YAML Repository、确定性查询与针对非法种子的单元测试，不引入 Neo4j
+[2026-09-21T22:54:29] [MVP-0.2-T004] VERIFIED | executor=Lee
+新增只读、不可变的本地知识结构 Repository：加载 JSON 兼容 YAML，校验 schema、节点、关系、前置一致性和 DAG，并提供稳定查询 | 7 个单元测试、Ruff、Mypy（33 个 source）与 `git diff --check` 均通过 | 暂无；T005 需将 Repository 注入只读图谱 API | 创建含 Task-Completed 标记的本地提交；继续 T005 图谱只读 API
