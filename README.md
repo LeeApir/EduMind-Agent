@@ -84,3 +84,23 @@ docker compose exec -T postgres psql -U edumind -d edumind_dev < edumind_dev-bac
 ```
 
 `docker compose down` 不会删除数据卷；`docker compose down -v` 会删除它，只应在明确放弃本地数据后使用。当前 Compose 配置没有自动备份、跨主机复制或生产级灾备；备份文件可能包含学习数据，应保存在受保护位置且不得提交到 Git。
+
+## MVP 0.1 浏览器 E2E
+
+首次运行先安装锁文件中的开发依赖和 Playwright 对应的 Chromium：
+
+```bash
+cd backend
+uv sync --python 3.11 --all-groups
+uv run playwright install chromium
+cd ..
+pnpm --dir web install --frozen-lockfile
+```
+
+随后用单个命令执行浏览器 E2E；命令会在 `127.0.0.1:4173` 临时启动 Vite，结束后自动停止：
+
+```bash
+pnpm --dir web e2e
+```
+
+该套件使用浏览器路由级 mock API，稳定覆盖一句话开始、临时首段、正式讲解/代码/三道练习、Provider 故障、审核拒绝和 SSE 异常后的持久化操作恢复，不会调用或计费真实 Provider。后端 Provider、审核门禁、幂等和恢复逻辑由 `backend/tests/test_learning_sessions.py` 的隔离 PostgreSQL 测试覆盖。真实 Provider 和首段 P95 性能不由 mock 结果替代，必须按 T035 单独验收。

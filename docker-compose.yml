@@ -33,6 +33,8 @@ services:
 
   web:
     build: ./web
+    environment:
+      EDUMIND_API_PROXY_TARGET: http://api:8000
     depends_on:
       api:
         condition: service_healthy

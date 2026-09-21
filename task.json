@@ -1366,14 +1366,21 @@
       "phase": "MVP 0.1",
       "parent_work_package": "MVP-0.1-011",
       "title": "完成 MVP 0.1 自动化 E2E",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.1-T031",
         "MVP-0.1-T033"
       ],
       "scope": [
+        "web/src/",
         "web/tests/",
+        "web/package.json",
+        "web/pnpm-lock.yaml",
+        "web/vite.config.ts",
+        "docker-compose.yml",
+        "backend/pyproject.toml",
+        "backend/uv.lock",
         "backend/tests/",
         "README.md"
       ],
@@ -1384,9 +1391,30 @@
       "verification": [
         "运行本任务建立的 E2E 命令、后端相关测试及前端构建。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "pnpm --dir web e2e",
+          "result": "passed: headless Chromium covered one-sentence start, temporary first content, reviewed explanation/code/three exercises, Provider failure, review rejection, and persisted-operation recovery after malformed SSE"
+        },
+        {
+          "command": "EDUMIND_DATABASE_URL=<isolated-postgres> uv run alembic upgrade head && EDUMIND_TEST_DATABASE_URL=<isolated-postgres> uv run pytest",
+          "result": "passed: all migrations applied and 125 backend tests passed against an ephemeral PostgreSQL container; container removed after verification"
+        },
+        {
+          "command": "pnpm --dir web test --run && pnpm --dir web typecheck && pnpm --dir web lint --quiet && pnpm --dir web build",
+          "result": "passed: 13 tests, typecheck, zero lint errors, and production build"
+        },
+        {
+          "command": "docker compose config --quiet && docker compose build web && docker compose up -d web && docker compose ps; curl http://127.0.0.1:5173/api/auth/session",
+          "result": "passed: postgres/api/web healthy and Web API proxy returned the backend structured 401 response for an unauthenticated session"
+        },
+        {
+          "command": "cd backend && uv lock --check && uv run --no-sync ruff check ../web/tests/e2e && git diff --check",
+          "result": "passed"
+        }
+      ],
+      "started_at": "2026-09-21T08:44:05+08:00",
+      "completed_at": "2026-09-21T09:12:17+08:00",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.1-T034"
     },

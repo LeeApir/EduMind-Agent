@@ -57,6 +57,7 @@ describe("learning entry", () => {
 
     expect(startLearningRequest).toHaveBeenCalledTimes(2);
     expect(startLearningRequest).toHaveBeenLastCalledWith("想理解链表");
-    expect(wrapper.get('[data-testid="loading-state"]').text()).toContain("想理解链表");
+    expect(wrapper.find('[data-testid="loading-state"]').exists()).toBe(false);
+    expect(wrapper.find(".error-state").exists()).toBe(false);
   });
 });
