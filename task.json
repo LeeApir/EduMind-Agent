@@ -1429,6 +1429,7 @@
         "MVP-0.1-T034"
       ],
       "scope": [
+        "backend/tests/",
         "docs/",
         "README.md",
         "task.json",
@@ -1450,11 +1451,19 @@
         {
           "command": "docker compose exec -T api <redacted 8-token real Provider stream check>",
           "result": "passed: deepseek-flash returned a non-empty first stream chunk in 1637 ms; response content, Base URL, and API key were not printed"
+        },
+        {
+          "command": "docker compose exec -T api <redacted strict JSON Schema capability probe>",
+          "result": "blocked: the configured deepseek-flash model returned the standardized CAPABILITY_UNAVAILABLE code for response_format.type=json_schema with strict=true; no response content or credentials were printed"
+        },
+        {
+          "command": "cd backend && uv run --python 3.11 python tests/manual_provider_acceptance.py --samples 20 --confirm-billable",
+          "result": "partial pass: 20/20 first-content samples succeeded with 0% failure rate, P50 4922 ms, P95 6968 ms, and max 7405 ms; the full learning flow was not published because structured generation is unavailable"
         }
       ],
       "started_at": "2026-09-21T09:14:17+08:00",
       "completed_at": null,
-      "blocker": "Real Provider connectivity is verified. User approval is required before the billable full learning flow and multi-sample P95 benchmark; 20 samples are recommended for a minimally meaningful P95 estimate.",
+      "blocker": "The configured deepseek-flash model supports ordinary streaming but returns CAPABILITY_UNAVAILABLE for the strict OpenAI JSON Schema response format required by the P0 adapter. Configure a model that supports response_format.type=json_schema with strict=true, recreate api/web, and rerun full-flow, browser, and model-specific performance acceptance.",
       "commit_lookup": "Task-Completed: MVP-0.1-T035"
     }
   ]
