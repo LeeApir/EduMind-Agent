@@ -1,6 +1,7 @@
 EduMind Agent 开发执行日志
 任务状态来源：task.json；产品范围来源：docs/PRD.md。
-MVP 0.2 起格式：[ISO 8601 时间（含时区）] [Task ID] [事件] [executor=执行人] [branch=分支]；已完成评审的 VERIFIED 可追加 [reviewer=姓名]
+MVP 0.2 起格式：[YYYY-MM-DDTHH:mm:ss] [Task ID] EVENT | executor=执行人 | branch=分支；时间使用项目本地时间，不附加时区后缀
+START 和 RESUME 记录 branch；其他事件只保留 executor，已完成评审的 VERIFIED 可追加 | reviewer=姓名
 正文：改动摘要 | 验证结果 | 遗留问题 | 下一步
 MVP 0.1 历史记录保留原格式，不补写人员字段。
 只追加，不覆盖历史；禁止记录密钥和敏感学习内容。
@@ -150,5 +151,5 @@ VERIFIED 表示验证通过并准备提交，完成以 Git 中的 Task-Completed
 [2026-09-21T19:23:51+08:00] [MVP 0.1] PHASE_COMPLETED | 最终活动账本包含 38 个 done 任务，退出验收提交为 63444d3；原样归档到 docs/tasks/mvp-0.1.json。 | 归档只读，后续状态更正只追加日志，不修改历史快照。 | 根 task.json 切换到 MVP 0.2。
 [2026-09-21T19:23:51+08:00] [MVP 0.2] PHASE_STARTED | 按 PRD §9.1 将学习闭环细化为 25 个可执行任务，覆盖契约、10 节点知识结构、渐进画像、测验评分、掌握度、路径、前端闭环、Review 质量与退出验收。 | 未增加 owner、reviewer 或两人并行字段；max_in_progress 仍为 1，当前没有任务被领取。 | 下一步按依赖领取 MVP-0.2-T001。
 
-[2026-09-21T19:55:20+08:00] [WORKFLOW-CONTRIBUTION] [VERIFIED] [executor=Lee] [branch=codex/task-workflow]
+[2026-09-21T19:55:20] [WORKFLOW-CONTRIBUTION] VERIFIED | executor=Lee | branch=codex/task-workflow
 新增 MVP 0.2 起的执行人、分支、可选评审人和换人交接日志规范；MVP 0.1 历史不回填 | 已核对新格式包含四段正文，且不向 Task 对象增加人员字段 | 尚未发生代码评审，因此未记录 reviewer | 创建治理提交；下一条任务日志继续使用新格式

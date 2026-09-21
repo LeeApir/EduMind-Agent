@@ -149,8 +149,8 @@ EduMind-Agent/
 
 ### 日志与人工求助
 
-- 从 MVP 0.2 开始，`process.txt` 使用统一格式：`[ISO 8601 时间（含时区）] [Task ID] [事件] [executor=执行人] [branch=分支]`，下一行写 `改动摘要 | 验证结果 | 遗留问题 | 下一步`。当前主执行人的稳定标识为 `Lee`；其他贡献者使用自己的稳定姓名，不冒用他人身份。
-- `START` 必须记录 `executor` 和 `branch`；`BLOCKED`、`RESUME`、`VERIFIED`、`COMMIT_FAILED` 必须继续记录 `executor`，并保留实际工作分支。`VERIFIED` 只有在代码评审已经完成时才增加 `[reviewer=姓名]`，不得预填或把执行人自动视为评审人。
+- 从 MVP 0.2 开始，`process.txt` 使用统一格式：`[YYYY-MM-DDTHH:mm:ss] [Task ID] EVENT | executor=执行人 | branch=分支`，下一行写 `改动摘要 | 验证结果 | 遗留问题 | 下一步`。时间使用项目本地时间，不附加时区后缀。当前主执行人的稳定标识为 `Lee`；其他贡献者使用自己的稳定姓名，不冒用他人身份。
+- `START` 必须记录 `executor` 和 `branch`；`RESUME` 也记录当前执行人和分支，用于换人、换分支或恢复任务。`BLOCKED`、`VERIFIED`、`COMMIT_FAILED` 记录 `executor`，分支未变化时不重复填写。`VERIFIED` 只有在代码评审已经完成时才增加 `| reviewer=姓名`，不得预填或把执行人自动视为评审人。
 - 任务中途换人时不修改历史记录，追加 `RESUME`，填写新执行人、当前分支，并在正文说明交接原因、已有成果和剩余工作。人员信息只记录在日志、Git 提交和 PR 中，不写入每个 Task 对象。
 - `process.txt` 按事件追加 START/VERIFIED/BLOCKED/RESUME/COMMIT_FAILED；正文固定为改动摘要、验证结果、遗留问题、下一步四段。历史错误通过新记录纠正，不覆盖历史；MVP 0.1 旧记录保留原格式，不回填人员字段。
 - 每个任务提交前写好简短交接记录，与代码、状态一起提交。交接包含完成内容、关键决定、验证证据、遗留问题、下一任务及相关文件；提交后在回复中报告实际 hash。上下文压缩或开启新对话后，优先从这些文件及 Git 恢复，不依赖聊天记忆。
