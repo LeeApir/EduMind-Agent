@@ -1324,7 +1324,7 @@
       "phase": "MVP 0.1",
       "parent_work_package": "MVP-0.1-010",
       "title": "验证容器重启与数据恢复",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.1-T032",
@@ -1342,9 +1342,22 @@
       "verification": [
         "在隔离 Compose 环境执行重启恢复测试；记录命令与证据。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "docker compose build api && docker compose up -d api; docker compose exec -T api ./.venv/bin/python tests/compose_recovery_check.py seed; docker compose restart postgres; docker compose restart api; docker compose exec -T api ./.venv/bin/python tests/compose_recovery_check.py check",
+          "result": "passed: reviewed resource was read after PostgreSQL and API restarts with owner-scoped learning-unit/resource endpoints"
+        },
+        {
+          "command": "docker compose ps; curl --fail --silent http://127.0.0.1:8000/health; curl --fail --silent http://127.0.0.1:5173/",
+          "result": "passed: postgres, api, and web healthy; API health returned status ok; Web responded successfully"
+        },
+        {
+          "command": "cd backend && uv run --no-sync ruff check tests/compose_recovery_check.py && uv run --no-sync python -m compileall -q tests/compose_recovery_check.py && git diff --check",
+          "result": "passed"
+        }
+      ],
+      "started_at": "2026-09-21T00:13:00+08:00",
+      "completed_at": "2026-09-21T00:28:39+08:00",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.1-T033"
     },

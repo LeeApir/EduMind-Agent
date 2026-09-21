@@ -54,7 +54,7 @@ curl --fail http://127.0.0.1:8000/health
 curl --fail http://127.0.0.1:5173/
 ```
 
-PostgreSQL、API、Web 分别暴露为 5432、8000、5173；Compose 会先等待数据库与 API 健康检查，API 启动时自动执行 `alembic upgrade head`。仅检查健康状态时不需要 Provider 凭据；实际学习生成需要在 `.env` 设置三项 `EDUMIND_PROVIDER_*`。开发停止但保留数据卷：
+PostgreSQL 仅在 Compose 内部网络开放；API、Web 分别暴露为 8000、5173。Compose 会先等待数据库与 API 健康检查，API 启动时自动执行 `alembic upgrade head`。仅检查健康状态时不需要 Provider 凭据；实际学习生成需要在 `.env` 设置三项 `EDUMIND_PROVIDER_*`。开发停止但保留数据卷：
 
 ```bash
 docker compose down
@@ -66,3 +66,21 @@ docker compose down
 docker compose config --quiet
 docker compose build
 ```
+
+## 本地数据备份与恢复
+
+Compose 使用命名卷 `edumind_postgres_data` 保存 PostgreSQL 数据。日常重启使用
+`docker compose restart`，或停止后重新 `docker compose up -d`；两者都会保留该卷。
+在升级镜像或迁移前，建议先导出逻辑备份：
+
+```bash
+docker compose exec -T postgres pg_dump -U edumind -d edumind_dev > edumind_dev-backup.sql
+```
+
+恢复到已经启动的本地数据库时：
+
+```bash
+docker compose exec -T postgres psql -U edumind -d edumind_dev < edumind_dev-backup.sql
+```
+
+`docker compose down` 不会删除数据卷；`docker compose down -v` 会删除它，只应在明确放弃本地数据后使用。当前 Compose 配置没有自动备份、跨主机复制或生产级灾备；备份文件可能包含学习数据，应保存在受保护位置且不得提交到 Git。
