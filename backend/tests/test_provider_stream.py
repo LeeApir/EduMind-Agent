@@ -9,7 +9,7 @@ import pytest
 
 from app.core.config import ProviderSettings
 from app.core.provider_target import ProviderTargetGuard, TargetPolicy
-from app.services.openai_compatible import OpenAICompatibleAdapter
+from app.services.deepseek_responses import DeepSeekResponsesAdapter
 from app.services.provider_gateway import (
     ChatMessage,
     ProviderError,
@@ -35,12 +35,16 @@ class FragmentedStream(httpx.AsyncByteStream):
         self.closed = True
 
 
-def frame(content: str | None = None, *, finish: str | None = None) -> bytes:
-    chunk = {"choices": [{"delta": {"content": content}, "finish_reason": finish}]}
-    return b"data: " + json.dumps(chunk, ensure_ascii=False).encode("utf-8") + b"\r\n\r\n"
+def frame(event_type: str, **payload: object) -> bytes:
+    event = {"type": event_type, "sequence_number": 1, **payload}
+    return (
+        f"event: {event_type}\r\ndata: ".encode()
+        + json.dumps(event, ensure_ascii=False).encode("utf-8")
+        + b"\r\n\r\n"
+    )
 
 
-def create_adapter(stream: FragmentedStream) -> OpenAICompatibleAdapter:
+def create_adapter(stream: FragmentedStream) -> DeepSeekResponsesAdapter:
     settings = ProviderSettings(
         base_url="https://stream.provider.test/v1", api_key="test-secret", model="server-model"
     )
@@ -49,7 +53,7 @@ def create_adapter(stream: FragmentedStream) -> OpenAICompatibleAdapter:
     )
 
     def respond(request: httpx.Request) -> httpx.Response:
-        assert str(request.url) == "https://8.8.8.8/v1/chat/completions"
+        assert str(request.url) == "https://8.8.8.8/v1/responses"
         assert request.headers["Host"] == "stream.provider.test"
         assert request.extensions["sni_hostname"] == "stream.provider.test"
         assert request.headers["Authorization"] == "Bearer test-secret"
@@ -59,7 +63,7 @@ def create_adapter(stream: FragmentedStream) -> OpenAICompatibleAdapter:
         assert body["model"] == "server-model"
         return httpx.Response(200, headers={"content-type": "text/event-stream"}, stream=stream)
 
-    return OpenAICompatibleAdapter(settings, guard, transport=httpx.MockTransport(respond))
+    return DeepSeekResponsesAdapter(settings, guard, transport=httpx.MockTransport(respond))
 
 
 def request() -> TextRequest:
@@ -69,11 +73,12 @@ def request() -> TextRequest:
 def test_unicode_and_sse_frames_split_at_every_byte() -> None:
     wire = (
         b": heartbeat\r\n\r\n"
-        + frame(None)
-        + frame("链")
-        + frame("表🙂")
-        + frame(None, finish="stop")
-        + b"data: [DONE]\r\n\r\n"
+        + frame("response.created", response={"status": "in_progress"})
+        + frame("response.reasoning_text.delta", delta="private")
+        + frame("response.output_text.delta", delta="链")
+        + frame("response.output_text.delta", delta="表🙂")
+        + frame("response.output_text.done", text="链表🙂")
+        + frame("response.completed", response={"status": "completed"})
     )
     stream = FragmentedStream([bytes([byte]) for byte in wire])
 
@@ -84,10 +89,13 @@ def test_unicode_and_sse_frames_split_at_every_byte() -> None:
     assert stream.closed
 
 
-def test_usage_only_chunk_before_done_is_ignored() -> None:
-    usage = b'data: {"choices":[],"usage":{"prompt_tokens":1}}\n\n'
+def test_progress_events_before_completed_are_ignored() -> None:
     stream = FragmentedStream(
-        [frame("ok", finish="stop"), usage, b"data: [DONE]\n\n"]
+        [
+            frame("response.in_progress"),
+            frame("response.output_text.delta", delta="ok"),
+            frame("response.completed", response={"status": "completed"}),
+        ]
     )
 
     async def collect() -> list[str]:
@@ -101,10 +109,10 @@ def test_usage_only_chunk_before_done_is_ignored() -> None:
     "wire",
     [
         b"data: not-json\n\n",
-        b"data: {\"choices\":{}}\n\n",
+        b"data: {\"type\":3}\n\n",
         b"data: \xff\n\n",
-        frame("cut", finish="length"),
-        b"data: [DONE]\n\n",
+        frame("response.incomplete", response={"status": "incomplete"}),
+        frame("response.completed", response={"status": "completed"}),
     ],
 )
 def test_invalid_frames_raise_safe_error_and_close(wire: bytes) -> None:
@@ -121,7 +129,7 @@ def test_invalid_frames_raise_safe_error_and_close(wire: bytes) -> None:
 
 
 def test_upstream_eof_without_done_reports_interruption_and_closes() -> None:
-    stream = FragmentedStream([frame("partial"), frame(None, finish="stop")])
+    stream = FragmentedStream([frame("response.output_text.delta", delta="partial")])
 
     async def collect() -> list[str]:
         seen: list[str] = []
@@ -136,7 +144,13 @@ def test_upstream_eof_without_done_reports_interruption_and_closes() -> None:
 
 
 def test_upstream_read_error_is_sanitized_and_closes() -> None:
-    stream = FragmentedStream([frame("partial"), b"data: [DONE]\n\n"], fail_after=1)
+    stream = FragmentedStream(
+        [
+            frame("response.output_text.delta", delta="partial"),
+            frame("response.completed", response={"status": "completed"}),
+        ],
+        fail_after=1,
+    )
 
     async def collect() -> None:
         async for _delta in create_adapter(stream).stream_text(request()):
@@ -149,10 +163,40 @@ def test_upstream_read_error_is_sanitized_and_closes() -> None:
     assert stream.closed
 
 
+def test_response_failed_is_sanitized_temporary_failure_and_closes() -> None:
+    stream = FragmentedStream(
+        [
+            frame("response.output_text.delta", delta="partial"),
+            frame(
+                "response.failed",
+                response={
+                    "status": "failed",
+                    "error": {"message": "test-secret private upstream detail"},
+                },
+            ),
+        ]
+    )
+
+    async def collect() -> None:
+        async for _delta in create_adapter(stream).stream_text(request()):
+            pass
+
+    with pytest.raises(ProviderError) as raised:
+        asyncio.run(collect())
+    assert raised.value.code == ProviderErrorCode.TEMPORARILY_UNAVAILABLE
+    assert "test-secret" not in str(raised.value)
+    assert "private upstream detail" not in str(raised.value)
+    assert stream.closed
+
+
 def test_consumer_cancellation_closes_adapter_and_gateway_stream() -> None:
     async def stop_after_first(use_gateway: bool) -> bool:
         stream = FragmentedStream(
-            [frame("first"), frame("second"), frame(None, finish="stop"), b"data: [DONE]\n\n"]
+            [
+                frame("response.output_text.delta", delta="first"),
+                frame("response.output_text.delta", delta="second"),
+                frame("response.completed", response={"status": "completed"}),
+            ]
         )
         adapter = create_adapter(stream)
         source = ProviderGateway(adapter) if use_gateway else adapter

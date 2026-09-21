@@ -8,7 +8,7 @@ import pytest
 
 from app.core.config import ProviderSettings
 from app.core.provider_target import ProviderTargetGuard, TargetPolicy
-from app.services.openai_compatible import OpenAICompatibleAdapter
+from app.services.deepseek_responses import DeepSeekResponsesAdapter
 from app.services.provider_gateway import (
     ChatMessage,
     ProviderError,
@@ -27,14 +27,14 @@ def prompt() -> TextRequest:
     return TextRequest(messages=(ChatMessage(role="user", content="hello"),))
 
 
-def network_adapter(handler: Callable[[httpx.Request], httpx.Response]) -> OpenAICompatibleAdapter:
+def network_adapter(handler: Callable[[httpx.Request], httpx.Response]) -> DeepSeekResponsesAdapter:
     settings = ProviderSettings(
         base_url="https://provider.test/v1", api_key="test-secret", model="server-model"
     )
     guard = ProviderTargetGuard(
         settings.base_url, TargetPolicy(), resolver=lambda _host, _port: ("8.8.8.8",)
     )
-    return OpenAICompatibleAdapter(settings, guard, transport=httpx.MockTransport(handler))
+    return DeepSeekResponsesAdapter(settings, guard, transport=httpx.MockTransport(handler))
 
 
 @pytest.mark.parametrize(

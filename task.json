@@ -1472,7 +1472,7 @@
       "phase": "MVP 0.1",
       "parent_work_package": "MVP-0.1-011",
       "title": "适配 DeepSeek Responses 作为 P0 默认模型",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.1-T017"
@@ -1497,9 +1497,26 @@
         "cd backend && uv run --python 3.11 ruff check . && uv run --python 3.11 mypy app && uv run --python 3.11 python -m pytest -q",
         "python3 -m json.tool task.json >/dev/null && git diff --check"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "cd backend && uv run --python 3.11 python -m pytest -q tests/test_deepseek_responses.py tests/test_provider_stream.py tests/test_provider_retry.py tests/test_config.py",
+          "result": "passed: 41 passed; MockTransport covers Responses text, JSON Schema, semantic SSE byte fragmentation, incomplete/failed events, cancellation, error mapping, retry and missing configuration"
+        },
+        {
+          "command": "docker compose exec -T api <redacted DeepSeek Responses JSON Schema probe>",
+          "result": "passed: deepseek-flash returned a local-schema-valid object through POST /responses; only model id and field names were printed"
+        },
+        {
+          "command": "cd backend && uv lock --check && uv run --python 3.11 ruff check . && uv run --python 3.11 mypy app && uv run --python 3.11 python -m pytest -q",
+          "result": "passed: lock check, Ruff and mypy passed; 111 passed, 15 existing database-dependent skips, 1 dependency deprecation warning"
+        },
+        {
+          "command": "python3 -m json.tool task.json >/dev/null && git diff --check",
+          "result": "passed"
+        }
+      ],
+      "started_at": "2026-09-21T10:20:00+08:00",
+      "completed_at": "2026-09-21T14:04:10+08:00",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.1-T035-2"
     }

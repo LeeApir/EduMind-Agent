@@ -1,4 +1,4 @@
-"""Single server-configured OpenAI-compatible Chat Completions adapter."""
+"""DeepSeek Responses API adapter for the server-configured P0 model."""
 
 import ipaddress
 import json
@@ -29,6 +29,23 @@ from app.services.provider_gateway import (
 _MAX_RESPONSE_BYTES = 2 * 1024 * 1024
 _MAX_SSE_FRAME_BYTES = 1024 * 1024
 _TIMEOUT = httpx.Timeout(connect=5.0, read=60.0, write=10.0, pool=5.0)
+_IGNORED_STREAM_EVENTS = frozenset(
+    {
+        "response.created",
+        "response.in_progress",
+        "response.output_item.added",
+        "response.output_item.done",
+        "response.content_part.added",
+        "response.content_part.done",
+        "response.reasoning_text.delta",
+        "response.reasoning_text.done",
+        "response.output_text.done",
+        "response.function_call_arguments.delta",
+        "response.function_call_arguments.done",
+        "response.custom_tool_call_input.delta",
+        "response.custom_tool_call_input.done",
+    }
+)
 
 
 def _retry_after_seconds(raw: str | None) -> float | None:
@@ -54,8 +71,10 @@ def _check_status(response: httpx.Response) -> None:
     if response.is_redirect:
         raise ProviderError(ProviderErrorCode.INVALID_TARGET)
     if status == 429:
-        retry_after = _retry_after_seconds(response.headers.get("Retry-After"))
-        raise ProviderError(ProviderErrorCode.RATE_LIMITED, retry_after_seconds=retry_after)
+        raise ProviderError(
+            ProviderErrorCode.RATE_LIMITED,
+            retry_after_seconds=_retry_after_seconds(response.headers.get("Retry-After")),
+        )
     if status in {408, 504}:
         raise ProviderError(ProviderErrorCode.TIMEOUT)
     if 400 <= status < 500 or status == 501:
@@ -72,7 +91,7 @@ def _wire_target(target: ApprovedTarget) -> tuple[str, str]:
         (
             parsed.scheme,
             f"{ip_host}:{target.port}",
-            parsed.path.rstrip("/") + "/chat/completions",
+            parsed.path.rstrip("/") + "/responses",
             "",
             "",
         )
@@ -86,18 +105,21 @@ def _wire_target(target: ApprovedTarget) -> tuple[str, str]:
 
 def _request_body(request: TextRequest) -> dict[str, object]:
     body: dict[str, object] = {
-        "messages": [{"role": item.role, "content": item.content} for item in request.messages],
+        "input": [
+            {"role": message.role, "content": message.content}
+            for message in request.messages
+        ],
         "stream": False,
     }
     if request.max_output_tokens is not None:
-        body["max_completion_tokens"] = request.max_output_tokens
+        body["max_output_tokens"] = request.max_output_tokens
     if request.temperature is not None:
         body["temperature"] = request.temperature
     return body
 
 
 def _reject_external_schema_refs(value: object) -> None:
-    """Do not let local result validation fetch arbitrary remote schemas."""
+    """Prevent local result validation from resolving an external schema."""
     if isinstance(value, dict):
         for key, child in value.items():
             if key in {"$id", "$dynamicRef", "$recursiveRef"} or (
@@ -125,30 +147,44 @@ def _usage(payload: Mapping[str, object]) -> TokenUsage | None:
             raise ProviderError(ProviderErrorCode.INVALID_OUTPUT)
         return int(value)
 
-    return TokenUsage(input_tokens=count("prompt_tokens"), output_tokens=count("completion_tokens"))
+    return TokenUsage(input_tokens=count("input_tokens"), output_tokens=count("output_tokens"))
 
 
 def _result(payload: object) -> TextResult:
     if not isinstance(payload, dict):
         raise ProviderError(ProviderErrorCode.INVALID_OUTPUT)
+    if payload.get("status") != "completed":
+        raise ProviderError(ProviderErrorCode.INVALID_OUTPUT)
     model = payload.get("model")
-    choices = payload.get("choices")
-    if not isinstance(model, str) or not model or not isinstance(choices, list) or not choices:
+    output = payload.get("output")
+    if not isinstance(model, str) or not model or not isinstance(output, list):
         raise ProviderError(ProviderErrorCode.INVALID_OUTPUT)
-    choice = choices[0]
-    if not isinstance(choice, dict) or choice.get("finish_reason") != "stop":
+
+    parts: list[str] = []
+    for item in output:
+        if not isinstance(item, dict):
+            raise ProviderError(ProviderErrorCode.INVALID_OUTPUT)
+        if item.get("type") != "message":
+            continue
+        if item.get("status") != "completed" or item.get("role") != "assistant":
+            raise ProviderError(ProviderErrorCode.INVALID_OUTPUT)
+        content = item.get("content")
+        if not isinstance(content, list):
+            raise ProviderError(ProviderErrorCode.INVALID_OUTPUT)
+        for part in content:
+            if not isinstance(part, dict):
+                raise ProviderError(ProviderErrorCode.INVALID_OUTPUT)
+            if part.get("type") != "output_text" or not isinstance(part.get("text"), str):
+                raise ProviderError(ProviderErrorCode.INVALID_OUTPUT)
+            parts.append(part["text"])
+    text = "".join(parts)
+    if not text:
         raise ProviderError(ProviderErrorCode.INVALID_OUTPUT)
-    message = choice.get("message")
-    if not isinstance(message, dict):
-        raise ProviderError(ProviderErrorCode.INVALID_OUTPUT)
-    content = message.get("content")
-    if not isinstance(content, str) or not content:
-        raise ProviderError(ProviderErrorCode.INVALID_OUTPUT)
-    return TextResult(text=content, model_id=model, usage=_usage(payload))
+    return TextResult(text=text, model_id=model, usage=_usage(payload))
 
 
 async def _sse_data(chunks: AsyncIterator[bytes]) -> AsyncIterator[str]:
-    """Assemble UTF-8 SSE data frames across arbitrary network byte boundaries."""
+    """Assemble UTF-8 SSE data fields across arbitrary byte boundaries."""
     line = bytearray()
     data_lines: list[str] = []
     frame_size = 0
@@ -188,28 +224,35 @@ async def _sse_data(chunks: AsyncIterator[bytes]) -> AsyncIterator[str]:
         raise ProviderError(ProviderErrorCode.INVALID_OUTPUT)
 
 
-def _stream_chunk(data: str) -> tuple[str | None, bool]:
+def _stream_event(data: str) -> tuple[str | None, ProviderErrorCode | None, bool]:
     try:
         payload = json.loads(data)
     except (UnicodeError, ValueError):
         raise ProviderError(ProviderErrorCode.INVALID_OUTPUT) from None
-    if not isinstance(payload, dict) or not isinstance(payload.get("choices"), list):
+    if not isinstance(payload, dict) or not isinstance(payload.get("type"), str):
         raise ProviderError(ProviderErrorCode.INVALID_OUTPUT)
-    choices = payload["choices"]
-    if not choices:  # optional terminal usage-only chunk
-        return None, False
-    choice = choices[0]
-    if not isinstance(choice, dict) or not isinstance(choice.get("delta"), dict):
-        raise ProviderError(ProviderErrorCode.INVALID_OUTPUT)
-    content = choice["delta"].get("content")
-    reason = choice.get("finish_reason")
-    if (content is not None and not isinstance(content, str)) or reason not in (None, "stop"):
-        raise ProviderError(ProviderErrorCode.INVALID_OUTPUT)
-    return content, reason == "stop"
+    event_type = payload["type"]
+    if event_type == "response.output_text.delta":
+        delta = payload.get("delta")
+        if not isinstance(delta, str):
+            raise ProviderError(ProviderErrorCode.INVALID_OUTPUT)
+        return delta or None, None, False
+    if event_type == "response.completed":
+        response = payload.get("response")
+        if not isinstance(response, dict) or response.get("status") != "completed":
+            raise ProviderError(ProviderErrorCode.INVALID_OUTPUT)
+        return None, None, True
+    if event_type == "response.incomplete":
+        return None, ProviderErrorCode.INVALID_OUTPUT, True
+    if event_type == "response.failed":
+        return None, ProviderErrorCode.TEMPORARILY_UNAVAILABLE, True
+    if event_type in _IGNORED_STREAM_EVENTS:
+        return None, None, False
+    raise ProviderError(ProviderErrorCode.INVALID_OUTPUT)
 
 
-class OpenAICompatibleAdapter:
-    """P0 adapter; one attempt, pinned IP, no proxy or automatic redirects."""
+class DeepSeekResponsesAdapter:
+    """One-attempt DeepSeek adapter with pinned IP and semantic Responses SSE."""
 
     def __init__(
         self,
@@ -222,18 +265,21 @@ class OpenAICompatibleAdapter:
         self._guard = guard
         self._transport = transport
 
-    async def _completion(self, body: dict[str, object]) -> TextResult:
+    def _target(self) -> tuple[ApprovedTarget, str, dict[str, str]]:
         try:
             target = self._guard.approve_base()
         except TargetValidationError:
             raise ProviderError(ProviderErrorCode.INVALID_TARGET) from None
         url, host_header = _wire_target(target)
-        body["model"] = self._settings.model
-        headers = {
+        return target, url, {
             "Authorization": f"Bearer {self._settings.api_key}",
             "Host": host_header,
-            "Accept": "application/json",
         }
+
+    async def _response(self, body: dict[str, object]) -> TextResult:
+        target, url, headers = self._target()
+        body["model"] = self._settings.model
+        headers["Accept"] = "application/json"
         try:
             async with httpx.AsyncClient(
                 transport=self._transport,
@@ -268,7 +314,7 @@ class OpenAICompatibleAdapter:
         return _result(payload)
 
     async def generate_text(self, request: TextRequest) -> TextResult:
-        return await self._completion(_request_body(request))
+        return await self._response(_request_body(request))
 
     async def generate_structured(self, request: StructuredRequest) -> StructuredResult:
         try:
@@ -280,11 +326,14 @@ class OpenAICompatibleAdapter:
         except (TypeError, ValueError, SchemaError):
             raise ProviderError(ProviderErrorCode.INVALID_OUTPUT) from None
         body = _request_body(request.prompt)
-        body["response_format"] = {
-            "type": "json_schema",
-            "json_schema": {"name": "edumind_result", "schema": schema, "strict": True},
+        body["text"] = {
+            "format": {
+                "type": "json_schema",
+                "name": "edumind_result",
+                "schema": schema,
+            }
         }
-        result = await self._completion(body)
+        result = await self._response(body)
         try:
             value = json.loads(result.text)
             if not isinstance(value, dict):
@@ -295,19 +344,11 @@ class OpenAICompatibleAdapter:
         return StructuredResult(value=value, model_id=result.model_id, usage=result.usage)
 
     async def stream_text(self, request: TextRequest) -> AsyncIterator[TextDelta]:
-        try:
-            target = self._guard.approve_base()
-        except TargetValidationError:
-            raise ProviderError(ProviderErrorCode.INVALID_TARGET) from None
-        url, host_header = _wire_target(target)
+        target, url, headers = self._target()
         body = _request_body(request)
         body["model"] = self._settings.model
         body["stream"] = True
-        headers = {
-            "Authorization": f"Bearer {self._settings.api_key}",
-            "Host": host_header,
-            "Accept": "text/event-stream",
-        }
+        headers["Accept"] = "text/event-stream"
         try:
             async with httpx.AsyncClient(
                 transport=self._transport,
@@ -320,21 +361,21 @@ class OpenAICompatibleAdapter:
                 response = await client.send(wire_request, stream=True, follow_redirects=False)
                 try:
                     _check_status(response)
-                    finished = False
-                    done = False
+                    saw_text = False
+                    terminal = False
                     async for data in _sse_data(response.aiter_bytes()):
-                        if data == "[DONE]":
-                            done = True
+                        delta, error_code, finished = _stream_event(data)
+                        if error_code is not None:
+                            raise ProviderError(error_code)
+                        if delta:
+                            saw_text = True
+                            yield TextDelta(text=delta)
+                        if finished:
+                            terminal = True
                             break
-                        content, stopped = _stream_chunk(data)
-                        if finished and content:
-                            raise ProviderError(ProviderErrorCode.INVALID_OUTPUT)
-                        if content:
-                            yield TextDelta(text=content)
-                        finished = finished or stopped
-                    if not done:
+                    if not terminal:
                         raise ProviderError(ProviderErrorCode.TEMPORARILY_UNAVAILABLE)
-                    if not finished:
+                    if not saw_text:
                         raise ProviderError(ProviderErrorCode.INVALID_OUTPUT)
                 finally:
                     await response.aclose()

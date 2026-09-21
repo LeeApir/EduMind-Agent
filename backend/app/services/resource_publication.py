@@ -11,7 +11,7 @@ from app.agents.learning_resource_schema import ResourceSchemaError, validate_le
 from app.agents.review_agent import ReviewOutcome
 from app.models.learning import GeneratedResource, LearningScene, LearningUnit
 
-_PROVIDER_ID = "configured_openai_compatible"
+_PROVIDER_ID = "deepseek_responses"
 
 
 class ResourcePublicationError(ValueError):

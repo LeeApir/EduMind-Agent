@@ -10,7 +10,7 @@ class ConfigurationError(RuntimeError):
 
 @dataclass(frozen=True, slots=True)
 class ProviderSettings:
-    """The minimum P0 OpenAI-compatible provider configuration."""
+    """The minimum server-only P0 DeepSeek provider configuration."""
 
     base_url: str
     api_key: str = field(repr=False)

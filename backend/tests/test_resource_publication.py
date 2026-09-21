@@ -101,7 +101,7 @@ def test_publish_gate_versions_and_owner_reads_preserve_prior_visible_resource()
             assert rejected.review_status == "rejected"
             assert replacement.supersedes_id == first.id
             assert replacement.generation_metadata == {
-                "provider": "configured_openai_compatible",
+                "provider": "deepseek_responses",
                 "model_id": "generation-model",
                 "prompt_version": "learning-resources-v1",
                 "content_version": 3,

@@ -34,6 +34,6 @@ def build_server_provider_gateway(
 
 def build_default_provider_gateway() -> ProviderGateway:
     """Compose the one configured P0 network adapter behind the neutral Gateway."""
-    from app.services.openai_compatible import OpenAICompatibleAdapter
+    from app.services.deepseek_responses import DeepSeekResponsesAdapter
 
-    return build_server_provider_gateway(OpenAICompatibleAdapter)
+    return build_server_provider_gateway(DeepSeekResponsesAdapter)

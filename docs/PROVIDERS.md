@@ -1,6 +1,6 @@
 # Provider Gateway（MVP 0.1）
 
-PRD §3.8 是产品范围来源。P0 只连接一个由服务端配置的 OpenAI-compatible Provider；本文件定义业务代码和网络适配器之间的内部契约，不开放 BYOK、模型选择页或自动跨厂商回退。
+PRD §3.8 是产品范围来源。P0 默认且只连接一个由服务端配置的 DeepSeek 模型，并通过 DeepSeek 的 OpenAI Responses-compatible API 调用；本文件定义业务代码和网络适配器之间的内部契约，不开放 BYOK、模型选择页或自动跨厂商回退。
 
 ## 内部调用边界
 
@@ -20,13 +20,13 @@ PRD §3.8 是产品范围来源。P0 只连接一个由服务端配置的 OpenAI
 
 `ProviderGateway` 默认**只调用一次**。只有调用方确认请求尚未产生可见副作用并显式传入 `retry_safe=True`，才会在同一个适配器（同一个 Provider）上重试 `RATE_LIMITED`、`TEMPORARILY_UNAVAILABLE` 或 `TIMEOUT`；重试最多 3 次，指数退避不超过 2 秒。超过本地等待上限、无效或负数的 `Retry-After` 会停止重试，避免忽略上游限流窗口；不会静默切换厂商。流式调用永不自动重试，特别是已经输出 token 后。Provider 故障不能删除已发布资源或覆盖学习进度。
 
-真实 Provider 验证仍未完成；测试替身和 Mock HTTP 只证明协议转换，不代表真实供应商连通性。
+Mock HTTP 只证明协议转换，不代表真实供应商完整链路可用。真实 Provider 的普通流式连通与旧 Chat Completions 性能基准已有脱敏记录；切换 Responses 适配器后必须重新验证结构化生成、正式发布、真实浏览器流程和性能。
 
 ## 服务端配置组装
 
 生产生成路径通过 `backend/app/core/provider_factory.py` 的 `build_server_provider_gateway` 组装适配器。它在调用适配器工厂前读取 `EDUMIND_PROVIDER_BASE_URL`、`EDUMIND_PROVIDER_MODEL`、`EDUMIND_PROVIDER_API_KEY`；任一缺失或仅为空白时返回固定 `CONFIGURATION_MISSING` 错误，不能开始生成。此组装入口只在服务端使用，不提供读取凭据的客户端端点。
 
-`ProviderSettings` 的普通 `repr`/`str` 隐藏 API Key，配置失败消息只列变量名，不包含值；适配器收到 Key 后仍须遵守不记录原始请求、响应或异常的约束。`.env.example` 只能放占位符，真实 `.env` 不进入 Git。T015 才接真实网络适配器。
+`ProviderSettings` 的普通 `repr`/`str` 隐藏 API Key，配置失败消息只列变量名，不包含值；适配器收到 Key 后仍须遵守不记录原始请求、响应或异常的约束。`.env.example` 固定公开的 DeepSeek Base URL 和默认模型标识，但 API Key 只能放占位符；真实 `.env` 不进入 Git。
 
 ## Provider 目标地址边界
 
@@ -36,12 +36,14 @@ PRD §3.8 是产品范围来源。P0 只连接一个由服务端配置的 OpenAI
 
 适配器工厂收到 `ProviderTargetGuard`，而不是可以永久信任的启动时 DNS 结果。**每次出站尝试**必须调用 `approve_base()`，只连接返回的 `ApprovedTarget.connect_ip`（或其 `addresses` 中另一已批准 IP），同时保留原始主机名用于 HTTP Host 与 HTTPS TLS SNI/证书验证；禁止让 HTTP 客户端再次解析原始主机名、使用环境代理绕过目标 IP，或自动跟随重定向。默认拒绝 3xx；若确需处理跳转，只可通过 `approve_redirect(previous, location)` 在下一次请求前重新解析并校验同源目标，不得把 Key 发送到其他源。连接失败后的每次重试也必须重新调用 Guard。T014/T015 使用受控 DNS 与 Mock HTTP 覆盖这些边界，不进行真实网络请求。
 
-## P0 非流式适配器
+## P0 DeepSeek Responses 非流式适配器
 
-`build_default_provider_gateway()` 组装唯一服务端适配器 `OpenAICompatibleAdapter`。P0 选择 Chat Completions 的 `POST /chat/completions`；服务端配置的 Base URL 作为 API 前缀（例如 `/v1`），模型 ID 和 API Key 只从服务端配置注入。请求携带消息、可选 `max_completion_tokens` 与 `temperature`；结构化请求携带 `response_format.type=json_schema`。适配器将第一条已正常结束的文本结果、模型 ID 和可选用量转换成内部类型；缺失、截断或无效数据返回固定 `INVALID_OUTPUT`，不会发布结果。结构化结果再用本地 JSON Schema 验证，拒绝需要远程读取的 schema 引用。
+`build_default_provider_gateway()` 只组装 `DeepSeekResponsesAdapter`。它向服务端配置的 Base URL 追加 `POST /responses`，模型 ID 和 API Key 只从服务端环境注入。内部消息映射为 `input`，输出上限映射为 `max_output_tokens`；结构化请求使用 `text.format={"type":"json_schema","name":"edumind_result","schema":...}`。适配器只接受 `status=completed` 的 assistant `output_text`，忽略 reasoning 内容，把 `input_tokens`/`output_tokens` 转换为内部用量；不完整、失败、空文本或畸形结果返回安全错误，不会发布资源。
 
-HTTPX 0.28.1 连接到 Guard 批准的 IP，同时设置原始 Host 和 `sni_hostname` 来保持 TLS 证书验证；禁用环境代理与自动重定向，单次非流式响应限 2 MiB，并在结束时关闭连接。鉴权失败映射为不含原始响应的 `AUTHENTICATION_FAILED`；其他 HTTP 错误的细分和有界重试在 T017 完成。当前没有真实 Provider 凭据或连通性证明，不能据此宣称完整生成链路已可用。依据：[OpenAI Chat Completions API](https://developers.openai.com/api/reference/resources/chat/subresources/completions/methods/create)、[HTTPX SNI extension](https://www.python-httpx.org/advanced/extensions/)。
+结构化文本解析后仍以本地 Draft 2020-12 JSON Schema 校验；Provider 侧约束不能替代本地校验或 ReviewAgent。外部 `$ref`、`$id` 等可能触发远程读取的 schema 在网络调用前被拒绝。HTTPX 0.28.1 连接到 Guard 批准的 IP，同时设置原始 Host 和 `sni_hostname` 保持 TLS 证书验证；禁用环境代理与自动重定向，单次非流式响应限制为 2 MiB 并始终关闭连接。依据：[DeepSeek Responses API](https://api-docs.deepseek.com/api/create-response/)、[DeepSeek Responses 使用指南](https://api-docs.deepseek.com/guides/responses_api/)、[HTTPX SNI extension](https://www.python-httpx.org/advanced/extensions/)。
 
-## P0 Provider 流式适配
+## P0 DeepSeek Responses 流式适配
 
-`stream_text` 对同一 Chat Completions 路径发送 `stream=true`，以增量 SSE `data:` 帧解出 `choices[0].delta.content`，只向业务层给出 `TextDelta`。解析器按原始字节拼齐 UTF-8 行，容忍 CRLF 和任意网络分片边界；注释心跳与无文本的角色/用量分片不会误报为内容。必须见到正常 `finish_reason=stop` 与 `[DONE]` 才算完整；非法 UTF-8/JSON/帧返回安全的 `INVALID_OUTPUT`，上游提前 EOF 或读取中断返回安全的 Provider 错误。每帧限制 1 MiB；3xx 不自动跟随。正常完成、异常与消费者取消都会关闭上游响应。`ProviderGateway.stream_text` 在关闭外层流时也会关闭内层适配器流；已输出部分 token 后，上层不得静默重试同一流。
+`stream_text` 对 `/responses` 发送 `stream=true`，只把 `response.output_text.delta` 转为业务层 `TextDelta`；reasoning 与生命周期事件不向学生暴露。正常结束必须看到携带 `status=completed` 的 `response.completed`，DeepSeek Responses 不使用 `[DONE]`。`response.incomplete` 映射为 `INVALID_OUTPUT`，`response.failed` 和终止事件前 EOF 映射为安全的临时不可用错误。
+
+解析器按任意网络字节分片重组 UTF-8 SSE，兼容 CRLF、注释心跳和 `event:` 字段，每帧限制 1 MiB。未知或畸形事件、非法 UTF-8/JSON、完成但没有可见文本均拒绝；3xx 不自动跟随。正常完成、异常与消费者取消都会关闭上游响应，且已输出部分 token 后不静默重试。

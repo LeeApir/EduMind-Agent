@@ -1,4 +1,4 @@
-"""Non-streaming adapter contract exercised only through mock HTTP transport."""
+"""DeepSeek Responses non-streaming contract through mock HTTP only."""
 
 import asyncio
 import json
@@ -10,7 +10,7 @@ import pytest
 from app.core.config import ProviderSettings
 from app.core.provider_factory import build_default_provider_gateway
 from app.core.provider_target import ProviderTargetGuard, TargetPolicy
-from app.services.openai_compatible import OpenAICompatibleAdapter
+from app.services.deepseek_responses import DeepSeekResponsesAdapter
 from app.services.provider_gateway import (
     ChatMessage,
     ProviderError,
@@ -25,12 +25,12 @@ def resolver(_host: str, _port: int) -> Sequence[str]:
     return ("8.8.8.8",)
 
 
-def adapter(handler: httpx.MockTransport) -> OpenAICompatibleAdapter:
+def adapter(handler: httpx.MockTransport) -> DeepSeekResponsesAdapter:
     settings = ProviderSettings(
-        base_url="https://api.provider.test/v1", api_key="test-secret", model="server-model"
+        base_url="https://api.deepseek.test", api_key="test-secret", model="deepseek-flash"
     )
     guard = ProviderTargetGuard(settings.base_url, TargetPolicy(), resolver=resolver)
-    return OpenAICompatibleAdapter(settings, guard, transport=handler)
+    return DeepSeekResponsesAdapter(settings, guard, transport=handler)
 
 
 def prompt() -> TextRequest:
@@ -41,45 +41,56 @@ def prompt() -> TextRequest:
     )
 
 
-def completion(content: str = "A linked list has nodes.") -> dict[str, object]:
+def response(content: str = "A linked list has nodes.") -> dict[str, object]:
     return {
-        "model": "server-model-v2",
-        "choices": [
-            {"finish_reason": "stop", "message": {"role": "assistant", "content": content}}
+        "object": "response",
+        "status": "completed",
+        "model": "deepseek-flash",
+        "output": [
+            {
+                "type": "reasoning",
+                "status": "completed",
+                "content": [{"type": "reasoning_text", "text": "private reasoning"}],
+            },
+            {
+                "type": "message",
+                "status": "completed",
+                "role": "assistant",
+                "content": [{"type": "output_text", "text": content}],
+            },
         ],
-        "usage": {"prompt_tokens": 8, "completion_tokens": 9},
+        "usage": {"input_tokens": 8, "output_tokens": 9, "total_tokens": 17},
     }
 
 
-def test_text_request_uses_pinned_ip_original_host_sni_and_neutral_result() -> None:
+def test_text_request_uses_responses_pinned_ip_host_sni_and_neutral_result() -> None:
     calls = 0
 
     def respond(request: httpx.Request) -> httpx.Response:
         nonlocal calls
         calls += 1
         assert request.method == "POST"
-        assert str(request.url) == "https://8.8.8.8/v1/chat/completions"
-        assert request.headers["Host"] == "api.provider.test"
-        assert request.extensions["sni_hostname"] == "api.provider.test"
+        assert str(request.url) == "https://8.8.8.8/responses"
+        assert request.headers["Host"] == "api.deepseek.test"
+        assert request.extensions["sni_hostname"] == "api.deepseek.test"
         assert request.headers["Authorization"] == "Bearer test-secret"
-        body = json.loads(request.content)
-        assert body == {
-            "model": "server-model",
-            "messages": [{"role": "user", "content": "Explain a linked list"}],
+        assert json.loads(request.content) == {
+            "model": "deepseek-flash",
+            "input": [{"role": "user", "content": "Explain a linked list"}],
             "stream": False,
-            "max_completion_tokens": 300,
+            "max_output_tokens": 300,
             "temperature": 0.4,
         }
-        return httpx.Response(200, json=completion())
+        return httpx.Response(200, json=response())
 
     result = asyncio.run(adapter(httpx.MockTransport(respond)).generate_text(prompt()))
     assert result.text == "A linked list has nodes."
-    assert result.model_id == "server-model-v2"
+    assert result.model_id == "deepseek-flash"
     assert result.usage == TokenUsage(input_tokens=8, output_tokens=9)
     assert calls == 1
 
 
-def test_structured_request_sends_json_schema_and_validates_result() -> None:
+def test_structured_request_uses_text_json_schema_and_validates_result() -> None:
     schema = {
         "type": "object",
         "properties": {"answer": {"type": "string"}},
@@ -89,11 +100,15 @@ def test_structured_request_sends_json_schema_and_validates_result() -> None:
 
     def respond(request: httpx.Request) -> httpx.Response:
         body = json.loads(request.content)
-        assert body["response_format"] == {
-            "type": "json_schema",
-            "json_schema": {"name": "edumind_result", "schema": schema, "strict": True},
+        assert body["text"] == {
+            "format": {
+                "type": "json_schema",
+                "name": "edumind_result",
+                "schema": schema,
+            }
         }
-        return httpx.Response(200, json=completion('{"answer":"linked nodes"}'))
+        assert "response_format" not in body
+        return httpx.Response(200, json=response('{"answer":"linked nodes"}'))
 
     result = asyncio.run(
         adapter(httpx.MockTransport(respond)).generate_structured(
@@ -119,23 +134,25 @@ def test_authentication_failure_never_exposes_vendor_body_or_key() -> None:
 @pytest.mark.parametrize(
     "payload",
     [
-        {"model": "server-model", "choices": []},
+        {"model": "deepseek-flash", "status": "completed", "output": []},
+        {**response(), "status": "incomplete"},
         {
-            "model": "server-model",
-            "choices": [{"finish_reason": "length", "message": {"content": "cut"}}],
+            **response(),
+            "output": [
+                {
+                    "type": "message",
+                    "status": "incomplete",
+                    "role": "assistant",
+                    "content": [{"type": "output_text", "text": "cut"}],
+                }
+            ],
         },
-        {
-            "model": "server-model",
-            "choices": [{"finish_reason": "stop", "message": {"content": None}}],
-        },
-        {
-            "model": "server-model",
-            "choices": [{"finish_reason": "stop", "message": {"content": "ok"}}],
-            "usage": {"prompt_tokens": "bad"},
-        },
+        {**response(), "usage": {"input_tokens": "bad"}},
     ],
 )
-def test_malformed_response_is_safe_invalid_output(payload: dict[str, object]) -> None:
+def test_malformed_or_incomplete_response_is_safe_invalid_output(
+    payload: dict[str, object],
+) -> None:
     with pytest.raises(ProviderError) as raised:
         asyncio.run(
             adapter(
@@ -159,7 +176,9 @@ def test_non_json_and_schema_mismatch_are_invalid_output() -> None:
         asyncio.run(
             adapter(
                 httpx.MockTransport(
-                    lambda _request: httpx.Response(200, json=completion('{"answer":"wrong"}'))
+                    lambda _request: httpx.Response(
+                        200, json=response('{"answer":"wrong"}')
+                    )
                 )
             ).generate_structured(StructuredRequest(prompt=prompt(), json_schema=schema))
         )
@@ -172,13 +191,14 @@ def test_external_schema_reference_is_rejected_before_http() -> None:
     def respond(_request: httpx.Request) -> httpx.Response:
         nonlocal calls
         calls += 1
-        return httpx.Response(200, json=completion())
+        return httpx.Response(200, json=response())
 
-    schema = {"$ref": "https://169.254.169.254/schema.json"}
     with pytest.raises(ProviderError) as raised:
         asyncio.run(
             adapter(httpx.MockTransport(respond)).generate_structured(
-                StructuredRequest(prompt=prompt(), json_schema=schema)
+                StructuredRequest(
+                    prompt=prompt(), json_schema={"$ref": "https://169.254.169.254/schema"}
+                )
             )
         )
     assert raised.value.code == ProviderErrorCode.INVALID_OUTPUT
@@ -205,17 +225,17 @@ def test_dns_change_to_private_is_blocked_before_mock_http() -> None:
     def respond(_request: httpx.Request) -> httpx.Response:
         nonlocal calls
         calls += 1
-        return httpx.Response(200, json=completion())
+        return httpx.Response(200, json=response())
 
     settings = ProviderSettings(
-        base_url="https://api.provider.test/v1", api_key="test-secret", model="server-model"
+        base_url="https://api.deepseek.test", api_key="test-secret", model="deepseek-flash"
     )
     guard = ProviderTargetGuard(
         settings.base_url, TargetPolicy(), resolver=lambda _host, _port: ("10.0.0.1",)
     )
     with pytest.raises(ProviderError) as raised:
         asyncio.run(
-            OpenAICompatibleAdapter(
+            DeepSeekResponsesAdapter(
                 settings, guard, transport=httpx.MockTransport(respond)
             ).generate_text(prompt())
         )
@@ -223,11 +243,13 @@ def test_dns_change_to_private_is_blocked_before_mock_http() -> None:
     assert calls == 0
 
 
-def test_default_gateway_composes_single_server_adapter(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setenv("EDUMIND_PROVIDER_BASE_URL", "https://8.8.8.8/v1")
+def test_default_gateway_composes_only_deepseek_responses(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("EDUMIND_PROVIDER_BASE_URL", "https://8.8.8.8")
     monkeypatch.setenv("EDUMIND_PROVIDER_API_KEY", "test-secret")
-    monkeypatch.setenv("EDUMIND_PROVIDER_MODEL", "server-model")
+    monkeypatch.setenv("EDUMIND_PROVIDER_MODEL", "deepseek-flash")
     monkeypatch.delenv("EDUMIND_PROVIDER_DEPLOYMENT", raising=False)
     monkeypatch.delenv("EDUMIND_PROVIDER_LOCAL_ALLOWLIST", raising=False)
     gateway = build_default_provider_gateway()
-    assert isinstance(gateway._adapter, OpenAICompatibleAdapter)
+    assert isinstance(gateway._adapter, DeepSeekResponsesAdapter)
