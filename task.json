@@ -1428,7 +1428,8 @@
       "depends_on": [
         "MVP-0.1-T034",
         "MVP-0.1-T035-2",
-        "MVP-0.1-T035-3"
+        "MVP-0.1-T035-3",
+        "MVP-0.1-T035-4"
       ],
       "scope": [
         "backend/tests/",
@@ -1466,7 +1467,7 @@
       ],
       "started_at": "2026-09-21T09:14:17+08:00",
       "completed_at": null,
-      "blocker": "The real DeepSeek Responses browser flow reached temporary streaming but formal resource generation exceeded the P0 read/latency boundary. MVP-0.1-T035-3 must explicitly disable DeepSeek default thinking and bound unspecified output before rerunning acceptance.",
+      "blocker": "The new non-thinking/bounded DeepSeek Responses path still produced intermittent INVALID_OUTPUT for formal structured resources at the provider default temperature. MVP-0.1-T035-4 must lock unspecified structured generation temperature to 0.0 before acceptance is rerun.",
       "commit_lookup": "Task-Completed: MVP-0.1-T035"
     },
     {
@@ -1567,6 +1568,52 @@
       "completed_at": "2026-09-21T14:25:00+08:00",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.1-T035-3"
+    },
+    {
+      "id": "MVP-0.1-T035-4",
+      "phase": "MVP 0.1",
+      "parent_work_package": "MVP-0.1-011",
+      "title": "稳定 DeepSeek P0 结构化采样",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.1-T035-3"
+      ],
+      "scope": [
+        "backend/app/services/deepseek_responses.py",
+        "backend/tests/test_deepseek_responses.py",
+        "docs/PROVIDERS.md",
+        "task.json",
+        "process.txt"
+      ],
+      "acceptance_criteria": [
+        "未指定温度的 DeepSeek `generate_structured` 请求发送 `temperature=0.0`，降低正式 JSON Schema 资源的随机性；显式温度保持不变。",
+        "非结构化文本和现有内部 Gateway 契约不受该默认值影响。",
+        "MockTransport 覆盖默认与显式温度映射，且既有 JSON Schema、SSE、安全错误、类型检查和全量测试保持通过。"
+      ],
+      "verification": [
+        "cd backend && uv run --python 3.11 python -m pytest -q tests/test_deepseek_responses.py tests/test_provider_stream.py",
+        "cd backend && uv run --python 3.11 ruff check . && uv run --python 3.11 mypy app && uv run --python 3.11 python -m pytest -q",
+        "python3 -m json.tool task.json >/dev/null && git diff --check"
+      ],
+      "verification_results": [
+        {
+          "command": "cd backend && uv run --python 3.11 python -m pytest -q tests/test_deepseek_responses.py tests/test_provider_stream.py",
+          "result": "passed: 25 passed; covers non-thinking/bounded P0 requests, default structured temperature 0.0, explicit temperature passthrough, JSON Schema and semantic SSE"
+        },
+        {
+          "command": "cd backend && uv lock --check && uv run --python 3.11 ruff check . && uv run --python 3.11 mypy app && uv run --python 3.11 python -m pytest -q",
+          "result": "passed: lock check, Ruff and mypy passed; 113 passed, 15 existing database-dependent skips, 1 dependency deprecation warning"
+        },
+        {
+          "command": "python3 -m json.tool task.json >/dev/null && git diff --check",
+          "result": "passed"
+        }
+      ],
+      "started_at": "2026-09-21T14:35:00+08:00",
+      "completed_at": "2026-09-21T14:40:00+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.1-T035-4"
     }
   ]
 }

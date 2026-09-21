@@ -42,6 +42,8 @@ Mock HTTP 只证明协议转换，不代表真实供应商完整链路可用。�
 
 DeepSeek Responses 默认开启 thinking，而 P0 的第一段讲解和正式资源需要可预期的低时延。因此 P0 的唯一适配器对所有文本与结构化请求显式发送 `reasoning={"effort":"none"}`；调用方未提供上限时使用 4096 `max_output_tokens`，已指定上限保持原值。这个 P0 策略不改变内部 `TaskProfile`、业务 schema 或审核流程；需要深度推理的独立模型策略属于后续阶段，不能通过浏览器参数覆盖。
 
+正式 JSON Schema 生成在调用方未指定温度时还固定使用 `temperature=0.0`，以减少可复现资源的随机性；显式温度照常透传。普通文本流不注入这个默认值，保持首段讲解现有采样行为。
+
 结构化文本解析后仍以本地 Draft 2020-12 JSON Schema 校验；Provider 侧约束不能替代本地校验或 ReviewAgent。外部 `$ref`、`$id` 等可能触发远程读取的 schema 在网络调用前被拒绝。HTTPX 0.28.1 连接到 Guard 批准的 IP，同时设置原始 Host 和 `sni_hostname` 保持 TLS 证书验证；禁用环境代理与自动重定向，单次非流式响应限制为 2 MiB 并始终关闭连接。依据：[DeepSeek Responses API](https://api-docs.deepseek.com/api/create-response/)、[DeepSeek Responses 使用指南](https://api-docs.deepseek.com/guides/responses_api/)、[HTTPX SNI extension](https://www.python-httpx.org/advanced/extensions/)。
 
 ## P0 DeepSeek Responses 流式适配

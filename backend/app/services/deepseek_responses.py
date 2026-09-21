@@ -334,6 +334,8 @@ class DeepSeekResponsesAdapter:
         except (TypeError, ValueError, SchemaError):
             raise ProviderError(ProviderErrorCode.INVALID_OUTPUT) from None
         body = _request_body(request.prompt)
+        if request.prompt.temperature is None:
+            body["temperature"] = 0.0
         body["text"] = {
             "format": {
                 "type": "json_schema",

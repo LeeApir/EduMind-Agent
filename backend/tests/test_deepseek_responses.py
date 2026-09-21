@@ -132,6 +132,33 @@ def test_structured_request_uses_text_json_schema_and_validates_result() -> None
     assert result.usage == TokenUsage(input_tokens=8, output_tokens=9)
 
 
+def test_structured_request_defaults_temperature_without_overriding_explicit_value() -> None:
+    schema = {"type": "object", "properties": {"ok": {"type": "boolean"}}}
+    calls = 0
+
+    def respond(request: httpx.Request) -> httpx.Response:
+        nonlocal calls
+        calls += 1
+        body = json.loads(request.content)
+        assert body["temperature"] == (0.0 if calls == 1 else 0.7)
+        return httpx.Response(200, json=response('{"ok":true}'))
+
+    subject = adapter(httpx.MockTransport(respond))
+    default_request = StructuredRequest(
+        prompt=TextRequest(messages=(ChatMessage(role="user", content="Return JSON"),)),
+        json_schema=schema,
+    )
+    explicit_request = StructuredRequest(
+        prompt=TextRequest(
+            messages=(ChatMessage(role="user", content="Return JSON"),), temperature=0.7
+        ),
+        json_schema=schema,
+    )
+    assert asyncio.run(subject.generate_structured(default_request)).value == {"ok": True}
+    assert asyncio.run(subject.generate_structured(explicit_request)).value == {"ok": True}
+    assert calls == 2
+
+
 def test_authentication_failure_never_exposes_vendor_body_or_key() -> None:
     def respond(_request: httpx.Request) -> httpx.Response:
         return httpx.Response(401, text="test-secret vendor detail")
