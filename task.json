@@ -1446,11 +1446,15 @@
         {
           "command": "docker compose exec -T api <safe Provider presence check>",
           "result": "blocked: EDUMIND_PROVIDER_BASE_URL, EDUMIND_PROVIDER_API_KEY, and EDUMIND_PROVIDER_MODEL are all empty; no secret values were printed"
+        },
+        {
+          "command": "docker compose exec -T api <redacted 8-token real Provider stream check>",
+          "result": "passed: deepseek-flash returned a non-empty first stream chunk in 1637 ms; response content, Base URL, and API key were not printed"
         }
       ],
       "started_at": "2026-09-21T09:14:17+08:00",
       "completed_at": null,
-      "blocker": "A real OpenAI-compatible Provider base URL, API key, and model are not configured in the API container. Real end-to-end learning and P95 first-content measurement cannot run until the user adds them to the ignored root .env and recreates the API container.",
+      "blocker": "Real Provider connectivity is verified. User approval is required before the billable full learning flow and multi-sample P95 benchmark; 20 samples are recommended for a minimally meaningful P95 estimate.",
       "commit_lookup": "Task-Completed: MVP-0.1-T035"
     }
   ]
