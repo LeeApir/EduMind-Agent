@@ -413,7 +413,7 @@
       "phase": "MVP 0.2",
       "parent_work_package": "MVP-0.2-006",
       "title": "实现可查看和修正的画像卡片",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.2-T008"
@@ -430,9 +430,30 @@
       "verification": [
         "运行画像卡片组件测试、类型检查、Lint 和构建。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "corepack pnpm test --run",
+          "result": "passed: 30 tests across 6 files, including new profile.spec.ts (9) and ProfileCard.spec.ts (7)"
+        },
+        {
+          "command": "corepack pnpm typecheck",
+          "result": "passed: vue-tsc -b reports no type errors"
+        },
+        {
+          "command": "corepack pnpm lint",
+          "result": "passed: 0 errors (97 non-blocking formatting warnings)"
+        },
+        {
+          "command": "corepack pnpm build",
+          "result": "passed: vue-tsc + vite build succeeded"
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed"
+        }
+      ],
+      "started_at": "2026-09-23T18:32:45",
+      "completed_at": "2026-09-23T19:14:16",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.2-T009"
     },

@@ -15,6 +15,7 @@ const stubs = {
     template: "<textarea @input=\"$emit('update:value', $event.target.value)\" />",
   },
   NTag: { template: "<span><slot /></span>" },
+  ProfileCard: { template: "<section data-testid=\"profile-card\">学习画像</section>" },
 };
 
 describe("learning entry", () => {
@@ -28,6 +29,14 @@ describe("learning entry", () => {
     expect(wrapper.get("h1").text()).toContain("你现在想弄懂什么？");
     expect(wrapper.get("label").text()).toBe("学习目标");
     expect(wrapper.text()).toContain("不需要先填写画像");
+  });
+
+  it("renders the viewable and correctable profile card", () => {
+    const wrapper = mount(App, {
+      global: { stubs },
+    });
+
+    expect(wrapper.get('[data-testid="profile-card"]').text()).toContain("学习画像");
   });
 
   it("enters a clear pending state from one sentence", async () => {

@@ -7,6 +7,7 @@ import LearningProgressPanel, {
   type PublishedResource,
   type ReviewState,
 } from "./components/LearningProgressPanel.vue";
+import ProfileCard from "./components/ProfileCard.vue";
 import PublishedLearningWorkspace from "./components/PublishedLearningWorkspace.vue";
 
 type StartLearningRequest = (goal: string) => Promise<void>;
@@ -282,5 +283,6 @@ function stringValue(value: unknown): string {
       v-if="resources.length"
       :resources="resources"
     />
+    <ProfileCard />
   </main>
 </template>
