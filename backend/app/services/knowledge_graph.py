@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from enum import StrEnum
 from functools import lru_cache
 from graphlib import CycleError, TopologicalSorter
+from os import getenv
 from pathlib import Path
 from types import MappingProxyType
 from typing import Mapping, cast
@@ -143,8 +144,9 @@ class KnowledgeGraphRepository:
 
 
 def default_knowledge_graph_path() -> Path:
-    """Return the repository-relative MVP seed path for controlled injection in tests."""
-    return _DEFAULT_GRAPH_PATH
+    """Return the MVP seed path, overridable via env for containerized runs."""
+    override = getenv("EDUMIND_KNOWLEDGE_GRAPH_PATH")
+    return Path(override) if override else _DEFAULT_GRAPH_PATH
 
 
 @lru_cache(maxsize=1)

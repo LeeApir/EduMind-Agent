@@ -15,7 +15,10 @@ services:
 
   api:
     build: ./backend
+    volumes:
+      - ./data:/app/data:ro
     environment:
+      EDUMIND_KNOWLEDGE_GRAPH_PATH: /app/data/knowledge_graph.yaml
       EDUMIND_DATABASE_URL: postgresql+asyncpg://edumind:${EDUMIND_POSTGRES_PASSWORD:-edumind_dev_password}@postgres:5432/edumind_dev
       EDUMIND_PROVIDER_BASE_URL: ${EDUMIND_PROVIDER_BASE_URL:-}
       EDUMIND_PROVIDER_API_KEY: ${EDUMIND_PROVIDER_API_KEY:-}
