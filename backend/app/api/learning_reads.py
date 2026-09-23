@@ -1,4 +1,4 @@
-"""Authenticated, owner-scoped profile and published resource reads."""
+"""Authenticated, owner-scoped published resource reads."""
 
 from uuid import UUID
 
@@ -7,9 +7,8 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.core.auth import AuthenticatedSession, AuthFailure, require_authenticated_session
 from app.core.database import database_session_factory
-from app.models.learning import GeneratedResource, StudentProfile
+from app.models.learning import GeneratedResource
 from app.services.owned_learning import (
-    latest_profile,
     published_resource,
     published_scenes,
     visible_unit,
@@ -23,23 +22,6 @@ def not_found() -> AuthFailure:
     return AuthFailure(404, "NOT_FOUND", "Resource not found.")
 
 
-def profile_payload(profile: StudentProfile) -> dict[str, object]:
-    return {
-        "id": str(profile.id),
-        "version": profile.version,
-        "initial_query": profile.initial_query,
-        "professional_background": profile.professional_background,
-        "knowledge_base": profile.knowledge_base,
-        "cognitive_style": profile.cognitive_style,
-        "learning_goals": profile.learning_goals,
-        "error_preferences": profile.error_preferences,
-        "engineering_preference": profile.engineering_preference,
-        "extended_dimensions": profile.extended_dimensions,
-        "evidence": profile.evidence,
-        "updated_at": profile.updated_at.isoformat(),
-    }
-
-
 def resource_payload(resource: GeneratedResource) -> dict[str, object]:
     return {
         "id": str(resource.id),
@@ -48,20 +30,6 @@ def resource_payload(resource: GeneratedResource) -> dict[str, object]:
         "content": resource.content,
         "review_status": resource.review_status,
     }
-
-
-@router.get("/api/profile/me")
-async def get_my_profile(
-    response: Response,
-    current: AuthenticatedSession = Depends(require_authenticated_session),
-    session_factory: async_sessionmaker[AsyncSession] = Depends(database_session_factory),
-) -> dict[str, object]:
-    response.headers["Cache-Control"] = "no-store"
-    async with session_factory() as db:
-        profile = await latest_profile(db, current.user.id)
-    if profile is None:
-        raise not_found()
-    return profile_payload(profile)
 
 
 @router.get("/api/learning-units/{unit_id}")

@@ -181,3 +181,7 @@ VERIFIED 表示验证通过并准备提交，完成以 Git 中的 Task-Completed
 领取"持久化画像事件与不可变画像版本" | T006 完成提交 0aa65a1 已确认，事件 schema 与合并规则已存在 | 暂无 | 新增 ProfileEvent 模型、Alembic 迁移与持久化服务，覆盖 owner 隔离、幂等与不可变版本
 [2026-09-23T17:30:46] [MVP-0.2-T007] VERIFIED | executor=Lee
 新增 ProfileEvent 模型（owner+idempotency_key 唯一、event_type 约束）、Alembic 0005_profile_events 迁移（含 downgrade 往返）与 profile_updates 服务（record_profile_event、persist_profile_version、ProfileVersionConflict） | 临时 PostgreSQL（镜像 sha256:cf78e766…，端口 55432）上 alembic upgrade/downgrade 往返通过，test_profile_persistence.py 5 项幂等/owner 隔离/不可变版本/冲突测试通过，全量后端 167 passed；ruff、mypy（36 个 source）通过 | 事件只持久化、尚未触发画像更新（T015 Provider 更新）；读取/修正/历史 API 与前端卡片留待 T008、T009 | 领取 T008，实现画像读取、历史与手动修正 API（GET/PATCH/profile/me、history、events）
+[2026-09-23T17:55:25] [MVP-0.2-T008] START | executor=Lee | branch=codex/mvp-0.2-t006
+领取"实现画像读取、历史与手动修正 API" | T002、T007 完成提交已确认，OpenAPI 画像四端点契约与幂等/版本服务已存在 | 暂无 | 新增 profile 路由、幂等修正服务与 owner 隔离的读取/历史/事件端点，补齐 VALIDATION_ERROR 稳定响应
+[2026-09-23T18:31:44] [MVP-0.2-T008] VERIFIED | executor=Lee
+新增 app/api/profile.py 四端点（GET/PATCH /me、GET /me/history、POST /events），GET /me 从 learning_reads 迁出；main.py 注册 profile 路由并新增 RequestValidationError 处理器返回稳定 VALIDATION_ERROR；student_profiles 增加幂等列与 Alembic 0006 迁移，profile_updates 新增 correct_profile（幂等重放 + 乐观并发） | 新增 test_profile_api.py 7 项（owner 隔离/404/白名单修正/非法字段 422/CSRF 403/版本冲突 409/幂等重放/事件回执）；临时 PostgreSQL 上 alembic upgrade + 0006 往返通过，全量后端 174 passed；ruff、mypy（37 个 source）通过 | 事件端点仅持久化并返回 queued，Provider 驱动的画像更新留待 T015；前端画像卡片留待 T009 | 领取 T009，实现可查看和修正的画像卡片（ProfileCard + profile API 客户端）

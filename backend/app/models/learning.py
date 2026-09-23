@@ -30,6 +30,9 @@ class StudentProfile(Base):
     __tablename__ = "student_profiles"
     __table_args__ = (
         UniqueConstraint("user_id", "version", name="uq_student_profiles_user_version"),
+        UniqueConstraint(
+            "user_id", "idempotency_key", name="uq_student_profiles_user_idempotency_key"
+        ),
         CheckConstraint("version >= 1", name="ck_student_profiles_version_positive"),
     )
 
@@ -47,6 +50,8 @@ class StudentProfile(Base):
     engineering_preference: Mapped[dict[str, object] | None] = mapped_column(JSONB)
     extended_dimensions: Mapped[dict[str, object] | None] = mapped_column(JSONB)
     evidence: Mapped[dict[str, object] | None] = mapped_column(JSONB)
+    idempotency_key: Mapped[str | None] = mapped_column(String(128))
+    request_digest: Mapped[str | None] = mapped_column(String(64))
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
 
 

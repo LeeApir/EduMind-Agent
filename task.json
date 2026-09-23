@@ -375,7 +375,7 @@
       "phase": "MVP 0.2",
       "parent_work_package": "MVP-0.2-003",
       "title": "实现画像读取、历史与手动修正 API",
-      "status": "todo",
+      "status": "in_progress",
       "priority": "P0",
       "depends_on": [
         "MVP-0.2-T002",
@@ -384,6 +384,8 @@
       "scope": [
         "backend/app/api/",
         "backend/app/services/",
+        "backend/app/models/",
+        "backend/alembic/",
         "backend/tests/",
         "docs/api/openapi.yaml"
       ],
@@ -395,9 +397,14 @@
       "verification": [
         "运行画像 API 成功、校验、CSRF、并发和 owner 隔离测试。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "新增 app/api/profile.py 四端点（GET/PATCH /me、GET /me/history、POST /events），GET /me 从 learning_reads 迁出；main.py 注册 profile 路由并新增 RequestValidationError 处理器，返回稳定 VALIDATION_ERROR。",
+        "student_profiles 增加幂等列（idempotency_key + request_digest，唯一约束）与 Alembic 0006 迁移；profile_updates 新增 snapshot_profile/correction_digest/correct_profile，PATCH 幂等重放 + 乐观并发。",
+        "新增 test_profile_api.py：owner 隔离、404、白名单修正 + manual_correction 证据、非法/空字段 422、CSRF 403、版本冲突 409、幂等重放/摘要冲突、事件回执与去重。",
+        "临时 PostgreSQL 上 alembic upgrade head + 0006 往返通过；全量后端 174 passed；ruff、mypy（37 个 source）通过。OpenAPI 契约由 T002 定义，未改动。"
+      ],
+      "started_at": "2026-09-23T17:55:25",
+      "completed_at": "2026-09-23T18:31:44",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.2-T008"
     },
