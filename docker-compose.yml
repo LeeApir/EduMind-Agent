@@ -32,7 +32,10 @@ services:
       retries: 20
 
   web:
-    build: ./web
+    build:
+      context: ./web
+      args:
+        NPM_REGISTRY: ${NPM_REGISTRY:-https://registry.npmjs.org}
     environment:
       EDUMIND_API_PROXY_TARGET: http://api:8000
     depends_on:
