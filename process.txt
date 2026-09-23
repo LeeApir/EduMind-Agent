@@ -173,3 +173,7 @@ VERIFIED 表示验证通过并准备提交，完成以 Git 中的 Task-Completed
 领取“提供知识结构只读 API” | T002、T004 完成提交已确认，OpenAPI 契约和 Repository 校验边界已存在 | 暂无 | 注入图谱 Repository，新增稳定排序的公共读端点、未知节点安全错误和 API 集成测试
 [2026-09-21T22:59:56] [MVP-0.2-T005] VERIFIED | executor=Lee
 新增 `GET /api/graph` 和 `GET /api/graph/node/{nodeId}`，注入已校验 Repository，稳定返回公共图谱并以 `GRAPH_NODE_NOT_FOUND` 隐藏未知节点的内部细节 | 图谱 API/Repository 9 测试、Ruff、Mypy（34 个 source）、全量后端 122 passed/15 skipped、OpenAPI JSON 和 `git diff --check` 均通过 | 仅 JSON 兼容 YAML 受 P0 支持；通用 YAML 语法解析需新的明确依赖决策 | 创建含 Task-Completed 标记的本地提交；T001–T005 已完成，下一个可领取任务为 T006
+[2026-09-23T15:05:25] [MVP-0.2-T006] START | executor=Lee | branch=codex/mvp-0.2-t006
+领取"定义渐进画像事件与合并规则" | T001–T005 完成提交已确认，已核对 PRD §3.2、ADR-0003 与 OpenAPI 画像事件/修正契约 | 暂无 | 定义版本化画像事件 schema 与确定性合并规则，覆盖行为事件与显式修正优先级
+[2026-09-23T15:20:23] [MVP-0.2-T006] VERIFIED | executor=Lee
+新增 `backend/app/agents/profile_events.py`（版本化事件 schema、事件类型/动作一致性、幂等摘要），扩展 `profile_schema.py`（EDITABLE_PROFILE_FIELDS、EVIDENCE_SOURCE_PRECEDENCE、strongest_evidence_source、apply_manual_correction，证据版本放宽为 ≤ 画像版本），新增 `docs/agents/prompts/profile-events-v1.md` | 新增 test_profile_events.py + test_profile_merge.py；ruff、mypy（35 个 source）通过；全量后端 147 passed/15 skipped | 事件仅完成 schema 与合并层；持久化、读取/修正 API 与前端卡片留待 T007–T009 | 领取 T007，新增 ProfileEvent 模型、Alembic 迁移与持久化服务

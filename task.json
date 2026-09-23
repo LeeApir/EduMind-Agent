@@ -308,7 +308,7 @@
       "phase": "MVP 0.2",
       "parent_work_package": "MVP-0.2-003",
       "title": "定义渐进画像事件与合并规则",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.2-T001"
@@ -326,9 +326,13 @@
       "verification": [
         "运行事件 schema、合并优先级、未知字段和冲突回归测试。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "新增 profile_events.py（版本化事件 schema + 幂等摘要）与 profile_schema.py 合并规则（EDITABLE_PROFILE_FIELDS、EVIDENCE_SOURCE_PRECEDENCE、strongest_evidence_source、apply_manual_correction、证据版本 ≤ 画像版本）。",
+        "新增 test_profile_events.py 与 test_profile_merge.py，含事件类型/动作一致性、来源优先级、显式修正覆盖、旧证据随新版本携带等回归测试。",
+        "ruff check、mypy app（35 个 source）通过；全量后端 147 passed/15 skipped。"
+      ],
+      "started_at": "2026-09-23T15:05:25",
+      "completed_at": "2026-09-23T15:20:23",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.2-T006"
     },
