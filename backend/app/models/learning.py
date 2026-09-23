@@ -50,6 +50,37 @@ class StudentProfile(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
 
 
+class ProfileEvent(Base):
+    """An append-only, owner-scoped whitelisted behavior summary.
+
+    Never stores scores, mastery state, or profile fields; those belong to mastery
+    evidence and quiz submission. Duplicate events are deduplicated by owner + key.
+    """
+
+    __tablename__ = "profile_events"
+    __table_args__ = (
+        UniqueConstraint("user_id", "idempotency_key", name="uq_profile_events_user_key"),
+        CheckConstraint(
+            "event_type IN ('hint_used', 'reexplanation_requested', 'resource_selected', "
+            "'explicit_feedback')",
+            name="ck_profile_events_event_type",
+        ),
+    )
+
+    id: Mapped[UUID] = mapped_column(PostgreSQLUUID(as_uuid=True), primary_key=True, default=uuid4)
+    user_id: Mapped[UUID] = mapped_column(
+        PostgreSQLUUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
+    idempotency_key: Mapped[str] = mapped_column(String(128), nullable=False)
+    request_digest: Mapped[str] = mapped_column(String(64), nullable=False)
+    event_type: Mapped[str] = mapped_column(String(30), nullable=False)
+    knowledge_node_id: Mapped[str] = mapped_column(String(64), nullable=False)
+    learning_unit_id: Mapped[str | None] = mapped_column(String(64))
+    scene_id: Mapped[str | None] = mapped_column(String(64))
+    action: Mapped[str | None] = mapped_column(String(30))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
+
+
 class LearningUnit(Base):
     """An internal learning plan owned by one authenticated user."""
 
