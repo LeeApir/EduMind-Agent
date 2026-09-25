@@ -375,7 +375,7 @@
       "phase": "MVP 0.2",
       "parent_work_package": "MVP-0.2-003",
       "title": "实现画像读取、历史与手动修正 API",
-      "status": "in_progress",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.2-T002",
@@ -619,7 +619,10 @@
       "depends_on": [
         "MVP-0.2-T007",
         "MVP-0.2-T012",
-        "MVP-0.2-T014"
+        "MVP-0.2-T014",
+        "MVP-0.2-T026",
+        "MVP-0.2-T027",
+        "MVP-0.2-T029"
       ],
       "scope": [
         "backend/app/agents/",
@@ -894,7 +897,11 @@
         "MVP-0.2-T019",
         "MVP-0.2-T020",
         "MVP-0.2-T021",
-        "MVP-0.2-T023"
+        "MVP-0.2-T023",
+        "MVP-0.2-T026",
+        "MVP-0.2-T027",
+        "MVP-0.2-T028",
+        "MVP-0.2-T029"
       ],
       "scope": [
         "backend/tests/",
@@ -944,6 +951,90 @@
       "completed_at": null,
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.2-T025"
+    },
+    {
+      "id": "MVP-0.2-T026",
+      "phase": "MVP 0.2",
+      "parent_work_package": "MVP-0.2-003",
+      "title": "保留跨学习会话的显式画像修正",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": ["MVP-0.2-T008"],
+      "scope": ["backend/app/services/", "backend/tests/", "docs/acceptance/"],
+      "acceptance_criteria": [
+        "新学习请求创建画像版本时保留既有手动修正及其证据，未知字段不臆测。",
+        "无新证据或 Provider 失败时不得清空已有修正；旧版本仍可读取。",
+        "覆盖再次学习、字段冲突与版本递增的回归测试。"
+      ],
+      "verification": ["运行跨会话画像合并回归与相关后端检查。"],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.2-T026"
+    },
+    {
+      "id": "MVP-0.2-T027",
+      "phase": "MVP 0.2",
+      "parent_work_package": "MVP-0.2-003",
+      "title": "并发重复画像事件返回同一回执",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": ["MVP-0.2-T007", "MVP-0.2-T008"],
+      "scope": ["backend/app/services/", "backend/tests/", "docs/acceptance/"],
+      "acceptance_criteria": [
+        "同一 owner、幂等键和载荷并发提交只创建一条事件，并返回同一事件 ID。",
+        "相同键但不同载荷稳定返回幂等冲突，不泄露数据库异常。",
+        "隔离 PostgreSQL 并发回归测试覆盖查询后插入竞争。"
+      ],
+      "verification": ["运行并发幂等回归与相关后端检查。"],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.2-T027"
+    },
+    {
+      "id": "MVP-0.2-T028",
+      "phase": "MVP 0.2",
+      "parent_work_package": "MVP-0.2-006",
+      "title": "首次学习完成后刷新画像卡片",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": ["MVP-0.2-T009"],
+      "scope": ["web/src/", "web/tests/", "docs/acceptance/"],
+      "acceptance_criteria": [
+        "学习请求创建画像后，当前页面中的画像卡片自动读取并显示新版本。",
+        "刷新不阻塞首段内容，也不覆盖正在编辑的修正草稿。",
+        "组件或入口回归覆盖空态转为最新画像及失败重试。"
+      ],
+      "verification": ["运行画像卡片与入口测试、类型检查和构建。"],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.2-T028"
+    },
+    {
+      "id": "MVP-0.2-T029",
+      "phase": "MVP 0.2",
+      "parent_work_package": "MVP-0.2-003",
+      "title": "持久化画像事件与快照的版本来源",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": ["MVP-0.2-T006", "MVP-0.2-T007"],
+      "scope": ["backend/app/models/", "backend/alembic/", "backend/app/services/", "backend/tests/", "docs/acceptance/"],
+      "acceptance_criteria": [
+        "画像事件持久化 schema 版本；画像快照记录合并规则版本及前一版本引用。",
+        "迁移为现有记录提供可解释的版本回填，不改写已有画像内容。",
+        "临时 PostgreSQL 验证迁移与重启后可读取版本来源。"
+      ],
+      "verification": ["运行迁移、版本来源与相关后端检查。"],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.2-T029"
     }
   ]
 }
