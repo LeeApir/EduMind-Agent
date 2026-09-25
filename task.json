@@ -1010,7 +1010,7 @@
       "phase": "MVP 0.2",
       "parent_work_package": "MVP-0.2-006",
       "title": "首次学习完成后刷新画像卡片",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": ["MVP-0.2-T009"],
       "scope": ["web/src/", "web/tests/", "docs/acceptance/"],
@@ -1020,9 +1020,15 @@
         "组件或入口回归覆盖空态转为最新画像及失败重试。"
       ],
       "verification": ["运行画像卡片与入口测试、类型检查和构建。"],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {"command": "pnpm test --run tests/ProfileCard.spec.ts tests/App.spec.ts", "result": "passed: 14 tests; refresh token, empty-to-ready transition and deferred edit refresh covered"},
+        {"command": "pnpm test --run", "result": "passed: 33 tests across 6 files"},
+        {"command": "pnpm typecheck && pnpm build", "result": "passed: Vue typecheck and Vite production build"},
+        {"command": "pnpm lint", "result": "passed: 0 errors, 97 existing formatting warnings"},
+        {"command": "git diff --check", "result": "passed"}
+      ],
+      "started_at": "2026-09-25T19:36:52",
+      "completed_at": "2026-09-25T19:39:28",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.2-T028"
     },

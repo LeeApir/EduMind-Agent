@@ -199,3 +199,7 @@ VERIFIED 表示验证通过并准备提交，完成以 Git 中的 Task-Completed
 领取“并发重复画像事件返回同一回执” | T007/T008 完成提交与 T026 完成提交均已确认；临时隔离 PostgreSQL 已升级到现有 head | 现有事件服务在唯一约束竞争后未回查，可能向 API 泄露 500 | 以两个数据库会话制造查询后插入竞争并修复事务回退后的幂等回执
 [2026-09-25T19:34:49] [MVP-0.2-T027] VERIFIED | executor=Lee
 画像事件并发唯一键竞争后回滚并重读已提交事件；同摘要返回原 ID、不同摘要给稳定幂等冲突 | 两个独立 PostgreSQL 会话在查询后同步竞争：修复前 2 failed，修复后定向 7 passed、全量 181 passed；Ruff、Mypy（37 个 source）、git diff --check 通过 | R3–R4 尚未处理；7 条依赖弃用警告不影响结果 | 创建 T027 完成提交；继续 T028 前端画像刷新
+[2026-09-25T19:36:52] [MVP-0.2-T028] START | executor=Lee | branch=codex/mvp-0.2-profile-audit
+领取“首次学习完成后刷新画像卡片” | T009 完成提交与 T027 完成提交已确认；组件只在挂载时读取，学习流没有通知组件 | 首屏 404 后画像虽已持久化，页面仍停留空态 | 添加学习流刷新信号、编辑时延后刷新和空态转已知的前端回归
+[2026-09-25T19:39:28] [MVP-0.2-T028] VERIFIED | executor=Lee
+学习流确认画像已提交时递增刷新序号；画像卡片自动重读，编辑中延后且旧响应不能覆盖新版本 | 修复前定向 3 failed；修复后定向 14 passed、前端全量 33 passed、typecheck/build 通过、lint 0 error/97 既有 warning、git diff --check 通过 | R4 版本来源持久化尚未处理 | 创建 T028 完成提交；继续 T029 迁移与版本来源回归

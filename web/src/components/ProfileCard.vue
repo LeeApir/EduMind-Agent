@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { NButton, NInput, NTag } from "naive-ui";
 
 import {
@@ -26,10 +26,12 @@ const props = withDefaults(defineProps<{
   fetchProfile?: () => Promise<Profile>;
   correctProfile?: (options: CorrectProfileOptions) => Promise<Profile>;
   ensureSession?: () => Promise<string>;
+  refreshToken?: number;
 }>(), {
   fetchProfile: () => requestProfile(),
   correctProfile: (options: CorrectProfileOptions) => requestCorrection(options),
   ensureSession: () => ensureProfileSession(),
+  refreshToken: 0,
 });
 
 const profile = ref<Profile | null>(null);
@@ -40,6 +42,8 @@ const saveError = ref("");
 const editingField = ref<EditableProfileField | null>(null);
 const draft = ref("");
 const saveIdempotencyKey = ref("");
+const pendingRefresh = ref(false);
+let latestLoad = 0;
 
 const fields = PROFILE_FIELDS;
 
@@ -51,15 +55,26 @@ const STATUS_TAG_TYPES: Record<ProfileFieldStatus, "default" | "success" | "info
 };
 
 onMounted(loadProfile);
+watch(() => props.refreshToken, () => {
+  if (editingField.value) {
+    pendingRefresh.value = true;
+  } else {
+    void loadProfile();
+  }
+});
 
 async function loadProfile(): Promise<void> {
+  const requestId = ++latestLoad;
   loadState.value = "loading";
   loadError.value = "";
   try {
     await props.ensureSession();
-    profile.value = await props.fetchProfile();
+    const loaded = await props.fetchProfile();
+    if (requestId !== latestLoad) return;
+    profile.value = loaded;
     loadState.value = "ready";
   } catch (error: unknown) {
+    if (requestId !== latestLoad) return;
     if (error instanceof ProfileRequestError && error.code === "NOT_FOUND") {
       profile.value = null;
       loadState.value = "empty";
@@ -124,6 +139,10 @@ function cancelEdit(): void {
   saveIdempotencyKey.value = "";
   saveState.value = "idle";
   saveError.value = "";
+  if (pendingRefresh.value) {
+    pendingRefresh.value = false;
+    void loadProfile();
+  }
 }
 
 async function saveEdit(): Promise<void> {
@@ -163,6 +182,7 @@ async function saveEdit(): Promise<void> {
 }
 
 async function reloadAfterConflict(): Promise<void> {
+  pendingRefresh.value = false;
   cancelEdit();
   await loadProfile();
 }

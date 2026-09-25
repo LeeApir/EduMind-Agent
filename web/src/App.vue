@@ -37,6 +37,7 @@ const learningUnitId = ref("");
 const operationId = ref("");
 const idempotencyKey = ref("");
 const csrfToken = ref("");
+const profileRefreshToken = ref(0);
 const canSubmit = computed(() => Boolean(goal.value.trim()) && requestState.value !== "loading");
 const publishedResources = computed<PublishedResource[]>(() =>
   resources.value.map(({ id, type, version }) => ({ id, type, version })),
@@ -68,6 +69,7 @@ async function submitLearningRequest(): Promise<void> {
   try {
     if (props.startLearningRequest) {
       await props.startLearningRequest(submittedGoal.value);
+      profileRefreshToken.value += 1;
       requestState.value = "idle";
       return;
     }
@@ -100,7 +102,9 @@ async function submitLearningRequest(): Promise<void> {
 function applyLearningEvent(event: LearningEvent): string {
   const eventOperationId = stringValue(event.data.operation_id);
   if (eventOperationId) operationId.value = eventOperationId;
-  if (event.type === "token" && event.data.temporary === true) {
+  if (event.type === "agent_start" && event.data.stage === "preparing") {
+    profileRefreshToken.value += 1;
+  } else if (event.type === "token" && event.data.temporary === true) {
     temporaryText.value += stringValue(event.data.delta);
   } else if (event.type === "stage_changed" && event.data.stage === "reviewing") {
     reviewState.value = "reviewing";
@@ -283,6 +287,6 @@ function stringValue(value: unknown): string {
       v-if="resources.length"
       :resources="resources"
     />
-    <ProfileCard />
+    <ProfileCard :refresh-token="profileRefreshToken" />
   </main>
 </template>

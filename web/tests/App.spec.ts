@@ -1,4 +1,4 @@
-import { mount } from "@vue/test-utils";
+import { flushPromises, mount } from "@vue/test-utils";
 import { describe, expect, it, vi } from "vitest";
 
 import App from "../src/App.vue";
@@ -15,7 +15,10 @@ const stubs = {
     template: "<textarea @input=\"$emit('update:value', $event.target.value)\" />",
   },
   NTag: { template: "<span><slot /></span>" },
-  ProfileCard: { template: "<section data-testid=\"profile-card\">学习画像</section>" },
+  ProfileCard: {
+    props: ["refreshToken"],
+    template: "<section data-testid=\"profile-card\">学习画像 {{ refreshToken }}</section>",
+  },
 };
 
 describe("learning entry", () => {
@@ -37,6 +40,20 @@ describe("learning entry", () => {
     });
 
     expect(wrapper.get('[data-testid="profile-card"]').text()).toContain("学习画像");
+  });
+
+  it("notifies the profile card after a learning request succeeds", async () => {
+    const wrapper = mount(App, {
+      props: { startLearningRequest: vi.fn().mockResolvedValue(undefined) },
+      global: { stubs },
+    });
+    expect(wrapper.get('[data-testid="profile-card"]').text()).toContain("0");
+
+    await wrapper.get("textarea").setValue("想理解链表");
+    await wrapper.get("form").trigger("submit");
+    await flushPromises();
+
+    expect(wrapper.get('[data-testid="profile-card"]').text()).toContain("1");
   });
 
   it("enters a clear pending state from one sentence", async () => {

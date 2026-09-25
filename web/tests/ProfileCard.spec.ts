@@ -108,6 +108,44 @@ describe("ProfileCard", () => {
     expect(wrapper.get('[data-testid="profile-empty"]').text()).toContain("还没有生成画像");
   });
 
+  it("loads the profile when a learning request creates the first snapshot", async () => {
+    const fetchProfile = vi.fn()
+      .mockRejectedValueOnce(
+        new ProfileRequestError({ message: "还没有生成学习画像。", code: "NOT_FOUND", retryable: false }),
+      )
+      .mockResolvedValueOnce(sampleProfile);
+    const { wrapper } = mountCard({ fetchProfile });
+    await flushPromises();
+    expect(wrapper.find('[data-testid="profile-empty"]').exists()).toBe(true);
+
+    await wrapper.setProps({ refreshToken: 1 });
+    await flushPromises();
+
+    expect(fetchProfile).toHaveBeenCalledTimes(2);
+    expect(wrapper.text()).toContain("版本 v3");
+  });
+
+  it("defers a learning refresh until the current edit is canceled", async () => {
+    const fetchProfile = vi.fn().mockResolvedValue(sampleProfile);
+    const { wrapper } = mountCard({ fetchProfile });
+    await flushPromises();
+    await wrapper.get('[data-testid="profile-field-learning_goals"] button').trigger("click");
+    await wrapper.get('[data-testid="profile-editor-learning_goals"] textarea').setValue('{"goal":"我的草稿"}');
+
+    await wrapper.setProps({ refreshToken: 1 });
+    await flushPromises();
+    expect(fetchProfile).toHaveBeenCalledTimes(1);
+    expect((wrapper.get('[data-testid="profile-editor-learning_goals"] textarea').element as HTMLTextAreaElement).value)
+      .toBe('{"goal":"我的草稿"}');
+
+    const cancelButton = wrapper
+      .findAll('[data-testid="profile-editor-learning_goals"] button')
+      .find((button) => button.text() === "取消");
+    await cancelButton!.trigger("click");
+    await flushPromises();
+    expect(fetchProfile).toHaveBeenCalledTimes(2);
+  });
+
   it("shows a load error and retries", async () => {
     const fetchProfile = vi.fn()
       .mockRejectedValueOnce(new ProfileRequestError({ message: "网络中断", code: "CONNECTION_FAILED" }))
