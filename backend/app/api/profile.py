@@ -1,5 +1,6 @@
 """Authenticated, owner-scoped profile reads, history, corrections, and events."""
 
+from collections.abc import Callable
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, Header, Query, Response
@@ -7,12 +8,18 @@ from pydantic import BaseModel, ConfigDict
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+from app.agents.profile_agent import StructuredProfileGateway
 from app.agents.profile_events import ProfileEventSchemaError
 from app.core.auth import AuthenticatedSession, AuthFailure, require_authenticated_session
 from app.core.database import database_session_factory
 from app.models.learning import StudentProfile
 from app.services.learning_operations import IdempotencyConflict
 from app.services.owned_learning import latest_profile
+from app.services.profile_behavior_updates import (
+    profile_behavior_gateway_factory,
+    resource_event_summary,
+    update_profile_from_summary,
+)
 from app.services.profile_updates import (
     ProfileVersionConflict,
     correct_profile,
@@ -127,9 +134,7 @@ async def correct_my_profile(
                 observed_at=datetime.now(timezone.utc).isoformat(),
             )
         except IdempotencyConflict:
-            raise AuthFailure(
-                409, "IDEMPOTENCY_CONFLICT", "Idempotency key conflicts."
-            ) from None
+            raise AuthFailure(409, "IDEMPOTENCY_CONFLICT", "Idempotency key conflicts.") from None
         except ProfileVersionConflict:
             raise AuthFailure(
                 409, "PROFILE_VERSION_CONFLICT", "Profile version no longer matches."
@@ -143,6 +148,9 @@ async def record_profile_event_endpoint(
     response: Response,
     current: AuthenticatedSession = Depends(require_authenticated_session),
     session_factory: async_sessionmaker[AsyncSession] = Depends(database_session_factory),
+    gateway_factory: Callable[[], StructuredProfileGateway] = Depends(
+        profile_behavior_gateway_factory
+    ),
     idempotency_key: str = Header(min_length=16, max_length=128, alias="Idempotency-Key"),
 ) -> dict[str, object]:
     response.headers["Cache-Control"] = "no-store"
@@ -159,11 +167,17 @@ async def record_profile_event_endpoint(
                 422, "VALIDATION_ERROR", "Profile event did not satisfy the schema."
             ) from None
         except IdempotencyConflict:
-            raise AuthFailure(
-                409, "IDEMPOTENCY_CONFLICT", "Idempotency key conflicts."
-            ) from None
+            raise AuthFailure(409, "IDEMPOTENCY_CONFLICT", "Idempotency key conflicts.") from None
+    profile_status = await update_profile_from_summary(
+        session_factory,
+        owner_id=current.user.id,
+        evidence_id=record.id,
+        observed_at=record.created_at,
+        summary=resource_event_summary(record),
+        gateway_factory=gateway_factory,
+    )
     return {
         "evidence_id": str(record.id),
         "event_type": record.event_type,
-        "profile_update_status": "queued",
+        "profile_update_status": profile_status,
     }

@@ -231,7 +231,7 @@ def test_record_event_returns_receipt_and_deduplicates(database_url: str) -> Non
     )
     assert first.status_code == 202
     assert first.json()["event_type"] == "hint_used"
-    assert first.json()["profile_update_status"] == "queued"
+    assert first.json()["profile_update_status"] == "no_change"
     replayed = client.post(
         "/api/profile/events", json=body, headers={**write_headers(csrf), "Idempotency-Key": key}
     )

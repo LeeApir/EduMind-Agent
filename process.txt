@@ -227,3 +227,7 @@ VERIFIED 表示验证通过并准备提交，完成以 Git 中的 Task-Completed
 领取“记录提示、重新解释与显式反馈证据” | T011/T013 完成提交已确认；现有 profile/events 为缺少必需场景关联的轻量画像事件 | 客户端自报 hint_used 不能证明系统已提供提示，不能直接计入掌握度 | 新增 owner/场景/节点验证的学习行为命令，提示由服务端交付后写证据，同事务更新掌握度
 [2026-09-25T20:47:30] [MVP-0.2-T014] VERIFIED | executor=Lee
 新增 POST /api/learning-events，验证 owner、ready 单元、审核场景和图谱节点；提示响应由服务端知识结构确定性生成，动作证据与 mastery revision 同事务提交；保留旧 profile/events 为轻量画像事件 | 定向 9 passed、隔离库全量后端 220 passed、Ruff/Mypy（45 个 source）、OpenAPI JSON 和 git diff --check 通过 | 7 条依赖弃用警告；前端行为入口与画像增量更新留给 T015/T020 | 创建 T014 完成提交；继续 T015 渐进画像更新
+[2026-09-25T20:48:22] [MVP-0.2-T015] START | executor=Lee | branch=codex/mvp-0.2
+领取“用学习行为渐进更新画像” | T007/T012/T014/T026/T027/T029 完成提交已确认，证据与不可变画像版本已落库 | Provider 调用不能占据证据事务，也不能接收原始测验作答或伪造证据来源 | 从已提交证据抽取白名单摘要，Provider 仅提议受限字段增量，服务端合并/校验并在失败时保留证据
+[2026-09-25T20:58:14] [MVP-0.2-T015] VERIFIED | executor=Lee
+测验、学习行为和资源选择在证据提交后用最小白名单摘要尝试画像增量更新；服务端赋予来源并合并不可变版本，失败不回滚证据 | 隔离库全量后端 226 passed；Ruff、改动文件格式、Mypy、OpenAPI JSON 和 git diff --check 通过 | 全局 Ruff 格式检查提示 20 个历史文件未格式化，本任务文件均已通过；真实 Provider 验证未运行 | 创建 T015 完成提交；继续 T016 路径规则

@@ -1,14 +1,21 @@
 """Authenticated, idempotent submission of published exercise answers."""
 
+from collections.abc import Callable
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Header, Response
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+from app.agents.profile_agent import StructuredProfileGateway
 from app.core.auth import AuthenticatedSession, AuthFailure, require_authenticated_session
 from app.core.database import database_session_factory
 from app.services.learning_operations import IdempotencyConflict
+from app.services.profile_behavior_updates import (
+    learning_evidence_summary,
+    profile_behavior_gateway_factory,
+    update_profile_from_summary,
+)
 from app.services.quiz_scoring import QuizScoringError
 from app.services.quiz_submissions import QuizResourceNotFound, quiz_receipt, submit_quiz_attempt
 
@@ -36,6 +43,9 @@ async def submit_quiz(
     response: Response,
     current: AuthenticatedSession = Depends(require_authenticated_session),
     session_factory: async_sessionmaker[AsyncSession] = Depends(database_session_factory),
+    gateway_factory: Callable[[], StructuredProfileGateway] = Depends(
+        profile_behavior_gateway_factory
+    ),
     idempotency_key: str = Header(min_length=16, max_length=128, alias="Idempotency-Key"),
 ) -> dict[str, object]:
     response.headers["Cache-Control"] = "no-store"
@@ -57,4 +67,12 @@ async def submit_quiz(
             ) from None
         except IdempotencyConflict:
             raise AuthFailure(409, "IDEMPOTENCY_CONFLICT", "Idempotency key conflicts.") from None
-    return quiz_receipt(record)
+    profile_status = await update_profile_from_summary(
+        session_factory,
+        owner_id=current.user.id,
+        evidence_id=record.id,
+        observed_at=record.created_at,
+        summary=learning_evidence_summary(record),
+        gateway_factory=gateway_factory,
+    )
+    return {**quiz_receipt(record), "profile_update_status": profile_status}

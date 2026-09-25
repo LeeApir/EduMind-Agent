@@ -119,3 +119,50 @@ def test_provider_cannot_forge_manual_correction_evidence() -> None:
         assert extraction.profile["profile_version"] == 2
 
     asyncio.run(exercise())
+
+
+def test_behavior_update_sends_only_minimal_summary_and_allowlists_delta() -> None:
+    async def exercise() -> None:
+        gateway = StubGateway(
+            StructuredResult(
+                value={"updates": {"error_preferences": [{"topic": "链表"}]}}, model_id="test"
+            )
+        )
+        summary = {"event_type": "quiz_attempt", "knowledge_node_id": "linked-list", "score": 0.5}
+        proposal = await ProfileAgent(gateway).update_from_behavior(
+            summary, allowed_fields=("error_preferences",)
+        )
+        assert proposal.degraded is False
+        assert proposal.updates == {"error_preferences": [{"topic": "链表"}]}
+        request, retry_safe = gateway.requests[0]
+        assert retry_safe is True
+        assert request.prompt.messages[-1].content == (
+            '{"event_type": "quiz_attempt", "knowledge_node_id": "linked-list", "score": 0.5}'
+        )
+        assert "answers" not in request.prompt.messages[-1].content
+        assert "initial_query" not in request.prompt.messages[-1].content
+        assert set(request.json_schema["properties"]["updates"]["properties"]) == {
+            "error_preferences"
+        }
+
+    asyncio.run(exercise())
+
+
+@pytest.mark.parametrize(
+    "value",
+    [
+        {"updates": {"learning_goals": {"current_topic": "链表"}}},
+        {"updates": {"error_preferences": None}},
+        {"updates": {}, "source": "manual_correction"},
+    ],
+)
+def test_behavior_update_rejects_forged_or_invalid_output(value: dict[str, object]) -> None:
+    async def exercise() -> None:
+        gateway = StubGateway(StructuredResult(value=value, model_id="test"))
+        proposal = await ProfileAgent(gateway).update_from_behavior(
+            {"event_type": "quiz_attempt"}, allowed_fields=("error_preferences",)
+        )
+        assert proposal.degraded is True
+        assert proposal.updates == {}
+
+    asyncio.run(exercise())
