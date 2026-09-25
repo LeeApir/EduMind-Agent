@@ -7,7 +7,7 @@ from uuid import UUID
 import pytest
 from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.ext.asyncio import async_sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.agents.profile_events import ProfileEventSchemaError
 from app.agents.profile_schema import merge_explicit_profile_values
@@ -95,6 +95,72 @@ def test_events_are_idempotent_and_owner_scoped() -> None:
                 )
                 assert created_other is True
                 assert third.id != first.id
+        finally:
+            await engine.dispose()
+
+    asyncio.run(exercise())
+
+
+@pytest.mark.parametrize("second_action", ["hint_level_1", "hint_level_2"])
+def test_concurrent_event_key_resolves_to_receipt_or_conflict(second_action: str) -> None:
+    assert TEST_DATABASE_URL is not None
+
+    async def exercise() -> None:
+        engine = create_database_engine(TEST_DATABASE_URL)
+        try:
+            sessions = async_sessionmaker(engine, expire_on_commit=False)
+            async with sessions() as db:
+                owner = User(is_guest=True)
+                db.add(owner)
+                await db.commit()
+                owner_id = owner.id
+
+            barrier = asyncio.Barrier(2)
+
+            class LookupBarrierSession(AsyncSession):
+                waited = False
+
+                async def scalar(self, statement: object, *args: object, **kwargs: object):
+                    result = await super().scalar(statement, *args, **kwargs)
+                    if not self.waited:
+                        self.waited = True
+                        await barrier.wait()
+                    return result
+
+            racing = async_sessionmaker(
+                engine, class_=LookupBarrierSession, expire_on_commit=False
+            )
+
+            async def submit(action: str):
+                async with racing() as db:
+                    return await record_profile_event(
+                        db,
+                        owner_id=owner_id,
+                        idempotency_key="race-event-key-0001",
+                        event=event(action=action),
+                    )
+
+            results = await asyncio.wait_for(
+                asyncio.gather(
+                    submit("hint_level_1"), submit(second_action), return_exceptions=True
+                ),
+                timeout=10,
+            )
+            if second_action == "hint_level_1":
+                assert all(isinstance(result, tuple) for result in results)
+                assert results[0][0].id == results[1][0].id
+                assert sorted(result[1] for result in results) == [False, True]
+            else:
+                assert sum(isinstance(result, IdempotencyConflict) for result in results) == 1
+                assert sum(isinstance(result, tuple) for result in results) == 1
+
+            async with sessions() as db:
+                count = await db.scalar(
+                    select(func.count())
+                    .select_from(ProfileEvent)
+                    .where(ProfileEvent.user_id == owner_id)
+                )
+                assert count == 1
         finally:
             await engine.dispose()
 

@@ -195,3 +195,7 @@ VERIFIED 表示验证通过并准备提交，完成以 Git 中的 Task-Completed
 领取“保留跨学习会话的显式画像修正”，补充模型输出不能伪造手动修正来源的边界 | 已确认 T008 完成提交与任务状态更正、T026 依赖满足；现有再学习流程每次从空画像提取 | 数据库隔离环境尚待确认 | 增加回归并实现确定性画像合并，验证旧版本与 Provider 失败路径
 [2026-09-25T19:31:15] [MVP-0.2-T026] VERIFIED | executor=Lee
 新增跨版本确定性合并并保留手动修正与历史证据；拒绝模型伪造手动修正来源，修正 Provider 降级时的画像版本号 | 临时内存 PostgreSQL Alembic upgrade head；定向 21 passed、全量 179 passed；Ruff、Mypy（37 个 source）、git diff --check 通过，证据见 docs/acceptance/mvp-0.2-profile-code-review.md | 其余 R2–R4 尚未处理，7 条依赖弃用警告不影响结果 | 创建 T026 完成提交；继续 T027 并发幂等回归
+[2026-09-25T19:32:59] [MVP-0.2-T027] START | executor=Lee | branch=codex/mvp-0.2-profile-audit
+领取“并发重复画像事件返回同一回执” | T007/T008 完成提交与 T026 完成提交均已确认；临时隔离 PostgreSQL 已升级到现有 head | 现有事件服务在唯一约束竞争后未回查，可能向 API 泄露 500 | 以两个数据库会话制造查询后插入竞争并修复事务回退后的幂等回执
+[2026-09-25T19:34:49] [MVP-0.2-T027] VERIFIED | executor=Lee
+画像事件并发唯一键竞争后回滚并重读已提交事件；同摘要返回原 ID、不同摘要给稳定幂等冲突 | 两个独立 PostgreSQL 会话在查询后同步竞争：修复前 2 failed，修复后定向 7 passed、全量 181 passed；Ruff、Mypy（37 个 source）、git diff --check 通过 | R3–R4 尚未处理；7 条依赖弃用警告不影响结果 | 创建 T027 完成提交；继续 T028 前端画像刷新

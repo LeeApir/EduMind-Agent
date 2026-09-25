@@ -984,7 +984,7 @@
       "phase": "MVP 0.2",
       "parent_work_package": "MVP-0.2-003",
       "title": "并发重复画像事件返回同一回执",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": ["MVP-0.2-T007", "MVP-0.2-T008"],
       "scope": ["backend/app/services/", "backend/tests/", "docs/acceptance/"],
@@ -994,9 +994,14 @@
         "隔离 PostgreSQL 并发回归测试覆盖查询后插入竞争。"
       ],
       "verification": ["运行并发幂等回归与相关后端检查。"],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {"command": "EDUMIND_TEST_DATABASE_URL=<isolated PostgreSQL> uv run --frozen pytest tests/test_profile_persistence.py -q", "result": "passed: 7 tests; two real sessions race after lookup, identical payload replays one ID and different payload conflicts"},
+        {"command": "EDUMIND_TEST_DATABASE_URL=<isolated PostgreSQL> uv run --frozen pytest -q", "result": "passed: 181 tests; 7 dependency deprecation warnings"},
+        {"command": "uv run --frozen ruff check . && uv run --frozen mypy app", "result": "passed: Ruff clean; Mypy 37 source files"},
+        {"command": "git diff --check", "result": "passed"}
+      ],
+      "started_at": "2026-09-25T19:32:59",
+      "completed_at": "2026-09-25T19:34:49",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.2-T027"
     },

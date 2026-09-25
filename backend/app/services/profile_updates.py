@@ -73,7 +73,21 @@ async def record_profile_event(
         action=cast(str | None, validated["action"]),
     )
     db.add(record)
-    await db.commit()
+    try:
+        await db.commit()
+    except IntegrityError:
+        await db.rollback()
+        raced = await db.scalar(
+            select(ProfileEvent).where(
+                ProfileEvent.user_id == owner_id,
+                ProfileEvent.idempotency_key == idempotency_key,
+            )
+        )
+        if raced is None:
+            raise
+        if raced.request_digest != digest:
+            raise IdempotencyConflict("Idempotency key was reused for another event.") from None
+        return raced, False
     return record, True
 
 
