@@ -215,3 +215,7 @@ VERIFIED 表示验证通过并准备提交，完成以 Git 中的 Task-Completed
 领取“建立学习证据、掌握度与路径版本数据模型” | T001/T004/T010 完成提交已确认；ADR-0003 固定证据、投影、版本与事务边界 | 数据模型尚未落库，T012–T018 无法持久化闭环 | 建立 owner-scoped 表与约束，验证迁移、跨 owner 隔离和非法分数/状态/版本拒绝
 [2026-09-25T20:27:12] [MVP-0.2-T011] VERIFIED | executor=Lee
 新增 learning_evidence、node_mastery_revisions/current、learning_path_versions/current 五表及 0008 迁移；owner 复合外键约束补偿、证据、版本与当前指针，当前路径保留待重规划标记 | 隔离 PostgreSQL 0008 迁移/降级/重升通过；定向 3 passed、全量 194 passed、Ruff/Mypy 与 git diff --check 通过 | 7 条依赖弃用警告；事务命令服务留给 T012–T018 | 创建 T011 完成提交；继续 T012 测验提交与不可变证据
+[2026-09-25T20:28:17] [MVP-0.2-T012] START | executor=Lee | branch=codex/mvp-0.2
+领取“提交并持久化测验作答” | T010/T011 完成提交已确认；评分器、证据表和 API 契约存在 | 当前学习单元尚待 T019 映射节点；T012 先对有可信节点绑定的正式资源提交 | 实现 owner/审核/CSRF/幂等保护下的测验提交与只追加证据，使用隔离数据库完成 API 回归
+[2026-09-25T20:32:57] [MVP-0.2-T012] VERIFIED | executor=Lee
+新增 POST /api/quiz-submissions：只读 owner 可见已发布资源，服务端判分并保存作答快照、逐题结果和错误模式；同键重放原证据，并发竞争安全回查 | 定向 5 passed、隔离库全量 199 passed、Ruff/Mypy（41 个 source）、OpenAPI JSON 和 git diff --check 通过 | 7 条依赖弃用警告；掌握度事务与响应更新留给 T013，真实学习单元节点绑定留给 T019 | 创建 T012 完成提交；继续 T013 版本化掌握度规则
