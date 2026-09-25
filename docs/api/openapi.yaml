@@ -269,6 +269,25 @@
         }
       }
     },
+    "/api/learning-events": {
+      "post": {
+        "tags": ["Assessment"],
+        "summary": "记录已验证学习场景内的提示、重新解释或显式反馈",
+        "description": "需要当前 owner 的 ready 学习单元、审核通过的场景及一致的图谱节点。hint_used 在同一响应交付服务端确定性提示；行为证据和掌握度变化在同一事务提交。轻量画像事件端点不等同于此可信学习证据。",
+        "operationId": "recordLearningAction",
+        "security": [{"sessionCookie": []}],
+        "parameters": [{"$ref": "#/components/parameters/CsrfToken"}, {"$ref": "#/components/parameters/IdempotencyKey"}],
+        "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/LearningActionRequest"}}}},
+        "responses": {
+          "200": {"description": "已提交的行为证据、可选提示与掌握度变化。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/LearningActionReceipt"}}}},
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "403": {"$ref": "#/components/responses/CsrfFailed"},
+          "404": {"$ref": "#/components/responses/NotFound"},
+          "409": {"$ref": "#/components/responses/IdempotencyConflict"},
+          "422": {"$ref": "#/components/responses/ValidationError"}
+        }
+      }
+    },
     "/api/mastery": {
       "get": {
         "tags": ["Assessment"],
@@ -391,6 +410,8 @@
       "QuizQuestionResult": {"type": "object", "additionalProperties": false, "required": ["question_id", "correct", "explanation", "error_patterns"], "properties": {"question_id": {"type": "string"}, "correct": {"type": "boolean"}, "explanation": {"type": "string"}, "error_patterns": {"type": "array", "items": {"type": "string"}}}},
       "MasteryChange": {"type": "object", "additionalProperties": false, "required": ["knowledge_node_id", "previous_score", "score", "status", "revision", "rule_version"], "properties": {"knowledge_node_id": {"$ref": "#/components/schemas/KnowledgeNodeId"}, "previous_score": {"type": "number", "minimum": 0, "maximum": 1}, "score": {"type": "number", "minimum": 0, "maximum": 1}, "status": {"type": "string", "enum": ["unseen", "learning", "weak", "mastered"]}, "revision": {"type": "integer", "minimum": 1}, "rule_version": {"type": "string"}, "evidence_summary": {"type": "array", "items": {"type": "string"}}}},
       "QuizSubmissionResult": {"type": "object", "additionalProperties": false, "required": ["evidence_id", "resource_id", "resource_version", "question_results", "score", "correct_count", "question_count", "quiz_schema_version", "scoring_rule_version", "mastery_changes", "path_replan_required"], "properties": {"evidence_id": {"$ref": "#/components/schemas/Identifier"}, "resource_id": {"$ref": "#/components/schemas/Identifier"}, "resource_version": {"type": "integer", "minimum": 1}, "question_results": {"type": "array", "items": {"$ref": "#/components/schemas/QuizQuestionResult"}}, "score": {"type": "number", "minimum": 0, "maximum": 1}, "correct_count": {"type": "integer", "minimum": 0}, "question_count": {"type": "integer", "minimum": 1}, "quiz_schema_version": {"type": "integer", "minimum": 1}, "scoring_rule_version": {"type": "string"}, "mastery_changes": {"type": "array", "items": {"$ref": "#/components/schemas/MasteryChange"}}, "path_replan_required": {"type": "boolean"}}},
+      "LearningActionRequest": {"type": "object", "additionalProperties": false, "required": ["event_type", "knowledge_node_id", "learning_unit_id", "scene_id", "action"], "properties": {"event_type": {"type": "string", "enum": ["hint_used", "reexplanation_requested", "explicit_feedback"]}, "knowledge_node_id": {"$ref": "#/components/schemas/KnowledgeNodeId"}, "learning_unit_id": {"$ref": "#/components/schemas/Identifier"}, "scene_id": {"$ref": "#/components/schemas/Identifier"}, "action": {"type": "string", "enum": ["hint_level_1", "hint_level_2", "simpler", "deeper", "different_example", "too_easy", "too_hard", "liked_explanation", "skip", "mark_known"]}}},
+      "LearningActionReceipt": {"type": "object", "additionalProperties": false, "required": ["evidence_id", "event_type", "action", "knowledge_node_id", "hint_text", "mastery_changes", "path_replan_required"], "properties": {"evidence_id": {"$ref": "#/components/schemas/Identifier"}, "event_type": {"type": "string"}, "action": {"type": "string"}, "knowledge_node_id": {"$ref": "#/components/schemas/KnowledgeNodeId"}, "hint_text": {"type": ["string", "null"]}, "mastery_changes": {"type": "array", "items": {"$ref": "#/components/schemas/MasteryChange"}}, "path_replan_required": {"type": "boolean"}}},
       "MasteryList": {"type": "object", "additionalProperties": false, "required": ["graph_version", "items"], "properties": {"graph_version": {"type": "string"}, "items": {"type": "array", "items": {"$ref": "#/components/schemas/MasteryChange"}}}},
       "PathPlanRequest": {"type": "object", "additionalProperties": false, "required": ["target_node_id"], "properties": {"target_node_id": {"$ref": "#/components/schemas/KnowledgeNodeId"}}},
       "PathReplanRequest": {"type": "object", "additionalProperties": false, "required": ["target_node_id"], "properties": {"target_node_id": {"$ref": "#/components/schemas/KnowledgeNodeId"}, "reason": {"type": "string", "enum": ["learner_request", "mastery_changed", "profile_changed"]}}},

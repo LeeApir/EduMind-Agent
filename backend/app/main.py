@@ -6,6 +6,7 @@ from fastapi.responses import JSONResponse
 
 from app.api.auth import router as auth_router
 from app.api.knowledge_graph import router as knowledge_graph_router
+from app.api.learning_events import router as learning_events_router
 from app.api.learning_reads import router as learning_reads_router
 from app.api.learning_sessions import router as learning_sessions_router
 from app.api.profile import router as profile_router
@@ -16,6 +17,7 @@ app = FastAPI(title="EduMind Agent API", version="0.1.0")
 app.include_router(auth_router)
 app.include_router(knowledge_graph_router)
 app.include_router(learning_reads_router)
+app.include_router(learning_events_router)
 app.include_router(learning_sessions_router)
 app.include_router(profile_router)
 app.include_router(quiz_router)
