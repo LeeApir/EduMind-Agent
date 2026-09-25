@@ -223,6 +223,54 @@ def strongest_evidence_source(records: Sequence[Mapping[str, object]]) -> str:
     return strongest
 
 
+def merge_profile_snapshots(
+    previous: Mapping[str, ProfileValue], candidate: Mapping[str, ProfileValue]
+) -> dict[str, ProfileValue]:
+    """Carry prior evidence forward and let the strongest source choose each field.
+
+    A newer observation wins only when the strongest sources have equal precedence.
+    In particular, a new initial query cannot undo an explicit correction.
+    """
+    old = validate_transient_profile(dict(previous))
+    new = validate_transient_profile(dict(candidate))
+    old_version = old["profile_version"]
+    new_version = new["profile_version"]
+    if not isinstance(old_version, int) or new_version != old_version + 1:
+        raise ProfileSchemaError
+
+    old_evidence = old["evidence"]
+    new_evidence = new["evidence"]
+    if not isinstance(old_evidence, dict) or not isinstance(new_evidence, dict):
+        raise ProfileSchemaError
+    values: dict[str, object] = {}
+    evidence: dict[str, list[dict[str, object]]] = {}
+    for field in PROFILE_FIELDS:
+        old_value = old[field]
+        new_value = new[field]
+        if old_value is None and new_value is None:
+            continue
+        old_records = old_evidence.get(field, [])
+        new_records = new_evidence.get(field, [])
+        if not isinstance(old_records, list) or not isinstance(new_records, list):
+            raise ProfileSchemaError
+        if old_value is None:
+            values[field] = new_value
+        elif new_value is None:
+            values[field] = old_value
+        else:
+            old_rank = evidence_source_rank(strongest_evidence_source(old_records))
+            new_rank = evidence_source_rank(strongest_evidence_source(new_records))
+            values[field] = old_value if old_rank < new_rank else new_value
+        evidence[field] = deepcopy(old_records) + deepcopy(new_records)
+
+    initial_query = new["initial_query"]
+    if not isinstance(initial_query, str) or not isinstance(new_version, int):
+        raise ProfileSchemaError
+    return merge_explicit_profile_values(
+        initial_query, values, evidence, profile_version=new_version
+    )
+
+
 def apply_manual_correction(
     profile: Mapping[str, ProfileValue],
     corrections: Mapping[str, object],

@@ -17,7 +17,7 @@
 
 | ID | 严重度 | 证据和可复现步骤 | 预期 | 后续任务 | 状态 |
 | --- | --- | --- | --- | --- | --- |
-| R1 | 高 | `create_transient_profile()` 每次学习都仅从新输入提取下一版本，没有合并已有手动修正。用同一 owner 建立画像、PATCH 修正字段、再次 POST `/api/learning-sessions`、GET `/api/profile/me` 比较修正值与证据。 | 修正值及其证据仍在最新版本，历史版本不变。 | T026 | 待回归 |
+| R1 | 高 | `create_transient_profile()` 每次学习都仅从新输入提取下一版本，没有合并已有手动修正。用同一 owner 建立画像、PATCH 修正字段、再次 POST `/api/learning-sessions`、GET `/api/profile/me` 比较修正值与证据。 | 修正值及其证据仍在最新版本，历史版本不变。 | T026 | 已修复并复测 |
 | R2 | 高 | `record_profile_event()` 先查 owner+幂等键，再无竞争处理地提交。两个数据库会话同时以同一键、同一载荷 POST `/api/profile/events`，可能由唯一约束抛出未处理 `IntegrityError`。 | 只创建一条事件，两个请求返回同一 ID；不同载荷返回 409。 | T027 | 待回归 |
 | R3 | 中 | `ProfileCard` 仅挂载时读取；页面初次加载为 404 后完成学习，组件没有来自 `App` 的刷新信号。 | 首次学习创建画像后自动展示最新版本，不影响首段流式内容或编辑草稿。 | T028 | 待回归 |
 | R4 | 中 | 事件与合并规则仅有代码常量；`profile_events` 和 `student_profiles` 不保存事件 schema 版本、合并规则版本或前一画像版本引用。 | 已保存记录能解释使用的 schema/规则版本和快照顺序，旧记录迁移后仍可读。 | T029 | 待回归 |
@@ -29,6 +29,14 @@
 - T008：临时 PostgreSQL 迁移往返；后端 174 passed；Ruff/Mypy 通过。
 - T009：前端 30 tests、类型检查、构建通过；Lint 0 error、97 warnings。
 - 上述数字来自 `task.json` 和 `process.txt` 的交接记录；本轮独立验证结果按各修复任务完成情况追加。
+
+## 独立修复与验证
+
+### T026：跨学习会话保留手动修正
+
+- 回归先因缺少 `merge_profile_snapshots` 在测试收集阶段失败；实现后 21 项定向测试通过。
+- 新学习请求按来源优先级合并旧画像与新提取结果：手动修正优先于初始查询，同优先级的新证据才覆盖旧值；旧证据和历史版本保持不变。Provider 输出若伪造手动修正来源则降级为空提取，原有修正仍保留。
+- 固定镜像 `postgres@sha256:cf78e766…` 的临时内存 PostgreSQL 从空库升级到 Alembic head；该库全量后端 `179 passed`（7 条依赖弃用警告）。`ruff check .` 与 `mypy app` 通过。
 
 ## 结题汇报取材边界
 

@@ -957,19 +957,25 @@
       "phase": "MVP 0.2",
       "parent_work_package": "MVP-0.2-003",
       "title": "保留跨学习会话的显式画像修正",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": ["MVP-0.2-T008"],
-      "scope": ["backend/app/services/", "backend/tests/", "docs/acceptance/"],
+      "scope": ["backend/app/agents/", "backend/app/services/", "backend/tests/", "docs/acceptance/"],
       "acceptance_criteria": [
         "新学习请求创建画像版本时保留既有手动修正及其证据，未知字段不臆测。",
         "无新证据或 Provider 失败时不得清空已有修正；旧版本仍可读取。",
+        "模型提取结果不能伪造 manual_correction 来源覆盖用户修正。",
         "覆盖再次学习、字段冲突与版本递增的回归测试。"
       ],
       "verification": ["运行跨会话画像合并回归与相关后端检查。"],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {"command": "EDUMIND_TEST_DATABASE_URL=<isolated PostgreSQL> uv run --frozen pytest tests/test_transient_profiles.py tests/test_profile_merge.py tests/test_profile_agent.py -q", "result": "passed: 21 tests; manual correction survives another learning request and Provider failure, old versions remain readable"},
+        {"command": "EDUMIND_TEST_DATABASE_URL=<isolated PostgreSQL> uv run --frozen pytest -q", "result": "passed: 179 tests; 7 dependency deprecation warnings"},
+        {"command": "uv run --frozen ruff check . && uv run --frozen mypy app", "result": "passed: Ruff clean; Mypy 37 source files"},
+        {"command": "git diff --check", "result": "passed"}
+      ],
+      "started_at": "2026-09-25T18:48:26",
+      "completed_at": "2026-09-25T19:31:15",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.2-T026"
     },

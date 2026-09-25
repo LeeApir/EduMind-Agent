@@ -9,6 +9,7 @@ from app.agents.profile_schema import (
     apply_manual_correction,
     evidence_source_rank,
     merge_explicit_profile_values,
+    merge_profile_snapshots,
     strongest_evidence_source,
 )
 
@@ -147,3 +148,62 @@ def test_older_evidence_carries_into_newer_snapshot_version() -> None:
         profile_version=2,
     )
     assert profile["profile_version"] == 2
+
+
+def test_new_learning_query_preserves_manual_correction_and_older_evidence() -> None:
+    previous = apply_manual_correction(
+        build_profile(),
+        {"learning_goals": {"current_topic": "数组"}},
+        observed_at=OBSERVED_AT,
+    )
+    candidate = merge_explicit_profile_values(
+        "再学习队列",
+        {"learning_goals": {"current_topic": "队列"}},
+        {"learning_goals": [evidence("initial_query", version=3)]},
+        profile_version=3,
+    )
+
+    merged = merge_profile_snapshots(previous, candidate)
+
+    assert merged["profile_version"] == 3
+    assert merged["initial_query"] == "再学习队列"
+    assert merged["learning_goals"] == {"current_topic": "数组"}
+    assert merged["engineering_preference"] == {"code_first": True}
+    assert merged["knowledge_base"] is None
+    assert [item["source"] for item in merged["evidence"]["learning_goals"]] == [
+        "initial_query",
+        "manual_correction",
+        "initial_query",
+    ]
+    assert previous["profile_version"] == 2
+    assert previous["learning_goals"] == {"current_topic": "数组"}
+
+
+def test_failed_new_extraction_keeps_previous_values_and_evidence() -> None:
+    previous = apply_manual_correction(
+        build_profile(),
+        {"professional_background": {"major": "计算机"}},
+        observed_at=OBSERVED_AT,
+    )
+    empty = merge_explicit_profile_values("重新开始", {}, {}, profile_version=3)
+
+    merged = merge_profile_snapshots(previous, empty)
+
+    assert merged["professional_background"] == {"major": "计算机"}
+    assert merged["learning_goals"] == previous["learning_goals"]
+    assert merged["evidence"]["professional_background"] == previous["evidence"][
+        "professional_background"
+    ]
+
+
+def test_latest_initial_query_wins_when_sources_have_equal_priority() -> None:
+    previous = build_profile()
+    candidate = merge_explicit_profile_values(
+        "现在学栈",
+        {"learning_goals": {"current_topic": "栈"}},
+        {"learning_goals": [evidence("initial_query", version=2)]},
+        profile_version=2,
+    )
+    assert merge_profile_snapshots(previous, candidate)["learning_goals"] == {
+        "current_topic": "栈"
+    }

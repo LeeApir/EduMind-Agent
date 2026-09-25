@@ -191,3 +191,7 @@ VERIFIED 表示验证通过并准备提交，完成以 Git 中的 Task-Completed
 新增 web/src/api/profile.ts（Profile/证据类型、字段四态分类 profileFieldStatus、fetchProfile/correctProfile/fetchProfileHistory/ensureProfileSession 与 ProfileRequestError），web/src/components/ProfileCard.vue（六维字段区分未知/已知/推断/用户修正，白名单字段 JSON 编辑保存，加载/空态/冲突/失败/重试状态清晰，仅展示来源标签不渲染证据原文），并在 App.vue 接入画像卡片 | pnpm test 30 passed（含 profile.spec 9、ProfileCard.spec 7、App.spec 新增卡片断言）；typecheck 通过；lint 0 error/97 非阻塞格式 warning；build 通过；git diff --check 通过 | 画像历史仅提供 API 客户端，未在卡片内做历史版本 UI；事件上报的前端调用留待后续任务 | 提交 T009，T006–T009 画像查看与修正批次完成
 [2026-09-25T18:46:34] [WORKFLOW-PROFILE-REVIEW] VERIFIED | executor=Lee | branch=codex/mvp-0.2-profile-audit
 更正 T008 账本状态：完成提交 80b2d16 与 VERIFIED 日志已存在，但提交内误留 in_progress；新增画像审查记录及 T026–T029 回归任务，历史日志未改写 | 已核对完成标记、完成时间、29 个唯一任务 ID、JSON 语法及 git diff --check；本次代码回归尚待执行 | R1–R4 审查问题仍待独立回归和修复，尚未合入 main | 创建治理提交，随后按用户授权优先领取 T026
+[2026-09-25T18:48:26] [MVP-0.2-T026] START | executor=Lee | branch=codex/mvp-0.2-profile-audit
+领取“保留跨学习会话的显式画像修正”，补充模型输出不能伪造手动修正来源的边界 | 已确认 T008 完成提交与任务状态更正、T026 依赖满足；现有再学习流程每次从空画像提取 | 数据库隔离环境尚待确认 | 增加回归并实现确定性画像合并，验证旧版本与 Provider 失败路径
+[2026-09-25T19:31:15] [MVP-0.2-T026] VERIFIED | executor=Lee
+新增跨版本确定性合并并保留手动修正与历史证据；拒绝模型伪造手动修正来源，修正 Provider 降级时的画像版本号 | 临时内存 PostgreSQL Alembic upgrade head；定向 21 passed、全量 179 passed；Ruff、Mypy（37 个 source）、git diff --check 通过，证据见 docs/acceptance/mvp-0.2-profile-code-review.md | 其余 R2–R4 尚未处理，7 条依赖弃用警告不影响结果 | 创建 T026 完成提交；继续 T027 并发幂等回归

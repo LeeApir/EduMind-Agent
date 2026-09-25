@@ -101,6 +101,18 @@ class ProfileAgent:
                 or profile["profile_version"] != profile_version
             ):
                 raise ProfileSchemaError
+            evidence = profile["evidence"]
+            if not isinstance(evidence, dict) or any(
+                not isinstance(records, list)
+                or any(
+                    not isinstance(record, dict) or record.get("source") != "initial_query"
+                    for record in records
+                )
+                for records in evidence.values()
+            ):
+                raise ProfileSchemaError
         except (ProviderError, ProfileSchemaError):
-            return ProfileExtraction(profile=empty_transient_profile(query), degraded=True)
+            fallback = empty_transient_profile(query)
+            fallback["profile_version"] = profile_version
+            return ProfileExtraction(profile=fallback, degraded=True)
         return ProfileExtraction(profile=profile, degraded=False)

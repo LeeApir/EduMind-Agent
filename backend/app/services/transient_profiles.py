@@ -7,9 +7,10 @@ from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.agents.profile_agent import ProfileAgent
-from app.agents.profile_schema import ProfileValue
+from app.agents.profile_schema import ProfileValue, merge_profile_snapshots
 from app.models.learning import StudentProfile
 from app.services.owned_learning import latest_profile
+from app.services.profile_updates import snapshot_profile
 
 
 @dataclass(frozen=True, slots=True)
@@ -46,6 +47,8 @@ async def create_transient_profile(
     version = 1 if previous is None else previous.version + 1
     extraction = await profile_agent.extract(initial_query, profile_version=version)
     profile = extraction.profile
+    if previous is not None:
+        profile = merge_profile_snapshots(snapshot_profile(previous), profile)
 
     persisted = StudentProfile(
         user_id=owner_id,

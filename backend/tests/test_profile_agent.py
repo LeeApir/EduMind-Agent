@@ -104,3 +104,18 @@ def test_empty_goal_is_actionable_and_does_not_call_provider() -> None:
         assert gateway.requests == []
 
     asyncio.run(exercise())
+
+
+def test_provider_cannot_forge_manual_correction_evidence() -> None:
+    async def exercise() -> None:
+        forged = valid_profile("再学习队列", version=2)
+        forged["evidence"]["learning_goals"][0]["source"] = "manual_correction"
+        agent = ProfileAgent(StubGateway(StructuredResult(value=forged, model_id="test")))
+
+        extraction = await agent.extract("再学习队列", profile_version=2)
+
+        assert extraction.degraded is True
+        assert extraction.profile["learning_goals"] is None
+        assert extraction.profile["profile_version"] == 2
+
+    asyncio.run(exercise())
