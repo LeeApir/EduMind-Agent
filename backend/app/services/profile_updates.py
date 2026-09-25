@@ -10,7 +10,12 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.agents.profile_events import event_digest, validate_profile_event
+from app.agents.profile_events import (
+    PROFILE_EVENT_SCHEMA_VERSION,
+    PROFILE_MERGE_RULE_VERSION,
+    event_digest,
+    validate_profile_event,
+)
 from app.agents.profile_schema import ProfileValue, apply_manual_correction
 from app.models.learning import ProfileEvent, StudentProfile
 from app.services.learning_operations import IdempotencyConflict
@@ -66,6 +71,7 @@ async def record_profile_event(
         user_id=owner_id,
         idempotency_key=idempotency_key,
         request_digest=digest,
+        schema_version=PROFILE_EVENT_SCHEMA_VERSION,
         event_type=cast(str, validated["event_type"]),
         knowledge_node_id=cast(str, validated["knowledge_node_id"]),
         learning_unit_id=cast(str | None, validated["learning_unit_id"]),
@@ -111,6 +117,8 @@ async def persist_profile_version(
     persisted = StudentProfile(
         user_id=owner_id,
         version=next_version,
+        merge_rule_version=PROFILE_MERGE_RULE_VERSION,
+        previous_profile_id=latest.id if latest is not None else None,
         initial_query=_optional_str(profile["initial_query"]),
         professional_background=_object_or_none(profile["professional_background"]),
         knowledge_base=_object_or_none(profile["knowledge_base"]),

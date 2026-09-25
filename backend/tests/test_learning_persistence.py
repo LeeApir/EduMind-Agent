@@ -9,6 +9,7 @@ from sqlalchemy import select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
+from app.agents.profile_events import PROFILE_MERGE_RULE_VERSION
 from app.core.database import create_database_engine
 from app.models.auth import User
 from app.models.learning import GeneratedResource, LearningScene, LearningUnit, StudentProfile
@@ -31,6 +32,7 @@ def test_versioned_snapshots_survive_new_connection_and_enforce_review_boundary(
                 profile_v1 = StudentProfile(
                     user_id=user.id,
                     version=1,
+                    merge_rule_version=PROFILE_MERGE_RULE_VERSION,
                     initial_query="我想学习链表插入",
                     learning_goals={"topic": "linked-list insertion"},
                     evidence={"learning_goals": {"source": "initial_query", "confidence": 0.9}},
@@ -38,6 +40,7 @@ def test_versioned_snapshots_survive_new_connection_and_enforce_review_boundary(
                 profile_v2 = StudentProfile(
                     user_id=user.id,
                     version=2,
+                    merge_rule_version=PROFILE_MERGE_RULE_VERSION,
                     initial_query="我想学习链表插入",
                     learning_goals={"topic": "linked-list insertion", "language": "c"},
                     evidence={"learning_goals": {"source": "user_feedback", "confidence": 1.0}},

@@ -1037,7 +1037,7 @@
       "phase": "MVP 0.2",
       "parent_work_package": "MVP-0.2-003",
       "title": "持久化画像事件与快照的版本来源",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": ["MVP-0.2-T006", "MVP-0.2-T007"],
       "scope": ["backend/app/models/", "backend/alembic/", "backend/app/services/", "backend/tests/", "docs/acceptance/"],
@@ -1047,9 +1047,16 @@
         "临时 PostgreSQL 验证迁移与重启后可读取版本来源。"
       ],
       "verification": ["运行迁移、版本来源与相关后端检查。"],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {"command": "EDUMIND_DATABASE_URL=<isolated PostgreSQL> uv run --frozen alembic upgrade head", "result": "passed: 0006_profile_correction -> 0007_profile_provenance"},
+        {"command": "docker exec <isolated PostgreSQL> psql ... legacy provenance queries", "result": "passed: 77 profile and 16 event original-field digests unchanged; all legacy profiles marked; 0 invalid lineage; event schema v1"},
+        {"command": "EDUMIND_TEST_DATABASE_URL=<isolated PostgreSQL> uv run --frozen pytest -q tests/test_profile_persistence.py tests/test_transient_profiles.py", "result": "passed: 9 tests including provenance read with a new connection"},
+        {"command": "EDUMIND_TEST_DATABASE_URL=<isolated PostgreSQL> uv run --frozen pytest -q --tb=short", "result": "passed: 181 tests, 7 dependency deprecation warnings"},
+        {"command": "uv run --frozen ruff check . && uv run --frozen mypy app", "result": "passed: 37 source files type checked"},
+        {"command": "git diff --check", "result": "passed"}
+      ],
+      "started_at": "2026-09-25T19:41:26",
+      "completed_at": "2026-09-25T19:45:29",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.2-T029"
     }

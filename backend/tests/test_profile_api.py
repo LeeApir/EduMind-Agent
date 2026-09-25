@@ -9,6 +9,7 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
+from app.agents.profile_events import PROFILE_MERGE_RULE_VERSION
 from app.core.database import create_database_engine
 from app.main import app
 from app.models.learning import StudentProfile
@@ -34,6 +35,7 @@ def seed_profile(user_id: UUID, *, version: int) -> None:
                     StudentProfile(
                         user_id=user_id,
                         version=version,
+                        merge_rule_version=PROFILE_MERGE_RULE_VERSION,
                         initial_query="我想理解链表",
                         learning_goals={"current_topic": "链表"},
                         evidence={

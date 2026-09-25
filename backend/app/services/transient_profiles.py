@@ -7,6 +7,7 @@ from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.agents.profile_agent import ProfileAgent
+from app.agents.profile_events import PROFILE_MERGE_RULE_VERSION
 from app.agents.profile_schema import ProfileValue, merge_profile_snapshots
 from app.models.learning import StudentProfile
 from app.services.owned_learning import latest_profile
@@ -53,6 +54,8 @@ async def create_transient_profile(
     persisted = StudentProfile(
         user_id=owner_id,
         version=version,
+        merge_rule_version=PROFILE_MERGE_RULE_VERSION,
+        previous_profile_id=previous.id if previous is not None else None,
         initial_query=cast(str, profile["initial_query"]),
         professional_background=_object_or_none(profile["professional_background"]),
         knowledge_base=_object_or_none(profile["knowledge_base"]),

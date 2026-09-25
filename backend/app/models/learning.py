@@ -41,6 +41,10 @@ class StudentProfile(Base):
         PostgreSQLUUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
     version: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    merge_rule_version: Mapped[str] = mapped_column(String(40), nullable=False)
+    previous_profile_id: Mapped[UUID | None] = mapped_column(
+        PostgreSQLUUID(as_uuid=True), ForeignKey("student_profiles.id")
+    )
     initial_query: Mapped[str | None] = mapped_column(Text)
     professional_background: Mapped[dict[str, object] | None] = mapped_column(JSONB)
     knowledge_base: Mapped[dict[str, object] | None] = mapped_column(JSONB)
@@ -65,6 +69,7 @@ class ProfileEvent(Base):
     __tablename__ = "profile_events"
     __table_args__ = (
         UniqueConstraint("user_id", "idempotency_key", name="uq_profile_events_user_key"),
+        CheckConstraint("schema_version >= 1", name="ck_profile_events_schema_version_positive"),
         CheckConstraint(
             "event_type IN ('hint_used', 'reexplanation_requested', 'resource_selected', "
             "'explicit_feedback')",
@@ -78,6 +83,7 @@ class ProfileEvent(Base):
     )
     idempotency_key: Mapped[str] = mapped_column(String(128), nullable=False)
     request_digest: Mapped[str] = mapped_column(String(64), nullable=False)
+    schema_version: Mapped[int] = mapped_column(Integer, nullable=False)
     event_type: Mapped[str] = mapped_column(String(30), nullable=False)
     knowledge_node_id: Mapped[str] = mapped_column(String(64), nullable=False)
     learning_unit_id: Mapped[str | None] = mapped_column(String(64))

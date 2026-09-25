@@ -8,6 +8,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from app.agents.profile_agent import ProfileAgent
+from app.agents.profile_events import PROFILE_MERGE_RULE_VERSION
 from app.agents.profile_schema import empty_transient_profile
 from app.core.database import create_database_engine
 from app.models.auth import User
@@ -82,6 +83,10 @@ def test_transient_profiles_increment_per_owner_and_hide_other_anonymous_session
 
             assert alice_first.profile.version == 1
             assert alice_second.profile.version == 2
+            assert alice_first.profile.merge_rule_version == PROFILE_MERGE_RULE_VERSION
+            assert alice_first.profile.previous_profile_id is None
+            assert alice_second.profile.merge_rule_version == PROFILE_MERGE_RULE_VERSION
+            assert alice_second.profile.previous_profile_id == alice_first.profile.id
             assert bob_first.profile.version == 1
             assert bob_first.degraded is True
             async with sessions() as db:
@@ -164,6 +169,13 @@ def test_new_learning_keeps_manual_correction_and_old_snapshot() -> None:
                     )
                 ).all()
                 assert [row.version for row in rows] == [1, 2, 3, 4]
+                assert [row.previous_profile_id for row in rows] == [
+                    None,
+                    rows[0].id,
+                    rows[1].id,
+                    rows[2].id,
+                ]
+                assert all(row.merge_rule_version == PROFILE_MERGE_RULE_VERSION for row in rows)
                 assert rows[0].learning_goals == {"current_topic": "学习链表"}
                 assert rows[1].learning_goals == {"current_topic": "数组"}
                 assert rows[-1].learning_goals == {"current_topic": "数组"}

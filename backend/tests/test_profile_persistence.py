@@ -9,7 +9,11 @@ from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from app.agents.profile_events import ProfileEventSchemaError
+from app.agents.profile_events import (
+    PROFILE_EVENT_SCHEMA_VERSION,
+    PROFILE_MERGE_RULE_VERSION,
+    ProfileEventSchemaError,
+)
 from app.agents.profile_schema import merge_explicit_profile_values
 from app.core.database import create_database_engine
 from app.models.auth import User
@@ -55,6 +59,7 @@ def profile(version: int) -> dict[str, object]:
 
 def test_events_are_idempotent_and_owner_scoped() -> None:
     assert TEST_DATABASE_URL is not None
+    captured: list[UUID] = []
 
     async def exercise() -> None:
         engine = create_database_engine(TEST_DATABASE_URL)
@@ -69,6 +74,8 @@ def test_events_are_idempotent_and_owner_scoped() -> None:
                     db, owner_id=user.id, idempotency_key=key, event=event()
                 )
                 assert created is True
+                assert first.schema_version == PROFILE_EVENT_SCHEMA_VERSION
+                captured.append(first.id)
                 second, replayed = await record_profile_event(
                     db, owner_id=user.id, idempotency_key=key, event=event()
                 )
@@ -97,6 +104,16 @@ def test_events_are_idempotent_and_owner_scoped() -> None:
                 assert third.id != first.id
         finally:
             await engine.dispose()
+
+        read_engine = create_database_engine(TEST_DATABASE_URL)
+        try:
+            read_sessions = async_sessionmaker(read_engine)
+            async with read_sessions() as db:
+                stored = await db.get(ProfileEvent, captured[0])
+                assert stored is not None
+                assert stored.schema_version == PROFILE_EVENT_SCHEMA_VERSION
+        finally:
+            await read_engine.dispose()
 
     asyncio.run(exercise())
 
@@ -214,6 +231,10 @@ def test_profile_versions_are_immutable_and_survive_restart() -> None:
                 v2 = await persist_profile_version(db, owner_id=user.id, profile=profile(2))
                 assert (v1.version, v2.version) == (1, 2)
                 assert v1.id != v2.id
+                assert v1.merge_rule_version == PROFILE_MERGE_RULE_VERSION
+                assert v1.previous_profile_id is None
+                assert v2.merge_rule_version == PROFILE_MERGE_RULE_VERSION
+                assert v2.previous_profile_id == v1.id
                 # Version 1 is not overwritten by version 2.
                 assert v1.learning_goals == {"current_topic": "链表"}
         finally:
@@ -232,6 +253,8 @@ def test_profile_versions_are_immutable_and_survive_restart() -> None:
                 ).all()
                 assert [profile.version for profile in versions] == [1, 2]
                 assert versions[-1].version == 2
+                assert versions[-1].merge_rule_version == PROFILE_MERGE_RULE_VERSION
+                assert versions[-1].previous_profile_id == versions[0].id
         finally:
             await read_engine.dispose()
 
@@ -276,7 +299,13 @@ def test_duplicate_version_violates_database_constraint() -> None:
                 await db.flush()
                 await persist_profile_version(db, owner_id=user.id, profile=profile(1))
                 # Bypass the service to prove the (user_id, version) constraint holds.
-                db.add(StudentProfile(user_id=user.id, version=1))
+                db.add(
+                    StudentProfile(
+                        user_id=user.id,
+                        version=1,
+                        merge_rule_version=PROFILE_MERGE_RULE_VERSION,
+                    )
+                )
                 with pytest.raises(IntegrityError):
                     await db.commit()
                 await db.rollback()
