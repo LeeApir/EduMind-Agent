@@ -462,7 +462,7 @@
       "phase": "MVP 0.2",
       "parent_work_package": "MVP-0.2-004",
       "title": "定义测验提交与确定性评分规则",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.2-T002"
@@ -480,9 +480,15 @@
       "verification": [
         "运行评分规则、非法输入和正式资源绑定测试。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {"command": "EDUMIND_DATABASE_URL=<isolated PostgreSQL> uv run --frozen alembic upgrade head", "result": "passed: fresh schema upgraded through 0007_profile_provenance"},
+        {"command": "EDUMIND_TEST_DATABASE_URL=<isolated PostgreSQL> uv run --frozen pytest -q tests/test_quiz_scoring.py", "result": "passed: 10 tests; published owner/version boundary, tampered payload, duplicate IDs, deterministic scoring"},
+        {"command": "EDUMIND_TEST_DATABASE_URL=<isolated PostgreSQL> uv run --frozen pytest -q --tb=short", "result": "passed: 191 tests, 7 dependency deprecation warnings"},
+        {"command": "uv run --frozen ruff check . && uv run --frozen mypy app", "result": "passed: lint and 38 source files type checked"},
+        {"command": "git diff --check", "result": "passed"}
+      ],
+      "started_at": "2026-09-25T20:13:06",
+      "completed_at": "2026-09-25T20:17:32",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.2-T010"
     },
