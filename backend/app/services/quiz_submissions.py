@@ -12,6 +12,7 @@ from app.agents.learning_resource_schema import RESOURCE_PROMPT_VERSION
 from app.models.learning import LearningUnit
 from app.models.learning_state import LearningEvidence
 from app.services.learning_operations import IdempotencyConflict
+from app.services.mastery_updates import apply_mastery_evidence, lock_mastery_node
 from app.services.owned_learning import published_resource
 from app.services.quiz_scoring import QuizScoringError, score_exercise_content
 
@@ -50,8 +51,8 @@ def quiz_receipt(record: LearningEvidence) -> dict[str, object]:
         "question_count": payload["question_count"],
         "quiz_schema_version": record.schema_version,
         "scoring_rule_version": record.rule_version,
-        "mastery_changes": [],
-        "path_replan_required": False,
+        "mastery_changes": payload.get("mastery_changes", []),
+        "path_replan_required": payload.get("path_replan_required", False),
     }
 
 
@@ -138,8 +139,16 @@ async def submit_quiz_attempt(
         rule_version=scored.rule_version,
         payload=payload,
     )
+    await lock_mastery_node(db, owner_id=owner_id, node_id=knowledge_node_id)
     db.add(record)
     try:
+        await db.flush()
+        change, replan_required = await apply_mastery_evidence(db, record)
+        record.payload = {
+            **payload,
+            "mastery_changes": [change] if change is not None else [],
+            "path_replan_required": replan_required,
+        }
         await db.commit()
     except IntegrityError:
         await db.rollback()

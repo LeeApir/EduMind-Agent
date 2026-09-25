@@ -14,7 +14,7 @@ from app.agents.learning_resource_schema import RESOURCE_PROMPT_VERSION
 from app.core.database import create_database_engine
 from app.main import app
 from app.models.learning import GeneratedResource, LearningScene, LearningUnit
-from app.models.learning_state import LearningEvidence
+from app.models.learning_state import LearningEvidence, NodeMasteryCurrent, NodeMasteryRevision
 from app.services.learning_operations import IdempotencyConflict
 from app.services.quiz_submissions import submit_quiz_attempt
 
@@ -133,7 +133,17 @@ def test_submission_scores_server_answer_key_and_replay_does_not_append_evidence
     assert body["scoring_rule_version"] == "quiz-exact-text-v1"
     assert [result["correct"] for result in body["question_results"]] == [True, False]
     assert body["question_results"][1]["error_patterns"] == ["answer_mismatch"]
-    assert body["mastery_changes"] == []
+    assert body["mastery_changes"] == [
+        {
+            "knowledge_node_id": "linked-list",
+            "previous_score": 0.0,
+            "score": 0.275,
+            "status": "weak",
+            "revision": 1,
+            "rule_version": "mastery-v1",
+            "evidence_summary": ["quiz_score=0.5000;wrong_streak=0"],
+        }
+    ]
     assert body["path_replan_required"] is False
 
     request["answers"] = list(reversed(request["answers"]))
@@ -160,6 +170,13 @@ def test_submission_scores_server_answer_key_and_replay_does_not_append_evidence
                     {"question_id": "q2", "answer": "wrong"},
                 ]
                 assert "answer_key" not in str(record.payload)
+                current = await db.get(NodeMasteryCurrent, (owner_id, "linked-list"))
+                assert current is not None
+                assert current.score == 0.275
+                revision = await db.get(NodeMasteryRevision, current.revision_id)
+                assert revision is not None
+                assert revision.evidence_id == record.id
+                assert revision.previous_score == 0.0
         finally:
             await engine.dispose()
 

@@ -219,3 +219,7 @@ VERIFIED 表示验证通过并准备提交，完成以 Git 中的 Task-Completed
 领取“提交并持久化测验作答” | T010/T011 完成提交已确认；评分器、证据表和 API 契约存在 | 当前学习单元尚待 T019 映射节点；T012 先对有可信节点绑定的正式资源提交 | 实现 owner/审核/CSRF/幂等保护下的测验提交与只追加证据，使用隔离数据库完成 API 回归
 [2026-09-25T20:32:57] [MVP-0.2-T012] VERIFIED | executor=Lee
 新增 POST /api/quiz-submissions：只读 owner 可见已发布资源，服务端判分并保存作答快照、逐题结果和错误模式；同键重放原证据，并发竞争安全回查 | 定向 5 passed、隔离库全量 199 passed、Ruff/Mypy（41 个 source）、OpenAPI JSON 和 git diff --check 通过 | 7 条依赖弃用警告；掌握度事务与响应更新留给 T013，真实学习单元节点绑定留给 T019 | 创建 T012 完成提交；继续 T013 版本化掌握度规则
+[2026-09-25T20:34:00] [MVP-0.2-T013] START | executor=Lee | branch=codex/mvp-0.2
+领取“根据学习证据更新节点掌握度” | T011/T012 完成提交已确认；ADR-0003 要求证据与 mastery revision 在同一短事务 | 测验目前只写证据，未产生掌握度或待重规划标记 | 固定离线规则、实现可重算 reducer 和事务投影更新，覆盖跳过、连续错误、阈值和幂等回放
+[2026-09-25T20:40:57] [MVP-0.2-T013] VERIFIED | executor=Lee
+固定 mastery-v1 离线规则与重放 reducer；测验证据、掌握度 revision/当前投影及路径待重规划标记同事务写入，owner+节点事务锁保证并发顺序 | 规则定向 10 passed、事务/API 合计 17 passed、隔离库全量后端 211 passed、Ruff/Mypy 与 git diff --check 通过 | 7 条依赖弃用警告；提示/反馈命令入口留给 T014，路径重算留给 T017 | 创建 T013 完成提交；继续 T014 行为证据
