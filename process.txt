@@ -211,3 +211,7 @@ VERIFIED 表示验证通过并准备提交，完成以 Git 中的 Task-Completed
 领取“定义测验提交与确定性评分规则” | T002 完成提交 76becbf 已确认；现有正式练习为短答案 v1 资源 | v1 不支持语义等价判断，也不能信任客户端上传的题干、标准答案或分数 | 定义可追溯的精确匹配评分与错误模式，绑定 owner 可读的已发布资源并覆盖非法输入
 [2026-09-25T20:17:32] [MVP-0.2-T010] VERIFIED | executor=Lee
 新增 quiz-exact-text-v1 确定性评分器：固定已发布资源版本与 owner，服务端答案键判分，遗漏题计错，返回逐题解释和错误模式；规则文档明确精确匹配边界 | 隔离 PostgreSQL 迁移至 0007；定向 10 passed、全量后端 191 passed、Ruff/Mypy 通过，git diff --check 通过 | 7 条依赖弃用警告；v1 不判断语义等价，后续新题型需新版本 | 创建 T010 完成提交；继续 T011 学习证据/掌握度/路径数据模型
+[2026-09-25T20:18:58] [MVP-0.2-T011] START | executor=Lee | branch=codex/mvp-0.2
+领取“建立学习证据、掌握度与路径版本数据模型” | T001/T004/T010 完成提交已确认；ADR-0003 固定证据、投影、版本与事务边界 | 数据模型尚未落库，T012–T018 无法持久化闭环 | 建立 owner-scoped 表与约束，验证迁移、跨 owner 隔离和非法分数/状态/版本拒绝
+[2026-09-25T20:27:12] [MVP-0.2-T011] VERIFIED | executor=Lee
+新增 learning_evidence、node_mastery_revisions/current、learning_path_versions/current 五表及 0008 迁移；owner 复合外键约束补偿、证据、版本与当前指针，当前路径保留待重规划标记 | 隔离 PostgreSQL 0008 迁移/降级/重升通过；定向 3 passed、全量 194 passed、Ruff/Mypy 与 git diff --check 通过 | 7 条依赖弃用警告；事务命令服务留给 T012–T018 | 创建 T011 完成提交；继续 T012 测验提交与不可变证据

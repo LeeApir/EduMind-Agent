@@ -28,6 +28,8 @@
 
 影响掌握度的命令在一个 PostgreSQL 事务中追加证据、创建 mastery revision、替换当前投影并标记待重规划。路径以已提交输入在独立短事务中重算；Provider 画像推断也不占用证据事务。幂等记录、版本水位与待重规划标记均存于 PostgreSQL，因此并发、重复提交和服务重启后可安全恢复。
 
+落库映射：`learning_evidence` 保存 owner 范围幂等键、资源版本、规则版本和结构化事实；`node_mastery_revisions` 与 `node_mastery_current` 分离历史与当前投影；`learning_path_versions` 与 `learning_path_current` 分离路径历史与当前指针/持久化重规划标记。当前指针和补偿引用使用包含 owner（适用时还包含节点/目标）的复合外键，禁止跨用户或跨节点串接。业务写入仍须在事务内检查事实、版本水位和投影一致性，数据库约束不代替命令服务。
+
 完整的证据含义、归属、事务边界、并发策略和重算规则见 [ADR-0003](ADR/0003-learning-evidence-mastery-and-path-versioning.md)。
 
 ## 学习闭环 API 契约（MVP 0.2）

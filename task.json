@@ -497,7 +497,7 @@
       "phase": "MVP 0.2",
       "parent_work_package": "MVP-0.2-004",
       "title": "建立学习证据、掌握度与路径版本数据模型",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.2-T001",
@@ -517,9 +517,16 @@
       "verification": [
         "在临时 PostgreSQL 验证迁移、约束、外键和 ORM 类型。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {"command": "EDUMIND_DATABASE_URL=<isolated PostgreSQL> uv run --frozen alembic upgrade head", "result": "passed: 0007_profile_provenance -> 0008_learning_state"},
+        {"command": "EDUMIND_DATABASE_URL=<isolated PostgreSQL> uv run --frozen alembic downgrade 0007_profile_provenance && uv run --frozen alembic upgrade head", "result": "passed: T011 migration roundtrip on isolated database"},
+        {"command": "EDUMIND_TEST_DATABASE_URL=<isolated PostgreSQL> uv run --frozen pytest -q tests/test_learning_state_models.py --tb=short", "result": "passed: 3 tests for owner-scoped idempotency, score/status/version constraints, cross-owner foreign keys and restart reads"},
+        {"command": "EDUMIND_TEST_DATABASE_URL=<isolated PostgreSQL> uv run --frozen pytest -q --tb=short", "result": "passed: 194 tests, 7 dependency deprecation warnings"},
+        {"command": "uv run --frozen ruff check . && uv run --frozen mypy app", "result": "passed: lint and 39 source files type checked"},
+        {"command": "git diff --check", "result": "passed"}
+      ],
+      "started_at": "2026-09-25T20:18:58",
+      "completed_at": "2026-09-25T20:27:12",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.2-T011"
     },
