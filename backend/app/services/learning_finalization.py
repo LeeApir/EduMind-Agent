@@ -3,12 +3,14 @@
 from dataclasses import dataclass
 from uuid import UUID
 
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.agents.learning_resource_schema import LearningResourceType
 from app.agents.learning_unit_generator import LearningResourceRequest, LearningUnitGenerator
 from app.agents.review_agent import ReviewAgent, ReviewOutcome
-from app.models.learning import GeneratedResource, LearningScene, LearningUnit
+from app.agents.review_context import build_review_context
+from app.models.learning import GeneratedResource, LearningScene, LearningUnit, StudentProfile
 from app.services.knowledge_graph import KnowledgeGraphRepository
 from app.services.provider_gateway import ProviderGateway
 from app.services.resource_publication import ResourcePublicationError, record_reviewed_resource
@@ -48,6 +50,25 @@ async def finalize_learning_unit(
     expected_node = path_snapshot.get("current_node_id") or path_snapshot.get("target_node_id")
     if expected_node != node.id or path_snapshot.get("graph_version") != graph.graph_version:
         raise ValueError("Learning node does not match the path snapshot.")
+    profile = await db.scalar(
+        select(StudentProfile).where(
+            StudentProfile.user_id == owner_id,
+            StudentProfile.version == path_snapshot.get("profile_version"),
+        )
+    )
+    if profile is None:
+        raise ValueError("Review profile snapshot is unavailable.")
+    review_context = build_review_context(
+        graph,
+        node_id=node.id,
+        profile_version=profile.version,
+        code_language=code_language,
+        profile={
+            "knowledge_base": profile.knowledge_base,
+            "error_preferences": profile.error_preferences,
+            "evidence": profile.evidence,
+        },
+    )
     title = node.name
     unit = LearningUnit(
         user_id=owner_id,
@@ -60,6 +81,8 @@ async def finalize_learning_unit(
             "knowledge_node_id": node.id,
             "graph_version": graph.graph_version,
             "path_snapshot": path_snapshot,
+            "review_context_version": review_context.payload()["context_version"],
+            "review_profile_version": profile.version,
         },
         status="draft",
     )
@@ -92,7 +115,7 @@ async def finalize_learning_unit(
     )
     reviews: list[ReviewOutcome] = []
     for candidate in generation.resources:
-        reviews.append(await ReviewAgent(gateway).review(candidate))
+        reviews.append(await ReviewAgent(gateway).review(candidate, context=review_context))
 
     expected_types = set(LearningResourceType)
     generated_types = {candidate.resource_type for candidate in generation.resources}

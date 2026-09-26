@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.agents.learning_resource_schema import ResourceSchemaError, validate_learning_resource
 from app.agents.review_agent import ReviewOutcome
+from app.agents.review_schema import REVIEW_PROMPT_VERSION
 from app.models.learning import GeneratedResource, LearningScene, LearningUnit
 
 _PROVIDER_ID = "deepseek_responses"
@@ -87,7 +88,7 @@ async def record_reviewed_resource(
     content = envelope["content"]
     assert isinstance(content, dict)
     review_comments: dict[str, object] = {
-        "review_version": "resource-review-v1",
+        "review_version": REVIEW_PROMPT_VERSION,
         "verdict": review.verdict.value,
         "issues": [dict(issue) for issue in review.issues],
         "correction_attempts": review.correction_attempts,

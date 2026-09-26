@@ -896,7 +896,7 @@
       "phase": "MVP 0.2",
       "parent_work_package": "MVP-0.2-007",
       "title": "让正式资源审核使用图谱与画像上下文",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.2-T004",
@@ -916,9 +916,13 @@
       "verification": [
         "运行事实、前置、难度、误区、未知字段和代码错误测试。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {"command": "EDUMIND_TEST_DATABASE_URL=<isolated PostgreSQL> uv run pytest -q", "result": "passed: 266 tests, no skips, 7 dependency warnings; review context facts/prerequisites/difficulty/misconceptions, minimal evidence-backed profile, unknown omission, correction context, severe-code gate and production learning-session snapshot covered"},
+        {"command": "uv run ruff check app tests && uv run mypy app", "result": "passed: backend lint and 53 source files checked"},
+        {"command": "Review v2 prompt and persistence version audit; git diff --check", "result": "passed: legacy v1 remains only in historical log/document; new reviews persist v2 and unit records exact profile/context source. Mock verdict tests do not establish real model quality; T023 owns the benchmark."}
+      ],
+      "started_at": "2026-09-26T12:55:39",
+      "completed_at": "2026-09-26T13:02:21",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.2-T022"
     },

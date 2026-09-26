@@ -60,6 +60,7 @@ class FakeAdapter:
         self.fail_stream = fail_stream
         self.reject_review = reject_review
         self.calls: list[str] = []
+        self.review_contexts: list[dict[str, object]] = []
 
     async def generate_text(self, request: TextRequest) -> TextResult:
         raise AssertionError(f"unexpected non-stream request: {request}")
@@ -74,9 +75,12 @@ class FakeAdapter:
             )
         if "review_version" in properties:
             self.calls.append("review")
+            self.review_contexts.append(
+                json.loads(request.prompt.messages[-1].content)["reference_context"]
+            )
             return StructuredResult(
                 value={
-                    "review_version": "resource-review-v1",
+                    "review_version": "resource-review-v2",
                     "verdict": "reject" if self.reject_review else "pass",
                     "issues": (
                         [{"area": "fact", "severity": "major", "message": "Needs correction."}]
@@ -217,6 +221,8 @@ def test_session_publishes_only_reviewed_resources_after_temporary_tokens(
                     snapshot = unit.outline["path_snapshot"]
                     assert isinstance(snapshot, dict)
                     assert snapshot["graph_version"] == "mvp-0.2.0"
+                    assert unit.outline["review_context_version"] == "resource-review-context-v1"
+                    assert unit.outline["review_profile_version"] == snapshot["profile_version"]
                     path = await db.get(LearningPathVersion, UUID(snapshot["id"]))
                     assert path is not None and path.version == snapshot["version"]
                     assert unit.knowledge_point_id == path.current_node_id
@@ -224,6 +230,13 @@ def test_session_publishes_only_reviewed_resources_after_temporary_tokens(
                 await engine.dispose()
 
         asyncio.run(verify_binding())
+        assert len(adapter.review_contexts) == 3
+        assert all(item == adapter.review_contexts[0] for item in adapter.review_contexts)
+        reference = adapter.review_contexts[0]
+        assert reference["profile_version"] == profile.json()["version"]
+        assert reference["node"]["id"] == "c-pointer"
+        assert reference["known_profile"] == {}
+        assert "讲解单链表" not in json.dumps(reference, ensure_ascii=False)
         assert len(formal.json()["scenes"][0]["resources"]) == 3
         for resource_id in resource_ids:
             resource = client.get(f"/api/resource/{resource_id}")
