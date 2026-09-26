@@ -1,0 +1,41 @@
+{
+  "benchmark_version": "resource-quality-v1",
+  "authorship": "Original project-authored concise examples; no textbook excerpts or learner data.",
+  "schema_generation_repetitions": 2,
+  "semantic_errors": [
+    {"id": "array-index-complexity", "node_id": "array", "area": "fact", "text": "数组下标访问必须从第一个元素逐个遍历，所以访问 a[7] 的时间复杂度一定是 O(n)。", "rationale": "Contiguous arrays support constant-time indexing."},
+    {"id": "array-middle-insert", "node_id": "array", "area": "fact", "text": "在未留空位的数组中间插入一个元素不需要搬移任何后续元素，所以任意中间插入都为 O(1)。", "rationale": "Middle insertion generally moves following elements."},
+    {"id": "pointer-uninitialized", "node_id": "c-pointer", "area": "code_safety", "text": "C 语言局部指针 int *p; 未初始化时可以安全执行 *p = 42，因为指针会自动指向可写内存。", "rationale": "Dereferencing an uninitialized pointer is undefined behavior."},
+    {"id": "pointer-value", "node_id": "c-pointer", "area": "fact", "text": "C 指针变量保存的是所指对象的整数值，而不是内存地址；取地址运算符 & 与解引用运算符 * 完全相同。", "rationale": "Address and pointed-to value are distinct."},
+    {"id": "list-contiguous", "node_id": "linked-list-concept", "area": "fact", "text": "链表节点必须连续存放在内存中，next 保存的只是下一个节点的数据值，不能保存节点地址。", "rationale": "Nodes need not be contiguous; links identify successor nodes."},
+    {"id": "list-prerequisite-direction", "node_id": "linked-list-concept", "area": "fact", "text": "课程前置关系规定 C 指针依赖链表概念，链表概念反而不需要理解任何指针地址或链接概念。", "rationale": "Graph prerequisite direction is reversed."},
+    {"id": "single-list-terminal", "node_id": "single-linked-list", "area": "fact", "text": "普通非循环单链表最后一个节点的 next 总是指向自身，空链表的 head 必须指向一个有数据的节点。", "rationale": "Noncircular list terminates at NULL; empty head may be NULL."},
+    {"id": "list-index", "node_id": "linked-list-traversal", "area": "fact", "text": "不建立辅助索引的单链表可以像数组一样在 O(1) 时间直接按任意下标访问节点，完全不需要遍历链接。", "rationale": "Positional access requires traversal without an index."},
+    {"id": "list-traversal-stop", "node_id": "linked-list-traversal", "area": "code_safety", "text": "遍历空链表时先无条件执行 head->next，再检查 head 是否为 NULL，这种顺序对空链表同样安全。", "rationale": "Checking NULL must precede dereference."},
+    {"id": "list-insert-links", "node_id": "linked-list-insertion", "area": "fact", "text": "在 prev 后插入 new_node 的正确通用顺序是 prev->next = new_node; new_node->next = prev->next; 不必保存旧后继。这能保留原链表所有后续节点。", "rationale": "This loses the original successor and creates a self-loop."},
+    {"id": "list-delete-head", "node_id": "linked-list-deletion", "area": "code_safety", "text": "删除不带哨兵的单链表头节点时，只要 free(head) 就可以，不必修改 head；随后可以继续通过原 head 访问链表。", "rationale": "Head becomes dangling and must be updated before reuse."},
+    {"id": "stack-order", "node_id": "stack", "area": "fact", "text": "栈遵循先进先出规则。先 push(1) 再 push(2)，第一次 pop 一定得到 1。", "rationale": "Stack is LIFO; first pop returns 2."},
+    {"id": "queue-order", "node_id": "queue", "area": "fact", "text": "队列遵循后进先出规则。先入队 1 再入队 2，第一次出队一定得到 2。", "rationale": "Queue is FIFO; first dequeue returns 1."},
+    {"id": "circular-full", "node_id": "circular-queue", "area": "fact", "text": "采用牺牲一个存储单元的循环队列中，front == rear 唯一表示队满，空队列必须满足 (rear + 1) % capacity == front。", "rationale": "Empty and full conditions are reversed for one-slot-empty convention."},
+    {"id": "circular-wrap", "node_id": "circular-queue", "area": "fact", "text": "循环队列容量为 8，rear 等于 7 时下一次合法下标就是 8。rear + 1 无需模运算，因为数组会自动回绕。", "rationale": "Index wraps with modulo; index 8 is out of range."},
+    {"id": "pointer-null", "node_id": "c-pointer", "area": "code_safety", "text": "空指针 NULL 是合法可读对象，任何时候执行 *NULL 都会可靠返回整数 0，不会有未定义行为。", "rationale": "Dereferencing NULL is undefined behavior."}
+  ],
+  "local_code_errors": [
+    {"id": "code-system", "node_id": "c-pointer", "source": "os.system('echo unsafe')", "rationale": "Prohibited process execution."},
+    {"id": "code-eval", "node_id": "array", "source": "eval('1 + 1')", "rationale": "Prohibited dynamic evaluation."},
+    {"id": "code-file", "node_id": "linked-list-concept", "source": "open('/tmp/private.txt').read()", "rationale": "Prohibited arbitrary file access."},
+    {"id": "code-network", "node_id": "queue", "source": "requests.get('https://example.invalid')", "rationale": "Prohibited network access."}
+  ],
+  "controls": [
+    {"id": "correct-array", "node_id": "array", "text": "数组通过下标定位连续存储的元素，按下标访问通常为 O(1)；在中间插入元素一般需要搬移后续元素。"},
+    {"id": "correct-pointer", "node_id": "c-pointer", "text": "指针保存地址，&x 取得对象 x 的地址，*p 访问 p 所指对象。只有 p 指向有效对象时才可解引用；NULL 不可解引用。"},
+    {"id": "correct-list-concept", "node_id": "linked-list-concept", "text": "链表节点可以分散存储，节点的数据域保存内容，链域保存后继节点地址。理解地址和指针有助于理解链接。"},
+    {"id": "correct-single-list", "node_id": "single-linked-list", "text": "普通非循环单链表每个节点有一个 next。最后节点 next 为 NULL；head 为 NULL 可表示空链表。"},
+    {"id": "correct-traversal", "node_id": "linked-list-traversal", "text": "从 head 开始，先判断 cur != NULL，再访问当前节点并令 cur = cur->next。没有索引时按位置查找需要沿链接遍历。"},
+    {"id": "correct-insertion", "node_id": "linked-list-insertion", "text": "已知合法前驱 prev 与新节点 new_node，在 prev 后插入时先 new_node->next = prev->next，再 prev->next = new_node，避免丢失旧后继。"},
+    {"id": "correct-deletion", "node_id": "linked-list-deletion", "text": "删除中间节点先保留前驱，再让 prev->next 指向目标后继。删除不带哨兵的头节点需要更新 head，释放后不可继续访问目标。"},
+    {"id": "correct-stack", "node_id": "stack", "text": "栈是后进先出。先 push(1) 再 push(2)，首次 pop 返回 2；入栈和出栈都发生在栈顶。"},
+    {"id": "correct-queue", "node_id": "queue", "text": "队列是先进先出。先入队 1 再入队 2，首次出队返回 1。队尾入队、队首出队。"},
+    {"id": "correct-circular", "node_id": "circular-queue", "text": "牺牲一个单元的循环队列约定 front == rear 为空，(rear + 1) % capacity == front 为满；通过模运算回绕数组下标。"}
+  ]
+}

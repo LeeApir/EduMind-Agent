@@ -99,15 +99,64 @@ _RETRYABLE_CODES = frozenset(
 )
 
 
+class OutputFailureReason(StrEnum):
+    """Content-free diagnostics; never carry vendor text or schema values."""
+
+    RESPONSE_INCOMPLETE = "RESPONSE_INCOMPLETE"
+    OUTPUT_TOKEN_LIMIT = "OUTPUT_TOKEN_LIMIT"
+    RESPONSE_JSON_INVALID = "RESPONSE_JSON_INVALID"
+    STRUCTURED_JSON_INVALID = "STRUCTURED_JSON_INVALID"
+    STRUCTURED_NOT_OBJECT = "STRUCTURED_NOT_OBJECT"
+    STRUCTURED_SCHEMA_MISMATCH = "STRUCTURED_SCHEMA_MISMATCH"
+    REQUEST_SCHEMA_INVALID = "REQUEST_SCHEMA_INVALID"
+
+
+class JsonSyntaxReason(StrEnum):
+    """Fixed syntax categories; no text, positions, paths, or generated values."""
+
+    INVALID_ESCAPE = "INVALID_ESCAPE"
+    UNESCAPED_CONTROL_CHARACTER = "UNESCAPED_CONTROL_CHARACTER"
+    UNTERMINATED_STRING = "UNTERMINATED_STRING"
+    EXPECTED_DELIMITER = "EXPECTED_DELIMITER"
+    EXPECTED_PROPERTY_NAME = "EXPECTED_PROPERTY_NAME"
+    EXPECTED_VALUE = "EXPECTED_VALUE"
+    EXTRA_DATA = "EXTRA_DATA"
+    OTHER = "OTHER"
+
+
 class ProviderError(RuntimeError):
     """Stable safe error; adapters must never include raw vendor messages or keys."""
 
     def __init__(
-        self, code: ProviderErrorCode, *, retry_after_seconds: float | None = None
+        self, code: ProviderErrorCode, *, retry_after_seconds: float | None = None,
+        output_failure_reason: OutputFailureReason | None = None,
+        schema_keyword: str | None = None,
+        json_syntax_reason: JsonSyntaxReason | None = None,
     ) -> None:
         super().__init__(_SAFE_MESSAGES[code])
         self.code = code
         self.retry_after_seconds = retry_after_seconds
+        if output_failure_reason is not None and (
+            code is not ProviderErrorCode.INVALID_OUTPUT
+            or not isinstance(output_failure_reason, OutputFailureReason)
+        ):
+            raise ValueError("Invalid output diagnostic.")
+        self.output_failure_reason = output_failure_reason
+        if schema_keyword is not None and (
+            output_failure_reason is not OutputFailureReason.STRUCTURED_SCHEMA_MISMATCH
+            or schema_keyword not in {
+                "type", "required", "additionalProperties", "const", "enum", "minLength",
+                "maxLength", "minItems", "maxItems", "uniqueItems", "pattern", "other",
+            }
+        ):
+            raise ValueError("Invalid schema diagnostic.")
+        self.schema_keyword = schema_keyword
+        if json_syntax_reason is not None and (
+            output_failure_reason is not OutputFailureReason.STRUCTURED_JSON_INVALID
+            or not isinstance(json_syntax_reason, JsonSyntaxReason)
+        ):
+            raise ValueError("Invalid JSON syntax diagnostic.")
+        self.json_syntax_reason = json_syntax_reason
 
     @property
     def retryable(self) -> bool:

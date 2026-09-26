@@ -5,7 +5,10 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Protocol, cast
 
-from app.agents.learning_resource_prompt import learning_resource_prompt
+from app.agents.learning_resource_prompt import (
+    RESOURCE_INSTRUCTION_VERSION,
+    learning_resource_prompt,
+)
 from app.agents.learning_resource_schema import resource_output_schema, validate_learning_resource
 from app.agents.learning_unit_generator import PendingLearningResource
 from app.agents.review_context import ResourceReviewContext
@@ -164,6 +167,7 @@ class ReviewAgent:
             prompt_version=resource.prompt_version,
             model_id=result.model_id,
             usage=result.usage,
+            instruction_version=RESOURCE_INSTRUCTION_VERSION,
         )
 
     async def review(

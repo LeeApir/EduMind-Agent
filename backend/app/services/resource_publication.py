@@ -100,6 +100,8 @@ async def record_reviewed_resource(
         "prompt_version": resource.prompt_version,
         "content_version": version,
     }
+    if resource.instruction_version is not None:
+        metadata["instruction_version"] = resource.instruction_version
     persisted = GeneratedResource(
         user_id=owner_id,
         learning_unit_id=learning_unit_id,

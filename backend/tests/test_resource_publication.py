@@ -2,6 +2,7 @@
 
 import asyncio
 import os
+from dataclasses import replace
 
 import pytest
 from sqlalchemy.ext.asyncio import async_sessionmaker
@@ -91,7 +92,13 @@ def test_publish_gate_versions_and_owner_reads_preserve_prior_visible_resource()
                     owner_id=owner_id,
                     learning_unit_id=unit_id,
                     scene_id=scene_id,
-                    review=outcome("新版正式内容", ReviewVerdict.PASS),
+                    review=replace(
+                        outcome("新版正式内容", ReviewVerdict.PASS),
+                        resource=replace(
+                            candidate("新版正式内容"),
+                            instruction_version="learning-resources-instructions-v2",
+                        ),
+                    ),
                 )
                 await db.commit()
 
@@ -100,10 +107,12 @@ def test_publish_gate_versions_and_owner_reads_preserve_prior_visible_resource()
             assert rejected.published_at is None
             assert rejected.review_status == "rejected"
             assert replacement.supersedes_id == first.id
+            assert "instruction_version" not in first.generation_metadata
             assert replacement.generation_metadata == {
                 "provider": "deepseek_responses",
                 "model_id": "generation-model",
                 "prompt_version": "learning-resources-v1",
+                "instruction_version": "learning-resources-instructions-v2",
                 "content_version": 3,
             }
             async with sessions() as db:

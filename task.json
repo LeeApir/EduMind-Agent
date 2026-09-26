@@ -931,13 +931,20 @@
       "phase": "MVP 0.2",
       "parent_work_package": "MVP-0.2-007",
       "title": "建立正式资源 schema 与 Review 质量基准",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.2-T022"
       ],
       "scope": [
         "backend/tests/",
+        "backend/app/services/provider_gateway.py",
+        "backend/app/services/deepseek_responses.py",
+        "backend/app/agents/learning_resource_prompt.py",
+        "backend/app/agents/learning_unit_generator.py",
+        "backend/app/agents/review_agent.py",
+        "backend/app/services/resource_publication.py",
+        "docs/agents/prompts/",
         "data/",
         "docs/acceptance/"
       ],
@@ -949,9 +956,20 @@
       "verification": [
         "运行离线错误集和经明确授权的真实 Provider 质量基准。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {"command": "uv run python -m tests.resource_quality --mode offline", "result": "passed: 30 authored schema-valid fixtures, 4/4 deterministic dangerous-code detections, 0 Provider calls; 16 semantic errors unevaluated, real generation/recall metrics null, stage gate false"},
+        {"command": "uv run pytest -q tests/test_resource_quality.py", "result": "passed: 6 benchmark tests in the final full run; mock failure accounting retains 60 generation denominators, missed semantic errors and provider unavailability; explicit billable guard and 86-call no-retry cap covered"},
+        {"command": "EDUMIND_TEST_DATABASE_URL=<isolated PostgreSQL> uv run pytest -q", "result": "passed: 272 tests, no skips, 7 dependency deprecation warnings; no real Provider calls"},
+        {"command": "uv run ruff check app tests && uv run mypy app && git diff --check", "result": "passed: backend lint/typecheck (53 source files) and whitespace checks"},
+        {"command": "git check-ignore .env; uv run --env-file ../.env configuration presence check", "result": "passed: .env ignored and required Provider settings present; no credentials printed and no network request made"},
+        {"command": "uv run --env-file ../.env python -m tests.resource_quality --mode provider --confirm-billable --output ../docs/acceptance/mvp-0.2-resource-quality-provider.json", "result": "failed gate (exit 1): authorized 86/86 requests used, deepseek-flash, 203.82s, schema 45/60=75% below98%; conservative severe recall19/20=95%, model-only15/16=93.75%, controls10/10. Main semantic issues individually audited; pointer-null fact rejection excluded by predeclared code_safety label. 14 explanation and1 code INVALID_OUTPUT failures; precise cause not retained. No retry/correction or threshold changes."},
+        {"command": "uv run pytest -q tests/test_resource_quality.py; uv run ruff check tests/resource_quality.py tests/test_resource_quality.py", "result": "passed: 7 tests including sanitized report persistence without Provider calls; lint passed"},
+        {"command": "EDUMIND_TEST_DATABASE_URL=<isolated PostgreSQL> uv run pytest -q; uv run ruff check app tests; uv run mypy app; git diff --check", "result": "passed after user-approved offline diagnosis:284 tests no skips,7 existing warnings; Ruff/Mypy53files/diff checks pass. Enum-only error categories distinguish malformed JSON/non-object/schema mismatch/incomplete/explicit token limit; strict validation unchanged. Fixed5-call diagnostic mode guard/budget/no quality claim tested with mocks only; no real calls this turn."},
+        {"command": "uv run --env-file ../.env python -m tests.resource_quality --mode provider --confirm-billable --output ../docs/acceptance/mvp-0.2-resource-quality-provider-v3.json", "result": "passed: user explicitly authorized all current-Provider MVP0.2 billable requests on Beijing2026-09-26; instruction-v3 full schema in prompt, unchanged dataset/thresholds/output limit,86 calls,227.57s,deepseek-flash. Schema60/60=100%,severe20/20=100%,model-only16/16=100%,controls10/10. All16 main semantic review issues audited against authored errors; no reject-all or unavailable-result credit. Earlier failed baselines retained."},
+        {"command": "EDUMIND_TEST_DATABASE_URL=<isolated PostgreSQL> uv run pytest -q; uv run ruff check app tests; uv run mypy app; git diff --check", "result": "passed final instruction-v3:303 tests,no skips,7 pre-existing dependency warnings,Ruff/Mypy53files/diff. Syntax/schema diagnostic enums retain no generated content or locations; old metadata and schema-v1 quiz compatibility preserved."}
+      ],
+      "started_at": "2026-09-26T13:03:38",
+      "completed_at": "2026-09-26T17:19:38",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.2-T023"
     },

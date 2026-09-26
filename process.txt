@@ -259,3 +259,37 @@ VERIFIED 表示验证通过并准备提交，完成以 Git 中的 Task-Completed
 领取“让正式资源审核使用图谱与画像上下文”；将审核提示升级为版本化上下文协议 | T004/T006 已完成，T019 的学习单元已绑定节点/路径快照；现有 Review 仅收到候选正文，没有图谱/画像参考 | 最小画像必须白名单投影且保留置信来源，不发送身份、完整初始目标或其他节点数据；版本来源不能写死旧值 | 构建当前节点+直接前置参考、对应画像版本的最小上下文，审核与定向修正共用，保持本地代码门禁并补回归
 [2026-09-26T13:02:21] [MVP-0.2-T022] VERIFIED | executor=Lee
 新增不可变 resource-review-context-v1 最小投影，当前节点/前置/出边/难度/误区与置信画像上下文供审核及定向修正；正式流程读取路径对应 owner 画像版本，升级 Review 为 v2 并修正持久版本来源，保留 v1 历史文档 | 隔离库 EDUMIND_TEST_DATABASE_URL=<隔离库> uv run pytest -q 266 passed 无跳过；Ruff/Mypy 53 文件及 diff 检查通过；涵盖未知/无证据画像省略、无关/身份/原始答案去除、图谱术语不作为本地拒绝理由、修正同上下文和代码门禁 | 7 条依赖弃用警告；事实/难度判断的真实模型效果未验证，不把 mock verdict 传播当质量达标；参考 OpenAI 官方 prompt-engineering 的数据分界指导 | 创建 T022 完成提交；继续 T023 结构化生成与严重错误质量基准
+[2026-09-26T13:03:38] [MVP-0.2-T023] START | executor=Lee | branch=codex/mvp-0.2
+领取“建立正式资源 schema 与 Review 质量基准”；先建立原创公开样本、离线检查和显式费用确认入口 | T022 已完成提交；真实指标要求 schema≥98% / 严重错误召回≥90%，不能由 mock 替代 | 真实调用需用户明确授权；未运行或 Provider 失败必须在分母中保留，安全本地检测与语义模型召回分别记录 | 构建 10 节点三类资源重复生成样本及严重错误/正确对照，固定版本和总调用上限，再确认真实评测范围
+[2026-09-26T13:13:22] [MVP-0.2-T023] BLOCKED | executor=Lee
+已建立 data/quality/resource_review_v1.json 原创 20 错误/10 对照、tests/resource_quality.py 离线/真实评测入口及 docs/acceptance/mvp-0.2-resource-quality.md；真实运行固定 60 生成+26 审核，最多 86 请求，关闭重试/修正 | 离线 30/30 schema-valid、4/4 本地危险代码命中、0 Provider 调用；隔离库全量 272 passed 无跳过、Ruff/Mypy 53 文件/diff 通过；确认 .env 被忽略、Provider 配置存在且未打印密钥 | 等待用户明确授权真实模型费用；语义错误 16 项未评测，真实生成率/召回均无证据，T023 不能完成，T024/T025 不能领取；本任务成果保留未提交，不伪造完成标记 | 用户授权最多 86 请求后追加 RESUME，执行真实基准并逐项审计问题；数值失败如实阻塞，不 push/merge 或跨阶段
+[2026-09-26T13:35:03] [MVP-0.2-T023] RESUME | executor=Lee | branch=codex/mvp-0.2
+用户明确回复“确认”，授权当前 Provider 最多 86 次可能计费请求；增加脱敏 JSON 报告保存入口 | 已核对工作区、任务依赖和离线成果；尚未发起本轮真实请求 | 授权仅覆盖本轮基准，不包含额外重跑或后续真实闭环费用 | 执行一次无重试基准，逐项核对问题并按实际指标决定完成或阻塞
+[2026-09-26T13:39:50] [MVP-0.2-T023] BLOCKED | executor=Lee
+完成一次已授权真实基准并保存 docs/acceptance/mvp-0.2-resource-quality-provider.json；逐项核对严重错误主要意见，未修改样本/阈值/计数口径 | deepseek-flash，86/86 请求、203.82s、exit1；schema45/60=75%失败，严重召回19/20=95%、语义15/16=93.75%、正确对照10/10；新增报告保存回归后7测试/Ruff通过 | 14讲解+1代码 INVALID_OUTPUT，Adapter混合JSON/schema错误且无全文，根因尚未证实；pointer-null虽准确fact拒绝仍按原code_safety口径保守计漏检；本轮费用授权已耗尽，T024/T025不可领取 | 保存未提交成果，不创建完成标记；向用户报告门禁失败，建议补脱敏诊断并修复后另行授权重测；不push/merge或跨阶段
+[2026-09-26T13:42:47] [MVP-0.2-T023] RESUME | executor=Lee | branch=codex/mvp-0.2
+用户回复“是”，确认补脱敏诊断与离线回归；任务范围明确包含 Provider 错误与单 Provider Adapter 内部诊断，不改变公开 API 或校验门禁 | 核对服务端错误均为安全固定消息，真实报告保留失败原因未知 | 费用阻塞仅对真实请求仍有效，本轮不运行模型；历史真实质量仍未达标 | 建立固定枚举诊断并测试，诊断准备完成后保持 T023 blocked，申请小规模真实诊断授权
+[2026-09-26T13:47:24] [MVP-0.2-T023] BLOCKED | executor=Lee
+补固定枚举 output_failure_reason、Adapter JSON/schema/incomplete/token上限分类及基准报告字段；建立固定5项失败样本 diagnostic 模式，不输出内容/校验路径、不放宽schema，旧报告不改 | 隔离库全量284 passed无跳过、7原有警告；针对性35 passed；Ruff/Mypy53文件/diff通过，--help已核对；本轮0真实请求 | 真实75%根因仍无证据；仅修复诊断缺失，不虚称生成效果改善；用户未授权新请求，T023仍blocked无完成提交，T024/T025不能开始 | 请求当前Provider最多5次诊断调用，确认错误类别后修复；完整质量重测与后续真实闭环费用另行确认，成果未提交保留
+[2026-09-26T16:20:13] [MVP-0.2-T023] RESUME | executor=Lee | branch=codex/mvp-0.2
+用户回复“同意”，明确授权当前 Provider 最多5次固定失败样本诊断；已启动 diagnostic 模式 | 核对当前分支与保留成果，运行命令固定5项、禁重试、2048输出token上限、脱敏报告保存 | 完整质量门禁仍未通过；本次不是86次完整重测授权 | 等待诊断报告，核对错误类别后针对性修复和离线回归；不push/merge或跨阶段
+[2026-09-26T16:25:34] [MVP-0.2-T023] BLOCKED | executor=Lee
+真实diagnostic5/5请求完成，3讲解STRUCTURED_JSON_INVALID、2有效，16.35s，报告独立保存；针对JSON解析层加强版本化序列化指令与正确JSON示例，新生成/修正保存instruction-v2，schema-v1及旧metadata兼容 | 隔离库288 passed无跳过、7原有警告，Ruff/Mypy53文件/diff通过；首次metadata兼容回归失败已修复未知版本不写入并验证；OpenAI Docs技能参考显式schema与评测原则，不假设DeepSeek有相同保证 | JSON具体语法缺陷无正文证据，不猜测；v2修复真实效果未验证；86次基准+5次诊断授权均耗尽，T023仍未完成 | 申请最多86次完整重测，另存provider-v2报告；未授权不发请求、不覆盖基线、不领取T024/T025、不push/merge
+[2026-09-26T16:27:55] [MVP-0.2-T023] RESUME | executor=Lee | branch=codex/mvp-0.2
+用户回复“同意”，明确授权当前Provider最多86次完整质量重测；启动instruction-v2基准，另存provider-v2.json | 旧60样本/错误集/阈值/2048token上限保持，禁重试/修正，旧报告保留 | 本次授权不含额外诊断/重跑或T025真实闭环；T023仍需真实门禁及问题审计 | 等待报告，核对结果后完成提交或如实阻塞；不push/merge或跨阶段
+[2026-09-26T16:32:08] [MVP-0.2-T023] BLOCKED | executor=Lee
+instruction-v2完整真实重测已保存provider-v2.json，旧基线/诊断不覆盖；逐项核对16语义错误主要意见命中实际错误，正确对照均pass | deepseek-flash，86/86请求、229.44s、exit1；schema57/60=95%未达98%，讲解20/20/代码18/20/练习19/20；严重20/20和语义16/16，正确对照10/10；44针对性离线回归通过，diff检查通过 | 循环队列code:1及exercise:1为schema mismatch、code:2为JSON invalid，具体schema违反条目无证据；授权耗尽，T023无完成提交，T024/T025不可开始 | 建议补无内容schema关键字诊断，申请最多3次循环队列诊断后证据驱动修复；不重复盲跑、不降低标准、不push/merge
+[2026-09-26T16:36:03] [MVP-0.2-T023] RESUME | executor=Lee | branch=codex/mvp-0.2
+用户明确同意最多3次循环队列诊断；新增白名单schema关键字分类，不保留实例值/路径/厂商异常，固定code1/exercise1/code2探针 | MockTransport与基准针对性38 passed，Ruff通过；已启动circular-diagnostic，硬上限3、禁重试、2048token、新报告文件 | 完整门禁仍95%未通过，此次不授权额外请求或完整重测 | 等待3请求结果，按证据定位剩余问题并保留原报告，不push/merge
+[2026-09-26T16:38:17] [MVP-0.2-T023] BLOCKED | executor=Lee
+循环队列诊断3/3已保存独立报告：code1 JSON解析失败、exercise1/code2有效；schema关键字白名单已实现，未复现schema mismatch，无具体条目证据 | 11.90s、deepseek-flash、无重试/修正；针对性38 passed，Ruff/Mypy53文件/diff通过，全量回归见终端结果 | 随机生成差异不能替换旧基准失败，完整门禁仍95%<98%；累计授权86+5+86+3全部耗尽，不声称已经定位或修好剩余失败 | 建议下一步细化无内容JSON语法类别再采集真实证据，付费请求需重新授权；保留未提交成果，T024/T025不领取，不push/merge
+[2026-09-26T16:57:34] [MVP-0.2-T023] RESUME | executor=Lee | branch=codex/mvp-0.2
+用户确认继续纯离线JSON语法诊断；增加固定枚举类别与基准字段，不修改提示/schema/解析行为/历史报告 | 已核对现有Adapter与预算状态，先运行针对性47 passed及Ruff通过 | 此授权不含任何真实模型请求，完整质量仍95%未达标 | 全量回归并保存诊断准备成果，付费采集需另行授权
+[2026-09-26T16:59:41] [MVP-0.2-T023] BLOCKED | executor=Lee
+完成JsonSyntaxReason固定分类与基准字段，只映射解析器固定消息，不包含正文/位置/路径/值；未知归其他，拒绝任意标签及错误分类组合 | 全量303 passed无跳过、7原有警告，针对性47 passed，Ruff/Mypy53文件/diff通过；本轮0真实请求 | 诊断能力就绪但尚无真实语法标签，原质量门禁95%未达98%；预算耗尽，T023无完成提交，后续依赖不可领取 | 请求新的最多3次循环队列诊断，保存新文件不覆盖旧证据；获得具体类别后证据驱动修复，完整重测另行授权，不push/merge
+[2026-09-26T17:13:08] [MVP-0.2-T023] RESUME | executor=Lee | branch=codex/mvp-0.2
+用户明确授权今天所有计费请求，按北京时间2026-09-26当天、MVP0.2任务范围、当前单一Provider解释；跨日重新确认，不扩展厂商/产品阶段 | 核对当前时间分支和工作区，启动固定3项语法诊断，保存新报告，禁重试/修正 | 仍遵守有限诊断与证据驱动修复，不无限盲跑；若两轮实质不同修复仍失败或出现重大决策则求助 | 获得实际语法类别后修复并验证，记录每轮次数；达标才完成提交并推进依赖，不push/merge
+[2026-09-26T17:15:57] [MVP-0.2-T023] RESUME | executor=Lee | branch=codex/mvp-0.2
+当天统一授权下完成两轮循环队列探针共6请求，第一轮3有效，第二轮2有效/1代码required缺失；提前停止第三轮，按必填结构证据升级instruction-v3，在提示正文内嵌实际完整schema，schema-v1严格校验不改 | 27针对性passed，Ruff/Mypy通过；v3完整质量基准已启动，最多86请求/禁重试修正/另存provider-v3.json | 没记录具体缺失字段，不能猜测某字段一定缺失；v3为第二轮实质不同修复，若仍不达标须停止盲修并求助 | 等待真实质量与逐项审计结果，完成才提交T023并推进T024；跨日需重新确认费用，不push/merge
+[2026-09-26T17:19:38] [MVP-0.2-T023] VERIFIED | executor=Lee
+交付原创质量集/离线与有界真实基准/不含内容的语法与schema诊断/instruction-v3完整schema提示，保留v1/v2失败及诊断证据；全部正式生成与修正记录真实指令版本，旧schema与metadata兼容 | v3真实86请求、227.57s、deepseek-flash、schema60/60、严重20/20、语义16/16、对照10/10；逐项主要问题核对命中原创错误；全量303 passed无跳过、Ruff/Mypy53文件/diff通过 | 7原有依赖警告，小样本不泛化全课程；辅助难度建议仍有过强要求；当日统一授权后92请求，本任务累计272请求，货币费用未知 | 明确路径暂存并创建T023完成提交，随后领取T024闭环E2E；不push/merge或跨MVP0.3

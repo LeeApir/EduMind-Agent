@@ -4,7 +4,10 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Literal, Protocol
 
-from app.agents.learning_resource_prompt import learning_resource_prompt
+from app.agents.learning_resource_prompt import (
+    RESOURCE_INSTRUCTION_VERSION,
+    learning_resource_prompt,
+)
 from app.agents.learning_resource_schema import (
     RESOURCE_PROMPT_VERSION,
     LearningResourceType,
@@ -63,6 +66,7 @@ class PendingLearningResource:
     model_id: str
     usage: TokenUsage | None
     review_status: Literal["pending"] = "pending"
+    instruction_version: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -147,6 +151,7 @@ class LearningUnitGenerator:
                     prompt_version=RESOURCE_PROMPT_VERSION,
                     model_id=result.model_id,
                     usage=result.usage,
+                    instruction_version=RESOURCE_INSTRUCTION_VERSION,
                 )
             )
         return LearningUnitGeneration(resources=tuple(resources), failures=tuple(failures))
