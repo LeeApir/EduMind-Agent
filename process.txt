@@ -293,3 +293,7 @@ instruction-v2完整真实重测已保存provider-v2.json，旧基线/诊断不�
 当天统一授权下完成两轮循环队列探针共6请求，第一轮3有效，第二轮2有效/1代码required缺失；提前停止第三轮，按必填结构证据升级instruction-v3，在提示正文内嵌实际完整schema，schema-v1严格校验不改 | 27针对性passed，Ruff/Mypy通过；v3完整质量基准已启动，最多86请求/禁重试修正/另存provider-v3.json | 没记录具体缺失字段，不能猜测某字段一定缺失；v3为第二轮实质不同修复，若仍不达标须停止盲修并求助 | 等待真实质量与逐项审计结果，完成才提交T023并推进T024；跨日需重新确认费用，不push/merge
 [2026-09-26T17:19:38] [MVP-0.2-T023] VERIFIED | executor=Lee
 交付原创质量集/离线与有界真实基准/不含内容的语法与schema诊断/instruction-v3完整schema提示，保留v1/v2失败及诊断证据；全部正式生成与修正记录真实指令版本，旧schema与metadata兼容 | v3真实86请求、227.57s、deepseek-flash、schema60/60、严重20/20、语义16/16、对照10/10；逐项主要问题核对命中原创错误；全量303 passed无跳过、Ruff/Mypy53文件/diff通过 | 7原有依赖警告，小样本不泛化全课程；辅助难度建议仍有过强要求；当日统一授权后92请求，本任务累计272请求，货币费用未知 | 明确路径暂存并创建T023完成提交，随后领取T024闭环E2E；不push/merge或跨MVP0.3
+[2026-09-26T17:21:50] [MVP-0.2-T024] START | executor=Lee | branch=codex/mvp-0.2
+领取学习闭环自动化E2E，组合输入/学习/练习/掌握度/推荐并覆盖画像修正、连续答错回退、重放/跨owner/重启 | T023完成提交cfeb6b6已核对，工作区干净，所有依赖完成；读取webapp-testing技能及helper --help | 既有浏览器仅路由mock，既有Compose恢复仅学习资源，不能冒充MVP0.2完整闭环；真实Provider证据需独立 | 补真实数据库+mock Provider集成链及浏览器/Compose恢复证据，再按门禁验证提交，不push/merge
+[2026-09-26T17:33:00] [MVP-0.2-T024] VERIFIED | executor=Lee
+交付真实DB/mock模型闭环及独立进程恢复，扩展Compose资源/回执/掌握度/路径恢复，记录证据边界 | 全量304 passed无跳过、7既有警告，Ruff/Mypy53文件通过；浏览器路由mock通过；独立Compose迁移后seed及重启postgres/api后check通过 | 初次seed早于迁移失败已记录，确认Alembic就绪后成功；0真实模型调用；浏览器不冒充真实Provider，独立测试卷保留 | 明确路径提交T024，随后领取T025真实闭环和性能退出验收，不push/merge或跨阶段
