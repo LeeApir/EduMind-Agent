@@ -6,7 +6,7 @@ from collections.abc import Mapping
 from typing import cast
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -18,7 +18,9 @@ from app.agents.profile_events import (
 )
 from app.agents.profile_schema import ProfileValue, apply_manual_correction
 from app.models.learning import ProfileEvent, StudentProfile
+from app.models.learning_state import LearningPathCurrent
 from app.services.learning_operations import IdempotencyConflict
+from app.services.learning_owner_lock import lock_learning_owner
 from app.services.owned_learning import latest_profile
 
 
@@ -106,6 +108,7 @@ async def persist_profile_version(
     request_digest: str | None = None,
 ) -> StudentProfile:
     """Insert the next immutable snapshot; a stale or concurrent writer fails loudly."""
+    await lock_learning_owner(db, owner_id)
     next_version = profile["profile_version"]
     if not isinstance(next_version, int) or isinstance(next_version, bool):
         raise ProfileVersionConflict("Profile version must be a positive integer.")
@@ -132,6 +135,12 @@ async def persist_profile_version(
     )
     db.add(persisted)
     try:
+        await db.flush()
+        await db.execute(
+            update(LearningPathCurrent)
+            .where(LearningPathCurrent.user_id == owner_id)
+            .values(replan_required=True)
+        )
         await db.commit()
     except IntegrityError:
         await db.rollback()
@@ -156,9 +165,7 @@ def snapshot_profile(profile: StudentProfile) -> dict[str, ProfileValue]:
 
 def correction_digest(corrections: Mapping[str, object]) -> str:
     """Canonical digest so an owner cannot reuse a correction key for another payload."""
-    value = json.dumps(
-        dict(corrections), ensure_ascii=False, sort_keys=True, separators=(",", ":")
-    )
+    value = json.dumps(dict(corrections), ensure_ascii=False, sort_keys=True, separators=(",", ":"))
     return hashlib.sha256(value.encode()).hexdigest()
 
 

@@ -13,11 +13,13 @@ from app.models.learning_state import (
     NodeMasteryCurrent,
     NodeMasteryRevision,
 )
+from app.services.learning_owner_lock import lock_learning_owner
 from app.services.mastery_rules import MASTERY_RULE_VERSION, MasteryFact, reduce_mastery
 
 
 async def lock_mastery_node(db: AsyncSession, *, owner_id: UUID, node_id: str) -> None:
     """Serialize writers for one owner/node before inserting their evidence."""
+    await lock_learning_owner(db, owner_id)
     digest = sha256(f"{owner_id}:{node_id}".encode("utf-8")).digest()
     lock_key = int.from_bytes(digest[:8], "big", signed=True)
     await db.execute(text("SELECT pg_advisory_xact_lock(:lock_key)"), {"lock_key": lock_key})
@@ -38,9 +40,7 @@ async def apply_mastery_evidence(
             .order_by(LearningEvidence.created_at, LearningEvidence.id)
         )
     ).all()
-    decision = reduce_mastery(
-        [MasteryFact(row.evidence_type, row.payload) for row in rows]
-    )
+    decision = reduce_mastery([MasteryFact(row.evidence_type, row.payload) for row in rows])
     current = await db.scalar(
         select(NodeMasteryCurrent)
         .where(

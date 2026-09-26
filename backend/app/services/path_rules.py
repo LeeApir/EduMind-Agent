@@ -130,10 +130,13 @@ def plan_learning_path(
     *,
     target_node_id: str,
     mastery: Mapping[str, PathMastery],
+    profile: Mapping[str, object] | None = None,
     available_node_ids: frozenset[str] | None = None,
 ) -> PathDecision:
     """Choose stable prerequisite-safe steps; never infer mastery or call a Provider."""
     nodes = _dependency_closure(graph, target_node_id, available_node_ids)
+    engineering = profile.get("engineering_preference") if profile is not None else None
+    code_first = isinstance(engineering, dict) and engineering.get("code_first") is True
     distances = _distance_to_target(nodes, target_node_id)
     states = {node_id: _mastery_for(node_id, mastery) for node_id in nodes}
     complete = {
@@ -188,6 +191,12 @@ def plan_learning_path(
             }
         elif dependent is not None:
             reason = {"kind": "prerequisite", "node_id": chosen, "required_by": dependent}
+        elif code_first:
+            reason = {
+                "kind": "profile_field",
+                "node_id": chosen,
+                "field": "engineering_preference.code_first",
+            }
         else:
             reason = {
                 "kind": "mastery_state",
@@ -204,6 +213,8 @@ def plan_learning_path(
                 recommended_resource=(
                     "review"
                     if state.status == "weak"
+                    else "code"
+                    if code_first
                     else "exercise"
                     if state.score >= 0.4
                     else "explanation"

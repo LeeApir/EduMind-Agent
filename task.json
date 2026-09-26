@@ -717,7 +717,7 @@
       "phase": "MVP 0.2",
       "parent_work_package": "MVP-0.2-005",
       "title": "生成并持久化初始路径与重新规划版本",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.2-T013",
@@ -735,9 +735,12 @@
       "verification": [
         "在 PostgreSQL 运行规划、重规划、幂等、历史和重启测试。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "隔离 PostgreSQL 路径版本测试覆盖初始规划、同输入重放、并发重放、掌握度重规划、画像偏好变更、旧版本和新引擎重启读取。",
+        "EDUMIND_TEST_DATABASE_URL=... uv run pytest -q：后端全量 236 passed；uv run ruff check app tests、uv run mypy app（49 个 source）、改动文件格式和 git diff --check 通过。"
+      ],
+      "started_at": "2026-09-25T23:44:59",
+      "completed_at": "2026-09-26T08:40:39",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.2-T017"
     },

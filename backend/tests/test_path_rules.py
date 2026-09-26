@@ -92,6 +92,21 @@ def test_mastered_target_has_no_remaining_steps() -> None:
     assert result.next_node_id is None
 
 
+def test_explicit_profile_preference_changes_resource_and_explanation() -> None:
+    result = plan_learning_path(
+        graph(),
+        target_node_id="array",
+        mastery={},
+        profile={"engineering_preference": {"code_first": True}},
+    )
+    assert result.steps[0].recommended_resource == "code"
+    assert result.steps[0].reason == {
+        "kind": "profile_field",
+        "node_id": "array",
+        "field": "engineering_preference.code_first",
+    }
+
+
 @pytest.mark.parametrize(
     ("target", "available", "code"),
     [
