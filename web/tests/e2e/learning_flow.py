@@ -10,6 +10,7 @@ from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
 BASE_URL = os.getenv("EDUMIND_E2E_BASE_URL", "http://127.0.0.1:4173")
 LAST_QUIZ_RECEIPT: dict[str, object] | None = None
 QUIZ_POST_COUNT = 0
+PATH_REPLANNED = False
 ANSWER_KEYS = {"q1": "next", "q2": "head", "q3": "->"}
 
 RESOURCES = [
@@ -60,7 +61,7 @@ def sse(*events: tuple[str, dict[str, object]]) -> str:
 
 
 def mock_api(route: Route) -> None:
-    global LAST_QUIZ_RECEIPT, QUIZ_POST_COUNT
+    global LAST_QUIZ_RECEIPT, QUIZ_POST_COUNT, PATH_REPLANNED
     request = route.request
     path = urlparse(request.url).path
     if path == "/api/auth/session":
@@ -75,7 +76,106 @@ def mock_api(route: Route) -> None:
             json={
                 "id": "unit-reviewed-001",
                 "status": "ready",
+                "path_target_node_id": "linked-list-concept",
                 "scenes": [{"resources": RESOURCES}],
+            },
+        )
+        return
+    if path == "/api/graph":
+        route.fulfill(
+            status=200,
+            json={
+                "graph_version": "g1",
+                "nodes": [
+                    {"id": "array", "name": "数组", "prerequisites": []},
+                    {"id": "c-pointer", "name": "C 指针", "prerequisites": []},
+                    {
+                        "id": "linked-list-concept",
+                        "name": "链表概念",
+                        "prerequisites": ["array", "c-pointer"],
+                    },
+                ],
+            },
+        )
+        return
+    if path == "/api/mastery":
+        items = [
+            {
+                "knowledge_node_id": "array",
+                "previous_score": 0.8,
+                "score": 0.9,
+                "status": "mastered",
+                "revision": 3,
+                "rule_version": "mastery-v1",
+                "evidence_summary": ["数组测验通过"],
+            }
+        ]
+        if LAST_QUIZ_RECEIPT:
+            items.append(
+                {
+                    "knowledge_node_id": "c-pointer",
+                    "previous_score": 0,
+                    "score": 0.55,
+                    "status": "learning",
+                    "revision": 1,
+                    "rule_version": "mastery-v1",
+                    "evidence_summary": ["指针测验记录"],
+                }
+            )
+        route.fulfill(status=200, json={"graph_version": "g1", "items": items})
+        return
+    if path in {"/api/path/current", "/api/path/replan"}:
+        if path == "/api/path/replan":
+            assert request.headers.get("if-match-path-version") == "1"
+            assert request.headers.get("idempotency-key") and request.headers.get("x-csrf-token")
+            PATH_REPLANNED = True
+        recorded = bool(LAST_QUIZ_RECEIPT)
+        route.fulfill(
+            status=200,
+            json={
+                "version": 2 if PATH_REPLANNED else 1,
+                "target_node_id": "linked-list-concept",
+                "graph_version": "g1",
+                "profile_version": 1,
+                "mastery_revision_watermark": 4 if recorded else 3,
+                "planner_rule_version": "path-v2",
+                "nodes": ["c-pointer", "linked-list-concept"],
+                "node_details": [
+                    {
+                        "node_id": "c-pointer",
+                        "score": 0.55 if recorded else 0,
+                        "status": "learning" if recorded else "unseen",
+                        "cost": 0.2,
+                        "recommended_resource": "exercise" if recorded else "explanation",
+                        "estimated_minutes": 12,
+                    },
+                    {
+                        "node_id": "linked-list-concept",
+                        "score": 0,
+                        "status": "unseen",
+                        "cost": 0,
+                        "recommended_resource": "explanation",
+                        "estimated_minutes": 16,
+                    },
+                ],
+                "current_node_id": "c-pointer",
+                "prerequisite_node_ids": [],
+                "next_node_id": "linked-list-concept",
+                "reasons": [
+                    {
+                        "kind": "prerequisite",
+                        "knowledge_node_id": "c-pointer",
+                        "summary": "C 指针是链表概念的前置知识。",
+                    }
+                ],
+                "changes": {
+                    "kind": "path_change" if PATH_REPLANNED else "initial_plan",
+                    "trigger": "mastery_changed" if PATH_REPLANNED else "initial_plan",
+                    "added_node_ids": [],
+                    "removed_node_ids": [],
+                    "reordered_node_ids": [],
+                },
+                "is_stale": recorded and not PATH_REPLANNED,
             },
         )
         return
@@ -206,9 +306,10 @@ def mock_api(route: Route) -> None:
 
 
 def open_page(page: Page) -> None:
-    global LAST_QUIZ_RECEIPT, QUIZ_POST_COUNT
+    global LAST_QUIZ_RECEIPT, QUIZ_POST_COUNT, PATH_REPLANNED
     LAST_QUIZ_RECEIPT = None
     QUIZ_POST_COUNT = 0
+    PATH_REPLANNED = False
     page.on(
         "console",
         lambda message: print(f"browser console [{message.type}]: {message.text}", flush=True),
@@ -243,6 +344,9 @@ def run() -> None:
             page.get_by_role("button", name="代码", exact=True).click()
             expect(page.get_by_test_id("code-tab")).to_contain_text("node->next")
             page.get_by_role("button", name="练习", exact=True).click()
+            learning_path = page.get_by_role("region", name="学习路径", exact=True)
+            expect(learning_path).to_contain_text("当前：C 指针 · 下一步：链表概念")
+            expect(learning_path.locator('[data-node-id="array"]')).to_contain_text("已掌握 · 90%")
             page.get_by_label("插入前先保存什么？").fill("next")
             page.get_by_label("头节点变量？").fill("head")
             page.get_by_label("指针运算符？").fill("->")
@@ -251,6 +355,21 @@ def run() -> None:
                 "0% → 55%"
             )
             assert QUIZ_POST_COUNT == 1
+            expect(learning_path).to_contain_text("路径 v2")
+            expect(learning_path.locator('[data-node-id="c-pointer"]')).to_contain_text(
+                "学习中 · 55%"
+            )
+            expect(learning_path.locator('[data-node-id="array"]')).to_have_attribute(
+                "data-changed", "false"
+            )
+            learning_path.locator('[data-node-id="array"] button').focus()
+            page.keyboard.press("Enter")
+            expect(learning_path.get_by_role("region", name="节点推荐依据")).to_contain_text(
+                "数组测验通过"
+            )
+            learning_path.screenshot(
+                path="/tmp/edumind-mvp02-t021-desktop.png", animations="disabled"
+            )
             page.locator(".published-workspace").screenshot(
                 path="/tmp/edumind-mvp02-t020-desktop.png", animations="disabled"
             )
@@ -265,6 +384,9 @@ def run() -> None:
                 path="/tmp/edumind-mvp02-t020-mobile.png", animations="disabled"
             )
             assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
+            learning_path.screenshot(
+                path="/tmp/edumind-mvp02-t021-mobile.png", animations="disabled"
+            )
             page.close()
 
             page = browser.new_page()

@@ -251,3 +251,7 @@ VERIFIED 表示验证通过并准备提交，完成以 Git 中的 Task-Completed
 领取“将练习改为服务端提交并展示掌握度变化”；补充结果恢复 API 与答案键去敏范围 | T012/T013 已完成，前端仍为内存答案比对 | 刷新恢复需要 owner 服务端结果读取；正式资源响应不能预先泄露答案键 | 新增结果恢复读取，改为全卷幂等提交与逐题/掌握度回执，补组件和客户端测试
 [2026-09-26T12:36:56] [MVP-0.2-T020] VERIFIED | executor=Lee
 正式练习去除公开答案键，新增 owner 最近回执 GET，前端全卷幂等提交并展示逐题反馈/掌握度历史变化，刷新仅存单元 ID 并恢复服务端结果；沿用现有视觉系统并核对移动布局 | pnpm test --run 42 passed，typecheck/lint/build 通过（67 原有格式警告）；EDUMIND_TEST_DATABASE_URL=<隔离库> uv run pytest -q 255 passed 无跳过；Ruff/Mypy 52 文件、OpenAPI/diff 检查通过；with_server.py + web/tests/e2e/learning_flow.py 路由模拟通过，截图 /tmp/edumind-mvp02-t020-{desktop,mobile}.png | 7 条后端依赖弃用警告；浏览器预期 401/404 不算真实 Provider 验证，阶段验收仍待完成 | 创建 T020 完成提交；继续 T021 轻量路径视图，接入真实服务端路径和掌握度
+[2026-09-26T12:38:21] [MVP-0.2-T021] START | executor=Lee | branch=codex/mvp-0.2
+领取“实现轻量学习路径视图”；沿用当前雾蓝/纸白视觉与等宽掌握度数据，以可键盘操作的节点列表呈现推荐顺序 | T018/T020 已有完成提交，工作区干净；服务端路径只读和幂等重规划契约已核对 | 已掌握节点可能被路径省略，视图需结合公开图谱与 owner 掌握度显示前置证据；不能从测验历史回执替代当前状态 | 建立路径客户端、版本受控重规划、增量节点视图与单元/浏览器验证
+[2026-09-26T12:54:03] [MVP-0.2-T021] VERIFIED | executor=Lee
+新增类型校验路径客户端及轻量节点视图，组合图谱/当前掌握度/路径版本显示当前前置下一步、四态与证据；练习触发幂等重规划，只替换变化节点并保留选中项，校验图谱与掌握度水位一致性 | pnpm test --run 54 passed，typecheck/变更文件 ESLint/build 通过；全量 lint 0 错误/67 原有警告；with_server.py + learning_flow.py 浏览器路由模拟通过，键盘 Enter、版本更新、刷新恢复、390px 无溢出；/tmp/edumind-mvp02-t021-{desktop,mobile}.png 视觉核对通过；Ruff/diff 检查通过 | 首次浏览器运行发现 Vue 默认函数属性被当作工厂，已修复并补默认客户端回归；真实 Provider 与完整闭环仍待后续阶段验收 | 创建 T021 完成提交；继续 T022 图谱与画像审核上下文

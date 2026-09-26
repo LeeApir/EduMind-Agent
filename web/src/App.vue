@@ -9,6 +9,7 @@ import LearningProgressPanel, {
 } from "./components/LearningProgressPanel.vue";
 import ProfileCard from "./components/ProfileCard.vue";
 import PublishedLearningWorkspace from "./components/PublishedLearningWorkspace.vue";
+import LearningPathPanel from "./components/LearningPathPanel.vue";
 
 type StartLearningRequest = (goal: string) => Promise<void>;
 
@@ -19,6 +20,7 @@ interface Resource extends PublishedResource {
 
 interface LearningUnitPayload {
   scenes: Array<{ resources: Resource[] }>;
+  path_target_node_id?: string | null;
 }
 
 interface SessionPayload {
@@ -38,6 +40,8 @@ const operationId = ref("");
 const idempotencyKey = ref("");
 const csrfToken = ref("");
 const profileRefreshToken = ref(0);
+const pathTargetNodeId = ref("");
+const pathRefreshToken = ref(0);
 const restoringUnit = ref(false);
 const restoreUnitError = ref("");
 let learningGeneration = 0;
@@ -65,6 +69,7 @@ function resetAttempt(): void {
   temporaryText.value = "";
   reviewState.value = "idle";
   resources.value = [];
+  pathTargetNodeId.value = "";
   learningUnitId.value = "";
   operationId.value = "";
   idempotencyKey.value = crypto.randomUUID();
@@ -174,6 +179,7 @@ async function loadPublishedUnit(unitId = learningUnitId.value, expectedGenerati
   if (expectedGeneration !== learningGeneration) return;
   learningUnitId.value = unitId;
   resources.value = loaded;
+  pathTargetNodeId.value = typeof payload.path_target_node_id === "string" ? payload.path_target_node_id : "";
   reviewState.value = "published";
   try { sessionStorage.setItem("edumind:last-learning-unit", unitId); } catch { /* Storage is optional; server state remains authoritative. */ }
 }
@@ -198,6 +204,7 @@ onMounted(() => { if (!props.startLearningRequest) void restoreRecentUnit(); });
 
 function handleQuizSubmitted(): void {
   profileRefreshToken.value += 1;
+  pathRefreshToken.value += 1;
 }
 
 function isPublishedResource(value: Resource): value is Resource {
@@ -335,6 +342,12 @@ function stringValue(value: unknown): string {
         重新读取上次学习
       </NButton>
     </section>
+    <LearningPathPanel
+      v-if="pathTargetNodeId"
+      :target-node-id="pathTargetNodeId"
+      :csrf-token="csrfToken"
+      :refresh-token="pathRefreshToken"
+    />
     <ProfileCard :refresh-token="profileRefreshToken" />
   </main>
 </template>

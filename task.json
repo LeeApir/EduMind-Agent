@@ -861,7 +861,7 @@
       "phase": "MVP 0.2",
       "parent_work_package": "MVP-0.2-006",
       "title": "实现轻量学习路径视图",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.2-T018",
@@ -879,9 +879,15 @@
       "verification": [
         "运行路径组件测试、无障碍检查、类型检查、Lint 和构建。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {"command": "pnpm test --run", "result": "passed: 54 tests across 9 files; path client 4 tests and path component 8 tests cover four-state legend, evidence, changed-node preservation, stable replan retry, version conflict, empty/completed paths and obsolete requests"},
+        {"command": "pnpm typecheck && pnpm exec eslint src/App.vue src/api/paths.ts src/components/LearningPathPanel.vue tests/paths.spec.ts tests/LearningPathPanel.spec.ts && pnpm build", "result": "passed: typecheck, changed-file lint without warnings, production build"},
+        {"command": "pnpm lint", "result": "passed: 0 errors, 67 existing Vue formatting warnings"},
+        {"command": "python3 /Users/apir/.agents/skills/webapp-testing/scripts/with_server.py --server 'cd ../web && pnpm dev --host 127.0.0.1 --port 4173 --strictPort' --port 4173 -- uv run python ../web/tests/e2e/learning_flow.py", "result": "passed: route-mock browser learning/quiz/replan/reload, native keyboard Enter selection and named evidence region, unchanged-node check, 390px no overflow; visually inspected /tmp/edumind-mvp02-t021-desktop.png and /tmp/edumind-mvp02-t021-mobile.png; not real Provider evidence"},
+        {"command": "uv run ruff check ../web/tests/e2e/learning_flow.py && git diff --check", "result": "passed"}
+      ],
+      "started_at": "2026-09-26T12:38:21",
+      "completed_at": "2026-09-26T12:54:03",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.2-T021"
     },
