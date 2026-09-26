@@ -58,7 +58,17 @@ async def get_learning_unit(
         resources = scenes[scene_key]["resources"]
         assert isinstance(resources, list)
         resources.append(resource_payload(resource))
-    return {"id": str(unit.id), "status": unit.status, "scenes": list(scenes.values())}
+    path_snapshot = (unit.outline or {}).get("path_snapshot")
+    return {
+        "id": str(unit.id),
+        "status": unit.status,
+        "scenes": list(scenes.values()),
+        "knowledge_node_id": unit.knowledge_point_id,
+        "path_target_node_id": path_snapshot.get("target_node_id")
+        if isinstance(path_snapshot, dict)
+        else None,
+        "path_version": path_snapshot.get("version") if isinstance(path_snapshot, dict) else None,
+    }
 
 
 @router.get("/api/resource/{resource_id}")

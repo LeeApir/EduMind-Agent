@@ -787,7 +787,7 @@
       "phase": "MVP 0.2",
       "parent_work_package": "MVP-0.2-005",
       "title": "把一句话目标和学习单元关联到知识节点",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.2-T004",
@@ -796,7 +796,9 @@
       "scope": [
         "backend/app/agents/",
         "backend/app/services/",
-        "backend/tests/"
+        "backend/app/api/",
+        "backend/tests/",
+        "docs/api/openapi.yaml"
       ],
       "acceptance_criteria": [
         "解析候选节点后由本地 Repository 校验，模型不得创造未知节点。",
@@ -806,9 +808,12 @@
       "verification": [
         "运行别名、模糊目标、未知节点、Provider 失败和关联测试。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "目标解析覆盖别名、嵌套别名、模糊/否定/多主题、未知模型节点、低置信度和 Provider 失败；学习 SSE 集成覆盖持久澄清重放及节点/路径快照关联。",
+        "隔离 PostgreSQL 后端全量 255 passed，包含初始画像并发重基、OpenAPI GoalClarification/LearningUnit 校验；Ruff/Mypy（52 个 source）、OpenAPI JSON 和 git diff --check 通过。"
+      ],
+      "started_at": "2026-09-26T11:16:40",
+      "completed_at": "2026-09-26T11:49:10",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.2-T019"
     },

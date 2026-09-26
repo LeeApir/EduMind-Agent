@@ -5,14 +5,17 @@ from collections.abc import AsyncIterator
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Header, Request
-from fastapi.responses import StreamingResponse
-from pydantic import BaseModel, Field
+from fastapi.responses import JSONResponse, StreamingResponse
+from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+from app.agents.goal_node_resolver import resolve_goal_node
+from app.api.knowledge_graph import knowledge_graph_repository
 from app.core.auth import AuthenticatedSession, require_authenticated_session
 from app.core.database import database_session_factory
 from app.core.provider_factory import build_default_provider_gateway
 from app.services.first_learning import prepare_first_learning
+from app.services.knowledge_graph import KnowledgeGraphRepository
 from app.services.learning_finalization import finalize_learning_unit
 from app.services.learning_operations import (
     IdempotencyConflict,
@@ -28,6 +31,7 @@ router = APIRouter(tags=["Learning"])
 
 
 class StartLearningRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
     goal: str = Field(min_length=1, max_length=2000)
     preferred_language: str = "c"
 
@@ -58,6 +62,9 @@ async def _first_screen_events(
     owner_id: UUID,
     goal: str,
     code_language: str,
+    knowledge_node_id: str,
+    path_snapshot: dict[str, object],
+    graph: KnowledgeGraphRepository,
 ) -> AsyncIterator[str]:
     operation = str(operation_id)
     yield _event("agent_start", {"operation_id": operation, "stage": "preparing"})
@@ -95,6 +102,9 @@ async def _first_screen_events(
                 goal=goal,
                 code_language=code_language,
                 gateway=gateway,
+                knowledge_node_id=knowledge_node_id,
+                path_snapshot=path_snapshot,
+                graph=graph,
             )
     except (ProviderError, ValueError):
         async with session_factory() as db:
@@ -153,7 +163,7 @@ async def _first_screen_events(
     yield _event("done", {"operation_id": operation, "status": "published"})
 
 
-@router.post("/api/learning-sessions")
+@router.post("/api/learning-sessions", response_model=None)
 async def start_learning_session(
     payload: StartLearningRequest,
     _request: Request,
@@ -161,7 +171,8 @@ async def start_learning_session(
     idempotency_key: str = Header(min_length=16, max_length=128, alias="Idempotency-Key"),
     session_factory: async_sessionmaker[AsyncSession] = Depends(database_session_factory),
     gateway: ProviderGateway = Depends(provider_gateway),
-) -> StreamingResponse:
+    graph: KnowledgeGraphRepository = Depends(knowledge_graph_repository),
+) -> StreamingResponse | JSONResponse:
     """Persist only the profile, then stream explicitly temporary first learning content."""
     async with session_factory() as db:
         try:
@@ -177,13 +188,38 @@ async def start_learning_session(
 
             raise AuthFailure(409, "IDEMPOTENCY_CONFLICT", "Idempotency key conflicts.") from None
         if not reservation.created:
+            previous_error = reservation.operation.error
+            if previous_error and previous_error.get("code") == "GOAL_CLARIFICATION_REQUIRED":
+                return JSONResponse(
+                    status_code=422, content=previous_error, headers={"Cache-Control": "no-store"}
+                )
             return StreamingResponse(
                 _replay_operation_events(reservation.operation),
                 media_type="text/event-stream",
                 headers={"Cache-Control": "no-store", "X-Accel-Buffering": "no"},
             )
+        resolution = await resolve_goal_node(payload.goal, graph=graph, gateway=gateway)
+        if resolution.node is None:
+            clarification: dict[str, object] = {
+                "code": "GOAL_CLARIFICATION_REQUIRED",
+                "message": "请明确一个知识点，例如“C 指针”“单链表”或“链表插入”。",
+                "retryable": False,
+                "candidate_nodes": [
+                    {"id": node.id, "name": node.name}
+                    for node in (resolution.candidates or graph.all_nodes())
+                ],
+            }
+            await update_operation(db, reservation.operation, status="failed", error=clarification)
+            return JSONResponse(
+                status_code=422, content=clarification, headers={"Cache-Control": "no-store"}
+            )
         prepared = await prepare_first_learning(
-            db, owner_id=current.user.id, goal=payload.goal, gateway=gateway
+            db,
+            owner_id=current.user.id,
+            goal=payload.goal,
+            gateway=gateway,
+            target_node_id=resolution.node.id,
+            graph=graph,
         )
     return StreamingResponse(
         _first_screen_events(
@@ -194,6 +230,9 @@ async def start_learning_session(
             owner_id=current.user.id,
             goal=payload.goal,
             code_language=payload.preferred_language,
+            knowledge_node_id=prepared.knowledge_node_id,
+            path_snapshot=prepared.path_snapshot,
+            graph=graph,
         ),
         media_type="text/event-stream",
         headers={"Cache-Control": "no-store", "X-Accel-Buffering": "no"},

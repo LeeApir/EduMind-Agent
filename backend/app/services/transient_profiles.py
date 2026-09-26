@@ -1,15 +1,23 @@
 """Persist the first conservative profile for an authenticated anonymous owner."""
 
+from copy import deepcopy
 from dataclasses import dataclass
 from typing import cast
 from uuid import UUID
 
+from sqlalchemy import update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.agents.profile_agent import ProfileAgent
 from app.agents.profile_events import PROFILE_MERGE_RULE_VERSION
-from app.agents.profile_schema import ProfileValue, merge_profile_snapshots
+from app.agents.profile_schema import (
+    ProfileValue,
+    merge_profile_snapshots,
+    validate_transient_profile,
+)
 from app.models.learning import StudentProfile
+from app.models.learning_state import LearningPathCurrent
+from app.services.learning_owner_lock import lock_learning_owner
 from app.services.owned_learning import latest_profile
 from app.services.profile_updates import snapshot_profile
 
@@ -47,7 +55,19 @@ async def create_transient_profile(
     previous = await latest_profile(db, owner_id)
     version = 1 if previous is None else previous.version + 1
     extraction = await profile_agent.extract(initial_query, profile_version=version)
-    profile = extraction.profile
+    # Provider work finishes before taking the short owner-state lock.
+    await lock_learning_owner(db, owner_id)
+    previous = await latest_profile(db, owner_id)
+    version = 1 if previous is None else previous.version + 1
+    profile = deepcopy(extraction.profile)
+    profile["profile_version"] = version
+    evidence = profile["evidence"]
+    assert isinstance(evidence, dict)
+    for records in evidence.values():
+        assert isinstance(records, list)
+        for record in records:
+            record["profile_version"] = version
+    profile = validate_transient_profile(profile)
     if previous is not None:
         profile = merge_profile_snapshots(snapshot_profile(previous), profile)
 
@@ -67,4 +87,9 @@ async def create_transient_profile(
     )
     db.add(persisted)
     await db.flush()
+    await db.execute(
+        update(LearningPathCurrent)
+        .where(LearningPathCurrent.user_id == owner_id)
+        .values(replan_required=True)
+    )
     return PersistedTransientProfile(profile=persisted, degraded=extraction.degraded)

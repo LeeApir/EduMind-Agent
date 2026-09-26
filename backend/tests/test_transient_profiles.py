@@ -15,7 +15,7 @@ from app.models.auth import User
 from app.models.learning import StudentProfile
 from app.services.owned_learning import latest_profile
 from app.services.profile_updates import correct_profile
-from app.services.provider_gateway import StructuredResult
+from app.services.provider_gateway import StructuredRequest, StructuredResult
 from app.services.transient_profiles import create_transient_profile
 
 TEST_DATABASE_URL = os.getenv("EDUMIND_TEST_DATABASE_URL")
@@ -48,6 +48,57 @@ def profile(query: str, version: int) -> dict[str, object]:
         ]
     }
     return value
+
+
+def test_concurrent_initial_profiles_rebase_after_provider_without_lost_versions() -> None:
+    assert TEST_DATABASE_URL is not None
+
+    async def exercise() -> None:
+        engine = create_database_engine(TEST_DATABASE_URL)
+        try:
+            sessions = async_sessionmaker(engine, expire_on_commit=False)
+            async with sessions() as db:
+                owner = User(is_guest=True)
+                db.add(owner)
+                await db.commit()
+                owner_id = owner.id
+            barrier = asyncio.Event()
+            calls = 0
+
+            class BarrierGateway:
+                async def generate_structured(
+                    self, request: StructuredRequest, *, retry_safe: bool = False
+                ) -> StructuredResult:
+                    nonlocal calls
+                    calls += 1
+                    if calls == 2:
+                        barrier.set()
+                    await asyncio.wait_for(barrier.wait(), timeout=5)
+                    return StructuredResult(
+                        value=profile(request.prompt.messages[-1].content, 1), model_id="test"
+                    )
+
+            async def create(query: str) -> int:
+                async with sessions() as db:
+                    result = await create_transient_profile(
+                        db,
+                        owner_id=owner_id,
+                        initial_query=query,
+                        profile_agent=ProfileAgent(BarrierGateway()),
+                    )
+                    await db.commit()
+                    return result.profile.version
+
+            assert sorted(await asyncio.gather(create("学习数组"), create("学习队列"))) == [1, 2]
+            async with sessions() as db:
+                latest = await latest_profile(db, owner_id)
+                assert latest is not None and latest.version == 2
+                assert latest.previous_profile_id is not None
+                assert latest.evidence["learning_goals"][-1]["profile_version"] == 2
+        finally:
+            await engine.dispose()
+
+    asyncio.run(exercise())
 
 
 def test_transient_profiles_increment_per_owner_and_hide_other_anonymous_session() -> None:
@@ -150,15 +201,15 @@ def test_new_learning_keeps_manual_correction_and_old_snapshot() -> None:
                 ]
                 assert second.profile.learning_goals == {"current_topic": "数组"}
                 assert (
-                    second.profile.evidence["learning_goals"][-2]["source"]
-                    == "manual_correction"
+                    second.profile.evidence["learning_goals"][-2]["source"] == "manual_correction"
                 )
                 assert degraded.degraded is True
                 assert degraded.profile.version == 4
                 assert degraded.profile.learning_goals == {"current_topic": "数组"}
-                assert degraded.profile.evidence["learning_goals"] == second.profile.evidence[
-                    "learning_goals"
-                ]
+                assert (
+                    degraded.profile.evidence["learning_goals"]
+                    == second.profile.evidence["learning_goals"]
+                )
 
             async with sessions() as db:
                 rows = (

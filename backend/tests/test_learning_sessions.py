@@ -4,16 +4,19 @@ import asyncio
 import json
 import os
 from collections.abc import AsyncIterator, Iterator
+from pathlib import Path
 from uuid import UUID
 
 import pytest
 from fastapi.testclient import TestClient
+from jsonschema import Draft202012Validator
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from app.api.learning_sessions import provider_gateway
 from app.core.database import create_database_engine
 from app.main import app
-from app.models.learning import LearningOperation
+from app.models.learning import LearningOperation, LearningUnit
+from app.models.learning_state import LearningPathVersion
 from app.services.provider_gateway import (
     ProviderError,
     ProviderErrorCode,
@@ -154,6 +157,15 @@ def event_data(event: str) -> dict[str, object]:
     return json.loads(event.split("data: ", 1)[1])
 
 
+def validate_contract(name: str, value: object) -> None:
+    specification = json.loads(
+        (Path(__file__).resolve().parents[2] / "docs/api/openapi.yaml").read_text(encoding="utf-8")
+    )
+    Draft202012Validator(
+        {"components": specification["components"], "$ref": f"#/components/schemas/{name}"}
+    ).validate(value)
+
+
 def test_session_publishes_only_reviewed_resources_after_temporary_tokens(
     database_url: str,
 ) -> None:
@@ -162,7 +174,7 @@ def test_session_publishes_only_reviewed_resources_after_temporary_tokens(
     try:
         response = client.post(
             "/api/learning-sessions",
-            json={"goal": "讲解链表", "preferred_language": "c"},
+            json={"goal": "讲解单链表", "preferred_language": "c"},
             headers={"Origin": "https://testserver", "X-CSRF-Token": csrf},
         )
         assert response.status_code == 200
@@ -187,10 +199,31 @@ def test_session_publishes_only_reviewed_resources_after_temporary_tokens(
         assert '"status": "published"' in events[-1]
         profile = client.get("/api/profile/me")
         assert profile.status_code == 200
-        assert profile.json()["initial_query"] == "讲解链表"
+        assert profile.json()["initial_query"] == "讲解单链表"
         formal = client.get(f"/api/learning-units/{unit_id}")
         assert formal.status_code == 200
+        validate_contract("LearningUnit", formal.json())
         assert formal.json()["status"] == "ready"
+        assert formal.json()["knowledge_node_id"] == "c-pointer"
+        assert formal.json()["path_target_node_id"] == "single-linked-list"
+        assert formal.json()["path_version"] == 1
+
+        async def verify_binding() -> None:
+            engine = create_database_engine(database_url)
+            try:
+                async with async_sessionmaker(engine)() as db:
+                    unit = await db.get(LearningUnit, UUID(unit_id))
+                    assert unit is not None and unit.outline is not None
+                    snapshot = unit.outline["path_snapshot"]
+                    assert isinstance(snapshot, dict)
+                    assert snapshot["graph_version"] == "mvp-0.2.0"
+                    path = await db.get(LearningPathVersion, UUID(snapshot["id"]))
+                    assert path is not None and path.version == snapshot["version"]
+                    assert unit.knowledge_point_id == path.current_node_id
+            finally:
+                await engine.dispose()
+
+        asyncio.run(verify_binding())
         assert len(formal.json()["scenes"][0]["resources"]) == 3
         for resource_id in resource_ids:
             resource = client.get(f"/api/resource/{resource_id}")
@@ -206,6 +239,32 @@ def test_session_publishes_only_reviewed_resources_after_temporary_tokens(
             "review",
             "review",
         ]
+    finally:
+        client.close()
+        app.dependency_overrides.clear()
+
+
+def test_ambiguous_goal_returns_durable_clarification_without_generation(database_url: str) -> None:
+    adapter = FakeAdapter()
+    client, csrf = create_authenticated_client(adapter)
+    try:
+        write_headers = {"Origin": "https://testserver", "X-CSRF-Token": csrf}
+        first = client.post(
+            "/api/learning-sessions", json={"goal": "讲解链表"}, headers=write_headers
+        )
+        assert first.status_code == 422
+        assert first.json()["code"] == "GOAL_CLARIFICATION_REQUIRED"
+        validate_contract("GoalClarification", first.json())
+        assert {node["id"] for node in first.json()["candidate_nodes"]} == {
+            "linked-list-concept",
+            "single-linked-list",
+        }
+        replay = client.post(
+            "/api/learning-sessions", json={"goal": "讲解链表"}, headers=write_headers
+        )
+        assert replay.status_code == 422 and replay.json() == first.json()
+        assert adapter.calls == []
+        assert client.get("/api/profile/me").status_code == 404
     finally:
         client.close()
         app.dependency_overrides.clear()

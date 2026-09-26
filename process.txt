@@ -243,3 +243,7 @@ VERIFIED 表示验证通过并准备提交，完成以 Git 中的 Task-Completed
 领取“提供掌握度与路径 API”；为契约要求的持久幂等回执补充 models/Alembic 范围 | T002/T005/T017 完成，OpenAPI 已固定 plan/replan/current/mastery 边界 | 必须持久化 owner 幂等键与版本预条件，重放不能被当前新版本替代 | 建立命令回执表、路由、owner 契约与无 Provider/性能测试
 [2026-09-26T11:14:14] [MVP-0.2-T018] VERIFIED | executor=Lee
 新增 mastery/current/plan/replan API 与 0009 持久幂等命令回执；返回版本、资源/时长、去敏理由及变化节点；修正 T017 画像偏好规则标识为 path-v2 并保留 v1 重算入口 | 定向 API 4 passed、隔离库迁移升降级和全量 240 passed、查询 P95 < 200ms、Ruff/Mypy/OpenAPI/git diff --check 通过 | 7 条依赖弃用警告；P95 是本地隔离库结果，不替代阶段部署验收 | 创建 T018 完成提交；继续 T019 学习单元图谱绑定
+[2026-09-26T11:16:40] [MVP-0.2-T019] START | executor=Lee | branch=codex/mvp-0.2
+领取“把一句话目标和学习单元关联到知识节点”；补充澄清 API/契约范围 | T004/T017 完成，知识节点与路径版本已可用 | 原学习单元没有节点或路径快照，不能可靠归属测验；模糊目标不得默认节点 | 先解析并本地校验，再保存路径快照并用于正式资源生成；失败或低置信映射返回澄清
+[2026-09-26T11:49:10] [MVP-0.2-T019] VERIFIED | executor=Lee
+新增 goal-node-v1 保守别名/候选校验与持久澄清；学习按路径当前节点生成并保存图谱/路径快照，API 返回关联字段；初始画像在 Provider 完成后加 owner 锁并重基版本 | 隔离库后端全量 255 passed，覆盖映射失败、澄清重放、关联和并发画像；Ruff/Mypy/OpenAPI/git diff --check 通过 | 7 条依赖弃用警告；真实 Provider 与浏览器闭环留给阶段验收 | 创建 T019 完成提交；继续 T020 服务端练习提交前端

@@ -9,6 +9,7 @@ from app.agents.learning_resource_schema import LearningResourceType
 from app.agents.learning_unit_generator import LearningResourceRequest, LearningUnitGenerator
 from app.agents.review_agent import ReviewAgent, ReviewOutcome
 from app.models.learning import GeneratedResource, LearningScene, LearningUnit
+from app.services.knowledge_graph import KnowledgeGraphRepository
 from app.services.provider_gateway import ProviderGateway
 from app.services.resource_publication import ResourcePublicationError, record_reviewed_resource
 
@@ -31,6 +32,9 @@ async def finalize_learning_unit(
     goal: str,
     code_language: str,
     gateway: ProviderGateway,
+    knowledge_node_id: str,
+    path_snapshot: dict[str, object],
+    graph: KnowledgeGraphRepository,
 ) -> FinalizedLearningUnit:
     """Generate, review, and atomically expose a complete first learning scene.
 
@@ -38,14 +42,24 @@ async def finalize_learning_unit(
     unit non-ready and the scene non-passed, so owner-scoped read APIs cannot expose
     any partial or rejected material.
     """
-    title = goal.strip()[:200]
+    node = graph.get_node(knowledge_node_id)
+    if node is None:
+        raise ValueError("Knowledge node is not in the course graph.")
+    expected_node = path_snapshot.get("current_node_id") or path_snapshot.get("target_node_id")
+    if expected_node != node.id or path_snapshot.get("graph_version") != graph.graph_version:
+        raise ValueError("Learning node does not match the path snapshot.")
+    title = node.name
     unit = LearningUnit(
         user_id=owner_id,
+        knowledge_point_id=node.id,
         title=title,
         learning_objectives={"goal": goal.strip()},
         outline={
             "scene_key": "intro",
             "resource_types": [kind.value for kind in LearningResourceType],
+            "knowledge_node_id": node.id,
+            "graph_version": graph.graph_version,
+            "path_snapshot": path_snapshot,
         },
         status="draft",
     )
@@ -56,7 +70,13 @@ async def finalize_learning_unit(
         scene_key="intro",
         scene_order=1,
         scene_type="first_learning",
-        input_snapshot={"goal": goal.strip(), "code_language": code_language},
+        input_snapshot={
+            "goal": goal.strip(),
+            "code_language": code_language,
+            "knowledge_node_id": node.id,
+            "graph_version": graph.graph_version,
+            "path_snapshot": path_snapshot,
+        },
         generation_status="pending",
         review_status="pending",
     )
@@ -65,7 +85,7 @@ async def finalize_learning_unit(
 
     generation = await LearningUnitGenerator(gateway).generate(
         LearningResourceRequest(
-            knowledge_point=title,
+            knowledge_point=f"{node.name}: {node.description}; {node.ai_context}",
             learner_goal=goal,
             code_language=code_language,
         )
