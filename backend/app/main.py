@@ -9,6 +9,7 @@ from app.api.knowledge_graph import router as knowledge_graph_router
 from app.api.learning_events import router as learning_events_router
 from app.api.learning_reads import router as learning_reads_router
 from app.api.learning_sessions import router as learning_sessions_router
+from app.api.paths import router as paths_router
 from app.api.profile import router as profile_router
 from app.api.quiz import router as quiz_router
 from app.core.auth import AuthFailure
@@ -20,6 +21,7 @@ app.include_router(learning_reads_router)
 app.include_router(learning_events_router)
 app.include_router(learning_sessions_router)
 app.include_router(profile_router)
+app.include_router(paths_router)
 app.include_router(quiz_router)
 
 

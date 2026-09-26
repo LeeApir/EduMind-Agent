@@ -749,7 +749,7 @@
       "phase": "MVP 0.2",
       "parent_work_package": "MVP-0.2-005",
       "title": "提供掌握度与路径 API",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.2-T002",
@@ -759,8 +759,11 @@
       "scope": [
         "backend/app/api/",
         "backend/app/services/",
+        "backend/app/models/",
+        "backend/alembic/",
         "backend/tests/",
-        "docs/api/openapi.yaml"
+        "docs/api/openapi.yaml",
+        "docs/path-rules-v2.md"
       ],
       "acceptance_criteria": [
         "掌握度和当前路径接口只返回当前 owner 的状态与证据摘要。",
@@ -770,9 +773,12 @@
       "verification": [
         "运行契约、owner 隔离、无 Provider 调用和查询性能测试。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "路径 API 定向 4 passed：OpenAPI JSON Schema、owner 隔离、持久幂等重放/冲突、版本冲突、无 Provider 构造和去敏掌握度；20 次本地 TestClient + PostgreSQL 路径查询 P95 < 200ms。",
+        "隔离库 Alembic 0009 upgrade、downgrade 到 0008、再 upgrade head 通过；全量后端 240 passed，Ruff/Mypy（51 个 source）、OpenAPI JSON 和 git diff --check 通过。"
+      ],
+      "started_at": "2026-09-26T10:39:12",
+      "completed_at": "2026-09-26T11:14:14",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.2-T018"
     },

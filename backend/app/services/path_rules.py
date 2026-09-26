@@ -9,7 +9,7 @@ from typing import Final
 from app.services.knowledge_graph import KnowledgeGraphRepository, KnowledgeNode
 from app.services.mastery_rules import MASTERY_RULE_CONFIG
 
-PATH_RULE_VERSION: Final = "path-v1"
+PATH_RULE_VERSION: Final = "path-v2"
 PATH_RULE_CONFIG: Final[Mapping[str, float]] = MappingProxyType(
     {
         "mastered_at": MASTERY_RULE_CONFIG["mastered_at"],
@@ -131,12 +131,19 @@ def plan_learning_path(
     target_node_id: str,
     mastery: Mapping[str, PathMastery],
     profile: Mapping[str, object] | None = None,
+    rule_version: str = PATH_RULE_VERSION,
     available_node_ids: frozenset[str] | None = None,
 ) -> PathDecision:
     """Choose stable prerequisite-safe steps; never infer mastery or call a Provider."""
+    if rule_version not in {"path-v1", "path-v2"}:
+        raise PathRuleError("UNSUPPORTED_RULE_VERSION")
     nodes = _dependency_closure(graph, target_node_id, available_node_ids)
     engineering = profile.get("engineering_preference") if profile is not None else None
-    code_first = isinstance(engineering, dict) and engineering.get("code_first") is True
+    code_first = (
+        rule_version == "path-v2"
+        and isinstance(engineering, dict)
+        and engineering.get("code_first") is True
+    )
     distances = _distance_to_target(nodes, target_node_id)
     states = {node_id: _mastery_for(node_id, mastery) for node_id in nodes}
     complete = {
@@ -235,7 +242,7 @@ def plan_learning_path(
     )
     return PathDecision(
         target_node_id=target_node_id,
-        rule_version=PATH_RULE_VERSION,
+        rule_version=rule_version,
         steps=tuple(ordered),
         current_node_id=current,
         prerequisite_node_ids=direct_prerequisites,

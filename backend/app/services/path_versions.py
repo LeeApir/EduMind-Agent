@@ -42,6 +42,7 @@ async def plan_or_replan_path(
     target_node_id: str,
     graph: KnowledgeGraphRepository,
     trigger_reason: str,
+    commit: bool = True,
 ) -> tuple[LearningPathVersion, bool]:
     """Atomically replace the pointer only after reading locked profile/mastery inputs."""
     if trigger_reason not in {
@@ -98,7 +99,8 @@ async def plan_or_replan_path(
     ):
         if pointer is not None and pointer.replan_required:
             pointer.replan_required = False
-            await db.commit()
+            if commit:
+                await db.commit()
         return previous, False
 
     nodes = [
@@ -160,5 +162,8 @@ async def plan_or_replan_path(
     else:
         pointer.path_version_id = version.id
         pointer.replan_required = False
-    await db.commit()
+    if commit:
+        await db.commit()
+    else:
+        await db.flush()
     return version, True

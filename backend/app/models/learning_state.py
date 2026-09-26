@@ -227,3 +227,31 @@ class LearningPathCurrent(Base):
     path_version_id: Mapped[UUID] = mapped_column(PostgreSQLUUID(as_uuid=True), nullable=False)
     replan_required: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
+
+
+class LearningPathCommand(Base):
+    """Durable owner-scoped request key pointing at its original immutable result."""
+
+    __tablename__ = "learning_path_commands"
+    __table_args__ = (
+        UniqueConstraint("user_id", "idempotency_key", name="uq_path_command_owner_key"),
+        ForeignKeyConstraint(
+            ["user_id", "target_node_id", "path_version_id"],
+            [
+                "learning_path_versions.user_id",
+                "learning_path_versions.target_node_id",
+                "learning_path_versions.id",
+            ],
+            name="fk_path_command_owner_target_version",
+        ),
+    )
+
+    id: Mapped[UUID] = mapped_column(PostgreSQLUUID(as_uuid=True), primary_key=True, default=uuid4)
+    user_id: Mapped[UUID] = mapped_column(
+        PostgreSQLUUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
+    idempotency_key: Mapped[str] = mapped_column(String(128), nullable=False)
+    request_digest: Mapped[str] = mapped_column(String(64), nullable=False)
+    target_node_id: Mapped[str] = mapped_column(String(64), nullable=False)
+    path_version_id: Mapped[UUID] = mapped_column(PostgreSQLUUID(as_uuid=True), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)

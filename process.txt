@@ -239,3 +239,7 @@ VERIFIED 表示验证通过并准备提交，完成以 Git 中的 Task-Completed
 领取“生成并持久化初始路径与重新规划版本” | T013/T016 完成，路径状态表和纯规则规划器已存在 | 需固定输入快照水位、并发与重启恢复，避免过期计划覆盖当前路径 | 在短事务中读取 owner 画像与掌握度，写入不可变版本并原子更新当前指针；覆盖幂等与历史
 [2026-09-26T08:40:39] [MVP-0.2-T017] VERIFIED | executor=Lee
 新增不可变路径版本服务，固定图谱/画像/掌握度水位/规则版本，保存变化节点及理由；owner 短事务锁协调画像、掌握度与路径，画像更新标记待重规划 | 隔离库后端全量 236 passed，覆盖并发重放、重规划、偏好、历史和重启；Ruff/Mypy/格式/git diff --check 通过 | 7 条依赖弃用警告；API 幂等命令、owner 契约和查询新鲜度交给 T018 | 创建 T017 完成提交；继续 T018 掌握度与路径 API
+[2026-09-26T10:39:12] [MVP-0.2-T018] START | executor=Lee | branch=codex/mvp-0.2
+领取“提供掌握度与路径 API”；为契约要求的持久幂等回执补充 models/Alembic 范围 | T002/T005/T017 完成，OpenAPI 已固定 plan/replan/current/mastery 边界 | 必须持久化 owner 幂等键与版本预条件，重放不能被当前新版本替代 | 建立命令回执表、路由、owner 契约与无 Provider/性能测试
+[2026-09-26T11:14:14] [MVP-0.2-T018] VERIFIED | executor=Lee
+新增 mastery/current/plan/replan API 与 0009 持久幂等命令回执；返回版本、资源/时长、去敏理由及变化节点；修正 T017 画像偏好规则标识为 path-v2 并保留 v1 重算入口 | 定向 API 4 passed、隔离库迁移升降级和全量 240 passed、查询 P95 < 200ms、Ruff/Mypy/OpenAPI/git diff --check 通过 | 7 条依赖弃用警告；P95 是本地隔离库结果，不替代阶段部署验收 | 创建 T018 完成提交；继续 T019 学习单元图谱绑定

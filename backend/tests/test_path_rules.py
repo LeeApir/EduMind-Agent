@@ -105,6 +105,15 @@ def test_explicit_profile_preference_changes_resource_and_explanation() -> None:
         "node_id": "array",
         "field": "engineering_preference.code_first",
     }
+    old_rule = plan_learning_path(
+        graph(),
+        target_node_id="array",
+        mastery={},
+        profile={"engineering_preference": {"code_first": True}},
+        rule_version="path-v1",
+    )
+    assert old_rule.rule_version == "path-v1"
+    assert old_rule.steps[0].recommended_resource == "explanation"
 
 
 @pytest.mark.parametrize(
@@ -142,7 +151,7 @@ def test_invalid_mastery_and_graph_structure_are_rejected() -> None:
 
 
 def test_rule_weights_are_versioned_and_immutable() -> None:
-    assert PATH_RULE_VERSION == "path-v1"
+    assert PATH_RULE_VERSION == "path-v2"
     assert PATH_RULE_CONFIG["mastered_at"] == 0.8
     with pytest.raises(TypeError):
         PATH_RULE_CONFIG["mastered_at"] = 0.1  # type: ignore[index]
