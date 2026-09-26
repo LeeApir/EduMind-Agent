@@ -269,6 +269,25 @@
         }
       }
     },
+    "/api/quiz-submissions/latest": {
+      "get": {
+        "tags": ["Assessment"],
+        "summary": "恢复当前 owner 对指定正式练习版本的最近一次提交结果",
+        "description": "仅返回已保存的服务端评分回执，不包含原始作答或答案键，也不重新评分或调用 Provider。掌握度变化是该次提交的历史回执；当前掌握度使用 mastery API。读取时 profile_update_status 为 no_change。",
+        "operationId": "getLatestQuizSubmission",
+        "security": [{"sessionCookie": []}],
+        "parameters": [
+          {"name": "resource_id", "in": "query", "required": true, "schema": {"$ref": "#/components/schemas/Identifier"}},
+          {"name": "resource_version", "in": "query", "required": true, "schema": {"type": "integer", "minimum": 1}}
+        ],
+        "responses": {
+          "200": {"description": "最近一次已提交回执。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/QuizSubmissionResult"}}}},
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "404": {"$ref": "#/components/responses/NotFound"},
+          "422": {"$ref": "#/components/responses/ValidationError"}
+        }
+      }
+    },
     "/api/learning-events": {
       "post": {
         "tags": ["Assessment"],
@@ -396,7 +415,7 @@
       "GoalClarification": {"type": "object", "additionalProperties": false, "required": ["code", "message", "retryable", "candidate_nodes"], "properties": {"code": {"const": "GOAL_CLARIFICATION_REQUIRED"}, "message": {"type": "string"}, "retryable": {"const": false}, "candidate_nodes": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["id", "name"], "properties": {"id": {"$ref": "#/components/schemas/KnowledgeNodeId"}, "name": {"type": "string"}}}}}},
       "LearningUnit": {"type": "object", "required": ["id", "status", "scenes", "knowledge_node_id", "path_target_node_id", "path_version"], "properties": {"id": {"$ref": "#/components/schemas/Identifier"}, "status": {"const": "ready"}, "scenes": {"type": "array", "items": {"$ref": "#/components/schemas/PublishedScene"}}, "knowledge_node_id": {"type": ["string", "null"]}, "path_target_node_id": {"type": ["string", "null"]}, "path_version": {"type": ["integer", "null"], "minimum": 1}}},
       "PublishedScene": {"type": "object", "required": ["id", "version", "resources", "review_status"], "properties": {"id": {"$ref": "#/components/schemas/Identifier"}, "version": {"type": "integer", "minimum": 1}, "review_status": {"const": "passed"}, "resources": {"type": "array", "items": {"$ref": "#/components/schemas/PublishedResource"}}}},
-      "PublishedResource": {"type": "object", "required": ["id", "type", "version", "content", "review_status"], "properties": {"id": {"$ref": "#/components/schemas/Identifier"}, "type": {"type": "string", "enum": ["explanation", "code", "exercise"]}, "version": {"type": "integer", "minimum": 1}, "content": {"type": "object", "description": "按资源类型定义的已清洗结构化内容。"}, "review_status": {"const": "passed"}}},
+      "PublishedResource": {"type": "object", "required": ["id", "type", "version", "content", "review_status"], "properties": {"id": {"$ref": "#/components/schemas/Identifier"}, "type": {"type": "string", "enum": ["explanation", "code", "exercise"]}, "version": {"type": "integer", "minimum": 1}, "content": {"type": "object", "description": "按资源类型定义的已清洗内容；练习 items 只包含 id/question，答案键保留在服务端，评分解释由提交回执返回。"}, "review_status": {"const": "passed"}}},
       "ProfileCorrectionRequest": {"type": "object", "additionalProperties": false, "minProperties": 1, "properties": {"professional_background": {"type": "object"}, "learning_goals": {"type": "object"}, "error_preferences": {"type": "array"}, "engineering_preference": {"type": "object"}}},
       "ProfileHistoryPage": {"type": "object", "additionalProperties": false, "required": ["items", "next_before_version"], "properties": {"items": {"type": "array", "items": {"$ref": "#/components/schemas/StudentProfile"}}, "next_before_version": {"type": ["integer", "null"], "minimum": 1}}},
       "ProfileEventRequest": {"type": "object", "additionalProperties": false, "required": ["event_type", "knowledge_node_id"], "properties": {"event_type": {"type": "string", "enum": ["hint_used", "reexplanation_requested", "resource_selected", "explicit_feedback"]}, "knowledge_node_id": {"$ref": "#/components/schemas/KnowledgeNodeId"}, "learning_unit_id": {"$ref": "#/components/schemas/Identifier"}, "scene_id": {"$ref": "#/components/schemas/Identifier"}, "action": {"type": "string", "enum": ["hint_level_1", "hint_level_2", "simpler", "deeper", "different_example", "code", "exercise", "too_easy", "too_hard", "liked_explanation", "skip", "mark_known"]}}},

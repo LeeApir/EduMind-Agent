@@ -822,7 +822,7 @@
       "phase": "MVP 0.2",
       "parent_work_package": "MVP-0.2-006",
       "title": "将练习改为服务端提交并展示掌握度变化",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.2-T012",
@@ -830,7 +830,11 @@
       ],
       "scope": [
         "web/src/",
-        "web/tests/"
+        "web/tests/",
+        "backend/app/api/",
+        "backend/app/services/",
+        "backend/tests/",
+        "docs/api/openapi.yaml"
       ],
       "acceptance_criteria": [
         "提交正式练习答案，不再以内存比对作为最终证据。",
@@ -840,9 +844,15 @@
       "verification": [
         "运行练习组件/API 客户端测试、类型检查、Lint 和构建。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {"command": "pnpm test --run && pnpm typecheck && pnpm lint && pnpm build", "result": "passed: 42 frontend tests, typecheck and production build; 0 lint errors, 67 pre-existing Vue formatting warnings"},
+        {"command": "EDUMIND_TEST_DATABASE_URL=<isolated PostgreSQL> uv run pytest -q", "result": "passed: 255 tests, no skips, 7 dependency deprecation warnings; owner receipt recovery and answer-key filtering covered"},
+        {"command": "uv run ruff check app tests && uv run mypy app", "result": "passed: backend lint and 52 source files checked"},
+        {"command": "python3 /Users/apir/.agents/skills/webapp-testing/scripts/with_server.py --server 'cd ../web && pnpm dev --host 127.0.0.1 --port 4173 --strictPort' --port 4173 -- uv run python ../web/tests/e2e/learning_flow.py", "result": "passed: browser route-mock quiz submit, reload without duplicate POST, mobile no overflow, provider failure, review rejection and SSE recovery; screenshots /tmp/edumind-mvp02-t020-desktop.png and /tmp/edumind-mvp02-t020-mobile.png visually inspected; expected guest/missing-result 401/404 console responses, not real Provider validation"},
+        {"command": "jq empty docs/api/openapi.yaml && git diff --check", "result": "passed: contract parses and whitespace check clean"}
+      ],
+      "started_at": "2026-09-26T11:51:07",
+      "completed_at": "2026-09-26T12:36:56",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.2-T020"
     },

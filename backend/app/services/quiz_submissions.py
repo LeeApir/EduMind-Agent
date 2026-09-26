@@ -2,6 +2,7 @@
 
 import hashlib
 import json
+from typing import cast
 from uuid import UUID
 
 from sqlalchemy import select
@@ -68,6 +69,33 @@ async def _existing_receipt(
     if existing is not None and existing.request_digest != digest:
         raise IdempotencyConflict("Idempotency key was reused for another quiz submission.")
     return existing
+
+
+async def latest_quiz_attempt(
+    db: AsyncSession, *, owner_id: UUID, resource_id: UUID, resource_version: int
+) -> LearningEvidence | None:
+    """Read only the owner's latest scored receipt for a visible exact resource version."""
+    resource = await published_resource(db, owner_id, resource_id)
+    if (
+        resource is None
+        or resource.resource_type != "exercise"
+        or resource.version != resource_version
+    ):
+        raise QuizResourceNotFound
+    return cast(
+        LearningEvidence | None,
+        await db.scalar(
+            select(LearningEvidence)
+            .where(
+                LearningEvidence.user_id == owner_id,
+                LearningEvidence.evidence_type == "quiz_attempt",
+                LearningEvidence.resource_id == resource_id,
+                LearningEvidence.resource_version == resource_version,
+            )
+            .order_by(LearningEvidence.created_at.desc(), LearningEvidence.id.desc())
+            .limit(1)
+        ),
+    )
 
 
 async def submit_quiz_attempt(

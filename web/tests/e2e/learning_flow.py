@@ -8,6 +8,9 @@ from playwright.sync_api import Page, Route, expect, sync_playwright
 from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
 
 BASE_URL = os.getenv("EDUMIND_E2E_BASE_URL", "http://127.0.0.1:4173")
+LAST_QUIZ_RECEIPT: dict[str, object] | None = None
+QUIZ_POST_COUNT = 0
+ANSWER_KEYS = {"q1": "next", "q2": "head", "q3": "->"}
 
 RESOURCES = [
     {
@@ -34,20 +37,14 @@ RESOURCES = [
                 {
                     "id": "q1",
                     "question": "插入前先保存什么？",
-                    "answer": "next",
-                    "explanation": "先保存 next 指针。",
                 },
                 {
                     "id": "q2",
                     "question": "头节点变量？",
-                    "answer": "head",
-                    "explanation": "使用 head。",
                 },
                 {
                     "id": "q3",
                     "question": "指针运算符？",
-                    "answer": "->",
-                    "explanation": "结构体指针使用 ->。",
                 },
             ]
         },
@@ -63,6 +60,7 @@ def sse(*events: tuple[str, dict[str, object]]) -> str:
 
 
 def mock_api(route: Route) -> None:
+    global LAST_QUIZ_RECEIPT, QUIZ_POST_COUNT
     request = route.request
     path = urlparse(request.url).path
     if path == "/api/auth/session":
@@ -74,7 +72,11 @@ def mock_api(route: Route) -> None:
     if path.startswith("/api/learning-units/"):
         route.fulfill(
             status=200,
-            json={"id": "unit-1", "status": "ready", "scenes": [{"resources": RESOURCES}]},
+            json={
+                "id": "unit-reviewed-001",
+                "status": "ready",
+                "scenes": [{"resources": RESOURCES}],
+            },
         )
         return
     if path.startswith("/api/learning-operations/"):
@@ -82,10 +84,57 @@ def mock_api(route: Route) -> None:
         if operation_id == "op-recover":
             route.fulfill(
                 status=200,
-                json={"status": "published", "learning_unit_id": "unit-1"},
+                json={"status": "published", "learning_unit_id": "unit-reviewed-001"},
             )
         else:
             route.fulfill(status=200, json={"status": "failed", "learning_unit_id": None})
+        return
+    if path == "/api/quiz-submissions/latest":
+        if LAST_QUIZ_RECEIPT is None:
+            route.fulfill(status=404, json={"code": "NOT_FOUND"})
+        else:
+            route.fulfill(status=200, json=LAST_QUIZ_RECEIPT)
+        return
+    if path == "/api/quiz-submissions":
+        payload = json.loads(request.post_data or "{}")
+        assert set(payload) == {"resource_id", "resource_version", "answers"}
+        assert request.headers.get("idempotency-key") and request.headers.get("x-csrf-token")
+        QUIZ_POST_COUNT += 1
+        answers = {item["question_id"]: item["answer"] for item in payload["answers"]}
+        question_results = [
+            {
+                "question_id": key,
+                "correct": answers.get(key) == answer,
+                "explanation": "服务端反馈：检查后继连接。",
+                "error_patterns": [],
+            }
+            for key, answer in ANSWER_KEYS.items()
+        ]
+        correct_count = sum(item["correct"] for item in question_results)
+        LAST_QUIZ_RECEIPT = {
+            "evidence_id": "evidence-reviewed-001",
+            "resource_id": payload["resource_id"],
+            "resource_version": payload["resource_version"],
+            "question_results": question_results,
+            "score": correct_count / 3,
+            "correct_count": correct_count,
+            "question_count": 3,
+            "quiz_schema_version": 1,
+            "scoring_rule_version": "quiz-exact-text-v1",
+            "mastery_changes": [
+                {
+                    "knowledge_node_id": "c-pointer",
+                    "previous_score": 0,
+                    "score": 0.55,
+                    "status": "learning",
+                    "revision": 1,
+                    "rule_version": "mastery-v1",
+                }
+            ],
+            "path_replan_required": True,
+            "profile_update_status": "no_change",
+        }
+        route.fulfill(status=200, json=LAST_QUIZ_RECEIPT)
         return
     if path != "/api/learning-sessions":
         route.fulfill(status=404, json={"code": "NOT_FOUND"})
@@ -145,7 +194,7 @@ def mock_api(route: Route) -> None:
                 "scene_ready",
                 {
                     "operation_id": "op-success",
-                    "learning_unit_id": "unit-1",
+                    "learning_unit_id": "unit-reviewed-001",
                     "scene_id": "scene-1",
                     "version": 1,
                     "resource_ids": [resource["id"] for resource in RESOURCES],
@@ -157,6 +206,9 @@ def mock_api(route: Route) -> None:
 
 
 def open_page(page: Page) -> None:
+    global LAST_QUIZ_RECEIPT, QUIZ_POST_COUNT
+    LAST_QUIZ_RECEIPT = None
+    QUIZ_POST_COUNT = 0
     page.on(
         "console",
         lambda message: print(f"browser console [{message.type}]: {message.text}", flush=True),
@@ -192,9 +244,27 @@ def run() -> None:
             expect(page.get_by_test_id("code-tab")).to_contain_text("node->next")
             page.get_by_role("button", name="练习", exact=True).click()
             page.get_by_label("插入前先保存什么？").fill("next")
-            page.get_by_role("button", name="检查答案").first.click()
-            expect(page.get_by_role("status")).to_contain_text("回答正确")
-            page.screenshot(path="/tmp/edumind-t034-success.png", full_page=True)
+            page.get_by_label("头节点变量？").fill("head")
+            page.get_by_label("指针运算符？").fill("->")
+            page.get_by_role("button", name="提交练习", exact=True).click()
+            expect(page.get_by_role("region", name="最近一次练习提交回执")).to_contain_text(
+                "0% → 55%"
+            )
+            assert QUIZ_POST_COUNT == 1
+            page.locator(".published-workspace").screenshot(
+                path="/tmp/edumind-mvp02-t020-desktop.png", animations="disabled"
+            )
+            page.reload(wait_until="networkidle")
+            page.get_by_role("button", name="练习", exact=True).click()
+            expect(page.get_by_role("region", name="最近一次练习提交回执")).to_contain_text(
+                "服务端已记录"
+            )
+            assert QUIZ_POST_COUNT == 1
+            page.set_viewport_size({"width": 390, "height": 844})
+            page.locator(".published-workspace").screenshot(
+                path="/tmp/edumind-mvp02-t020-mobile.png", animations="disabled"
+            )
+            assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
             page.close()
 
             page = browser.new_page()
@@ -223,7 +293,10 @@ def run() -> None:
             page.close()
         finally:
             browser.close()
-    print("T034 browser E2E passed: success, provider failure, review rejection, SSE recovery")
+    print(
+        "MVP 0.2 browser route-mock E2E passed: quiz submit/reload, mobile, "
+        "provider failure, review rejection, SSE recovery"
+    )
 
 
 if __name__ == "__main__":

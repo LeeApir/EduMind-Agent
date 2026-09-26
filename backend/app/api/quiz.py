@@ -3,7 +3,7 @@
 from collections.abc import Callable
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Header, Response
+from fastapi import APIRouter, Depends, Header, Query, Response
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
@@ -17,9 +17,38 @@ from app.services.profile_behavior_updates import (
     update_profile_from_summary,
 )
 from app.services.quiz_scoring import QuizScoringError
-from app.services.quiz_submissions import QuizResourceNotFound, quiz_receipt, submit_quiz_attempt
+from app.services.quiz_submissions import (
+    QuizResourceNotFound,
+    latest_quiz_attempt,
+    quiz_receipt,
+    submit_quiz_attempt,
+)
 
 router = APIRouter(tags=["Assessment"])
+
+
+@router.get("/api/quiz-submissions/latest")
+async def get_latest_quiz_result(
+    response: Response,
+    resource_id: UUID,
+    resource_version: int = Query(ge=1),
+    current: AuthenticatedSession = Depends(require_authenticated_session),
+    session_factory: async_sessionmaker[AsyncSession] = Depends(database_session_factory),
+) -> dict[str, object]:
+    response.headers["Cache-Control"] = "no-store"
+    async with session_factory() as db:
+        try:
+            record = await latest_quiz_attempt(
+                db,
+                owner_id=current.user.id,
+                resource_id=resource_id,
+                resource_version=resource_version,
+            )
+        except QuizResourceNotFound:
+            raise AuthFailure(404, "NOT_FOUND", "Quiz result not found.") from None
+        if record is None:
+            raise AuthFailure(404, "NOT_FOUND", "Quiz result not found.")
+        return {**quiz_receipt(record), "profile_update_status": "no_change"}
 
 
 class QuizAnswerRequest(BaseModel):

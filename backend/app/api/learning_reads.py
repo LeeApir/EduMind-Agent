@@ -23,11 +23,23 @@ def not_found() -> AuthFailure:
 
 
 def resource_payload(resource: GeneratedResource) -> dict[str, object]:
+    content = resource.content
+    if resource.resource_type == "exercise":
+        items = content.get("items")
+        content = {
+            "items": [
+                {"id": item.get("id"), "question": item.get("question")}
+                for item in items
+                if isinstance(item, dict)
+            ]
+            if isinstance(items, list)
+            else []
+        }
     return {
         "id": str(resource.id),
         "type": resource.resource_type,
         "version": resource.version,
-        "content": resource.content,
+        "content": content,
         "review_status": resource.review_status,
     }
 

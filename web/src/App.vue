@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { NButton, NInput, NTag } from "naive-ui";
 
 import { LearningRequestError, startLearningSession, type LearningEvent } from "./api/learningSessions";
@@ -38,6 +38,9 @@ const operationId = ref("");
 const idempotencyKey = ref("");
 const csrfToken = ref("");
 const profileRefreshToken = ref(0);
+const restoringUnit = ref(false);
+const restoreUnitError = ref("");
+let learningGeneration = 0;
 const canSubmit = computed(() => Boolean(goal.value.trim()) && requestState.value !== "loading");
 const publishedResources = computed<PublishedResource[]>(() =>
   resources.value.map(({ id, type, version }) => ({ id, type, version })),
@@ -55,6 +58,9 @@ async function retryLearning(): Promise<void> {
 }
 
 function resetAttempt(): void {
+  learningGeneration += 1;
+  restoringUnit.value = false;
+  restoreUnitError.value = "";
   requestError.value = "";
   temporaryText.value = "";
   reviewState.value = "idle";
@@ -153,9 +159,9 @@ async function recoverPublishedOperation(): Promise<boolean> {
   }
 }
 
-async function loadPublishedUnit(unitId = learningUnitId.value): Promise<void> {
+async function loadPublishedUnit(unitId = learningUnitId.value, expectedGeneration = learningGeneration): Promise<void> {
   if (!unitId) throw new Error("正式学习资源缺少单元标识，请重新开始。");
-  const response = await fetch(`/api/learning-units/${unitId}`, {
+  const response = await fetch(`/api/learning-units/${encodeURIComponent(unitId)}`, {
     credentials: "same-origin",
     headers: { Accept: "application/json" },
   });
@@ -165,13 +171,38 @@ async function loadPublishedUnit(unitId = learningUnitId.value): Promise<void> {
   const payload = await response.json() as LearningUnitPayload;
   const loaded = payload.scenes.flatMap((scene) => scene.resources).filter(isPublishedResource);
   if (!loaded.length) throw new Error("正式学习资源为空，请重新开始。");
+  if (expectedGeneration !== learningGeneration) return;
   learningUnitId.value = unitId;
   resources.value = loaded;
   reviewState.value = "published";
+  try { sessionStorage.setItem("edumind:last-learning-unit", unitId); } catch { /* Storage is optional; server state remains authoritative. */ }
+}
+
+async function restoreRecentUnit(): Promise<void> {
+  let unitId = "";
+  try { unitId = sessionStorage.getItem("edumind:last-learning-unit") ?? ""; } catch { return; }
+  if (!/^[A-Za-z0-9_-]{8,64}$/.test(unitId)) return;
+  const token = learningGeneration;
+  restoringUnit.value = true;
+  restoreUnitError.value = "";
+  try {
+    await ensureSession();
+    await loadPublishedUnit(unitId, token);
+  } catch {
+    if (token === learningGeneration) restoreUnitError.value = "上次学习资源暂时无法读取。可以重试读取或开始新目标。";
+  } finally {
+    if (token === learningGeneration) restoringUnit.value = false;
+  }
+}
+onMounted(() => { if (!props.startLearningRequest) void restoreRecentUnit(); });
+
+function handleQuizSubmitted(): void {
+  profileRefreshToken.value += 1;
 }
 
 function isPublishedResource(value: Resource): value is Resource {
   return ["explanation", "code", "exercise"].includes(value.type)
+    && typeof value.id === "string" && Number.isInteger(value.version) && value.version >= 1
     && value.review_status === "passed"
     && Boolean(value.content)
     && typeof value.content === "object";
@@ -286,7 +317,24 @@ function stringValue(value: unknown): string {
     <PublishedLearningWorkspace
       v-if="resources.length"
       :resources="resources"
+      :csrf-token="csrfToken"
+      @quiz-submitted="handleQuizSubmitted"
     />
+    <p
+      v-if="restoringUnit"
+      role="status"
+    >
+      正在恢复上次已审核的学习资源…
+    </p>
+    <section
+      v-if="restoreUnitError"
+      role="alert"
+    >
+      <p>{{ restoreUnitError }}</p>
+      <NButton @click="restoreRecentUnit">
+        重新读取上次学习
+      </NButton>
+    </section>
     <ProfileCard :refresh-token="profileRefreshToken" />
   </main>
 </template>

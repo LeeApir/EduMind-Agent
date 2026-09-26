@@ -145,6 +145,21 @@ def test_submission_scores_server_answer_key_and_replay_does_not_append_evidence
         }
     ]
     assert body["path_replan_required"] is False
+    restored = client.get(
+        "/api/quiz-submissions/latest",
+        params={"resource_id": str(resource_id), "resource_version": 1},
+    )
+    assert restored.status_code == 200 and restored.json() == body
+    assert "answers" not in restored.json()
+    published = client.get(f"/api/resource/{resource_id}")
+    assert published.status_code == 200
+    assert all(set(item) == {"id", "question"} for item in published.json()["content"]["items"])
+    other, _, _ = make_guest()
+    foreign = other.get(
+        "/api/quiz-submissions/latest",
+        params={"resource_id": str(resource_id), "resource_version": 1},
+    )
+    assert foreign.status_code == 404
 
     request["answers"] = list(reversed(request["answers"]))
     replay = client.post("/api/quiz-submissions", json=request, headers=headers(csrf, key))

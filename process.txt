@@ -247,3 +247,7 @@ VERIFIED 表示验证通过并准备提交，完成以 Git 中的 Task-Completed
 领取“把一句话目标和学习单元关联到知识节点”；补充澄清 API/契约范围 | T004/T017 完成，知识节点与路径版本已可用 | 原学习单元没有节点或路径快照，不能可靠归属测验；模糊目标不得默认节点 | 先解析并本地校验，再保存路径快照并用于正式资源生成；失败或低置信映射返回澄清
 [2026-09-26T11:49:10] [MVP-0.2-T019] VERIFIED | executor=Lee
 新增 goal-node-v1 保守别名/候选校验与持久澄清；学习按路径当前节点生成并保存图谱/路径快照，API 返回关联字段；初始画像在 Provider 完成后加 owner 锁并重基版本 | 隔离库后端全量 255 passed，覆盖映射失败、澄清重放、关联和并发画像；Ruff/Mypy/OpenAPI/git diff --check 通过 | 7 条依赖弃用警告；真实 Provider 与浏览器闭环留给阶段验收 | 创建 T019 完成提交；继续 T020 服务端练习提交前端
+[2026-09-26T11:51:07] [MVP-0.2-T020] START | executor=Lee | branch=codex/mvp-0.2
+领取“将练习改为服务端提交并展示掌握度变化”；补充结果恢复 API 与答案键去敏范围 | T012/T013 已完成，前端仍为内存答案比对 | 刷新恢复需要 owner 服务端结果读取；正式资源响应不能预先泄露答案键 | 新增结果恢复读取，改为全卷幂等提交与逐题/掌握度回执，补组件和客户端测试
+[2026-09-26T12:36:56] [MVP-0.2-T020] VERIFIED | executor=Lee
+正式练习去除公开答案键，新增 owner 最近回执 GET，前端全卷幂等提交并展示逐题反馈/掌握度历史变化，刷新仅存单元 ID 并恢复服务端结果；沿用现有视觉系统并核对移动布局 | pnpm test --run 42 passed，typecheck/lint/build 通过（67 原有格式警告）；EDUMIND_TEST_DATABASE_URL=<隔离库> uv run pytest -q 255 passed 无跳过；Ruff/Mypy 52 文件、OpenAPI/diff 检查通过；with_server.py + web/tests/e2e/learning_flow.py 路由模拟通过，截图 /tmp/edumind-mvp02-t020-{desktop,mobile}.png | 7 条后端依赖弃用警告；浏览器预期 401/404 不算真实 Provider 验证，阶段验收仍待完成 | 创建 T020 完成提交；继续 T021 轻量路径视图，接入真实服务端路径和掌握度
