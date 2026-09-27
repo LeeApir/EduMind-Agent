@@ -1258,15 +1258,15 @@
       "phase": "MVP 0.2",
       "parent_work_package": "MVP-0.2-008",
       "title": "当前模型首字节和首段性能复测",
-      "status": "blocked",
+      "status": "done",
       "priority": "P0",
       "depends_on": ["MVP-0.2-T031", "MVP-0.2-T034"],
       "scope": ["docs/acceptance/", "backend/tests/", "task.json", "process.txt"],
       "acceptance_criteria": [
         "先确认可复现且批准的首段规则、起点、有限样本和实际计费硬上限。",
-        "分别统计客户端HTTP原始首字节/头收齐/SSE状态/任意delta/人工确认教学正文token/首段/发布；PRD首字节≤2秒、首段≤10秒不变，原批准教学token2秒内容门槛独立检查，不能互相替代。",
+        "分别统计客户端HTTP原始首字节/头收齐/SSE状态/任意delta/人工确认教学正文token/首段/发布；PRD首字节≤2秒、首段≤10秒不变。2026-09-27用户明确批准独立教学token2秒未达标转后续优化，不再阻塞MVP0.2收尾；仍独立报告，不互相替代。",
         "记录当前模型/传输/指令/环境/并发/样本/预热/失败，失败超时不丢弃、不无限重跑。",
-        "证据和命令脱敏，未达门槛标记阻塞，不改变真实.env或模型。"
+        "证据和命令脱敏，未达PRD门槛标记阻塞；附加token门槛按批准记录保留失败并交接后续优化，不改变真实.env或模型，不改旧冻结综合gate。"
       ],
       "verification": ["有限样本实际HTTP/Provider性能入口、指标离线回归、git diff --check"],
       "verification_results": [
@@ -1275,11 +1275,13 @@
         {"command": "用户同意冻结规则；隔离perf_t032迁移；serve_first_screen.py + 实际Vite代理 + run_first_screen.py一次20样本 + audit_first_screen.py", "result": "failed gate: current Pro/Responses, 20/20 published; 162/240 actual attempts (20 stream,142 structured; 2 TIMEOUT retained); token P95 5661.935ms >2000ms, 0/20 within2s; first paragraph 3/20 unconfirmed, full planned P95 missing, observed17 conditional P95 6260.461ms not acceptance. No warmups/client retries/replacement runs; services stopped; evidence docs/acceptance/mvp-0.2-t032-first-screen.md"},
         {"command": "backend: EDUMIND_TEST_DATABASE_URL=<isolated regression DB> uv run --frozen pytest -q; uv run --frozen ruff check app tests ../docs/acceptance/run_first_screen.py ../docs/acceptance/serve_first_screen.py ../docs/acceptance/audit_first_screen.py; uv run --frozen mypy app", "result": "passed:403 tests, no skips,7 existing warnings; Ruff clean; Mypy55 source files; offline instrumentation tests separate from real performance samples"},
         {"command": "pnpm --dir web test --run; pnpm --dir web typecheck; pnpm --dir web lint; pnpm --dir web build", "result": "passed:66 tests/11 files; typecheck/build pass;0 ESLint errors/67 existing formatting warnings"},
-        {"command": "隔离PG只读操作聚合；脱敏证据只读检查；git diff --check", "result": "passed:20 operations/20 distinct owners/20 keys/20 units, all published; actual key/base URL absent from new evidence; task JSON valid; self-inspected code/docs/data diff, no product/env changes or staged unrelated files"}
+        {"command": "隔离PG只读操作聚合；脱敏证据只读检查；git diff --check", "result": "passed:20 operations/20 distinct owners/20 keys/20 units, all published; actual key/base URL absent from new evidence; task JSON valid; self-inspected code/docs/data diff, no product/env changes or staged unrelated files"},
+        {"command": "2026-09-27非计费收尾：python3 -c离线audit重算及Git历史文件逐字节/任务依赖/完成提交核对；python3 -m json.tool task.json；Markdown引用检查；git diff --check", "result": "passed:113历史文件检查，除阶段报告仅追加外全部逐字节不变；旧audit=false原样保留，10引用存在；既有37个done任务均有完成提交，依赖有效。独立文档读者核对通过。用户yes批准首token2秒转后续优化，不再阻塞收尾；本范围下PRD HTTP P95 1647.309ms/首段3094.385ms达标，20操作发布，内部1/161超时与操作0/20失败分列。T032完成不声称token2632.575ms通过。0新付费，无服务/.env/生产代码修改，无归档/阶段切换/push/merge。"}
       ],
       "started_at": "2026-09-27T14:42:14",
-      "completed_at": null,
-      "blocker": "旧20失败和T035三诊断保留。T036无损正文/T037即时停机完成后，用户批准T038冻结v2正式20样本；161/240实际尝试（1 TIMEOUT保留），20发布/20最早教学首段确认。PRD client HTTP P95 1647.309ms≤2秒、首段3094.385ms≤10秒达标，但冻结独立validated教学token P95 2632.575ms>2秒，gate=false。画像/路径时序未改变，不自行豁免内容门槛、不补跑，T032继续blocked。证据mvp-0.2-t038-formal-retest.md/raw/ledger/decisions/audit。",
+      "completed_at": "2026-09-27T19:14:09",
+      "blocker": null,
+      "scope_change": "2026-09-27用户yes明确批准独立教学首token≤2秒转后续优化，不阻塞MVP0.2收尾；旧失败证据/冻结gate=false不变。批准与指标交接见docs/acceptance/mvp-0.2-closeout-decision.md。",
       "commit_lookup": "Task-Completed: MVP-0.2-T032"
     },
     {
