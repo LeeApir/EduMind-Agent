@@ -7,16 +7,20 @@ from collections.abc import AsyncIterator, Iterator
 from pathlib import Path
 from uuid import UUID
 
+import httpx
 import pytest
 from fastapi.testclient import TestClient
 from jsonschema import Draft202012Validator
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from app.api.learning_sessions import provider_gateway
+from app.core.config import ProviderSettings
 from app.core.database import create_database_engine
+from app.core.provider_target import ProviderTargetGuard, TargetPolicy
 from app.main import app
 from app.models.learning import LearningOperation, LearningUnit
 from app.models.learning_state import LearningPathVersion
+from app.services.deepseek_responses import DeepSeekResponsesAdapter
 from app.services.provider_gateway import (
     ProviderError,
     ProviderErrorCode,
@@ -30,6 +34,12 @@ from app.services.provider_gateway import (
 
 TEST_DATABASE_URL = os.getenv("EDUMIND_TEST_DATABASE_URL")
 pytestmark = pytest.mark.skipif(not TEST_DATABASE_URL, reason="isolated PostgreSQL URL not set")
+
+LOSSLESS_BODY = (
+    " 中文 正文。\n\n1. 列表。\n2. 第二项。\n\n"
+    "| 名称 | 含义 |\n|---|---|\n| next | 地址 |\n\n"
+    "```c\n    int *p;\n\treturn 0;\n```\n\n指针保存地址。  "
+)
 
 
 def profile_value(goal: str) -> dict[str, object]:
@@ -116,8 +126,9 @@ class FakeAdapter:
                     },
                     {
                         "id": "q2",
-                        "question": ("[判断题] 头指针可以用于开始遍历。"
-                                     "仅填 T 或 F（T=正确，F=错误）"),
+                        "question": (
+                            "[判断题] 头指针可以用于开始遍历。仅填 T 或 F（T=正确，F=错误）"
+                        ),
                         "answer": "T",
                         "explanation": "从它遍历。",
                     },
@@ -169,6 +180,87 @@ def validate_contract(name: str, value: object) -> None:
     Draft202012Validator(
         {"components": specification["components"], "$ref": f"#/components/schemas/{name}"}
     ).validate(value)
+
+
+@pytest.mark.parametrize("partition", ["whole", "characters", "mixed"])
+def test_body_lossless_from_mock_provider_through_gateway_and_real_sse(
+    database_url: str,
+    partition: str,
+) -> None:
+    pieces = [LOSSLESS_BODY] if partition == "whole" else list(LOSSLESS_BODY)
+    if partition == "mixed":
+        pieces = [LOSSLESS_BODY[i : i + 3] for i in range(0, len(LOSSLESS_BODY), 3)]
+    pieces = ["", *pieces, ""]
+    frames = [
+        ": heartbeat\n\n",
+        'data: {"type":"response.reasoning_text.delta","delta":"private reasoning"}\n\n',
+        'data: {"type":"response.created"}\n\n',
+    ]
+    frames += [
+        "data: "
+        + json.dumps({"type": "response.output_text.delta", "delta": p}, ensure_ascii=False)
+        + "\n\n"
+        for p in pieces
+    ]
+    frames += ['data: {"type":"response.completed","response":{"status":"completed"}}\n\n']
+    wire = "".join(frames).encode()
+
+    class Bytes(httpx.AsyncByteStream):
+        async def __aiter__(self):
+            # One-byte transport fragmentation also splits UTF-8 characters.
+            for byte in wire:
+                yield bytes([byte])
+
+    settings = ProviderSettings(base_url="https://provider.test", api_key="mock-only", model="mock")
+    guard = ProviderTargetGuard(settings.base_url, TargetPolicy(), resolver=lambda *_: ("8.8.8.8",))
+    transport = httpx.MockTransport(lambda _: httpx.Response(200, stream=Bytes()))
+    network_adapter = DeepSeekResponsesAdapter(settings, guard, transport=transport)
+
+    class Adapter(FakeAdapter):
+        async def stream_text(self, request):
+            async for delta in ProviderGateway(network_adapter).stream_text(request):
+                yield delta
+
+    client, csrf = create_authenticated_client(Adapter())
+    try:
+        response = client.post(
+            "/api/learning-sessions",
+            json={"goal": "讲解单链表"},
+            headers={"Origin": "https://testserver", "X-CSRF-Token": csrf},
+        )
+        assert response.status_code == 200
+        tokens = [
+            event_data(frame)
+            for frame in response.text.split("\n\n")
+            if frame.startswith("event: token\n")
+        ]
+        assert [item["delta"] for item in tokens] == [p for p in pieces if p != ""]
+        assert "".join(str(item["delta"]) for item in tokens) == LOSSLESS_BODY
+        assert "private reasoning" not in response.text
+        assert any('"status": "published"' in frame for frame in response.text.split("\n\n"))
+        output = os.getenv("EDUMIND_LOSSLESS_FIXTURE_OUTPUT")
+        if output and partition == "characters":
+            from app.api.learning_sessions import _event
+
+            # Generated offline fixture: actual token JSON encoding, test identities only.
+            exported = "".join(
+                _event("token", {**item, "operation_id": "mock-operation"}) for item in tokens
+            )
+            with Path(output).open("x") as handle:
+                json.dump(
+                    {
+                        "source": "offline MockTransport/real route, not T035 replay",
+                        "expected": LOSSLESS_BODY,
+                        "sse": exported,
+                    },
+                    handle,
+                    ensure_ascii=False,
+                    indent=2,
+                )
+                handle.write("\n")
+    finally:
+        client.close()
+        app.dependency_overrides.clear()
 
 
 def test_session_publishes_only_reviewed_resources_after_temporary_tokens(
@@ -353,11 +445,21 @@ def test_same_idempotency_key_reuses_published_operation(database_url: str) -> N
 
 
 @pytest.mark.parametrize(
-    "status", ["accepted", "preparing", "streaming_temporary", "temporary_complete", "reviewing",
-               "regenerating", "failed", "canceled"]
+    "status",
+    [
+        "accepted",
+        "preparing",
+        "streaming_temporary",
+        "temporary_complete",
+        "reviewing",
+        "regenerating",
+        "failed",
+        "canceled",
+    ],
 )
 def test_operation_read_and_same_key_replay_preserve_state_without_generation(
-    database_url: str, status: str,
+    database_url: str,
+    status: str,
 ) -> None:
     from app.services.learning_operations import request_digest
 
@@ -391,12 +493,14 @@ def test_operation_read_and_same_key_replay_preserve_state_without_generation(
         assert recovered.json()["status"] == status
         assert recovered.json()["error"] is None
         with TestClient(app, base_url="https://testserver") as other:
-            assert other.post(
-                "/api/auth/guest", headers={"Origin": "https://testserver"}
-            ).status_code == 201
+            assert (
+                other.post("/api/auth/guest", headers={"Origin": "https://testserver"}).status_code
+                == 201
+            )
             assert other.get(f"/api/learning-operations/{operation_id}").status_code == 404
         replay = client.post(
-            "/api/learning-sessions", json={"goal": "讲解队列"},
+            "/api/learning-sessions",
+            json={"goal": "讲解队列"},
             headers={"Origin": "https://testserver", "X-CSRF-Token": csrf},
         )
         events = [part for part in replay.text.split("\n\n") if part]
@@ -429,7 +533,8 @@ def test_failed_operation_replays_without_provider_and_new_key_creates_new_opera
         assert event_data(events[-1])["status"] == "failed"
         assert adapter.calls == calls
         new = client.post(
-            "/api/learning-sessions", json={"goal": "讲解栈"},
+            "/api/learning-sessions",
+            json={"goal": "讲解栈"},
             headers={**headers, "Idempotency-Key": "explicit-regeneration-new-key"},
         )
         new_events = [part for part in new.text.split("\n\n") if part]

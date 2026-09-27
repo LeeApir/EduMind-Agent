@@ -18,6 +18,26 @@ def decisions(clock, verdicts):
     }
 
 
+def test_saved_public_sample_one_is_partial_evidence_not_lossless_replay():
+    import hashlib
+
+    source = Path(__file__).resolve().parents[2] / "docs/acceptance/mvp-0.2-t035-raw.json"
+    sample = json.loads(source.read_text())["samples"][0]
+    assert len(sample["candidates"]) == 10
+    assert "chunks" not in sample and "raw_stream" not in sample
+    for candidate in sample["candidates"]:
+        text = candidate["public_text"]
+        assert hashlib.sha256(text.encode()).hexdigest() == candidate["sha256"]
+        # Reuse only the saved candidate text; never invent original boundaries or times.
+        rebuilt = "".join(text[i : i + 1] for i in range(len(text)))
+        assert rebuilt == text
+    assert "**2." in sample["candidates"][2]["public_text"]
+    assert "```" in sample["candidates"][8]["public_text"]
+    decisions_file = source.with_name("mvp-0.2-t035-decisions.json")
+    original_decisions = json.loads(decisions_file.read_text())["1"]
+    assert qualify(sample["candidates"], original_decisions)["milestone_confirmed"] is False
+
+
 def test_multiple_candidates_cross_chunk_intro_and_end_are_independent():
     clock = ParagraphClock()
     clock.feed("接下来观察代码。\n", 10)
@@ -193,3 +213,26 @@ def test_wire_timeout_retained_without_finishing_pending_paragraph():
         assert not result.paragraphs.ended
 
     asyncio.run(run())
+
+
+def test_whitespace_boundary_arrival_is_not_token_or_invented_completion():
+    import sys
+    from pathlib import Path
+
+    sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "docs/acceptance"))
+    from first_screen_v2 import ParagraphClock
+
+    clock = ParagraphClock()
+    clock.feed(" ", 1)
+    clock.feed("指针保存地址。", 10)
+    clock.feed("\n", 20)
+    assert clock.candidates == []
+    clock.feed("\n", 30)
+    assert clock.candidates[0]["first_token_ns"] == 10
+    assert clock.candidates[0]["completed_ns"] == 30
+    for fragment in ("`", "`", "`c", "\n", "    int *p;", "\n", "`", "``", "\n", "\n"):
+        clock.feed(fragment, 40)
+    clock.feed("下一段完整正文。", 50)
+    clock.finish(60)
+    assert [c["text"] for c in clock.candidates] == ["指针保存地址。", "下一段完整正文。"]
+    assert clock.candidates[1]["completed_ns"] == 60

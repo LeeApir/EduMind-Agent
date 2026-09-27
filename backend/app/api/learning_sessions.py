@@ -73,7 +73,8 @@ async def _first_screen_events(
         await update_operation(db, persisted, status="streaming_temporary")
     try:
         async for delta in gateway.stream_text(prompt):
-            if delta.text.strip():
+            # Empty text is a no-op; whitespace is real body text, not a heartbeat.
+            if delta.text != "":
                 yield _event(
                     "token",
                     {"operation_id": operation, "temporary": True, "delta": delta.text},
