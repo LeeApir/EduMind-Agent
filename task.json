@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "本次只授权归档与任务拆分；全部任务保持 todo，实施需用户后续指示。阶段验收完成后报告，不自动进入 Phase 1。",
+    "phase_gate": "用户授权串行完成 MVP 0.3 T001–T004；新安全、持久化与 API 决策按任务验收先批准，未授权后续任务或付费采样。阶段验收完成后报告，不自动进入 Phase 1。",
     "task_granularity": "一个可独立验证的行为，包含实现、对应测试和必要文档；验收通过后一个本地完成提交。",
     "completion_rule": "验收通过，且 Git 历史存在 Task-Completed 标记的提交。工作区 done 仅是待提交状态。",
     "verification_note": "以下为计划验证入口，尚未执行；领取任务时建立必要命令，结果写入 verification_results。"
@@ -86,7 +86,7 @@
       "id": "MVP-0.3-T001",
       "phase": "MVP 0.3",
       "title": "固定 MVP 0.3 范围与验收口径",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [],
       "scope": [
@@ -103,9 +103,23 @@
       "verification": [
         "逐项核对 PRD/收尾决定与退出清单；检查所有门槛的来源、测量方式和失败口径。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "python3 inline: local Markdown references, all 34 task IDs, task status checks",
+          "result": "passed;首次范围字符串检查未展开区间已补逐任务来源索引后通过",
+          "evidence": "docs/acceptance/mvp-0.3-acceptance-plan.md"
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed"
+        },
+        {
+          "command": "doc-coauthoring independent reader review",
+          "result": "四项口径反馈已落实：逐次缓存2s、首次候选分母、过期游标恢复、匿名准备计时"
+        }
+      ],
+      "started_at": "2026-09-28T02:43:54",
+      "completed_at": "2026-09-28T02:46:53",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.3-T001"
     },
