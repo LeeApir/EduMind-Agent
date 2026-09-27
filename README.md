@@ -5,7 +5,7 @@
 当前阶段：MVP 0.3 任务已拆分，尚未开始实施。MVP 0.2 的 38 项任务已完成并[原样归档](docs/tasks/mvp-0.2.json)；[收尾决定](docs/acceptance/mvp-0.2-closeout-decision.md)保留 Pro 质量/闭环与 Flash 性能的证据边界，独立教学首 token 目标转为非阻塞后续优化。MVP 0.3 的 34 项任务见根目录 [task.json](task.json)，包括两个链表动画模板、专注/互动、多视角演示与导出；这些新增能力尚未实现。
 学习链路连接一句话目标、10 节点知识结构、渐进画像、正式资源审核、服务端测验、
 掌握度与可解释推荐。计分题只使用明确格式的客观唯一答案；不让 LLM 判定对错。
-阶段状态与失败/修复证据见 [MVP 0.2 验收记录](docs/acceptance/mvp-0.2-stage-acceptance.md)。
+阶段状态与失败/修复证据见 [MVP 0.2 验收记录](docs/acceptance/mvp-0.2-stage-acceptance.md)。架构决定的批准状态、待决项及后续入口见 [ADR 索引](docs/ADR/README.md)。
 
 ## 后端
 
@@ -59,9 +59,13 @@ curl --fail http://127.0.0.1:8000/health
 curl --fail http://127.0.0.1:5173/
 ```
 
-PostgreSQL 仅在 Compose 内部网络开放；API、Web 分别暴露为 8000、5173。Compose 会先等待数据库与 API 健康检查，API 启动时自动执行 `alembic upgrade head`。仅检查健康状态时不需要 Provider 凭据；实际学习生成需要在 `.env` 设置三项 `EDUMIND_PROVIDER_*`。开发停止但保留数据卷：
+PostgreSQL 仅在 Compose 内部网络开放；API、Web 分别暴露为 8000、5173。Compose 会先等待数据库与 API 健康检查，API 启动时自动执行 `alembic upgrade head`。仅检查健康状态时不需要 Provider 凭据；实际学习生成需要在 `.env` 设置三项 `EDUMIND_PROVIDER_*`。
 
-MVP 0.1 默认使用 DeepSeek Responses API 和 `deepseek-flash`；推荐 `.env` 中使用 `EDUMIND_PROVIDER_BASE_URL=https://api.deepseek.com`。API Key 只留在 `.env`，不要提交或放入浏览器。当前真实验收与可复现性能命令见 [Provider 验收报告](docs/acceptance/mvp-0.1-provider-acceptance.md)。
+仓库示例配置使用 DeepSeek Responses API、`https://api.deepseek.com` 和 `deepseek-flash`；实际模型以服务端配置及验收记录为准，示例不代表该模型通过所有质量指标。API Key 只留在服务端 `.env`，不要提交或放入浏览器。支持的传输与安全边界见 [Provider 说明](docs/PROVIDERS.md)。
+
+最近阶段证据见 [MVP 0.2 收尾决定](docs/acceptance/mvp-0.2-closeout-decision.md)；其中 Pro 质量/闭环与 Flash 性能分别报告。[MVP 0.1 Provider 报告](docs/acceptance/mvp-0.1-provider-acceptance.md) 仅作为历史证据。
+
+开发停止但保留数据卷：
 
 ```bash
 docker compose down
@@ -110,7 +114,7 @@ pnpm --dir web install --frozen-lockfile
 pnpm --dir web e2e
 ```
 
-该套件使用浏览器路由级 mock API，稳定覆盖一句话开始、临时首段、正式讲解/代码/三道练习、Provider 故障、审核拒绝和 SSE 异常后的持久化操作恢复，不会调用或计费真实 Provider。后端 Provider、审核门禁、幂等和恢复逻辑由 `backend/tests/test_learning_sessions.py` 的隔离 PostgreSQL 测试覆盖。真实 Provider 和首段 P95 性能不由 mock 结果替代，必须按 T035 单独验收。
+该套件使用浏览器路由级 mock API，稳定覆盖一句话开始、临时首段、正式讲解/代码/三道练习、Provider 故障、审核拒绝和 SSE 异常后的持久化操作恢复，不会调用或计费真实 Provider。后端 Provider、审核门禁、幂等和恢复逻辑由 `backend/tests/test_learning_sessions.py` 的隔离 PostgreSQL 测试覆盖。真实 Provider 和首段 P95 性能不由 mock 结果替代，需要按冻结计划、实际模型和批准预算单独验收；MVP 0.2 已有证据见收尾决定，MVP 0.3 的新增真实验收安排在 T033，尚未执行。
 
 ## MVP 0.2 验证入口
 

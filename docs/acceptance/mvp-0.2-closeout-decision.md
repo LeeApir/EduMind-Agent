@@ -13,7 +13,7 @@
 
 [PRD](../PRD.md) §8.1 的 HTTP 首字节 ≤2 秒、可学习首段 ≤10 秒不变；§9.1 的 MVP 0.2
 退出条件仍是“输入→学习→练习→掌握度更新→下一步推荐”，未修改 PRD。
-[ADR-0002](../adr/0002-streaming-first-screen-and-resource-review.md):61 曾将有效 token 到达命名为 TTFB，整体仍 Proposed。
+[ADR-0002](../ADR/0002-streaming-first-screen-and-resource-review.md):61 曾将有效 token 到达命名为 TTFB，整体仍 Proposed。
 原计划记录的首次“同意”确认段落规则、起点和预算，不足以证明独立批准新的阶段退出条款。
 [T033口径纠正](mvp-0.2-t033-nonbillable-diagnosis.md)后保留该历史内容门槛，
 [v2计划](mvp-0.2-t032-retest-plan-v2.md):25及本轮执行授权将其作为附加门槛审计。

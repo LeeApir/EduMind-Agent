@@ -1,6 +1,8 @@
 # Compose 重启恢复验证
 
-T033 在本地 OrbStack Compose 环境验证持久化资源恢复。该验证只重启 `postgres` 和 `api` 容器，不执行 `docker compose down -v`，也不删除命名卷。
+MVP 0.1-T033 在本地 OrbStack Compose 环境验证已发布资源恢复。该验证只重启 `postgres` 和 `api` 容器，不执行 `docker compose down -v`，也不删除命名卷。
+
+本记录不证明在途生成中断识别、课堂会话或动画 Job 恢复。MVP 0.2 闭环与恢复证据见 [闭环报告](acceptance/mvp-0.2-closed-loop.md)；课堂/Job/媒体恢复由 MVP 0.3-T031 验证，尚未实施。
 
 ## 可重复命令
 

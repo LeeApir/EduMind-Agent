@@ -429,3 +429,10 @@ T038正式v2采样审计完成，未更改口径或阈值；修复无损正文�
 用户授权归档MVP0.2并拆分MVP0.3，在收尾提交f7cacc2上建立功能分支 | 开始时工作区干净，0.2共38项done且无阻塞 | 本次仅治理规划，不领取实现任务、不调用Provider | 原样归档并生成新阶段任务，核对PRD范围与依赖
 [2026-09-27T19:25:28] [WORKFLOW-MVP-0.3-PLANNING] VERIFIED | executor=Lee
 docs/tasks/mvp-0.2.json原样归档，根task.json切换MVP0.3并细化34项todo；同步AGENTS/CLAUDE/README及归档索引 | Python离线检查归档与git show f7cacc2:task.json字节一致、38完成提交存在、34唯一ID/无环依赖/2–5验收条件/空验证记录及引用通过，git diff --check通过；纯文档未跑业务测试，0付费 | 教学token P95 2632.575ms仍未达2秒，保留非阻塞后续项；Pro质量与Flash性能不混证，新API/安全/持久化决策待ADR批准 | 明确文件本地治理提交，不push/merge；后续获授权从MVP-0.3-T001固定验收口径开始，全部实现任务尚未领取
+
+[2026-09-27T19:55:26] [WORKFLOW-DOCS-CONSISTENCY] START | executor=Lee | branch=codex/mvp-0.3
+用户授权整理文档；统一已批准契约、待决项与历史证据入口 | 起始工作区干净，已核对ADR/OpenAPI/收尾决定/任务账本 | 不新增批准、不领取MVP0.3任务 | 整理文档并检查引用、历史证据与差异，独立本地治理提交
+[2026-09-28T02:33:11] [WORKFLOW-DOCS-CONSISTENCY] RESUME | executor=Lee | branch=codex/mvp-0.3
+用户要求继续整理，恢复既有文档改动并完成独立阅读检查 | git diff检查发现Provider文末空行已修；45引用及111验收文件内容边界检查通过 | 原ADR待决项保留，34任务仍todo | 完成阅读检查、追加验证交接并本地提交
+[2026-09-28T02:34:31] [WORKFLOW-DOCS-CONSISTENCY] VERIFIED | executor=Lee
+新增ADR索引，统一ADR02批准/提案/计时边界，更新架构/README/Provider/Compose入口并修正收尾决定链接大小写；按代码纠正最多3次总尝试，业务代码未改 | python3 /tmp/edumind_check_docs.py通过45个大小写敏感本地引用、111份验收文件仅一处链接修正、PRD/API/ADR03/活动及归档账本不变、34项todo、日志只追加；git diff --check通过；独立读者五项核对通过并补清重解释证据与生成服务区别；纯文档未跑业务测试，0Provider调用 | ADR未批准项保留，未扩大恢复或模型质量承诺 | 明确八文件暂存并检查后本地chore(workflow)提交；后续从T001固定口径开始，索引见docs/ADR/README.md，不push/merge
