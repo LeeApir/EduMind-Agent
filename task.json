@@ -1260,7 +1260,7 @@
       "title": "当前模型首字节和首段性能复测",
       "status": "blocked",
       "priority": "P0",
-      "depends_on": ["MVP-0.2-T031"],
+      "depends_on": ["MVP-0.2-T031", "MVP-0.2-T034"],
       "scope": ["docs/acceptance/", "backend/tests/", "task.json", "process.txt"],
       "acceptance_criteria": [
         "先确认可复现且批准的首段规则、起点、有限样本和实际计费硬上限。",
@@ -1281,6 +1281,34 @@
       "completed_at": null,
       "blocker": "冻结20样本已执行：首token P95 5661.935ms超过2秒；3个候选只是目标/观察导语，不能确认教学段落，且更晚候选时间未采集，全计划首段P95缺失。不得补跑/换模型/降低标准；后续关键路径或测量采集改进需独立任务与新冻结计划。",
       "commit_lookup": "Task-Completed: MVP-0.2-T032"
+    },
+    {
+      "id": "MVP-0.2-T033", "phase": "MVP 0.2", "parent_work_package": "MVP-0.2-008",
+      "title": "非计费首屏指标纠正、关键路径诊断与多段候选计时",
+      "status": "done", "priority": "P0", "depends_on": ["MVP-0.2-T031"],
+      "scope": ["docs/acceptance/", "backend/tests/", "task.json", "process.txt"],
+      "acceptance_criteria": [
+        "追加历史指标口径纠正，不覆盖旧证据，分别采集真实HTTP首字节、状态、正文token、完整段落和发布。",
+        "多个段落/跨chunk/结束/超时中断有单调时钟及独立资格评审，导语不阻止后段评审，未确认不算通过。",
+        "真实路由与隔离PG使用延迟mock记录匿名/鉴权/DB/画像/节点/路径/Provider/传输关键路径，0付费请求。"
+      ],
+      "verification": ["backend: uv run --frozen pytest -q tests/test_first_screen_measurement.py tests/test_first_screen_v2.py tests/test_first_screen_diagnostics.py", "backend: uv run --frozen ruff check ../docs/acceptance tests", "git diff --check"],
+      "verification_results": [{"command": "隔离PG pytest -q tests/test_first_screen_measurement.py tests/test_first_screen_v2.py tests/test_first_screen_diagnostics.py；ruff check tests ../docs/acceptance；git diff --check", "result": "passed:12 tests,1 existing warning; Ruff/diff clean;0 paid calls; raw loopback first byte independent of headers/status, semantic review selects later paragraph original timestamps; evidence mvp-0.2-t033-nonbillable-diagnosis.md and diagnostics-v2/v3.json"}], "started_at": "2026-09-27T15:46:36", "completed_at": "2026-09-27T16:00:00",
+      "blocker": null, "commit_lookup": "Task-Completed: MVP-0.2-T033"
+    },
+    {
+      "id": "MVP-0.2-T034", "phase": "MVP 0.2", "parent_work_package": "MVP-0.2-008",
+      "title": "首屏数据库连接生命周期局部优化及恢复回归",
+      "status": "todo", "priority": "P0", "depends_on": ["MVP-0.2-T033"],
+      "scope": ["backend/app/core/database.py", "backend/app/main.py", "backend/tests/", "docs/acceptance/", "task.json", "process.txt"],
+      "acceptance_criteria": [
+        "以诊断证据支持生命周期内连接池复用，正确关闭，保持owner/事务/幂等/审核与显式修正/前置路径语义。",
+        "可控连接延迟证明首次教学段落较原按请求建池更早，区别mock改善与真实模型结果。",
+        "回归T030防重复生成及前后端工程检查通过；T032继续blocked，0真实付费请求。"
+      ],
+      "verification": ["backend: 隔离PG uv run --frozen pytest -q", "backend: uv run --frozen ruff check app tests；uv run --frozen mypy app", "pnpm --dir web test --run；pnpm --dir web typecheck；pnpm --dir web lint；pnpm --dir web build", "git diff --check"],
+      "verification_results": [], "started_at": null, "completed_at": null,
+      "blocker": null, "commit_lookup": "Task-Completed: MVP-0.2-T034"
     }
   ]
 }
