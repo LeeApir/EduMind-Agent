@@ -6,6 +6,7 @@ import hashlib
 import json
 import re
 import time
+from contextlib import suppress
 
 
 class ParagraphClock:
@@ -25,7 +26,7 @@ class ParagraphClock:
         # Track each character's delivery time, including fragments before line completion.
         for char in delta:
             self.pending += char
-            if self.first_ns is None and not char.isspace():
+            if self.first_ns is None and char.isalnum():
                 self.first_ns = now_ns
             if char == "\n":
                 self.line(self.pending, now_ns)
@@ -36,24 +37,25 @@ class ParagraphClock:
         if stripped.startswith(("```", "~~~")):
             marker = stripped[:3]
             if self.fence is None:
-                self.complete(now_ns, "before_fence")
                 self.fence = marker
             elif self.fence == marker:
                 self.fence = None
-            self.first_ns = None
+            if not self.lines:
+                self.first_ns = None
         elif self.fence:
-            self.first_ns = None
+            if not self.lines:
+                self.first_ns = None
         elif not stripped:
             self.complete(now_ns, "blank_line")
         elif re.match(r"^#{1,6}\s", stripped):
-            self.first_ns = None
+            if not self.lines:
+                self.first_ns = None
         else:
             self.lines.append(line.rstrip("\r\n"))
 
     def complete(self, now_ns, boundary):
         text = "\n".join(self.lines).strip()
-        # Before a fence is not an approved paragraph delimiter; no invented boundary.
-        if text and boundary != "before_fence":
+        if text:
             self.candidates.append(
                 {
                     "id": len(self.candidates) + 1,
@@ -125,6 +127,7 @@ class SSEClock:
         self.status = "incomplete"
         self.errors = []
         self.validated_ns = None
+        self.operation_id = None  # In-memory recovery only; never exported in timing evidence.
 
     def feed(self, chunk, now_ns):
         self.pending += self.decoder.decode(chunk)
@@ -138,6 +141,8 @@ class SSEClock:
             elif not line and self.data:
                 payload = json.loads("\n".join(self.data))
                 self.data = []
+                if isinstance(payload.get("operation_id"), str):
+                    self.operation_id = payload["operation_id"]
                 if self.event == "agent_start":
                     self.milestones_ns.setdefault("sse_status", now_ns)
                 elif self.event == "token" and payload.get("temporary") is True:
@@ -264,5 +269,6 @@ async def raw_learning_post(*, port, cookie, csrf, key, goal, timeout=180):
     finally:
         if writer:
             writer.close()
-            await writer.wait_closed()
+            with suppress(OSError, TimeoutError):
+                await asyncio.wait_for(writer.wait_closed(), 1)
     return result

@@ -7,6 +7,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "docs/acceptance"))
 
+from audit_first_screen_v2 import audit
 from first_screen_v2 import ParagraphClock, SSEClock, assessed_metrics, qualify, raw_learning_post
 
 
@@ -64,6 +65,52 @@ def test_intro_only_interruption_and_incomplete_sentences_are_not_teaching():
         qualify(clock.candidates, decisions(clock, ["intro", "teaching"]))["milestone_confirmed"]
         is False
     )
+
+
+def test_fence_without_blank_line_does_not_invent_boundary_or_lose_prose():
+    clock = ParagraphClock()
+    clock.feed("指针保存地址。\n```c\nint *p;\n```", 10)
+    assert clock.candidates == []
+    clock.finish(20)
+    assert clock.candidates[0]["text"] == "指针保存地址。"
+    assert clock.candidates[0]["first_token_ns"] == 10
+    assert clock.candidates[0]["completed_ns"] == 20
+
+
+def test_markdown_delimiters_alone_are_not_teaching_body_tokens():
+    clock = ParagraphClock()
+    clock.feed("**", 10)
+    clock.feed("指针保存地址。**\n\n", 20)
+    assert clock.candidates[0]["first_token_ns"] == 20
+
+
+def test_full_plan_audit_retains_unconfirmed_samples_and_failures():
+    clock = ParagraphClock()
+    clock.feed("导语说明。\n\n指针保存地址。\n\n", 100000000)
+    raw = {
+        "samples_planned": 20,
+        "samples": [
+            {
+                "number": n,
+                "started_ns": 0,
+                "validated_ns": 100,
+                "milestones_ns": {"http_first_byte": 1000, "sse_status": 1000},
+                "candidates": clock.candidates,
+                "status": "published",
+                "errors": [],
+            }
+            for n in range(1, 21)
+        ],
+    }
+    decision = decisions(clock, ["intro", "teaching"])
+    reviewed = {str(n): decision for n in range(1, 21)}
+    assert audit(raw, reviewed)["stage_gate_passed"] is True
+    del reviewed["2"]
+    result = audit(raw, reviewed)
+    assert result["stage_gate_passed"] is False
+    assert result["metrics"]["client_ms"]["teaching_paragraph"]["missing"] == 1
+    raw["samples"][3]["errors"] = ["INTERRUPTED"]
+    assert audit(raw, reviewed)["request_failures"] == 1
 
 
 def test_utf8_split_sse_keeps_first_token_and_publication_separate():

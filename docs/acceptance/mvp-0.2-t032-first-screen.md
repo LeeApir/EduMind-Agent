@@ -122,3 +122,11 @@ uv run --frozen python ../docs/acceptance/audit_first_screen.py --results ../doc
 
 交接：A已完成；B保留阻塞及失败证据，原始结果不可覆盖。
 不创建Task-Completed，不声称具备本次补充验收的阶段切换条件。
+
+## 2026-09-27 追加口径纠正（历史数据不改写）
+
+上述headers实测的是HTTPX收齐响应头，不是原始HTTP首字节；token是任意非空temporary delta，
+并非经独立资格评审的教学正文首token，也不能称为HTTP TTFB。
+旧raw无法重建这两项真实时刻；保留旧数值/失败证据，但不把旧“首token失败”标签推导为
+精确HTTP首字节失败。完整说明及非计费诊断见mvp-0.2-t033-nonbillable-diagnosis.md；
+局部连接优化及控制实验见mvp-0.2-t034-local-optimization.md。T032仍blocked，未真实复测。

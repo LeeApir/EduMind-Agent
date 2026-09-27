@@ -2,7 +2,9 @@
 
 import argparse
 import asyncio
+import hashlib
 import json
+import platform
 import time
 from pathlib import Path
 from uuid import uuid4
@@ -28,6 +30,25 @@ async def run(args):
         "manual_review_pending": True,
         "samples": [],
         "configured_model": ledger["configured_model"],
+        "structured_transport": ledger["structured_transport"],
+        "text_transport": "Responses streaming",
+        "environment": {
+            "platform": platform.platform(),
+            "python": platform.python_version(),
+            "httpx": httpx.__version__,
+            "provider_cold_state": "unknown",
+        },
+        "instruction_source_sha256": {
+            name: hashlib.sha256(
+                (Path(__file__).resolve().parents[2] / name).read_bytes()
+            ).hexdigest()
+            for name in (
+                "backend/app/services/first_learning.py",
+                "backend/app/agents/profile_agent.py",
+                "backend/app/agents/learning_resource_prompt.py",
+                "backend/app/agents/review_agent.py",
+            )
+        },
         "goal": GOAL,
     }
     stop = None

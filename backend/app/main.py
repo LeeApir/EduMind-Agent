@@ -13,8 +13,9 @@ from app.api.paths import router as paths_router
 from app.api.profile import router as profile_router
 from app.api.quiz import router as quiz_router
 from app.core.auth import AuthFailure
+from app.core.database import database_lifespan
 
-app = FastAPI(title="EduMind Agent API", version="0.1.0")
+app = FastAPI(title="EduMind Agent API", version="0.1.0", lifespan=database_lifespan)
 app.include_router(auth_router)
 app.include_router(knowledge_graph_router)
 app.include_router(learning_reads_router)

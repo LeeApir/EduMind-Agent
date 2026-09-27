@@ -1264,7 +1264,7 @@
       "scope": ["docs/acceptance/", "backend/tests/", "task.json", "process.txt"],
       "acceptance_criteria": [
         "先确认可复现且批准的首段规则、起点、有限样本和实际计费硬上限。",
-        "分别统计HTTP头/SSE状态/首token/首段，P95首token≤2秒、首段≤10秒，不用总生成时长代替。",
+        "分别统计客户端HTTP原始首字节/头收齐/SSE状态/任意delta/人工确认教学正文token/首段/发布；PRD首字节≤2秒、首段≤10秒不变，原批准教学token2秒内容门槛独立检查，不能互相替代。",
         "记录当前模型/传输/指令/环境/并发/样本/预热/失败，失败超时不丢弃、不无限重跑。",
         "证据和命令脱敏，未达门槛标记阻塞，不改变真实.env或模型。"
       ],
@@ -1279,7 +1279,7 @@
       ],
       "started_at": "2026-09-27T14:42:14",
       "completed_at": null,
-      "blocker": "冻结20样本已执行：首token P95 5661.935ms超过2秒；3个候选只是目标/观察导语，不能确认教学段落，且更晚候选时间未采集，全计划首段P95缺失。不得补跑/换模型/降低标准；后续关键路径或测量采集改进需独立任务与新冻结计划。",
+      "blocker": "旧20样本和162尝试保留，原任意delta 5661.935ms不等同HTTP首字节或确认正文；3首候选未确认。T033/T034非计费修复不证明真实性能，仍需另行批准v2有界20样本/240上限复测；画像后台化涉及合并偏好/路径版本契约未实施。",
       "commit_lookup": "Task-Completed: MVP-0.2-T032"
     },
     {
@@ -1293,13 +1293,13 @@
         "真实路由与隔离PG使用延迟mock记录匿名/鉴权/DB/画像/节点/路径/Provider/传输关键路径，0付费请求。"
       ],
       "verification": ["backend: uv run --frozen pytest -q tests/test_first_screen_measurement.py tests/test_first_screen_v2.py tests/test_first_screen_diagnostics.py", "backend: uv run --frozen ruff check ../docs/acceptance tests", "git diff --check"],
-      "verification_results": [{"command": "隔离PG pytest -q tests/test_first_screen_measurement.py tests/test_first_screen_v2.py tests/test_first_screen_diagnostics.py；ruff check tests ../docs/acceptance；git diff --check", "result": "passed:12 tests,1 existing warning; Ruff/diff clean;0 paid calls; raw loopback first byte independent of headers/status, semantic review selects later paragraph original timestamps; evidence mvp-0.2-t033-nonbillable-diagnosis.md and diagnostics-v2/v3.json"}], "started_at": "2026-09-27T15:46:36", "completed_at": "2026-09-27T16:00:00",
+      "verification_results": [{"command": "隔离PG pytest -q tests/test_first_screen_measurement.py tests/test_first_screen_v2.py tests/test_first_screen_diagnostics.py；ruff check tests ../docs/acceptance；git diff --check", "result": "passed:12 tests,1 existing warning; Ruff/diff clean;0 paid calls; raw loopback first byte independent of headers/status, semantic review selects later paragraph original timestamps; evidence mvp-0.2-t033-nonbillable-diagnosis.md and diagnostics-v2/v3.json"}], "started_at": "2026-09-27T15:46:36", "completed_at": "2026-09-27T15:56:48",
       "blocker": null, "commit_lookup": "Task-Completed: MVP-0.2-T033"
     },
     {
       "id": "MVP-0.2-T034", "phase": "MVP 0.2", "parent_work_package": "MVP-0.2-008",
       "title": "首屏数据库连接生命周期局部优化及恢复回归",
-      "status": "todo", "priority": "P0", "depends_on": ["MVP-0.2-T033"],
+      "status": "done", "priority": "P0", "depends_on": ["MVP-0.2-T033"],
       "scope": ["backend/app/core/database.py", "backend/app/main.py", "backend/tests/", "docs/acceptance/", "task.json", "process.txt"],
       "acceptance_criteria": [
         "以诊断证据支持生命周期内连接池复用，正确关闭，保持owner/事务/幂等/审核与显式修正/前置路径语义。",
@@ -1307,7 +1307,11 @@
         "回归T030防重复生成及前后端工程检查通过；T032继续blocked，0真实付费请求。"
       ],
       "verification": ["backend: 隔离PG uv run --frozen pytest -q", "backend: uv run --frozen ruff check app tests；uv run --frozen mypy app", "pnpm --dir web test --run；pnpm --dir web typecheck；pnpm --dir web lint；pnpm --dir web build", "git diff --check"],
-      "verification_results": [], "started_at": null, "completed_at": null,
+      "verification_results": [
+        {"command": "隔离PG/FakeAdapter真实Uvicorn raw HTTP对比；test_database_lifespan/test_owner_reads/test_first_screen_pool_latency/test_first_screen_v2", "result": "passed:13 targeted regressions; injected100ms cold connections learning POST2→0, teaching paragraph399.108→44.813ms; 8/8 mock attempts, same-key extra0, ownedGET200/foreign404; explicit code_first correction preserved in profile/pathversion3 and C-pointer prerequisite; final v3 evidence, no paid calls"},
+        {"command": "backend:隔离PG uv run --frozen pytest -q; ruff check app tests ../docs/acceptance; mypy app", "result": "passed:416 tests,no skips,9 deprecation warnings; Ruff clean,Mypy55 files; initial full1failed/414passed detected cross-loop app.state pool bug, fixed request.state lifespan and preserved owner assertions; mistaken missing test path had no tests run, corrected; path assertion uses actual node_details contract"},
+        {"command": "pnpm --dir web test --run; pnpm --dir web typecheck; pnpm --dir web lint; pnpm --dir web build; git diff --check", "result": "passed:66 tests/11 files including10 T030 recovery/stale-response cases; types/build clean,lint0errors/67existing warnings; diff clean, historical raw/audit/ledger unchanged; T032 still blocked, v2 finite plan prepared not executed"}
+      ], "started_at": "2026-09-27T16:17:18", "completed_at": "2026-09-27T16:35:48",
       "blocker": null, "commit_lookup": "Task-Completed: MVP-0.2-T034"
     }
   ]
