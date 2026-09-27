@@ -45,18 +45,40 @@ const pathRefreshToken = ref(0);
 const restoringUnit = ref(false);
 const restoreUnitError = ref("");
 let learningGeneration = 0;
-const canSubmit = computed(() => Boolean(goal.value.trim()) && requestState.value !== "loading");
+const canSubmit = computed(() => Boolean(goal.value.trim())
+  && (requestState.value !== "loading" || goal.value.trim() !== submittedGoal.value));
 const publishedResources = computed<PublishedResource[]>(() =>
   resources.value.map(({ id, type, version }) => ({ id, type, version })),
 );
 
 async function startLearning(): Promise<void> {
+  if (!canSubmit.value) return;
   submittedGoal.value = goal.value.trim();
   resetAttempt();
   await submitLearningRequest();
 }
 
 async function retryLearning(): Promise<void> {
+  if (requestState.value === "loading") return;
+  requestError.value = "";
+  if (operationId.value) {
+    const generation = learningGeneration;
+    requestState.value = "loading";
+    try {
+      await recoverPublishedOperation(generation);
+      if (generation === learningGeneration) requestState.value = "idle";
+    } catch (error) {
+      if (generation !== learningGeneration) return;
+      requestError.value = error instanceof Error ? error.message : "恢复失败，请再次重试。";
+      requestState.value = "error";
+    }
+    return;
+  }
+  await submitLearningRequest();
+}
+
+async function regenerateLearning(): Promise<void> {
+  if (!submittedGoal.value || requestState.value === "loading") return;
   resetAttempt();
   await submitLearningRequest();
 }
@@ -76,35 +98,58 @@ function resetAttempt(): void {
 }
 
 async function submitLearningRequest(): Promise<void> {
+  const generation = learningGeneration;
+  const requestGoal = submittedGoal.value;
+  const requestKey = idempotencyKey.value;
+  let recoveryAttempted = false;
   requestState.value = "loading";
   try {
     if (props.startLearningRequest) {
-      await props.startLearningRequest(submittedGoal.value);
+      await props.startLearningRequest(requestGoal);
+      if (generation !== learningGeneration) return;
       profileRefreshToken.value += 1;
       requestState.value = "idle";
       return;
     }
     const csrf = await ensureSession();
+    if (generation !== learningGeneration) return;
     let readyUnitId = "";
     await startLearningSession({
-      goal: submittedGoal.value,
+      goal: requestGoal,
       csrfToken: csrf,
-      idempotencyKey: idempotencyKey.value,
+      idempotencyKey: requestKey,
       onEvent: (event) => {
+        if (generation !== learningGeneration) return;
         readyUnitId = applyLearningEvent(event) || readyUnitId;
       },
     });
+    if (generation !== learningGeneration) return;
     if (readyUnitId) {
-      await loadPublishedUnit(readyUnitId);
+      await loadPublishedUnit(readyUnitId, generation);
+    } else if (operationId.value) {
+      recoveryAttempted = true;
+      await recoverPublishedOperation(generation);
+    } else {
+      throw new Error("未收到操作状态，请恢复原请求。");
     }
-    requestState.value = "idle";
+    if (generation === learningGeneration) requestState.value = "idle";
   } catch (error: unknown) {
-    if (await recoverPublishedOperation()) {
-      requestState.value = "idle";
-      return;
+    if (generation !== learningGeneration) return;
+    if (error instanceof LearningRequestError && error.operationId) operationId.value = error.operationId;
+    let recoveryError: unknown;
+    if (operationId.value && !recoveryAttempted) {
+      try {
+        await recoverPublishedOperation(generation);
+        if (generation === learningGeneration) requestState.value = "idle";
+        return;
+      } catch (failure) {
+        recoveryError = failure;
+      }
     }
-    requestError.value = error instanceof Error && error.message
-      ? error.message
+    if (generation !== learningGeneration) return;
+    const failure = recoveryError ?? error;
+    requestError.value = failure instanceof Error && failure.message
+      ? failure.message
       : "暂时无法开始学习，请检查网络后重试。";
     requestState.value = "error";
   }
@@ -147,21 +192,26 @@ async function ensureSession(): Promise<string> {
   return csrfToken.value;
 }
 
-async function recoverPublishedOperation(): Promise<boolean> {
-  if (!operationId.value) return false;
-  try {
-    const response = await fetch(`/api/learning-operations/${operationId.value}`, {
-      credentials: "same-origin",
-    });
-    if (!response.ok) return false;
-    const payload = await response.json() as Record<string, unknown>;
-    const unitId = stringValue(payload.learning_unit_id);
-    if (payload.status !== "published" || !unitId) return false;
-    await loadPublishedUnit(unitId);
-    return true;
-  } catch {
-    return false;
+async function recoverPublishedOperation(generation: number): Promise<void> {
+  const recoveringOperationId = operationId.value;
+  if (!recoveringOperationId) throw new Error("缺少操作标识，请恢复原请求。");
+  const response = await fetch(`/api/learning-operations/${recoveringOperationId}`, {
+    credentials: "same-origin",
+  });
+  if (generation !== learningGeneration) return;
+  if (!response.ok) throw new Error("原请求状态暂时无法读取，请再次重试恢复。");
+  const payload = await response.json() as Record<string, unknown>;
+  if (generation !== learningGeneration) return;
+  const unitId = stringValue(payload.learning_unit_id);
+  if (payload.id !== recoveringOperationId) throw new Error("原请求状态无效，请再次重试恢复。");
+  if (payload.status === "published" && unitId) {
+    await loadPublishedUnit(unitId, generation);
+    return;
   }
+  if (payload.status === "failed" || payload.status === "canceled") {
+    throw new Error("原请求已失败或取消。恢复不会再次生成；需要新内容请明确选择“重新生成”。");
+  }
+  throw new Error("原请求尚未发布，请等待后重试恢复；不会重复生成。");
 }
 
 async function loadPublishedUnit(unitId = learningUnitId.value, expectedGeneration = learningGeneration): Promise<void> {
@@ -312,9 +362,17 @@ function stringValue(value: unknown): string {
         size="small"
         @click="retryLearning"
       >
-        重试
+        重试恢复原请求
       </NButton>
     </aside>
+    <NButton
+      v-if="submittedGoal && requestState !== 'loading'"
+      size="small"
+      data-testid="regenerate-learning"
+      @click="regenerateLearning"
+    >
+      重新生成（新请求）
+    </NButton>
     <LearningProgressPanel
       :temporary-text="temporaryText"
       :review-state="reviewState"

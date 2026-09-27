@@ -1193,6 +1193,36 @@
       "completed_at": "2026-09-25T19:45:29",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.2-T029"
+    },
+    {
+      "id": "MVP-0.2-T030",
+      "phase": "MVP 0.2",
+      "parent_work_package": "MVP-0.2-006",
+      "title": "恢复学习请求身份，防止网络重试重复生成与计费",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": ["MVP-0.2-T025"],
+      "scope": ["web/src/App.vue", "web/tests/", "backend/app/services/learning_operations.py", "backend/app/api/learning_sessions.py", "backend/tests/", "docs/api/openapi.yaml", "docs/ADR/0002-streaming-first-screen-and-resource-review.md", "docs/acceptance/mvp-0.2-t030-retry-recovery.md", "process.txt"],
+      "acceptance_criteria": [
+        "恢复原请求保留目标、操作 ID 和幂等键；查询失败再次恢复、已发布读取和运行中等待均不新建生成。",
+        "明确重新生成或提交新目标才创建新身份；旧异步响应不能覆盖新目标页面。",
+        "明确失败按批准的后端契约处理，不改变审核发布、安全或 owner 隔离边界。",
+        "回归覆盖用户要求的六种情形，仅 mock 或隔离数据库验证，无真实付费调用。",
+        "相关前后端测试、类型检查、静态检查和构建通过并记录；完成后只创建本地提交。"
+      ],
+      "verification": ["pnpm --dir web test --run", "pnpm --dir web typecheck", "pnpm --dir web lint", "pnpm --dir web build", "在 backend 使用隔离 EDUMIND_TEST_DATABASE_URL 执行 uv run --frozen pytest -q", "在 backend 执行 uv run --frozen ruff check app tests 和 uv run --frozen mypy app", "git diff --check"],
+      "verification_results": [
+        {"command": "backend: EDUMIND_TEST_DATABASE_URL=<isolated PostgreSQL> uv run --frozen pytest -q", "result": "passed: 396 tests, no skips, 7 existing deprecation warnings; FakeAdapter only, active/failed/canceled GET and same-key replay preserve state/attempt, external owner 404"},
+        {"command": "backend: uv run --frozen ruff check app tests; uv run --frozen mypy app", "result": "passed: Ruff clean, 55 source files type checked"},
+        {"command": "pnpm --dir web test --run", "result": "passed: 65 tests across 10 files, including 10 request identity and stale-response regressions"},
+        {"command": "pnpm --dir web typecheck; pnpm --dir web lint; pnpm --dir web build", "result": "passed: vue-tsc and Vite build, ESLint 0 errors/67 existing formatting warnings"},
+        {"command": "backend: uv run --frozen python ../web/tests/e2e/run.py", "result": "passed: route-mock browser scenarios; failed recovery one POST, explicit regeneration new key, published SSE recovery one POST; existing mock 401/404 console messages retained; webapp-testing lifecycle/interaction guidance used"},
+        {"command": "git diff --check", "result": "passed; self-inspected code/test/docs diff, no real .env/key/generated media staged; 0 real model requests"}
+      ],
+      "started_at": "2026-09-27T13:25:13",
+      "completed_at": "2026-09-27T13:33:42",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.2-T030"
     }
   ]
 }

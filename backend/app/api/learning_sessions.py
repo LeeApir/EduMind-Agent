@@ -19,7 +19,6 @@ from app.services.knowledge_graph import KnowledgeGraphRepository
 from app.services.learning_finalization import finalize_learning_unit
 from app.services.learning_operations import (
     IdempotencyConflict,
-    fail_interrupted_operation,
     operation_payload,
     owned_operation,
     reserve_operation,
@@ -261,5 +260,4 @@ async def get_learning_operation(
             from app.core.auth import AuthFailure
 
             raise AuthFailure(404, "NOT_FOUND", "Resource not found.")
-        await fail_interrupted_operation(db, operation)
         return operation_payload(operation)

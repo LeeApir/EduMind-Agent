@@ -11,6 +11,7 @@ BASE_URL = os.getenv("EDUMIND_E2E_BASE_URL", "http://127.0.0.1:4173")
 LAST_QUIZ_RECEIPT: dict[str, object] | None = None
 QUIZ_POST_COUNT = 0
 PATH_REPLANNED = False
+LEARNING_KEYS: list[str] = []
 ANSWER_KEYS = {"q1": "A", "q2": "head", "q3": "->"}
 OBJECTIVE_QUESTION = (
     "[单选题] 插入前先保存什么？\nA. 后继连接\nB. 空指针\nC. 类型名\nD. 节点数量\n仅填 A、B、C 或 D"
@@ -187,10 +188,10 @@ def mock_api(route: Route) -> None:
         if operation_id == "op-recover":
             route.fulfill(
                 status=200,
-                json={"status": "published", "learning_unit_id": "unit-reviewed-001"},
+                json={"id": operation_id, "status": "published", "learning_unit_id": "unit-reviewed-001"},
             )
         else:
-            route.fulfill(status=200, json={"status": "failed", "learning_unit_id": None})
+            route.fulfill(status=200, json={"id": operation_id, "status": "failed", "learning_unit_id": None})
         return
     if path == "/api/quiz-submissions/latest":
         if LAST_QUIZ_RECEIPT is None:
@@ -244,6 +245,7 @@ def mock_api(route: Route) -> None:
         return
 
     goal = json.loads(request.post_data or "{}").get("goal", "")
+    LEARNING_KEYS.append(request.headers["idempotency-key"])
     if "Provider 故障" in goal:
         body = sse(
             ("agent_start", {"operation_id": "op-provider", "stage": "preparing"}),
@@ -313,6 +315,7 @@ def open_page(page: Page) -> None:
     LAST_QUIZ_RECEIPT = None
     QUIZ_POST_COUNT = 0
     PATH_REPLANNED = False
+    LEARNING_KEYS.clear()
     page.on(
         "console",
         lambda message: print(f"browser console [{message.type}]: {message.text}", flush=True),
@@ -401,7 +404,13 @@ def run() -> None:
             print("E2E: provider failure", flush=True)
             open_page(page)
             submit(page, "模拟 Provider 故障")
-            expect(page.get_by_text("模型服务暂不可用，请稍后重试。")).to_be_visible()
+            expect(page.get_by_text("原请求已失败或取消。", exact=False)).to_be_visible()
+            page.get_by_role("button", name="重试恢复原请求", exact=True).click()
+            expect(page.get_by_text("原请求已失败或取消。", exact=False)).to_be_visible()
+            assert len(LEARNING_KEYS) == 1
+            page.get_by_test_id("regenerate-learning").click()
+            expect(page.get_by_text("原请求已失败或取消。", exact=False)).to_be_visible()
+            assert len(LEARNING_KEYS) == 2 and LEARNING_KEYS[0] != LEARNING_KEYS[1]
             page.close()
 
             page = browser.new_page()
@@ -419,6 +428,7 @@ def run() -> None:
             submit(page, "模拟 SSE 恢复")
             expect(page.get_by_test_id("published-state")).to_contain_text("已审核正式资源")
             expect(page.get_by_test_id("explanation-tab")).to_contain_text("链表节点")
+            assert len(LEARNING_KEYS) == 1
             page.close()
         finally:
             browser.close()

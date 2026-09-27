@@ -367,3 +367,11 @@ v4本地题型门禁和真实质量通过，首次真实闭环7调用有一个�
 用户确认明确ProfileAgent输出契约，初始与行为指令单独版本化，原schema/白名单/保守更新及失败降级不变 | 核对当前任务、失败回执、代码、测试和分支；上轮质量v11证据保留，不重跑无关质量挑样本 | 当前模型完整闭环仍未通过，真实.env和其他任务不改 | 回归测试后最多3请求画像诊断，通过再最多30次实际尝试闭环v10；验证/最终恢复及退出审计后才完成本地提交，不push/merge或跨阶段
 [2026-09-27T10:56:50] [MVP-0.2-T025] VERIFIED | executor=Lee
 画像输出契约v2及诊断/回归补齐，保留所有失败报告并完成阶段退出核对；客观评分、审核分类及安全传输改动一起交付，真实.env未修改 | 画像3诊断通过；当前Pro闭环v10 10请求通过，独立B/T/B后score1/mastery .9515及可解释下一节点，路径100样本+5预热P99 35.175ms/P95 47.43ms失败0；原完整质量v11通过。388后端无跳过/7警告、Ruff/Mypy55、前端55/构建通过；lint0错误67警告，浏览器route-mock通过但401/404 console。隔离Compose最终3a88d83镜像0009 head/seed/restart/check恢复通过 | 前置关系漏检、正确对照超时保留；TestClient非HTTP，Pro首段P95未测，不宣称全产品发布指标；本轮13调用/T025累计901/连通另12，金额余额未知；新测试长行已修，webapp-testing指导浏览器生命周期及交互验证 | 自查diff/明确路径暂存后本地Task-Completed提交并核对；本阶段停止，不push/merge/跨MVP0.3，阶段切换时再原样归档task.json
+[2026-09-27T13:25:13] [MVP-0.2-T030] START | executor=Lee | branch=codex/mvp-0.2
+用户授权独立修复学习请求重试重复生成，补充当前阶段任务；分支工作区原本干净，不归档/跨阶段 | 静态核对前后端、OpenAPI及既有恢复测试，未调用真实Provider | 验收检查待实现后执行 | 先核对恢复与失败重试契约
+[2026-09-27T13:25:13] [MVP-0.2-T030] BLOCKED | executor=Lee
+核实retryLearning清空身份，异步事件及错误缺少请求代次隔离；发现后端查询无条件将active状态标为INTERRUPTED | learning_operations.py:90-102及learning_sessions.py:264明确写失败；既有test_operation_read_marks_pre_restart_active_operation_failed只有reviewing记录无重启证据；同键POST只回放agent_start/done、不增加attempt | 当前API无法可靠判断运行中与真正中断；ADR-0002仍Proposed，其同操作新attempt未实现，不擅自改变重大契约。尚未实现或运行验收，无完成提交/付费调用 | 请求确认GET只读保留运行状态，失败同键仅恢复、明确重新生成才换键；进程中断识别另需批准可靠方案，不以查询或猜测超时认定失败
+[2026-09-27T13:27:50] [MVP-0.2-T030] RESUME | executor=Lee | branch=codex/mvp-0.2
+用户同意查询只读、失败同键仅恢复、明确重新生成才换键及不新增中断检测；恢复修复任务 | 已核对既有幂等POST只回放状态，schema/发布/owner规则不变 | 真正进程中断可能保持运行中，不能猜测失败；0付费请求 | 实现代次隔离及六类回归，mock/隔离数据库验证后本地提交
+[2026-09-27T13:33:42] [MVP-0.2-T030] VERIFIED | executor=Lee
+恢复原请求保留目标/操作ID/幂等键，明确新生成才换键；查询只读，SSE及查询/资源异步响应代次隔离；OpenAPI/ADR已批准的有限语义与验收记录同步 | 后端396通过无跳过/7既有警告、Ruff/Mypy55通过；前端65通过、类型/构建通过、lint0错误67既有警告；webapp-testing指导浏览器route-mock通过：失败恢复仅一POST、新生成换键、已发布恢复仅一POST；diff检查通过，0付费请求 | 未新增中断检测，真实中断可持续运行中；未完成身份不跨刷新保存，不取消旧调用；浏览器既有401/404 mock console保留，不声称真实Provider验收 | 自查与明确路径暂存后本地Task-Completed提交并核对；交接见docs/acceptance/mvp-0.2-t030-retry-recovery.md，不push/merge/归档/跨MVP0.3

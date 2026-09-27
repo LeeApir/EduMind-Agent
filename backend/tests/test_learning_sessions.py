@@ -352,10 +352,17 @@ def test_same_idempotency_key_reuses_published_operation(database_url: str) -> N
         app.dependency_overrides.clear()
 
 
-def test_operation_read_marks_pre_restart_active_operation_failed(
-    database_url: str,
+@pytest.mark.parametrize(
+    "status", ["accepted", "preparing", "streaming_temporary", "temporary_complete", "reviewing",
+               "regenerating", "failed", "canceled"]
+)
+def test_operation_read_and_same_key_replay_preserve_state_without_generation(
+    database_url: str, status: str,
 ) -> None:
-    client, _csrf = create_authenticated_client(FakeAdapter())
+    from app.services.learning_operations import request_digest
+
+    adapter = FakeAdapter()
+    client, csrf = create_authenticated_client(adapter)
     try:
         guest = client.get("/api/auth/session")
         owner_id = UUID(guest.json()["user"]["id"])
@@ -366,11 +373,11 @@ def test_operation_read_marks_pre_restart_active_operation_failed(
                 async with async_sessionmaker(engine, expire_on_commit=False)() as db:
                     operation = LearningOperation(
                         user_id=owner_id,
-                        idempotency_key="interrupted-operation-key",
-                        request_digest="0" * 64,
+                        idempotency_key="test-learning-operation-key",
+                        request_digest=request_digest(goal="讲解队列", preferred_language="c"),
                         goal="讲解队列",
                         preferred_language="c",
-                        status="reviewing",
+                        status=status,
                     )
                     db.add(operation)
                     await db.commit()
@@ -381,8 +388,54 @@ def test_operation_read_marks_pre_restart_active_operation_failed(
         operation_id = asyncio.run(seed())
         recovered = client.get(f"/api/learning-operations/{operation_id}")
         assert recovered.status_code == 200
-        assert recovered.json()["status"] == "failed"
-        assert recovered.json()["error"]["code"] == "INTERRUPTED"
+        assert recovered.json()["status"] == status
+        assert recovered.json()["error"] is None
+        with TestClient(app, base_url="https://testserver") as other:
+            assert other.post(
+                "/api/auth/guest", headers={"Origin": "https://testserver"}
+            ).status_code == 201
+            assert other.get(f"/api/learning-operations/{operation_id}").status_code == 404
+        replay = client.post(
+            "/api/learning-sessions", json={"goal": "讲解队列"},
+            headers={"Origin": "https://testserver", "X-CSRF-Token": csrf},
+        )
+        events = [part for part in replay.text.split("\n\n") if part]
+        assert event_data(events[0])["operation_id"] == operation_id
+        assert event_data(events[-1])["status"] == status
+        assert adapter.calls == []
+        assert client.get(f"/api/learning-operations/{operation_id}").json() == recovered.json()
+    finally:
+        client.close()
+        app.dependency_overrides.clear()
+
+
+def test_failed_operation_replays_without_provider_and_new_key_creates_new_operation(
+    database_url: str,
+) -> None:
+    adapter = FakeAdapter(fail_stream=True)
+    client, csrf = create_authenticated_client(adapter)
+    try:
+        headers = {"Origin": "https://testserver", "X-CSRF-Token": csrf}
+        first = client.post("/api/learning-sessions", json={"goal": "讲解栈"}, headers=headers)
+        first_events = [part for part in first.text.split("\n\n") if part]
+        operation_id = event_data(first_events[0])["operation_id"]
+        calls = list(adapter.calls)
+        persisted = client.get(f"/api/learning-operations/{operation_id}").json()
+        assert persisted["status"] == "failed"
+        assert persisted["error"]["retryable"] is True
+        replay = client.post("/api/learning-sessions", json={"goal": "讲解栈"}, headers=headers)
+        events = [part for part in replay.text.split("\n\n") if part]
+        assert event_data(events[0])["operation_id"] == operation_id
+        assert event_data(events[-1])["status"] == "failed"
+        assert adapter.calls == calls
+        new = client.post(
+            "/api/learning-sessions", json={"goal": "讲解栈"},
+            headers={**headers, "Idempotency-Key": "explicit-regeneration-new-key"},
+        )
+        new_events = [part for part in new.text.split("\n\n") if part]
+        assert event_data(new_events[0])["operation_id"] != operation_id
+        assert len(adapter.calls) > len(calls)
+        assert client.get(f"/api/learning-operations/{operation_id}").json() == persisted
     finally:
         client.close()
         app.dependency_overrides.clear()
