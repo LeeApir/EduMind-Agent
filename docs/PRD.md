@@ -209,7 +209,7 @@ M2 围绕一个知识点组装可适应、可重试、可恢复的**学习单元
 |---|---|---|---|
 | 课程讲解 | `LearningUnitGenerator` | Markdown | P0，短段落、示例和必要公式，支持“更简单/更深入/换个例子” |
 | 代码示例 | `LearningUnitGenerator` | JSON | P0，首发一种语言，包含预期输出和关键步骤说明 |
-| 小型练习 | `LearningUnitGenerator` | JSON | P0，每个单元 3 道左右，结果用于更新掌握度 |
+| 小型练习 | `LearningUnitGenerator` | JSON | P0，每个单元 3 道左右的客观唯一答案题，明确作答格式，服务端确定性评分后更新掌握度；解释不作为计分输入 |
 | **Manim 算法动画** | `VideoAgent` | mp4 URL + 字幕 | P0 增强项，优先预渲染或参数化模板，按需播放 |
 | 知识点思维导图 | `MindmapAgent` | JSON 树 | P1，不阻塞核心学习闭环 |
 

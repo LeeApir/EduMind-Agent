@@ -1,6 +1,7 @@
 """Server-only composition root for configured Provider Gateway calls."""
 
 from collections.abc import Callable
+from os import getenv
 
 from app.core.config import ConfigurationError, ProviderSettings, get_provider_settings
 from app.core.provider_target import (
@@ -34,6 +35,20 @@ def build_server_provider_gateway(
 
 def build_default_provider_gateway() -> ProviderGateway:
     """Compose the one configured P0 network adapter behind the neutral Gateway."""
+    return build_server_provider_gateway(configured_provider_adapter)
+
+
+def configured_provider_adapter(
+    settings: ProviderSettings,
+    guard: ProviderTargetGuard,
+) -> ProviderAdapter:
     from app.services.deepseek_responses import DeepSeekResponsesAdapter
 
-    return build_server_provider_gateway(DeepSeekResponsesAdapter)
+    mode = getenv("EDUMIND_PROVIDER_STRUCTURED_TRANSPORT", "responses_json_schema")
+    if mode == "responses_json_schema":
+        return DeepSeekResponsesAdapter(settings, guard)
+    if mode == "beta_tools":
+        from app.services.deepseek_beta_tools import DeepSeekBetaToolsAdapter
+
+        return DeepSeekBetaToolsAdapter(settings, guard)
+    raise ProviderError(ProviderErrorCode.CONFIGURATION_MISSING)

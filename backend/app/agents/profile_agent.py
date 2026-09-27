@@ -1,7 +1,7 @@
 """Extract one evidence-backed transient profile without asking a questionnaire."""
 
 import json
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Protocol
@@ -25,6 +25,8 @@ from app.services.provider_gateway import (
 
 PROFILE_PROMPT_VERSION = "profile-v1"
 PROFILE_BEHAVIOR_PROMPT_VERSION = "profile-behavior-v1"
+PROFILE_INSTRUCTION_VERSION = "profile-instructions-v2"
+PROFILE_BEHAVIOR_INSTRUCTION_VERSION = "profile-behavior-instructions-v2"
 _EXTRACTION_INSTRUCTIONS = """You extract an evidence-backed transient learning profile.
 Only use facts explicitly stated in the student's one input. Never infer background,
 ability, preferences, or prior knowledge. Keep every unknown dimension null and omit its
@@ -35,6 +37,16 @@ provided whitelisted learning-behavior summary. Never infer demographic backgrou
 stable ability, or preferences from a single ambiguous action. Return an empty updates
 object when evidence is insufficient. Do not output versions, evidence records, source,
 confidence, raw answers, or fields outside the allowed list."""
+
+
+def profile_contract(schema: Mapping[str, object], version: str) -> str:
+    """Explain the existing wire contract without changing validation or fallback."""
+    return (
+        f"\nInstruction version: {version}. Emit exactly one JSON object, "
+        "no Markdown, trailing text or additional root fields. Use the exact field names "
+        "and required fields in this schema; do not rename or flatten fields.\n"
+        + json.dumps(schema, ensure_ascii=False)
+    )
 
 
 class StructuredProfileGateway(Protocol):
@@ -90,6 +102,17 @@ class ProfileAgent:
             field: {"type": "array" if field == "error_preferences" else "object"}
             for field in allowed_fields
         }
+        schema = {
+            "type": "object",
+            "additionalProperties": False,
+            "required": ["updates"],
+            "properties": {
+                "updates": {
+                    "type": "object", "additionalProperties": False,
+                    "properties": properties,
+                }
+            },
+        }
         request = StructuredRequest(
             prompt=TextRequest(
                 messages=(
@@ -99,6 +122,10 @@ class ProfileAgent:
                             f"{_BEHAVIOR_INSTRUCTIONS}\n"
                             f"Prompt version: {PROFILE_BEHAVIOR_PROMPT_VERSION}.\n"
                             f"Allowed fields: {', '.join(allowed_fields)}."
+                            + profile_contract(schema, PROFILE_BEHAVIOR_INSTRUCTION_VERSION)
+                            + '\nThe only root field is updates. With insufficient evidence emit '
+                            '{"updates": {}} exactly, not an empty root, no_change or a status. '
+                            "Allowed fields belong inside updates only."
                         ),
                     ),
                     ChatMessage(
@@ -108,18 +135,7 @@ class ProfileAgent:
                 ),
                 task_profile=TaskProfile.FAST,
             ),
-            json_schema={
-                "type": "object",
-                "additionalProperties": False,
-                "required": ["updates"],
-                "properties": {
-                    "updates": {
-                        "type": "object",
-                        "additionalProperties": False,
-                        "properties": properties,
-                    }
-                },
-            },
+            json_schema=schema,
         )
         try:
             result = await self._gateway.generate_structured(request, retry_safe=True)
@@ -160,6 +176,10 @@ class ProfileAgent:
                             f"Set profile_version to {profile_version}.\n"
                             "Use this ISO-8601 timestamp with timezone for every "
                             f"observed_at: {self._now().isoformat()}."
+                            + profile_contract(profile_output_schema(), PROFILE_INSTRUCTION_VERSION)
+                            + "\nEvidence is an object keyed only by non-null profile dimensions; "
+                            "each value is an array of records with exactly source, confidence, "
+                            "observed_at, profile_version. Do not add inferred dimensions."
                         ),
                     ),
                     ChatMessage(role="user", content=query),

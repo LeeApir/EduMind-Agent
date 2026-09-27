@@ -6,11 +6,17 @@ from dataclasses import dataclass
 from typing import Protocol, cast
 
 from app.agents.learning_resource_prompt import (
+    OBJECTIVE_INSTRUCTION_VERSIONS,
     RESOURCE_INSTRUCTION_VERSION,
     learning_resource_prompt,
 )
-from app.agents.learning_resource_schema import resource_output_schema, validate_learning_resource
+from app.agents.learning_resource_schema import (
+    LearningResourceType,
+    resource_output_schema,
+    validate_learning_resource,
+)
 from app.agents.learning_unit_generator import PendingLearningResource
+from app.agents.objective_exercises import objective_exercise_issues
 from app.agents.review_context import ResourceReviewContext
 from app.agents.review_schema import (
     MAX_TARGETED_CORRECTIONS,
@@ -42,6 +48,36 @@ unsupported prerequisite assumptions, difficulty mismatch or relevant misconcept
 do not demand that each short resource cover every listed objective or misconception.
 If reference context is absent, do not pretend to have checked graph or learner fit.
 Return only the requested JSON review. Do not pass a resource with any unresolved issue."""
+
+REVIEW_INSTRUCTION_VERSION = "resource-review-instructions-v2"
+
+
+def review_contract_instructions() -> str:
+    """Specify wire field names without changing schema or the review decision policy."""
+    examples = [
+        {"review_version": REVIEW_PROMPT_VERSION, "verdict": "pass", "issues": []},
+        {"review_version": REVIEW_PROMPT_VERSION, "verdict": "revise", "issues": [
+            {"area": "fact", "severity": "major", "message": "A concrete factual error."}
+        ]},
+    ]
+    return (
+        f"\nInstruction version: {REVIEW_INSTRUCTION_VERSION}.\n"
+        "Emit exactly one JSON object, no surrounding Markdown or trailing commentary. "
+        "Use exactly review_version, verdict, issues at the root and exactly area, severity, "
+        "message in each issue. Do not add scores, explanations, summaries or other fields. "
+        "A pass requires issues=[]; revise/reject requires at least one concrete issue. "
+        "Choose the actual verdict independently; examples demonstrate serialization only.\n"
+        "Issue classification: use code_safety for unsafe execution or memory access, "
+        "including NULL dereference, use-after-free, dangling pointers and out-of-bounds "
+        "access, even when the unsafe claim appears only in explanation or exercise text. "
+        "Classify the concrete safety defect as code_safety, not merely fact or "
+        "misconception. Use fact for non-safety conceptual or complexity errors; difficulty "
+        "for learner-level mismatch; misconception for relevant misconception coverage. "
+        "Do not invent a safety issue in a correct resource. Describe the actual defect "
+        "and choose severity from its impact, not from the resource type.\n"
+        "Required output schema:\n" + json.dumps(review_output_schema(), ensure_ascii=False)
+        + "\nSerialization examples:\n" + json.dumps(examples, ensure_ascii=False)
+    )
 
 
 class StructuredReviewGateway(Protocol):
@@ -94,10 +130,36 @@ class ReviewAgent:
                 },
                 None,
             )
+        objective_required = (
+            resource.resource_type is LearningResourceType.EXERCISE
+            and resource.instruction_version in OBJECTIVE_INSTRUCTION_VERSIONS
+        )
+        if objective_required:
+            objective_issues = objective_exercise_issues(resource.content)
+            if objective_issues:
+                return (
+                    {
+                        "review_version": REVIEW_PROMPT_VERSION,
+                        "verdict": "revise",
+                        "issues": objective_issues,
+                    },
+                    None,
+                )
         request = StructuredRequest(
             prompt=TextRequest(
                 messages=(
-                    ChatMessage(role="system", content=_REVIEW_INSTRUCTIONS),
+                    ChatMessage(
+                        role="system",
+                        content=_REVIEW_INSTRUCTIONS + review_contract_instructions()
+                        + (
+                            "\nThis is a scored objective exercise. Independently verify each "
+                            "answer key, exactly one correct option/answer, and explicit input "
+                            "format. Reject ambiguous alternatives and open-ended explanation "
+                            "questions. Reasoning belongs only in explanation."
+                            if objective_required
+                            else ""
+                        ),
+                    ),
                     ChatMessage(role="user", content=self._candidate_payload(resource, context)),
                 ),
                 task_profile=TaskProfile.REVIEW,

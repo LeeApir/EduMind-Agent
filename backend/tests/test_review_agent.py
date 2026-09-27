@@ -1,11 +1,12 @@
 """ReviewAgent gates severe code and bounds directed corrections."""
 
 import asyncio
+import json
 
 from app.agents.learning_resource_schema import LearningResourceType
 from app.agents.learning_unit_generator import PendingLearningResource
-from app.agents.review_agent import ReviewAgent
-from app.agents.review_schema import REVIEW_PROMPT_VERSION, ReviewVerdict
+from app.agents.review_agent import REVIEW_INSTRUCTION_VERSION, ReviewAgent
+from app.agents.review_schema import REVIEW_PROMPT_VERSION, ReviewVerdict, review_output_schema
 from app.services.provider_gateway import StructuredRequest, StructuredResult
 
 
@@ -52,6 +53,17 @@ def test_passed_review_approves_candidate() -> None:
         assert outcome.approved is True
         assert outcome.verdict is ReviewVerdict.PASS
         assert outcome.correction_attempts == 0
+        instruction = gateway.requests[0].prompt.messages[0].content
+        assert REVIEW_INSTRUCTION_VERSION in instruction
+        assert json.dumps(review_output_schema(), ensure_ascii=False) in instruction
+        assert "examples demonstrate serialization only" in instruction
+        assert "resource-review-instructions-v2" in instruction
+        assert "including NULL dereference, use-after-free" in instruction
+        assert (
+            "even when the unsafe claim appears only in explanation or exercise text" in instruction
+        )
+        assert "Use fact for non-safety conceptual or complexity errors" in instruction
+        assert "Do not invent a safety issue in a correct resource" in instruction
 
     asyncio.run(exercise())
 

@@ -54,8 +54,8 @@ def test_learning_quiz_mastery_replan_correction_wrong_fallback_and_process_reco
             assert all("answer" not in item and "explanation" not in item
                        for item in exercise["content"]["items"])
             quiz = {"resource_id": exercise["id"], "resource_version": exercise["version"],
-                    "answers": [{"question_id": "q1", "answer": "后继指针"},
-                                {"question_id": "q2", "answer": "起点"}]}
+                    "answers": [{"question_id": "q1", "answer": "2"},
+                                {"question_id": "q2", "answer": "T"}]}
             for attempt in range(2):
                 receipt = client.post("/api/quiz-submissions", json=quiz,
                                       headers=headers(f"closed-loop-correct-{attempt:03}"))

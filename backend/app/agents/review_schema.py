@@ -8,7 +8,7 @@ from typing import Final, cast
 
 from app.agents.learning_resource_schema import LearningResourceType
 
-REVIEW_PROMPT_VERSION: Final = "resource-review-v2"
+REVIEW_PROMPT_VERSION: Final = "resource-review-v3"
 MAX_TARGETED_CORRECTIONS: Final = 2
 
 

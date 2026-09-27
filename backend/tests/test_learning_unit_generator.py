@@ -100,7 +100,7 @@ def test_generates_schema_valid_explanation_single_language_code_and_three_exerc
         assert result.failures == ()
         assert all(item.review_status == "pending" for item in result.resources)
         assert all(item.prompt_version == RESOURCE_PROMPT_VERSION for item in result.resources)
-        assert all(item.instruction_version == "learning-resources-instructions-v3"
+        assert all(item.instruction_version == "learning-resources-instructions-v8"
                    for item in result.resources)
         code = result.resources[1].content
         assert code["language"] == "C"

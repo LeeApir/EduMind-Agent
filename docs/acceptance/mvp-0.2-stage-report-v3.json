@@ -1,0 +1,77 @@
+{
+  "started_at": "2026-09-26T17:48:55",
+  "environment": {
+    "platform": "macOS-15.6.1-arm64-arm-64bit",
+    "python": "3.11.16",
+    "transport": "TestClient actual routes, real PostgreSQL, real Provider",
+    "concurrency": 1,
+    "provider_limit": 30
+  },
+  "provider_calls": [
+    {
+      "kind": "structured",
+      "model": "deepseek-flash"
+    },
+    {
+      "kind": "stream"
+    },
+    {
+      "kind": "structured",
+      "model": "deepseek-flash"
+    },
+    {
+      "kind": "structured",
+      "model": "deepseek-flash"
+    },
+    {
+      "kind": "structured",
+      "model": "deepseek-flash"
+    },
+    {
+      "kind": "structured",
+      "model": "deepseek-flash"
+    },
+    {
+      "kind": "structured",
+      "model": "deepseek-flash"
+    },
+    {
+      "kind": "structured",
+      "model": "deepseek-flash"
+    },
+    {
+      "kind": "structured",
+      "model": "deepseek-flash"
+    }
+  ],
+  "passed": false,
+  "step": "learning",
+  "http_status": 200,
+  "learning": {
+    "node_id": "c-pointer",
+    "published": true,
+    "generation_total_ms": 16111,
+    "resource_types": [
+      "code",
+      "exercise",
+      "explanation"
+    ],
+    "public_questions": [
+      {
+        "id": "ex1",
+        "question": "阅读下面的 C 代码，回答问题。\n\n```c\nint a = 10;\nint *p = &a;\n*p = 20;\n```\n\n执行完这三行后，变量 a 的值是多少？请说明 p 中保存的是什么，以及 *p 表示什么。"
+      },
+      {
+        "id": "ex2",
+        "question": "下面代码中，p 和 q 分别指向哪里？执行 *q = 30; 后，a 和 b 的值分别是多少？\n\n```c\nint a = 1;\nint b = 2;\nint *p = &a;\nint *q = p;\n*q = 30;\n```"
+      },
+      {
+        "id": "ex3",
+        "question": "单链表的结点通常这样定义：\n\n```c\nstruct Node {\n    int value;\n    struct Node *next;\n};\n```\n\n请回答：next 这个成员保存的是什么？如果 head 是指向第一个结点的指针，那么 head->next 表示什么？为什么链表需要这种“指针指向结点”的结构？"
+      }
+    ],
+    "initial_current_node": "c-pointer"
+  },
+  "failure_class": "AssertionError",
+  "finished_at": "2026-09-26T17:49:35"
+}

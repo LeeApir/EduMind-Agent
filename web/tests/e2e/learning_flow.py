@@ -11,7 +11,10 @@ BASE_URL = os.getenv("EDUMIND_E2E_BASE_URL", "http://127.0.0.1:4173")
 LAST_QUIZ_RECEIPT: dict[str, object] | None = None
 QUIZ_POST_COUNT = 0
 PATH_REPLANNED = False
-ANSWER_KEYS = {"q1": "next", "q2": "head", "q3": "->"}
+ANSWER_KEYS = {"q1": "A", "q2": "head", "q3": "->"}
+OBJECTIVE_QUESTION = (
+    "[单选题] 插入前先保存什么？\nA. 后继连接\nB. 空指针\nC. 类型名\nD. 节点数量\n仅填 A、B、C 或 D"
+)
 
 RESOURCES = [
     {
@@ -37,7 +40,7 @@ RESOURCES = [
             "items": [
                 {
                     "id": "q1",
-                    "question": "插入前先保存什么？",
+                    "question": OBJECTIVE_QUESTION,
                 },
                 {
                     "id": "q2",
@@ -347,7 +350,11 @@ def run() -> None:
             learning_path = page.get_by_role("region", name="学习路径", exact=True)
             expect(learning_path).to_contain_text("当前：C 指针 · 下一步：链表概念")
             expect(learning_path.locator('[data-node-id="array"]')).to_contain_text("已掌握 · 90%")
-            page.get_by_label("插入前先保存什么？").fill("next")
+            objective_label = page.get_by_label(OBJECTIVE_QUESTION, exact=True)
+            objective_label.fill("A")
+            assert page.locator('label[for="answer-q1"]').evaluate(
+                "element => getComputedStyle(element).whiteSpace"
+            ) == "pre-wrap"
             page.get_by_label("头节点变量？").fill("head")
             page.get_by_label("指针运算符？").fill("->")
             page.get_by_role("button", name="提交练习", exact=True).click()

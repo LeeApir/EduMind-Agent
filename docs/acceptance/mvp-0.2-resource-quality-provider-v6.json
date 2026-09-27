@@ -1,0 +1,919 @@
+{
+  "benchmark_version": "resource-quality-v1",
+  "call_limit": 86,
+  "configured_model": "deepseek-flash",
+  "control_count": 10,
+  "control_pass_rate": 1.0,
+  "corrections": 0,
+  "dataset_sha256": "f6dca43e80ad6244136ba88af7ff4d01dad5bd81501cee350d26e5c2e76caed3",
+  "elapsed_seconds": 196.86,
+  "graph_version": "mvp-0.2.0",
+  "mode": "provider",
+  "model_only_severe_error_count": 16,
+  "model_only_severe_error_recall": 1.0,
+  "objective_exercise_count": 20,
+  "objective_exercise_format_rate": 0.95,
+  "provider_calls": 86,
+  "requires_issue_audit": true,
+  "resource_instruction_version": "learning-resources-instructions-v6",
+  "resource_prompt_version": "learning-resources-v1",
+  "retries": 0,
+  "review_prompt_version": "resource-review-v3",
+  "review_samples": [
+    {
+      "detected": true,
+      "group": "semantic_errors",
+      "id": "array-index-complexity",
+      "issues": [
+        {
+          "area": "fact",
+          "message": "The resource claims that accessing a[7] requires traversing from the first element one by one, so its time complexity is necessarily O(n). This is factually wrong: arrays support random access via index computation (base address + index * element size), so a[7] is O(1). The statement directly contradicts the node's learning objective '说出下标访问的时间复杂度' (state the time complexity of index access).",
+          "severity": "severe"
+        },
+        {
+          "area": "misconception",
+          "message": "The resource actively reinforces the listed common misconception '数组每次访问都要从头遍历' (every array access must traverse from the beginning) instead of correcting it. This is the exact misconception the node is meant to address, so the resource is counterproductive for this node.",
+          "severity": "severe"
+        },
+        {
+          "area": "difficulty",
+          "message": "The node difficulty is 1 (introductory) and the objective is to state that index access is O(1). Presenting an incorrect O(n) claim at this level would mislead novice learners on a foundational point.",
+          "severity": "major"
+        }
+      ],
+      "local_gate": false,
+      "model_id": "deepseek-flash",
+      "verdict": "reject"
+    },
+    {
+      "detected": true,
+      "group": "semantic_errors",
+      "id": "array-middle-insert",
+      "issues": [
+        {
+          "area": "fact",
+          "message": "核心论断错误：在未留空位的连续存储数组中，中间插入元素必须搬移插入位置之后的全部后续元素，因此时间复杂度为 O(n)，而非 O(1)。该资源把“不需要搬移任何后续元素”作为前提，与数组的连续存储定义直接矛盾。",
+          "severity": "severe"
+        },
+        {
+          "area": "misconception",
+          "message": "该资源正面强化了节点列出的常见误解“数组插入总是 O(1)”，而非纠正它。节点 ai_context 明确要求对比中间插入时的元素搬移，本资源却否认搬移存在，与教学目标背道而驰。",
+          "severity": "severe"
+        },
+        {
+          "area": "difficulty",
+          "message": "节点难度为 1，学习目标为“说明连续存储对插入和删除的影响”。资源给出的结论与连续存储的基本性质相反，无法支撑该目标，且会误导初学者。",
+          "severity": "major"
+        }
+      ],
+      "local_gate": false,
+      "model_id": "deepseek-flash",
+      "verdict": "reject"
+    },
+    {
+      "detected": true,
+      "group": "semantic_errors",
+      "id": "pointer-uninitialized",
+      "issues": [
+        {
+          "area": "fact",
+          "message": "The resource claims an uninitialized local pointer `int *p;` can safely be dereferenced with `*p = 42` because it 'automatically points to writable memory.' This is factually false: an uninitialized local pointer has an indeterminate value, and dereferencing it is undefined behavior (typically a crash or memory corruption).",
+          "severity": "severe"
+        },
+        {
+          "area": "misconception",
+          "message": "The resource directly reinforces the node's listed misconception '未初始化指针可以直接解引用' (uninitialized pointers can be dereferenced directly) instead of correcting it, and also contradicts the objective of safely using the dereference operator.",
+          "severity": "severe"
+        },
+        {
+          "area": "code_safety",
+          "message": "The described code pattern `int *p; *p = 42;` is unsafe: writing through an indeterminate pointer is undefined behavior and can corrupt arbitrary memory. The resource presents this as safe, which is dangerous guidance.",
+          "severity": "severe"
+        },
+        {
+          "area": "difficulty",
+          "message": "The content is pitched at a level that misrepresents a foundational safety rule for a difficulty-1 introductory pointer node, teaching an incorrect mental model that would need to be unlearned.",
+          "severity": "major"
+        }
+      ],
+      "local_gate": false,
+      "model_id": "deepseek-flash",
+      "verdict": "reject"
+    },
+    {
+      "detected": true,
+      "group": "semantic_errors",
+      "id": "pointer-value",
+      "issues": [
+        {
+          "area": "fact",
+          "message": "内容声称“C 指针变量保存的是所指对象的整数值，而不是内存地址”，这与事实相反：指针变量保存的是内存地址（通常以整数形式表示），而不是所指对象的值。这直接违背节点描述“保存内存地址、可以间接访问对象的 C 语言变量”。",
+          "severity": "severe"
+        },
+        {
+          "area": "fact",
+          "message": "内容声称“取地址运算符 & 与解引用运算符 * 完全相同”，这是错误的：& 产生操作数的地址，而 * 解引用指针以访问所指对象。二者是互逆运算，并非相同。",
+          "severity": "severe"
+        },
+        {
+          "area": "misconception",
+          "message": "该资源不仅未处理节点列出的常见误解（“指针就是数组”“未初始化指针可以直接解引用”），反而通过混淆指针值与所指对象、混淆 & 与 *，主动强化了关于指针语义的错误观念。",
+          "severity": "major"
+        },
+        {
+          "area": "difficulty",
+          "message": "节点难度为 1，学习目标为“区分指针值、地址和所指对象”以及“安全地使用取地址和解引用运算符”。该资源的核心陈述与这些目标直接矛盾，因此无法支持目标难度下的学习。",
+          "severity": "major"
+        }
+      ],
+      "local_gate": false,
+      "model_id": "deepseek-flash",
+      "verdict": "reject"
+    },
+    {
+      "detected": true,
+      "group": "semantic_errors",
+      "id": "list-contiguous",
+      "issues": [
+        {
+          "area": "fact",
+          "message": "The resource states linked-list nodes must be stored contiguously in memory, which is factually wrong: linked-list nodes are typically scattered, and contiguity is a property of arrays. This directly contradicts the node description ('由分散节点通过链接形成的线性结构') and the learning objective of comparing linked-list vs array storage.",
+          "severity": "severe"
+        },
+        {
+          "area": "fact",
+          "message": "The resource claims next stores only the data value of the next node and cannot store a node address. In C, next is a pointer that stores the address of the next node; storing a data value would not form a linked structure. This contradicts the prerequisite c-pointer ('保存内存地址、可以间接访问对象的 C 语言变量') and the node's ai_context ('分散地址之间的箭头连接').",
+          "severity": "severe"
+        },
+        {
+          "area": "misconception",
+          "message": "The resource actively reinforces both listed common misconceptions ('指针保存的是下一个节点的数值' and '链表节点在内存中必须连续') instead of correcting them, so it fails to address the relevant misconception coverage for this node.",
+          "severity": "severe"
+        },
+        {
+          "area": "difficulty",
+          "message": "The content is factually inverted relative to the target difficulty-1 conceptual objectives, so it cannot support the stated learning objectives of contrasting linked-list and array storage or identifying the data field and link field.",
+          "severity": "major"
+        }
+      ],
+      "local_gate": false,
+      "model_id": "deepseek-flash",
+      "verdict": "reject"
+    },
+    {
+      "detected": true,
+      "group": "semantic_errors",
+      "id": "list-prerequisite-direction",
+      "issues": [
+        {
+          "area": "fact",
+          "message": "The resource states that the linked-list concept does not require understanding any pointer address or link concept, and that C pointers depend on the linked-list concept. This directly contradicts the reference graph, which declares linked-list-concept DEPENDS_ON c-pointer, and contradicts the node's own ai_context and learning objectives, which require explaining the next link field and arrows between scattered addresses. The prerequisite direction is reversed.",
+          "severity": "severe"
+        },
+        {
+          "area": "misconception",
+          "message": "The resource's claim that no pointer/address/link understanding is needed actively reinforces the listed misconception that linked-list nodes must be contiguous in memory and obscures the distinction that the link field stores an address, not the next node's value. It fails to address either listed misconception.",
+          "severity": "major"
+        },
+        {
+          "area": "difficulty",
+          "message": "The node is difficulty 1 and its objectives include describing the data field and link field and comparing linked lists with arrays. The resource instead asserts a false prerequisite ordering and omits the link/address concept entirely, making it unsuitable for the stated difficulty and objectives.",
+          "severity": "major"
+        }
+      ],
+      "local_gate": false,
+      "model_id": "deepseek-flash",
+      "verdict": "reject"
+    },
+    {
+      "detected": true,
+      "group": "semantic_errors",
+      "id": "single-list-terminal",
+      "issues": [
+        {
+          "area": "fact",
+          "message": "The statement '普通非循环单链表最后一个节点的 next 总是指向自身' is factually wrong: in a non-circular singly linked list the last node's next is NULL, not itself. This directly contradicts the node's ai_context ('明确标出最后一个 next 为 NULL') and the learning objective about representing an empty list with head == NULL.",
+          "severity": "severe"
+        },
+        {
+          "area": "fact",
+          "message": "The statement '空链表的 head 必须指向一个有数据的节点' is wrong: an empty list is represented by head == NULL, i.e. head points to no node at all. This contradicts the node's learning objective '说明 head 为 NULL 的空链表表示'.",
+          "severity": "severe"
+        },
+        {
+          "area": "misconception",
+          "message": "The resource actively reinforces the listed common misconception '最后一个节点的 next 指向自身' instead of correcting it, and also conflicts with the objective of representing an empty list via head == NULL. It therefore fails to address, and in fact entrenches, the relevant misconceptions.",
+          "severity": "severe"
+        }
+      ],
+      "local_gate": false,
+      "model_id": "deepseek-flash",
+      "verdict": "reject"
+    },
+    {
+      "detected": true,
+      "group": "semantic_errors",
+      "id": "list-index",
+      "issues": [
+        {
+          "area": "fact",
+          "message": "The resource claims a singly linked list without an auxiliary index can be accessed by arbitrary index in O(1) time like an array, with no traversal. This is factually false: singly linked lists require O(n) sequential traversal from the head to reach the k-th node, since nodes are not contiguous and there is no random-access mechanism.",
+          "severity": "severe"
+        },
+        {
+          "area": "misconception",
+          "message": "The content directly reinforces a listed common misconception for the linked-list-traversal node ('链表可以像数组一样按下标访问'). Rather than correcting it, the resource asserts it as true, which is the opposite of the intended learning outcome.",
+          "severity": "severe"
+        },
+        {
+          "area": "difficulty",
+          "message": "The node targets difficulty 2 and objectives about writing NULL-terminated traversal loops and explaining positional access complexity. The resource contradicts the core traversal concept and the complexity objective, making it unsuitable for the target difficulty and prerequisite (single-linked-list).",
+          "severity": "major"
+        }
+      ],
+      "local_gate": false,
+      "model_id": "deepseek-flash",
+      "verdict": "reject"
+    },
+    {
+      "detected": true,
+      "group": "semantic_errors",
+      "id": "list-traversal-stop",
+      "issues": [
+        {
+          "area": "fact",
+          "message": "The resource claims that dereferencing head->next before checking whether head is NULL is safe for an empty list. This is factually wrong: if head is NULL, evaluating head->next is a null-pointer dereference and undefined behavior (typically a crash). The correct traversal pattern checks the pointer for NULL before dereferencing it, e.g. while (cur != NULL) { ... cur = cur->next; }.",
+          "severity": "severe"
+        },
+        {
+          "area": "code_safety",
+          "message": "The described ordering (unconditional head->next followed by a NULL check) is unsafe C code: it dereferences a potentially NULL pointer, causing undefined behavior. The resource presents this unsafe pattern as safe, which could lead learners to write crashing code.",
+          "severity": "severe"
+        },
+        {
+          "area": "misconception",
+          "message": "The resource reinforces a dangerous misconception about NULL handling in linked-list traversal, directly conflicting with the node's objective of writing a traversal loop that terminates on NULL. It does not address the listed misconception about stopping at the last node versus NULL, and instead introduces a new error about NULL dereference ordering.",
+          "severity": "major"
+        }
+      ],
+      "local_gate": false,
+      "model_id": "deepseek-flash",
+      "verdict": "reject"
+    },
+    {
+      "detected": true,
+      "group": "semantic_errors",
+      "id": "list-insert-links",
+      "issues": [
+        {
+          "area": "fact",
+          "message": "The stated insertion order is factually wrong and self-contradictory. After `prev->next = new_node;`, the old successor is no longer reachable from `prev`, so `new_node->next = prev->next;` sets `new_node->next` to `new_node` itself (a self-loop), not the old successor. The claim that this 'preserves all subsequent nodes' is false. The correct order is to save the old successor first (e.g., `new_node->next = prev->next;` then `prev->next = new_node;`), which matches the node's ai_context ('先保存新节点指向的旧后继，再连接前驱').",
+          "severity": "severe"
+        },
+        {
+          "area": "misconception",
+          "message": "The resource directly reinforces the listed common misconception '可以先让 prev->next 指向新节点再保存后继' by presenting exactly that incorrect order as the 'correct general order' and asserting no need to save the old successor. This is the opposite of the intended learning outcome.",
+          "severity": "severe"
+        },
+        {
+          "area": "difficulty",
+          "message": "The node targets difficulty 3 with objectives covering head insertion, tail insertion, and invalid-position boundary cases, but the resource only addresses a single middle-insertion step and does so incorrectly. It does not support the stated objectives.",
+          "severity": "major"
+        }
+      ],
+      "local_gate": false,
+      "model_id": "deepseek-flash",
+      "verdict": "reject"
+    },
+    {
+      "detected": true,
+      "group": "semantic_errors",
+      "id": "list-delete-head",
+      "issues": [
+        {
+          "area": "fact",
+          "message": "The resource claims that deleting the head node of a singly linked list without a sentinel can be done with just free(head) and that the original head can still be used to access the list afterward. This is factually wrong: freeing the head node releases its memory, so the original head pointer becomes a dangling pointer and must not be dereferenced. Correct deletion of the head requires advancing head to head->next (and returning/updating the caller's head pointer) before freeing the old node.",
+          "severity": "severe"
+        },
+        {
+          "area": "misconception",
+          "message": "The content directly reinforces the listed misconception that deleting the head node is the same as deleting a middle node. It ignores the required head-pointer update and the boundary case of deleting the first node, which is an explicit learning objective for this node.",
+          "severity": "major"
+        },
+        {
+          "area": "code_safety",
+          "message": "The described approach produces a use-after-free / dangling-pointer situation: after free(head), continuing to access the list through the original head is undefined behavior. The resource presents this unsafe pattern as correct.",
+          "severity": "severe"
+        }
+      ],
+      "local_gate": false,
+      "model_id": "deepseek-flash",
+      "verdict": "reject"
+    },
+    {
+      "detected": true,
+      "group": "semantic_errors",
+      "id": "stack-order",
+      "issues": [
+        {
+          "area": "fact",
+          "message": "资源声称“栈遵循先进先出规则”，与参考上下文中栈的定义“遵循后进先出（LIFO）规则的受限线性结构”直接矛盾。栈应为后进先出（LIFO），而非先进先出（FIFO）。",
+          "severity": "severe"
+        },
+        {
+          "area": "fact",
+          "message": "示例“先 push(1) 再 push(2)，第一次 pop 一定得到 1”错误。按 LIFO 规则，先 push(1) 再 push(2) 后，第一次 pop 应得到 2（最后入栈的元素先出栈），而非 1。",
+          "severity": "severe"
+        },
+        {
+          "area": "misconception",
+          "message": "该资源不仅未纠正参考上下文中列出的常见误解“栈与队列的出元素顺序一样”，反而强化了该误解：将栈描述为先进先出，等同于把栈的出元素顺序与队列混淆。",
+          "severity": "major"
+        }
+      ],
+      "local_gate": false,
+      "model_id": "deepseek-flash",
+      "verdict": "reject"
+    },
+    {
+      "detected": true,
+      "group": "semantic_errors",
+      "id": "queue-order",
+      "issues": [
+        {
+          "area": "fact",
+          "message": "The resource states queues follow LIFO (后进先出) and that after enqueuing 1 then 2, the first dequeue yields 2. This is factually wrong: a queue is FIFO (先进先出), so the first dequeue must yield 1. The reference node explicitly defines the queue as FIFO and lists '队列与栈都是后进先出' as a common misconception, which this resource instead asserts as correct.",
+          "severity": "severe"
+        },
+        {
+          "area": "misconception",
+          "message": "The resource directly reinforces the listed misconception that queues are LIFO, and its example (dequeue returns 2) actively teaches the wrong behavior, contradicting the node's learning objective of explaining FIFO and its correspondence to real queues.",
+          "severity": "severe"
+        },
+        {
+          "area": "difficulty",
+          "message": "The content is a single incorrect sentence with no coverage of distinguishing enqueue/dequeue/peek or the FIFO-to-real-queue mapping, so it does not match the node's difficulty-2 objectives and cannot serve as a valid explanation.",
+          "severity": "major"
+        }
+      ],
+      "local_gate": false,
+      "model_id": "deepseek-flash",
+      "verdict": "reject"
+    },
+    {
+      "detected": true,
+      "group": "semantic_errors",
+      "id": "circular-full",
+      "issues": [
+        {
+          "area": "fact",
+          "message": "The resource states that in a circular queue sacrificing one storage slot, 'front == rear uniquely indicates the queue is full' and that an empty queue must satisfy '(rear + 1) % capacity == front'. This is exactly reversed. With the sacrifice-one-slot convention, front == rear indicates the queue is EMPTY, and (rear + 1) % capacity == front indicates the queue is FULL. The resource inverts the standard invariant, which is a concrete factual error directly contradicting the node's learning objective of handling empty/full determination.",
+          "severity": "severe"
+        },
+        {
+          "area": "misconception",
+          "message": "The node lists common misconceptions '循环队列无法判断队满' (circular queue cannot determine full) and '队首等于队尾总表示队空' (front == rear always means empty). The resource's inverted invariant would actively reinforce the first misconception by presenting a wrong full/empty rule, and it fails to correctly clarify the front==rear ambiguity that the second misconception targets. The explanation does not resolve the relevant misconceptions and instead introduces a new error.",
+          "severity": "major"
+        }
+      ],
+      "local_gate": false,
+      "model_id": "deepseek-flash",
+      "verdict": "reject"
+    },
+    {
+      "detected": true,
+      "group": "semantic_errors",
+      "id": "circular-wrap",
+      "issues": [
+        {
+          "area": "fact",
+          "message": "The resource claims that when rear equals 7 in a circular queue of capacity 8, the next valid index is 8 and that 'rear + 1 needs no modulo because the array wraps automatically.' This is factually wrong: valid indices for a capacity-8 array are 0–7, so index 8 is out of bounds. Circular queues require explicit modulo arithmetic (e.g., (rear + 1) % capacity) to wrap; arrays in C do not wrap automatically. This directly contradicts the node's ai_context ('模运算后的位置') and the learning objective '解释队首、队尾环绕的原因'.",
+          "severity": "severe"
+        },
+        {
+          "area": "misconception",
+          "message": "The resource reinforces rather than addresses the core misconception about circular queue wrapping. By asserting that no modulo is needed and the array 'automatically wraps,' it actively teaches an incorrect mental model of how front/rear pointers cycle, which is the central concept of this node.",
+          "severity": "major"
+        },
+        {
+          "area": "difficulty",
+          "message": "The content is too shallow for a difficulty-3 node whose objectives include handling empty/full detection and explaining wrap-around. It presents a single incorrect claim without covering the modulo mechanism or the empty/full distinction.",
+          "severity": "minor"
+        }
+      ],
+      "local_gate": false,
+      "model_id": "deepseek-flash",
+      "verdict": "reject"
+    },
+    {
+      "detected": true,
+      "group": "semantic_errors",
+      "id": "pointer-null",
+      "issues": [
+        {
+          "area": "fact",
+          "message": "The resource claims that NULL is a legal readable object and that dereferencing *NULL reliably returns integer 0 with no undefined behavior. This is factually false in C: NULL is a null pointer constant, not a valid object address, and dereferencing it is undefined behavior (typically a crash/segmentation fault). The claim that *NULL returns 0 is incorrect.",
+          "severity": "severe"
+        },
+        {
+          "area": "misconception",
+          "message": "The content actively reinforces and introduces a dangerous misconception about null pointer dereference, contradicting the node's objective of safely using dereference operators. It teaches learners that dereferencing NULL is safe and well-defined, which is the opposite of correct C semantics.",
+          "severity": "severe"
+        },
+        {
+          "area": "code_safety",
+          "message": "The resource promotes unsafe code behavior by asserting that *NULL is safe and reliable, which could lead learners to write code that dereferences null pointers, causing undefined behavior and crashes.",
+          "severity": "severe"
+        }
+      ],
+      "local_gate": false,
+      "model_id": "deepseek-flash",
+      "verdict": "reject"
+    },
+    {
+      "detected": true,
+      "group": "local_code_errors",
+      "id": "code-system",
+      "issues": [
+        {
+          "area": "code_safety",
+          "message": "Code uses a prohibited execution, file, or network primitive.",
+          "severity": "severe"
+        }
+      ],
+      "local_gate": true,
+      "model_id": null,
+      "verdict": "reject"
+    },
+    {
+      "detected": true,
+      "group": "local_code_errors",
+      "id": "code-eval",
+      "issues": [
+        {
+          "area": "code_safety",
+          "message": "Code uses a prohibited execution, file, or network primitive.",
+          "severity": "severe"
+        }
+      ],
+      "local_gate": true,
+      "model_id": null,
+      "verdict": "reject"
+    },
+    {
+      "detected": true,
+      "group": "local_code_errors",
+      "id": "code-file",
+      "issues": [
+        {
+          "area": "code_safety",
+          "message": "Code uses a prohibited execution, file, or network primitive.",
+          "severity": "severe"
+        }
+      ],
+      "local_gate": true,
+      "model_id": null,
+      "verdict": "reject"
+    },
+    {
+      "detected": true,
+      "group": "local_code_errors",
+      "id": "code-network",
+      "issues": [
+        {
+          "area": "code_safety",
+          "message": "Code uses a prohibited execution, file, or network primitive.",
+          "severity": "severe"
+        }
+      ],
+      "local_gate": true,
+      "model_id": null,
+      "verdict": "reject"
+    },
+    {
+      "correctly_passed": true,
+      "group": "controls",
+      "id": "correct-array",
+      "issues": [],
+      "local_gate": false,
+      "model_id": "deepseek-flash",
+      "verdict": "pass"
+    },
+    {
+      "correctly_passed": true,
+      "group": "controls",
+      "id": "correct-pointer",
+      "issues": [],
+      "local_gate": false,
+      "model_id": "deepseek-flash",
+      "verdict": "pass"
+    },
+    {
+      "correctly_passed": true,
+      "group": "controls",
+      "id": "correct-list-concept",
+      "issues": [],
+      "local_gate": false,
+      "model_id": "deepseek-flash",
+      "verdict": "pass"
+    },
+    {
+      "correctly_passed": true,
+      "group": "controls",
+      "id": "correct-single-list",
+      "issues": [],
+      "local_gate": false,
+      "model_id": "deepseek-flash",
+      "verdict": "pass"
+    },
+    {
+      "correctly_passed": true,
+      "group": "controls",
+      "id": "correct-traversal",
+      "issues": [],
+      "local_gate": false,
+      "model_id": "deepseek-flash",
+      "verdict": "pass"
+    },
+    {
+      "correctly_passed": true,
+      "group": "controls",
+      "id": "correct-insertion",
+      "issues": [],
+      "local_gate": false,
+      "model_id": "deepseek-flash",
+      "verdict": "pass"
+    },
+    {
+      "correctly_passed": true,
+      "group": "controls",
+      "id": "correct-deletion",
+      "issues": [],
+      "local_gate": false,
+      "model_id": "deepseek-flash",
+      "verdict": "pass"
+    },
+    {
+      "correctly_passed": true,
+      "group": "controls",
+      "id": "correct-stack",
+      "issues": [],
+      "local_gate": false,
+      "model_id": "deepseek-flash",
+      "verdict": "pass"
+    },
+    {
+      "correctly_passed": true,
+      "group": "controls",
+      "id": "correct-queue",
+      "issues": [],
+      "local_gate": false,
+      "model_id": "deepseek-flash",
+      "verdict": "pass"
+    },
+    {
+      "correctly_passed": true,
+      "group": "controls",
+      "id": "correct-circular",
+      "issues": [],
+      "local_gate": false,
+      "model_id": "deepseek-flash",
+      "verdict": "pass"
+    }
+  ],
+  "schema_generation_rate": 0.9666666666666667,
+  "schema_sample_count": 60,
+  "schema_samples": [
+    {
+      "id": "array:explanation:1",
+      "model_id": "deepseek-flash",
+      "valid": true
+    },
+    {
+      "id": "array:code:1",
+      "model_id": "deepseek-flash",
+      "valid": true
+    },
+    {
+      "id": "array:exercise:1",
+      "model_id": "deepseek-flash",
+      "objective_format_valid": true,
+      "valid": true
+    },
+    {
+      "id": "c-pointer:explanation:1",
+      "model_id": "deepseek-flash",
+      "valid": true
+    },
+    {
+      "id": "c-pointer:code:1",
+      "model_id": "deepseek-flash",
+      "valid": true
+    },
+    {
+      "id": "c-pointer:exercise:1",
+      "model_id": "deepseek-flash",
+      "objective_format_valid": true,
+      "valid": true
+    },
+    {
+      "id": "circular-queue:explanation:1",
+      "model_id": "deepseek-flash",
+      "valid": true
+    },
+    {
+      "id": "circular-queue:code:1",
+      "model_id": "deepseek-flash",
+      "valid": true
+    },
+    {
+      "id": "circular-queue:exercise:1",
+      "model_id": "deepseek-flash",
+      "objective_format_valid": true,
+      "valid": true
+    },
+    {
+      "id": "linked-list-concept:explanation:1",
+      "model_id": "deepseek-flash",
+      "valid": true
+    },
+    {
+      "id": "linked-list-concept:code:1",
+      "model_id": "deepseek-flash",
+      "valid": true
+    },
+    {
+      "id": "linked-list-concept:exercise:1",
+      "model_id": "deepseek-flash",
+      "objective_format_valid": true,
+      "valid": true
+    },
+    {
+      "id": "linked-list-deletion:explanation:1",
+      "model_id": "deepseek-flash",
+      "valid": true
+    },
+    {
+      "id": "linked-list-deletion:code:1",
+      "model_id": "deepseek-flash",
+      "valid": true
+    },
+    {
+      "id": "linked-list-deletion:exercise:1",
+      "model_id": "deepseek-flash",
+      "objective_format_valid": false,
+      "valid": true
+    },
+    {
+      "id": "linked-list-insertion:explanation:1",
+      "model_id": "deepseek-flash",
+      "valid": true
+    },
+    {
+      "id": "linked-list-insertion:code:1",
+      "model_id": "deepseek-flash",
+      "valid": true
+    },
+    {
+      "id": "linked-list-insertion:exercise:1",
+      "model_id": "deepseek-flash",
+      "objective_format_valid": true,
+      "valid": true
+    },
+    {
+      "id": "linked-list-traversal:explanation:1",
+      "model_id": "deepseek-flash",
+      "valid": true
+    },
+    {
+      "id": "linked-list-traversal:code:1",
+      "model_id": "deepseek-flash",
+      "valid": true
+    },
+    {
+      "id": "linked-list-traversal:exercise:1",
+      "model_id": "deepseek-flash",
+      "objective_format_valid": true,
+      "valid": true
+    },
+    {
+      "id": "queue:explanation:1",
+      "model_id": "deepseek-flash",
+      "valid": true
+    },
+    {
+      "id": "queue:code:1",
+      "model_id": "deepseek-flash",
+      "valid": true
+    },
+    {
+      "id": "queue:exercise:1",
+      "model_id": "deepseek-flash",
+      "objective_format_valid": true,
+      "valid": true
+    },
+    {
+      "id": "single-linked-list:explanation:1",
+      "model_id": "deepseek-flash",
+      "valid": true
+    },
+    {
+      "id": "single-linked-list:code:1",
+      "model_id": "deepseek-flash",
+      "valid": true
+    },
+    {
+      "id": "single-linked-list:exercise:1",
+      "model_id": "deepseek-flash",
+      "objective_format_valid": true,
+      "valid": true
+    },
+    {
+      "id": "stack:explanation:1",
+      "model_id": "deepseek-flash",
+      "valid": true
+    },
+    {
+      "error": "INVALID_OUTPUT",
+      "id": "stack:code:1",
+      "output_failure_reason": "STRUCTURED_SCHEMA_MISMATCH",
+      "schema_keyword": "required",
+      "valid": false
+    },
+    {
+      "id": "stack:exercise:1",
+      "model_id": "deepseek-flash",
+      "objective_format_valid": true,
+      "valid": true
+    },
+    {
+      "error": "INVALID_OUTPUT",
+      "id": "array:explanation:2",
+      "json_syntax_reason": "EXTRA_DATA",
+      "output_failure_reason": "STRUCTURED_JSON_INVALID",
+      "valid": false
+    },
+    {
+      "id": "array:code:2",
+      "model_id": "deepseek-flash",
+      "valid": true
+    },
+    {
+      "id": "array:exercise:2",
+      "model_id": "deepseek-flash",
+      "objective_format_valid": true,
+      "valid": true
+    },
+    {
+      "id": "c-pointer:explanation:2",
+      "model_id": "deepseek-flash",
+      "valid": true
+    },
+    {
+      "id": "c-pointer:code:2",
+      "model_id": "deepseek-flash",
+      "valid": true
+    },
+    {
+      "id": "c-pointer:exercise:2",
+      "model_id": "deepseek-flash",
+      "objective_format_valid": true,
+      "valid": true
+    },
+    {
+      "id": "circular-queue:explanation:2",
+      "model_id": "deepseek-flash",
+      "valid": true
+    },
+    {
+      "id": "circular-queue:code:2",
+      "model_id": "deepseek-flash",
+      "valid": true
+    },
+    {
+      "id": "circular-queue:exercise:2",
+      "model_id": "deepseek-flash",
+      "objective_format_valid": true,
+      "valid": true
+    },
+    {
+      "id": "linked-list-concept:explanation:2",
+      "model_id": "deepseek-flash",
+      "valid": true
+    },
+    {
+      "id": "linked-list-concept:code:2",
+      "model_id": "deepseek-flash",
+      "valid": true
+    },
+    {
+      "id": "linked-list-concept:exercise:2",
+      "model_id": "deepseek-flash",
+      "objective_format_valid": true,
+      "valid": true
+    },
+    {
+      "id": "linked-list-deletion:explanation:2",
+      "model_id": "deepseek-flash",
+      "valid": true
+    },
+    {
+      "id": "linked-list-deletion:code:2",
+      "model_id": "deepseek-flash",
+      "valid": true
+    },
+    {
+      "id": "linked-list-deletion:exercise:2",
+      "model_id": "deepseek-flash",
+      "objective_format_valid": true,
+      "valid": true
+    },
+    {
+      "id": "linked-list-insertion:explanation:2",
+      "model_id": "deepseek-flash",
+      "valid": true
+    },
+    {
+      "id": "linked-list-insertion:code:2",
+      "model_id": "deepseek-flash",
+      "valid": true
+    },
+    {
+      "id": "linked-list-insertion:exercise:2",
+      "model_id": "deepseek-flash",
+      "objective_format_valid": true,
+      "valid": true
+    },
+    {
+      "id": "linked-list-traversal:explanation:2",
+      "model_id": "deepseek-flash",
+      "valid": true
+    },
+    {
+      "id": "linked-list-traversal:code:2",
+      "model_id": "deepseek-flash",
+      "valid": true
+    },
+    {
+      "id": "linked-list-traversal:exercise:2",
+      "model_id": "deepseek-flash",
+      "objective_format_valid": true,
+      "valid": true
+    },
+    {
+      "id": "queue:explanation:2",
+      "model_id": "deepseek-flash",
+      "valid": true
+    },
+    {
+      "id": "queue:code:2",
+      "model_id": "deepseek-flash",
+      "valid": true
+    },
+    {
+      "id": "queue:exercise:2",
+      "model_id": "deepseek-flash",
+      "objective_format_valid": true,
+      "valid": true
+    },
+    {
+      "id": "single-linked-list:explanation:2",
+      "model_id": "deepseek-flash",
+      "valid": true
+    },
+    {
+      "id": "single-linked-list:code:2",
+      "model_id": "deepseek-flash",
+      "valid": true
+    },
+    {
+      "id": "single-linked-list:exercise:2",
+      "model_id": "deepseek-flash",
+      "objective_format_valid": true,
+      "valid": true
+    },
+    {
+      "id": "stack:explanation:2",
+      "model_id": "deepseek-flash",
+      "valid": true
+    },
+    {
+      "id": "stack:code:2",
+      "model_id": "deepseek-flash",
+      "valid": true
+    },
+    {
+      "id": "stack:exercise:2",
+      "model_id": "deepseek-flash",
+      "objective_format_valid": true,
+      "valid": true
+    }
+  ],
+  "severe_error_count": 20,
+  "severe_error_recall": 1.0,
+  "stage_gate_passed": false,
+  "thresholds": {
+    "schema_rate": 0.98,
+    "severe_error_recall": 0.9
+  }
+}

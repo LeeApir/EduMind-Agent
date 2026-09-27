@@ -80,7 +80,7 @@ class FakeAdapter:
             )
             return StructuredResult(
                 value={
-                    "review_version": "resource-review-v2",
+                    "review_version": "resource-review-v3",
                     "verdict": "reject" if self.reject_review else "pass",
                     "issues": (
                         [{"area": "fact", "severity": "major", "message": "Needs correction."}]
@@ -110,14 +110,15 @@ class FakeAdapter:
                 "items": [
                     {
                         "id": "q1",
-                        "question": "next 是什么？",
-                        "answer": "后继指针",
+                        "question": "[填空题] int x=1; x=2; 最后x=____。仅填一个整数",
+                        "answer": "2",
                         "explanation": "连接节点。",
                     },
                     {
                         "id": "q2",
-                        "question": "头节点作用？",
-                        "answer": "起点",
+                        "question": ("[判断题] 头指针可以用于开始遍历。"
+                                     "仅填 T 或 F（T=正确，F=错误）"),
+                        "answer": "T",
                         "explanation": "从它遍历。",
                     },
                 ]

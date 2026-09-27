@@ -28,6 +28,20 @@ const stubs = { NButton: { props: ["disabled", "attrType", "loading"], emits: ["
 const loadQuizResult = () => Promise.resolve(null);
 
 describe("PublishedLearningWorkspace", () => {
+  it("preserves objective options and submits a single answer token without prose", async () => {
+    const question = "[单选题] 指针保存什么？\nA. 地址\nB. 值\nC. 类型\nD. 长度\n仅填 A、B、C 或 D";
+    const objectiveResources = resources.map((resource) => resource.type === "exercise"
+      ? { ...resource, content: { items: [{ id: "q1", question }] } } : resource);
+    const submitQuiz = vi.fn().mockRejectedValue(new Error("test pending"));
+    const wrapper = mount(PublishedLearningWorkspace, { props: { resources: objectiveResources, csrfToken: "csrf", loadQuizResult, submitQuiz }, global: { stubs } });
+    await flushPromises();
+    await wrapper.get("button:nth-child(3)").trigger("click");
+    expect(wrapper.get("label").element.textContent).toBe(question);
+    await wrapper.get("input").setValue("A");
+    await wrapper.get("form").trigger("submit");
+    await flushPromises();
+    expect(submitQuiz).toHaveBeenCalledWith(expect.objectContaining({ answers: [{ question_id: "q1", answer: "A" }] }));
+  });
   it("switches among reviewed explanation, code, and three exercises", async () => {
     const wrapper = mount(PublishedLearningWorkspace, { props: { resources, loadQuizResult }, global: { stubs } });
     expect(wrapper.get('[data-testid="explanation-tab"]').text()).toContain("保存 next");

@@ -248,7 +248,7 @@ function beginNewAttempt(): void {
 .published-workspace nav :deep(.n-button[aria-pressed="true"]) { background: #35656d !important; color: #fbfcf9; }
 .published-workspace :deep(button:focus-visible) { outline: 2px solid #f06e43; outline-offset: 3px; }
 .quiz-question { border-bottom: 1px solid #cbd6d4; padding: 18px 0; }
-.quiz-question label, .quiz-question-title { display: block; font-weight: 500; margin-bottom: 8px; }
+.quiz-question label, .quiz-question-title { display: block; font-weight: 500; margin-bottom: 8px; white-space: pre-wrap; overflow-wrap: anywhere; }
 .quiz-question input { background: #fbfcf9; border: 1px solid #8aafb0; color: #17253a; font: inherit; max-width: 100%; padding: 10px; width: 100%; }
 .quiz-question input:focus-visible { outline: 2px solid #35656d; outline-offset: 3px; }
 .quiz-needs-work { color: #a13d36; }

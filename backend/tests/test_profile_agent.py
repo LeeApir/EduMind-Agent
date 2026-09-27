@@ -1,6 +1,7 @@
 """ProfileAgent extracts only supported evidence and degrades safely."""
 
 import asyncio
+import json
 from datetime import datetime, timezone
 
 import pytest
@@ -73,6 +74,9 @@ def test_one_sentence_extracts_explicit_goal_without_questionnaire() -> None:
         assert request.prompt.messages[-1].content == "链表插入总搞混，先看 C 代码"
         assert "Prompt version: profile-v1." in request.prompt.messages[0].content
         assert "2026-09-17T14:30:00+00:00" in request.prompt.messages[0].content
+        assert "profile-instructions-v2" in request.prompt.messages[0].content
+        instruction = request.prompt.messages[0].content
+        assert json.dumps(request.json_schema, ensure_ascii=False) in instruction
 
     asyncio.run(exercise())
 
@@ -141,6 +145,10 @@ def test_behavior_update_sends_only_minimal_summary_and_allowlists_delta() -> No
         )
         assert "answers" not in request.prompt.messages[-1].content
         assert "initial_query" not in request.prompt.messages[-1].content
+        instruction = request.prompt.messages[0].content
+        assert "profile-behavior-instructions-v2" in instruction
+        assert json.dumps(request.json_schema, ensure_ascii=False) in instruction
+        assert 'emit {"updates": {}} exactly' in instruction
         assert set(request.json_schema["properties"]["updates"]["properties"]) == {
             "error_preferences"
         }
