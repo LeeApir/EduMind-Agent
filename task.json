@@ -1271,11 +1271,15 @@
       "verification": ["有限样本实际HTTP/Provider性能入口、指标离线回归、git diff --check"],
       "verification_results": [
         {"command": "读取 docs/ADR/0002-streaming-first-screen-and-resource-review.md、docs/PRD.md §8.1、backend/tests/manual_provider_acceptance.py 及最终验收报告", "result": "gap confirmed: old first_content_ms is first nonempty token; no approved reproducible full teaching paragraph rule. Non-billable 20-sample/240-attempt plan prepared in docs/acceptance/mvp-0.2-t032-first-screen-plan.md, 0 actual samples/calls"},
-        {"command": "git diff --check", "result": "passed; documentation-only preparation, no latency result or completion claim"}
+        {"command": "git diff --check", "result": "passed; documentation-only preparation, no latency result or completion claim"},
+        {"command": "用户同意冻结规则；隔离perf_t032迁移；serve_first_screen.py + 实际Vite代理 + run_first_screen.py一次20样本 + audit_first_screen.py", "result": "failed gate: current Pro/Responses, 20/20 published; 162/240 actual attempts (20 stream,142 structured; 2 TIMEOUT retained); token P95 5661.935ms >2000ms, 0/20 within2s; first paragraph 3/20 unconfirmed, full planned P95 missing, observed17 conditional P95 6260.461ms not acceptance. No warmups/client retries/replacement runs; services stopped; evidence docs/acceptance/mvp-0.2-t032-first-screen.md"},
+        {"command": "backend: EDUMIND_TEST_DATABASE_URL=<isolated regression DB> uv run --frozen pytest -q; uv run --frozen ruff check app tests ../docs/acceptance/run_first_screen.py ../docs/acceptance/serve_first_screen.py ../docs/acceptance/audit_first_screen.py; uv run --frozen mypy app", "result": "passed:403 tests, no skips,7 existing warnings; Ruff clean; Mypy55 source files; offline instrumentation tests separate from real performance samples"},
+        {"command": "pnpm --dir web test --run; pnpm --dir web typecheck; pnpm --dir web lint; pnpm --dir web build", "result": "passed:66 tests/11 files; typecheck/build pass;0 ESLint errors/67 existing formatting warnings"},
+        {"command": "隔离PG只读操作聚合；脱敏证据只读检查；git diff --check", "result": "passed:20 operations/20 distinct owners/20 keys/20 units, all published; actual key/base URL absent from new evidence; task JSON valid; self-inspected code/docs/data diff, no product/env changes or staged unrelated files"}
       ],
       "started_at": "2026-09-27T14:42:14",
       "completed_at": null,
-      "blocker": "需用户确认完整首段判定规则及冻结20样本/0计费预热/240实际尝试硬上限计划；旧脚本只测首token不能代替首段。未发起B计费请求。",
+      "blocker": "冻结20样本已执行：首token P95 5661.935ms超过2秒；3个候选只是目标/观察导语，不能确认教学段落，且更晚候选时间未采集，全计划首段P95缺失。不得补跑/换模型/降低标准；后续关键路径或测量采集改进需独立任务与新冻结计划。",
       "commit_lookup": "Task-Completed: MVP-0.2-T032"
     }
   ]
