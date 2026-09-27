@@ -1,0 +1,315 @@
+"""PostgreSQL persistence of profile events and immutable profile versions."""
+
+import asyncio
+import os
+from uuid import UUID
+
+import pytest
+from sqlalchemy import func, select
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
+
+from app.agents.profile_events import (
+    PROFILE_EVENT_SCHEMA_VERSION,
+    PROFILE_MERGE_RULE_VERSION,
+    ProfileEventSchemaError,
+)
+from app.agents.profile_schema import merge_explicit_profile_values
+from app.core.database import create_database_engine
+from app.models.auth import User
+from app.models.learning import ProfileEvent, StudentProfile
+from app.services.learning_operations import IdempotencyConflict
+from app.services.profile_updates import (
+    ProfileVersionConflict,
+    persist_profile_version,
+    record_profile_event,
+)
+
+TEST_DATABASE_URL = os.getenv("EDUMIND_TEST_DATABASE_URL")
+pytestmark = pytest.mark.skipif(not TEST_DATABASE_URL, reason="isolated PostgreSQL URL not set")
+
+
+def event(**overrides: object) -> dict[str, object]:
+    payload: dict[str, object] = {
+        "event_type": "hint_used",
+        "knowledge_node_id": "linked-list",
+        "action": "hint_level_1",
+    }
+    payload.update(overrides)
+    return payload
+
+
+def profile(version: int) -> dict[str, object]:
+    return merge_explicit_profile_values(
+        "想理解链表",
+        {"learning_goals": {"current_topic": "链表"}},
+        {
+            "learning_goals": [
+                {
+                    "source": "initial_query",
+                    "confidence": 0.9,
+                    "observed_at": "2026-09-23T15:00:00+08:00",
+                    "profile_version": version,
+                }
+            ]
+        },
+        profile_version=version,
+    )
+
+
+def test_events_are_idempotent_and_owner_scoped() -> None:
+    assert TEST_DATABASE_URL is not None
+    captured: list[UUID] = []
+
+    async def exercise() -> None:
+        engine = create_database_engine(TEST_DATABASE_URL)
+        try:
+            sessions = async_sessionmaker(engine, expire_on_commit=False)
+            async with sessions() as db:
+                user = User(is_guest=True)
+                db.add(user)
+                await db.flush()
+                key = "idem-event-0001"
+                first, created = await record_profile_event(
+                    db, owner_id=user.id, idempotency_key=key, event=event()
+                )
+                assert created is True
+                assert first.schema_version == PROFILE_EVENT_SCHEMA_VERSION
+                captured.append(first.id)
+                second, replayed = await record_profile_event(
+                    db, owner_id=user.id, idempotency_key=key, event=event()
+                )
+                assert replayed is False
+                assert second.id == first.id
+                count = await db.scalar(
+                    select(func.count())
+                    .select_from(ProfileEvent)
+                    .where(ProfileEvent.user_id == user.id)
+                )
+                assert count == 1
+                with pytest.raises(IdempotencyConflict):
+                    await record_profile_event(
+                        db,
+                        owner_id=user.id,
+                        idempotency_key=key,
+                        event=event(action="hint_level_2"),
+                    )
+                other = User(is_guest=True)
+                db.add(other)
+                await db.flush()
+                third, created_other = await record_profile_event(
+                    db, owner_id=other.id, idempotency_key=key, event=event()
+                )
+                assert created_other is True
+                assert third.id != first.id
+        finally:
+            await engine.dispose()
+
+        read_engine = create_database_engine(TEST_DATABASE_URL)
+        try:
+            read_sessions = async_sessionmaker(read_engine)
+            async with read_sessions() as db:
+                stored = await db.get(ProfileEvent, captured[0])
+                assert stored is not None
+                assert stored.schema_version == PROFILE_EVENT_SCHEMA_VERSION
+        finally:
+            await read_engine.dispose()
+
+    asyncio.run(exercise())
+
+
+@pytest.mark.parametrize("second_action", ["hint_level_1", "hint_level_2"])
+def test_concurrent_event_key_resolves_to_receipt_or_conflict(second_action: str) -> None:
+    assert TEST_DATABASE_URL is not None
+
+    async def exercise() -> None:
+        engine = create_database_engine(TEST_DATABASE_URL)
+        try:
+            sessions = async_sessionmaker(engine, expire_on_commit=False)
+            async with sessions() as db:
+                owner = User(is_guest=True)
+                db.add(owner)
+                await db.commit()
+                owner_id = owner.id
+
+            barrier = asyncio.Barrier(2)
+
+            class LookupBarrierSession(AsyncSession):
+                waited = False
+
+                async def scalar(self, statement: object, *args: object, **kwargs: object):
+                    result = await super().scalar(statement, *args, **kwargs)
+                    if not self.waited:
+                        self.waited = True
+                        await barrier.wait()
+                    return result
+
+            racing = async_sessionmaker(
+                engine, class_=LookupBarrierSession, expire_on_commit=False
+            )
+
+            async def submit(action: str):
+                async with racing() as db:
+                    return await record_profile_event(
+                        db,
+                        owner_id=owner_id,
+                        idempotency_key="race-event-key-0001",
+                        event=event(action=action),
+                    )
+
+            results = await asyncio.wait_for(
+                asyncio.gather(
+                    submit("hint_level_1"), submit(second_action), return_exceptions=True
+                ),
+                timeout=10,
+            )
+            if second_action == "hint_level_1":
+                assert all(isinstance(result, tuple) for result in results)
+                assert results[0][0].id == results[1][0].id
+                assert sorted(result[1] for result in results) == [False, True]
+            else:
+                assert sum(isinstance(result, IdempotencyConflict) for result in results) == 1
+                assert sum(isinstance(result, tuple) for result in results) == 1
+
+            async with sessions() as db:
+                count = await db.scalar(
+                    select(func.count())
+                    .select_from(ProfileEvent)
+                    .where(ProfileEvent.user_id == owner_id)
+                )
+                assert count == 1
+        finally:
+            await engine.dispose()
+
+    asyncio.run(exercise())
+
+
+def test_invalid_event_is_rejected_before_persistence() -> None:
+    assert TEST_DATABASE_URL is not None
+
+    async def exercise() -> None:
+        engine = create_database_engine(TEST_DATABASE_URL)
+        try:
+            sessions = async_sessionmaker(engine, expire_on_commit=False)
+            async with sessions() as db:
+                user = User(is_guest=True)
+                db.add(user)
+                await db.flush()
+                with pytest.raises(ProfileEventSchemaError):
+                    await record_profile_event(
+                        db,
+                        owner_id=user.id,
+                        idempotency_key="bad-key-0001",
+                        event=event(action="code"),
+                    )
+                count = await db.scalar(
+                    select(func.count())
+                    .select_from(ProfileEvent)
+                    .where(ProfileEvent.user_id == user.id)
+                )
+                assert count == 0
+        finally:
+            await engine.dispose()
+
+    asyncio.run(exercise())
+
+
+def test_profile_versions_are_immutable_and_survive_restart() -> None:
+    assert TEST_DATABASE_URL is not None
+    captured: list[UUID] = []
+
+    async def exercise() -> None:
+        engine = create_database_engine(TEST_DATABASE_URL)
+        try:
+            sessions = async_sessionmaker(engine, expire_on_commit=False)
+            async with sessions() as db:
+                user = User(is_guest=True)
+                db.add(user)
+                await db.flush()
+                captured.append(user.id)
+                v1 = await persist_profile_version(db, owner_id=user.id, profile=profile(1))
+                v2 = await persist_profile_version(db, owner_id=user.id, profile=profile(2))
+                assert (v1.version, v2.version) == (1, 2)
+                assert v1.id != v2.id
+                assert v1.merge_rule_version == PROFILE_MERGE_RULE_VERSION
+                assert v1.previous_profile_id is None
+                assert v2.merge_rule_version == PROFILE_MERGE_RULE_VERSION
+                assert v2.previous_profile_id == v1.id
+                # Version 1 is not overwritten by version 2.
+                assert v1.learning_goals == {"current_topic": "链表"}
+        finally:
+            await engine.dispose()
+
+        read_engine = create_database_engine(TEST_DATABASE_URL)
+        try:
+            read_sessions = async_sessionmaker(read_engine)
+            async with read_sessions() as db:
+                versions = (
+                    await db.scalars(
+                        select(StudentProfile)
+                        .where(StudentProfile.user_id == captured[0])
+                        .order_by(StudentProfile.version)
+                    )
+                ).all()
+                assert [profile.version for profile in versions] == [1, 2]
+                assert versions[-1].version == 2
+                assert versions[-1].merge_rule_version == PROFILE_MERGE_RULE_VERSION
+                assert versions[-1].previous_profile_id == versions[0].id
+        finally:
+            await read_engine.dispose()
+
+    asyncio.run(exercise())
+
+
+def test_stale_or_skipping_version_is_rejected() -> None:
+    assert TEST_DATABASE_URL is not None
+
+    async def exercise() -> None:
+        engine = create_database_engine(TEST_DATABASE_URL)
+        try:
+            sessions = async_sessionmaker(engine, expire_on_commit=False)
+            async with sessions() as db:
+                user = User(is_guest=True)
+                db.add(user)
+                await db.flush()
+                await persist_profile_version(db, owner_id=user.id, profile=profile(1))
+                await persist_profile_version(db, owner_id=user.id, profile=profile(2))
+                # A stale writer still claiming version 2 no longer matches latest 2.
+                with pytest.raises(ProfileVersionConflict):
+                    await persist_profile_version(db, owner_id=user.id, profile=profile(2))
+                # Skipping ahead is also rejected.
+                with pytest.raises(ProfileVersionConflict):
+                    await persist_profile_version(db, owner_id=user.id, profile=profile(5))
+        finally:
+            await engine.dispose()
+
+    asyncio.run(exercise())
+
+
+def test_duplicate_version_violates_database_constraint() -> None:
+    assert TEST_DATABASE_URL is not None
+
+    async def exercise() -> None:
+        engine = create_database_engine(TEST_DATABASE_URL)
+        try:
+            sessions = async_sessionmaker(engine, expire_on_commit=False)
+            async with sessions() as db:
+                user = User(is_guest=True)
+                db.add(user)
+                await db.flush()
+                await persist_profile_version(db, owner_id=user.id, profile=profile(1))
+                # Bypass the service to prove the (user_id, version) constraint holds.
+                db.add(
+                    StudentProfile(
+                        user_id=user.id,
+                        version=1,
+                        merge_rule_version=PROFILE_MERGE_RULE_VERSION,
+                    )
+                )
+                with pytest.raises(IntegrityError):
+                    await db.commit()
+                await db.rollback()
+        finally:
+            await engine.dispose()
+
+    asyncio.run(exercise())

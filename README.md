@@ -2,7 +2,12 @@
 
 启智学伴：面向数据结构学习的个性化学习系统。
 
-## 后端（MVP 0.1）
+当前阶段：MVP 0.2 已通过阶段退出验收。当前Pro完整质量v11、真实学习闭环v10、路径性能及最终容器重启恢复均通过；限制和历史失败见阶段验收报告。尚未进入MVP 0.3。
+学习链路连接一句话目标、10 节点知识结构、渐进画像、正式资源审核、服务端测验、
+掌握度与可解释推荐。计分题只使用明确格式的客观唯一答案；不让 LLM 判定对错。
+阶段状态与失败/修复证据见 [MVP 0.2 验收记录](docs/acceptance/mvp-0.2-stage-acceptance.md)。
+
+## 后端
 
 后端固定使用 Python 3.11，并由 `uv.lock` 固定依赖版本。首次安装依赖：
 
@@ -26,7 +31,7 @@ cd backend
 uv run --python 3.11 pytest
 ```
 
-## Web（MVP 0.1）
+## Web
 
 首次安装并启动学习入口：
 
@@ -87,7 +92,7 @@ docker compose exec -T postgres psql -U edumind -d edumind_dev < edumind_dev-bac
 
 `docker compose down` 不会删除数据卷；`docker compose down -v` 会删除它，只应在明确放弃本地数据后使用。当前 Compose 配置没有自动备份、跨主机复制或生产级灾备；备份文件可能包含学习数据，应保存在受保护位置且不得提交到 Git。
 
-## MVP 0.1 浏览器 E2E
+## 浏览器 E2E
 
 首次运行先安装锁文件中的开发依赖和 Playwright 对应的 Chromium：
 
@@ -106,3 +111,35 @@ pnpm --dir web e2e
 ```
 
 该套件使用浏览器路由级 mock API，稳定覆盖一句话开始、临时首段、正式讲解/代码/三道练习、Provider 故障、审核拒绝和 SSE 异常后的持久化操作恢复，不会调用或计费真实 Provider。后端 Provider、审核门禁、幂等和恢复逻辑由 `backend/tests/test_learning_sessions.py` 的隔离 PostgreSQL 测试覆盖。真实 Provider 和首段 P95 性能不由 mock 结果替代，必须按 T035 单独验收。
+
+## MVP 0.2 验证入口
+
+后端数据库测试必须设置 `EDUMIND_TEST_DATABASE_URL` 为已经迁移的隔离 PostgreSQL
+URL；未设置会跳过 DB 测试，不能视为全量通过。测试数据库会写入合成夹具，不可指向生产库。
+闭环与容器恢复证据见 [自动化闭环报告](docs/acceptance/mvp-0.2-closed-loop.md)。
+
+从 `backend/` 执行真实验收前，设置 `EDUMIND_DATABASE_URL` 指向隔离测试库，
+确保 `.env` 中配置当前服务端 Provider，然后使用全新的报告文件名：
+
+Beta严格工具参数路径需显式设置 `EDUMIND_PROVIDER_STRUCTURED_TRANSPORT=beta_tools`；
+只支持已配置的官方DeepSeek同源主机，普通文本/SSE仍走原Responses。
+当前Beta完整质量验收未通过，4项协议探针通过不代表阶段通过；默认配置不自动切换。
+可在以下命令前加 `env EDUMIND_PROVIDER_STRUCTURED_TRANSPORT=beta_tools` 作隔离验证，
+无需修改真实`.env`。接口与安全约束见 [Provider说明](docs/PROVIDERS.md)。
+
+```bash
+uv run --env-file ../.env python ../docs/acceptance/run_mvp02_acceptance.py \
+  --confirm-billable --output ../docs/acceptance/new-stage-report.json
+uv run --env-file ../.env python -m tests.resource_quality \
+  --mode provider --confirm-billable --output ../docs/acceptance/new-quality-report.json
+```
+
+第一个命令按公开题面要求操作者独立输入答案 JSON，最多 30 次模型尝试；
+第二个命令最多 86 次请求、禁重试/修正。两者都会计费，必须事先授权；
+不要读取答案键或复制标准答案完成验收，不要覆盖历史报告。
+旧指令生成的开放题保留原版本，不迁移评分或改写历史证据；应使用新生成的客观题。
+真实资源质量见 [质量报告](docs/acceptance/mvp-0.2-resource-quality.md)。
+
+非计费 HTTP 路径性能使用 `run_path_benchmark.py`：先启动连接隔离数据库的
+Uvicorn 8001，运行 `uv run python ../docs/acceptance/run_path_benchmark.py --output ../docs/acceptance/new-path-report.json`。
+它创建独立用户和合成画像，单并发、每接口 5 次预热与 100 次测量，不证明公网或高并发容量。

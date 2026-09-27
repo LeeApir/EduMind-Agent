@@ -13,6 +13,10 @@ from app.core.provider_target import ProviderTargetGuard, TargetPolicy
 from app.services.deepseek_responses import DeepSeekResponsesAdapter
 from app.services.provider_gateway import (
     ChatMessage,
+    JsonExtraDataKind,
+    JsonSyntaxReason,
+    OutputFailureReason,
+    OutputTextCounts,
     ProviderError,
     ProviderErrorCode,
     StructuredRequest,
@@ -132,6 +136,94 @@ def test_structured_request_uses_text_json_schema_and_validates_result() -> None
     assert result.usage == TokenUsage(input_tokens=8, output_tokens=9)
 
 
+def test_structured_parse_failure_preserves_usage_without_exporting_generated_text():
+    def respond(request):
+        return httpx.Response(200, json=response('{"secret":"sensitive"} trailing'))
+
+    schema = {"type": "object"}
+    with pytest.raises(ProviderError) as caught:
+        asyncio.run(
+            adapter(httpx.MockTransport(respond)).generate_structured(
+                StructuredRequest(prompt=prompt(), json_schema=schema)
+            )
+        )
+    assert caught.value.usage == TokenUsage(input_tokens=8, output_tokens=9)
+    assert caught.value.json_syntax_reason == JsonSyntaxReason.EXTRA_DATA
+    assert "sensitive" not in str(caught.value)
+    assert caught.value.output_text_counts == OutputTextCounts(1, 1)
+
+
+@pytest.mark.parametrize("separate_messages", [False, True])
+@pytest.mark.parametrize("parts, valid", [
+    (['{"answer":', '"private"}'], True),
+    (['{"answer":"private"}', '{}'], False),
+])
+def test_multiple_text_blocks_preserve_strict_parsing_and_safe_counts(
+    separate_messages, parts, valid
+):
+    payload = response()
+    messages = [{"type": "message", "status": "completed", "role": "assistant",
+                 "content": [{"type": "output_text", "text": part}]} for part in parts]
+    if not separate_messages:
+        messages = [{**messages[0], "content": [item["content"][0] for item in messages]}]
+    payload["output"] = [payload["output"][0], *messages]
+    subject = adapter(httpx.MockTransport(lambda request: httpx.Response(200, json=payload)))
+    request = StructuredRequest(prompt(), {"type": "object"})
+    counts = OutputTextCounts(2 if separate_messages else 1, 2)
+    if valid:
+        result = asyncio.run(subject.generate_structured(request))
+        assert result.value == {"answer": "private"}
+        assert result.output_text_counts == counts
+    else:
+        with pytest.raises(ProviderError) as caught:
+            asyncio.run(subject.generate_structured(request))
+        assert caught.value.json_syntax_reason == JsonSyntaxReason.EXTRA_DATA
+        assert caught.value.output_text_counts == counts
+        assert "private" not in str(caught.value)
+        assert "private" not in repr(caught.value)
+
+
+@pytest.mark.parametrize("value", [-1, True, "private", None])
+def test_output_text_counts_reject_untrusted_non_counts(value):
+    with pytest.raises(ValueError, match="Invalid output text counts"):
+        OutputTextCounts(value, 1)
+
+
+@pytest.mark.parametrize("suffix, kind", [
+    ('{"private":"secret"}', JsonExtraDataKind.JSON_VALUE_SUFFIX),
+    ('[1,2]', JsonExtraDataKind.JSON_VALUE_SUFFIX),
+    ('"secret"', JsonExtraDataKind.JSON_VALUE_SUFFIX),
+    ('false', JsonExtraDataKind.JSON_VALUE_SUFFIX),
+    ('{"private":', JsonExtraDataKind.JSON_LIKE_SUFFIX),
+    ('{} {}', JsonExtraDataKind.JSON_LIKE_SUFFIX),
+    ('}', JsonExtraDataKind.OTHER_SUFFIX),
+    ('``` secret', JsonExtraDataKind.MARKDOWN_FENCE_SUFFIX),
+    ('private prose', JsonExtraDataKind.OTHER_SUFFIX),
+])
+def test_extra_data_shape_remains_rejected_and_never_exports_content(suffix, kind):
+    subject = adapter(httpx.MockTransport(
+        lambda request: httpx.Response(200, json=response('{} \n' + suffix))))
+    with pytest.raises(ProviderError) as caught:
+        asyncio.run(subject.generate_structured(StructuredRequest(prompt(), {"type": "object"})))
+    assert caught.value.json_extra_data_kind is kind
+    assert caught.value.json_syntax_reason is JsonSyntaxReason.EXTRA_DATA
+    assert "secret" not in str(caught.value)
+    assert "private" not in repr(caught.value)
+    assert not hasattr(caught.value, "doc")
+    assert not hasattr(caught.value, "pos")
+
+
+def test_extra_data_kind_requires_fixed_enum_and_extra_data_error():
+    with pytest.raises(ValueError, match="Invalid JSON extra data diagnostic"):
+        ProviderError(ProviderErrorCode.INVALID_OUTPUT,
+                      json_extra_data_kind=JsonExtraDataKind.OTHER_SUFFIX)
+    with pytest.raises(ValueError, match="Invalid JSON extra data diagnostic"):
+        ProviderError(ProviderErrorCode.INVALID_OUTPUT,
+                      output_failure_reason=OutputFailureReason.STRUCTURED_JSON_INVALID,
+                      json_syntax_reason=JsonSyntaxReason.EXTRA_DATA,
+                      json_extra_data_kind="private")
+
+
 def test_structured_request_defaults_temperature_without_overriding_explicit_value() -> None:
     schema = {"type": "object", "properties": {"ok": {"type": "boolean"}}}
     calls = 0
@@ -216,13 +308,148 @@ def test_non_json_and_schema_mismatch_are_invalid_output() -> None:
         asyncio.run(
             adapter(
                 httpx.MockTransport(
-                    lambda _request: httpx.Response(
-                        200, json=response('{"answer":"wrong"}')
-                    )
+                    lambda _request: httpx.Response(200, json=response('{"answer":"wrong"}'))
                 )
             ).generate_structured(StructuredRequest(prompt=prompt(), json_schema=schema))
         )
     assert raised.value.code == ProviderErrorCode.INVALID_OUTPUT
+
+
+@pytest.mark.parametrize(
+    ("content", "reason"),
+    [
+        ('{"answer":"private\nvalue"}', OutputFailureReason.STRUCTURED_JSON_INVALID),
+        ('```json\n{"answer":1}\n```', OutputFailureReason.STRUCTURED_JSON_INVALID),
+        ('["private"]', OutputFailureReason.STRUCTURED_NOT_OBJECT),
+        ('{"answer":"private"}', OutputFailureReason.STRUCTURED_SCHEMA_MISMATCH),
+    ],
+)
+def test_structured_failures_have_content_free_diagnostics(content, reason) -> None:
+    subject = adapter(
+        httpx.MockTransport(lambda _request: httpx.Response(200, json=response(content)))
+    )
+    schema = {"type": "object", "properties": {"answer": {"type": "integer"}}}
+    with pytest.raises(ProviderError) as raised:
+        asyncio.run(subject.generate_structured(StructuredRequest(prompt(), schema)))
+    error = raised.value
+    assert error.code == ProviderErrorCode.INVALID_OUTPUT and not error.retryable
+    assert error.output_failure_reason is reason
+    assert "private" not in str(error) and "test-secret" not in repr(error)
+    assert not hasattr(error, "body") and not hasattr(error, "validation_error")
+
+
+@pytest.mark.parametrize(
+    ("details", "reason"),
+    [
+        ({"reason": "max_output_tokens"}, OutputFailureReason.OUTPUT_TOKEN_LIMIT),
+        ({"reason": "private-vendor-text"}, OutputFailureReason.RESPONSE_INCOMPLETE),
+        (None, OutputFailureReason.RESPONSE_INCOMPLETE),
+    ],
+)
+def test_incomplete_response_diagnostics_do_not_invent_token_limit(details, reason) -> None:
+    payload = {**response(), "status": "incomplete", "incomplete_details": details}
+    with pytest.raises(ProviderError) as raised:
+        asyncio.run(
+            adapter(
+                httpx.MockTransport(lambda _request: httpx.Response(200, json=payload))
+            ).generate_text(prompt())
+        )
+    assert raised.value.output_failure_reason is reason
+    assert "private-vendor-text" not in str(raised.value)
+
+
+def test_json_escaped_markdown_is_accepted_without_repair() -> None:
+    content = {"answer": "# Title\nAn original example: `a[7]`."}
+    schema = {"type": "object", "properties": {"answer": {"type": "string"}}}
+    subject = adapter(
+        httpx.MockTransport(
+            lambda _request: httpx.Response(200, json=response(json.dumps(content)))
+        )
+    )
+    result = asyncio.run(subject.generate_structured(StructuredRequest(prompt(), schema)))
+    assert result.value == content
+
+
+@pytest.mark.parametrize(
+    ("content", "keyword"),
+    [
+        ("{}", "required"),
+        ('{"answer":"private"}', "type"),
+        ('{"answer":1,"private":2}', "additionalProperties"),
+    ],
+)
+def test_schema_keyword_diagnostic_never_contains_instance_value_or_path(content, keyword):
+    schema = {
+        "type": "object",
+        "required": ["answer"],
+        "additionalProperties": False,
+        "properties": {"answer": {"type": "integer"}},
+    }
+    subject = adapter(
+        httpx.MockTransport(lambda _request: httpx.Response(200, json=response(content)))
+    )
+    with pytest.raises(ProviderError) as raised:
+        asyncio.run(subject.generate_structured(StructuredRequest(prompt(), schema)))
+    assert raised.value.schema_keyword == keyword
+    assert "private" not in str(raised.value)
+    assert not hasattr(raised.value, "path")
+
+
+def test_schema_diagnostic_rejects_arbitrary_text():
+    with pytest.raises(ValueError, match="Invalid schema diagnostic"):
+        ProviderError(
+            ProviderErrorCode.INVALID_OUTPUT,
+            output_failure_reason=OutputFailureReason.STRUCTURED_SCHEMA_MISMATCH,
+            schema_keyword="private",
+        )
+
+
+@pytest.mark.parametrize(
+    ("content", "reason"),
+    [
+        (r'{"answer":"\q private"}', JsonSyntaxReason.INVALID_ESCAPE),
+        (r'{"answer":"\uZZZZ private"}', JsonSyntaxReason.INVALID_ESCAPE),
+        ('{"answer":"private\nvalue"}', JsonSyntaxReason.UNESCAPED_CONTROL_CHARACTER),
+        ('{"answer":"private', JsonSyntaxReason.UNTERMINATED_STRING),
+        ('{"answer":"private" "x":1}', JsonSyntaxReason.EXPECTED_DELIMITER),
+        ('{"answer":"private",}', JsonSyntaxReason.EXPECTED_PROPERTY_NAME),
+        ('```json\n{"answer":"private"}\n```', JsonSyntaxReason.EXPECTED_VALUE),
+        ('{"answer":"private"} {}', JsonSyntaxReason.EXTRA_DATA),
+    ],
+)
+def test_json_syntax_categories_retain_no_output_text_or_location(content, reason):
+    schema = {"type": "object", "properties": {"answer": {"type": "string"}}}
+    subject = adapter(
+        httpx.MockTransport(lambda _request: httpx.Response(200, json=response(content)))
+    )
+    with pytest.raises(ProviderError) as raised:
+        asyncio.run(subject.generate_structured(StructuredRequest(prompt(), schema)))
+    error = raised.value
+    assert error.json_syntax_reason is reason
+    assert error.output_failure_reason is OutputFailureReason.STRUCTURED_JSON_INVALID
+    assert not error.retryable and "private" not in str(error)
+    assert not any(hasattr(error, name) for name in ("doc", "pos", "lineno", "colno"))
+
+
+def test_json_syntax_diagnostic_rejects_arbitrary_strings_or_wrong_error_class():
+    with pytest.raises(ValueError, match="Invalid JSON syntax diagnostic"):
+        ProviderError(
+            ProviderErrorCode.INVALID_OUTPUT,
+            output_failure_reason=OutputFailureReason.STRUCTURED_JSON_INVALID,
+            json_syntax_reason="private",
+        )
+    with pytest.raises(ValueError, match="Invalid JSON syntax diagnostic"):
+        ProviderError(ProviderErrorCode.TIMEOUT, json_syntax_reason=JsonSyntaxReason.OTHER)
+
+
+def test_output_diagnostic_rejects_arbitrary_text_and_non_output_codes() -> None:
+    with pytest.raises(ValueError, match="Invalid output diagnostic"):
+        ProviderError(ProviderErrorCode.INVALID_OUTPUT, output_failure_reason="secret")
+    with pytest.raises(ValueError, match="Invalid output diagnostic"):
+        ProviderError(
+            ProviderErrorCode.TIMEOUT,
+            output_failure_reason=OutputFailureReason.STRUCTURED_JSON_INVALID,
+        )
 
 
 def test_external_schema_reference_is_rejected_before_http() -> None:

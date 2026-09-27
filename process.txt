@@ -153,3 +153,275 @@ VERIFIED 表示验证通过并准备提交，完成以 Git 中的 Task-Completed
 
 [2026-09-21T19:55:20] [WORKFLOW-CONTRIBUTION] VERIFIED | executor=Lee | branch=codex/task-workflow
 新增 MVP 0.2 起的执行人、分支、可选评审人和换人交接日志规范；MVP 0.1 历史不回填 | 已核对新格式包含四段正文，且不向 Task 对象增加人员字段 | 尚未发生代码评审，因此未记录 reviewer | 创建治理提交；下一条任务日志继续使用新格式
+[2026-09-21T20:36:01] [MVP-0.2-T001] START | executor=Lee | branch=codex/mvp-0.2-t001
+领取“确定学习证据、掌握度与路径版本边界”，复核 25 个 MVP 0.2 任务已是可独立验证粒度 | 已核对 PRD 相关章节、当前架构文档、既有 ADR 和 Git 状态，T001 无依赖 | 暂无 | 编写学习证据与版本边界 ADR，同步架构摘要并完成自查
+[2026-09-21T20:41:10] [MVP-0.2-T001] VERIFIED | executor=Lee
+新增 ADR-0003，确定四类只追加学习证据、可重建 mastery 投影、不可变画像/路径版本及跨边界失败语义，并同步架构摘要 | 已核对 PRD §3.2/§3.4/§3.7/§5/§9.1；任务账本、必备边界词、本地文档链接与 `git diff --check` 均通过 | 暂无；具体表名和 API 字段由后续任务在本 ADR 语义内落地 | 创建含 Task-Completed 标记的本地提交；下一可领取任务为 T002、T003 或 T006
+[2026-09-21T22:29:14] [MVP-0.2-T002] START | executor=Lee | branch=codex/mvp-0.2-t002
+领取“固定 MVP 0.2 学习闭环 API 契约” | T001 完成提交已确认，已阅读 PRD §7.2/§7.4、ADR-0003 与 MVP 0.1 OpenAPI | 暂无 | 增补 MVP 0.2 路径、schema 和错误语义，保持既有 MVP 0.1 端点兼容
+[2026-09-21T22:36:58] [MVP-0.2-T002] VERIFIED | executor=Lee
+将 OpenAPI 升级到 MVP 0.2，增加画像修正/历史/事件、公共知识结构、服务端测验提交、掌握度与可解释路径端点 | OpenAPI JSON 解析、必需路径、写请求 Cookie/CSRF/幂等约束、本地 `$ref` 解析和 `git diff --check` 均通过 | 暂无；这是契约先行，路由/数据模型由 T005 及后续任务落地 | 创建含 Task-Completed 标记的本地提交；继续 T003 知识结构种子
+[2026-09-21T22:39:06] [MVP-0.2-T003] START | executor=Lee | branch=codex/mvp-0.2-t003
+领取“建立 10 节点数据结构种子知识结构” | T001 完成提交已确认；已核对 PRD 附录 B 的 10 个节点、关系类型与知识结构约束 | 暂无 | 创建版本化、可稳定加载的知识结构种子并运行人工事实和引用完整性自查
+[2026-09-21T22:45:50] [MVP-0.2-T003] VERIFIED | executor=Lee
+创建 `data/knowledge_graph.yaml`，包含 PRD 附录 B 的 10 个稳定节点、知识元数据、前置、学习目标、误区、教学上下文和版本事实核对记录 | JSON/YAML、10 节点、引用完整性、关系类型、前置 DAG、OpenAPI schema 和 `git diff --check` 均通过 | 暂无；后续 Repository 需将种子的审核元数据与对外图谱响应分开 | 创建含 Task-Completed 标记的本地提交；继续 T004 实现知识结构 Repository
+[2026-09-21T22:48:02] [MVP-0.2-T004] START | executor=Lee | branch=codex/mvp-0.2-t004
+领取“实现知识结构校验与 Repository” | T003 完成提交已确认，种子文件通过 schema、引用、DAG 校验 | 暂无 | 实现本地 YAML Repository、确定性查询与针对非法种子的单元测试，不引入 Neo4j
+[2026-09-21T22:54:29] [MVP-0.2-T004] VERIFIED | executor=Lee
+新增只读、不可变的本地知识结构 Repository：加载 JSON 兼容 YAML，校验 schema、节点、关系、前置一致性和 DAG，并提供稳定查询 | 7 个单元测试、Ruff、Mypy（33 个 source）与 `git diff --check` 均通过 | 暂无；T005 需将 Repository 注入只读图谱 API | 创建含 Task-Completed 标记的本地提交；继续 T005 图谱只读 API
+[2026-09-21T22:56:30] [MVP-0.2-T005] START | executor=Lee | branch=codex/mvp-0.2-t005
+领取“提供知识结构只读 API” | T002、T004 完成提交已确认，OpenAPI 契约和 Repository 校验边界已存在 | 暂无 | 注入图谱 Repository，新增稳定排序的公共读端点、未知节点安全错误和 API 集成测试
+[2026-09-21T22:59:56] [MVP-0.2-T005] VERIFIED | executor=Lee
+新增 `GET /api/graph` 和 `GET /api/graph/node/{nodeId}`，注入已校验 Repository，稳定返回公共图谱并以 `GRAPH_NODE_NOT_FOUND` 隐藏未知节点的内部细节 | 图谱 API/Repository 9 测试、Ruff、Mypy（34 个 source）、全量后端 122 passed/15 skipped、OpenAPI JSON 和 `git diff --check` 均通过 | 仅 JSON 兼容 YAML 受 P0 支持；通用 YAML 语法解析需新的明确依赖决策 | 创建含 Task-Completed 标记的本地提交；T001–T005 已完成，下一个可领取任务为 T006
+[2026-09-23T15:05:25] [MVP-0.2-T006] START | executor=Lee | branch=codex/mvp-0.2-t006
+领取"定义渐进画像事件与合并规则" | T001–T005 完成提交已确认，已核对 PRD §3.2、ADR-0003 与 OpenAPI 画像事件/修正契约 | 暂无 | 定义版本化画像事件 schema 与确定性合并规则，覆盖行为事件与显式修正优先级
+[2026-09-23T15:20:23] [MVP-0.2-T006] VERIFIED | executor=Lee
+新增 `backend/app/agents/profile_events.py`（版本化事件 schema、事件类型/动作一致性、幂等摘要），扩展 `profile_schema.py`（EDITABLE_PROFILE_FIELDS、EVIDENCE_SOURCE_PRECEDENCE、strongest_evidence_source、apply_manual_correction，证据版本放宽为 ≤ 画像版本），新增 `docs/agents/prompts/profile-events-v1.md` | 新增 test_profile_events.py + test_profile_merge.py；ruff、mypy（35 个 source）通过；全量后端 147 passed/15 skipped | 事件仅完成 schema 与合并层；持久化、读取/修正 API 与前端卡片留待 T007–T009 | 领取 T007，新增 ProfileEvent 模型、Alembic 迁移与持久化服务
+[2026-09-23T15:25:26] [MVP-0.2-T007] START | executor=Lee | branch=codex/mvp-0.2-t006
+领取"持久化画像事件与不可变画像版本" | T006 完成提交 0aa65a1 已确认，事件 schema 与合并规则已存在 | 暂无 | 新增 ProfileEvent 模型、Alembic 迁移与持久化服务，覆盖 owner 隔离、幂等与不可变版本
+[2026-09-23T17:30:46] [MVP-0.2-T007] VERIFIED | executor=Lee
+新增 ProfileEvent 模型（owner+idempotency_key 唯一、event_type 约束）、Alembic 0005_profile_events 迁移（含 downgrade 往返）与 profile_updates 服务（record_profile_event、persist_profile_version、ProfileVersionConflict） | 临时 PostgreSQL（镜像 sha256:cf78e766…，端口 55432）上 alembic upgrade/downgrade 往返通过，test_profile_persistence.py 5 项幂等/owner 隔离/不可变版本/冲突测试通过，全量后端 167 passed；ruff、mypy（36 个 source）通过 | 事件只持久化、尚未触发画像更新（T015 Provider 更新）；读取/修正/历史 API 与前端卡片留待 T008、T009 | 领取 T008，实现画像读取、历史与手动修正 API（GET/PATCH/profile/me、history、events）
+[2026-09-23T17:55:25] [MVP-0.2-T008] START | executor=Lee | branch=codex/mvp-0.2-t006
+领取"实现画像读取、历史与手动修正 API" | T002、T007 完成提交已确认，OpenAPI 画像四端点契约与幂等/版本服务已存在 | 暂无 | 新增 profile 路由、幂等修正服务与 owner 隔离的读取/历史/事件端点，补齐 VALIDATION_ERROR 稳定响应
+[2026-09-23T18:31:44] [MVP-0.2-T008] VERIFIED | executor=Lee
+新增 app/api/profile.py 四端点（GET/PATCH /me、GET /me/history、POST /events），GET /me 从 learning_reads 迁出；main.py 注册 profile 路由并新增 RequestValidationError 处理器返回稳定 VALIDATION_ERROR；student_profiles 增加幂等列与 Alembic 0006 迁移，profile_updates 新增 correct_profile（幂等重放 + 乐观并发） | 新增 test_profile_api.py 7 项（owner 隔离/404/白名单修正/非法字段 422/CSRF 403/版本冲突 409/幂等重放/事件回执）；临时 PostgreSQL 上 alembic upgrade + 0006 往返通过，全量后端 174 passed；ruff、mypy（37 个 source）通过 | 事件端点仅持久化并返回 queued，Provider 驱动的画像更新留待 T015；前端画像卡片留待 T009 | 领取 T009，实现可查看和修正的画像卡片（ProfileCard + profile API 客户端）
+[2026-09-23T18:32:45] [MVP-0.2-T009] START | executor=Lee | branch=codex/mvp-0.2-t006
+领取"实现可查看和修正的画像卡片" | T008 完成提交 80b2d16 已确认，画像四端点契约（GET/PATCH /me、history、events）与白名单修正服务已存在 | 暂无 | 新增 profile API 客户端与 ProfileCard 组件，区分已知/未知/推断/用户修正字段并支持白名单修正保存与清晰加载/冲突/失败/重试状态
+[2026-09-23T19:14:16] [MVP-0.2-T009] VERIFIED | executor=Lee
+新增 web/src/api/profile.ts（Profile/证据类型、字段四态分类 profileFieldStatus、fetchProfile/correctProfile/fetchProfileHistory/ensureProfileSession 与 ProfileRequestError），web/src/components/ProfileCard.vue（六维字段区分未知/已知/推断/用户修正，白名单字段 JSON 编辑保存，加载/空态/冲突/失败/重试状态清晰，仅展示来源标签不渲染证据原文），并在 App.vue 接入画像卡片 | pnpm test 30 passed（含 profile.spec 9、ProfileCard.spec 7、App.spec 新增卡片断言）；typecheck 通过；lint 0 error/97 非阻塞格式 warning；build 通过；git diff --check 通过 | 画像历史仅提供 API 客户端，未在卡片内做历史版本 UI；事件上报的前端调用留待后续任务 | 提交 T009，T006–T009 画像查看与修正批次完成
+[2026-09-25T18:46:34] [WORKFLOW-PROFILE-REVIEW] VERIFIED | executor=Lee | branch=codex/mvp-0.2-profile-audit
+更正 T008 账本状态：完成提交 80b2d16 与 VERIFIED 日志已存在，但提交内误留 in_progress；新增画像审查记录及 T026–T029 回归任务，历史日志未改写 | 已核对完成标记、完成时间、29 个唯一任务 ID、JSON 语法及 git diff --check；本次代码回归尚待执行 | R1–R4 审查问题仍待独立回归和修复，尚未合入 main | 创建治理提交，随后按用户授权优先领取 T026
+[2026-09-25T18:48:26] [MVP-0.2-T026] START | executor=Lee | branch=codex/mvp-0.2-profile-audit
+领取“保留跨学习会话的显式画像修正”，补充模型输出不能伪造手动修正来源的边界 | 已确认 T008 完成提交与任务状态更正、T026 依赖满足；现有再学习流程每次从空画像提取 | 数据库隔离环境尚待确认 | 增加回归并实现确定性画像合并，验证旧版本与 Provider 失败路径
+[2026-09-25T19:31:15] [MVP-0.2-T026] VERIFIED | executor=Lee
+新增跨版本确定性合并并保留手动修正与历史证据；拒绝模型伪造手动修正来源，修正 Provider 降级时的画像版本号 | 临时内存 PostgreSQL Alembic upgrade head；定向 21 passed、全量 179 passed；Ruff、Mypy（37 个 source）、git diff --check 通过，证据见 docs/acceptance/mvp-0.2-profile-code-review.md | 其余 R2–R4 尚未处理，7 条依赖弃用警告不影响结果 | 创建 T026 完成提交；继续 T027 并发幂等回归
+[2026-09-25T19:32:59] [MVP-0.2-T027] START | executor=Lee | branch=codex/mvp-0.2-profile-audit
+领取“并发重复画像事件返回同一回执” | T007/T008 完成提交与 T026 完成提交均已确认；临时隔离 PostgreSQL 已升级到现有 head | 现有事件服务在唯一约束竞争后未回查，可能向 API 泄露 500 | 以两个数据库会话制造查询后插入竞争并修复事务回退后的幂等回执
+[2026-09-25T19:34:49] [MVP-0.2-T027] VERIFIED | executor=Lee
+画像事件并发唯一键竞争后回滚并重读已提交事件；同摘要返回原 ID、不同摘要给稳定幂等冲突 | 两个独立 PostgreSQL 会话在查询后同步竞争：修复前 2 failed，修复后定向 7 passed、全量 181 passed；Ruff、Mypy（37 个 source）、git diff --check 通过 | R3–R4 尚未处理；7 条依赖弃用警告不影响结果 | 创建 T027 完成提交；继续 T028 前端画像刷新
+[2026-09-25T19:36:52] [MVP-0.2-T028] START | executor=Lee | branch=codex/mvp-0.2-profile-audit
+领取“首次学习完成后刷新画像卡片” | T009 完成提交与 T027 完成提交已确认；组件只在挂载时读取，学习流没有通知组件 | 首屏 404 后画像虽已持久化，页面仍停留空态 | 添加学习流刷新信号、编辑时延后刷新和空态转已知的前端回归
+[2026-09-25T19:39:28] [MVP-0.2-T028] VERIFIED | executor=Lee
+学习流确认画像已提交时递增刷新序号；画像卡片自动重读，编辑中延后且旧响应不能覆盖新版本 | 修复前定向 3 failed；修复后定向 14 passed、前端全量 33 passed、typecheck/build 通过、lint 0 error/97 既有 warning、git diff --check 通过 | R4 版本来源持久化尚未处理 | 创建 T028 完成提交；继续 T029 迁移与版本来源回归
+[2026-09-25T19:41:26] [MVP-0.2-T029] START | executor=Lee | branch=codex/mvp-0.2-profile-audit
+领取“持久化画像事件与快照的版本来源” | T006/T007 完成提交已确认；现有表缺少版本来源字段 | 历史数据不能误标为现行合并规则 | 新增可解释回填迁移、写入路径及隔离 PostgreSQL 回归
+[2026-09-25T19:45:29] [MVP-0.2-T029] VERIFIED | executor=Lee
+事件和快照来源字段、前一快照引用与旧数据迁移回填完成；历史快照标为 legacy 而非冒认现行规则 | 隔离 PostgreSQL 从 0006 升到 0007；77 条画像和 16 条事件原字段摘要未变、断链 0；定向 9 passed、全量 181 passed、Ruff/Mypy 通过 | 7 条依赖弃用警告；审查修复分支尚未 push/合并 main | 创建 T029 完成提交；关闭临时容器，交付审查记录与提交清单
+[2026-09-25T20:13:06] [MVP-0.2-T010] START | executor=Lee | branch=codex/mvp-0.2
+领取“定义测验提交与确定性评分规则” | T002 完成提交 76becbf 已确认；现有正式练习为短答案 v1 资源 | v1 不支持语义等价判断，也不能信任客户端上传的题干、标准答案或分数 | 定义可追溯的精确匹配评分与错误模式，绑定 owner 可读的已发布资源并覆盖非法输入
+[2026-09-25T20:17:32] [MVP-0.2-T010] VERIFIED | executor=Lee
+新增 quiz-exact-text-v1 确定性评分器：固定已发布资源版本与 owner，服务端答案键判分，遗漏题计错，返回逐题解释和错误模式；规则文档明确精确匹配边界 | 隔离 PostgreSQL 迁移至 0007；定向 10 passed、全量后端 191 passed、Ruff/Mypy 通过，git diff --check 通过 | 7 条依赖弃用警告；v1 不判断语义等价，后续新题型需新版本 | 创建 T010 完成提交；继续 T011 学习证据/掌握度/路径数据模型
+[2026-09-25T20:18:58] [MVP-0.2-T011] START | executor=Lee | branch=codex/mvp-0.2
+领取“建立学习证据、掌握度与路径版本数据模型” | T001/T004/T010 完成提交已确认；ADR-0003 固定证据、投影、版本与事务边界 | 数据模型尚未落库，T012–T018 无法持久化闭环 | 建立 owner-scoped 表与约束，验证迁移、跨 owner 隔离和非法分数/状态/版本拒绝
+[2026-09-25T20:27:12] [MVP-0.2-T011] VERIFIED | executor=Lee
+新增 learning_evidence、node_mastery_revisions/current、learning_path_versions/current 五表及 0008 迁移；owner 复合外键约束补偿、证据、版本与当前指针，当前路径保留待重规划标记 | 隔离 PostgreSQL 0008 迁移/降级/重升通过；定向 3 passed、全量 194 passed、Ruff/Mypy 与 git diff --check 通过 | 7 条依赖弃用警告；事务命令服务留给 T012–T018 | 创建 T011 完成提交；继续 T012 测验提交与不可变证据
+[2026-09-25T20:28:17] [MVP-0.2-T012] START | executor=Lee | branch=codex/mvp-0.2
+领取“提交并持久化测验作答” | T010/T011 完成提交已确认；评分器、证据表和 API 契约存在 | 当前学习单元尚待 T019 映射节点；T012 先对有可信节点绑定的正式资源提交 | 实现 owner/审核/CSRF/幂等保护下的测验提交与只追加证据，使用隔离数据库完成 API 回归
+[2026-09-25T20:32:57] [MVP-0.2-T012] VERIFIED | executor=Lee
+新增 POST /api/quiz-submissions：只读 owner 可见已发布资源，服务端判分并保存作答快照、逐题结果和错误模式；同键重放原证据，并发竞争安全回查 | 定向 5 passed、隔离库全量 199 passed、Ruff/Mypy（41 个 source）、OpenAPI JSON 和 git diff --check 通过 | 7 条依赖弃用警告；掌握度事务与响应更新留给 T013，真实学习单元节点绑定留给 T019 | 创建 T012 完成提交；继续 T013 版本化掌握度规则
+[2026-09-25T20:34:00] [MVP-0.2-T013] START | executor=Lee | branch=codex/mvp-0.2
+领取“根据学习证据更新节点掌握度” | T011/T012 完成提交已确认；ADR-0003 要求证据与 mastery revision 在同一短事务 | 测验目前只写证据，未产生掌握度或待重规划标记 | 固定离线规则、实现可重算 reducer 和事务投影更新，覆盖跳过、连续错误、阈值和幂等回放
+[2026-09-25T20:40:57] [MVP-0.2-T013] VERIFIED | executor=Lee
+固定 mastery-v1 离线规则与重放 reducer；测验证据、掌握度 revision/当前投影及路径待重规划标记同事务写入，owner+节点事务锁保证并发顺序 | 规则定向 10 passed、事务/API 合计 17 passed、隔离库全量后端 211 passed、Ruff/Mypy 与 git diff --check 通过 | 7 条依赖弃用警告；提示/反馈命令入口留给 T014，路径重算留给 T017 | 创建 T013 完成提交；继续 T014 行为证据
+[2026-09-25T20:42:13] [MVP-0.2-T014] START | executor=Lee | branch=codex/mvp-0.2
+领取“记录提示、重新解释与显式反馈证据” | T011/T013 完成提交已确认；现有 profile/events 为缺少必需场景关联的轻量画像事件 | 客户端自报 hint_used 不能证明系统已提供提示，不能直接计入掌握度 | 新增 owner/场景/节点验证的学习行为命令，提示由服务端交付后写证据，同事务更新掌握度
+[2026-09-25T20:47:30] [MVP-0.2-T014] VERIFIED | executor=Lee
+新增 POST /api/learning-events，验证 owner、ready 单元、审核场景和图谱节点；提示响应由服务端知识结构确定性生成，动作证据与 mastery revision 同事务提交；保留旧 profile/events 为轻量画像事件 | 定向 9 passed、隔离库全量后端 220 passed、Ruff/Mypy（45 个 source）、OpenAPI JSON 和 git diff --check 通过 | 7 条依赖弃用警告；前端行为入口与画像增量更新留给 T015/T020 | 创建 T014 完成提交；继续 T015 渐进画像更新
+[2026-09-25T20:48:22] [MVP-0.2-T015] START | executor=Lee | branch=codex/mvp-0.2
+领取“用学习行为渐进更新画像” | T007/T012/T014/T026/T027/T029 完成提交已确认，证据与不可变画像版本已落库 | Provider 调用不能占据证据事务，也不能接收原始测验作答或伪造证据来源 | 从已提交证据抽取白名单摘要，Provider 仅提议受限字段增量，服务端合并/校验并在失败时保留证据
+[2026-09-25T20:58:14] [MVP-0.2-T015] VERIFIED | executor=Lee
+测验、学习行为和资源选择在证据提交后用最小白名单摘要尝试画像增量更新；服务端赋予来源并合并不可变版本，失败不回滚证据 | 隔离库全量后端 226 passed；Ruff、改动文件格式、Mypy、OpenAPI JSON 和 git diff --check 通过 | 全局 Ruff 格式检查提示 20 个历史文件未格式化，本任务文件均已通过；真实 Provider 验证未运行 | 创建 T015 完成提交；继续 T016 路径规则
+[2026-09-25T21:00:17] [MVP-0.2-T016] START | executor=Lee | branch=codex/mvp-0.2
+领取“定义可解释路径规划规则” | T004/T011/T013 已完成，版本化知识图谱和掌握度状态可用 | 路径必须独立于 LLM，前置、阈值、排序和解释需稳定并可复算 | 实现纯规则规划器、边界校验及前置/薄弱/已掌握/不可达测试
+[2026-09-25T23:44:11] [MVP-0.2-T016] VERIFIED | executor=Lee
+固定 path-v1 权重、前置闭包与稳定排序，跳过达标节点并优先薄弱前置；每步附资源、时长及结构化推荐理由 | 路径规则 8 passed、隔离库全量后端 234 passed、Ruff/Mypy/git diff --check 通过 | 7 条依赖弃用警告；持久化路径版本与输入水位交给 T017 | 创建 T016 完成提交；继续 T017 路径持久化
+[2026-09-25T23:44:59] [MVP-0.2-T017] START | executor=Lee | branch=codex/mvp-0.2
+领取“生成并持久化初始路径与重新规划版本” | T013/T016 完成，路径状态表和纯规则规划器已存在 | 需固定输入快照水位、并发与重启恢复，避免过期计划覆盖当前路径 | 在短事务中读取 owner 画像与掌握度，写入不可变版本并原子更新当前指针；覆盖幂等与历史
+[2026-09-26T08:40:39] [MVP-0.2-T017] VERIFIED | executor=Lee
+新增不可变路径版本服务，固定图谱/画像/掌握度水位/规则版本，保存变化节点及理由；owner 短事务锁协调画像、掌握度与路径，画像更新标记待重规划 | 隔离库后端全量 236 passed，覆盖并发重放、重规划、偏好、历史和重启；Ruff/Mypy/格式/git diff --check 通过 | 7 条依赖弃用警告；API 幂等命令、owner 契约和查询新鲜度交给 T018 | 创建 T017 完成提交；继续 T018 掌握度与路径 API
+[2026-09-26T10:39:12] [MVP-0.2-T018] START | executor=Lee | branch=codex/mvp-0.2
+领取“提供掌握度与路径 API”；为契约要求的持久幂等回执补充 models/Alembic 范围 | T002/T005/T017 完成，OpenAPI 已固定 plan/replan/current/mastery 边界 | 必须持久化 owner 幂等键与版本预条件，重放不能被当前新版本替代 | 建立命令回执表、路由、owner 契约与无 Provider/性能测试
+[2026-09-26T11:14:14] [MVP-0.2-T018] VERIFIED | executor=Lee
+新增 mastery/current/plan/replan API 与 0009 持久幂等命令回执；返回版本、资源/时长、去敏理由及变化节点；修正 T017 画像偏好规则标识为 path-v2 并保留 v1 重算入口 | 定向 API 4 passed、隔离库迁移升降级和全量 240 passed、查询 P95 < 200ms、Ruff/Mypy/OpenAPI/git diff --check 通过 | 7 条依赖弃用警告；P95 是本地隔离库结果，不替代阶段部署验收 | 创建 T018 完成提交；继续 T019 学习单元图谱绑定
+[2026-09-26T11:16:40] [MVP-0.2-T019] START | executor=Lee | branch=codex/mvp-0.2
+领取“把一句话目标和学习单元关联到知识节点”；补充澄清 API/契约范围 | T004/T017 完成，知识节点与路径版本已可用 | 原学习单元没有节点或路径快照，不能可靠归属测验；模糊目标不得默认节点 | 先解析并本地校验，再保存路径快照并用于正式资源生成；失败或低置信映射返回澄清
+[2026-09-26T11:49:10] [MVP-0.2-T019] VERIFIED | executor=Lee
+新增 goal-node-v1 保守别名/候选校验与持久澄清；学习按路径当前节点生成并保存图谱/路径快照，API 返回关联字段；初始画像在 Provider 完成后加 owner 锁并重基版本 | 隔离库后端全量 255 passed，覆盖映射失败、澄清重放、关联和并发画像；Ruff/Mypy/OpenAPI/git diff --check 通过 | 7 条依赖弃用警告；真实 Provider 与浏览器闭环留给阶段验收 | 创建 T019 完成提交；继续 T020 服务端练习提交前端
+[2026-09-26T11:51:07] [MVP-0.2-T020] START | executor=Lee | branch=codex/mvp-0.2
+领取“将练习改为服务端提交并展示掌握度变化”；补充结果恢复 API 与答案键去敏范围 | T012/T013 已完成，前端仍为内存答案比对 | 刷新恢复需要 owner 服务端结果读取；正式资源响应不能预先泄露答案键 | 新增结果恢复读取，改为全卷幂等提交与逐题/掌握度回执，补组件和客户端测试
+[2026-09-26T12:36:56] [MVP-0.2-T020] VERIFIED | executor=Lee
+正式练习去除公开答案键，新增 owner 最近回执 GET，前端全卷幂等提交并展示逐题反馈/掌握度历史变化，刷新仅存单元 ID 并恢复服务端结果；沿用现有视觉系统并核对移动布局 | pnpm test --run 42 passed，typecheck/lint/build 通过（67 原有格式警告）；EDUMIND_TEST_DATABASE_URL=<隔离库> uv run pytest -q 255 passed 无跳过；Ruff/Mypy 52 文件、OpenAPI/diff 检查通过；with_server.py + web/tests/e2e/learning_flow.py 路由模拟通过，截图 /tmp/edumind-mvp02-t020-{desktop,mobile}.png | 7 条后端依赖弃用警告；浏览器预期 401/404 不算真实 Provider 验证，阶段验收仍待完成 | 创建 T020 完成提交；继续 T021 轻量路径视图，接入真实服务端路径和掌握度
+[2026-09-26T12:38:21] [MVP-0.2-T021] START | executor=Lee | branch=codex/mvp-0.2
+领取“实现轻量学习路径视图”；沿用当前雾蓝/纸白视觉与等宽掌握度数据，以可键盘操作的节点列表呈现推荐顺序 | T018/T020 已有完成提交，工作区干净；服务端路径只读和幂等重规划契约已核对 | 已掌握节点可能被路径省略，视图需结合公开图谱与 owner 掌握度显示前置证据；不能从测验历史回执替代当前状态 | 建立路径客户端、版本受控重规划、增量节点视图与单元/浏览器验证
+[2026-09-26T12:54:03] [MVP-0.2-T021] VERIFIED | executor=Lee
+新增类型校验路径客户端及轻量节点视图，组合图谱/当前掌握度/路径版本显示当前前置下一步、四态与证据；练习触发幂等重规划，只替换变化节点并保留选中项，校验图谱与掌握度水位一致性 | pnpm test --run 54 passed，typecheck/变更文件 ESLint/build 通过；全量 lint 0 错误/67 原有警告；with_server.py + learning_flow.py 浏览器路由模拟通过，键盘 Enter、版本更新、刷新恢复、390px 无溢出；/tmp/edumind-mvp02-t021-{desktop,mobile}.png 视觉核对通过；Ruff/diff 检查通过 | 首次浏览器运行发现 Vue 默认函数属性被当作工厂，已修复并补默认客户端回归；真实 Provider 与完整闭环仍待后续阶段验收 | 创建 T021 完成提交；继续 T022 图谱与画像审核上下文
+[2026-09-26T12:55:39] [MVP-0.2-T022] START | executor=Lee | branch=codex/mvp-0.2
+领取“让正式资源审核使用图谱与画像上下文”；将审核提示升级为版本化上下文协议 | T004/T006 已完成，T019 的学习单元已绑定节点/路径快照；现有 Review 仅收到候选正文，没有图谱/画像参考 | 最小画像必须白名单投影且保留置信来源，不发送身份、完整初始目标或其他节点数据；版本来源不能写死旧值 | 构建当前节点+直接前置参考、对应画像版本的最小上下文，审核与定向修正共用，保持本地代码门禁并补回归
+[2026-09-26T13:02:21] [MVP-0.2-T022] VERIFIED | executor=Lee
+新增不可变 resource-review-context-v1 最小投影，当前节点/前置/出边/难度/误区与置信画像上下文供审核及定向修正；正式流程读取路径对应 owner 画像版本，升级 Review 为 v2 并修正持久版本来源，保留 v1 历史文档 | 隔离库 EDUMIND_TEST_DATABASE_URL=<隔离库> uv run pytest -q 266 passed 无跳过；Ruff/Mypy 53 文件及 diff 检查通过；涵盖未知/无证据画像省略、无关/身份/原始答案去除、图谱术语不作为本地拒绝理由、修正同上下文和代码门禁 | 7 条依赖弃用警告；事实/难度判断的真实模型效果未验证，不把 mock verdict 传播当质量达标；参考 OpenAI 官方 prompt-engineering 的数据分界指导 | 创建 T022 完成提交；继续 T023 结构化生成与严重错误质量基准
+[2026-09-26T13:03:38] [MVP-0.2-T023] START | executor=Lee | branch=codex/mvp-0.2
+领取“建立正式资源 schema 与 Review 质量基准”；先建立原创公开样本、离线检查和显式费用确认入口 | T022 已完成提交；真实指标要求 schema≥98% / 严重错误召回≥90%，不能由 mock 替代 | 真实调用需用户明确授权；未运行或 Provider 失败必须在分母中保留，安全本地检测与语义模型召回分别记录 | 构建 10 节点三类资源重复生成样本及严重错误/正确对照，固定版本和总调用上限，再确认真实评测范围
+[2026-09-26T13:13:22] [MVP-0.2-T023] BLOCKED | executor=Lee
+已建立 data/quality/resource_review_v1.json 原创 20 错误/10 对照、tests/resource_quality.py 离线/真实评测入口及 docs/acceptance/mvp-0.2-resource-quality.md；真实运行固定 60 生成+26 审核，最多 86 请求，关闭重试/修正 | 离线 30/30 schema-valid、4/4 本地危险代码命中、0 Provider 调用；隔离库全量 272 passed 无跳过、Ruff/Mypy 53 文件/diff 通过；确认 .env 被忽略、Provider 配置存在且未打印密钥 | 等待用户明确授权真实模型费用；语义错误 16 项未评测，真实生成率/召回均无证据，T023 不能完成，T024/T025 不能领取；本任务成果保留未提交，不伪造完成标记 | 用户授权最多 86 请求后追加 RESUME，执行真实基准并逐项审计问题；数值失败如实阻塞，不 push/merge 或跨阶段
+[2026-09-26T13:35:03] [MVP-0.2-T023] RESUME | executor=Lee | branch=codex/mvp-0.2
+用户明确回复“确认”，授权当前 Provider 最多 86 次可能计费请求；增加脱敏 JSON 报告保存入口 | 已核对工作区、任务依赖和离线成果；尚未发起本轮真实请求 | 授权仅覆盖本轮基准，不包含额外重跑或后续真实闭环费用 | 执行一次无重试基准，逐项核对问题并按实际指标决定完成或阻塞
+[2026-09-26T13:39:50] [MVP-0.2-T023] BLOCKED | executor=Lee
+完成一次已授权真实基准并保存 docs/acceptance/mvp-0.2-resource-quality-provider.json；逐项核对严重错误主要意见，未修改样本/阈值/计数口径 | deepseek-flash，86/86 请求、203.82s、exit1；schema45/60=75%失败，严重召回19/20=95%、语义15/16=93.75%、正确对照10/10；新增报告保存回归后7测试/Ruff通过 | 14讲解+1代码 INVALID_OUTPUT，Adapter混合JSON/schema错误且无全文，根因尚未证实；pointer-null虽准确fact拒绝仍按原code_safety口径保守计漏检；本轮费用授权已耗尽，T024/T025不可领取 | 保存未提交成果，不创建完成标记；向用户报告门禁失败，建议补脱敏诊断并修复后另行授权重测；不push/merge或跨阶段
+[2026-09-26T13:42:47] [MVP-0.2-T023] RESUME | executor=Lee | branch=codex/mvp-0.2
+用户回复“是”，确认补脱敏诊断与离线回归；任务范围明确包含 Provider 错误与单 Provider Adapter 内部诊断，不改变公开 API 或校验门禁 | 核对服务端错误均为安全固定消息，真实报告保留失败原因未知 | 费用阻塞仅对真实请求仍有效，本轮不运行模型；历史真实质量仍未达标 | 建立固定枚举诊断并测试，诊断准备完成后保持 T023 blocked，申请小规模真实诊断授权
+[2026-09-26T13:47:24] [MVP-0.2-T023] BLOCKED | executor=Lee
+补固定枚举 output_failure_reason、Adapter JSON/schema/incomplete/token上限分类及基准报告字段；建立固定5项失败样本 diagnostic 模式，不输出内容/校验路径、不放宽schema，旧报告不改 | 隔离库全量284 passed无跳过、7原有警告；针对性35 passed；Ruff/Mypy53文件/diff通过，--help已核对；本轮0真实请求 | 真实75%根因仍无证据；仅修复诊断缺失，不虚称生成效果改善；用户未授权新请求，T023仍blocked无完成提交，T024/T025不能开始 | 请求当前Provider最多5次诊断调用，确认错误类别后修复；完整质量重测与后续真实闭环费用另行确认，成果未提交保留
+[2026-09-26T16:20:13] [MVP-0.2-T023] RESUME | executor=Lee | branch=codex/mvp-0.2
+用户回复“同意”，明确授权当前 Provider 最多5次固定失败样本诊断；已启动 diagnostic 模式 | 核对当前分支与保留成果，运行命令固定5项、禁重试、2048输出token上限、脱敏报告保存 | 完整质量门禁仍未通过；本次不是86次完整重测授权 | 等待诊断报告，核对错误类别后针对性修复和离线回归；不push/merge或跨阶段
+[2026-09-26T16:25:34] [MVP-0.2-T023] BLOCKED | executor=Lee
+真实diagnostic5/5请求完成，3讲解STRUCTURED_JSON_INVALID、2有效，16.35s，报告独立保存；针对JSON解析层加强版本化序列化指令与正确JSON示例，新生成/修正保存instruction-v2，schema-v1及旧metadata兼容 | 隔离库288 passed无跳过、7原有警告，Ruff/Mypy53文件/diff通过；首次metadata兼容回归失败已修复未知版本不写入并验证；OpenAI Docs技能参考显式schema与评测原则，不假设DeepSeek有相同保证 | JSON具体语法缺陷无正文证据，不猜测；v2修复真实效果未验证；86次基准+5次诊断授权均耗尽，T023仍未完成 | 申请最多86次完整重测，另存provider-v2报告；未授权不发请求、不覆盖基线、不领取T024/T025、不push/merge
+[2026-09-26T16:27:55] [MVP-0.2-T023] RESUME | executor=Lee | branch=codex/mvp-0.2
+用户回复“同意”，明确授权当前Provider最多86次完整质量重测；启动instruction-v2基准，另存provider-v2.json | 旧60样本/错误集/阈值/2048token上限保持，禁重试/修正，旧报告保留 | 本次授权不含额外诊断/重跑或T025真实闭环；T023仍需真实门禁及问题审计 | 等待报告，核对结果后完成提交或如实阻塞；不push/merge或跨阶段
+[2026-09-26T16:32:08] [MVP-0.2-T023] BLOCKED | executor=Lee
+instruction-v2完整真实重测已保存provider-v2.json，旧基线/诊断不覆盖；逐项核对16语义错误主要意见命中实际错误，正确对照均pass | deepseek-flash，86/86请求、229.44s、exit1；schema57/60=95%未达98%，讲解20/20/代码18/20/练习19/20；严重20/20和语义16/16，正确对照10/10；44针对性离线回归通过，diff检查通过 | 循环队列code:1及exercise:1为schema mismatch、code:2为JSON invalid，具体schema违反条目无证据；授权耗尽，T023无完成提交，T024/T025不可开始 | 建议补无内容schema关键字诊断，申请最多3次循环队列诊断后证据驱动修复；不重复盲跑、不降低标准、不push/merge
+[2026-09-26T16:36:03] [MVP-0.2-T023] RESUME | executor=Lee | branch=codex/mvp-0.2
+用户明确同意最多3次循环队列诊断；新增白名单schema关键字分类，不保留实例值/路径/厂商异常，固定code1/exercise1/code2探针 | MockTransport与基准针对性38 passed，Ruff通过；已启动circular-diagnostic，硬上限3、禁重试、2048token、新报告文件 | 完整门禁仍95%未通过，此次不授权额外请求或完整重测 | 等待3请求结果，按证据定位剩余问题并保留原报告，不push/merge
+[2026-09-26T16:38:17] [MVP-0.2-T023] BLOCKED | executor=Lee
+循环队列诊断3/3已保存独立报告：code1 JSON解析失败、exercise1/code2有效；schema关键字白名单已实现，未复现schema mismatch，无具体条目证据 | 11.90s、deepseek-flash、无重试/修正；针对性38 passed，Ruff/Mypy53文件/diff通过，全量回归见终端结果 | 随机生成差异不能替换旧基准失败，完整门禁仍95%<98%；累计授权86+5+86+3全部耗尽，不声称已经定位或修好剩余失败 | 建议下一步细化无内容JSON语法类别再采集真实证据，付费请求需重新授权；保留未提交成果，T024/T025不领取，不push/merge
+[2026-09-26T16:57:34] [MVP-0.2-T023] RESUME | executor=Lee | branch=codex/mvp-0.2
+用户确认继续纯离线JSON语法诊断；增加固定枚举类别与基准字段，不修改提示/schema/解析行为/历史报告 | 已核对现有Adapter与预算状态，先运行针对性47 passed及Ruff通过 | 此授权不含任何真实模型请求，完整质量仍95%未达标 | 全量回归并保存诊断准备成果，付费采集需另行授权
+[2026-09-26T16:59:41] [MVP-0.2-T023] BLOCKED | executor=Lee
+完成JsonSyntaxReason固定分类与基准字段，只映射解析器固定消息，不包含正文/位置/路径/值；未知归其他，拒绝任意标签及错误分类组合 | 全量303 passed无跳过、7原有警告，针对性47 passed，Ruff/Mypy53文件/diff通过；本轮0真实请求 | 诊断能力就绪但尚无真实语法标签，原质量门禁95%未达98%；预算耗尽，T023无完成提交，后续依赖不可领取 | 请求新的最多3次循环队列诊断，保存新文件不覆盖旧证据；获得具体类别后证据驱动修复，完整重测另行授权，不push/merge
+[2026-09-26T17:13:08] [MVP-0.2-T023] RESUME | executor=Lee | branch=codex/mvp-0.2
+用户明确授权今天所有计费请求，按北京时间2026-09-26当天、MVP0.2任务范围、当前单一Provider解释；跨日重新确认，不扩展厂商/产品阶段 | 核对当前时间分支和工作区，启动固定3项语法诊断，保存新报告，禁重试/修正 | 仍遵守有限诊断与证据驱动修复，不无限盲跑；若两轮实质不同修复仍失败或出现重大决策则求助 | 获得实际语法类别后修复并验证，记录每轮次数；达标才完成提交并推进依赖，不push/merge
+[2026-09-26T17:15:57] [MVP-0.2-T023] RESUME | executor=Lee | branch=codex/mvp-0.2
+当天统一授权下完成两轮循环队列探针共6请求，第一轮3有效，第二轮2有效/1代码required缺失；提前停止第三轮，按必填结构证据升级instruction-v3，在提示正文内嵌实际完整schema，schema-v1严格校验不改 | 27针对性passed，Ruff/Mypy通过；v3完整质量基准已启动，最多86请求/禁重试修正/另存provider-v3.json | 没记录具体缺失字段，不能猜测某字段一定缺失；v3为第二轮实质不同修复，若仍不达标须停止盲修并求助 | 等待真实质量与逐项审计结果，完成才提交T023并推进T024；跨日需重新确认费用，不push/merge
+[2026-09-26T17:19:38] [MVP-0.2-T023] VERIFIED | executor=Lee
+交付原创质量集/离线与有界真实基准/不含内容的语法与schema诊断/instruction-v3完整schema提示，保留v1/v2失败及诊断证据；全部正式生成与修正记录真实指令版本，旧schema与metadata兼容 | v3真实86请求、227.57s、deepseek-flash、schema60/60、严重20/20、语义16/16、对照10/10；逐项主要问题核对命中原创错误；全量303 passed无跳过、Ruff/Mypy53文件/diff通过 | 7原有依赖警告，小样本不泛化全课程；辅助难度建议仍有过强要求；当日统一授权后92请求，本任务累计272请求，货币费用未知 | 明确路径暂存并创建T023完成提交，随后领取T024闭环E2E；不push/merge或跨MVP0.3
+[2026-09-26T17:21:50] [MVP-0.2-T024] START | executor=Lee | branch=codex/mvp-0.2
+领取学习闭环自动化E2E，组合输入/学习/练习/掌握度/推荐并覆盖画像修正、连续答错回退、重放/跨owner/重启 | T023完成提交cfeb6b6已核对，工作区干净，所有依赖完成；读取webapp-testing技能及helper --help | 既有浏览器仅路由mock，既有Compose恢复仅学习资源，不能冒充MVP0.2完整闭环；真实Provider证据需独立 | 补真实数据库+mock Provider集成链及浏览器/Compose恢复证据，再按门禁验证提交，不push/merge
+[2026-09-26T17:33:00] [MVP-0.2-T024] VERIFIED | executor=Lee
+交付真实DB/mock模型闭环及独立进程恢复，扩展Compose资源/回执/掌握度/路径恢复，记录证据边界 | 全量304 passed无跳过、7既有警告，Ruff/Mypy53文件通过；浏览器路由mock通过；独立Compose迁移后seed及重启postgres/api后check通过 | 初次seed早于迁移失败已记录，确认Alembic就绪后成功；0真实模型调用；浏览器不冒充真实Provider，独立测试卷保留 | 明确路径提交T024，随后领取T025真实闭环和性能退出验收，不push/merge或跨阶段
+[2026-09-26T17:48:00] [MVP-0.2-T025] START | executor=Lee | branch=codex/mvp-0.2
+领取阶段真实闭环与性能退出验收；保持当前Provider，首轮最多30模型请求，人工根据公开题面作答，不从答案键获取答案 | T024完成提交acc19e0且工作区干净；核对PRD路径P95和普通查询P99均200ms，读取OpenAI Docs及文档协作技能 | 当天费用统一授权有效；TestClient实网Provider证据与浏览器mock明确分离，性能范围与并发条件需记录 | 建立可重放有界验收入口，真实生成/评分/画像/推荐及路径性能通过后核对阶段所有完成提交；不push/merge或跨阶段
+[2026-09-26T17:53:00] [MVP-0.2-T025] BLOCKED | executor=Lee
+保留有界真实闭环入口与三轮报告、独立HTTP路径性能报告和阶段未通过清单；真实开放解释题与全文精确评分不匹配 | v1/v2均0模型请求前置断言失败，v3正式三资源发布/9次请求，独立正确作答后DB评分0/3；100读取/100重规划各5预热，P99 35.067ms/P95 47.877ms且失败0；Ruff/diff通过 | 无掌握后推进真实证据，不冒充完成；建议保持ADR客观题确定性评分并限制计分题型，修复范围需用户确认；START时间手填17:48:00而首次报告实际17:47:33，以原始报告时间为真实执行证据 | 请求批准选择/判断/唯一填空约束及对应Prompt/Review/测试修复，之后重新质量门禁和真实闭环；成果未提交完成标记，不push/merge或跨阶段
+[2026-09-26T18:03:00] [MVP-0.2-T025] RESUME | executor=Lee | branch=codex/mvp-0.2
+用户回复“是的”批准客观唯一答案约束与生成/审核/回归修复，扩展本任务必要修复范围；保持原评分规则和JSON字段，旧资源/证据不覆盖 | 当前仍北京时间2026-09-26，费用统一授权有效；核对Prompt v3、Review v2和全文匹配边界，读取OpenAI Docs并获取官方结构化输出说明 | 历史失败证据保留；不声称普通JSON schema能验证题目事实唯一性，需独立审核与本地作答格式门禁 | 实现新指令/审核版本及测试，完整质量重测最多86请求并单独真实闭环最多30请求；不push/merge或跨阶段
+[2026-09-26T18:34:00] [MVP-0.2-T025] RESUME | executor=Lee | branch=codex/mvp-0.2
+v4本地题型门禁和真实质量通过，首次真实闭环7调用有一个代码生成失败；v5修正地址概念不能强塞整数后真实闭环10调用通过，另一次8调用因不正确整数题被独立审核拒绝，均保留报告 | 322后端/55前端测试、Ruff/Mypy54文件、构建/浏览器mock与最终Compose恢复通过；v4质量86调用schema60/60、客观20/20、严重19/20；v5质量86调用schema58/60、客观12/20、严重20/20，未通过 | 更正先前口头“schema达标”，实际v5为96.67%未达98%；3调用格式探针均整数题漏____，不能推定原8失败全同因；无降低阈值/改解析/复制答案 | v6补序列化完整代码/练习示例及明确填空位，离线验证后完整重测一次最多86；原始失败均保留，若新门槛仍不达标则停止继续盲修并求助
+[2026-09-26T19:10:13] [MVP-0.2-T025] BLOCKED | executor=Lee
+保留客观题生成/审核/UI及测试修复和全部真实报告，当前v6真实闭环v7通过但质量未达标；只读发现Responses请求缺strict:true，兼容性与因果均未验证 | 326后端/55前端测试、Ruff/Mypy54文件/构建通过，浏览器路由mock通过；质量86请求schema58/60、格式19/20、严重20/20、语义16/16、对照10/10；闭环10请求通过，TestClient读取P99 31.014ms/重规划P95 46.458ms/失败0 | 两轮不同提示修复仍失败，停止盲修；T025累计305真实请求，金额未知；纠正上条18:34手填时间为汇总估计，实际执行以原始报告时间为准，Compose仅v5中期镜像而非当前v6 | 等待用户批准转向当前Provider严格结构化输出兼容性排查；不更换模型/降低标准，不创建Task-Completed，不push/merge或跨阶段
+[2026-09-26T19:35:04] [MVP-0.2-T025] RESUME | executor=Lee | branch=codex/mvp-0.2
+用户同意当前Provider严格模式兼容性排查，扩展适配器及Provider文档范围；OpenAI Docs核对协议，DeepSeek官方Responses页面未列strict参数 | 尚未新增真实请求；日期仍为统一计费授权当天，计划隔离探针最多3请求且禁重试 | 缺strict不等于已证实根因，参数被接受不等于强约束；不直接套用OpenAI保证 | 先测试请求注入与本地拒绝回归，再做有界兼容性探针；保留生产适配器默认行为直到取得证据
+[2026-09-26T19:38:34] [MVP-0.2-T025] BLOCKED | executor=Lee
+完成获准的strict兼容性排查，新增隔离探针和本地请求注入/enum拒绝/3次硬上限回归；官方文档通过只读HTTP获取 | 41项针对性测试通过后发起3真实请求，默认符合，strict=true一符合/一enum不符；禁重试，原报告保留，生产适配器未变，累计308请求 | 单加strict不足以修复质量；初次mock缺message.status导致2失败，补正确协议fixture后通过；OpenAI Docs用于协议对照，不把其保证套用DeepSeek | 请求批准官方Beta严格工具调用兼容性验证，涉及端点和结构化传输策略；保留代码/证据，不创建完成提交，不push/merge或跨阶段
+[2026-09-26T19:45:59] [MVP-0.2-T025] RESUME | executor=Lee | branch=codex/mvp-0.2
+用户批准Beta严格工具调用兼容性验证，保持当前模型/凭据及业务评分/质量标准，隔离探针不改变生产默认配置 | 读取OpenAI Docs协议对照及DeepSeek官方Beta规则，前轮strict探针反例保留 | 凭据只允许配置中的同一官方主机，不把函数调用当可执行命令；跨日费用需再确认 | 先Mock安全传输/工具参数解析，再以最多4请求验证简单enum及三类真实schema，失败立即停止
+[2026-09-26T20:13:51] [MVP-0.2-T025] BLOCKED | executor=Lee
+获准Beta兼容排查交付显式结构化传输选项，普通Responses文本/SSE不变；常量和隐含enum类型做等价出站投影，原schema与评分/Review保持 | Beta协议2+4请求；完整质量86请求299.52秒schema55/60/题型17/20/严重4/20/语义0/16/对照0/10失败；审核enum修正后1协议请求通过；Ruff/Mypy55文件通过，隔离Compose中期镜像seed/restart/check通过 | 26审核不可用不冒充检出，生成3超时/1required缺失/1截断JSON；1审核诊断不补证完整质量，镜像先于最终enum修正；T025累计401请求，金额未知 | 保留所有失败证据和代码，不开启默认Beta、不降低门槛、不创建Task-Completed；请求是否扩大模型/Provider能力评估，未经决定不换模型/接口策略或计费盲跑
+[2026-09-26T20:56:54] [MVP-0.2-T025] BLOCKED | executor=Lee
+用户决定多模型设置留在P1并批准非计费诊断；只读核对报告/源码及合成合法选择题复现，未改业务代码 | 含为什么的合法A-D单选schema通过却被题型门禁拒绝，同选项/答案改问法即可通过；基准生成2048token而生产默认4096；33项既有针对性测试通过，0新增真实请求 | 原始格式失败内容/结束原因/用量证据不足，不能将新复现误判或预算差异认定为历史全部根因，也不能先断言必须换模型；现有测试没覆盖误判 | 建议先修有证据的题型误判、补脱敏结束原因/用量诊断、对齐基准与生产参数，新增离线回归；修复及有界真实复验需下一步确认，不降低质量门槛/换模型/push/merge
+[2026-09-26T21:06:33] [MVP-0.2-T025] RESUME | executor=Lee | branch=codex/mvp-0.2
+用户yes批准本地误判修复/参数对齐/脱敏诊断和离线验证，补Provider中立错误元数据范围 | 工作区均为T025遗留改动，失败报告保留；读取OpenAI Docs固定错误分类指导，不套用厂商保证 | 本轮不计费、不改模型/默认传输/验收门槛，无完整质量通过证据 | 修合法为什么单选误拒，统一默认输出预算，保留固定结束类别/合法用量及审核失败尝试账本，再执行针对性与全量测试
+[2026-09-26T21:11:49] [MVP-0.2-T025] BLOCKED | executor=Lee
+完成获准本地修复：合法为什么单选通过，解释要求/开放题/多答案仍拒绝；基准与生产共享4096预算，Provider固定结束类别/合法用量及审核失败尝试账本已补 | 93针对性/361全量后端无跳过通过，全量7既有警告；Ruff/Mypy55文件/diff通过，后补诊断模式账本后16工具测试通过；离线30夹具schema/4本地安全错误通过，16语义未评估，0Provider请求 | 历史失败不能由新合成复现或预算差异倒推原因；修复后真实质量未运行，T025不可done，不创建完成提交；默认传输/模型/真实.env不变，本轮0计费 | 待确认最多6次当前模型真实诊断，凭新错误类别/用量证据决定下一步，禁止盲重跑完整门禁/降低阈值/跨阶段/push/merge
+[2026-09-26T21:47:48] [MVP-0.2-T025] RESUME | executor=Lee | branch=codex/mvp-0.2
+用户yes批准最多6计费诊断；固定数组讲解、栈/循环队列代码、删除/插入/单链表练习六样本，沿用当前模型及默认Responses传输和4096预算 | 新诊断硬上限/无重试回归17测试通过、Ruff通过；报告拒绝覆盖 | 小样本不替代完整质量门禁，无额外审核请求；旧证据保留 | 发起一次六请求诊断，记录结果后停止计费并确定下一步
+[2026-09-26T21:49:22] [MVP-0.2-T025] BLOCKED | executor=Lee
+获准六请求诊断完成，保存独立脱敏报告，不覆盖历史、不重试；当前模型与默认传输不变 | 15.79秒结构5/6，三组练习格式均通过；数组讲解EXTRA_DATA且输出1086/4096，非输出额度耗尽证据；17工具测试/Ruff/diff检查及拒绝覆盖/无确认拒绝调用通过 | 六请求额度已用完，累计407请求/货币费用未知；没有完整质量门禁，不能done或创建完成提交 | 建议先非计费检查Responses文本聚合与JSON解析边界，保留严格校验，不擅自提取首个JSON掩盖额外输出；需用户同意下一步，不push/merge或跨阶段
+[2026-09-26T21:53:28] [MVP-0.2-T025] RESUME | executor=Lee | branch=codex/mvp-0.2
+用户yes批准非计费文本块数量诊断及离线回归，恢复本地排查 | 核对当前Responses聚合与质量账本，上一轮6请求已终止且报告保留 | 不改变解析接受范围，不导出文本内容，不新增真实请求 | 添加受验证数字计数及分块/多JSON/隐私回归，再全量验证
+[2026-09-26T21:55:00] [MVP-0.2-T025] BLOCKED | executor=Lee
+交付消息/文本块数诊断，结构化成功和失败均可由质量账本保存；reasoning排除，不保留原文，解析行为不变 | 79针对性通过后补账本回归，全量371通过无跳过/7既有警告；Ruff/Mypy55源文件/diff通过，0真实请求 | 旧报告无法倒推块数及EXTRA_DATA来源；T025累计407请求，缺完整质量门禁，不创建完成提交 | 建议批准新报告下最多3次数组讲解诊断，不重试、不换模型/传输、不覆盖旧报告；未经批准停止计费，不push/merge或跨阶段
+[2026-09-26T21:56:33] [MVP-0.2-T025] RESUME | executor=Lee | branch=codex/mvp-0.2
+用户yes批准最多3次数组讲解诊断，同一提示/4096预算/默认Responses/当前模型；数字块数量不包含原文 | 64针对性测试/Ruff/diff通过；3调用硬上限已覆盖，旧报告保留 | 三样本不是完整质量门禁，不允许请求额外审核或重试 | 执行一次诊断保存新报告，额度用完后停止计费
+[2026-09-26T21:57:56] [MVP-0.2-T025] BLOCKED | executor=Lee
+数组讲解诊断完成，保留新报告及全部旧证据；不改变模型/默认传输/解析门禁 | 3请求12.02秒，结构2/3；失败EXTRA_DATA为1消息/1文本块，输出897/4096token，排除本次多块拼接与额度耗尽；64针对性/Ruff/Mypy55/diff通过 | 单块额外内容类型未记录，现有prompt已要求单JSON，不能盲目认定再加一句提示即修复；累计410真实请求，金额未知，三次额度用完 | 停止计费，向用户报告证据及下一步诊断/Provider能力处理决策，不创建完成提交、不push/merge或跨阶段
+[2026-09-26T23:34:34] [MVP-0.2-T025] RESUME | executor=Lee | branch=codex/mvp-0.2
+用户yes批准非计费尾随内容脱敏分类及离线测试，恢复本地诊断 | 核对当前解析器与安全错误契约，原始失败正文未保存 | 不倒推旧分类、不改接受范围、不新增真实请求 | 添加固定尾随类别及不泄露/仍拒绝/账本回归
+[2026-09-26T23:35:54] [MVP-0.2-T025] BLOCKED | executor=Lee
+增加EXTRA_DATA固定尾随类别：完整JSON值/疑似JSON/Markdown围栏/其他尾随内容，质量账本仅保存枚举；所有失败仍拒绝，不提取首JSON、不保留原文和位置 | 73针对性后补账本回归，全量381通过无跳过/7既有警告；初始import排序lint失败已修复，Ruff/Mypy55/diff通过；0真实请求 | 历史报告没有尾随类型不能补造；累计410真实调用，完整质量门禁仍缺，不能创建完成提交 | 等待新有界诊断批准（建议最多3次，同模型/默认传输/4096/无重试/新报告）；未获批准不计费，不push/merge或跨阶段
+[2026-09-27T00:17:54] [MVP-0.2-T025] RESUME | executor=Lee | branch=codex/mvp-0.2
+用户跨日明确确认最多3次真实诊断，保持当前模型/默认Responses/4096预算，无重试，输出新v2报告 | 分支codex/mvp-0.2及diff检查通过，复用已验证的三调用硬上限和固定尾随分类 | 不沿用昨日无限计费授权，不新增其他真实请求，不把诊断作为完整质量门禁 | 执行一次三样本数组讲解诊断后停止计费并记录证据
+[2026-09-27T00:18:50] [MVP-0.2-T025] BLOCKED | executor=Lee
+数组诊断v2完成并保存新报告，原v1失败证据保留；不改模型/默认传输/Prompt/校验门槛 | 3请求12.12秒，结构3/3，均1消息/1块，未复现EXTRA_DATA因此无新尾随类别证据；73针对性/diff通过，0重试 | 当天3真实请求、T025累计413，费用未知；小样本不证明修复，完整质量仍未验证，不能创建完成提交 | 建议批准最多86次完整质量基准，使用已有脱敏诊断/4096预算及原阈值，失败无重试/新报告；未经批准停止计费，不push/merge或跨阶段
+[2026-09-27T01:29:16] [MVP-0.2-T025] RESUME | executor=Lee | branch=codex/mvp-0.2
+用户批准本轮最多86次完整基准并授权此key后续必要验证直到用量耗尽，无需逐次计费确认；用户自行配置deepseek-v4.1-flash，沿用默认Responses和4096预算 | 最近最小文本/结构化/流式均通过；核对原质量阈值/任务范围及分支diff，旧报告保留 | 连通不代表质量，新模型的旧闭环证据不能替代当前配置；不扩大范围、不切换厂商或泄露key，配额/余额错误停止 | 先执行完整86硬上限无重试质量基准，新报告v7，按真实证据推进当前阶段验收
+[2026-09-27T01:38:37] [MVP-0.2-T025] RESUME | executor=Lee | branch=codex/mvp-0.2
+完整质量v7结束失败，实际加载/返回deepseek-v4-flash-0731，纠正开始日志和口头预期v4.1；不覆盖用户配置或猜测其修改时间；新增审核字段契约排查 | 86请求496.72秒，schema46/60、题型19/20、严重4/20（仅本地安全）、语义0/16、对照0/10，26审核不可用；23审核additionalProperties/2required/1语法，14讲解EXTRA_DATA且OTHER_SUFFIX | 不能把审核不可用算检出，完整阶段未通过；累计T025验收499请求，另用户连通探针9次（6失败/3成功）分别计账，费用未知 | 定向补审核schema/字段及序列化示例和独立指令版本，不改schema/标准；按持续计费授权先3次审核诊断
+[2026-09-27T01:42:36] [MVP-0.2-T025] RESUME | executor=Lee | branch=codex/mvp-0.2
+审核契约指令v1三请求诊断通过，两个错误正确拒绝/一个对照通过；讲解三请求字符类别探针中两份失败仅多出关闭大括号，新增资源指令v7定向结构结束约束 | 审核3请求7.3秒；字符类别3请求一通过/两拒绝，内容不保存、原schema不变；106针对性/Ruff/diff通过 | 不倒推旧OTHER_SUFFIX全部同因，诊断不替代完整质量；仍有一份旧练习格式失败来源未知 | 执行已授权5请求生成小样本诊断；通过后重跑完整质量及当前模型真实闭环，失败依据新证据处置，不盲改、不push/merge或跨阶段
+[2026-09-27T01:43:53] [MVP-0.2-T025] BLOCKED | executor=Lee
+讲解指令v7定向结构边界修复后诊断仍失败，不再盲重跑完整86；审核指令v1修复保留，schema/评分/安全门槛不变，旧报告不覆盖 | 5请求47.6秒仅2/5通过、3EXTRA_DATA；最终383后端无跳过/7既有警告、55前端通过，Ruff/Mypy55源文件/构建/diff通过；前端lint0错误67样式警告；本轮97真实调用，T025验收累计510，另连通9（6失败3成功） | 新诊断报告误标structured_transport=mock，命令实际显式Responses；已修元数据生成器，不回写报告。费用和剩余额度未知，未出现配额错误；费用授权有效但不扩展Provider策略 | 求当前服务商公开协议文档或允许适配其支持的严格接口，不截取首JSON/降阈值/换模型；当前配置完整质量与闭环未通过，不创建完成提交、不push/merge或跨阶段
+[2026-09-27T01:55:48] [MVP-0.2-T025] RESUME | executor=Lee | branch=codex/mvp-0.2
+用户自行切回原配置并要求继续，加载deepseek-flash/default Responses；沿用持续必要计费授权，不更改.env或擅自回退Prompt/schema | 核对分支/活动任务/日志/PRD退出标准；20工具测试通过，新增固定请求序号进度（无正文/凭据），初次超长行已修 | 所有旧失败报告保留；旧质量与闭环不补证当前指令v7/审核指令v1组合，费用和额度未知 | 执行最多86次完整无重试质量v8，新报告；通过后当前模型真实闭环、最终测试/恢复/退出核对，按任务提交，不push/merge或跨阶段
+[2026-09-27T02:03:16] [MVP-0.2-T025] RESUME | executor=Lee | branch=codex/mvp-0.2
+质量v8结束后定向排查练习格式，补仅数字/布尔/固定类别的格式诊断；资源指令v8明确无需凑齐题型，指针操作优先单选/判断，保留合法整数填空及原校验 | v8完整86请求161.84秒，schema59/60达98%、严重19/20达90%、语义15/16、对照10/10；题型17/20失败。3诊断中2份删除填空无____且答案非整数；v8指令3诊断均通过，分别5.26/6.01秒。50针对性/Ruff/Mypy55通过；前次全量384通过 | 原质量失败报告保留，3诊断不补证20练习；初始测试插入位置lint错误已修，不改题型接受范围/阈值/评分或读答案作弊 | 执行完整质量v9，最多86无重试；通过后当前指令/模型真实闭环、最终复核，费用授权有效，不push/merge或跨阶段
+[2026-09-27T02:09:21] [MVP-0.2-T025] BLOCKED | executor=Lee
+切回后修复题型选择策略并补当前真实闭环/最终镜像恢复，保留失败，不默认切Beta；webapp-testing用于浏览器生命周期及交互复核 | 质量v9 86请求167.02秒schema58/60失败（循环代码required/栈讲解additionalProperties），题型20/20/严重20/20/语义16/16/对照10/10；闭环v8 10请求独立B/T/B后两次score1/mastery .9515并推荐下一节点，路径100样本读取P99 44.11ms/重规划P95 48.033ms失败0；此前已批Beta隔离5请求4/5。386后端无跳过/7警告、Ruff/Mypy55/diff通过；浏览器route-mock通过但401/404 console；最终Compose0009/seed/restart/check恢复通过 | 切回后193请求，T025累计703，另连通9，费用/余额未知，未见配额错误；schema低于98%不能完成/提交，TestClient不冒充HTTP/首段；最终镜像67b4548及合成资源a2f5ddb3-efe6-4a96-8b94-17c82e9f640d已记录 | 请求是否评估另一模型或可靠严格结构化策略，费用无需重批但模型/策略需用户决定；不盲改/补造字段/截取JSON/降阈值、不push/merge或跨MVP0.3
+[2026-09-27T09:40:49] [MVP-0.2-T025] RESUME | executor=Lee | branch=codex/mvp-0.2
+用户自行切为deepseek-v4-pro-0813并要求继续，当前Responses传输/资源指令v8/审核指令v1/原schema及阈值保持；沿用持续必要计费授权，不修改真实.env | 分支/活动任务/日志/diff核对，工作区为已知T025遗留成果，所有失败报告保留 | Pro名称不等于已证实结构化可靠，旧flash闭环不能补证新模型；配额和金额未知 | 最多3请求普通文本/结构化/流式最小测试，任何失败停止；通过后完整质量最多86无重试新报告，再当前模型真实闭环，不push/merge或跨阶段
+[2026-09-27T09:53:10] [MVP-0.2-T025] BLOCKED | executor=Lee
+保存Pro连通v1及完整质量v10，未修改真实.env/模型/传输/schema/评分；只读审核明细与数据集对照，保留原计分 | 连通3通过：文本1.44秒/结构1.26秒/流式首段.99秒总1.13秒；质量86请求493.11秒结构59/60、题型20/20、严重18/20、语义14/16、对照10/10；386后端通过/7既有警告，Ruff/Mypy55/diff通过 | 语义87.5%未达90%；两例NULL解引用/释放后访问正确拒绝但fact分类不符code_safety，队列讲解EXTRA_DATA/OTHER_SUFFIX。当前Pro闭环未跑；本轮89调用，T025验收累计789、连通另12，金额余额未知 | 请求确认定向明确审核分类规则，保持基准及阈值后复验；不盲重跑挑样本/切模型/提前完成或提交，不push/merge或跨阶段
+[2026-09-27T10:18:08] [MVP-0.2-T025] RESUME | executor=Lee | branch=codex/mvp-0.2
+用户确认定向明确审核分类，升级审核指令v2，内存安全风险即使出现在讲解/练习也归code_safety，非安全事实错误仍归fact，不强制拒绝正确内容 | 核对AGENTS/PRD/task/最近日志/Git遗留改动；旧v10及原数据集/检测口径/阈值保留 | 当前Pro质量未通过、闭环未验证，不改真实.env或静默切换模型/传输 | 补回归与三请求安全分类诊断；通过后最多86完整基准及当前模型真实闭环，必要计费授权有效，不push/merge或跨阶段
+[2026-09-27T10:43:56] [MVP-0.2-T025] BLOCKED | executor=Lee
+审核指令v2明确分类，补固定三请求诊断及拒绝重分类/不可用不计检出回归，Provider文档同步；未改原数据集/schema/阈值/.env | 三诊断9.43秒通过；完整v11 86请求548.82秒结构60/60、题型20/20、严重19/20、语义15/16达门槛，前置方向漏检/正确删除TIMEOUT导致对照9/10均保留，已审明细。真实闭环v9 10请求资源发布、独立B/T/B两次score1/mastery .9515，但第二次画像provider_failed使断言失败；388后端/Ruff/Mypy55/diff通过，最终镜像dec9942构建完成 | 初始画像与第二次行为画像additionalProperties，未知额外字段原文未导出；本轮推荐/路径未执行，当前镜像尚未重启恢复。本轮99请求、T025验收累计888、连通另12，费用余额未知；uv缓存权限与新测试长行已解决 | 请求确认明确ProfileAgent输出字段契约后定向复验，保留原schema与降级；不重跑碰通过/用旧Flash补证/提交完成，不push/merge或跨阶段
+[2026-09-27T10:51:50] [MVP-0.2-T025] RESUME | executor=Lee | branch=codex/mvp-0.2
+用户确认明确ProfileAgent输出契约，初始与行为指令单独版本化，原schema/白名单/保守更新及失败降级不变 | 核对当前任务、失败回执、代码、测试和分支；上轮质量v11证据保留，不重跑无关质量挑样本 | 当前模型完整闭环仍未通过，真实.env和其他任务不改 | 回归测试后最多3请求画像诊断，通过再最多30次实际尝试闭环v10；验证/最终恢复及退出审计后才完成本地提交，不push/merge或跨阶段
+[2026-09-27T10:56:50] [MVP-0.2-T025] VERIFIED | executor=Lee
+画像输出契约v2及诊断/回归补齐，保留所有失败报告并完成阶段退出核对；客观评分、审核分类及安全传输改动一起交付，真实.env未修改 | 画像3诊断通过；当前Pro闭环v10 10请求通过，独立B/T/B后score1/mastery .9515及可解释下一节点，路径100样本+5预热P99 35.175ms/P95 47.43ms失败0；原完整质量v11通过。388后端无跳过/7警告、Ruff/Mypy55、前端55/构建通过；lint0错误67警告，浏览器route-mock通过但401/404 console。隔离Compose最终3a88d83镜像0009 head/seed/restart/check恢复通过 | 前置关系漏检、正确对照超时保留；TestClient非HTTP，Pro首段P95未测，不宣称全产品发布指标；本轮13调用/T025累计901/连通另12，金额余额未知；新测试长行已修，webapp-testing指导浏览器生命周期及交互验证 | 自查diff/明确路径暂存后本地Task-Completed提交并核对；本阶段停止，不push/merge/跨MVP0.3，阶段切换时再原样归档task.json
+[2026-09-27T13:25:13] [MVP-0.2-T030] START | executor=Lee | branch=codex/mvp-0.2
+用户授权独立修复学习请求重试重复生成，补充当前阶段任务；分支工作区原本干净，不归档/跨阶段 | 静态核对前后端、OpenAPI及既有恢复测试，未调用真实Provider | 验收检查待实现后执行 | 先核对恢复与失败重试契约
+[2026-09-27T13:25:13] [MVP-0.2-T030] BLOCKED | executor=Lee
+核实retryLearning清空身份，异步事件及错误缺少请求代次隔离；发现后端查询无条件将active状态标为INTERRUPTED | learning_operations.py:90-102及learning_sessions.py:264明确写失败；既有test_operation_read_marks_pre_restart_active_operation_failed只有reviewing记录无重启证据；同键POST只回放agent_start/done、不增加attempt | 当前API无法可靠判断运行中与真正中断；ADR-0002仍Proposed，其同操作新attempt未实现，不擅自改变重大契约。尚未实现或运行验收，无完成提交/付费调用 | 请求确认GET只读保留运行状态，失败同键仅恢复、明确重新生成才换键；进程中断识别另需批准可靠方案，不以查询或猜测超时认定失败
+[2026-09-27T13:27:50] [MVP-0.2-T030] RESUME | executor=Lee | branch=codex/mvp-0.2
+用户同意查询只读、失败同键仅恢复、明确重新生成才换键及不新增中断检测；恢复修复任务 | 已核对既有幂等POST只回放状态，schema/发布/owner规则不变 | 真正进程中断可能保持运行中，不能猜测失败；0付费请求 | 实现代次隔离及六类回归，mock/隔离数据库验证后本地提交
+[2026-09-27T13:33:42] [MVP-0.2-T030] VERIFIED | executor=Lee
+恢复原请求保留目标/操作ID/幂等键，明确新生成才换键；查询只读，SSE及查询/资源异步响应代次隔离；OpenAPI/ADR已批准的有限语义与验收记录同步 | 后端396通过无跳过/7既有警告、Ruff/Mypy55通过；前端65通过、类型/构建通过、lint0错误67既有警告；webapp-testing指导浏览器route-mock通过：失败恢复仅一POST、新生成换键、已发布恢复仅一POST；diff检查通过，0付费请求 | 未新增中断检测，真实中断可持续运行中；未完成身份不跨刷新保存，不取消旧调用；浏览器既有401/404 mock console保留，不声称真实Provider验收 | 自查与明确路径暂存后本地Task-Completed提交并核对；交接见docs/acceptance/mvp-0.2-t030-retry-recovery.md，不push/merge/归档/跨MVP0.3
+[2026-09-27T13:53:58] [MVP-0.2-T031] START | executor=Lee | branch=codex/mvp-0.2
+用户授权真实浏览器闭环及当前模型性能分成T031/T032串行；核对最终质量v11/闭环v10与T030 fb273c7完成提交 | 工作区干净，当前deepseek-v4-pro-0813/default Responses；既有同key必要验证直到耗尽授权仍有效，A计划单学习操作最多30实际尝试含重试/审核修正/行为画像；不换模型或.env | 旧浏览器route-mock与TestClient不能替代本次；B旧脚本首token误作首段、可复现完整段落规则缺口待A完成后报告 | 非计费准备真实Chromium/Vite/Uvicorn/隔离PG、硬预算账本及断线注入，再执行A，不push/merge/归档或跨阶段
+[2026-09-27T14:02:25] [MVP-0.2-T031] RESUME | executor=Lee | branch=codex/mvp-0.2
+非计费诊断定位主样式同步Google Fonts导入使真实浏览器networkidle超时，保留首轮失败报告，不以mock绕过；移除阻塞远程导入保留本地字体回退并补回归 | 全新PG0009迁移通过，预算离线测试先发现异常参数已修为现有不可重试错误并通过；原v1账本/修后v2账本均0调用；Vite监听权限解决 | 首轮停在页面准备、无学习操作，不能算闭环通过 | 本地字体依赖回归通过后新报告复跑，沿用原30实际尝试全局账本上限，不无限重跑或改Provider
+[2026-09-27T14:22:31] [MVP-0.2-T031] RESUME | executor=Lee | branch=codex/mvp-0.2
+纠正上一条根因推断：移除远程字体依赖后第二轮仍在networkidle等待超时，因此不能认定字体是唯一或已证实根因；独立真实浏览器DOM检查标题已渲染，匿名请求正常 | v1/v2均无模型请求，失败报告保留；样式回归的Vitest URL/CSS导入问题改为工作目录文件读取后通过 | Vite整体networkidle不能替代明确DOM及接口检查，未放宽业务验收 | 按webapp-testing探测networkidle再用真实DOM/响应逐项验证，第三轮仍沿用同一30尝试账本；若再次入口失败停止求助
+[2026-09-27T14:25:03] [MVP-0.2-T031] RESUME | executor=Lee | branch=codex/mvp-0.2
+第三轮真实Provider/浏览器已通过首段/审核/资源/断网恢复，按公开题面独立B/T/B后两次评分和掌握度检查通过，但验收脚本误要求路径v2 | 10实际调用；恢复前后8=8，POST仅1；真实HTTP两次replan200。只读隔离SQL确认路径1→2→3/current linked-list-concept，未读答案；首段总生成27328ms不冒充首段P95 | 真实前端每次练习后都重规划，不同于旧TestClient最后才规划；脚本假定v2错误；故v3报告仍保留failed。另外注入丢流对应ERR_ABORTED、离线查询对应ERR_INTERNET_DISCONNECTED应分类预期 | 修复脚本断言为两次各自v2/v3并留逐次回执，单次新报告复验；全局预算30仍仅10已用，若再失败依据具体证据停止，不改模型或挑质量样本
+[2026-09-27T14:27:28] [MVP-0.2-T031] RESUME | executor=Lee | branch=codex/mvp-0.2
+第四轮资源/评分/95%掌握度/下一步及刷新后的资源/回执/v3均通过，但脚本把整个路径组件文本（含瞬时已更新标记/选中节点详情）要求刷新逐字相同 | 10新增调用/累计20；恢复前后18=18，独立B/C/B两次3/3正确；failure行208；刷新actualGET资源/回执/路径/掌握度200。LearningPathPanel挂载重置changedIds/selectedId，全文不是持久化契约；保留v4失败 | 未保存v4刷新全文，不能倒推具体字符差异，不冒充最终完整通过 | 改验收为真实服务端路径快照逐字段相同及UI方向/版本/95%状态，不比较瞬时选择；最多一次最后复验，仍全局30尝试上限，耗尽停止；不重跑质量或扩大预算
+[2026-09-27T14:39:03] [MVP-0.2-T031] VERIFIED | executor=Lee
+真实Chromium153/Vite4181/Uvicorn8011/全新隔离PG0009/当前Pro闭环通过；不使用mock/TestClient/合成发布资源；保留所有失败并补入口与预算工具、移除同步远程字体依赖 | v5九项检查通过，独立B/T/B两次3/3，掌握度55%→95%、路径v3、刷新实际路径快照完整相同；学习POST1次、断网恢复计数28=28。30实际尝试用完，3flow各10，均完成。397后端/66前端通过，Ruff/Mypy55/类型/构建/diff通过；lint0错67既有警告；pageerror和意外HTTP失败0，401/404及ERR_ABORTED/INTERNET_DISCONNECTED分类预期 | 初始networkidle仍false，不宣称网络无负向或首段性能通过；总生成30664ms非首段P95；费用余额未知，.env未修改；B完整首段判定仍缺，阶段不切换 | 明确路径暂存并独立本地Task-Completed提交A；已停止本次服务、保留隔离库；随后领取B只做规则/样本准备并报告需确认项，不push/merge/归档
+[2026-09-27T14:42:14] [MVP-0.2-T032] START | executor=Lee | branch=codex/mvp-0.2
+确认A独立完成提交2ff61f7且工作区干净，领取B非计费口径与样本准备 | 原最终质量/闭环与A报告已核对；同key持续授权存在，当前Pro/Responses未改，A30预算已停止 | 旧首段脚本仅首非空delta，ADR只有完整教学段落文字且仍Proposed | 明确HTTP头/SSE状态/token/完整段落分开，先准备冻结计划并报告规则缺口
+[2026-09-27T14:42:14] [MVP-0.2-T032] BLOCKED | executor=Lee
+编写非计费首段规则/20样本单并发/0计费预热/180秒请求超时/240实际Provider尝试硬上限计划；不套用旧首token指标，不把A30664ms总生成当首段 | 源码与文档核对确认规则缺口；git diff检查通过；B0实际样本/0模型调用，无性能通过证据 | 需确认正文段落空行或临时流结束边界及完整教学陈述规则；不自行制定通过标准；总体补充验收尚未完成 | 本地chore(workflow)保存B准备与blocked，不包含Task-Completed；等待用户确认后建测量入口/冻结采样，不push/merge/归档/跨阶段
+[2026-09-27T14:58:22] [MVP-0.2-T032] RESUME | executor=Lee | branch=codex/mvp-0.2
+用户确认完整教学段落规则及冻结20样本/0计费预热/180秒/240实际尝试上限 | T031完成提交已核对，工作区干净；尚未开始B计费采样 | 无独立首段prompt版本，采用源码摘要；Provider冷热未知 | 建立验收专用计时入口并离线验证，单次有限采样，不补跑、不改变真实.env
+[2026-09-27T15:37:30] [MVP-0.2-T032] BLOCKED | executor=Lee
+完成冻结20样本实际Vite/HTTPX/Uvicorn/全新隔离PG/当前Pro Responses采样，保存原始结果、人工核对、162尝试账本和复现报告；仅验收入口增加校验后时钟，生产API及.env不变 | 20/20正式发布；首token P95 5661.935ms失败(目标2000ms)，3/20段落候选教学意义不能确认，全计划首段P95缺失；2实际TIMEOUT保留且现有重试完成；后端403测试/Ruff/Mypy通过，前端66测试/typecheck/build通过，lint0错误67既有警告；采样服务已停止 | B未通过，候选导语不能放行且更晚段落时刻未保留；单目标/本机网络、负载与Provider冷热限制详见docs/acceptance/mvp-0.2-t032-first-screen.md；无完成标记 | 本地chore(workflow)保存失败和工具证据，不push/merge/归档/跨阶段；后续首屏关键路径和完整候选采集需独立改进任务/新冻结采样，不擅自补跑
+[2026-09-27T15:46:36] [MVP-0.2-T033] START | executor=Lee | branch=codex/mvp-0.2
+用户要求本轮仅非计费诊断和局部修复；拆T033测量诊断、T034连接生命周期优化，T032真实验收继续blocked | 核对T030–T032源码/报告/协议和历史20样本；工作区干净 | 画像输入影响工程偏好路径，不擅自后台化/跳过；旧HTTP头非原始首字节、token非确认教学正文 | 补多候选单调时钟和资格评审，延迟mock/隔离PG诊断；0付费、不加载/修改真实.env、不push/merge
+[2026-09-27T16:00:00] [MVP-0.2-T033] VERIFIED | executor=Lee
+完成独立wire首字节、多候选段落及hash绑定资格评审，追加旧T032口径纠正和关键路径诊断；保留历史和诊断v1–v3 | 12针对性测试/Ruff/diff通过，0付费；真实路由/隔离PG延迟mock证明画像→路径→状态→DB状态→文本Provider串行，同键回放零新增Provider | 旧原始HTTP首字节及教学token无法倒推；画像异步化涉及已合并偏好/路径版本需另行决策，本轮不实施；详见T033报告 | 明确文件本地Task-Completed提交后领取T034连接生命周期优化，T032继续blocked，不push/merge
+[2026-09-27T16:17:18] [MVP-0.2-T034] START | executor=Lee | branch=codex/mvp-0.2
+核对T033完成提交f839a07，领取连接生命周期优化；纠正上一条T033 VERIFIED事件时间误填16:00:00，实际完成提交15:56:48，task completed_at同步纠正而保留原日志 | T033独立提交工作区干净；先前0付费，无真实.env读取 | 连接优化只复用engine/pool，绝不复用session/owner事务；画像后台化需批准未实施 | lifespan内lazy engine、关闭清理及可控冷连接延迟对比，回归恢复/前置/显式画像修正/审核
+[2026-09-27T16:35:48] [MVP-0.2-T034] VERIFIED | executor=Lee
+ASGI lifespan请求state内lazy复用数据库engine/factory，关闭dispose，不复用session/owner事务；补raw HTTP/multi-candidate审核与格式符/围栏边界回归，旧T032报告仅追加口径纠正 | 后端416测试0跳过/9警告、Ruff/Mypy55通过；前端66测试/typecheck/build通过，lint0错误67已有警告；真实wire/隔离PG/100ms冷连接mock对比教学首段399.108→44.813ms、连接2→0，Provider8/8且同键恢复新增0、本人200外部404；0付费；原历史raw/audit/账本不变 | 首轮全量1failed/414passed发现跨loop app.state池共享，现request.state隔离且原owner断言通过；错测试路径/新增路径shape断言已纠正；实际模型收益未知；画像后台化需要旧/新画像版本与修正重规划契约决策未实施 | 明确文件本地T034完成提交；T032继续blocked，另行批准后才能执行v2一次20样本/240尝试复测，详见T034交接及v2计划；不push/merge/归档/跨阶段
+[2026-09-27T17:37:31] [MVP-0.2-T035] START | executor=Lee | branch=codex/mvp-0.2
+用户批准独立3样本、36实际尝试含内部重试、单并发0预热180秒；不执行20正式计划 | T030/T034完成提交和干净分支核对，8012/4182无遗留服务；先mock验证新预算和计时 | 原失败证据保留，T032仍blocked | 新隔离PG和真实代理一次诊断；不修改.env/模型、不push/merge/跨阶段
+[2026-09-27T17:53:20] [MVP-0.2-T035] VERIFIED | executor=Lee
+完成独立三样本真实diagnostic；24/36全部完成，3发布/2最早段落确认/1未确认保留；当前配置deepseek-flash而非旧Pro，不改.env或模型 | 421后端/66前端测试通过，13工具针对性通过；Ruff导入排序修正后clean/Mypy55/typecheck/build通过，lint0错误67已有警告；3POST物理connect0，恢复3GET200新增Provider0，DB只读聚合3owner/3key/3操作；17:44:33服务关闭，0补跑/P95声明 | 画像串行1.055–1.537秒+首delta0.877–1.540秒；列表编号/成员句点非句末、代码围栏异常，生产strip过滤独立空白chunk风险需独立非计费修复；T032仍blocked | 明确路径本地T035完成提交；详见docs/acceptance/mvp-0.2-t035-diagnostic.md及原始证据，下一步先修测量辅助/空白传输再决定20样本，不push/merge/归档/跨阶段
+[2026-09-27T18:02:27] [MVP-0.2-T036] START | executor=Lee | branch=codex/mvp-0.2
+用户批准非计费空白chunk修复；核对T032–T035和干净分支，沿adapter/gateway/SSE/前端/DOM检查 | SSE strip条件丢独立空白，前端数据追加无裁剪但普通p默认折叠空白 | 样本1缺原始Provider chunks/全文/时间，不能无损重放或回填通过；T032仍blocked | 独立空白与多切分mock全链测试、隔离库回归、本地提交；0付费、不改.env/模型/时序/阶段
+[2026-09-27T18:08:51] [MVP-0.2-T036] VERIFIED | executor=Lee
+SSE仅排除空串，纯空白正文原样发出；临时正文pre-wrap呈现，reasoning/协议事件不混正文、不修补Markdown | MockTransport实际adapter/Gateway/SSE隔离PG三正文切分/单字节Provider传输一致，离线SSE前端1/7/65536字节及App DOM一致；426后端/70前端通过、最终DOM4通过，Ruff/Mypy55/typecheck/build通过，lint0错误67既有警告，diff通过；0付费 | 样本1仅10规范化候选hash可检查，无法原始全文/分片/时间无损重放，原未确认不变；正式20入口异常即时熔断待核对及重新冻结授权，画像串行未变、T032仍blocked | 明确路径本地T036完成提交，交接docs/acceptance/mvp-0.2-t036-lossless-stream.md；不push/merge/归档/跨阶段
+[2026-09-27T18:33:37] [MVP-0.2-T037] START | executor=Lee | branch=codex/mvp-0.2
+用户批准冻结20正式样本/最多240实际尝试；先独立非计费保护工具修复，基线97490a2干净 | 发现正式240入口无异常即时熔断，3样本入口已有但不能自动视为正式具备 | T032继续blocked，当前模型只读待核对，0本轮付费 | 验证保护与固定槽位/恢复记录，完成独立提交再冻结正式执行，不改.env/模型/生产时序
+[2026-09-27T18:39:00] [MVP-0.2-T037] VERIFIED | executor=Lee
+正式240入口增加异常即时全局halt；固定20槽与只读恢复证据分开，匿名HTTP/准备分列 | 23针对性/434后端全量通过、Ruff/Mypy55/diff通过，0真实模型；只读当前deepseek-flash/Responses | T032未通过仍blocked；前端本轮未重跑，生产/口径/规则/.env未改 | 明确路径自查本地完成提交；随后单次20/240正式计划独立证据，不push/merge/跨阶段
+[2026-09-27T18:40:00] [MVP-0.2-T038] START | executor=Lee | branch=codex/mvp-0.2
+用户明确授权冻结20样本/最多240实际尝试；T037 a7e7cc8完成，正式采样基线冻结 | 新隔离edumind_perf_t032_v2迁移0009完成；模型只读deepseek-flash/Responses，不改变.env | T032保持blocked直至正式通过，旧20和T035诊断不混样 | 单次实际代理正式采样、独立语义评审及报告；异常立即停止，无补跑/预热/并发工程检查
+[2026-09-27T18:57:29] [MVP-0.2-T032] BLOCKED | executor=Lee
+T038正式v2采样审计完成，未更改口径或阈值；修复无损正文后20最早教学段落均确认 | PRD HTTP P95 1647.309ms/首段3094.385ms通过，但冻结validated教学token P95 2632.575ms失败；161/240尝试含1TIMEOUT，20发布，旧证据保留 | T032不能done，不自行豁免独立内容门槛；当前flash非旧Pro对照，画像串行契约未变 | 保存独立正式证据；建议下一步仅非计费正文关键路径诊断，时序/门槛变更先报告决定项，不追加付费/跨阶段
+[2026-09-27T18:57:29] [MVP-0.2-T038] VERIFIED | executor=Lee
+一次20/240正式采样及133候选hash独立语义审计完整交付，20最早首段确认、11后续候选未确认保留；T038是证据交付非T032通过 | 161实际尝试（160完成/1TIMEOUT）、20发布/20GET恢复新增0，DB20owner/key/操作/单元；HTTP/段落PRD达标但独立教学token失败，T032blocked；23离线/本轮434后端/70前端回归及Ruff/Mypy55/typecheck/build/diff通过，lint0错67警告；脱敏/冻结SHA通过，18:50:55停机 | 费用/余额/stream usage未知，计费已停止；无新阶段trace，不猜测模型因果或用旧Pro对比；原始证据保持，.env/模型/画像路径时序未改 | 明确路径自查本地完成提交T038证据并报告；不push/merge/归档/进入MVP0.3，下一步待用户决定
+[2026-09-27T19:09:41] [MVP-0.2-T032] RESUME | executor=Lee | branch=codex/mvp-0.2
+用户明确yes批准附加教学token2秒转后续优化、不阻塞收尾；解除治理阻塞，同步批准后的任务范围和追加阶段说明 | PRD HTTP/首段指标已达标，原冻结gate=false/全部失败证据继续保留，本轮0计费 | 首token优化未完成，Pro闭环/Flash性能不混证；不更改PRD/画像路径/真实配置或计时规则 | 验证证据不可变与治理引用，按新范围创建本地T032完成提交；不归档/跨阶段/push/merge
+[2026-09-27T19:14:09] [MVP-0.2-T032] VERIFIED | executor=Lee
+按用户yes批准后的范围结题，首token2秒失败转后续优化，追加收尾决定与阶段说明 | 离线重算一致且旧audit=false不变；113历史文件逐字节核对，报告仅追加；JSON/依赖/37既有完成提交/10引用/diff检查通过，独立文档读者四项核对通过；0新付费 | token P95 2632.575ms仍失败，不混Pro/Flash证据，不冒充重新跑工程或真实模型测试；活动账本仍MVP0.2，未归档 | 明确四文件自查暂存，创建本地Task-Completed T032治理提交并核对；未来优化及阶段归档/切换/push/merge待另行授权

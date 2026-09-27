@@ -9,6 +9,7 @@ from typing import Awaitable, Callable, Literal, Protocol, TypeVar
 
 MessageRole = Literal["system", "user", "assistant"]
 _Result = TypeVar("_Result")
+P0_DEFAULT_MAX_OUTPUT_TOKENS = 4096
 
 
 class TaskProfile(StrEnum):
@@ -49,10 +50,23 @@ class TokenUsage:
 
 
 @dataclass(frozen=True, slots=True)
+class OutputTextCounts:
+    """Content-free counts of assistant messages and output text blocks."""
+
+    messages: int
+    blocks: int
+
+    def __post_init__(self) -> None:
+        if any(type(value) is not int or value < 0 for value in (self.messages, self.blocks)):
+            raise ValueError("Invalid output text counts.")
+
+
+@dataclass(frozen=True, slots=True)
 class TextResult:
     text: str
     model_id: str
     usage: TokenUsage | None = None
+    output_text_counts: OutputTextCounts | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -60,6 +74,7 @@ class StructuredResult:
     value: Mapping[str, object]
     model_id: str
     usage: TokenUsage | None = None
+    output_text_counts: OutputTextCounts | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -99,15 +114,109 @@ _RETRYABLE_CODES = frozenset(
 )
 
 
+class OutputFailureReason(StrEnum):
+    """Content-free diagnostics; never carry vendor text or schema values."""
+
+    RESPONSE_INCOMPLETE = "RESPONSE_INCOMPLETE"
+    OUTPUT_TOKEN_LIMIT = "OUTPUT_TOKEN_LIMIT"
+    RESPONSE_JSON_INVALID = "RESPONSE_JSON_INVALID"
+    STRUCTURED_JSON_INVALID = "STRUCTURED_JSON_INVALID"
+    STRUCTURED_NOT_OBJECT = "STRUCTURED_NOT_OBJECT"
+    STRUCTURED_SCHEMA_MISMATCH = "STRUCTURED_SCHEMA_MISMATCH"
+    REQUEST_SCHEMA_INVALID = "REQUEST_SCHEMA_INVALID"
+
+
+class JsonSyntaxReason(StrEnum):
+    """Fixed syntax categories; no text, positions, paths, or generated values."""
+
+    INVALID_ESCAPE = "INVALID_ESCAPE"
+    UNESCAPED_CONTROL_CHARACTER = "UNESCAPED_CONTROL_CHARACTER"
+    UNTERMINATED_STRING = "UNTERMINATED_STRING"
+    EXPECTED_DELIMITER = "EXPECTED_DELIMITER"
+    EXPECTED_PROPERTY_NAME = "EXPECTED_PROPERTY_NAME"
+    EXPECTED_VALUE = "EXPECTED_VALUE"
+    EXTRA_DATA = "EXTRA_DATA"
+    OTHER = "OTHER"
+
+
+class JsonExtraDataKind(StrEnum):
+    """Shape of rejected trailing data, never its contents or parser position."""
+
+    JSON_VALUE_SUFFIX = "JSON_VALUE_SUFFIX"
+    JSON_LIKE_SUFFIX = "JSON_LIKE_SUFFIX"
+    MARKDOWN_FENCE_SUFFIX = "MARKDOWN_FENCE_SUFFIX"
+    OTHER_SUFFIX = "OTHER_SUFFIX"
+
+
 class ProviderError(RuntimeError):
     """Stable safe error; adapters must never include raw vendor messages or keys."""
 
     def __init__(
-        self, code: ProviderErrorCode, *, retry_after_seconds: float | None = None
+        self,
+        code: ProviderErrorCode,
+        *,
+        retry_after_seconds: float | None = None,
+        output_failure_reason: OutputFailureReason | None = None,
+        schema_keyword: str | None = None,
+        json_syntax_reason: JsonSyntaxReason | None = None,
+        usage: TokenUsage | None = None,
+        output_text_counts: OutputTextCounts | None = None,
+        json_extra_data_kind: JsonExtraDataKind | None = None,
     ) -> None:
         super().__init__(_SAFE_MESSAGES[code])
         self.code = code
         self.retry_after_seconds = retry_after_seconds
+        if output_failure_reason is not None and (
+            code is not ProviderErrorCode.INVALID_OUTPUT
+            or not isinstance(output_failure_reason, OutputFailureReason)
+        ):
+            raise ValueError("Invalid output diagnostic.")
+        self.output_failure_reason = output_failure_reason
+        if schema_keyword is not None and (
+            output_failure_reason is not OutputFailureReason.STRUCTURED_SCHEMA_MISMATCH
+            or schema_keyword
+            not in {
+                "type",
+                "required",
+                "additionalProperties",
+                "const",
+                "enum",
+                "minLength",
+                "maxLength",
+                "minItems",
+                "maxItems",
+                "uniqueItems",
+                "pattern",
+                "other",
+            }
+        ):
+            raise ValueError("Invalid schema diagnostic.")
+        self.schema_keyword = schema_keyword
+        if json_syntax_reason is not None and (
+            output_failure_reason is not OutputFailureReason.STRUCTURED_JSON_INVALID
+            or not isinstance(json_syntax_reason, JsonSyntaxReason)
+        ):
+            raise ValueError("Invalid JSON syntax diagnostic.")
+        self.json_syntax_reason = json_syntax_reason
+        if json_extra_data_kind is not None and (
+            json_syntax_reason is not JsonSyntaxReason.EXTRA_DATA
+            or not isinstance(json_extra_data_kind, JsonExtraDataKind)
+        ):
+            raise ValueError("Invalid JSON extra data diagnostic.")
+        self.json_extra_data_kind = json_extra_data_kind
+        if usage is not None and (
+            not isinstance(usage, TokenUsage)
+            or any(
+                value is not None
+                and (isinstance(value, bool) or not isinstance(value, int) or value < 0)
+                for value in (usage.input_tokens, usage.output_tokens)
+            )
+        ):
+            raise ValueError("Invalid token usage diagnostic.")
+        self.usage = usage
+        if output_text_counts is not None and not isinstance(output_text_counts, OutputTextCounts):
+            raise ValueError("Invalid output text counts.")
+        self.output_text_counts = output_text_counts
 
     @property
     def retryable(self) -> bool:

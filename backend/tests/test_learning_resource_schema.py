@@ -1,8 +1,14 @@
 """P0 learning-resource output contracts remain strict and traceable."""
 
+import json
+
 import pytest
 
-from app.agents.learning_resource_prompt import learning_resource_prompt
+from app.agents.learning_resource_prompt import (
+    RESOURCE_INSTRUCTION_VERSION,
+    explanation_serialization_example,
+    learning_resource_prompt,
+)
 from app.agents.learning_resource_schema import (
     RESOURCE_PROMPT_VERSION,
     LearningResourceType,
@@ -10,6 +16,25 @@ from app.agents.learning_resource_schema import (
     resource_output_schema,
     validate_learning_resource,
 )
+
+
+def test_serialization_example_is_valid_current_schema_with_escaped_markdown() -> None:
+    example = explanation_serialization_example()
+    assert "\n" not in example
+    envelope = validate_learning_resource(json.loads(example), expected_type="explanation")
+    assert "\n" in envelope["content"]["markdown"]
+    assert '"x"' in envelope["content"]["markdown"]
+    assert example in learning_resource_prompt("explanation")
+
+
+@pytest.mark.parametrize("kind", list(LearningResourceType))
+def test_all_resource_prompts_have_versioned_json_serialization_constraints(kind) -> None:
+    prompt = learning_resource_prompt(kind)
+    assert RESOURCE_INSTRUCTION_VERSION in prompt
+    assert "Escape every newline" in prompt
+    assert "Never put literal line breaks" in prompt
+    assert "trailing commas" in prompt
+    assert json.dumps(resource_output_schema(kind), ensure_ascii=False) in prompt
 
 
 def envelope(resource_type: str, content: dict[str, object]) -> dict[str, object]:

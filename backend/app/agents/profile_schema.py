@@ -32,6 +32,21 @@ EVIDENCE_SOURCES: Final = frozenset(
         "manual_correction",
     }
 )
+# Only these dimensions may be edited by the student; the rest stay inference-only.
+EDITABLE_PROFILE_FIELDS: Final = (
+    "professional_background",
+    "learning_goals",
+    "error_preferences",
+    "engineering_preference",
+)
+# Strongest first. A manual correction always outranks any inferred source.
+EVIDENCE_SOURCE_PRECEDENCE: Final = (
+    "manual_correction",
+    "explicit_feedback",
+    "learner_statement",
+    "learning_behavior",
+    "initial_query",
+)
 
 
 class ProfileSchemaError(ValueError):
@@ -95,7 +110,7 @@ def _validate_evidence(
             raise ProfileSchemaError from None
         _require_condition(parsed.tzinfo is not None)
         _require_condition(isinstance(version, int) and not isinstance(version, bool))
-        _require_condition(version == profile_version)
+        _require_condition(version <= profile_version)
         validated.append(deepcopy(item))
     return validated
 
@@ -181,3 +196,125 @@ def merge_explicit_profile_values(
         profile[field] = deepcopy(field_value)
     profile["evidence"] = deepcopy(dict(evidence))
     return validate_transient_profile(profile)
+
+
+def evidence_source_rank(source: str) -> int:
+    """Lower rank wins; manual corrections are strongest, initial queries weakest."""
+    if source not in EVIDENCE_SOURCES:
+        raise ProfileSchemaError
+    return EVIDENCE_SOURCE_PRECEDENCE.index(source)
+
+
+def strongest_evidence_source(records: Sequence[Mapping[str, object]]) -> str:
+    """Return the highest-precedence source among a field's evidence records."""
+    if not records:
+        raise ProfileSchemaError
+    strongest: str | None = None
+    strongest_rank: int | None = None
+    for record in records:
+        source = record["source"]
+        if not isinstance(source, str):
+            raise ProfileSchemaError
+        rank = evidence_source_rank(source)
+        if strongest_rank is None or rank < strongest_rank:
+            strongest = source
+            strongest_rank = rank
+    assert strongest is not None
+    return strongest
+
+
+def merge_profile_snapshots(
+    previous: Mapping[str, ProfileValue], candidate: Mapping[str, ProfileValue]
+) -> dict[str, ProfileValue]:
+    """Carry prior evidence forward and let the strongest source choose each field.
+
+    A newer observation wins only when the strongest sources have equal precedence.
+    In particular, a new initial query cannot undo an explicit correction.
+    """
+    old = validate_transient_profile(dict(previous))
+    new = validate_transient_profile(dict(candidate))
+    old_version = old["profile_version"]
+    new_version = new["profile_version"]
+    if not isinstance(old_version, int) or new_version != old_version + 1:
+        raise ProfileSchemaError
+
+    old_evidence = old["evidence"]
+    new_evidence = new["evidence"]
+    if not isinstance(old_evidence, dict) or not isinstance(new_evidence, dict):
+        raise ProfileSchemaError
+    values: dict[str, object] = {}
+    evidence: dict[str, list[dict[str, object]]] = {}
+    for field in PROFILE_FIELDS:
+        old_value = old[field]
+        new_value = new[field]
+        if old_value is None and new_value is None:
+            continue
+        old_records = old_evidence.get(field, [])
+        new_records = new_evidence.get(field, [])
+        if not isinstance(old_records, list) or not isinstance(new_records, list):
+            raise ProfileSchemaError
+        if old_value is None:
+            values[field] = new_value
+        elif new_value is None:
+            values[field] = old_value
+        else:
+            old_rank = evidence_source_rank(strongest_evidence_source(old_records))
+            new_rank = evidence_source_rank(strongest_evidence_source(new_records))
+            values[field] = old_value if old_rank < new_rank else new_value
+        evidence[field] = deepcopy(old_records) + deepcopy(new_records)
+
+    initial_query = new["initial_query"]
+    if not isinstance(initial_query, str) or not isinstance(new_version, int):
+        raise ProfileSchemaError
+    return merge_explicit_profile_values(
+        initial_query, values, evidence, profile_version=new_version
+    )
+
+
+def apply_manual_correction(
+    profile: Mapping[str, ProfileValue],
+    corrections: Mapping[str, object],
+    *,
+    observed_at: str,
+) -> dict[str, ProfileValue]:
+    """Overwrite whitelisted fields with explicit user values, never mutating the old snapshot.
+
+    Each corrected field gains a ``manual_correction`` evidence record (confidence 1.0)
+    bound to the new version; older evidence is carried forward untouched.
+    """
+    if not corrections:
+        raise ProfileSchemaError
+    for field in corrections:
+        if field not in EDITABLE_PROFILE_FIELDS:
+            raise ProfileSchemaError
+
+    current_version = profile["profile_version"]
+    if not isinstance(current_version, int) or isinstance(current_version, bool):
+        raise ProfileSchemaError
+    next_version = current_version + 1
+
+    merged: dict[str, ProfileValue] = deepcopy(dict(profile))
+    merged["profile_version"] = next_version
+
+    evidence = merged["evidence"]
+    if not isinstance(evidence, dict):
+        raise ProfileSchemaError
+    merged_evidence: dict[str, object] = deepcopy(evidence)
+    for field in corrections:
+        merged[field] = deepcopy(corrections[field])
+        records = merged_evidence.get(field)
+        if records is None:
+            records = []
+        if not isinstance(records, list):
+            raise ProfileSchemaError
+        records.append(
+            {
+                "source": "manual_correction",
+                "confidence": 1.0,
+                "observed_at": observed_at,
+                "profile_version": next_version,
+            }
+        )
+        merged_evidence[field] = records
+    merged["evidence"] = merged_evidence
+    return validate_transient_profile(merged)

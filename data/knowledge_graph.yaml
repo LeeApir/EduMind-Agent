@@ -1,0 +1,150 @@
+{
+  "schema_version": 1,
+  "graph_version": "mvp-0.2.0",
+  "review": {
+    "source": "docs/PRD.md 附录 B（P0 种子节点）",
+    "fact_checked_at": "2026-09-21",
+    "status": "manual_fact_checked"
+  },
+  "relationship_direction": "from 指向 to；DEPENDS_ON 表示 from 以 to 为前置，EXTENDS 表示 from 是 to 的进阶，SIMILAR_TO 表示两节点需要对比讲解。",
+  "nodes": [
+    {
+      "id": "array",
+      "name": "数组",
+      "chapter": "线性表",
+      "difficulty": 1,
+      "description": "使用连续存储空间、通过下标访问元素的线性结构。",
+      "prerequisites": [],
+      "learning_objectives": ["说出下标访问的时间复杂度", "说明连续存储对插入和删除的影响"],
+      "common_misconceptions": ["数组每次访问都要从头遍历", "数组插入总是 O(1)"],
+      "ai_context": "使用连续格子和下标精灵的图示，对比中间插入时的元素搬移。",
+      "mastery_rule_key": "linear-structure-v1"
+    },
+    {
+      "id": "c-pointer",
+      "name": "C 指针",
+      "chapter": "C 基础",
+      "difficulty": 1,
+      "description": "保存内存地址、可以间接访问对象的 C 语言变量。",
+      "prerequisites": [],
+      "learning_objectives": ["区分指针值、地址和所指对象", "安全地使用取地址和解引用运算符"],
+      "common_misconceptions": ["指针就是数组", "未初始化指针可以直接解引用"],
+      "ai_context": "将指针表示为带有地址标签的箭头，明确分开变量框和其指向的对象。",
+      "mastery_rule_key": "linear-structure-v1"
+    },
+    {
+      "id": "circular-queue",
+      "name": "循环队列",
+      "chapter": "线性表",
+      "difficulty": 3,
+      "description": "使用定长数组和模运算维护队首、队尾的队列实现。",
+      "prerequisites": ["array", "queue"],
+      "learning_objectives": ["解释队首、队尾环绕的原因", "处理队空与队满的判定"],
+      "common_misconceptions": ["队首等于队尾总表示队空", "循环队列无法判断队满"],
+      "ai_context": "用环形数组和 front/rear 指针动画呈现模运算后的位置。",
+      "mastery_rule_key": "linear-structure-v1"
+    },
+    {
+      "id": "linked-list-concept",
+      "name": "链表概念",
+      "chapter": "线性表",
+      "difficulty": 1,
+      "description": "由分散节点通过链接形成的线性结构，节点同时保存数据和后继连接。",
+      "prerequisites": ["c-pointer"],
+      "learning_objectives": ["说出链表节点的数据域与链域", "对比链表与数组的存储方式"],
+      "common_misconceptions": ["链表节点在内存中必须连续", "指针保存的是下一个节点的数值"],
+      "ai_context": "先讲数据域和 next 链域，再展示分散地址之间的箭头连接。",
+      "mastery_rule_key": "linear-structure-v1"
+    },
+    {
+      "id": "linked-list-deletion",
+      "name": "链表删除",
+      "chapter": "线性表",
+      "difficulty": 3,
+      "description": "在单链表中通过修改前驱节点的 next 链接移除目标节点。",
+      "prerequisites": ["c-pointer", "linked-list-traversal"],
+      "learning_objectives": ["写出删除中间节点的链接更新顺序", "处理删除首节点和未找到目标的边界情况"],
+      "common_misconceptions": ["可以直接跳过目标节点而不保存前驱", "删除头节点与删除中间节点的代码完全相同"],
+      "ai_context": "高亮 prev、target和target->next，分步动画先断开哪条连接、后更新哪个 next。",
+      "mastery_rule_key": "linear-structure-v1"
+    },
+    {
+      "id": "linked-list-insertion",
+      "name": "链表插入",
+      "chapter": "线性表",
+      "difficulty": 3,
+      "description": "在单链表中创建新节点，并以正确顺序重连 next 链接。",
+      "prerequisites": ["c-pointer", "linked-list-traversal"],
+      "learning_objectives": ["写出中间插入的两步连接更新", "处理头插、尾插和位置不合法的边界情况"],
+      "common_misconceptions": ["可以先让 prev->next 指向新节点再保存后继", "插入中间位置不需要前驱节点"],
+      "ai_context": "继续使用箭头比喻：先保存新节点指向的旧后继，再连接前驱。",
+      "mastery_rule_key": "linear-structure-v1"
+    },
+    {
+      "id": "linked-list-traversal",
+      "name": "链表遍历",
+      "chapter": "线性表",
+      "difficulty": 2,
+      "description": "从头指针出发，依次访问每个节点直到 NULL 的过程。",
+      "prerequisites": ["single-linked-list"],
+      "learning_objectives": ["写出以 NULL 为结束条件的遍历循环", "解释链表按位置访问的时间复杂度"],
+      "common_misconceptions": ["链表可以像数组一样按下标访问", "遍历到最后节点时应该停在节点本身而不是 NULL"],
+      "ai_context": "用一个移动的 cur 指针标记当前节点，每步强调 cur = cur->next。",
+      "mastery_rule_key": "linear-structure-v1"
+    },
+    {
+      "id": "queue",
+      "name": "队列",
+      "chapter": "线性表",
+      "difficulty": 2,
+      "description": "遵循先进先出（FIFO）规则的受限线性结构。",
+      "prerequisites": ["array"],
+      "learning_objectives": ["区分入队、出队与查看队首", "说明 FIFO 规则与实际队列的对应"],
+      "common_misconceptions": ["队列与栈都是后进先出", "入队和出队都在同一端进行"],
+      "ai_context": "用排队比喻固定 front 和 rear，展示 enqueue 与 dequeue 发生在不同端。",
+      "mastery_rule_key": "linear-structure-v1"
+    },
+    {
+      "id": "single-linked-list",
+      "name": "单链表",
+      "chapter": "线性表",
+      "difficulty": 2,
+      "description": "每个节点只保存一个 next 指针的链式线性表。",
+      "prerequisites": ["c-pointer", "linked-list-concept"],
+      "learning_objectives": ["定义包含数据域和 next 的节点", "说明 head 为 NULL 的空链表表示"],
+      "common_misconceptions": ["最后一个节点的 next 指向自身", "链表只需要保存头结点值而不需要头指针"],
+      "ai_context": "将 head 、普通节点、NULL 绘制为三种角色，明确标出最后一个 next 为 NULL。",
+      "mastery_rule_key": "linear-structure-v1"
+    },
+    {
+      "id": "stack",
+      "name": "栈",
+      "chapter": "线性表",
+      "difficulty": 2,
+      "description": "遵循后进先出（LIFO）规则的受限线性结构。",
+      "prerequisites": ["array"],
+      "learning_objectives": ["区分入栈、出栈与查看栈顶", "说明 LIFO 规则与调用栈的直观关系"],
+      "common_misconceptions": ["栈可以从栈底直接删除元素", "栈与队列的出元素顺序一样"],
+      "ai_context": "使用盘子堆叠的比喻，将所有操作聚焦在栈顶。",
+      "mastery_rule_key": "linear-structure-v1"
+    }
+  ],
+  "relations": [
+    {"from": "circular-queue", "to": "array", "type": "DEPENDS_ON"},
+    {"from": "circular-queue", "to": "queue", "type": "DEPENDS_ON"},
+    {"from": "circular-queue", "to": "queue", "type": "EXTENDS"},
+    {"from": "linked-list-concept", "to": "c-pointer", "type": "DEPENDS_ON"},
+    {"from": "linked-list-deletion", "to": "c-pointer", "type": "DEPENDS_ON"},
+    {"from": "linked-list-deletion", "to": "linked-list-traversal", "type": "DEPENDS_ON"},
+    {"from": "linked-list-insertion", "to": "c-pointer", "type": "DEPENDS_ON"},
+    {"from": "linked-list-insertion", "to": "linked-list-traversal", "type": "DEPENDS_ON"},
+    {"from": "linked-list-traversal", "to": "single-linked-list", "type": "DEPENDS_ON"},
+    {"from": "queue", "to": "array", "type": "DEPENDS_ON"},
+    {"from": "single-linked-list", "to": "c-pointer", "type": "DEPENDS_ON"},
+    {"from": "single-linked-list", "to": "linked-list-concept", "type": "DEPENDS_ON"},
+    {"from": "single-linked-list", "to": "linked-list-concept", "type": "EXTENDS"},
+    {"from": "single-linked-list", "to": "array", "type": "SIMILAR_TO"},
+    {"from": "array", "to": "single-linked-list", "type": "SIMILAR_TO"},
+    {"from": "stack", "to": "array", "type": "DEPENDS_ON"}
+  ]
+}

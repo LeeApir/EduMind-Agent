@@ -1,0 +1,75 @@
+{
+  "started_at": "2026-09-27T13:59:40.846711",
+  "environment": {
+    "platform": "macOS-15.6.1-arm64-arm-64bit",
+    "python": "3.11.16",
+    "concurrency": 1,
+    "transport": "Chromium/Vite proxy/Uvicorn/PostgreSQL/real Provider"
+  },
+  "passed": false,
+  "checks": {},
+  "http_responses": [
+    {
+      "path": "/src/api/learningSessions.ts",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/src/api/quiz.ts",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/src/api/profile.ts",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/src/api/paths.ts",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/auth/session",
+      "status": 401,
+      "method": "GET"
+    },
+    {
+      "path": "/api/auth/guest",
+      "status": 201,
+      "method": "POST"
+    },
+    {
+      "path": "/api/profile/me",
+      "status": 404,
+      "method": "GET"
+    }
+  ],
+  "request_failures": [],
+  "console": [
+    {
+      "type": "debug"
+    },
+    {
+      "type": "debug"
+    },
+    {
+      "type": "error"
+    },
+    {
+      "type": "error"
+    }
+  ],
+  "page_errors": [],
+  "failure": {
+    "step": "anonymous",
+    "class": "TimeoutError"
+  },
+  "finished_at": "2026-09-27T14:02:41.476970",
+  "provider": {
+    "configured_model": "deepseek-v4-pro-0813",
+    "structured_transport": "responses_json_schema",
+    "limit": 30,
+    "provider_calls": []
+  }
+}

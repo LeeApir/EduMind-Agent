@@ -19,3 +19,21 @@
 ## API 与 SSE 契约（MVP 0.1）
 
 最小 API 契约在 [OpenAPI](api/openapi.yaml) 中维护。创建学习会话必须带 `Idempotency-Key`；POST SSE 断线后先读取持久化操作状态，再按需重新附着后续事件，且不承诺回放临时 token。资源读取端点只返回当前用户拥有、审核通过的不可变版本；P1 的 Provider 设置与 Manim Job 不在此契约中。
+
+## 学习证据、掌握度与路径（MVP 0.2）
+
+测验、提示、重新解释和显式反馈作为 owner-scoped、只追加的学习证据持久化。已发布题目由服务端确定性评分；客户端和 LLM 都不能直接写入正确性、掌握分或节点状态。更正通过补偿证据完成，不覆盖原事实。
+
+掌握度和节点状态是使用版本化规则生成的可重建投影，每次变化保留不可变 revision。画像和路径每次有效更新都创建不可变版本；路径同时固定图谱版本、画像版本、掌握度水位和规划规则版本。规则和阈值由服务端版本化配置决定，不由 LLM 临时选择。
+
+影响掌握度的命令在一个 PostgreSQL 事务中追加证据、创建 mastery revision、替换当前投影并标记待重规划。路径以已提交输入在独立短事务中重算；Provider 画像推断也不占用证据事务。幂等记录、版本水位与待重规划标记均存于 PostgreSQL，因此并发、重复提交和服务重启后可安全恢复。
+
+落库映射：`learning_evidence` 保存 owner 范围幂等键、资源版本、规则版本和结构化事实；`node_mastery_revisions` 与 `node_mastery_current` 分离历史与当前投影；`learning_path_versions` 与 `learning_path_current` 分离路径历史与当前指针/持久化重规划标记。当前指针和补偿引用使用包含 owner（适用时还包含节点/目标）的复合外键，禁止跨用户或跨节点串接。业务写入仍须在事务内检查事实、版本水位和投影一致性，数据库约束不代替命令服务。
+
+完整的证据含义、归属、事务边界、并发策略和重算规则见 [ADR-0003](ADR/0003-learning-evidence-mastery-and-path-versioning.md)。
+
+## 学习闭环 API 契约（MVP 0.2）
+
+[OpenAPI](api/openapi.yaml) 将 MVP 0.2 固定为一组可演进而不泄露所有者的端点：公共 `GET /api/graph` 与 `GET /api/graph/node/{nodeId}` 仅返回版本化知识结构；其他画像、测验、掌握度和路径端点从会话 Cookie 推导 owner。不存在可以由客户端写入的 `user_id`、正确性、分数、掌握状态或规则版本字段。
+
+所有 MVP 0.2 写请求都需要会话 Cookie、同源 CSRF 令牌和 owner-scoped `Idempotency-Key`。画像修正和路径重规划另带显式的当前版本头，并发时返回稳定的 409 而非最后写入者覆盖。测验只接收已发布资源版本的答案，由服务端确定性评分；路径只使用已提交的快照，不调用 Provider。

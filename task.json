@@ -92,7 +92,7 @@
       "phase": "MVP 0.2",
       "parent_work_package": "MVP-0.2-001",
       "title": "确定学习证据、掌握度与路径版本边界",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [],
       "scope": [
@@ -107,9 +107,22 @@
       "verification": [
         "核对 PRD §3.2、§3.4、§3.7、§5 与 §9.1，完成 ADR 自查。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "jq -e '<MVP 0.2 ledger invariants>' task.json",
+          "result": "passed: schema/active phase valid, task IDs unique, and T001 was the only in-progress task during verification"
+        },
+        {
+          "command": "ADR required-boundary term check and documentation link target check",
+          "result": "passed: four evidence types, ownership, idempotency, mastery/profile/path rule versions, durable replanning and PostgreSQL restart boundary are present; referenced local documents exist"
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed"
+        }
+      ],
+      "started_at": "2026-09-21T20:36:01",
+      "completed_at": "2026-09-21T20:41:10",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.2-T001"
     },
@@ -118,7 +131,7 @@
       "phase": "MVP 0.2",
       "parent_work_package": "MVP-0.2-001",
       "title": "固定 MVP 0.2 学习闭环 API 契约",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.2-T001"
@@ -135,9 +148,22 @@
       "verification": [
         "解析 OpenAPI 3.1 并核对 MVP 0.2 路径、鉴权和错误响应。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "python3 -m json.tool docs/api/openapi.yaml >/dev/null",
+          "result": "passed: OpenAPI JSON-compatible YAML parsed successfully"
+        },
+        {
+          "command": "OpenAPI MVP 0.2 path, write-security and local-reference structural checks",
+          "result": "passed: required profile/graph/quiz/mastery/path routes exist; every MVP 0.2 write operation declares Cookie authentication, CSRF and idempotency; all local component references resolve"
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed"
+        }
+      ],
+      "started_at": "2026-09-21T22:29:14",
+      "completed_at": "2026-09-21T22:36:58",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.2-T002"
     },
@@ -146,7 +172,7 @@
       "phase": "MVP 0.2",
       "parent_work_package": "MVP-0.2-002",
       "title": "建立 10 节点数据结构种子知识结构",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.2-T001"
@@ -164,9 +190,26 @@
       "verification": [
         "运行 schema、引用完整性、环检测和 10 节点断言。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "python3 -m json.tool data/knowledge_graph.yaml >/dev/null",
+          "result": "passed: JSON-compatible YAML parsed successfully"
+        },
+        {
+          "command": "seed graph structural check with graphlib.TopologicalSorter",
+          "result": "passed: exactly 10 PRD Appendix B IDs, legal relation types, no dangling/duplicate relations, node prerequisites match DEPENDS_ON edges, and prerequisite graph is acyclic"
+        },
+        {
+          "command": "cd backend && uv run --group dev python <JSON Schema node/relation validation>",
+          "result": "passed: all seed nodes and relations conform to the public OpenAPI component schemas"
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed"
+        }
+      ],
+      "started_at": "2026-09-21T22:39:06",
+      "completed_at": "2026-09-21T22:45:50",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.2-T003"
     },
@@ -175,7 +218,7 @@
       "phase": "MVP 0.2",
       "parent_work_package": "MVP-0.2-002",
       "title": "实现知识结构校验与 Repository",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.2-T003"
@@ -193,9 +236,22 @@
       "verification": [
         "运行知识 Repository 单元测试、Ruff 和 Mypy。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "cd backend && uv run --group dev python -m pytest -q tests/test_knowledge_graph.py",
+          "result": "passed: 7 tests cover seed loading, stable query order, duplicate IDs, unknown/illegal relations, illegal difficulty, prerequisite drift and DEPENDS_ON cycles"
+        },
+        {
+          "command": "cd backend && uv run --group dev ruff check app/services/knowledge_graph.py tests/test_knowledge_graph.py && uv run --group dev mypy app",
+          "result": "passed: Ruff clean; Mypy reports no issues in 33 application source files"
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed"
+        }
+      ],
+      "started_at": "2026-09-21T22:48:02",
+      "completed_at": "2026-09-21T22:54:29",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.2-T004"
     },
@@ -204,7 +260,7 @@
       "phase": "MVP 0.2",
       "parent_work_package": "MVP-0.2-002",
       "title": "提供知识结构只读 API",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.2-T002",
@@ -224,9 +280,26 @@
       "verification": [
         "运行图谱 API 集成测试、OpenAPI 检查和后端静态检查。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "cd backend && uv run --group dev python -m pytest -q tests/test_knowledge_graph.py tests/test_knowledge_graph_api.py",
+          "result": "passed: 9 tests cover Repository behavior, public graph/node responses, stable ordering, OpenAPI response schemas and safe unknown-node errors"
+        },
+        {
+          "command": "cd backend && uv run --group dev ruff check app/api/knowledge_graph.py app/main.py tests/test_knowledge_graph.py tests/test_knowledge_graph_api.py && uv run --group dev mypy app",
+          "result": "passed: Ruff clean; Mypy reports no issues in 34 application source files"
+        },
+        {
+          "command": "cd backend && uv run --group dev python -m pytest -q",
+          "result": "passed: 122 passed, 15 existing database-dependent skips, 1 dependency deprecation warning"
+        },
+        {
+          "command": "python3 -m json.tool docs/api/openapi.yaml >/dev/null && git diff --check",
+          "result": "passed"
+        }
+      ],
+      "started_at": "2026-09-21T22:56:30",
+      "completed_at": "2026-09-21T22:59:56",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.2-T005"
     },
@@ -235,7 +308,7 @@
       "phase": "MVP 0.2",
       "parent_work_package": "MVP-0.2-003",
       "title": "定义渐进画像事件与合并规则",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.2-T001"
@@ -253,9 +326,13 @@
       "verification": [
         "运行事件 schema、合并优先级、未知字段和冲突回归测试。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "新增 profile_events.py（版本化事件 schema + 幂等摘要）与 profile_schema.py 合并规则（EDITABLE_PROFILE_FIELDS、EVIDENCE_SOURCE_PRECEDENCE、strongest_evidence_source、apply_manual_correction、证据版本 ≤ 画像版本）。",
+        "新增 test_profile_events.py 与 test_profile_merge.py，含事件类型/动作一致性、来源优先级、显式修正覆盖、旧证据随新版本携带等回归测试。",
+        "ruff check、mypy app（35 个 source）通过；全量后端 147 passed/15 skipped。"
+      ],
+      "started_at": "2026-09-23T15:05:25",
+      "completed_at": "2026-09-23T15:20:23",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.2-T006"
     },
@@ -264,7 +341,7 @@
       "phase": "MVP 0.2",
       "parent_work_package": "MVP-0.2-003",
       "title": "持久化画像事件与不可变画像版本",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.2-T006"
@@ -283,9 +360,13 @@
       "verification": [
         "在临时 PostgreSQL 运行迁移、幂等、并发和重启测试。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "新增 ProfileEvent 模型（owner + idempotency_key 唯一、event_type 约束）、Alembic 0005_profile_events 迁移（含 downgrade 往返验证）与 profile_updates 服务（record_profile_event、persist_profile_version、ProfileVersionConflict）。",
+        "新增 test_profile_persistence.py：幂等去重、跨 owner 隔离、非法事件拒绝、不可变版本、过期/跳版本冲突、数据库唯一约束。",
+        "临时 PostgreSQL（镜像 sha256:cf78e766…，端口 55432）上 alembic upgrade head 与 downgrade/upgrade 往返通过；该库全量后端 167 passed（含 20 个 DB 依赖测试），ruff、mypy（36 个 source）通过。"
+      ],
+      "started_at": "2026-09-23T15:25:26",
+      "completed_at": "2026-09-23T17:30:46",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.2-T007"
     },
@@ -294,7 +375,7 @@
       "phase": "MVP 0.2",
       "parent_work_package": "MVP-0.2-003",
       "title": "实现画像读取、历史与手动修正 API",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.2-T002",
@@ -303,6 +384,8 @@
       "scope": [
         "backend/app/api/",
         "backend/app/services/",
+        "backend/app/models/",
+        "backend/alembic/",
         "backend/tests/",
         "docs/api/openapi.yaml"
       ],
@@ -314,9 +397,14 @@
       "verification": [
         "运行画像 API 成功、校验、CSRF、并发和 owner 隔离测试。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "新增 app/api/profile.py 四端点（GET/PATCH /me、GET /me/history、POST /events），GET /me 从 learning_reads 迁出；main.py 注册 profile 路由并新增 RequestValidationError 处理器，返回稳定 VALIDATION_ERROR。",
+        "student_profiles 增加幂等列（idempotency_key + request_digest，唯一约束）与 Alembic 0006 迁移；profile_updates 新增 snapshot_profile/correction_digest/correct_profile，PATCH 幂等重放 + 乐观并发。",
+        "新增 test_profile_api.py：owner 隔离、404、白名单修正 + manual_correction 证据、非法/空字段 422、CSRF 403、版本冲突 409、幂等重放/摘要冲突、事件回执与去重。",
+        "临时 PostgreSQL 上 alembic upgrade head + 0006 往返通过；全量后端 174 passed；ruff、mypy（37 个 source）通过。OpenAPI 契约由 T002 定义，未改动。"
+      ],
+      "started_at": "2026-09-23T17:55:25",
+      "completed_at": "2026-09-23T18:31:44",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.2-T008"
     },
@@ -325,7 +413,7 @@
       "phase": "MVP 0.2",
       "parent_work_package": "MVP-0.2-006",
       "title": "实现可查看和修正的画像卡片",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.2-T008"
@@ -342,9 +430,30 @@
       "verification": [
         "运行画像卡片组件测试、类型检查、Lint 和构建。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "corepack pnpm test --run",
+          "result": "passed: 30 tests across 6 files, including new profile.spec.ts (9) and ProfileCard.spec.ts (7)"
+        },
+        {
+          "command": "corepack pnpm typecheck",
+          "result": "passed: vue-tsc -b reports no type errors"
+        },
+        {
+          "command": "corepack pnpm lint",
+          "result": "passed: 0 errors (97 non-blocking formatting warnings)"
+        },
+        {
+          "command": "corepack pnpm build",
+          "result": "passed: vue-tsc + vite build succeeded"
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed"
+        }
+      ],
+      "started_at": "2026-09-23T18:32:45",
+      "completed_at": "2026-09-23T19:14:16",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.2-T009"
     },
@@ -353,7 +462,7 @@
       "phase": "MVP 0.2",
       "parent_work_package": "MVP-0.2-004",
       "title": "定义测验提交与确定性评分规则",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.2-T002"
@@ -371,9 +480,15 @@
       "verification": [
         "运行评分规则、非法输入和正式资源绑定测试。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {"command": "EDUMIND_DATABASE_URL=<isolated PostgreSQL> uv run --frozen alembic upgrade head", "result": "passed: fresh schema upgraded through 0007_profile_provenance"},
+        {"command": "EDUMIND_TEST_DATABASE_URL=<isolated PostgreSQL> uv run --frozen pytest -q tests/test_quiz_scoring.py", "result": "passed: 10 tests; published owner/version boundary, tampered payload, duplicate IDs, deterministic scoring"},
+        {"command": "EDUMIND_TEST_DATABASE_URL=<isolated PostgreSQL> uv run --frozen pytest -q --tb=short", "result": "passed: 191 tests, 7 dependency deprecation warnings"},
+        {"command": "uv run --frozen ruff check . && uv run --frozen mypy app", "result": "passed: lint and 38 source files type checked"},
+        {"command": "git diff --check", "result": "passed"}
+      ],
+      "started_at": "2026-09-25T20:13:06",
+      "completed_at": "2026-09-25T20:17:32",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.2-T010"
     },
@@ -382,7 +497,7 @@
       "phase": "MVP 0.2",
       "parent_work_package": "MVP-0.2-004",
       "title": "建立学习证据、掌握度与路径版本数据模型",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.2-T001",
@@ -402,9 +517,16 @@
       "verification": [
         "在临时 PostgreSQL 验证迁移、约束、外键和 ORM 类型。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {"command": "EDUMIND_DATABASE_URL=<isolated PostgreSQL> uv run --frozen alembic upgrade head", "result": "passed: 0007_profile_provenance -> 0008_learning_state"},
+        {"command": "EDUMIND_DATABASE_URL=<isolated PostgreSQL> uv run --frozen alembic downgrade 0007_profile_provenance && uv run --frozen alembic upgrade head", "result": "passed: T011 migration roundtrip on isolated database"},
+        {"command": "EDUMIND_TEST_DATABASE_URL=<isolated PostgreSQL> uv run --frozen pytest -q tests/test_learning_state_models.py --tb=short", "result": "passed: 3 tests for owner-scoped idempotency, score/status/version constraints, cross-owner foreign keys and restart reads"},
+        {"command": "EDUMIND_TEST_DATABASE_URL=<isolated PostgreSQL> uv run --frozen pytest -q --tb=short", "result": "passed: 194 tests, 7 dependency deprecation warnings"},
+        {"command": "uv run --frozen ruff check . && uv run --frozen mypy app", "result": "passed: lint and 39 source files type checked"},
+        {"command": "git diff --check", "result": "passed"}
+      ],
+      "started_at": "2026-09-25T20:18:58",
+      "completed_at": "2026-09-25T20:27:12",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.2-T011"
     },
@@ -413,7 +535,7 @@
       "phase": "MVP 0.2",
       "parent_work_package": "MVP-0.2-004",
       "title": "提交并持久化测验作答",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.2-T010",
@@ -433,9 +555,15 @@
       "verification": [
         "运行真实 PostgreSQL 的测验 API、幂等、CSRF 和隔离测试。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {"command": "EDUMIND_TEST_DATABASE_URL=<isolated PostgreSQL> uv run --frozen pytest -q tests/test_quiz_api.py --tb=short", "result": "passed: 5 API/service tests including concurrent same-key submissions"},
+        {"command": "EDUMIND_TEST_DATABASE_URL=<isolated PostgreSQL> uv run --frozen pytest -q --tb=short", "result": "passed: 199 tests, 7 dependency deprecation warnings"},
+        {"command": "uv run --frozen ruff check . && uv run --frozen mypy app", "result": "passed: lint and 41 source files type checked"},
+        {"command": "python3 -m json.tool docs/api/openapi.yaml >/dev/null", "result": "passed: OpenAPI JSON-compatible YAML parsed"},
+        {"command": "git diff --check", "result": "passed"}
+      ],
+      "started_at": "2026-09-25T20:28:17",
+      "completed_at": "2026-09-25T20:32:57",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.2-T012"
     },
@@ -444,7 +572,7 @@
       "phase": "MVP 0.2",
       "parent_work_package": "MVP-0.2-004",
       "title": "根据学习证据更新节点掌握度",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.2-T011",
@@ -463,9 +591,15 @@
       "verification": [
         "运行边界、重复证据、跳过、连续答错和掌握阈值测试。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {"command": "uv run --frozen pytest -q tests/test_mastery_rules.py", "result": "passed: 10 deterministic boundary, review, hint, reexplanation, skip and invalid-score tests"},
+        {"command": "EDUMIND_TEST_DATABASE_URL=<isolated PostgreSQL> uv run --frozen pytest -q tests/test_mastery_updates.py tests/test_mastery_rules.py tests/test_quiz_api.py --tb=short", "result": "passed: 17 tests including atomic rollback, persisted path stale flag and quiz mastery receipt"},
+        {"command": "EDUMIND_TEST_DATABASE_URL=<isolated PostgreSQL> uv run --frozen pytest -q --tb=short", "result": "passed: 211 tests, 7 dependency deprecation warnings"},
+        {"command": "uv run --frozen ruff check . && uv run --frozen mypy app", "result": "passed: lint and 43 source files type checked"},
+        {"command": "git diff --check", "result": "passed"}
+      ],
+      "started_at": "2026-09-25T20:34:00",
+      "completed_at": "2026-09-25T20:40:57",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.2-T013"
     },
@@ -474,7 +608,7 @@
       "phase": "MVP 0.2",
       "parent_work_package": "MVP-0.2-004",
       "title": "记录提示、重新解释与显式反馈证据",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.2-T011",
@@ -494,9 +628,15 @@
       "verification": [
         "运行动作白名单、幂等、事务回滚和跨 owner 测试。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {"command": "EDUMIND_TEST_DATABASE_URL=<isolated PostgreSQL> uv run --frozen pytest -q tests/test_learning_events_api.py --tb=short", "result": "passed: 9 tests covering whitelist, owner/scene/node checks, idempotency, CSRF and transaction rollback"},
+        {"command": "EDUMIND_TEST_DATABASE_URL=<isolated PostgreSQL> uv run --frozen pytest -q --tb=short", "result": "passed: 220 tests, 7 dependency deprecation warnings"},
+        {"command": "uv run --frozen ruff check . && uv run --frozen mypy app", "result": "passed: lint and 45 source files type checked"},
+        {"command": "python3 -m json.tool docs/api/openapi.yaml >/dev/null", "result": "passed: OpenAPI JSON-compatible YAML parsed"},
+        {"command": "git diff --check", "result": "passed"}
+      ],
+      "started_at": "2026-09-25T20:42:13",
+      "completed_at": "2026-09-25T20:47:30",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.2-T014"
     },
@@ -505,12 +645,15 @@
       "phase": "MVP 0.2",
       "parent_work_package": "MVP-0.2-003",
       "title": "用学习行为渐进更新画像",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.2-T007",
         "MVP-0.2-T012",
-        "MVP-0.2-T014"
+        "MVP-0.2-T014",
+        "MVP-0.2-T026",
+        "MVP-0.2-T027",
+        "MVP-0.2-T029"
       ],
       "scope": [
         "backend/app/agents/",
@@ -526,9 +669,12 @@
       "verification": [
         "运行行为更新、未知字段、Provider 失败、数据最小化和历史测试。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "隔离 PostgreSQL 后端全量测试：EDUMIND_TEST_DATABASE_URL=... uv run pytest -q，226 passed；覆盖摘要最小化、未知字段、不可变历史、幂等重放和 Provider 失败保留证据。",
+        "uv run ruff check app tests、改动文件 ruff format --check、uv run mypy app tests/test_profile_behavior_updates.py、OpenAPI JSON 解析与 git diff --check 通过。"
+      ],
+      "started_at": "2026-09-25T20:48:22",
+      "completed_at": "2026-09-25T20:58:14",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.2-T015"
     },
@@ -537,7 +683,7 @@
       "phase": "MVP 0.2",
       "parent_work_package": "MVP-0.2-005",
       "title": "定义可解释路径规划规则",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.2-T004",
@@ -557,9 +703,12 @@
       "verification": [
         "运行前置、薄弱回退、已掌握跳过、不可达和解释测试。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "定向路径规则测试：uv run pytest -q tests/test_path_rules.py，8 passed；覆盖前置、薄弱回退、已掌握跳过、不可达、结构错误和理由。",
+        "隔离 PostgreSQL 后端全量测试：EDUMIND_TEST_DATABASE_URL=... uv run pytest -q，234 passed；Ruff、Mypy 和 git diff --check 通过。"
+      ],
+      "started_at": "2026-09-25T21:00:17",
+      "completed_at": "2026-09-25T23:44:11",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.2-T016"
     },
@@ -568,7 +717,7 @@
       "phase": "MVP 0.2",
       "parent_work_package": "MVP-0.2-005",
       "title": "生成并持久化初始路径与重新规划版本",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.2-T013",
@@ -586,9 +735,12 @@
       "verification": [
         "在 PostgreSQL 运行规划、重规划、幂等、历史和重启测试。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "隔离 PostgreSQL 路径版本测试覆盖初始规划、同输入重放、并发重放、掌握度重规划、画像偏好变更、旧版本和新引擎重启读取。",
+        "EDUMIND_TEST_DATABASE_URL=... uv run pytest -q：后端全量 236 passed；uv run ruff check app tests、uv run mypy app（49 个 source）、改动文件格式和 git diff --check 通过。"
+      ],
+      "started_at": "2026-09-25T23:44:59",
+      "completed_at": "2026-09-26T08:40:39",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.2-T017"
     },
@@ -597,7 +749,7 @@
       "phase": "MVP 0.2",
       "parent_work_package": "MVP-0.2-005",
       "title": "提供掌握度与路径 API",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.2-T002",
@@ -607,8 +759,11 @@
       "scope": [
         "backend/app/api/",
         "backend/app/services/",
+        "backend/app/models/",
+        "backend/alembic/",
         "backend/tests/",
-        "docs/api/openapi.yaml"
+        "docs/api/openapi.yaml",
+        "docs/path-rules-v2.md"
       ],
       "acceptance_criteria": [
         "掌握度和当前路径接口只返回当前 owner 的状态与证据摘要。",
@@ -618,9 +773,12 @@
       "verification": [
         "运行契约、owner 隔离、无 Provider 调用和查询性能测试。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "路径 API 定向 4 passed：OpenAPI JSON Schema、owner 隔离、持久幂等重放/冲突、版本冲突、无 Provider 构造和去敏掌握度；20 次本地 TestClient + PostgreSQL 路径查询 P95 < 200ms。",
+        "隔离库 Alembic 0009 upgrade、downgrade 到 0008、再 upgrade head 通过；全量后端 240 passed，Ruff/Mypy（51 个 source）、OpenAPI JSON 和 git diff --check 通过。"
+      ],
+      "started_at": "2026-09-26T10:39:12",
+      "completed_at": "2026-09-26T11:14:14",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.2-T018"
     },
@@ -629,7 +787,7 @@
       "phase": "MVP 0.2",
       "parent_work_package": "MVP-0.2-005",
       "title": "把一句话目标和学习单元关联到知识节点",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.2-T004",
@@ -638,7 +796,9 @@
       "scope": [
         "backend/app/agents/",
         "backend/app/services/",
-        "backend/tests/"
+        "backend/app/api/",
+        "backend/tests/",
+        "docs/api/openapi.yaml"
       ],
       "acceptance_criteria": [
         "解析候选节点后由本地 Repository 校验，模型不得创造未知节点。",
@@ -648,9 +808,12 @@
       "verification": [
         "运行别名、模糊目标、未知节点、Provider 失败和关联测试。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "目标解析覆盖别名、嵌套别名、模糊/否定/多主题、未知模型节点、低置信度和 Provider 失败；学习 SSE 集成覆盖持久澄清重放及节点/路径快照关联。",
+        "隔离 PostgreSQL 后端全量 255 passed，包含初始画像并发重基、OpenAPI GoalClarification/LearningUnit 校验；Ruff/Mypy（52 个 source）、OpenAPI JSON 和 git diff --check 通过。"
+      ],
+      "started_at": "2026-09-26T11:16:40",
+      "completed_at": "2026-09-26T11:49:10",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.2-T019"
     },
@@ -659,7 +822,7 @@
       "phase": "MVP 0.2",
       "parent_work_package": "MVP-0.2-006",
       "title": "将练习改为服务端提交并展示掌握度变化",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.2-T012",
@@ -667,7 +830,11 @@
       ],
       "scope": [
         "web/src/",
-        "web/tests/"
+        "web/tests/",
+        "backend/app/api/",
+        "backend/app/services/",
+        "backend/tests/",
+        "docs/api/openapi.yaml"
       ],
       "acceptance_criteria": [
         "提交正式练习答案，不再以内存比对作为最终证据。",
@@ -677,9 +844,15 @@
       "verification": [
         "运行练习组件/API 客户端测试、类型检查、Lint 和构建。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {"command": "pnpm test --run && pnpm typecheck && pnpm lint && pnpm build", "result": "passed: 42 frontend tests, typecheck and production build; 0 lint errors, 67 pre-existing Vue formatting warnings"},
+        {"command": "EDUMIND_TEST_DATABASE_URL=<isolated PostgreSQL> uv run pytest -q", "result": "passed: 255 tests, no skips, 7 dependency deprecation warnings; owner receipt recovery and answer-key filtering covered"},
+        {"command": "uv run ruff check app tests && uv run mypy app", "result": "passed: backend lint and 52 source files checked"},
+        {"command": "python3 /Users/apir/.agents/skills/webapp-testing/scripts/with_server.py --server 'cd ../web && pnpm dev --host 127.0.0.1 --port 4173 --strictPort' --port 4173 -- uv run python ../web/tests/e2e/learning_flow.py", "result": "passed: browser route-mock quiz submit, reload without duplicate POST, mobile no overflow, provider failure, review rejection and SSE recovery; screenshots /tmp/edumind-mvp02-t020-desktop.png and /tmp/edumind-mvp02-t020-mobile.png visually inspected; expected guest/missing-result 401/404 console responses, not real Provider validation"},
+        {"command": "jq empty docs/api/openapi.yaml && git diff --check", "result": "passed: contract parses and whitespace check clean"}
+      ],
+      "started_at": "2026-09-26T11:51:07",
+      "completed_at": "2026-09-26T12:36:56",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.2-T020"
     },
@@ -688,7 +861,7 @@
       "phase": "MVP 0.2",
       "parent_work_package": "MVP-0.2-006",
       "title": "实现轻量学习路径视图",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.2-T018",
@@ -706,9 +879,15 @@
       "verification": [
         "运行路径组件测试、无障碍检查、类型检查、Lint 和构建。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {"command": "pnpm test --run", "result": "passed: 54 tests across 9 files; path client 4 tests and path component 8 tests cover four-state legend, evidence, changed-node preservation, stable replan retry, version conflict, empty/completed paths and obsolete requests"},
+        {"command": "pnpm typecheck && pnpm exec eslint src/App.vue src/api/paths.ts src/components/LearningPathPanel.vue tests/paths.spec.ts tests/LearningPathPanel.spec.ts && pnpm build", "result": "passed: typecheck, changed-file lint without warnings, production build"},
+        {"command": "pnpm lint", "result": "passed: 0 errors, 67 existing Vue formatting warnings"},
+        {"command": "python3 /Users/apir/.agents/skills/webapp-testing/scripts/with_server.py --server 'cd ../web && pnpm dev --host 127.0.0.1 --port 4173 --strictPort' --port 4173 -- uv run python ../web/tests/e2e/learning_flow.py", "result": "passed: route-mock browser learning/quiz/replan/reload, native keyboard Enter selection and named evidence region, unchanged-node check, 390px no overflow; visually inspected /tmp/edumind-mvp02-t021-desktop.png and /tmp/edumind-mvp02-t021-mobile.png; not real Provider evidence"},
+        {"command": "uv run ruff check ../web/tests/e2e/learning_flow.py && git diff --check", "result": "passed"}
+      ],
+      "started_at": "2026-09-26T12:38:21",
+      "completed_at": "2026-09-26T12:54:03",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.2-T021"
     },
@@ -717,7 +896,7 @@
       "phase": "MVP 0.2",
       "parent_work_package": "MVP-0.2-007",
       "title": "让正式资源审核使用图谱与画像上下文",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.2-T004",
@@ -737,9 +916,13 @@
       "verification": [
         "运行事实、前置、难度、误区、未知字段和代码错误测试。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {"command": "EDUMIND_TEST_DATABASE_URL=<isolated PostgreSQL> uv run pytest -q", "result": "passed: 266 tests, no skips, 7 dependency warnings; review context facts/prerequisites/difficulty/misconceptions, minimal evidence-backed profile, unknown omission, correction context, severe-code gate and production learning-session snapshot covered"},
+        {"command": "uv run ruff check app tests && uv run mypy app", "result": "passed: backend lint and 53 source files checked"},
+        {"command": "Review v2 prompt and persistence version audit; git diff --check", "result": "passed: legacy v1 remains only in historical log/document; new reviews persist v2 and unit records exact profile/context source. Mock verdict tests do not establish real model quality; T023 owns the benchmark."}
+      ],
+      "started_at": "2026-09-26T12:55:39",
+      "completed_at": "2026-09-26T13:02:21",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.2-T022"
     },
@@ -748,13 +931,20 @@
       "phase": "MVP 0.2",
       "parent_work_package": "MVP-0.2-007",
       "title": "建立正式资源 schema 与 Review 质量基准",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.2-T022"
       ],
       "scope": [
         "backend/tests/",
+        "backend/app/services/provider_gateway.py",
+        "backend/app/services/deepseek_responses.py",
+        "backend/app/agents/learning_resource_prompt.py",
+        "backend/app/agents/learning_unit_generator.py",
+        "backend/app/agents/review_agent.py",
+        "backend/app/services/resource_publication.py",
+        "docs/agents/prompts/",
         "data/",
         "docs/acceptance/"
       ],
@@ -766,9 +956,20 @@
       "verification": [
         "运行离线错误集和经明确授权的真实 Provider 质量基准。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {"command": "uv run python -m tests.resource_quality --mode offline", "result": "passed: 30 authored schema-valid fixtures, 4/4 deterministic dangerous-code detections, 0 Provider calls; 16 semantic errors unevaluated, real generation/recall metrics null, stage gate false"},
+        {"command": "uv run pytest -q tests/test_resource_quality.py", "result": "passed: 6 benchmark tests in the final full run; mock failure accounting retains 60 generation denominators, missed semantic errors and provider unavailability; explicit billable guard and 86-call no-retry cap covered"},
+        {"command": "EDUMIND_TEST_DATABASE_URL=<isolated PostgreSQL> uv run pytest -q", "result": "passed: 272 tests, no skips, 7 dependency deprecation warnings; no real Provider calls"},
+        {"command": "uv run ruff check app tests && uv run mypy app && git diff --check", "result": "passed: backend lint/typecheck (53 source files) and whitespace checks"},
+        {"command": "git check-ignore .env; uv run --env-file ../.env configuration presence check", "result": "passed: .env ignored and required Provider settings present; no credentials printed and no network request made"},
+        {"command": "uv run --env-file ../.env python -m tests.resource_quality --mode provider --confirm-billable --output ../docs/acceptance/mvp-0.2-resource-quality-provider.json", "result": "failed gate (exit 1): authorized 86/86 requests used, deepseek-flash, 203.82s, schema 45/60=75% below98%; conservative severe recall19/20=95%, model-only15/16=93.75%, controls10/10. Main semantic issues individually audited; pointer-null fact rejection excluded by predeclared code_safety label. 14 explanation and1 code INVALID_OUTPUT failures; precise cause not retained. No retry/correction or threshold changes."},
+        {"command": "uv run pytest -q tests/test_resource_quality.py; uv run ruff check tests/resource_quality.py tests/test_resource_quality.py", "result": "passed: 7 tests including sanitized report persistence without Provider calls; lint passed"},
+        {"command": "EDUMIND_TEST_DATABASE_URL=<isolated PostgreSQL> uv run pytest -q; uv run ruff check app tests; uv run mypy app; git diff --check", "result": "passed after user-approved offline diagnosis:284 tests no skips,7 existing warnings; Ruff/Mypy53files/diff checks pass. Enum-only error categories distinguish malformed JSON/non-object/schema mismatch/incomplete/explicit token limit; strict validation unchanged. Fixed5-call diagnostic mode guard/budget/no quality claim tested with mocks only; no real calls this turn."},
+        {"command": "uv run --env-file ../.env python -m tests.resource_quality --mode provider --confirm-billable --output ../docs/acceptance/mvp-0.2-resource-quality-provider-v3.json", "result": "passed: user explicitly authorized all current-Provider MVP0.2 billable requests on Beijing2026-09-26; instruction-v3 full schema in prompt, unchanged dataset/thresholds/output limit,86 calls,227.57s,deepseek-flash. Schema60/60=100%,severe20/20=100%,model-only16/16=100%,controls10/10. All16 main semantic review issues audited against authored errors; no reject-all or unavailable-result credit. Earlier failed baselines retained."},
+        {"command": "EDUMIND_TEST_DATABASE_URL=<isolated PostgreSQL> uv run pytest -q; uv run ruff check app tests; uv run mypy app; git diff --check", "result": "passed final instruction-v3:303 tests,no skips,7 pre-existing dependency warnings,Ruff/Mypy53files/diff. Syntax/schema diagnostic enums retain no generated content or locations; old metadata and schema-v1 quiz compatibility preserved."}
+      ],
+      "started_at": "2026-09-26T13:03:38",
+      "completed_at": "2026-09-26T17:19:38",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.2-T023"
     },
@@ -777,7 +978,7 @@
       "phase": "MVP 0.2",
       "parent_work_package": "MVP-0.2-008",
       "title": "完成 MVP 0.2 学习闭环自动化 E2E",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.2-T009",
@@ -785,7 +986,11 @@
         "MVP-0.2-T019",
         "MVP-0.2-T020",
         "MVP-0.2-T021",
-        "MVP-0.2-T023"
+        "MVP-0.2-T023",
+        "MVP-0.2-T026",
+        "MVP-0.2-T027",
+        "MVP-0.2-T028",
+        "MVP-0.2-T029"
       ],
       "scope": [
         "backend/tests/",
@@ -800,9 +1005,13 @@
       "verification": [
         "运行后端集成、前端 E2E、Compose 恢复和安全回归。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "2026-09-26: 真实PostgreSQL+mock Provider闭环及独立进程恢复通过；全量304 passed，无跳过，7既有警告。",
+        "浏览器路由mock E2E通过；隔离Compose重启PostgreSQL/API后资源、回执、掌握度与路径快照恢复通过。",
+        "Ruff、Mypy53源文件、diff检查通过；证据与限制见docs/acceptance/mvp-0.2-closed-loop.md；本任务0真实模型请求。"
+      ],
+      "started_at": "2026-09-26T17:21:50",
+      "completed_at": "2026-09-26T17:33:00",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.2-T024"
     },
@@ -811,7 +1020,7 @@
       "phase": "MVP 0.2",
       "parent_work_package": "MVP-0.2-008",
       "title": "完成 MVP 0.2 性能与阶段退出验收",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.2-T024"
@@ -820,7 +1029,20 @@
         "docs/acceptance/",
         "README.md",
         "task.json",
-        "process.txt"
+        "process.txt",
+        "backend/app/agents/",
+        "backend/tests/",
+        "web/src/components/PublishedLearningWorkspace.vue",
+        "web/tests/",
+        "docs/PRD.md",
+        "docs/ADR/0003-learning-evidence-mastery-and-path-versioning.md",
+        "backend/app/services/deepseek_responses.py",
+        "docs/PROVIDERS.md",
+        "backend/app/services/deepseek_beta_tools.py",
+        "backend/app/core/provider_factory.py",
+        "backend/app/services/provider_gateway.py",
+        "docker-compose.yml",
+        ".env.example"
       ],
       "acceptance_criteria": [
         "真实流程完成输入、学习、练习、掌握度更新和可解释推荐。",
@@ -830,11 +1052,321 @@
       "verification": [
         "执行真实 Provider 闭环、路径性能基准和阶段退出清单。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "2026-09-27最终：资源指令v8/审核v2质量v11通过原门槛：结构60/60、题型20/20、严重19/20、语义15/16；前置关系漏检及正确对照超时保留，对照9/10，不修改计分。",
+        "画像提取/行为指令v2保持schema及降级，3诊断通过；当前Pro真实闭环v10 10请求通过，公开题面独立B/T/B，两次score1/mastery .9515/mastered、画像no_change、推荐linked-list-concept/path v2；TestClient每接口100样本/5预热读取P99 35.175ms/重规划P95 47.43ms/失败0。",
+        "最终388后端无跳过/7警告、Ruff/Mypy55/前端55测试/构建通过，lint0错误67警告；浏览器route-mock通过但401/404 console。最终镜像3a88d834d2719030ddecb95d29b7a9e6ea10a9e57cb95eaa52b86e9a5b369700，隔离Compose0009 head/seed/restart/check恢复通过，合成资源10f7dcdc-6985-47f9-af20-51bbbdaefc84。",
+        "本轮13模型请求、T025验收累计901、连通另12，金额余额未知；限制及实际命令见阶段报告，Pro首段P95未测，不冒充HTTP/公网或全部产品发布门槛。下列记录为历史失败，不覆盖旧报告；不push/merge或进入MVP0.3。",
+        "2026-09-26: 真实Provider发布三类正式资源，9次模型请求；独立作答开放解释题后确定性评分0/3，闭环失败，未完成。",
+        "真实本机HTTP路径性能：每接口100样本+5预热，读取P99 35.067ms、重规划P95 47.877ms，失败率均0；合成画像与真实闭环明确分开。",
+        "证据/限制/待决策见docs/acceptance/mvp-0.2-stage-acceptance.md；新验收入口Ruff通过，diff检查通过。",
+        "指令v6真实闭环报告v7通过，10请求，独立作答后两次score=1、mastery=.9515/mastered并推荐下一节点；TestClient路径读取P99 31.014ms、重规划P95 46.458ms，各100样本/5预热/失败0，不冒充浏览器或独立HTTP性能。",
+        "当前指令v6质量86请求：schema58/60=96.67%未达98%，客观格式19/20未达100%；严重20/20、模型语义16/16、对照10/10。阶段门禁失败，不创建完成提交。",
+        "最终本地326后端/55前端测试通过，Ruff/Mypy54文件/Web构建通过；浏览器为路由mock，Compose恢复仅验证修复中期v5镜像；截至严格模式探针前T025累计305真实请求，货币费用未知。",
+        "2026-09-26严格模式隔离探针3请求无重试：默认schema符合、strict=true一份符合/一份enum不符且安全拒绝；当时生产适配器未改变，证据mvp-0.2-strict-probe-v1.json。累计308真实请求；字段被接受不足以证明强约束。",
+        "获准Beta探针v1为2请求：enum通过/原资源schema HTTP400；v2等价const投影后4请求均通过。接入显式beta_tools选项，默认仍responses_json_schema；模型/真实.env不变，普通文本/SSE不变。",
+        "Beta完整质量v1为86请求/299.52秒/无重试，schema55/60=91.67%，客观17/20=85%，严重4/20、模型语义0/16、对照0/10；26模型审核均不可用，不伪称拒绝即检出。生成失败3超时/1required缺失/1截断JSON，阶段门禁失败。",
+        "随后修正审核enum缺type的等价映射，1请求审核schema协议诊断通过，不冒充26项审核复验；最终349后端测试无跳过/7既有警告、Ruff/Mypy55源文件通过，中期镜像恢复与最终本地证据分开。T025累计401真实请求，费用以Provider账单为准。",
+        "2026-09-26非计费诊断：合成合法单选题含为什么时被_OPEN_RESPONSE全局规则误拒绝，替换问法而保留选项/答案后通过；这是可复现的本地误判，不证明历史格式失败也同因。质量生成上限2048而生产默认4096，报告未保留结束原因/用量，不能断言JSON不完整皆因模型能力。33项既有针对性测试通过，但未覆盖这一误判；新增0真实请求。",
+        "用户yes批准本地修复后，合法为什么单选误判已修，基准与生产共享4096默认，固定错误类别/合法用量及审核失败账本已补；93针对性/361全量后端无跳过通过，7既有警告，Ruff/Mypy55文件通过。离线质量30夹具/4安全错误通过、16语义未评估、0Provider请求，不补证真实质量。",
+        "获准修复后六请求诊断15.79秒，默认Responses/deepseek-flash/4096/无重试：结构5/6、三组练习题型均通过，数组讲解EXTRA_DATA，输出1086token未到上限；不是完整质量门禁。新17工具测试/Ruff/diff检查及拒绝覆盖/未确认拒绝调用通过；T025累计407请求，报告mvp-0.2-resource-repair-diagnostic-v1.json。",
+        "获准非计费块数量诊断已完成：Responses结果和结构化失败保存已验证的消息数/文本块数，质量尝试账本仅导出数字；不改变拼接/严格JSON解析，不保留原文。拆分合法JSON通过，多个JSON仍EXTRA_DATA，reasoning不计数，非法计数拒绝。371全量后端无跳过通过/7既有警告，Ruff/Mypy55文件/diff通过，0真实请求；旧报告无块数不能倒推原因。",
+        "获准数组讲解三请求诊断12.02秒、结构2/3；三次均1消息/1文本块，失败EXTRA_DATA输出897/4096token，排除本次多块拼接和额度耗尽，额外内容在单个文本块内。不据此断言额外内容具体类型或厂商内部根因。64针对性/Ruff/Mypy55/diff通过，无重试；累计410真实请求，报告mvp-0.2-array-diagnostic-v1.json。",
+        "获准非计费尾随内容分类已完成：仅EXTRA_DATA诊断固定JSON_VALUE_SUFFIX/JSON_LIKE_SUFFIX/MARKDOWN_FENCE_SUFFIX/OTHER_SUFFIX，不导出原文或位置，不恢复部分JSON、不改变接受范围；质量账本记录分类。73针对性后追加账本回归，381全量通过无跳过/7既有警告，Ruff/Mypy55/diff通过。新增0真实调用；旧报告无法补填类型。",
+        "2026-09-27重新明确批准的数组诊断v2为3请求12.12秒，结构3/3，均1消息/1块，未复现EXTRA_DATA因此无新失败类别证据；不能证明已修复或补证完整质量。73针对性/diff通过，无重试；当天3请求、T025累计413，报告mvp-0.2-array-diagnostic-v2.json。",
+        "用户批准86基准及此key持续必要验证直到用量耗尽；v7实际deepseek-v4-flash-0731（非口头预期v4.1），86请求496.72秒，schema46/60/题型19/20/严重4/20仅本地安全/语义0/16/对照0/10，26审核不可用，不冒充检出。14讲解单块EXTRA_DATA/OTHER_SUFFIX，审核23additionalProperties/2required/1语法。",
+        "新增审核指令v1明确原schema/字段，3请求诊断2错误正确拒绝/1对照通过；另3公开讲解字符类别探针中2失败尾随仅关闭大括号，原文不保存。资源指令v7定向关闭边界后5请求生成仅2/5通过、3EXTRA_DATA，未盲重跑完整86。generation-v7诊断报告structured_transport误标mock，实际命令显式responses_json_schema，已修元数据生成器但旧报告不覆盖。",
+        "最终383后端全量无跳过通过/7既有警告，55前端通过，Ruff/Mypy55源文件/前端构建/diff通过；前端lint0错误/67样式警告。本轮97真实调用，T025验收累计510，另连通探针9次（6失败/3成功），金额和剩余额度未知；旧模型闭环不补证当前模型，缺完整质量通过，不创建完成提交。",
+        "切回deepseek-flash/default Responses后质量v8 86请求161.84秒，schema59/60、严重19/20、语义15/16、对照10/10；题型17/20失败。3新格式诊断复现两份删除填空无____/非整数答案，资源指令v8明确无需凑齐题型且概念/指针优先选择判断，保留合法整数填空及原schema/评分/门禁；新3请求诊断均通过。",
+        "质量v9 86请求167.02秒，题型20/20、严重20/20、语义16/16、对照10/10，但schema58/60=96.67%未达98%（循环队列代码required/栈讲解additionalProperties）。真实闭环v8 10请求通过，按公开题面独立B/T/B后两次不同幂等键提交score1、mastery0→.55→.9515/mastered、推荐linked-list-concept/path v2，画像no_change。TestClient每接口100样本+5预热：读取P99 44.11ms/重规划P95 48.033ms失败0，不冒充HTTP/首段/浏览器证据。",
+        "最终386后端无跳过/7警告、Ruff/Mypy55/diff通过；浏览器route-mock通过但console有401/404；最终隔离Compose镜像manifest67b454830507871ee5cda78dcadb1e6bfe9889869a6b68e33662b71f6b838b6d的0009 head/seed/restart/check恢复通过，合成资源a2f5ddb3-efe6-4a96-8b94-17c82e9f640d。此前已批Beta范围内官方同主机隔离5请求仅4/5，C指针讲解delimiter失败；真实.env/生产默认未改。切回后193请求、T025验收累计703、另连通9，费用/余额未知，质量未通过不创建完成提交。"
+      ],
+      "started_at": "2026-09-26T17:48:00",
+      "completed_at": "2026-09-27T10:56:50",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.2-T025"
+    },
+    {
+      "id": "MVP-0.2-T026",
+      "phase": "MVP 0.2",
+      "parent_work_package": "MVP-0.2-003",
+      "title": "保留跨学习会话的显式画像修正",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": ["MVP-0.2-T008"],
+      "scope": ["backend/app/agents/", "backend/app/services/", "backend/tests/", "docs/acceptance/"],
+      "acceptance_criteria": [
+        "新学习请求创建画像版本时保留既有手动修正及其证据，未知字段不臆测。",
+        "无新证据或 Provider 失败时不得清空已有修正；旧版本仍可读取。",
+        "模型提取结果不能伪造 manual_correction 来源覆盖用户修正。",
+        "覆盖再次学习、字段冲突与版本递增的回归测试。"
+      ],
+      "verification": ["运行跨会话画像合并回归与相关后端检查。"],
+      "verification_results": [
+        {"command": "EDUMIND_TEST_DATABASE_URL=<isolated PostgreSQL> uv run --frozen pytest tests/test_transient_profiles.py tests/test_profile_merge.py tests/test_profile_agent.py -q", "result": "passed: 21 tests; manual correction survives another learning request and Provider failure, old versions remain readable"},
+        {"command": "EDUMIND_TEST_DATABASE_URL=<isolated PostgreSQL> uv run --frozen pytest -q", "result": "passed: 179 tests; 7 dependency deprecation warnings"},
+        {"command": "uv run --frozen ruff check . && uv run --frozen mypy app", "result": "passed: Ruff clean; Mypy 37 source files"},
+        {"command": "git diff --check", "result": "passed"}
+      ],
+      "started_at": "2026-09-25T18:48:26",
+      "completed_at": "2026-09-25T19:31:15",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.2-T026"
+    },
+    {
+      "id": "MVP-0.2-T027",
+      "phase": "MVP 0.2",
+      "parent_work_package": "MVP-0.2-003",
+      "title": "并发重复画像事件返回同一回执",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": ["MVP-0.2-T007", "MVP-0.2-T008"],
+      "scope": ["backend/app/services/", "backend/tests/", "docs/acceptance/"],
+      "acceptance_criteria": [
+        "同一 owner、幂等键和载荷并发提交只创建一条事件，并返回同一事件 ID。",
+        "相同键但不同载荷稳定返回幂等冲突，不泄露数据库异常。",
+        "隔离 PostgreSQL 并发回归测试覆盖查询后插入竞争。"
+      ],
+      "verification": ["运行并发幂等回归与相关后端检查。"],
+      "verification_results": [
+        {"command": "EDUMIND_TEST_DATABASE_URL=<isolated PostgreSQL> uv run --frozen pytest tests/test_profile_persistence.py -q", "result": "passed: 7 tests; two real sessions race after lookup, identical payload replays one ID and different payload conflicts"},
+        {"command": "EDUMIND_TEST_DATABASE_URL=<isolated PostgreSQL> uv run --frozen pytest -q", "result": "passed: 181 tests; 7 dependency deprecation warnings"},
+        {"command": "uv run --frozen ruff check . && uv run --frozen mypy app", "result": "passed: Ruff clean; Mypy 37 source files"},
+        {"command": "git diff --check", "result": "passed"}
+      ],
+      "started_at": "2026-09-25T19:32:59",
+      "completed_at": "2026-09-25T19:34:49",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.2-T027"
+    },
+    {
+      "id": "MVP-0.2-T028",
+      "phase": "MVP 0.2",
+      "parent_work_package": "MVP-0.2-006",
+      "title": "首次学习完成后刷新画像卡片",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": ["MVP-0.2-T009"],
+      "scope": ["web/src/", "web/tests/", "docs/acceptance/"],
+      "acceptance_criteria": [
+        "学习请求创建画像后，当前页面中的画像卡片自动读取并显示新版本。",
+        "刷新不阻塞首段内容，也不覆盖正在编辑的修正草稿。",
+        "组件或入口回归覆盖空态转为最新画像及失败重试。"
+      ],
+      "verification": ["运行画像卡片与入口测试、类型检查和构建。"],
+      "verification_results": [
+        {"command": "pnpm test --run tests/ProfileCard.spec.ts tests/App.spec.ts", "result": "passed: 14 tests; refresh token, empty-to-ready transition and deferred edit refresh covered"},
+        {"command": "pnpm test --run", "result": "passed: 33 tests across 6 files"},
+        {"command": "pnpm typecheck && pnpm build", "result": "passed: Vue typecheck and Vite production build"},
+        {"command": "pnpm lint", "result": "passed: 0 errors, 97 existing formatting warnings"},
+        {"command": "git diff --check", "result": "passed"}
+      ],
+      "started_at": "2026-09-25T19:36:52",
+      "completed_at": "2026-09-25T19:39:28",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.2-T028"
+    },
+    {
+      "id": "MVP-0.2-T029",
+      "phase": "MVP 0.2",
+      "parent_work_package": "MVP-0.2-003",
+      "title": "持久化画像事件与快照的版本来源",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": ["MVP-0.2-T006", "MVP-0.2-T007"],
+      "scope": ["backend/app/models/", "backend/alembic/", "backend/app/services/", "backend/tests/", "docs/acceptance/"],
+      "acceptance_criteria": [
+        "画像事件持久化 schema 版本；画像快照记录合并规则版本及前一版本引用。",
+        "迁移为现有记录提供可解释的版本回填，不改写已有画像内容。",
+        "临时 PostgreSQL 验证迁移与重启后可读取版本来源。"
+      ],
+      "verification": ["运行迁移、版本来源与相关后端检查。"],
+      "verification_results": [
+        {"command": "EDUMIND_DATABASE_URL=<isolated PostgreSQL> uv run --frozen alembic upgrade head", "result": "passed: 0006_profile_correction -> 0007_profile_provenance"},
+        {"command": "docker exec <isolated PostgreSQL> psql ... legacy provenance queries", "result": "passed: 77 profile and 16 event original-field digests unchanged; all legacy profiles marked; 0 invalid lineage; event schema v1"},
+        {"command": "EDUMIND_TEST_DATABASE_URL=<isolated PostgreSQL> uv run --frozen pytest -q tests/test_profile_persistence.py tests/test_transient_profiles.py", "result": "passed: 9 tests including provenance read with a new connection"},
+        {"command": "EDUMIND_TEST_DATABASE_URL=<isolated PostgreSQL> uv run --frozen pytest -q --tb=short", "result": "passed: 181 tests, 7 dependency deprecation warnings"},
+        {"command": "uv run --frozen ruff check . && uv run --frozen mypy app", "result": "passed: 37 source files type checked"},
+        {"command": "git diff --check", "result": "passed"}
+      ],
+      "started_at": "2026-09-25T19:41:26",
+      "completed_at": "2026-09-25T19:45:29",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.2-T029"
+    },
+    {
+      "id": "MVP-0.2-T030",
+      "phase": "MVP 0.2",
+      "parent_work_package": "MVP-0.2-006",
+      "title": "恢复学习请求身份，防止网络重试重复生成与计费",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": ["MVP-0.2-T025"],
+      "scope": ["web/src/App.vue", "web/tests/", "backend/app/services/learning_operations.py", "backend/app/api/learning_sessions.py", "backend/tests/", "docs/api/openapi.yaml", "docs/ADR/0002-streaming-first-screen-and-resource-review.md", "docs/acceptance/mvp-0.2-t030-retry-recovery.md", "process.txt"],
+      "acceptance_criteria": [
+        "恢复原请求保留目标、操作 ID 和幂等键；查询失败再次恢复、已发布读取和运行中等待均不新建生成。",
+        "明确重新生成或提交新目标才创建新身份；旧异步响应不能覆盖新目标页面。",
+        "明确失败按批准的后端契约处理，不改变审核发布、安全或 owner 隔离边界。",
+        "回归覆盖用户要求的六种情形，仅 mock 或隔离数据库验证，无真实付费调用。",
+        "相关前后端测试、类型检查、静态检查和构建通过并记录；完成后只创建本地提交。"
+      ],
+      "verification": ["pnpm --dir web test --run", "pnpm --dir web typecheck", "pnpm --dir web lint", "pnpm --dir web build", "在 backend 使用隔离 EDUMIND_TEST_DATABASE_URL 执行 uv run --frozen pytest -q", "在 backend 执行 uv run --frozen ruff check app tests 和 uv run --frozen mypy app", "git diff --check"],
+      "verification_results": [
+        {"command": "backend: EDUMIND_TEST_DATABASE_URL=<isolated PostgreSQL> uv run --frozen pytest -q", "result": "passed: 396 tests, no skips, 7 existing deprecation warnings; FakeAdapter only, active/failed/canceled GET and same-key replay preserve state/attempt, external owner 404"},
+        {"command": "backend: uv run --frozen ruff check app tests; uv run --frozen mypy app", "result": "passed: Ruff clean, 55 source files type checked"},
+        {"command": "pnpm --dir web test --run", "result": "passed: 65 tests across 10 files, including 10 request identity and stale-response regressions"},
+        {"command": "pnpm --dir web typecheck; pnpm --dir web lint; pnpm --dir web build", "result": "passed: vue-tsc and Vite build, ESLint 0 errors/67 existing formatting warnings"},
+        {"command": "backend: uv run --frozen python ../web/tests/e2e/run.py", "result": "passed: route-mock browser scenarios; failed recovery one POST, explicit regeneration new key, published SSE recovery one POST; existing mock 401/404 console messages retained; webapp-testing lifecycle/interaction guidance used"},
+        {"command": "git diff --check", "result": "passed; self-inspected code/test/docs diff, no real .env/key/generated media staged; 0 real model requests"}
+      ],
+      "started_at": "2026-09-27T13:25:13",
+      "completed_at": "2026-09-27T13:33:42",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.2-T030"
+    },
+    {
+      "id": "MVP-0.2-T031",
+      "phase": "MVP 0.2",
+      "parent_work_package": "MVP-0.2-008",
+      "title": "真实浏览器完整学习闭环及断线恢复验收",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": ["MVP-0.2-T030"],
+      "scope": ["docs/acceptance/", "web/tests/", "web/src/styles.css", "backend/tests/", "task.json", "process.txt"],
+      "acceptance_criteria": [
+        "真实Chromium/Vite代理/Uvicorn/隔离PostgreSQL/当前Provider完整链路，不用route mock、TestClient或合成发布资源。",
+        "匿名Cookie/CSRF、首段与审核、三类资源、公开题面独立作答、评分/掌握度/推荐正常。",
+        "刷新恢复资源/回执/路径；可控断线恢复同操作，Provider账本无重复生成。",
+        "分类控制台/网络负向与缺陷，保存脱敏证据、复现入口；实际Provider尝试硬上限30，失败不冒充通过。"
+      ],
+      "verification": ["真实浏览器验收入口、隔离迁移、相关离线工具回归及静态检查、git diff --check"],
+      "verification_results": [
+        {"command": "backend: EDUMIND_DATABASE_URL=<fresh isolated browser DB> uv run --frozen alembic upgrade head", "result": "passed: empty database to 0009 head, no synthetic reviewed resources"},
+        {"command": "serve_real_browser.py --confirm-billable --limit 30; Vite real proxy; run_real_browser.py --confirm-billable --output <fresh report>", "result": "passed: real Chromium/Vite/Uvicorn/PostgreSQL/current Provider v5, all 9 checks; independent B/T/B twice, mastery 95%, path v3; 1 learning POST, recovery counters 28=28; 30 total attempts across 3 actual flows, final 10; all failed reports preserved"},
+        {"command": "backend: EDUMIND_TEST_DATABASE_URL=<isolated regression DB> uv run --frozen pytest -q", "result": "passed: 397 tests, no skips, 7 existing warnings"},
+        {"command": "backend: uv run --frozen ruff check app tests ../docs/acceptance/serve_real_browser.py ../docs/acceptance/run_real_browser.py; uv run --frozen mypy app", "result": "passed: Ruff clean after import-order fix, Mypy 55 source files"},
+        {"command": "pnpm --dir web test --run; pnpm --dir web typecheck; pnpm --dir web lint; pnpm --dir web build", "result": "passed: 66 tests/11 files; typecheck/build pass; 0 lint errors/67 existing warnings"},
+        {"command": "git diff --check", "result": "passed; webapp-testing used; evidence docs/acceptance/mvp-0.2-t031-real-browser.md; actual console negatives classified, pageerror/unexpected HTTP failures 0"}
+      ],
+      "started_at": "2026-09-27T13:53:58",
+      "completed_at": "2026-09-27T14:39:03",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.2-T031"
+    },
+    {
+      "id": "MVP-0.2-T032",
+      "phase": "MVP 0.2",
+      "parent_work_package": "MVP-0.2-008",
+      "title": "当前模型首字节和首段性能复测",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": ["MVP-0.2-T031", "MVP-0.2-T034"],
+      "scope": ["docs/acceptance/", "backend/tests/", "task.json", "process.txt"],
+      "acceptance_criteria": [
+        "先确认可复现且批准的首段规则、起点、有限样本和实际计费硬上限。",
+        "分别统计客户端HTTP原始首字节/头收齐/SSE状态/任意delta/人工确认教学正文token/首段/发布；PRD首字节≤2秒、首段≤10秒不变。2026-09-27用户明确批准独立教学token2秒未达标转后续优化，不再阻塞MVP0.2收尾；仍独立报告，不互相替代。",
+        "记录当前模型/传输/指令/环境/并发/样本/预热/失败，失败超时不丢弃、不无限重跑。",
+        "证据和命令脱敏，未达PRD门槛标记阻塞；附加token门槛按批准记录保留失败并交接后续优化，不改变真实.env或模型，不改旧冻结综合gate。"
+      ],
+      "verification": ["有限样本实际HTTP/Provider性能入口、指标离线回归、git diff --check"],
+      "verification_results": [
+        {"command": "读取 docs/ADR/0002-streaming-first-screen-and-resource-review.md、docs/PRD.md §8.1、backend/tests/manual_provider_acceptance.py 及最终验收报告", "result": "gap confirmed: old first_content_ms is first nonempty token; no approved reproducible full teaching paragraph rule. Non-billable 20-sample/240-attempt plan prepared in docs/acceptance/mvp-0.2-t032-first-screen-plan.md, 0 actual samples/calls"},
+        {"command": "git diff --check", "result": "passed; documentation-only preparation, no latency result or completion claim"},
+        {"command": "用户同意冻结规则；隔离perf_t032迁移；serve_first_screen.py + 实际Vite代理 + run_first_screen.py一次20样本 + audit_first_screen.py", "result": "failed gate: current Pro/Responses, 20/20 published; 162/240 actual attempts (20 stream,142 structured; 2 TIMEOUT retained); token P95 5661.935ms >2000ms, 0/20 within2s; first paragraph 3/20 unconfirmed, full planned P95 missing, observed17 conditional P95 6260.461ms not acceptance. No warmups/client retries/replacement runs; services stopped; evidence docs/acceptance/mvp-0.2-t032-first-screen.md"},
+        {"command": "backend: EDUMIND_TEST_DATABASE_URL=<isolated regression DB> uv run --frozen pytest -q; uv run --frozen ruff check app tests ../docs/acceptance/run_first_screen.py ../docs/acceptance/serve_first_screen.py ../docs/acceptance/audit_first_screen.py; uv run --frozen mypy app", "result": "passed:403 tests, no skips,7 existing warnings; Ruff clean; Mypy55 source files; offline instrumentation tests separate from real performance samples"},
+        {"command": "pnpm --dir web test --run; pnpm --dir web typecheck; pnpm --dir web lint; pnpm --dir web build", "result": "passed:66 tests/11 files; typecheck/build pass;0 ESLint errors/67 existing formatting warnings"},
+        {"command": "隔离PG只读操作聚合；脱敏证据只读检查；git diff --check", "result": "passed:20 operations/20 distinct owners/20 keys/20 units, all published; actual key/base URL absent from new evidence; task JSON valid; self-inspected code/docs/data diff, no product/env changes or staged unrelated files"},
+        {"command": "2026-09-27非计费收尾：python3 -c离线audit重算及Git历史文件逐字节/任务依赖/完成提交核对；python3 -m json.tool task.json；Markdown引用检查；git diff --check", "result": "passed:113历史文件检查，除阶段报告仅追加外全部逐字节不变；旧audit=false原样保留，10引用存在；既有37个done任务均有完成提交，依赖有效。独立文档读者核对通过。用户yes批准首token2秒转后续优化，不再阻塞收尾；本范围下PRD HTTP P95 1647.309ms/首段3094.385ms达标，20操作发布，内部1/161超时与操作0/20失败分列。T032完成不声称token2632.575ms通过。0新付费，无服务/.env/生产代码修改，无归档/阶段切换/push/merge。"}
+      ],
+      "started_at": "2026-09-27T14:42:14",
+      "completed_at": "2026-09-27T19:14:09",
+      "blocker": null,
+      "scope_change": "2026-09-27用户yes明确批准独立教学首token≤2秒转后续优化，不阻塞MVP0.2收尾；旧失败证据/冻结gate=false不变。批准与指标交接见docs/acceptance/mvp-0.2-closeout-decision.md。",
+      "commit_lookup": "Task-Completed: MVP-0.2-T032"
+    },
+    {
+      "id": "MVP-0.2-T033", "phase": "MVP 0.2", "parent_work_package": "MVP-0.2-008",
+      "title": "非计费首屏指标纠正、关键路径诊断与多段候选计时",
+      "status": "done", "priority": "P0", "depends_on": ["MVP-0.2-T031"],
+      "scope": ["docs/acceptance/", "backend/tests/", "task.json", "process.txt"],
+      "acceptance_criteria": [
+        "追加历史指标口径纠正，不覆盖旧证据，分别采集真实HTTP首字节、状态、正文token、完整段落和发布。",
+        "多个段落/跨chunk/结束/超时中断有单调时钟及独立资格评审，导语不阻止后段评审，未确认不算通过。",
+        "真实路由与隔离PG使用延迟mock记录匿名/鉴权/DB/画像/节点/路径/Provider/传输关键路径，0付费请求。"
+      ],
+      "verification": ["backend: uv run --frozen pytest -q tests/test_first_screen_measurement.py tests/test_first_screen_v2.py tests/test_first_screen_diagnostics.py", "backend: uv run --frozen ruff check ../docs/acceptance tests", "git diff --check"],
+      "verification_results": [{"command": "隔离PG pytest -q tests/test_first_screen_measurement.py tests/test_first_screen_v2.py tests/test_first_screen_diagnostics.py；ruff check tests ../docs/acceptance；git diff --check", "result": "passed:12 tests,1 existing warning; Ruff/diff clean;0 paid calls; raw loopback first byte independent of headers/status, semantic review selects later paragraph original timestamps; evidence mvp-0.2-t033-nonbillable-diagnosis.md and diagnostics-v2/v3.json"}], "started_at": "2026-09-27T15:46:36", "completed_at": "2026-09-27T15:56:48",
+      "blocker": null, "commit_lookup": "Task-Completed: MVP-0.2-T033"
+    },
+    {
+      "id": "MVP-0.2-T034", "phase": "MVP 0.2", "parent_work_package": "MVP-0.2-008",
+      "title": "首屏数据库连接生命周期局部优化及恢复回归",
+      "status": "done", "priority": "P0", "depends_on": ["MVP-0.2-T033"],
+      "scope": ["backend/app/core/database.py", "backend/app/main.py", "backend/tests/", "docs/acceptance/", "task.json", "process.txt"],
+      "acceptance_criteria": [
+        "以诊断证据支持生命周期内连接池复用，正确关闭，保持owner/事务/幂等/审核与显式修正/前置路径语义。",
+        "可控连接延迟证明首次教学段落较原按请求建池更早，区别mock改善与真实模型结果。",
+        "回归T030防重复生成及前后端工程检查通过；T032继续blocked，0真实付费请求。"
+      ],
+      "verification": ["backend: 隔离PG uv run --frozen pytest -q", "backend: uv run --frozen ruff check app tests；uv run --frozen mypy app", "pnpm --dir web test --run；pnpm --dir web typecheck；pnpm --dir web lint；pnpm --dir web build", "git diff --check"],
+      "verification_results": [
+        {"command": "隔离PG/FakeAdapter真实Uvicorn raw HTTP对比；test_database_lifespan/test_owner_reads/test_first_screen_pool_latency/test_first_screen_v2", "result": "passed:13 targeted regressions; injected100ms cold connections learning POST2→0, teaching paragraph399.108→44.813ms; 8/8 mock attempts, same-key extra0, ownedGET200/foreign404; explicit code_first correction preserved in profile/pathversion3 and C-pointer prerequisite; final v3 evidence, no paid calls"},
+        {"command": "backend:隔离PG uv run --frozen pytest -q; ruff check app tests ../docs/acceptance; mypy app", "result": "passed:416 tests,no skips,9 deprecation warnings; Ruff clean,Mypy55 files; initial full1failed/414passed detected cross-loop app.state pool bug, fixed request.state lifespan and preserved owner assertions; mistaken missing test path had no tests run, corrected; path assertion uses actual node_details contract"},
+        {"command": "pnpm --dir web test --run; pnpm --dir web typecheck; pnpm --dir web lint; pnpm --dir web build; git diff --check", "result": "passed:66 tests/11 files including10 T030 recovery/stale-response cases; types/build clean,lint0errors/67existing warnings; diff clean, historical raw/audit/ledger unchanged; T032 still blocked, v2 finite plan prepared not executed"}
+      ], "started_at": "2026-09-27T16:17:18", "completed_at": "2026-09-27T16:35:48",
+      "blocker": null, "commit_lookup": "Task-Completed: MVP-0.2-T034"
+    },
+    {
+      "id": "MVP-0.2-T035", "phase": "MVP 0.2", "parent_work_package": "MVP-0.2-008",
+      "title": "当前模型三样本有界真实关键路径诊断",
+      "status": "done", "priority": "P0", "depends_on": ["MVP-0.2-T034"],
+      "scope": ["docs/acceptance/", "backend/tests/", "task.json", "process.txt"],
+      "acceptance_criteria": ["独立三样本、单并发、零预热、180秒截止、全局36实际尝试含重试；异常停止、不补跑。", "五项指标、多候选独立语义评审、匿名和完整等待与嵌套阶段计时保留脱敏证据。", "验证池连接及只读恢复零增量；先mock验证，不宣称P95，T032保持blocked。", "停止本次计费服务，报告瓶颈和正式计划建议，不改.env/模型、不跨阶段。"],
+      "verification": ["backend: uv run --frozen pytest -q tests/test_diagnostic_three.py tests/test_first_screen_v2.py", "backend: uv run --frozen ruff check ../docs/acceptance tests", "一次run_diagnostic_three.py及独立语义评审", "git diff --check"],
+      "verification_results": [
+        {"command": "隔离diag3 Alembic0009；serve_diagnostic_three/实际Vite/run_diagnostic_three一次；独立audit_diagnostic_three", "result": "3/3发布，24/36尝试全部completed，无重试/替换/预热/超时；15候选独立hash语义评审，2确认、1保留未确认，不计算P95；model current deepseek-flash，不是旧Pro；恢复GET3个200/published、额外Provider0；3owner/3key/3操作；所有POST新物理连接0。17:44:33确认服务停止。"},
+        {"command": "backend: EDUMIND_TEST_DATABASE_URL=<isolated regression DB> uv run --frozen pytest -q; ruff check app tests ../docs/acceptance; mypy app", "result": "421 passed/0skip/9既有警告；Ruff导入排序修正后全量clean，Mypy55文件通过；最终工具针对性13passed。未调用真实模型进行回归。"},
+        {"command": "pnpm --dir web test --run/typecheck/lint/build; git diff --check", "result": "66测试/11文件通过，类型/构建通过，lint0错误67既有警告；diff干净，真实.env/模型/生产API未修改；报告和raw/trace/ledger/decisions/audit(v1,v2)独立保留，T032仍blocked。"}
+      ], "started_at": "2026-09-27T17:37:31", "completed_at": "2026-09-27T17:53:20",
+      "blocker": null, "commit_lookup": "Task-Completed: MVP-0.2-T035"
+    },
+    {
+      "id": "MVP-0.2-T036", "phase": "MVP 0.2", "parent_work_package": "MVP-0.2-008",
+      "title": "流式正文空白无损传递与展示回归",
+      "status": "done", "priority": "P0", "depends_on": ["MVP-0.2-T035"],
+      "scope": ["backend/app/api/learning_sessions.py", "web/src/components/LearningProgressPanel.vue", "backend/tests/", "web/tests/", "docs/acceptance/", "task.json", "process.txt"],
+      "acceptance_criteria": ["真实正文空白无损，不混入reasoning/心跳/元数据，不补造Markdown。", "mock adapter到Gateway/真实SSE路由/前端解析/DOM验证不同切分重建一致，含空格/空行/缩进/围栏/中文/列表/表格。", "测量候选及边界时间回归，不改变已批准语义规则；公开样本1证据不足明确说明，不回填通过。", "仅非计费与隔离库验证后本地提交，T032仍blocked，不改.env/模型/画像路径时序。"],
+      "verification": ["backend: 隔离PG uv run --frozen pytest -q", "backend: uv run --frozen ruff check app tests ../docs/acceptance; uv run --frozen mypy app", "pnpm --dir web test --run; pnpm --dir web typecheck; pnpm --dir web lint; pnpm --dir web build", "git diff --check"],
+      "verification_results": [
+        {"command": "MockTransport真实adapter/Gateway/真实SSE路由与隔离PG三切分测试；前端读取生成offline SSE fixture三字节切分+真实App DOM", "result": "passed:空格/换行/空行/tab/缩进/围栏/中文/列表/表格逐字符一致；heartbeat/reasoning/metadata不混正文，空字符串不发token。CSS pre-wrap保留呈现，无HTML执行或Markdown补造。"},
+        {"command": "backend:隔离PG uv run --frozen pytest -q; ruff check app tests ../docs/acceptance; mypy app", "result": "426 passed/0skip/9既有警告；Ruff新长行排序修正后clean，Mypy55通过；候选边界t10/t30/t60受控回归，规则未改；T035样本1 hash复核和原未确认不变。0真实请求。"},
+        {"command": "pnpm --dir web test --run/typecheck/lint/build; git diff --check", "result": "70测试12文件通过，最终DOM格式调整后4针对性再次通过；最终类型/构建通过，lint0错误67既有警告；报告mvp-0.2-t036-lossless-stream.md，T032仍blocked，20正式入口异常熔断需核对及另行冻结授权。"}
+      ], "started_at": "2026-09-27T18:02:27", "completed_at": "2026-09-27T18:08:51",
+      "blocker": null, "commit_lookup": "Task-Completed: MVP-0.2-T036"
+    },
+    {
+      "id": "MVP-0.2-T037", "phase": "MVP 0.2", "parent_work_package": "MVP-0.2-008",
+      "title": "正式性能验收入口异常即时停机保护",
+      "status": "done", "priority": "P0", "depends_on": ["MVP-0.2-T036"],
+      "scope": ["docs/acceptance/", "backend/tests/", "task.json", "process.txt"],
+      "acceptance_criteria": ["240全局实际adapter尝试包含内部重试，认证/余额/配额异常阻止下一实际调用。", "固定20槽位不补跑，停机余下槽位标记未执行；恢复查询失败不覆盖原生成证据。", "匿名HTTP/全准备时间分列，只读恢复记录调用增量；口径与段落规则不变。", "非计费mock验证及本地独立提交后冻结，T032继续blocked。"],
+      "verification": ["uv run --frozen pytest -q tests/test_acceptance_budget.py tests/test_first_screen_v2.py tests/test_diagnostic_three.py", "uv run --frozen ruff check app tests ../docs/acceptance", "git diff --check"],
+      "verification_results": [{"command": "mock预算/固定槽位回归23；隔离PG全量pytest；Ruff/Mypy/diff", "result": "434 passed/0skip/9既有警告，Ruff clean，Mypy55通过；401/402/403/429后实际尝试仅1，240包含失败，停机19槽未执行；恢复失败原发布证据保留。0真实模型调用。详见mvp-0.2-t037-budget-guard.md"}], "started_at": "2026-09-27T18:33:37", "completed_at": "2026-09-27T18:39:00",
+      "blocker": null, "commit_lookup": "Task-Completed: MVP-0.2-T037"
+    },
+    {
+      "id": "MVP-0.2-T038", "phase": "MVP 0.2", "parent_work_package": "MVP-0.2-008",
+      "title": "执行冻结T032 v2正式20样本并独立审计",
+      "status": "done", "priority": "P0", "depends_on": ["MVP-0.2-T037"],
+      "scope": ["docs/acceptance/", "task.json", "process.txt"],
+      "acceptance_criteria": ["一次20槽、单并发、无计费预热、每POST180秒、全局240实际尝试含内部重试；异常即停止，不补跑。", "独立保留raw/ledger/hash绑定语义评审/audit及报告，旧失败和3诊断样本不混入。", "分别报告HTTP首字节/头/SSE/教学token/完整首段/发布，匿名与完整用户等待独立；模型/传输/指令/环境及缺失不隐瞒。", "停本轮服务/计费，真实未达标则T032继续blocked，不修改.env/模型或生产代码，不push/merge/归档/跨阶段。"],
+      "verification": ["隔离perf_t032_v2迁移；serve_first_screen.py + Vite4182 + run_first_screen_v2.py一次20样本", "audit_first_screen_v2.py + 独立hash候选评审；隔离DB只读聚合及恢复账本", "脱敏检查、git diff --check、本地独立证据提交"],
+      "verification_results": [
+        {"command": "perf_t032_v2 Alembic0009；serve_first_screen.py/实际Vite/run_first_screen_v2.py一次20样本", "result": "20/20 published，161/240实际尝试=20stream+141structured；160completed/1TIMEOUT保留，无认证/余额/配额异常，无补跑/预热/替换；当前deepseek-flash，.env不改。18:50:55确认服务关闭。"},
+        {"command": "133候选独立SHA评审 + audit_first_screen_v2.py；隔离DB只读聚合/恢复", "result": "20最早教学段落确认，11后续候选仍未确认不静默放行；HTTP client P95 1647.309ms、首段3094.385ms均达PRD；独立validated教学token2632.575ms>2000失败，T032保持blocked。20GET200/published新增Provider0；20owner/key/操作/单元。"},
+        {"command": "离线工具23测试/Ruff/Mypy55；前端test/typecheck/lint/build；脱敏/时钟/source/hash一致性/git diff --check", "result": "全部通过；前端70测试12文件/类型构建通过，0lint错误67既有警告；后端T037本轮已434全量通过。raw/ledger不可变，真实key/URL未泄漏，代码摘要不变；报告mvp-0.2-t038-formal-retest.md。T038仅完成采样审计证据，不等于T032完成或阶段可切换。"}
+      ], "started_at": "2026-09-27T18:40:00", "completed_at": "2026-09-27T18:57:29",
+      "blocker": null, "commit_lookup": "Task-Completed: MVP-0.2-T038"
     }
   ]
 }

@@ -44,6 +44,55 @@ DeepSeek Responses 默认开启 thinking，而 P0 的第一段讲解和正式资
 
 正式 JSON Schema 生成在调用方未指定温度时还固定使用 `temperature=0.0`，以减少可复现资源的随机性；显式温度照常透传。普通文本流不注入这个默认值，保持首段讲解现有采样行为。
 
+2026-09-26 严格模式兼容性排查：DeepSeek Responses 官方 `text.format` 文档未列出 `strict`。
+隔离探针给现有请求添加 `strict: true`，两次中有一次返回值违反 `enum` 并被本地校验拒绝。
+这证明当前配置下该字段不足以保证强约束，不证明字段被忽略的内部机制，也不代表所有 schema
+均不兼容。生产适配器不据此添加字段，不静默切换端点或降级校验。原始脱敏报告见
+[`mvp-0.2-strict-probe-v1.json`](acceptance/mvp-0.2-strict-probe-v1.json)。
+官方另有 [Beta 严格工具调用](https://api-docs.deepseek.com/guides/tool_calls/)，涉及 Beta Base URL
+及 function 参数约束；它不是当前 Responses 文本输出开关。采用该路线前须批准接口策略，
+验证当前模型/凭据/安全目标兼容性，保持业务 schema、ReviewAgent 和质量门槛不变。
+
+随后用户批准 Beta 验证：直接传原 schema 的 enum 探针通过，但讲解 schema 被400拒绝；
+常量转换为等价 `type + enum:[value]` 后 enum/讲解/代码/练习4项均通过。
+这只是协议兼容性证据，完整质量和闭环须独立验收。对应探针报告为
+`acceptance/mvp-0.2-beta-tool-probe-v1.json` / `mvp-0.2-beta-tool-probe-v2.json`。
+
+显式服务端选项：`EDUMIND_PROVIDER_STRUCTURED_TRANSPORT=beta_tools`。默认仍为
+`responses_json_schema`，未知选项拒绝启动Provider；禁止自动回退。Beta选项只支持当前
+配置已为HTTPS `api.deepseek.com:443`，不从自定义代理迁移凭据到官方站点。
+仅 `generate_structured` 使用同源 `/beta/chat/completions`，强制唯一
+`edumind_result` function 且 `strict:true`、关闭thinking；函数参数作为数据返回，绝不执行。
+普通文本及SSE仍用原配置的Responses路径。每次尝试重新Guard校验并固定IP/Host/TLS SNI，
+禁代理/跳转、超时和2MiB限制与原适配器一致。常量仅在出站schema做等价投影，原schema
+仍本地校验，再进入Review；拒绝冲突的type/enum，模型/Key不变，真实`.env`未被修改。
+
+完整Beta质量v1未通过：schema55/60，题型17/20，26项模型审核均不可用。
+审核schema含无type的字符串enum，随后补等价类型映射并用1请求验证协议兼容；
+这不代表语义审核或完整质量复验通过。仍有生成超时/缺字段/截断JSON证据，
+不得宣称此选项已满足MVP0.2退出标准或自动启用。
+
+2026-09-26 本地诊断修复：生产默认输出上限仍为4096，由中立共享常量统一；
+质量基准从旧2048对齐为4096，不修改旧报告、原schema、98%门槛或严重错误召回门槛。
+Provider失败只携带固定输出类别与验证过的非负整数token用量；未知/缺失用量为未知，
+不能记成零。Responses incomplete/max_output_tokens 与Beta finish_reason=length
+均安全映射为OUTPUT_TOKEN_LIMIT，其他非工具结束映射RESPONSE_INCOMPLETE；未知原始
+供应商字符串不记录。完成响应中JSON语法/schema失败保留合法用量，不推测是否预算耗尽。
+质量基准按尝试保存请求上限、固定错误类别和用量；ReviewAgent拒绝时仍保留失败尝试，
+不把审核不可用当作事实错误检出。生成正文、密钥、完整供应商错误不进入这些诊断。
+
+审核指令 `resource-review-instructions-v2` 明确问题分类：NULL解引用、释放后访问、
+悬空指针和越界访问等执行/内存安全风险归 `code_safety`，即使描述出现在讲解或练习中。
+非安全概念/复杂度错误仍归 `fact`；不得对正确内容虚构风险。业务审核schema-v3、
+原错误集、检测口径及阈值不变，不把正确拒绝但分类不符的历史样本改计为通过。
+`safety-diagnostic` 仅固定三请求（两个内存安全错误和一个正确对照），不是完整质量门禁。
+
+画像提取指令 `profile-instructions-v2` 在消息中重申原schema的精确根字段及证据记录字段；
+行为更新指令 `profile-behavior-instructions-v2` 要求唯一根字段 `updates`，证据不足时
+仅返回 `{"updates": {}}`。原schema、允许字段、服务端证据归属和失败降级策略不变。
+`diagnose_profile_contract.py` 以三次无重试请求验证一次提取和两次行为更新；
+合法的无变化不是失败，也不能以此宣称已证明完整学习闭环。
+
 结构化文本解析后仍以本地 Draft 2020-12 JSON Schema 校验；Provider 侧约束不能替代本地校验或 ReviewAgent。外部 `$ref`、`$id` 等可能触发远程读取的 schema 在网络调用前被拒绝。HTTPX 0.28.1 连接到 Guard 批准的 IP，同时设置原始 Host 和 `sni_hostname` 保持 TLS 证书验证；禁用环境代理与自动重定向，单次非流式响应限制为 2 MiB 并始终关闭连接。依据：[DeepSeek Responses API](https://api-docs.deepseek.com/api/create-response/)、[DeepSeek Responses 使用指南](https://api-docs.deepseek.com/guides/responses_api/)、[HTTPX SNI extension](https://www.python-httpx.org/advanced/extensions/)。
 
 ## P0 DeepSeek Responses 流式适配

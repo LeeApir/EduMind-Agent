@@ -11,14 +11,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.learning import LearningOperation
 
-_ACTIVE_STATUSES = {
-    "accepted",
-    "preparing",
-    "streaming_temporary",
-    "temporary_complete",
-    "reviewing",
-}
-
 
 class IdempotencyConflict(ValueError):
     """A key may not be reused by its owner for a different request."""
@@ -85,21 +77,6 @@ async def owned_operation(
             )
         ),
     )
-
-
-async def fail_interrupted_operation(
-    db: AsyncSession, operation: LearningOperation
-) -> LearningOperation:
-    """A newly observed active record survived a process break; never resume temp text."""
-    if operation.status in _ACTIVE_STATUSES:
-        operation.status = "failed"
-        operation.error = {
-            "code": "INTERRUPTED",
-            "message": "Generation was interrupted before formal resources were published.",
-            "retryable": True,
-        }
-        await db.commit()
-    return operation
 
 
 async def update_operation(

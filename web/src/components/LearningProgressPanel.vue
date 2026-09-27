@@ -42,7 +42,9 @@ async function reload(): Promise<void> {
     <section v-if="hasTemporaryText" class="temporary-card" data-testid="temporary-explanation">
       <div class="resource-label"><NTag type="warning" size="small">临时流式内容</NTag><span>尚未审核，不会作为正式资源保存</span></div>
       <h2>首段讲解</h2>
-      <p>{{ temporaryText }}</p>
+      <p class="temporary-body">
+        {{ temporaryText }}
+      </p>
     </section>
     <section v-else class="empty-card" data-testid="empty-state">
       <h2>首段讲解会显示在这里</h2>
@@ -69,3 +71,10 @@ async function reload(): Promise<void> {
     </section>
   </section>
 </template>
+
+<style scoped>
+.temporary-body {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+</style>

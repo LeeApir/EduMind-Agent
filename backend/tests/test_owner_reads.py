@@ -10,6 +10,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import update
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
+from app.agents.profile_events import PROFILE_MERGE_RULE_VERSION
 from app.core.auth import token_hash
 from app.core.database import create_database_engine
 from app.main import app
@@ -45,11 +46,13 @@ def test_owner_scoped_reads_hide_foreign_and_unpublished_data(
                             StudentProfile(
                                 user_id=alice_id,
                                 version=1,
+                                merge_rule_version=PROFILE_MERGE_RULE_VERSION,
                                 learning_goals={"topic": "alice-private-topic"},
                             ),
                             StudentProfile(
                                 user_id=bob_id,
                                 version=1,
+                                merge_rule_version=PROFILE_MERGE_RULE_VERSION,
                                 learning_goals={"topic": "bob-private-topic"},
                             ),
                         ]

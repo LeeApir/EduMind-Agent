@@ -1,0 +1,162 @@
+{
+  "benchmark_version": "resource-quality-v1",
+  "call_limit": 3,
+  "configured_model": "deepseek-v4-pro-0813",
+  "corrections": 0,
+  "dataset_sha256": "f6dca43e80ad6244136ba88af7ff4d01dad5bd81501cee350d26e5c2e76caed3",
+  "elapsed_seconds": 9.43,
+  "generation_max_output_tokens": 4096,
+  "graph_version": "mvp-0.2.0",
+  "mode": "safety-diagnostic",
+  "note": "Three independent review probes only; not a full quality gate.",
+  "provider_attempts": [
+    {
+      "max_output_tokens": 4096,
+      "model_id": "deepseek-v4-pro-0813",
+      "number": 1,
+      "output_text_counts": {
+        "blocks": 1,
+        "messages": 1
+      },
+      "usage": {
+        "input_tokens": 944,
+        "output_tokens": 117
+      }
+    },
+    {
+      "max_output_tokens": 4096,
+      "model_id": "deepseek-v4-pro-0813",
+      "number": 2,
+      "output_text_counts": {
+        "blocks": 1,
+        "messages": 1
+      },
+      "usage": {
+        "input_tokens": 1015,
+        "output_tokens": 238
+      }
+    },
+    {
+      "max_output_tokens": 4096,
+      "model_id": "deepseek-v4-pro-0813",
+      "number": 3,
+      "output_text_counts": {
+        "blocks": 1,
+        "messages": 1
+      },
+      "usage": {
+        "input_tokens": 893,
+        "output_tokens": 26
+      }
+    }
+  ],
+  "provider_calls": 3,
+  "resource_instruction_version": "learning-resources-instructions-v8",
+  "resource_prompt_version": "learning-resources-v1",
+  "retries": 0,
+  "review_instruction_version": "resource-review-instructions-v2",
+  "review_max_output_tokens": 4096,
+  "review_prompt_version": "resource-review-v3",
+  "review_samples": [
+    {
+      "detected": true,
+      "group": "semantic_errors",
+      "id": "list-traversal-stop",
+      "issues": [
+        {
+          "area": "code_safety",
+          "message": "The statement claims that dereferencing head->next before checking whether head is NULL is safe for an empty linked list. In C, if head is NULL, evaluating head->next is a NULL pointer dereference and undefined behavior, which can crash the program. The check must occur before any dereference.",
+          "severity": "severe"
+        }
+      ],
+      "local_gate": false,
+      "model_id": "deepseek-v4-pro-0813",
+      "provider_attempts": [
+        {
+          "max_output_tokens": 4096,
+          "model_id": "deepseek-v4-pro-0813",
+          "number": 1,
+          "output_text_counts": {
+            "blocks": 1,
+            "messages": 1
+          },
+          "usage": {
+            "input_tokens": 944,
+            "output_tokens": 117
+          }
+        }
+      ],
+      "verdict": "reject"
+    },
+    {
+      "detected": true,
+      "group": "semantic_errors",
+      "id": "list-delete-head",
+      "issues": [
+        {
+          "area": "code_safety",
+          "message": "The resource claims that after free(head) the original head can still be used to access the list. This is a use-after-free defect: the freed memory may be reused or unmapped, so dereferencing head is undefined behavior.",
+          "severity": "severe"
+        },
+        {
+          "area": "fact",
+          "message": "The resource states that deleting the head node only requires free(head) and that head does not need to be modified. In a singly linked list, the head pointer must be updated to head->next before freeing the old head; otherwise the list is lost and the pointer is dangling.",
+          "severity": "major"
+        },
+        {
+          "area": "misconception",
+          "message": "The resource reinforces the misconception that head deletion is the same as middle-node deletion and omits the required boundary-case handling for updating the head pointer.",
+          "severity": "major"
+        }
+      ],
+      "local_gate": false,
+      "model_id": "deepseek-v4-pro-0813",
+      "provider_attempts": [
+        {
+          "max_output_tokens": 4096,
+          "model_id": "deepseek-v4-pro-0813",
+          "number": 2,
+          "output_text_counts": {
+            "blocks": 1,
+            "messages": 1
+          },
+          "usage": {
+            "input_tokens": 1015,
+            "output_tokens": 238
+          }
+        }
+      ],
+      "verdict": "reject"
+    },
+    {
+      "correctly_passed": true,
+      "group": "controls",
+      "id": "correct-array",
+      "issues": [],
+      "local_gate": false,
+      "model_id": "deepseek-v4-pro-0813",
+      "provider_attempts": [
+        {
+          "max_output_tokens": 4096,
+          "model_id": "deepseek-v4-pro-0813",
+          "number": 3,
+          "output_text_counts": {
+            "blocks": 1,
+            "messages": 1
+          },
+          "usage": {
+            "input_tokens": 893,
+            "output_tokens": 26
+          }
+        }
+      ],
+      "verdict": "pass"
+    }
+  ],
+  "stage_gate_passed": false,
+  "structured_transport": "responses_json_schema",
+  "thresholds": {
+    "schema_rate": 0.98,
+    "severe_error_recall": 0.9
+  }
+}

@@ -4,16 +4,23 @@ import asyncio
 import json
 import os
 from collections.abc import AsyncIterator, Iterator
+from pathlib import Path
 from uuid import UUID
 
+import httpx
 import pytest
 from fastapi.testclient import TestClient
+from jsonschema import Draft202012Validator
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from app.api.learning_sessions import provider_gateway
+from app.core.config import ProviderSettings
 from app.core.database import create_database_engine
+from app.core.provider_target import ProviderTargetGuard, TargetPolicy
 from app.main import app
-from app.models.learning import LearningOperation
+from app.models.learning import LearningOperation, LearningUnit
+from app.models.learning_state import LearningPathVersion
+from app.services.deepseek_responses import DeepSeekResponsesAdapter
 from app.services.provider_gateway import (
     ProviderError,
     ProviderErrorCode,
@@ -27,6 +34,12 @@ from app.services.provider_gateway import (
 
 TEST_DATABASE_URL = os.getenv("EDUMIND_TEST_DATABASE_URL")
 pytestmark = pytest.mark.skipif(not TEST_DATABASE_URL, reason="isolated PostgreSQL URL not set")
+
+LOSSLESS_BODY = (
+    " 中文 正文。\n\n1. 列表。\n2. 第二项。\n\n"
+    "| 名称 | 含义 |\n|---|---|\n| next | 地址 |\n\n"
+    "```c\n    int *p;\n\treturn 0;\n```\n\n指针保存地址。  "
+)
 
 
 def profile_value(goal: str) -> dict[str, object]:
@@ -57,6 +70,7 @@ class FakeAdapter:
         self.fail_stream = fail_stream
         self.reject_review = reject_review
         self.calls: list[str] = []
+        self.review_contexts: list[dict[str, object]] = []
 
     async def generate_text(self, request: TextRequest) -> TextResult:
         raise AssertionError(f"unexpected non-stream request: {request}")
@@ -71,9 +85,12 @@ class FakeAdapter:
             )
         if "review_version" in properties:
             self.calls.append("review")
+            self.review_contexts.append(
+                json.loads(request.prompt.messages[-1].content)["reference_context"]
+            )
             return StructuredResult(
                 value={
-                    "review_version": "resource-review-v1",
+                    "review_version": "resource-review-v3",
                     "verdict": "reject" if self.reject_review else "pass",
                     "issues": (
                         [{"area": "fact", "severity": "major", "message": "Needs correction."}]
@@ -103,14 +120,16 @@ class FakeAdapter:
                 "items": [
                     {
                         "id": "q1",
-                        "question": "next 是什么？",
-                        "answer": "后继指针",
+                        "question": "[填空题] int x=1; x=2; 最后x=____。仅填一个整数",
+                        "answer": "2",
                         "explanation": "连接节点。",
                     },
                     {
                         "id": "q2",
-                        "question": "头节点作用？",
-                        "answer": "起点",
+                        "question": (
+                            "[判断题] 头指针可以用于开始遍历。仅填 T 或 F（T=正确，F=错误）"
+                        ),
+                        "answer": "T",
                         "explanation": "从它遍历。",
                     },
                 ]
@@ -154,6 +173,96 @@ def event_data(event: str) -> dict[str, object]:
     return json.loads(event.split("data: ", 1)[1])
 
 
+def validate_contract(name: str, value: object) -> None:
+    specification = json.loads(
+        (Path(__file__).resolve().parents[2] / "docs/api/openapi.yaml").read_text(encoding="utf-8")
+    )
+    Draft202012Validator(
+        {"components": specification["components"], "$ref": f"#/components/schemas/{name}"}
+    ).validate(value)
+
+
+@pytest.mark.parametrize("partition", ["whole", "characters", "mixed"])
+def test_body_lossless_from_mock_provider_through_gateway_and_real_sse(
+    database_url: str,
+    partition: str,
+) -> None:
+    pieces = [LOSSLESS_BODY] if partition == "whole" else list(LOSSLESS_BODY)
+    if partition == "mixed":
+        pieces = [LOSSLESS_BODY[i : i + 3] for i in range(0, len(LOSSLESS_BODY), 3)]
+    pieces = ["", *pieces, ""]
+    frames = [
+        ": heartbeat\n\n",
+        'data: {"type":"response.reasoning_text.delta","delta":"private reasoning"}\n\n',
+        'data: {"type":"response.created"}\n\n',
+    ]
+    frames += [
+        "data: "
+        + json.dumps({"type": "response.output_text.delta", "delta": p}, ensure_ascii=False)
+        + "\n\n"
+        for p in pieces
+    ]
+    frames += ['data: {"type":"response.completed","response":{"status":"completed"}}\n\n']
+    wire = "".join(frames).encode()
+
+    class Bytes(httpx.AsyncByteStream):
+        async def __aiter__(self):
+            # One-byte transport fragmentation also splits UTF-8 characters.
+            for byte in wire:
+                yield bytes([byte])
+
+    settings = ProviderSettings(base_url="https://provider.test", api_key="mock-only", model="mock")
+    guard = ProviderTargetGuard(settings.base_url, TargetPolicy(), resolver=lambda *_: ("8.8.8.8",))
+    transport = httpx.MockTransport(lambda _: httpx.Response(200, stream=Bytes()))
+    network_adapter = DeepSeekResponsesAdapter(settings, guard, transport=transport)
+
+    class Adapter(FakeAdapter):
+        async def stream_text(self, request):
+            async for delta in ProviderGateway(network_adapter).stream_text(request):
+                yield delta
+
+    client, csrf = create_authenticated_client(Adapter())
+    try:
+        response = client.post(
+            "/api/learning-sessions",
+            json={"goal": "讲解单链表"},
+            headers={"Origin": "https://testserver", "X-CSRF-Token": csrf},
+        )
+        assert response.status_code == 200
+        tokens = [
+            event_data(frame)
+            for frame in response.text.split("\n\n")
+            if frame.startswith("event: token\n")
+        ]
+        assert [item["delta"] for item in tokens] == [p for p in pieces if p != ""]
+        assert "".join(str(item["delta"]) for item in tokens) == LOSSLESS_BODY
+        assert "private reasoning" not in response.text
+        assert any('"status": "published"' in frame for frame in response.text.split("\n\n"))
+        output = os.getenv("EDUMIND_LOSSLESS_FIXTURE_OUTPUT")
+        if output and partition == "characters":
+            from app.api.learning_sessions import _event
+
+            # Generated offline fixture: actual token JSON encoding, test identities only.
+            exported = "".join(
+                _event("token", {**item, "operation_id": "mock-operation"}) for item in tokens
+            )
+            with Path(output).open("x") as handle:
+                json.dump(
+                    {
+                        "source": "offline MockTransport/real route, not T035 replay",
+                        "expected": LOSSLESS_BODY,
+                        "sse": exported,
+                    },
+                    handle,
+                    ensure_ascii=False,
+                    indent=2,
+                )
+                handle.write("\n")
+    finally:
+        client.close()
+        app.dependency_overrides.clear()
+
+
 def test_session_publishes_only_reviewed_resources_after_temporary_tokens(
     database_url: str,
 ) -> None:
@@ -162,7 +271,7 @@ def test_session_publishes_only_reviewed_resources_after_temporary_tokens(
     try:
         response = client.post(
             "/api/learning-sessions",
-            json={"goal": "讲解链表", "preferred_language": "c"},
+            json={"goal": "讲解单链表", "preferred_language": "c"},
             headers={"Origin": "https://testserver", "X-CSRF-Token": csrf},
         )
         assert response.status_code == 200
@@ -187,10 +296,40 @@ def test_session_publishes_only_reviewed_resources_after_temporary_tokens(
         assert '"status": "published"' in events[-1]
         profile = client.get("/api/profile/me")
         assert profile.status_code == 200
-        assert profile.json()["initial_query"] == "讲解链表"
+        assert profile.json()["initial_query"] == "讲解单链表"
         formal = client.get(f"/api/learning-units/{unit_id}")
         assert formal.status_code == 200
+        validate_contract("LearningUnit", formal.json())
         assert formal.json()["status"] == "ready"
+        assert formal.json()["knowledge_node_id"] == "c-pointer"
+        assert formal.json()["path_target_node_id"] == "single-linked-list"
+        assert formal.json()["path_version"] == 1
+
+        async def verify_binding() -> None:
+            engine = create_database_engine(database_url)
+            try:
+                async with async_sessionmaker(engine)() as db:
+                    unit = await db.get(LearningUnit, UUID(unit_id))
+                    assert unit is not None and unit.outline is not None
+                    snapshot = unit.outline["path_snapshot"]
+                    assert isinstance(snapshot, dict)
+                    assert snapshot["graph_version"] == "mvp-0.2.0"
+                    assert unit.outline["review_context_version"] == "resource-review-context-v1"
+                    assert unit.outline["review_profile_version"] == snapshot["profile_version"]
+                    path = await db.get(LearningPathVersion, UUID(snapshot["id"]))
+                    assert path is not None and path.version == snapshot["version"]
+                    assert unit.knowledge_point_id == path.current_node_id
+            finally:
+                await engine.dispose()
+
+        asyncio.run(verify_binding())
+        assert len(adapter.review_contexts) == 3
+        assert all(item == adapter.review_contexts[0] for item in adapter.review_contexts)
+        reference = adapter.review_contexts[0]
+        assert reference["profile_version"] == profile.json()["version"]
+        assert reference["node"]["id"] == "c-pointer"
+        assert reference["known_profile"] == {}
+        assert "讲解单链表" not in json.dumps(reference, ensure_ascii=False)
         assert len(formal.json()["scenes"][0]["resources"]) == 3
         for resource_id in resource_ids:
             resource = client.get(f"/api/resource/{resource_id}")
@@ -206,6 +345,32 @@ def test_session_publishes_only_reviewed_resources_after_temporary_tokens(
             "review",
             "review",
         ]
+    finally:
+        client.close()
+        app.dependency_overrides.clear()
+
+
+def test_ambiguous_goal_returns_durable_clarification_without_generation(database_url: str) -> None:
+    adapter = FakeAdapter()
+    client, csrf = create_authenticated_client(adapter)
+    try:
+        write_headers = {"Origin": "https://testserver", "X-CSRF-Token": csrf}
+        first = client.post(
+            "/api/learning-sessions", json={"goal": "讲解链表"}, headers=write_headers
+        )
+        assert first.status_code == 422
+        assert first.json()["code"] == "GOAL_CLARIFICATION_REQUIRED"
+        validate_contract("GoalClarification", first.json())
+        assert {node["id"] for node in first.json()["candidate_nodes"]} == {
+            "linked-list-concept",
+            "single-linked-list",
+        }
+        replay = client.post(
+            "/api/learning-sessions", json={"goal": "讲解链表"}, headers=write_headers
+        )
+        assert replay.status_code == 422 and replay.json() == first.json()
+        assert adapter.calls == []
+        assert client.get("/api/profile/me").status_code == 404
     finally:
         client.close()
         app.dependency_overrides.clear()
@@ -279,10 +444,27 @@ def test_same_idempotency_key_reuses_published_operation(database_url: str) -> N
         app.dependency_overrides.clear()
 
 
-def test_operation_read_marks_pre_restart_active_operation_failed(
+@pytest.mark.parametrize(
+    "status",
+    [
+        "accepted",
+        "preparing",
+        "streaming_temporary",
+        "temporary_complete",
+        "reviewing",
+        "regenerating",
+        "failed",
+        "canceled",
+    ],
+)
+def test_operation_read_and_same_key_replay_preserve_state_without_generation(
     database_url: str,
+    status: str,
 ) -> None:
-    client, _csrf = create_authenticated_client(FakeAdapter())
+    from app.services.learning_operations import request_digest
+
+    adapter = FakeAdapter()
+    client, csrf = create_authenticated_client(adapter)
     try:
         guest = client.get("/api/auth/session")
         owner_id = UUID(guest.json()["user"]["id"])
@@ -293,11 +475,11 @@ def test_operation_read_marks_pre_restart_active_operation_failed(
                 async with async_sessionmaker(engine, expire_on_commit=False)() as db:
                     operation = LearningOperation(
                         user_id=owner_id,
-                        idempotency_key="interrupted-operation-key",
-                        request_digest="0" * 64,
+                        idempotency_key="test-learning-operation-key",
+                        request_digest=request_digest(goal="讲解队列", preferred_language="c"),
                         goal="讲解队列",
                         preferred_language="c",
-                        status="reviewing",
+                        status=status,
                     )
                     db.add(operation)
                     await db.commit()
@@ -308,8 +490,57 @@ def test_operation_read_marks_pre_restart_active_operation_failed(
         operation_id = asyncio.run(seed())
         recovered = client.get(f"/api/learning-operations/{operation_id}")
         assert recovered.status_code == 200
-        assert recovered.json()["status"] == "failed"
-        assert recovered.json()["error"]["code"] == "INTERRUPTED"
+        assert recovered.json()["status"] == status
+        assert recovered.json()["error"] is None
+        with TestClient(app, base_url="https://testserver") as other:
+            assert (
+                other.post("/api/auth/guest", headers={"Origin": "https://testserver"}).status_code
+                == 201
+            )
+            assert other.get(f"/api/learning-operations/{operation_id}").status_code == 404
+        replay = client.post(
+            "/api/learning-sessions",
+            json={"goal": "讲解队列"},
+            headers={"Origin": "https://testserver", "X-CSRF-Token": csrf},
+        )
+        events = [part for part in replay.text.split("\n\n") if part]
+        assert event_data(events[0])["operation_id"] == operation_id
+        assert event_data(events[-1])["status"] == status
+        assert adapter.calls == []
+        assert client.get(f"/api/learning-operations/{operation_id}").json() == recovered.json()
+    finally:
+        client.close()
+        app.dependency_overrides.clear()
+
+
+def test_failed_operation_replays_without_provider_and_new_key_creates_new_operation(
+    database_url: str,
+) -> None:
+    adapter = FakeAdapter(fail_stream=True)
+    client, csrf = create_authenticated_client(adapter)
+    try:
+        headers = {"Origin": "https://testserver", "X-CSRF-Token": csrf}
+        first = client.post("/api/learning-sessions", json={"goal": "讲解栈"}, headers=headers)
+        first_events = [part for part in first.text.split("\n\n") if part]
+        operation_id = event_data(first_events[0])["operation_id"]
+        calls = list(adapter.calls)
+        persisted = client.get(f"/api/learning-operations/{operation_id}").json()
+        assert persisted["status"] == "failed"
+        assert persisted["error"]["retryable"] is True
+        replay = client.post("/api/learning-sessions", json={"goal": "讲解栈"}, headers=headers)
+        events = [part for part in replay.text.split("\n\n") if part]
+        assert event_data(events[0])["operation_id"] == operation_id
+        assert event_data(events[-1])["status"] == "failed"
+        assert adapter.calls == calls
+        new = client.post(
+            "/api/learning-sessions",
+            json={"goal": "讲解栈"},
+            headers={**headers, "Idempotency-Key": "explicit-regeneration-new-key"},
+        )
+        new_events = [part for part in new.text.split("\n\n") if part]
+        assert event_data(new_events[0])["operation_id"] != operation_id
+        assert len(adapter.calls) > len(calls)
+        assert client.get(f"/api/learning-operations/{operation_id}").json() == persisted
     finally:
         client.close()
         app.dependency_overrides.clear()

@@ -30,6 +30,9 @@ class StudentProfile(Base):
     __tablename__ = "student_profiles"
     __table_args__ = (
         UniqueConstraint("user_id", "version", name="uq_student_profiles_user_version"),
+        UniqueConstraint(
+            "user_id", "idempotency_key", name="uq_student_profiles_user_idempotency_key"
+        ),
         CheckConstraint("version >= 1", name="ck_student_profiles_version_positive"),
     )
 
@@ -38,6 +41,10 @@ class StudentProfile(Base):
         PostgreSQLUUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
     version: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    merge_rule_version: Mapped[str] = mapped_column(String(40), nullable=False)
+    previous_profile_id: Mapped[UUID | None] = mapped_column(
+        PostgreSQLUUID(as_uuid=True), ForeignKey("student_profiles.id")
+    )
     initial_query: Mapped[str | None] = mapped_column(Text)
     professional_background: Mapped[dict[str, object] | None] = mapped_column(JSONB)
     knowledge_base: Mapped[dict[str, object] | None] = mapped_column(JSONB)
@@ -47,7 +54,42 @@ class StudentProfile(Base):
     engineering_preference: Mapped[dict[str, object] | None] = mapped_column(JSONB)
     extended_dimensions: Mapped[dict[str, object] | None] = mapped_column(JSONB)
     evidence: Mapped[dict[str, object] | None] = mapped_column(JSONB)
+    idempotency_key: Mapped[str | None] = mapped_column(String(128))
+    request_digest: Mapped[str | None] = mapped_column(String(64))
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
+
+
+class ProfileEvent(Base):
+    """An append-only, owner-scoped whitelisted behavior summary.
+
+    Never stores scores, mastery state, or profile fields; those belong to mastery
+    evidence and quiz submission. Duplicate events are deduplicated by owner + key.
+    """
+
+    __tablename__ = "profile_events"
+    __table_args__ = (
+        UniqueConstraint("user_id", "idempotency_key", name="uq_profile_events_user_key"),
+        CheckConstraint("schema_version >= 1", name="ck_profile_events_schema_version_positive"),
+        CheckConstraint(
+            "event_type IN ('hint_used', 'reexplanation_requested', 'resource_selected', "
+            "'explicit_feedback')",
+            name="ck_profile_events_event_type",
+        ),
+    )
+
+    id: Mapped[UUID] = mapped_column(PostgreSQLUUID(as_uuid=True), primary_key=True, default=uuid4)
+    user_id: Mapped[UUID] = mapped_column(
+        PostgreSQLUUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
+    idempotency_key: Mapped[str] = mapped_column(String(128), nullable=False)
+    request_digest: Mapped[str] = mapped_column(String(64), nullable=False)
+    schema_version: Mapped[int] = mapped_column(Integer, nullable=False)
+    event_type: Mapped[str] = mapped_column(String(30), nullable=False)
+    knowledge_node_id: Mapped[str] = mapped_column(String(64), nullable=False)
+    learning_unit_id: Mapped[str | None] = mapped_column(String(64))
+    scene_id: Mapped[str | None] = mapped_column(String(64))
+    action: Mapped[str | None] = mapped_column(String(30))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
 
 
 class LearningUnit(Base):

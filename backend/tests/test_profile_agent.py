@@ -1,6 +1,7 @@
 """ProfileAgent extracts only supported evidence and degrades safely."""
 
 import asyncio
+import json
 from datetime import datetime, timezone
 
 import pytest
@@ -73,6 +74,9 @@ def test_one_sentence_extracts_explicit_goal_without_questionnaire() -> None:
         assert request.prompt.messages[-1].content == "链表插入总搞混，先看 C 代码"
         assert "Prompt version: profile-v1." in request.prompt.messages[0].content
         assert "2026-09-17T14:30:00+00:00" in request.prompt.messages[0].content
+        assert "profile-instructions-v2" in request.prompt.messages[0].content
+        instruction = request.prompt.messages[0].content
+        assert json.dumps(request.json_schema, ensure_ascii=False) in instruction
 
     asyncio.run(exercise())
 
@@ -102,5 +106,71 @@ def test_empty_goal_is_actionable_and_does_not_call_provider() -> None:
         with pytest.raises(ProfileInputError, match="learning goal is required"):
             await ProfileAgent(gateway).extract("  ")
         assert gateway.requests == []
+
+    asyncio.run(exercise())
+
+
+def test_provider_cannot_forge_manual_correction_evidence() -> None:
+    async def exercise() -> None:
+        forged = valid_profile("再学习队列", version=2)
+        forged["evidence"]["learning_goals"][0]["source"] = "manual_correction"
+        agent = ProfileAgent(StubGateway(StructuredResult(value=forged, model_id="test")))
+
+        extraction = await agent.extract("再学习队列", profile_version=2)
+
+        assert extraction.degraded is True
+        assert extraction.profile["learning_goals"] is None
+        assert extraction.profile["profile_version"] == 2
+
+    asyncio.run(exercise())
+
+
+def test_behavior_update_sends_only_minimal_summary_and_allowlists_delta() -> None:
+    async def exercise() -> None:
+        gateway = StubGateway(
+            StructuredResult(
+                value={"updates": {"error_preferences": [{"topic": "链表"}]}}, model_id="test"
+            )
+        )
+        summary = {"event_type": "quiz_attempt", "knowledge_node_id": "linked-list", "score": 0.5}
+        proposal = await ProfileAgent(gateway).update_from_behavior(
+            summary, allowed_fields=("error_preferences",)
+        )
+        assert proposal.degraded is False
+        assert proposal.updates == {"error_preferences": [{"topic": "链表"}]}
+        request, retry_safe = gateway.requests[0]
+        assert retry_safe is True
+        assert request.prompt.messages[-1].content == (
+            '{"event_type": "quiz_attempt", "knowledge_node_id": "linked-list", "score": 0.5}'
+        )
+        assert "answers" not in request.prompt.messages[-1].content
+        assert "initial_query" not in request.prompt.messages[-1].content
+        instruction = request.prompt.messages[0].content
+        assert "profile-behavior-instructions-v2" in instruction
+        assert json.dumps(request.json_schema, ensure_ascii=False) in instruction
+        assert 'emit {"updates": {}} exactly' in instruction
+        assert set(request.json_schema["properties"]["updates"]["properties"]) == {
+            "error_preferences"
+        }
+
+    asyncio.run(exercise())
+
+
+@pytest.mark.parametrize(
+    "value",
+    [
+        {"updates": {"learning_goals": {"current_topic": "链表"}}},
+        {"updates": {"error_preferences": None}},
+        {"updates": {}, "source": "manual_correction"},
+    ],
+)
+def test_behavior_update_rejects_forged_or_invalid_output(value: dict[str, object]) -> None:
+    async def exercise() -> None:
+        gateway = StubGateway(StructuredResult(value=value, model_id="test"))
+        proposal = await ProfileAgent(gateway).update_from_behavior(
+            {"event_type": "quiz_attempt"}, allowed_fields=("error_preferences",)
+        )
+        assert proposal.degraded is True
+        assert proposal.updates == {}
 
     asyncio.run(exercise())

@@ -1,0 +1,553 @@
+{
+  "plan": "mvp-0.2-t032-first-screen-plan.md",
+  "samples_planned": 20,
+  "concurrency": 1,
+  "billable_warmups": 0,
+  "request_total_timeout_seconds": 180,
+  "provider_attempt_limit": 240,
+  "goal": "我想理解单链表的前置知识，先看 C 代码。",
+  "instructions": {
+    "profile_prompt": "profile-v1",
+    "profile": "profile-instructions-v2",
+    "resources_prompt": "learning-resources-v1",
+    "resources": "learning-resources-instructions-v8",
+    "review_prompt": "resource-review-v3",
+    "review": "resource-review-instructions-v2",
+    "first_screen_version": "no separate version constant; source hash below",
+    "first_learning_source_sha256": "0169bf5acbbabd38a2c8da2e66b0f70c3d73ba1babdc20bc443f177a2312a57c"
+  },
+  "environment": {
+    "platform": "macOS-15.6.1-arm64-arm-64bit",
+    "python": "3.11.16",
+    "httpx": "0.28.1",
+    "client": "HTTPX via actual Vite proxy",
+    "provider_network": "host outbound network, trust_env=False client; Provider uses current configuration",
+    "provider_cold_state": "unknown; first sample retained"
+  },
+  "samples": [
+    {
+      "number": 1,
+      "validated_ms": {
+        "headers": 3270.236,
+        "status": 3270.453,
+        "token": 5424.548,
+        "paragraph": 5424.923,
+        "published": 29907.506
+      },
+      "client_ms": {
+        "headers": 3345.116,
+        "status": 3345.333,
+        "token": 5499.428,
+        "paragraph": 5499.804,
+        "published": 29982.387
+      },
+      "status": "published",
+      "error_codes": [],
+      "manual_review_required": true,
+      "http_status": 200,
+      "client_total_ms": 29984.166,
+      "paragraph_sha256": "6c46862b798dcdd6fd0ca0c74006e403f1d41245446c3b46ee6c9d59eea098ce",
+      "paragraph_characters": 63
+    },
+    {
+      "number": 2,
+      "validated_ms": {
+        "headers": 2886.089,
+        "status": 2886.375,
+        "token": 3923.094,
+        "paragraph": 4571.483,
+        "published": 28278.637
+      },
+      "client_ms": {
+        "headers": 2916.366,
+        "status": 2916.652,
+        "token": 3953.371,
+        "paragraph": 4601.76,
+        "published": 28308.913
+      },
+      "status": "published",
+      "error_codes": [],
+      "manual_review_required": true,
+      "http_status": 200,
+      "client_total_ms": 28309.844,
+      "paragraph_sha256": "b881ab1107f47e5a024e68e34cc96c9d9d7e52238168cbd18641b1dc5b097c78",
+      "paragraph_characters": 51
+    },
+    {
+      "number": 3,
+      "validated_ms": {
+        "headers": 3730.564,
+        "status": 3730.9,
+        "token": 4977.861,
+        "paragraph": 5274.544,
+        "published": 30685.518
+      },
+      "client_ms": {
+        "headers": 3762.991,
+        "status": 3763.326,
+        "token": 5010.288,
+        "paragraph": 5306.971,
+        "published": 30717.945
+      },
+      "status": "published",
+      "error_codes": [],
+      "manual_review_required": true,
+      "http_status": 200,
+      "client_total_ms": 30720.141,
+      "paragraph_sha256": "389c2a61f1125b3e5b84061e8ca0255c5a66b26f800382f117fe79b58b5cd1f5",
+      "paragraph_characters": 29
+    },
+    {
+      "number": 4,
+      "validated_ms": {
+        "headers": 2870.136,
+        "status": 2870.446,
+        "token": 3626.122,
+        "paragraph": 4631.456,
+        "published": 28260.539
+      },
+      "client_ms": {
+        "headers": 2904.627,
+        "status": 2904.937,
+        "token": 3660.613,
+        "paragraph": 4665.947,
+        "published": 28295.03
+      },
+      "status": "published",
+      "error_codes": [],
+      "manual_review_required": true,
+      "http_status": 200,
+      "client_total_ms": 28298.024,
+      "paragraph_sha256": "1a26cd1a499ebf851678e82df7c9859c27aa268ff336c91403af065f0cc12d02",
+      "paragraph_characters": 66
+    },
+    {
+      "number": 5,
+      "validated_ms": {
+        "headers": 2773.675,
+        "status": 2773.989,
+        "token": 3997.708,
+        "paragraph": 4319.448,
+        "published": 39853.549
+      },
+      "client_ms": {
+        "headers": 2808.711,
+        "status": 2809.024,
+        "token": 4032.744,
+        "paragraph": 4354.483,
+        "published": 39888.584
+      },
+      "status": "published",
+      "error_codes": [],
+      "manual_review_required": true,
+      "http_status": 200,
+      "client_total_ms": 39890.049,
+      "paragraph_sha256": "46dbf9e2ed093086377ea716dce95ab8a74e346fedff3505b208f49ffbba0165",
+      "paragraph_characters": 34
+    },
+    {
+      "number": 6,
+      "validated_ms": {
+        "headers": 3578.498,
+        "status": 3578.807,
+        "token": 4524.683,
+        "paragraph": 5147.3,
+        "published": 30724.539
+      },
+      "client_ms": {
+        "headers": 3605.211,
+        "status": 3605.52,
+        "token": 4551.396,
+        "paragraph": 5174.013,
+        "published": 30751.252
+      },
+      "status": "published",
+      "error_codes": [],
+      "manual_review_required": true,
+      "http_status": 200,
+      "client_total_ms": 30752.583,
+      "paragraph_sha256": "c48fbdf60c51ae60069eb0daee37c09bc59e34e8bdad8d7b774bec9687d10c32",
+      "paragraph_characters": 37
+    },
+    {
+      "number": 7,
+      "validated_ms": {
+        "headers": 3882.473,
+        "status": 3882.774,
+        "token": 5160.218,
+        "paragraph": 5667.644,
+        "published": 27851.571
+      },
+      "client_ms": {
+        "headers": 3916.27,
+        "status": 3916.572,
+        "token": 5194.016,
+        "paragraph": 5701.441,
+        "published": 27885.369
+      },
+      "status": "published",
+      "error_codes": [],
+      "manual_review_required": true,
+      "http_status": 200,
+      "client_total_ms": 27886.678,
+      "paragraph_sha256": "6a4798b039b97a18403a215cc200920975440daf3bf178685637ed32b4c70f42",
+      "paragraph_characters": 31
+    },
+    {
+      "number": 8,
+      "validated_ms": {
+        "headers": 3886.082,
+        "status": 3886.412,
+        "token": 5115.823,
+        "paragraph": 5874.522,
+        "published": 28932.326
+      },
+      "client_ms": {
+        "headers": 3919.696,
+        "status": 3920.027,
+        "token": 5149.437,
+        "paragraph": 5908.136,
+        "published": 28965.941
+      },
+      "status": "published",
+      "error_codes": [],
+      "manual_review_required": true,
+      "http_status": 200,
+      "client_total_ms": 28966.489,
+      "paragraph_sha256": "c6cdd8db0a56870064b5b49f5894f4b32f544111aaf331aca22ba3e350ea5447",
+      "paragraph_characters": 45
+    },
+    {
+      "number": 9,
+      "validated_ms": {
+        "headers": 4563.092,
+        "status": 4563.329,
+        "token": 5731.441,
+        "paragraph": 6015.98,
+        "published": 29685.625
+      },
+      "client_ms": {
+        "headers": 4589.209,
+        "status": 4589.446,
+        "token": 5757.558,
+        "paragraph": 6042.097,
+        "published": 29711.742
+      },
+      "status": "published",
+      "error_codes": [],
+      "manual_review_required": true,
+      "http_status": 200,
+      "client_total_ms": 29713.372,
+      "paragraph_sha256": "c6d4af93aa67d62adeb958e51d874af5ae9e17cbaa65b63b7c909abcc9b80998",
+      "paragraph_characters": 27
+    },
+    {
+      "number": 10,
+      "validated_ms": {
+        "headers": 3290.466,
+        "status": 3290.746,
+        "token": 4261.729,
+        "paragraph": 4863.22,
+        "published": 28210.135
+      },
+      "client_ms": {
+        "headers": 3315.683,
+        "status": 3315.963,
+        "token": 4286.946,
+        "paragraph": 4888.437,
+        "published": 28235.352
+      },
+      "status": "published",
+      "error_codes": [],
+      "manual_review_required": true,
+      "http_status": 200,
+      "client_total_ms": 28236.273,
+      "paragraph_sha256": "36fe4f6f1c2896487e6edd2c4dcd31f72936b9d4b028c461dac5191ec17d6684",
+      "paragraph_characters": 40
+    },
+    {
+      "number": 11,
+      "validated_ms": {
+        "headers": 3069.015,
+        "status": 3069.108,
+        "token": 3865.163,
+        "paragraph": 4288.253,
+        "published": 28815.652
+      },
+      "client_ms": {
+        "headers": 3103.348,
+        "status": 3103.441,
+        "token": 3899.496,
+        "paragraph": 4322.586,
+        "published": 28849.985
+      },
+      "status": "published",
+      "error_codes": [],
+      "manual_review_required": true,
+      "http_status": 200,
+      "client_total_ms": 28850.739,
+      "paragraph_sha256": "df7611b6522f0feb83491b64f46452ea297591e3da572b7de765f8ecbec4417f",
+      "paragraph_characters": 24
+    },
+    {
+      "number": 12,
+      "validated_ms": {
+        "headers": 2735.593,
+        "status": 2735.79,
+        "token": 3916.72,
+        "paragraph": 4708.922,
+        "published": 29044.47
+      },
+      "client_ms": {
+        "headers": 2769.703,
+        "status": 2769.901,
+        "token": 3950.831,
+        "paragraph": 4743.032,
+        "published": 29078.58
+      },
+      "status": "published",
+      "error_codes": [],
+      "manual_review_required": true,
+      "http_status": 200,
+      "client_total_ms": 29079.729,
+      "paragraph_sha256": "fd391c864e959bda047dc62b8a7eed23cad79e1d4466a7bfbe4a5dae62ed60cf",
+      "paragraph_characters": 58
+    },
+    {
+      "number": 13,
+      "validated_ms": {
+        "headers": 4482.13,
+        "status": 4482.275,
+        "token": 5661.935,
+        "paragraph": 6260.461,
+        "published": 30862.355
+      },
+      "client_ms": {
+        "headers": 4519.432,
+        "status": 4519.578,
+        "token": 5699.237,
+        "paragraph": 6297.763,
+        "published": 30899.657
+      },
+      "status": "published",
+      "error_codes": [],
+      "manual_review_required": true,
+      "http_status": 200,
+      "client_total_ms": 30901.121,
+      "paragraph_sha256": "eb162de3423f61162b4db94d6d4375ebd4626b99473dee29dc10210f2c04bdc6",
+      "paragraph_characters": 47
+    },
+    {
+      "number": 14,
+      "validated_ms": {
+        "headers": 2833.353,
+        "status": 2833.75,
+        "token": 4054.567,
+        "paragraph": 4998.286,
+        "published": 29482.478
+      },
+      "client_ms": {
+        "headers": 2870.62,
+        "status": 2871.017,
+        "token": 4091.833,
+        "paragraph": 5035.552,
+        "published": 29519.745
+      },
+      "status": "published",
+      "error_codes": [],
+      "manual_review_required": true,
+      "http_status": 200,
+      "client_total_ms": 29520.746,
+      "paragraph_sha256": "0f8bce22d6ac54cbffd0dd253c7a564a93abe76cf39ffa25cd0add3bc57f8a22",
+      "paragraph_characters": 51
+    },
+    {
+      "number": 15,
+      "validated_ms": {
+        "headers": 4574.509,
+        "status": 4574.76,
+        "token": 5403.791,
+        "paragraph": 5869.118,
+        "published": 31693.754
+      },
+      "client_ms": {
+        "headers": 4609.095,
+        "status": 4609.346,
+        "token": 5438.376,
+        "paragraph": 5903.704,
+        "published": 31728.339
+      },
+      "status": "published",
+      "error_codes": [],
+      "manual_review_required": true,
+      "http_status": 200,
+      "client_total_ms": 31729.461,
+      "paragraph_sha256": "fb378bc7b52854b555ad9886b3f4972d0fc33bc64b585f931ae2882c5f7efb64",
+      "paragraph_characters": 35
+    },
+    {
+      "number": 16,
+      "validated_ms": {
+        "headers": 3435.108,
+        "status": 3435.367,
+        "token": 4265.288,
+        "paragraph": 4896.944,
+        "published": 32351.182
+      },
+      "client_ms": {
+        "headers": 3463.703,
+        "status": 3463.963,
+        "token": 4293.883,
+        "paragraph": 4925.539,
+        "published": 32379.777
+      },
+      "status": "published",
+      "error_codes": [],
+      "manual_review_required": true,
+      "http_status": 200,
+      "client_total_ms": 32380.019,
+      "paragraph_sha256": "7dc116aafc1680efd459c27e64db65ce65613dcccc046f8870ad7bdb9e191e40",
+      "paragraph_characters": 50
+    },
+    {
+      "number": 17,
+      "validated_ms": {
+        "headers": 3987.646,
+        "status": 3987.727,
+        "token": 5066.369,
+        "paragraph": 5361.689,
+        "published": 29908.583
+      },
+      "client_ms": {
+        "headers": 4006.853,
+        "status": 4006.934,
+        "token": 5085.576,
+        "paragraph": 5380.896,
+        "published": 29927.79
+      },
+      "status": "published",
+      "error_codes": [],
+      "manual_review_required": true,
+      "http_status": 200,
+      "client_total_ms": 29928.098,
+      "paragraph_sha256": "580088eb8199081fb03b869f3228b8123f050bbd023e873c564b009302b9eb89",
+      "paragraph_characters": 25
+    },
+    {
+      "number": 18,
+      "validated_ms": {
+        "headers": 3219.52,
+        "status": 3219.683,
+        "token": 4001.819,
+        "paragraph": 4459.633,
+        "published": 26872.682
+      },
+      "client_ms": {
+        "headers": 3260.588,
+        "status": 3260.752,
+        "token": 4042.887,
+        "paragraph": 4500.701,
+        "published": 26913.751
+      },
+      "status": "published",
+      "error_codes": [],
+      "manual_review_required": true,
+      "http_status": 200,
+      "client_total_ms": 26914.295,
+      "paragraph_sha256": "3a104fc5ec942697c75f2ba0d02f7450092cbdc5f8302b8dd0a9832241bbe8e1",
+      "paragraph_characters": 27
+    },
+    {
+      "number": 19,
+      "validated_ms": {
+        "headers": 3048.63,
+        "status": 3048.957,
+        "token": 3741.026,
+        "paragraph": 4444.4,
+        "published": 29115.057
+      },
+      "client_ms": {
+        "headers": 3078.195,
+        "status": 3078.522,
+        "token": 3770.59,
+        "paragraph": 4473.964,
+        "published": 29144.622
+      },
+      "status": "published",
+      "error_codes": [],
+      "manual_review_required": true,
+      "http_status": 200,
+      "client_total_ms": 29145.256,
+      "paragraph_sha256": "0ea991b23d3cccbb367c8ce3d343b06d63c4d15906d20bd7c4d86b67c5f61b6d",
+      "paragraph_characters": 47
+    },
+    {
+      "number": 20,
+      "validated_ms": {
+        "headers": 3110.159,
+        "status": 3110.301,
+        "token": 4266.79,
+        "paragraph": 4926.008,
+        "published": 25938.731
+      },
+      "client_ms": {
+        "headers": 3151.635,
+        "status": 3151.777,
+        "token": 4308.266,
+        "paragraph": 4967.484,
+        "published": 25980.208
+      },
+      "status": "published",
+      "error_codes": [],
+      "manual_review_required": true,
+      "http_status": 200,
+      "client_total_ms": 25981.862,
+      "paragraph_sha256": "59bfce94de7a214b6365a1003dbdb2c709d400955f5e96a2fd0ef94b5674a141",
+      "paragraph_characters": 46
+    }
+  ],
+  "manual_semantic_review_pending": true,
+  "actual_provider_attempts": 162,
+  "configured_model": "deepseek-v4-pro-0813",
+  "structured_transport": "responses_json_schema",
+  "text_transport": "Responses streaming",
+  "metrics": {
+    "headers": {
+      "observed": 20,
+      "missing": 0,
+      "planned_p95_ms": 4563.092,
+      "planned_p95_missing": false,
+      "conditional_observed_p95_ms": 4563.092
+    },
+    "status": {
+      "observed": 20,
+      "missing": 0,
+      "planned_p95_ms": 4563.329,
+      "planned_p95_missing": false,
+      "conditional_observed_p95_ms": 4563.329
+    },
+    "token": {
+      "observed": 20,
+      "missing": 0,
+      "planned_p95_ms": 5661.935,
+      "planned_p95_missing": false,
+      "conditional_observed_p95_ms": 5661.935
+    },
+    "paragraph": {
+      "observed": 20,
+      "missing": 0,
+      "planned_p95_ms": 6015.98,
+      "planned_p95_missing": false,
+      "conditional_observed_p95_ms": 6015.98
+    },
+    "published": {
+      "observed": 20,
+      "missing": 0,
+      "planned_p95_ms": 32351.182,
+      "planned_p95_missing": false,
+      "conditional_observed_p95_ms": 32351.182
+    }
+  },
+  "published_failures": 0,
+  "published_failure_rate": 0.0
+}

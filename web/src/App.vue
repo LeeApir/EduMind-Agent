@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { NButton, NInput, NTag } from "naive-ui";
 
 import { LearningRequestError, startLearningSession, type LearningEvent } from "./api/learningSessions";
@@ -7,7 +7,9 @@ import LearningProgressPanel, {
   type PublishedResource,
   type ReviewState,
 } from "./components/LearningProgressPanel.vue";
+import ProfileCard from "./components/ProfileCard.vue";
 import PublishedLearningWorkspace from "./components/PublishedLearningWorkspace.vue";
+import LearningPathPanel from "./components/LearningPathPanel.vue";
 
 type StartLearningRequest = (goal: string) => Promise<void>;
 
@@ -18,6 +20,7 @@ interface Resource extends PublishedResource {
 
 interface LearningUnitPayload {
   scenes: Array<{ resources: Resource[] }>;
+  path_target_node_id?: string | null;
 }
 
 interface SessionPayload {
@@ -36,61 +39,117 @@ const learningUnitId = ref("");
 const operationId = ref("");
 const idempotencyKey = ref("");
 const csrfToken = ref("");
-const canSubmit = computed(() => Boolean(goal.value.trim()) && requestState.value !== "loading");
+const profileRefreshToken = ref(0);
+const pathTargetNodeId = ref("");
+const pathRefreshToken = ref(0);
+const restoringUnit = ref(false);
+const restoreUnitError = ref("");
+let learningGeneration = 0;
+const canSubmit = computed(() => Boolean(goal.value.trim())
+  && (requestState.value !== "loading" || goal.value.trim() !== submittedGoal.value));
 const publishedResources = computed<PublishedResource[]>(() =>
   resources.value.map(({ id, type, version }) => ({ id, type, version })),
 );
 
 async function startLearning(): Promise<void> {
+  if (!canSubmit.value) return;
   submittedGoal.value = goal.value.trim();
   resetAttempt();
   await submitLearningRequest();
 }
 
 async function retryLearning(): Promise<void> {
+  if (requestState.value === "loading") return;
+  requestError.value = "";
+  if (operationId.value) {
+    const generation = learningGeneration;
+    requestState.value = "loading";
+    try {
+      await recoverPublishedOperation(generation);
+      if (generation === learningGeneration) requestState.value = "idle";
+    } catch (error) {
+      if (generation !== learningGeneration) return;
+      requestError.value = error instanceof Error ? error.message : "恢复失败，请再次重试。";
+      requestState.value = "error";
+    }
+    return;
+  }
+  await submitLearningRequest();
+}
+
+async function regenerateLearning(): Promise<void> {
+  if (!submittedGoal.value || requestState.value === "loading") return;
   resetAttempt();
   await submitLearningRequest();
 }
 
 function resetAttempt(): void {
+  learningGeneration += 1;
+  restoringUnit.value = false;
+  restoreUnitError.value = "";
   requestError.value = "";
   temporaryText.value = "";
   reviewState.value = "idle";
   resources.value = [];
+  pathTargetNodeId.value = "";
   learningUnitId.value = "";
   operationId.value = "";
   idempotencyKey.value = crypto.randomUUID();
 }
 
 async function submitLearningRequest(): Promise<void> {
+  const generation = learningGeneration;
+  const requestGoal = submittedGoal.value;
+  const requestKey = idempotencyKey.value;
+  let recoveryAttempted = false;
   requestState.value = "loading";
   try {
     if (props.startLearningRequest) {
-      await props.startLearningRequest(submittedGoal.value);
+      await props.startLearningRequest(requestGoal);
+      if (generation !== learningGeneration) return;
+      profileRefreshToken.value += 1;
       requestState.value = "idle";
       return;
     }
     const csrf = await ensureSession();
+    if (generation !== learningGeneration) return;
     let readyUnitId = "";
     await startLearningSession({
-      goal: submittedGoal.value,
+      goal: requestGoal,
       csrfToken: csrf,
-      idempotencyKey: idempotencyKey.value,
+      idempotencyKey: requestKey,
       onEvent: (event) => {
+        if (generation !== learningGeneration) return;
         readyUnitId = applyLearningEvent(event) || readyUnitId;
       },
     });
+    if (generation !== learningGeneration) return;
     if (readyUnitId) {
-      await loadPublishedUnit(readyUnitId);
+      await loadPublishedUnit(readyUnitId, generation);
+    } else if (operationId.value) {
+      recoveryAttempted = true;
+      await recoverPublishedOperation(generation);
+    } else {
+      throw new Error("未收到操作状态，请恢复原请求。");
     }
-    requestState.value = "idle";
+    if (generation === learningGeneration) requestState.value = "idle";
   } catch (error: unknown) {
-    if (await recoverPublishedOperation()) {
-      requestState.value = "idle";
-      return;
+    if (generation !== learningGeneration) return;
+    if (error instanceof LearningRequestError && error.operationId) operationId.value = error.operationId;
+    let recoveryError: unknown;
+    if (operationId.value && !recoveryAttempted) {
+      try {
+        await recoverPublishedOperation(generation);
+        if (generation === learningGeneration) requestState.value = "idle";
+        return;
+      } catch (failure) {
+        recoveryError = failure;
+      }
     }
-    requestError.value = error instanceof Error && error.message
-      ? error.message
+    if (generation !== learningGeneration) return;
+    const failure = recoveryError ?? error;
+    requestError.value = failure instanceof Error && failure.message
+      ? failure.message
       : "暂时无法开始学习，请检查网络后重试。";
     requestState.value = "error";
   }
@@ -99,7 +158,9 @@ async function submitLearningRequest(): Promise<void> {
 function applyLearningEvent(event: LearningEvent): string {
   const eventOperationId = stringValue(event.data.operation_id);
   if (eventOperationId) operationId.value = eventOperationId;
-  if (event.type === "token" && event.data.temporary === true) {
+  if (event.type === "agent_start" && event.data.stage === "preparing") {
+    profileRefreshToken.value += 1;
+  } else if (event.type === "token" && event.data.temporary === true) {
     temporaryText.value += stringValue(event.data.delta);
   } else if (event.type === "stage_changed" && event.data.stage === "reviewing") {
     reviewState.value = "reviewing";
@@ -131,26 +192,31 @@ async function ensureSession(): Promise<string> {
   return csrfToken.value;
 }
 
-async function recoverPublishedOperation(): Promise<boolean> {
-  if (!operationId.value) return false;
-  try {
-    const response = await fetch(`/api/learning-operations/${operationId.value}`, {
-      credentials: "same-origin",
-    });
-    if (!response.ok) return false;
-    const payload = await response.json() as Record<string, unknown>;
-    const unitId = stringValue(payload.learning_unit_id);
-    if (payload.status !== "published" || !unitId) return false;
-    await loadPublishedUnit(unitId);
-    return true;
-  } catch {
-    return false;
+async function recoverPublishedOperation(generation: number): Promise<void> {
+  const recoveringOperationId = operationId.value;
+  if (!recoveringOperationId) throw new Error("缺少操作标识，请恢复原请求。");
+  const response = await fetch(`/api/learning-operations/${recoveringOperationId}`, {
+    credentials: "same-origin",
+  });
+  if (generation !== learningGeneration) return;
+  if (!response.ok) throw new Error("原请求状态暂时无法读取，请再次重试恢复。");
+  const payload = await response.json() as Record<string, unknown>;
+  if (generation !== learningGeneration) return;
+  const unitId = stringValue(payload.learning_unit_id);
+  if (payload.id !== recoveringOperationId) throw new Error("原请求状态无效，请再次重试恢复。");
+  if (payload.status === "published" && unitId) {
+    await loadPublishedUnit(unitId, generation);
+    return;
   }
+  if (payload.status === "failed" || payload.status === "canceled") {
+    throw new Error("原请求已失败或取消。恢复不会再次生成；需要新内容请明确选择“重新生成”。");
+  }
+  throw new Error("原请求尚未发布，请等待后重试恢复；不会重复生成。");
 }
 
-async function loadPublishedUnit(unitId = learningUnitId.value): Promise<void> {
+async function loadPublishedUnit(unitId = learningUnitId.value, expectedGeneration = learningGeneration): Promise<void> {
   if (!unitId) throw new Error("正式学习资源缺少单元标识，请重新开始。");
-  const response = await fetch(`/api/learning-units/${unitId}`, {
+  const response = await fetch(`/api/learning-units/${encodeURIComponent(unitId)}`, {
     credentials: "same-origin",
     headers: { Accept: "application/json" },
   });
@@ -160,13 +226,40 @@ async function loadPublishedUnit(unitId = learningUnitId.value): Promise<void> {
   const payload = await response.json() as LearningUnitPayload;
   const loaded = payload.scenes.flatMap((scene) => scene.resources).filter(isPublishedResource);
   if (!loaded.length) throw new Error("正式学习资源为空，请重新开始。");
+  if (expectedGeneration !== learningGeneration) return;
   learningUnitId.value = unitId;
   resources.value = loaded;
+  pathTargetNodeId.value = typeof payload.path_target_node_id === "string" ? payload.path_target_node_id : "";
   reviewState.value = "published";
+  try { sessionStorage.setItem("edumind:last-learning-unit", unitId); } catch { /* Storage is optional; server state remains authoritative. */ }
+}
+
+async function restoreRecentUnit(): Promise<void> {
+  let unitId = "";
+  try { unitId = sessionStorage.getItem("edumind:last-learning-unit") ?? ""; } catch { return; }
+  if (!/^[A-Za-z0-9_-]{8,64}$/.test(unitId)) return;
+  const token = learningGeneration;
+  restoringUnit.value = true;
+  restoreUnitError.value = "";
+  try {
+    await ensureSession();
+    await loadPublishedUnit(unitId, token);
+  } catch {
+    if (token === learningGeneration) restoreUnitError.value = "上次学习资源暂时无法读取。可以重试读取或开始新目标。";
+  } finally {
+    if (token === learningGeneration) restoringUnit.value = false;
+  }
+}
+onMounted(() => { if (!props.startLearningRequest) void restoreRecentUnit(); });
+
+function handleQuizSubmitted(): void {
+  profileRefreshToken.value += 1;
+  pathRefreshToken.value += 1;
 }
 
 function isPublishedResource(value: Resource): value is Resource {
   return ["explanation", "code", "exercise"].includes(value.type)
+    && typeof value.id === "string" && Number.isInteger(value.version) && value.version >= 1
     && value.review_status === "passed"
     && Boolean(value.content)
     && typeof value.content === "object";
@@ -269,9 +362,17 @@ function stringValue(value: unknown): string {
         size="small"
         @click="retryLearning"
       >
-        重试
+        重试恢复原请求
       </NButton>
     </aside>
+    <NButton
+      v-if="submittedGoal && requestState !== 'loading'"
+      size="small"
+      data-testid="regenerate-learning"
+      @click="regenerateLearning"
+    >
+      重新生成（新请求）
+    </NButton>
     <LearningProgressPanel
       :temporary-text="temporaryText"
       :review-state="reviewState"
@@ -281,6 +382,30 @@ function stringValue(value: unknown): string {
     <PublishedLearningWorkspace
       v-if="resources.length"
       :resources="resources"
+      :csrf-token="csrfToken"
+      @quiz-submitted="handleQuizSubmitted"
     />
+    <p
+      v-if="restoringUnit"
+      role="status"
+    >
+      正在恢复上次已审核的学习资源…
+    </p>
+    <section
+      v-if="restoreUnitError"
+      role="alert"
+    >
+      <p>{{ restoreUnitError }}</p>
+      <NButton @click="restoreRecentUnit">
+        重新读取上次学习
+      </NButton>
+    </section>
+    <LearningPathPanel
+      v-if="pathTargetNodeId"
+      :target-node-id="pathTargetNodeId"
+      :csrf-token="csrfToken"
+      :refresh-token="pathRefreshToken"
+    />
+    <ProfileCard :refresh-token="profileRefreshToken" />
   </main>
 </template>

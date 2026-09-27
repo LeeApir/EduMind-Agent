@@ -16,6 +16,11 @@ from jsonschema.exceptions import SchemaError, ValidationError  # type: ignore[i
 from app.core.config import ProviderSettings
 from app.core.provider_target import ApprovedTarget, ProviderTargetGuard, TargetValidationError
 from app.services.provider_gateway import (
+    P0_DEFAULT_MAX_OUTPUT_TOKENS,
+    JsonExtraDataKind,
+    JsonSyntaxReason,
+    OutputFailureReason,
+    OutputTextCounts,
     ProviderError,
     ProviderErrorCode,
     StructuredRequest,
@@ -28,8 +33,42 @@ from app.services.provider_gateway import (
 
 _MAX_RESPONSE_BYTES = 2 * 1024 * 1024
 _MAX_SSE_FRAME_BYTES = 1024 * 1024
-_P0_DEFAULT_MAX_OUTPUT_TOKENS = 4096
 _TIMEOUT = httpx.Timeout(connect=5.0, read=60.0, write=10.0, pool=5.0)
+
+
+def _json_syntax_reason(cause: ValueError | UnicodeError) -> JsonSyntaxReason:
+    if not isinstance(cause, json.JSONDecodeError):
+        return JsonSyntaxReason.OTHER
+    # Map only CPython's fixed parser messages, never forward cause.doc/msg/pos.
+    for prefix, reason in (
+        ("Invalid \\escape", JsonSyntaxReason.INVALID_ESCAPE),
+        ("Invalid \\uXXXX escape", JsonSyntaxReason.INVALID_ESCAPE),
+        ("Invalid control character", JsonSyntaxReason.UNESCAPED_CONTROL_CHARACTER),
+        ("Unterminated string", JsonSyntaxReason.UNTERMINATED_STRING),
+        ("Expecting ',' delimiter", JsonSyntaxReason.EXPECTED_DELIMITER),
+        ("Expecting ':' delimiter", JsonSyntaxReason.EXPECTED_DELIMITER),
+        ("Expecting property name", JsonSyntaxReason.EXPECTED_PROPERTY_NAME),
+        ("Expecting value", JsonSyntaxReason.EXPECTED_VALUE),
+        ("Extra data", JsonSyntaxReason.EXTRA_DATA),
+    ):
+        if cause.msg.startswith(prefix):
+            return reason
+    return JsonSyntaxReason.OTHER
+def _json_extra_data_kind(cause: ValueError | UnicodeError) -> JsonExtraDataKind | None:
+    """Inspect a rejected suffix only; never recover or publish a partial JSON value."""
+    if not isinstance(cause, json.JSONDecodeError) or cause.msg != "Extra data":
+        return None
+    suffix = cause.doc[cause.pos:].strip()
+    if suffix.startswith("```"):
+        return JsonExtraDataKind.MARKDOWN_FENCE_SUFFIX
+    try:
+        json.loads(suffix)
+    except (ValueError, RecursionError):
+        return (JsonExtraDataKind.JSON_LIKE_SUFFIX if suffix.startswith(("{", "["))
+                else JsonExtraDataKind.OTHER_SUFFIX)
+    return JsonExtraDataKind.JSON_VALUE_SUFFIX
+
+
 _IGNORED_STREAM_EVENTS = frozenset(
     {
         "response.created",
@@ -118,7 +157,7 @@ def _request_body(request: TextRequest) -> dict[str, object]:
         "max_output_tokens": (
             request.max_output_tokens
             if request.max_output_tokens is not None
-            else _P0_DEFAULT_MAX_OUTPUT_TOKENS
+            else P0_DEFAULT_MAX_OUTPUT_TOKENS
         ),
     }
     if request.temperature is not None:
@@ -162,6 +201,17 @@ def _result(payload: object) -> TextResult:
     if not isinstance(payload, dict):
         raise ProviderError(ProviderErrorCode.INVALID_OUTPUT)
     if payload.get("status") != "completed":
+        if payload.get("status") == "incomplete":
+            details = payload.get("incomplete_details")
+            token_limit = isinstance(details, dict) and details.get("reason") == "max_output_tokens"
+            raise ProviderError(
+                ProviderErrorCode.INVALID_OUTPUT,
+                output_failure_reason=(
+                    OutputFailureReason.OUTPUT_TOKEN_LIMIT if token_limit
+                    else OutputFailureReason.RESPONSE_INCOMPLETE
+                ),
+                usage=_usage(payload),
+            )
         raise ProviderError(ProviderErrorCode.INVALID_OUTPUT)
     model = payload.get("model")
     output = payload.get("output")
@@ -169,6 +219,7 @@ def _result(payload: object) -> TextResult:
         raise ProviderError(ProviderErrorCode.INVALID_OUTPUT)
 
     parts: list[str] = []
+    message_count = 0
     for item in output:
         if not isinstance(item, dict):
             raise ProviderError(ProviderErrorCode.INVALID_OUTPUT)
@@ -176,6 +227,7 @@ def _result(payload: object) -> TextResult:
             continue
         if item.get("status") != "completed" or item.get("role") != "assistant":
             raise ProviderError(ProviderErrorCode.INVALID_OUTPUT)
+        message_count += 1
         content = item.get("content")
         if not isinstance(content, list):
             raise ProviderError(ProviderErrorCode.INVALID_OUTPUT)
@@ -188,7 +240,8 @@ def _result(payload: object) -> TextResult:
     text = "".join(parts)
     if not text:
         raise ProviderError(ProviderErrorCode.INVALID_OUTPUT)
-    return TextResult(text=text, model_id=model, usage=_usage(payload))
+    return TextResult(text=text, model_id=model, usage=_usage(payload),
+                      output_text_counts=OutputTextCounts(message_count, len(parts)))
 
 
 async def _sse_data(chunks: AsyncIterator[bytes]) -> AsyncIterator[str]:
@@ -318,7 +371,10 @@ class DeepSeekResponsesAdapter:
         try:
             payload: Any = json.loads(b"".join(chunks))
         except (UnicodeError, ValueError):
-            raise ProviderError(ProviderErrorCode.INVALID_OUTPUT) from None
+            raise ProviderError(
+                ProviderErrorCode.INVALID_OUTPUT,
+                output_failure_reason=OutputFailureReason.RESPONSE_JSON_INVALID,
+            ) from None
         return _result(payload)
 
     async def generate_text(self, request: TextRequest) -> TextResult:
@@ -332,7 +388,10 @@ class DeepSeekResponsesAdapter:
         except ProviderError:
             raise
         except (TypeError, ValueError, SchemaError):
-            raise ProviderError(ProviderErrorCode.INVALID_OUTPUT) from None
+            raise ProviderError(
+                ProviderErrorCode.INVALID_OUTPUT,
+                output_failure_reason=OutputFailureReason.REQUEST_SCHEMA_INVALID,
+            ) from None
         body = _request_body(request.prompt)
         if request.prompt.temperature is None:
             body["temperature"] = 0.0
@@ -346,12 +405,39 @@ class DeepSeekResponsesAdapter:
         result = await self._response(body)
         try:
             value = json.loads(result.text)
-            if not isinstance(value, dict):
-                raise ValueError
+        except (UnicodeError, ValueError) as cause:
+            raise ProviderError(
+                ProviderErrorCode.INVALID_OUTPUT,
+                output_failure_reason=OutputFailureReason.STRUCTURED_JSON_INVALID,
+                json_syntax_reason=_json_syntax_reason(cause),
+                json_extra_data_kind=_json_extra_data_kind(cause),
+                usage=result.usage,
+                output_text_counts=result.output_text_counts,
+            ) from None
+        if not isinstance(value, dict):
+            raise ProviderError(
+                ProviderErrorCode.INVALID_OUTPUT,
+                output_failure_reason=OutputFailureReason.STRUCTURED_NOT_OBJECT,
+                usage=result.usage,
+                output_text_counts=result.output_text_counts,
+            )
+        try:
             Draft202012Validator(schema).validate(value)
-        except (UnicodeError, ValueError, ValidationError, SchemaError):
-            raise ProviderError(ProviderErrorCode.INVALID_OUTPUT) from None
-        return StructuredResult(value=value, model_id=result.model_id, usage=result.usage)
+        except (ValidationError, SchemaError) as cause:
+            keyword = getattr(cause, "validator", None)
+            safe_keyword = keyword if keyword in {
+                "type", "required", "additionalProperties", "const", "enum", "minLength",
+                "maxLength", "minItems", "maxItems", "uniqueItems", "pattern",
+            } else "other"
+            raise ProviderError(
+                ProviderErrorCode.INVALID_OUTPUT,
+                output_failure_reason=OutputFailureReason.STRUCTURED_SCHEMA_MISMATCH,
+                schema_keyword=safe_keyword,
+                usage=result.usage,
+                output_text_counts=result.output_text_counts,
+            ) from None
+        return StructuredResult(value=value, model_id=result.model_id, usage=result.usage,
+                                output_text_counts=result.output_text_counts)
 
     async def stream_text(self, request: TextRequest) -> AsyncIterator[TextDelta]:
         target, url, headers = self._target()
