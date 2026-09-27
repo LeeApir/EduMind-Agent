@@ -1,4 +1,4 @@
-"""Future paid run entry: NOT executed by the non-billable repair task."""
+"""Fixed 20-slot acceptance: no warmups, replacements or client POST retries."""
 
 import argparse
 import asyncio
@@ -37,6 +37,7 @@ async def run(args):
             "python": platform.python_version(),
             "httpx": httpx.__version__,
             "provider_cold_state": "unknown",
+            "client_wire": "loopback HTTP/1.1 via actual Vite",
         },
         "instruction_source_sha256": {
             name: hashlib.sha256(
@@ -65,6 +66,7 @@ async def run(args):
         else:
             print(f"START_SAMPLE {number}/20", flush=True)
             started = time.monotonic_ns()
+            before = len(json.loads(args.ledger.read_text())["provider_calls"])
             try:
                 # Auth preparatory request is separate from the learning POST clock.
                 async with httpx.AsyncClient(
@@ -73,20 +75,42 @@ async def run(args):
                     headers={"Origin": "http://127.0.0.1:4182"},
                     timeout=30,
                 ) as client:
+                    auth_start = time.monotonic_ns()
                     auth = await client.post("/api/auth/guest")
                     auth.raise_for_status()
-                stream = await raw_learning_post(
-                    port=4182,
-                    cookie=auth.cookies["edumind_session"],
-                    csrf=auth.json()["csrf_token"],
-                    key=str(uuid4()),
-                    goal=GOAL,
-                )
-                item = {
-                    "number": number,
-                    **stream.evidence(public_benchmark=True),
-                    "anonymous_session_ms": (stream.started_ns - started) / 1e6,
-                }
+                    auth_end = time.monotonic_ns()
+                    cookie = auth.cookies["edumind_session"]
+                    stream = await raw_learning_post(
+                        port=4182,
+                        cookie=cookie,
+                        csrf=auth.json()["csrf_token"],
+                        key=str(uuid4()),
+                        goal=GOAL,
+                        timeout=180,
+                    )
+                    item = {
+                        "number": number,
+                        **stream.evidence(public_benchmark=True),
+                        "journey_started_ns": started,
+                        "anonymous_session_ms": (stream.started_ns - started) / 1e6,
+                        "anonymous_http_ms": (auth_end - auth_start) / 1e6,
+                        "anonymous_setup_ms": (stream.started_ns - started) / 1e6,
+                    }
+                    recovery_before = len(json.loads(args.ledger.read_text())["provider_calls"])
+                    if stream.operation_id:
+                        try:
+                            recovered = await client.get(
+                                f"/api/learning-operations/{stream.operation_id}",
+                                headers={"Cookie": f"edumind_session={cookie}"},
+                            )
+                            item["recovery_http_status"] = recovered.status_code
+                            if recovered.status_code == 200:
+                                item["recovery_state"] = recovered.json().get("status")
+                        except httpx.HTTPError:
+                            item["recovery_error"] = "READ_FAILED"
+                    item["recovery_extra_attempts"] = (
+                        len(json.loads(args.ledger.read_text())["provider_calls"]) - recovery_before
+                    )
             except (httpx.HTTPError, KeyError):
                 item = {
                     "number": number,
@@ -96,11 +120,14 @@ async def run(args):
                     "milestones_ns": {},
                     "started_ns": started,
                 }
+            item["attempts_before"] = before
         report["samples"].append(item)
         ledger = json.loads(args.ledger.read_text())
         calls = ledger["provider_calls"]
         if len(calls) >= 240:
             stop = "BUDGET_EXHAUSTED"
+        if ledger.get("halted"):
+            stop = ledger["halted"]
         if any(c.get("error_code") in {"AUTHENTICATION_FAILED", "RATE_LIMITED"} for c in calls):
             stop = "AUTH_OR_QUOTA_FAILURE"
         report["actual_provider_attempts"] = len(calls)

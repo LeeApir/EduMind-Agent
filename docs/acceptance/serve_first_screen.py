@@ -5,7 +5,8 @@ import os
 import time
 from pathlib import Path
 
-from serve_real_browser import Budget, CountingAdapter
+from acceptance_budget import GuardedBudget, install_status_guard
+from serve_real_browser import CountingAdapter
 
 HEADER = "X-Acceptance-Validated-At-Ns"
 
@@ -36,8 +37,10 @@ def main():
         parser.error("Requires dedicated perf_t032 database")
 
     from app.core import provider_factory
+    from app.services import deepseek_responses
 
-    budget = Budget(args.ledger, 240)
+    budget = GuardedBudget(args.ledger, 240)
+    install_status_guard(deepseek_responses, budget)
     original = provider_factory.configured_provider_adapter
     provider_factory.configured_provider_adapter = lambda settings, guard: CountingAdapter(
         original(settings, guard), budget

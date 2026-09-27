@@ -1341,6 +1341,16 @@
         {"command": "pnpm --dir web test --run/typecheck/lint/build; git diff --check", "result": "70测试12文件通过，最终DOM格式调整后4针对性再次通过；最终类型/构建通过，lint0错误67既有警告；报告mvp-0.2-t036-lossless-stream.md，T032仍blocked，20正式入口异常熔断需核对及另行冻结授权。"}
       ], "started_at": "2026-09-27T18:02:27", "completed_at": "2026-09-27T18:08:51",
       "blocker": null, "commit_lookup": "Task-Completed: MVP-0.2-T036"
+    },
+    {
+      "id": "MVP-0.2-T037", "phase": "MVP 0.2", "parent_work_package": "MVP-0.2-008",
+      "title": "正式性能验收入口异常即时停机保护",
+      "status": "done", "priority": "P0", "depends_on": ["MVP-0.2-T036"],
+      "scope": ["docs/acceptance/", "backend/tests/", "task.json", "process.txt"],
+      "acceptance_criteria": ["240全局实际adapter尝试包含内部重试，认证/余额/配额异常阻止下一实际调用。", "固定20槽位不补跑，停机余下槽位标记未执行；恢复查询失败不覆盖原生成证据。", "匿名HTTP/全准备时间分列，只读恢复记录调用增量；口径与段落规则不变。", "非计费mock验证及本地独立提交后冻结，T032继续blocked。"],
+      "verification": ["uv run --frozen pytest -q tests/test_acceptance_budget.py tests/test_first_screen_v2.py tests/test_diagnostic_three.py", "uv run --frozen ruff check app tests ../docs/acceptance", "git diff --check"],
+      "verification_results": [{"command": "mock预算/固定槽位回归23；隔离PG全量pytest；Ruff/Mypy/diff", "result": "434 passed/0skip/9既有警告，Ruff clean，Mypy55通过；401/402/403/429后实际尝试仅1，240包含失败，停机19槽未执行；恢复失败原发布证据保留。0真实模型调用。详见mvp-0.2-t037-budget-guard.md"}], "started_at": "2026-09-27T18:33:37", "completed_at": "2026-09-27T18:39:00",
+      "blocker": null, "commit_lookup": "Task-Completed: MVP-0.2-T037"
     }
   ]
 }
