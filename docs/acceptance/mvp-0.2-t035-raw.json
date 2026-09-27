@@ -1,0 +1,265 @@
+{
+  "schema": "three-diagnostic-wire-v2",
+  "samples_planned": 3,
+  "concurrency": 1,
+  "warmups": 0,
+  "deadline_seconds": 180,
+  "configured_model": "deepseek-flash",
+  "structured_transport": "responses_json_schema",
+  "goal": "我想理解单链表的前置知识，先看 C 代码。",
+  "samples": [
+    {
+      "number": 1,
+      "started_ns": 415052307095833,
+      "validated_ns": 415052512199125,
+      "milestones_ns": {
+        "http_first_byte": 415053649755041,
+        "http_headers_complete": 415053649782958,
+        "sse_status": 415053649843250,
+        "any_nonempty_token": 415055201624750,
+        "published": 415069927275208
+      },
+      "candidates": [
+        {
+          "id": 1,
+          "sha256": "771deeb02d7523663800cbe4c4791c88665444b2535d299baff112474f716e0f",
+          "first_token_ns": 415055201735333,
+          "completed_ns": 415055253006666,
+          "boundary": "blank_line",
+          "sentence_terminated": false,
+          "qualification": "unconfirmed",
+          "characters": 22,
+          "public_text": "**前置知识：结构体指针的访问与动态内存**"
+        },
+        {
+          "id": 2,
+          "sha256": "d42b505d9028489b4e8d05a42797bb6eeb758e2057e8089923f42ca9517fefb3",
+          "first_token_ns": 415055253579625,
+          "completed_ns": 415055388516500,
+          "boundary": "blank_line",
+          "sentence_terminated": false,
+          "qualification": "unconfirmed",
+          "characters": 29,
+          "public_text": "这一小步的目标是——先不写链表，掌握两个必备的 C语法点："
+        },
+        {
+          "id": 3,
+          "sha256": "c237e4177bd37dbacfecf0848d5b0db786dc0154d3ba5ff2ea7c905b1a293ef8",
+          "first_token_ns": 415055388827166,
+          "completed_ns": 415055521301166,
+          "boundary": "blank_line",
+          "sentence_terminated": true,
+          "qualification": "unconfirmed",
+          "characters": 64,
+          "public_text": "1. **用箭头 `->`通过指针访问结构体成员**2. **用 `malloc` / `free`在堆上创建和释放“结点”**"
+        },
+        {
+          "id": 4,
+          "sha256": "29bd4adb1aae42052ec064fcd7043a82edc595ae7c0fc0b3226e773bf7f184bc",
+          "first_token_ns": 415055521417041,
+          "completed_ns": 415055891845791,
+          "boundary": "blank_line",
+          "sentence_terminated": false,
+          "qualification": "unconfirmed",
+          "characters": 9,
+          "public_text": "先看一段最小代码："
+        },
+        {
+          "id": 5,
+          "sha256": "de2d9fd127a272dbad7859350d5b39bbeaa7c0816f3234eb54575245e758174d",
+          "first_token_ns": 415056109415958,
+          "completed_ns": 415056145071208,
+          "boundary": "blank_line",
+          "sentence_terminated": false,
+          "qualification": "unconfirmed",
+          "characters": 10,
+          "public_text": "**关键点对照：**"
+        },
+        {
+          "id": 6,
+          "sha256": "9a5a18459f2aa386820d67ce800a647c09cd829ff1fb6c0836e699cde575f799",
+          "first_token_ns": 415056145167666,
+          "completed_ns": 415056668611541,
+          "boundary": "blank_line",
+          "sentence_terminated": true,
+          "qualification": "unconfirmed",
+          "characters": 295,
+          "public_text": "|写法 |含义 |\n|---|---|\n| `p->data` |通过指针 `p`访问它指向的结构体的 `data`成员，等价于 `(*p).data` |\n| `p->next` |通过指针 `p`访问它指向的结构体的 `next`成员 |\n| `malloc(sizeof(struct Node))` |在堆上分配足够存一个 `struct Node`的内存，返回 `void *`，需要转换成 `struct Node *` |\n| `free(p)` |释放 `p`指向的堆内存；释放后不要再用 `p`解引用 |\n| `p = NULL` |避免悬空指针，防止误用已释放的内存 |"
+        },
+        {
+          "id": 7,
+          "sha256": "2a531b34c613b935ab2013c5474c2e2fe755ccc3120db49d9d5c19e16d584e41",
+          "first_token_ns": 415056668780125,
+          "completed_ns": 415056787407791,
+          "boundary": "blank_line",
+          "sentence_terminated": false,
+          "qualification": "unconfirmed",
+          "characters": 21,
+          "public_text": "再强调一下**变量框和指向对象**的区别："
+        },
+        {
+          "id": 8,
+          "sha256": "d488554d686984b8efdc26ed24280c979ea60b72ad00659771fe72f575c667ae",
+          "first_token_ns": 415057330968250,
+          "completed_ns": 415057343696958,
+          "boundary": "blank_line",
+          "sentence_terminated": false,
+          "qualification": "unconfirmed",
+          "characters": 45,
+          "public_text": "struct Node *b = malloc(sizeof(struct Node));"
+        },
+        {
+          "id": 9,
+          "sha256": "db13288cb8e0998768e59a8fdeaec1215b5dec61c11324dd71a9f396771fdd6f",
+          "first_token_ns": 415057377726083,
+          "completed_ns": 415057655800291,
+          "boundary": "blank_line",
+          "sentence_terminated": true,
+          "qualification": "unconfirmed",
+          "characters": 188,
+          "public_text": "a->data =1;\na->next = b; // a的 next指向 bb->data =2;\nb->next = NULL; // b是最后一个结点//从 a出发遍历struct Node *cur = a;\nwhile (cur != NULL) {\n printf(\"%d \", cur->data);\n cur = cur->next;\n}\n//输出:12```"
+        },
+        {
+          "id": 10,
+          "sha256": "0006ef38dc7d258df4ceb2c88758bb47986a106b632a8c113e6ea11ee23aed8a",
+          "first_token_ns": 415057655880291,
+          "completed_ns": 415057979124500,
+          "boundary": "temporary_stream_end",
+          "sentence_terminated": true,
+          "qualification": "unconfirmed",
+          "characters": 78,
+          "public_text": "到这里，单链表的两个语法前提——**箭头访问**和**动态结点**——就已经齐了。下一步就可以把“创建结点、连成链、遍历、插入、删除”正式组织成链表的操作。"
+        }
+      ],
+      "temporary_stream_ended": true,
+      "status": "published",
+      "errors": [],
+      "journey_started_ns": 415052197092541,
+      "anonymous_http_ms": 85.148209,
+      "anonymous_setup_ms": 110.003292,
+      "recovery_http_status": 200,
+      "recovery_state": "published",
+      "recovery_extra_attempts": 0,
+      "attempts_before": 0
+    },
+    {
+      "number": 2,
+      "started_ns": 415069962470833,
+      "validated_ns": 415069971178666,
+      "milestones_ns": {
+        "http_first_byte": 415071551365666,
+        "http_headers_complete": 415071551410958,
+        "sse_status": 415071551454083,
+        "any_nonempty_token": 415072438610000,
+        "published": 415084072909333
+      },
+      "candidates": [
+        {
+          "id": 1,
+          "sha256": "00455e262aefa88a685ec372b2639348d554dde9f603110caeb8cfce11098336",
+          "first_token_ns": 415072438610000,
+          "completed_ns": 415072810356625,
+          "boundary": "blank_line",
+          "sentence_terminated": true,
+          "qualification": "unconfirmed",
+          "characters": 115,
+          "public_text": "先看一个最小的 C单链表节点和建表代码。它的前置知识主要是：结构体、指针、动态内存分配，以及“指针存的是地址”这件事。下面这段代码会显式打印每个节点的地址、`next`里存的地址，以及它指向谁，方便你把“箭头”和“地址标签”对上。"
+        },
+        {
+          "id": 2,
+          "sha256": "8a6c5a805f8f033ca03047afd3c274a4553152572515ae83bbd44f84d12d39a1",
+          "first_token_ns": 415074314085708,
+          "completed_ns": 415074314143458,
+          "boundary": "blank_line",
+          "sentence_terminated": false,
+          "qualification": "unconfirmed",
+          "characters": 5,
+          "public_text": "观察重点："
+        },
+        {
+          "id": 3,
+          "sha256": "fa267729964115031b13615abd8cefd89eaadf9cc4a801df625c40d2b39ea571",
+          "first_token_ns": 415074314192958,
+          "completed_ns": 415074784636875,
+          "boundary": "blank_line",
+          "sentence_terminated": true,
+          "qualification": "unconfirmed",
+          "characters": 208,
+          "public_text": "1. `Node *head`是变量框，里面放地址。\n2. `n1`、`n2`、`n3`分别指向 `malloc`出来的节点对象。\n3. `n1->next = n2`表示把 `n2`的地址写进 `n1`的 `next`字段里，于是 `n1`的箭头指向 `n2`。\n4. `head = n1`表示头指针指向第一个节点。\n5. `cur = cur->next`就是沿着 `next`里保存的地址往后走到下一个节点。"
+        },
+        {
+          "id": 4,
+          "sha256": "f293e8c0df4d67c65b9d65bc197a422b36c20ae2a67de1eedae0484752b30dea",
+          "first_token_ns": 415074784681458,
+          "completed_ns": 415074787056416,
+          "boundary": "temporary_stream_end",
+          "sentence_terminated": true,
+          "qualification": "unconfirmed",
+          "characters": 45,
+          "public_text": "如果你愿意，我可以接着把这段代码按“变量框 /对象框 /箭头”画成内存示意图，再逐行解释。"
+        }
+      ],
+      "temporary_stream_ended": true,
+      "status": "published",
+      "errors": [],
+      "journey_started_ns": 415069944848291,
+      "anonymous_http_ms": 10.38925,
+      "anonymous_setup_ms": 17.622542,
+      "recovery_http_status": 200,
+      "recovery_state": "published",
+      "recovery_extra_attempts": 0,
+      "attempts_before": 8
+    },
+    {
+      "number": 3,
+      "started_ns": 415084108748000,
+      "validated_ns": 415084117459625,
+      "milestones_ns": {
+        "http_first_byte": 415085270111291,
+        "http_headers_complete": 415085270123333,
+        "sse_status": 415085270157625,
+        "any_nonempty_token": 415086267971166,
+        "published": 415096328306916
+      },
+      "candidates": [
+        {
+          "id": 1,
+          "sha256": "78a830d6753ac636679184b41e84a6c643891de4c8189fdf92fbc5fc7a167e5f",
+          "first_token_ns": 415086267971166,
+          "completed_ns": 415086339442666,
+          "boundary": "temporary_stream_end",
+          "sentence_terminated": true,
+          "qualification": "unconfirmed",
+          "characters": 48,
+          "public_text": "先记住一句话：**指针变量里存的是地址**。看 C代码时，先找这个地址指向谁，再看你要对谁操作。"
+        }
+      ],
+      "temporary_stream_ended": true,
+      "status": "published",
+      "errors": [],
+      "journey_started_ns": 415084092186708,
+      "anonymous_http_ms": 9.80225,
+      "anonymous_setup_ms": 16.561292,
+      "recovery_http_status": 200,
+      "recovery_state": "published",
+      "recovery_extra_attempts": 0,
+      "attempts_before": 16
+    }
+  ],
+  "formal_acceptance": false,
+  "environment": {
+    "platform": "macOS-15.6.1-arm64-arm-64bit",
+    "python": "3.11.16",
+    "httpx": "0.28.1",
+    "client_wire": "loopback HTTP/1.1 via actual Vite",
+    "provider_cold_state": "unknown",
+    "text_transport": "Responses streaming"
+  },
+  "instruction_source_sha256": {
+    "backend/app/services/first_learning.py": "0169bf5acbbabd38a2c8da2e66b0f70c3d73ba1babdc20bc443f177a2312a57c",
+    "backend/app/agents/profile_agent.py": "9a375c3d2f426992515b1eeccf788bb6c01914348eb8a98fc15cfada137a8f11",
+    "backend/app/agents/learning_resource_prompt.py": "8044b64fc874da02c970abef783cdc5c27eb73a00085906ecc4ea7ce0d920bfc",
+    "backend/app/agents/review_agent.py": "71ea2ab84629de8f4b40f5caaee345e9e409a02e4ad9c54bc34680e0939a8930"
+  },
+  "actual_attempts": 24
+}

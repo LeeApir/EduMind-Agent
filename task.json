@@ -1279,7 +1279,7 @@
       ],
       "started_at": "2026-09-27T14:42:14",
       "completed_at": null,
-      "blocker": "旧20样本和162尝试保留，原任意delta 5661.935ms不等同HTTP首字节或确认正文；3首候选未确认。T033/T034非计费修复不证明真实性能，仍需另行批准v2有界20样本/240上限复测；画像后台化涉及合并偏好/路径版本契约未实施。",
+      "blocker": "旧20样本/162尝试保留。T035独立3样本当前deepseek-flash(非旧Pro)24尝试，3发布但1最早首段未确认，另外2正文token超过独立2秒门槛；不计算P95。采样/语义评审发现列表句点误判辅助字段和纯空白chunk丢失风险，建议先非计费修复再批准冻结20样本/240上限正式验收。画像串行契约未改变。",
       "commit_lookup": "Task-Completed: MVP-0.2-T032"
     },
     {
@@ -1313,6 +1313,20 @@
         {"command": "pnpm --dir web test --run; pnpm --dir web typecheck; pnpm --dir web lint; pnpm --dir web build; git diff --check", "result": "passed:66 tests/11 files including10 T030 recovery/stale-response cases; types/build clean,lint0errors/67existing warnings; diff clean, historical raw/audit/ledger unchanged; T032 still blocked, v2 finite plan prepared not executed"}
       ], "started_at": "2026-09-27T16:17:18", "completed_at": "2026-09-27T16:35:48",
       "blocker": null, "commit_lookup": "Task-Completed: MVP-0.2-T034"
+    },
+    {
+      "id": "MVP-0.2-T035", "phase": "MVP 0.2", "parent_work_package": "MVP-0.2-008",
+      "title": "当前模型三样本有界真实关键路径诊断",
+      "status": "done", "priority": "P0", "depends_on": ["MVP-0.2-T034"],
+      "scope": ["docs/acceptance/", "backend/tests/", "task.json", "process.txt"],
+      "acceptance_criteria": ["独立三样本、单并发、零预热、180秒截止、全局36实际尝试含重试；异常停止、不补跑。", "五项指标、多候选独立语义评审、匿名和完整等待与嵌套阶段计时保留脱敏证据。", "验证池连接及只读恢复零增量；先mock验证，不宣称P95，T032保持blocked。", "停止本次计费服务，报告瓶颈和正式计划建议，不改.env/模型、不跨阶段。"],
+      "verification": ["backend: uv run --frozen pytest -q tests/test_diagnostic_three.py tests/test_first_screen_v2.py", "backend: uv run --frozen ruff check ../docs/acceptance tests", "一次run_diagnostic_three.py及独立语义评审", "git diff --check"],
+      "verification_results": [
+        {"command": "隔离diag3 Alembic0009；serve_diagnostic_three/实际Vite/run_diagnostic_three一次；独立audit_diagnostic_three", "result": "3/3发布，24/36尝试全部completed，无重试/替换/预热/超时；15候选独立hash语义评审，2确认、1保留未确认，不计算P95；model current deepseek-flash，不是旧Pro；恢复GET3个200/published、额外Provider0；3owner/3key/3操作；所有POST新物理连接0。17:44:33确认服务停止。"},
+        {"command": "backend: EDUMIND_TEST_DATABASE_URL=<isolated regression DB> uv run --frozen pytest -q; ruff check app tests ../docs/acceptance; mypy app", "result": "421 passed/0skip/9既有警告；Ruff导入排序修正后全量clean，Mypy55文件通过；最终工具针对性13passed。未调用真实模型进行回归。"},
+        {"command": "pnpm --dir web test --run/typecheck/lint/build; git diff --check", "result": "66测试/11文件通过，类型/构建通过，lint0错误67既有警告；diff干净，真实.env/模型/生产API未修改；报告和raw/trace/ledger/decisions/audit(v1,v2)独立保留，T032仍blocked。"}
+      ], "started_at": "2026-09-27T17:37:31", "completed_at": "2026-09-27T17:53:20",
+      "blocker": null, "commit_lookup": "Task-Completed: MVP-0.2-T035"
     }
   ]
 }
