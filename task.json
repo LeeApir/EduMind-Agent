@@ -1279,7 +1279,7 @@
       ],
       "started_at": "2026-09-27T14:42:14",
       "completed_at": null,
-      "blocker": "旧20样本/162尝试保留。T035独立3样本当前deepseek-flash(非旧Pro)24尝试，3发布但1最早首段未确认，另外2正文token超过独立2秒门槛；不计算P95。采样/语义评审发现列表句点误判辅助字段和纯空白chunk丢失风险，建议先非计费修复再批准冻结20样本/240上限正式验收。画像串行契约未改变。",
+      "blocker": "旧20失败和T035三诊断保留。T036无损正文/T037即时停机完成后，用户批准T038冻结v2正式20样本；161/240实际尝试（1 TIMEOUT保留），20发布/20最早教学首段确认。PRD client HTTP P95 1647.309ms≤2秒、首段3094.385ms≤10秒达标，但冻结独立validated教学token P95 2632.575ms>2秒，gate=false。画像/路径时序未改变，不自行豁免内容门槛、不补跑，T032继续blocked。证据mvp-0.2-t038-formal-retest.md/raw/ledger/decisions/audit。",
       "commit_lookup": "Task-Completed: MVP-0.2-T032"
     },
     {
@@ -1351,6 +1351,20 @@
       "verification": ["uv run --frozen pytest -q tests/test_acceptance_budget.py tests/test_first_screen_v2.py tests/test_diagnostic_three.py", "uv run --frozen ruff check app tests ../docs/acceptance", "git diff --check"],
       "verification_results": [{"command": "mock预算/固定槽位回归23；隔离PG全量pytest；Ruff/Mypy/diff", "result": "434 passed/0skip/9既有警告，Ruff clean，Mypy55通过；401/402/403/429后实际尝试仅1，240包含失败，停机19槽未执行；恢复失败原发布证据保留。0真实模型调用。详见mvp-0.2-t037-budget-guard.md"}], "started_at": "2026-09-27T18:33:37", "completed_at": "2026-09-27T18:39:00",
       "blocker": null, "commit_lookup": "Task-Completed: MVP-0.2-T037"
+    },
+    {
+      "id": "MVP-0.2-T038", "phase": "MVP 0.2", "parent_work_package": "MVP-0.2-008",
+      "title": "执行冻结T032 v2正式20样本并独立审计",
+      "status": "done", "priority": "P0", "depends_on": ["MVP-0.2-T037"],
+      "scope": ["docs/acceptance/", "task.json", "process.txt"],
+      "acceptance_criteria": ["一次20槽、单并发、无计费预热、每POST180秒、全局240实际尝试含内部重试；异常即停止，不补跑。", "独立保留raw/ledger/hash绑定语义评审/audit及报告，旧失败和3诊断样本不混入。", "分别报告HTTP首字节/头/SSE/教学token/完整首段/发布，匿名与完整用户等待独立；模型/传输/指令/环境及缺失不隐瞒。", "停本轮服务/计费，真实未达标则T032继续blocked，不修改.env/模型或生产代码，不push/merge/归档/跨阶段。"],
+      "verification": ["隔离perf_t032_v2迁移；serve_first_screen.py + Vite4182 + run_first_screen_v2.py一次20样本", "audit_first_screen_v2.py + 独立hash候选评审；隔离DB只读聚合及恢复账本", "脱敏检查、git diff --check、本地独立证据提交"],
+      "verification_results": [
+        {"command": "perf_t032_v2 Alembic0009；serve_first_screen.py/实际Vite/run_first_screen_v2.py一次20样本", "result": "20/20 published，161/240实际尝试=20stream+141structured；160completed/1TIMEOUT保留，无认证/余额/配额异常，无补跑/预热/替换；当前deepseek-flash，.env不改。18:50:55确认服务关闭。"},
+        {"command": "133候选独立SHA评审 + audit_first_screen_v2.py；隔离DB只读聚合/恢复", "result": "20最早教学段落确认，11后续候选仍未确认不静默放行；HTTP client P95 1647.309ms、首段3094.385ms均达PRD；独立validated教学token2632.575ms>2000失败，T032保持blocked。20GET200/published新增Provider0；20owner/key/操作/单元。"},
+        {"command": "离线工具23测试/Ruff/Mypy55；前端test/typecheck/lint/build；脱敏/时钟/source/hash一致性/git diff --check", "result": "全部通过；前端70测试12文件/类型构建通过，0lint错误67既有警告；后端T037本轮已434全量通过。raw/ledger不可变，真实key/URL未泄漏，代码摘要不变；报告mvp-0.2-t038-formal-retest.md。T038仅完成采样审计证据，不等于T032完成或阶段可切换。"}
+      ], "started_at": "2026-09-27T18:40:00", "completed_at": "2026-09-27T18:57:29",
+      "blocker": null, "commit_lookup": "Task-Completed: MVP-0.2-T038"
     }
   ]
 }
