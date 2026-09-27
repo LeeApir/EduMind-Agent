@@ -1223,6 +1223,57 @@
       "completed_at": "2026-09-27T13:33:42",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.2-T030"
+    },
+    {
+      "id": "MVP-0.2-T031",
+      "phase": "MVP 0.2",
+      "parent_work_package": "MVP-0.2-008",
+      "title": "真实浏览器完整学习闭环及断线恢复验收",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": ["MVP-0.2-T030"],
+      "scope": ["docs/acceptance/", "web/tests/", "web/src/styles.css", "backend/tests/", "task.json", "process.txt"],
+      "acceptance_criteria": [
+        "真实Chromium/Vite代理/Uvicorn/隔离PostgreSQL/当前Provider完整链路，不用route mock、TestClient或合成发布资源。",
+        "匿名Cookie/CSRF、首段与审核、三类资源、公开题面独立作答、评分/掌握度/推荐正常。",
+        "刷新恢复资源/回执/路径；可控断线恢复同操作，Provider账本无重复生成。",
+        "分类控制台/网络负向与缺陷，保存脱敏证据、复现入口；实际Provider尝试硬上限30，失败不冒充通过。"
+      ],
+      "verification": ["真实浏览器验收入口、隔离迁移、相关离线工具回归及静态检查、git diff --check"],
+      "verification_results": [
+        {"command": "backend: EDUMIND_DATABASE_URL=<fresh isolated browser DB> uv run --frozen alembic upgrade head", "result": "passed: empty database to 0009 head, no synthetic reviewed resources"},
+        {"command": "serve_real_browser.py --confirm-billable --limit 30; Vite real proxy; run_real_browser.py --confirm-billable --output <fresh report>", "result": "passed: real Chromium/Vite/Uvicorn/PostgreSQL/current Provider v5, all 9 checks; independent B/T/B twice, mastery 95%, path v3; 1 learning POST, recovery counters 28=28; 30 total attempts across 3 actual flows, final 10; all failed reports preserved"},
+        {"command": "backend: EDUMIND_TEST_DATABASE_URL=<isolated regression DB> uv run --frozen pytest -q", "result": "passed: 397 tests, no skips, 7 existing warnings"},
+        {"command": "backend: uv run --frozen ruff check app tests ../docs/acceptance/serve_real_browser.py ../docs/acceptance/run_real_browser.py; uv run --frozen mypy app", "result": "passed: Ruff clean after import-order fix, Mypy 55 source files"},
+        {"command": "pnpm --dir web test --run; pnpm --dir web typecheck; pnpm --dir web lint; pnpm --dir web build", "result": "passed: 66 tests/11 files; typecheck/build pass; 0 lint errors/67 existing warnings"},
+        {"command": "git diff --check", "result": "passed; webapp-testing used; evidence docs/acceptance/mvp-0.2-t031-real-browser.md; actual console negatives classified, pageerror/unexpected HTTP failures 0"}
+      ],
+      "started_at": "2026-09-27T13:53:58",
+      "completed_at": "2026-09-27T14:39:03",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.2-T031"
+    },
+    {
+      "id": "MVP-0.2-T032",
+      "phase": "MVP 0.2",
+      "parent_work_package": "MVP-0.2-008",
+      "title": "当前模型首字节和首段性能复测",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": ["MVP-0.2-T031"],
+      "scope": ["docs/acceptance/", "backend/tests/", "task.json", "process.txt"],
+      "acceptance_criteria": [
+        "先确认可复现且批准的首段规则、起点、有限样本和实际计费硬上限。",
+        "分别统计HTTP头/SSE状态/首token/首段，P95首token≤2秒、首段≤10秒，不用总生成时长代替。",
+        "记录当前模型/传输/指令/环境/并发/样本/预热/失败，失败超时不丢弃、不无限重跑。",
+        "证据和命令脱敏，未达门槛标记阻塞，不改变真实.env或模型。"
+      ],
+      "verification": ["有限样本实际HTTP/Provider性能入口、指标离线回归、git diff --check"],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.2-T032"
     }
   ]
 }

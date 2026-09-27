@@ -375,3 +375,15 @@ v4本地题型门禁和真实质量通过，首次真实闭环7调用有一个�
 用户同意查询只读、失败同键仅恢复、明确重新生成才换键及不新增中断检测；恢复修复任务 | 已核对既有幂等POST只回放状态，schema/发布/owner规则不变 | 真正进程中断可能保持运行中，不能猜测失败；0付费请求 | 实现代次隔离及六类回归，mock/隔离数据库验证后本地提交
 [2026-09-27T13:33:42] [MVP-0.2-T030] VERIFIED | executor=Lee
 恢复原请求保留目标/操作ID/幂等键，明确新生成才换键；查询只读，SSE及查询/资源异步响应代次隔离；OpenAPI/ADR已批准的有限语义与验收记录同步 | 后端396通过无跳过/7既有警告、Ruff/Mypy55通过；前端65通过、类型/构建通过、lint0错误67既有警告；webapp-testing指导浏览器route-mock通过：失败恢复仅一POST、新生成换键、已发布恢复仅一POST；diff检查通过，0付费请求 | 未新增中断检测，真实中断可持续运行中；未完成身份不跨刷新保存，不取消旧调用；浏览器既有401/404 mock console保留，不声称真实Provider验收 | 自查与明确路径暂存后本地Task-Completed提交并核对；交接见docs/acceptance/mvp-0.2-t030-retry-recovery.md，不push/merge/归档/跨MVP0.3
+[2026-09-27T13:53:58] [MVP-0.2-T031] START | executor=Lee | branch=codex/mvp-0.2
+用户授权真实浏览器闭环及当前模型性能分成T031/T032串行；核对最终质量v11/闭环v10与T030 fb273c7完成提交 | 工作区干净，当前deepseek-v4-pro-0813/default Responses；既有同key必要验证直到耗尽授权仍有效，A计划单学习操作最多30实际尝试含重试/审核修正/行为画像；不换模型或.env | 旧浏览器route-mock与TestClient不能替代本次；B旧脚本首token误作首段、可复现完整段落规则缺口待A完成后报告 | 非计费准备真实Chromium/Vite/Uvicorn/隔离PG、硬预算账本及断线注入，再执行A，不push/merge/归档或跨阶段
+[2026-09-27T14:02:25] [MVP-0.2-T031] RESUME | executor=Lee | branch=codex/mvp-0.2
+非计费诊断定位主样式同步Google Fonts导入使真实浏览器networkidle超时，保留首轮失败报告，不以mock绕过；移除阻塞远程导入保留本地字体回退并补回归 | 全新PG0009迁移通过，预算离线测试先发现异常参数已修为现有不可重试错误并通过；原v1账本/修后v2账本均0调用；Vite监听权限解决 | 首轮停在页面准备、无学习操作，不能算闭环通过 | 本地字体依赖回归通过后新报告复跑，沿用原30实际尝试全局账本上限，不无限重跑或改Provider
+[2026-09-27T14:22:31] [MVP-0.2-T031] RESUME | executor=Lee | branch=codex/mvp-0.2
+纠正上一条根因推断：移除远程字体依赖后第二轮仍在networkidle等待超时，因此不能认定字体是唯一或已证实根因；独立真实浏览器DOM检查标题已渲染，匿名请求正常 | v1/v2均无模型请求，失败报告保留；样式回归的Vitest URL/CSS导入问题改为工作目录文件读取后通过 | Vite整体networkidle不能替代明确DOM及接口检查，未放宽业务验收 | 按webapp-testing探测networkidle再用真实DOM/响应逐项验证，第三轮仍沿用同一30尝试账本；若再次入口失败停止求助
+[2026-09-27T14:25:03] [MVP-0.2-T031] RESUME | executor=Lee | branch=codex/mvp-0.2
+第三轮真实Provider/浏览器已通过首段/审核/资源/断网恢复，按公开题面独立B/T/B后两次评分和掌握度检查通过，但验收脚本误要求路径v2 | 10实际调用；恢复前后8=8，POST仅1；真实HTTP两次replan200。只读隔离SQL确认路径1→2→3/current linked-list-concept，未读答案；首段总生成27328ms不冒充首段P95 | 真实前端每次练习后都重规划，不同于旧TestClient最后才规划；脚本假定v2错误；故v3报告仍保留failed。另外注入丢流对应ERR_ABORTED、离线查询对应ERR_INTERNET_DISCONNECTED应分类预期 | 修复脚本断言为两次各自v2/v3并留逐次回执，单次新报告复验；全局预算30仍仅10已用，若再失败依据具体证据停止，不改模型或挑质量样本
+[2026-09-27T14:27:28] [MVP-0.2-T031] RESUME | executor=Lee | branch=codex/mvp-0.2
+第四轮资源/评分/95%掌握度/下一步及刷新后的资源/回执/v3均通过，但脚本把整个路径组件文本（含瞬时已更新标记/选中节点详情）要求刷新逐字相同 | 10新增调用/累计20；恢复前后18=18，独立B/C/B两次3/3正确；failure行208；刷新actualGET资源/回执/路径/掌握度200。LearningPathPanel挂载重置changedIds/selectedId，全文不是持久化契约；保留v4失败 | 未保存v4刷新全文，不能倒推具体字符差异，不冒充最终完整通过 | 改验收为真实服务端路径快照逐字段相同及UI方向/版本/95%状态，不比较瞬时选择；最多一次最后复验，仍全局30尝试上限，耗尽停止；不重跑质量或扩大预算
+[2026-09-27T14:39:03] [MVP-0.2-T031] VERIFIED | executor=Lee
+真实Chromium153/Vite4181/Uvicorn8011/全新隔离PG0009/当前Pro闭环通过；不使用mock/TestClient/合成发布资源；保留所有失败并补入口与预算工具、移除同步远程字体依赖 | v5九项检查通过，独立B/T/B两次3/3，掌握度55%→95%、路径v3、刷新实际路径快照完整相同；学习POST1次、断网恢复计数28=28。30实际尝试用完，3flow各10，均完成。397后端/66前端通过，Ruff/Mypy55/类型/构建/diff通过；lint0错67既有警告；pageerror和意外HTTP失败0，401/404及ERR_ABORTED/INTERNET_DISCONNECTED分类预期 | 初始networkidle仍false，不宣称网络无负向或首段性能通过；总生成30664ms非首段P95；费用余额未知，.env未修改；B完整首段判定仍缺，阶段不切换 | 明确路径暂存并独立本地Task-Completed提交A；已停止本次服务、保留隔离库；随后领取B只做规则/样本准备并报告需确认项，不push/merge/归档
