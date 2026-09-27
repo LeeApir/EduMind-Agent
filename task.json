@@ -1258,7 +1258,7 @@
       "phase": "MVP 0.2",
       "parent_work_package": "MVP-0.2-008",
       "title": "当前模型首字节和首段性能复测",
-      "status": "todo",
+      "status": "blocked",
       "priority": "P0",
       "depends_on": ["MVP-0.2-T031"],
       "scope": ["docs/acceptance/", "backend/tests/", "task.json", "process.txt"],
@@ -1269,10 +1269,13 @@
         "证据和命令脱敏，未达门槛标记阻塞，不改变真实.env或模型。"
       ],
       "verification": ["有限样本实际HTTP/Provider性能入口、指标离线回归、git diff --check"],
-      "verification_results": [],
-      "started_at": null,
+      "verification_results": [
+        {"command": "读取 docs/ADR/0002-streaming-first-screen-and-resource-review.md、docs/PRD.md §8.1、backend/tests/manual_provider_acceptance.py 及最终验收报告", "result": "gap confirmed: old first_content_ms is first nonempty token; no approved reproducible full teaching paragraph rule. Non-billable 20-sample/240-attempt plan prepared in docs/acceptance/mvp-0.2-t032-first-screen-plan.md, 0 actual samples/calls"},
+        {"command": "git diff --check", "result": "passed; documentation-only preparation, no latency result or completion claim"}
+      ],
+      "started_at": "2026-09-27T14:42:14",
       "completed_at": null,
-      "blocker": null,
+      "blocker": "需用户确认完整首段判定规则及冻结20样本/0计费预热/240实际尝试硬上限计划；旧脚本只测首token不能代替首段。未发起B计费请求。",
       "commit_lookup": "Task-Completed: MVP-0.2-T032"
     }
   ]
