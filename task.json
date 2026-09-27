@@ -237,7 +237,7 @@
       "id": "MVP-0.3-T004",
       "phase": "MVP 0.3",
       "title": "固定 MVP 0.3 API 与 SSE 契约",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.3-T002",
@@ -258,9 +258,36 @@
       "verification": [
         "解析 OpenAPI，验证引用/请求响应 schema、写入安全和 SSE 事件契约。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen pytest -q tests/test_mvp03_openapi_contract.py",
+          "result": "7 passed, 0 skipped",
+          "evidence": "backend/tests/test_mvp03_openapi_contract.py"
+        },
+        {
+          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen ruff check tests/test_mvp03_openapi_contract.py",
+          "result": "passed"
+        },
+        {
+          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen mypy app",
+          "result": "passed, 55 source files"
+        },
+        {
+          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen python inline JSON Schema and link check",
+          "result": "43 unique operations, 49 component schemas valid, links passed",
+          "evidence": "docs/acceptance/mvp-0.3-t004-api-contract.md"
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed"
+        },
+        {
+          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen pytest -q tests/test_mvp03_openapi_contract.py tests/test_learning_events_api.py tests/test_learning_sessions.py",
+          "result": "4 passed, 27 skipped (database unavailable); not counted as integration pass"
+        }
+      ],
+      "started_at": "2026-09-28T07:51:24",
+      "completed_at": "2026-09-28T07:59:00",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.3-T004"
     },

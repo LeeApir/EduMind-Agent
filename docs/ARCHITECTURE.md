@@ -53,3 +53,7 @@ HTTP 首字节 P95≤2 秒、完整教学首段 P95≤10 秒与独立教学首 t
 ## 课堂会话与场景版本（ADR-0005 已批准设计）
 
 [T003 决定](ADR/0005-classroom-session-and-scene-version.md) 定义owner范围的模式/消息游标、迟到输出隔离、重解释版本CAS、演示返回点与显式偏好反馈。状态Accepted，尚未实施；现有ADR-0003证据/画像/掌握度事务和ADR-0002操作恢复仍有效。由T004落实API契约。
+
+## MVP 0.3 API 契约（T004）
+
+[OpenAPI 0.3.0](api/openapi.yaml) 固定动画Job、媒体/导出及课堂/场景接口，交接见 [T004契约记录](acceptance/mvp-0.3-t004-api-contract.md)。新增端点仍待T012–T028实现，不能把文档路径当作当前服务已提供。POST课堂流使用fetch；GET持久动画Job事件使用EventSource及游标重放。
