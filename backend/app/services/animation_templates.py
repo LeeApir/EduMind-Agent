@@ -22,6 +22,10 @@ _SOURCE_FILES = {
         "backend/app/animation_templates/insertion_plan.py",
         "backend/app/animation_templates/linked_list_insertion.py",
     ),
+    "linked-list-deletion": (
+        "backend/app/animation_templates/deletion_plan.py",
+        "backend/app/animation_templates/linked_list_deletion.py",
+    ),
 }
 _MAX_NODES = 8
 

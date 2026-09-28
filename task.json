@@ -406,7 +406,7 @@
       "id": "MVP-0.3-T007",
       "phase": "MVP 0.3",
       "title": "实现并审核链表删除动画模板",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.3-T005"
@@ -426,9 +426,36 @@
       "verification": [
         "执行删除步骤和边界断言、真实渲染及人工视频/字幕审核。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen pytest -q tests/test_linked_list_deletion_plan.py tests/test_animation_templates.py tests/test_linked_list_insertion_plan.py tests/test_mvp03_openapi_contract.py",
+          "result": "57 passed",
+          "evidence": "backend/tests/test_linked_list_deletion_plan.py"
+        },
+        {
+          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen pytest -q",
+          "result": "417 passed, 74 skipped with local loopback permission"
+        },
+        {
+          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen ruff check app/animation_templates app/services/animation_templates.py scripts/render_linked_list_deletion.py tests/test_animation_templates.py tests/test_linked_list_deletion_plan.py",
+          "result": "passed"
+        },
+        {
+          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen mypy app/animation_templates app/services/animation_templates.py scripts/render_linked_list_deletion.py",
+          "result": "passed, 7 source files"
+        },
+        {
+          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen python scripts/render_linked_list_deletion.py --case single --parameters '{\"values\":[7],\"index\":0}'",
+          "result": "passed; head/middle/tail exact commands in evidence also passed; 4 MP4 each 42.0s 854x480 630 frames, 7 SRT cues and 15s/21s/27s frames reviewed",
+          "evidence": "docs/acceptance/mvp-0.3-t007-deletion.md"
+        },
+        {
+          "command": "git diff --check; git check-ignore -v data/videos/cache/t007/middle/videos/linked_list_deletion/480p15/LinkedListDeletionScene.mp4",
+          "result": "passed; generated media ignored"
+        }
+      ],
+      "started_at": "2026-09-28T08:46:44",
+      "completed_at": "2026-09-28T08:55:52",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.3-T007"
     },
