@@ -809,7 +809,7 @@
       "id": "MVP-0.3-T014",
       "phase": "MVP 0.3",
       "title": "提供已审核动画媒体读取",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.3-T009",
@@ -830,9 +830,35 @@
       "verification": [
         "测试完整/范围/越界请求、owner 隔离及未发布资源拒绝；浏览器实际播放媒体。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "cd backend && EDUMIND_TEST_DATABASE_URL=<isolated-url> UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen pytest -q tests/test_animation_media_api.py tests/test_mvp03_openapi_contract.py",
+          "result": "9 passed; owner/Range/SRT/symlink/corrupt/missing/contract",
+          "evidence": "docs/acceptance/mvp-0.3-t014-media-read.md"
+        },
+        {
+          "command": "cd backend && EDUMIND_TEST_DATABASE_URL=<isolated-url> UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen pytest -q",
+          "result": "531 passed, 5 Docker-only skipped"
+        },
+        {
+          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen ruff check app/api/animation_media.py app/services/animation_media.py app/main.py tests/test_animation_media_api.py",
+          "result": "passed"
+        },
+        {
+          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen mypy app/api/animation_media.py app/services/animation_media.py app/main.py",
+          "result": "passed, 3 source files"
+        },
+        {
+          "command": "webapp-testing with_server.py + Playwright Chromium on real Docker Job and local Uvicorn",
+          "result": "passed; readyState=4, currentTime=1.216558s, duration=36s, media error=null, SRT 200; disposable PostgreSQL"
+        },
+        {
+          "command": "python -m json.tool docs/api/openapi.yaml >/dev/null && git diff --check",
+          "result": "passed"
+        }
+      ],
+      "started_at": "2026-09-28T14:22:00",
+      "completed_at": "2026-09-28T14:30:33",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.3-T014"
     },

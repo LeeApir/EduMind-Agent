@@ -6,6 +6,7 @@ from fastapi.responses import JSONResponse
 
 from app.api.animation_events import router as animation_events_router
 from app.api.animation_jobs import router as animation_jobs_router
+from app.api.animation_media import router as animation_media_router
 from app.api.auth import router as auth_router
 from app.api.knowledge_graph import router as knowledge_graph_router
 from app.api.learning_events import router as learning_events_router
@@ -20,6 +21,7 @@ from app.core.database import database_lifespan
 app = FastAPI(title="EduMind Agent API", version="0.1.0", lifespan=database_lifespan)
 app.include_router(auth_router)
 app.include_router(animation_jobs_router)
+app.include_router(animation_media_router)
 app.include_router(animation_events_router)
 app.include_router(knowledge_graph_router)
 app.include_router(learning_reads_router)
