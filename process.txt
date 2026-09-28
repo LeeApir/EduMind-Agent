@@ -493,3 +493,7 @@ T010 2c55172完成提交且工作区干净，领取持久Job领取与渲染发�
 T011 fc970df完成提交且工作区干净，领取动画创建与Job生命周期API | ADR-0004/OpenAPI已有创建、查询、取消、重试契约；独立PG与真实Worker已就绪 | 缓存命中必须有owner绑定，取消/发布需要同锁排序，API不得直接运行渲染 | 实现服务及受鉴权路由，集成测试命中/竞态/重试/幂等/越权，验证后独立提交
 [2026-09-28T14:12:33] [MVP-0.3-T012] VERIFIED | executor=Lee
 动画创建/缓存命中/查询/取消/失败重试API与0011取消键迁移完成；owner/CSRF/幂等与同Job行锁竞争受控，运行中取消由Worker停当前容器 | 独立PG迁移升降升通过，Docker专项12通过、全量后端524通过5跳过、OpenAPI7/Ruff/Mypy9/diff通过；首轮迁移修复超长revision，真并发测试发现逆序锁死锁后改唯一约束并通过；0Provider调用 | Job SSE/媒体下载与播放器待T013–T015；本次未触碰既有运行库 | 明确路径本地T012完成提交，核对后领取T013；交接docs/acceptance/mvp-0.3-t012-job-api.md，不push/merge
+[2026-09-28T14:15:00] [MVP-0.3-T013] START | executor=Lee | branch=codex/mvp-0.3
+T012 980caf7完成提交且工作区干净，领取Job SSE进度与断线恢复 | T010持久事件表/单调游标、T012 owner Job快照和认证依赖已就绪 | GET订阅不能创建/取消Job，不能长期延长失效会话，终态不得占连接 | 实现有界轮询SSE和游标/会话校验，真实DB断线重连/跨owner/终态测试后独立提交
+[2026-09-28T14:19:56] [MVP-0.3-T013] VERIFIED | executor=Lee
+owner范围GET SSE从持久事件游标回放实时进度/终态，处理无效与缺口游标、会话过期和有界连接/轮询；关闭订阅不动Job | 独立PG专项5通过、全量后端529通过5跳过、OpenAPI7/Ruff/Mypy3/diff通过；初次测试fixture提交后对象过期，改session不自动过期后通过；0Provider调用 | HTTP媒体读取/浏览器播放仍待T014/T015；当前不自动删除事件 | 明确路径本地T013完成提交，核对后领取T014；交接docs/acceptance/mvp-0.3-t013-job-sse.md，不push/merge

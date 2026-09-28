@@ -753,7 +753,7 @@
       "id": "MVP-0.3-T013",
       "phase": "MVP 0.3",
       "title": "提供 Job SSE 进度与断线恢复",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.3-T012"
@@ -773,9 +773,35 @@
       "verification": [
         "测试 Last-Event-ID/重复事件/断线/重启/终态/越权，断线前后渲染调用数不增加。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "cd backend && EDUMIND_TEST_DATABASE_URL=<isolated-url> UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen pytest -q tests/test_animation_events_api.py",
+          "result": "5 passed; durable cursor/reconnect/live progress/terminal/owner/expiry/capacity/disconnect",
+          "evidence": "docs/acceptance/mvp-0.3-t013-job-sse.md"
+        },
+        {
+          "command": "cd backend && EDUMIND_TEST_DATABASE_URL=<isolated-url> UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen pytest -q",
+          "result": "529 passed, 5 Docker-only skipped"
+        },
+        {
+          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen ruff check app/api/animation_events.py app/main.py app/services/animation_jobs.py tests/test_animation_events_api.py",
+          "result": "passed"
+        },
+        {
+          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen mypy app/api/animation_events.py app/main.py app/services/animation_jobs.py",
+          "result": "passed, 3 source files"
+        },
+        {
+          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen pytest -q tests/test_mvp03_openapi_contract.py",
+          "result": "7 passed"
+        },
+        {
+          "command": "python -m json.tool docs/api/openapi.yaml >/dev/null && git diff --check",
+          "result": "passed"
+        }
+      ],
+      "started_at": "2026-09-28T14:15:00",
+      "completed_at": "2026-09-28T14:19:56",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.3-T013"
     },

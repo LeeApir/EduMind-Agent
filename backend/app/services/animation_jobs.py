@@ -33,6 +33,10 @@ class AnimationEventCursorInvalid(ValueError):
     code = "EVENT_CURSOR_INVALID"
 
 
+class AnimationEventCursorExpired(ValueError):
+    code = "EVENT_CURSOR_EXPIRED"
+
+
 @dataclass(frozen=True)
 class AnimationReservation:
     job: AnimationJob
@@ -226,4 +230,8 @@ async def replay_animation_events(
             AnimationJobEvent.event_id > after,
         ).order_by(AnimationJobEvent.event_id))
     ).all()
+    if (events and events[0].event_id != after + 1) or (
+        not events and after < job.last_event_id
+    ):
+        raise AnimationEventCursorExpired("Animation event cursor has expired.")
     return job, tuple(events)
