@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import hashlib
 import json
 import re
@@ -14,7 +15,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.animation import AnimationJob, AnimationJobEvent
 from app.models.learning import LearningScene, LearningUnit
-from app.services.animation_cache import runtime_identity
+from app.services.animation_cache import AnimationCache, runtime_identity
+from app.services.animation_publication import bind_media, reviewed_media_row
 from app.services.animation_templates import cache_identity, load_template, normalize_parameters
 from app.services.learning_owner_lock import lock_learning_owner
 
@@ -72,6 +74,7 @@ async def reserve_animation_job(
     template_version: str,
     parameters: dict[str, object],
     idempotency_key: str,
+    cache: AnimationCache | None = None,
 ) -> AnimationReservation:
     """Atomically create queued job+event or replay the original owner/key result."""
     digest = animation_request_digest(
@@ -125,14 +128,30 @@ async def reserve_animation_job(
             renderer_config_sha256=runtime.renderer_config_sha256,
             subtitle_version=runtime.subtitle_version,
             cache_key=cache_identity(spec, normalized, runtime),
-            status="queued", attempt=0, progress=0.0, last_event_id=1,
+            status="queued", attempt=0, progress=0.0, last_event_id=0,
             cancel_requested=False,
         )
         db.add(job)
-        db.add(AnimationJobEvent(
-            job_id=job.id, event_id=1, user_id=owner_id,
-            event_type="queued", payload={"stage": "queued", "progress": 0.0},
-        ))
+        await db.flush()
+        hit = await asyncio.to_thread(cache.lookup, template_id, normalized) if cache else None
+        if hit is not None:
+            record = await reviewed_media_row(db, job, hit)
+            if record is None:
+                raise AnimationTargetUnavailable("Reviewed animation media is unavailable.")
+            job.status = "succeeded"
+            job.progress = 1.0
+            job.media_id = record.id
+            await db.flush()
+            bind_media(db, job, record)
+            await append_animation_event(
+                db, owner_id=owner_id, job_id=job.id, event_type="succeeded",
+                payload={"stage": "completed", "progress": 1.0, "media_id": str(record.id)},
+            )
+        else:
+            await append_animation_event(
+                db, owner_id=owner_id, job_id=job.id, event_type="queued",
+                payload={"stage": "queued", "progress": 0.0},
+            )
         await db.commit()
         return AnimationReservation(job, True)
     except Exception:

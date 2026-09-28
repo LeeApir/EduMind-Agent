@@ -692,7 +692,7 @@
       "id": "MVP-0.3-T012",
       "phase": "MVP 0.3",
       "title": "提供动画创建与 Job 生命周期 API",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.3-T004",
@@ -713,9 +713,39 @@
       "verification": [
         "运行创建/命中/查询/取消竞态/失败重试/幂等/越权测试，核对 OpenAPI。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "cd backend && EDUMIND_DATABASE_URL=<isolated-url> UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen alembic upgrade head; downgrade 0010_animation_jobs; upgrade head",
+          "result": "passed on disposable PostgreSQL; 0011 reversible; initial too-long revision rolled back, corrected before success",
+          "evidence": "docs/acceptance/mvp-0.3-t012-job-api.md"
+        },
+        {
+          "command": "cd backend && EDUMIND_TEST_DATABASE_URL=<isolated-url> EDUMIND_DOCKER_TESTS=1 UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen pytest -q tests/test_animation_job_api.py tests/test_animation_worker.py",
+          "result": "12 passed; actual container cancellation and Worker render; concurrent lock-order deadlock fixed before pass"
+        },
+        {
+          "command": "cd backend && EDUMIND_TEST_DATABASE_URL=<isolated-url> UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen pytest -q",
+          "result": "524 passed, 5 Docker-only skipped"
+        },
+        {
+          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen ruff check app/api/animation_jobs.py app/main.py app/models/animation.py app/services/animation_cache.py app/services/animation_jobs.py app/services/animation_lifecycle.py app/services/animation_publication.py app/services/animation_renderer.py app/services/animation_worker.py alembic/versions/0011_animation_cancel_key.py tests/test_animation_job_api.py tests/test_animation_worker.py",
+          "result": "passed"
+        },
+        {
+          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen mypy app/api/animation_jobs.py app/main.py app/models/animation.py app/services/animation_cache.py app/services/animation_jobs.py app/services/animation_lifecycle.py app/services/animation_publication.py app/services/animation_renderer.py app/services/animation_worker.py",
+          "result": "passed, 9 source files"
+        },
+        {
+          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen pytest -q tests/test_mvp03_openapi_contract.py",
+          "result": "7 passed"
+        },
+        {
+          "command": "python -m json.tool docs/api/openapi.yaml >/dev/null && git diff --check",
+          "result": "passed"
+        }
+      ],
+      "started_at": "2026-09-28T13:56:00",
+      "completed_at": "2026-09-28T14:12:33",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.3-T012"
     },

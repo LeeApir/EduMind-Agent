@@ -48,7 +48,7 @@ HTTP 首字节 P95≤2 秒、完整教学首段 P95≤10 秒与独立教学首 t
 
 ## 可信动画 Job（ADR-0004 已批准设计）
 
-[T002 决定](ADR/0004-trusted-animation-jobs.md) 描述 PostgreSQL 短事务领取与租约、取消/发布互斥、可信模板容器隔离及 owner 媒体授权。状态为 Accepted；T005–T009 已实现审核模板、受限渲染与私有缓存，T010 已建立 `animation_jobs`、`animation_job_events`、`animation_media` 和 owner 范围资源绑定的迁移、幂等预约与事件重放。T011 已提供独立 Worker：数据库短事务领取、30 秒租约/10 秒心跳、重启回收、最多两次尝试和当前尝试原子发布；真实 Job 已在独立进程与受限 Docker 容器跑通。取消竞争、HTTP/SSE 接口与媒体下载授权仍由 T012–T014 实现，不改变现有学习操作的最小恢复边界。
+[T002 决定](ADR/0004-trusted-animation-jobs.md) 描述 PostgreSQL 短事务领取与租约、取消/发布互斥、可信模板容器隔离及 owner 媒体授权。状态为 Accepted；T005–T009 已实现审核模板、受限渲染与私有缓存，T010 已建立 `animation_jobs`、`animation_job_events`、`animation_media` 和 owner 范围资源绑定的迁移、幂等预约与事件重放。T011 已提供独立 Worker：数据库短事务领取、30 秒租约/10 秒心跳、重启回收、最多两次尝试和当前尝试原子发布；真实 Job 已在独立进程与受限 Docker 容器跑通。T012 已提供受 Cookie/CSRF 保护的创建、快照、取消和显式重试接口；缓存命中在请求事务中绑定 owner，运行中取消由 Worker 停止当前容器，取消与发布共用 Job 行锁排序。Job SSE 与媒体下载授权仍由 T013–T014 实现，不改变现有学习操作的最小恢复边界。
 
 ## 课堂会话与场景版本（ADR-0005 已批准设计）
 

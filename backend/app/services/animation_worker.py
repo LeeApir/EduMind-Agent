@@ -3,22 +3,26 @@
 from __future__ import annotations
 
 import asyncio
+import logging
+import subprocess
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import cast
 from uuid import UUID, uuid4
 
 from sqlalchemy import func, select, update
-from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from app.models.animation import AnimationJob, AnimationMedia, AnimationResourceBinding
+from app.models.animation import AnimationJob
 from app.services.animation_cache import AnimationCache, CachedAnimation
 from app.services.animation_jobs import append_animation_event
+from app.services.animation_publication import bind_media, reviewed_media_row
 from app.services.animation_renderer import RenderError
 
 LEASE_SECONDS = 30
 HEARTBEAT_SECONDS = 10
+CANCEL_POLL_SECONDS = 1
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -29,6 +33,33 @@ class JobLease:
     token: UUID
     template_id: str
     parameters: dict[str, object]
+
+    @property
+    def container_name(self) -> str:
+        return f"edumind-render-{self.token.hex}"
+
+
+def stop_animation_container(lease: JobLease) -> bool:
+    """Remove only this attempt's named container after losing its lease."""
+    try:
+        result = subprocess.run(
+            ["docker", "rm", "-f", lease.container_name],
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+            timeout=10, check=False,
+        )
+        if result.returncode == 0:
+            return True
+        absent = subprocess.run(
+            ["docker", "inspect", lease.container_name],
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+            timeout=3, check=False,
+        ).returncode != 0
+        if not absent:
+            logger.warning("Animation container termination failed for job %s", lease.job_id)
+        return absent
+    except (OSError, subprocess.TimeoutExpired):
+        logger.warning("Animation container termination unavailable for job %s", lease.job_id)
+        return False
 
 
 async def claim_animation_job(
@@ -59,9 +90,10 @@ async def claim_animation_job(
             db, owner_id=job.user_id, job_id=job.id, event_type="running",
             payload={"stage": "rendering", "progress": 0.05, "attempt": job.attempt},
         )
+        lease = JobLease(job.id, job.user_id, job.attempt, token,
+                         job.template_id, dict(job.parameters))
         await db.commit()
-        return JobLease(job.id, job.user_id, job.attempt, token,
-                        job.template_id, dict(job.parameters))
+        return lease
 
 
 async def heartbeat_animation_job(
@@ -196,34 +228,8 @@ async def publish_animation_job(
             await db.rollback()
             await fail_animation_job(sessions, lease, code="MEDIA_INVALID")
             return False
-        runtime_fields = (
-            "source_sha256", "image_digest", "font_digest", "renderer_config_sha256",
-            "subtitle_version",
-        )
-        values: dict[str, object] = {
-            "id": uuid4(), "cache_key": media.cache_key,
-            "template_id": job.template_id, "template_version": job.template_version,
-            "review_rule_version": job.review_rule_version,
-            **{field: getattr(job, field) for field in runtime_fields},
-            "mp4_sha256": media.mp4_sha256, "srt_sha256": media.srt_sha256,
-            "mp4_size": media.mp4_path.stat().st_size,
-            "srt_size": media.srt_path.stat().st_size,
-            "duration_seconds": media.duration_seconds,
-            "review_status": "passed",
-        }
-        await db.execute(
-            pg_insert(AnimationMedia).values(**values)
-            .on_conflict_do_nothing(index_elements=[AnimationMedia.cache_key])
-        )
-        record = await db.scalar(select(AnimationMedia).where(
-            AnimationMedia.cache_key == media.cache_key,
-        ))
-        if record is None or (
-            record.review_status != "passed"
-            or record.mp4_sha256 != media.mp4_sha256
-            or record.srt_sha256 != media.srt_sha256
-            or any(getattr(record, field) != getattr(job, field) for field in runtime_fields)
-        ):
+        record = await reviewed_media_row(db, job, media)
+        if record is None:
             await db.rollback()
             await fail_animation_job(sessions, lease, code="MEDIA_INVALID")
             return False
@@ -244,11 +250,7 @@ async def publish_animation_job(
         if final_cas is None:
             await db.rollback()
             return False
-        db.add(AnimationResourceBinding(
-            user_id=job.user_id, job_id=job.id, media_id=record.id,
-            learning_unit_id=job.learning_unit_id, scene_id=job.scene_id,
-            scene_version=job.scene_version,
-        ))
+        bind_media(db, job, record)
         await append_animation_event(
             db, owner_id=job.user_id, job_id=job.id, event_type="succeeded",
             payload={"stage": "completed", "progress": 1.0, "media_id": str(record.id)},
@@ -261,12 +263,28 @@ async def _heartbeat_until_stopped(
     sessions: async_sessionmaker[AsyncSession], lease: JobLease,
     stop: asyncio.Event,
 ) -> None:
+    loop = asyncio.get_running_loop()
+    next_heartbeat = loop.time() + HEARTBEAT_SECONDS
     while not stop.is_set():
         try:
-            await asyncio.wait_for(stop.wait(), timeout=HEARTBEAT_SECONDS)
+            await asyncio.wait_for(stop.wait(), timeout=CANCEL_POLL_SECONDS)
         except TimeoutError:
-            if not await heartbeat_animation_job(sessions, lease):
+            async with sessions() as db:
+                current = await db.scalar(select(AnimationJob.id).where(
+                    AnimationJob.id == lease.job_id,
+                    AnimationJob.status == "running",
+                    AnimationJob.attempt == lease.attempt,
+                    AnimationJob.lease_token == lease.token,
+                    AnimationJob.cancel_requested.is_(False),
+                ))
+            if current is None:
+                await asyncio.to_thread(stop_animation_container, lease)
                 return
+            if loop.time() >= next_heartbeat:
+                if not await heartbeat_animation_job(sessions, lease):
+                    await asyncio.to_thread(stop_animation_container, lease)
+                    return
+                next_heartbeat = loop.time() + HEARTBEAT_SECONDS
 
 
 async def run_one_animation_job(
@@ -282,6 +300,7 @@ async def run_one_animation_job(
     try:
         media = await asyncio.to_thread(
             trusted_cache.resolve, lease.template_id, lease.parameters,
+            container_name=lease.container_name,
         )
         if not await report_animation_progress(
             sessions, lease, stage="validating", progress=0.8,

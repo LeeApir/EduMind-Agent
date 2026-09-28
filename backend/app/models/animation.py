@@ -61,6 +61,8 @@ class AnimationJob(Base):
     __table_args__ = (
         UniqueConstraint("user_id", "action_kind", "idempotency_key",
                          name="uq_animation_job_owner_action_key"),
+        UniqueConstraint("user_id", "cancel_idempotency_key",
+                         name="uq_animation_job_owner_cancel_key"),
         UniqueConstraint("user_id", "id", name="uq_animation_job_owner_id"),
         UniqueConstraint("user_id", "id", "media_id", name="uq_animation_job_owner_id_media"),
         UniqueConstraint(
@@ -122,6 +124,7 @@ class AnimationJob(Base):
     lease_token: Mapped[UUID | None] = mapped_column(PostgreSQLUUID(as_uuid=True))
     lease_expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     cancel_requested: Mapped[bool] = mapped_column(default=False, nullable=False)
+    cancel_idempotency_key: Mapped[str | None] = mapped_column(String(128))
     retry_of: Mapped[UUID | None] = mapped_column(PostgreSQLUUID(as_uuid=True))
     media_id: Mapped[UUID | None] = mapped_column(
         PostgreSQLUUID(as_uuid=True), ForeignKey("animation_media.id")

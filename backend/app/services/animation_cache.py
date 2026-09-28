@@ -176,7 +176,23 @@ class AnimationCache:
             and entry.srt_sha256 == media.srt_sha256
         )
 
-    def resolve(self, template_id: str, parameters: Mapping[str, object]) -> CachedAnimation:
+    def lookup(self, template_id: str, parameters: Mapping[str, object]) -> CachedAnimation | None:
+        """Return only intact reviewed bytes; a request must never render inline."""
+        if template_id not in _ALLOWED or self.root.is_symlink():
+            return None
+        spec = load_template(template_id, require_executable=True)
+        normalized = normalize_parameters(spec, parameters)
+        runtime = self.runtime_factory(template_id)
+        key = cache_identity(spec, normalized, runtime)
+        return self._valid_entry(
+            key, template_id, spec.template_version, spec.review["rule_version"],
+            normalized, runtime,
+        )
+
+    def resolve(
+        self, template_id: str, parameters: Mapping[str, object],
+        *, container_name: str | None = None,
+    ) -> CachedAnimation:
         """Hit an audited public asset first; otherwise render only its fixed template."""
         if template_id not in _ALLOWED:
             raise UnsupportedAnimationError("当前目标没有可用的已审核动画模板")
@@ -201,7 +217,10 @@ class AnimationCache:
             )
             if hit is not None:
                 return hit
-            candidate = self.renderer(template_id, normalized, work_root=self.root / "attempts")
+            render_options: dict[str, object] = {"work_root": self.root / "attempts"}
+            if container_name is not None:
+                render_options["container_name"] = container_name
+            candidate = self.renderer(template_id, normalized, **render_options)
             try:
                 object_lock = self.root / "locks" / "objects.lock"
                 object_descriptor = os.open(

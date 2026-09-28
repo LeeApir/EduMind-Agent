@@ -5,6 +5,7 @@ from __future__ import annotations
 import ast
 import hashlib
 import json
+import re
 import shutil
 import subprocess
 import tempfile
@@ -216,6 +217,7 @@ def render_template(
     *,
     work_root: Path | None = None,
     timeout_seconds: float = 120,
+    container_name: str | None = None,
 ) -> RenderedCandidate:
     """Return only validated local candidate bytes; publication is a later task."""
     spec = load_template(template_id, require_executable=True)
@@ -234,7 +236,9 @@ def render_template(
     try:
         _stage_input(template_id, normalized, input_dir)
         _, _, scene, module = _TEMPLATES[template_id]
-        name = "edumind-render-" + uuid.uuid4().hex
+        name = container_name or "edumind-render-" + uuid.uuid4().hex
+        if not re.fullmatch(r"edumind-render-[0-9a-f]{32}", name):
+            raise RenderError("RENDER_SOURCE_REJECTED")
         command = [
             "run", "-d", "--rm", "--name", name, "--network", "none", "--read-only",
             "--user", "10001:10001", "--cpus", "2", "--memory", "1g",

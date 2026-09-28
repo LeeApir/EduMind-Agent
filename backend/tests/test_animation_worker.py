@@ -215,7 +215,10 @@ def test_corrupt_media_fails_without_binding_or_overwriting_learning(tmp_path: P
 def test_render_failure_preserves_existing_learning_resource(tmp_path: Path) -> None:
     assert TEST_DATABASE_URL is not None
 
-    def broken_renderer(template_id: str, parameters: dict[str, object], *, work_root: Path):
+    def broken_renderer(
+        template_id: str, parameters: dict[str, object], *, work_root: Path,
+        container_name: str,
+    ):
         raise RenderError("RENDER_UNAVAILABLE")
 
     async def exercise() -> None:

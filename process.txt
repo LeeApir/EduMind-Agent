@@ -489,3 +489,7 @@ T009 89895f5完成提交且工作区干净，领取动画Job/事件/资源持久
 T010 2c55172完成提交且工作区干净，领取持久Job领取与渲染发布 | PostgreSQL模型/租约字段/事件水位、受限执行器和私有缓存已就绪；独立测试PG仍运行 | 旧租约/取消/并发发布必须通过DB行锁和实际媒体检查，不能以进程内存判定成功 | 实现短事务领取、心跳/回收、受限渲染与当前尝试CAS发布，测试并发/重启/损坏及真实Job后独立提交
 [2026-09-28T13:53:37] [MVP-0.3-T011] VERIFIED | executor=Lee
 独立Worker短事务领取/心跳/回收、真实受限模板渲染、当前尝试CAS发布及owner媒体绑定完成，补宿主中断后容器自退兜底 | 独立PG+Docker专项6通过、全量后端519通过4项Docker专项跳过、Ruff/Mypy4/diff检查通过；新引擎恢复与独立Worker进程均实测，0Provider调用 | 用户取消与发布互斥、HTTP/SSE和媒体下载鉴权待T012–T014；独立PG未触碰既有运行库 | 明确路径本地T011完成提交，核对后领取T012；交接docs/acceptance/mvp-0.3-t011-worker.md，不push/merge
+[2026-09-28T13:56:00] [MVP-0.3-T012] START | executor=Lee | branch=codex/mvp-0.3
+T011 fc970df完成提交且工作区干净，领取动画创建与Job生命周期API | ADR-0004/OpenAPI已有创建、查询、取消、重试契约；独立PG与真实Worker已就绪 | 缓存命中必须有owner绑定，取消/发布需要同锁排序，API不得直接运行渲染 | 实现服务及受鉴权路由，集成测试命中/竞态/重试/幂等/越权，验证后独立提交
+[2026-09-28T14:12:33] [MVP-0.3-T012] VERIFIED | executor=Lee
+动画创建/缓存命中/查询/取消/失败重试API与0011取消键迁移完成；owner/CSRF/幂等与同Job行锁竞争受控，运行中取消由Worker停当前容器 | 独立PG迁移升降升通过，Docker专项12通过、全量后端524通过5跳过、OpenAPI7/Ruff/Mypy9/diff通过；首轮迁移修复超长revision，真并发测试发现逆序锁死锁后改唯一约束并通过；0Provider调用 | Job SSE/媒体下载与播放器待T013–T015；本次未触碰既有运行库 | 明确路径本地T012完成提交，核对后领取T013；交接docs/acceptance/mvp-0.3-t012-job-api.md，不push/merge
