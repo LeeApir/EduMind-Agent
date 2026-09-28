@@ -129,6 +129,8 @@ def test_terminal_sse_replays_only_new_events_across_client_restart(
         ] == "RENDER_UNAVAILABLE"
         tail = client.get(path, headers={"Last-Event-ID": "2"})
         assert _ids(tail.text) == [3]
+        assert _ids(client.get(path + "?after=2").text) == [3]
+        assert _ids(client.get(path + "?after=1", headers={"Last-Event-ID": "2"}).text) == [3]
         consumed = client.get(path, headers={"Last-Event-ID": "3"})
         assert consumed.status_code == 200 and consumed.text == ""
         assert client.get(path, headers={"Last-Event-ID": "4"}).json()[

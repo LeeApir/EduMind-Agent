@@ -10,7 +10,7 @@ from collections.abc import AsyncIterator
 from datetime import datetime, timezone
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Header, Request
+from fastapi import APIRouter, Depends, Header, Query, Request
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
@@ -87,14 +87,15 @@ async def animation_job_events(
     job_id: UUID, request: Request,
     current: AuthenticatedSession = Depends(require_authenticated_session),
     last_event_id: str | None = Header(default=None, alias="Last-Event-ID"),
+    after: int | None = Query(default=None, ge=0, le=999999999999999999),
     sessions: async_sessionmaker[AsyncSession] = Depends(database_session_factory),
 ) -> StreamingResponse:
     if last_event_id is not None and not re.fullmatch(r"[0-9]{1,18}", last_event_id):
         raise AuthFailure(409, "EVENT_CURSOR_INVALID", "Invalid animation event cursor.")
-    after = int(last_event_id) if last_event_id is not None else 0
+    cursor = int(last_event_id) if last_event_id is not None else (after or 0)
     async with sessions() as db:
         try:
-            await replay_animation_events(db, owner_id=current.user.id, job_id=job_id, after=after)
+            await replay_animation_events(db, owner_id=current.user.id, job_id=job_id, after=cursor)
         except AnimationTargetUnavailable:
             raise AuthFailure(404, "NOT_FOUND", "Animation job not found.") from None
         except AnimationEventCursorInvalid:
@@ -110,7 +111,7 @@ async def animation_job_events(
     return StreamingResponse(
         _events(
             request, sessions, owner_id=current.user.id,
-            token_hash=current.record.token_hash, job_id=job_id, after=after,
+            token_hash=current.record.token_hash, job_id=job_id, after=cursor,
         ),
         media_type="text/event-stream",
         headers={"Cache-Control": "no-store", "X-Accel-Buffering": "no"},

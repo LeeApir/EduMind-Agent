@@ -501,3 +501,7 @@ owner范围GET SSE从持久事件游标回放实时进度/终态，处理无效�
 T013 c495e89完成提交且工作区干净，领取已审核媒体读取 | T009私有内容地址缓存、T010 owner绑定/T011真实发布/T012鉴权API已就绪 | 缓存键/媒体ID不能代替owner授权，缺失损坏字节不得声称可播放 | 实现授权MP4 Range/SRT读取与固定响应头，隔离DB和真实浏览器播放验证后独立提交
 [2026-09-28T14:30:33] [MVP-0.3-T014] VERIFIED | executor=Lee
 owner/成功Job/已审核场景绑定授权MP4和SRT，内容地址安全打开并校验摘要，支持单段Range及安全响应头，损坏/缺失统一MEDIA_UNAVAILABLE | 独立PG专项+OpenAPI9通过、全量后端531通过5跳过、Ruff/Mypy3/diff通过；真实Docker媒体由Chromium播放readyState4/currentTime1.216558/36秒无错误且SRT200；首次浏览器脚本模块路径/事件循环问题修复后通过；0Provider调用 | T015按需播放器尚待接入；不提交生成媒体或临时浏览器脚本 | 明确路径本地T014完成提交，核对后领取T015；交接docs/acceptance/mvp-0.3-t014-media-read.md，不push/merge
+[2026-09-28T14:33:00] [MVP-0.3-T015] START | executor=Lee | branch=codex/mvp-0.3
+T014 98e6571完成提交且工作区干净，领取按需动画播放器与Job操作 | 创建/查询/取消/重试/SSE/媒体接口已实测，现有Vue学习页尚无动画入口 | 不得页面载入即创建Job，刷新/断线只按已有Job查询与事件游标恢复，旧节点事件不得覆盖当前页 | 接入状态组件和SRT播放，组件/类型/构建与浏览器播放取消重试断网验证后独立提交
+[2026-09-28T14:53:44] [MVP-0.3-T015] VERIFIED | executor=Lee
+按需动画入口、持久Job恢复/SSE游标、取消重试、MP4与SRT播放和节点切换隔离接入Web；EventSource首订阅补after查询游标 | 前端77通过/类型构建/ESLint通过，后端全量531通过5跳过、Ruff/Mypy通过；真实Chromium仅显式创建1次、36秒媒体播放/字幕、刷新无新Job、取消重试与离线恢复通过；0Provider调用 | 固定教学参数仅为P0模板样例，课堂与导出仍待T016后续；一次性测试库与生成媒体不提交 | 明确路径本地T015完成提交，核对后领取T016；交接docs/acceptance/mvp-0.3-t015-player.md，不push/merge

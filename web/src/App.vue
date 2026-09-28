@@ -10,6 +10,7 @@ import LearningProgressPanel, {
 import ProfileCard from "./components/ProfileCard.vue";
 import PublishedLearningWorkspace from "./components/PublishedLearningWorkspace.vue";
 import LearningPathPanel from "./components/LearningPathPanel.vue";
+import AnimationPanel from "./components/AnimationPanel.vue";
 
 type StartLearningRequest = (goal: string) => Promise<void>;
 
@@ -19,7 +20,8 @@ interface Resource extends PublishedResource {
 }
 
 interface LearningUnitPayload {
-  scenes: Array<{ resources: Resource[] }>;
+  scenes: Array<{ version: number; resources: Resource[] }>;
+  knowledge_node_id?: string | null;
   path_target_node_id?: string | null;
 }
 
@@ -36,6 +38,8 @@ const temporaryText = ref("");
 const reviewState = ref<ReviewState>("idle");
 const resources = ref<Resource[]>([]);
 const learningUnitId = ref("");
+const animationNodeId = ref("");
+const animationSceneVersion = ref(0);
 const operationId = ref("");
 const idempotencyKey = ref("");
 const csrfToken = ref("");
@@ -93,6 +97,8 @@ function resetAttempt(): void {
   resources.value = [];
   pathTargetNodeId.value = "";
   learningUnitId.value = "";
+  animationNodeId.value = "";
+  animationSceneVersion.value = 0;
   operationId.value = "";
   idempotencyKey.value = crypto.randomUUID();
 }
@@ -228,6 +234,9 @@ async function loadPublishedUnit(unitId = learningUnitId.value, expectedGenerati
   if (!loaded.length) throw new Error("正式学习资源为空，请重新开始。");
   if (expectedGeneration !== learningGeneration) return;
   learningUnitId.value = unitId;
+  animationNodeId.value = typeof payload.knowledge_node_id === "string" ? payload.knowledge_node_id : "";
+  animationSceneVersion.value = Number.isInteger(payload.scenes[0]?.version)
+    ? payload.scenes[0].version : 0;
   resources.value = loaded;
   pathTargetNodeId.value = typeof payload.path_target_node_id === "string" ? payload.path_target_node_id : "";
   reviewState.value = "published";
@@ -384,6 +393,13 @@ function stringValue(value: unknown): string {
       :resources="resources"
       :csrf-token="csrfToken"
       @quiz-submitted="handleQuizSubmitted"
+    />
+    <AnimationPanel
+      v-if="resources.length && learningUnitId && animationSceneVersion >= 1"
+      :unit-id="learningUnitId"
+      :node-id="animationNodeId"
+      :scene-version="animationSceneVersion"
+      :csrf-token="csrfToken"
     />
     <p
       v-if="restoringUnit"

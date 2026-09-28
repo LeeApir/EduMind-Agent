@@ -866,7 +866,7 @@
       "id": "MVP-0.3-T015",
       "phase": "MVP 0.3",
       "title": "实现按需动画播放器与任务操作",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.3-T013",
@@ -874,7 +874,11 @@
       ],
       "scope": [
         "web/src/",
-        "web/tests/"
+        "web/tests/",
+        "backend/app/api/animation_events.py",
+        "backend/tests/test_animation_events_api.py",
+        "docs/api/openapi.yaml",
+        "docs/"
       ],
       "prd_source": "PRD §3.3",
       "acceptance_criteria": [
@@ -885,9 +889,39 @@
       "verification": [
         "运行组件/客户端测试、类型检查和构建；浏览器验证播放、取消、重试及断网恢复。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "cd web && pnpm exec vitest run",
+          "result": "77 passed across 14 files; includes 5 player component and 2 HTTP client tests"
+        },
+        {
+          "command": "cd web && pnpm build",
+          "result": "passed; Vue typecheck and Vite build"
+        },
+        {
+          "command": "cd web && pnpm exec eslint src/api/animationJobs.ts src/components/AnimationPanel.vue src/App.vue tests/AnimationPanel.spec.ts tests/animationJobs.spec.ts",
+          "result": "passed"
+        },
+        {
+          "command": "cd backend && EDUMIND_TEST_DATABASE_URL=<isolated-url> UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen pytest -q",
+          "result": "531 passed, 5 skipped; includes SSE after/header precedence and OpenAPI contract"
+        },
+        {
+          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen ruff check app/api/animation_events.py tests/test_animation_events_api.py ../web/tests/e2e/animation_flow.py && uv run --frozen mypy app/api/animation_events.py",
+          "result": "passed; E2E script also py_compile passed"
+        },
+        {
+          "command": "webapp-testing with_server.py + web/tests/e2e/animation_flow.py against isolated PostgreSQL, Vite, Uvicorn, Docker and Chromium",
+          "result": "passed; one explicit create POST, 36s MP4 played >1s with SRT track, refresh no new Job, cancel/retry, offline recovery",
+          "evidence": "docs/acceptance/mvp-0.3-t015-player.md"
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed"
+        }
+      ],
+      "started_at": "2026-09-28T14:33:00",
+      "completed_at": "2026-09-28T14:53:44",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.3-T015"
     },
