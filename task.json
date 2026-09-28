@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "用户授权串行完成 MVP 0.3 T001–T004；新安全、持久化与 API 决策按任务验收先批准，未授权后续任务或付费采样。阶段验收完成后报告，不自动进入 Phase 1。",
+    "phase_gate": "用户已授权连续推进 MVP 0.3 已满足依赖的任务，自 T005–T015 动画模块开始，验收后逐项本地提交并继续；遇需用户决策的阻塞或额度耗尽停止。不自动 push、merge 或跨 Phase 1。付费 Provider 采样仍须单独冻结预算和授权。",
     "task_granularity": "一个可独立验证的行为，包含实现、对应测试和必要文档；验收通过后一个本地完成提交。",
     "completion_rule": "验收通过，且 Git 历史存在 Task-Completed 标记的提交。工作区 done 仅是待提交状态。",
     "verification_note": "以下为计划验证入口，尚未执行；领取任务时建立必要命令，结果写入 verification_results。"
@@ -295,7 +295,7 @@
       "id": "MVP-0.3-T005",
       "phase": "MVP 0.3",
       "title": "建立可信动画模板目录与参数校验",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.3-T002"
@@ -315,9 +315,32 @@
       "verification": [
         "运行模板参数、规范化、边界与注入回归测试，检查 schema 与事实审核记录。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen pytest -q tests/test_animation_templates.py tests/test_mvp03_openapi_contract.py",
+          "result": "37 passed, 0 skipped",
+          "evidence": "backend/tests/test_animation_templates.py"
+        },
+        {
+          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen ruff check app/services/animation_templates.py tests/test_animation_templates.py",
+          "result": "passed"
+        },
+        {
+          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen mypy app",
+          "result": "passed, 56 source files"
+        },
+        {
+          "command": "python3 inline: local links, fixed manifest set, source review fail-closed",
+          "result": "passed",
+          "evidence": "docs/animation-templates.md"
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed"
+        }
+      ],
+      "started_at": "2026-09-28T08:02:35",
+      "completed_at": "2026-09-28T08:08:25",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.3-T005"
     },

@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "template_id": "linked-list-insertion",
+  "knowledge_point_id": "linked-list-insertion",
+  "template_version": "1.0.0",
+  "language": "zh-CN",
+  "operation": "insert",
+  "parameter_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["values", "index", "value"],
+    "properties": {
+      "values": {"type": "array", "minItems": 0, "maxItems": 8, "items": {"type": "integer", "minimum": -99, "maximum": 99}},
+      "index": {"type": "integer", "minimum": 0, "maximum": 8},
+      "value": {"type": "integer", "minimum": -99, "maximum": 99}
+    }
+  },
+  "teaching_steps": [
+    {"id": "before", "fact": "展示插入前节点顺序及 head。"},
+    {"id": "save_successor", "fact": "先令新节点 next 指向原位置后继；尾插后继为 NULL。"},
+    {"id": "link_predecessor", "fact": "再让前驱 next 或 head 指向新节点。"},
+    {"id": "after", "fact": "展示插入后节点顺序与所有 next 连接。"}
+  ],
+  "review": {
+    "design_status": "fact_checked",
+    "source_status": "pending",
+    "fact_source": "data/knowledge_graph.yaml#linked-list-insertion",
+    "rule_version": "animation-template-review-v1",
+    "evidence": "backend/tests/test_animation_templates.py"
+  }
+}
