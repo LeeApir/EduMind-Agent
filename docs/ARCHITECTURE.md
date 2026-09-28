@@ -48,7 +48,7 @@ HTTP 首字节 P95≤2 秒、完整教学首段 P95≤10 秒与独立教学首 t
 
 ## 可信动画 Job（ADR-0004 已批准设计）
 
-[T002 决定](ADR/0004-trusted-animation-jobs.md) 描述 PostgreSQL 短事务领取与租约、取消/发布互斥、可信模板容器隔离及 owner 媒体授权。状态为 Accepted，尚未实施；不改变现有学习操作的最小恢复边界。批准后由 T004 固定接口，T005 以后实现能力。
+[T002 决定](ADR/0004-trusted-animation-jobs.md) 描述 PostgreSQL 短事务领取与租约、取消/发布互斥、可信模板容器隔离及 owner 媒体授权。状态为 Accepted；T005–T009 已实现审核模板、受限渲染与私有缓存，T010 已建立 `animation_jobs`、`animation_job_events`、`animation_media` 和 owner 范围资源绑定的迁移、幂等预约与事件重放。当前没有 API/Worker 自动领取、正式媒体发布或下载授权；这些行为由 T011–T014 继续实现，不改变现有学习操作的最小恢复边界。
 
 ## 课堂会话与场景版本（ADR-0005 已批准设计）
 

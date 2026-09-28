@@ -97,6 +97,7 @@ class LearningUnit(Base):
 
     __tablename__ = "learning_units"
     __table_args__ = (
+        UniqueConstraint("user_id", "id", name="uq_learning_units_owner_id"),
         CheckConstraint("version >= 1", name="ck_learning_units_version_positive"),
         CheckConstraint("outline_version >= 1", name="ck_learning_units_outline_version_positive"),
     )
@@ -158,6 +159,9 @@ class LearningScene(Base):
     __table_args__ = (
         UniqueConstraint(
             "learning_unit_id", "scene_key", "version", name="uq_learning_scenes_unit_key_version"
+        ),
+        UniqueConstraint(
+            "learning_unit_id", "id", "version", name="uq_learning_scenes_unit_id_version"
         ),
         CheckConstraint("version >= 1", name="ck_learning_scenes_version_positive"),
     )

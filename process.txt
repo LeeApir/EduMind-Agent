@@ -481,3 +481,7 @@ T007 615f814完成提交且工作区干净，领取受限模板渲染执行器 |
 T008 bac0d8e完成提交且工作区干净，领取预渲染缓存与审核资源复用 | 已有两种已审核模板和隔离候选渲染，媒体缓存尚未实现 | owner授权属于后续Job/接口，缓存不得直接公开绝对路径或跨owner资源 | 建立版本化公共缓存和损坏拒绝/重建、并发复用及基准媒体准备命令，验证后独立提交
 [2026-09-28T10:20:15] [MVP-0.3-T009] VERIFIED | executor=Lee
 公共已审核模板媒体先查版本化私有缓存再隔离渲染，内容摘要校验/损坏重建/同键锁与基准媒体准备入口完成 | 缓存+执行器22通过2 Docker-only跳过、全量439通过76跳过、Ruff/Mypy2；两基准真实渲染后第二次均命中，元数据无owner字段且媒体Git忽略；0Provider调用 | 数据库Job、owner资源绑定/下载鉴权与GC属T010–T014，缓存对象不得直接对外 | 明确路径本地T009完成提交，核对后领取T010；交接docs/acceptance/mvp-0.3-t009-cache.md，不push/merge
+[2026-09-28T10:23:27] [MVP-0.3-T010] START | executor=Lee | branch=codex/mvp-0.3
+T009 89895f5完成提交且工作区干净，领取动画Job/事件/资源持久化 | ADR-0004 B–D与OpenAPI契约已批准；宿主未配置测试库但Docker可启动独立PostgreSQL | 不能用现有MVP0.2运行库进行破坏性迁移测试 | 建立新模型和Alembic迁移、幂等及事件持久事务，独立PG升降级/重连/owner约束实测后提交
+[2026-09-28T13:36:24] [MVP-0.3-T010] VERIFIED | executor=Lee
+新增动画Job/事件/共享媒体/owner绑定模型及0010迁移，按owner锁幂等预约、同事务queued事件与游标重放，事件载荷限白名单 | 独立PG空库升级/降级到0009/四表消失/再升级通过，重连和并发幂等/约束集成2通过，全量连接PG后端515通过2项Docker专项跳过，Ruff/Mypy2/diff通过；首次重复集成因共享媒体fixture重复键失败，改为复用该媒体后通过；0Provider调用 | Worker租约/取消/发布与API仍属T011–T014；测试PG独立容器不触碰现有运行库 | 明确路径本地T010完成提交，核对后领取T011；交接docs/acceptance/mvp-0.3-t010-job-persistence.md，不push/merge

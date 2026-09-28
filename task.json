@@ -578,15 +578,17 @@
       "id": "MVP-0.3-T010",
       "phase": "MVP 0.3",
       "title": "持久化动画 Job 与事件记录",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.3-T004"
       ],
       "scope": [
         "backend/app/models/",
+        "backend/app/services/",
         "backend/alembic/",
-        "backend/tests/"
+        "backend/tests/",
+        "docs/"
       ],
       "prd_source": "PRD §3.3、§9.2",
       "acceptance_criteria": [
@@ -597,9 +599,39 @@
       "verification": [
         "运行 Alembic 往返及 PostgreSQL 幂等/约束/owner/事件顺序集成测试。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen alembic upgrade head",
+          "result": "passed on empty disposable PostgreSQL; revisions 0001–0010; environment: disposable T010 PostgreSQL URL"
+        },
+        {
+          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen alembic downgrade 0009_path_commands",
+          "result": "passed; four animation tables verified absent, then upgrade head passed; environment: disposable T010 PostgreSQL URL",
+          "evidence": "docs/acceptance/mvp-0.3-t010-job-persistence.md"
+        },
+        {
+          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen pytest -q tests/test_animation_job_persistence.py",
+          "result": "2 passed after re-upgrade; idempotency, concurrent key, restart, cursor, constraints, owner FKs; environment: disposable T010 PostgreSQL URL"
+        },
+        {
+          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen pytest -q",
+          "result": "515 passed, 2 Docker-only skipped; environment: disposable T010 PostgreSQL URL"
+        },
+        {
+          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen ruff check app/models/animation.py app/models/learning.py app/services/animation_jobs.py alembic/versions/0010_animation_jobs.py tests/test_animation_job_persistence.py",
+          "result": "passed"
+        },
+        {
+          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen mypy app/models/animation.py app/services/animation_jobs.py",
+          "result": "passed, 2 source files"
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed"
+        }
+      ],
+      "started_at": "2026-09-28T10:23:27",
+      "completed_at": "2026-09-28T13:36:24",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.3-T010"
     },
