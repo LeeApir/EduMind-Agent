@@ -348,7 +348,7 @@
       "id": "MVP-0.3-T006",
       "phase": "MVP 0.3",
       "title": "实现并审核链表插入动画模板",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.3-T005"
@@ -368,9 +368,37 @@
       "verification": [
         "执行参数化步骤断言和真实 Manim 渲染；人工检查视频帧/字幕/指针顺序，记录审核证据。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen pytest -q tests/test_animation_templates.py tests/test_linked_list_insertion_plan.py tests/test_mvp03_openapi_contract.py",
+          "result": "47 passed",
+          "evidence": "backend/tests/test_linked_list_insertion_plan.py"
+        },
+        {
+          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen pytest -q",
+          "result": "407 passed, 74 skipped with local loopback permission; sandbox-only first attempt had 2 loopback bind failures",
+          "evidence": "docs/acceptance/mvp-0.3-t006-insertion.md"
+        },
+        {
+          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen ruff check app/animation_templates app/services/animation_templates.py scripts/render_linked_list_insertion.py tests/test_animation_templates.py tests/test_linked_list_insertion_plan.py",
+          "result": "passed"
+        },
+        {
+          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen mypy app/animation_templates app/services/animation_templates.py scripts/render_linked_list_insertion.py",
+          "result": "passed, 5 source files"
+        },
+        {
+          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen python scripts/render_linked_list_insertion.py --case empty --parameters '{\"values\":[],\"index\":0,\"value\":7}' (and head, middle, tail commands recorded in evidence)",
+          "result": "4 real Docker renders passed; MP4 36.0s, 854x480, 540 frames each; SRT 6 cues to 36s; 15s/21s frames visually reviewed",
+          "evidence": "docs/acceptance/mvp-0.3-t006-insertion.md"
+        },
+        {
+          "command": "git diff --check; git check-ignore -v data/videos/cache/t006/tail/videos/linked_list_insertion/480p15/LinkedListInsertionScene.mp4",
+          "result": "passed; generated media ignored"
+        }
+      ],
+      "started_at": "2026-09-28T08:10:13",
+      "completed_at": "2026-09-28T08:43:39",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.3-T006"
     },

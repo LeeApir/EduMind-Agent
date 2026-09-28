@@ -13,6 +13,7 @@ from app.services.animation_templates import (
     cache_identity,
     load_template,
     normalize_parameters,
+    source_digest,
 )
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -38,9 +39,14 @@ def test_registry_matches_reviewed_graph_nodes_and_step_order() -> None:
         assert spec.language == "zh-CN"
         assert [step["id"] for step in spec.teaching_steps] == steps
         assert spec.review["design_status"] == "fact_checked"
-        assert spec.review["source_status"] == "pending"
-        with pytest.raises(TemplateValidationError, match="not reviewed"):
-            load_template(template_id, require_executable=True)
+        if template_id == "linked-list-insertion":
+            assert spec.review["source_status"] == "approved"
+            assert spec.review["source_sha256"] == source_digest(template_id)
+            assert load_template(template_id, require_executable=True).executable
+        else:
+            assert spec.review["source_status"] == "pending"
+            with pytest.raises(TemplateValidationError, match="not reviewed"):
+                load_template(template_id, require_executable=True)
 
 
 @pytest.mark.parametrize("template_id", ["../secrets", "linked-list-insertion.py", "array", ""])
@@ -120,6 +126,17 @@ def test_loaded_manifest_cannot_be_mutated_to_bypass_review_or_schema() -> None:
     editable_schema["additionalProperties"] = True
     with pytest.raises(TemplateValidationError):
         normalize_parameters(spec, {"values": [], "index": 0, "value": 1, "path": "/tmp"})
+
+
+def test_approved_source_change_is_rejected(monkeypatch: pytest.MonkeyPatch) -> None:
+    from app.services import animation_templates
+
+    monkeypatch.setattr(
+        animation_templates, "_SOURCE_FILES",
+        {"linked-list-insertion": ("backend/tests/test_animation_templates.py",)},
+    )
+    with pytest.raises(TemplateValidationError, match="digest mismatch"):
+        load_template("linked-list-insertion", require_executable=True)
 
 
 def test_cache_key_includes_knowledge_language_and_review_rule() -> None:

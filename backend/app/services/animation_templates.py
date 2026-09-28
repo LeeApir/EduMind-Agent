@@ -17,11 +17,34 @@ _ALLOWED_FILES = {
     "linked-list-insertion": "linked-list-insertion.json",
     "linked-list-deletion": "linked-list-deletion.json",
 }
+_SOURCE_FILES = {
+    "linked-list-insertion": (
+        "backend/app/animation_templates/insertion_plan.py",
+        "backend/app/animation_templates/linked_list_insertion.py",
+    ),
+}
 _MAX_NODES = 8
 
 
 class TemplateValidationError(ValueError):
     """A requested template or its data is outside the fixed P0 boundary."""
+
+
+def source_digest(template_id: str) -> str:
+    """Bind a source approval to every file that defines its teaching frames."""
+    paths = _SOURCE_FILES.get(template_id)
+    if paths is None:
+        raise TemplateValidationError("template source is unavailable")
+    digest = hashlib.sha256()
+    for relative_path in paths:
+        path = _ROOT / relative_path
+        if not path.is_file():
+            raise TemplateValidationError("template source is unavailable")
+        digest.update(relative_path.encode("utf-8"))
+        digest.update(b"\0")
+        digest.update(path.read_bytes())
+        digest.update(b"\0")
+    return digest.hexdigest()
 
 
 @dataclass(frozen=True)
@@ -98,11 +121,18 @@ def load_template(template_id: str, *, require_executable: bool = False) -> Temp
         raise TemplateValidationError("invalid teaching steps")
     review = raw["review"]
     if not isinstance(review, dict) or set(review) != {
-        "design_status", "source_status", "fact_source", "rule_version", "evidence"
+        "design_status", "source_status", "fact_source", "rule_version", "evidence",
+        "source_sha256",
     } or review["design_status"] != "fact_checked" or review["source_status"] not in {
         "pending", "approved"
     }:
         raise TemplateValidationError("invalid review record")
+    if review["source_status"] == "approved" and (
+        review["source_sha256"] != source_digest(template_id)
+    ):
+        raise TemplateValidationError("template source approval digest mismatch")
+    if review["source_status"] == "pending" and review["source_sha256"] != "":
+        raise TemplateValidationError("pending source cannot have an approval digest")
     spec = TemplateSpec(
         template_id=raw["template_id"],
         knowledge_point_id=raw["knowledge_point_id"],
