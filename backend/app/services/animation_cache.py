@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import fcntl
 import hashlib
 import json
 import os
@@ -27,6 +26,9 @@ from app.services.animation_templates import (
     normalize_parameters,
     source_digest,
 )
+from app.services.file_lock import lock_exclusive, unlock
+
+_O_NOFOLLOW = getattr(os, "O_NOFOLLOW", 0)
 
 FONT_DIGEST = "9520e535c5093ae57e3e4b0707ee73d3d4b6f42d98ce05139654da991a9bfd6d"
 SUBTITLE_VERSION = "srt-v1"
@@ -208,9 +210,9 @@ class AnimationCache:
                 raise ValueError("invalid cache directory")
             path.mkdir(parents=True, exist_ok=True)
         lock_path = self.root / "locks" / f"{key}.lock"
-        descriptor = os.open(lock_path, os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW, 0o600)
+        descriptor = os.open(lock_path, os.O_CREAT | os.O_RDWR | _O_NOFOLLOW, 0o600)
         try:
-            fcntl.flock(descriptor, fcntl.LOCK_EX)
+            lock_exclusive(descriptor)
             hit = self._valid_entry(
                 key, template_id, spec.template_version, spec.review["rule_version"],
                 normalized, runtime,
@@ -224,14 +226,14 @@ class AnimationCache:
             try:
                 object_lock = self.root / "locks" / "objects.lock"
                 object_descriptor = os.open(
-                    object_lock, os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW, 0o600
+                    object_lock, os.O_CREAT | os.O_RDWR | _O_NOFOLLOW, 0o600
                 )
                 try:
-                    fcntl.flock(object_descriptor, fcntl.LOCK_EX)
+                    lock_exclusive(object_descriptor)
                     mp4 = self._publish_object(candidate.mp4_path, candidate.mp4_sha256, "mp4")
                     srt = self._publish_object(candidate.srt_path, candidate.srt_sha256, "srt")
                 finally:
-                    fcntl.flock(object_descriptor, fcntl.LOCK_UN)
+                    unlock(object_descriptor)
                     os.close(object_descriptor)
                 metadata = {
                     "cache_key": key,
@@ -260,5 +262,5 @@ class AnimationCache:
             finally:
                 candidate.cleanup()
         finally:
-            fcntl.flock(descriptor, fcntl.LOCK_UN)
+            unlock(descriptor)
             os.close(descriptor)

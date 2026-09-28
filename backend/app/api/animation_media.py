@@ -5,7 +5,8 @@ from __future__ import annotations
 import asyncio
 import os
 import re
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Callable
+from typing import cast
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Header
@@ -24,6 +25,21 @@ from app.services.animation_media import (
 )
 
 router = APIRouter(tags=["Animation"])
+
+_pread = cast(Callable[[int, int, int], bytes] | None, getattr(os, "pread", None))
+
+
+def _read_at(fd: int, count: int, offset: int) -> bytes:
+    """Read ``count`` bytes at ``offset``; ``pread`` where available, seek+read otherwise.
+
+    ``os.pread`` is POSIX-only and leaves the descriptor offset untouched; the
+    Windows fallback seeks before reading. This generator is the sole reader of
+    its descriptor, so the seek is safe.
+    """
+    if _pread is not None:
+        return _pread(fd, count, offset)
+    os.lseek(fd, offset, os.SEEK_SET)
+    return os.read(fd, count)
 
 
 def _range(value: str | None, size: int) -> tuple[int, int] | None:
@@ -47,7 +63,7 @@ async def _chunks(file: VerifiedMediaFile, *, start: int, end: int) -> AsyncIter
     offset = start
     try:
         while offset <= end:
-            chunk = await asyncio.to_thread(os.pread, file.fd, min(65536, end - offset + 1), offset)
+            chunk = await asyncio.to_thread(_read_at, file.fd, min(65536, end - offset + 1), offset)
             if not chunk:
                 return
             offset += len(chunk)

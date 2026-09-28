@@ -19,6 +19,7 @@ from app.models.learning import LearningScene, LearningUnit
 from app.services.animation_cache import AnimationCache
 
 MAX_MEDIA_BYTES = 64 * 1024 * 1024
+_O_NOFOLLOW = getattr(os, "O_NOFOLLOW", 0)
 
 
 class MediaUnavailable(ValueError):
@@ -87,7 +88,7 @@ def open_verified_media(
         raise MediaUnavailable("Media unavailable.")
     fd = -1
     try:
-        fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW)
+        fd = os.open(path, os.O_RDONLY | _O_NOFOLLOW)
         info = os.fstat(fd)
         if (
             not stat.S_ISREG(info.st_mode)
