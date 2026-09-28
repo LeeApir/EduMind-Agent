@@ -74,6 +74,58 @@ class ClassroomSession(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
 
 
+class ClassroomOperation(Base):
+    """Owner-scoped idempotency record for one classroom write command.
+
+    Mode/control commands resolve synchronously to ``published``; streaming
+    commands (speech/reexplanation/debate) move through ``accepted``/``running``
+    to a terminal status. Only streaming kinds are ever surfaced through the
+    public ``GET /api/classroom-operations`` read model.
+    """
+
+    __tablename__ = "classroom_operations"
+    __table_args__ = (
+        UniqueConstraint(
+            "user_id", "idempotency_key", name="uq_classroom_operations_owner_key"
+        ),
+        UniqueConstraint("user_id", "id", name="uq_classroom_operations_owner_id"),
+        ForeignKeyConstraint(
+            ["user_id", "learning_unit_id"],
+            ["learning_units.user_id", "learning_units.id"],
+            name="fk_classroom_operations_unit_owner",
+            ondelete="CASCADE",
+        ),
+        CheckConstraint(
+            "kind IN ('mode', 'control', 'speech', 'reexplanation', 'debate')",
+            name="ck_classroom_operations_kind",
+        ),
+        CheckConstraint(
+            "status IN ('accepted', 'running', 'published', 'failed', 'cancelled', "
+            "'superseded')",
+            name="ck_classroom_operations_status",
+        ),
+        CheckConstraint(
+            "base_revision >= 1", name="ck_classroom_operations_base_revision_positive"
+        ),
+    )
+
+    id: Mapped[UUID] = mapped_column(PostgreSQLUUID(as_uuid=True), primary_key=True, default=uuid4)
+    user_id: Mapped[UUID] = mapped_column(
+        PostgreSQLUUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
+    learning_unit_id: Mapped[UUID] = mapped_column(PostgreSQLUUID(as_uuid=True), nullable=False)
+    kind: Mapped[str] = mapped_column(String(20), nullable=False)
+    idempotency_key: Mapped[str] = mapped_column(String(128), nullable=False)
+    request_digest: Mapped[str] = mapped_column(String(64), nullable=False)
+    base_revision: Mapped[int] = mapped_column(Integer, nullable=False)
+    generation_id: Mapped[UUID | None] = mapped_column(PostgreSQLUUID(as_uuid=True))
+    result_id: Mapped[UUID | None] = mapped_column(PostgreSQLUUID(as_uuid=True))
+    status: Mapped[str] = mapped_column(String(20), nullable=False, default="accepted")
+    error: Mapped[dict[str, object] | None] = mapped_column(JSONB)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
+
+
 class ClassroomMessage(Base):
     """An append-only committed message with a per-session increasing cursor."""
 

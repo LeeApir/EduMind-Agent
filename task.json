@@ -981,7 +981,7 @@
       "id": "MVP-0.3-T017",
       "phase": "MVP 0.3",
       "title": "提供专注与互动模式切换",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.3-T016"
@@ -1001,9 +1001,13 @@
       "verification": [
         "测试默认专注、重复切换、并发冲突及旧响应门禁，验证不产生多余 Provider 调用。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "迁移0013往返升降升通过；classroom_mode_api 11项、OpenAPI契约7项、T016持久化4项通过；ruff/mypy通过",
+        "默认focus、幂等重放、focus↔interactive切换、版本冲突、同键异摘要、focus空角色、跨owner404、并发同键幂等与异键CAS",
+        "模式切换为纯数据库事务不调用Provider；全量48失败均为既有CRLF模板摘要/计时抖动/Docker镜像问题，非本任务回归"
+      ],
+      "started_at": "2026-09-28T22:06:00",
+      "completed_at": "2026-09-28T22:26:00",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.3-T017"
     },
