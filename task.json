@@ -929,7 +929,7 @@
       "id": "MVP-0.3-T016",
       "phase": "MVP 0.3",
       "title": "持久化课堂会话与角色上下文",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.3-T003",
@@ -949,9 +949,31 @@
       "verification": [
         "运行迁移往返、会话隔离/版本冲突/重启恢复数据库测试。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "cd backend && EDUMIND_DATABASE_URL=<isolated-pg> alembic upgrade head && alembic downgrade 0011_animation_cancel_key && alembic upgrade head; docker exec psql checks classroom_* tables",
+          "result": "0001–0012 upgrade; downgrade leaves zero classroom_* tables; re-upgrade restores classroom_sessions/classroom_messages/classroom_role_contexts"
+        },
+        {
+          "command": "cd backend && EDUMIND_TEST_DATABASE_URL=<isolated-pg> pytest -q tests/test_classroom_persistence.py",
+          "result": "4 passed; owner-unit uniqueness, cross-owner FK isolation, message cursor monotonicity, role/kind separation, restart recovery"
+        },
+        {
+          "command": "cd backend && ruff check app/models/classroom.py alembic/versions/0012_classroom_sessions.py tests/test_classroom_persistence.py",
+          "result": "passed (2 E501 fixed)",
+          "evidence": "docs/acceptance/mvp-0.3-t016-classroom-persistence.md"
+        },
+        {
+          "command": "cd backend && mypy app/models/classroom.py",
+          "result": "passed, 1 source file"
+        },
+        {
+          "command": "cd backend && EDUMIND_TEST_DATABASE_URL=<isolated-pg> PYTHONUTF8=1 pytest -q",
+          "result": "collection blocked on Windows host: app/services/animation_cache.py imports POSIX fcntl (pre-existing commit 980caf7, macOS-verified in T006–T015); T016 files unaffected"
+        }
+      ],
+      "started_at": "2026-09-28T21:56:00",
+      "completed_at": "2026-09-28T22:04:00",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.3-T016"
     },
