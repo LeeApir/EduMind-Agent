@@ -521,7 +521,7 @@
       "id": "MVP-0.3-T009",
       "phase": "MVP 0.3",
       "title": "实现预渲染缓存与审核资源复用",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.3-T006",
@@ -542,9 +542,35 @@
       "verification": [
         "运行缓存命中/未命中/损坏/版本变化/并发测试，并实际准备两种模板基准媒体。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen pytest -q tests/test_animation_cache.py tests/test_animation_renderer.py",
+          "result": "22 passed, 2 Docker-only skipped; hit/miss/corrupt/version/concurrency/owner boundary"
+        },
+        {
+          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen pytest -q",
+          "result": "439 passed, 76 skipped with local loopback permission"
+        },
+        {
+          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen ruff check app/services/animation_cache.py scripts/prepare_animation_cache.py tests/test_animation_cache.py",
+          "result": "passed"
+        },
+        {
+          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen mypy app/services/animation_cache.py scripts/prepare_animation_cache.py",
+          "result": "passed, 2 source files"
+        },
+        {
+          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen python scripts/prepare_animation_cache.py",
+          "result": "first run: 2 real Docker renders; second run: 2 verified cache hits, same hashes",
+          "evidence": "docs/acceptance/mvp-0.3-t009-cache.md"
+        },
+        {
+          "command": "git diff --check; git check-ignore -v data/videos/cache/approved/objects/35b4ee0ac13ecff166320e4b1abde9dccc4226f8e177216c92d0b61abaa94f01.mp4",
+          "result": "passed; media ignored"
+        }
+      ],
+      "started_at": "2026-09-28T09:40:35",
+      "completed_at": "2026-09-28T10:20:15",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.3-T009"
     },
