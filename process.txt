@@ -485,3 +485,7 @@ T008 bac0d8e完成提交且工作区干净，领取预渲染缓存与审核资�
 T009 89895f5完成提交且工作区干净，领取动画Job/事件/资源持久化 | ADR-0004 B–D与OpenAPI契约已批准；宿主未配置测试库但Docker可启动独立PostgreSQL | 不能用现有MVP0.2运行库进行破坏性迁移测试 | 建立新模型和Alembic迁移、幂等及事件持久事务，独立PG升降级/重连/owner约束实测后提交
 [2026-09-28T13:36:24] [MVP-0.3-T010] VERIFIED | executor=Lee
 新增动画Job/事件/共享媒体/owner绑定模型及0010迁移，按owner锁幂等预约、同事务queued事件与游标重放，事件载荷限白名单 | 独立PG空库升级/降级到0009/四表消失/再升级通过，重连和并发幂等/约束集成2通过，全量连接PG后端515通过2项Docker专项跳过，Ruff/Mypy2/diff通过；首次重复集成因共享媒体fixture重复键失败，改为复用该媒体后通过；0Provider调用 | Worker租约/取消/发布与API仍属T011–T014；测试PG独立容器不触碰现有运行库 | 明确路径本地T010完成提交，核对后领取T011；交接docs/acceptance/mvp-0.3-t010-job-persistence.md，不push/merge
+[2026-09-28T13:38:27] [MVP-0.3-T011] START | executor=Lee | branch=codex/mvp-0.3
+T010 2c55172完成提交且工作区干净，领取持久Job领取与渲染发布 | PostgreSQL模型/租约字段/事件水位、受限执行器和私有缓存已就绪；独立测试PG仍运行 | 旧租约/取消/并发发布必须通过DB行锁和实际媒体检查，不能以进程内存判定成功 | 实现短事务领取、心跳/回收、受限渲染与当前尝试CAS发布，测试并发/重启/损坏及真实Job后独立提交
+[2026-09-28T13:53:37] [MVP-0.3-T011] VERIFIED | executor=Lee
+独立Worker短事务领取/心跳/回收、真实受限模板渲染、当前尝试CAS发布及owner媒体绑定完成，补宿主中断后容器自退兜底 | 独立PG+Docker专项6通过、全量后端519通过4项Docker专项跳过、Ruff/Mypy4/diff检查通过；新引擎恢复与独立Worker进程均实测，0Provider调用 | 用户取消与发布互斥、HTTP/SSE和媒体下载鉴权待T012–T014；独立PG未触碰既有运行库 | 明确路径本地T011完成提交，核对后领取T012；交接docs/acceptance/mvp-0.3-t011-worker.md，不push/merge

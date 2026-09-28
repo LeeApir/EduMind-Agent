@@ -20,6 +20,7 @@ SCENES = {
 
 
 def main() -> None:
+    started_at = time.monotonic()
     if len(sys.argv) != 2 or sys.argv[1] not in SCENES:
         raise ValueError("unsupported template")
     scene, module = SCENES[sys.argv[1]], "compiled_scene"
@@ -81,7 +82,10 @@ def main() -> None:
         "srt_sha256": hashlib.sha256(subtitle.read_bytes()).hexdigest(),
     }
     (OUTPUT / ".ready").write_text(json.dumps(manifest, sort_keys=True), encoding="utf-8")
-    while True:
+    # A killed host worker cannot run its finally block. Exit and auto-remove
+    # the container even if the host never retrieves the ready media.
+    stop_at = started_at + 130
+    while time.monotonic() < stop_at:
         time.sleep(1)
 
 

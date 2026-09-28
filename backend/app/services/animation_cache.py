@@ -157,6 +157,25 @@ class AnimationCache:
         target.chmod(0o444)
         return target
 
+    def validate(self, media: CachedAnimation, parameters: dict[str, object]) -> bool:
+        """Recheck exact reviewed bytes before a Job obtains an owner binding."""
+        spec = load_template(media.template_id, require_executable=True)
+        normalized = normalize_parameters(spec, parameters)
+        runtime = self.runtime_factory(media.template_id)
+        expected_key = cache_identity(spec, normalized, runtime)
+        if media.cache_key != expected_key or media.template_version != spec.template_version:
+            return False
+        entry = self._valid_entry(
+            expected_key, media.template_id, spec.template_version,
+            spec.review["rule_version"], normalized, runtime,
+        )
+        return entry is not None and (
+            entry.mp4_path == media.mp4_path
+            and entry.srt_path == media.srt_path
+            and entry.mp4_sha256 == media.mp4_sha256
+            and entry.srt_sha256 == media.srt_sha256
+        )
+
     def resolve(self, template_id: str, parameters: Mapping[str, object]) -> CachedAnimation:
         """Hit an audited public asset first; otherwise render only its fixed template."""
         if template_id not in _ALLOWED:

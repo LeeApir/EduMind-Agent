@@ -639,7 +639,7 @@
       "id": "MVP-0.3-T011",
       "phase": "MVP 0.3",
       "title": "实现持久化 Job 领取与渲染发布",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.3-T008",
@@ -660,9 +660,31 @@
       "verification": [
         "测试并发领取/重复完成/崩溃恢复/损坏产物；真实运行一项 Job 并检查资源与事件一致性。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "cd backend && EDUMIND_TEST_DATABASE_URL=<isolated-url> EDUMIND_DOCKER_TESTS=1 UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen pytest -q tests/test_animation_worker.py",
+          "result": "6 passed; isolated PostgreSQL, real Docker render and separate Worker process",
+          "evidence": "docs/acceptance/mvp-0.3-t011-worker.md"
+        },
+        {
+          "command": "cd backend && EDUMIND_TEST_DATABASE_URL=<isolated-url> UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen pytest -q",
+          "result": "519 passed, 4 Docker-only skipped on isolated PostgreSQL"
+        },
+        {
+          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen ruff check app/services/animation_worker.py app/services/animation_cache.py app/animation_templates/container_runner.py scripts/run_animation_worker.py tests/test_animation_worker.py",
+          "result": "passed"
+        },
+        {
+          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen mypy app/services/animation_worker.py app/services/animation_cache.py app/animation_templates/container_runner.py scripts/run_animation_worker.py",
+          "result": "passed, 4 source files"
+        },
+        {
+          "command": "git diff --check",
+          "result": "passed"
+        }
+      ],
+      "started_at": "2026-09-28T13:38:27",
+      "completed_at": "2026-09-28T13:53:37",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.3-T011"
     },
