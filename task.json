@@ -1086,7 +1086,7 @@
       "id": "MVP-0.3-T020",
       "phase": "MVP 0.3",
       "title": "实现专注与按需角色课堂界面",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.3-T017",
@@ -1105,9 +1105,13 @@
       "verification": [
         "运行模式/流式/迟到响应/XSS组件测试与真实后端mock Provider浏览器联调。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "前端 96 项测试全部通过（16 文件）：ClassroomPanel 12 项组件测试覆盖模式切换、流式 token 累积与当前发言者、迟到响应丢弃、XSS 转义、键盘 Enter/Shift+Enter、错误重试与课堂恢复；classroom API 客户端 7 项测试覆盖 SSE 事件映射与 HTTP 错误。",
+        "浏览器 classroom_flow.py（headless Chromium）路由 mock 联调通过：默认专注视图、按需互动与同学角色开关、流式发言提交与提交、XSS 转义、键盘提交、Provider 故障后换新幂等键重试、移动端无横向溢出。",
+        "后端 58 项课堂测试全部通过（真实 app + PostgreSQL + FakeAdapter mock Provider）：SSE 契约、模式 CAS、消息持久化、上下文、角色与审核规则。"
+      ],
+      "started_at": "2026-09-29T09:06:00",
+      "completed_at": "2026-09-29T09:38:00",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.3-T020"
     },
