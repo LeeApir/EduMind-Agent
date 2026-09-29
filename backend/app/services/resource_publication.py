@@ -47,6 +47,8 @@ async def record_reviewed_resource(
     scene_id: UUID,
     review: ReviewOutcome,
     knowledge_point_id: str | None = None,
+    supersedes_id: UUID | None = None,
+    generation_metadata_extra: dict[str, object] | None = None,
 ) -> GeneratedResource:
     """Store a new immutable candidate; only an approved schema-valid one is published."""
     resource = review.resource
@@ -102,6 +104,8 @@ async def record_reviewed_resource(
     }
     if resource.instruction_version is not None:
         metadata["instruction_version"] = resource.instruction_version
+    if generation_metadata_extra is not None:
+        metadata.update(generation_metadata_extra)
     persisted = GeneratedResource(
         user_id=owner_id,
         learning_unit_id=learning_unit_id,
@@ -113,7 +117,10 @@ async def record_reviewed_resource(
         review_comments=review_comments,
         review_status="passed" if review.approved else "rejected",
         version=version,
-        supersedes_id=previous_published.id if review.approved and previous_published else None,
+        supersedes_id=(
+            supersedes_id if review.approved and supersedes_id is not None
+            else previous_published.id if review.approved and previous_published else None
+        ),
         generation_metadata=metadata,
         published_at=datetime.now(timezone.utc) if review.approved else None,
     )

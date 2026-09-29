@@ -47,6 +47,7 @@ class LearningResourceRequest:
     knowledge_point: str
     learner_goal: str
     code_language: str
+    adjustment: str | None = None
 
     def __post_init__(self) -> None:
         if not all(
@@ -100,17 +101,19 @@ class LearningUnitGenerator:
             for part in (
                 f"Knowledge point: {request.knowledge_point.strip()}",
                 f"Learner goal: {request.learner_goal.strip()}",
+                f"Current-scene adjustment: {request.adjustment}"
+                if request.adjustment and resource_type is LearningResourceType.EXPLANATION
+                else "",
                 language_instruction,
             )
             if part
         )
 
-    async def generate(self, request: LearningResourceRequest) -> LearningUnitGeneration:
-        """Return all valid candidates and explicit safe errors for failed resource types."""
-        resources: list[PendingLearningResource] = []
-        failures: list[ResourceGenerationFailure] = []
-        for resource_type in LearningResourceType:
-            provider_request = StructuredRequest(
+    async def generate_one(
+        self, request: LearningResourceRequest, resource_type: LearningResourceType
+    ) -> PendingLearningResource | ResourceGenerationFailure:
+        """Generate only the selected resource when a scene needs one new explanation."""
+        provider_request = StructuredRequest(
                 prompt=TextRequest(
                     messages=(
                         ChatMessage(role="system", content=learning_resource_prompt(resource_type)),
@@ -119,39 +122,35 @@ class LearningUnitGenerator:
                     task_profile=TaskProfile.QUALITY,
                 ),
                 json_schema=resource_output_schema(resource_type),
+        )
+        try:
+            result = await self._gateway.generate_structured(provider_request, retry_safe=True)
+            envelope = validate_learning_resource(result.value, expected_type=resource_type)
+        except ProviderError as error:
+            return ResourceGenerationFailure(resource_type, error.code, str(error))
+        except ResourceSchemaError as error:
+            return ResourceGenerationFailure(
+                resource_type, ProviderErrorCode.INVALID_OUTPUT, str(error)
             )
-            try:
-                result = await self._gateway.generate_structured(provider_request, retry_safe=True)
-                envelope = validate_learning_resource(result.value, expected_type=resource_type)
-            except ProviderError as error:
-                failures.append(
-                    ResourceGenerationFailure(
-                        resource_type=resource_type,
-                        code=error.code,
-                        message=str(error),
-                    )
-                )
-                continue
-            except ResourceSchemaError as error:
-                failures.append(
-                    ResourceGenerationFailure(
-                        resource_type=resource_type,
-                        code=ProviderErrorCode.INVALID_OUTPUT,
-                        message=str(error),
-                    )
-                )
-                continue
+        content = envelope["content"]
+        assert isinstance(content, dict)
+        return PendingLearningResource(
+            resource_type=resource_type,
+            content=content,
+            prompt_version=RESOURCE_PROMPT_VERSION,
+            model_id=result.model_id,
+            usage=result.usage,
+            instruction_version=RESOURCE_INSTRUCTION_VERSION,
+        )
 
-            content = envelope["content"]
-            assert isinstance(content, dict)
-            resources.append(
-                PendingLearningResource(
-                    resource_type=resource_type,
-                    content=content,
-                    prompt_version=RESOURCE_PROMPT_VERSION,
-                    model_id=result.model_id,
-                    usage=result.usage,
-                    instruction_version=RESOURCE_INSTRUCTION_VERSION,
-                )
-            )
+    async def generate(self, request: LearningResourceRequest) -> LearningUnitGeneration:
+        """Return all valid candidates and explicit safe errors for failed resource types."""
+        resources: list[PendingLearningResource] = []
+        failures: list[ResourceGenerationFailure] = []
+        for resource_type in LearningResourceType:
+            outcome = await self.generate_one(request, resource_type)
+            if isinstance(outcome, ResourceGenerationFailure):
+                failures.append(outcome)
+            else:
+                resources.append(outcome)
         return LearningUnitGeneration(resources=tuple(resources), failures=tuple(failures))

@@ -1119,7 +1119,7 @@
       "id": "MVP-0.3-T021",
       "phase": "MVP 0.3",
       "title": "实现当前场景重解释版本服务",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.3-T003",
@@ -1140,9 +1140,12 @@
       "verification": [
         "测试新旧版本、审核拒绝、并发冲突、重复请求和其他场景不变；验证 API 契约。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "独立 PostgreSQL 库 Alembic 升级 head 通过；T021/课堂/OpenAPI 定向 36 通过，后端全量 612 通过、5 跳过，使用 FakeAdapter，无真实 Provider 调用。",
+        "Ruff app 与 T021 测试、Mypy strict 85 源文件、OpenAPI JSON 解析和 git diff --check 通过；新旧版本、审核拒绝/不可用、Provider 失败、并发 CAS、重复请求、跨 owner 与其他场景保持不变均有回归验证。证据 docs/acceptance/mvp-0.3-t021-scene-reexplanation.md。"
+      ],
+      "started_at": "2026-09-29T10:20:26",
+      "completed_at": "2026-09-29T10:37:18",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.3-T021"
     },

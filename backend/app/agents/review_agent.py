@@ -98,6 +98,14 @@ class ReviewOutcome:
     def approved(self) -> bool:
         return self.verdict is ReviewVerdict.PASS
 
+    @property
+    def unavailable(self) -> bool:
+        """Distinguish a failed review call from an actual review rejection."""
+        return any(
+            issue.get("message") == "Resource review is unavailable."
+            for issue in self.issues
+        )
+
 
 class ReviewAgent:
     def __init__(self, gateway: StructuredReviewGateway) -> None:

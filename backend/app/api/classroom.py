@@ -19,6 +19,13 @@ from app.agents.classroom_speech_rules import (
     classify_tutor_turn,
     combined_speech_verdict,
 )
+from app.agents.learning_resource_schema import LearningResourceType, ResourceSchemaError
+from app.agents.learning_unit_generator import (
+    LearningResourceRequest,
+    LearningUnitGenerator,
+    ResourceGenerationFailure,
+)
+from app.agents.review_agent import ReviewAgent
 from app.agents.tutor_agent import TutorAgent
 from app.api.knowledge_graph import knowledge_graph_repository
 from app.core.auth import AuthenticatedSession, AuthFailure, require_authenticated_session
@@ -45,8 +52,18 @@ from app.services.classroom_speech import (
     speech_materials,
 )
 from app.services.knowledge_graph import KnowledgeGraphRepository
+from app.services.learning_events import LearningEventInvalid, LearningEventNotFound
 from app.services.learning_operations import IdempotencyConflict
 from app.services.provider_gateway import ProviderGateway
+from app.services.scene_reexplanation import (
+    ReexplanationMaterials,
+    ReexplanationReservation,
+    SceneVersionConflict,
+    fail_reexplanation,
+    publish_reexplanation,
+    reexplanation_materials,
+    reserve_reexplanation,
+)
 
 router = APIRouter(tags=["Classroom"])
 
@@ -63,6 +80,13 @@ class ClassroomSpeech(BaseModel):
 
     text: str = Field(min_length=1, max_length=2000)
     scene_version: int = Field(ge=1)
+
+
+class ReexplanationRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    action: Literal["simpler", "deeper", "another_example"]
+    base_scene_version: int = Field(ge=1)
 
 
 def _not_found() -> AuthFailure:
@@ -391,6 +415,179 @@ def _replay_speech(reservation: object) -> StreamingResponse:
 
     return StreamingResponse(
         events(),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-store", "X-Accel-Buffering": "no"},
+    )
+
+
+async def _reexplanation_events(
+    *, reservation: ReexplanationReservation, materials: ReexplanationMaterials,
+    owner_id: UUID, gateway: ProviderGateway,
+    sessions: async_sessionmaker[AsyncSession],
+) -> AsyncIterator[str]:
+    operation = reservation.operation
+    snapshot = operation.result_snapshot or {}
+    base_version = snapshot.get("base_scene_version")
+    assert isinstance(base_version, int)
+    generation = _generation(operation.generation_id)
+    yield _event("agent_start", {
+        "operation_id": str(operation.id), "revision": operation.base_revision,
+        "scene_version": base_version, "generation_id": generation,
+    })
+    async with sessions() as db:
+        persisted = await owned_classroom_operation(
+            db, owner_id=owner_id, operation_id=operation.id
+        )
+        if persisted is not None:
+            persisted.status = "running"
+            persisted.updated_at = utc_now()
+            await db.commit()
+    outcome = await LearningUnitGenerator(gateway).generate_one(
+        LearningResourceRequest(
+            knowledge_point=materials.knowledge_point, learner_goal=materials.goal,
+            code_language=materials.code_language, adjustment=materials.adjustment,
+        ),
+        LearningResourceType.EXPLANATION,
+    )
+    if isinstance(outcome, ResourceGenerationFailure):
+        async with sessions() as db:
+            await fail_reexplanation(
+                db, operation_id=operation.id, owner_id=owner_id,
+                code="PROVIDER_UNAVAILABLE",
+            )
+        yield _event("error", {"code": "PROVIDER_UNAVAILABLE", "retryable": True})
+        yield _event("done", {"status": "failed"})
+        return
+    markdown = outcome.content["markdown"]
+    assert isinstance(markdown, str)
+    for chunk in _chunks(markdown):
+        yield _event("token", {
+            "revision": operation.base_revision, "scene_version": base_version,
+            "generation_id": generation, "temporary": True,
+            "delta": chunk,
+        })
+    review = await ReviewAgent(gateway).review(outcome, context=materials.review_context)
+    if not review.approved:
+        code = "REVIEW_UNAVAILABLE" if review.unavailable else "REVIEW_REJECTED"
+        async with sessions() as db:
+            await fail_reexplanation(
+                db, operation_id=operation.id, owner_id=owner_id,
+                code=code,
+            )
+        yield _event("content_retracted", {
+            "revision": operation.base_revision, "generation_id": generation,
+            "code": code,
+        })
+        if review.unavailable:
+            yield _event("error", {"code": code, "retryable": True})
+        yield _event("done", {"status": "failed"})
+        return
+    try:
+        async with sessions() as db:
+            published = await publish_reexplanation(
+                db, owner_id=owner_id, operation_id=operation.id, review=review,
+            )
+    except (SceneVersionConflict, ResourceSchemaError, ValueError):
+        async with sessions() as db:
+            await fail_reexplanation(
+                db, operation_id=operation.id, owner_id=owner_id,
+                code="SCENE_PUBLICATION_FAILED",
+            )
+        yield _event("content_retracted", {
+            "revision": operation.base_revision, "generation_id": generation,
+            "code": "SCENE_PUBLICATION_FAILED",
+        })
+        yield _event("error", {"code": "SCENE_PUBLICATION_FAILED", "retryable": False})
+        yield _event("done", {"status": "failed"})
+        return
+    if not published.published:
+        yield _event("content_retracted", {
+            "revision": operation.base_revision, "generation_id": generation,
+            "code": "SCENE_VERSION_CONFLICT",
+        })
+        yield _event("error", {"code": "SCENE_VERSION_CONFLICT", "retryable": False})
+        yield _event("done", {"status": "cancelled"})
+        return
+    yield _event("review_pass", {"operation_id": str(operation.id), "kind": "reexplanation"})
+    yield _event("scene_ready", {
+        "revision": operation.base_revision + 1,
+        "scene_key": snapshot["scene_key"],
+        "scene_version": published.scene_version,
+        "resource_ids": [str(value) for value in published.resource_ids],
+    })
+    yield _event("done", {"status": "published"})
+
+
+@router.post(
+    "/api/learning-units/{unit_id}/classroom/scenes/{scene_key}/reexplanations",
+    response_model=None,
+)
+async def stream_reexplanation(
+    unit_id: UUID, scene_key: str, payload: ReexplanationRequest,
+    current: AuthenticatedSession = Depends(require_authenticated_session),
+    idempotency_key: str = Header(min_length=16, max_length=128, alias="Idempotency-Key"),
+    if_match_revision: int = Header(ge=1, alias="If-Match-Classroom-Revision"),
+    sessions: async_sessionmaker[AsyncSession] = Depends(database_session_factory),
+    gateway: ProviderGateway = Depends(provider_gateway),
+    graph: KnowledgeGraphRepository = Depends(knowledge_graph_repository),
+) -> StreamingResponse:
+    async with sessions() as db:
+        try:
+            reservation = await reserve_reexplanation(
+                db, owner_id=current.user.id, unit_id=unit_id,
+                scene_key=scene_key, idempotency_key=idempotency_key,
+                action=payload.action, base_scene_version=payload.base_scene_version,
+                expected_revision=if_match_revision, graph=graph,
+            )
+        except IdempotencyConflict:
+            raise _conflict("IDEMPOTENCY_CONFLICT", "Idempotency key conflicts.") from None
+        except ClassroomVersionConflict as error:
+            raise _conflict(
+                "CLASSROOM_VERSION_CONFLICT",
+                f"Classroom revision is now {error.current_revision}.",
+            ) from None
+        except SceneVersionConflict:
+            raise _conflict("SCENE_VERSION_CONFLICT", "Scene version changed.") from None
+        except ClassroomNotFound:
+            raise _not_found() from None
+        except (LearningEventNotFound, LearningEventInvalid):
+            raise _not_found() from None
+        if not reservation.created:
+            async def replay() -> AsyncIterator[str]:
+                operation = reservation.operation
+                prior = operation.result_snapshot or {}
+                yield _event("agent_start", {
+                    "operation_id": str(operation.id),
+                    "revision": operation.base_revision,
+                    "scene_version": prior.get("base_scene_version"),
+                    "generation_id": _generation(operation.generation_id),
+                })
+                if operation.status not in {"accepted", "running"}:
+                    yield _event("done", {
+                        "status": "cancelled" if operation.status == "superseded"
+                        else operation.status,
+                    })
+            return StreamingResponse(
+                replay(), media_type="text/event-stream",
+                headers={"Cache-Control": "no-store", "X-Accel-Buffering": "no"},
+            )
+        try:
+            materials = await reexplanation_materials(
+                db, owner_id=current.user.id, unit_id=unit_id,
+                scene_key=scene_key, base_scene_version=payload.base_scene_version,
+                action=payload.action, graph=graph,
+            )
+        except (ClassroomNotFound, ValueError):
+            await fail_reexplanation(
+                db, operation_id=reservation.operation.id,
+                owner_id=current.user.id, code="SCENE_CONTEXT_UNAVAILABLE",
+            )
+            raise _not_found() from None
+    return StreamingResponse(
+        _reexplanation_events(
+            reservation=reservation, materials=materials,
+            owner_id=current.user.id, gateway=gateway, sessions=sessions,
+        ),
         media_type="text/event-stream",
         headers={"Cache-Control": "no-store", "X-Accel-Buffering": "no"},
     )

@@ -533,3 +533,7 @@ T019 2894446完成提交且工作区干净，领取专注与按需角色课堂�
 队友完成提交后的代码复核，接手修正幂等回放与未发布资源门禁 | 旧键在模式变化后返回当前快照、无正式资源也能建课堂，均已复现 | 迁移前操作缺原回执，不能无损恢复 | 新增0014回执迁移与回归测试，同步OpenAPI
 [2026-09-29T10:10:10] [MVP-0.3-T017] VERIFIED | executor=Lee
 创建/模式命令持久化原回执、发布资源门禁及旧记录明确409完成 | 独立PG迁移升降升、定向35通过、全量606通过5跳过、Ruff/Mypy/diff通过；证据docs/acceptance/mvp-0.3-t016-t020-review.md | 迁移前无回执记录无法回放原快照，返回IDEMPOTENCY_RESULT_UNAVAILABLE；无真实Provider调用 | 自查并提交本地补丁，不push/merge；后续T021按任务协议领取
+[2026-09-29T10:20:26] [MVP-0.3-T021] START | executor=Lee | branch=codex/mvp-0.3
+T020与T016依赖已完成，领取当前场景重解释版本服务 | 工作区干净，ADR-0005决定C与OpenAPI契约已批准 | 旧场景须只读可回溯，证据先提交，候选经schema/Review后CAS发布 | 实现持久操作与场景版本，覆盖重复、并发、拒绝、越权和其他场景，验证后本地提交
+[2026-09-29T10:37:18] [MVP-0.3-T021] VERIFIED | executor=Lee
+当前场景重解释先持久化幂等操作及学习证据，仅重写讲解；正式新版本经schema/Review与owner锁CAS发布，原场景/其他场景只读保留，学习单元返回scene_key/is_current | 独立PG迁移head、定向36通过、后端全量612通过5跳过、Ruff/Mypy85源/OpenAPI解析/diff通过；证据docs/acceptance/mvp-0.3-t021-scene-reexplanation.md；0真实Provider调用 | 运行中操作断线只恢复持久状态，临时token不重放；T022仍需前端学习控制 | 明确路径本地完成提交后领取T022，不push/merge
