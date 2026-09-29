@@ -89,6 +89,11 @@ def _known_profile(profile: Mapping[str, object], topics: set[str]) -> dict[str,
                 errors.append(selected)
         if errors:
             known["error_preferences"] = errors[:3]
+    style = profile.get("cognitive_style")
+    if isinstance(style, dict) and _evidence(profile, "cognitive_style"):
+        persona = style.get("preference_persona")
+        if persona in {"performance", "engineering", "academic"}:
+            known["preference_persona"] = persona
     return known
 
 

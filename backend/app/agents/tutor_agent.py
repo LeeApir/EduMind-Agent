@@ -36,7 +36,7 @@ from app.services.provider_gateway import (
     TokenUsage,
 )
 
-TURN_INSTRUCTION_VERSION = "classroom-turn-instructions-v1"
+TURN_INSTRUCTION_VERSION = "classroom-turn-instructions-v2"
 
 
 class StructuredTurnGateway(Protocol):
@@ -116,6 +116,8 @@ class TutorAgent:
             f"Prompt version: {TURN_PROMPT_VERSION}. "
             f"Instruction version: {TURN_INSTRUCTION_VERSION}.\n"
             "仅使用提供的当前目标、已审核资源、必要画像和路径上下文，不得臆测未知画像字段。"
+            "若known_profile有preference_persona，只调整讲解例子和表达顺序；"
+            "性能/工程/学术偏好绝不能改变算法事实、复杂度或题目条件。"
             "tutor 是唯一主讲角色，负责讲解当前知识点、提问、反馈与资源切换，且必须且只能发言一次。"
             + companion_rule
             + "每个角色至多发言一次，text 不得与其他角色重复。"

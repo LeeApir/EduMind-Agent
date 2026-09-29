@@ -12,6 +12,7 @@ import {
   setClassroomMode,
   streamClassroomSpeech,
   streamDebate,
+  submitPerspectiveFeedback,
   streamReexplanation,
   type ClassroomSpeechEvent,
 } from "../src/api/classroom";
@@ -98,6 +99,24 @@ describe("classroom API client", () => {
       "/api/learning-units/unit-1/classroom/debate/result-1/exit",
       expect.objectContaining({ method: "POST", headers: expect.objectContaining({
         "If-Match-Classroom-Revision": "2", "Idempotency-Key": "debate-exit-key-01",
+      }) }),
+    );
+  });
+
+  it("submits only an explicit helpful perspective with CSRF and idempotency", async () => {
+    const fetchImpl = vi.fn().mockImplementation(async () => Response.json({
+      evidence_id: "evidence-1", profile_version: 3, update_status: "updated",
+    }, { status: 202 }));
+    const receipt = await submitPerspectiveFeedback(
+      "unit-1", "result-1", "academic", "csrf", "feedback-key-0001", fetchImpl,
+    );
+    expect(receipt).toMatchObject({ evidence_id: "evidence-1", profile_version: 3 });
+    expect(fetchImpl).toHaveBeenCalledWith(
+      "/api/learning-units/unit-1/classroom/debate/result-1/feedback",
+      expect.objectContaining({ method: "POST", body: JSON.stringify({
+        perspective: "academic", feedback: "helpful",
+      }), headers: expect.objectContaining({
+        "X-CSRF-Token": "csrf", "Idempotency-Key": "feedback-key-0001",
       }) }),
     );
   });

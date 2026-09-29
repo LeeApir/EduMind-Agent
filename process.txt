@@ -557,3 +557,7 @@ T023 eaf74a2与T016依赖完成提交且工作区干净，领取多视角审核�
 T020与T024 0cbfa4f已完成且工作区干净，领取多视角展示及课堂返回 | 后端已有正式结果GET、debate POST SSE、exit POST和detour回执 | 页面需只展示审核通过结果，刷新/断流恢复，不丢失原课堂进度与资源 | 接入API和安全渲染，完成组件及浏览器验证后本地提交；不push/merge
 [2026-09-29T16:45:51] [MVP-0.3-T025] VERIFIED | executor=Lee
 学习页接入主动演示、正式三视角/主持人展示、状态恢复和幂等退出；切换时保留原组件，审核拒绝或Provider故障不展示候选，模型文本安全转义 | 前端全量113通过、构建/改动文件ESLint通过；Chromium路由模拟进入退出/刷新/失败/XSS/草稿保持及隔离PG真实HTTP联调通过；E2E Python Ruff/diff通过；证据docs/acceptance/mvp-0.3-t025-debate-ui.md；0真实Provider调用 | T026需显式偏好提交；当前按需演示不自动触发，也不推断画像偏好 | 自查并本地完成提交，再领取下一依赖满足任务；不push/merge
+[2026-09-29T16:47:31] [MVP-0.3-T026] START | executor=Lee | branch=codex/mvp-0.3
+T018与T024已完成且T025 afc3c67已本地提交、工作区干净，领取显式视角偏好证据 | ADR-0005批准owner结果ID+视角枚举、explicit_feedback与画像版本化合并；现有ProfileEvent/画像更新规则可复用 | 不从浏览行为推断偏好，不修改算法事实或直接增加掌握度，人工修正优先 | 核对既有画像schema与事件事务，接入反馈API/UI及后续Tutor表达并验证隔离/幂等/修正
+[2026-09-29T17:03:31] [MVP-0.3-T026] VERIFIED | executor=Lee
+显式有帮助视角反馈写owner证据并合并版本化画像，人工修正优先；前端按钮调用API，后续Tutor读取有证据偏好且限制为表达方式，未知保持未知 | 隔离PG定向26通过、后端全量645通过5跳过；Tutor提示词专项15通过；前端115通过、构建/ESLint、Ruff/Mypy93源、OpenAPI校验及真实HTTP浏览器反馈流程通过；证据docs/acceptance/mvp-0.3-t026-perspective-feedback.md；0真实Provider调用 | 无已知阻塞；T027仍todo | 自查并本地完成提交，随后按用户要求暂停；不push/merge

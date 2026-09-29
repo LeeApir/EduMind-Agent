@@ -487,6 +487,7 @@ function stringValue(value: unknown): string {
       :refresh-token="classroomRefreshToken"
       @active="debateActive = $event"
       @changed="classroomRefreshToken += 1"
+      @profile-changed="profileRefreshToken += 1"
     />
     <div v-show="!debateActive">
       <PublishedLearningWorkspace

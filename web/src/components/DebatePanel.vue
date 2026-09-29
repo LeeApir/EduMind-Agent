@@ -4,9 +4,10 @@ import { NButton } from "naive-ui";
 
 import {
   ClassroomSpeechError, createClassroom, exitDebate, loadClassroom,
-  loadClassroomOperation, loadDebateResult, streamDebate,
+  loadClassroomOperation, loadDebateResult, streamDebate, submitPerspectiveFeedback,
   type ClassroomOperation, type ClassroomSnapshot, type ClassroomSpeechEvent,
-  type DebateResult, type StreamDebateOptions,
+  type DebatePerspective, type DebateResult, type PerspectiveReceipt,
+  type StreamDebateOptions,
 } from "../api/classroom";
 
 interface PendingDebate { key: string; question: string; revision: number; operationId?: string }
@@ -22,6 +23,8 @@ const props = withDefaults(defineProps<{
   loadResult?: (unitId: string, resultId: string) => Promise<DebateResult>;
   start?: (options: StreamDebateOptions) => Promise<void>;
   exit?: (unitId: string, resultId: string, revision: number, csrf: string, key: string) => Promise<ClassroomSnapshot>;
+  feedback?: (unitId: string, resultId: string, perspective: DebatePerspective,
+    csrf: string, key: string) => Promise<PerspectiveReceipt>;
 }>(), {
   refreshToken: 0,
   loadSnapshot: loadClassroom,
@@ -30,8 +33,9 @@ const props = withDefaults(defineProps<{
   loadResult: loadDebateResult,
   start: streamDebate,
   exit: exitDebate,
+  feedback: submitPerspectiveFeedback,
 });
-const emit = defineEmits<{ active: [value: boolean]; changed: [] }>();
+const emit = defineEmits<{ active: [value: boolean]; changed: []; profileChanged: [] }>();
 const snapshot = ref<ClassroomSnapshot | null>(null);
 const result = ref<DebateResult | null>(null);
 const question = ref("");
@@ -40,6 +44,8 @@ const stage = ref("");
 const error = ref("");
 const notice = ref("");
 const pending = ref<PendingDebate | null>(null);
+const feedbackBusy = ref<DebatePerspective | null>(null);
+const feedbackNotice = ref("");
 let generation = 0;
 
 const active = computed(() => result.value !== null && snapshot.value?.detour?.kind === "debate");
@@ -219,9 +225,35 @@ async function leave(): Promise<void> {
   finally { busy.value = false; }
 }
 
+async function markHelpful(perspective: DebatePerspective): Promise<void> {
+  if (!result.value || feedbackBusy.value) return;
+  feedbackBusy.value = perspective;
+  feedbackNotice.value = "";
+  const resultId = result.value.id;
+  const keyName = `feedback:${resultId}:${perspective}`;
+  const stored = readStored<{ key: string }>(keyName);
+  const requestKey = stored?.key ?? crypto.randomUUID();
+  save(keyName, { key: requestKey });
+  try {
+    const receipt = await props.feedback(props.unitId, resultId, perspective,
+      props.csrfToken, requestKey);
+    save(keyName, null);
+    feedbackNotice.value = receipt.update_status === "pending"
+      ? "反馈已记录，画像更新待处理。"
+      : receipt.update_status === "failed"
+        ? "反馈已记录，画像更新暂未完成。"
+        : "反馈已记录，后续讲解会参考这个视角。";
+    if (receipt.update_status === "updated" || receipt.update_status === "unchanged") {
+      emit("profileChanged");
+    }
+  } catch (failure) { feedbackNotice.value = explain(failure); }
+  finally { feedbackBusy.value = null; }
+}
+
 watch(() => props.unitId, () => {
   snapshot.value = null; result.value = null; pending.value = null;
   question.value = ""; stage.value = ""; notice.value = ""; error.value = "";
+  feedbackNotice.value = "";
   emit("active", false);
   if (props.unitId) void refresh();
 }, { immediate: true });
@@ -265,9 +297,30 @@ onBeforeUnmount(() => { generation += 1; emit("active", false); });
         class="perspectives"
         data-testid="debate-perspectives"
       >
-        <article><span>01 · 性能派</span><h3>性能视角</h3><p>{{ result.perspectives.performance }}</p></article>
-        <article><span>02 · 工程派</span><h3>工程视角</h3><p>{{ result.perspectives.engineering }}</p></article>
-        <article><span>03 · 学术派</span><h3>学术视角</h3><p>{{ result.perspectives.academic }}</p></article>
+        <article>
+          <span>01 · 性能派</span><h3>性能视角</h3><p>{{ result.perspectives.performance }}</p><NButton
+            :disabled="!!feedbackBusy"
+            @click="markHelpful('performance')"
+          >
+            这个视角有帮助
+          </NButton>
+        </article>
+        <article>
+          <span>02 · 工程派</span><h3>工程视角</h3><p>{{ result.perspectives.engineering }}</p><NButton
+            :disabled="!!feedbackBusy"
+            @click="markHelpful('engineering')"
+          >
+            这个视角有帮助
+          </NButton>
+        </article>
+        <article>
+          <span>03 · 学术派</span><h3>学术视角</h3><p>{{ result.perspectives.academic }}</p><NButton
+            :disabled="!!feedbackBusy"
+            @click="markHelpful('academic')"
+          >
+            这个视角有帮助
+          </NButton>
+        </article>
       </div>
       <article
         class="moderator"
@@ -278,6 +331,13 @@ onBeforeUnmount(() => { generation += 1; emit("active", false); });
         <h3>取舍</h3><p>{{ result.moderator.tradeoffs }}</p>
         <h3>学习建议</h3><p>{{ result.moderator.learner_advice }}</p>
       </article>
+      <p
+        v-if="feedbackNotice"
+        role="status"
+        data-testid="perspective-feedback-status"
+      >
+        {{ feedbackNotice }}
+      </p>
     </template>
     <template v-else>
       <div class="debate-heading">

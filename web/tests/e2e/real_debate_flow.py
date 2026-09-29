@@ -58,6 +58,7 @@ def run() -> None:
         sys.path.insert(0, str(BACKEND))
         sys.path.insert(0, str(BACKEND / "tests"))
         from test_debate_api import seed_unit
+        from test_debate_feedback_api import prepare_profile
 
         with sync_playwright() as playwright:
             browser = playwright.chromium.launch(headless=True)
@@ -67,6 +68,7 @@ def run() -> None:
                 assert guest.status == 201
                 with ThreadPoolExecutor(max_workers=1) as pool:
                     unit_id = pool.submit(seed_unit, UUID(guest.json()["user"]["id"])).result()
+                    pool.submit(prepare_profile, UUID(guest.json()["user"]["id"])).result()
                 page = context.new_page()
                 page.add_init_script(
                     f"sessionStorage.setItem('edumind:last-learning-unit', '{unit_id}')"
@@ -77,6 +79,18 @@ def run() -> None:
                 page.get_by_test_id("start-debate").click()
                 expect(page.get_by_test_id("debate-perspectives")).to_contain_text("随机访问")
                 expect(page.get_by_test_id("debate-moderator")).to_contain_text("条件")
+                page.get_by_test_id("debate-perspectives").locator("article").first.get_by_role(
+                    "button", name="这个视角有帮助"
+                ).click()
+                expect(page.get_by_test_id("perspective-feedback-status")).to_contain_text(
+                    "反馈已记录"
+                )
+                profile = page.evaluate("""async () => {
+                    const response = await fetch('/api/profile/me', {credentials: 'same-origin'});
+                    return {status: response.status, body: await response.json()};
+                }""")
+                assert profile["status"] == 200, profile["body"]
+                assert profile["body"]["cognitive_style"]["preference_persona"] == "performance"
                 page.reload()
                 expect(page.get_by_test_id("debate-perspectives")).to_be_visible()
                 page.get_by_test_id("exit-debate").click()

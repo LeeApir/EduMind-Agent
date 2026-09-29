@@ -104,6 +104,18 @@ def test_unknown_or_unbacked_fields_are_not_sent(profile) -> None:
     assert context(profile).payload()["known_profile"] == {}
 
 
+def test_only_evidence_backed_persona_is_available_to_future_tutor_turns() -> None:
+    profile = {
+        "cognitive_style": {"preference_persona": "engineering"},
+        "evidence": {"cognitive_style": [{"source": "explicit_feedback", "confidence": 0.9}]},
+    }
+    assert context(profile).payload()["known_profile"] == {
+        "preference_persona": "engineering",
+    }
+    profile["evidence"] = {}
+    assert context(profile).payload()["known_profile"] == {}
+
+
 def test_path_context_keeps_only_relevant_signals() -> None:
     path = {
         "version": 3,

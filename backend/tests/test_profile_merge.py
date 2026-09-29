@@ -45,6 +45,7 @@ def test_editable_fields_are_a_subset_of_profile_dimensions() -> None:
         "learning_goals",
         "error_preferences",
         "engineering_preference",
+        "cognitive_style",
     }
 
 
@@ -119,6 +120,19 @@ def test_correction_can_fill_a_previously_unknown_field() -> None:
             "profile_version": 2,
         }
     ]
+
+
+def test_explicit_persona_correction_is_scoped_and_has_priority() -> None:
+    profile = merge_explicit_profile_values(
+        "想理解链表", {"cognitive_style": {"visual": True, "preference_persona": "engineering"}},
+        {"cognitive_style": [evidence("explicit_feedback")]},
+    )
+    corrected = apply_manual_correction(
+        profile, {"cognitive_style": {"preference_persona": "academic"}},
+        observed_at=OBSERVED_AT,
+    )
+    assert corrected["cognitive_style"] == {"visual": True, "preference_persona": "academic"}
+    assert corrected["evidence"]["cognitive_style"][-1]["source"] == "manual_correction"
 
 
 @pytest.mark.parametrize(

@@ -46,6 +46,8 @@ function makeProps(overrides: Record<string, unknown> = {}) {
     loadResult: vi.fn().mockResolvedValue(result),
     start: vi.fn().mockResolvedValue(undefined),
     exit: vi.fn().mockResolvedValue(classroom),
+    feedback: vi.fn().mockResolvedValue({ evidence_id: "evidence-1",
+      profile_version: 2, update_status: "updated" }),
     ...overrides,
   };
 }
@@ -97,6 +99,22 @@ describe("DebatePanel", () => {
     expect(wrapper.find('[data-testid="debate-perspectives"] img').exists()).toBe(false);
     expect(start).not.toHaveBeenCalled();
     expect(wrapper.emitted("active")?.at(-1)).toEqual([true]);
+  });
+
+  it("records a perspective only after a deliberate click and refreshes profile", async () => {
+    const feedback = vi.fn().mockResolvedValue({ evidence_id: "evidence-1",
+      profile_version: 2, update_status: "updated" });
+    const wrapper = mountPanel(makeProps({
+      loadSnapshot: vi.fn().mockResolvedValue(debateSnapshot), feedback,
+    }));
+    await flushPromises();
+    expect(feedback).not.toHaveBeenCalled();
+    await wrapper.findAll(".perspectives article")[1].find("button").trigger("click");
+    await flushPromises();
+    expect(feedback).toHaveBeenCalledWith("unit-1", "result-1", "engineering",
+      "csrf", expect.any(String));
+    expect(wrapper.get('[data-testid="perspective-feedback-status"]').text()).toContain("已记录");
+    expect(wrapper.emitted("profileChanged")).toHaveLength(1);
   });
 
   it("keeps the original classroom visible after review rejection", async () => {

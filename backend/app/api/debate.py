@@ -2,6 +2,7 @@
 
 import json
 from collections.abc import AsyncIterator
+from typing import Literal
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Header, Response
@@ -23,6 +24,7 @@ from app.core.auth import AuthenticatedSession, AuthFailure, require_authenticat
 from app.core.database import database_session_factory
 from app.models.learning import utc_now
 from app.services.classroom import ClassroomNotFound, ClassroomVersionConflict
+from app.services.debate_feedback import DebateFeedbackNotFound, record_debate_feedback
 from app.services.debate_publication import (
     DebateAlreadyActive,
     DebateReservation,
@@ -46,6 +48,13 @@ class DebateRequest(BaseModel):
 
     preset: str = Field(pattern="^array-vs-linked-list$")
     question: str = Field(min_length=1, max_length=1000)
+
+
+class PerspectiveFeedback(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    perspective: Literal["performance", "engineering", "academic"]
+    feedback: Literal["helpful"]
 
 
 def _event(name: str, data: dict[str, object]) -> str:
@@ -263,3 +272,30 @@ async def exit_debate_endpoint(
             raise _not_found() from None
     response.headers["Cache-Control"] = "no-store"
     return receipt
+
+
+@router.post("/api/learning-units/{unit_id}/classroom/debate/{result_id}/feedback",
+             status_code=202)
+async def post_debate_feedback(
+    unit_id: UUID, result_id: UUID, payload: PerspectiveFeedback, response: Response,
+    current: AuthenticatedSession = Depends(require_authenticated_session),
+    idempotency_key: str = Header(min_length=16, max_length=128, alias="Idempotency-Key"),
+    sessions: async_sessionmaker[AsyncSession] = Depends(database_session_factory),
+) -> dict[str, object]:
+    async with sessions() as db:
+        try:
+            receipt = await record_debate_feedback(
+                db, owner_id=current.user.id, unit_id=unit_id,
+                result_id=result_id, perspective=payload.perspective,
+                idempotency_key=idempotency_key,
+            )
+        except DebateFeedbackNotFound:
+            raise _not_found() from None
+        except IdempotencyConflict:
+            raise _conflict("IDEMPOTENCY_CONFLICT", "Idempotency key conflicts.") from None
+    response.headers["Cache-Control"] = "no-store"
+    return {
+        "evidence_id": str(receipt.evidence_id),
+        "profile_version": receipt.profile_version,
+        "update_status": receipt.update_status,
+    }

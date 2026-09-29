@@ -76,6 +76,13 @@ export interface DebateResult {
   correction_attempts: number;
 }
 
+export type DebatePerspective = "performance" | "engineering" | "academic";
+export interface PerspectiveReceipt {
+  evidence_id: string;
+  profile_version: number | null;
+  update_status: "updated" | "pending" | "unchanged" | "failed";
+}
+
 export interface StreamDebateOptions {
   unitId: string;
   question: string;
@@ -450,6 +457,24 @@ export async function exitDebate(
     },
   );
   return readJson<ClassroomSnapshot>(response);
+}
+
+export async function submitPerspectiveFeedback(
+  unitId: string, resultId: string, perspective: DebatePerspective,
+  csrfToken: string, idempotencyKey: string, fetchImpl: FetchLike = fetch,
+): Promise<PerspectiveReceipt> {
+  const response = await fetchImpl(
+    `/api/learning-units/${encodeURIComponent(unitId)}/classroom/debate/${encodeURIComponent(resultId)}/feedback`,
+    {
+      method: "POST", credentials: "same-origin",
+      headers: {
+        Accept: "application/json", "Content-Type": "application/json",
+        "X-CSRF-Token": csrfToken, "Idempotency-Key": idempotencyKey,
+      },
+      body: JSON.stringify({ perspective, feedback: "helpful" }),
+    },
+  );
+  return readJson<PerspectiveReceipt>(response);
 }
 
 /** Read committed classroom messages after the given cursor (no temporary tokens). */
