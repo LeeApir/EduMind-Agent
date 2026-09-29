@@ -1456,7 +1456,7 @@
       "id": "MVP-0.3-T030",
       "phase": "MVP 0.3",
       "title": "验证 MVP 0.3 核心集成与非阻塞学习",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.3-T022",
@@ -1479,9 +1479,13 @@
       "verification": [
         "运行完整前后端测试/静态检查/类型/构建及真实浏览器集成，逐项记录失败与跳过。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "隔离 PostgreSQL Alembic head；真实 FastAPI/Vite/Chromium/已审核 Manim 缓存媒体完整旅程通过，模型为确定性 mock，下载三格式非空且未触发新生成。",
+        "backend: uv run pytest tests -q -> 649 passed, 5 skipped (Docker-gated), 9 warnings；Ruff 与 Mypy (95 files) 通过。",
+        "web: pnpm test -> 122 passed；pnpm e2e、pnpm build 通过；ESLint 0 errors、67 既有格式 warnings。异常路径与 MVP 0.2 回归证据见 docs/acceptance/mvp-0.3-t030-core-integration.md。"
+      ],
+      "started_at": "2026-09-29T21:57:10+08:00",
+      "completed_at": "2026-09-29T22:15:45+08:00",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.3-T030"
     },

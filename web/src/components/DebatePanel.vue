@@ -191,14 +191,32 @@ async function run(request: PendingDebate): Promise<void> {
   } finally { if (token === generation) busy.value = false; }
 }
 
-function beginDebate(): void {
+async function beginDebate(): Promise<void> {
   if (!canStart.value || !snapshot.value) return;
-  const request: PendingDebate = {
-    key: crypto.randomUUID(), question: question.value.trim(), revision: snapshot.value.revision,
-  };
-  pending.value = request;
-  save("pending", request);
-  void run(request);
+  const token = generation;
+  busy.value = true;
+  error.value = "";
+  let request: PendingDebate;
+  try {
+    const latest = await props.loadSnapshot(props.unitId);
+    if (token !== generation) return;
+    snapshot.value = latest;
+    if (latest.detour) {
+      error.value = "课堂已有演示，请刷新状态后再试。";
+      return;
+    }
+    request = {
+      key: crypto.randomUUID(), question: question.value.trim(), revision: latest.revision,
+    };
+    pending.value = request;
+    save("pending", request);
+  } catch (failure) {
+    if (token === generation) error.value = explain(failure);
+    return;
+  } finally {
+    if (token === generation) busy.value = false;
+  }
+  if (token === generation) await run(request);
 }
 function retry(): void {
   if (!pending.value || busy.value) return;

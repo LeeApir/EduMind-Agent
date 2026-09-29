@@ -2,7 +2,7 @@
 
 启智学伴：面向数据结构学习的个性化学习系统。
 
-当前阶段：MVP 0.3 任务已拆分，尚未开始实施。MVP 0.2 的 38 项任务已完成并[原样归档](docs/tasks/mvp-0.2.json)；[收尾决定](docs/acceptance/mvp-0.2-closeout-decision.md)保留 Pro 质量/闭环与 Flash 性能的证据边界，独立教学首 token 目标转为非阻塞后续优化。MVP 0.3 的 34 项任务见根目录 [task.json](task.json)，包括两个链表动画模板、专注/互动、多视角演示与导出；这些新增能力尚未实现。
+当前阶段：MVP 0.3 集成验收中，已实现两个链表动画模板、专注/互动课堂、数组与链表多视角演示及 Markdown/MP4/SRT 导出；任务状态以根目录 [task.json](task.json) 为准。MVP 0.2 的 38 项任务已完成并[原样归档](docs/tasks/mvp-0.2.json)；[收尾决定](docs/acceptance/mvp-0.2-closeout-decision.md)保留 Pro 质量/闭环与 Flash 性能的证据边界，独立教学首 token 目标转为非阻塞后续优化。
 学习链路连接一句话目标、10 节点知识结构、渐进画像、正式资源审核、服务端测验、
 掌握度与可解释推荐。计分题只使用明确格式的客观唯一答案；不让 LLM 判定对错。
 阶段状态与失败/修复证据见 [MVP 0.2 验收记录](docs/acceptance/mvp-0.2-stage-acceptance.md)。架构决定的批准状态、待决项及后续入口见 [ADR 索引](docs/ADR/README.md)。
@@ -114,7 +114,7 @@ pnpm --dir web install --frozen-lockfile
 pnpm --dir web e2e
 ```
 
-该套件使用浏览器路由级 mock API，稳定覆盖一句话开始、临时首段、正式讲解/代码/三道练习、Provider 故障、审核拒绝和 SSE 异常后的持久化操作恢复，不会调用或计费真实 Provider。后端 Provider、审核门禁、幂等和恢复逻辑由 `backend/tests/test_learning_sessions.py` 的隔离 PostgreSQL 测试覆盖。真实 Provider 和首段 P95 性能不由 mock 结果替代，需要按冻结计划、实际模型和批准预算单独验收；MVP 0.2 已有证据见收尾决定，MVP 0.3 的新增真实验收安排在 T033，尚未执行。
+该套件使用浏览器路由级 mock API，稳定覆盖一句话开始、正式资源、课堂模式与多视角、练习、文件下载、Provider 故障、审核拒绝和 SSE 异常恢复，不会调用或计费真实 Provider。隔离 PostgreSQL 后端测试负责审核、owner、幂等和持久恢复。真实前后端集成需要另外运行 `web/tests/e2e/real_stage_flow.py`：先迁移隔离测试库、准备已审核的真实模板媒体缓存，再设置 `EDUMIND_TEST_DATABASE_URL` 和 `EDUMIND_DATABASE_URL` 指向该库，从 `backend/` 执行 `uv run python ../web/tests/e2e/real_stage_flow.py`。这条流程使用确定性 mock Provider，不能替代真实模型质量或首段 P95 验收；真实模型证据由 T033 单独记录。
 
 ## MVP 0.2 验证入口
 

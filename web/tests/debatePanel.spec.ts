@@ -86,6 +86,22 @@ describe("DebatePanel", () => {
     expect(wrapper.get('[data-testid="start-debate"]').exists()).toBe(true);
   });
 
+  it("uses the current classroom revision after mode and speech changed it", async () => {
+    const loadSnapshot = vi.fn()
+      .mockResolvedValueOnce(classroom)
+      .mockResolvedValueOnce({ ...classroom, revision: 5, message_cursor: 8 });
+    const start = vi.fn().mockRejectedValue(new ClassroomSpeechError({
+      message: "review unavailable", code: "REVIEW_UNAVAILABLE", retryable: true,
+    }));
+    const wrapper = mountPanel(makeProps({ loadSnapshot, start }));
+    await flushPromises();
+    await wrapper.get('[data-testid="debate-question"]').setValue("随机访问怎么选？");
+    await wrapper.get('[data-testid="start-debate"]').trigger("click");
+    await flushPromises();
+    expect(start).toHaveBeenCalledWith(expect.objectContaining({ revision: 5 }));
+    expect(wrapper.get('[data-testid="debate-error"]').text()).toContain("审核暂时不可用");
+  });
+
   it("restores a published result after refresh without generating again and escapes model text", async () => {
     const malicious = { ...result, perspectives: { ...result.perspectives,
       performance: '<img src=x onerror="alert(1)">' } };
