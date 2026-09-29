@@ -97,6 +97,7 @@ export async function retryAnimationJob(
   return readJob(response);
 }
 
-export function mediaUrl(mediaId: string, extension: "mp4" | "srt"): string {
-  return `/api/animation-media/${encodeURIComponent(mediaId)}/${extension}`;
+export function mediaUrl(mediaId: string, extension: "mp4" | "srt", download = false): string {
+  const url = `/api/animation-media/${encodeURIComponent(mediaId)}/${extension}`;
+  return download ? `${url}?download=true` : url;
 }

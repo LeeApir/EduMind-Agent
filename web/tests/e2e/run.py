@@ -37,11 +37,13 @@ def main() -> None:
     try:
         wait_for_server()
         os.environ["EDUMIND_E2E_BASE_URL"] = environment["EDUMIND_E2E_BASE_URL"]
-        from learning_flow import run
         from debate_flow import run as run_debate
+        from export_flow import run as run_export
+        from learning_flow import run
 
         run()
         run_debate()
+        run_export()
     finally:
         process.terminate()
         try:

@@ -6,8 +6,10 @@ import {
   cancelAnimationJob, loadAnimationJob, mediaUrl, requestAnimation, retryAnimationJob,
   type AnimationJob, type AnimationRequest, type AnimationStatus, type AnimationTemplateId,
 } from "../api/animationJobs";
+import { DownloadError, downloadFile } from "../api/downloads";
 
 interface StoredRequest {
+  sceneId?: string;
   requestKey: string;
   request: AnimationRequest;
   jobId?: string;
@@ -20,6 +22,8 @@ const props = defineProps<{
   unitId: string;
   nodeId: string;
   sceneVersion: number;
+  sceneId?: string;
+  sceneKey?: string;
   csrfToken: string;
 }>();
 
@@ -28,6 +32,9 @@ const phase = ref<"idle" | "requesting" | "recovering" | "acting" | "reconnectin
 const error = ref("");
 const subtitleError = ref("");
 const subtitleUrl = ref("");
+const downloadError = ref("");
+const downloading = ref<"mp4" | "srt" | "">("");
+const missingMedia = ref<"mp4" | "srt" | "">("");
 let active: StoredRequest | null = null;
 let source: EventSource | null = null;
 let generation = 0;
@@ -45,21 +52,32 @@ const exampleLabel = computed(() => props.nodeId === "linked-list-insertion"
   ? "在 [1, 3, 5] 的第 1 位插入 4"
   : "删除 [1, 3, 5] 的第 1 位元素");
 
-function storageKey(unitId: string): string { return `edumind:animation:${unitId}`; }
+function storageKey(unitId: string, sceneId = props.sceneId): string {
+  return `edumind:animation:${unitId}${sceneId ? `:${sceneId}` : ""}`;
+}
 
 function save(unitId: string, value: StoredRequest): void {
-  try { sessionStorage.setItem(storageKey(unitId), JSON.stringify(value)); } catch { /* Optional browser storage. */ }
+  try { sessionStorage.setItem(storageKey(unitId, value.sceneId), JSON.stringify(value)); } catch { /* Optional browser storage. */ }
 }
 
 function restore(unitId: string): StoredRequest | null {
   try {
-    const raw = sessionStorage.getItem(storageKey(unitId));
+    const currentKey = storageKey(unitId);
+    const legacyKey = storageKey(unitId, "");
+    const raw = sessionStorage.getItem(currentKey)
+      ?? (props.sceneKey === "intro" ? sessionStorage.getItem(legacyKey) : null);
     if (!raw) return null;
     const value = JSON.parse(raw) as Partial<StoredRequest>;
     if (typeof value.requestKey !== "string" || !value.request || typeof value.request !== "object") return null;
     if (value.request.template_id !== "linked-list-insertion" && value.request.template_id !== "linked-list-deletion") return null;
     if (value.request.scene_version !== props.sceneVersion || value.request.template_id !== props.nodeId) return null;
+    if (value.sceneId && value.sceneId !== props.sceneId) return null;
     if (typeof value.jobId !== "undefined" && typeof value.jobId !== "string") return null;
+    if (props.sceneId && !value.sceneId) {
+      value.sceneId = props.sceneId;
+      sessionStorage.setItem(currentKey, JSON.stringify(value));
+      sessionStorage.removeItem(legacyKey);
+    }
     return value as StoredRequest;
   } catch { return null; }
 }
@@ -82,6 +100,30 @@ function clearSubtitle(): void {
   subtitleError.value = "";
 }
 
+async function downloadMedia(extension: "mp4" | "srt"): Promise<void> {
+  const mediaId = job.value?.media_id;
+  if (job.value?.status !== "succeeded" || !mediaId || downloading.value) return;
+  const token = generation;
+  downloading.value = extension;
+  downloadError.value = "";
+  try {
+    await downloadFile(mediaUrl(mediaId, extension, true), `animation-${mediaId}.${extension}`,
+      () => token === generation && job.value?.media_id === mediaId);
+    if (token === generation && missingMedia.value === extension) missingMedia.value = "";
+  } catch (failure) {
+    if (token === generation && job.value?.media_id === mediaId) {
+      downloadError.value = failure instanceof DownloadError && failure.code === "unavailable"
+        ? `${extension.toUpperCase()} 文件缺失，请重新请求动画。`
+        : `${extension.toUpperCase()} 下载失败，请重试下载。`;
+      if (failure instanceof DownloadError && failure.code === "unavailable") {
+        missingMedia.value = extension;
+      }
+    }
+  } finally {
+    if (token === generation) downloading.value = "";
+  }
+}
+
 async function loadSubtitle(mediaId: string, token: number): Promise<void> {
   clearSubtitle();
   try {
@@ -100,6 +142,10 @@ function applyJob(next: AnimationJob, token: number): void {
   if (token !== generation || next.learning_unit_id !== props.unitId) return;
   const oldMediaId = job.value?.media_id;
   job.value = next;
+  if (next.media_id !== oldMediaId || next.status !== "succeeded") {
+    downloadError.value = "";
+    missingMedia.value = "";
+  }
   phase.value = "idle";
   error.value = "";
   if (next.status === "succeeded" && next.media_id && next.media_id !== oldMediaId) {
@@ -128,6 +174,10 @@ function applyEvent(type: AnimationStatus | "progress" | "recovered", event: Mes
     updated.error = { code: data.code, message: "动画暂不可用。", retryable: true };
   }
   job.value = updated;
+  if (updated.media_id !== oldMediaId || updated.status !== "succeeded") {
+    downloadError.value = "";
+    missingMedia.value = "";
+  }
   if (type === "succeeded" && updated.media_id && updated.media_id !== oldMediaId) {
     void loadSubtitle(updated.media_id, token);
   }
@@ -192,12 +242,22 @@ async function sendInitial(record: StoredRequest, unitId: string, token: number)
 
 function openAnimation(): void {
   if (!supported.value || !props.csrfToken || busy.value || job.value) return;
-  const record: StoredRequest = { requestKey: crypto.randomUUID(), request: requestForScene() };
+  const record: StoredRequest = { sceneId: props.sceneId, requestKey: crypto.randomUUID(), request: requestForScene() };
   active = record;
   save(props.unitId, record);
   phase.value = "requesting";
   error.value = "";
   void sendInitial(record, props.unitId, generation);
+}
+
+function requestMissingMedia(): void {
+  if (!missingMedia.value || !props.csrfToken || busy.value) return;
+  closeSource();
+  job.value = null;
+  active = null;
+  missingMedia.value = "";
+  downloadError.value = "";
+  openAnimation();
 }
 
 function recoverRequest(): void {
@@ -262,10 +322,13 @@ async function restoreCurrent(unitId: string, token: number): Promise<void> {
   else if (props.csrfToken) await sendInitial(stored, unitId, token);
 }
 
-watch(() => [props.unitId, props.nodeId, props.sceneVersion], () => {
+watch(() => [props.unitId, props.nodeId, props.sceneVersion, props.sceneId], () => {
   generation += 1;
   closeSource();
   clearSubtitle();
+  downloadError.value = "";
+  downloading.value = "";
+  missingMedia.value = "";
   active = null;
   job.value = null;
   phase.value = "idle";
@@ -404,7 +467,46 @@ onBeforeUnmount(() => {
       >
         {{ subtitleError }}
       </p>
+      <div
+        class="download-actions"
+        aria-label="动画文件下载"
+      >
+        <NButton
+          data-testid="download-mp4"
+          :disabled="Boolean(downloading)"
+          @click="downloadMedia('mp4')"
+        >
+          {{ downloading === 'mp4' ? '正在下载…' : '下载 MP4' }}
+        </NButton>
+        <NButton
+          data-testid="download-srt"
+          :disabled="Boolean(downloading)"
+          @click="downloadMedia('srt')"
+        >
+          {{ downloading === 'srt' ? '正在下载…' : '下载 SRT 字幕' }}
+        </NButton>
+      </div>
+      <p
+        v-if="downloadError"
+        role="alert"
+      >
+        {{ downloadError }}
+      </p>
+      <NButton
+        v-if="missingMedia"
+        data-testid="request-missing-animation"
+        :disabled="busy"
+        @click="requestMissingMedia"
+      >
+        重新请求动画
+      </NButton>
     </div>
+    <p
+      v-else-if="job && job.status !== 'succeeded'"
+      class="animation-hint"
+    >
+      {{ job.status === 'failed' ? '动画生成失败，暂无已审核文件可下载。' : '动画尚未审核完成，暂无文件可下载。' }}
+    </p>
     <p class="animation-hint">
       动画是可选补充。讲解、代码和练习始终可以继续。
     </p>

@@ -1421,7 +1421,7 @@
       "id": "MVP-0.3-T029",
       "phase": "MVP 0.3",
       "title": "接通笔记与动画下载入口",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.3-T015",
@@ -1442,9 +1442,13 @@
       "verification": [
         "运行组件测试及真实后端下载浏览器验证，核对 Markdown/媒体/字幕文件。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "前端全量 Vitest 121 passed；pnpm build / Vue 类型检查与改动文件 ESLint 通过",
+        "Chromium 路由模拟移动端/键盘 Markdown、MP4、SRT 下载字节/文件名与历史场景隔离通过；pnpm e2e 通过",
+        "隔离 PostgreSQL 真实 FastAPI/Vite/Chromium 三格式下载与文件名/版本/原始字节通过，重复运行通过；Ruff 与 git diff --check 通过；见 docs/acceptance/mvp-0.3-t029-download-ui.md"
+      ],
+      "started_at": "2026-09-29T21:36:22+08:00",
+      "completed_at": "2026-09-29T21:55:45+08:00",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.3-T029"
     },

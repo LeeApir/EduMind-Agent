@@ -134,6 +134,30 @@ describe("on-demand animation panel", () => {
     wrapper.unmount();
   });
 
+  it("isolates downloads when two selected scenes share a node and version", async () => {
+    sessionStorage.setItem("edumind:animation:unit-1:scene-a", JSON.stringify({
+      sceneId: "scene-a", requestKey: "old-key", jobId: "job-a",
+      request: { template_id: "linked-list-insertion", template_version: "1.0.0", scene_version: 1,
+        parameters: { values: [1, 3, 5], index: 1, value: 4 } },
+    }));
+    vi.mocked(loadAnimationJob).mockResolvedValue({ ...queued, id: "job-a", status: "succeeded", media_id: "media-a" });
+    vi.stubGlobal("fetch", vi.fn(async () => new Response("subtitles")));
+    Object.defineProperty(URL, "createObjectURL", { value: vi.fn(() => "blob:subtitle"), configurable: true });
+    Object.defineProperty(URL, "revokeObjectURL", { value: vi.fn(), configurable: true });
+    const wrapper = mount(AnimationPanel, {
+      props: { unitId: "unit-1", nodeId: "linked-list-insertion", sceneVersion: 1,
+        sceneId: "scene-a", sceneKey: "intro", csrfToken: "csrf" }, global: { stubs },
+    });
+    await flushPromises();
+    expect(wrapper.get("video source").attributes("src")).toContain("media-a");
+    await wrapper.setProps({ sceneId: "scene-b" });
+    await flushPromises();
+    expect(wrapper.find('[data-testid="download-mp4"]').exists()).toBe(false);
+    expect(wrapper.find('[data-testid="request-animation"]').exists()).toBe(true);
+    expect(loadAnimationJob).toHaveBeenCalledTimes(1);
+    wrapper.unmount();
+  });
+
   it("uses the MP4 endpoint and converts authenticated SRT to a VTT track", async () => {
     const completed = { ...queued, status: "succeeded" as const, media_id: "media-1", progress: 1 };
     vi.mocked(requestAnimation).mockResolvedValue(completed);
@@ -156,6 +180,65 @@ describe("on-demand animation panel", () => {
     expect(caption).toContain("WEBVTT\n\n1\n00:00:00.000 --> 00:00:01.000");
     wrapper.unmount();
     expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:subtitle");
+  });
+
+  it("downloads the reviewed MP4/SRT pair by media ID and retries a missing file without a new Job", async () => {
+    const completed = { ...queued, status: "succeeded" as const, media_id: "media-1", progress: 1 };
+    vi.mocked(requestAnimation).mockResolvedValue(completed);
+    const requests: string[] = [];
+    const fetchImpl = vi.fn(async (input: RequestInfo | URL) => {
+      const url = String(input);
+      requests.push(url);
+      if (url.endsWith("/mp4?download=true") && requests.filter((item) => item === url).length === 1) {
+        return new Response("unavailable", { status: 503 });
+      }
+      return new Response(url.endsWith("/mp4?download=true") ? "mp4-bytes" : "srt-bytes", {
+        headers: { "Content-Disposition": `attachment; filename="animation-media-1.${url.includes("/mp4") ? "mp4" : "srt"}"` },
+      });
+    });
+    vi.stubGlobal("fetch", fetchImpl);
+    Object.defineProperty(URL, "createObjectURL", { value: vi.fn(() => "blob:media"), configurable: true });
+    Object.defineProperty(URL, "revokeObjectURL", { value: vi.fn(), configurable: true });
+    const click = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => {});
+    const wrapper = mountPanel();
+    await wrapper.get('[data-testid="request-animation"]').trigger("click");
+    await flushPromises();
+    expect(wrapper.get('[data-testid="download-mp4"]').text()).toContain("MP4");
+    await wrapper.get('[data-testid="download-mp4"]').trigger("click");
+    await flushPromises();
+    expect(wrapper.get('[role="alert"]').text()).toContain("文件缺失");
+    await wrapper.get('[data-testid="download-mp4"]').trigger("click");
+    await flushPromises();
+    await wrapper.get('[data-testid="download-srt"]').trigger("click");
+    await flushPromises();
+    expect(requests).toContain("/api/animation-media/media-1/mp4?download=true");
+    expect(requests).toContain("/api/animation-media/media-1/srt?download=true");
+    expect(click).toHaveBeenCalledTimes(2);
+    expect(requestAnimation).toHaveBeenCalledTimes(1);
+    expect(retryAnimationJob).not.toHaveBeenCalled();
+    wrapper.unmount();
+    click.mockRestore();
+  });
+
+  it("offers an explicit new animation request only after verified media is unavailable", async () => {
+    const completed = { ...queued, status: "succeeded" as const, media_id: "media-1", progress: 1 };
+    vi.mocked(requestAnimation).mockResolvedValueOnce(completed).mockResolvedValueOnce({ ...queued, id: "job-2" });
+    vi.stubGlobal("fetch", vi.fn(async (input: RequestInfo | URL) =>
+      new Response("unavailable", { status: String(input).includes("?download=true") ? 503 : 200 })));
+    Object.defineProperty(URL, "createObjectURL", { value: vi.fn(() => "blob:subtitle"), configurable: true });
+    Object.defineProperty(URL, "revokeObjectURL", { value: vi.fn(), configurable: true });
+    const wrapper = mountPanel();
+    await wrapper.get('[data-testid="request-animation"]').trigger("click");
+    await flushPromises();
+    await wrapper.get('[data-testid="download-mp4"]').trigger("click");
+    await flushPromises();
+    expect(wrapper.get('[data-testid="request-missing-animation"]').text()).toContain("重新请求动画");
+    await wrapper.get('[data-testid="request-missing-animation"]').trigger("click");
+    await flushPromises();
+    expect(requestAnimation).toHaveBeenCalledTimes(2);
+    expect(vi.mocked(requestAnimation).mock.calls[0][3]).not.toBe(vi.mocked(requestAnimation).mock.calls[1][3]);
+    expect(wrapper.text()).toContain("排队中");
+    wrapper.unmount();
   });
 
   it("keeps a clicked request key for recovery after a lost response", async () => {

@@ -14,6 +14,7 @@ import AnimationPanel from "./components/AnimationPanel.vue";
 import ClassroomPanel from "./components/ClassroomPanel.vue";
 import DebatePanel from "./components/DebatePanel.vue";
 import LearningControlsPanel from "./components/LearningControlsPanel.vue";
+import NotesDownload from "./components/NotesDownload.vue";
 import { ClassroomSpeechError, controlClassroom, loadClassroom, type LearningResourceType } from "./api/classroom";
 
 type StartLearningRequest = (goal: string) => Promise<void>;
@@ -498,6 +499,11 @@ function stringValue(value: unknown): string {
         :select-resource="selectResource"
         @quiz-submitted="handleQuizSubmitted"
       />
+      <NotesDownload
+        v-if="resources.length && learningUnitId"
+        :unit-id="learningUnitId"
+        :current="Boolean(selectedScene?.isCurrent)"
+      />
       <LearningControlsPanel
         v-if="resources.length && learningUnitId && csrfToken"
         :unit-id="learningUnitId"
@@ -513,6 +519,8 @@ function stringValue(value: unknown): string {
         :unit-id="learningUnitId"
         :node-id="animationNodeId"
         :scene-version="animationSceneVersion"
+        :scene-id="selectedSceneId"
+        :scene-key="selectedScene?.sceneKey"
         :csrf-token="csrfToken"
       />
       <ClassroomPanel
