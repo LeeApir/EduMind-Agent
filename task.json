@@ -1049,7 +1049,7 @@
       "id": "MVP-0.3-T019",
       "phase": "MVP 0.3",
       "title": "提供分级审核的课堂流式发言",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.3-T004",
@@ -1070,9 +1070,15 @@
       "verification": [
         "运行轻量/升级审核、拒绝/Provider失败、SSE分块/重连/重复提交/模式竞态测试。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "test_classroom_speech_rules.py 15 项通过：版本固定、中文/英文指令劫持、系统提示词/执行代码/凭据/破坏性请求升级、危险生成原语升级、指针代码不误报、合并去重。",
+        "test_classroom_speech_review.py 6 项通过：pass 放行、revise/reject 收回、Provider 失败与非法 review schema 均映射 unavailable，且请求固定 prompt/instruction/schema 版本。",
+        "test_classroom_speech_api.py 11 项通过（隔离 PostgreSQL）：低风险 SSE 分块无损重组+student/tutor 消息持久化、高风险升级拒绝/不可用 content_retracted 无 token、升级但通过照常发布、编排失败 error+done、同键幂等重放无 token、409 版本冲突、消息游标分页/越界 409、owner 隔离 404、CSRF/Origin 403、切模式中旧 commit 降级 superseded。",
+        "ruff check app tests 通过；strict mypy app 84 源文件通过；test_mvp03_openapi_contract.py 7 项通过（含 token.data.role 契约补记）；课堂相关测试合计 73 项通过。",
+        "全量后端 557 通过/48 失败/5 跳过；48 失败均为既有环境非回归（动画/链表模板 CRLF 摘要不匹配、首屏毫秒计时抖动、Docker 镜像缺失），与 T017/T018 记录一致；0 Provider 实调。"
+      ],
+      "started_at": "2026-09-29T08:41:00",
+      "completed_at": "2026-09-29T08:57:33",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.3-T019"
     },
