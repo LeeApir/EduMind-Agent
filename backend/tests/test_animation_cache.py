@@ -58,6 +58,17 @@ def test_prepared_public_asset_is_hit_without_owner_data(tmp_path: Path) -> None
     assert "owner" not in metadata and "cookie" not in metadata.lower()
 
 
+def test_shared_cache_root_is_used_by_independent_processes(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("EDUMIND_ANIMATION_CACHE_ROOT", str(tmp_path))
+    calls: list[str] = []
+    AnimationCache(renderer=fake_renderer(calls)).resolve("linked-list-insertion", INSERT)
+    media = AnimationCache(renderer=fake_renderer(calls)).lookup("linked-list-insertion", INSERT)
+    assert media is not None and media.cache_hit
+    assert calls == ["linked-list-insertion"]
+
+
 def test_corrupt_media_or_review_metadata_is_never_a_hit(tmp_path: Path) -> None:
     calls: list[str] = []
     cache = AnimationCache(tmp_path, renderer=fake_renderer(calls))

@@ -1493,7 +1493,7 @@
       "id": "MVP-0.3-T031",
       "phase": "MVP 0.3",
       "title": "验证容器重启后的课堂与 Job 恢复",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.3-T030"
@@ -1513,9 +1513,13 @@
       "verification": [
         "构建隔离 Compose，迁移、seed、重启、check；在途/已完成/已取消三类任务分别检查。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "独立 Compose 项目/卷与临时媒体目录空库迁移至 head；PostgreSQL/API 真实重启后课堂 revision 2、模式/角色、Markdown、已完成及已取消 Job 和 MP4/SRT 摘要保持一致。",
+        "宿主 Worker 重启回收在途租约，固定 Manim 镜像真实渲染 attempt 2 并发布；旧 attempt 发布返回 false，取消 Job 不重开；最终镜像重建后二次读取通过。",
+        "docker compose config --quiet、Ruff、Mypy 通过；隔离库相关测试 22 passed、3 Docker-gated skipped。证据与复现命令见 docs/acceptance/mvp-0.3-t031-compose-recovery.md。"
+      ],
+      "started_at": "2026-09-29T22:17:00+08:00",
+      "completed_at": "2026-09-29T22:33:26+08:00",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.3-T031"
     },

@@ -581,3 +581,7 @@ T022/T025/T026/T029均已完成提交且工作区干净，领取MVP 0.3核心集
 用户明确批准T030读取测试容器凭据并新建隔离数据库，解除自动审批阻塞 | 已有完整旅程脚本与无DB回归/静态检查，数据库全量与真实浏览器尚待运行 | 仅在进程内传递测试库连接信息，真实Provider仍为mock | 新建迁移独立库，运行真实集成与全量回归后自查提交
 [2026-09-29T22:15:45] [MVP-0.3-T030] VERIFIED | executor=Lee
 隔离PG真实前后端完整旅程通过，修复辩论旧revision 409并加回归；覆盖课堂、练习、真实缓存模板播放和三格式下载 | 后端649通过/5项Docker-gated跳过，前端122通过、pnpm e2e/构建、Ruff/Mypy/ESLint通过；异常矩阵及命令见docs/acceptance/mvp-0.3-t030-core-integration.md；真实Provider未调用 | 5项Docker-gated渲染/Worker用例由T031/T032专项验证，T033真实模型质量待预算授权 | 自查diff并本地完成提交后领取T031；不push/merge
+[2026-09-29T22:17:00] [MVP-0.3-T031] START | executor=Lee | branch=codex/mvp-0.3
+T030已完成提交且工作区干净，领取隔离Compose重启恢复验收 | 现有Compose仅挂知识图谱，未把动画缓存挂给API；渲染Worker为宿主独立进程且需Docker CLI | 使用独立Compose项目与媒体目录避免触碰开发卷，保持Worker与API分离和已批准容器隔离边界 | 修正媒体部署说明与挂载，建立课堂/Job/导出跨重启检查并真实执行
+[2026-09-29T22:33:26] [MVP-0.3-T031] VERIFIED | executor=Lee
+修正容器仓库目录与只读媒体挂载，固定基础镜像摘要并文档化宿主独立Worker及成对备份；真实重启PG/API/Worker验收课堂与三类Job | 独立Compose迁移、seed、重启、check通过；在途attempt2真实Manim发布，旧attempt拒绝，取消不重开；最终镜像重建复查、相关22通过/3项Docker开关跳过、Ruff/Mypy/Compose配置通过；证据docs/acceptance/mvp-0.3-t031-compose-recovery.md | 批量模板可用率与性能归T032，真实Provider质量仍归T033；隔离项目已down且保留独立证据卷 | 自查并本地完成提交后领取T032；不push/merge

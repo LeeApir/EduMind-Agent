@@ -93,7 +93,9 @@ class AnimationCache:
         renderer: Callable[..., RenderedCandidate] = render_template,
         runtime_factory: Callable[[str], RuntimeIdentity] = runtime_identity,
     ) -> None:
-        self.root = root or ROOT / "data" / "videos" / "cache" / "approved"
+        configured_root = os.getenv("EDUMIND_ANIMATION_CACHE_ROOT")
+        default_root = ROOT / "data" / "videos" / "cache" / "approved"
+        self.root = root or (Path(configured_root) if configured_root else default_root)
         self.renderer = renderer
         self.runtime_factory = runtime_factory
 

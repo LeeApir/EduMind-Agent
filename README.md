@@ -59,7 +59,16 @@ curl --fail http://127.0.0.1:8000/health
 curl --fail http://127.0.0.1:5173/
 ```
 
-PostgreSQL 仅在 Compose 内部网络开放；API、Web 分别暴露为 8000、5173。Compose 会先等待数据库与 API 健康检查，API 启动时自动执行 `alembic upgrade head`。仅检查健康状态时不需要 Provider 凭据；实际学习生成需要在 `.env` 设置三项 `EDUMIND_PROVIDER_*`。
+PostgreSQL 仅向宿主回环地址的 15432 端口开放，供独立动画 Worker 连接；API、Web 分别仅在回环地址暴露 8000、5173。端口可用 `EDUMIND_POSTGRES_PORT`、`EDUMIND_API_PORT`、`EDUMIND_WEB_PORT` 覆盖。Compose 会先等待数据库与 API 健康检查，API 启动时自动执行 `alembic upgrade head`。仅检查健康状态时不需要 Provider 凭据；实际学习生成需要在 `.env` 设置三项 `EDUMIND_PROVIDER_*`。
+
+MVP 0.3 动画 Worker 是宿主机上的独立进程，需要可用的 Docker CLI、已拉取的固定 Manim 镜像和仅含本地数据库 URL 的私有 `.env.worker`（不要提交）。先创建可写媒体目录 `mkdir -p data/videos/cache/approved`；Compose 以只读方式把同一目录挂给 API，Worker 在宿主机写入经审核媒体。`.env.worker` 中将 `EDUMIND_DATABASE_URL` 指向 `127.0.0.1:15432/edumind_dev`，然后另开终端运行：
+
+```bash
+cd backend
+uv run --env-file ../.env.worker python scripts/run_animation_worker.py
+```
+
+Worker 不接收 Provider 密钥；渲染时启动的固定 Manim 容器不挂 Docker socket、数据库或媒体库。只启动 API 而不启动 Worker 时，缓存命中仍可读，但新动画 Job 会保持排队。Worker 重启先回收过期租约，最多自动尝试两次；取消或旧尝试的迟到结果不能重新发布。隔离 Compose 重启实测见 [T031 验收记录](docs/acceptance/mvp-0.3-t031-compose-recovery.md)。
 
 仓库示例配置使用 DeepSeek Responses API、`https://api.deepseek.com` 和 `deepseek-flash`；实际模型以服务端配置及验收记录为准，示例不代表该模型通过所有质量指标。API Key 只留在服务端 `.env`，不要提交或放入浏览器。支持的传输与安全边界见 [Provider 说明](docs/PROVIDERS.md)。
 
@@ -80,21 +89,23 @@ docker compose build
 
 ## 本地数据备份与恢复
 
-Compose 使用命名卷 `edumind_postgres_data` 保存 PostgreSQL 数据。日常重启使用
+Compose 使用命名卷 `edumind_postgres_data` 保存 PostgreSQL 数据，动画媒体默认保存在宿主 `data/videos/cache`（可通过 `EDUMIND_MEDIA_CACHE_HOST_PATH` 改为绝对路径）。该目录须由 Worker 用户可写、API 可读；不要让 API 写入或直接公开为静态目录。日常重启使用
 `docker compose restart`，或停止后重新 `docker compose up -d`；两者都会保留该卷。
-在升级镜像或迁移前，建议先导出逻辑备份：
+在升级镜像或迁移前，建议先导出逻辑备份，并同时复制媒体缓存的 `approved/entries` 与 `approved/objects`（其余临时尝试目录不作为恢复数据）：
 
 ```bash
 docker compose exec -T postgres pg_dump -U edumind -d edumind_dev > edumind_dev-backup.sql
+tar -C data/videos/cache -cf edumind-media-backup.tar approved/entries approved/objects
 ```
 
 恢复到已经启动的本地数据库时：
 
 ```bash
 docker compose exec -T postgres psql -U edumind -d edumind_dev < edumind_dev-backup.sql
+tar -C data/videos/cache -xf edumind-media-backup.tar
 ```
 
-`docker compose down` 不会删除数据卷；`docker compose down -v` 会删除它，只应在明确放弃本地数据后使用。当前 Compose 配置没有自动备份、跨主机复制或生产级灾备；备份文件可能包含学习数据，应保存在受保护位置且不得提交到 Git。
+数据库和媒体须按同一时间点成对备份/恢复；恢复后核对 API owner 授权及 MP4/SRT 摘要。`docker compose down` 不会删除数据卷或宿主媒体；`docker compose down -v` 会删除数据库卷，只应在明确放弃本地数据后使用。当前 Compose 配置没有自动备份、跨主机复制或生产级灾备；备份文件可能包含学习数据，应保存在受保护位置且不得提交到 Git。
 
 ## 浏览器 E2E
 
