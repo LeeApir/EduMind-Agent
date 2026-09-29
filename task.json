@@ -1150,6 +1150,40 @@
       "commit_lookup": "Task-Completed: MVP-0.3-T021"
     },
     {
+      "id": "MVP-0.3-T035",
+      "phase": "MVP 0.3",
+      "title": "实现课堂学习控制 API",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.3-T004",
+        "MVP-0.3-T017",
+        "MVP-0.3-T021"
+      ],
+      "scope": [
+        "backend/app/",
+        "backend/tests/",
+        "docs/"
+      ],
+      "prd_source": "PRD §3.3、ADR-0005 决定 C",
+      "acceptance_criteria": [
+        "暂停/继续与跳过以 owner、revision 和幂等键持久化，切换生成代际以阻止迟到发言；跳过只推进场景进度，不伪造掌握度。",
+        "资源选择只接受当前已发布资源并记录既有学习行为证据；动画仍需显式请求 Job。",
+        "补前置按已审核图谱及当前路径保存返回点，失败保留原课堂；重复、并发和越权请求可验证。"
+      ],
+      "verification": [
+        "独立 PostgreSQL 测试暂停/继续/跳过/资源选择/补前置的幂等、CAS、证据和 owner 门禁；验证 OpenAPI 与后端回归。"
+      ],
+      "verification_results": [
+        "独立 PostgreSQL 定向 26 通过、后端全量 617 通过5跳过；Ruff、Mypy strict 86源、OpenAPI/task JSON解析及diff检查通过；0真实Provider调用。",
+        "暂停/继续、跳过、资源选择、补前置的幂等原回执、owner隔离、revision CAS、并发冲突、审核资源门禁、学习证据和返回点由 tests/test_classroom_controls_api.py 验证；证据 docs/acceptance/mvp-0.3-t035-classroom-controls.md。"
+      ],
+      "started_at": "2026-09-29T10:40:02",
+      "completed_at": "2026-09-29T10:49:04",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.3-T035"
+    },
+    {
       "id": "MVP-0.3-T022",
       "phase": "MVP 0.3",
       "title": "接通学习控制与场景版本界面",
@@ -1157,7 +1191,8 @@
       "priority": "P0",
       "depends_on": [
         "MVP-0.3-T020",
-        "MVP-0.3-T021"
+        "MVP-0.3-T021",
+        "MVP-0.3-T035"
       ],
       "scope": [
         "web/src/",

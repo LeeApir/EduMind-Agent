@@ -25,6 +25,7 @@ from app.agents.learning_unit_generator import (
     LearningUnitGenerator,
     ResourceGenerationFailure,
 )
+from app.agents.profile_events import ProfileEventSchemaError
 from app.agents.review_agent import ReviewAgent
 from app.agents.tutor_agent import TutorAgent
 from app.api.knowledge_graph import knowledge_graph_repository
@@ -41,6 +42,11 @@ from app.services.classroom import (
     create_classroom,
     owned_classroom,
     set_classroom_mode,
+)
+from app.services.classroom_controls import (
+    ClassroomControlConflict,
+    ClassroomControlInvalid,
+    apply_classroom_control,
 )
 from app.services.classroom_speech import (
     classroom_message_payload,
@@ -87,6 +93,14 @@ class ReexplanationRequest(BaseModel):
 
     action: Literal["simpler", "deeper", "another_example"]
     base_scene_version: int = Field(ge=1)
+
+
+class LearningControl(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    action: Literal["pause", "resume", "skip", "prerequisite", "select_resource"]
+    resource_type: Literal["explanation", "code", "exercise", "animation"] | None = None
+    target_node_id: str | None = Field(default=None, min_length=2, max_length=64)
 
 
 def _not_found() -> AuthFailure:
@@ -189,6 +203,46 @@ async def set_classroom_mode_endpoint(
             raise AuthFailure(
                 422, "VALIDATION_ERROR", "Focus mode enables no companion roles."
             ) from None
+    response.headers["Cache-Control"] = "no-store"
+    return receipt
+
+
+@router.post("/api/learning-units/{unit_id}/classroom/controls")
+async def control_classroom(
+    unit_id: UUID, payload: LearningControl, response: Response,
+    current: AuthenticatedSession = Depends(require_authenticated_session),
+    idempotency_key: str = Header(min_length=16, max_length=128, alias="Idempotency-Key"),
+    if_match_revision: int = Header(ge=1, alias="If-Match-Classroom-Revision"),
+    sessions: async_sessionmaker[AsyncSession] = Depends(database_session_factory),
+    graph: KnowledgeGraphRepository = Depends(knowledge_graph_repository),
+) -> dict[str, object]:
+    async with sessions() as db:
+        try:
+            receipt, _ = await apply_classroom_control(
+                db, owner_id=current.user.id, unit_id=unit_id,
+                idempotency_key=idempotency_key, expected_revision=if_match_revision,
+                action=payload.action, resource_type=payload.resource_type,
+                target_node_id=payload.target_node_id, graph=graph,
+            )
+        except IdempotencyConflict:
+            raise _conflict("IDEMPOTENCY_CONFLICT", "Idempotency key conflicts.") from None
+        except ClassroomVersionConflict as error:
+            raise _conflict(
+                "CLASSROOM_VERSION_CONFLICT",
+                f"Classroom revision is now {error.current_revision}.",
+            ) from None
+        except ClassroomControlConflict:
+            raise _conflict("CLASSROOM_CONTROL_CONFLICT", "A detour is active.") from None
+        except ClassroomNotFound:
+            raise _not_found() from None
+        except ClassroomReplayUnavailable:
+            raise _conflict(
+                "IDEMPOTENCY_RESULT_UNAVAILABLE", "Original receipt is unavailable."
+            ) from None
+        except (ClassroomControlInvalid, LearningEventInvalid, ProfileEventSchemaError):
+            raise AuthFailure(422, "VALIDATION_ERROR", "Learning control is invalid.") from None
+        except LearningEventNotFound:
+            raise _not_found() from None
     response.headers["Cache-Control"] = "no-store"
     return receipt
 

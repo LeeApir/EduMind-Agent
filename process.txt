@@ -537,3 +537,7 @@ T019 2894446完成提交且工作区干净，领取专注与按需角色课堂�
 T020与T016依赖已完成，领取当前场景重解释版本服务 | 工作区干净，ADR-0005决定C与OpenAPI契约已批准 | 旧场景须只读可回溯，证据先提交，候选经schema/Review后CAS发布 | 实现持久操作与场景版本，覆盖重复、并发、拒绝、越权和其他场景，验证后本地提交
 [2026-09-29T10:37:18] [MVP-0.3-T021] VERIFIED | executor=Lee
 当前场景重解释先持久化幂等操作及学习证据，仅重写讲解；正式新版本经schema/Review与owner锁CAS发布，原场景/其他场景只读保留，学习单元返回scene_key/is_current | 独立PG迁移head、定向36通过、后端全量612通过5跳过、Ruff/Mypy85源/OpenAPI解析/diff通过；证据docs/acceptance/mvp-0.3-t021-scene-reexplanation.md；0真实Provider调用 | 运行中操作断线只恢复持久状态，临时token不重放；T022仍需前端学习控制 | 明确路径本地完成提交后领取T022，不push/merge
+[2026-09-29T10:40:02] [MVP-0.3-T035] START | executor=Lee | branch=codex/mvp-0.3
+复核T022前端接入条件发现已批准controls端点尚未实现；在账本增加前置T035并更新T022依赖 | 对照backend/app/api与ADR-0005/OpenAPI确认缺口，T021 d1c6c35已完成且工作区干净 | T022不能以静态UI或客户端本地状态替代持久控制API | 先完成owner范围持久控制API并验证，再恢复T022；不push/merge
+[2026-09-29T10:49:04] [MVP-0.3-T035] VERIFIED | executor=Lee
+已批准controls端点落地：owner/CAS/幂等原回执、暂停/继续/跳过、正式资源选择和路径前置返回点；ProfileEvent schema v2记录新增资源类别 | 独立PG定向26通过、后端全量617通过5跳过、Ruff/Mypy86源/OpenAPI与task JSON解析/diff通过；证据docs/acceptance/mvp-0.3-t035-classroom-controls.md；0真实Provider调用 | 前置目标仅保存导航与返回点，不自动生成教学资源；T022界面仍需接入 | 自查并本地完成提交后领取T022，不push/merge
