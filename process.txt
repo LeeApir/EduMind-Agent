@@ -585,3 +585,7 @@ T022/T025/T026/T029均已完成提交且工作区干净，领取MVP 0.3核心集
 T030已完成提交且工作区干净，领取隔离Compose重启恢复验收 | 现有Compose仅挂知识图谱，未把动画缓存挂给API；渲染Worker为宿主独立进程且需Docker CLI | 使用独立Compose项目与媒体目录避免触碰开发卷，保持Worker与API分离和已批准容器隔离边界 | 修正媒体部署说明与挂载，建立课堂/Job/导出跨重启检查并真实执行
 [2026-09-29T22:33:26] [MVP-0.3-T031] VERIFIED | executor=Lee
 修正容器仓库目录与只读媒体挂载，固定基础镜像摘要并文档化宿主独立Worker及成对备份；真实重启PG/API/Worker验收课堂与三类Job | 独立Compose迁移、seed、重启、check通过；在途attempt2真实Manim发布，旧attempt拒绝，取消不重开；最终镜像重建复查、相关22通过/3项Docker开关跳过、Ruff/Mypy/Compose配置通过；证据docs/acceptance/mvp-0.3-t031-compose-recovery.md | 批量模板可用率与性能归T032，真实Provider质量仍归T033；隔离项目已down且保留独立证据卷 | 自查并本地完成提交后领取T032；不push/merge
+[2026-09-29T22:35:00] [MVP-0.3-T032] START | executor=Lee | branch=codex/mvp-0.3
+T031已完成提交且工作区干净，领取两模板可用率与动画性能验收 | T001冻结100模板/100缓存播放/20按需渲染槽及nearest-rank P95，合法边界已有单元覆盖，尚缺真实批量浏览器指标 | 所有计划槽计入分母，失败为无穷大；独立缓存目录与隔离库，0 Provider调用，不把T031单次渲染冒充性能通过 | 先固定输入清单和脚本，再运行真实渲染/浏览器计时并保留原始证据
+[2026-09-29T22:54:10] [MVP-0.3-T032] VERIFIED | executor=Lee
+冻结100模板/100缓存/20按需渲染槽并实测；20组真实渲染与80复用均通过，另证实运行中讲解/测验2/2不阻塞 | 模板可用率100%；Chromium禁缓存P95=0.0486s且逐槽≤2s，独立缓存新渲染P95=9.1521s；Docker模板/渲染/缓存57通过，Ruff/编译/JSON检查通过；首次定位器故障原始20槽失败报告保留，完整重跑见docs/acceptance/mvp-0.3-t032-animation-performance.md | 单机单并发结果不推断公网/高并发；质量矩阵20不同参数重复5次；T033真实Provider仍需批准费用预算 | 自查并本地完成提交后准备T033冻结配置/预算；不push/merge

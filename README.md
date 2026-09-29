@@ -70,6 +70,8 @@ uv run --env-file ../.env.worker python scripts/run_animation_worker.py
 
 Worker 不接收 Provider 密钥；渲染时启动的固定 Manim 容器不挂 Docker socket、数据库或媒体库。只启动 API 而不启动 Worker 时，缓存命中仍可读，但新动画 Job 会保持排队。Worker 重启先回收过期租约，最多自动尝试两次；取消或旧尝试的迟到结果不能重新发布。隔离 Compose 重启实测见 [T031 验收记录](docs/acceptance/mvp-0.3-t031-compose-recovery.md)。
 
+两个模板的合法边界、缓存播放和按需渲染单机验收结果见 [T032 动画报告](docs/acceptance/mvp-0.3-t032-animation-performance.md)；报告保留每槽数据、首次测量脚本失败和当前环境限制。
+
 仓库示例配置使用 DeepSeek Responses API、`https://api.deepseek.com` 和 `deepseek-flash`；实际模型以服务端配置及验收记录为准，示例不代表该模型通过所有质量指标。API Key 只留在服务端 `.env`，不要提交或放入浏览器。支持的传输与安全边界见 [Provider 说明](docs/PROVIDERS.md)。
 
 最近阶段证据见 [MVP 0.2 收尾决定](docs/acceptance/mvp-0.2-closeout-decision.md)；其中 Pro 质量/闭环与 Flash 性能分别报告。[MVP 0.1 Provider 报告](docs/acceptance/mvp-0.1-provider-acceptance.md) 仅作为历史证据。
