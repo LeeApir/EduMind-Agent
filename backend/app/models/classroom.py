@@ -220,3 +220,40 @@ class ClassroomRoleContext(Base):
     message_refs: Mapped[list[object]] = mapped_column(JSONB, nullable=False, default=list)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
+
+
+class DebateResult(Base):
+    """Immutable, owner-scoped result written only after a whole-candidate review pass."""
+
+    __tablename__ = "debate_results"
+    __table_args__ = (
+        UniqueConstraint("user_id", "id", name="uq_debate_results_owner_id"),
+        UniqueConstraint("user_id", "operation_id", name="uq_debate_results_owner_operation"),
+        ForeignKeyConstraint(
+            ["user_id", "learning_unit_id"],
+            ["learning_units.user_id", "learning_units.id"],
+            name="fk_debate_results_unit_owner", ondelete="CASCADE",
+        ),
+        ForeignKeyConstraint(
+            ["user_id", "operation_id"],
+            ["classroom_operations.user_id", "classroom_operations.id"],
+            name="fk_debate_results_operation_owner", ondelete="CASCADE",
+        ),
+        CheckConstraint("scene_version >= 1", name="ck_debate_results_scene_version_positive"),
+    )
+
+    id: Mapped[UUID] = mapped_column(PostgreSQLUUID(as_uuid=True), primary_key=True, default=uuid4)
+    user_id: Mapped[UUID] = mapped_column(PostgreSQLUUID(as_uuid=True), nullable=False)
+    learning_unit_id: Mapped[UUID] = mapped_column(PostgreSQLUUID(as_uuid=True), nullable=False)
+    operation_id: Mapped[UUID] = mapped_column(PostgreSQLUUID(as_uuid=True), nullable=False)
+    scene_key: Mapped[str] = mapped_column(String(64), nullable=False)
+    scene_version: Mapped[int] = mapped_column(Integer, nullable=False)
+    question: Mapped[str] = mapped_column(Text, nullable=False)
+    content: Mapped[dict[str, object]] = mapped_column(JSONB, nullable=False)
+    candidate_schema_version: Mapped[str] = mapped_column(String(80), nullable=False)
+    candidate_prompt_version: Mapped[str] = mapped_column(String(80), nullable=False)
+    generation_model_id: Mapped[str] = mapped_column(String(200), nullable=False)
+    review_version: Mapped[str] = mapped_column(String(80), nullable=False)
+    review_model_id: Mapped[str] = mapped_column(String(200), nullable=False)
+    correction_attempts: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    published_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
