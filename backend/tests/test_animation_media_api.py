@@ -5,6 +5,7 @@ import hashlib
 import json
 import os
 import tempfile
+from datetime import datetime
 from pathlib import Path
 from uuid import UUID, uuid4
 
@@ -45,6 +46,10 @@ def _fake_renderer(
         hashlib.sha256(mp4.read_bytes()).hexdigest(),
         hashlib.sha256(srt.read_bytes()).hexdigest(),
     )
+
+
+def _unexpected_renderer(*_args: object, **_kwargs: object) -> RenderedCandidate:
+    raise AssertionError("A media download must not render again.")
 
 
 def _clean_jobs() -> None:
@@ -137,6 +142,7 @@ def test_mp4_ranges_srt_headers_owner_and_unbound_media(
         _, unit_id, job_id = _create(client, 61)
         assert client.get(f"/api/animation-media/{uuid4()}/mp4").status_code == 404
         media_id = _finish(job_id, cache)
+        monkeypatch.setattr(cache, "renderer", _unexpected_renderer)
         mp4_url = f"/api/animation-media/{media_id}/mp4"
         srt_url = f"/api/animation-media/{media_id}/srt"
         full = client.get(mp4_url)
@@ -149,9 +155,22 @@ def test_mp4_ranges_srt_headers_owner_and_unbound_media(
         assert full.headers["content-disposition"].startswith("inline;")
         assert "Users/" not in str(full.headers)
         assert int(full.headers["content-length"]) == len(full.content)
+        assert full.headers["x-animation-media-id"] == str(media_id)
+        assert full.headers["x-animation-template-id"] == "linked-list-insertion"
+        assert full.headers["x-animation-template-version"] == "1.0.0"
+        assert full.headers["x-animation-subtitle-version"] == "srt-v1"
+        assert full.headers["x-animation-review-version"]
+        assert full.headers["x-animation-generated-by"] == "reviewed-manim-template"
+        assert hashlib.sha256(full.content).hexdigest() == full.headers[
+            "x-animation-content-sha256"
+        ]
+        datetime.fromisoformat(full.headers["x-animation-published-at"])
         first = client.get(mp4_url, headers={"Range": "bytes=0-7"})
         assert first.status_code == 206 and first.content == full.content[:8]
         assert first.headers["content-range"] == f"bytes 0-7/{len(full.content)}"
+        assert first.headers["x-animation-content-sha256"] == full.headers[
+            "x-animation-content-sha256"
+        ]
         assert client.get(mp4_url, headers={"Range": "bytes=8-"}).content == full.content[8:]
         assert client.get(mp4_url, headers={"Range": "bytes=-5"}).content == full.content[-5:]
         for bad in (
@@ -162,14 +181,31 @@ def test_mp4_ranges_srt_headers_owner_and_unbound_media(
             assert invalid.status_code == 416
             assert invalid.headers["content-range"] == f"bytes */{len(full.content)}"
         subtitle = client.get(srt_url)
-        assert subtitle.status_code == 200 and subtitle.text == srt_for_insertion()
+        assert subtitle.status_code == 200 and subtitle.content == srt_for_insertion().encode()
         assert subtitle.headers["content-type"].startswith("application/x-subrip")
-        assert client.get(srt_url + "?download=true").headers[
-            "content-disposition"
-        ].startswith("attachment;")
-        assert client.get(mp4_url + "?download=true").headers[
-            "content-disposition"
-        ].startswith("attachment;")
+        assert subtitle.headers["x-animation-media-id"] == full.headers[
+            "x-animation-media-id"
+        ]
+        for field in (
+            "template-id", "template-version", "subtitle-version", "review-version",
+            "generated-by", "published-at",
+        ):
+            assert subtitle.headers[f"x-animation-{field}"] == full.headers[
+                f"x-animation-{field}"
+            ]
+        assert hashlib.sha256(subtitle.content).hexdigest() == subtitle.headers[
+            "x-animation-content-sha256"
+        ]
+        srt_download = client.get(srt_url + "?download=true")
+        assert srt_download.content == subtitle.content
+        assert srt_download.headers["content-disposition"] == (
+            f'attachment; filename="animation-{media_id}.srt"'
+        )
+        download = client.get(mp4_url + "?download=true&filename=../../private.env")
+        assert download.content == full.content
+        assert download.headers["content-disposition"] == (
+            f'attachment; filename="animation-{media_id}.mp4"'
+        )
         assert client.get("/api/animation-media/not-a-uuid/mp4").status_code == 422
         assert client.get(f"/api/learning-units/{unit_id}").status_code == 200
 
@@ -244,10 +280,14 @@ def test_corrupt_or_missing_bound_bytes_are_unavailable_without_harming_text(
         mp4.unlink()
         original.rename(mp4)
         mp4.chmod(0o644)
+        original_bytes = mp4.read_bytes()
         mp4.write_bytes(b"corrupt")
         unavailable = client.get(f"/api/animation-media/{media_id}/mp4")
         assert unavailable.status_code == 503
         assert unavailable.json()["code"] == "MEDIA_UNAVAILABLE"
+        assert "Request a new animation job" in unavailable.json()["message"]
+        mp4.write_bytes(original_bytes)
         srt.unlink()
         assert client.get(f"/api/animation-media/{media_id}/srt").status_code == 503
+        assert client.get(f"/api/animation-media/{media_id}/mp4").content == original_bytes
         assert client.get(f"/api/learning-units/{unit_id}").status_code == 200

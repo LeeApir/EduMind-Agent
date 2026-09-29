@@ -565,3 +565,7 @@ T018与T024已完成且T025 afc3c67已本地提交、工作区干净，领取显
 T004与T024已完成且T026 5ee6c0f已本地提交、工作区干净，领取已审核Markdown笔记导出 | 已批准OpenAPI以只读GET /notes.md下载；PRD描述的POST为早期路径，CSRF只校验写请求 | 仅组合owner已发布版本及本人错题，不泄露答案、原始作答、临时或拒绝内容，不调用Provider | 实现确定性导出、固定安全文件名和来源记录，验证版本/归属/下载正文后本地提交
 [2026-09-29T18:02:09] [MVP-0.3-T027] VERIFIED | executor=Lee
 只读GET组合当前已审核讲解、知识摘录、本人的合法版本错题和可选已审核主持人总结；记录模型/时间/版本，转义活动HTML/链接，安全文件名并对齐PRD与OpenAPI | 隔离PG后端全量649通过5跳过，最终导出与OpenAPI专项11通过；Ruff、Mypy95源、OpenAPI JSON及diff检查通过；真实FastAPI下载字节与owner/版本/错题归属/无额外Provider测试通过；证据docs/acceptance/mvp-0.3-t027-markdown-notes.md | 无已知阻塞；前端下载入口由T029负责 | 自查并本地完成T027提交后停止，不领取T028；不push/merge
+[2026-09-29T18:05:13] [MVP-0.3-T028] START | executor=Lee | branch=codex/mvp-0.3
+T014已完成且T027 bddcd42已本地提交、工作区干净，领取已生成MP4/SRT导出 | 现有媒体GET已有owner绑定、哈希校验、Range、nosniff与安全文件名；缺少显式版本/生成来源回执及恢复提示 | 保留只读且不触发模型/渲染，跨owner与未知媒体统一404，已绑定缺失媒体使用稳定错误码 | 补下载来源头、缺失恢复语义及真实字节/版本/路径回归后本地提交
+[2026-09-29T18:10:46] [MVP-0.3-T028] VERIFIED | executor=Lee
+MP4/SRT同媒体ID下载回执加入模板/字幕/审核版本、各格式完整字节哈希、来源与发布时间；缺失媒体返回明确重新请求动画提示，不在GET渲染 | 隔离PG媒体/OpenAPI定向9通过、后端全量649通过5跳过；真实MP4/SRT字节与Range、owner/路径/文件名/损坏/单格式缺失、零重渲染测试通过；Ruff、Mypy95源、OpenAPI JSON及diff检查通过；证据docs/acceptance/mvp-0.3-t028-media-export.md；0真实Provider调用 | 无已知阻塞；前端入口与恢复提示由T029负责 | 自查并本地完成T028提交后停止，不领取T029；不push/merge

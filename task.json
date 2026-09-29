@@ -1387,7 +1387,7 @@
       "id": "MVP-0.3-T028",
       "phase": "MVP 0.3",
       "title": "导出已生成 MP4 与 SRT",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.3-T014"
@@ -1407,9 +1407,13 @@
       "verification": [
         "测试 MP4/SRT 版本匹配、字节内容、越权/路径遍历及零生成调用。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "隔离 PostgreSQL 媒体下载/OpenAPI 定向 9 passed，后端全量 649 passed / 5 skipped",
+        "实际 MP4/SRT 下载字节、SHA-256、对应媒体 ID 与模板/字幕/审核版本、owner/路径/文件名/Range/缺失恢复均通过",
+        "下载渲染器失败哨兵通过；Ruff、Mypy 95 source、OpenAPI JSON 和 git diff --check 通过；见 docs/acceptance/mvp-0.3-t028-media-export.md"
+      ],
+      "started_at": "2026-09-29T18:05:13",
+      "completed_at": "2026-09-29T18:10:46",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.3-T028"
     },

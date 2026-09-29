@@ -6,6 +6,7 @@ import asyncio
 import os
 import re
 from collections.abc import AsyncIterator, Callable
+from datetime import timezone
 from typing import cast
 from uuid import UUID
 
@@ -87,7 +88,10 @@ async def _read_media(
             open_verified_media, media, extension=extension, cache=AnimationCache(),
         )
     except MediaUnavailable:
-        raise AuthFailure(503, "MEDIA_UNAVAILABLE", "Animation media is unavailable.") from None
+        raise AuthFailure(
+            503, "MEDIA_UNAVAILABLE",
+            "Animation media is unavailable. Request a new animation job to restore it.",
+        ) from None
     bounds = _range(range_header, file.size) if extension == "mp4" else (0, file.size - 1)
     if bounds is None:
         file.close()
@@ -108,6 +112,16 @@ async def _read_media(
             f'{"attachment" if download else "inline"}; filename="animation-{media_id}.{extension}"'
         ),
         "Content-Length": str(end - start + 1),
+        "X-Animation-Media-ID": str(media.id),
+        "X-Animation-Template-ID": media.template_id,
+        "X-Animation-Template-Version": media.template_version,
+        "X-Animation-Subtitle-Version": media.subtitle_version,
+        "X-Animation-Review-Version": media.review_rule_version,
+        "X-Animation-Content-SHA256": (
+            media.mp4_sha256 if extension == "mp4" else media.srt_sha256
+        ),
+        "X-Animation-Generated-By": "reviewed-manim-template",
+        "X-Animation-Published-At": media.published_at.astimezone(timezone.utc).isoformat(),
     }
     if extension == "mp4":
         headers["Accept-Ranges"] = "bytes"

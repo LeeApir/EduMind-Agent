@@ -113,7 +113,16 @@ def test_download_headers_and_range_behavior_are_explicit() -> None:
         assert {"Content-Disposition", "X-Content-Type-Options", "Cache-Control"} <= set(
             response["headers"]
         )
+        assert {
+            "X-Animation-Media-ID", "X-Animation-Template-ID",
+            "X-Animation-Template-Version", "X-Animation-Subtitle-Version",
+            "X-Animation-Review-Version", "X-Animation-Content-SHA256",
+            "X-Animation-Generated-By", "X-Animation-Published-At",
+        } <= set(response["headers"])
     assert "206" in paths[media + "mp4"]["get"]["responses"]
+    assert "X-Animation-Content-SHA256" in paths[media + "mp4"]["get"]["responses"][
+        "206"
+    ]["headers"]
     assert "206" not in paths[media + "srt"]["get"]["responses"]
     notes = paths["/api/learning-units/{learningUnitId}/notes.md"]["get"]["responses"]["200"]
     assert "text/markdown; charset=utf-8" in notes["content"]
