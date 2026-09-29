@@ -14,7 +14,7 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 from app.api.classroom import provider_gateway
 from app.core.database import create_database_engine
 from app.main import app
-from app.models.learning import LearningScene, LearningUnit
+from app.models.learning import GeneratedResource, LearningScene, LearningUnit, utc_now
 from app.services.classroom import set_classroom_mode
 from app.services.classroom_speech import (
     commit_classroom_speech,
@@ -122,13 +122,18 @@ def seed_unit_with_intro(owner_id: UUID) -> UUID:
                 )
                 db.add(unit)
                 await db.flush()
-                db.add(
-                    LearningScene(
+                scene = LearningScene(
                         learning_unit_id=unit.id, scene_key="intro", scene_order=1,
                         scene_type="first_learning", version=1,
                         generation_status="complete", review_status="passed",
                     )
-                )
+                db.add(scene)
+                await db.flush()
+                db.add(GeneratedResource(
+                    user_id=owner_id, learning_unit_id=unit.id, scene_id=scene.id,
+                    resource_type="explanation", content={"text": "链表插入"},
+                    review_status="passed", published_at=utc_now(),
+                ))
                 await db.commit()
                 return unit.id
         finally:
@@ -467,7 +472,7 @@ def test_mode_switch_mid_stream_demotes_late_commit_to_superseded(database_url: 
                         mode="interactive", enabled_roles=["beginner"], expected_revision=1,
                     )
                     assert created is True
-                    assert session.revision == 2
+                    assert session["revision"] == 2
                 async with sessions() as db:
                     operation = await owned_classroom_operation(
                         db, owner_id=user_id, operation_id=operation_id

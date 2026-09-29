@@ -525,3 +525,11 @@ T018 34151ab完成提交且工作区干净，领取分级审核课堂流式发�
 T019 2894446完成提交且工作区干净，领取专注与按需角色课堂界面 | T017课堂模式/幂等/T019分级审核流式发言与SSE契约已就绪，现有Vue学习页尚无课堂入口 | 默认导师视图、互动才按需显示同学角色与当前发言者、可随时关闭；接通真实API/SSE+错误重试与课堂恢复，不得只交付静态组件；页面转义模型内容防XSS，保留讲解/代码/练习/路径进度，支持键盘与移动端 | 实现classroom API模块与ClassroomPanel组件、接入App.vue共存于已审核资源，模式/流式/迟到响应/XSS/键盘组件测试与真实后端mock Provider联调通过后独立提交
 [2026-09-29T09:38:00] [MVP-0.3-T020] VERIFIED | executor=Xerneus111 | branch=codex/mvp-0.3-t015
 新增web/src/api/classroom.ts(课堂快照/建/切模式/消息分页/操作读取/流式发言+ClassroomSpeechError错误码映射)与web/src/components/ClassroomPanel.vue(默认专注视图、互动才按需显示同学角色与当前发言者、SSE token累积、content_retracted、幂等键重试与sessionStorage恢复、纯文本插值转义防XSS、键盘Enter/Shift+Enter、响应式移动端)，接入App.vue与已审核讲解/代码/练习/路径/动画面板共存 | 前端96项测试通过(16文件：ClassroomPanel 12项组件测试覆盖模式/流式当前发言者/迟到响应丢弃/XSS/键盘/错误重试恢复，classroom API 7项客户端测试覆盖SSE事件与HTTP错误)；浏览器classroom_flow.py(headless Chromium路由mock)联调通过：默认专注→互动角色开关→流式发言提交→XSS转义→键盘提交→Provider故障换新幂等键重试→移动端无横向溢出；后端58项课堂测试通过(真实app+PostgreSQL+FakeAdapter mock Provider：SSE契约/模式CAS/持久化/上下文/角色/审核规则)；ESLint 0错误，vue-tsc+vite build通过 | 浏览器联调沿用learning_flow.py路由mock既有约定，真实后端mock Provider由58项后端课堂测试覆盖；教学正文首token P95≤2秒为非阻塞后续优化 | 明确路径本地T020完成提交，不push/merge；交接docs/acceptance/mvp-0.3-t020-classroom-ui.md
+[2026-09-29T10:10:07] [MVP-0.3-T016] RESUME | executor=Lee | branch=codex/mvp-0.3-t015
+队友完成提交后的代码复核，接手修正跨平台文件锁测试误判 | macOS flock 空文件行为已复现 | 原任务完成状态保留，本次为补丁复核 | 修改测试并验证，不伪造新的任务完成提交
+[2026-09-29T10:10:08] [MVP-0.3-T016] VERIFIED | executor=Lee
+文件锁测试按平台检查锁文件字节，并整理Windows模块动态导入以通过严格类型检查 | 文件锁测试通过、Ruff及Mypy通过；全量后端606通过5跳过；证据docs/acceptance/mvp-0.3-t016-t020-review.md | 无真实Windows运行环境，Windows分支仅静态检查 | 与T017课堂补丁一起本地提交，不push/merge
+[2026-09-29T10:10:09] [MVP-0.3-T017] RESUME | executor=Lee | branch=codex/mvp-0.3-t015
+队友完成提交后的代码复核，接手修正幂等回放与未发布资源门禁 | 旧键在模式变化后返回当前快照、无正式资源也能建课堂，均已复现 | 迁移前操作缺原回执，不能无损恢复 | 新增0014回执迁移与回归测试，同步OpenAPI
+[2026-09-29T10:10:10] [MVP-0.3-T017] VERIFIED | executor=Lee
+创建/模式命令持久化原回执、发布资源门禁及旧记录明确409完成 | 独立PG迁移升降升、定向35通过、全量606通过5跳过、Ruff/Mypy/diff通过；证据docs/acceptance/mvp-0.3-t016-t020-review.md | 迁移前无回执记录无法回放原快照，返回IDEMPOTENCY_RESULT_UNAVAILABLE；无真实Provider调用 | 自查并提交本地补丁，不push/merge；后续T021按任务协议领取

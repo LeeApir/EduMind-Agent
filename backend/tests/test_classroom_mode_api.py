@@ -7,11 +7,13 @@ from uuid import UUID
 
 import pytest
 from fastapi.testclient import TestClient
+from sqlalchemy import update
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from app.core.database import create_database_engine
 from app.main import app
-from app.models.learning import LearningScene, LearningUnit
+from app.models.classroom import ClassroomOperation
+from app.models.learning import GeneratedResource, LearningScene, LearningUnit, utc_now
 from app.services.classroom import ClassroomVersionConflict, set_classroom_mode
 
 TEST_DATABASE_URL = os.getenv("EDUMIND_TEST_DATABASE_URL")
@@ -25,7 +27,9 @@ def database_url(monkeypatch: pytest.MonkeyPatch) -> Iterator[str]:
     yield TEST_DATABASE_URL
 
 
-def seed_unit_with_intro(owner_id: UUID, *, with_scene: bool = True) -> UUID:
+def seed_unit_with_intro(
+    owner_id: UUID, *, with_scene: bool = True, published: bool = True
+) -> UUID:
     async def insert() -> UUID:
         engine = create_database_engine(TEST_DATABASE_URL)
         try:
@@ -35,13 +39,18 @@ def seed_unit_with_intro(owner_id: UUID, *, with_scene: bool = True) -> UUID:
                 db.add(unit)
                 await db.flush()
                 if with_scene:
-                    db.add(
-                        LearningScene(
+                    scene = LearningScene(
                             learning_unit_id=unit.id, scene_key="intro", scene_order=1,
                             scene_type="first_learning", version=1,
                             generation_status="complete", review_status="passed",
                         )
-                    )
+                    db.add(scene)
+                    await db.flush()
+                    db.add(GeneratedResource(
+                        user_id=owner_id, learning_unit_id=unit.id, scene_id=scene.id,
+                        resource_type="explanation", content={"text": "链表"},
+                        review_status="passed", published_at=utc_now() if published else None,
+                    ))
                 await db.commit()
                 return unit.id
         finally:
@@ -120,6 +129,36 @@ def test_create_requires_csrf_and_matching_origin(database_url: str) -> None:
     assert foreign.json()["code"] == "CSRF_FAILED"
 
 
+def test_legacy_operation_without_original_receipt_does_not_return_current_state(
+    database_url: str,
+) -> None:
+    client, user_id, csrf = make_guest()
+    unit_id = seed_unit_with_intro(user_id)
+    path = f"/api/learning-units/{unit_id}/classroom"
+    key = "create-key-legacy"
+    assert client.post(path, headers=write_headers(csrf, key=key)).status_code == 201
+
+    async def remove_receipt() -> None:
+        engine = create_database_engine(TEST_DATABASE_URL)
+        try:
+            sessions = async_sessionmaker(engine, expire_on_commit=False)
+            async with sessions() as db:
+                await db.execute(
+                    update(ClassroomOperation)
+                    .where(ClassroomOperation.user_id == user_id,
+                           ClassroomOperation.idempotency_key == key)
+                    .values(result_snapshot=None)
+                )
+                await db.commit()
+        finally:
+            await engine.dispose()
+
+    asyncio.run(remove_receipt())
+    replay = client.post(path, headers=write_headers(csrf, key=key))
+    assert replay.status_code == 409
+    assert replay.json()["code"] == "IDEMPOTENCY_RESULT_UNAVAILABLE"
+
+
 def test_create_requires_published_intro_scene(database_url: str) -> None:
     client, user_id, csrf = make_guest()
     unit_id = seed_unit_with_intro(user_id, with_scene=False)
@@ -129,6 +168,12 @@ def test_create_requires_published_intro_scene(database_url: str) -> None:
     )
     assert response.status_code == 404
     assert response.json()["code"] == "NOT_FOUND"
+    unpublished_id = seed_unit_with_intro(user_id, published=False)
+    unpublished = client.post(
+        f"/api/learning-units/{unpublished_id}/classroom",
+        headers=write_headers(csrf, key="create-key-unpublished"),
+    )
+    assert unpublished.status_code == 404
 
 
 def test_mode_switch_to_interactive_and_back_to_focus(database_url: str) -> None:
@@ -209,6 +254,25 @@ def test_mode_switch_idempotent_replay_and_digest_conflict(database_url: str) ->
     )
     assert conflict.status_code == 409
     assert conflict.json()["code"] == "IDEMPOTENCY_CONFLICT"
+    later = client.patch(
+        f"{path}/mode",
+        json={"mode": "focus", "enabled_roles": []},
+        headers=write_headers(csrf, key="mode-switch-key-later", revision=2),
+    )
+    assert later.status_code == 200
+    assert later.json()["revision"] == 3
+    old_replay = client.patch(
+        f"{path}/mode",
+        json={"mode": "interactive", "enabled_roles": ["beginner"]},
+        headers=write_headers(csrf, key=key, revision=1),
+    )
+    assert old_replay.json() == first.json()
+    create_replay = client.post(path, headers=write_headers(csrf, key="create-key-00008"))
+    assert create_replay.json()["revision"] == 1
+    new_create = client.post(path, headers=write_headers(csrf, key="create-key-after-mode"))
+    assert new_create.status_code == 200
+    assert new_create.json()["revision"] == 3
+    assert client.get(path).json()["revision"] == 3
 
 
 def test_focus_requires_empty_roles(database_url: str) -> None:
@@ -262,7 +326,7 @@ def test_concurrent_mode_switch_same_key_is_idempotent(database_url: str) -> Non
                         db, owner_id=user_id, unit_id=unit_id, idempotency_key=key,
                         mode="interactive", enabled_roles=["beginner"], expected_revision=1,
                     )
-                    return created, session.revision
+                    return created, int(session["revision"])
 
             results = await asyncio.gather(switch(), switch())
             assert sorted(results) == [(False, 2), (True, 2)]
@@ -291,7 +355,7 @@ def test_concurrent_mode_switch_distinct_keys_single_winner(database_url: str) -
                         db, owner_id=user_id, unit_id=unit_id, idempotency_key=key,
                         mode="interactive", enabled_roles=["beginner"], expected_revision=1,
                     )
-                    return session.revision
+                    return int(session["revision"])
 
             results = await asyncio.gather(
                 switch("mode-switch-key-00009"), switch("mode-switch-key-00010"),

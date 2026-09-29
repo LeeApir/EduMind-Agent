@@ -17,7 +17,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.classroom import ClassroomOperation, ClassroomSession
-from app.models.learning import LearningScene, LearningUnit, utc_now
+from app.models.learning import GeneratedResource, LearningScene, LearningUnit, utc_now
 from app.services.learning_operations import IdempotencyConflict
 from app.services.learning_owner_lock import lock_learning_owner
 
@@ -36,6 +36,10 @@ class ClassroomVersionConflict(ValueError):
 
 class InvalidModeCombination(ValueError):
     """Focus mode enables no companion roles."""
+
+
+class ClassroomReplayUnavailable(ValueError):
+    """A pre-migration command has no recoverable immutable receipt."""
 
 
 def classroom_digest(payload: Mapping[str, object]) -> str:
@@ -94,6 +98,15 @@ async def current_intro_scene(
                 LearningScene.scene_key == "intro",
                 LearningScene.generation_status == "complete",
                 LearningScene.review_status == "passed",
+                select(GeneratedResource.id)
+                .where(
+                    GeneratedResource.scene_id == LearningScene.id,
+                    GeneratedResource.user_id == owner_id,
+                    GeneratedResource.learning_unit_id == unit_id,
+                    GeneratedResource.review_status == "passed",
+                    GeneratedResource.published_at.is_not(None),
+                )
+                .exists(),
             )
             .order_by(LearningScene.version.desc())
             .limit(1)
@@ -121,61 +134,63 @@ def classroom_payload(session: ClassroomSession) -> dict[str, object]:
     return payload
 
 
+def _operation_receipt(operation: ClassroomOperation) -> dict[str, object]:
+    if operation.result_snapshot is None:
+        raise ClassroomReplayUnavailable("Original classroom receipt is unavailable.")
+    return operation.result_snapshot
+
+
 async def create_classroom(
     db: AsyncSession, *, owner_id: UUID, unit_id: UUID, idempotency_key: str
-) -> tuple[ClassroomSession, bool]:
+) -> tuple[dict[str, object], bool]:
     """Create the default focus classroom once, or replay the existing snapshot."""
     digest = classroom_digest({"kind": "create", "learning_unit_id": str(unit_id)})
     existing = await _find_operation(db, owner_id=owner_id, idempotency_key=idempotency_key)
     if existing is not None:
         if existing.request_digest != digest:
             raise IdempotencyConflict("Idempotency key was reused for another classroom.")
-        session = await owned_classroom(db, owner_id=owner_id, unit_id=unit_id)
-        if session is None:
-            raise ClassroomNotFound("Classroom does not exist.")
-        return session, False
+        return _operation_receipt(existing), False
     await lock_learning_owner(db, owner_id)
     existing = await _find_operation(db, owner_id=owner_id, idempotency_key=idempotency_key)
     if existing is not None:
         if existing.request_digest != digest:
             raise IdempotencyConflict("Idempotency key was reused for another classroom.")
-        session = await owned_classroom(db, owner_id=owner_id, unit_id=unit_id)
-        if session is None:
-            raise ClassroomNotFound("Classroom does not exist.")
-        return session, False
+        return _operation_receipt(existing), False
     session = await owned_classroom(db, owner_id=owner_id, unit_id=unit_id)
-    if session is not None:
-        return session, False
-    intro = await current_intro_scene(db, owner_id=owner_id, unit_id=unit_id)
-    if intro is None:
-        raise ClassroomNotFound("No published intro scene for this learning unit.")
-    session = ClassroomSession(
-        user_id=owner_id,
-        learning_unit_id=unit_id,
-        scene_key="intro",
-        scene_version=intro.version,
-        scene_progress=0,
-        mode="focus",
-        revision=1,
-        message_cursor=0,
-        enabled_roles=[],
-        paused=False,
-    )
-    db.add(session)
-    await db.flush()
+    created = session is None
+    if session is None:
+        intro = await current_intro_scene(db, owner_id=owner_id, unit_id=unit_id)
+        if intro is None:
+            raise ClassroomNotFound("No published intro scene for this learning unit.")
+        session = ClassroomSession(
+            user_id=owner_id,
+            learning_unit_id=unit_id,
+            scene_key="intro",
+            scene_version=intro.version,
+            scene_progress=0,
+            mode="focus",
+            revision=1,
+            message_cursor=0,
+            enabled_roles=[],
+            paused=False,
+        )
+        db.add(session)
+        await db.flush()
+    receipt = classroom_payload(session)
     db.add(
         ClassroomOperation(
             user_id=owner_id,
             learning_unit_id=unit_id,
-            kind="mode",
+            kind="create",
             idempotency_key=idempotency_key,
             request_digest=digest,
-            base_revision=1,
+            base_revision=session.revision,
+            result_snapshot=receipt,
             status="published",
         )
     )
     await db.commit()
-    return session, True
+    return receipt, created
 
 
 async def set_classroom_mode(
@@ -187,7 +202,7 @@ async def set_classroom_mode(
     mode: str,
     enabled_roles: Sequence[str],
     expected_revision: int,
-) -> tuple[ClassroomSession, bool]:
+) -> tuple[dict[str, object], bool]:
     """Switch focus/interactive mode and enabled roles idempotently with CAS."""
     roles = _normalized_roles(enabled_roles)
     if mode == "focus" and roles:
@@ -204,19 +219,13 @@ async def set_classroom_mode(
     if existing is not None:
         if existing.request_digest != digest:
             raise IdempotencyConflict("Idempotency key was reused for another mode change.")
-        session = await owned_classroom(db, owner_id=owner_id, unit_id=unit_id)
-        if session is None:
-            raise ClassroomNotFound("Classroom does not exist.")
-        return session, False
+        return _operation_receipt(existing), False
     await lock_learning_owner(db, owner_id)
     existing = await _find_operation(db, owner_id=owner_id, idempotency_key=idempotency_key)
     if existing is not None:
         if existing.request_digest != digest:
             raise IdempotencyConflict("Idempotency key was reused for another mode change.")
-        session = await owned_classroom(db, owner_id=owner_id, unit_id=unit_id)
-        if session is None:
-            raise ClassroomNotFound("Classroom does not exist.")
-        return session, False
+        return _operation_receipt(existing), False
     session = await owned_classroom(db, owner_id=owner_id, unit_id=unit_id)
     if session is None:
         raise ClassroomNotFound("Classroom does not exist.")
@@ -228,6 +237,7 @@ async def set_classroom_mode(
     session.enabled_roles = cast(list[object], roles)
     session.generation_id = new_generation
     session.updated_at = utc_now()
+    receipt = classroom_payload(session)
     db.add(
         ClassroomOperation(
             user_id=owner_id,
@@ -237,8 +247,9 @@ async def set_classroom_mode(
             request_digest=digest,
             base_revision=expected_revision,
             generation_id=new_generation,
+            result_snapshot=receipt,
             status="published",
         )
     )
     await db.commit()
-    return session, True
+    return receipt, True

@@ -27,6 +27,7 @@ from app.core.provider_factory import build_default_provider_gateway
 from app.models.learning import utc_now
 from app.services.classroom import (
     ClassroomNotFound,
+    ClassroomReplayUnavailable,
     ClassroomVersionConflict,
     InvalidModeCombination,
     classroom_payload,
@@ -112,16 +113,20 @@ async def create_classroom_endpoint(
 ) -> dict[str, object]:
     async with sessions() as db:
         try:
-            session, created = await create_classroom(
+            receipt, created = await create_classroom(
                 db, owner_id=current.user.id, unit_id=unit_id, idempotency_key=idempotency_key
             )
         except IdempotencyConflict:
             raise _conflict("IDEMPOTENCY_CONFLICT", "Idempotency key conflicts.") from None
         except ClassroomNotFound:
             raise _not_found() from None
+        except ClassroomReplayUnavailable:
+            raise _conflict(
+                "IDEMPOTENCY_RESULT_UNAVAILABLE", "Original receipt is unavailable."
+            ) from None
     response.headers["Cache-Control"] = "no-store"
     response.status_code = 201 if created else 200
-    return classroom_payload(session)
+    return receipt
 
 
 @router.patch("/api/learning-units/{unit_id}/classroom/mode")
@@ -134,7 +139,7 @@ async def set_classroom_mode_endpoint(
 ) -> dict[str, object]:
     async with sessions() as db:
         try:
-            session, _ = await set_classroom_mode(
+            receipt, _ = await set_classroom_mode(
                 db,
                 owner_id=current.user.id,
                 unit_id=unit_id,
@@ -152,12 +157,16 @@ async def set_classroom_mode_endpoint(
             ) from None
         except ClassroomNotFound:
             raise _not_found() from None
+        except ClassroomReplayUnavailable:
+            raise _conflict(
+                "IDEMPOTENCY_RESULT_UNAVAILABLE", "Original receipt is unavailable."
+            ) from None
         except InvalidModeCombination:
             raise AuthFailure(
                 422, "VALIDATION_ERROR", "Focus mode enables no companion roles."
             ) from None
     response.headers["Cache-Control"] = "no-store"
-    return classroom_payload(session)
+    return receipt
 
 
 async def _speech_events(

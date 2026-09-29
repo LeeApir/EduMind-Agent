@@ -8,6 +8,7 @@ POSIX-only, so Windows uses ``msvcrt.locking`` over one guaranteed byte instead.
 from __future__ import annotations
 
 import os
+from importlib import import_module
 
 
 def _ensure_lockable(fd: int) -> None:
@@ -21,24 +22,22 @@ def _ensure_lockable(fd: int) -> None:
 def lock_exclusive(fd: int) -> None:
     """Acquire a blocking exclusive lock on the open descriptor ``fd``."""
     if os.name == "nt":  # pragma: no cover - Windows byte-range lock
-        import msvcrt
-
+        msvcrt = import_module("msvcrt")
         _ensure_lockable(fd)
         msvcrt.locking(fd, msvcrt.LK_LOCK, 1)
         return
     import fcntl
 
-    fcntl.flock(fd, fcntl.LOCK_EX)  # type: ignore[attr-defined]
+    fcntl.flock(fd, fcntl.LOCK_EX)
 
 
 def unlock(fd: int) -> None:
     """Release the exclusive lock previously taken with :func:`lock_exclusive`."""
     if os.name == "nt":  # pragma: no cover - Windows byte-range lock
-        import msvcrt
-
+        msvcrt = import_module("msvcrt")
         os.lseek(fd, 0, os.SEEK_SET)
         msvcrt.locking(fd, msvcrt.LK_UNLCK, 1)
         return
     import fcntl
 
-    fcntl.flock(fd, fcntl.LOCK_UN)  # type: ignore[attr-defined]
+    fcntl.flock(fd, fcntl.LOCK_UN)

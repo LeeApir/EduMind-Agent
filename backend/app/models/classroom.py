@@ -96,7 +96,7 @@ class ClassroomOperation(Base):
             ondelete="CASCADE",
         ),
         CheckConstraint(
-            "kind IN ('mode', 'control', 'speech', 'reexplanation', 'debate')",
+            "kind IN ('create', 'mode', 'control', 'speech', 'reexplanation', 'debate')",
             name="ck_classroom_operations_kind",
         ),
         CheckConstraint(
@@ -120,6 +120,7 @@ class ClassroomOperation(Base):
     base_revision: Mapped[int] = mapped_column(Integer, nullable=False)
     generation_id: Mapped[UUID | None] = mapped_column(PostgreSQLUUID(as_uuid=True))
     result_id: Mapped[UUID | None] = mapped_column(PostgreSQLUUID(as_uuid=True))
+    result_snapshot: Mapped[dict[str, object] | None] = mapped_column(JSONB)
     status: Mapped[str] = mapped_column(String(20), nullable=False, default="accepted")
     error: Mapped[dict[str, object] | None] = mapped_column(JSONB)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
