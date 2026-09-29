@@ -4,11 +4,14 @@ import {
   ClassroomSpeechError,
   controlClassroom,
   createClassroom,
+  exitDebate,
   loadClassroom,
   loadClassroomMessages,
   loadClassroomOperation,
+  loadDebateResult,
   setClassroomMode,
   streamClassroomSpeech,
+  streamDebate,
   streamReexplanation,
   type ClassroomSpeechEvent,
 } from "../src/api/classroom";
@@ -46,6 +49,58 @@ function speechOptions(overrides: Record<string, unknown> = {}) {
 }
 
 describe("classroom API client", () => {
+  it("starts the fixed debate with CAS and only emits durable ready after review", async () => {
+    const fetchImpl = vi.fn().mockResolvedValue(streamResponse([
+      'event: agent_start\ndata: {"operation_id":"op-debate"}\n\n',
+      'event: stage_changed\ndata: {"stage":"reviewing"}\n\n',
+      'event: review_pass\ndata: {"operation_id":"op-debate","kind":"debate"}\n\n',
+      'event: debate_ready\ndata: {"result_id":"result-1"}\n\n',
+      'event: done\ndata: {"status":"published"}\n\n',
+    ]));
+    const received: ClassroomSpeechEvent[] = [];
+    await streamDebate({ unitId: "unit-1", question: "怎么选？", revision: 3,
+      csrfToken: "csrf", idempotencyKey: "debate-request-key-1", fetchImpl,
+      onEvent: (event) => received.push(event) });
+    expect(received.map((event) => event.type)).toEqual([
+      "agent_start", "stage_changed", "review_pass", "debate_ready", "done",
+    ]);
+    expect(fetchImpl).toHaveBeenCalledWith(
+      "/api/learning-units/unit-1/classroom/debate",
+      expect.objectContaining({ method: "POST", body: JSON.stringify({
+        preset: "array-vs-linked-list", question: "怎么选？",
+      }), headers: expect.objectContaining({
+        "If-Match-Classroom-Revision": "3", "Idempotency-Key": "debate-request-key-1",
+        "X-CSRF-Token": "csrf",
+      }) }),
+    );
+  });
+
+  it("does not turn a rejected review into a published debate", async () => {
+    const fetchImpl = vi.fn().mockResolvedValue(streamResponse([
+      'event: agent_start\ndata: {"operation_id":"op-debate"}\n\n',
+      'event: error\ndata: {"code":"REVIEW_REJECTED","retryable":false}\n\n',
+    ]));
+    await expect(streamDebate({ unitId: "unit-1", question: "怎么选？", revision: 1,
+      csrfToken: "csrf", idempotencyKey: "debate-request-key-2", fetchImpl,
+      onEvent: vi.fn() })).rejects.toMatchObject({
+      code: "REVIEW_REJECTED", retryable: false, operationId: "op-debate",
+    });
+  });
+
+  it("reads the reviewed result and exits with the original CAS receipt key", async () => {
+    const fetchImpl = vi.fn().mockImplementation(async () =>
+      Response.json({ id: "result-1", status: "published" }));
+    await expect(loadDebateResult("unit-1", "result-1", fetchImpl)).resolves.toMatchObject({
+      id: "result-1", status: "published",
+    });
+    await exitDebate("unit-1", "result-1", 2, "csrf", "debate-exit-key-01", fetchImpl);
+    expect(fetchImpl).toHaveBeenLastCalledWith(
+      "/api/learning-units/unit-1/classroom/debate/result-1/exit",
+      expect.objectContaining({ method: "POST", headers: expect.objectContaining({
+        "If-Match-Classroom-Revision": "2", "Idempotency-Key": "debate-exit-key-01",
+      }) }),
+    );
+  });
   it("streams speech events with the required headers, body, and typed event data", async () => {
     const fetchImpl = vi.fn().mockResolvedValue(streamResponse([
       'event: agent_start\ndata: {"operation_id":"op-1","revision":1,"scene_version":1,"generation_id":null}\n\n',

@@ -38,8 +38,10 @@ def main() -> None:
         wait_for_server()
         os.environ["EDUMIND_E2E_BASE_URL"] = environment["EDUMIND_E2E_BASE_URL"]
         from learning_flow import run
+        from debate_flow import run as run_debate
 
         run()
+        run_debate()
     finally:
         process.terminate()
         try:

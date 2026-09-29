@@ -12,6 +12,7 @@ import PublishedLearningWorkspace from "./components/PublishedLearningWorkspace.
 import LearningPathPanel from "./components/LearningPathPanel.vue";
 import AnimationPanel from "./components/AnimationPanel.vue";
 import ClassroomPanel from "./components/ClassroomPanel.vue";
+import DebatePanel from "./components/DebatePanel.vue";
 import LearningControlsPanel from "./components/LearningControlsPanel.vue";
 import { ClassroomSpeechError, controlClassroom, loadClassroom, type LearningResourceType } from "./api/classroom";
 
@@ -58,6 +59,7 @@ const selectedSceneId = ref("");
 const learningUnitId = ref("");
 const animationNodeId = ref("");
 const classroomRefreshToken = ref(0);
+const debateActive = ref(false);
 const operationId = ref("");
 const idempotencyKey = ref("");
 const csrfToken = ref("");
@@ -478,38 +480,48 @@ function stringValue(value: unknown): string {
       :published-resources="publishedResources"
       :reload-published="learningUnitId ? loadPublishedUnit : undefined"
     />
-    <PublishedLearningWorkspace
-      v-if="resources.length"
-      :key="selectedSceneId"
-      :resources="resources"
-      :csrf-token="csrfToken"
-      :select-resource="selectResource"
-      @quiz-submitted="handleQuizSubmitted"
-    />
-    <LearningControlsPanel
+    <DebatePanel
       v-if="resources.length && learningUnitId && csrfToken"
       :unit-id="learningUnitId"
       :csrf-token="csrfToken"
-      :scenes="scenes"
-      :selected-scene-id="selectedSceneId"
-      @select-scene="selectScene"
-      @scene-changed="handleScenePublished"
-      @classroom-changed="classroomRefreshToken += 1"
-    />
-    <AnimationPanel
-      v-if="resources.length && learningUnitId && animationSceneVersion >= 1"
-      :unit-id="learningUnitId"
-      :node-id="animationNodeId"
-      :scene-version="animationSceneVersion"
-      :csrf-token="csrfToken"
-    />
-    <ClassroomPanel
-      v-if="resources.length && learningUnitId && csrfToken"
-      :unit-id="learningUnitId"
-      :csrf-token="csrfToken"
-      :scene-version="classroomSceneVersion"
       :refresh-token="classroomRefreshToken"
+      @active="debateActive = $event"
+      @changed="classroomRefreshToken += 1"
     />
+    <div v-show="!debateActive">
+      <PublishedLearningWorkspace
+        v-if="resources.length"
+        :key="selectedSceneId"
+        :resources="resources"
+        :csrf-token="csrfToken"
+        :select-resource="selectResource"
+        @quiz-submitted="handleQuizSubmitted"
+      />
+      <LearningControlsPanel
+        v-if="resources.length && learningUnitId && csrfToken"
+        :unit-id="learningUnitId"
+        :csrf-token="csrfToken"
+        :scenes="scenes"
+        :selected-scene-id="selectedSceneId"
+        @select-scene="selectScene"
+        @scene-changed="handleScenePublished"
+        @classroom-changed="classroomRefreshToken += 1"
+      />
+      <AnimationPanel
+        v-if="resources.length && learningUnitId && animationSceneVersion >= 1"
+        :unit-id="learningUnitId"
+        :node-id="animationNodeId"
+        :scene-version="animationSceneVersion"
+        :csrf-token="csrfToken"
+      />
+      <ClassroomPanel
+        v-if="resources.length && learningUnitId && csrfToken"
+        :unit-id="learningUnitId"
+        :csrf-token="csrfToken"
+        :scene-version="classroomSceneVersion"
+        :refresh-token="classroomRefreshToken"
+      />
+    </div>
     <p
       v-if="restoringUnit"
       role="status"

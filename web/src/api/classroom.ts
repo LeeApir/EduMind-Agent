@@ -17,6 +17,8 @@ export type ClassroomSpeechEventType =
   | "agent_start"
   | "token"
   | "review_pass"
+  | "stage_changed"
+  | "debate_ready"
   | "message_ready"
   | "scene_ready"
   | "content_retracted"
@@ -35,6 +37,10 @@ export interface ClassroomDetour {
   kind?: "prerequisite" | "debate";
   target_node_id?: string;
   path_version_id?: string;
+  result_id?: string;
+  mode?: ClassroomMode;
+  enabled_roles?: CompanionRole[];
+  paused?: boolean;
 }
 
 export interface ClassroomSnapshot {
@@ -49,6 +55,35 @@ export interface ClassroomSnapshot {
   paused: boolean;
   generation_id?: string;
   detour?: ClassroomDetour;
+  version_changed?: boolean;
+}
+
+export interface DebateResult {
+  id: string;
+  scene_key: string;
+  scene_version: number;
+  status: "published";
+  question: string;
+  question_conditions: { stated: string[]; unknown: string[] };
+  perspectives: { performance: string; engineering: string; academic: string };
+  moderator: { objective_conclusion: string; tradeoffs: string; learner_advice: string };
+  moderator_summary: string;
+  candidate_schema_version: string;
+  candidate_prompt_version: string;
+  generation_model_id: string;
+  review_version: string;
+  review_model_id: string;
+  correction_attempts: number;
+}
+
+export interface StreamDebateOptions {
+  unitId: string;
+  question: string;
+  revision: number;
+  csrfToken: string;
+  idempotencyKey: string;
+  onEvent: (event: ClassroomSpeechEvent) => void;
+  fetchImpl?: FetchLike;
 }
 
 export interface ClassroomMessage {
@@ -345,6 +380,76 @@ export async function streamReexplanation({
       code: "CONNECTION_INTERRUPTED", retryable: true, operationId,
     });
   }
+}
+
+/** Start the fixed P0 debate; provisional candidate text is never exposed. */
+export async function streamDebate({
+  unitId, question, revision, csrfToken, idempotencyKey, onEvent, fetchImpl = fetch,
+}: StreamDebateOptions): Promise<void> {
+  let response: Response;
+  try {
+    response = await fetchImpl(
+      `/api/learning-units/${encodeURIComponent(unitId)}/classroom/debate`,
+      {
+        method: "POST", credentials: "same-origin",
+        headers: {
+          Accept: "text/event-stream", "Content-Type": "application/json",
+          "X-CSRF-Token": csrfToken, "Idempotency-Key": idempotencyKey,
+          "If-Match-Classroom-Revision": String(revision),
+        },
+        body: JSON.stringify({ preset: "array-vs-linked-list", question }),
+      },
+    );
+  } catch {
+    throw new ClassroomSpeechError({ message: "多视角演示连接失败，请恢复原请求。", code: "CONNECTION_FAILED" });
+  }
+  if (!response.ok) throw await classroomErrorFromResponse(response);
+  if (!response.body) throw new ClassroomSpeechError({ message: "演示没有返回状态流。", code: "EMPTY_STREAM" });
+  let operationId: string | undefined;
+  try {
+    for await (const raw of parseSseStream(response.body)) {
+      const event = raw as unknown as ClassroomSpeechEvent;
+      if (event.type === "agent_start" && typeof event.data.operation_id === "string") {
+        operationId = event.data.operation_id;
+      }
+      onEvent(event);
+      if (event.type === "error") throw speechErrorFromPayload(event.data, operationId);
+    }
+  } catch (error) {
+    if (error instanceof ClassroomSpeechError) throw error;
+    throw new ClassroomSpeechError({
+      message: "演示连接中断，请先查询原操作状态。", code: "CONNECTION_INTERRUPTED",
+      retryable: true, operationId,
+    });
+  }
+}
+
+export async function loadDebateResult(
+  unitId: string, resultId: string, fetchImpl: FetchLike = fetch,
+): Promise<DebateResult> {
+  const response = await fetchImpl(
+    `/api/learning-units/${encodeURIComponent(unitId)}/classroom/debate/${encodeURIComponent(resultId)}`,
+    { credentials: "same-origin", headers: { Accept: "application/json" } },
+  );
+  return readJson<DebateResult>(response);
+}
+
+export async function exitDebate(
+  unitId: string, resultId: string, revision: number, csrfToken: string,
+  idempotencyKey: string, fetchImpl: FetchLike = fetch,
+): Promise<ClassroomSnapshot> {
+  const response = await fetchImpl(
+    `/api/learning-units/${encodeURIComponent(unitId)}/classroom/debate/${encodeURIComponent(resultId)}/exit`,
+    {
+      method: "POST", credentials: "same-origin",
+      headers: {
+        Accept: "application/json", "X-CSRF-Token": csrfToken,
+        "Idempotency-Key": idempotencyKey,
+        "If-Match-Classroom-Revision": String(revision),
+      },
+    },
+  );
+  return readJson<ClassroomSnapshot>(response);
 }
 
 /** Read committed classroom messages after the given cursor (no temporary tokens). */

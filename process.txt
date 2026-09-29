@@ -553,3 +553,7 @@ T022已本地完成提交9ec85db且工作区干净，T004/T018依赖已完成，
 T023 eaf74a2与T016依赖完成提交且工作区干净，领取多视角审核与发布门禁 | T023已有待审核完整候选，ADR-0005要求整体审核、失败保留课堂、owner/幂等回放 | T025仅前端实现，T024须交付持久正式结果与已批准的API/SSE，不得直接展示pending候选 | 核对Review和课堂操作模型后实现有界审核、原子发布及失败恢复，独立数据库与Provider mock验证后本地提交
 [2026-09-29T16:26:03] [MVP-0.3-T024] VERIFIED | executor=Lee
 独立Review有界修正并整体发布三视角与主持人结果；owner/CAS/幂等、断流清理、失败保留课堂和退出恢复返回点；新增结果表迁移及OpenAPI契约 | 独立PG升级head及后端全量640通过5跳过、新增API定向7通过，Ruff/Mypy92源/OpenAPI Schema与JSON/diff通过；证据docs/acceptance/mvp-0.3-t024-reviewed-debate.md；0真实Provider调用 | T025需前端展示与刷新恢复，T026需显式偏好反馈；旧回执缺失仍409 | 自查并本地完成提交，再领取T025；不push/merge
+[2026-09-29T16:27:47] [MVP-0.3-T025] START | executor=Lee | branch=codex/mvp-0.3
+T020与T024 0cbfa4f已完成且工作区干净，领取多视角展示及课堂返回 | 后端已有正式结果GET、debate POST SSE、exit POST和detour回执 | 页面需只展示审核通过结果，刷新/断流恢复，不丢失原课堂进度与资源 | 接入API和安全渲染，完成组件及浏览器验证后本地提交；不push/merge
+[2026-09-29T16:45:51] [MVP-0.3-T025] VERIFIED | executor=Lee
+学习页接入主动演示、正式三视角/主持人展示、状态恢复和幂等退出；切换时保留原组件，审核拒绝或Provider故障不展示候选，模型文本安全转义 | 前端全量113通过、构建/改动文件ESLint通过；Chromium路由模拟进入退出/刷新/失败/XSS/草稿保持及隔离PG真实HTTP联调通过；E2E Python Ruff/diff通过；证据docs/acceptance/mvp-0.3-t025-debate-ui.md；0真实Provider调用 | T026需显式偏好提交；当前按需演示不自动触发，也不推断画像偏好 | 自查并本地完成提交，再领取下一依赖满足任务；不push/merge
