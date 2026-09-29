@@ -505,11 +505,11 @@ owner/成功Job/已审核场景绑定授权MP4和SRT，内容地址安全打开�
 T014 98e6571完成提交且工作区干净，领取按需动画播放器与Job操作 | 创建/查询/取消/重试/SSE/媒体接口已实测，现有Vue学习页尚无动画入口 | 不得页面载入即创建Job，刷新/断线只按已有Job查询与事件游标恢复，旧节点事件不得覆盖当前页 | 接入状态组件和SRT播放，组件/类型/构建与浏览器播放取消重试断网验证后独立提交
 [2026-09-28T14:53:44] [MVP-0.3-T015] VERIFIED | executor=Lee
 按需动画入口、持久Job恢复/SSE游标、取消重试、MP4与SRT播放和节点切换隔离接入Web；EventSource首订阅补after查询游标 | 前端77通过/类型构建/ESLint通过，后端全量531通过5跳过、Ruff/Mypy通过；真实Chromium仅显式创建1次、36秒媒体播放/字幕、刷新无新Job、取消重试与离线恢复通过；0Provider调用 | 固定教学参数仅为P0模板样例，课堂与导出仍待T016后续；一次性测试库与生成媒体不提交 | 明确路径本地T015完成提交，核对后领取T016；交接docs/acceptance/mvp-0.3-t015-player.md，不push/merge
-[2026-09-28T21:56:00] [MVP-0.3-T016] START | executor=Lee | branch=codex/mvp-0.3-t015
+[2026-09-28T21:56:00] [MVP-0.3-T016] START | executor=Xerneus111 | branch=codex/mvp-0.3-t015
 T015 26409aa完成提交且工作区干净，领取持久化课堂会话与角色上下文 | ADR-0005决定A与OpenAPI课堂快照/消息/操作契约已批准，T003/T004完成；宿主Docker守护未启动、无独立测试PG可用 | 只能以临时PG容器验证迁移与owner隔离，不可用现有运行库做破坏性迁移 | 建立课堂会话/消息/角色上下文模型与0012迁移，会话隔离/消息游标/重启恢复数据库测试通过后独立提交
-[2026-09-28T22:04:00] [MVP-0.3-T016] VERIFIED | executor=Lee
+[2026-09-28T22:04:00] [MVP-0.3-T016] VERIFIED | executor=Xerneus111
 新增课堂会话/只追加消息/角色上下文模型与0012迁移：owner+单元唯一当前课堂、revision乐观版本、全局message_cursor、focus默认、enabled_roles/generation_id/paused/detour；消息按会话单调游标+role+session_revision+scene_version+text/resource_id+visible；角色上下文以context_kind区分课堂角色与多视角职责并CHECK互斥 | 空库升0001–0012、降0011三表消失、再升恢复三表；4项数据库测试通过（owner/单元唯一、跨owner复合外键拒绝、游标单调、角色kind分离、重启读回模式/版本/游标/暂停/消息）；ruff/mypy通过 | 本Windows宿主app/main因动画缓存animation_cache.py的POSIX fcntl无法导入（前序980caf7于macOS验证），全量后端无法在此收集，属既有跨平台缺口非本任务回归；T016仅交付持久原语 | 明确路径本地T016完成提交，核对后领取T017；交接docs/acceptance/mvp-0.3-t016-classroom-persistence.md，不push/merge；T017前需先决策或修复fcntl以便API测试在本机可收集
-[2026-09-28T22:26:00] [MVP-0.3-T017] START | executor=Lee | branch=codex/mvp-0.3-t015
+[2026-09-28T22:26:00] [MVP-0.3-T017] START | executor=Xerneus111 | branch=codex/mvp-0.3-t015
 T016 3903676与fcntl跨平台修复166a158完成提交且工作区仅task.json已标记，领取专注与互动模式切换 | ADR-0005决定B与OpenAPI课堂GET/POST/PATCH契约已批准；T016课堂模型/owner锁/幂等与CSRF依赖已就绪 | 幂等命中先于版本检查，focus要求空角色，切模式需CAS+新generation_id并标记旧generation_id作废 | 实现owner范围课堂读/建/切模式服务与受鉴权路由、迁移0013、真PG幂等/并发/门禁测试后独立提交
-[2026-09-28T22:38:06] [MVP-0.3-T017] VERIFIED | executor=Lee | branch=codex/mvp-0.3-t015
+[2026-09-28T22:38:06] [MVP-0.3-T017] VERIFIED | executor=Xerneus111 | branch=codex/mvp-0.3-t015
 新增classroom_operations幂等表(0013)、服务classroom.py(owner课堂读/建/切模式)与API GET/POST/PATCH；幂等命中先于版本检查、owner行锁后重查幂等再revision CAS，切模式revision+1并换generation_id，focus强制空角色，纯数据库事务不调Provider | 迁移0013升降升通过；classroom_mode_api 11项、OpenAPI契约7项、T016持久化4项通过；ruff app+tests与strict mypy 77源通过；并发同键幂等/异键CAS/旧响应门禁/跨owner404/同键异摘要409全部实测 | 全量后端48失败均为既有问题非回归：动画/链表模板CRLF摘要不匹配+首屏毫秒计时抖动+Docker镜像缺失；无Provider调用 | 明确路径本地T017完成提交，核对后领取T018；交接docs/acceptance/mvp-0.3-t017-classroom-mode.md，不push/merge
