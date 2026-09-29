@@ -541,3 +541,7 @@ T020与T016依赖已完成，领取当前场景重解释版本服务 | 工作区
 复核T022前端接入条件发现已批准controls端点尚未实现；在账本增加前置T035并更新T022依赖 | 对照backend/app/api与ADR-0005/OpenAPI确认缺口，T021 d1c6c35已完成且工作区干净 | T022不能以静态UI或客户端本地状态替代持久控制API | 先完成owner范围持久控制API并验证，再恢复T022；不push/merge
 [2026-09-29T10:49:04] [MVP-0.3-T035] VERIFIED | executor=Lee
 已批准controls端点落地：owner/CAS/幂等原回执、暂停/继续/跳过、正式资源选择和路径前置返回点；ProfileEvent schema v2记录新增资源类别 | 独立PG定向26通过、后端全量617通过5跳过、Ruff/Mypy86源/OpenAPI与task JSON解析/diff通过；证据docs/acceptance/mvp-0.3-t035-classroom-controls.md；0真实Provider调用 | 前置目标仅保存导航与返回点，不自动生成教学资源；T022界面仍需接入 | 自查并本地完成提交后领取T022，不push/merge
+[2026-09-29T10:53:04] [MVP-0.3-T022] START | executor=Lee | branch=codex/mvp-0.3
+T021 d1c6c35与新前置T035 4d407d5已完成提交且工作区干净，领取学习控制与版本界面 | T021流式重解释/旧版只读、T035持久控制API与T020课堂UI已可用 | App现将所有场景版本资源扁平合并，须避免新旧练习/代码混显；迟到响应和刷新不得覆盖用户版本选择 | 接入当前版本/历史视图、控制与SSE状态，保留练习回执与其他场景，组件/浏览器/构建验证后本地提交
+[2026-09-29T13:41:31] [MVP-0.3-T022] VERIFIED | executor=Lee
+学习页按场景版本隔离正式资源并记住用户选择；接通持久暂停/继续/跳过/资源选择和重解释SSE，恢复未确认操作、收回未审核候选、刷新后保留旧版作答，课堂迟到发言不再显示 | 前端105测试通过、构建/改动文件ESLint/diff通过，Chromium路由mock E2E覆盖新旧版/刷新/失败并留截图；证据docs/acceptance/mvp-0.3-t022-learning-controls-ui.md | 浏览器联调使用路由mock，后端T021/T035已有数据库与mock Provider验证；0真实Provider调用 | 自查并本地完成提交，再领取下一依赖已满足任务；不push/merge

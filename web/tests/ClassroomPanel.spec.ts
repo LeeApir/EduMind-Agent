@@ -275,6 +275,30 @@ describe("ClassroomPanel", () => {
     expect(loadMessages).toHaveBeenCalledTimes(1);
   });
 
+  it("ends an in-flight speech when learning controls refresh the classroom", async () => {
+    let onEvent: ((event: ClassroomSpeechEvent) => void) | undefined;
+    const streamSpeech = vi.fn((options: StreamClassroomSpeechOptions) => {
+      onEvent = options.onEvent;
+      return new Promise<void>(() => {});
+    });
+    const wrapper = mountPanel(makeProps({ streamSpeech, refreshToken: 0 }));
+    await flushPromises();
+    await wrapper.get('[data-testid="speech-input"]').setValue("旧场景问题");
+    await wrapper.get("form").trigger("submit");
+    onEvent?.({ type: "token", data: { role: "tutor", delta: "旧的回复" } });
+    await flushPromises();
+    expect(wrapper.get(".message-streaming").text()).toContain("旧的回复");
+
+    await wrapper.setProps({ refreshToken: 1 });
+    await flushPromises();
+    onEvent?.({ type: "token", data: { role: "tutor", delta: "迟到的内容" } });
+    await flushPromises();
+    expect(wrapper.find(".message-streaming").exists()).toBe(false);
+    expect(wrapper.get('[data-testid="speech-input"]').element).toHaveProperty("value", "旧场景问题");
+    expect(wrapper.text()).toContain("课堂进度已变化");
+    expect(wrapper.text()).not.toContain("迟到的内容");
+  });
+
   it("escapes hostile model content in both streaming and committed messages", async () => {
     let onEvent: ((event: ClassroomSpeechEvent) => void) | undefined;
     const streamSpeech = vi.fn((options: StreamClassroomSpeechOptions) => {

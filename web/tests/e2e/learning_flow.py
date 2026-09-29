@@ -74,6 +74,28 @@ def mock_api(route: Route) -> None:
     if path == "/api/auth/guest":
         route.fulfill(status=201, json={"csrf_token": "c" * 64, "user": {"id": "user-1"}})
         return
+    if path == "/api/learning-units/unit-reviewed-001/classroom":
+        route.fulfill(status=200, json={
+            "learning_unit_id": "unit-reviewed-001", "revision": 1,
+            "message_cursor": 0, "scene_key": "intro", "scene_version": 1,
+            "scene_progress": 0, "mode": "focus", "enabled_roles": [], "paused": False,
+        })
+        return
+    if path == "/api/learning-units/unit-reviewed-001/classroom/controls":
+        payload = json.loads(request.post_data or "{}")
+        assert payload["action"] == "select_resource"
+        assert payload["resource_type"] in {"explanation", "code", "exercise"}
+        assert request.headers.get("if-match-classroom-revision") == "1"
+        assert request.headers.get("idempotency-key")
+        route.fulfill(status=200, json={
+            "learning_unit_id": "unit-reviewed-001", "revision": 2,
+            "message_cursor": 0, "scene_key": "intro", "scene_version": 1,
+            "scene_progress": 0, "mode": "focus", "enabled_roles": [], "paused": False,
+        })
+        return
+    if path == "/api/learning-units/unit-reviewed-001/classroom/messages":
+        route.fulfill(status=200, json={"messages": [], "last_message_cursor": 0})
+        return
     if path.startswith("/api/learning-units/"):
         route.fulfill(
             status=200,
@@ -81,7 +103,10 @@ def mock_api(route: Route) -> None:
                 "id": "unit-reviewed-001",
                 "status": "ready",
                 "path_target_node_id": "linked-list-concept",
-                "scenes": [{"resources": RESOURCES}],
+                "scenes": [{
+                    "id": "scene-1", "scene_key": "intro", "version": 1,
+                    "is_current": True, "resources": RESOURCES,
+                }],
             },
         )
         return
@@ -430,11 +455,99 @@ def run() -> None:
             expect(page.get_by_test_id("explanation-tab")).to_contain_text("链表节点")
             assert len(LEARNING_KEYS) == 1
             page.close()
+
+            page = browser.new_page()
+            page.set_default_timeout(5_000)
+            print("E2E: learning controls and scene versions", flush=True)
+            open_page(page)
+            scene_state = {"version": 1, "revision": 1}
+
+            def scene_api(route: Route) -> None:
+                request = route.request
+                path = urlparse(request.url).path
+                unit = "/api/learning-units/unit-reviewed-001"
+                if path == unit:
+                    newer = [{
+                        "id": "scene-2", "scene_key": "intro", "version": 2,
+                        "is_current": True,
+                        "resources": [
+                            {**resource,
+                             "id": f"{resource['id']}-v2",
+                             "version": 2,
+                             "content": {"markdown": "新版：先保存后继再修改指针。"}
+                             if resource["type"] == "explanation" else resource["content"]}
+                            for resource in RESOURCES
+                        ],
+                    }] if scene_state["version"] == 2 else []
+                    older = [{
+                        "id": "scene-1", "scene_key": "intro", "version": 1,
+                        "is_current": scene_state["version"] == 1,
+                        "resources": RESOURCES,
+                    }]
+                    route.fulfill(status=200, json={"id": "unit-reviewed-001", "status": "ready",
+                                                    "scenes": newer + older})
+                    return
+                if path == f"{unit}/classroom":
+                    route.fulfill(status=200, json={
+                        "learning_unit_id": "unit-reviewed-001", "revision": scene_state["revision"],
+                        "message_cursor": 0, "scene_key": "intro",
+                        "scene_version": scene_state["version"], "scene_progress": 0,
+                        "mode": "focus", "enabled_roles": [], "paused": False,
+                    })
+                    return
+                if path.endswith("/reexplanations"):
+                    payload = json.loads(request.post_data or "{}")
+                    assert request.headers.get("if-match-classroom-revision") == str(scene_state["revision"])
+                    assert request.headers.get("idempotency-key")
+                    if payload["action"] == "simpler":
+                        scene_state["version"] = 2
+                        scene_state["revision"] = 2
+                        body = sse(
+                            ("agent_start", {"operation_id": "op-reexplain-ok"}),
+                            ("token", {"temporary": True, "delta": "候选新版"}),
+                            ("review_pass", {"kind": "reexplanation"}),
+                            ("scene_ready", {"scene_key": "intro", "scene_version": 2}),
+                            ("done", {"status": "published"}),
+                        )
+                    else:
+                        body = sse(
+                            ("agent_start", {"operation_id": "op-reexplain-failed"}),
+                            ("token", {"temporary": True, "delta": "未审核候选"}),
+                            ("content_retracted", {"code": "REVIEW_REJECTED"}),
+                            ("error", {"code": "REVIEW_REJECTED", "message": "审核未通过", "retryable": False}),
+                            ("done", {"status": "failed"}),
+                        )
+                    route.fulfill(status=200, content_type="text/event-stream", body=body)
+                    return
+                if path == "/api/classroom-operations/op-reexplain-failed":
+                    route.fulfill(status=200, json={"id": "op-reexplain-failed", "status": "failed",
+                                                    "kind": "reexplanation", "learning_unit_id": "unit-reviewed-001",
+                                                    "base_revision": 2})
+                    return
+                route.fallback()
+
+            page.route(f"{BASE_URL}/api/**", scene_api)
+            submit(page, "我想理解链表插入")
+            expect(page.get_by_test_id("explanation-tab")).to_contain_text("链表节点")
+            controls = page.get_by_test_id("learning-controls")
+            controls.get_by_role("button", name="更简单").click()
+            expect(page.get_by_test_id("explanation-tab")).to_contain_text("新版：先保存后继")
+            controls.get_by_role("button", name="intro · 版本 1 · 旧版只读").click()
+            expect(page.get_by_test_id("explanation-tab")).to_contain_text("链表节点")
+            page.reload(wait_until="domcontentloaded")
+            expect(page.get_by_test_id("explanation-tab")).to_contain_text("链表节点")
+            controls.get_by_role("button", name="intro · 版本 2 · 当前").click()
+            controls.get_by_role("button", name="更深入").click()
+            expect(controls).to_contain_text("上次重解释未发布，原正式版本仍可学习")
+            expect(page.get_by_test_id("explanation-tab")).to_contain_text("新版：先保存后继")
+            expect(controls.get_by_label("临时讲解")).to_have_count(0)
+            controls.screenshot(path="/tmp/edumind-mvp03-t022-controls.png", animations="disabled")
+            page.close()
         finally:
             browser.close()
     print(
-        "MVP 0.2 browser route-mock E2E passed: quiz submit/reload, mobile, "
-        "provider failure, review rejection, SSE recovery"
+        "Browser route-mock E2E passed: quiz submit/reload, mobile, "
+        "provider failure, review rejection, SSE recovery, controls and scene versions"
     )
 
 

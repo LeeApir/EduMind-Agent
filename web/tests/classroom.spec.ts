@@ -2,12 +2,14 @@ import { describe, expect, it, vi } from "vitest";
 
 import {
   ClassroomSpeechError,
+  controlClassroom,
   createClassroom,
   loadClassroom,
   loadClassroomMessages,
   loadClassroomOperation,
   setClassroomMode,
   streamClassroomSpeech,
+  streamReexplanation,
   type ClassroomSpeechEvent,
 } from "../src/api/classroom";
 
@@ -148,6 +150,48 @@ describe("classroom API client", () => {
         method: "PATCH",
         headers: expect.objectContaining({ "If-Match-Classroom-Revision": "1" }),
         body: JSON.stringify({ mode: "interactive", enabled_roles: ["beginner", "advanced"] }),
+      }),
+    );
+  });
+
+  it("sends learning controls with revision, idempotency, and selected resource", async () => {
+    const fetchImpl = vi.fn().mockResolvedValue(Response.json({ ...snapshot, revision: 2 }));
+    await controlClassroom({
+      unitId: "unit-1", action: "select_resource", resourceType: "code",
+      revision: 1, csrfToken: "csrf", idempotencyKey: "request-1", fetchImpl,
+    });
+    expect(fetchImpl).toHaveBeenCalledWith(
+      "/api/learning-units/unit-1/classroom/controls",
+      expect.objectContaining({
+        method: "POST",
+        headers: expect.objectContaining({
+          "If-Match-Classroom-Revision": "1", "Idempotency-Key": "request-1",
+          "X-CSRF-Token": "csrf",
+        }),
+        body: JSON.stringify({ action: "select_resource", resource_type: "code" }),
+      }),
+    );
+  });
+
+  it("streams reexplanation and treats temporary tokens as distinct from publication", async () => {
+    const fetchImpl = vi.fn().mockResolvedValue(streamResponse([
+      'event: agent_start\ndata: {"operation_id":"op-reexplain"}\n\n',
+      'event: token\ndata: {"temporary":true,"delta":"候选讲解"}\n\n',
+      'event: scene_ready\ndata: {"scene_key":"intro","scene_version":2}\n\n',
+      'event: done\ndata: {"status":"published"}\n\n',
+    ]));
+    const events: ClassroomSpeechEvent[] = [];
+    await streamReexplanation({
+      unitId: "unit-1", sceneKey: "intro", baseSceneVersion: 1,
+      action: "simpler", revision: 1, csrfToken: "csrf", idempotencyKey: "request-2",
+      fetchImpl, onEvent: (event) => events.push(event),
+    });
+    expect(events.map((event) => event.type)).toEqual(["agent_start", "token", "scene_ready", "done"]);
+    expect(fetchImpl).toHaveBeenCalledWith(
+      "/api/learning-units/unit-1/classroom/scenes/intro/reexplanations",
+      expect.objectContaining({
+        headers: expect.objectContaining({ "If-Match-Classroom-Revision": "1" }),
+        body: JSON.stringify({ action: "simpler", base_scene_version: 1 }),
       }),
     );
   });

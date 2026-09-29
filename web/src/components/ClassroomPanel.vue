@@ -38,6 +38,7 @@ const props = withDefaults(defineProps<{
   unitId: string;
   csrfToken?: string;
   sceneVersion?: number;
+  refreshToken?: number;
   loadSnapshot?: (unitId: string) => Promise<ClassroomSnapshot>;
   create?: (unitId: string, csrfToken: string, idempotencyKey: string) => Promise<ClassroomSnapshot>;
   setMode?: (unitId: string, options: SetClassroomModeOptions) => Promise<ClassroomSnapshot>;
@@ -47,6 +48,7 @@ const props = withDefaults(defineProps<{
 }>(), {
   csrfToken: "",
   sceneVersion: 0,
+  refreshToken: 0,
   loadSnapshot: (unitId: string) => loadClassroom(unitId),
   create: (unitId: string, csrfToken: string, idempotencyKey: string) => createClassroom(unitId, csrfToken, idempotencyKey),
   setMode: (unitId: string, options: SetClassroomModeOptions) => setClassroomMode(unitId, options),
@@ -228,6 +230,20 @@ watch(() => props.unitId, () => {
   resetState();
   if (props.unitId) void ensureClassroom(token);
 }, { immediate: true });
+
+watch(() => props.refreshToken, () => {
+  if (!props.unitId || phase.value !== "ready") return;
+  if (streaming.value) {
+    streaming.value = false;
+    streamingText.value = "";
+    retracted.value = true;
+    if (pendingSpeech.value && !draft.value) draft.value = pendingSpeech.value.text;
+    pendingSpeech.value = null;
+    clearPending(props.unitId);
+    streamNotice.value = "课堂进度已变化，原发言未发布。";
+  }
+  void refreshSnapshot();
+});
 
 async function applyEvent(event: ClassroomSpeechEvent): Promise<void> {
   switch (event.type) {

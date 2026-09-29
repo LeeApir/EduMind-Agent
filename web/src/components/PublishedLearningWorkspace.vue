@@ -12,10 +12,12 @@ const props = withDefaults(defineProps<{
   csrfToken?: string;
   submitQuiz?: (options: SubmitQuizOptions) => Promise<QuizSubmissionResult>;
   loadQuizResult?: (options: QuizResourceRef) => Promise<QuizSubmissionResult | null>;
+  selectResource?: (type: ResourceType) => Promise<void>;
 }>(), {
   csrfToken: "",
   submitQuiz: (options: SubmitQuizOptions) => submitQuizAttempt(options),
   loadQuizResult: (options: QuizResourceRef) => loadLatestQuizResult(options),
+  selectResource: undefined,
 });
 const emit = defineEmits<{ "quiz-submitted": [result: QuizSubmissionResult] }>();
 const activeTab = ref<ResourceType>("explanation");
@@ -25,6 +27,8 @@ const restoring = ref(false);
 const restoreError = ref("");
 const submitting = ref(false);
 const requestError = ref("");
+const selectionError = ref("");
+const selecting = ref(false);
 let generation = 0;
 let pending: { signature: string; key: string; answers: SubmitQuizOptions["answers"] } | null = null;
 onBeforeUnmount(() => { generation += 1; });
@@ -105,6 +109,23 @@ function beginNewAttempt(): void {
   pending = null;
   requestError.value = "";
 }
+
+async function switchTab(tab: ResourceType): Promise<void> {
+  if (tab === activeTab.value || selecting.value) return;
+  selectionError.value = "";
+  if (props.selectResource) {
+    selecting.value = true;
+    try {
+      await props.selectResource(tab);
+    } catch (error) {
+      selectionError.value = errorMessage(error);
+      return;
+    } finally {
+      selecting.value = false;
+    }
+  }
+  activeTab.value = tab;
+}
 </script>
 
 <template>
@@ -118,11 +139,18 @@ function beginNewAttempt(): void {
         :key="tab"
         :type="activeTab === tab ? 'primary' : 'default'"
         :aria-pressed="activeTab === tab"
-        @click="activeTab = tab"
+        :disabled="selecting"
+        @click="switchTab(tab)"
       >
         {{ ({ explanation: '讲解', code: '代码', exercise: '练习' })[tab] }}
       </NButton>
     </nav>
+    <p
+      v-if="selectionError"
+      role="alert"
+    >
+      {{ selectionError }}
+    </p>
     <article
       v-if="activeTab === 'explanation'"
       data-testid="explanation-tab"

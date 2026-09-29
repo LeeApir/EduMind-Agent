@@ -18,6 +18,7 @@ export type ClassroomSpeechEventType =
   | "token"
   | "review_pass"
   | "message_ready"
+  | "scene_ready"
   | "content_retracted"
   | "error"
   | "done";
@@ -31,6 +32,9 @@ export interface ClassroomDetour {
   scene_key: string;
   scene_version: number;
   scene_progress: number;
+  kind?: "prerequisite" | "debate";
+  target_node_id?: string;
+  path_version_id?: string;
 }
 
 export interface ClassroomSnapshot {
@@ -96,6 +100,32 @@ export interface StreamClassroomSpeechOptions {
   csrfToken: string;
   idempotencyKey: string;
   revision: number;
+  onEvent: (event: ClassroomSpeechEvent) => void;
+  fetchImpl?: FetchLike;
+}
+
+export type LearningControlAction = "pause" | "resume" | "skip" | "prerequisite" | "select_resource";
+export type LearningResourceType = "explanation" | "code" | "exercise" | "animation";
+
+export interface ControlClassroomOptions {
+  unitId: string;
+  action: LearningControlAction;
+  revision: number;
+  csrfToken: string;
+  idempotencyKey: string;
+  resourceType?: LearningResourceType;
+  targetNodeId?: string;
+  fetchImpl?: FetchLike;
+}
+
+export interface StreamReexplanationOptions {
+  unitId: string;
+  sceneKey: string;
+  baseSceneVersion: number;
+  action: "simpler" | "deeper" | "another_example";
+  revision: number;
+  csrfToken: string;
+  idempotencyKey: string;
   onEvent: (event: ClassroomSpeechEvent) => void;
   fetchImpl?: FetchLike;
 }
@@ -237,6 +267,84 @@ export async function setClassroomMode(
     },
   );
   return readJson<ClassroomSnapshot>(response);
+}
+
+/** Persist one learning control with an original receipt for idempotent retries. */
+export async function controlClassroom({
+  unitId, action, revision, csrfToken, idempotencyKey,
+  resourceType, targetNodeId, fetchImpl = fetch,
+}: ControlClassroomOptions): Promise<ClassroomSnapshot> {
+  const response = await fetchImpl(
+    `/api/learning-units/${encodeURIComponent(unitId)}/classroom/controls`,
+    {
+      method: "POST",
+      credentials: "same-origin",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        "X-CSRF-Token": csrfToken,
+        "Idempotency-Key": idempotencyKey,
+        "If-Match-Classroom-Revision": String(revision),
+      },
+      body: JSON.stringify({
+        action,
+        ...(resourceType ? { resource_type: resourceType } : {}),
+        ...(targetNodeId ? { target_node_id: targetNodeId } : {}),
+      }),
+    },
+  );
+  return readJson<ClassroomSnapshot>(response);
+}
+
+/** Stream temporary explanation text; only scene_ready identifies a published version. */
+export async function streamReexplanation({
+  unitId, sceneKey, baseSceneVersion, action, revision, csrfToken,
+  idempotencyKey, onEvent, fetchImpl = fetch,
+}: StreamReexplanationOptions): Promise<void> {
+  let response: Response;
+  try {
+    response = await fetchImpl(
+      `/api/learning-units/${encodeURIComponent(unitId)}/classroom/scenes/${encodeURIComponent(sceneKey)}/reexplanations`,
+      {
+        method: "POST",
+        credentials: "same-origin",
+        headers: {
+          Accept: "text/event-stream",
+          "Content-Type": "application/json",
+          "X-CSRF-Token": csrfToken,
+          "Idempotency-Key": idempotencyKey,
+          "If-Match-Classroom-Revision": String(revision),
+        },
+        body: JSON.stringify({ action, base_scene_version: baseSceneVersion }),
+      },
+    );
+  } catch {
+    throw new ClassroomSpeechError({
+      message: "重解释连接失败，请检查网络后恢复原请求。",
+      code: "CONNECTION_FAILED", retryable: true,
+    });
+  }
+  if (!response.ok) throw await classroomErrorFromResponse(response);
+  if (!response.body) throw new ClassroomSpeechError({
+    message: "重解释未返回流式内容。", code: "EMPTY_STREAM", retryable: true,
+  });
+  let operationId: string | undefined;
+  try {
+    for await (const raw of parseSseStream(response.body)) {
+      const event = raw as unknown as ClassroomSpeechEvent;
+      if (event.type === "agent_start" && typeof event.data.operation_id === "string") {
+        operationId = event.data.operation_id;
+      }
+      onEvent(event);
+      if (event.type === "error") throw speechErrorFromPayload(event.data, operationId);
+    }
+  } catch (error) {
+    if (error instanceof ClassroomSpeechError) throw error;
+    throw new ClassroomSpeechError({
+      message: "重解释连接中断，请先恢复原操作状态。",
+      code: "CONNECTION_INTERRUPTED", retryable: true, operationId,
+    });
+  }
 }
 
 /** Read committed classroom messages after the given cursor (no temporary tokens). */
