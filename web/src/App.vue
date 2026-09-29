@@ -11,6 +11,7 @@ import ProfileCard from "./components/ProfileCard.vue";
 import PublishedLearningWorkspace from "./components/PublishedLearningWorkspace.vue";
 import LearningPathPanel from "./components/LearningPathPanel.vue";
 import AnimationPanel from "./components/AnimationPanel.vue";
+import ClassroomPanel from "./components/ClassroomPanel.vue";
 
 type StartLearningRequest = (goal: string) => Promise<void>;
 
@@ -400,6 +401,12 @@ function stringValue(value: unknown): string {
       :node-id="animationNodeId"
       :scene-version="animationSceneVersion"
       :csrf-token="csrfToken"
+    />
+    <ClassroomPanel
+      v-if="resources.length && learningUnitId && csrfToken"
+      :unit-id="learningUnitId"
+      :csrf-token="csrfToken"
+      :scene-version="animationSceneVersion"
     />
     <p
       v-if="restoringUnit"
