@@ -1015,7 +1015,7 @@
       "id": "MVP-0.3-T018",
       "phase": "MVP 0.3",
       "title": "实现单 Tutor 的按需角色编排",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.3-T003",
@@ -1035,9 +1035,13 @@
       "verification": [
         "运行角色选择、上下文最小化、输出 schema、冗余与 Provider 失败单元测试。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "test_classroom_roles.py 5 项通过：画像固定/版本化、专注恒仅导师、互动按产品序去重、未知角色与模式拒绝。",
+        "test_classroom_context.py 7 项通过：当前事实/前置/目标/已审核资源齐全且上下文不可变，仅发相关已知字段且不含 evidence/私隐值，未知或无证据字段不发送，路径只保留必要信号。",
+        "test_tutor_agent.py 15 项通过：专注一次调用仅导师、互动允许同学且可仅 tutor、专注拒绝同学/重复角色/重复 text/缺 tutor、Provider 失败与非法输出返回可恢复失败。"
+      ],
+      "started_at": "2026-09-29T00:32:00",
+      "completed_at": "2026-09-29T00:38:00",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.3-T018"
     },
