@@ -1063,7 +1063,7 @@ services:
 | POST | `/api/learning-units/{id}/scenes/{scene_id}/actions` | 跳过、标记已会、切换资源或请求动画 |
 | GET | `/api/resource/{id}` | 获取已生成资源 |
 | GET | `/api/resource/list` | 列出我的资源（分页+筛选） |
-| POST | `/api/learning-units/{id}/notes/export` | 导出 Markdown 学习笔记与错题摘要 |
+| GET | `/api/learning-units/{id}/notes.md` | 只读下载已审核 Markdown 学习笔记与本人错题摘要 |
 | POST | `/api/learning-units/{id}/scenes/{scene_id}/animation` | 获取缓存动画或创建 Manim 渲染 Job |
 | GET | `/api/jobs/{job_id}` | 查询异步任务状态、阶段和错误 |
 | GET | `/api/jobs/{job_id}/events` (SSE) | 接收进度、局部结果和完成事件 |
