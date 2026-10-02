@@ -1,0 +1,38 @@
+{
+  "explanation": {
+    "markdown": "# 链表遍历\n\n从head开始，每次处理当前节点，再执行cur=cur->next，直到cur==NULL。循环条件是当前指针是否为NULL，不能用cur->next!=NULL作为普通遍历条件，否则会漏掉末节点并可能对空表解引用。\n\n示例只遍历合法非循环链表；循环或悬空指针输入不在此函数前提内。访问所有n个节点是O(n)时间、O(1)额外空间。链表按位置访问需要从头前进，不能像数组一样直接计算任意节点地址。"
+  },
+  "code": {
+    "language": "C",
+    "source": "#include <assert.h>\n#include <stdbool.h>\n#include <stddef.h>\n#include <stdio.h>\ntypedef struct Node { int value; struct Node *next; } Node;\nstatic size_t length(const Node *head) {\n    size_t count = 0;\n    for (const Node *cur = head; cur != NULL; cur = cur->next) ++count;\n    return count;\n}\nint main(void) {\n    assert(length(NULL) == 0);\n    Node third = {3, NULL}; Node second = {2, &third}; Node first = {1, &second};\n    assert(length(&first) == 3);\n    for (const Node *cur = &first; cur != NULL; cur = cur->next) printf(\"%d\\n\", cur->value);\n    return 0;\n}",
+    "expected_output": "1\n2\n3",
+    "key_steps": [
+      "先验证操作的边界与表示约定。",
+      "检查每次操作的成功状态。",
+      "仅在指针和索引有效时访问对象；保留已有状态并正确释放所拥有的内存。"
+    ],
+    "display_only": true
+  },
+  "exercise": {
+    "items": [
+      {
+        "id": "linked-list-traversal-q1",
+        "question": "遍历时让cur指向后继，需要读取cur的哪个成员？",
+        "answer": "next",
+        "explanation": "cur = cur->next 沿后继指针前进。"
+      },
+      {
+        "id": "linked-list-traversal-q2",
+        "question": "遍历n个节点的时间复杂度是多少？",
+        "answer": "O(n)",
+        "explanation": "每个节点访问一次。"
+      },
+      {
+        "id": "linked-list-traversal-q3",
+        "question": "遍历空链表会访问多少个节点？",
+        "answer": "0",
+        "explanation": "head为NULL时循环一次也不进入。"
+      }
+    ]
+  }
+}

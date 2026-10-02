@@ -1,0 +1,38 @@
+{
+  "explanation": {
+    "markdown": "# 栈\n\n栈遵循后进先出LIFO：push入栈，pop取出并移除栈顶，peek只查看栈顶而不移除。本文数组实现用count表示元素个数，非空时栈顶下标为count-1。\n\npush必须先检查count==CAP，peek/pop必须先检查count==0。不能在空栈中读取data[count-1]，否则下标下溢或越界。操作返回bool表示成功，输出参数仅在成功时写入。此固定容量实现三种操作均为O(1)，没有扩容。"
+  },
+  "code": {
+    "language": "C",
+    "source": "#include <assert.h>\n#include <stdbool.h>\n#include <stddef.h>\n#include <stdio.h>\nenum { CAP = 2 };\ntypedef struct { int data[CAP]; size_t count; } Stack;\nstatic bool push(Stack *s, int v) {\n    if (s->count == CAP) return false;\n    s->data[s->count++] = v; return true;\n}\nstatic bool peek(const Stack *s, int *out) {\n    if (s->count == 0) return false;\n    *out = s->data[s->count - 1]; return true;\n}\nstatic bool pop(Stack *s, int *out) {\n    if (s->count == 0) return false;\n    *out = s->data[--s->count]; return true;\n}\nint main(void) {\n    Stack s = {{0}, 0}; int value = -1;\n    assert(!peek(&s, &value) && value == -1); assert(!pop(&s, &value));\n    assert(push(&s, 1)); assert(push(&s, 2)); assert(!push(&s, 3));\n    assert(peek(&s, &value) && value == 2);\n    assert(pop(&s, &value)); printf(\"%d\\n\", value);\n    assert(pop(&s, &value)); printf(\"%d\\n\", value);\n    assert(!pop(&s, &value) && !peek(&s, &value)); return 0;\n}",
+    "expected_output": "2\n1",
+    "key_steps": [
+      "先验证操作的边界与表示约定。",
+      "检查每次操作的成功状态。",
+      "仅在指针和索引有效时访问对象；保留已有状态并正确释放所拥有的内存。"
+    ],
+    "display_only": true
+  },
+  "exercise": {
+    "items": [
+      {
+        "id": "stack-q1",
+        "question": "栈的出元素顺序缩写是什么？",
+        "answer": "LIFO",
+        "explanation": "Last In First Out，后进先出。"
+      },
+      {
+        "id": "stack-q2",
+        "question": "本文count为元素个数，count=3时栈顶下标是多少？",
+        "answer": "2",
+        "explanation": "非空时是count-1。"
+      },
+      {
+        "id": "stack-q3",
+        "question": "peek会删除栈顶吗？回答yes或no。",
+        "answer": "no",
+        "explanation": "peek只读取，pop才移除。"
+      }
+    ]
+  }
+}

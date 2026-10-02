@@ -1,0 +1,38 @@
+{
+  "explanation": {
+    "markdown": "# 链表删除\n\n删除位置pos从0开始，只允许0到长度-1。必须确定目标存在；空表或超出范围时返回false且保持原表。无头哨兵的头删必须能更新调用者head。\n\n示例找到指向目标的链接，先保存target，再把该链接改为target->next，最后free(target)。释放之后不再读取target。main最后删除首节点与唯一剩余节点，head回到NULL。寻找位置O(n)，已知前驱时修改链接和释放操作不包含搜索开销。"
+  },
+  "code": {
+    "language": "C",
+    "source": "#include <assert.h>\n#include <stdbool.h>\n#include <stddef.h>\n#include <stdio.h>\n#include <stdlib.h>\n#ifndef EDUMIND_ALLOC_FAIL_AFTER\n#define EDUMIND_ALLOC_FAIL_AFTER -1\n#endif\ntypedef struct Node { int value; struct Node *next; } Node;\nstatic Node *make_node(int value) {\n    static int allocations = 0;\n    if (EDUMIND_ALLOC_FAIL_AFTER >= 0 && allocations >= EDUMIND_ALLOC_FAIL_AFTER) return NULL;\n    Node *p = malloc(sizeof *p);\n    if (p == NULL) return NULL;\n    ++allocations; p->value = value; p->next = NULL;\n    return p;\n}\nstatic bool insert_at(Node **head, size_t pos, int value) {\n    Node **link = head;\n    while (pos > 0) {\n        if (*link == NULL) return false;\n        link = &(*link)->next; --pos;\n    }\n    Node *node = make_node(value);\n    if (node == NULL) return false; /* Existing head/links remain untouched. */\n    node->next = *link;\n    *link = node;\n    return true;\n}\nstatic void free_list(Node *head) {\n    while (head != NULL) { Node *next = head->next; free(head); head = next; }\n}\nstatic void print_list(const Node *head) {\n    while (head != NULL) { printf(\"%d%s\", head->value, head->next == NULL ? \"\\n\" : \" \"); head = head->next; }\n}\nstatic bool delete_at(Node **head, size_t pos) {\n    Node **link = head;\n    while (pos > 0) {\n        if (*link == NULL) return false;\n        link = &(*link)->next; --pos;\n    }\n    Node *target = *link;\n    if (target == NULL) return false;\n    *link = target->next; free(target); return true;\n}\nint main(void) {\n    Node *head = NULL; assert(!delete_at(&head, 0));\n    if (!insert_at(&head, 0, 1) || !insert_at(&head, 1, 2) || !insert_at(&head, 2, 3)) {\n        free_list(head); puts(\"allocation unavailable\"); return 0;\n    }\n    assert(!delete_at(&head, 3)); assert(delete_at(&head, 1));\n    print_list(head);\n    assert(delete_at(&head, 0)); assert(delete_at(&head, 0));\n    assert(head == NULL && !delete_at(&head, 0));\n    free_list(head); return 0;\n}",
+    "expected_output": "1 3",
+    "key_steps": [
+      "先验证操作的边界与表示约定。",
+      "检查每次操作的成功状态。",
+      "仅在指针和索引有效时访问对象；保留已有状态并正确释放所拥有的内存。"
+    ],
+    "display_only": true
+  },
+  "exercise": {
+    "items": [
+      {
+        "id": "linked-list-deletion-q1",
+        "question": "长度为3的链表最大合法删除下标是多少？",
+        "answer": "2",
+        "explanation": "删除对象是已有节点，不是插入间隙。"
+      },
+      {
+        "id": "linked-list-deletion-q2",
+        "question": "free(target)后还能读取target->next吗？回答yes或no。",
+        "answer": "no",
+        "explanation": "释放后的对象不能继续访问。"
+      },
+      {
+        "id": "linked-list-deletion-q3",
+        "question": "本文无头哨兵链表删除唯一节点后head是什么？",
+        "answer": "NULL",
+        "explanation": "原唯一节点的后继为NULL。"
+      }
+    ]
+  }
+}

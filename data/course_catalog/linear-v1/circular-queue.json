@@ -1,0 +1,38 @@
+{
+  "explanation": {
+    "markdown": "# 循环队列\n\n循环队列使用模运算使数组下标环绕，避免线性数组出队后的整体搬移。本文CAP是实际容量，front指向下次出队位置，rear指向下次入队位置，另用count记录元素个数。\n\n空判定count==0，满判定count==CAP。front==rear可能是空也可能是满，不能单独判断。另一种“预留一个槽”的设计有CAP-1有效容量，判满式(rear+1)%CAP==front；不能把该式混入本文count方案。示例覆盖满队拒绝、出队后重新入队和多次环绕，三个操作均为O(1)。"
+  },
+  "code": {
+    "language": "C",
+    "source": "#include <assert.h>\n#include <stdbool.h>\n#include <stddef.h>\n#include <stdio.h>\nenum { CAP = 3 };\ntypedef struct { int data[CAP]; size_t front, rear, count; } Queue;\nstatic bool enqueue(Queue *q, int value) {\n    if (q->count == CAP) return false;\n    q->data[q->rear] = value; q->rear = (q->rear + 1) % CAP; ++q->count; return true;\n}\nstatic bool peek(const Queue *q, int *out) {\n    if (q->count == 0) return false;\n    *out = q->data[q->front]; return true;\n}\nstatic bool dequeue(Queue *q, int *out) {\n    if (q->count == 0) return false;\n    *out = q->data[q->front]; q->front = (q->front + 1) % CAP; --q->count; return true;\n}\nint main(void) {\n    Queue q = {{0}, 0, 0, 0}; int value = -1;\n    assert(!peek(&q, &value) && value == -1); assert(!dequeue(&q, &value));\n    assert(enqueue(&q, 1)); assert(enqueue(&q, 2)); assert(enqueue(&q, 3));\n    assert(q.front == q.rear && q.count == CAP); assert(!enqueue(&q, 4));\n    assert(dequeue(&q, &value) && value == 1); assert(enqueue(&q, 4));\n    for (int i = 2; i <= 4; ++i) { assert(dequeue(&q, &value) && value == i); printf(\"%d\\n\", value); }\n    assert(q.count == 0 && q.front == q.rear); assert(!dequeue(&q, &value));\n    return 0;\n}",
+    "expected_output": "2\n3\n4",
+    "key_steps": [
+      "先验证操作的边界与表示约定。",
+      "检查每次操作的成功状态。",
+      "仅在指针和索引有效时访问对象；保留已有状态并正确释放所拥有的内存。"
+    ],
+    "display_only": true
+  },
+  "exercise": {
+    "items": [
+      {
+        "id": "circular-queue-q1",
+        "question": "本文count方案中，CAP=3时实际最多存几个元素？",
+        "answer": "3",
+        "explanation": "没有预留空槽，count用于区分空满。"
+      },
+      {
+        "id": "circular-queue-q2",
+        "question": "本文count方案中，front==rear能单独判断队空吗？回答yes或no。",
+        "answer": "no",
+        "explanation": "空和满都可能front==rear。"
+      },
+      {
+        "id": "circular-queue-q3",
+        "question": "CAP=3时，下标2的下一个循环下标是多少？",
+        "answer": "0",
+        "explanation": "(2+1)%3等于0。"
+      }
+    ]
+  }
+}

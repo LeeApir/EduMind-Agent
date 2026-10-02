@@ -1,0 +1,38 @@
+{
+  "explanation": {
+    "markdown": "# 链表概念\n\n链表通过链接组织节点，节点包含数据域和指向后继的指针域。节点不必在内存中连续，next保存后继地址而不是后继数据值。无头哨兵的空链表可用head=NULL表示；普通非循环链表的最后一个next为NULL。\n\n示例使用两个生存期覆盖main的自动节点，用next链接起来，不需要malloc或free。采用动态分配时应另定所有权：分配失败不能覆盖原head，释放节点前先保存后继。已知前驱后的链接修改为O(1)，寻找位置仍可能O(n)。"
+  },
+  "code": {
+    "language": "C",
+    "source": "#include <assert.h>\n#include <stdbool.h>\n#include <stddef.h>\n#include <stdio.h>\ntypedef struct Node { int value; struct Node *next; } Node;\nint main(void) {\n    Node second = {2, NULL}; Node first = {1, &second};\n    Node *head = &first;\n    assert(head->next == &second && second.next == NULL);\n    printf(\"%d %d\\n\", head->value, head->next->value);\n    /* Both nodes are automatic objects, valid until main returns. Do not free them. */\n    return 0;\n}",
+    "expected_output": "1 2",
+    "key_steps": [
+      "先验证操作的边界与表示约定。",
+      "检查每次操作的成功状态。",
+      "仅在指针和索引有效时访问对象；保留已有状态并正确释放所拥有的内存。"
+    ],
+    "display_only": true
+  },
+  "exercise": {
+    "items": [
+      {
+        "id": "linked-list-concept-q1",
+        "question": "节点的next保存后继的地址还是数值？用address或value作答。",
+        "answer": "address",
+        "explanation": "next是指向后继节点的指针。"
+      },
+      {
+        "id": "linked-list-concept-q2",
+        "question": "普通非循环链表末节点的next是什么？",
+        "answer": "NULL",
+        "explanation": "NULL表示没有后继。"
+      },
+      {
+        "id": "linked-list-concept-q3",
+        "question": "链表节点必须在内存中连续吗？回答yes或no。",
+        "answer": "no",
+        "explanation": "链接允许节点位于不同地址。"
+      }
+    ]
+  }
+}

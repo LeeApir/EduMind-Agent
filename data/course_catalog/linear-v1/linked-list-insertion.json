@@ -1,0 +1,38 @@
+{
+  "explanation": {
+    "markdown": "# 链表插入\n\n插入位置pos采用从0开始的间隙编号，允许0到当前长度；0为头插，长度为尾插，超过长度非法。示例用指向链接的指针Node **统一处理头部和中间位置。\n\n找到需要替换的链接后，先分配节点。失败返回false，原表不变；成功后先node->next=*link保存旧后继，再*link=node连入新节点。先覆盖旧链接而未保存后继会丢失原链。已知前驱时链接修改O(1)，按位置寻找需要O(n)。动画展示相同链接顺序，不执行用户代码。"
+  },
+  "code": {
+    "language": "C",
+    "source": "#include <assert.h>\n#include <stdbool.h>\n#include <stddef.h>\n#include <stdio.h>\n#include <stdlib.h>\n#ifndef EDUMIND_ALLOC_FAIL_AFTER\n#define EDUMIND_ALLOC_FAIL_AFTER -1\n#endif\ntypedef struct Node { int value; struct Node *next; } Node;\nstatic Node *make_node(int value) {\n    static int allocations = 0;\n    if (EDUMIND_ALLOC_FAIL_AFTER >= 0 && allocations >= EDUMIND_ALLOC_FAIL_AFTER) return NULL;\n    Node *p = malloc(sizeof *p);\n    if (p == NULL) return NULL;\n    ++allocations; p->value = value; p->next = NULL;\n    return p;\n}\nstatic bool insert_at(Node **head, size_t pos, int value) {\n    Node **link = head;\n    while (pos > 0) {\n        if (*link == NULL) return false;\n        link = &(*link)->next; --pos;\n    }\n    Node *node = make_node(value);\n    if (node == NULL) return false; /* Existing head/links remain untouched. */\n    node->next = *link;\n    *link = node;\n    return true;\n}\nstatic void free_list(Node *head) {\n    while (head != NULL) { Node *next = head->next; free(head); head = next; }\n}\nstatic void print_list(const Node *head) {\n    while (head != NULL) { printf(\"%d%s\", head->value, head->next == NULL ? \"\\n\" : \" \"); head = head->next; }\n}\nint main(void) {\n    Node *head = NULL;\n    assert(!insert_at(&head, 1, 99));\n    if (!insert_at(&head, 0, 1) || !insert_at(&head, 1, 3)) {\n        free_list(head); puts(\"allocation unavailable\"); return 0;\n    }\n    Node *saved = head;\n    if (!insert_at(&head, 1, 2)) {\n        assert(head == saved && head->next->value == 3);\n        free_list(head); puts(\"allocation unavailable\"); return 0;\n    }\n    assert(!insert_at(&head, 4, 99));\n    print_list(head); free_list(head); return 0;\n}",
+    "expected_output": "1 2 3",
+    "key_steps": [
+      "先验证操作的边界与表示约定。",
+      "检查每次操作的成功状态。",
+      "仅在指针和索引有效时访问对象；保留已有状态并正确释放所拥有的内存。"
+    ],
+    "display_only": true
+  },
+  "exercise": {
+    "items": [
+      {
+        "id": "linked-list-insertion-q1",
+        "question": "长度为3的链表允许的最大插入位置是多少？",
+        "answer": "3",
+        "explanation": "插入位置包括末尾间隙n。"
+      },
+      {
+        "id": "linked-list-insertion-q2",
+        "question": "插入前应先保存新节点的后继还是先覆盖前驱链接？用successor或predecessor作答。",
+        "answer": "successor",
+        "explanation": "先node->next=旧后继，再修改前驱链接。"
+      },
+      {
+        "id": "linked-list-insertion-q3",
+        "question": "已知前驱且不计分配开销，链接修改的时间复杂度是多少？",
+        "answer": "O(1)",
+        "explanation": "只需常数次指针修改。"
+      }
+    ]
+  }
+}

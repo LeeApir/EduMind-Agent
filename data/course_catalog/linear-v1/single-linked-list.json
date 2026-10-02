@@ -1,0 +1,38 @@
+{
+  "explanation": {
+    "markdown": "# 单链表\n\n单链表每个节点只有一个next，只能沿next前进。本文约定没有头哨兵，head直接指向首个数据节点；head=NULL表示空表。其他教材若使用头哨兵，判断空表的表达式会不同，不能混用。\n\n示例insert_at接收Node **，仅分配成功后修改链接，失败返回false而保留旧表。main检查每次返回值，失败时释放仍拥有的全部节点。禁止head=某个失败会返回NULL的插入函数这样的无条件覆盖。free_list先保存next再free当前节点，不能释放后读取head->next。"
+  },
+  "code": {
+    "language": "C",
+    "source": "#include <assert.h>\n#include <stdbool.h>\n#include <stddef.h>\n#include <stdio.h>\n#include <stdlib.h>\n#ifndef EDUMIND_ALLOC_FAIL_AFTER\n#define EDUMIND_ALLOC_FAIL_AFTER -1\n#endif\ntypedef struct Node { int value; struct Node *next; } Node;\nstatic Node *make_node(int value) {\n    static int allocations = 0;\n    if (EDUMIND_ALLOC_FAIL_AFTER >= 0 && allocations >= EDUMIND_ALLOC_FAIL_AFTER) return NULL;\n    Node *p = malloc(sizeof *p);\n    if (p == NULL) return NULL;\n    ++allocations; p->value = value; p->next = NULL;\n    return p;\n}\nstatic bool insert_at(Node **head, size_t pos, int value) {\n    Node **link = head;\n    while (pos > 0) {\n        if (*link == NULL) return false;\n        link = &(*link)->next; --pos;\n    }\n    Node *node = make_node(value);\n    if (node == NULL) return false; /* Existing head/links remain untouched. */\n    node->next = *link;\n    *link = node;\n    return true;\n}\nstatic void free_list(Node *head) {\n    while (head != NULL) { Node *next = head->next; free(head); head = next; }\n}\nstatic void print_list(const Node *head) {\n    while (head != NULL) { printf(\"%d%s\", head->value, head->next == NULL ? \"\\n\" : \" \"); head = head->next; }\n}\nint main(void) {\n    Node *head = NULL;\n    assert(!insert_at(&head, 1, 99));\n    if (!insert_at(&head, 0, 2) || !insert_at(&head, 0, 1)) {\n        free_list(head); puts(\"allocation unavailable\"); return 0;\n    }\n    assert(head != NULL && head->next != NULL && head->next->next == NULL);\n    print_list(head); free_list(head); return 0;\n}",
+    "expected_output": "1 2",
+    "key_steps": [
+      "先验证操作的边界与表示约定。",
+      "检查每次操作的成功状态。",
+      "仅在指针和索引有效时访问对象；保留已有状态并正确释放所拥有的内存。"
+    ],
+    "display_only": true
+  },
+  "exercise": {
+    "items": [
+      {
+        "id": "single-linked-list-q1",
+        "question": "本文无头哨兵单链表的空表head是什么？",
+        "answer": "NULL",
+        "explanation": "head直接指向数据节点，NULL表示没有节点。"
+      },
+      {
+        "id": "single-linked-list-q2",
+        "question": "分配失败时是否应无条件把已有head覆盖为NULL？回答yes或no。",
+        "answer": "no",
+        "explanation": "这样会失去旧链的拥有者指针并泄漏。"
+      },
+      {
+        "id": "single-linked-list-q3",
+        "question": "free当前节点之前应先保存哪个成员？",
+        "answer": "next",
+        "explanation": "释放后不能再访问当前节点的成员。"
+      }
+    ]
+  }
+}
