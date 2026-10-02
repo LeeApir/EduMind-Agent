@@ -1,13 +1,13 @@
 {
   "schema_version": 3,
-  "product_source": "docs/PRD.md v2.1 §9.1",
+  "product_source": "docs/PRD.md v2.2 §0、§9.1",
   "active_phase": "MVP 0.3",
   "execution_policy": {
     "max_in_progress": 1,
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "用户已授权连续推进 MVP 0.3 已满足依赖的任务，自 T005–T015 动画模块开始，验收后逐项本地提交并继续；遇需用户决策的阻塞或额度耗尽停止。不自动 push、merge 或跨 Phase 1。付费 Provider 采样仍须单独冻结预算和授权。",
+    "phase_gate": "用户授权执行B课程目录版，按T036–T046及T034串行实施；0 Provider，原T033 blocked；人工内容签核前不发布；不push/merge/部署/跨阶段。",
     "task_granularity": "一个可独立验证的行为，包含实现、对应测试和必要文档；验收通过后一个本地完成提交。",
     "completion_rule": "验收通过，且 Git 历史存在 Task-Completed 标记的提交。工作区 done 仅是待提交状态。",
     "verification_note": "以下为计划验证入口，尚未执行；领取任务时建立必要命令，结果写入 verification_results。"
@@ -70,7 +70,21 @@
       "通用开放式深度辅导"
     ],
     "prerequisite_evidence": "docs/acceptance/mvp-0.2-closeout-decision.md",
-    "planning_note": "Task verification 为待实施验证计划，不是已经存在或通过的证据。新 API/数据/安全决策先完成 ADR 审批；人员只记录在日志/Git/PR。"
+    "planning_note": "Task verification 为待实施验证计划，不是已经存在或通过的证据。新 API/数据/安全决策先完成 ADR 审批；人员只记录在日志/Git/PR。",
+    "catalog_only": {
+      "approved": true,
+      "nodes": 10,
+      "resource_count": 30,
+      "exercise_count": 30,
+      "provider_requests": 0,
+      "human_release_approval_required": true,
+      "deferred": [
+        "自由生成",
+        "重解释",
+        "实时AI互动",
+        "动态辩论"
+      ]
+    }
   },
   "deferred_improvements": [
     {
@@ -1562,7 +1576,7 @@
       "id": "MVP-0.3-T033",
       "phase": "MVP 0.3",
       "title": "完成当前配置真实课堂与质量验收",
-      "status": "todo",
+      "status": "blocked",
       "priority": "P0",
       "depends_on": [
         "MVP-0.3-T001",
@@ -1572,7 +1586,13 @@
         "docs/acceptance/",
         "backend/tests/",
         "web/tests/e2e/",
-        "README.md"
+        "README.md",
+        "backend/app/services/provider_gateway.py",
+        "backend/app/services/deepseek_responses.py",
+        "docs/PROVIDERS.md",
+        "backend/app/services/bailian_review_candidate.py",
+        "backend/app/core/review_candidate_factory.py",
+        "docs/ADR/0006-a1-offline-review-candidate.md"
       ],
       "prd_source": "PRD §3.3、§3.5、§8.1、§10.2",
       "acceptance_criteria": [
@@ -1584,21 +1604,46 @@
       "verification": [
         "按批准预算运行冻结真实基准和浏览器流程，人工审核内容与指标，保存脱敏原始/审计证据。"
       ],
-      "verification_results": [],
-      "started_at": null,
+      "verification_results": [
+        "正式120槽首次schema118/120(98.33%)、最终发布111/120(92.5%，失败)、发布schema111/111；人工覆盖111已发布，3条major漏检。",
+        "固定20严重错误+10对照：冻结召回19/20(95%)、对照10/10；分类不一致保持保守原分，4条本地拦截、26次模型审核。",
+        "20首屏保留全部失败/中断，环境失败不归因模型；失败/缺失P95=∞。课堂真实建场未发布，20发言未执行；旅程首次发布失败，后续步骤未执行。",
+        "未从头重跑资源/审核，浏览器中断后只续未完成槽；新增405、累计2016/2500，已知1247176 token，21次usage未知。审计docs/acceptance/mvp-0.3-t033-low-full-audit-20260930.md，最终汇总docs/acceptance/mvp-0.3-t033-low-full-final-summary-20261001.json。",
+        "既有86离线回归证据保留；本轮测量器Ruff与git diff --check通过，真实验收失败不创建完成提交。",
+        "2026-10-01离线归因：9个未发布槽中6个最终审核触及8192输出token上限、2个首次生成格式无效、1个修正仍失败；已发布内容3条major漏检。隔离库唯一已发布首屏资源约74.1秒落库但浏览器未观察到，客户端/测量归因未证实。修正最终审核模型归属和首次访客会话并发竞争；后端81、前端122单测及路由模拟E2E通过，类型检查/构建通过，lint 0错误/67既有警告。未调用Provider，累计仍2016/2500；报告docs/acceptance/mvp-0.3-t033-offline-root-cause-20261001.md；T033仍blocked。",
+        "2026-10-01按新口径完成零调用归档回放：120质量/30审核/20首屏原分未改，6+2+1未发布原因、19/20审核、首屏P95缺失即∞均核验；模拟Chromium成功/拒绝双路径检查测量器，移除可能悬挂的response.finished等待并增加失败阶段/API状态观测。单独冻结10槽审核诊断及内容/代码哈希，未运行Provider；累计仍2016/2500。证据docs/acceptance/mvp-0.3-t033-offline-replay-and-diagnostic-freeze-20261001.md；T033仍blocked，不计正式验收。",
+        "2026-10-01新增固定分母提前停止和阶段闸门：正式质量120槽schema至少118、发布至少114，审核20槽检出至少18，20槽P95第19位；最佳可能结果低于原阈值即记录stop_reason和剩余unattempted，10槽诊断首败即停且每槽最多一次实际请求。24项离线边界测试通过，旧111/120只读演练会阻止后续4付费阶段；新增0 Provider请求，累计仍2016/2500。新执行协议及25文件哈希单独冻结，旧冻结/成绩未覆盖；证据docs/acceptance/mvp-0.3-t033-early-stop-implementation-20261001.md；T033仍blocked。",
+        "2026-10-01审核候选v6：通用跨函数/表示约定/计数边界检查并缩短输出指令，24项离线测试和Ruff通过，冻结25文件、指令、非密钥配置哈希；10槽真实诊断首败即停于第4槽。前3条历史major均按预期检出，第4条未初始化指针错误只报严重fact/misconception，缺code_safety；4次实际请求、6槽unattempted，累计2020/2500；独立账本halted，未运行生成/浏览器/正式验收。证据docs/acceptance/mvp-0.3-t033-review-v6-audit-20261001.md。",
+        "2026-10-01零调用核对area：生产发布由verdict决定，area参与审核记录/定向修正和严格诊断评分；旧标准/成绩未改。v7新候选36项离线测试/Ruff/编译通过，27文件/指令/配置哈希另冻。真实10槽首败即停于第5槽，前4通过，第5检出自环/丢链但仅报code_safety，缺预期fact；5次实际请求、5槽unattempted，累计2025/2500、账本halted。未运行小批生成/浏览器/正式验收；报告docs/acceptance/mvp-0.3-t033-review-v7-audit-20261001.md。",
+        "2026-10-01仅离线：形成fact/code_safety交叉类别提案，分离具体错误检出和类别准确而不修改生产审核/旧评分；旧v7错误组人工复核检出5/5、类别4/5、严格得分4/5，仍failed。新增三组独立诊断执行器与正式闸门：组内首败即停、一次仅一组、缺失/失败证据禁止正式验收；冻结未运行3对照+2长审核最多5次无重试，协议状态FROZEN_NOT_EXECUTABLE。本轮41项离线测试、Ruff/编译/diff通过，Provider新增0，累计仍2025/2500。证据docs/acceptance/mvp-0.3-t033-review-category-proposal-20261001.md、mvp-0.3-t033-review-pending-five-freeze-20261001.json、mvp-0.3-t033-review-group-protocol-20261001.json、mvp-0.3-t033-review-groups-offline-result-20261001.json；T033仍blocked。",
+        "2026-10-01按授权先显式长审核组：冻结v7/配置/输入/代码哈希通过；第1槽一次真实请求输入3099、输出8192/8192，INVALID_OUTPUT且OUTPUT_TOKEN_LIMIT，无可用结构化verdict；首败停止，第2长审核及3正确对照均unattempted，误拒率无法评估。新增1次累计2026/2500，独立v22账本halted；分组状态错误failed/长审核failed/正确对照unattempted，正式闸门关闭。未生成/浏览器/正式验收。证据docs/acceptance/mvp-0.3-t033-review-long-audit-20261001.md。",
+        "2026-10-01仅离线审核结束归因：历史第2026次输入3099/总输出8192已知，推理与最终正文tokens及部分正文计数未保存，均明确未知；MockTransport重建确认系统4492字符、完整schema两份、候选一次，输出已要求单个简短JSON，不能证明截断由推理或重复正文导致。形成未实施/未冻结候选：同模型none+2048总输出、单份schema、919字符审核正文、最多3条issue/160字符、数值观测及零重试；分类暂缓，旧v7/配置/评分不改。4项定向离线测试、Mock归因断言、Ruff/编译/diff通过，原30文件冻结哈希和v22账本哈希不变；新增Provider 0，累计2026/2500。报告docs/acceptance/mvp-0.3-t033-review-completion-attribution-20261001.md；未来至多2条长审核须先实施/离线验证、独立冻结与授权，本轮不执行，正式闸门关闭，T033仍blocked。",
+        "2026-10-01完成授权离线实现：Responses结果/安全错误与T033新尝试记录显式推理/正文token明细、正文字符/块数、响应状态及耗时；缺失/非法明细为null，不反推，不保存推理原文，截断/JSON/schema失败仍关闭。独立候选未接入生产：none+2048、单schema、919字符指令、最多3条issue/160字符、60秒期限、零重试、最多2唯一槽首败即停，成功仍关闭正式闸门。196项相关离线测试、Ruff、95文件mypy、编译/diff通过；新33文件代码/指令/schema/配置/完整长审核请求哈希冻结，状态FROZEN_NOT_EXECUTABLE，SHA256 066745f0b7bcfae3be316e070e178a99758eb5c1884d4aaf024b6feb4d79a78f。v7/生产schema/env/旧评分/v22账本不变，历史8192分量仍未知；本轮Provider新增0、累计2026/2500，两条长审核仍unattempted。交接docs/acceptance/mvp-0.3-t033-review-completion-implementation-20261001.md及同日freeze/offline-result。未来真实诊断须新授权和独立ready协议/账本；本轮停止，T033仍blocked。",
+        "2026-10-01按用户明确授权执行冻结完成候选2条长审核：同模型deepseek-flash/api.deepseek.com，候选none+2048/60秒/单schema/零重试；代码/输入/指令/配置哈希预检匹配，新增独立ready协议及v23账本，不改原冻结。两条均完整返回合法pass/空issues，无截断，输入2432/1866、总输出各22、供应商推理明细各0、最终正文token明细缺失均null，正文各73字符，耗时0.954/0.892秒。实际新增2次、累计2028/2500，新账本halted；无重试、无其他测试/对照/生成/浏览器/正式验收。v7/生产low+8192/env/原schema/v22证据未改；仅证明这两个样本能完成，不拼v7成绩或作为质量/P95通过。报告docs/acceptance/mvp-0.3-t033-review-completion-real-audit-20261001.md及同日real-result/run-protocol、ledger-v23；T033保持blocked，正式闸门关闭，保存后停止。",
+        "2026-10-02按授权只测完成候选审核正确性：固定原5错误/3对照，最多8、每槽单次、首败即停；新协议冻结具体错误判据与完整输入，分类/原严格分单列，不改旧成绩或正式口径。第1槽linked-list-concept:explanation:1漏检malloc失败后main覆盖head导致链丢失/泄漏，候选返回合法pass/空issues；首败停止，余4错误+3对照共7槽unattempted。新增1次累计2029/2500，输入2083/输出22，显式推理0、正文token未知、73字符，1.006秒，无截断；v24账本halted。候选none+2048/60秒/指令/原模型目标不变，生产v7/low+8192/env/schema/v23证据不改。包装器Ruff/编译与哈希/配置/证据核对通过；只有一次真实审核，无其他Provider测试/生成/浏览器/正式验收。错误组未完整、检出比例null，对照未测误拒未知；报告docs/acceptance/mvp-0.3-t033-candidate-correctness-audit-20261002.md及同日protocol/result/ledger-v24。不能以长审核完成或拼旧成绩宣称质量通过，T033保持blocked，保存后停止。",
+        "2026-10-02按用户决定停止全部付费测试并淘汰review-completion-candidate-v1（none+2048），原余7槽不再运行；新停付费/淘汰治理记录替代旧运行授权，不覆盖旧协议/成绩/账本。本轮仅离线分析：保留v7+low具体检出5/5但原严格分4/5仍失败，历史长审核8192推理/正文分量未知；纯字符串重建确认传输重复schema消息591字符，去重仅节省两长输入消息内容6.42%/7.27%，输出收益未知。推荐仅考虑单次完整上下文low/v7的传输层schema去重，不改检查文字或丢调用者；按维度拆分可保留完整上下文但重复输入、两次输出最坏16384，不推荐当前实施。提案含离线等价否决条件及未来另行授权后最多4单次的首败/无效/缺观测/哈希漂移/7373输出裕量停止线，非正式门槛变更。无代码/架构/提示词实现或调参，新增Provider 0，累计仍2029/2500。文件docs/acceptance/mvp-0.3-t033-low-review-options-20261002.md、同日low-plan-offline-measurement与paid-stop-and-retirement；T033保持blocked，保存后停止。",
+        "2026-10-02按用户限定实现schema去重并只做离线验证：诊断显式启用可信完整v7系统文本，单一系统消息与完整schema唯一精确匹配才移除传输重复消息；生产默认关闭，v7/low+8192/env/schema/工厂与109份历史/生产文件不改。原四输入完整保留跨函数/调用者上下文，Mock证实其他wire字段一致，减少591字符，两长样本消息字符省6.42%/7.27%，真实token/结束收益未知。185项相关离线测试（新增35项）、Ruff、95文件mypy、哈希/diff核对通过，36文件及指令/schema/配置/完整请求独立冻结。冻结2长审核→1main/head复杂缺陷→1正确对照，总计最多4、零重试、首败永久淘汰且不再微调重测；输出裕量/缺观测等停止条件不改正式阈值。状态FROZEN_NOT_EXECUTABLE，四条全unattempted，未来付费须显式开始并生成ready协议/持久计数账本；新增Provider 0，累计仍2029/2500，正式闸门关闭。证据docs/acceptance/mvp-0.3-t033-schema-dedup-offline-20261002.md及同日freeze/measurement/result；T033保持blocked，保存后停止。",
+        "2026-10-02按新明确授权执行schema去重最后4槽，原顺序/模型目标/v7/low+8192不变，另冻单槽包装器38文件/ready协议/v25账本，51项离线测试与Ruff通过。第1循环队列长审核completed/合法pass/空issues，输入2930、输出993、推理970、正文token未知/73字符、5.047622秒；第2单链表长审核incomplete/OUTPUT_TOKEN_LIMIT，输入2364、总输出8192、显式推理8192、正文token未知/0字符、40.994731秒。首败停止并永久终止去重配置路线，不微调重测；复杂缺陷与正确对照两槽unattempted，检出/误拒未测。实际2请求、零重试，累计2031/2500；总输入5294/输出9185/推理9162，输入+输出14479，缺失正文token仍null不反推。两份原始最终输出/usage/status证据、剩余槽、retired决定保存，结果STOPPED/route_retired，v25 halted。原38代码/输入/144份历史与.env哈希不变，v25前2029条等于v24，未修改旧评分/生产默认。报告docs/acceptance/mvp-0.3-t033-schema-dedup-real-audit-20261002.md及同日real-result/slot-1/slot-2/retired/run-verification，正式闸门关闭，T033保持blocked，保存后停止，不学习流程/浏览器/生成/正式验收或切生产。",
+        "2026-10-02仅做方案决策：形成待批准ADR-0006，比较独立Qwen3.8-Max审核候选与人工审核课程目录版；推荐仅A1隔离接入/离线验证，未实施、未冻结新模型、未调用Provider。官方资料仅验证思考预算/总输出/结构化接口声明，项目检错与账号可用性未知；拟议总输出仍≤8192，不改v7/生产/旧评分。A2最多8次仅未来建议，需独立授权；B仅规划方向，PRD/可信导入/API数据/退出任务须另行批准，不能把旧T033失败改成通过。文档引用/预算算术/255保护文件哈希/diff检查与独立读者审核通过，新增Provider 0、累计2031/2500。提案docs/ADR/0006-review-model-or-curated-scope-proposal.md，证据docs/acceptance/mvp-0.3-t033-review-model-decision-offline-20261002.json；T033保持blocked，正式闸门关闭，保存后停止。",
+        "2026-10-02用户批准A1/qwen3.8-max-0902，仅离线实施独立审核候选：新增隔离Chat strict-schema适配器和REVIEW路由，生产工厂/env/v7/schema/原判定不改；4096思考预算、8182含推理总输出请求限制及10token余量、180秒、零重试、无审核回退。三类原审核消费者Mock验证拒绝/无效schema/语义/超时均不批准，FAST/DEFAULT/QUALITY及纠错仍原网关；缺用量/模型漂移/超预算失败关闭，百炼text_tokens含推理不误记正文，正文明细仍未知、不保存推理原文。273项相关离线测试、Ruff、97文件mypy、编译/diff及250生产/旧证据哈希检查通过。新冻结128代码/指令/原与等价传输schema/配置/8完整请求与来源哈希，FROZEN_NOT_EXECUTABLE，全unattempted；真实请求授权0，新增Provider 0、累计2031/2500。账户/参数组合/检错质量未验证，未批准生产双目标例外。交接docs/ADR/0006-a1-offline-review-candidate.md及docs/acceptance/mvp-0.3-t033-qwen-a1-freeze-20261002.json、同日qwen-a1-offline-result；T033保持blocked，正式闸门关闭，保存后停止。",
+        "2026-10-02按用户明确yes授权A2最多8次、固定顺序、零重试、首败即停；用户北京工作空间endpoint另冻130代码/原输入/原v7/schema/配置、新READY协议/v26账本，A1冻结不改。122项相关离线测试、Ruff、编译通过。第1槽linked-list-concept:explanation:1返回完整合法pass/空issues，漏检malloc失败后main直接赋值head丢失已有链的重大缺陷；首败停止并淘汰qwen-review-v7-budget4096-v1，余4错误/2长审核/1正确对照共7槽unattempted，不微调重测。真实新增1次、累计2032/2500；输入2559、总输出1389、推理1369、正文token未知/68字符、34.960303秒、HTTP200/stop、无截断；长审核与误拒未测。原始最终输出/用量/剩余槽/淘汰记录保存，运行后本地核验新增0请求：130代码/8来源/262生产历史与.env哈希不变、v26前2031条等于v25。本轮未修改用户env或切换生产，不构造生成网关、无生成/浏览器/正式验收、旧评分不改。证据docs/acceptance/mvp-0.3-t033-qwen-a2-real-audit-20261002.md及同日real-result/slot-1/target-freeze/run-protocol/retired/run-verification；T033保持blocked，正式闸门关闭，保存后停止。",
+        "2026-10-02用户另行授权qwen3.8-max-0902原main/head槽一次原样复测，最多1、零重试；新单槽协议/132代码哈希/v27账本，不恢复旧路线或余7槽。36项离线测试/Ruff/编译通过。真实1请求再次返回合法pass/空issues，漏检malloc失败后main覆盖非空head丢链/泄漏；完整原v7/schema/输入/配置不改，具体错误离线核对。HTTP200/stop，无截断，输入2559/总输出1334/推理1314/正文token未知/68字符，30.649966秒，累计2033/2500。441旧文件与.env、132代码哈希不变，v27前2032条等于v26，原失败/7 unattempted/旧成绩不改，结果STOPPED/retired。原始最终输出/usage与审计JSON已保存，运行后本地核验新增0调用，无生成/浏览器/正式验收或生产切换。证据docs/acceptance/mvp-0.3-t033-qwen-repeat-audit-20261002.json及repeat-result/slot-1/protocol/offline、ledger-v27；单槽重复性不能作为整体合格率，T033保持blocked，停止。"
+      ],
+      "started_at": "2026-09-29T22:56:00+08:00",
       "completed_at": null,
-      "blocker": null,
+      "blocker": "qwen3.8-max-0902原main/head槽另行授权的单次原样复测再次漏检，返回合法pass/空issues；本次新增1、累计2033/2500。原候选仍retired，余7槽不跑，旧失败/评分不改。两次同样本漏检不能给出整体合格率，长审核/误拒仍未知。原动态正式质量与P95阻塞未解除，T033保持blocked、正式闸门关闭；不切生产或自动重测，不生成/浏览器/正式验收。课程目录B仅讨论未批准实施。 用户后续批准执行B课程目录版，动态验收仍暂缓；不改变本任务状态或原标准。",
       "commit_lookup": "Task-Completed: MVP-0.3-T033"
     },
     {
       "id": "MVP-0.3-T034",
       "phase": "MVP 0.3",
-      "title": "完成 MVP 0.3 阶段退出与交接",
+      "title": "完成课程目录版阶段退出与交接",
       "status": "todo",
       "priority": "P0",
       "depends_on": [
         "MVP-0.3-T032",
-        "MVP-0.3-T033"
+        "MVP-0.3-T045",
+        "MVP-0.3-T046"
       ],
       "scope": [
         "docs/acceptance/",
@@ -1606,11 +1651,11 @@
         "web/tests/e2e/",
         "README.md"
       ],
-      "prd_source": "PRD §9.1、§10.4",
+      "prd_source": "PRD v2.2 §0；原定义见目录范围变更记录",
       "acceptance_criteria": [
-        "核对动画、专注/互动、多视角和导出全部退出项及完成提交；确认普通学习不依赖增强功能成功。",
-        "README/架构/安全/部署/已知限制与代码一致，列明未完成产品发布指标及模型证据适用范围。",
-        "报告独立首 token 优化遗留，不把历史失败改为通过；阶段完成后停止，不自动归档或启动 Phase 1。"
+        "目录版内容签核/功能/动画/进度/导出/0模型调用通过且有完成提交；原动态T033仍blocked，不宣称通过。",
+        "README/部署/安全/来源与目录行为一致，列明自由生成/重解释/实时AI暂缓。",
+        "停止于目录版阶段交付，不自动归档或进入Phase 1。"
       ],
       "verification": [
         "运行最终任务依赖/完成标记/文档引用/证据一致性检查，必要时补风险相关回归并形成退出报告。"
@@ -1620,6 +1665,333 @@
       "completed_at": null,
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.3-T034"
+    },
+    {
+      "id": "MVP-0.3-T036",
+      "phase": "MVP 0.3",
+      "title": "落实课程目录版范围与任务治理",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [],
+      "scope": [
+        "docs/PRD.md",
+        "docs/ADR/0007-curated-course-catalog.md",
+        "docs/ADR/README.md",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD v2.2 §0（目录版增补）",
+      "acceptance_criteria": [
+        "固定10节点/30资源/30题/预设演示与暂缓能力，原动态指标和失败保留。",
+        "拆分目录实施任务；T033仍blocked，新退出依赖单独记录。"
+      ],
+      "verification": [
+        "python3 scripts/check_catalog_workflow.py"
+      ],
+      "verification_results": [
+        "python3 scripts/check_catalog_workflow.py：范围/唯一ID/依赖/单执行者/T033 blocked检查通过；git diff --check通过；本轮Provider 0累计2033/2500。"
+      ],
+      "started_at": "2026-10-02T20:08:13+08:00",
+      "completed_at": "2026-10-02T20:08:41+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.3-T036"
+    },
+    {
+      "id": "MVP-0.3-T037",
+      "phase": "MVP 0.3",
+      "title": "建立可信课程包与人工发布来源",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.3-T036"
+      ],
+      "scope": [
+        "backend/app/models/",
+        "backend/app/services/catalog*",
+        "backend/alembic/",
+        "backend/tests/test_catalog*"
+      ],
+      "prd_source": "PRD v2.2 §0（目录版增补）",
+      "acceptance_criteria": [
+        "受信摘要/人工审核证据/schema/完整性全部有效才原子发布；伪造/冲突拒绝。",
+        "人工来源可追溯、可撤回、旧模型审核不改；迁移与来源资格测试通过。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/python -m pytest -q tests/test_catalog_package.py tests/test_catalog_publication.py"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.3-T037"
+    },
+    {
+      "id": "MVP-0.3-T038",
+      "phase": "MVP 0.3",
+      "title": "准备固定课程候选包并离线验证",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.3-T037"
+      ],
+      "scope": [
+        "data/course_catalog/",
+        "backend/tests/test_catalog_content.py"
+      ],
+      "prd_source": "PRD v2.2 §0（目录版增补）",
+      "acceptance_criteria": [
+        "10节点各讲解/C示例/3唯一答案题，共30资源30题及1预设脚本；内容不使用旧错误候选直接发布。",
+        "C示例受限编译/边界验证；候选保持待人工签核，不伪造审核人。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/python -m pytest -q tests/test_catalog_content.py"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.3-T038"
+    },
+    {
+      "id": "MVP-0.3-T039",
+      "phase": "MVP 0.3",
+      "title": "无模型创建目录学习单元",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.3-T037",
+        "MVP-0.3-T038"
+      ],
+      "scope": [
+        "backend/app/api/catalog.py",
+        "backend/app/services/catalog_sessions.py",
+        "backend/tests/test_catalog_sessions.py",
+        "docs/api/openapi.yaml"
+      ],
+      "prd_source": "PRD v2.2 §0（目录版增补）",
+      "acceptance_criteria": [
+        "目录读取/固定node创建owner快照，REST/CSRF/幂等/版本绑定通过。",
+        "不需Provider key、不解析自由目标、不暴露答案、未批准/撤回不创建。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/python -m pytest -q tests/test_catalog_sessions.py"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.3-T039"
+    },
+    {
+      "id": "MVP-0.3-T040",
+      "phase": "MVP 0.3",
+      "title": "关闭目录版动态模型入口",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.3-T036"
+      ],
+      "scope": [
+        "backend/app/core/",
+        "backend/app/main.py",
+        "backend/app/api/",
+        "backend/tests/test_catalog_mode.py",
+        "docker-compose.yml"
+      ],
+      "prd_source": "PRD v2.2 §0（目录版增补）",
+      "acceptance_criteria": [
+        "目录模式生成/重解释/发言/动态辩论/角色直调在模型依赖前拒绝，0 Provider。",
+        "静态查询/控制/Job可用，无key启动，历史代码保留但不自动重放模型操作。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/python -m pytest -q tests/test_catalog_mode.py"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.3-T040"
+    },
+    {
+      "id": "MVP-0.3-T041",
+      "phase": "MVP 0.3",
+      "title": "固定题评分与掌握度证据去重",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.3-T039"
+      ],
+      "scope": [
+        "backend/app/services/quiz*",
+        "backend/app/services/mastery*",
+        "backend/tests/test_catalog_quiz.py"
+      ],
+      "prd_source": "PRD v2.2 §0（目录版增补）",
+      "acceptance_criteria": [
+        "服务端评分、题集来源/版本/撤回校验通过，重开相同题集/重复作答不刷掌握度。",
+        "重复提交回执可恢复，错题反馈保留，历史归约规则/成绩不回写。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/python -m pytest -q tests/test_catalog_quiz.py"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.3-T041"
+    },
+    {
+      "id": "MVP-0.3-T042",
+      "phase": "MVP 0.3",
+      "title": "读取预设演示并恢复学习位置",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.3-T039",
+        "MVP-0.3-T040"
+      ],
+      "scope": [
+        "backend/app/api/catalog.py",
+        "backend/app/services/catalog*",
+        "backend/tests/test_catalog_demo.py"
+      ],
+      "prd_source": "PRD v2.2 §0（目录版增补）",
+      "acceptance_criteria": [
+        "仅批准脚本，明确预设、无模型总结；开始退出保持owner/返回点。",
+        "不调用动态辩论入口，脚本来源及恢复测试通过。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/python -m pytest -q tests/test_catalog_demo.py"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.3-T042"
+    },
+    {
+      "id": "MVP-0.3-T043",
+      "phase": "MVP 0.3",
+      "title": "接通目录学习与动画进度界面",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.3-T039",
+        "MVP-0.3-T040",
+        "MVP-0.3-T041",
+        "MVP-0.3-T042"
+      ],
+      "scope": [
+        "web/src/",
+        "web/tests/"
+      ],
+      "prd_source": "PRD v2.2 §0（目录版增补）",
+      "acceptance_criteria": [
+        "目录/固定正文/练习/进度/动画与刷新恢复可用，动态按钮不触发调用。",
+        "预设标识清楚、未知未批准/撤回有明确反馈；类型检查/组件测试/构建通过。"
+      ],
+      "verification": [
+        "cd web && pnpm test",
+        "cd web && pnpm build"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.3-T043"
+    },
+    {
+      "id": "MVP-0.3-T044",
+      "phase": "MVP 0.3",
+      "title": "导出目录资源与真实来源",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.3-T039",
+        "MVP-0.3-T041",
+        "MVP-0.3-T042"
+      ],
+      "scope": [
+        "backend/app/services/markdown_notes.py",
+        "backend/tests/test_catalog_exports.py",
+        "web/src/components/"
+      ],
+      "prd_source": "PRD v2.2 §0（目录版增补）",
+      "acceptance_criteria": [
+        "本人笔记来源为人工课程包/版本，不伪造模型审核。",
+        "未审/撤回/foreign不导出；错题及MP4/SRT绑定回归通过。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/python -m pytest -q tests/test_catalog_exports.py"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.3-T044"
+    },
+    {
+      "id": "MVP-0.3-T045",
+      "phase": "MVP 0.3",
+      "title": "目录版独立核心集成验收",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.3-T037",
+        "MVP-0.3-T038",
+        "MVP-0.3-T039",
+        "MVP-0.3-T040",
+        "MVP-0.3-T041",
+        "MVP-0.3-T042",
+        "MVP-0.3-T043",
+        "MVP-0.3-T044"
+      ],
+      "scope": [
+        "docs/acceptance/",
+        "backend/tests/",
+        "web/tests/e2e/"
+      ],
+      "prd_source": "PRD v2.2 §0（目录版增补）",
+      "acceptance_criteria": [
+        "真实隔离数据库/Worker/浏览器完成学习/作答/动画/导出/恢复、安全边界与0 Provider出口。",
+        "固定内容自动检查/静态首屏独立冻结，不拼旧生成成绩；测试批准夹具明确标为验证用途。"
+      ],
+      "verification": [
+        "python3 scripts/verify_catalog_acceptance.py"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.3-T045"
+    },
+    {
+      "id": "MVP-0.3-T046",
+      "phase": "MVP 0.3",
+      "title": "人工签核课程包并验证可发布状态",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "MVP-0.3-T038",
+        "MVP-0.3-T045"
+      ],
+      "scope": [
+        "data/course_catalog/",
+        "docs/acceptance/"
+      ],
+      "prd_source": "PRD v2.2 §0（目录版增补）",
+      "acceptance_criteria": [
+        "用户实际审阅候选课程内容、签核准确digest；未签核不能发布为正式课程。",
+        "受信发布登记/撤回/核心旅程在批准版本核验；不伪造human审核。"
+      ],
+      "verification": [
+        "python3 scripts/verify_catalog_release.py"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: MVP-0.3-T046"
     }
   ]
 }
