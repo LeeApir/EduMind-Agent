@@ -4,6 +4,7 @@ from collections.abc import Callable
 from os import getenv
 
 from app.core.config import ConfigurationError, ProviderSettings, get_provider_settings
+from app.core.product_mode import catalog_only
 from app.core.provider_target import (
     ProviderTargetGuard,
     TargetValidationError,
@@ -21,6 +22,8 @@ def build_server_provider_gateway(
     adapter_factory: Callable[[ProviderSettings, ProviderTargetGuard], ProviderAdapter],
 ) -> ProviderGateway:
     """Reject unsafe targets before handing credentials to a network adapter."""
+    if catalog_only():
+        raise ProviderError(ProviderErrorCode.CONFIGURATION_MISSING)
     try:
         settings = get_provider_settings()
     except ConfigurationError:

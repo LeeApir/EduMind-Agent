@@ -36,6 +36,34 @@
     }
   ],
   "paths": {
+  "/api/runtime": {
+    "get": {
+      "tags": [
+        "system"
+      ],
+      "summary": "部署范围",
+      "responses": {
+        "200": {
+          "description": "仅mode字段，catalog_only默认且不含Provider配置或密钥。",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "mode": {
+                    "enum": [
+                      "catalog_only",
+                      "dynamic"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
   "/api/catalog": {
     "get": {
       "tags": [

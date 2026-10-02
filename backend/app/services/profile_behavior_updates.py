@@ -14,6 +14,7 @@ from app.agents.profile_schema import (
     merge_explicit_profile_values,
     merge_profile_snapshots,
 )
+from app.core.product_mode import catalog_only
 from app.core.provider_factory import build_default_provider_gateway
 from app.models.learning import ProfileEvent, StudentProfile
 from app.models.learning_state import LearningEvidence
@@ -89,6 +90,8 @@ async def update_profile_from_summary(
     gateway_factory: Callable[[], StructuredProfileGateway],
 ) -> str:
     """Never put Provider I/O in the evidence transaction or invent unknown fields."""
+    if catalog_only():
+        return "no_change"
     if summary is None:
         return "no_change"
     key = f"profile-evidence-{evidence_id}"

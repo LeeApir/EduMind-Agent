@@ -6,6 +6,7 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.product_mode import catalog_only
 from app.models.learning import GeneratedResource, LearningScene, LearningUnit, StudentProfile
 from app.services.catalog_publication import approved_release, resource_provenance_valid
 
@@ -36,6 +37,8 @@ async def visible_unit(db: AsyncSession, owner_id: UUID, unit_id: UUID) -> Learn
         ),
     )
 
+    if unit is not None and catalog_only() and unit.catalog_release_id is None:
+        return None
     if unit is not None and unit.catalog_release_id is not None:
         if await approved_release(db, unit.catalog_release_id) is None:
             return None
@@ -67,7 +70,8 @@ async def published_resource(
 
     if resource is not None:
         unit = await db.get(LearningUnit, resource.learning_unit_id)
-        if unit is None or not await resource_provenance_valid(db, resource, unit):
+        if (unit is None or (catalog_only() and unit.catalog_release_id is None)
+                or not await resource_provenance_valid(db, resource, unit)):
             return None
     return resource
 

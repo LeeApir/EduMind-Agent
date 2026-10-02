@@ -31,6 +31,7 @@ from app.agents.tutor_agent import TutorAgent
 from app.api.knowledge_graph import knowledge_graph_repository
 from app.core.auth import AuthenticatedSession, AuthFailure, require_authenticated_session
 from app.core.database import database_session_factory
+from app.core.product_mode import require_dynamic_mode
 from app.core.provider_factory import build_default_provider_gateway
 from app.models.learning import utc_now
 from app.services.classroom import (
@@ -167,7 +168,8 @@ async def create_classroom_endpoint(
     return receipt
 
 
-@router.patch("/api/learning-units/{unit_id}/classroom/mode")
+@router.patch("/api/learning-units/{unit_id}/classroom/mode",
+              dependencies=[Depends(require_dynamic_mode)])
 async def set_classroom_mode_endpoint(
     unit_id: UUID, payload: ModeChange, response: Response,
     current: AuthenticatedSession = Depends(require_authenticated_session),
@@ -375,7 +377,8 @@ async def _speech_events(
     yield _event("done", {"status": "published"})
 
 
-@router.post("/api/learning-units/{unit_id}/classroom/messages", response_model=None)
+@router.post("/api/learning-units/{unit_id}/classroom/messages", response_model=None,
+             dependencies=[Depends(require_dynamic_mode)])
 async def stream_classroom_speech(
     unit_id: UUID,
     payload: ClassroomSpeech,
@@ -574,7 +577,7 @@ async def _reexplanation_events(
 
 @router.post(
     "/api/learning-units/{unit_id}/classroom/scenes/{scene_key}/reexplanations",
-    response_model=None,
+    response_model=None, dependencies=[Depends(require_dynamic_mode)],
 )
 async def stream_reexplanation(
     unit_id: UUID, scene_key: str, payload: ReexplanationRequest,
@@ -647,7 +650,8 @@ async def stream_reexplanation(
     )
 
 
-@router.get("/api/learning-units/{unit_id}/classroom/messages")
+@router.get("/api/learning-units/{unit_id}/classroom/messages",
+            dependencies=[Depends(require_dynamic_mode)])
 async def get_classroom_messages(
     unit_id: UUID,
     response: Response,
@@ -674,7 +678,8 @@ async def get_classroom_messages(
     return payload
 
 
-@router.get("/api/classroom-operations/{operation_id}")
+@router.get("/api/classroom-operations/{operation_id}",
+            dependencies=[Depends(require_dynamic_mode)])
 async def get_classroom_operation(
     operation_id: UUID,
     response: Response,
