@@ -1764,7 +1764,7 @@
       "id": "MVP-0.3-T039",
       "phase": "MVP 0.3",
       "title": "无模型创建目录学习单元",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.3-T037",
@@ -1784,9 +1784,12 @@
       "verification": [
         "cd backend && .venv/bin/python -m pytest -q tests/test_catalog_sessions.py"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "backend/.venv/bin/python scripts/run_catalog_db_tests.py tests/test_catalog_sessions.py：实际PostgreSQL/REST 1复合场景通过；身份/CSRF/原子单快照/幂等冲突/owner隔离/服务器答案隐藏/撤回/未批准失败关闭；Provider工厂禁止构造且无key。",
+        "Ruff、2文件mypy、契约JSON解析、workflow/diff通过；初次字段名及夹具长度检查失败，修复后全量复验通过；Provider 0累计2033/2500。"
+      ],
+      "started_at": "2026-10-02T20:30:42",
+      "completed_at": "2026-10-02T21:00:29",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.3-T039"
     },
