@@ -36,6 +36,120 @@
     }
   ],
   "paths": {
+  "/api/catalog": {
+    "get": {
+      "tags": [
+        "Catalog"
+      ],
+      "summary": "Get Catalog",
+      "operationId": "get_catalog_api_catalog_get",
+      "responses": {
+        "200": {
+          "description": "Successful Response",
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": true,
+                "type": "object",
+                "title": "Response Get Catalog Api Catalog Get"
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "#/components/responses/Unauthorized"
+        }
+      },
+      "security": [
+        {
+          "sessionCookie": []
+        }
+      ],
+      "description": "目录不返回答案；课程撤回后已有资源也不可读取。选择release_id固定课程版本，重复相同幂等请求返回原快照。"
+    }
+  },
+  "/api/catalog/sessions": {
+    "post": {
+      "tags": [
+        "Catalog"
+      ],
+      "summary": "Start Catalog Session",
+      "operationId": "start_catalog_session_api_catalog_sessions_post",
+      "parameters": [
+        {
+          "name": "Idempotency-Key",
+          "in": "header",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "minLength": 16,
+            "maxLength": 128,
+            "title": "Idempotency-Key"
+          }
+        },
+        {
+          "name": "X-CSRF-Token",
+          "in": "header",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/CatalogSessionRequest"
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "Successful Response",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true,
+                "title": "Response Start Catalog Session Api Catalog Sessions Post"
+              }
+            }
+          }
+        },
+        "422": {
+          "description": "Validation Error",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HTTPValidationError"
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "#/components/responses/Unauthorized"
+        },
+        "201": {
+          "description": "新建固定owner学习快照，无Provider调用；仅批准release可使用。"
+        },
+        "403": {
+          "$ref": "#/components/responses/CsrfFailed"
+        },
+        "409": {
+          "description": "CATALOG_NOT_READY或IDEMPOTENCY_CONFLICT；不生成、不回退。"
+        }
+      },
+      "security": [
+        {
+          "sessionCookie": []
+        }
+      ],
+      "description": "目录不返回答案；课程撤回后已有资源也不可读取。选择release_id固定课程版本，重复相同幂等请求返回原快照。"
+    }
+  },
     "/api/auth/guest": {
       "post": {
         "tags": ["Authentication"],
@@ -465,6 +579,27 @@
       "ReviewUnavailable": {"description": "审核不可用；code=REVIEW_UNAVAILABLE，禁止正式发布。","content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}}
     },
     "schemas": {
+  "CatalogSessionRequest": {
+    "properties": {
+      "release_id": {
+        "type": "string",
+        "format": "uuid",
+        "title": "Release Id"
+      },
+      "node_id": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9-]{1,63}$",
+        "title": "Node Id"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "release_id",
+      "node_id"
+    ],
+    "title": "CatalogSessionRequest"
+  },
       "Identifier": {"type": "string", "pattern": "^[A-Za-z0-9_-]{8,64}$"},
       "GuestSession": {"type": "object", "required": ["user", "csrf_token", "expires_at"], "properties": {"user": {"$ref": "#/components/schemas/User"}, "csrf_token": {"type": "string", "description": "只放在内存，用于 X-CSRF-Token；不得持久化到浏览器存储。"}, "expires_at": {"type": "string", "format": "date-time"}}},
       "User": {"type": "object", "required": ["id", "is_guest"], "properties": {"id": {"$ref": "#/components/schemas/Identifier"}, "is_guest": {"type": "boolean"}}},
