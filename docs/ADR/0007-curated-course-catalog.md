@@ -5,8 +5,8 @@
 - 交付10节点/30资源/30题、两个既有模板、预设对比演示、进度推荐与导出；自由生成/重解释/实时AI暂缓。遵循PRD §0。
 - 新增受信课程包发布来源：schema/内容与审核证据hash完整、人工实际签核digest、部署allowlist授权后原子登记；版本不可变，可撤回。没有学生上传/在线编辑后台。
 - 新增CatalogRelease及资源/单元来源引用，通过Alembic迁移。人工发布服务与模型ReviewOutcome分离；旧生成发布规则不改。不通过仅写passed伪装可信。
-- 新增GET /api/course-catalog、POST /api/catalog-learning-sessions与预设演示开始/退出REST；复用资源/测验/路径/Job/导出身份协议。目录读取必须核验curated来源/批准release/owner，撤回后停止正文/新计分但保留进度历史。
-- catalog_only模式不需Provider key。旧动态入口在构建模型依赖前鉴权并返回409 FEATURE_DEFERRED，禁止自动重放调用；前端同时停用这些控件。
+- 新增GET /api/catalog、POST /api/catalog/sessions与预设演示开始/退出REST；复用资源/测验/路径/Job/导出身份协议。目录读取必须核验curated来源/批准release/owner，撤回后停止正文/新计分但保留进度历史。
+- catalog_only模式不需Provider key。旧动态入口在构建模型依赖前鉴权并返回409 FEATURE_UNAVAILABLE，禁止自动重放调用；前端同时停用这些控件。
 - 固定题按owner/节点/题集语义digest仅首次完成记掌握度，重做有反馈但不刷分；历史规则/成绩不回写。
 - AI编写候选内容只可标为待人工审核，不能替用户署名。全部实施/离线检查和可审阅内容准备好后，最终请求用户签核具体课程包；批准前不作为正式课程发布。
 - T036–T046独立实施；T034仅完成目录版退出，原T033和所有旧成绩/冻结保留。不得自动Provider测试、部署、push/merge或Phase 1。

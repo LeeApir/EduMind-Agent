@@ -1896,7 +1896,7 @@
       "id": "MVP-0.3-T043",
       "phase": "MVP 0.3",
       "title": "接通目录学习与动画进度界面",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.3-T039",
@@ -1917,9 +1917,13 @@
         "cd web && pnpm test",
         "cd web && pnpm build"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "pnpm --dir web test --run：21文件132 passed；含新目录API/页面10项、lost-response幂等、owner恢复、撤回清理、预设返回tab、固定动画节点、范围读取失败关闭；原组件/旧mock流程保留。",
+        "pnpm --dir web typecheck/build通过；pnpm --dir web lint通过（0 errors，原有67 warnings）；新文件定向eslint无warning；backend目录API补来源字段，5实际PG/REST回归通过；Ruff/diff通过。",
+        "Provider 0累计2033/2500，目录候选尚未发布；真实浏览器/测量在T045。"
+      ],
+      "started_at": "2026-10-03T00:33:46",
+      "completed_at": "2026-10-03T00:47:15",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.3-T043"
     },

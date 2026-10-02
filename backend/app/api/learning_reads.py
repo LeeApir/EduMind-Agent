@@ -83,6 +83,8 @@ async def get_learning_unit(
         "status": unit.status,
         "scenes": list(scenes.values()),
         "knowledge_node_id": unit.knowledge_point_id,
+        "origin_type": "curated" if unit.catalog_release_id else "generated",
+        "catalog_release_id": str(unit.catalog_release_id) if unit.catalog_release_id else None,
         "path_target_node_id": path_snapshot.get("target_node_id")
         if isinstance(path_snapshot, dict)
         else None,
