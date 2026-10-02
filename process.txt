@@ -717,3 +717,7 @@ A2按授权首槽qwen3.8-max-0902返回合法pass但漏检malloc失败后main覆
 用户执行B批准既定课程目录范围，先同步治理与单行为任务；不另写长提案 | 已读PRD/任务/历史日志/Git；Provider新增0累计2033/2500 | 原T033仍blocked，既有未提交改动保留，正式课程须实际人工签核 | 完成简短PRD增补/ADR与任务验证后本地治理提交，再串行实施
 [2026-10-02T20:08:41] [MVP-0.3-T036] VERIFIED | executor=Lee
 完成简短PRD v2.2增补/Accepted ADR-0007/目录实施任务，保留原T034定义与T033失败 | python3 scripts/check_catalog_workflow.py和git diff --check通过，新增Provider 0累计2033/2500 | 功能尚未实施，内容须实际人工签核 | 本地范围提交后领取T037，逐项测试提交；不push/merge
+[2026-10-02T20:09:24] [MVP-0.3-T037] START | executor=Lee | branch=codex/mvp-0.3
+建立课程包校验/人工来源/批准与撤回，不修改模型审核链 | T036完成提交9003864；本轮Provider 0 | 固定内容尚未人工签核 | 实现迁移与受信发布服务，先离线再隔离数据库验证
+[2026-10-02T20:17:28] [MVP-0.3-T037] VERIFIED | executor=Lee
+实现数据包完整性/人工签核digest校验、独立CatalogRelease发布/撤回、curated资源及单元FK来源、只读来源门禁；旧模型发布不改 | 25离线测试/Ruff/4文件mypy通过；独立PostgreSQL新库迁移0016/0017，2数据库测试通过；初次篡改测试被旧不可变约束拒绝，改为明确断言该拒绝；Provider 0累计2033/2500 | 真实课程尚无人工批准，不发布 | 提交后领取T038，准备10节点课程候选与受限C验证；人工签核在最终T046
