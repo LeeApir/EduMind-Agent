@@ -20,6 +20,7 @@ from app.models.classroom import ClassroomOperation, ClassroomSession
 from app.models.learning import GeneratedResource, LearningScene, LearningUnit, utc_now
 from app.services.learning_operations import IdempotencyConflict
 from app.services.learning_owner_lock import lock_learning_owner
+from app.services.owned_learning import visible_unit
 
 
 class ClassroomNotFound(ValueError):
@@ -71,6 +72,8 @@ async def owned_classroom(
     db: AsyncSession, *, owner_id: UUID, unit_id: UUID
 ) -> ClassroomSession | None:
     """Return the owner's current classroom, if one has been created yet."""
+    if await visible_unit(db, owner_id, unit_id) is None:
+        return None
     return cast(
         ClassroomSession | None,
         await db.scalar(
@@ -144,6 +147,8 @@ async def create_classroom(
     db: AsyncSession, *, owner_id: UUID, unit_id: UUID, idempotency_key: str
 ) -> tuple[dict[str, object], bool]:
     """Create the default focus classroom once, or replay the existing snapshot."""
+    if await visible_unit(db, owner_id, unit_id) is None:
+        raise ClassroomNotFound
     digest = classroom_digest({"kind": "create", "learning_unit_id": str(unit_id)})
     existing = await _find_operation(db, owner_id=owner_id, idempotency_key=idempotency_key)
     if existing is not None:

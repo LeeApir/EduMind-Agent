@@ -36,6 +36,163 @@
     }
   ],
   "paths": {
+  "/api/catalog/learning-units/{unit_id}/demo": {
+    "get": {
+      "tags": [
+        "Catalog"
+      ],
+      "summary": "Get Preset Demo",
+      "operationId": "get_preset_demo_api_catalog_learning_units__unit_id__demo_get",
+      "parameters": [
+        {
+          "name": "unit_id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Unit Id"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Successful Response",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true,
+                "title": "Response Get Preset Demo Api Catalog Learning Units  Unit Id  Demo Get"
+              }
+            }
+          }
+        },
+        "422": {
+          "description": "Validation Error",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HTTPValidationError"
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "#/components/responses/Unauthorized"
+        },
+        "404": {
+          "description": "不存在/外人/撤回课程隐藏。"
+        }
+      },
+      "security": [
+        {
+          "sessionCookie": []
+        }
+      ],
+      "description": "仅已批准的预设脚本，preset=true；无模型。begin持久保存场景/版本/进度/暂停和选中资源，exit恢复；revision单调，幂等重试回放原回执。"
+    },
+    "post": {
+      "tags": [
+        "Catalog"
+      ],
+      "summary": "Change Preset Demo",
+      "operationId": "change_preset_demo_api_catalog_learning_units__unit_id__demo_post",
+      "parameters": [
+        {
+          "name": "unit_id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Unit Id"
+          }
+        },
+        {
+          "name": "Idempotency-Key",
+          "in": "header",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "minLength": 16,
+            "maxLength": 128,
+            "title": "Idempotency-Key"
+          }
+        },
+        {
+          "name": "If-Match-Classroom-Revision",
+          "in": "header",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "minimum": 1,
+            "title": "If-Match-Classroom-Revision"
+          }
+        },
+        {
+          "name": "X-CSRF-Token",
+          "in": "header",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/CatalogDemoControl"
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "Successful Response",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true,
+                "title": "Response Change Preset Demo Api Catalog Learning Units  Unit Id  Demo Post"
+              }
+            }
+          }
+        },
+        "422": {
+          "description": "Validation Error",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HTTPValidationError"
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "#/components/responses/Unauthorized"
+        },
+        "404": {
+          "description": "不存在/外人/撤回课程隐藏。"
+        },
+        "403": {
+          "$ref": "#/components/responses/CsrfFailed"
+        },
+        "409": {
+          "description": "版本/幂等/演示状态冲突。"
+        }
+      },
+      "security": [
+        {
+          "sessionCookie": []
+        }
+      ],
+      "description": "仅已批准的预设脚本，preset=true；无模型。begin持久保存场景/版本/进度/暂停和选中资源，exit恢复；revision单调，幂等重试回放原回执。"
+    }
+  },
   "/api/runtime": {
     "get": {
       "tags": [
@@ -607,6 +764,35 @@
       "ReviewUnavailable": {"description": "审核不可用；code=REVIEW_UNAVAILABLE，禁止正式发布。","content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}}
     },
     "schemas": {
+  "CatalogDemoControl": {
+    "properties": {
+      "action": {
+        "type": "string",
+        "enum": [
+          "begin",
+          "exit"
+        ],
+        "title": "Action"
+      },
+      "return_resource_type": {
+        "type": "string",
+        "enum": [
+          "explanation",
+          "code",
+          "exercise",
+          "animation"
+        ],
+        "title": "Return Resource Type",
+        "default": "explanation"
+      }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+      "action"
+    ],
+    "title": "CatalogDemoControl"
+  },
   "CatalogSessionRequest": {
     "properties": {
       "release_id": {
