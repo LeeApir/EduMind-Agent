@@ -810,3 +810,7 @@ MVP 0.3源账本逐字节归档（45 done/T033 blocked），根切换Phase 1共4
 用户明确回复“批准”，批准ADR-0008 A–D及提案digest 2e8287cf8fcf8a3c7dccbc6fcb758f8ec274e8aa0a63d984f9b6791018431372，解除具体安全决定阻塞 | 提案原始字节保存本地、批准登记与hash匹配，之前文档核验有效；Provider0 | 运行实现仍未交付、历史ADR/T033不变 | 登记Accepted并本地完成提交后领取T003
 [2026-10-04T00:25:20] [PHASE-1-T002] VERIFIED | executor=Lee
 ADR-0008 A–D获用户批准，安全边界与PRD/Provider/ADR索引同步，T018继承T002批准前置 | 具体批准/hash/30链接/依赖/归档/diff检查通过；Provider0累计2033/2500 | 用户批准安全方案不等于运行时已实现或真实模型预算；不填AI为人工reviewer | 完成本地T002提交后继续T003 API契约，交接ADR-0008及批准JSON
+[2026-10-04T00:26:20] [PHASE-1-T003] START | executor=Lee | branch=codex/phase-1-t002-t005
+依据Accepted ADR-0008冻结Provider API契约，复用Cookie/CSRF并定义临时handle/版本/删除/能力/同意/错误语义 | T002完成73d92b3；现有OpenAPI为JSON兼容YAML，Provider0 | 本任务不实现HTTP端点或解除目录门禁 | 校验全部ref/operationId/请求与响应示例及secret写入边界，独立提交后T004
+[2026-10-04T00:33:02] [PHASE-1-T003] VERIFIED | executor=Lee
+冻结12项Provider连接/临时上传/探测/缓存与显式刷新/档位API，owner/CSRF/no-store、版本冲突/墓碑删除/只写secret/同意/错误/未知能力及planned状态同步 | 532引用/60唯一operationId/84示例及负例检查、Ruff/diff通过；初次本地生成脚本括号错误修正后通过；Provider0 | 本任务只有契约，实际端点由T009至T012实现；目录门禁不变 | 本地完成提交后T004，交接docs/ADR/0008-provider-api-contract.md与scripts/check_provider_contract.py

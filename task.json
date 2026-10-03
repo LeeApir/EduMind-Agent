@@ -225,7 +225,7 @@
       "id": "PHASE-1-T003",
       "phase": "Phase 1",
       "title": "固定Provider连接及模型偏好API契约",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1-T002"
@@ -233,7 +233,8 @@
       "scope": [
         "docs/api/openapi.yaml",
         "docs/PROVIDERS.md",
-        "docs/ADR/"
+        "docs/ADR/",
+        "scripts/check_provider_contract.py"
       ],
       "prd_source": "PRD §3.8、§7.8",
       "acceptance_criteria": [
@@ -244,9 +245,20 @@
       "verification": [
         "校验OpenAPI全部引用、operationId唯一性及请求/错误示例；对照批准ADR。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "backend/.venv/bin/python scripts/check_provider_contract.py",
+          "result": "passed: all 532 local refs resolve, 60 unique operation IDs, 84 schema-valid examples; secret/owner injection, missing consent, capability unknown and read/refresh boundary checks pass",
+          "evidence": "docs/ADR/0008-provider-api-contract.md; docs/api/openapi.yaml; scripts/check_provider_contract.py"
+        },
+        {
+          "command": "backend/.venv/bin/ruff check scripts/check_provider_contract.py; git diff --check",
+          "result": "passed; 12 Provider operations conform to Accepted ADR-0008, marked planned, no runtime/model calls",
+          "evidence": "docs/ADR/0008-provider-api-contract.md"
+        }
+      ],
+      "started_at": "2026-10-04T00:26:20",
+      "completed_at": "2026-10-04T00:33:02",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T003"
     },

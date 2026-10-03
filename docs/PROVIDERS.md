@@ -112,3 +112,7 @@ Provider失败只携带固定输出类别与验证过的非负整数token用量�
 仅返回 `{"updates": {}}`。原schema、允许字段、服务端证据归属和失败降级策略不变。
 `diagnose_profile_contract.py` 以三次无重试请求验证一次提取和两次行为更新；
 合法的无变化不是失败，也不能以此宣称已证明完整学习闭环。
+
+## Phase 1 API契约
+
+[T003契约落实](ADR/0008-provider-api-contract.md)与[OpenAPI](api/openapi.yaml)定义12个Provider操作，包括临时凭据提交及GET模型缓存/POST显式刷新。If-Match/配置版本、owner与CSRF、只写secret、同意与统一错误均固定；x-runtime-status=planned端点尚未实现。可运行 `backend/.venv/bin/python scripts/check_provider_contract.py` 离线核验引用/示例/安全字段，不能替代实际HTTP验收。

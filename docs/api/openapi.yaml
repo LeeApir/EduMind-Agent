@@ -1,9 +1,9 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "EduMind MVP 0.3 API contract",
+    "title": "EduMind API contract (Phase 1 Provider design)",
     "version": "0.3.0",
-    "description": "MVP 0.1/0.2已实现接口及MVP 0.3拟实现契约；新增路径仅为T004设计，运行端点由T012–T028交付。JSON是YAML 1.2子集。"
+    "description": "MVP 0.1/0.2已实现接口及MVP 0.3拟实现契约；新增路径仅为T004设计，运行端点由T012–T028交付。JSON是YAML 1.2子集；Phase 1 Provider路径为T003批准边界内设计，x-runtime-status=planned，按x-implementation-task实现，非当前可用端点。"
   },
   "servers": [{"url": "/"}],
   "tags": [
@@ -36,6 +36,2520 @@
     }
   ],
   "paths": {
+
+  "/api/providers/catalog": {
+    "get": {
+      "tags": [
+        "Providers"
+      ],
+      "operationId": "getProviderCatalog",
+      "security": [
+        {
+          "sessionCookie": []
+        }
+      ],
+      "parameters": [],
+      "responses": {
+        "200": {
+          "description": "Successful operation.",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "types": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/ProviderType"
+                    }
+                  }
+                },
+                "required": [
+                  "types"
+                ]
+              }
+            }
+          }
+        },
+        "401": {
+          "description": "UNAUTHORIZED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "UNAUTHORIZED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "403": {
+          "description": "CSRF_FAILED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "CSRF_FAILED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "404": {
+          "description": "NOT_FOUND",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "NOT_FOUND",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "409": {
+          "description": "VERSION_CONFLICT",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "VERSION_CONFLICT",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "422": {
+          "description": "VALIDATION_ERROR",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "VALIDATION_ERROR",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "503": {
+          "description": "CREDENTIAL_UNAVAILABLE",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "CREDENTIAL_UNAVAILABLE",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        }
+      },
+      "description": "Static adapter types; no model calls, no private connection data.",
+      "x-implementation-task": "PHASE-1-T011",
+      "x-runtime-status": "planned"
+    }
+  },
+  "/api/providers/connections": {
+    "get": {
+      "tags": [
+        "Providers"
+      ],
+      "operationId": "listProviderConnections",
+      "security": [
+        {
+          "sessionCookie": []
+        }
+      ],
+      "parameters": [],
+      "responses": {
+        "200": {
+          "description": "Successful operation.",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "connections": {
+                    "type": "array",
+                    "maxItems": 100,
+                    "items": {
+                      "$ref": "#/components/schemas/ProviderConnection"
+                    }
+                  }
+                },
+                "required": [
+                  "connections"
+                ]
+              }
+            }
+          }
+        },
+        "401": {
+          "description": "UNAUTHORIZED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "UNAUTHORIZED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "403": {
+          "description": "CSRF_FAILED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "CSRF_FAILED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "404": {
+          "description": "NOT_FOUND",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "NOT_FOUND",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "409": {
+          "description": "VERSION_CONFLICT",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "VERSION_CONFLICT",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "422": {
+          "description": "VALIDATION_ERROR",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "VALIDATION_ERROR",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "503": {
+          "description": "CREDENTIAL_UNAVAILABLE",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "CREDENTIAL_UNAVAILABLE",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        }
+      },
+      "description": "Current owner only; at most 100 connections; no secret/handle/ciphertext fields and no network probe.",
+      "x-implementation-task": "PHASE-1-T009",
+      "x-runtime-status": "planned"
+    },
+    "post": {
+      "tags": [
+        "Providers"
+      ],
+      "operationId": "createProviderConnection",
+      "security": [
+        {
+          "sessionCookie": []
+        }
+      ],
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/CsrfToken"
+        }
+      ],
+      "responses": {
+        "201": {
+          "description": "Successful operation.",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderConnection"
+              }
+            }
+          }
+        },
+        "401": {
+          "description": "UNAUTHORIZED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "UNAUTHORIZED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "403": {
+          "description": "CSRF_FAILED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "CSRF_FAILED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "404": {
+          "description": "NOT_FOUND",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "NOT_FOUND",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "409": {
+          "description": "VERSION_CONFLICT",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "VERSION_CONFLICT",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "422": {
+          "description": "VALIDATION_ERROR",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "VALIDATION_ERROR",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "503": {
+          "description": "CREDENTIAL_UNAVAILABLE",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "CREDENTIAL_UNAVAILABLE",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        }
+      },
+      "description": "Owner/session derived from cookie. Persistent mode requires secret, temporary/none forbid it. Syntax and target eligibility only; no automatic model probe. Credential expiry cannot exceed original session.",
+      "x-implementation-task": "PHASE-1-T009",
+      "x-runtime-status": "planned",
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ProviderConnectionCreate"
+            },
+            "example": {
+              "provider_type": "openai-compatible",
+              "display_name": "Example",
+              "base_url": "https://provider.example/v1",
+              "credential_mode": "persistent",
+              "secret": {
+                "api_key": "TEST_ONLY_EXAMPLE_SECRET"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "/api/providers/connections/{connection_id}": {
+    "get": {
+      "tags": [
+        "Providers"
+      ],
+      "operationId": "getProviderConnection",
+      "security": [
+        {
+          "sessionCookie": []
+        }
+      ],
+      "parameters": [
+        {
+          "name": "connection_id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Successful operation.",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderConnection"
+              }
+            }
+          }
+        },
+        "401": {
+          "description": "UNAUTHORIZED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "UNAUTHORIZED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "403": {
+          "description": "CSRF_FAILED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "CSRF_FAILED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "404": {
+          "description": "NOT_FOUND",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "NOT_FOUND",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "409": {
+          "description": "VERSION_CONFLICT",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "VERSION_CONFLICT",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "422": {
+          "description": "VALIDATION_ERROR",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "VALIDATION_ERROR",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "503": {
+          "description": "CREDENTIAL_UNAVAILABLE",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "CREDENTIAL_UNAVAILABLE",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        }
+      },
+      "description": "Current owner and originating session; foreign or deleted connection is 404; missing/expired session is 401.",
+      "x-implementation-task": "PHASE-1-T009",
+      "x-runtime-status": "planned"
+    },
+    "patch": {
+      "tags": [
+        "Providers"
+      ],
+      "operationId": "updateProviderConnection",
+      "security": [
+        {
+          "sessionCookie": []
+        }
+      ],
+      "parameters": [
+        {
+          "name": "connection_id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "$ref": "#/components/parameters/CsrfToken"
+        },
+        {
+          "name": "If-Match",
+          "in": "header",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "description": "Current positive config_version as an unquoted decimal integer."
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Successful operation.",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderConnection"
+              }
+            }
+          }
+        },
+        "401": {
+          "description": "UNAUTHORIZED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "UNAUTHORIZED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "403": {
+          "description": "CSRF_FAILED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "CSRF_FAILED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "404": {
+          "description": "NOT_FOUND",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "NOT_FOUND",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "409": {
+          "description": "VERSION_CONFLICT",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "VERSION_CONFLICT",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "422": {
+          "description": "VALIDATION_ERROR",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "VALIDATION_ERROR",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "503": {
+          "description": "CREDENTIAL_UNAVAILABLE",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "CREDENTIAL_UNAVAILABLE",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        }
+      },
+      "description": "If-Match mandatory. Target/type change clears old credentials and consent; replacement secret must be explicitly provided for persistent mode. null clears secret. Reject secret in temporary/none mode. All changes increment config_version and invalidate old consent/temporary handles; no model call.",
+      "x-implementation-task": "PHASE-1-T009",
+      "x-runtime-status": "planned",
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ProviderConnectionPatch"
+            },
+            "example": {
+              "display_name": "Renamed"
+            }
+          }
+        }
+      }
+    },
+    "delete": {
+      "tags": [
+        "Providers"
+      ],
+      "operationId": "deleteProviderConnection",
+      "security": [
+        {
+          "sessionCookie": []
+        }
+      ],
+      "parameters": [
+        {
+          "name": "connection_id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "$ref": "#/components/parameters/CsrfToken"
+        },
+        {
+          "name": "If-Match",
+          "in": "header",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "description": "Current positive config_version as an unquoted decimal integer."
+        }
+      ],
+      "responses": {
+        "204": {
+          "description": "Successful operation.",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          }
+        },
+        "401": {
+          "description": "UNAUTHORIZED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "UNAUTHORIZED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "403": {
+          "description": "CSRF_FAILED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "CSRF_FAILED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "404": {
+          "description": "NOT_FOUND",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "NOT_FOUND",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "409": {
+          "description": "VERSION_CONFLICT",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "VERSION_CONFLICT",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "422": {
+          "description": "VALIDATION_ERROR",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "VALIDATION_ERROR",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "503": {
+          "description": "CREDENTIAL_UNAVAILABLE",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "CREDENTIAL_UNAVAILABLE",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        }
+      },
+      "description": "Transaction clears secret, disables and tombstones connection, increments version, invalidates preferences/consent. Repeated delete with last pre-delete If-Match returns 204; another version returns 409. Cross-owner 404. Already sent data cannot be recalled; see ADR-0008 cancellation boundary.",
+      "x-implementation-task": "PHASE-1-T009",
+      "x-runtime-status": "planned"
+    }
+  },
+  "/api/providers/connections/{connection_id}/temporary-credentials": {
+    "post": {
+      "tags": [
+        "Providers"
+      ],
+      "operationId": "provideTemporaryCredential",
+      "security": [
+        {
+          "sessionCookie": []
+        }
+      ],
+      "parameters": [
+        {
+          "name": "connection_id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "$ref": "#/components/parameters/CsrfToken"
+        }
+      ],
+      "responses": {
+        "201": {
+          "description": "Successful operation.",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TemporaryCredentialReceipt"
+              }
+            }
+          }
+        },
+        "401": {
+          "description": "UNAUTHORIZED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "UNAUTHORIZED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "403": {
+          "description": "CSRF_FAILED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "CSRF_FAILED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "404": {
+          "description": "NOT_FOUND",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "NOT_FOUND",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "409": {
+          "description": "VERSION_CONFLICT",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "VERSION_CONFLICT",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "422": {
+          "description": "VALIDATION_ERROR",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "VALIDATION_ERROR",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "503": {
+          "description": "CREDENTIAL_UNAVAILABLE",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "CREDENTIAL_UNAVAILABLE",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        }
+      },
+      "description": "Only temporary connection at matching consent/config version. Process-local handle bound to authenticated owner/session/operation; pending <=5min, <=4 per session; one claim, total operation <=180s and session deadline. No persistence/network call.",
+      "x-implementation-task": "PHASE-1-T009",
+      "x-runtime-status": "planned",
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/TemporaryCredentialRequest"
+            },
+            "example": {
+              "secret": {
+                "api_key": "TEST_ONLY_EXAMPLE_SECRET"
+              },
+              "consent": {
+                "accepted": true,
+                "config_version": 1,
+                "model_id": "test-model",
+                "data_categories": [
+                  "probe"
+                ]
+              },
+              "operation_id": "00000000-0000-4000-8000-000000000001",
+              "purpose": "connection_test"
+            }
+          }
+        }
+      }
+    }
+  },
+  "/api/providers/connections/{connection_id}/test": {
+    "post": {
+      "tags": [
+        "Providers"
+      ],
+      "operationId": "testProviderConnection",
+      "security": [
+        {
+          "sessionCookie": []
+        }
+      ],
+      "parameters": [
+        {
+          "name": "connection_id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "$ref": "#/components/parameters/CsrfToken"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Successful operation.",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderProbeResult"
+              }
+            }
+          }
+        },
+        "401": {
+          "description": "UNAUTHORIZED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "UNAUTHORIZED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "403": {
+          "description": "BUDGET_NOT_AUTHORIZED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "BUDGET_NOT_AUTHORIZED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "404": {
+          "description": "NOT_FOUND",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "NOT_FOUND",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "409": {
+          "description": "VERSION_CONFLICT",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "VERSION_CONFLICT",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "422": {
+          "description": "VALIDATION_ERROR",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "VALIDATION_ERROR",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "503": {
+          "description": "CREDENTIAL_UNAVAILABLE",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "CREDENTIAL_UNAVAILABLE",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "429": {
+          "description": "RATE_LIMITED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "RATE_LIMITED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "502": {
+          "description": "AUTHENTICATION_FAILED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "AUTHENTICATION_FAILED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "504": {
+          "description": "TIMEOUT",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "TIMEOUT",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        }
+      },
+      "description": "Explicit consent for selected version/model and probe-only data. At most one bounded outbound attempt, no retry/fallback/download. Budget must be separately authorized; otherwise 403 BUDGET_NOT_AUTHORIZED. Temporary handle only for same operation/purpose; unavailable process requires re-entry.",
+      "x-implementation-task": "PHASE-1-T010",
+      "x-runtime-status": "planned",
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ProviderProbeRequest"
+            },
+            "example": {
+              "operation_id": "00000000-0000-4000-8000-000000000001",
+              "consent": {
+                "accepted": true,
+                "config_version": 1,
+                "model_id": "test-model",
+                "data_categories": [
+                  "probe"
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "/api/providers/connections/{connection_id}/models": {
+    "get": {
+      "tags": [
+        "Providers"
+      ],
+      "operationId": "getCachedProviderModels",
+      "security": [
+        {
+          "sessionCookie": []
+        }
+      ],
+      "parameters": [
+        {
+          "name": "connection_id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Successful operation.",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderModelList"
+              }
+            }
+          }
+        },
+        "401": {
+          "description": "UNAUTHORIZED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "UNAUTHORIZED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "403": {
+          "description": "CSRF_FAILED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "CSRF_FAILED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "404": {
+          "description": "NOT_FOUND",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "NOT_FOUND",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "409": {
+          "description": "VERSION_CONFLICT",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "VERSION_CONFLICT",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "422": {
+          "description": "VALIDATION_ERROR",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "VALIDATION_ERROR",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "503": {
+          "description": "CREDENTIAL_UNAVAILABLE",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "CREDENTIAL_UNAVAILABLE",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        }
+      },
+      "description": "Read existing owner-scoped snapshot only, never refresh or contact Provider. Unknown/undeclared capability is null; empty cache is empty models with refreshed_at=null.",
+      "x-implementation-task": "PHASE-1-T011",
+      "x-runtime-status": "planned"
+    }
+  },
+  "/api/providers/connections/{connection_id}/models/refresh": {
+    "post": {
+      "tags": [
+        "Providers"
+      ],
+      "operationId": "refreshProviderModels",
+      "security": [
+        {
+          "sessionCookie": []
+        }
+      ],
+      "parameters": [
+        {
+          "name": "connection_id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "$ref": "#/components/parameters/CsrfToken"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Successful operation.",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderModelList"
+              }
+            }
+          }
+        },
+        "401": {
+          "description": "UNAUTHORIZED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "UNAUTHORIZED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "403": {
+          "description": "BUDGET_NOT_AUTHORIZED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "BUDGET_NOT_AUTHORIZED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "404": {
+          "description": "NOT_FOUND",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "NOT_FOUND",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "409": {
+          "description": "VERSION_CONFLICT",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "VERSION_CONFLICT",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "422": {
+          "description": "VALIDATION_ERROR",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "VALIDATION_ERROR",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "503": {
+          "description": "CREDENTIAL_UNAVAILABLE",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "CREDENTIAL_UNAVAILABLE",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "429": {
+          "description": "RATE_LIMITED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "RATE_LIMITED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "502": {
+          "description": "AUTHENTICATION_FAILED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "AUTHENTICATION_FAILED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "504": {
+          "description": "TIMEOUT",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "TIMEOUT",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        }
+      },
+      "description": "Explicit consent/budget. One bounded outbound model-list attempt, no background poll or fallback. Error retains previous snapshot. GET never refreshes. Missing usage stays unknown.",
+      "x-implementation-task": "PHASE-1-T011",
+      "x-runtime-status": "planned",
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ProviderProbeRequest"
+            },
+            "example": {
+              "operation_id": "00000000-0000-4000-8000-000000000001",
+              "consent": {
+                "accepted": true,
+                "config_version": 1,
+                "model_id": "test-model",
+                "data_categories": [
+                  "probe"
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "/api/model-preferences": {
+    "get": {
+      "tags": [
+        "Providers"
+      ],
+      "operationId": "getModelPreferences",
+      "security": [
+        {
+          "sessionCookie": []
+        }
+      ],
+      "parameters": [],
+      "responses": {
+        "200": {
+          "description": "Successful operation.",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "preferences": {
+                    "type": "array",
+                    "maxItems": 4,
+                    "items": {
+                      "$ref": "#/components/schemas/ModelPreference"
+                    }
+                  }
+                },
+                "required": [
+                  "preferences"
+                ]
+              }
+            }
+          }
+        },
+        "401": {
+          "description": "UNAUTHORIZED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "UNAUTHORIZED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "403": {
+          "description": "CSRF_FAILED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "CSRF_FAILED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "404": {
+          "description": "NOT_FOUND",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "NOT_FOUND",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "409": {
+          "description": "VERSION_CONFLICT",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "VERSION_CONFLICT",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "422": {
+          "description": "VALIDATION_ERROR",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "VALIDATION_ERROR",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "503": {
+          "description": "CREDENTIAL_UNAVAILABLE",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "CREDENTIAL_UNAVAILABLE",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        }
+      },
+      "description": "Only persisted user task profiles; missing profile uses documented priority resolution, never overrides explicit unavailable choice. No Provider call. Effective destination must be shown before generation.",
+      "x-implementation-task": "PHASE-1-T012",
+      "x-runtime-status": "planned"
+    }
+  },
+  "/api/model-preferences/{task_profile}": {
+    "put": {
+      "tags": [
+        "Providers"
+      ],
+      "operationId": "setModelPreference",
+      "security": [
+        {
+          "sessionCookie": []
+        }
+      ],
+      "parameters": [
+        {
+          "name": "task_profile",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "fast",
+              "default",
+              "quality",
+              "review"
+            ]
+          }
+        },
+        {
+          "$ref": "#/components/parameters/CsrfToken"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Successful operation.",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModelPreference"
+              }
+            }
+          }
+        },
+        "401": {
+          "description": "UNAUTHORIZED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "UNAUTHORIZED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "403": {
+          "description": "CSRF_FAILED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "CSRF_FAILED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "404": {
+          "description": "NOT_FOUND",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "NOT_FOUND",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "409": {
+          "description": "VERSION_CONFLICT",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "VERSION_CONFLICT",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "422": {
+          "description": "VALIDATION_ERROR",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "VALIDATION_ERROR",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "503": {
+          "description": "CREDENTIAL_UNAVAILABLE",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "CREDENTIAL_UNAVAILABLE",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        }
+      },
+      "description": "expected_version=0 creates; otherwise compare exact current version. Consent explicitly approves route and ordered fallbacks/data categories. Deleted/expired/stale connection rejected; model/capability unknown blocks invocation, no automatic discovery. Default empty fallbacks; no silent system route after explicit selection fails.",
+      "x-implementation-task": "PHASE-1-T012",
+      "x-runtime-status": "planned",
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ModelPreferenceWrite"
+            },
+            "example": {
+              "expected_version": 0,
+              "route": {
+                "connection_id": "00000000-0000-4000-8000-000000000001",
+                "config_version": 1,
+                "model_id": "test-model",
+                "data_categories": [
+                  "learning_goal"
+                ]
+              },
+              "fallbacks": [],
+              "consent_accepted": true
+            }
+          }
+        }
+      }
+    }
+  }
+,
   "/api/catalog/learning-units/{unit_id}/demo": {
     "get": {
       "tags": [
@@ -765,6 +3279,711 @@
       "ReviewUnavailable": {"description": "审核不可用；code=REVIEW_UNAVAILABLE，禁止正式发布。","content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}}
     },
     "schemas": {
+
+  "ProviderType": {
+    "type": "string",
+    "enum": [
+      "openai-compatible",
+      "ollama",
+      "anthropic",
+      "gemini",
+      "spark"
+    ]
+  },
+  "CredentialMode": {
+    "type": "string",
+    "enum": [
+      "none",
+      "persistent",
+      "temporary"
+    ]
+  },
+  "ProviderSecret": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "api_key": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4096,
+        "writeOnly": true
+      },
+      "api_secret": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4096,
+        "writeOnly": true
+      },
+      "app_id": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4096,
+        "writeOnly": true
+      }
+    },
+    "required": [
+      "api_key"
+    ],
+    "writeOnly": true
+  },
+  "ProviderConnection": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "provider_type": {
+        "$ref": "#/components/schemas/ProviderType"
+      },
+      "display_name": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 80
+      },
+      "base_url": {
+        "type": "string",
+        "maxLength": 500
+      },
+      "is_local": {
+        "type": "boolean"
+      },
+      "enabled": {
+        "type": "boolean"
+      },
+      "config_version": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "credential_mode": {
+        "$ref": "#/components/schemas/CredentialMode"
+      },
+      "credential_state": {
+        "type": "string",
+        "enum": [
+          "present",
+          "missing",
+          "expired",
+          "revoked"
+        ]
+      },
+      "credential_expires_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time"
+      }
+    },
+    "required": [
+      "id",
+      "provider_type",
+      "display_name",
+      "base_url",
+      "is_local",
+      "enabled",
+      "config_version",
+      "credential_mode",
+      "credential_state",
+      "credential_expires_at"
+    ]
+  },
+  "ProviderConnectionCreate": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "provider_type": {
+        "$ref": "#/components/schemas/ProviderType"
+      },
+      "display_name": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 80
+      },
+      "base_url": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 500
+      },
+      "enabled": {
+        "type": "boolean",
+        "default": true
+      },
+      "credential_mode": {
+        "$ref": "#/components/schemas/CredentialMode"
+      },
+      "secret": {
+        "$ref": "#/components/schemas/ProviderSecret"
+      }
+    },
+    "required": [
+      "provider_type",
+      "display_name",
+      "base_url",
+      "credential_mode"
+    ],
+    "allOf": [
+      {
+        "if": {
+          "properties": {
+            "credential_mode": {
+              "const": "persistent"
+            }
+          }
+        },
+        "then": {
+          "required": [
+            "secret"
+          ]
+        },
+        "else": {
+          "not": {
+            "required": [
+              "secret"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "ProviderConnectionPatch": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "display_name": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 80
+      },
+      "base_url": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 500
+      },
+      "provider_type": {
+        "$ref": "#/components/schemas/ProviderType"
+      },
+      "enabled": {
+        "type": "boolean"
+      },
+      "credential_mode": {
+        "$ref": "#/components/schemas/CredentialMode"
+      },
+      "secret": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/ProviderSecret"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      }
+    },
+    "required": [],
+    "minProperties": 1
+  },
+  "ProviderCapability": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "streaming": {
+        "type": [
+          "boolean",
+          "null"
+        ]
+      },
+      "structured_output": {
+        "type": [
+          "boolean",
+          "null"
+        ]
+      },
+      "tool_calling": {
+        "type": [
+          "boolean",
+          "null"
+        ]
+      },
+      "vision": {
+        "type": [
+          "boolean",
+          "null"
+        ]
+      },
+      "embedding": {
+        "type": [
+          "boolean",
+          "null"
+        ]
+      },
+      "tts": {
+        "type": [
+          "boolean",
+          "null"
+        ]
+      },
+      "asr": {
+        "type": [
+          "boolean",
+          "null"
+        ]
+      },
+      "source": {
+        "type": "string",
+        "enum": [
+          "declared",
+          "verified",
+          "unknown"
+        ]
+      },
+      "version": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 100
+      }
+    },
+    "required": [
+      "streaming",
+      "structured_output",
+      "tool_calling",
+      "vision",
+      "embedding",
+      "tts",
+      "asr",
+      "source",
+      "version"
+    ]
+  },
+  "ProviderModel": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "id": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 160
+      },
+      "capabilities": {
+        "$ref": "#/components/schemas/ProviderCapability"
+      }
+    },
+    "required": [
+      "id",
+      "capabilities"
+    ]
+  },
+  "ProviderModelList": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "connection_id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "config_version": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "models": {
+        "type": "array",
+        "maxItems": 1000,
+        "items": {
+          "$ref": "#/components/schemas/ProviderModel"
+        }
+      },
+      "refreshed_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time"
+      }
+    },
+    "required": [
+      "connection_id",
+      "config_version",
+      "models",
+      "refreshed_at"
+    ]
+  },
+  "ProviderDataConsent": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "accepted": {
+        "type": "boolean",
+        "const": true
+      },
+      "config_version": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "model_id": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 160
+      },
+      "data_categories": {
+        "type": "array",
+        "uniqueItems": true,
+        "minItems": 1,
+        "maxItems": 5,
+        "items": {
+          "type": "string",
+          "enum": [
+            "probe",
+            "learning_goal",
+            "profile_evidence",
+            "limited_history",
+            "content_for_review"
+          ]
+        }
+      }
+    },
+    "required": [
+      "accepted",
+      "config_version",
+      "model_id",
+      "data_categories"
+    ]
+  },
+  "ProviderProbeRequest": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "operation_id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "consent": {
+        "$ref": "#/components/schemas/ProviderDataConsent"
+      },
+      "temporary_handle": {
+        "type": "string",
+        "minLength": 32,
+        "maxLength": 200,
+        "writeOnly": true
+      }
+    },
+    "required": [
+      "operation_id",
+      "consent"
+    ]
+  },
+  "ProviderProbeResult": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "connection_id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "config_version": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "model_id": {
+        "type": "string",
+        "maxLength": 160
+      },
+      "target": {
+        "type": "string",
+        "maxLength": 500
+      },
+      "is_local": {
+        "type": "boolean"
+      },
+      "capabilities": {
+        "$ref": "#/components/schemas/ProviderCapability"
+      },
+      "requests": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 1
+      },
+      "usage": {
+        "type": [
+          "object",
+          "null"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "input_tokens": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "output_tokens": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          }
+        }
+      }
+    },
+    "required": [
+      "connection_id",
+      "config_version",
+      "model_id",
+      "target",
+      "is_local",
+      "capabilities",
+      "requests",
+      "usage"
+    ]
+  },
+  "TemporaryCredentialRequest": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "secret": {
+        "$ref": "#/components/schemas/ProviderSecret"
+      },
+      "consent": {
+        "$ref": "#/components/schemas/ProviderDataConsent"
+      },
+      "operation_id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "purpose": {
+        "type": "string",
+        "enum": [
+          "connection_test",
+          "model_refresh",
+          "generation"
+        ]
+      }
+    },
+    "required": [
+      "secret",
+      "consent",
+      "operation_id",
+      "purpose"
+    ]
+  },
+  "TemporaryCredentialReceipt": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "handle": {
+        "type": "string",
+        "minLength": 32,
+        "maxLength": 200
+      },
+      "expires_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "operation_id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "config_version": {
+        "type": "integer",
+        "minimum": 1
+      }
+    },
+    "required": [
+      "handle",
+      "expires_at",
+      "operation_id",
+      "config_version"
+    ]
+  },
+  "ProviderRoute": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "connection_id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "config_version": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "model_id": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 160
+      },
+      "data_categories": {
+        "type": "array",
+        "uniqueItems": true,
+        "minItems": 1,
+        "maxItems": 5,
+        "items": {
+          "type": "string",
+          "enum": [
+            "probe",
+            "learning_goal",
+            "profile_evidence",
+            "limited_history",
+            "content_for_review"
+          ]
+        }
+      }
+    },
+    "required": [
+      "connection_id",
+      "config_version",
+      "model_id",
+      "data_categories"
+    ]
+  },
+  "ProviderFallback": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "route": {
+        "$ref": "#/components/schemas/ProviderRoute"
+      },
+      "on_errors": {
+        "type": "array",
+        "uniqueItems": true,
+        "minItems": 1,
+        "maxItems": 3,
+        "items": {
+          "type": "string",
+          "enum": [
+            "RATE_LIMITED",
+            "TIMEOUT",
+            "TEMPORARILY_UNAVAILABLE"
+          ]
+        }
+      }
+    },
+    "required": [
+      "route",
+      "on_errors"
+    ]
+  },
+  "ModelPreferenceWrite": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "expected_version": {
+        "type": "integer",
+        "minimum": 0
+      },
+      "route": {
+        "$ref": "#/components/schemas/ProviderRoute"
+      },
+      "fallbacks": {
+        "type": "array",
+        "maxItems": 3,
+        "items": {
+          "$ref": "#/components/schemas/ProviderFallback"
+        },
+        "default": []
+      },
+      "consent_accepted": {
+        "type": "boolean",
+        "const": true
+      }
+    },
+    "required": [
+      "expected_version",
+      "route",
+      "fallbacks",
+      "consent_accepted"
+    ]
+  },
+  "ModelPreference": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "task_profile": {
+        "type": "string",
+        "enum": [
+          "fast",
+          "default",
+          "quality",
+          "review"
+        ]
+      },
+      "version": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "route": {
+        "$ref": "#/components/schemas/ProviderRoute"
+      },
+      "fallbacks": {
+        "type": "array",
+        "maxItems": 3,
+        "items": {
+          "$ref": "#/components/schemas/ProviderFallback"
+        }
+      },
+      "state": {
+        "type": "string",
+        "enum": [
+          "available",
+          "unavailable",
+          "consent_required"
+        ]
+      }
+    },
+    "required": [
+      "task_profile",
+      "version",
+      "route",
+      "fallbacks",
+      "state"
+    ]
+  },
+  "ProviderApiError": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "code": {
+        "type": "string",
+        "enum": [
+          "UNAUTHORIZED",
+          "CSRF_FAILED",
+          "NOT_FOUND",
+          "VALIDATION_ERROR",
+          "CONFIGURATION_MISSING",
+          "INVALID_TARGET",
+          "VERSION_CONFLICT",
+          "CREDENTIAL_MISSING",
+          "CREDENTIAL_EXPIRED",
+          "CREDENTIAL_UNAVAILABLE",
+          "CAPABILITY_UNAVAILABLE",
+          "MODEL_UNAVAILABLE",
+          "CONSENT_REQUIRED",
+          "BUDGET_NOT_AUTHORIZED",
+          "RATE_LIMITED",
+          "AUTHENTICATION_FAILED",
+          "TIMEOUT",
+          "TEMPORARILY_UNAVAILABLE",
+          "INVALID_OUTPUT",
+          "FEATURE_UNAVAILABLE"
+        ]
+      },
+      "message": {
+        "type": "string",
+        "maxLength": 200
+      },
+      "retryable": {
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "code",
+      "message",
+      "retryable"
+    ]
+  }
+,
   "CatalogDemoControl": {
     "properties": {
       "action": {
