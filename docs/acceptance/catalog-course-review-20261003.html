@@ -1,0 +1,340 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>线性结构课程候选 · 人工审阅</title><style>
+body{margin:0;background:#eef3f1;color:#17253a;font:16px/1.8 system-ui,sans-serif}main{max-width:1050px;margin:auto;padding:32px 20px}header,section{padding:24px;background:#fbfcf9;border:1px solid #cbd6d4;margin:20px 0}nav{display:flex;gap:12px;flex-wrap:wrap}a{color:#244c5a}h1,h2{line-height:1.3}pre{overflow:auto;background:#eaf0f2;padding:16px;font:13px/1.7 monospace}pre.prose{white-space:pre-wrap;font:inherit;background:transparent;padding:0}summary{cursor:pointer;color:#244c5a;font-weight:600}.digest{overflow-wrap:anywhere}li{margin:16px 0}
+</style><main><header><small>待人工审核 · 尚未作为正式课程发布</small><h1>线性结构课程候选</h1><p>10 节点、30 资源、30 题及一份预设演示。工程测试只验证运行、结构和边界；请审阅教学内容、完整 C 示例、题目答案与反馈。</p><p class="digest">linear-course v0.1.0<br>SHA256：<code>92bb0dd4778391e23aae978b8a411b466d8b5988d1cff61cff01654604af21a1</code></p><nav><a href="#array">数组</a><a href="#c-pointer">C 指针</a><a href="#linked-list-concept">链表概念</a><a href="#single-linked-list">单链表</a><a href="#linked-list-traversal">链表遍历</a><a href="#linked-list-insertion">链表插入</a><a href="#linked-list-deletion">链表删除</a><a href="#stack">栈</a><a href="#queue">队列</a><a href="#circular-queue">循环队列</a><a href="#demo">预设演示</a></nav></header><section id="array"><h2>数组</h2><small>array</small><h3>讲解</h3><pre class="prose"># 数组
+
+数组把同类型元素放在连续空间中。有效下标是0到n-1；长度n和容量cap不是同一个数。知道下标时访问是O(1)。中间插入需要搬移后面的元素，最坏O(n)；末尾插入只有在尚有容量且不扩容时才是O(1)。
+
+示例先检查容量和插入位置，再从后向前移动，避免覆盖尚未搬移的值。空数组只能在0处插入，满数组拒绝插入。示例展示固定容量，不承诺自动扩容。</pre><details><summary>完整 C 示例（含边界断言）</summary><pre><code>#include &lt;assert.h&gt;
+#include &lt;stdbool.h&gt;
+#include &lt;stddef.h&gt;
+#include &lt;stdio.h&gt;
+static bool insert(int *a, size_t *n, size_t cap, size_t pos, int value) {
+    if (*n &gt;= cap || pos &gt; *n) return false;
+    for (size_t i = *n; i &gt; pos; --i) a[i] = a[i - 1];
+    a[pos] = value;
+    ++*n;
+    return true;
+}
+int main(void) {
+    int a[3] = {0}; size_t n = 0;
+    assert(!insert(a, &amp;n, 3, 1, 7));
+    assert(insert(a, &amp;n, 3, 0, 1));
+    assert(insert(a, &amp;n, 3, 1, 2));
+    assert(insert(a, &amp;n, 3, 1, 9));
+    assert(!insert(a, &amp;n, 3, 0, 8));
+    for (size_t i = 0; i &lt; n; ++i) printf(&quot;%d%s&quot;, a[i], i + 1 == n ? &quot;\n&quot; : &quot; &quot;);
+    return 0;
+}</code></pre></details><h3>预期输出</h3><pre>1 9 2</pre><ol><li>先验证操作的边界与表示约定。</li><li>检查每次操作的成功状态。</li><li>仅在指针和索引有效时访问对象；保留已有状态并正确释放所拥有的内存。</li></ol><h3>固定练习及反馈</h3><ol><li><p>知道有效下标时，数组访问的时间复杂度是什么？用O(...)作答。</p><strong>标准答案：O(1)</strong><p>地址可由起始地址和元素大小直接计算。</p></li><li><p>长度为3的数组，最后一个有效下标是多少？</p><strong>标准答案：2</strong><p>下标从0开始，到n-1结束。</p></li><li><p>在数组中间插入并搬移后续元素，最坏时间复杂度是多少？</p><strong>标准答案：O(n)</strong><p>需要移动的元素数量随数组长度增长。</p></li></ol></section><section id="c-pointer"><h2>C 指针</h2><small>c-pointer</small><h3>讲解</h3><pre class="prose"># C 指针
+
+指针变量保存地址，&amp;value取得对象的地址，*p在p有效时访问所指对象。指针变量、它保存的地址、该地址中的值是不同概念。不能解引用未初始化指针或NULL。
+
+示例p指向main中的value，该对象的生存期覆盖全部使用过程。修改*p会修改value。自动对象不能free；malloc获得的对象由拥有者在使用完后free。释放后的指针不能继续解引用，函数不能返回局部自动对象的地址供调用者使用。</pre><details><summary>完整 C 示例（含边界断言）</summary><pre><code>#include &lt;assert.h&gt;
+#include &lt;stdbool.h&gt;
+#include &lt;stddef.h&gt;
+#include &lt;stdio.h&gt;
+int main(void) {
+    int value = 4; int *p = &amp;value;
+    assert(p != NULL);
+    printf(&quot;%d\n&quot;, *p);
+    *p = 5;
+    assert(value == 5);
+    int *empty = NULL;
+    if (empty != NULL) puts(&quot;This branch is not reached.&quot;);
+    printf(&quot;%d\n&quot;, value);
+    return 0;
+}</code></pre></details><h3>预期输出</h3><pre>4
+5</pre><ol><li>先验证操作的边界与表示约定。</li><li>检查每次操作的成功状态。</li><li>仅在指针和索引有效时访问对象；保留已有状态并正确释放所拥有的内存。</li></ol><h3>固定练习及反馈</h3><ol><li><p>C中取得变量x地址的表达式是什么？</p><strong>标准答案：&amp;x</strong><p>&amp;是取地址运算符。</p></li><li><p>指针p有效时，读取所指对象使用什么表达式？</p><strong>标准答案：*p</strong><p>*在此表示解引用。</p></li><li><p>空指针可以直接解引用吗？回答yes或no。</p><strong>标准答案：no</strong><p>NULL不指向可访问对象。</p></li></ol></section><section id="linked-list-concept"><h2>链表概念</h2><small>linked-list-concept</small><h3>讲解</h3><pre class="prose"># 链表概念
+
+链表通过链接组织节点，节点包含数据域和指向后继的指针域。节点不必在内存中连续，next保存后继地址而不是后继数据值。无头哨兵的空链表可用head=NULL表示；普通非循环链表的最后一个next为NULL。
+
+示例使用两个生存期覆盖main的自动节点，用next链接起来，不需要malloc或free。采用动态分配时应另定所有权：分配失败不能覆盖原head，释放节点前先保存后继。已知前驱后的链接修改为O(1)，寻找位置仍可能O(n)。</pre><details><summary>完整 C 示例（含边界断言）</summary><pre><code>#include &lt;assert.h&gt;
+#include &lt;stdbool.h&gt;
+#include &lt;stddef.h&gt;
+#include &lt;stdio.h&gt;
+typedef struct Node { int value; struct Node *next; } Node;
+int main(void) {
+    Node second = {2, NULL}; Node first = {1, &amp;second};
+    Node *head = &amp;first;
+    assert(head-&gt;next == &amp;second &amp;&amp; second.next == NULL);
+    printf(&quot;%d %d\n&quot;, head-&gt;value, head-&gt;next-&gt;value);
+    /* Both nodes are automatic objects, valid until main returns. Do not free them. */
+    return 0;
+}</code></pre></details><h3>预期输出</h3><pre>1 2</pre><ol><li>先验证操作的边界与表示约定。</li><li>检查每次操作的成功状态。</li><li>仅在指针和索引有效时访问对象；保留已有状态并正确释放所拥有的内存。</li></ol><h3>固定练习及反馈</h3><ol><li><p>节点的next保存后继的地址还是数值？用address或value作答。</p><strong>标准答案：address</strong><p>next是指向后继节点的指针。</p></li><li><p>普通非循环链表末节点的next是什么？</p><strong>标准答案：NULL</strong><p>NULL表示没有后继。</p></li><li><p>链表节点必须在内存中连续吗？回答yes或no。</p><strong>标准答案：no</strong><p>链接允许节点位于不同地址。</p></li></ol></section><section id="single-linked-list"><h2>单链表</h2><small>single-linked-list</small><h3>讲解</h3><pre class="prose"># 单链表
+
+单链表每个节点只有一个next，只能沿next前进。本文约定没有头哨兵，head直接指向首个数据节点；head=NULL表示空表。其他教材若使用头哨兵，判断空表的表达式会不同，不能混用。
+
+示例insert_at接收Node **，仅分配成功后修改链接，失败返回false而保留旧表。main检查每次返回值，失败时释放仍拥有的全部节点。禁止head=某个失败会返回NULL的插入函数这样的无条件覆盖。free_list先保存next再free当前节点，不能释放后读取head-&gt;next。</pre><details><summary>完整 C 示例（含边界断言）</summary><pre><code>#include &lt;assert.h&gt;
+#include &lt;stdbool.h&gt;
+#include &lt;stddef.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#ifndef EDUMIND_ALLOC_FAIL_AFTER
+#define EDUMIND_ALLOC_FAIL_AFTER -1
+#endif
+typedef struct Node { int value; struct Node *next; } Node;
+static Node *make_node(int value) {
+    static int allocations = 0;
+    if (EDUMIND_ALLOC_FAIL_AFTER &gt;= 0 &amp;&amp; allocations &gt;= EDUMIND_ALLOC_FAIL_AFTER) return NULL;
+    Node *p = malloc(sizeof *p);
+    if (p == NULL) return NULL;
+    ++allocations; p-&gt;value = value; p-&gt;next = NULL;
+    return p;
+}
+static bool insert_at(Node **head, size_t pos, int value) {
+    Node **link = head;
+    while (pos &gt; 0) {
+        if (*link == NULL) return false;
+        link = &amp;(*link)-&gt;next; --pos;
+    }
+    Node *node = make_node(value);
+    if (node == NULL) return false; /* Existing head/links remain untouched. */
+    node-&gt;next = *link;
+    *link = node;
+    return true;
+}
+static void free_list(Node *head) {
+    while (head != NULL) { Node *next = head-&gt;next; free(head); head = next; }
+}
+static void print_list(const Node *head) {
+    while (head != NULL) { printf(&quot;%d%s&quot;, head-&gt;value, head-&gt;next == NULL ? &quot;\n&quot; : &quot; &quot;); head = head-&gt;next; }
+}
+int main(void) {
+    Node *head = NULL;
+    assert(!insert_at(&amp;head, 1, 99));
+    if (!insert_at(&amp;head, 0, 2) || !insert_at(&amp;head, 0, 1)) {
+        free_list(head); puts(&quot;allocation unavailable&quot;); return 0;
+    }
+    assert(head != NULL &amp;&amp; head-&gt;next != NULL &amp;&amp; head-&gt;next-&gt;next == NULL);
+    print_list(head); free_list(head); return 0;
+}</code></pre></details><h3>预期输出</h3><pre>1 2</pre><ol><li>先验证操作的边界与表示约定。</li><li>检查每次操作的成功状态。</li><li>仅在指针和索引有效时访问对象；保留已有状态并正确释放所拥有的内存。</li></ol><h3>固定练习及反馈</h3><ol><li><p>本文无头哨兵单链表的空表head是什么？</p><strong>标准答案：NULL</strong><p>head直接指向数据节点，NULL表示没有节点。</p></li><li><p>分配失败时是否应无条件把已有head覆盖为NULL？回答yes或no。</p><strong>标准答案：no</strong><p>这样会失去旧链的拥有者指针并泄漏。</p></li><li><p>free当前节点之前应先保存哪个成员？</p><strong>标准答案：next</strong><p>释放后不能再访问当前节点的成员。</p></li></ol></section><section id="linked-list-traversal"><h2>链表遍历</h2><small>linked-list-traversal</small><h3>讲解</h3><pre class="prose"># 链表遍历
+
+从head开始，每次处理当前节点，再执行cur=cur-&gt;next，直到cur==NULL。循环条件是当前指针是否为NULL，不能用cur-&gt;next!=NULL作为普通遍历条件，否则会漏掉末节点并可能对空表解引用。
+
+示例只遍历合法非循环链表；循环或悬空指针输入不在此函数前提内。访问所有n个节点是O(n)时间、O(1)额外空间。链表按位置访问需要从头前进，不能像数组一样直接计算任意节点地址。</pre><details><summary>完整 C 示例（含边界断言）</summary><pre><code>#include &lt;assert.h&gt;
+#include &lt;stdbool.h&gt;
+#include &lt;stddef.h&gt;
+#include &lt;stdio.h&gt;
+typedef struct Node { int value; struct Node *next; } Node;
+static size_t length(const Node *head) {
+    size_t count = 0;
+    for (const Node *cur = head; cur != NULL; cur = cur-&gt;next) ++count;
+    return count;
+}
+int main(void) {
+    assert(length(NULL) == 0);
+    Node third = {3, NULL}; Node second = {2, &amp;third}; Node first = {1, &amp;second};
+    assert(length(&amp;first) == 3);
+    for (const Node *cur = &amp;first; cur != NULL; cur = cur-&gt;next) printf(&quot;%d\n&quot;, cur-&gt;value);
+    return 0;
+}</code></pre></details><h3>预期输出</h3><pre>1
+2
+3</pre><ol><li>先验证操作的边界与表示约定。</li><li>检查每次操作的成功状态。</li><li>仅在指针和索引有效时访问对象；保留已有状态并正确释放所拥有的内存。</li></ol><h3>固定练习及反馈</h3><ol><li><p>遍历时让cur指向后继，需要读取cur的哪个成员？</p><strong>标准答案：next</strong><p>cur = cur-&gt;next 沿后继指针前进。</p></li><li><p>遍历n个节点的时间复杂度是多少？</p><strong>标准答案：O(n)</strong><p>每个节点访问一次。</p></li><li><p>遍历空链表会访问多少个节点？</p><strong>标准答案：0</strong><p>head为NULL时循环一次也不进入。</p></li></ol></section><section id="linked-list-insertion"><h2>链表插入</h2><small>linked-list-insertion</small><h3>讲解</h3><pre class="prose"># 链表插入
+
+插入位置pos采用从0开始的间隙编号，允许0到当前长度；0为头插，长度为尾插，超过长度非法。示例用指向链接的指针Node **统一处理头部和中间位置。
+
+找到需要替换的链接后，先分配节点。失败返回false，原表不变；成功后先node-&gt;next=*link保存旧后继，再*link=node连入新节点。先覆盖旧链接而未保存后继会丢失原链。已知前驱时链接修改O(1)，按位置寻找需要O(n)。动画展示相同链接顺序，不执行用户代码。</pre><details><summary>完整 C 示例（含边界断言）</summary><pre><code>#include &lt;assert.h&gt;
+#include &lt;stdbool.h&gt;
+#include &lt;stddef.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#ifndef EDUMIND_ALLOC_FAIL_AFTER
+#define EDUMIND_ALLOC_FAIL_AFTER -1
+#endif
+typedef struct Node { int value; struct Node *next; } Node;
+static Node *make_node(int value) {
+    static int allocations = 0;
+    if (EDUMIND_ALLOC_FAIL_AFTER &gt;= 0 &amp;&amp; allocations &gt;= EDUMIND_ALLOC_FAIL_AFTER) return NULL;
+    Node *p = malloc(sizeof *p);
+    if (p == NULL) return NULL;
+    ++allocations; p-&gt;value = value; p-&gt;next = NULL;
+    return p;
+}
+static bool insert_at(Node **head, size_t pos, int value) {
+    Node **link = head;
+    while (pos &gt; 0) {
+        if (*link == NULL) return false;
+        link = &amp;(*link)-&gt;next; --pos;
+    }
+    Node *node = make_node(value);
+    if (node == NULL) return false; /* Existing head/links remain untouched. */
+    node-&gt;next = *link;
+    *link = node;
+    return true;
+}
+static void free_list(Node *head) {
+    while (head != NULL) { Node *next = head-&gt;next; free(head); head = next; }
+}
+static void print_list(const Node *head) {
+    while (head != NULL) { printf(&quot;%d%s&quot;, head-&gt;value, head-&gt;next == NULL ? &quot;\n&quot; : &quot; &quot;); head = head-&gt;next; }
+}
+int main(void) {
+    Node *head = NULL;
+    assert(!insert_at(&amp;head, 1, 99));
+    if (!insert_at(&amp;head, 0, 1) || !insert_at(&amp;head, 1, 3)) {
+        free_list(head); puts(&quot;allocation unavailable&quot;); return 0;
+    }
+    Node *saved = head;
+    if (!insert_at(&amp;head, 1, 2)) {
+        assert(head == saved &amp;&amp; head-&gt;next-&gt;value == 3);
+        free_list(head); puts(&quot;allocation unavailable&quot;); return 0;
+    }
+    assert(!insert_at(&amp;head, 4, 99));
+    print_list(head); free_list(head); return 0;
+}</code></pre></details><h3>预期输出</h3><pre>1 2 3</pre><ol><li>先验证操作的边界与表示约定。</li><li>检查每次操作的成功状态。</li><li>仅在指针和索引有效时访问对象；保留已有状态并正确释放所拥有的内存。</li></ol><h3>固定练习及反馈</h3><ol><li><p>长度为3的链表允许的最大插入位置是多少？</p><strong>标准答案：3</strong><p>插入位置包括末尾间隙n。</p></li><li><p>插入前应先保存新节点的后继还是先覆盖前驱链接？用successor或predecessor作答。</p><strong>标准答案：successor</strong><p>先node-&gt;next=旧后继，再修改前驱链接。</p></li><li><p>已知前驱且不计分配开销，链接修改的时间复杂度是多少？</p><strong>标准答案：O(1)</strong><p>只需常数次指针修改。</p></li></ol></section><section id="linked-list-deletion"><h2>链表删除</h2><small>linked-list-deletion</small><h3>讲解</h3><pre class="prose"># 链表删除
+
+删除位置pos从0开始，只允许0到长度-1。必须确定目标存在；空表或超出范围时返回false且保持原表。无头哨兵的头删必须能更新调用者head。
+
+示例找到指向目标的链接，先保存target，再把该链接改为target-&gt;next，最后free(target)。释放之后不再读取target。main最后删除首节点与唯一剩余节点，head回到NULL。寻找位置O(n)，已知前驱时修改链接和释放操作不包含搜索开销。</pre><details><summary>完整 C 示例（含边界断言）</summary><pre><code>#include &lt;assert.h&gt;
+#include &lt;stdbool.h&gt;
+#include &lt;stddef.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#ifndef EDUMIND_ALLOC_FAIL_AFTER
+#define EDUMIND_ALLOC_FAIL_AFTER -1
+#endif
+typedef struct Node { int value; struct Node *next; } Node;
+static Node *make_node(int value) {
+    static int allocations = 0;
+    if (EDUMIND_ALLOC_FAIL_AFTER &gt;= 0 &amp;&amp; allocations &gt;= EDUMIND_ALLOC_FAIL_AFTER) return NULL;
+    Node *p = malloc(sizeof *p);
+    if (p == NULL) return NULL;
+    ++allocations; p-&gt;value = value; p-&gt;next = NULL;
+    return p;
+}
+static bool insert_at(Node **head, size_t pos, int value) {
+    Node **link = head;
+    while (pos &gt; 0) {
+        if (*link == NULL) return false;
+        link = &amp;(*link)-&gt;next; --pos;
+    }
+    Node *node = make_node(value);
+    if (node == NULL) return false; /* Existing head/links remain untouched. */
+    node-&gt;next = *link;
+    *link = node;
+    return true;
+}
+static void free_list(Node *head) {
+    while (head != NULL) { Node *next = head-&gt;next; free(head); head = next; }
+}
+static void print_list(const Node *head) {
+    while (head != NULL) { printf(&quot;%d%s&quot;, head-&gt;value, head-&gt;next == NULL ? &quot;\n&quot; : &quot; &quot;); head = head-&gt;next; }
+}
+static bool delete_at(Node **head, size_t pos) {
+    Node **link = head;
+    while (pos &gt; 0) {
+        if (*link == NULL) return false;
+        link = &amp;(*link)-&gt;next; --pos;
+    }
+    Node *target = *link;
+    if (target == NULL) return false;
+    *link = target-&gt;next; free(target); return true;
+}
+int main(void) {
+    Node *head = NULL; assert(!delete_at(&amp;head, 0));
+    if (!insert_at(&amp;head, 0, 1) || !insert_at(&amp;head, 1, 2) || !insert_at(&amp;head, 2, 3)) {
+        free_list(head); puts(&quot;allocation unavailable&quot;); return 0;
+    }
+    assert(!delete_at(&amp;head, 3)); assert(delete_at(&amp;head, 1));
+    print_list(head);
+    assert(delete_at(&amp;head, 0)); assert(delete_at(&amp;head, 0));
+    assert(head == NULL &amp;&amp; !delete_at(&amp;head, 0));
+    free_list(head); return 0;
+}</code></pre></details><h3>预期输出</h3><pre>1 3</pre><ol><li>先验证操作的边界与表示约定。</li><li>检查每次操作的成功状态。</li><li>仅在指针和索引有效时访问对象；保留已有状态并正确释放所拥有的内存。</li></ol><h3>固定练习及反馈</h3><ol><li><p>长度为3的链表最大合法删除下标是多少？</p><strong>标准答案：2</strong><p>删除对象是已有节点，不是插入间隙。</p></li><li><p>free(target)后还能读取target-&gt;next吗？回答yes或no。</p><strong>标准答案：no</strong><p>释放后的对象不能继续访问。</p></li><li><p>本文无头哨兵链表删除唯一节点后head是什么？</p><strong>标准答案：NULL</strong><p>原唯一节点的后继为NULL。</p></li></ol></section><section id="stack"><h2>栈</h2><small>stack</small><h3>讲解</h3><pre class="prose"># 栈
+
+栈遵循后进先出LIFO：push入栈，pop取出并移除栈顶，peek只查看栈顶而不移除。本文数组实现用count表示元素个数，非空时栈顶下标为count-1。
+
+push必须先检查count==CAP，peek/pop必须先检查count==0。不能在空栈中读取data[count-1]，否则下标下溢或越界。操作返回bool表示成功，输出参数仅在成功时写入。此固定容量实现三种操作均为O(1)，没有扩容。</pre><details><summary>完整 C 示例（含边界断言）</summary><pre><code>#include &lt;assert.h&gt;
+#include &lt;stdbool.h&gt;
+#include &lt;stddef.h&gt;
+#include &lt;stdio.h&gt;
+enum { CAP = 2 };
+typedef struct { int data[CAP]; size_t count; } Stack;
+static bool push(Stack *s, int v) {
+    if (s-&gt;count == CAP) return false;
+    s-&gt;data[s-&gt;count++] = v; return true;
+}
+static bool peek(const Stack *s, int *out) {
+    if (s-&gt;count == 0) return false;
+    *out = s-&gt;data[s-&gt;count - 1]; return true;
+}
+static bool pop(Stack *s, int *out) {
+    if (s-&gt;count == 0) return false;
+    *out = s-&gt;data[--s-&gt;count]; return true;
+}
+int main(void) {
+    Stack s = {{0}, 0}; int value = -1;
+    assert(!peek(&amp;s, &amp;value) &amp;&amp; value == -1); assert(!pop(&amp;s, &amp;value));
+    assert(push(&amp;s, 1)); assert(push(&amp;s, 2)); assert(!push(&amp;s, 3));
+    assert(peek(&amp;s, &amp;value) &amp;&amp; value == 2);
+    assert(pop(&amp;s, &amp;value)); printf(&quot;%d\n&quot;, value);
+    assert(pop(&amp;s, &amp;value)); printf(&quot;%d\n&quot;, value);
+    assert(!pop(&amp;s, &amp;value) &amp;&amp; !peek(&amp;s, &amp;value)); return 0;
+}</code></pre></details><h3>预期输出</h3><pre>2
+1</pre><ol><li>先验证操作的边界与表示约定。</li><li>检查每次操作的成功状态。</li><li>仅在指针和索引有效时访问对象；保留已有状态并正确释放所拥有的内存。</li></ol><h3>固定练习及反馈</h3><ol><li><p>栈的出元素顺序缩写是什么？</p><strong>标准答案：LIFO</strong><p>Last In First Out，后进先出。</p></li><li><p>本文count为元素个数，count=3时栈顶下标是多少？</p><strong>标准答案：2</strong><p>非空时是count-1。</p></li><li><p>peek会删除栈顶吗？回答yes或no。</p><strong>标准答案：no</strong><p>peek只读取，pop才移除。</p></li></ol></section><section id="queue"><h2>队列</h2><small>queue</small><h3>讲解</h3><pre class="prose"># 队列
+
+队列遵循先进先出FIFO：enqueue从队尾入队，dequeue从队首移除并返回，peek只看队首。抽象顺序与具体实现复杂度要分开。
+
+示例使用连续数组，入队加到末尾，出队后整体左移，因此enqueue/peek为O(1)、dequeue最坏O(n)。空/满必须在访问前检查，失败不修改输出参数。若使用循环数组可避免搬移，但需正确区分空与满，见循环队列节点。</pre><details><summary>完整 C 示例（含边界断言）</summary><pre><code>#include &lt;assert.h&gt;
+#include &lt;stdbool.h&gt;
+#include &lt;stddef.h&gt;
+#include &lt;stdio.h&gt;
+enum { CAP = 3 };
+typedef struct { int data[CAP]; size_t count; } Queue;
+static bool enqueue(Queue *q, int value) {
+    if (q-&gt;count == CAP) return false;
+    q-&gt;data[q-&gt;count++] = value; return true;
+}
+static bool peek(const Queue *q, int *out) {
+    if (q-&gt;count == 0) return false;
+    *out = q-&gt;data[0]; return true;
+}
+static bool dequeue(Queue *q, int *out) {
+    if (q-&gt;count == 0) return false;
+    *out = q-&gt;data[0];
+    for (size_t i = 1; i &lt; q-&gt;count; ++i) q-&gt;data[i - 1] = q-&gt;data[i];
+    --q-&gt;count; return true;
+}
+int main(void) {
+    Queue q = {{0}, 0}; int value = -1;
+    assert(!peek(&amp;q, &amp;value) &amp;&amp; value == -1); assert(!dequeue(&amp;q, &amp;value));
+    assert(enqueue(&amp;q, 1)); assert(enqueue(&amp;q, 2)); assert(enqueue(&amp;q, 3));
+    assert(!enqueue(&amp;q, 4)); assert(peek(&amp;q, &amp;value) &amp;&amp; value == 1);
+    for (int i = 1; i &lt;= 3; ++i) { assert(dequeue(&amp;q, &amp;value) &amp;&amp; value == i); printf(&quot;%d\n&quot;, value); }
+    assert(!dequeue(&amp;q, &amp;value)); return 0;
+}</code></pre></details><h3>预期输出</h3><pre>1
+2
+3</pre><ol><li>先验证操作的边界与表示约定。</li><li>检查每次操作的成功状态。</li><li>仅在指针和索引有效时访问对象；保留已有状态并正确释放所拥有的内存。</li></ol><h3>固定练习及反馈</h3><ol><li><p>队列的出元素顺序缩写是什么？</p><strong>标准答案：FIFO</strong><p>First In First Out，先进先出。</p></li><li><p>依次入队1、2、3，首次出队值是多少？</p><strong>标准答案：1</strong><p>最先入队的1最先出队。</p></li><li><p>本文出队后搬移数组的dequeue最坏时间复杂度是多少？</p><strong>标准答案：O(n)</strong><p>余下元素需要向前搬移。</p></li></ol></section><section id="circular-queue"><h2>循环队列</h2><small>circular-queue</small><h3>讲解</h3><pre class="prose"># 循环队列
+
+循环队列使用模运算使数组下标环绕，避免线性数组出队后的整体搬移。本文CAP是实际容量，front指向下次出队位置，rear指向下次入队位置，另用count记录元素个数。
+
+空判定count==0，满判定count==CAP。front==rear可能是空也可能是满，不能单独判断。另一种“预留一个槽”的设计有CAP-1有效容量，判满式(rear+1)%CAP==front；不能把该式混入本文count方案。示例覆盖满队拒绝、出队后重新入队和多次环绕，三个操作均为O(1)。</pre><details><summary>完整 C 示例（含边界断言）</summary><pre><code>#include &lt;assert.h&gt;
+#include &lt;stdbool.h&gt;
+#include &lt;stddef.h&gt;
+#include &lt;stdio.h&gt;
+enum { CAP = 3 };
+typedef struct { int data[CAP]; size_t front, rear, count; } Queue;
+static bool enqueue(Queue *q, int value) {
+    if (q-&gt;count == CAP) return false;
+    q-&gt;data[q-&gt;rear] = value; q-&gt;rear = (q-&gt;rear + 1) % CAP; ++q-&gt;count; return true;
+}
+static bool peek(const Queue *q, int *out) {
+    if (q-&gt;count == 0) return false;
+    *out = q-&gt;data[q-&gt;front]; return true;
+}
+static bool dequeue(Queue *q, int *out) {
+    if (q-&gt;count == 0) return false;
+    *out = q-&gt;data[q-&gt;front]; q-&gt;front = (q-&gt;front + 1) % CAP; --q-&gt;count; return true;
+}
+int main(void) {
+    Queue q = {{0}, 0, 0, 0}; int value = -1;
+    assert(!peek(&amp;q, &amp;value) &amp;&amp; value == -1); assert(!dequeue(&amp;q, &amp;value));
+    assert(enqueue(&amp;q, 1)); assert(enqueue(&amp;q, 2)); assert(enqueue(&amp;q, 3));
+    assert(q.front == q.rear &amp;&amp; q.count == CAP); assert(!enqueue(&amp;q, 4));
+    assert(dequeue(&amp;q, &amp;value) &amp;&amp; value == 1); assert(enqueue(&amp;q, 4));
+    for (int i = 2; i &lt;= 4; ++i) { assert(dequeue(&amp;q, &amp;value) &amp;&amp; value == i); printf(&quot;%d\n&quot;, value); }
+    assert(q.count == 0 &amp;&amp; q.front == q.rear); assert(!dequeue(&amp;q, &amp;value));
+    return 0;
+}</code></pre></details><h3>预期输出</h3><pre>2
+3
+4</pre><ol><li>先验证操作的边界与表示约定。</li><li>检查每次操作的成功状态。</li><li>仅在指针和索引有效时访问对象；保留已有状态并正确释放所拥有的内存。</li></ol><h3>固定练习及反馈</h3><ol><li><p>本文count方案中，CAP=3时实际最多存几个元素？</p><strong>标准答案：3</strong><p>没有预留空槽，count用于区分空满。</p></li><li><p>本文count方案中，front==rear能单独判断队空吗？回答yes或no。</p><strong>标准答案：no</strong><p>空和满都可能front==rear。</p></li><li><p>CAP=3时，下标2的下一个循环下标是多少？</p><strong>标准答案：0</strong><p>(2+1)%3等于0。</p></li></ol></section><section id="demo"><h2>数组 vs 链表（预设演示）</h2><h3>性能视角</h3><p>数组按下标访问O(1)，连续存储通常有局部性优势。单链表按位置寻找O(n)；只有已知前驱时插删的链接修改才是O(1)，寻找前驱与分配开销不能省略。</p><h3>内存视角</h3><p>数组需要连续空间；动态数组扩容可能搬移内容。链表节点可分散分配，但每节点多一个next且有分配器开销；malloc失败与所有权必须处理。不能简单断言链表总更省内存。</p><h3>使用视角</h3><p>频繁随机访问通常更适合数组；已知节点/前驱且频繁插删时可以考虑链表。选择还取决于规模、分配成本和接口需求，本演示不针对任意场景生成推荐。</p><h3>结论</h3><p>先明确访问方式与插删位置是否已知，再比较时间、空间和工程复杂度。该内容是固定课程脚本，不是正在进行的AI辩论。</p></section></main></html>

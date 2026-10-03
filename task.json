@@ -2016,7 +2016,7 @@
       "id": "MVP-0.3-T046",
       "phase": "MVP 0.3",
       "title": "人工签核课程包并验证可发布状态",
-      "status": "todo",
+      "status": "blocked",
       "priority": "P0",
       "depends_on": [
         "MVP-0.3-T038",
@@ -2024,7 +2024,11 @@
       ],
       "scope": [
         "data/course_catalog/",
-        "docs/acceptance/"
+        "docs/acceptance/",
+        "scripts/prepare_catalog_review.py",
+        "scripts/serve_catalog_review.py",
+        "scripts/verify_catalog_release.py",
+        "backend/tests/test_catalog_release_preflight.py"
       ],
       "prd_source": "PRD v2.2 §0（目录版增补）",
       "acceptance_criteria": [
@@ -2034,10 +2038,14 @@
       "verification": [
         "python3 scripts/verify_catalog_release.py"
       ],
-      "verification_results": [],
-      "started_at": null,
+      "verification_results": [
+        "课程审阅HTML11节（10节点+demo）/10完整C折叠块/30题答案；实际Chromium桌面/390px手机检查无横向溢出，HTML全转义，不执行代码。",
+        "2项发布预检离线测试通过（pending与TEST_ONLY不能发布、未授权digest拒绝）；Ruff通过。python3 scripts/verify_catalog_release.py实际返回PENDING_HUMAN_REVIEW/publishable=false并退出2，系批准未到的正确阻塞状态，不作为通过。CLI自动使用锁定backend虚拟环境；初次系统Python缺jsonschema已修正，不安装全局依赖。",
+        "真实审核人/时间未填写，没有approval.json，没有正式课程发布；Provider 0累计2033/2500。T045工程证据无变，T033仍blocked，T034退出等待本任务实际签核。"
+      ],
+      "started_at": "2026-10-03T14:57:30",
       "completed_at": null,
-      "blocker": null,
+      "blocker": "课程目录工程验收T045已完成05d5f87；具体候选内容仍未获实际人工审核签核。ADR-0007及PRD§0要求用户审阅并批准manifest digest 92bb0dd4778391e23aae978b8a411b466d8b5988d1cff61cff01654604af21a1后才能登记为正式内容；TEST_ONLY批准不能替代。可审阅HTML和安全发布预检已备妥，无Provider调用，不部署。",
       "commit_lookup": "Task-Completed: MVP-0.3-T046"
     }
   ]
