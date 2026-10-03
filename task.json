@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "用户已选择Phase 1功能开发，本次授权为阶段归档与任务细化。全部任务初始todo；后续实施依任务依赖逐项领取。重大API/数据/安全决定按设计任务取得批准；真实Provider调用须独立预算和授权。catalog_only基线维持，动态开放由新质量/性能证据与批准决定，不因阶段切换自动开启。不自动push/merge/部署或进入Phase 2。",
+    "phase_gate": "用户已选择Phase 1功能开发并完成阶段归档规划；当前聊天授权执行PHASE-1-T001，后续任务按用户授权及依赖逐项领取。重大API/数据/安全决定按设计任务取得批准；真实Provider调用须独立预算和授权。catalog_only基线维持，动态开放由新质量/性能证据与批准决定，不因阶段切换自动开启。不自动push/merge/部署或进入Phase 2。",
     "task_granularity": "一个可独立验证的行为，包含实现、对应测试和必要文档；验收通过后一个本地完成提交。",
     "completion_rule": "验收通过，且 Git 历史存在 Task-Completed 标记的提交。工作区 done 仅是待提交状态。",
     "verification_note": "任务verification是待建立和执行的验收接口，并非已通过；文件/命令不存在时须在对应任务完成前建立并实际运行。规划切换仅运行治理与归档离线检查。"
@@ -57,7 +57,7 @@
     }
   ],
   "stage_scope": {
-    "authorization": "2026-10-03 用户明确选择“还是继续Phase 1 功能开发”，授权本轮归档和细化任务。",
+    "authorization": "2026-10-03 用户明确选择“还是继续Phase 1 功能开发”，授权本轮归档和细化任务。 当前聊天用户进一步授权“开始T01”，仅领取并完成PHASE-1-T001。",
     "baseline": "MVP 0.3已签核课程目录版；PR #4已合并，本地维护基线30fcd4e1f9384359a72b451bb40243a2095691cf。",
     "included": [
       "兼容Provider/Ollama、持久及临时BYOK、任务档位与显式回退、Anthropic/Gemini/星火可选原生适配器",
@@ -67,7 +67,7 @@
       "目录零调用回归与独立授权的动态质量/性能验收"
     ],
     "excluded": [
-      "本轮功能实施或真实Provider调用",
+      "未另行授权的后续任务执行及真实Provider调用（当前仅授权T001文档/治理交付）",
       "公网部署与试用运营",
       "账户系统/跨设备账号合并",
       "真并行辩论、RAG、学习报告和更多课程（沿用§9.1后续阶段）",
@@ -84,7 +84,8 @@
       "historical_limit": 2500,
       "note": "历史额度不自动转为Phase 1授权；新真实调用单独冻结批准。"
     },
-    "planning_note": "优先按§9.1核心路线图细化。其他章节的P1扩展标签与阶段冲突由T001列明；新增范围需先调整PRD/任务，不静默加入。"
+    "planning_note": "优先按§9.1核心路线图细化。其他章节的P1扩展标签与阶段冲突由T001列明；新增范围需先调整PRD/任务，不静默加入。",
+    "acceptance_plan": "docs/acceptance/phase-1-acceptance-plan.md"
   },
   "deferred_improvements": [
     {
@@ -124,7 +125,7 @@
       "id": "PHASE-1-T001",
       "phase": "Phase 1",
       "title": "冻结Phase 1范围、验收与模型调用预算规则",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [],
       "scope": [
@@ -143,9 +144,30 @@
       "verification": [
         "核对PRD逐项映射、任务依赖、全部退出指标与预算规则；保存Phase 1验收计划。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "python3 local-materials/phase-1-t001/checks/verify_document.py",
+          "result": "passed: 42 tasks mapped; exit covers 41 prerequisites; other 41 tasks unchanged; three archives unchanged; append-only log; 46 local links; request budget 0",
+          "evidence": "docs/acceptance/phase-1-acceptance-plan.md §6; local-materials/phase-1-t001/checks/document-check.json"
+        },
+        {
+          "command": "python3 scripts/check_catalog_workflow.py",
+          "result": "passed: Phase 1 dependencies and catalog ledger valid; MVP-0.3-T033 blocked",
+          "evidence": "local-materials/phase-1-t001/checks/workflow.txt"
+        },
+        {
+          "command": "python3 scripts/verify_legacy_archives.py",
+          "result": "passed: 236 original files / 64 experiment files / 169 evidence files; Provider requests 0",
+          "evidence": "local-materials/phase-1-t001/checks/legacy-archives.json"
+        },
+        {
+          "command": "PRD / task mapping and doc-coauthoring reader review; git diff --check",
+          "result": "passed: six reader questions clear; scope, thresholds, sample/failed-slot rules, budgets and approval dependencies reviewed; documentation only, no runtime/real-Provider validation",
+          "evidence": "docs/acceptance/phase-1-acceptance-plan.md"
+        }
+      ],
+      "started_at": "2026-10-03T23:45:21",
+      "completed_at": "2026-10-03T23:55:16",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T001"
     },

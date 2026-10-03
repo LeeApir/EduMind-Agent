@@ -2,6 +2,10 @@
 
 当前交付是 PRD §0 / ADR-0007 的课程目录版。T033 保持 `blocked`，动态生成、重解释和实时 AI 暂缓；累计 Provider 请求仍为 **2033/2500**。整理不改变旧成绩、协议、阈值或付费授权。
 
+## Phase 1活动计划
+
+[Phase 1范围与验收计划](phase-1-acceptance-plan.md)映射42项活动任务、离线/集成/真实验证、沿用指标和独立预算规则。计划不授予真实调用或动态开放；旧T033与目录成绩保持原判定。
+
 ## Git 中保留
 
 - [目录版退出报告](mvp-0.3-catalog-exit-20261003.md)、[工程验收](mvp-0.3-catalog-engineering-20261003.md)、[实际签核验证](mvp-0.3-catalog-signed-handoff-20261003.md)及[Lee 原始批准](mvp-0.3-catalog-human-signoff-20261003.json)。批准 JSON 原样保留，是课程 approval/allowlist 的受信依据。
