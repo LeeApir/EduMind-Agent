@@ -89,6 +89,10 @@ async def request_animation(
             )
             if existing.request_digest != digest:
                 raise _conflict("IDEMPOTENCY_CONFLICT")
+            try:
+                await owned_animation_job(db, owner_id=current.user.id, job_id=existing.id)
+            except AnimationTargetUnavailable:
+                raise _not_found() from None
             response.headers["Cache-Control"] = "no-store"
             return animation_job_payload(existing)
         target = await db.scalar(select(LearningScene).join(

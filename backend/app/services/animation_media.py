@@ -17,6 +17,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.animation import AnimationJob, AnimationMedia, AnimationResourceBinding
 from app.models.learning import LearningScene, LearningUnit
 from app.services.animation_cache import AnimationCache
+from app.services.catalog_animation_access import animation_target_approved
 
 MAX_MEDIA_BYTES = 64 * 1024 * 1024
 _O_NOFOLLOW = getattr(os, "O_NOFOLLOW", 0)
@@ -41,8 +42,8 @@ async def owned_reviewed_media(
     db: AsyncSession, *, owner_id: UUID, media_id: UUID,
 ) -> AnimationMedia | None:
     """A media row alone grants no permission; require a published owner binding."""
-    return cast(AnimationMedia | None, await db.scalar(
-        select(AnimationMedia)
+    rows = (await db.execute(
+        select(AnimationMedia, AnimationJob)
         .join(AnimationResourceBinding,
               AnimationResourceBinding.media_id == AnimationMedia.id)
         .join(AnimationJob, and_(
@@ -68,8 +69,13 @@ async def owned_reviewed_media(
             LearningScene.generation_status == "complete",
             LearningScene.review_status == "passed",
         )
-        .limit(1)
-    ))
+    )).all()
+    for media, job in rows:
+        if await animation_target_approved(db, owner_id=owner_id, unit_id=job.learning_unit_id,
+                scene_id=job.scene_id, scene_version=job.scene_version,
+                template_id=job.template_id, template_version=job.template_version):
+            return cast(AnimationMedia, media)
+    return None
 
 
 def open_verified_media(

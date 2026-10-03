@@ -18,6 +18,7 @@ from app.services.animation_jobs import (
     append_animation_event,
 )
 from app.services.animation_templates import cache_identity, load_template
+from app.services.catalog_animation_access import animation_target_approved
 from app.services.learning_owner_lock import lock_learning_owner
 
 
@@ -37,6 +38,10 @@ async def owned_animation_job(
     job = await db.scalar(query)
     if job is None:
         raise AnimationTargetUnavailable("Animation job is unavailable.")
+    if not await animation_target_approved(db, owner_id=owner_id, unit_id=job.learning_unit_id,
+            scene_id=job.scene_id, scene_version=job.scene_version, template_id=job.template_id,
+            template_version=job.template_version, lock_release=lock):
+        raise AnimationTargetUnavailable("Reviewed course is unavailable.")
     return job
 
 
@@ -90,6 +95,7 @@ async def retry_animation_job(
         if existing is not None:
             if existing.request_digest != digest:
                 raise AnimationIdempotencyConflict("Retry key conflicts.")
+            await owned_animation_job(db, owner_id=owner_id, job_id=existing.id, lock=True)
             await db.commit()
             return existing, False
         original = await owned_animation_job(db, owner_id=owner_id, job_id=job_id, lock=True)

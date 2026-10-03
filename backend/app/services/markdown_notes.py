@@ -9,10 +9,13 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.classroom import DebateResult
+from app.models.catalog import CatalogRelease
+from app.models.classroom import ClassroomOperation, DebateResult
 from app.models.learning import GeneratedResource, LearningScene, LearningUnit
 from app.models.learning_state import LearningEvidence
-from app.services.owned_learning import published_scenes, visible_unit
+from app.services.catalog_package import CatalogError
+from app.services.catalog_publication import release_package
+from app.services.owned_learning import published_resource, published_scenes, visible_unit
 
 
 class NotesNotFound(ValueError):
@@ -75,6 +78,8 @@ async def _wrong_questions(
     wrong: list[str] = []
     sources: dict[UUID, tuple[LearningScene, GeneratedResource]] = {}
     for evidence, resource, scene in rows:
+        if await published_resource(db, owner_id, resource.id) is None:
+            continue
         results = evidence.payload.get("question_results")
         items = resource.content.get("items")
         if not isinstance(results, list) or not isinstance(items, list):
@@ -146,7 +151,25 @@ async def build_markdown_notes(db: AsyncSession, *, owner_id: UUID, unit_id: UUI
     lines.extend(wrong or ["暂无错题记录。"])
     lines.append("")
 
-    debate = await db.scalar(select(DebateResult).where(
+    release = (await db.get(CatalogRelease, unit.catalog_release_id)
+               if unit.catalog_release_id else None)
+    try:
+        package = release_package(release) if release else None
+    except CatalogError:
+        raise NotesNotFound("Learning unit is unavailable.") from None
+    viewed_preset = None
+    if package is not None:
+        viewed_preset = await db.scalar(select(ClassroomOperation.id).where(
+            ClassroomOperation.user_id == owner_id,
+            ClassroomOperation.learning_unit_id == unit_id,
+            ClassroomOperation.kind == "control",
+            ClassroomOperation.result_snapshot["preset"].astext == "true",
+            ClassroomOperation.result_snapshot["action"].astext == "begin",
+        ).limit(1))
+        if viewed_preset is not None:
+            lines.extend(["## 预设数组 vs 链表总结", "",
+                          _reviewed_text(package.demo["summary"]) or "", ""])
+    debate = None if package is not None else await db.scalar(select(DebateResult).where(
         DebateResult.user_id == owner_id,
         DebateResult.learning_unit_id == unit_id,
     ).order_by(DebateResult.published_at.desc(), DebateResult.id.desc()).limit(1))
@@ -162,18 +185,28 @@ async def build_markdown_notes(db: AsyncSession, *, owner_id: UUID, unit_id: UUI
                 lines.append("")
 
     lines.extend(["## 内容来源", ""])
-    for scene, resource in explanations:
-        metadata = resource.generation_metadata or {}
-        lines.append(
-            f"- 讲解：场景 {_inline(scene.scene_key)} v{scene.version}，资源 v{resource.version}；"
-            f"模型 {_inline(metadata.get('model_id'))}；发布时间 {_time(resource.published_at)}。"
-        )
-    for scene, resource in quiz_sources:
-        metadata = resource.generation_metadata or {}
-        lines.append(
-            f"- 练习：场景 {_inline(scene.scene_key)} v{scene.version}，资源 v{resource.version}；"
-            f"模型 {_inline(metadata.get('model_id'))}；发布时间 {_time(resource.published_at)}。"
-        )
+    for label, pairs in (("讲解", explanations), ("练习", quiz_sources)):
+        for scene, resource in pairs:
+            if release is not None:
+                lines.append(
+                    f"- {label}：人工审核课程包 {_inline(release.package_id)} "
+                    f"v{_inline(release.version)}；资源 v{resource.version}；"
+                    f"内容 SHA256 {_inline(resource.catalog_content_digest)}；"
+                    f"审核人 {_inline(release.approval.get('reviewer'))}；"
+                    f"审核时间 {_inline(release.approval.get('reviewed_at'))}；"
+                    f"发布时间 {_time(resource.published_at)}。"
+                )
+            else:
+                metadata = resource.generation_metadata or {}
+                lines.append(
+                    f"- {label}：场景 {_inline(scene.scene_key)} v{scene.version}，"
+                    f"资源 v{resource.version}；模型 {_inline(metadata.get('model_id'))}；"
+                    f"发布时间 {_time(resource.published_at)}。"
+                )
+    if release is not None and package is not None and viewed_preset is not None:
+        lines.append(f"- 预设演示：人工审核课程包 {_inline(release.package_id)} "
+                     f"v{_inline(release.version)}；内容 SHA256 "
+                     f"{_inline(package.manifest['demo_digest'])}。")
     if debate is not None:
         lines.append(
             f"- 多视角：场景 {_inline(debate.scene_key)} v{debate.scene_version}；"

@@ -18,6 +18,7 @@ from app.models.learning import LearningScene, LearningUnit
 from app.services.animation_cache import AnimationCache, runtime_identity
 from app.services.animation_publication import bind_media, reviewed_media_row
 from app.services.animation_templates import cache_identity, load_template, normalize_parameters
+from app.services.catalog_animation_access import animation_target_approved
 from app.services.learning_owner_lock import lock_learning_owner
 
 
@@ -88,6 +89,10 @@ async def reserve_animation_job(
     )
     try:
         await lock_learning_owner(db, owner_id)
+        if not await animation_target_approved(db, owner_id=owner_id, unit_id=learning_unit_id,
+                scene_id=scene_id, scene_version=scene_version, template_id=template_id,
+                template_version=template_version, lock_release=True):
+            raise AnimationTargetUnavailable("Reviewed course is unavailable.")
         existing = await db.scalar(select(AnimationJob).where(
             AnimationJob.user_id == owner_id,
             AnimationJob.action_kind == "request",
@@ -221,6 +226,10 @@ async def replay_animation_events(
     ))
     if job is None:
         raise AnimationTargetUnavailable("Animation job is unavailable.")
+    if not await animation_target_approved(db, owner_id=owner_id, unit_id=job.learning_unit_id,
+            scene_id=job.scene_id, scene_version=job.scene_version, template_id=job.template_id,
+            template_version=job.template_version):
+        raise AnimationTargetUnavailable("Reviewed course is unavailable.")
     if after < 0 or after > job.last_event_id:
         raise AnimationEventCursorInvalid("Invalid animation event cursor.")
     events = (

@@ -18,6 +18,7 @@ from app.services.animation_cache import AnimationCache, CachedAnimation
 from app.services.animation_jobs import append_animation_event
 from app.services.animation_publication import bind_media, reviewed_media_row
 from app.services.animation_renderer import RenderError
+from app.services.catalog_animation_access import animation_target_approved
 
 LEASE_SECONDS = 30
 HEARTBEAT_SECONDS = 10
@@ -219,6 +220,13 @@ async def publish_animation_job(
         job = await _locked_current_job(db, lease)
         if job is None:
             await db.rollback()
+            return False
+        if not await animation_target_approved(db, owner_id=job.user_id,
+                unit_id=job.learning_unit_id, scene_id=job.scene_id,
+                scene_version=job.scene_version, template_id=job.template_id,
+                template_version=job.template_version, lock_release=True):
+            await db.rollback()
+            await fail_animation_job(sessions, lease, code="ANIMATION_TARGET_UNAVAILABLE")
             return False
         if media.cache_key != job.cache_key or media.template_version != job.template_version:
             await db.rollback()
