@@ -1,5 +1,7 @@
 # MVP 0.3 课程目录版退出报告
 
+> 2026-10-03 整理：下列本地材料路径沿用原仓库相对路径；读取及历史恢复方式见[材料索引](README.md)。旧指标、失败与判定不变。
+
 结论：按PRD v2.2 §0及ADR-0007通过**课程目录版**阶段退出。T034直接依赖T032/T045/T046均done并有完成提交；全46项账本在本任务完成后为45 done、1 blocked。T033保持blocked，动态生成、重解释、实时AI互动及动态辩论暂缓，不宣称原动态MVP验收通过。不自动归档账本或启动Phase 1。
 
 ## 交付范围与来源
@@ -26,13 +28,13 @@ T045各项固定分母保留为独立组件，T046仅补实际人工来源，不
 | 缓存点击到可播放 | 100/100 | 0.1506s | ≤2s，逐槽≤2s |
 | 独立新缓存Worker到播放 | 20/20 | 8.0897s | ≤90s |
 
-原始[质量v2](mvp-0.3-catalog-20261003-v2-quality.json)、[性能v4](mvp-0.3-catalog-20261003-v4-result.json)、[核心旅程v5](mvp-0.3-catalog-20261003-v5-core.json)及各自冻结协议不变。[实际签核v3结果](mvp-0.3-catalog-signed-v3-result-20261003.json)证明批准版本的30资源来源摘要、计分/重做、预设恢复、两种真实缓存媒体导出、owner/CSRF和撤回拒绝；它不是新增浏览器/Worker/P95基准。
+原始质量v2（本地材料 `docs/acceptance/mvp-0.3-catalog-20261003-v2-quality.json`）、性能v4（本地材料 `docs/acceptance/mvp-0.3-catalog-20261003-v4-result.json`）、核心旅程v5（本地材料 `docs/acceptance/mvp-0.3-catalog-20261003-v5-core.json`）及各自冻结协议不变。实际签核v3结果（本地材料 `docs/acceptance/mvp-0.3-catalog-signed-v3-result-20261003.json`）证明批准版本的30资源来源摘要、计分/重做、预设恢复、两种真实缓存媒体导出、owner/CSRF和撤回拒绝；它不是新增浏览器/Worker/P95基准。
 
 首次质量失败、测量器/身份/定位器错误、T046测试契约误判均保留在原批次与交接中；未覆盖失败、剔除槽或修改阈值。T045复用了公开的20种不同质量输入，不能表述为100种输入全部新渲染。旧T033漏检、截断和动态质量/P95阻塞不被目录版成绩解除。
 
 ## 本轮离线退出核验
 
-`python3 scripts/verify_catalog_exit.py` 只读核验所有done任务的完成标记/提交内done状态与依赖、受信签核、T045固定分母/指标及代码hash、T046冻结代码/协议/结果hash、旧T033任务对象/证据/预算不变及文档引用。结果在[退出检查](mvp-0.3-catalog-exit-checks-20261003.json)；该证据在完成提交前保存，提交后另行只读确认T034完成标记。没有启动数据库、浏览器或Worker，没有重跑完整基准，没有Provider请求。
+`python3 scripts/verify_catalog_exit.py` 只读核验所有done任务的完成标记/提交内done状态与依赖、受信签核、T045固定分母/指标及代码hash、T046冻结代码/协议/结果hash、旧T033任务对象/证据/预算不变及文档引用。结果在退出检查（本地材料 `docs/acceptance/mvp-0.3-catalog-exit-checks-20261003.json`）；该证据在完成提交前保存，提交后另行只读确认T034完成标记。没有启动数据库、浏览器或Worker，没有重跑完整基准，没有Provider请求。
 
 本轮 `cd backend && .venv/bin/python -m pytest -q tests/test_catalog_release_preflight.py tests/test_catalog_acceptance_metrics.py tests/test_catalog_component_gate.py` 为11 passed、无跳过；`backend/.venv/bin/ruff check scripts/verify_catalog_exit.py`、`python3 scripts/check_catalog_workflow.py`、`python3 scripts/verify_catalog_release.py`及文档/diff检查通过。退出核验已找到44个前置done任务的完成提交，235个旧文件保护hash不变。已有工程测试与签核复验细节见各原报告，不重新宣称旧跳过测试通过。Provider累计仍2033/2500，预算和付费授权不因阶段退出恢复。
 

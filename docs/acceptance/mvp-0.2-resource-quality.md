@@ -1,5 +1,7 @@
 # MVP 0.2 正式资源质量基准
 
+> 2026-10-03 整理：下列本地材料路径沿用原仓库相对路径；读取及历史恢复方式见[材料索引](README.md)。旧指标、失败与判定不变。
+
 当前状态：指令v3完整真实基准schema60/60（100%）、严重召回20/20（100%）、正确对照10/10，达标且主要问题已逐项核对。首次75%和v2的95%失败基线保留。小样本结论仅适用于记录环境，不宣称生产全课程质量。
 
 ## 样本与口径
@@ -41,7 +43,7 @@ uv run --env-file ../.env python -m tests.resource_quality \
 
 ### 2026-09-26 真实评测
 
-用户回复“确认”后执行上面的命令，203.82 秒完成，退出码 1（质量门禁失败）。配置模型与成功响应实际模型均为 `deepseek-flash`；86 次请求，无重试、无修正。原始脱敏报告见 [provider JSON](mvp-0.2-resource-quality-provider.json)。
+用户回复“确认”后执行上面的命令，203.82 秒完成，退出码 1（质量门禁失败）。配置模型与成功响应实际模型均为 `deepseek-flash`；86 次请求，无重试、无修正。原始脱敏报告见 provider JSON（本地材料 `docs/acceptance/mvp-0.2-resource-quality-provider.json`）。
 
 - Schema：45/60，75%，未达 98%。讲解 6/20、代码 19/20、练习 20/20；15 项失败均为 `INVALID_OUTPUT`，没有偷偷剔除分母。
 - 严重错误保守自动计数：19/20，95%；剔除本地代码门禁后的语义模型计数为 15/16，93.75%。两项均达 90%。
@@ -68,7 +70,7 @@ uv run --env-file ../.env python -m tests.resource_quality \
 
 ### 2026-09-26 固定5次真实诊断与修复候选
 
-用户回复“同意”后执行 diagnostic 命令，共5请求、16.35秒；[脱敏诊断报告](mvp-0.2-resource-quality-diagnostic.json)保存原结果。array讲解及insertion代码有效；c-pointer/circular-queue/deletion讲解均为 `STRUCTURED_JSON_INVALID`。此报告使用修改前的v1指令；没有请求重试或定向修正。已证实这3项为JSON语法解析层失败，而不是schema类型错误或明确输出上限；但未保存正文，不能进一步断定具体语法缺陷。不同轮同一样本结果会变化，不能用2份通过覆盖原报告失败。
+用户回复“同意”后执行 diagnostic 命令，共5请求、16.35秒；脱敏诊断报告（本地材料 `docs/acceptance/mvp-0.2-resource-quality-diagnostic.json`）保存原结果。array讲解及insertion代码有效；c-pointer/circular-queue/deletion讲解均为 `STRUCTURED_JSON_INVALID`。此报告使用修改前的v1指令；没有请求重试或定向修正。已证实这3项为JSON语法解析层失败，而不是schema类型错误或明确输出上限；但未保存正文，不能进一步断定具体语法缺陷。不同轮同一样本结果会变化，不能用2份通过覆盖原报告失败。
 
 针对JSON解析层失败，新增 `learning-resources-instructions-v2` 明确序列化约束及完整对象示例；示例由 `json.dumps` 构造并经schema测试验证。schema/envelope版本仍为 `learning-resources-v1`，不改变字段/容忍度/输出上限；新生成及定向修正保存指令版本，历史候选无版本时保持原metadata而不是误标为v2。参考与约束见 [指令v2](../agents/prompts/learning-resources-instructions-v2.md)。未改变Review提示或原始质量样本。
 
@@ -78,7 +80,7 @@ uv run --env-file ../.env python -m tests.resource_quality \
 
 ### 2026-09-26 指令v2完整重测（未达标）
 
-用户再次回复“同意”，明确授权新的最多86次请求。执行相同provider命令，输出文件改为 `mvp-0.2-resource-quality-provider-v2.json`；[原始脱敏报告](mvp-0.2-resource-quality-provider-v2.json)完整保留。实际模型 `deepseek-flash`，229.44秒、86/86请求，禁重试/修正，exit1。
+用户再次回复“同意”，明确授权新的最多86次请求。执行相同provider命令，输出文件改为 `mvp-0.2-resource-quality-provider-v2.json`；原始脱敏报告（本地材料 `docs/acceptance/mvp-0.2-resource-quality-provider-v2.json`）完整保留。实际模型 `deepseek-flash`，229.44秒、86/86请求，禁重试/修正，exit1。
 
 - Schema57/60=95%，仍低于98%。讲解20/20、代码18/20、练习19/20。相比v1的75%，本轮观察到改善，但不能由两次小样本证明稳定性或泛化效果。
 - 失败为 `circular-queue:code:1` / `circular-queue:exercise:1` 的 `STRUCTURED_SCHEMA_MISMATCH`，以及 `circular-queue:code:2` 的 `STRUCTURED_JSON_INVALID`。没有放宽解析或忽略失败。现有脱敏分类不能指出具体违背哪条schema，仍不能猜测字段缺失、类型或内容问题。
@@ -97,7 +99,7 @@ uv run --env-file ../.env python -m tests.resource_quality \
   --output ../docs/acceptance/mvp-0.2-resource-quality-circular-diagnostic.json
 ```
 
-共3/3请求、11.90秒、deepseek-flash、无重试/修正。code:1为 `STRUCTURED_JSON_INVALID`，exercise:1及code:2有效。本轮未复现schema mismatch，因此没有具体schema关键字证据。不能推断旧失败已修复，也不能拿2个新成功替换质量报告中的失败。完整schema门禁仍57/60=95%。[独立诊断报告](mvp-0.2-resource-quality-circular-diagnostic.json)保留原结果。
+共3/3请求、11.90秒、deepseek-flash、无重试/修正。code:1为 `STRUCTURED_JSON_INVALID`，exercise:1及code:2有效。本轮未复现schema mismatch，因此没有具体schema关键字证据。不能推断旧失败已修复，也不能拿2个新成功替换质量报告中的失败。完整schema门禁仍57/60=95%。独立诊断报告（本地材料 `docs/acceptance/mvp-0.2-resource-quality-circular-diagnostic.json`）保留原结果。
 
 当前所有已授权请求已用完。继续盲跑完整基准或重复3次样本不能保证定位。下一步应先把JSON解析失败细分为固定、无内容的语法类别（如无效转义、未转义控制字符、未闭合字符串等），以真实失败类别为修复依据；不记录厂商正文或学习者数据、不放宽解析。需要新的明确费用授权才能再采集真实诊断证据。未创建T023完成提交，后续依赖保持阻塞。
 
@@ -113,6 +115,6 @@ uv run --env-file ../.env python -m tests.resource_quality \
 
 第二轮实质不同修复为 [instruction-v3](../agents/prompts/learning-resources-instructions-v3.md)：实际完整schema同时写入提示正文，强化所有嵌套required键可见性；输出schema-v1、校验、基准集、2048token、单Provider均不变。旧instruction-v2文档和资源版本不回填。
 
-执行provider模式，输出另存 [v3真实报告](mvp-0.2-resource-quality-provider-v3.json)，86请求、227.57秒、exit0、实际deepseek-flash、无重试/修正：schema60/60、严重召回20/20、语义16/16、正确对照10/10。逐项核对16份语义审核主要意见均对应原创错误：复杂度/搬移、指针地址与无效解引用、链表布局/前置方向/终止/索引/遍历/链接更新/释放、LIFO/FIFO、循环队列判空满和取模。安全4项由原静态门禁命中。辅助difficulty/misconception意见仍保留已记录限制，不因此把所有辅助建议当准确事实。
+执行provider模式，输出另存 v3真实报告（本地材料 `docs/acceptance/mvp-0.2-resource-quality-provider-v3.json`），86请求、227.57秒、exit0、实际deepseek-flash、无重试/修正：schema60/60、严重召回20/20、语义16/16、正确对照10/10。逐项核对16份语义审核主要意见均对应原创错误：复杂度/搬移、指针地址与无效解引用、链表布局/前置方向/终止/索引/遍历/链接更新/释放、LIFO/FIFO、循环队列判空满和取模。安全4项由原静态门禁命中。辅助difficulty/misconception意见仍保留已记录限制，不因此把所有辅助建议当准确事实。
 
 最终离线303 passed无跳过，7原有依赖警告；Ruff/Mypy53文件/diff通过。今天统一授权后本任务实际新增92请求（6诊断+86基准）；本任务累计已记录272请求，不代表已知货币金额，实际费用以Provider账单为准。授权不跨北京时间日期，不更换Provider，不授权push/merge。T023质量证据已满足，后续完整学习闭环与性能由T024/T025独立验收。

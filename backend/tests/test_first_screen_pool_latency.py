@@ -12,7 +12,7 @@ import httpx
 import pytest
 import uvicorn
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "docs/acceptance"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "scripts/acceptance_support"))
 
 from first_screen_v2 import assessed_metrics, raw_learning_post
 from test_learning_sessions import FakeAdapter

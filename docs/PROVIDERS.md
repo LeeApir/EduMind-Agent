@@ -73,7 +73,7 @@ DeepSeek Responses 默认开启 thinking，而 P0 的第一段讲解和正式资
 隔离探针给现有请求添加 `strict: true`，两次中有一次返回值违反 `enum` 并被本地校验拒绝。
 这证明当前配置下该字段不足以保证强约束，不证明字段被忽略的内部机制，也不代表所有 schema
 均不兼容。生产适配器不据此添加字段，不静默切换端点或降级校验。原始脱敏报告见
-[`mvp-0.2-strict-probe-v1.json`](acceptance/mvp-0.2-strict-probe-v1.json)。
+`mvp-0.2-strict-probe-v1.json`（本地材料 `docs/acceptance/mvp-0.2-strict-probe-v1.json`）。
 官方另有 [Beta 严格工具调用](https://api-docs.deepseek.com/guides/tool_calls/)，涉及 Beta Base URL
 及 function 参数约束；它不是当前 Responses 文本输出开关。采用该路线前须批准接口策略，
 验证当前模型/凭据/安全目标兼容性，保持业务 schema、ReviewAgent 和质量门槛不变。

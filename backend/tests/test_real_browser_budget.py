@@ -11,7 +11,7 @@ from app.services.provider_gateway import ProviderError, StructuredResult
 
 SPEC = importlib.util.spec_from_file_location(
     "real_browser_server",
-    Path(__file__).resolve().parents[2] / "docs/acceptance/serve_real_browser.py",
+    Path(__file__).resolve().parents[2] / "scripts/acceptance_support/serve_real_browser.py",
 )
 assert SPEC is not None and SPEC.loader is not None
 MODULE = importlib.util.module_from_spec(SPEC)

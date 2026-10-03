@@ -1,5 +1,7 @@
 # 目录版工程验收（不含人工内容批准）
 
+> 2026-10-03 整理：下列本地材料路径沿用原仓库相对路径；读取及历史恢复方式见[材料索引](README.md)。旧指标、失败与判定不变。
+
 | 独立组件 | 完整分母 | 结果 |
 |---|---:|---|
 | 两模板质量矩阵 | 100 | 100/100；20种输入实际渲染、80次审核缓存校验 |
@@ -10,7 +12,7 @@
 
 执行：`backend/.venv/bin/python scripts/run_catalog_acceptance.py`（v1–v4）、`backend/.venv/bin/python scripts/run_catalog_core.py`（v5）；最终 `python3 scripts/verify_catalog_acceptance.py` 离线核验通过。135项前端测试、typecheck/build、定向ESLint及Ruff通过；6项离线分母/组件闸门测试通过。
 
-[质量原始证据](mvp-0.3-catalog-20261003-v2-quality.json)、[完整性能矩阵](mvp-0.3-catalog-20261003-v4-result.json)、[独立核心旅程](mvp-0.3-catalog-20261003-v5-core.json)分别保留。每次执行前冻结代码/配置/内容hash；[v5协议](mvp-0.3-catalog-20261003-v5-protocol.json)明确引用未变的质量与性能组件，核验同一生产工作树/内容/模板hash及原执行器快照，不把v4失败的核心旅程改成通过。v5改用真实Chromium fetch验证Secure Cookie身份，生产Secure/HttpOnly未变。
+质量原始证据（本地材料 `docs/acceptance/mvp-0.3-catalog-20261003-v2-quality.json`）、完整性能矩阵（本地材料 `docs/acceptance/mvp-0.3-catalog-20261003-v4-result.json`）、独立核心旅程（本地材料 `docs/acceptance/mvp-0.3-catalog-20261003-v5-core.json`）分别保留。每次执行前冻结代码/配置/内容hash；v5协议（本地材料 `docs/acceptance/mvp-0.3-catalog-20261003-v5-protocol.json`）明确引用未变的质量与性能组件，核验同一生产工作树/内容/模板hash及原执行器快照，不把v4失败的核心旅程改成通过。v5改用真实Chromium fetch验证Secure Cookie身份，生产Secure/HttpOnly未变。
 
 首次质量8槽RENDER_UNAVAILABLE（底层原因未记录）、localhost502、401正文未读取、队列定位器歧义、Node HTTP客户端缺Secure Cookie均保留在旧批次。401及练习/路径404响应清理有生产修复与3条回归测试；其余为执行器/环境问题。v3保存停止记录及未运行槽，未将部分样本拼入完整性能矩阵。
 

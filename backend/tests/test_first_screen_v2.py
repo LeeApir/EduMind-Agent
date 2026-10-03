@@ -5,7 +5,7 @@ import json
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "docs/acceptance"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "scripts/acceptance_support"))
 
 from audit_first_screen_v2 import audit
 from first_screen_v2 import ParagraphClock, SSEClock, assessed_metrics, qualify, raw_learning_post
@@ -21,7 +21,7 @@ def decisions(clock, verdicts):
 def test_saved_public_sample_one_is_partial_evidence_not_lossless_replay():
     import hashlib
 
-    source = Path(__file__).resolve().parents[2] / "docs/acceptance/mvp-0.2-t035-raw.json"
+    source = Path(__file__).resolve().parent / "fixtures/acceptance/mvp-0.2-t035-raw.json"
     sample = json.loads(source.read_text())["samples"][0]
     assert len(sample["candidates"]) == 10
     assert "chunks" not in sample and "raw_stream" not in sample
@@ -219,7 +219,7 @@ def test_whitespace_boundary_arrival_is_not_token_or_invented_completion():
     import sys
     from pathlib import Path
 
-    sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "docs/acceptance"))
+    sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "scripts/acceptance_support"))
     from first_screen_v2 import ParagraphClock
 
     clock = ParagraphClock()

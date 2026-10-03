@@ -18,7 +18,7 @@ from app.services.provider_gateway import (
     TokenUsage,
 )
 
-SCRIPT = Path(__file__).resolve().parents[2] / "docs/acceptance/run_mvp02_acceptance.py"
+SCRIPT = Path(__file__).resolve().parents[2] / "scripts/acceptance_support/run_mvp02_acceptance.py"
 spec = importlib.util.spec_from_file_location("stage_acceptance", SCRIPT)
 assert spec is not None and spec.loader is not None
 acceptance = importlib.util.module_from_spec(spec)

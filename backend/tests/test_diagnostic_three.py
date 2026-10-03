@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "docs/acceptance"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "scripts/acceptance_support"))
 
 from first_screen_diagnostics import CURRENT
 from serve_diagnostic_three import DiagnosticAdapter, DiagnosticBudget, TraceMiddleware
@@ -101,7 +101,7 @@ def test_diagnostic_audit_keeps_all_three_and_never_computes_p95():
 
     from audit_diagnostic_three import audit
 
-    directory = Path(__file__).resolve().parents[2] / "docs/acceptance"
+    directory = Path(__file__).resolve().parent / "fixtures/acceptance"
     raw, decisions, trace = (
         json.loads((directory / f"mvp-0.2-t035-{name}.json").read_text())
         for name in ("raw", "decisions", "trace")

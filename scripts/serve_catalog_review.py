@@ -4,7 +4,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-PREVIEW = ROOT / "docs/acceptance/catalog-course-review-20261003.html"
+PREVIEW = ROOT / "local-materials/catalog-course-review-20261003.html"
 
 
 class ReviewHandler(BaseHTTPRequestHandler):

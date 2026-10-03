@@ -1,8 +1,10 @@
 # MVP 0.3 目录版：main 合并前审查
 
+> 2026-10-03 整理：下列本地材料路径沿用原仓库相对路径；读取及历史恢复方式见[材料索引](README.md)。旧指标、失败与判定不变。
+
 最新远端 main 为 `4bbded95f583d7c71c2df634f28b0bdb10f4b0d4`。交付提交 `3a2155b` 在独立 `codex/mvp-0.3-release` 工作区接入该基线，无冲突，基线对齐后源码树与交付提交相同。原工作区和既有干净验证 checkout 未切换或覆盖。
 
-本地最终差异审查通过；这是执行器自查，不代替独立 GitHub 审核批准。[机器记录](mvp-0.3-pr-review-20261003.json)记录基线、范围、具体命令、原始失败和成功输出、复用证据 hash 及归档排除检查。
+本地最终差异审查通过；这是执行器自查，不代替独立 GitHub 审核批准。机器记录（本地材料 `docs/acceptance/mvp-0.3-pr-review-20261003.json`）记录基线、范围、具体命令、原始失败和成功输出、复用证据 hash 及归档排除检查。
 
 交付为 PRD §0 / ADR-0007 的课程目录版：Lee 签核 `linear-course v0.1.0` 精确 digest，10节点/30资源/30题、两个既有动画模板、固定预设演示、评分/进度/路径及导出。`catalog_only` 默认并对无效配置失败关闭；动态生成、重解释、实时 AI 暂缓，T033 保持 blocked，累计2033/2500。本轮 Provider 请求0，没有部署或正式基准重跑。
 
@@ -14,4 +16,4 @@
 
 远端规则要求1个GitHub审核批准、最后推送由他人批准、审核线程解决；新推送会清除旧批准。普通PR合并必须遵守这些规则。本记录只证明本地检查完成，不预先声称PR已获批准或合并；实际状态与合并hash以GitHub PR及后续执行日志为准。
 
-已创建 [PR #4](https://github.com/LeeApir/EduMind-Agent/pull/4)，普通 merge commit 合并实际被 main 保护规则拦截（REVIEW_REQUIRED，暂无独立审核批准）；没有配置或报告远端 CI checks，不能称为 CI 通过。仓库 allow_auto_merge=false，未启用自动合并、未使用管理员绕过、未改变规则。[远端观察和合并尝试](mvp-0.3-pr-remote-gate-20261003.json)保留当时head/base及拒绝原因；后续实际状态以 GitHub 为准。
+已创建 [PR #4](https://github.com/LeeApir/EduMind-Agent/pull/4)，普通 merge commit 合并实际被 main 保护规则拦截（REVIEW_REQUIRED，暂无独立审核批准）；没有配置或报告远端 CI checks，不能称为 CI 通过。仓库 allow_auto_merge=false，未启用自动合并、未使用管理员绕过、未改变规则。远端观察和合并尝试（本地材料 `docs/acceptance/mvp-0.3-pr-remote-gate-20261003.json`）保留当时head/base及拒绝原因；后续实际状态以 GitHub 为准。

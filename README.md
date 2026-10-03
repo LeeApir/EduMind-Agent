@@ -74,7 +74,7 @@ uv run --env-file ../.env.worker python scripts/run_animation_worker.py
 
 Worker 不接收 Provider 密钥；渲染时启动的固定 Manim 容器不挂 Docker socket、数据库或媒体库。只启动 API 而不启动 Worker 时，缓存命中仍可读，但新动画 Job 会保持排队。Worker 重启先回收过期租约，最多自动尝试两次；取消或旧尝试的迟到结果不能重新发布。隔离 Compose 重启实测见 [T031 验收记录](docs/acceptance/mvp-0.3-t031-compose-recovery.md)。
 
-两个模板的合法边界、缓存播放和按需渲染单机验收结果见 [T032 动画报告](docs/acceptance/mvp-0.3-t032-animation-performance.md)；报告保留每槽数据、首次测量脚本失败和当前环境限制。
+两个模板的合法边界、缓存播放和按需渲染单机验收结果见 [T032 动画报告](docs/acceptance/mvp-0.3-t032-animation-performance.md)；报告记录指标、首次测量失败和环境限制；每槽原始数据保存在本地材料。
 
 仅保留用于历史动态开发的仓库示例配置使用 DeepSeek Responses API、`https://api.deepseek.com` 和 `deepseek-flash`；实际模型以服务端配置及验收记录为准，示例不代表该模型通过所有质量指标。API Key 只留在服务端 `.env`，不要提交或放入浏览器。支持的传输与安全边界见 [Provider 说明](docs/PROVIDERS.md)。
 
@@ -141,28 +141,4 @@ pnpm --dir web e2e
 URL；未设置会跳过 DB 测试，不能视为全量通过。测试数据库会写入合成夹具，不可指向生产库。
 闭环与容器恢复证据见 [自动化闭环报告](docs/acceptance/mvp-0.2-closed-loop.md)。
 
-从 `backend/` 执行真实验收前，设置 `EDUMIND_DATABASE_URL` 指向隔离测试库，
-确保 `.env` 中配置当前服务端 Provider，然后使用全新的报告文件名：
-
-Beta严格工具参数路径需显式设置 `EDUMIND_PROVIDER_STRUCTURED_TRANSPORT=beta_tools`；
-只支持已配置的官方DeepSeek同源主机，普通文本/SSE仍走原Responses。
-当前Beta完整质量验收未通过，4项协议探针通过不代表阶段通过；默认配置不自动切换。
-可在以下命令前加 `env EDUMIND_PROVIDER_STRUCTURED_TRANSPORT=beta_tools` 作隔离验证，
-无需修改真实`.env`。接口与安全约束见 [Provider说明](docs/PROVIDERS.md)。
-
-```bash
-uv run --env-file ../.env python ../docs/acceptance/run_mvp02_acceptance.py \
-  --confirm-billable --output ../docs/acceptance/new-stage-report.json
-uv run --env-file ../.env python -m tests.resource_quality \
-  --mode provider --confirm-billable --output ../docs/acceptance/new-quality-report.json
-```
-
-第一个命令按公开题面要求操作者独立输入答案 JSON，最多 30 次模型尝试；
-第二个命令最多 86 次请求、禁重试/修正。两者都会计费，必须事先授权；
-不要读取答案键或复制标准答案完成验收，不要覆盖历史报告。
-旧指令生成的开放题保留原版本，不迁移评分或改写历史证据；应使用新生成的客观题。
-真实资源质量见 [质量报告](docs/acceptance/mvp-0.2-resource-quality.md)。
-
-非计费 HTTP 路径性能使用 `run_path_benchmark.py`：先启动连接隔离数据库的
-Uvicorn 8001，运行 `uv run python ../docs/acceptance/run_path_benchmark.py --output ../docs/acceptance/new-path-report.json`。
-它创建独立用户和合成画像，单并发、每接口 5 次预热与 100 次测量，不证明公网或高并发容量。
+历史动态验收和质量成绩见[收尾决定](docs/acceptance/mvp-0.2-closeout-decision.md)与[质量报告](docs/acceptance/mvp-0.2-resource-quality.md)。当前目录版不启用这些付费流程。验收目录只保留阶段报告、关键动画/恢复报告与签核依据；原始日志、冻结协议、逐槽结果和诊断已移至被 Git 忽略的本地材料，读取及历史恢复方式见[材料索引](docs/acceptance/README.md)。回归测试所需工具和原样夹具分别保留在 `scripts/acceptance_support/`、`backend/tests/fixtures/acceptance/` 和 `web/tests/fixtures/`。

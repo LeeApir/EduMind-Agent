@@ -6,7 +6,7 @@ import App from "../src/App.vue";
 import { startLearningSession } from "../src/api/learningSessions";
 
 // Offline actual backend token frames, never a replay of T035's missing raw stream.
-const fixture = JSON.parse(readFileSync("../docs/acceptance/mvp-0.2-t036-offline-sse.json", "utf8")) as {
+const fixture = JSON.parse(readFileSync("tests/fixtures/offline-sse.json", "utf8")) as {
   expected: string;
   sse: string;
 };

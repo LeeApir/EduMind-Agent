@@ -13,7 +13,7 @@ from fastapi.responses import JSONResponse
 from fastapi.testclient import TestClient
 from pydantic import BaseModel
 
-DIRECTORY = Path(__file__).resolve().parents[2] / "docs/acceptance"
+DIRECTORY = Path(__file__).resolve().parents[2] / "scripts/acceptance_support"
 sys.path.insert(0, str(DIRECTORY))
 
 

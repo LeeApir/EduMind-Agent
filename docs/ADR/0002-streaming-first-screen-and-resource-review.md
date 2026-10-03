@@ -73,7 +73,7 @@ accepted
 
 原提案将“服务端认证/schema 校验通过至首个有效 token 到达”称作 TTFB；此命名已被后续口径纠正。HTTP 首字节、教学首 token、完整首段必须分别记录，不可互换，也不能将某一计时起点套用到所有指标。
 
-MVP 0.2 的实际起止点、正文资格和失败分母见 [T033 口径纠正](../acceptance/mvp-0.2-t033-nonbillable-diagnosis.md)、[T038 冻结计划](../acceptance/mvp-0.2-t038-frozen-plan.md) 和 [收尾决定](../acceptance/mvp-0.2-closeout-decision.md)。原始失败 gate 保留；Pro 质量/闭环与 Flash 性能不能拼成同一模型全项通过。
+MVP 0.2 的实际起止点、正文资格和失败分母见 T033 口径纠正（本地材料 `docs/acceptance/mvp-0.2-t033-nonbillable-diagnosis.md`）、T038 冻结计划（本地材料 `docs/acceptance/mvp-0.2-t038-frozen-plan.md`） 和 [收尾决定](../acceptance/mvp-0.2-closeout-decision.md)。原始失败 gate 保留；Pro 质量/闭环与 Flash 性能不能拼成同一模型全项通过。
 
 MVP 0.3-T001 需在新采样前冻结各指标的起止点、样本、失败处理和预算；本次文档整理不批准新采样。按 Provider、模型和请求类型分开报告；临时首段已显示但最终审核失败的操作不能计入正式资源生成成功。
 

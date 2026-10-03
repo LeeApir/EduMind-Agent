@@ -56,4 +56,4 @@ HTTP 首字节 P95≤2 秒、完整教学首段 P95≤10 秒与独立教学首 t
 
 ## MVP 0.3 API 契约（T004）
 
-[OpenAPI 0.3.0](api/openapi.yaml) 固定动画Job、媒体/导出及课堂/场景接口，交接见 [T004契约记录](acceptance/mvp-0.3-t004-api-contract.md)。新增端点仍待T012–T028实现，不能把文档路径当作当前服务已提供。POST课堂流使用fetch；GET持久动画Job事件使用EventSource及游标重放。
+[OpenAPI 0.3.0](api/openapi.yaml) 固定动画Job、媒体/导出及课堂/场景接口，当前交付范围与验证见[目录版退出报告](acceptance/mvp-0.3-catalog-exit-20261003.md)；目录模式下动态课堂与重解释仍关闭。POST课堂流使用fetch；GET持久动画Job事件使用EventSource及游标重放。

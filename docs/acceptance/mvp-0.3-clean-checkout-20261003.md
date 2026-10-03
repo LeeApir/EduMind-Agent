@@ -1,8 +1,10 @@
 # 已提交课程目录版：干净 checkout 验证
 
+> 2026-10-03 整理：下列本地材料路径沿用原仓库相对路径；读取及历史恢复方式见[材料索引](README.md)。旧指标、失败与判定不变。
+
 提交 `c7831d1dbf34219f22c6f7da30913002fa46966d` 的目录版可按锁文件安装、构建并在本机运行。独立 checkout 从开始到结束均无 Git 改动，566 个已跟踪文件逐字节一致；未复制真实 `.env`、未提交 T033 候选、原工作区虚拟环境或 node_modules。当前工作区的实验和旧证据保持原样。
 
-[机器结果](mvp-0.3-clean-checkout-20261003.json)、[执行协议/源码哈希](mvp-0.3-clean-checkout-20261003-evidence/protocol.json)、[全部日志及执行器](mvp-0.3-clean-checkout-20261003-evidence/)独立保存，不覆盖 T034/T045/T046 的旧协议、结果或成绩。
+机器结果（本地材料 `docs/acceptance/mvp-0.3-clean-checkout-20261003.json`）、执行协议/源码哈希（本地材料 `docs/acceptance/mvp-0.3-clean-checkout-20261003-evidence/protocol.json`）、全部日志及执行器（本地材料 `docs/acceptance/mvp-0.3-clean-checkout-20261003-evidence`）独立保存，不覆盖 T034/T045/T046 的旧协议、结果或成绩。
 
 | 检查 | 实际结果 |
 | --- | --- |

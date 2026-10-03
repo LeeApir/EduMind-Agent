@@ -47,6 +47,7 @@ body{{margin:0;background:#eef3f1;color:#17253a;font:16px/1.8 system-ui,sans-ser
 
 
 if __name__ == "__main__":
-    target = ROOT / "docs/acceptance/catalog-course-review-20261003.html"
+    target = ROOT / "local-materials/catalog-course-review-20261003.html"
+    target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text(render())
     print(target)
