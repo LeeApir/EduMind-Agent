@@ -16,7 +16,7 @@
 
 ```bash
 cd backend
-uv sync --python 3.11 --all-groups
+uv sync --frozen --python 3.11 --all-groups
 ```
 
 启动 API（健康检查不需要 Provider 凭据）：
@@ -119,7 +119,7 @@ tar -C data/videos/cache -xf edumind-media-backup.tar
 
 ```bash
 cd backend
-uv sync --python 3.11 --all-groups
+uv sync --frozen --python 3.11 --all-groups
 uv run playwright install chromium
 cd ..
 pnpm --dir web install --frozen-lockfile
@@ -131,7 +131,7 @@ pnpm --dir web install --frozen-lockfile
 pnpm --dir web e2e
 ```
 
-这是历史动态流程的回归套件，不能替代目录版真实集成证据；当前目录版复核运行 `python3 scripts/verify_catalog_exit.py`（只读离线，不启动浏览器/数据库/Provider）。该历史套件使用浏览器路由级 mock API，稳定覆盖一句话开始、正式资源、课堂模式与多视角、练习、文件下载、Provider 故障、审核拒绝和 SSE 异常恢复，不会调用或计费真实 Provider。隔离 PostgreSQL 后端测试负责审核、owner、幂等和持久恢复。真实前后端集成需要另外运行 `web/tests/e2e/real_stage_flow.py`：先迁移隔离测试库、准备已审核的真实模板媒体缓存，再设置 `EDUMIND_TEST_DATABASE_URL` 和 `EDUMIND_DATABASE_URL` 指向该库，从 `backend/` 执行 `uv run python ../web/tests/e2e/real_stage_flow.py`。这条流程使用确定性 mock Provider，不能替代真实模型质量或首段 P95 验收；真实模型证据由 T033 单独记录。
+这是历史动态流程的回归套件，不能替代目录版真实集成证据。干净 checkout 的目录版离线预检运行 `python3 scripts/check_catalog_workflow.py` 和 `python3 scripts/verify_catalog_release.py`，结果边界见[已提交版本验证](docs/acceptance/mvp-0.3-clean-checkout-20261003.md)。`verify_catalog_exit.py` 是依赖原 `.env` 和历史实验文件的冻结工作树审计器，不能作为干净 checkout 的检查入口。该历史套件使用浏览器路由级 mock API，稳定覆盖一句话开始、正式资源、课堂模式与多视角、练习、文件下载、Provider 故障、审核拒绝和 SSE 异常恢复，不会调用或计费真实 Provider。隔离 PostgreSQL 后端测试负责审核、owner、幂等和持久恢复。真实前后端集成需要另外运行 `web/tests/e2e/real_stage_flow.py`：先迁移隔离测试库、准备已审核的真实模板媒体缓存，再设置 `EDUMIND_TEST_DATABASE_URL` 和 `EDUMIND_DATABASE_URL` 指向该库，从 `backend/` 执行 `uv run python ../web/tests/e2e/real_stage_flow.py`。这条流程使用确定性 mock Provider，不能替代真实模型质量或首段 P95 验收；真实模型证据由 T033 单独记录。
 
 ## MVP 0.2 历史验证入口（当前暂缓付费测试）
 

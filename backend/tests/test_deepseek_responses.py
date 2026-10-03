@@ -513,6 +513,7 @@ def test_dns_change_to_private_is_blocked_before_mock_http() -> None:
 def test_default_gateway_composes_only_deepseek_responses(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    monkeypatch.setenv("EDUMIND_PRODUCT_MODE", "dynamic")
     monkeypatch.setenv("EDUMIND_PROVIDER_BASE_URL", "https://8.8.8.8")
     monkeypatch.setenv("EDUMIND_PROVIDER_API_KEY", "test-secret")
     monkeypatch.setenv("EDUMIND_PROVIDER_MODEL", "deepseek-flash")

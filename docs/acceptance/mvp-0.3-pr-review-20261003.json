@@ -1,0 +1,184 @@
+{
+  "base_main": "4bbded95f583d7c71c2df634f28b0bdb10f4b0d4",
+  "source_delivery_commit": "3a2155b3cac37430eac1d2cbb57ee1ccd62f4ffa",
+  "base_alignment_commit": "83d9a93176af15a1e574cc8ca717ac616a8ce57f",
+  "branch": "codex/mvp-0.3-release",
+  "review_type": "executor self-review, not independent GitHub approval",
+  "passed_local_review": true,
+  "reviewed_areas": [
+    "PRD and ADR0007 approved scope/default fail-closed catalog_only",
+    "course package validation/exact human digest/allowlist and trusted publication",
+    "owner scoped fixed resources/exercise answer hiding/CSRF/idempotent enrollment/withdrawal",
+    "database immutable source provenance/first-complete quiz qualification/repeat mastery exclusion",
+    "animation/publication/media revocation and sandbox reuse",
+    "Vue product mode guard/curated catalog/recovery and common session fix",
+    "locked dependencies/pinned images/local-only Compose/no private credentials or T033 archive commits",
+    "API contract reference resolution and documentation/reproducible clean checkout checks"
+  ],
+  "runtime_reuse": {
+    "runtime_source_files_identical": 174,
+    "reused_commit": "c7831d1dbf34219f22c6f7da30913002fa46966d",
+    "reused_manifest_digest": "92bb0dd4778391e23aae978b8a411b466d8b5988d1cff61cff01654604af21a1",
+    "reused_evidence_sha256": "a5e37d8af2595d8be3262bd0a0d27cbec77624bd6ada0971289b17316c9d97e3",
+    "database_regressions_reused": 14,
+    "runtime_browser_smoke_reused": true,
+    "runtime_changed": false,
+    "task_json_unchanged": true,
+    "t033": "blocked",
+    "provider_requests": 0
+  },
+  "archive_exclusion": {
+    "passed": true,
+    "new_experiment_files_excluded": 52,
+    "preexisting_files_keep_delivery_versions": 12,
+    "evidence_files_excluded": 169,
+    "archive_commits_not_ancestors": true,
+    "private_paths": [],
+    "credential_pattern_suspects": [],
+    "provider_requests": 0
+  },
+  "local_checks": {
+    "backend-final": {
+      "command": [
+        ".venv/bin/python",
+        "/private/tmp/edumind-pr-main-20261003/offline_pytest.py"
+      ],
+      "cwd": "backend",
+      "exit_code": 0,
+      "seconds": 1.545,
+      "raw_log": "backend-final.txt"
+    },
+    "build": {
+      "command": [
+        "pnpm",
+        "build"
+      ],
+      "cwd": "web",
+      "exit_code": 0,
+      "seconds": 10.306,
+      "raw_log": "build.txt"
+    },
+    "frontend": {
+      "command": [
+        "pnpm",
+        "test",
+        "--run"
+      ],
+      "cwd": "web",
+      "exit_code": 0,
+      "seconds": 8.06,
+      "raw_log": "frontend.txt"
+    },
+    "ruff-fixed": {
+      "command": [
+        ".venv/bin/ruff",
+        "check",
+        "app",
+        "tests"
+      ],
+      "cwd": "backend",
+      "exit_code": 0,
+      "seconds": 0.011,
+      "raw_log": "ruff-fixed.txt"
+    },
+    "lint": {
+      "command": [
+        "pnpm",
+        "lint"
+      ],
+      "cwd": "web",
+      "exit_code": 0,
+      "seconds": 2.223,
+      "raw_log": "lint.txt"
+    },
+    "workflow": {
+      "command": [
+        "backend/.venv/bin/python",
+        "scripts/check_catalog_workflow.py"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 0.018,
+      "raw_log": "workflow.txt"
+    },
+    "signature": {
+      "command": [
+        "backend/.venv/bin/python",
+        "scripts/verify_catalog_release.py"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 0.065,
+      "raw_log": "signature.txt"
+    }
+  },
+  "results": {
+    "backend": {
+      "passed": 548,
+      "skipped": 177,
+      "failed": 0
+    },
+    "frontend": {
+      "passed": 136,
+      "failed": 0
+    },
+    "eslint": {
+      "errors": 0,
+      "existing_warnings": 67
+    }
+  },
+  "review_fixes": [
+    "4 existing Provider factory tests explicitly select dynamic mode without relaxing assertions; production catalog gate unchanged",
+    "3 unresolved HTTPValidationError references use existing Error schema matching public validation handler",
+    "runtime operationId missing in hand-maintained contract restored",
+    "README uses frozen uv dependency install and directs clean checkout to workflow/signature checks; historical exit audit limitations remain explicit"
+  ],
+  "failures_retained": [
+    "backend-full.txt.json",
+    "backend-full-fixed.txt.json"
+  ],
+  "runtime_code_changed": false,
+  "task_json_unchanged": true,
+  "provider_requests": 0,
+  "cumulative_requests": 2033,
+  "request_limit": 2500,
+  "t033_status": "blocked",
+  "github_rules": {
+    "required_approving_review_count": 1,
+    "require_last_push_approval": true,
+    "require_extra_approval_for_unattributed_changes": true,
+    "required_review_thread_resolution": true,
+    "dismiss_stale_reviews_on_push": true
+  },
+  "new_benchmark_runs": 0,
+  "new_database_browser_worker_runs": 0,
+  "deployment": false,
+  "artifact_hashes": {
+    "build.txt.json": "e1c7adbe253250522a8ab28d2bcdf0f7e6923d9dfdfc130e13ac22e90e90f1af",
+    "lint.txt.json": "1fff97e7fd7621f2476a5ba999b0e77a062e61b02f71d668f5753e49cc638a74",
+    "workflow.json": "c6c1d1eaa9df921d1461a5d1910108ea7de6edce70fc069d93d03b3ea01681f9",
+    "backend-full.txt.json": "d798a2d0dbe9717aeb298a84471e3177887155fc5deee804bdfb65a346ef4642",
+    "ruff-fixed.txt.json": "b4c6e9171419ba7570b8d61dc1a8b8394aa8c18047ff1b74941421c74b22e5f4",
+    "ruff.json": "7710fe6fbd2523275ff1aa3ef103a06475afd97c20b148e1a8d66636318558dd",
+    "check.py": "4a845c5607c458ea8e7670712c36732a6f9ec5084341865bf6cf52441ba76f55",
+    "offline_pytest.py": "c2a5c4baf8af4229fc94f014fb686ba876c85e67b49c8ec9aa29664b7da25c85",
+    "backend-full.json": "79df62686d75e11b33024de35ee0df7473699d46685b1da709cf93f7af0af8e2",
+    "frontend.json": "7c5c18ffdfcfb624d89f7bd68353f375e5b5102e8831f6611cdb137cb9a79aaf",
+    "ruff.txt.json": "6571dc2ccd7035f08993e79289c9649c02ae7ed2bc4a2afa073952c9a3266532",
+    "archive-exclusion.json": "b5ad48efd4ab32dfc199a720ded5f44350ed734bd5f2e347dc0dd6cfd29432bb",
+    "workflow.txt.json": "6845006c8c601bba80e6bdc104e8c9e985f660fc8f8d55d7459fd9d4b52ff0bf",
+    "frontend.txt.json": "d3d86e2e22adef412455a10bfd67b37196b7fcab5318df2337d68a68ea2a2cb8",
+    "backend-final.txt.json": "2ca407e944ca14af04fa9affd421dcad9a0bab0e2c4b222ea94bb8bc3fc2b8cf",
+    "signature.txt.json": "61eb6484d37202602f3c33faa9860db4941d368b757e613046f1d6db620b079a",
+    "lint.json": "41f4928934ece460ec5f43c08bd382da869a983b1b26a04f8aaa6e7d400d5028",
+    "reuse-proof.json": "1422be804766a93d67974fd2a6d5394eddc46a167f386b0cf70217917554c618",
+    "backend-full-fixed.txt.json": "43d3374b42c92ec54beeb0655c9ee3f9dbadebc6b22dd9d824a1b4661471f62a",
+    "backend-final.json": "eb990e67e9de4f7eb349f57a6c28d930c1e2a16813ef00ffd27930d4df930cd2",
+    "backend-full-fixed.json": "226c6fcb38f8d3a92e17c95a53e7bb65f8dcb3b178abf8e05b06601f95e44628",
+    "signature.json": "ced50f6b0e195a268f9f98373a7aac51aa9368e8704d3cd9b89f103eff871685",
+    "ruff-fixed.json": "109301fc290fd02276038a7a1f24a6e81f6271edbc62ba5e35ff8974b7baa5c9",
+    "build.json": "4711d96031235f4732c4943b7394842b8fabfd8820d3021e7ff157323ea43802"
+  },
+  "source_pr_diff_files_before_review_commit": 347,
+  "review_protocol": "No Provider; exact runtime equality permits prior signed clean DB/browser evidence reuse; old evidence and archive branches unchanged; normal GitHub approval gates must be met before merge."
+}

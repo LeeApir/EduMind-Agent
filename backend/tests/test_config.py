@@ -50,6 +50,7 @@ def test_provider_configuration_is_loaded_from_server_environment(
 def test_server_gateway_refuses_missing_key_before_adapter_is_built(
     monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
 ) -> None:
+    monkeypatch.setenv("EDUMIND_PRODUCT_MODE", "dynamic")
     monkeypatch.setenv("EDUMIND_PROVIDER_BASE_URL", "https://provider.example/v1")
     monkeypatch.setenv("EDUMIND_PROVIDER_MODEL", "server-model")
     monkeypatch.setenv("EDUMIND_PROVIDER_API_KEY", " ")
@@ -82,6 +83,7 @@ def test_server_gateway_refuses_missing_key_before_adapter_is_built(
 def test_server_only_key_is_not_exposed_by_repr_error_log_or_client_response(
     monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
 ) -> None:
+    monkeypatch.setenv("EDUMIND_PRODUCT_MODE", "dynamic")
     secret = "test-secret-that-must-stay-server-side"
     monkeypatch.setenv("EDUMIND_PROVIDER_BASE_URL", "https://8.8.8.8/v1")
     monkeypatch.setenv("EDUMIND_PROVIDER_MODEL", "server-model")
