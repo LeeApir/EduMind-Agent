@@ -1,0 +1,39 @@
+{
+  "task_id": "MVP-0.3-T046",
+  "verified_at": "2026-10-03T15:38:59+08:00",
+  "protocol": "docs/acceptance/mvp-0.3-catalog-signed-v3-protocol-20261003.json",
+  "protocol_sha256": "97a316ee3ca2d834809e5fe72adba5a8299bfc68d36a7a1c03cba13e00a294f0",
+  "result": "docs/acceptance/mvp-0.3-catalog-signed-v3-result-20261003.json",
+  "result_sha256": "5a1912d3c1646680849dd6959198b165acd50a2197d7d7b7d3368bcbdad1c92c",
+  "signed_release_code_hashes_verified": 7,
+  "old_protected_hashes_verified": 207,
+  "t033_unchanged_from_HEAD": true,
+  "t033_status": "blocked",
+  "provider_requests": 0,
+  "cumulative_requests": 2033,
+  "request_limit": 2500,
+  "production_published": false,
+  "passed": true,
+  "commands": [
+    {
+      "command": "python3 scripts/verify_catalog_release.py",
+      "result": "HUMAN_APPROVED / Lee / exact authorized digest / publishable=true / exit0"
+    },
+    {
+      "command": "EDUMIND_CATALOG_SIGNED_RESULT=/Users/apir/Code/EduMind_Agent/docs/acceptance/mvp-0.3-catalog-signed-v3-result-20261003.json backend/.venv/bin/python scripts/run_catalog_signed_tests.py",
+      "result": "isolated new PostgreSQL upgraded to0017; 6 passed; no skips"
+    },
+    {
+      "command": "cd backend && .venv/bin/python -m pytest -q tests/test_catalog_release_preflight.py tests/test_catalog_content.py",
+      "result": "16 passed, 19 opt-in Docker tests skipped; T038/T045 actual C/render evidence preserved, not claimed rerun"
+    },
+    {
+      "command": "backend/.venv/bin/ruff check scripts/verify_catalog_release.py scripts/run_catalog_signed_tests.py backend/tests/test_catalog_release_preflight.py backend/tests/test_catalog_signed_release.py",
+      "result": "all checks passed"
+    },
+    {
+      "command": "python3 scripts/verify_catalog_acceptance.py",
+      "result": "all independent T045 components and protected hashes pass; frozen historical pending-human message is not current signature state"
+    }
+  ]
+}

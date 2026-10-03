@@ -2016,7 +2016,7 @@
       "id": "MVP-0.3-T046",
       "phase": "MVP 0.3",
       "title": "人工签核课程包并验证可发布状态",
-      "status": "blocked",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.3-T038",
@@ -2028,7 +2028,9 @@
         "scripts/prepare_catalog_review.py",
         "scripts/serve_catalog_review.py",
         "scripts/verify_catalog_release.py",
-        "backend/tests/test_catalog_release_preflight.py"
+        "backend/tests/test_catalog_release_preflight.py",
+        "backend/tests/test_catalog_signed_release.py",
+        "scripts/run_catalog_signed_tests.py"
       ],
       "prd_source": "PRD v2.2 §0（目录版增补）",
       "acceptance_criteria": [
@@ -2036,16 +2038,23 @@
         "受信发布登记/撤回/核心旅程在批准版本核验；不伪造human审核。"
       ],
       "verification": [
-        "python3 scripts/verify_catalog_release.py"
+        "python3 scripts/verify_catalog_release.py",
+        "EDUMIND_CATALOG_SIGNED_RESULT=/Users/apir/Code/EduMind_Agent/docs/acceptance/mvp-0.3-catalog-signed-v3-result-20261003.json backend/.venv/bin/python scripts/run_catalog_signed_tests.py（重跑必须使用新的证据路径，禁止覆盖）",
+        "python3 scripts/verify_catalog_acceptance.py",
+        "backend/.venv/bin/ruff check scripts/verify_catalog_release.py scripts/run_catalog_signed_tests.py backend/tests/test_catalog_release_preflight.py backend/tests/test_catalog_signed_release.py"
       ],
       "verification_results": [
         "课程审阅HTML11节（10节点+demo）/10完整C折叠块/30题答案；实际Chromium桌面/390px手机检查无横向溢出，HTML全转义，不执行代码。",
         "2项发布预检离线测试通过（pending与TEST_ONLY不能发布、未授权digest拒绝）；Ruff通过。python3 scripts/verify_catalog_release.py实际返回PENDING_HUMAN_REVIEW/publishable=false并退出2，系批准未到的正确阻塞状态，不作为通过。CLI自动使用锁定backend虚拟环境；初次系统Python缺jsonschema已修正，不安装全局依赖。",
-        "真实审核人/时间未填写，没有approval.json，没有正式课程发布；Provider 0累计2033/2500。T045工程证据无变，T033仍blocked，T034退出等待本任务实际签核。"
+        "真实审核人/时间未填写，没有approval.json，没有正式课程发布；Provider 0累计2033/2500。T045工程证据无变，T033仍blocked，T034退出等待本任务实际签核。",
+        "2026-10-03用户明确实际审阅并签核Lee/linear-course v0.1.0/digest92bb0dd4778391e23aae978b8a411b466d8b5988d1cff61cff01654604af21a1；独立approval/allowlist/授权原文保留，签核登记时间15:30:26+08:00；不覆盖原pending历史文件。",
+        "python3 scripts/verify_catalog_release.py：HUMAN_APPROVED、publishable=true、exit0；最终v3隔离新PostgreSQL迁移0017/HTTPS TestClient 6项通过，无跳过。实际签核版本原子登记/幂等/10节点30资源来源hash/30题计分/重做不增掌握度/预设恢复/两真实缓存动画MP4-SRT/owner-CSRF/撤回拒绝全部核验；最终仅测试库登记并撤回，没有开发或生产发布。",
+        "16离线预检/答案一致性通过，19显式Docker项未启用跳过；Ruff/原T045组件/所有保护hash通过。v1字段契约误判及v2空answers先schema422失败均单独保留，修正测试后完整v3通过；生产代码/内容不改，不拼旧成绩。",
+        "交接docs/acceptance/mvp-0.3-catalog-signed-handoff-20261003.md及signed-v1–v3各协议/raw结果、signed-verification证据；Provider 0累计2033/2500，T033任务对象与HEAD完全一致，旧blocked/成绩不变；不部署/push/merge，T046完成后停止，T034仍todo。"
       ],
       "started_at": "2026-10-03T14:57:30",
-      "completed_at": null,
-      "blocker": "课程目录工程验收T045已完成05d5f87；具体候选内容仍未获实际人工审核签核。ADR-0007及PRD§0要求用户审阅并批准manifest digest 92bb0dd4778391e23aae978b8a411b466d8b5988d1cff61cff01654604af21a1后才能登记为正式内容；TEST_ONLY批准不能替代。可审阅HTML和安全发布预检已备妥，无Provider调用，不部署。",
+      "completed_at": "2026-10-03T15:38:59",
+      "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.3-T046"
     }
   ]
