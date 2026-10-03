@@ -248,7 +248,9 @@ class ReviewAgent:
         review_model_id: str | None = None
         for attempt in range(MAX_TARGETED_CORRECTIONS + 1):
             review, model_id = await self._review(candidate, context)
-            review_model_id = model_id or review_model_id
+            # Attribution belongs to the verdict for this candidate, not an
+            # earlier review of a candidate that was subsequently corrected.
+            review_model_id = model_id
             raw_verdict = review["verdict"]
             raw_issues = review["issues"]
             assert isinstance(raw_verdict, str)

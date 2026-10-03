@@ -131,9 +131,13 @@ describe("profile API client", () => {
       .mockResolvedValueOnce(jsonResponse({ code: "UNAUTHORIZED", message: "unauthorized" }, 401))
       .mockResolvedValueOnce(jsonResponse({ csrf_token: "c".repeat(64) }));
 
-    const token = await ensureProfileSession({ fetchImpl });
+    const [token, concurrentToken] = await Promise.all([
+      ensureProfileSession({ fetchImpl }),
+      ensureProfileSession({ fetchImpl }),
+    ]);
 
     expect(token).toBe("c".repeat(64));
+    expect(concurrentToken).toBe(token);
     expect(fetchImpl).toHaveBeenCalledTimes(2);
   });
 });

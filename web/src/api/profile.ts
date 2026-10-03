@@ -276,6 +276,7 @@ export async function fetchProfileHistory({
 }
 
 let cachedCsrfToken = "";
+let pendingSession: Promise<string> | null = null;
 
 export async function ensureProfileSession(
   { fetchImpl = fetch }: { fetchImpl?: FetchLike } = {},
@@ -283,6 +284,16 @@ export async function ensureProfileSession(
   if (cachedCsrfToken) {
     return cachedCsrfToken;
   }
+  if (pendingSession) {
+    return pendingSession;
+  }
+  pendingSession = createProfileSession(fetchImpl).finally(() => {
+    pendingSession = null;
+  });
+  return pendingSession;
+}
+
+async function createProfileSession(fetchImpl: FetchLike): Promise<string> {
   let response: Response;
   try {
     response = await fetchImpl("/api/auth/session", { credentials: "same-origin" });

@@ -3,6 +3,7 @@ import { computed, onMounted, ref } from "vue";
 import { NButton, NInput, NTag } from "naive-ui";
 
 import { LearningRequestError, startLearningSession, type LearningEvent } from "./api/learningSessions";
+import { ensureProfileSession } from "./api/profile";
 import LearningProgressPanel, {
   type PublishedResource,
   type ReviewState,
@@ -42,10 +43,6 @@ interface SceneVersion {
   version: number;
   isCurrent: boolean;
   resources: Resource[];
-}
-
-interface SessionPayload {
-  csrf_token: string;
 }
 
 const props = defineProps<{ startLearningRequest?: StartLearningRequest }>();
@@ -220,20 +217,7 @@ function applyLearningEvent(event: LearningEvent): string {
 
 async function ensureSession(): Promise<string> {
   if (csrfToken.value) return csrfToken.value;
-  let response = await fetch("/api/auth/session", { credentials: "same-origin" });
-  if (response.status === 401) {
-    response = await fetch("/api/auth/guest", {
-      method: "POST",
-      credentials: "same-origin",
-      headers: { Accept: "application/json" },
-    });
-  }
-  if (!response.ok) throw new Error("无法建立安全学习会话，请刷新页面后重试。");
-  const payload = await response.json() as Partial<SessionPayload>;
-  if (typeof payload.csrf_token !== "string") {
-    throw new Error("学习会话响应无效，请刷新页面后重试。");
-  }
-  csrfToken.value = payload.csrf_token;
+  csrfToken.value = await ensureProfileSession();
   return csrfToken.value;
 }
 
