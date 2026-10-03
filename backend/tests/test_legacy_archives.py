@@ -94,3 +94,28 @@ def test_missing_restored_file_never_falls_back_to_git(archive_verifier, tmp_pat
     module, _, _ = archive_verifier
     with pytest.raises(FileNotFoundError):
         module.verify(restored_root=tmp_path / "missing")
+
+
+def test_phase_transition_reads_unchanged_archived_ledger(archive_verifier):
+    module, _, _ = archive_verifier
+    active = module.ROOT / "task.json"
+    archive = module.ROOT / "docs/tasks/mvp-0.3.json"
+    archive.parent.mkdir(parents=True)
+    archive.write_bytes(active.read_bytes())
+    active.write_text(json.dumps({"active_phase": "Phase 1", "tasks": []}))
+    assert module.verify()["t033"] == "blocked"
+
+    content = json.loads(archive.read_text())
+    content["tasks"][0]["status"] = "done"
+    archive.write_text(json.dumps(content))
+    with pytest.raises(AssertionError):
+        module.verify()
+
+
+def test_phase_transition_requires_archive(archive_verifier):
+    module, _, _ = archive_verifier
+    (module.ROOT / "task.json").write_text(
+        json.dumps({"active_phase": "Phase 1", "tasks": []})
+    )
+    with pytest.raises(FileNotFoundError):
+        module.verify()

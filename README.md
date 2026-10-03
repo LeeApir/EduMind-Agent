@@ -2,13 +2,13 @@
 
 启智学伴：面向数据结构学习的个性化学习系统。
 
-当前交付：**MVP 0.3 课程目录版**，范围依据 [PRD v2.2 §0](docs/PRD.md) 与 [ADR-0007](docs/ADR/0007-curated-course-catalog.md)。从10节固定课程选择节点，阅读讲解/完整C示例、完成每节3道固定练习，查看进度与路径推荐；保留两个链表动画模板、预设数组 vs 链表演示及 Markdown/MP4/SRT 导出。核心学习流程无需 Provider key，模型调用为0。
+当前交付：**MVP 0.3 课程目录版**，范围依据 [PRD §0](docs/PRD.md) 与 [ADR-0007](docs/ADR/0007-curated-course-catalog.md)。从10节固定课程选择节点，阅读讲解/完整C示例、完成每节3道固定练习，查看进度与路径推荐；保留两个链表动画模板、预设数组 vs 链表演示及 Markdown/MP4/SRT 导出。核心学习流程无需 Provider key，模型调用为0。
 
 `linear-course v0.1.0` 已由 Lee 实际审阅并签核具体摘要；[签核记录](docs/acceptance/mvp-0.3-catalog-human-signoff-20261003.json)与[受信发布清单](data/course_catalog/release-allowlist.json)独立保存。当前通过的是目录版阶段退出，见[退出报告](docs/acceptance/mvp-0.3-catalog-exit-20261003.md)；课程只在隔离测试库核验登记/撤回，尚未部署。
 
 **动态生成、重解释、实时AI互动及动态辩论仍暂缓**；服务端默认 `catalog_only`，在构建模型依赖前拒绝动态入口。T033 保持 blocked，原模型质量/延迟成绩不变，目录静态性能不作为动态生成通过。固定题由服务端确定性计分，首次完整作答形成掌握度证据，重复练习有反馈但不刷掌握度；做完课程不等于已掌握。
 
-任务状态以根目录 [task.json](task.json) 为准，目录版退出后保持此账本，不自动进入 Phase 1。MVP 0.2 的38项任务已[原样归档](docs/tasks/mvp-0.2.json)，其[收尾决定](docs/acceptance/mvp-0.2-closeout-decision.md)保留 Pro 质量/闭环与 Flash 性能的证据边界。架构状态和待决项见 [ADR 索引](docs/ADR/README.md)。
+当前开发阶段为**Phase 1功能规划**，根目录 [task.json](task.json)细化42项任务，初始全部todo，范围见[PRD §0.1](docs/PRD.md#01-当前开发阶段phase-1-功能开发2026-10-03)。[MVP 0.3账本](docs/tasks/mvp-0.3.json)已原样归档，保留45 done和T033 blocked；新阶段从`PHASE-1-T001`冻结范围与验收开始。模型/BYOK、队列、动画DSL和图谱扩展尚未实施，目录交付基线持续有效。MVP 0.2 的38项任务亦已[原样归档](docs/tasks/mvp-0.2.json)，其[收尾决定](docs/acceptance/mvp-0.2-closeout-decision.md)保留 Pro 质量/闭环与 Flash 性能的证据边界。架构状态和待决项见 [ADR 索引](docs/ADR/README.md)。
 
 ## 后端
 

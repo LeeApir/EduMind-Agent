@@ -49,10 +49,13 @@ def verify(*, restored_root: Path | None = None, check_worktree: bool = False):
     for name, digest in inventory["delivery_blob_hashes"].items():
         assert sha(git("show", inventory["delivery_commit"] + ":" + name)) == digest
     current = json.loads((ROOT / "task.json").read_text())
+    if current.get("active_phase", "MVP 0.3") != "MVP 0.3":
+        current = json.loads((ROOT / "docs/tasks/mvp-0.3.json").read_text())
+        assert current.get("active_phase", "MVP 0.3") == "MVP 0.3"
     original = json.loads(git("show", inventory["baseline_commit"] + ":task.json"))
     assert (
         current == original
-    )  # Sorting must not reopen/regrade/complete T033 or change any task.
+    )  # Cleanup or phase transition must preserve the complete historical ledger.
     assert (
         next(t for t in current["tasks"] if t["id"] == "MVP-0.3-T033")["status"]
         == "blocked"

@@ -1,23 +1,24 @@
 {
   "schema_version": 3,
-  "product_source": "docs/PRD.md v2.2 §0、§9.1",
-  "active_phase": "MVP 0.3",
+  "product_source": "docs/PRD.md v2.3 §0.1、§3.8、§3.3、§3.4、§9.1",
+  "active_phase": "Phase 1",
   "execution_policy": {
     "max_in_progress": 1,
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "用户授权执行B课程目录版，按T036–T046及T034串行实施；0 Provider，原T033 blocked；人工内容签核前不发布；不push/merge/部署/跨阶段。",
+    "phase_gate": "用户已选择Phase 1功能开发，本次授权为阶段归档与任务细化。全部任务初始todo；后续实施依任务依赖逐项领取。重大API/数据/安全决定按设计任务取得批准；真实Provider调用须独立预算和授权。catalog_only基线维持，动态开放由新质量/性能证据与批准决定，不因阶段切换自动开启。不自动push/merge/部署或进入Phase 2。",
     "task_granularity": "一个可独立验证的行为，包含实现、对应测试和必要文档；验收通过后一个本地完成提交。",
     "completion_rule": "验收通过，且 Git 历史存在 Task-Completed 标记的提交。工作区 done 仅是待提交状态。",
-    "verification_note": "以下为计划验证入口，尚未执行；领取任务时建立必要命令，结果写入 verification_results。"
+    "verification_note": "任务verification是待建立和执行的验收接口，并非已通过；文件/命令不存在时须在对应任务完成前建立并实际运行。规划切换仅运行治理与归档离线检查。"
   },
   "archive_policy": {
     "active_source": "根目录 task.json 只保存当前阶段，是活动任务状态的唯一事实来源。",
     "completed_snapshots": "阶段完成后将最终 task.json 原样归档到 docs/tasks/<phase>.json；归档文件只读，不可领取任务。",
     "completed_phases": {
       "MVP 0.1": "docs/tasks/mvp-0.1.json",
-      "MVP 0.2": "docs/tasks/mvp-0.2.json"
+      "MVP 0.2": "docs/tasks/mvp-0.2.json",
+      "MVP 0.3": "docs/tasks/mvp-0.3.json"
     }
   },
   "phases": [
@@ -35,12 +36,13 @@
     },
     {
       "id": "MVP 0.3",
-      "planning": "detailed",
-      "goal": "2-3 个 Manim 模板、专注/互动模式、数组 vs 链表演示、Markdown 笔记。"
+      "planning": "archived",
+      "goal": "已批准课程目录版退出；45 done、T033 blocked，动态验收失败保留。",
+      "archive": "docs/tasks/mvp-0.3.json"
     },
     {
       "id": "Phase 1",
-      "planning": "deferred",
+      "planning": "detailed",
       "goal": "Ollama/BYOK、多 Provider、持久化队列、完整 Manim DSL、约 30 节点与按需 Neo4j。"
     },
     {
@@ -55,36 +57,34 @@
     }
   ],
   "stage_scope": {
-    "templates": [
-      "链表插入",
-      "链表删除"
+    "authorization": "2026-10-03 用户明确选择“还是继续Phase 1 功能开发”，授权本轮归档和细化任务。",
+    "baseline": "MVP 0.3已签核课程目录版；PR #4已合并，本地维护基线30fcd4e1f9384359a72b451bb40243a2095691cf。",
+    "included": [
+      "兼容Provider/Ollama、持久及临时BYOK、任务档位与显式回退、Anthropic/Gemini/星火可选原生适配器",
+      "Redis/Celery可靠投递、PostgreSQL Job状态与恢复",
+      "白名单动画DSL、独立审核、确定性编译、隔离Worker和模板降级",
+      "约30节点版本化知识结构、兼容路径与按需Neo4j选型",
+      "目录零调用回归与独立授权的动态质量/性能验收"
     ],
-    "note": "以两个已审核模板满足 PRD 的2–3个范围；第三个指针移动模板可在后续明确范围后补充，不提前添加。",
     "excluded": [
-      "完整动画 DSL/任意 Python",
-      "Redis/Celery",
-      "多 Provider/BYOK",
-      "TTS/ASR",
-      "真并行多视角子图",
-      "iOS/PPTX/离线HTML",
-      "通用开放式深度辅导"
+      "本轮功能实施或真实Provider调用",
+      "公网部署与试用运营",
+      "账户系统/跨设备账号合并",
+      "真并行辩论、RAG、学习报告和更多课程（沿用§9.1后续阶段）",
+      "TTS/ASR、Embedding消费场景、额外多模态产品入口（保留能力规划，非本阶段必交付）",
+      "任意Python执行、iOS、PPTX/离线HTML、模板市场"
     ],
-    "prerequisite_evidence": "docs/acceptance/mvp-0.2-closeout-decision.md",
-    "planning_note": "Task verification 为待实施验证计划，不是已经存在或通过的证据。新 API/数据/安全决策先完成 ADR 审批；人员只记录在日志/Git/PR。",
-    "catalog_only": {
-      "approved": true,
-      "nodes": 10,
-      "resource_count": 30,
-      "exercise_count": 30,
-      "provider_requests": 0,
-      "human_release_approval_required": true,
-      "deferred": [
-        "自由生成",
-        "重解释",
-        "实时AI互动",
-        "动态辩论"
-      ]
-    }
+    "conditional": {
+      "Neo4j": "由PHASE-1-T030的查询场景/测量和批准选型决定；未必要时使用现有Repository，不以引入数据库为完成目标。",
+      "dynamic_release": "默认目录模式持续有效；PHASE-1-T035/040/041与实际批准形成开放条件，旧T033不会自动解除。"
+    },
+    "provider_budget": {
+      "authorized_requests_this_transition": 0,
+      "historical_requests": 2033,
+      "historical_limit": 2500,
+      "note": "历史额度不自动转为Phase 1授权；新真实调用单独冻结批准。"
+    },
+    "planning_note": "优先按§9.1核心路线图细化。其他章节的P1扩展标签与阶段冲突由T001列明；新增范围需先调整PRD/任务，不静默加入。"
   },
   "deferred_improvements": [
     {
@@ -95,1981 +95,1380 @@
       "next_step": "后续另行授权非计费诊断及必要的时序方案；不作为本阶段必做任务，不自动启动付费复测。"
     }
   ],
-  "tasks": [
-    {
-      "id": "MVP-0.3-T001",
-      "phase": "MVP 0.3",
-      "title": "固定 MVP 0.3 范围与验收口径",
-      "status": "done",
-      "priority": "P0",
-      "depends_on": [],
-      "scope": [
-        "docs/ADR/",
-        "docs/ARCHITECTURE.md",
-        "docs/acceptance/"
-      ],
-      "prd_source": "PRD §3.3、§3.5、§8.1、§9.1、§10",
-      "acceptance_criteria": [
-        "列明本阶段交付与排除项，建立任务到 PRD 验收条件的映射；确认两种链表模板满足 2–3 个要求。",
-        "采样前冻结首字节、正文、完整首段、缓存可播放及按需渲染指标的起止点、样本/分母、失败处理和调用预算；不同模型证据分开。",
-        "沿用 PRD 阈值；教学正文首 token P95≤2s（历史2.632575s）仅作为后续非阻塞优化，不增加或豁免其他门槛。"
-      ],
-      "verification": [
-        "逐项核对 PRD/收尾决定与退出清单；检查所有门槛的来源、测量方式和失败口径。"
-      ],
-      "verification_results": [
-        {
-          "command": "python3 inline: local Markdown references, all 34 task IDs, task status checks",
-          "result": "passed;首次范围字符串检查未展开区间已补逐任务来源索引后通过",
-          "evidence": "docs/acceptance/mvp-0.3-acceptance-plan.md"
-        },
-        {
-          "command": "git diff --check",
-          "result": "passed"
-        },
-        {
-          "command": "doc-coauthoring independent reader review",
-          "result": "四项口径反馈已落实：逐次缓存2s、首次候选分母、过期游标恢复、匿名准备计时"
-        }
-      ],
-      "started_at": "2026-09-28T02:43:54",
-      "completed_at": "2026-09-28T02:46:53",
-      "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.3-T001"
-    },
-    {
-      "id": "MVP-0.3-T002",
-      "phase": "MVP 0.3",
-      "title": "确定模板渲染与持久化 Job 安全边界",
-      "status": "done",
-      "priority": "P0",
-      "depends_on": [
-        "MVP-0.3-T001"
-      ],
-      "scope": [
-        "docs/ADR/",
-        "docs/ARCHITECTURE.md",
-        "docs/acceptance/"
-      ],
-      "prd_source": "PRD §3.3、§8.3",
-      "acceptance_criteria": [
-        "ADR 明确 P0 仅可信模板与参数，不执行模型生成 Python，不引入完整 DSL、Redis/Celery 或 TTS。",
-        "定义 PostgreSQL Job 状态、领取租约/重启恢复、取消/重试竞态、幂等、资源发布与缓存一致性。",
-        "定义隔离执行、无网络、文件访问白名单、CPU/内存/超时、媒体授权和缓存键；新安全决定获批准后才实现。"
-      ],
-      "verification": [
-        "审查正常/异常/重启状态转换及威胁边界，记录待批准事项。"
-      ],
-      "verification_results": [
-        {
-          "command": "python3 inline: Markdown references and serial task/status boundary",
-          "result": "passed",
-          "evidence": "docs/acceptance/mvp-0.3-t002-design-review.md"
-        },
-        {
-          "command": "doc-coauthoring independent reader review",
-          "result": "四项遗漏已补齐，只有设计审查，未实施"
-        },
-        {
-          "command": "git diff --check",
-          "result": "passed"
-        },
-        {
-          "command": "user approval of ADR-0004 A-D",
-          "result": "approved in current conversation; ADR marked Accepted and scope checked"
-        },
-        {
-          "command": "python3 inline: approved ADR, local references and serial task status",
-          "result": "passed"
-        },
-        {
-          "command": "git diff --check",
-          "result": "passed"
-        }
-      ],
-      "started_at": "2026-09-28T02:47:18",
-      "completed_at": "2026-09-28T07:47:05",
-      "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.3-T002"
-    },
-    {
-      "id": "MVP-0.3-T003",
-      "phase": "MVP 0.3",
-      "title": "确定课堂会话与场景版本边界",
-      "status": "done",
-      "priority": "P0",
-      "depends_on": [
-        "MVP-0.3-T001"
-      ],
-      "scope": [
-        "docs/ADR/",
-        "docs/ARCHITECTURE.md",
-        "docs/acceptance/"
-      ],
-      "prd_source": "PRD §3.3、§3.5",
-      "acceptance_criteria": [
-        "ADR 明确课堂与现有 owner/学习单元/场景/画像关联，保存模式、角色上下文和消息游标。",
-        "定义专注切换的迟到输出处理、多视角进入/退出恢复、场景重解释版本和并发冲突语义。",
-        "明确普通对话轻量规则与高风险升级、正式资源/辩论总结审核门禁，以及偏好反馈证据规则；新数据/API 决策获批准后实施。"
-      ],
-      "verification": [
-        "按模式切换、重连、重解释及辩论退出场景审查 ADR，与既有恢复/画像规则对照。"
-      ],
-      "verification_results": [
-        {
-          "command": "python3 inline: Markdown local links and serial task boundary",
-          "result": "passed",
-          "evidence": "docs/acceptance/mvp-0.3-t003-design-review.md"
-        },
-        {
-          "command": "doc-coauthoring independent reader review",
-          "result": "five identified gaps corrected in ADR-0005"
-        },
-        {
-          "command": "git diff --check",
-          "result": "passed"
-        },
-        {
-          "command": "user approval of ADR-0005 A-D",
-          "result": "approved in current conversation; ADR marked Accepted"
-        },
-        {
-          "command": "python3 inline: approved ADR and local references",
-          "result": "passed"
-        },
-        {
-          "command": "git diff --check",
-          "result": "passed"
-        }
-      ],
-      "started_at": "2026-09-28T07:48:12",
-      "completed_at": "2026-09-28T07:50:53",
-      "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.3-T003"
-    },
-    {
-      "id": "MVP-0.3-T004",
-      "phase": "MVP 0.3",
-      "title": "固定 MVP 0.3 API 与 SSE 契约",
-      "status": "done",
-      "priority": "P0",
-      "depends_on": [
-        "MVP-0.3-T002",
-        "MVP-0.3-T003"
-      ],
-      "scope": [
-        "backend/app/api/",
-        "backend/app/services/",
-        "backend/tests/",
-        "docs/api/openapi.yaml"
-      ],
-      "prd_source": "PRD §7.2、§7.5、§7.6",
-      "acceptance_criteria": [
-        "定义动画请求、Job 查询/取消/重试/事件、媒体及导出接口与稳定错误码。",
-        "定义课堂模式、发言/学习控制、场景版本、多视角及偏好反馈接口；复用 POST fetch 与 GET Job SSE 协议。",
-        "写接口沿用 Cookie/CSRF/owner/幂等；定义断线游标和重放语义，接口不包含 P1 多模型或并行辩论。"
-      ],
-      "verification": [
-        "解析 OpenAPI，验证引用/请求响应 schema、写入安全和 SSE 事件契约。"
-      ],
-      "verification_results": [
-        {
-          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen pytest -q tests/test_mvp03_openapi_contract.py",
-          "result": "7 passed, 0 skipped",
-          "evidence": "backend/tests/test_mvp03_openapi_contract.py"
-        },
-        {
-          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen ruff check tests/test_mvp03_openapi_contract.py",
-          "result": "passed"
-        },
-        {
-          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen mypy app",
-          "result": "passed, 55 source files"
-        },
-        {
-          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen python inline JSON Schema and link check",
-          "result": "43 unique operations, 49 component schemas valid, links passed",
-          "evidence": "docs/acceptance/mvp-0.3-t004-api-contract.md"
-        },
-        {
-          "command": "git diff --check",
-          "result": "passed"
-        },
-        {
-          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen pytest -q tests/test_mvp03_openapi_contract.py tests/test_learning_events_api.py tests/test_learning_sessions.py",
-          "result": "4 passed, 27 skipped (database unavailable); not counted as integration pass"
-        }
-      ],
-      "started_at": "2026-09-28T07:51:24",
-      "completed_at": "2026-09-28T07:59:00",
-      "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.3-T004"
-    },
-    {
-      "id": "MVP-0.3-T005",
-      "phase": "MVP 0.3",
-      "title": "建立可信动画模板目录与参数校验",
-      "status": "done",
-      "priority": "P0",
-      "depends_on": [
-        "MVP-0.3-T002"
-      ],
-      "scope": [
-        "backend/app/",
-        "backend/tests/",
-        "data/",
-        "docs/"
-      ],
-      "prd_source": "PRD §3.3",
-      "acceptance_criteria": [
-        "模板记录知识点、版本、语言、参数 schema、教学步骤及审核记录；至少规划插入和删除两个模板。",
-        "拒绝非法节点/索引/长度/字符串及注入参数；参数仅作为数据，不拼接可执行代码。",
-        "缓存标识包含知识点、模板版本、规范化参数和语言，版本变化使旧缓存失效。"
-      ],
-      "verification": [
-        "运行模板参数、规范化、边界与注入回归测试，检查 schema 与事实审核记录。"
-      ],
-      "verification_results": [
-        {
-          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen pytest -q tests/test_animation_templates.py tests/test_mvp03_openapi_contract.py",
-          "result": "37 passed, 0 skipped",
-          "evidence": "backend/tests/test_animation_templates.py"
-        },
-        {
-          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen ruff check app/services/animation_templates.py tests/test_animation_templates.py",
-          "result": "passed"
-        },
-        {
-          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen mypy app",
-          "result": "passed, 56 source files"
-        },
-        {
-          "command": "python3 inline: local links, fixed manifest set, source review fail-closed",
-          "result": "passed",
-          "evidence": "docs/animation-templates.md"
-        },
-        {
-          "command": "git diff --check",
-          "result": "passed"
-        }
-      ],
-      "started_at": "2026-09-28T08:02:35",
-      "completed_at": "2026-09-28T08:08:25",
-      "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.3-T005"
-    },
-    {
-      "id": "MVP-0.3-T006",
-      "phase": "MVP 0.3",
-      "title": "实现并审核链表插入动画模板",
-      "status": "done",
-      "priority": "P0",
-      "depends_on": [
-        "MVP-0.3-T005"
-      ],
-      "scope": [
-        "backend/app/",
-        "backend/tests/",
-        "data/",
-        "docs/"
-      ],
-      "prd_source": "PRD §3.3",
-      "acceptance_criteria": [
-        "实现插入前/后状态和指针更新顺序，覆盖头部/中间/尾部及空链表的合法边界。",
-        "使用固定模板输出 MP4 与同步 SRT；教学内容经过事实/安全审核并保留版本证据。",
-        "固定渲染依赖，生成媒体不提交 Git，提供可重复构建入口。"
-      ],
-      "verification": [
-        "执行参数化步骤断言和真实 Manim 渲染；人工检查视频帧/字幕/指针顺序，记录审核证据。"
-      ],
-      "verification_results": [
-        {
-          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen pytest -q tests/test_animation_templates.py tests/test_linked_list_insertion_plan.py tests/test_mvp03_openapi_contract.py",
-          "result": "47 passed",
-          "evidence": "backend/tests/test_linked_list_insertion_plan.py"
-        },
-        {
-          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen pytest -q",
-          "result": "407 passed, 74 skipped with local loopback permission; sandbox-only first attempt had 2 loopback bind failures",
-          "evidence": "docs/acceptance/mvp-0.3-t006-insertion.md"
-        },
-        {
-          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen ruff check app/animation_templates app/services/animation_templates.py scripts/render_linked_list_insertion.py tests/test_animation_templates.py tests/test_linked_list_insertion_plan.py",
-          "result": "passed"
-        },
-        {
-          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen mypy app/animation_templates app/services/animation_templates.py scripts/render_linked_list_insertion.py",
-          "result": "passed, 5 source files"
-        },
-        {
-          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen python scripts/render_linked_list_insertion.py --case empty --parameters '{\"values\":[],\"index\":0,\"value\":7}' (and head, middle, tail commands recorded in evidence)",
-          "result": "4 real Docker renders passed; MP4 36.0s, 854x480, 540 frames each; SRT 6 cues to 36s; 15s/21s frames visually reviewed",
-          "evidence": "docs/acceptance/mvp-0.3-t006-insertion.md"
-        },
-        {
-          "command": "git diff --check; git check-ignore -v data/videos/cache/t006/tail/videos/linked_list_insertion/480p15/LinkedListInsertionScene.mp4",
-          "result": "passed; generated media ignored"
-        }
-      ],
-      "started_at": "2026-09-28T08:10:13",
-      "completed_at": "2026-09-28T08:43:39",
-      "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.3-T006"
-    },
-    {
-      "id": "MVP-0.3-T007",
-      "phase": "MVP 0.3",
-      "title": "实现并审核链表删除动画模板",
-      "status": "done",
-      "priority": "P0",
-      "depends_on": [
-        "MVP-0.3-T005"
-      ],
-      "scope": [
-        "backend/app/",
-        "backend/tests/",
-        "data/",
-        "docs/"
-      ],
-      "prd_source": "PRD §3.3",
-      "acceptance_criteria": [
-        "展示先保存后继/更新连接再释放的合法顺序，覆盖头部/中间/尾部及单节点。",
-        "明确非法删除与空链表边界，不能展示悬空访问；输出带版本的 MP4/SRT。",
-        "模板经过事实/安全审核并保留证据，复用固定渲染依赖和产物规则。"
-      ],
-      "verification": [
-        "执行删除步骤和边界断言、真实渲染及人工视频/字幕审核。"
-      ],
-      "verification_results": [
-        {
-          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen pytest -q tests/test_linked_list_deletion_plan.py tests/test_animation_templates.py tests/test_linked_list_insertion_plan.py tests/test_mvp03_openapi_contract.py",
-          "result": "57 passed",
-          "evidence": "backend/tests/test_linked_list_deletion_plan.py"
-        },
-        {
-          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen pytest -q",
-          "result": "417 passed, 74 skipped with local loopback permission"
-        },
-        {
-          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen ruff check app/animation_templates app/services/animation_templates.py scripts/render_linked_list_deletion.py tests/test_animation_templates.py tests/test_linked_list_deletion_plan.py",
-          "result": "passed"
-        },
-        {
-          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen mypy app/animation_templates app/services/animation_templates.py scripts/render_linked_list_deletion.py",
-          "result": "passed, 7 source files"
-        },
-        {
-          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen python scripts/render_linked_list_deletion.py --case single --parameters '{\"values\":[7],\"index\":0}'",
-          "result": "passed; head/middle/tail exact commands in evidence also passed; 4 MP4 each 42.0s 854x480 630 frames, 7 SRT cues and 15s/21s/27s frames reviewed",
-          "evidence": "docs/acceptance/mvp-0.3-t007-deletion.md"
-        },
-        {
-          "command": "git diff --check; git check-ignore -v data/videos/cache/t007/middle/videos/linked_list_deletion/480p15/LinkedListDeletionScene.mp4",
-          "result": "passed; generated media ignored"
-        }
-      ],
-      "started_at": "2026-09-28T08:46:44",
-      "completed_at": "2026-09-28T08:55:52",
-      "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.3-T007"
-    },
-    {
-      "id": "MVP-0.3-T008",
-      "phase": "MVP 0.3",
-      "title": "建立受限模板渲染执行器",
-      "status": "done",
-      "priority": "P0",
-      "depends_on": [
-        "MVP-0.3-T002",
-        "MVP-0.3-T005"
-      ],
-      "scope": [
-        "backend/app/",
-        "backend/tests/",
-        "data/",
-        "docs/"
-      ],
-      "prd_source": "PRD §3.3、§8.3",
-      "acceptance_criteria": [
-        "仅允许已审核模板和合法参数，通过静态/AST 规则校验后在隔离环境运行。",
-        "强制禁网、非特权、受限文件路径及 CPU/内存/时间/产物大小限制，锁定依赖和镜像。",
-        "超时/异常终止子进程并清理本次临时产物，不删除其他任务或用户资源。"
-      ],
-      "verification": [
-        "运行真实隔离渲染与禁网/越界文件/非法导入/资源耗尽/超时负向测试，检查无敏感错误输出。"
-      ],
-      "verification_results": [
-        {
-          "command": "cd backend && EDUMIND_DOCKER_TESTS=1 UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen pytest -q tests/test_animation_renderer.py",
-          "result": "18 passed; real insertion/deletion render, network/rootfs/output-quota denial, timeout and cleanup",
-          "evidence": "backend/tests/test_animation_renderer.py"
-        },
-        {
-          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen pytest -q",
-          "result": "433 passed, 76 skipped with local loopback permission"
-        },
-        {
-          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen ruff check app/services/animation_renderer.py app/animation_templates/container_runner.py tests/test_animation_renderer.py",
-          "result": "passed"
-        },
-        {
-          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen mypy app/services/animation_renderer.py app/animation_templates/container_runner.py",
-          "result": "passed, 2 source files"
-        },
-        {
-          "command": "docker ps --filter name=edumind-render- --format '{{.ID}} {{.Names}}'",
-          "result": "no running renderer containers after forced timeout; attempt directory empty",
-          "evidence": "docs/acceptance/mvp-0.3-t008-renderer.md"
-        },
-        {
-          "command": "git diff --check",
-          "result": "passed"
-        }
-      ],
-      "started_at": "2026-09-28T08:59:01",
-      "completed_at": "2026-09-28T09:37:56",
-      "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.3-T008"
-    },
-    {
-      "id": "MVP-0.3-T009",
-      "phase": "MVP 0.3",
-      "title": "实现预渲染缓存与审核资源复用",
-      "status": "done",
-      "priority": "P0",
-      "depends_on": [
-        "MVP-0.3-T006",
-        "MVP-0.3-T007",
-        "MVP-0.3-T008"
-      ],
-      "scope": [
-        "backend/app/",
-        "backend/tests/",
-        "docs/"
-      ],
-      "prd_source": "PRD §3.3",
-      "acceptance_criteria": [
-        "优先命中审核通过的预渲染资源，再选择合法参数化模板；不支持的目标给出说明，不回退任意代码。",
-        "相同输入复用资源，校验媒体完整性、模板版本和审核状态；损坏缓存不作为命中。",
-        "缓存只共享公共模板媒体，用户学习数据仍 owner 隔离；提供预渲染准备命令。"
-      ],
-      "verification": [
-        "运行缓存命中/未命中/损坏/版本变化/并发测试，并实际准备两种模板基准媒体。"
-      ],
-      "verification_results": [
-        {
-          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen pytest -q tests/test_animation_cache.py tests/test_animation_renderer.py",
-          "result": "22 passed, 2 Docker-only skipped; hit/miss/corrupt/version/concurrency/owner boundary"
-        },
-        {
-          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen pytest -q",
-          "result": "439 passed, 76 skipped with local loopback permission"
-        },
-        {
-          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen ruff check app/services/animation_cache.py scripts/prepare_animation_cache.py tests/test_animation_cache.py",
-          "result": "passed"
-        },
-        {
-          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen mypy app/services/animation_cache.py scripts/prepare_animation_cache.py",
-          "result": "passed, 2 source files"
-        },
-        {
-          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen python scripts/prepare_animation_cache.py",
-          "result": "first run: 2 real Docker renders; second run: 2 verified cache hits, same hashes",
-          "evidence": "docs/acceptance/mvp-0.3-t009-cache.md"
-        },
-        {
-          "command": "git diff --check; git check-ignore -v data/videos/cache/approved/objects/35b4ee0ac13ecff166320e4b1abde9dccc4226f8e177216c92d0b61abaa94f01.mp4",
-          "result": "passed; media ignored"
-        }
-      ],
-      "started_at": "2026-09-28T09:40:35",
-      "completed_at": "2026-09-28T10:20:15",
-      "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.3-T009"
-    },
-    {
-      "id": "MVP-0.3-T010",
-      "phase": "MVP 0.3",
-      "title": "持久化动画 Job 与事件记录",
-      "status": "done",
-      "priority": "P0",
-      "depends_on": [
-        "MVP-0.3-T004"
-      ],
-      "scope": [
-        "backend/app/models/",
-        "backend/app/services/",
-        "backend/alembic/",
-        "backend/tests/",
-        "docs/"
-      ],
-      "prd_source": "PRD §3.3、§9.2",
-      "acceptance_criteria": [
-        "新增 Job/事件/资源关联迁移及状态约束，记录 owner、幂等摘要、模板版本和尝试标识。",
-        "相同 owner/key 重放同一任务，不同摘要冲突；事件序号稳定可重放。",
-        "隔离 PostgreSQL 迁移升降级与重连后数据一致，不以内存作为权威状态。"
-      ],
-      "verification": [
-        "运行 Alembic 往返及 PostgreSQL 幂等/约束/owner/事件顺序集成测试。"
-      ],
-      "verification_results": [
-        {
-          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen alembic upgrade head",
-          "result": "passed on empty disposable PostgreSQL; revisions 0001–0010; environment: disposable T010 PostgreSQL URL"
-        },
-        {
-          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen alembic downgrade 0009_path_commands",
-          "result": "passed; four animation tables verified absent, then upgrade head passed; environment: disposable T010 PostgreSQL URL",
-          "evidence": "docs/acceptance/mvp-0.3-t010-job-persistence.md"
-        },
-        {
-          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen pytest -q tests/test_animation_job_persistence.py",
-          "result": "2 passed after re-upgrade; idempotency, concurrent key, restart, cursor, constraints, owner FKs; environment: disposable T010 PostgreSQL URL"
-        },
-        {
-          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen pytest -q",
-          "result": "515 passed, 2 Docker-only skipped; environment: disposable T010 PostgreSQL URL"
-        },
-        {
-          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen ruff check app/models/animation.py app/models/learning.py app/services/animation_jobs.py alembic/versions/0010_animation_jobs.py tests/test_animation_job_persistence.py",
-          "result": "passed"
-        },
-        {
-          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen mypy app/models/animation.py app/services/animation_jobs.py",
-          "result": "passed, 2 source files"
-        },
-        {
-          "command": "git diff --check",
-          "result": "passed"
-        }
-      ],
-      "started_at": "2026-09-28T10:23:27",
-      "completed_at": "2026-09-28T13:36:24",
-      "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.3-T010"
-    },
-    {
-      "id": "MVP-0.3-T011",
-      "phase": "MVP 0.3",
-      "title": "实现持久化 Job 领取与渲染发布",
-      "status": "done",
-      "priority": "P0",
-      "depends_on": [
-        "MVP-0.3-T008",
-        "MVP-0.3-T009",
-        "MVP-0.3-T010"
-      ],
-      "scope": [
-        "backend/app/",
-        "backend/tests/",
-        "docs/"
-      ],
-      "prd_source": "PRD §3.3",
-      "acceptance_criteria": [
-        "按批准 ADR 原子领取并运行模板渲染，阶段进度与终态写 PostgreSQL。",
-        "处理进程中断/租约恢复和重复执行，只有当前有效尝试可原子发布已审核完整媒体。",
-        "渲染与普通学习请求隔离，失败不覆盖缓存或已发布学习资源。"
-      ],
-      "verification": [
-        "测试并发领取/重复完成/崩溃恢复/损坏产物；真实运行一项 Job 并检查资源与事件一致性。"
-      ],
-      "verification_results": [
-        {
-          "command": "cd backend && EDUMIND_TEST_DATABASE_URL=<isolated-url> EDUMIND_DOCKER_TESTS=1 UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen pytest -q tests/test_animation_worker.py",
-          "result": "6 passed; isolated PostgreSQL, real Docker render and separate Worker process",
-          "evidence": "docs/acceptance/mvp-0.3-t011-worker.md"
-        },
-        {
-          "command": "cd backend && EDUMIND_TEST_DATABASE_URL=<isolated-url> UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen pytest -q",
-          "result": "519 passed, 4 Docker-only skipped on isolated PostgreSQL"
-        },
-        {
-          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen ruff check app/services/animation_worker.py app/services/animation_cache.py app/animation_templates/container_runner.py scripts/run_animation_worker.py tests/test_animation_worker.py",
-          "result": "passed"
-        },
-        {
-          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen mypy app/services/animation_worker.py app/services/animation_cache.py app/animation_templates/container_runner.py scripts/run_animation_worker.py",
-          "result": "passed, 4 source files"
-        },
-        {
-          "command": "git diff --check",
-          "result": "passed"
-        }
-      ],
-      "started_at": "2026-09-28T13:38:27",
-      "completed_at": "2026-09-28T13:53:37",
-      "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.3-T011"
-    },
-    {
-      "id": "MVP-0.3-T012",
-      "phase": "MVP 0.3",
-      "title": "提供动画创建与 Job 生命周期 API",
-      "status": "done",
-      "priority": "P0",
-      "depends_on": [
-        "MVP-0.3-T004",
-        "MVP-0.3-T011"
-      ],
-      "scope": [
-        "backend/app/api/",
-        "backend/app/services/",
-        "backend/tests/",
-        "docs/api/openapi.yaml"
-      ],
-      "prd_source": "PRD §3.3、§7.2",
-      "acceptance_criteria": [
-        "动画请求命中缓存直接返回媒体，未命中创建持久化 Job；查询不误判仍在运行的任务。",
-        "取消与失败重试遵守状态机，取消旧尝试不能覆盖新尝试；重复请求不会重复渲染。",
-        "owner/CSRF/参数校验及冲突响应稳定，失败不影响普通学习 API。"
-      ],
-      "verification": [
-        "运行创建/命中/查询/取消竞态/失败重试/幂等/越权测试，核对 OpenAPI。"
-      ],
-      "verification_results": [
-        {
-          "command": "cd backend && EDUMIND_DATABASE_URL=<isolated-url> UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen alembic upgrade head; downgrade 0010_animation_jobs; upgrade head",
-          "result": "passed on disposable PostgreSQL; 0011 reversible; initial too-long revision rolled back, corrected before success",
-          "evidence": "docs/acceptance/mvp-0.3-t012-job-api.md"
-        },
-        {
-          "command": "cd backend && EDUMIND_TEST_DATABASE_URL=<isolated-url> EDUMIND_DOCKER_TESTS=1 UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen pytest -q tests/test_animation_job_api.py tests/test_animation_worker.py",
-          "result": "12 passed; actual container cancellation and Worker render; concurrent lock-order deadlock fixed before pass"
-        },
-        {
-          "command": "cd backend && EDUMIND_TEST_DATABASE_URL=<isolated-url> UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen pytest -q",
-          "result": "524 passed, 5 Docker-only skipped"
-        },
-        {
-          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen ruff check app/api/animation_jobs.py app/main.py app/models/animation.py app/services/animation_cache.py app/services/animation_jobs.py app/services/animation_lifecycle.py app/services/animation_publication.py app/services/animation_renderer.py app/services/animation_worker.py alembic/versions/0011_animation_cancel_key.py tests/test_animation_job_api.py tests/test_animation_worker.py",
-          "result": "passed"
-        },
-        {
-          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen mypy app/api/animation_jobs.py app/main.py app/models/animation.py app/services/animation_cache.py app/services/animation_jobs.py app/services/animation_lifecycle.py app/services/animation_publication.py app/services/animation_renderer.py app/services/animation_worker.py",
-          "result": "passed, 9 source files"
-        },
-        {
-          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen pytest -q tests/test_mvp03_openapi_contract.py",
-          "result": "7 passed"
-        },
-        {
-          "command": "python -m json.tool docs/api/openapi.yaml >/dev/null && git diff --check",
-          "result": "passed"
-        }
-      ],
-      "started_at": "2026-09-28T13:56:00",
-      "completed_at": "2026-09-28T14:12:33",
-      "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.3-T012"
-    },
-    {
-      "id": "MVP-0.3-T013",
-      "phase": "MVP 0.3",
-      "title": "提供 Job SSE 进度与断线恢复",
-      "status": "done",
-      "priority": "P0",
-      "depends_on": [
-        "MVP-0.3-T012"
-      ],
-      "scope": [
-        "backend/app/api/",
-        "backend/app/services/",
-        "backend/tests/",
-        "docs/api/openapi.yaml"
-      ],
-      "prd_source": "PRD §3.3、§7.7",
-      "acceptance_criteria": [
-        "GET SSE 从持久化事件推送进度/终态，重连按游标恢复且 owner 隔离。",
-        "断开订阅不取消任务、不重新渲染；终态可查询，服务重启后事件可恢复。",
-        "限制轮询/连接资源并正确结束终态与断开的订阅。"
-      ],
-      "verification": [
-        "测试 Last-Event-ID/重复事件/断线/重启/终态/越权，断线前后渲染调用数不增加。"
-      ],
-      "verification_results": [
-        {
-          "command": "cd backend && EDUMIND_TEST_DATABASE_URL=<isolated-url> UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen pytest -q tests/test_animation_events_api.py",
-          "result": "5 passed; durable cursor/reconnect/live progress/terminal/owner/expiry/capacity/disconnect",
-          "evidence": "docs/acceptance/mvp-0.3-t013-job-sse.md"
-        },
-        {
-          "command": "cd backend && EDUMIND_TEST_DATABASE_URL=<isolated-url> UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen pytest -q",
-          "result": "529 passed, 5 Docker-only skipped"
-        },
-        {
-          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen ruff check app/api/animation_events.py app/main.py app/services/animation_jobs.py tests/test_animation_events_api.py",
-          "result": "passed"
-        },
-        {
-          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen mypy app/api/animation_events.py app/main.py app/services/animation_jobs.py",
-          "result": "passed, 3 source files"
-        },
-        {
-          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen pytest -q tests/test_mvp03_openapi_contract.py",
-          "result": "7 passed"
-        },
-        {
-          "command": "python -m json.tool docs/api/openapi.yaml >/dev/null && git diff --check",
-          "result": "passed"
-        }
-      ],
-      "started_at": "2026-09-28T14:15:00",
-      "completed_at": "2026-09-28T14:19:56",
-      "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.3-T013"
-    },
-    {
-      "id": "MVP-0.3-T014",
-      "phase": "MVP 0.3",
-      "title": "提供已审核动画媒体读取",
-      "status": "done",
-      "priority": "P0",
-      "depends_on": [
-        "MVP-0.3-T009",
-        "MVP-0.3-T012"
-      ],
-      "scope": [
-        "backend/app/api/",
-        "backend/app/services/",
-        "backend/tests/",
-        "docs/api/openapi.yaml"
-      ],
-      "prd_source": "PRD §3.3、§8.3",
-      "acceptance_criteria": [
-        "只暴露已发布 MP4/SRT，通过合法资源关联授权，拒绝路径遍历与未审核产物。",
-        "响应类型正确，支持视频 Range 请求和字幕读取，不泄露内部路径。",
-        "缺失或损坏媒体返回可理解错误，不影响文字/代码/练习读取。"
-      ],
-      "verification": [
-        "测试完整/范围/越界请求、owner 隔离及未发布资源拒绝；浏览器实际播放媒体。"
-      ],
-      "verification_results": [
-        {
-          "command": "cd backend && EDUMIND_TEST_DATABASE_URL=<isolated-url> UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen pytest -q tests/test_animation_media_api.py tests/test_mvp03_openapi_contract.py",
-          "result": "9 passed; owner/Range/SRT/symlink/corrupt/missing/contract",
-          "evidence": "docs/acceptance/mvp-0.3-t014-media-read.md"
-        },
-        {
-          "command": "cd backend && EDUMIND_TEST_DATABASE_URL=<isolated-url> UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen pytest -q",
-          "result": "531 passed, 5 Docker-only skipped"
-        },
-        {
-          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen ruff check app/api/animation_media.py app/services/animation_media.py app/main.py tests/test_animation_media_api.py",
-          "result": "passed"
-        },
-        {
-          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen mypy app/api/animation_media.py app/services/animation_media.py app/main.py",
-          "result": "passed, 3 source files"
-        },
-        {
-          "command": "webapp-testing with_server.py + Playwright Chromium on real Docker Job and local Uvicorn",
-          "result": "passed; readyState=4, currentTime=1.216558s, duration=36s, media error=null, SRT 200; disposable PostgreSQL"
-        },
-        {
-          "command": "python -m json.tool docs/api/openapi.yaml >/dev/null && git diff --check",
-          "result": "passed"
-        }
-      ],
-      "started_at": "2026-09-28T14:22:00",
-      "completed_at": "2026-09-28T14:30:33",
-      "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.3-T014"
-    },
-    {
-      "id": "MVP-0.3-T015",
-      "phase": "MVP 0.3",
-      "title": "实现按需动画播放器与任务操作",
-      "status": "done",
-      "priority": "P0",
-      "depends_on": [
-        "MVP-0.3-T013",
-        "MVP-0.3-T014"
-      ],
-      "scope": [
-        "web/src/",
-        "web/tests/",
-        "backend/app/api/animation_events.py",
-        "backend/tests/test_animation_events_api.py",
-        "docs/api/openapi.yaml",
-        "docs/"
-      ],
-      "prd_source": "PRD §3.3",
-      "acceptance_criteria": [
-        "学生主动打开动画才发请求；展示缓存命中、排队、进度、失败、取消和重试。",
-        "使用 GET SSE/查询恢复任务，刷新或断线不新增任务，播放 MP4/SRT。",
-        "动画不可用时普通学习仍可继续，切换节点后旧事件不覆盖新页面。"
-      ],
-      "verification": [
-        "运行组件/客户端测试、类型检查和构建；浏览器验证播放、取消、重试及断网恢复。"
-      ],
-      "verification_results": [
-        {
-          "command": "cd web && pnpm exec vitest run",
-          "result": "77 passed across 14 files; includes 5 player component and 2 HTTP client tests"
-        },
-        {
-          "command": "cd web && pnpm build",
-          "result": "passed; Vue typecheck and Vite build"
-        },
-        {
-          "command": "cd web && pnpm exec eslint src/api/animationJobs.ts src/components/AnimationPanel.vue src/App.vue tests/AnimationPanel.spec.ts tests/animationJobs.spec.ts",
-          "result": "passed"
-        },
-        {
-          "command": "cd backend && EDUMIND_TEST_DATABASE_URL=<isolated-url> UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen pytest -q",
-          "result": "531 passed, 5 skipped; includes SSE after/header precedence and OpenAPI contract"
-        },
-        {
-          "command": "cd backend && UV_CACHE_DIR=/private/tmp/edumind-uv-cache uv run --frozen ruff check app/api/animation_events.py tests/test_animation_events_api.py ../web/tests/e2e/animation_flow.py && uv run --frozen mypy app/api/animation_events.py",
-          "result": "passed; E2E script also py_compile passed"
-        },
-        {
-          "command": "webapp-testing with_server.py + web/tests/e2e/animation_flow.py against isolated PostgreSQL, Vite, Uvicorn, Docker and Chromium",
-          "result": "passed; one explicit create POST, 36s MP4 played >1s with SRT track, refresh no new Job, cancel/retry, offline recovery",
-          "evidence": "docs/acceptance/mvp-0.3-t015-player.md"
-        },
-        {
-          "command": "git diff --check",
-          "result": "passed"
-        }
-      ],
-      "started_at": "2026-09-28T14:33:00",
-      "completed_at": "2026-09-28T14:53:44",
-      "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.3-T015"
-    },
-    {
-      "id": "MVP-0.3-T016",
-      "phase": "MVP 0.3",
-      "title": "持久化课堂会话与角色上下文",
-      "status": "done",
-      "priority": "P0",
-      "depends_on": [
-        "MVP-0.3-T003",
-        "MVP-0.3-T004"
-      ],
-      "scope": [
-        "backend/app/models/",
-        "backend/alembic/",
-        "backend/tests/"
-      ],
-      "prd_source": "PRD §3.5、§10.4",
-      "acceptance_criteria": [
-        "新增课堂模式、场景位置、角色上下文和消息游标持久化；默认 focus。",
-        "关联 owner 和合法学习单元，课堂角色与多视角职责上下文分开。",
-        "乐观版本/幂等与迁移可验证，重启恢复不丢已完成学习状态。"
-      ],
-      "verification": [
-        "运行迁移往返、会话隔离/版本冲突/重启恢复数据库测试。"
-      ],
-      "verification_results": [
-        {
-          "command": "cd backend && EDUMIND_DATABASE_URL=<isolated-pg> alembic upgrade head && alembic downgrade 0011_animation_cancel_key && alembic upgrade head; docker exec psql checks classroom_* tables",
-          "result": "0001–0012 upgrade; downgrade leaves zero classroom_* tables; re-upgrade restores classroom_sessions/classroom_messages/classroom_role_contexts"
-        },
-        {
-          "command": "cd backend && EDUMIND_TEST_DATABASE_URL=<isolated-pg> pytest -q tests/test_classroom_persistence.py",
-          "result": "4 passed; owner-unit uniqueness, cross-owner FK isolation, message cursor monotonicity, role/kind separation, restart recovery"
-        },
-        {
-          "command": "cd backend && ruff check app/models/classroom.py alembic/versions/0012_classroom_sessions.py tests/test_classroom_persistence.py",
-          "result": "passed (2 E501 fixed)",
-          "evidence": "docs/acceptance/mvp-0.3-t016-classroom-persistence.md"
-        },
-        {
-          "command": "cd backend && mypy app/models/classroom.py",
-          "result": "passed, 1 source file"
-        },
-        {
-          "command": "cd backend && EDUMIND_TEST_DATABASE_URL=<isolated-pg> PYTHONUTF8=1 pytest -q",
-          "result": "collection blocked on Windows host: app/services/animation_cache.py imports POSIX fcntl (pre-existing commit 980caf7, macOS-verified in T006–T015); T016 files unaffected"
-        }
-      ],
-      "started_at": "2026-09-28T21:56:00",
-      "completed_at": "2026-09-28T22:04:00",
-      "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.3-T016"
-    },
-    {
-      "id": "MVP-0.3-T017",
-      "phase": "MVP 0.3",
-      "title": "提供专注与互动模式切换",
-      "status": "done",
-      "priority": "P0",
-      "depends_on": [
-        "MVP-0.3-T016"
-      ],
-      "scope": [
-        "backend/app/api/",
-        "backend/app/services/",
-        "backend/tests/",
-        "docs/api/openapi.yaml"
-      ],
-      "prd_source": "PRD §3.5",
-      "acceptance_criteria": [
-        "读取/切换课堂模式满足 Cookie/CSRF/owner/版本/幂等契约。",
-        "切回专注后停止同学主动发言，隔离在途旧模式响应，不丢场景进度。",
-        "基础/进阶角色按需出现，模式切换不自动触发持续模型调用。"
-      ],
-      "verification": [
-        "测试默认专注、重复切换、并发冲突及旧响应门禁，验证不产生多余 Provider 调用。"
-      ],
-      "verification_results": [
-        "迁移0013往返升降升通过；classroom_mode_api 11项、OpenAPI契约7项、T016持久化4项通过；ruff/mypy通过",
-        "默认focus、幂等重放、focus↔interactive切换、版本冲突、同键异摘要、focus空角色、跨owner404、并发同键幂等与异键CAS",
-        "模式切换为纯数据库事务不调用Provider；全量48失败均为既有CRLF模板摘要/计时抖动/Docker镜像问题，非本任务回归"
-      ],
-      "started_at": "2026-09-28T22:06:00",
-      "completed_at": "2026-09-28T22:26:00",
-      "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.3-T017"
-    },
-    {
-      "id": "MVP-0.3-T018",
-      "phase": "MVP 0.3",
-      "title": "实现单 Tutor 的按需角色编排",
-      "status": "done",
-      "priority": "P0",
-      "depends_on": [
-        "MVP-0.3-T003",
-        "MVP-0.3-T017"
-      ],
-      "scope": [
-        "backend/app/",
-        "backend/tests/",
-        "docs/"
-      ],
-      "prd_source": "PRD §3.5",
-      "acceptance_criteria": [
-        "版本化固定导师/基础/进阶角色画像；一次课堂动作由一个 Tutor 编排。",
-        "仅使用当前目标、已审核资源、必要画像及路径上下文；不要求所有角色发言，不重复改写同一内容。",
-        "专注模式仅导师，互动按需选择角色；模型失败返回可恢复状态，普通学习资源保留。"
-      ],
-      "verification": [
-        "运行角色选择、上下文最小化、输出 schema、冗余与 Provider 失败单元测试。"
-      ],
-      "verification_results": [
-        "test_classroom_roles.py 5 项通过：画像固定/版本化、专注恒仅导师、互动按产品序去重、未知角色与模式拒绝。",
-        "test_classroom_context.py 7 项通过：当前事实/前置/目标/已审核资源齐全且上下文不可变，仅发相关已知字段且不含 evidence/私隐值，未知或无证据字段不发送，路径只保留必要信号。",
-        "test_tutor_agent.py 15 项通过：专注一次调用仅导师、互动允许同学且可仅 tutor、专注拒绝同学/重复角色/重复 text/缺 tutor、Provider 失败与非法输出返回可恢复失败。"
-      ],
-      "started_at": "2026-09-29T00:32:00",
-      "completed_at": "2026-09-29T00:38:00",
-      "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.3-T018"
-    },
-    {
-      "id": "MVP-0.3-T019",
-      "phase": "MVP 0.3",
-      "title": "提供分级审核的课堂流式发言",
-      "status": "done",
-      "priority": "P0",
-      "depends_on": [
-        "MVP-0.3-T004",
-        "MVP-0.3-T018"
-      ],
-      "scope": [
-        "backend/app/api/",
-        "backend/app/services/",
-        "backend/tests/",
-        "docs/api/openapi.yaml"
-      ],
-      "prd_source": "PRD §3.3、§3.5",
-      "acceptance_criteria": [
-        "普通对话通过版本化轻量规则，高风险内容按规则升级；不得把未审核对话冒充正式资源。",
-        "POST SSE 无损传递正文，持久化合法会话记录/游标并支持幂等恢复。",
-        "取消/断线/模式切换不导致旧发言覆盖新状态，保留 owner 和凭据安全边界。"
-      ],
-      "verification": [
-        "运行轻量/升级审核、拒绝/Provider失败、SSE分块/重连/重复提交/模式竞态测试。"
-      ],
-      "verification_results": [
-        "test_classroom_speech_rules.py 15 项通过：版本固定、中文/英文指令劫持、系统提示词/执行代码/凭据/破坏性请求升级、危险生成原语升级、指针代码不误报、合并去重。",
-        "test_classroom_speech_review.py 6 项通过：pass 放行、revise/reject 收回、Provider 失败与非法 review schema 均映射 unavailable，且请求固定 prompt/instruction/schema 版本。",
-        "test_classroom_speech_api.py 11 项通过（隔离 PostgreSQL）：低风险 SSE 分块无损重组+student/tutor 消息持久化、高风险升级拒绝/不可用 content_retracted 无 token、升级但通过照常发布、编排失败 error+done、同键幂等重放无 token、409 版本冲突、消息游标分页/越界 409、owner 隔离 404、CSRF/Origin 403、切模式中旧 commit 降级 superseded。",
-        "ruff check app tests 通过；strict mypy app 84 源文件通过；test_mvp03_openapi_contract.py 7 项通过（含 token.data.role 契约补记）；课堂相关测试合计 73 项通过。",
-        "全量后端 557 通过/48 失败/5 跳过；48 失败均为既有环境非回归（动画/链表模板 CRLF 摘要不匹配、首屏毫秒计时抖动、Docker 镜像缺失），与 T017/T018 记录一致；0 Provider 实调。"
-      ],
-      "started_at": "2026-09-29T08:41:00",
-      "completed_at": "2026-09-29T08:57:33",
-      "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.3-T019"
-    },
-    {
-      "id": "MVP-0.3-T020",
-      "phase": "MVP 0.3",
-      "title": "实现专注与按需角色课堂界面",
-      "status": "done",
-      "priority": "P0",
-      "depends_on": [
-        "MVP-0.3-T017",
-        "MVP-0.3-T019"
-      ],
-      "scope": [
-        "web/src/",
-        "web/tests/"
-      ],
-      "prd_source": "PRD §3.5",
-      "acceptance_criteria": [
-        "默认导师视图，互动时才按需显示同学角色和当前发言者；可随时关闭互动。",
-        "接通真实 API/SSE、错误重试及课堂恢复，不仅交付静态组件。",
-        "保留讲解/代码/练习/路径进度，页面转义模型内容，支持键盘与移动端。"
-      ],
-      "verification": [
-        "运行模式/流式/迟到响应/XSS组件测试与真实后端mock Provider浏览器联调。"
-      ],
-      "verification_results": [
-        "前端 96 项测试全部通过（16 文件）：ClassroomPanel 12 项组件测试覆盖模式切换、流式 token 累积与当前发言者、迟到响应丢弃、XSS 转义、键盘 Enter/Shift+Enter、错误重试与课堂恢复；classroom API 客户端 7 项测试覆盖 SSE 事件映射与 HTTP 错误。",
-        "浏览器 classroom_flow.py（headless Chromium）路由 mock 联调通过：默认专注视图、按需互动与同学角色开关、流式发言提交与提交、XSS 转义、键盘提交、Provider 故障后换新幂等键重试、移动端无横向溢出。",
-        "后端 58 项课堂测试全部通过（真实 app + PostgreSQL + FakeAdapter mock Provider）：SSE 契约、模式 CAS、消息持久化、上下文、角色与审核规则。"
-      ],
-      "started_at": "2026-09-29T09:06:00",
-      "completed_at": "2026-09-29T09:38:00",
-      "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.3-T020"
-    },
-    {
-      "id": "MVP-0.3-T021",
-      "phase": "MVP 0.3",
-      "title": "实现当前场景重解释版本服务",
-      "status": "done",
-      "priority": "P0",
-      "depends_on": [
-        "MVP-0.3-T003",
-        "MVP-0.3-T004",
-        "MVP-0.3-T016"
-      ],
-      "scope": [
-        "backend/app/",
-        "backend/tests/",
-        "docs/"
-      ],
-      "prd_source": "PRD §3.3、§10.4",
-      "acceptance_criteria": [
-        "支持更简单/更深入/换例子，仅基于当前场景创建新版本，不重建整个学习单元。",
-        "正式新版本经过 schema/Review 后发布，保留旧版与其他场景；失败维持原资源。",
-        "幂等/并发/owner 约束可验证，学习行为证据复用既有规则，不伪造掌握度。"
-      ],
-      "verification": [
-        "测试新旧版本、审核拒绝、并发冲突、重复请求和其他场景不变；验证 API 契约。"
-      ],
-      "verification_results": [
-        "独立 PostgreSQL 库 Alembic 升级 head 通过；T021/课堂/OpenAPI 定向 36 通过，后端全量 612 通过、5 跳过，使用 FakeAdapter，无真实 Provider 调用。",
-        "Ruff app 与 T021 测试、Mypy strict 85 源文件、OpenAPI JSON 解析和 git diff --check 通过；新旧版本、审核拒绝/不可用、Provider 失败、并发 CAS、重复请求、跨 owner 与其他场景保持不变均有回归验证。证据 docs/acceptance/mvp-0.3-t021-scene-reexplanation.md。"
-      ],
-      "started_at": "2026-09-29T10:20:26",
-      "completed_at": "2026-09-29T10:37:18",
-      "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.3-T021"
-    },
-    {
-      "id": "MVP-0.3-T035",
-      "phase": "MVP 0.3",
-      "title": "实现课堂学习控制 API",
-      "status": "done",
-      "priority": "P0",
-      "depends_on": [
-        "MVP-0.3-T004",
-        "MVP-0.3-T017",
-        "MVP-0.3-T021"
-      ],
-      "scope": [
-        "backend/app/",
-        "backend/tests/",
-        "docs/"
-      ],
-      "prd_source": "PRD §3.3、ADR-0005 决定 C",
-      "acceptance_criteria": [
-        "暂停/继续与跳过以 owner、revision 和幂等键持久化，切换生成代际以阻止迟到发言；跳过只推进场景进度，不伪造掌握度。",
-        "资源选择只接受当前已发布资源并记录既有学习行为证据；动画仍需显式请求 Job。",
-        "补前置按已审核图谱及当前路径保存返回点，失败保留原课堂；重复、并发和越权请求可验证。"
-      ],
-      "verification": [
-        "独立 PostgreSQL 测试暂停/继续/跳过/资源选择/补前置的幂等、CAS、证据和 owner 门禁；验证 OpenAPI 与后端回归。"
-      ],
-      "verification_results": [
-        "独立 PostgreSQL 定向 26 通过、后端全量 617 通过5跳过；Ruff、Mypy strict 86源、OpenAPI/task JSON解析及diff检查通过；0真实Provider调用。",
-        "暂停/继续、跳过、资源选择、补前置的幂等原回执、owner隔离、revision CAS、并发冲突、审核资源门禁、学习证据和返回点由 tests/test_classroom_controls_api.py 验证；证据 docs/acceptance/mvp-0.3-t035-classroom-controls.md。"
-      ],
-      "started_at": "2026-09-29T10:40:02",
-      "completed_at": "2026-09-29T10:49:04",
-      "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.3-T035"
-    },
-    {
-      "id": "MVP-0.3-T022",
-      "phase": "MVP 0.3",
-      "title": "接通学习控制与场景版本界面",
-      "status": "done",
-      "priority": "P0",
-      "depends_on": [
-        "MVP-0.3-T020",
-        "MVP-0.3-T021",
-        "MVP-0.3-T035"
-      ],
-      "scope": [
-        "web/src/",
-        "web/tests/"
-      ],
-      "prd_source": "PRD §3.3、§3.5",
-      "acceptance_criteria": [
-        "提供难度/换例子/重解释、暂停/跳过和资源切换控制，依照既有反馈与路径规则执行。",
-        "展示版本生成/审核/失败，支持查看与恢复合法旧版本，保留作答和其他场景。",
-        "刷新和迟到请求不会回退用户当前选择，失败时仍能学习原资源。"
-      ],
-      "verification": [
-        "组件与浏览器覆盖学习控制/版本切换/失败/刷新/迟到响应；检查类型/构建。"
-      ],
-      "verification_results": [
-        "2026-09-29: pnpm exec vitest run：17 文件、105 项通过；pnpm build：类型检查与生产构建通过；改动文件 ESLint 0 错误/0 警告；git diff --check 通过。",
-        "2026-09-29: UV_CACHE_DIR=/private/tmp/edumind-uv-cache pnpm e2e：Chromium 路由 mock 覆盖控制、版本发布/选择、刷新恢复与审核失败，通过；证据 docs/acceptance/mvp-0.3-t022-learning-controls-ui.md。"
-      ],
-      "started_at": "2026-09-29T10:53:04",
-      "completed_at": "2026-09-29T13:40:34",
-      "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.3-T022"
-    },
-    {
-      "id": "MVP-0.3-T023",
-      "phase": "MVP 0.3",
-      "title": "生成数组与链表结构化多视角候选",
-      "status": "done",
-      "priority": "P0",
-      "depends_on": [
-        "MVP-0.3-T004",
-        "MVP-0.3-T018"
-      ],
-      "scope": [
-        "backend/app/",
-        "backend/tests/",
-        "docs/"
-      ],
-      "prd_source": "PRD §3.5",
-      "acceptance_criteria": [
-        "只支持数组 vs 链表预设场景，一次结构化生成返回性能/工程/学术视角及主持人候选。",
-        "输出显式问题条件、图谱依据和必要画像字段，区分算法事实与学习偏好。",
-        "不创建真并行 Agent 子图，不自动触发通用辩论；schema/错误/Prompt 均版本化。"
-      ],
-      "verification": [
-        "测试三视角结构、上下文/事实边界、单次生成调用及 Provider/格式失败。"
-      ],
-      "verification_results": [
-        "2026-09-29: 定向候选生成测试11通过；后端全量498通过、135跳过（未设置独立数据库URL）；Ruff、Mypy 89源文件、JSON Schema校验和diff检查通过；证据 docs/acceptance/mvp-0.3-t023-debate-candidate.md。"
-      ],
-      "started_at": "2026-09-29T13:43:11",
-      "completed_at": "2026-09-29T14:25:41",
-      "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.3-T023"
-    },
-    {
-      "id": "MVP-0.3-T024",
-      "phase": "MVP 0.3",
-      "title": "审核并发布多视角结果",
-      "status": "done",
-      "priority": "P0",
-      "depends_on": [
-        "MVP-0.3-T023",
-        "MVP-0.3-T016"
-      ],
-      "scope": [
-        "backend/app/",
-        "backend/tests/",
-        "docs/"
-      ],
-      "prd_source": "PRD §3.3、§3.5",
-      "acceptance_criteria": [
-        "独立 Review 核对事实、条件、视角与总结，只有通过的正式结果可以发布/导出。",
-        "审核失败按既定有界规则处理，耗尽或超时保留原课堂，错误不伪装成通过。",
-        "结果带版本、模型和审核来源，owner/幂等重放不重复生成。"
-      ],
-      "verification": [
-        "用严重错误/正确对照夹具验证门禁，测试有界调用、超时及幂等发布。"
-      ],
-      "verification_results": [
-        "2026-09-29: 独立PG Alembic upgrade head；后端全量640通过、5跳过，新增API定向7通过；Ruff app/tests、Mypy 92源文件、OpenAPI Schema、JSON解析及diff检查通过；mock Provider、0真实调用；证据 docs/acceptance/mvp-0.3-t024-reviewed-debate.md。"
-      ],
-      "started_at": "2026-09-29T15:56:09",
-      "completed_at": "2026-09-29T16:26:03",
-      "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.3-T024"
-    },
-    {
-      "id": "MVP-0.3-T025",
-      "phase": "MVP 0.3",
-      "title": "实现多视角展示及课堂返回",
-      "status": "done",
-      "priority": "P0",
-      "depends_on": [
-        "MVP-0.3-T020",
-        "MVP-0.3-T024"
-      ],
-      "scope": [
-        "web/src/",
-        "web/tests/"
-      ],
-      "prd_source": "PRD §3.5",
-      "acceptance_criteria": [
-        "用户主动进入数组 vs 链表演示，展示三个视角与审核后的主持人条件化总结。",
-        "保存进入前场景、进度和游标，退出/失败/刷新后恢复，不重置测验或路径。",
-        "支持加载/审核拒绝/Provider失败状态和安全渲染，不影响普通学习。"
-      ],
-      "verification": [
-        "组件与浏览器测试进入/退出/重连/刷新/失败及 XSS；验证真实接口集成。"
-      ],
-      "verification_results": [
-        "2026-09-29: 前端全量113通过、构建和改动文件ESLint通过；Chromium路由模拟进入/退出/刷新/失败/XSS/练习草稿通过；隔离PG+真实HTTP/Vite+mock Provider浏览器联调通过；E2E Python Ruff及diff检查通过，0真实Provider调用；证据 docs/acceptance/mvp-0.3-t025-debate-ui.md。"
-      ],
-      "started_at": "2026-09-29T16:27:47",
-      "completed_at": "2026-09-29T16:45:51",
-      "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.3-T025"
-    },
-    {
-      "id": "MVP-0.3-T026",
-      "phase": "MVP 0.3",
-      "title": "记录视角偏好并影响后续表达",
-      "status": "done",
-      "priority": "P0",
-      "depends_on": [
-        "MVP-0.3-T018",
-        "MVP-0.3-T024"
-      ],
-      "scope": [
-        "backend/app/",
-        "backend/tests/",
-        "docs/",
-        "web/src/",
-        "web/tests/"
-      ],
-      "prd_source": "PRD §3.5",
-      "acceptance_criteria": [
-        "提供明确有帮助视角反馈，按批准 schema 更新 cognitive_style.preference_persona，保留证据/置信度/版本。",
-        "用户修正优先、owner/CSRF/幂等规则不变；偏好不影响事实或直接提高掌握度。",
-        "前端反馈接通 API，后续 Tutor 表达读取偏好，未知偏好保持未知。"
-      ],
-      "verification": [
-        "运行画像合并/显式修正/幂等/隔离测试及反馈到下一轮表达的集成测试。"
-      ],
-      "verification_results": [
-        "隔离 PostgreSQL 定向 26 passed，后端全量 645 passed / 5 skipped；Tutor 提示词版本调整后专项 15 passed",
-        "Ruff、Mypy 93 source、OpenAPI JSON/schema 校验通过",
-        "前端 Vitest 115 passed、构建和改动文件 ESLint 通过",
-        "实际 FastAPI/Vite HTTP + 隔离 PostgreSQL + mock Provider 的浏览器反馈流程通过；见 docs/acceptance/mvp-0.3-t026-perspective-feedback.md"
-      ],
-      "started_at": "2026-09-29T16:47:31",
-      "completed_at": "2026-09-29T17:03:31",
-      "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.3-T026"
-    },
-    {
-      "id": "MVP-0.3-T027",
-      "phase": "MVP 0.3",
-      "title": "导出已审核 Markdown 学习笔记",
-      "status": "done",
-      "priority": "P0",
-      "depends_on": [
-        "MVP-0.3-T004",
-        "MVP-0.3-T024"
-      ],
-      "scope": [
-        "backend/app/api/",
-        "backend/app/services/",
-        "backend/tests/",
-        "docs/api/openapi.yaml"
-      ],
-      "prd_source": "PRD §3.3、§7.2",
-      "acceptance_criteria": [
-        "从合法已审核资源版本组合讲解、知识总结与本人错题摘要；可包含已审核多视角总结。",
-        "记录来源模型、时间、内容版本；不额外调用模型生成未经审核的新正文。",
-        "owner/CSRF/安全文件名/UTF-8及下载内容正确，不导出临时或拒绝资源和敏感证据。"
-      ],
-      "verification": [
-        "测试版本来源/错题归属/拒绝资源过滤/安全文件名与实际下载内容。"
-      ],
-      "verification_results": [
-        "隔离 PostgreSQL 后端全量 649 passed / 5 skipped；最终导出与 OpenAPI 专项 11 passed",
-        "Ruff 全通过、Mypy 95 source、OpenAPI JSON 契约与 git diff --check 通过",
-        "实际 FastAPI 下载字节验证审核版本/owner/错题归属/安全文件名/UTF-8/零额外 Provider；见 docs/acceptance/mvp-0.3-t027-markdown-notes.md"
-      ],
-      "started_at": "2026-09-29T17:50:48",
-      "completed_at": "2026-09-29T18:02:09",
-      "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.3-T027"
-    },
-    {
-      "id": "MVP-0.3-T028",
-      "phase": "MVP 0.3",
-      "title": "导出已生成 MP4 与 SRT",
-      "status": "done",
-      "priority": "P0",
-      "depends_on": [
-        "MVP-0.3-T014"
-      ],
-      "scope": [
-        "backend/app/api/",
-        "backend/app/services/",
-        "backend/tests/",
-        "docs/api/openapi.yaml"
-      ],
-      "prd_source": "PRD §3.3",
-      "acceptance_criteria": [
-        "下载现有已审核视频和对应版本字幕，记录模板/资源版本与生成来源。",
-        "不因导出触发重渲染或模型调用，缺失媒体提示恢复处理。",
-        "校验 owner/资源关联、下载头及路径安全，避免跨用户数据泄露。"
-      ],
-      "verification": [
-        "测试 MP4/SRT 版本匹配、字节内容、越权/路径遍历及零生成调用。"
-      ],
-      "verification_results": [
-        "隔离 PostgreSQL 媒体下载/OpenAPI 定向 9 passed，后端全量 649 passed / 5 skipped",
-        "实际 MP4/SRT 下载字节、SHA-256、对应媒体 ID 与模板/字幕/审核版本、owner/路径/文件名/Range/缺失恢复均通过",
-        "下载渲染器失败哨兵通过；Ruff、Mypy 95 source、OpenAPI JSON 和 git diff --check 通过；见 docs/acceptance/mvp-0.3-t028-media-export.md"
-      ],
-      "started_at": "2026-09-29T18:05:13",
-      "completed_at": "2026-09-29T18:10:46",
-      "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.3-T028"
-    },
-    {
-      "id": "MVP-0.3-T029",
-      "phase": "MVP 0.3",
-      "title": "接通笔记与动画下载入口",
-      "status": "done",
-      "priority": "P0",
-      "depends_on": [
-        "MVP-0.3-T015",
-        "MVP-0.3-T025",
-        "MVP-0.3-T027",
-        "MVP-0.3-T028"
-      ],
-      "scope": [
-        "web/src/",
-        "web/tests/"
-      ],
-      "prd_source": "PRD §3.3",
-      "acceptance_criteria": [
-        "学习页支持 Markdown 与已生成 MP4/SRT 下载，展示可用/未审核/缺失/失败状态。",
-        "正确处理下载文件名和重试，不重建学习单元或动画。",
-        "移动端和键盘可操作，下载内容与当前选择的已审核版本一致。"
-      ],
-      "verification": [
-        "运行组件测试及真实后端下载浏览器验证，核对 Markdown/媒体/字幕文件。"
-      ],
-      "verification_results": [
-        "前端全量 Vitest 121 passed；pnpm build / Vue 类型检查与改动文件 ESLint 通过",
-        "Chromium 路由模拟移动端/键盘 Markdown、MP4、SRT 下载字节/文件名与历史场景隔离通过；pnpm e2e 通过",
-        "隔离 PostgreSQL 真实 FastAPI/Vite/Chromium 三格式下载与文件名/版本/原始字节通过，重复运行通过；Ruff 与 git diff --check 通过；见 docs/acceptance/mvp-0.3-t029-download-ui.md"
-      ],
-      "started_at": "2026-09-29T21:36:22+08:00",
-      "completed_at": "2026-09-29T21:55:45+08:00",
-      "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.3-T029"
-    },
-    {
-      "id": "MVP-0.3-T030",
-      "phase": "MVP 0.3",
-      "title": "验证 MVP 0.3 核心集成与非阻塞学习",
-      "status": "done",
-      "priority": "P0",
-      "depends_on": [
-        "MVP-0.3-T022",
-        "MVP-0.3-T025",
-        "MVP-0.3-T026",
-        "MVP-0.3-T029"
-      ],
-      "scope": [
-        "docs/acceptance/",
-        "backend/tests/",
-        "web/tests/e2e/",
-        "README.md"
-      ],
-      "prd_source": "PRD §9.1、§10.4",
-      "acceptance_criteria": [
-        "真实前后端/隔离 PostgreSQL/真实模板媒体，模型可 mock：覆盖专注→互动→多视角→返回→动画→导出完整旅程。",
-        "覆盖动画失败/排队/取消、审核拒绝、Provider失败、SSE中断及资源版本恢复；普通学习与测验始终可用。",
-        "回归 MVP 0.2 owner/画像/评分/路径/防重复生成/无损流；区分 mock 与真实 Provider 证据。"
-      ],
-      "verification": [
-        "运行完整前后端测试/静态检查/类型/构建及真实浏览器集成，逐项记录失败与跳过。"
-      ],
-      "verification_results": [
-        "隔离 PostgreSQL Alembic head；真实 FastAPI/Vite/Chromium/已审核 Manim 缓存媒体完整旅程通过，模型为确定性 mock，下载三格式非空且未触发新生成。",
-        "backend: uv run pytest tests -q -> 649 passed, 5 skipped (Docker-gated), 9 warnings；Ruff 与 Mypy (95 files) 通过。",
-        "web: pnpm test -> 122 passed；pnpm e2e、pnpm build 通过；ESLint 0 errors、67 既有格式 warnings。异常路径与 MVP 0.2 回归证据见 docs/acceptance/mvp-0.3-t030-core-integration.md。"
-      ],
-      "started_at": "2026-09-29T21:57:10+08:00",
-      "completed_at": "2026-09-29T22:15:45+08:00",
-      "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.3-T030"
-    },
-    {
-      "id": "MVP-0.3-T031",
-      "phase": "MVP 0.3",
-      "title": "验证容器重启后的课堂与 Job 恢复",
-      "status": "done",
-      "priority": "P0",
-      "depends_on": [
-        "MVP-0.3-T030"
-      ],
-      "scope": [
-        "docs/acceptance/",
-        "backend/tests/",
-        "web/tests/e2e/",
-        "README.md"
-      ],
-      "prd_source": "PRD §3.3、§10.4",
-      "acceptance_criteria": [
-        "更新固定依赖 Compose/渲染部署与使用说明，明确本地媒体卷、权限和备份。",
-        "真实重启 API/数据库/渲染执行器后，课堂进度、模式、Job终态/在途恢复、媒体与导出保持一致。",
-        "取消与旧尝试完成不能覆盖新状态，恢复不重复生成；隔离验证不破坏用户数据卷。"
-      ],
-      "verification": [
-        "构建隔离 Compose，迁移、seed、重启、check；在途/已完成/已取消三类任务分别检查。"
-      ],
-      "verification_results": [
-        "独立 Compose 项目/卷与临时媒体目录空库迁移至 head；PostgreSQL/API 真实重启后课堂 revision 2、模式/角色、Markdown、已完成及已取消 Job 和 MP4/SRT 摘要保持一致。",
-        "宿主 Worker 重启回收在途租约，固定 Manim 镜像真实渲染 attempt 2 并发布；旧 attempt 发布返回 false，取消 Job 不重开；最终镜像重建后二次读取通过。",
-        "docker compose config --quiet、Ruff、Mypy 通过；隔离库相关测试 22 passed、3 Docker-gated skipped。证据与复现命令见 docs/acceptance/mvp-0.3-t031-compose-recovery.md。"
-      ],
-      "started_at": "2026-09-29T22:17:00+08:00",
-      "completed_at": "2026-09-29T22:33:26+08:00",
-      "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.3-T031"
-    },
-    {
-      "id": "MVP-0.3-T032",
-      "phase": "MVP 0.3",
-      "title": "验证模板可用率与动画性能",
-      "status": "done",
-      "priority": "P0",
-      "depends_on": [
-        "MVP-0.3-T001",
-        "MVP-0.3-T031"
-      ],
-      "scope": [
-        "docs/acceptance/",
-        "backend/tests/",
-        "web/tests/e2e/",
-        "README.md"
-      ],
-      "prd_source": "PRD §3.3、§8.1、§10.2",
-      "acceptance_criteria": [
-        "按 T001 冻结矩阵实际渲染两种模板及合法边界，模板可用率≥98%，失败分母和错误完整保留。",
-        "真实浏览器测量缓存命中 P95≤2s 可播放；按需渲染 P95≤90s，报告硬件/并发/样本/冷暖状态。",
-        "验证动画运行不阻塞普通学习链路；指标不达标如实处理，不挑样本或无限复测。"
-      ],
-      "verification": [
-        "执行版本化模板质量/浏览器播放/渲染计时脚本，保留报告、媒体校验及失败证据。"
-      ],
-      "verification_results": [
-        "冻结100模板槽：100通过，20组不同参数首次真实Manim渲染、80次审核缓存复用；模板可用率100%。",
-        "真实Chromium禁缓存：100缓存播放槽全部≤2秒，nearest-rank P95=0.0486秒；20独立缓存新渲染槽全部成功，P95=9.1521秒，单并发。首次新渲染批次因测试定位器错误20槽中断，原始报告保留并在新隔离库完整重跑。",
-        "真实渲染running期间讲解/测验均200且评分2/2；Docker模板/渲染/缓存测试57通过，Ruff、Python编译和报告JSON检查通过。证据见 docs/acceptance/mvp-0.3-t032-animation-performance.md。"
-      ],
-      "started_at": "2026-09-29T22:35:00+08:00",
-      "completed_at": "2026-09-29T22:54:10+08:00",
-      "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.3-T032"
-    },
+  "archive_transition": {
+    "source_commit": "30fcd4e1f9384359a72b451bb40243a2095691cf",
+    "source_path": "task.json",
+    "archive_path": "docs/tasks/mvp-0.3.json",
+    "sha256": "0edbd007af6313235f94caaa536b8d60c4084f1472cfdaee9e0a2a41c3791a4f",
+    "task_count": 46,
+    "done": 45,
+    "blocked": [
+      "MVP-0.3-T033"
+    ]
+  },
+  "inherited_blockers": [
     {
       "id": "MVP-0.3-T033",
-      "phase": "MVP 0.3",
-      "title": "完成当前配置真实课堂与质量验收",
       "status": "blocked",
-      "priority": "P0",
-      "depends_on": [
-        "MVP-0.3-T001",
-        "MVP-0.3-T031"
-      ],
-      "scope": [
-        "docs/acceptance/",
-        "backend/tests/",
-        "web/tests/e2e/",
-        "README.md",
-        "backend/app/services/provider_gateway.py",
-        "backend/app/services/deepseek_responses.py",
-        "docs/PROVIDERS.md",
-        "backend/app/services/bailian_review_candidate.py",
-        "backend/app/core/review_candidate_factory.py",
-        "docs/ADR/0006-a1-offline-review-candidate.md"
-      ],
-      "prd_source": "PRD §3.3、§3.5、§8.1、§10.2",
-      "acceptance_criteria": [
-        "冻结实际 Provider/模型/指令，使用真实浏览器验证互动、重解释、审核后的多视角及偏好反馈，不拼接不同模型通过结论。",
-        "按冻结基准验证新增正式内容 schema≥98%、严重错误召回≥90%，课堂普通发言首字节 P95≤3s；沿用指标口径。",
-        "对核心学习首屏做风险相称回归，报告 HTTP≤2s/完整首段≤10s；教学首 token 单列非阻塞。",
-        "真实调用前核对明确预算与授权，预检后一次有界运行；认证/配额/预算异常停止，不替换失败样本。"
-      ],
-      "verification": [
-        "按批准预算运行冻结真实基准和浏览器流程，人工审核内容与指标，保存脱敏原始/审计证据。"
-      ],
-      "verification_results": [
-        "正式120槽首次schema118/120(98.33%)、最终发布111/120(92.5%，失败)、发布schema111/111；人工覆盖111已发布，3条major漏检。",
-        "固定20严重错误+10对照：冻结召回19/20(95%)、对照10/10；分类不一致保持保守原分，4条本地拦截、26次模型审核。",
-        "20首屏保留全部失败/中断，环境失败不归因模型；失败/缺失P95=∞。课堂真实建场未发布，20发言未执行；旅程首次发布失败，后续步骤未执行。",
-        "未从头重跑资源/审核，浏览器中断后只续未完成槽；新增405、累计2016/2500，已知1247176 token，21次usage未知。审计docs/acceptance/mvp-0.3-t033-low-full-audit-20260930.md，最终汇总docs/acceptance/mvp-0.3-t033-low-full-final-summary-20261001.json。",
-        "既有86离线回归证据保留；本轮测量器Ruff与git diff --check通过，真实验收失败不创建完成提交。",
-        "2026-10-01离线归因：9个未发布槽中6个最终审核触及8192输出token上限、2个首次生成格式无效、1个修正仍失败；已发布内容3条major漏检。隔离库唯一已发布首屏资源约74.1秒落库但浏览器未观察到，客户端/测量归因未证实。修正最终审核模型归属和首次访客会话并发竞争；后端81、前端122单测及路由模拟E2E通过，类型检查/构建通过，lint 0错误/67既有警告。未调用Provider，累计仍2016/2500；报告docs/acceptance/mvp-0.3-t033-offline-root-cause-20261001.md；T033仍blocked。",
-        "2026-10-01按新口径完成零调用归档回放：120质量/30审核/20首屏原分未改，6+2+1未发布原因、19/20审核、首屏P95缺失即∞均核验；模拟Chromium成功/拒绝双路径检查测量器，移除可能悬挂的response.finished等待并增加失败阶段/API状态观测。单独冻结10槽审核诊断及内容/代码哈希，未运行Provider；累计仍2016/2500。证据docs/acceptance/mvp-0.3-t033-offline-replay-and-diagnostic-freeze-20261001.md；T033仍blocked，不计正式验收。",
-        "2026-10-01新增固定分母提前停止和阶段闸门：正式质量120槽schema至少118、发布至少114，审核20槽检出至少18，20槽P95第19位；最佳可能结果低于原阈值即记录stop_reason和剩余unattempted，10槽诊断首败即停且每槽最多一次实际请求。24项离线边界测试通过，旧111/120只读演练会阻止后续4付费阶段；新增0 Provider请求，累计仍2016/2500。新执行协议及25文件哈希单独冻结，旧冻结/成绩未覆盖；证据docs/acceptance/mvp-0.3-t033-early-stop-implementation-20261001.md；T033仍blocked。",
-        "2026-10-01审核候选v6：通用跨函数/表示约定/计数边界检查并缩短输出指令，24项离线测试和Ruff通过，冻结25文件、指令、非密钥配置哈希；10槽真实诊断首败即停于第4槽。前3条历史major均按预期检出，第4条未初始化指针错误只报严重fact/misconception，缺code_safety；4次实际请求、6槽unattempted，累计2020/2500；独立账本halted，未运行生成/浏览器/正式验收。证据docs/acceptance/mvp-0.3-t033-review-v6-audit-20261001.md。",
-        "2026-10-01零调用核对area：生产发布由verdict决定，area参与审核记录/定向修正和严格诊断评分；旧标准/成绩未改。v7新候选36项离线测试/Ruff/编译通过，27文件/指令/配置哈希另冻。真实10槽首败即停于第5槽，前4通过，第5检出自环/丢链但仅报code_safety，缺预期fact；5次实际请求、5槽unattempted，累计2025/2500、账本halted。未运行小批生成/浏览器/正式验收；报告docs/acceptance/mvp-0.3-t033-review-v7-audit-20261001.md。",
-        "2026-10-01仅离线：形成fact/code_safety交叉类别提案，分离具体错误检出和类别准确而不修改生产审核/旧评分；旧v7错误组人工复核检出5/5、类别4/5、严格得分4/5，仍failed。新增三组独立诊断执行器与正式闸门：组内首败即停、一次仅一组、缺失/失败证据禁止正式验收；冻结未运行3对照+2长审核最多5次无重试，协议状态FROZEN_NOT_EXECUTABLE。本轮41项离线测试、Ruff/编译/diff通过，Provider新增0，累计仍2025/2500。证据docs/acceptance/mvp-0.3-t033-review-category-proposal-20261001.md、mvp-0.3-t033-review-pending-five-freeze-20261001.json、mvp-0.3-t033-review-group-protocol-20261001.json、mvp-0.3-t033-review-groups-offline-result-20261001.json；T033仍blocked。",
-        "2026-10-01按授权先显式长审核组：冻结v7/配置/输入/代码哈希通过；第1槽一次真实请求输入3099、输出8192/8192，INVALID_OUTPUT且OUTPUT_TOKEN_LIMIT，无可用结构化verdict；首败停止，第2长审核及3正确对照均unattempted，误拒率无法评估。新增1次累计2026/2500，独立v22账本halted；分组状态错误failed/长审核failed/正确对照unattempted，正式闸门关闭。未生成/浏览器/正式验收。证据docs/acceptance/mvp-0.3-t033-review-long-audit-20261001.md。",
-        "2026-10-01仅离线审核结束归因：历史第2026次输入3099/总输出8192已知，推理与最终正文tokens及部分正文计数未保存，均明确未知；MockTransport重建确认系统4492字符、完整schema两份、候选一次，输出已要求单个简短JSON，不能证明截断由推理或重复正文导致。形成未实施/未冻结候选：同模型none+2048总输出、单份schema、919字符审核正文、最多3条issue/160字符、数值观测及零重试；分类暂缓，旧v7/配置/评分不改。4项定向离线测试、Mock归因断言、Ruff/编译/diff通过，原30文件冻结哈希和v22账本哈希不变；新增Provider 0，累计2026/2500。报告docs/acceptance/mvp-0.3-t033-review-completion-attribution-20261001.md；未来至多2条长审核须先实施/离线验证、独立冻结与授权，本轮不执行，正式闸门关闭，T033仍blocked。",
-        "2026-10-01完成授权离线实现：Responses结果/安全错误与T033新尝试记录显式推理/正文token明细、正文字符/块数、响应状态及耗时；缺失/非法明细为null，不反推，不保存推理原文，截断/JSON/schema失败仍关闭。独立候选未接入生产：none+2048、单schema、919字符指令、最多3条issue/160字符、60秒期限、零重试、最多2唯一槽首败即停，成功仍关闭正式闸门。196项相关离线测试、Ruff、95文件mypy、编译/diff通过；新33文件代码/指令/schema/配置/完整长审核请求哈希冻结，状态FROZEN_NOT_EXECUTABLE，SHA256 066745f0b7bcfae3be316e070e178a99758eb5c1884d4aaf024b6feb4d79a78f。v7/生产schema/env/旧评分/v22账本不变，历史8192分量仍未知；本轮Provider新增0、累计2026/2500，两条长审核仍unattempted。交接docs/acceptance/mvp-0.3-t033-review-completion-implementation-20261001.md及同日freeze/offline-result。未来真实诊断须新授权和独立ready协议/账本；本轮停止，T033仍blocked。",
-        "2026-10-01按用户明确授权执行冻结完成候选2条长审核：同模型deepseek-flash/api.deepseek.com，候选none+2048/60秒/单schema/零重试；代码/输入/指令/配置哈希预检匹配，新增独立ready协议及v23账本，不改原冻结。两条均完整返回合法pass/空issues，无截断，输入2432/1866、总输出各22、供应商推理明细各0、最终正文token明细缺失均null，正文各73字符，耗时0.954/0.892秒。实际新增2次、累计2028/2500，新账本halted；无重试、无其他测试/对照/生成/浏览器/正式验收。v7/生产low+8192/env/原schema/v22证据未改；仅证明这两个样本能完成，不拼v7成绩或作为质量/P95通过。报告docs/acceptance/mvp-0.3-t033-review-completion-real-audit-20261001.md及同日real-result/run-protocol、ledger-v23；T033保持blocked，正式闸门关闭，保存后停止。",
-        "2026-10-02按授权只测完成候选审核正确性：固定原5错误/3对照，最多8、每槽单次、首败即停；新协议冻结具体错误判据与完整输入，分类/原严格分单列，不改旧成绩或正式口径。第1槽linked-list-concept:explanation:1漏检malloc失败后main覆盖head导致链丢失/泄漏，候选返回合法pass/空issues；首败停止，余4错误+3对照共7槽unattempted。新增1次累计2029/2500，输入2083/输出22，显式推理0、正文token未知、73字符，1.006秒，无截断；v24账本halted。候选none+2048/60秒/指令/原模型目标不变，生产v7/low+8192/env/schema/v23证据不改。包装器Ruff/编译与哈希/配置/证据核对通过；只有一次真实审核，无其他Provider测试/生成/浏览器/正式验收。错误组未完整、检出比例null，对照未测误拒未知；报告docs/acceptance/mvp-0.3-t033-candidate-correctness-audit-20261002.md及同日protocol/result/ledger-v24。不能以长审核完成或拼旧成绩宣称质量通过，T033保持blocked，保存后停止。",
-        "2026-10-02按用户决定停止全部付费测试并淘汰review-completion-candidate-v1（none+2048），原余7槽不再运行；新停付费/淘汰治理记录替代旧运行授权，不覆盖旧协议/成绩/账本。本轮仅离线分析：保留v7+low具体检出5/5但原严格分4/5仍失败，历史长审核8192推理/正文分量未知；纯字符串重建确认传输重复schema消息591字符，去重仅节省两长输入消息内容6.42%/7.27%，输出收益未知。推荐仅考虑单次完整上下文low/v7的传输层schema去重，不改检查文字或丢调用者；按维度拆分可保留完整上下文但重复输入、两次输出最坏16384，不推荐当前实施。提案含离线等价否决条件及未来另行授权后最多4单次的首败/无效/缺观测/哈希漂移/7373输出裕量停止线，非正式门槛变更。无代码/架构/提示词实现或调参，新增Provider 0，累计仍2029/2500。文件docs/acceptance/mvp-0.3-t033-low-review-options-20261002.md、同日low-plan-offline-measurement与paid-stop-and-retirement；T033保持blocked，保存后停止。",
-        "2026-10-02按用户限定实现schema去重并只做离线验证：诊断显式启用可信完整v7系统文本，单一系统消息与完整schema唯一精确匹配才移除传输重复消息；生产默认关闭，v7/low+8192/env/schema/工厂与109份历史/生产文件不改。原四输入完整保留跨函数/调用者上下文，Mock证实其他wire字段一致，减少591字符，两长样本消息字符省6.42%/7.27%，真实token/结束收益未知。185项相关离线测试（新增35项）、Ruff、95文件mypy、哈希/diff核对通过，36文件及指令/schema/配置/完整请求独立冻结。冻结2长审核→1main/head复杂缺陷→1正确对照，总计最多4、零重试、首败永久淘汰且不再微调重测；输出裕量/缺观测等停止条件不改正式阈值。状态FROZEN_NOT_EXECUTABLE，四条全unattempted，未来付费须显式开始并生成ready协议/持久计数账本；新增Provider 0，累计仍2029/2500，正式闸门关闭。证据docs/acceptance/mvp-0.3-t033-schema-dedup-offline-20261002.md及同日freeze/measurement/result；T033保持blocked，保存后停止。",
-        "2026-10-02按新明确授权执行schema去重最后4槽，原顺序/模型目标/v7/low+8192不变，另冻单槽包装器38文件/ready协议/v25账本，51项离线测试与Ruff通过。第1循环队列长审核completed/合法pass/空issues，输入2930、输出993、推理970、正文token未知/73字符、5.047622秒；第2单链表长审核incomplete/OUTPUT_TOKEN_LIMIT，输入2364、总输出8192、显式推理8192、正文token未知/0字符、40.994731秒。首败停止并永久终止去重配置路线，不微调重测；复杂缺陷与正确对照两槽unattempted，检出/误拒未测。实际2请求、零重试，累计2031/2500；总输入5294/输出9185/推理9162，输入+输出14479，缺失正文token仍null不反推。两份原始最终输出/usage/status证据、剩余槽、retired决定保存，结果STOPPED/route_retired，v25 halted。原38代码/输入/144份历史与.env哈希不变，v25前2029条等于v24，未修改旧评分/生产默认。报告docs/acceptance/mvp-0.3-t033-schema-dedup-real-audit-20261002.md及同日real-result/slot-1/slot-2/retired/run-verification，正式闸门关闭，T033保持blocked，保存后停止，不学习流程/浏览器/生成/正式验收或切生产。",
-        "2026-10-02仅做方案决策：形成待批准ADR-0006，比较独立Qwen3.8-Max审核候选与人工审核课程目录版；推荐仅A1隔离接入/离线验证，未实施、未冻结新模型、未调用Provider。官方资料仅验证思考预算/总输出/结构化接口声明，项目检错与账号可用性未知；拟议总输出仍≤8192，不改v7/生产/旧评分。A2最多8次仅未来建议，需独立授权；B仅规划方向，PRD/可信导入/API数据/退出任务须另行批准，不能把旧T033失败改成通过。文档引用/预算算术/255保护文件哈希/diff检查与独立读者审核通过，新增Provider 0、累计2031/2500。提案docs/ADR/0006-review-model-or-curated-scope-proposal.md，证据docs/acceptance/mvp-0.3-t033-review-model-decision-offline-20261002.json；T033保持blocked，正式闸门关闭，保存后停止。",
-        "2026-10-02用户批准A1/qwen3.8-max-0902，仅离线实施独立审核候选：新增隔离Chat strict-schema适配器和REVIEW路由，生产工厂/env/v7/schema/原判定不改；4096思考预算、8182含推理总输出请求限制及10token余量、180秒、零重试、无审核回退。三类原审核消费者Mock验证拒绝/无效schema/语义/超时均不批准，FAST/DEFAULT/QUALITY及纠错仍原网关；缺用量/模型漂移/超预算失败关闭，百炼text_tokens含推理不误记正文，正文明细仍未知、不保存推理原文。273项相关离线测试、Ruff、97文件mypy、编译/diff及250生产/旧证据哈希检查通过。新冻结128代码/指令/原与等价传输schema/配置/8完整请求与来源哈希，FROZEN_NOT_EXECUTABLE，全unattempted；真实请求授权0，新增Provider 0、累计2031/2500。账户/参数组合/检错质量未验证，未批准生产双目标例外。交接docs/ADR/0006-a1-offline-review-candidate.md及docs/acceptance/mvp-0.3-t033-qwen-a1-freeze-20261002.json、同日qwen-a1-offline-result；T033保持blocked，正式闸门关闭，保存后停止。",
-        "2026-10-02按用户明确yes授权A2最多8次、固定顺序、零重试、首败即停；用户北京工作空间endpoint另冻130代码/原输入/原v7/schema/配置、新READY协议/v26账本，A1冻结不改。122项相关离线测试、Ruff、编译通过。第1槽linked-list-concept:explanation:1返回完整合法pass/空issues，漏检malloc失败后main直接赋值head丢失已有链的重大缺陷；首败停止并淘汰qwen-review-v7-budget4096-v1，余4错误/2长审核/1正确对照共7槽unattempted，不微调重测。真实新增1次、累计2032/2500；输入2559、总输出1389、推理1369、正文token未知/68字符、34.960303秒、HTTP200/stop、无截断；长审核与误拒未测。原始最终输出/用量/剩余槽/淘汰记录保存，运行后本地核验新增0请求：130代码/8来源/262生产历史与.env哈希不变、v26前2031条等于v25。本轮未修改用户env或切换生产，不构造生成网关、无生成/浏览器/正式验收、旧评分不改。证据docs/acceptance/mvp-0.3-t033-qwen-a2-real-audit-20261002.md及同日real-result/slot-1/target-freeze/run-protocol/retired/run-verification；T033保持blocked，正式闸门关闭，保存后停止。",
-        "2026-10-02用户另行授权qwen3.8-max-0902原main/head槽一次原样复测，最多1、零重试；新单槽协议/132代码哈希/v27账本，不恢复旧路线或余7槽。36项离线测试/Ruff/编译通过。真实1请求再次返回合法pass/空issues，漏检malloc失败后main覆盖非空head丢链/泄漏；完整原v7/schema/输入/配置不改，具体错误离线核对。HTTP200/stop，无截断，输入2559/总输出1334/推理1314/正文token未知/68字符，30.649966秒，累计2033/2500。441旧文件与.env、132代码哈希不变，v27前2032条等于v26，原失败/7 unattempted/旧成绩不改，结果STOPPED/retired。原始最终输出/usage与审计JSON已保存，运行后本地核验新增0调用，无生成/浏览器/正式验收或生产切换。证据docs/acceptance/mvp-0.3-t033-qwen-repeat-audit-20261002.json及repeat-result/slot-1/protocol/offline、ledger-v27；单槽重复性不能作为整体合格率，T033保持blocked，停止。"
-      ],
-      "started_at": "2026-09-29T22:56:00+08:00",
-      "completed_at": null,
-      "blocker": "qwen3.8-max-0902原main/head槽另行授权的单次原样复测再次漏检，返回合法pass/空issues；本次新增1、累计2033/2500。原候选仍retired，余7槽不跑，旧失败/评分不改。两次同样本漏检不能给出整体合格率，长审核/误拒仍未知。原动态正式质量与P95阻塞未解除，T033保持blocked、正式闸门关闭；不切生产或自动重测，不生成/浏览器/正式验收。课程目录B仅讨论未批准实施。 用户后续批准执行B课程目录版，动态验收仍暂缓；不改变本任务状态或原标准。",
-      "commit_lookup": "Task-Completed: MVP-0.3-T033"
-    },
+      "source": "docs/tasks/mvp-0.3.json",
+      "note": "历史动态质量/性能验收未通过，归档只读；恢复工作由Phase 1新任务独立验证，不领取或修改归档任务。",
+      "follow_up_tasks": [
+        "PHASE-1-T035",
+        "PHASE-1-T040",
+        "PHASE-1-T041"
+      ]
+    }
+  ],
+  "tasks": [
     {
-      "id": "MVP-0.3-T034",
-      "phase": "MVP 0.3",
-      "title": "完成课程目录版阶段退出与交接",
-      "status": "done",
-      "priority": "P0",
-      "depends_on": [
-        "MVP-0.3-T032",
-        "MVP-0.3-T045",
-        "MVP-0.3-T046"
-      ],
-      "scope": [
-        "docs/acceptance/",
-        "backend/tests/",
-        "web/tests/e2e/",
-        "README.md",
-        "docs/DEPLOYMENT.md",
-        "docs/ADR/README.md",
-        "scripts/verify_catalog_exit.py"
-      ],
-      "prd_source": "PRD v2.2 §0；原定义见目录范围变更记录",
-      "acceptance_criteria": [
-        "目录版内容签核/功能/动画/进度/导出/0模型调用通过且有完成提交；原动态T033仍blocked，不宣称通过。",
-        "README/部署/安全/来源与目录行为一致，列明自由生成/重解释/实时AI暂缓。",
-        "停止于目录版阶段交付，不自动归档或进入Phase 1。"
-      ],
-      "verification": [
-        "python3 scripts/verify_catalog_exit.py",
-        "python3 scripts/check_catalog_workflow.py",
-        "python3 scripts/verify_catalog_release.py",
-        "cd backend && .venv/bin/python -m pytest -q tests/test_catalog_release_preflight.py tests/test_catalog_acceptance_metrics.py tests/test_catalog_component_gate.py",
-        "backend/.venv/bin/ruff check scripts/verify_catalog_exit.py",
-        "git diff --check"
-      ],
-      "verification_results": [
-        "T032/T045/T046直接依赖done并有完成提交39c8c2d/05d5f87/7944490；44个前置done任务逐项核对Task-Completed精确标记/提交内done及依赖（T039既有两次完成标记保留并逐个校验）。T034完成后45 done/1 blocked，根账本不归档、不开始Phase1。",
-        "目录工程v2质量100/100、v4首屏20/20/缓存100/100/新渲染20/20、v5真实核心旅程复用；固定分母/P95/内容/运行代码/原始hash通过；未运行完整基准、数据库、浏览器或Worker。Lee实际签核准确digest92bb0dd4778391e23aae978b8a411b466d8b5988d1cff61cff01654604af21a1、allowlist/30资源/demo摘要及T046实际批准版本v3结果一致，保持生产未发布。",
-        "11相关离线预检/固定分母/组件闸门测试passed无跳过；Ruff/check_catalog_workflow/verify_catalog_release/verify_catalog_exit/文档本地引用及diff检查通过；235旧T033/遗留源码文件hash与T033任务对象不变，累计仍2033/2500，新增Provider0。",
-        "README/新部署说明/ADR索引同步目录范围、人工来源/受信登记撤回、Worker/媒体/备份及限制；自由生成/重解释/实时AI与动态辩论暂缓，T033保持blocked旧成绩不变。原README历史Provider未提交hunk留工作区且不夹带；旧T033代码/证据未提交，不宣称洁净checkout/公网部署已验收。",
-        "退出报告docs/acceptance/mvp-0.3-catalog-exit-20261003.md，离线检查docs/acceptance/mvp-0.3-catalog-exit-checks-20261003.json记录提交前核验，提交后只读确认本任务完成标记；本地提交后停止，不push/merge/部署/归档/跨阶段。"
-      ],
-      "started_at": "2026-10-03T15:45:19",
-      "completed_at": "2026-10-03T15:52:48",
-      "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.3-T034"
-    },
-    {
-      "id": "MVP-0.3-T036",
-      "phase": "MVP 0.3",
-      "title": "落实课程目录版范围与任务治理",
-      "status": "done",
+      "id": "PHASE-1-T001",
+      "phase": "Phase 1",
+      "title": "冻结Phase 1范围、验收与模型调用预算规则",
+      "status": "todo",
       "priority": "P0",
       "depends_on": [],
       "scope": [
         "docs/PRD.md",
-        "docs/ADR/0007-curated-course-catalog.md",
-        "docs/ADR/README.md",
-        "task.json",
-        "process.txt"
+        "docs/ADR/",
+        "docs/acceptance/",
+        "task.json"
       ],
-      "prd_source": "PRD v2.2 §0（目录版增补）",
+      "prd_source": "PRD §0.1、§9.1、§8、§10",
       "acceptance_criteria": [
-        "固定10节点/30资源/30题/预设演示与暂缓能力，原动态指标和失败保留。",
-        "拆分目录实施任务；T033仍blocked，新退出依赖单独记录。"
+        "逐项映射模型接入、持久化队列、受约束DSL及约30节点图谱的交付与退出条件；以§9.1明确本阶段范围，其他章节P1标签中的扩展不自动纳入。",
+        "确定新增能力的离线、集成和真实验证口径；沿用相关PRD门槛，模型/配置/样本分母分别冻结，不把目录成绩当动态能力通过。",
+        "付费验证须有独立预算和授权、分组诊断与提前停止；沿用归档T033失败样本并加入未参与调参的新案例，不以少量诊断代替正式比例。",
+        "列明需批准的重大API/数据/安全决定和对应任务依赖；规划完成不等于批准ADR或开放动态入口。"
       ],
       "verification": [
-        "python3 scripts/check_catalog_workflow.py"
+        "核对PRD逐项映射、任务依赖、全部退出指标与预算规则；保存Phase 1验收计划。"
       ],
-      "verification_results": [
-        "python3 scripts/check_catalog_workflow.py：范围/唯一ID/依赖/单执行者/T033 blocked检查通过；git diff --check通过；本轮Provider 0累计2033/2500。"
-      ],
-      "started_at": "2026-10-02T20:08:13+08:00",
-      "completed_at": "2026-10-02T20:08:41+08:00",
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
       "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.3-T036"
+      "commit_lookup": "Task-Completed: PHASE-1-T001"
     },
     {
-      "id": "MVP-0.3-T037",
-      "phase": "MVP 0.3",
-      "title": "建立可信课程包与人工发布来源",
-      "status": "done",
+      "id": "PHASE-1-T002",
+      "phase": "Phase 1",
+      "title": "确定Provider身份、凭据及数据发送边界",
+      "status": "todo",
       "priority": "P0",
       "depends_on": [
-        "MVP-0.3-T036"
+        "PHASE-1-T001"
+      ],
+      "scope": [
+        "docs/ADR/",
+        "docs/PROVIDERS.md",
+        "docs/PRD.md"
+      ],
+      "prd_source": "PRD §3.8、§5.9、§8.3、§9.4",
+      "acceptance_criteria": [
+        "为现有匿名owner下的BYOK明确持久化凭据归属、会话到期/删除、主密钥管理和轮换边界；不顺带实施账户系统。",
+        "确定临时Key的会话绑定、任务终止及进程重启清理；临时Key不写数据库、队列、日志或前端持久存储。",
+        "确定本地模型白名单、自定义URL防SSRF、数据去向确认及显式回退策略；形成获得用户批准的ADR后才能实现相关任务。"
+      ],
+      "verification": [
+        "审阅威胁边界、凭据生命周期和失败情形；记录具体批准范围，未批准保持blocked。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T002"
+    },
+    {
+      "id": "PHASE-1-T003",
+      "phase": "Phase 1",
+      "title": "固定Provider连接及模型偏好API契约",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1-T002"
+      ],
+      "scope": [
+        "docs/api/openapi.yaml",
+        "docs/PROVIDERS.md",
+        "docs/ADR/"
+      ],
+      "prd_source": "PRD §3.8、§7.8",
+      "acceptance_criteria": [
+        "定义连接CRUD、连接测试、模型列表、任务档位与统一能力/错误响应；复用owner与CSRF身份边界。",
+        "API仅返回凭据存在标识和脱敏字段；定义连接删除、模型不可用及配置版本并发冲突语义。",
+        "OpenAPI引用可解析，新增契约符合已批准ADR；Provider API不得自行绕过catalog_only动态门禁。"
+      ],
+      "verification": [
+        "校验OpenAPI全部引用、operationId唯一性及请求/错误示例；对照批准ADR。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T003"
+    },
+    {
+      "id": "PHASE-1-T004",
+      "phase": "Phase 1",
+      "title": "持久化加密Provider连接",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1-T003"
       ],
       "scope": [
         "backend/app/models/",
-        "backend/app/services/catalog*",
         "backend/alembic/",
-        "backend/tests/test_catalog*"
+        "backend/app/core/",
+        "backend/app/services/",
+        "backend/tests/"
       ],
-      "prd_source": "PRD v2.2 §0（目录版增补）",
+      "prd_source": "PRD §3.8、§5.9、§8.3",
       "acceptance_criteria": [
-        "受信摘要/人工审核证据/schema/完整性全部有效才原子发布；伪造/冲突拒绝。",
-        "人工来源可追溯、可撤回、旧模型审核不改；迁移与来源资格测试通过。"
+        "以Alembic建立owner隔离的连接及加密凭据模型，数据库仅保存密文和必要元数据。",
+        "实现凭据加密、更新、删除及批准的主密钥轮换行为；密钥缺失/解密失败关闭调用。",
+        "数据库快照、日志和错误响应测试无明文Key，跨owner访问拒绝。"
       ],
       "verification": [
-        "cd backend && .venv/bin/python -m pytest -q tests/test_catalog_package.py tests/test_catalog_publication.py"
+        "cd backend && .venv/bin/python -m pytest -q tests/test_provider_connections_persistence.py",
+        "对本任务改动运行Ruff和mypy；涉及持久化时在隔离PostgreSQL核验迁移及并发。"
       ],
-      "verification_results": [
-        "25项课程包/原资源schema离线测试通过；Ruff通过；4文件mypy通过。",
-        "backend/.venv/bin/python scripts/run_catalog_db_tests.py tests/test_catalog_publication.py tests/test_resource_publication.py：新隔离PostgreSQL edumind_catalog_20261002迁移到0017，2 passed in 0.42s，实际owner/来源/撤回/旧模型发布回归通过；Provider 0。",
-        "第一次测试预期可篡改资源被既有数据库不可变触发器拒绝，修正测试为断言IntegrityError，没有取消约束；结果重新验证通过。"
-      ],
-      "started_at": "2026-10-02T20:09:24+08:00",
-      "completed_at": "2026-10-02T20:17:28+08:00",
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
       "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.3-T037"
+      "commit_lookup": "Task-Completed: PHASE-1-T004"
     },
     {
-      "id": "MVP-0.3-T038",
-      "phase": "MVP 0.3",
-      "title": "准备固定课程候选包并离线验证",
-      "status": "done",
-      "priority": "P0",
+      "id": "PHASE-1-T005",
+      "phase": "Phase 1",
+      "title": "提供会话临时Key生命周期",
+      "status": "todo",
+      "priority": "P1",
       "depends_on": [
-        "MVP-0.3-T037"
-      ],
-      "scope": [
-        "data/course_catalog/",
-        "backend/tests/test_catalog_content.py"
-      ],
-      "prd_source": "PRD v2.2 §0（目录版增补）",
-      "acceptance_criteria": [
-        "10节点各讲解/C示例/3唯一答案题，共30资源30题及1预设脚本；内容不使用旧错误候选直接发布。",
-        "C示例受限编译/边界验证；候选保持待人工签核，不伪造审核人。"
-      ],
-      "verification": [
-        "cd backend && .venv/bin/python -m pytest -q tests/test_catalog_content.py"
-      ],
-      "verification_results": [
-        "EDUMIND_DOCKER_TESTS=1 backend/.venv/bin/python -m pytest -q backend/tests/test_catalog_content.py：30 passed（11 schema/计分校验＋19真实禁网容器C/失败注入），ASan/UBSan启用；Ruff/diff通过。",
-        "初次19运行因临时目录noexec全部执行失败（编译成功），只修正测试tmpfs exec后全部独立重跑通过；未弱化代码断言。",
-        "候选manifest digest 92bb0dd4778391e23aae978b8a411b466d8b5988d1cff61cff01654604af21a1；PENDING_HUMAN_REVIEW，审核人/时间null，无批准文件。Provider 0，累计2033/2500。"
-      ],
-      "started_at": "2026-10-02T20:18:24+08:00",
-      "completed_at": "2026-10-02T20:26:18+08:00",
-      "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.3-T038"
-    },
-    {
-      "id": "MVP-0.3-T039",
-      "phase": "MVP 0.3",
-      "title": "无模型创建目录学习单元",
-      "status": "done",
-      "priority": "P0",
-      "depends_on": [
-        "MVP-0.3-T037",
-        "MVP-0.3-T038"
-      ],
-      "scope": [
-        "backend/app/api/catalog.py",
-        "backend/app/services/catalog_sessions.py",
-        "backend/tests/test_catalog_sessions.py",
-        "docs/api/openapi.yaml"
-      ],
-      "prd_source": "PRD v2.2 §0（目录版增补）",
-      "acceptance_criteria": [
-        "目录读取/固定node创建owner快照，REST/CSRF/幂等/版本绑定通过。",
-        "不需Provider key、不解析自由目标、不暴露答案、未批准/撤回不创建。"
-      ],
-      "verification": [
-        "cd backend && .venv/bin/python -m pytest -q tests/test_catalog_sessions.py"
-      ],
-      "verification_results": [
-        "backend/.venv/bin/python scripts/run_catalog_db_tests.py tests/test_catalog_sessions.py：实际PostgreSQL/REST 1复合场景通过；身份/CSRF/原子单快照/幂等冲突/owner隔离/服务器答案隐藏/撤回/未批准失败关闭；Provider工厂禁止构造且无key。",
-        "Ruff、2文件mypy、契约JSON解析、workflow/diff通过；初次字段名及夹具长度检查失败，修复后全量复验通过；Provider 0累计2033/2500。",
-        "补充更正：初次契约脚本使用系统Python失败；backend/.venv/bin/python生成并实际解析新契约后通过，单独补充提交。"
-      ],
-      "started_at": "2026-10-02T20:30:42",
-      "completed_at": "2026-10-02T21:00:29",
-      "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.3-T039"
-    },
-    {
-      "id": "MVP-0.3-T040",
-      "phase": "MVP 0.3",
-      "title": "关闭目录版动态模型入口",
-      "status": "done",
-      "priority": "P0",
-      "depends_on": [
-        "MVP-0.3-T036"
+        "PHASE-1-T002",
+        "PHASE-1-T004"
       ],
       "scope": [
         "backend/app/core/",
-        "backend/app/main.py",
+        "backend/app/services/",
+        "backend/tests/"
+      ],
+      "prd_source": "PRD §3.8 API Key与隐私",
+      "acceptance_criteria": [
+        "按批准ADR将临时Key限制在所属会话内存，任务结束或会话到期销毁。",
+        "进程重启或会话丢失后要求重新提供凭据；后台任务不得把临时Key序列化到队列。",
+        "并发owner、过期及取消回归通过，不把用户持久化Key误当临时Key清除。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/python -m pytest -q tests/test_temporary_provider_credentials.py",
+        "对本任务改动运行Ruff和mypy；涉及持久化时在隔离PostgreSQL核验迁移及并发。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T005"
+    },
+    {
+      "id": "PHASE-1-T006",
+      "phase": "Phase 1",
+      "title": "验证云端目标与本地模型白名单",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1-T002"
+      ],
+      "scope": [
+        "backend/app/core/",
+        "backend/app/services/",
+        "backend/tests/",
+        "docs/PROVIDERS.md"
+      ],
+      "prd_source": "PRD §8.3、§9.4",
+      "acceptance_criteria": [
+        "阻断云端回环、私网、链路本地、元数据、重定向及DNS解析变化绕过；请求前验证实际目标。",
+        "Ollama等本地目标仅允许管理员显式白名单；客户端不能自行扩大可访问网络。",
+        "拒绝时无出站请求，日志与错误不暴露凭据。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/python -m pytest -q tests/test_provider_target_policy.py",
+        "对本任务改动运行Ruff和mypy；涉及持久化时在隔离PostgreSQL核验迁移及并发。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T006"
+    },
+    {
+      "id": "PHASE-1-T007",
+      "phase": "Phase 1",
+      "title": "按连接路由OpenAI-compatible请求",
+      "status": "todo",
+      "priority": "P1",
+      "depends_on": [
+        "PHASE-1-T004",
+        "PHASE-1-T005",
+        "PHASE-1-T006"
+      ],
+      "scope": [
+        "backend/app/services/",
+        "backend/app/core/provider_factory.py",
+        "backend/tests/",
+        "docs/PROVIDERS.md"
+      ],
+      "prd_source": "PRD §3.8",
+      "acceptance_criteria": [
+        "网关接受已验证连接与能力需求，保留系统默认兼容Provider行为；业务模块不依赖厂商SDK。",
+        "流式、结构化输出、取消和统一错误语义保持一致；所有重试受上限约束。",
+        "凭据与学习上下文只发送到已选择目标，不隐式切换供应商。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/python -m pytest -q tests/test_provider_connection_gateway.py",
+        "对本任务改动运行Ruff和mypy；涉及持久化时在隔离PostgreSQL核验迁移及并发。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T007"
+    },
+    {
+      "id": "PHASE-1-T008",
+      "phase": "Phase 1",
+      "title": "接入Ollama文本与能力适配",
+      "status": "todo",
+      "priority": "P1",
+      "depends_on": [
+        "PHASE-1-T007"
+      ],
+      "scope": [
+        "backend/app/services/",
+        "backend/tests/",
+        "docs/PROVIDERS.md",
+        "backend/pyproject.toml",
+        "backend/uv.lock"
+      ],
+      "prd_source": "PRD §3.8 Provider类型与能力注册",
+      "acceptance_criteria": [
+        "Ollama文本、流式和支持的结构化能力映射到统一网关，模型能力显式声明。",
+        "仅走本地白名单，模型缺失/连接失败/输出无效使用统一错误；不自动下载模型。",
+        "Mock契约验证通过，真实本地实例可用性留到独立接入验收，不伪造未运行结果。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/python -m pytest -q tests/test_ollama_adapter.py",
+        "对本任务改动运行Ruff和mypy；涉及持久化时在隔离PostgreSQL核验迁移及并发。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T008"
+    },
+    {
+      "id": "PHASE-1-T009",
+      "phase": "Phase 1",
+      "title": "提供owner隔离的连接管理API",
+      "status": "todo",
+      "priority": "P1",
+      "depends_on": [
+        "PHASE-1-T003",
+        "PHASE-1-T004",
+        "PHASE-1-T005",
+        "PHASE-1-T006"
+      ],
+      "scope": [
         "backend/app/api/",
-        "backend/tests/test_catalog_mode.py",
-        "docker-compose.yml"
+        "backend/app/services/",
+        "backend/tests/",
+        "docs/api/openapi.yaml"
       ],
-      "prd_source": "PRD v2.2 §0（目录版增补）",
+      "prd_source": "PRD §7.8",
       "acceptance_criteria": [
-        "目录模式生成/重解释/发言/动态辩论/角色直调在模型依赖前拒绝，0 Provider。",
-        "静态查询/控制/Job可用，无key启动，历史代码保留但不自动重放模型操作。"
+        "提供新增、更新、删除连接及安全的查询表示，遵循配置版本和幂等约定。",
+        "owner/CSRF校验在凭据读取或网络动作前完成，删除后不可再调用。",
+        "所有响应不回传Key；缺失、撤销和并发更新行为符合契约。"
       ],
       "verification": [
-        "cd backend && .venv/bin/python -m pytest -q tests/test_catalog_mode.py"
+        "cd backend && .venv/bin/python -m pytest -q tests/test_provider_connections_api.py",
+        "对本任务改动运行Ruff和mypy；涉及持久化时在隔离PostgreSQL核验迁移及并发。"
       ],
-      "verification_results": [
-        "backend/.venv/bin/python scripts/run_catalog_db_tests.py tests/test_catalog_mode.py tests/test_catalog_sessions.py：8 passed；默认/无效范围关闭、无key health/runtime、Provider工厂阻断、真实身份/CSRF/路由依赖顺序、旧资源隔离与目录回归。",
-        "EDUMIND_PRODUCT_MODE=dynamic backend/.venv/bin/python scripts/run_catalog_db_tests.py tests/test_profile_behavior_updates.py tests/test_resource_publication.py：3 passed（mock、0 Provider）。",
-        "Ruff/5文件mypy、OpenAPI JSON解析/workflow/diff通过；Provider 0累计2033/2500。"
-      ],
-      "started_at": "2026-10-02T21:01:45",
-      "completed_at": "2026-10-02T21:25:34",
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
       "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.3-T040"
+      "commit_lookup": "Task-Completed: PHASE-1-T009"
     },
     {
-      "id": "MVP-0.3-T041",
-      "phase": "MVP 0.3",
-      "title": "固定题评分与掌握度证据去重",
-      "status": "done",
-      "priority": "P0",
+      "id": "PHASE-1-T010",
+      "phase": "Phase 1",
+      "title": "提供有界连接测试API",
+      "status": "todo",
+      "priority": "P1",
       "depends_on": [
-        "MVP-0.3-T039"
+        "PHASE-1-T007",
+        "PHASE-1-T008",
+        "PHASE-1-T009"
       ],
       "scope": [
-        "backend/app/services/quiz*",
-        "backend/app/services/mastery*",
-        "backend/tests/test_catalog_quiz.py"
+        "backend/app/api/",
+        "backend/app/services/",
+        "backend/tests/",
+        "docs/api/openapi.yaml"
       ],
-      "prd_source": "PRD v2.2 §0（目录版增补）",
+      "prd_source": "PRD §7.8 POST connections/{id}/test",
       "acceptance_criteria": [
-        "服务端评分、题集来源/版本/撤回校验通过，重开相同题集/重复作答不刷掌握度。",
-        "重复提交回执可恢复，错题反馈保留，历史归约规则/成绩不回写。"
+        "仅对显式选中的连接执行一次有期限的能力探测，返回实际目标与安全状态。",
+        "未授权owner、非法目标及缺失凭据在出站前失败；不后台轮询或自动回退。",
+        "UI/响应说明测试可能调用服务；自动化验证使用Mock，真实探测另行授权计数。"
       ],
       "verification": [
-        "cd backend && .venv/bin/python -m pytest -q tests/test_catalog_quiz.py"
+        "cd backend && .venv/bin/python -m pytest -q tests/test_provider_connection_test_api.py",
+        "对本任务改动运行Ruff和mypy；涉及持久化时在隔离PostgreSQL核验迁移及并发。"
       ],
-      "verification_results": [
-        "EDUMIND_PRODUCT_MODE=dynamic backend/.venv/bin/python scripts/run_catalog_db_tests.py tests/test_quiz_api.py tests/test_quiz_scoring.py tests/test_mastery_updates.py tests/test_mastery_rules.py tests/test_catalog_quiz.py：29 passed（实际PG+旧mock回归）；目录固定题含不完整/重复/重开/并发/后续重算/撤回/幂等恢复。",
-        "Ruff/4文件mypy/diff通过；首轮旧竞态2失败因读取屏障与新增前置锁相遇，调整为初读后锁/锁后复读，未弱化断言，最终29项完整复验通过；Provider 0累计2033/2500。"
-      ],
-      "started_at": "2026-10-02T21:25:56",
-      "completed_at": "2026-10-02T21:32:48",
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
       "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.3-T041"
+      "commit_lookup": "Task-Completed: PHASE-1-T010"
     },
     {
-      "id": "MVP-0.3-T042",
-      "phase": "MVP 0.3",
-      "title": "读取预设演示并恢复学习位置",
-      "status": "done",
-      "priority": "P0",
+      "id": "PHASE-1-T011",
+      "phase": "Phase 1",
+      "title": "提供模型列表与能力声明",
+      "status": "todo",
+      "priority": "P1",
       "depends_on": [
-        "MVP-0.3-T039",
-        "MVP-0.3-T040"
+        "PHASE-1-T007",
+        "PHASE-1-T008",
+        "PHASE-1-T009"
       ],
       "scope": [
-        "backend/app/api/catalog.py",
-        "backend/app/services/catalog*",
-        "backend/tests/test_catalog_demo.py"
+        "backend/app/api/",
+        "backend/app/services/",
+        "backend/tests/",
+        "docs/PROVIDERS.md"
       ],
-      "prd_source": "PRD v2.2 §0（目录版增补）",
+      "prd_source": "PRD §3.8、§7.8",
       "acceptance_criteria": [
-        "仅批准脚本，明确预设、无模型总结；开始退出保持owner/返回点。",
-        "不调用动态辩论入口，脚本来源及恢复测试通过。"
+        "按连接获取或显式刷新模型列表，保留能力来源和版本；供应商未声明的能力保持未知。",
+        "能力不匹配在业务请求出站前拒绝，不使用模型名称推断支持结构化/工具调用。",
+        "刷新有期限和次数上限；返回脱敏结果并隔离各owner的私有模型。"
       ],
       "verification": [
-        "cd backend && .venv/bin/python -m pytest -q tests/test_catalog_demo.py"
+        "cd backend && .venv/bin/python -m pytest -q tests/test_provider_model_catalog.py",
+        "对本任务改动运行Ruff和mypy；涉及持久化时在隔离PostgreSQL核验迁移及并发。"
       ],
-      "verification_results": [
-        "backend/.venv/bin/python scripts/run_catalog_db_tests.py tests/test_catalog_demo.py tests/test_catalog_mode.py tests/test_catalog_sessions.py tests/test_catalog_quiz.py：12 passed；含预设REST暂停/运行两种返回点、刷新恢复、CAS/幂等/跨owner/撤回/控制冲突。",
-        "EDUMIND_PRODUCT_MODE=dynamic backend/.venv/bin/python scripts/run_catalog_db_tests.py tests/test_classroom_persistence.py tests/test_classroom_controls_api.py tests/test_classroom_mode_api.py：21 passed（mock、零Provider）。",
-        "Ruff/3文件mypy/OpenAPI JSON/diff通过，预设不写动态DebateResult或model身份；Provider 0累计2033/2500。"
-      ],
-      "started_at": "2026-10-02T21:33:13",
-      "completed_at": "2026-10-03T00:33:16",
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
       "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.3-T042"
+      "commit_lookup": "Task-Completed: PHASE-1-T011"
     },
     {
-      "id": "MVP-0.3-T043",
-      "phase": "MVP 0.3",
-      "title": "接通目录学习与动画进度界面",
-      "status": "done",
-      "priority": "P0",
+      "id": "PHASE-1-T012",
+      "phase": "Phase 1",
+      "title": "按任务档位解析模型选择与回退",
+      "status": "todo",
+      "priority": "P1",
       "depends_on": [
-        "MVP-0.3-T039",
-        "MVP-0.3-T040",
-        "MVP-0.3-T041",
-        "MVP-0.3-T042"
+        "PHASE-1-T003",
+        "PHASE-1-T007",
+        "PHASE-1-T011"
+      ],
+      "scope": [
+        "backend/app/models/",
+        "backend/alembic/",
+        "backend/app/services/",
+        "backend/app/api/",
+        "backend/tests/"
+      ],
+      "prd_source": "PRD §3.8、§5.9、§7.8",
+      "acceptance_criteria": [
+        "持久化并解析任务临时覆盖→用户任务档位→用户默认→系统默认，支持fast/default/quality/review。",
+        "审核档位可独立选模型；审核运行不可用时继续拒绝正式发布。",
+        "仅按用户批准的回退目标发送数据，记录实际目标和原因；删除/撤销连接后的偏好失效可解释。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/python -m pytest -q tests/test_model_preferences.py",
+        "对本任务改动运行Ruff和mypy；涉及持久化时在隔离PostgreSQL核验迁移及并发。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T012"
+    },
+    {
+      "id": "PHASE-1-T013",
+      "phase": "Phase 1",
+      "title": "提供连接管理界面",
+      "status": "todo",
+      "priority": "P1",
+      "depends_on": [
+        "PHASE-1-T009",
+        "PHASE-1-T010",
+        "PHASE-1-T011"
+      ],
+      "scope": [
+        "web/src/",
+        "web/tests/",
+        "docs/PROVIDERS.md"
+      ],
+      "prd_source": "PRD §3.8",
+      "acceptance_criteria": [
+        "学生可新增、编辑、删除兼容/Ollama连接并显式测试，显示实际目标及支持能力。",
+        "Key输入完成后不落本地持久存储、不回显；清楚区分临时与持久化连接。",
+        "非法目标、模型缺失和测试失败有可理解反馈；模型设置不阻塞已有目录学习。"
+      ],
+      "verification": [
+        "cd web && pnpm test --run tests/provider-settings.spec.ts",
+        "cd web && pnpm typecheck && pnpm build；对本任务改动运行ESLint。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T013"
+    },
+    {
+      "id": "PHASE-1-T014",
+      "phase": "Phase 1",
+      "title": "提供任务档位与数据去向设置",
+      "status": "todo",
+      "priority": "P1",
+      "depends_on": [
+        "PHASE-1-T012",
+        "PHASE-1-T013"
       ],
       "scope": [
         "web/src/",
         "web/tests/"
       ],
-      "prd_source": "PRD v2.2 §0（目录版增补）",
+      "prd_source": "PRD §3.8 模型能力注册与隐私",
       "acceptance_criteria": [
-        "目录/固定正文/练习/进度/动画与刷新恢复可用，动态按钮不触发调用。",
-        "预设标识清楚、未知未批准/撤回有明确反馈；类型检查/组件测试/构建通过。"
+        "界面支持四档模型、默认连接与显式回退设置，保存后展示实际解析结果。",
+        "调用前说明Provider、模型、发送的数据类型和本地/云端属性；默认不授权跨厂商回退。",
+        "设置入口不自动开放被catalog_only关闭的动态学习能力。"
       ],
       "verification": [
-        "cd web && pnpm test",
-        "cd web && pnpm build"
+        "cd web && pnpm test --run tests/model-preferences.spec.ts",
+        "cd web && pnpm typecheck && pnpm build；对本任务改动运行ESLint。"
       ],
-      "verification_results": [
-        "pnpm --dir web test --run：21文件132 passed；含新目录API/页面10项、lost-response幂等、owner恢复、撤回清理、预设返回tab、固定动画节点、范围读取失败关闭；原组件/旧mock流程保留。",
-        "pnpm --dir web typecheck/build通过；pnpm --dir web lint通过（0 errors，原有67 warnings）；新文件定向eslint无warning；backend目录API补来源字段，5实际PG/REST回归通过；Ruff/diff通过。",
-        "Provider 0累计2033/2500，目录候选尚未发布；真实浏览器/测量在T045。"
-      ],
-      "started_at": "2026-10-03T00:33:46",
-      "completed_at": "2026-10-03T00:47:15",
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
       "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.3-T043"
+      "commit_lookup": "Task-Completed: PHASE-1-T014"
     },
     {
-      "id": "MVP-0.3-T044",
-      "phase": "MVP 0.3",
-      "title": "导出目录资源与真实来源",
-      "status": "done",
-      "priority": "P0",
+      "id": "PHASE-1-T015",
+      "phase": "Phase 1",
+      "title": "接入Anthropic原生适配器",
+      "status": "todo",
+      "priority": "P1",
       "depends_on": [
-        "MVP-0.3-T039",
-        "MVP-0.3-T041",
-        "MVP-0.3-T042"
+        "PHASE-1-T007",
+        "PHASE-1-T011",
+        "PHASE-1-T012"
       ],
       "scope": [
-        "backend/app/services/markdown_notes.py",
-        "backend/tests/test_catalog_exports.py",
-        "web/src/components/",
-        "backend/app/services/animation*.py",
-        "backend/app/services/catalog_animation_access.py",
-        "backend/app/api/animation_jobs.py",
+        "backend/app/services/",
+        "backend/tests/",
+        "docs/PROVIDERS.md",
+        "backend/pyproject.toml",
+        "backend/uv.lock"
+      ],
+      "prd_source": "PRD §3.8 Provider类型",
+      "acceptance_criteria": [
+        "按实施时官方文档适配文本、流式与声明支持的工具/结构化能力，依赖锁定。",
+        "统一消息/结束/用量/错误语义，缺失用量记未知，不伪造结构化能力。",
+        "Mock契约与取消/限流/无效结果测试通过；真实接入验证单独记录。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/python -m pytest -q tests/test_anthropic_adapter.py",
+        "对本任务改动运行Ruff和mypy；涉及持久化时在隔离PostgreSQL核验迁移及并发。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T015"
+    },
+    {
+      "id": "PHASE-1-T016",
+      "phase": "Phase 1",
+      "title": "接入Gemini原生适配器",
+      "status": "todo",
+      "priority": "P1",
+      "depends_on": [
+        "PHASE-1-T007",
+        "PHASE-1-T011",
+        "PHASE-1-T012"
+      ],
+      "scope": [
+        "backend/app/services/",
+        "backend/tests/",
+        "docs/PROVIDERS.md",
+        "backend/pyproject.toml",
+        "backend/uv.lock"
+      ],
+      "prd_source": "PRD §3.8 Provider类型",
+      "acceptance_criteria": [
+        "按实施时官方文档适配文本、流式、结构化及实际支持的多模态输入能力，依赖锁定。",
+        "非文本输入只按已有授权上传；统一输出、结束和错误语义。",
+        "Mock契约与取消/能力不匹配测试通过，真实多模态或云端探测不自动执行。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/python -m pytest -q tests/test_gemini_adapter.py",
+        "对本任务改动运行Ruff和mypy；涉及持久化时在隔离PostgreSQL核验迁移及并发。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T016"
+    },
+    {
+      "id": "PHASE-1-T017",
+      "phase": "Phase 1",
+      "title": "接入讯飞星火可选适配器",
+      "status": "todo",
+      "priority": "P1",
+      "depends_on": [
+        "PHASE-1-T007",
+        "PHASE-1-T011",
+        "PHASE-1-T012"
+      ],
+      "scope": [
+        "backend/app/services/",
+        "backend/tests/",
+        "docs/PROVIDERS.md",
+        "backend/pyproject.toml",
+        "backend/uv.lock"
+      ],
+      "prd_source": "PRD §3.8 Provider类型",
+      "acceptance_criteria": [
+        "按实施时官方文档接入可选文本生成与流式能力，凭据沿用统一安全边界。",
+        "业务层不绑定星火，能力不支持时显式拒绝，统一取消、限流和错误处理。",
+        "Mock测试通过，真实账号和模型可用性留独立接入验收。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/python -m pytest -q tests/test_spark_adapter.py",
+        "对本任务改动运行Ruff和mypy；涉及持久化时在隔离PostgreSQL核验迁移及并发。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T017"
+    },
+    {
+      "id": "PHASE-1-T018",
+      "phase": "Phase 1",
+      "title": "确定持久化队列与迁移边界",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1-T001"
+      ],
+      "scope": [
+        "docs/ADR/",
+        "docs/api/openapi.yaml",
+        "docs/ARCHITECTURE.md"
+      ],
+      "prd_source": "PRD §3.3异步任务、§5.7、§6、§9.1",
+      "acceptance_criteria": [
+        "确定Redis/Celery投递与PostgreSQL Job状态的职责、幂等键、租约和事务边界。",
+        "明确重复投递、broker重启、Worker死亡、取消和旧结果迟到的处置，不降低既有owner/SSE语义。",
+        "给出从现有Worker切换和回滚方案，获得涉及数据/安全边界的ADR批准后实施。"
+      ],
+      "verification": [
+        "逐情形评审任务时序与恢复方案，记录批准的ADR及API差异。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T018"
+    },
+    {
+      "id": "PHASE-1-T019",
+      "phase": "Phase 1",
+      "title": "可靠投递已提交的长任务",
+      "status": "todo",
+      "priority": "P1",
+      "depends_on": [
+        "PHASE-1-T018"
+      ],
+      "scope": [
+        "backend/app/models/",
+        "backend/alembic/",
+        "backend/app/services/",
+        "backend/app/workers/",
+        "backend/tests/",
+        "backend/pyproject.toml",
+        "backend/uv.lock",
+        "docker-compose.yml"
+      ],
+      "prd_source": "PRD §5.7、§9.1",
+      "acceptance_criteria": [
+        "事务提交后按批准机制投递Job，broker故障不丢失已接受的任务。",
+        "重复投递复用同一持久化Job，密钥和完整敏感上下文不进入消息载荷。",
+        "队列依赖由锁文件固定，迁移和回滚路径在隔离环境验证。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/python -m pytest -q tests/test_durable_job_dispatch.py",
+        "对本任务改动运行Ruff和mypy；涉及持久化时在隔离PostgreSQL核验迁移及并发。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T019"
+    },
+    {
+      "id": "PHASE-1-T020",
+      "phase": "Phase 1",
+      "title": "恢复Celery Worker中断任务",
+      "status": "todo",
+      "priority": "P1",
+      "depends_on": [
+        "PHASE-1-T019"
+      ],
+      "scope": [
+        "backend/app/workers/",
+        "backend/app/services/",
+        "backend/tests/",
+        "docs/DEPLOYMENT.md"
+      ],
+      "prd_source": "PRD §9.1长任务可恢复、ADR-0004",
+      "acceptance_criteria": [
+        "Celery Worker复用现有渲染服务和隔离规则，领取/心跳/租约与PostgreSQL状态一致。",
+        "进程死亡、租约过期和broker重启后有界恢复，不重复发布媒体。",
+        "新旧Worker不能同时拥有一个尝试，实际隔离恢复演练有证据。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/python -m pytest -q tests/test_celery_job_recovery.py",
+        "对本任务改动运行Ruff和mypy；涉及持久化时在隔离PostgreSQL核验迁移及并发。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T020"
+    },
+    {
+      "id": "PHASE-1-T021",
+      "phase": "Phase 1",
+      "title": "保持队列任务取消与SSE恢复语义",
+      "status": "todo",
+      "priority": "P1",
+      "depends_on": [
+        "PHASE-1-T020"
+      ],
+      "scope": [
+        "backend/app/api/",
+        "backend/app/services/",
+        "backend/app/workers/",
+        "backend/tests/",
         "docs/api/openapi.yaml"
       ],
-      "prd_source": "PRD v2.2 §0（目录版增补）",
+      "prd_source": "PRD §3.3、§7 SSE、ADR-0004",
       "acceptance_criteria": [
-        "本人笔记来源为人工课程包/版本，不伪造模型审核。",
-        "未审/撤回/foreign不导出；错题及MP4/SRT绑定回归通过。"
+        "取消、重试和终态事件持久化；迟到渲染结果及过期attempt不能发布。",
+        "SSE游标重放、失效游标和断线恢复仍满足已批准契约，跨owner不可订阅。",
+        "数据库与消息队列故障不会把未完成任务伪装为成功。"
       ],
       "verification": [
-        "cd backend && .venv/bin/python -m pytest -q tests/test_catalog_exports.py"
+        "cd backend && .venv/bin/python -m pytest -q tests/test_queued_job_events.py",
+        "对本任务改动运行Ruff和mypy；涉及持久化时在隔离PostgreSQL核验迁移及并发。"
       ],
-      "verification_results": [
-        "EDUMIND_PRODUCT_MODE=dynamic backend/.venv/bin/python scripts/run_catalog_db_tests.py tests/test_catalog_exports.py tests/test_markdown_notes_api.py tests/test_animation_job_persistence.py tests/test_animation_worker.py tests/test_animation_job_api.py tests/test_animation_media_api.py tests/test_animation_events_api.py：23 passed/3真实Docker额外项未启用而skipped；新增目录复合场景使用TEST_ONLY批准与mock媒体，实际PG/HTTP来源/共享绑定/撤回/迟到拒绝通过。",
-        "最终目录单文件复验1 passed；Ruff/7文件mypy/契约JSON/diff通过。初次Markdown下划线转义预期及mock renderer必填参数修正；回归发现内部失败事件被误拦，资格检查移到读取入口，保留停止事件后完整复验。Provider 0累计2033/2500；真实Worker/浏览器留T045。"
-      ],
-      "started_at": "2026-10-03T00:48:00",
-      "completed_at": "2026-10-03T12:42:29",
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
       "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.3-T044"
+      "commit_lookup": "Task-Completed: PHASE-1-T021"
     },
     {
-      "id": "MVP-0.3-T045",
-      "phase": "MVP 0.3",
-      "title": "目录版独立核心集成验收",
-      "status": "done",
+      "id": "PHASE-1-T022",
+      "phase": "Phase 1",
+      "title": "确定动画DSL与审核安全契约",
+      "status": "todo",
       "priority": "P0",
       "depends_on": [
-        "MVP-0.3-T037",
-        "MVP-0.3-T038",
-        "MVP-0.3-T039",
-        "MVP-0.3-T040",
-        "MVP-0.3-T041",
-        "MVP-0.3-T042",
-        "MVP-0.3-T043",
-        "MVP-0.3-T044"
+        "PHASE-1-T001",
+        "PHASE-1-T018"
       ],
       "scope": [
+        "docs/ADR/",
+        "docs/api/openapi.yaml",
+        "docs/ARCHITECTURE.md",
+        "docs/agents/"
+      ],
+      "prd_source": "PRD §3.3动画流水线、§8.2、§9.1",
+      "acceptance_criteria": [
+        "版本化定义create_node/connect/disconnect/move_pointer/highlight/compare/swap/visit/show_complexity动作、对象引用和资源上限。",
+        "明确DSL审核、确定性编译、AST检查和隔离执行职责；模型不能提交任意Python。",
+        "缓存包含DSL/编译器/审核规则/模型来源版本，定义失败降级与撤回规则并获得ADR批准。"
+      ],
+      "verification": [
+        "审核DSL有效/无效示例、资源上限、发布与降级时序，核对批准记录。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T022"
+    },
+    {
+      "id": "PHASE-1-T023",
+      "phase": "Phase 1",
+      "title": "校验DSL对象、动作与资源上限",
+      "status": "todo",
+      "priority": "P1",
+      "depends_on": [
+        "PHASE-1-T022"
+      ],
+      "scope": [
+        "backend/app/services/",
+        "backend/tests/",
+        "data/"
+      ],
+      "prd_source": "PRD §3.3 DSL动作白名单",
+      "acceptance_criteria": [
+        "严格schema与语义校验拒绝未知动作、悬空引用、不合法指针状态、非法参数和超限场景。",
+        "仅允许声明的动作和受限文本/数值，不接受可执行代码或外部资源路径。",
+        "校验结果与规则版本可追溯，边界及恶意输入回归通过。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/python -m pytest -q tests/test_animation_dsl_validation.py",
+        "对本任务改动运行Ruff和mypy；涉及持久化时在隔离PostgreSQL核验迁移及并发。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T023"
+    },
+    {
+      "id": "PHASE-1-T024",
+      "phase": "Phase 1",
+      "title": "确定性编译DSL并检查生成代码",
+      "status": "todo",
+      "priority": "P1",
+      "depends_on": [
+        "PHASE-1-T023"
+      ],
+      "scope": [
+        "backend/app/services/",
+        "backend/tests/",
+        "docs/ARCHITECTURE.md"
+      ],
+      "prd_source": "PRD §3.3、§8.2",
+      "acceptance_criteria": [
+        "同版本同DSL确定性生成仅引用受信模板库的渲染代码，不拼接任意可执行文本。",
+        "编译结果执行AST/静态白名单检查，禁止任意文件/网络访问、未授权导入、eval/exec/os.system。",
+        "对转义、代码注入、动作顺序与编译版本变化有回归证据。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/python -m pytest -q tests/test_animation_dsl_compiler.py",
+        "对本任务改动运行Ruff和mypy；涉及持久化时在隔离PostgreSQL核验迁移及并发。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T024"
+    },
+    {
+      "id": "PHASE-1-T025",
+      "phase": "Phase 1",
+      "title": "审核并保存DSL正式候选",
+      "status": "todo",
+      "priority": "P1",
+      "depends_on": [
+        "PHASE-1-T012",
+        "PHASE-1-T023"
+      ],
+      "scope": [
+        "backend/app/agents/",
+        "backend/app/services/",
+        "backend/app/models/",
+        "backend/alembic/",
+        "backend/tests/"
+      ],
+      "prd_source": "PRD §3.3正式资源审核、§8.2",
+      "acceptance_criteria": [
+        "将schema/语义有效DSL交给选定审核档位，审核指令与规则版本化并保留具体意见。",
+        "不可用、截断、拒绝或修正未通过时不得进入正式发布；候选审核与最终版本hash绑定。",
+        "审核不执行候选代码，重复请求/版本变化不会沿用旧通过结论。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/python -m pytest -q tests/test_animation_dsl_review.py",
+        "对本任务改动运行Ruff和mypy；涉及持久化时在隔离PostgreSQL核验迁移及并发。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T025"
+    },
+    {
+      "id": "PHASE-1-T026",
+      "phase": "Phase 1",
+      "title": "生成受约束DSL并提供模板降级",
+      "status": "todo",
+      "priority": "P1",
+      "depends_on": [
+        "PHASE-1-T024",
+        "PHASE-1-T025"
+      ],
+      "scope": [
+        "backend/app/agents/",
+        "backend/app/services/",
+        "backend/tests/"
+      ],
+      "prd_source": "PRD §3.3缓存优先级与DSL降级",
+      "acceptance_criteria": [
+        "仅在审核缓存和参数化模板不能满足时按选择模型生成受约束DSL，业务依赖统一网关。",
+        "生成/审核/编译失败有界终止并降级到适用已验证模板，标明来源；无适用模板返回不可用。",
+        "失败不引起无限修正或静默换厂商，降级不改变学习目标或假报原动画已生成。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/python -m pytest -q tests/test_video_dsl_generation.py",
+        "对本任务改动运行Ruff和mypy；涉及持久化时在隔离PostgreSQL核验迁移及并发。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T026"
+    },
+    {
+      "id": "PHASE-1-T027",
+      "phase": "Phase 1",
+      "title": "在隔离Worker渲染审核后的DSL",
+      "status": "todo",
+      "priority": "P1",
+      "depends_on": [
+        "PHASE-1-T020",
+        "PHASE-1-T024",
+        "PHASE-1-T025"
+      ],
+      "scope": [
+        "backend/app/workers/",
+        "backend/app/services/",
+        "backend/tests/",
+        "docs/DEPLOYMENT.md"
+      ],
+      "prd_source": "PRD §3.3、§8.2、§9.4",
+      "acceptance_criteria": [
+        "只领取审核hash匹配的DSL，使用固定镜像、禁网、只读挂载和CPU/内存/时间限制执行受信编译结果。",
+        "超时、资源超限与容器失败留下可恢复终态，不泄露宿主文件或发布半成品。",
+        "真实容器隔离与故障恢复在专用测试环境验证，不执行任意模型Python。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/python -m pytest -q tests/test_dsl_render_worker.py",
+        "对本任务改动运行Ruff和mypy；涉及持久化时在隔离PostgreSQL核验迁移及并发。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T027"
+    },
+    {
+      "id": "PHASE-1-T028",
+      "phase": "Phase 1",
+      "title": "提供DSL动画Job与版本化缓存访问",
+      "status": "todo",
+      "priority": "P1",
+      "depends_on": [
+        "PHASE-1-T021",
+        "PHASE-1-T026",
+        "PHASE-1-T027"
+      ],
+      "scope": [
+        "backend/app/api/",
+        "backend/app/services/",
+        "backend/app/models/",
+        "backend/alembic/",
+        "backend/tests/",
+        "docs/api/openapi.yaml"
+      ],
+      "prd_source": "PRD §3.3、§7动画API",
+      "acceptance_criteria": [
+        "Job串起生成/审核/编译/渲染状态，对重复输入复用受信版本缓存。",
+        "资源/媒体访问校验owner、课程/动态来源、审核版本及撤回状态。",
+        "保存可解释失败和模板降级来源；普通学习不等待动画完成。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/python -m pytest -q tests/test_dsl_animation_jobs.py",
+        "对本任务改动运行Ruff和mypy；涉及持久化时在隔离PostgreSQL核验迁移及并发。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T028"
+    },
+    {
+      "id": "PHASE-1-T029",
+      "phase": "Phase 1",
+      "title": "展示DSL动画进度及降级结果",
+      "status": "todo",
+      "priority": "P1",
+      "depends_on": [
+        "PHASE-1-T028"
+      ],
+      "scope": [
+        "web/src/",
+        "web/tests/"
+      ],
+      "prd_source": "PRD §3.3按需动画交互",
+      "acceptance_criteria": [
+        "显示阶段进度、取消、恢复和失败原因，成功后播放并复用现有媒体导出入口。",
+        "明确模板与生成动画来源；动态能力未获开放时保留目录模板入口。",
+        "断线/刷新/撤回下不展示错误版本，动画失败不阻塞讲解与练习。"
+      ],
+      "verification": [
+        "cd web && pnpm test --run tests/dsl-animation.spec.ts",
+        "cd web && pnpm typecheck && pnpm build；对本任务改动运行ESLint。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T029"
+    },
+    {
+      "id": "PHASE-1-T030",
+      "phase": "Phase 1",
+      "title": "确定约30节点图谱与后端选型",
+      "status": "todo",
+      "priority": "P1",
+      "depends_on": [
+        "PHASE-1-T001"
+      ],
+      "scope": [
+        "docs/ADR/",
+        "docs/ARCHITECTURE.md",
+        "data/",
+        "docs/PRD.md"
+      ],
+      "prd_source": "PRD §3.4、§5.4、附录B、§9.1",
+      "acceptance_criteria": [
+        "冻结约30个数据结构节点的确切清单、稳定ID、先修关系与教材依据，保留既有10节点ID。",
+        "依据查询复杂度与测量决定复用YAML/PostgreSQL或引入Neo4j，不能仅因节点增加强制迁移。",
+        "明确新增节点的正式内容资格与缺资源行为；知识元数据不等于已审核课程，数据/API变更取得ADR批准。"
+      ],
+      "verification": [
+        "审阅节点清单、先修无环与查询场景；保存存储选型和批准记录。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T030"
+    },
+    {
+      "id": "PHASE-1-T031",
+      "phase": "Phase 1",
+      "title": "发布版本化扩展知识结构",
+      "status": "todo",
+      "priority": "P1",
+      "depends_on": [
+        "PHASE-1-T030"
+      ],
+      "scope": [
+        "data/knowledge_graph.yaml",
+        "backend/app/services/",
+        "backend/tests/",
+        "docs/"
+      ],
+      "prd_source": "PRD §3.4、附录B",
+      "acceptance_criteria": [
+        "按批准清单补齐约30节点的学习目标、误区、依据及关系，结构版本可追溯。",
+        "验证ID唯一、先修引用有效且无环，关系方向与基础教学顺序一致。",
+        "不直接更改已签核课程包或生成虚假资源/掌握度证据。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/python -m pytest -q tests/test_expanded_knowledge_structure.py",
+        "对本任务改动运行Ruff和mypy；涉及持久化时在隔离PostgreSQL核验迁移及并发。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T031"
+    },
+    {
+      "id": "PHASE-1-T032",
+      "phase": "Phase 1",
+      "title": "提供扩展图查询Repository",
+      "status": "todo",
+      "priority": "P1",
+      "depends_on": [
+        "PHASE-1-T030",
+        "PHASE-1-T031"
+      ],
+      "scope": [
+        "backend/app/services/",
+        "backend/tests/",
+        "backend/pyproject.toml",
+        "backend/uv.lock",
+        "docker-compose.yml",
+        "docs/ARCHITECTURE.md"
+      ],
+      "prd_source": "PRD §3.4、§5.4、§8.1",
+      "acceptance_criteria": [
+        "按已批准选型提供当前/前置/后继与相似节点查询，外部API和稳定ID不因后端变化而改变。",
+        "若引入Neo4j，验证导入、版本切换与回滚；若复用现有后端，提交约30节点查询与性能证据。",
+        "用户掌握度继续由PostgreSQL管理，图谱失败有明确响应，不伪造空路径。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/python -m pytest -q tests/test_expanded_graph_repository.py",
+        "对本任务改动运行Ruff和mypy；涉及持久化时在隔离PostgreSQL核验迁移及并发。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T032"
+    },
+    {
+      "id": "PHASE-1-T033",
+      "phase": "Phase 1",
+      "title": "推荐扩展节点并保持路径版本兼容",
+      "status": "todo",
+      "priority": "P1",
+      "depends_on": [
+        "PHASE-1-T032"
+      ],
+      "scope": [
+        "backend/app/services/",
+        "backend/app/api/",
+        "backend/tests/"
+      ],
+      "prd_source": "PRD §3.4、ADR-0003",
+      "acceptance_criteria": [
+        "PathAgent组合扩展图谱与既有掌握度输出可解释推荐，现有10节点进度和历史路径可恢复。",
+        "新增节点无证据时保持未知，无可用正式资源时明确标识，不向学生承诺已发布课程。",
+        "图谱版本切换不重复计分，路径查询达到PRD既有P95≤200ms口径。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/python -m pytest -q tests/test_expanded_learning_paths.py",
+        "对本任务改动运行Ruff和mypy；涉及持久化时在隔离PostgreSQL核验迁移及并发。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T033"
+    },
+    {
+      "id": "PHASE-1-T034",
+      "phase": "Phase 1",
+      "title": "展示扩展路径与学习可用性",
+      "status": "todo",
+      "priority": "P1",
+      "depends_on": [
+        "PHASE-1-T033"
+      ],
+      "scope": [
+        "web/src/",
+        "web/tests/",
+        "web/package.json",
+        "web/pnpm-lock.yaml"
+      ],
+      "prd_source": "PRD §3.4路径可视化",
+      "acceptance_criteria": [
+        "可浏览约30节点、前置依赖与推荐理由，当前/已掌握/待学习状态可区分。",
+        "按批准视图方案使用轻量视图或G6，依赖由锁文件固定；无正式资源节点不能进入伪学习单元。",
+        "窄屏、键盘操作和历史路径恢复通过，显示完成固定题与已掌握的区别。"
+      ],
+      "verification": [
+        "cd web && pnpm test --run tests/expanded-path.spec.ts",
+        "cd web && pnpm typecheck && pnpm build；对本任务改动运行ESLint。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T034"
+    },
+    {
+      "id": "PHASE-1-T035",
+      "phase": "Phase 1",
+      "title": "冻结动态能力恢复与独立验收门禁",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1-T001",
+        "PHASE-1-T012",
+        "PHASE-1-T015",
+        "PHASE-1-T016",
+        "PHASE-1-T017",
+        "PHASE-1-T025"
+      ],
+      "scope": [
+        "docs/ADR/",
         "docs/acceptance/",
+        "backend/tests/",
+        "scripts/"
+      ],
+      "prd_source": "PRD §0.1、§3.3、§3.8、§8、§10；归档MVP-0.3-T033",
+      "acceptance_criteria": [
+        "针对新Provider/审核配置冻结代码、指令、样本、判定、用量与失败观测，旧T033只读引用。",
+        "错误检出、分类准确、正确对照和长审核分别记录；定义有界诊断、正式采样与环境故障处理，失败不替换。",
+        "明确动态资源、课堂与DSL开放需要的批准和证据；新接口或模型接入不自动解除catalog_only。",
+        "付费上限默认0，真实调用需独立批准；旧累计2033/2500不作为本阶段剩余预算授权。"
+      ],
+      "verification": [
+        "以模拟出站证明未授权/超预算/不达标即停，审核独立冻结协议及动态恢复ADR；保存离线结果。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T035"
+    },
+    {
+      "id": "PHASE-1-T036",
+      "phase": "Phase 1",
+      "title": "验证队列故障恢复与模板兼容",
+      "status": "todo",
+      "priority": "P1",
+      "depends_on": [
+        "PHASE-1-T021",
+        "PHASE-1-T027"
+      ],
+      "scope": [
+        "backend/tests/",
+        "scripts/",
+        "docs/acceptance/",
+        "docker-compose.yml"
+      ],
+      "prd_source": "PRD §9.1、ADR-0004",
+      "acceptance_criteria": [
+        "在隔离PostgreSQL/Redis/Worker中验证宕机、重复投递、租约恢复、取消和迟到发布拒绝。",
+        "既有两个模板、缓存媒体授权与导出在新队列下仍可用，恢复不依赖Provider。",
+        "固定源码与依赖，记录真实执行、跳过和失败，核心恢复无未解释失败。"
+      ],
+      "verification": [
+        "建立并运行隔离队列集成脚本，保留各故障注入及恢复证据；不触碰用户开发/生产数据。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T036"
+    },
+    {
+      "id": "PHASE-1-T037",
+      "phase": "Phase 1",
+      "title": "验证DSL容器安全与动作正确性",
+      "status": "todo",
+      "priority": "P1",
+      "depends_on": [
+        "PHASE-1-T028",
+        "PHASE-1-T029"
+      ],
+      "scope": [
         "backend/tests/",
         "web/tests/e2e/",
         "scripts/",
-        "web/src/api/catalog.ts",
-        "web/src/api/quiz.ts",
-        "web/src/api/paths.ts",
-        "web/tests/catalog.spec.ts",
-        "web/tests/quiz.spec.ts",
-        "web/tests/paths.spec.ts"
+        "docs/acceptance/"
       ],
-      "prd_source": "PRD v2.2 §0（目录版增补）",
+      "prd_source": "PRD §3.3、§8.2、§9.4",
       "acceptance_criteria": [
-        "真实隔离数据库/Worker/浏览器完成学习/作答/动画/导出/恢复、安全边界与0 Provider出口。",
-        "固定内容自动检查/静态首屏独立冻结，不拼旧生成成绩；测试批准夹具明确标为验证用途。"
+        "用固定可信DSL覆盖全部允许动作及越界/注入/资源耗尽输入，核验实际容器隔离。",
+        "人工核对渲染步骤与DSL一致，取消、模板降级、缓存版本和导出有完整证据。",
+        "固定样本分母并沿用相关动画质量/性能门槛；未运行不算通过，无Provider调用。"
       ],
       "verification": [
-        "python3 scripts/verify_catalog_acceptance.py"
+        "建立并运行DSL隔离集成与动画验证脚本；冻结版本/样本/硬件，保存真实媒体验证证据。"
       ],
-      "verification_results": [
-        "独立v2质量100/100（20种新渲染＋80缓存）；v4完整20首屏/100缓存播放/20独立新缓存真实Worker播放全部通过；v5核心旅程全10节点/30资源/30题与2额外真实Worker通过，TEST_ONLY批准，仅工程验证。",
-        "python3 scripts/verify_catalog_acceptance.py：冻结hash/原始组件/固定分母/零出口校验通过；HTTP P95 0.107111s/DOM0.959118s/缓存0.1506s/渲染8.0897s。v5仅核心旅程，引用同一未变生产/内容/模板的已完整测量组件，不把v4核心身份测试失败改通过。",
-        "135前端测试、typecheck/build/定向ESLint与Ruff通过，6离线分母/组件闸门测试通过；修复401及quiz/path404未读响应正文造成浏览器悬挂，3条回归覆盖。",
-        "首轮质量92/100底层RENDER_UNAVAILABLE未知、localhost502、401正文未读、队列匹配歧义及Node客户端Secure Cookie未携带全部保留；v3中断18缓存槽、20新渲染未运行，独立停止记录。最终跨owner使用实际已登录Chromium身份，不改生产cookie安全。",
-        "证据docs/acceptance/mvp-0.3-catalog-engineering-20261003.md及v1–v5各自冻结/raw JSON；Provider 0累计2033/2500、旧T033冻结/.env保护hash全部相同；原T033blocked，真实人工签核T046待处理。"
-      ],
-      "started_at": "2026-10-03T12:43:10",
-      "completed_at": "2026-10-03T14:55:23",
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
       "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.3-T045"
+      "commit_lookup": "Task-Completed: PHASE-1-T037"
     },
     {
-      "id": "MVP-0.3-T046",
-      "phase": "MVP 0.3",
-      "title": "人工签核课程包并验证可发布状态",
-      "status": "done",
-      "priority": "P0",
+      "id": "PHASE-1-T038",
+      "phase": "Phase 1",
+      "title": "验证无模型目录基线及跨模块集成",
+      "status": "todo",
+      "priority": "P1",
       "depends_on": [
-        "MVP-0.3-T038",
-        "MVP-0.3-T045"
+        "PHASE-1-T014",
+        "PHASE-1-T015",
+        "PHASE-1-T016",
+        "PHASE-1-T017",
+        "PHASE-1-T029",
+        "PHASE-1-T034",
+        "PHASE-1-T036",
+        "PHASE-1-T037"
       ],
       "scope": [
-        "data/course_catalog/",
-        "docs/acceptance/",
-        "scripts/prepare_catalog_review.py",
-        "scripts/serve_catalog_review.py",
-        "scripts/verify_catalog_release.py",
-        "backend/tests/test_catalog_release_preflight.py",
-        "backend/tests/test_catalog_signed_release.py",
-        "scripts/run_catalog_signed_tests.py"
+        "backend/tests/",
+        "web/tests/e2e/",
+        "scripts/",
+        "docs/acceptance/"
       ],
-      "prd_source": "PRD v2.2 §0（目录版增补）",
+      "prd_source": "PRD §0、§9.1",
       "acceptance_criteria": [
-        "用户实际审阅候选课程内容、签核准确digest；未签核不能发布为正式课程。",
-        "受信发布登记/撤回/核心旅程在批准版本核验；不伪造human审核。"
+        "干净checkout中以MockProvider验证连接设置、任务路由、扩展路径与Job交互，身份/凭据/回退隔离通过。",
+        "catalog_only下真实目录学习/计分/动画/导出/恢复保持0模型出口，既有签核和撤回规则有效。",
+        "核心单测、类型检查、构建及隔离E2E通过；未启用真实服务或跳过项单独记录。"
       ],
       "verification": [
-        "python3 scripts/verify_catalog_release.py",
-        "EDUMIND_CATALOG_SIGNED_RESULT=/Users/apir/Code/EduMind_Agent/docs/acceptance/mvp-0.3-catalog-signed-v3-result-20261003.json backend/.venv/bin/python scripts/run_catalog_signed_tests.py（重跑必须使用新的证据路径，禁止覆盖）",
-        "python3 scripts/verify_catalog_acceptance.py",
-        "backend/.venv/bin/ruff check scripts/verify_catalog_release.py scripts/run_catalog_signed_tests.py backend/tests/test_catalog_release_preflight.py backend/tests/test_catalog_signed_release.py"
+        "在固定提交运行相关后端/前端测试、类型检查和构建，建立零出站隔离E2E并保存证据。"
       ],
-      "verification_results": [
-        "课程审阅HTML11节（10节点+demo）/10完整C折叠块/30题答案；实际Chromium桌面/390px手机检查无横向溢出，HTML全转义，不执行代码。",
-        "2项发布预检离线测试通过（pending与TEST_ONLY不能发布、未授权digest拒绝）；Ruff通过。python3 scripts/verify_catalog_release.py实际返回PENDING_HUMAN_REVIEW/publishable=false并退出2，系批准未到的正确阻塞状态，不作为通过。CLI自动使用锁定backend虚拟环境；初次系统Python缺jsonschema已修正，不安装全局依赖。",
-        "真实审核人/时间未填写，没有approval.json，没有正式课程发布；Provider 0累计2033/2500。T045工程证据无变，T033仍blocked，T034退出等待本任务实际签核。",
-        "2026-10-03用户明确实际审阅并签核Lee/linear-course v0.1.0/digest92bb0dd4778391e23aae978b8a411b466d8b5988d1cff61cff01654604af21a1；独立approval/allowlist/授权原文保留，签核登记时间15:30:26+08:00；不覆盖原pending历史文件。",
-        "python3 scripts/verify_catalog_release.py：HUMAN_APPROVED、publishable=true、exit0；最终v3隔离新PostgreSQL迁移0017/HTTPS TestClient 6项通过，无跳过。实际签核版本原子登记/幂等/10节点30资源来源hash/30题计分/重做不增掌握度/预设恢复/两真实缓存动画MP4-SRT/owner-CSRF/撤回拒绝全部核验；最终仅测试库登记并撤回，没有开发或生产发布。",
-        "16离线预检/答案一致性通过，19显式Docker项未启用跳过；Ruff/原T045组件/所有保护hash通过。v1字段契约误判及v2空answers先schema422失败均单独保留，修正测试后完整v3通过；生产代码/内容不改，不拼旧成绩。",
-        "交接docs/acceptance/mvp-0.3-catalog-signed-handoff-20261003.md及signed-v1–v3各协议/raw结果、signed-verification证据；Provider 0累计2033/2500，T033任务对象与HEAD完全一致，旧blocked/成绩不变；不部署/push/merge，T046完成后停止，T034仍todo。"
-      ],
-      "started_at": "2026-10-03T14:57:30",
-      "completed_at": "2026-10-03T15:38:59",
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
       "blocker": null,
-      "commit_lookup": "Task-Completed: MVP-0.3-T046"
+      "commit_lookup": "Task-Completed: PHASE-1-T038"
+    },
+    {
+      "id": "PHASE-1-T039",
+      "phase": "Phase 1",
+      "title": "验证真实Provider连接与选择路由",
+      "status": "todo",
+      "priority": "P1",
+      "depends_on": [
+        "PHASE-1-T008",
+        "PHASE-1-T014",
+        "PHASE-1-T015",
+        "PHASE-1-T016",
+        "PHASE-1-T017",
+        "PHASE-1-T035",
+        "PHASE-1-T038"
+      ],
+      "scope": [
+        "scripts/",
+        "docs/acceptance/",
+        "docs/PROVIDERS.md"
+      ],
+      "prd_source": "PRD §3.8验收标准、§9.1",
+      "acceptance_criteria": [
+        "在另行批准的目标、凭据和有界预算内验证本地/兼容/已列原生适配器的实际连接、流式与声明能力。",
+        "证据区分Mock、真实本地和真实云端，每个实际Provider配置独立记录；无账号/能力不得伪称通过。",
+        "实际路由与用户设置一致，无静默回退，缺用量记未知；真实授权缺失时blocked。"
+      ],
+      "verification": [
+        "运行单独冻结的真实接入计划，保存实际wire配置脱敏证明、调用计数和各Provider结果；不得自动进入质量测试。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T039"
+    },
+    {
+      "id": "PHASE-1-T040",
+      "phase": "Phase 1",
+      "title": "完成新配置动态资源质量验收",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1-T035",
+        "PHASE-1-T039"
+      ],
+      "scope": [
+        "scripts/",
+        "backend/tests/",
+        "docs/acceptance/"
+      ],
+      "prd_source": "PRD §3.3、§8.2、§10.2",
+      "acceptance_criteria": [
+        "先在独立预算中通过冻结诊断，再执行正式质量基准；schema≥98%、正式生成成功≥95%、严重错误召回≥90%，发布schema有效且人工事实检查通过。",
+        "生成/审核模型组合与配置独立计分，保留所有失败/未运行槽，不拼接旧T033或不同模型成绩。",
+        "长审核能有界结束，正确对照误拒与用量完整记录；预算/能力/质量失败时停止并blocked。"
+      ],
+      "verification": [
+        "按批准的冻结计划执行有界真实质量验收与人工核对；没有真实预算或门禁不通过时不运行。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T040"
+    },
+    {
+      "id": "PHASE-1-T041",
+      "phase": "Phase 1",
+      "title": "完成动态学习与课堂性能验收",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1-T029",
+        "PHASE-1-T034",
+        "PHASE-1-T038",
+        "PHASE-1-T040"
+      ],
+      "scope": [
+        "web/tests/e2e/",
+        "scripts/",
+        "docs/acceptance/"
+      ],
+      "prd_source": "PRD §3.3、§3.5、§8.1、§10.1",
+      "acceptance_criteria": [
+        "在新动态开放决定及批准预算下完成一句话学习、练习反馈、重解释、课堂和按需DSL的实际端到端流程。",
+        "独立测量HTTP首字节P95≤2s、完整首段≤10s、普通课堂首字节≤3s；动态动画遵守相关≤90s口径，失败纳入固定分母。",
+        "教学正文首token≤2s仍单列既有非阻塞优化，不能混淆为其他指标通过；环境故障和模型失败分别归因。"
+      ],
+      "verification": [
+        "运行已冻结的真实浏览器/Worker端到端与性能计划，逐槽保存证据；未通过不开放正式动态能力。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T041"
+    },
+    {
+      "id": "PHASE-1-T042",
+      "phase": "Phase 1",
+      "title": "完成Phase 1退出与交接",
+      "status": "todo",
+      "priority": "P1",
+      "depends_on": [
+        "PHASE-1-T032",
+        "PHASE-1-T034",
+        "PHASE-1-T036",
+        "PHASE-1-T037",
+        "PHASE-1-T038",
+        "PHASE-1-T039",
+        "PHASE-1-T040",
+        "PHASE-1-T041"
+      ],
+      "scope": [
+        "docs/acceptance/",
+        "README.md",
+        "docs/DEPLOYMENT.md",
+        "docs/ARCHITECTURE.md",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD §0.1、§9.1",
+      "acceptance_criteria": [
+        "核对本阶段所有任务完成提交与退出证据，更多Provider/DSL通过统一边界接入，长任务真实可恢复。",
+        "交付说明区分目录基线与获批准动态能力，列明模型适用配置、图谱后端选择及已知限制；归档T033原状态不改。",
+        "报告实际调用与预算，不宣称部署、用户试用或Phase 2已完成；阶段结束保存交接并停止，下一次归档另行授权。"
+      ],
+      "verification": [
+        "核对任务完成标记、依赖、文档引用、冻结证据与源码版本；形成Phase 1退出报告。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T042"
     }
   ]
 }
