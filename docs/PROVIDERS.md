@@ -2,6 +2,10 @@
 
 PRD §3.8 规定 P0 使用单一服务端 OpenAI-compatible Provider。当前实现连接一个由服务端配置的 DeepSeek 模型，默认使用 Responses 传输；本文件定义业务代码和网络适配器之间的内部契约，不开放 BYOK、模型选择页或自动跨厂商回退。
 
+## Phase 1已批准边界
+
+用户已授权串行推进PHASE-1-T002至T005；[ADR-0008](ADR/0008-provider-credentials-and-egress-boundary.md)已于2026-10-04获用户A–D批准。确定匿名持久BYOK随原2h会话失效/清理、主密钥信封加密与显式轮换、进程/会话/单次操作内临时Key，以及配置版本绑定的数据去向同意和明确回退。批准登记见[具体记录](ADR/0008-provider-approval-20261004.json)。API/持久化/临时Key由T003至T005分别交付；批准不代表BYOK已可用，也不授权实际模型出口。
+
 ## 内部调用边界
 
 业务服务只依赖 `backend/app/services/provider_gateway.py` 中的 `ProviderGateway`、请求/结果类型与 `ProviderError`，不得直接导入厂商 SDK 或处理厂商响应格式。`ProviderAdapter` 是可替换的单次调用边界；现有具体适配器由服务端工厂按结构化传输配置组装。

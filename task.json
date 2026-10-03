@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "用户已选择Phase 1功能开发并完成阶段归档规划；当前聊天授权执行PHASE-1-T001，后续任务按用户授权及依赖逐项领取。重大API/数据/安全决定按设计任务取得批准；真实Provider调用须独立预算和授权。catalog_only基线维持，动态开放由新质量/性能证据与批准决定，不因阶段切换自动开启。不自动push/merge/部署或进入Phase 2。",
+    "phase_gate": "用户已选择Phase 1功能开发并完成阶段归档规划；当前聊天已授权串行执行PHASE-1-T002至T005，前置T001已完成，后续任务按用户授权及依赖逐项领取。重大API/数据/安全决定按设计任务取得批准；真实Provider调用须独立预算和授权。catalog_only基线维持，动态开放由新质量/性能证据与批准决定，不因阶段切换自动开启。不自动push/merge/部署或进入Phase 2。",
     "task_granularity": "一个可独立验证的行为，包含实现、对应测试和必要文档；验收通过后一个本地完成提交。",
     "completion_rule": "验收通过，且 Git 历史存在 Task-Completed 标记的提交。工作区 done 仅是待提交状态。",
     "verification_note": "任务verification是待建立和执行的验收接口，并非已通过；文件/命令不存在时须在对应任务完成前建立并实际运行。规划切换仅运行治理与归档离线检查。"
@@ -57,7 +57,7 @@
     }
   ],
   "stage_scope": {
-    "authorization": "2026-10-03 用户明确选择“还是继续Phase 1 功能开发”，授权本轮归档和细化任务。 当前聊天用户进一步授权“开始T01”，仅领取并完成PHASE-1-T001。",
+    "authorization": "2026-10-03 用户明确选择“还是继续Phase 1 功能开发”，授权本轮归档和细化任务。 当前聊天用户进一步授权“开始T01”，仅领取并完成PHASE-1-T001。 2026-10-04用户授权“继续T02-05”，按依赖串行推进T002至T005；重大安全方案仍需具体批准。",
     "baseline": "MVP 0.3已签核课程目录版；PR #4已合并，本地维护基线30fcd4e1f9384359a72b451bb40243a2095691cf。",
     "included": [
       "兼容Provider/Ollama、持久及临时BYOK、任务档位与显式回退、Anthropic/Gemini/星火可选原生适配器",
@@ -67,7 +67,7 @@
       "目录零调用回归与独立授权的动态质量/性能验收"
     ],
     "excluded": [
-      "未另行授权的后续任务执行及真实Provider调用（当前仅授权T001文档/治理交付）",
+      "未授权批次之外的任务执行及真实Provider调用（当前批次T002至T005）",
       "公网部署与试用运营",
       "账户系统/跨设备账号合并",
       "真并行辩论、RAG、学习报告和更多课程（沿用§9.1后续阶段）",
@@ -175,7 +175,7 @@
       "id": "PHASE-1-T002",
       "phase": "Phase 1",
       "title": "确定Provider身份、凭据及数据发送边界",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1-T001"
@@ -194,9 +194,30 @@
       "verification": [
         "审阅威胁边界、凭据生命周期和失败情形；记录具体批准范围，未批准保持blocked。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "python3 local-materials/phase-1-t002/checks/verify_proposal.py",
+          "result": "passed: 30 local links; archives unchanged; append-only process log; T003–T005 todo; other tasks unchanged except T018 adds T002 prerequisite",
+          "evidence": "docs/ADR/0008-provider-credentials-and-egress-boundary.md; local-materials/phase-1-t002/checks/proposal-check.json"
+        },
+        {
+          "command": "python3 scripts/check_catalog_workflow.py; git diff --check",
+          "result": "passed: active DAG/catalog constraints and formatting; no runtime implementation tested",
+          "evidence": "local-materials/phase-1-t002/checks/workflow.txt"
+        },
+        {
+          "command": "doc-coauthoring reader review and final read-only recheck",
+          "result": "initial three substantive gaps fixed: send authorization race, expiry/cross-process cancellation and T018 approval dependency; final recheck passed; user approval still missing",
+          "evidence": "docs/ADR/0008-provider-credentials-and-egress-boundary.md A6/C4/审批与后续执行"
+        },
+        {
+          "command": "登记用户明确批准并核对提案SHA256；python3 scripts/check_catalog_workflow.py; git diff --check",
+          "result": "passed: approved A–D for exact proposal; dependency gate released; Provider authorization remains 0",
+          "evidence": "docs/ADR/0008-provider-approval-20261004.json"
+        }
+      ],
+      "started_at": "2026-10-04T00:02:43",
+      "completed_at": "2026-10-04T00:25:20",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T002"
     },
@@ -693,7 +714,8 @@
       "status": "todo",
       "priority": "P0",
       "depends_on": [
-        "PHASE-1-T001"
+        "PHASE-1-T001",
+        "PHASE-1-T002"
       ],
       "scope": [
         "docs/ADR/",

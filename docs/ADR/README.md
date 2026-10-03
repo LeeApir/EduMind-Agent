@@ -36,3 +36,7 @@
 2026-10-03用户选择Phase 1功能开发，并授权原样归档MVP 0.3及替换根账本，见[PRD §0.1](../PRD.md)。42项计划任务从`PHASE-1-T001`开始；T002/003确定Provider身份、凭据与API，T018确定队列迁移边界，T022确定DSL安全契约，T030确定扩展图谱与按需存储选型，T035确定动态恢复与独立验收门禁。T001范围与验收规则见[Phase 1验收计划](../acceptance/phase-1-acceptance-plan.md)；相关设计任务状态以活动账本为准，新ADR尚未批准，不将阶段选择或T001完成等同于架构批准。
 
 历史ADR-0007及T033失败记录保留，目录基线不会因任务切换自动开放动态模型入口。部署、付费验证和后续阶段分别按明确授权执行。
+
+## Phase 1决定
+
+[ADR-0008：Provider身份、凭据与出站数据边界](0008-provider-credentials-and-egress-boundary.md)为PHASE-1-T002的Accepted方案，用户于2026-10-04明确批准A–D，具体提案digest及原话见[批准登记](0008-provider-approval-20261004.json)。批准2h匿名凭据留存、加密轮换、临时Key与发送/回退边界；按T002至T005批次实现，实际Provider调用仍须独立授权。

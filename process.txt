@@ -801,3 +801,12 @@ MVP 0.3源账本逐字节归档（45 done/T033 blocked），根切换Phase 1共4
 纠正START时分支记录：首次创建因.git只读失败，START实际仍在codex/phase-1-planning；获得工具权限后已创建当前分支，无代码改动 | Git切换成功；任务保持in_progress；Provider0 | 无人工阻塞，不覆盖历史日志 | 在当前功能分支继续T001文档和验证
 [2026-10-03T23:55:16] [PHASE-1-T001] VERIFIED | executor=Lee
 冻结Phase 1验收计划及PRD/ADR/验收入口，明确三类可选适配仍需交付、后续候选排除、分组质量/计时/失败规则、独立预算及六项重大设计批准门禁 | PRD/diff自查与独立上下文文档读者检查通过；42任务映射/退出41依赖/其余41任务不变/归档不变/46本地链接/日志只追加、workflow及236原件Git归档/diff检查通过；Provider新增0累计2033/2500 | 仅文档验证，新ADR/功能/真实采样/正式动态开放未通过，不填人工reviewer；T033仍blocked | 本地完成提交后停止，下一T002待用户指示；交接docs/acceptance/phase-1-acceptance-plan.md，原始证据local-materials/phase-1-t001/checks/；不push/merge/部署
+
+[2026-10-04T00:02:43] [PHASE-1-T002] START | executor=Lee | branch=codex/phase-1-t002-t005
+用户授权继续T002至T005；先准备匿名owner凭据生命周期/加密轮换/临时Key/出站安全与数据同意ADR | 工作区初始干净、T001完成提交4f67e19存在；核对auth_sessions为2h无续期、现有Guard固定IP与禁代理、当前无BYOK；Provider0 | T002验收明确新ADR须用户批准，未获具体方案批准不能领取T003至T005 | 完成ADR与文档一致性/失败矩阵/读者检查后呈现可审阅批准选项，不提前实现或真实探测
+[2026-10-04T00:15:46] [PHASE-1-T002] BLOCKED | executor=Lee
+已准备Proposed ADR-0008 A–D：匿名持久Key随2h会话到期、60s有界清理、AES-GCM信封/轮换、进程会话单operation临时Key、SSRF/版本同意/显式回退；T018新增T002前置 | 30本地链接/账本边界/归档只读/日志只追加/workflow/diff通过；独立文档检查三处问题修正复核通过；Provider0累计2033/2500；提案SHA256=2e8287cf8fcf8a3c7dccbc6fcb758f8ec274e8aa0a63d984f9b6791018431372 | 缺少用户对具体A–D安全方案批准，依据T002验收及AGENTS未批准重大安全决定求助规则；T003至T005仍todo，无完成提交 | 请用户审阅docs/ADR/0008-provider-credentials-and-egress-boundary.md后批准A–D或指定修改；获批RESUME再按批次逐项实现/验证/本地提交；原始核验local-materials/phase-1-t002/checks/，不真实调用/push/merge/部署
+[2026-10-04T00:25:20] [PHASE-1-T002] RESUME | executor=Lee | branch=codex/phase-1-t002-t005
+用户明确回复“批准”，批准ADR-0008 A–D及提案digest 2e8287cf8fcf8a3c7dccbc6fcb758f8ec274e8aa0a63d984f9b6791018431372，解除具体安全决定阻塞 | 提案原始字节保存本地、批准登记与hash匹配，之前文档核验有效；Provider0 | 运行实现仍未交付、历史ADR/T033不变 | 登记Accepted并本地完成提交后领取T003
+[2026-10-04T00:25:20] [PHASE-1-T002] VERIFIED | executor=Lee
+ADR-0008 A–D获用户批准，安全边界与PRD/Provider/ADR索引同步，T018继承T002批准前置 | 具体批准/hash/30链接/依赖/归档/diff检查通过；Provider0累计2033/2500 | 用户批准安全方案不等于运行时已实现或真实模型预算；不填AI为人工reviewer | 完成本地T002提交后继续T003 API契约，交接ADR-0008及批准JSON
