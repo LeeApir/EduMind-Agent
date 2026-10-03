@@ -20,8 +20,13 @@ function object(value: unknown): value is Record<string, unknown> {
 }
 async function request(path: string, init: RequestInit = {}, fetchImpl: FetchLike = fetch): Promise<unknown> {
   const response = await fetchImpl(path, { credentials: "same-origin", cache: "no-store", ...init });
-  if (!response.ok) throw new CatalogRequestError(response.status === 404 || response.status === 409
-    ? "课程或学习状态已变化，请重新读取。" : "课程暂时无法读取，请重试。", response.status);
+  if (!response.ok) {
+    // Finish the rejected response before starting the guest-session fallback.
+    // Leaving a fetch body unread keeps Chromium's request pending across navigation.
+    await response.text();
+    throw new CatalogRequestError(response.status === 404 || response.status === 409
+      ? "课程或学习状态已变化，请重新读取。" : "课程暂时无法读取，请重试。", response.status);
+  }
   try { return await response.json(); } catch { throw new CatalogRequestError("课程响应无效，请重新读取。"); }
 }
 function invalid(): never { throw new CatalogRequestError("课程响应无效，请重新读取。"); }

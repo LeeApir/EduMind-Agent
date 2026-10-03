@@ -1,0 +1,2262 @@
+{
+  "version": 1,
+  "baseline_commit": "84a16a6e999f57357a6b878688e10ec36f891b4a",
+  "scope": "Catalog engineering acceptance only; TEST_ONLY approval, no human release",
+  "provider_requests_authorized": 0,
+  "provider_cumulative_unchanged": "2033/2500",
+  "database": "edumind_catalog_accept_20261003",
+  "product_mode": "catalog_only",
+  "content_digest": "92bb0dd4778391e23aae978b8a411b466d8b5988d1cff61cff01654604af21a1",
+  "code_hashes": {
+    "backend/alembic/env.py": "8c1e9c8b75bc5ebdee32016f91db97e74d306c12e22d5756b171c7524b03a573",
+    "backend/alembic/script.py.mako": "5fe4edf4d6c2282065219fce1be9578410c9331289c906d2c579bf28a6281926",
+    "backend/alembic/versions/0001_initial.py": "b0011aabae70c6162d977948e087d050555f9a26f35e1e82db05bfe6bd1aefc6",
+    "backend/alembic/versions/0002_auth_sessions.py": "e79f3c085cc77cde9be7e7df31375db53a965c6251b81e06627934d149f9fdfd",
+    "backend/alembic/versions/0003_learning_snapshots.py": "c9f0525a7b265ff2537e3a7d9c4da73a9d9382202db9a376f6069936dc19e557",
+    "backend/alembic/versions/0004_learning_operations.py": "d3767552d4989a7b200a0d2508329ec509a645ace7d3de4f5eb8659f6b0d451d",
+    "backend/alembic/versions/0005_profile_events.py": "3335cb2d0e6bed94523c1bde2a2d29d568f7996192fb48f10b74fd43786ffc51",
+    "backend/alembic/versions/0006_profile_correction.py": "2e1346464d9950e8c6ae3c26e9f5666f24b3ab111d8d8ff25853108677ce7dc5",
+    "backend/alembic/versions/0007_profile_provenance.py": "1240750d479b6b9874c4f120e72dd4023511f4e15376092cf0d5f5b08915edec",
+    "backend/alembic/versions/0008_learning_state.py": "dfad5c15d512150ca0799d922673a40bc345581389a0af41909e6864391043ff",
+    "backend/alembic/versions/0009_path_commands.py": "9b0ac338eaf837c14d2206c4fc5c2e7416b09f46b316e6d0bc03e20538900487",
+    "backend/alembic/versions/0010_animation_jobs.py": "2149511ca1ea18933e399a47168f9fbb32eea8b5e42765bade0792c5af3e0b74",
+    "backend/alembic/versions/0011_animation_cancel_key.py": "dc2fd87311846205e5f6589e04e9a563718957f6eb107f7983a3df49a34eeb33",
+    "backend/alembic/versions/0012_classroom_sessions.py": "224ef3a42b01e714a2cf1c8733eab45dd1ec0ed070968f7a9cbfe861cbaab188",
+    "backend/alembic/versions/0013_classroom_operations.py": "c7469dfa9eb62d041fd86755770b4ffd0b4c0f8b64d1529b110e942c267e913c",
+    "backend/alembic/versions/0014_classroom_operation_receipts.py": "97a2f1452bb271747822f9a5987e5053b1493619fc1340366686720111f75081",
+    "backend/alembic/versions/0015_debate_results.py": "b0798c0c97d1c13f9d48dd128048d65b8c324c289f9b1238dfbae5da8edf52cd",
+    "backend/alembic/versions/0016_catalog_releases.py": "82a0f54dc4ea268d640ea4fd96b09b9ab87a32eb8b72ea8100147a4ef3235760",
+    "backend/alembic/versions/0017_catalog_immutability.py": "918bf5bce20a8d53a3e5fdc60785b7fd9bb10bb2e274f240c77dac3295779179",
+    "backend/app/__init__.py": "64e4ca239df0bc9a7016c6904b8289231f764f370f0f5221b1b21f038584171b",
+    "backend/app/agents/__init__.py": "36d95998d6e8d95ab04662951837eccfc82a8bce83b67b8c83ae1d6bef90ef9b",
+    "backend/app/agents/classroom_context.py": "d7cb6a5170e640061049b282d04ee253802ab1e0ef2130e5f384aa14fec92f73",
+    "backend/app/agents/classroom_roles.py": "73d9ff03f349fe365b273828f2b82763b13a52c69ae50fe9d6977e4200c712d3",
+    "backend/app/agents/classroom_speech_review.py": "1487a81c9e8d12c337885319b0e74b078e64b005d92133060d40b81e19638ee1",
+    "backend/app/agents/classroom_speech_rules.py": "5d65743770a48039430b28167439170760f341b10a7d5c1dd7f0c59b30c61a50",
+    "backend/app/agents/classroom_turn_schema.py": "2ebbef256f17bf8bd97b541ea93872346d5618173e51ea298630100251b2b52a",
+    "backend/app/agents/debate_candidate_generator.py": "646aca3d06ba7c0fe139600490f0381a8f8ee274f6603ce0dee207b6c16e4caa",
+    "backend/app/agents/debate_candidate_prompt.py": "00c7fd75e2d4a110cd3468428b653a3a550a2429ab139eba589264123e43b490",
+    "backend/app/agents/debate_candidate_schema.py": "8de2c376064ec5420199e529e8056be8153851baf2c22d2f54bf44cf94142382",
+    "backend/app/agents/debate_review.py": "04c0862f7166d6da932c9af9a5ff5b1dc57d31e994eaa9d42d87f4dc9c4d91ee",
+    "backend/app/agents/goal_node_resolver.py": "97ff3a62e86df15183980cf07847260298b408d4a3984dd01142c3deaadb2a6a",
+    "backend/app/agents/learning_resource_prompt.py": "34b4b286e538685261e947ff270f05668027453e6c4edfefc4ecece2accdfd7b",
+    "backend/app/agents/learning_resource_schema.py": "b9cd2e6a3e23a06eba80801301503a9ab18f9fe595b922a473713fc41526146a",
+    "backend/app/agents/learning_unit_generator.py": "23b894e0501106cf8ddab80d765484db7a23e4880d792f76678535f59b74f006",
+    "backend/app/agents/objective_exercises.py": "93bbf81f488e1f606722ce8edff570b55ac3e5264be4abdb2a24916330f9c07c",
+    "backend/app/agents/profile_agent.py": "9a375c3d2f426992515b1eeccf788bb6c01914348eb8a98fc15cfada137a8f11",
+    "backend/app/agents/profile_events.py": "de8abc8c7e147449b952b65ea01a05ec0949c2e7f5a1a416464fdfe4616e2011",
+    "backend/app/agents/profile_schema.py": "ec0a1ed7459daa7b051ac6b2c182438929285b470f61698a0fd56ba16c605acc",
+    "backend/app/agents/review_agent.py": "60301105a57b92d594f73d63c548b3597e091606016f226f70c069ed017bb1cf",
+    "backend/app/agents/review_context.py": "070682b9e163c9dc85ee76a5dda81db3b2f5f63823c393baeed634f2fe5dbbe7",
+    "backend/app/agents/review_schema.py": "6252ec782c373dbe62f5f18b9422b59e7adf2164f184c88aaf71f4eb936ace1e",
+    "backend/app/agents/tutor_agent.py": "78a9e706bc13d6d732c5ffd4b63ab6141d21cb967efadc7bc956db9bfb338259",
+    "backend/app/animation_templates/__init__.py": "d0d9c8eb51c5f24b874a0cfefb5d9aece34831275372415988e4bdded767c750",
+    "backend/app/animation_templates/container_runner.py": "31faf28fe027ad633e2f07b150b199175094525a635ca6e06b784612383db6b0",
+    "backend/app/animation_templates/deletion_plan.py": "f95849f75fd43e195f2ea8b656aba2c3b4cbfe753024238fc6440b5f70e793a1",
+    "backend/app/animation_templates/insertion_plan.py": "09fbe0f8f84ac093b85533a8a98a3c4da01117f32d9c1c8f4746330e93afaeb7",
+    "backend/app/animation_templates/linked_list_deletion.py": "cf3b30277247e06f2e89ea4d742ed850327017d2dd59963f26eaa0c7c894c0a0",
+    "backend/app/animation_templates/linked_list_insertion.py": "75fac853c1346abdd8931b055f42b1a20ae73fca8500f2ae28a69be64b6fbaf2",
+    "backend/app/api/__init__.py": "d93b5f927d5548a8ac36fcb08ff9ea4d61844066f86244c9564b8b01c01428b4",
+    "backend/app/api/animation_events.py": "50df31642f9c3609cd649c036004fdede73ef9e9a043624d70389012b2efbc8c",
+    "backend/app/api/animation_jobs.py": "9116dafcf97dc4f68482f9095bef48b7082697b175d8a5bd524004bd7c18dcf1",
+    "backend/app/api/animation_media.py": "90b99df14851a603a1d1d3ad0b6becb3ec846dc43a937d004389c52af13d4863",
+    "backend/app/api/auth.py": "8bebb9b05ec08c17f3c53601d3d181d1d78927a30835454fa4b9076df8322f66",
+    "backend/app/api/catalog.py": "13e27bef86912f8656d441d072e5aa2353f000344f74bbc68527d93fe3f10378",
+    "backend/app/api/classroom.py": "553069f02b54d52d1622851288e43b97462e637cdf67101656da91acec171c55",
+    "backend/app/api/debate.py": "d2b501fb5ccbd1691a07274121445389d8ff497a2cc55b52c12ef3661cf353a7",
+    "backend/app/api/knowledge_graph.py": "d849876673a3cb8c381aa282a4399403ab2448f4c9cbbe2cbd2c0e2fde711d2b",
+    "backend/app/api/learning_events.py": "e18cc59a306fbb3ca11f8a68798a3d803f78b75bcaa48fec398cca727a9da28d",
+    "backend/app/api/learning_reads.py": "5d7f72c2568f26aed3a794b978618c8a81eb611419d5ee6cc3eeb0630d6c45af",
+    "backend/app/api/learning_sessions.py": "b0fa88d29accb5c279303c331b9235fdda1a8cc3ef175a92e72616f3639f4110",
+    "backend/app/api/markdown_notes.py": "d2b560f7df4b1278fa2bb0b64136ec3d3124867730db5463c4d1d6ae2702e68c",
+    "backend/app/api/paths.py": "e933ce4e20b86ee799822f519a2f3aa98afe52b0b63145a85f93bda9c0d89fc8",
+    "backend/app/api/profile.py": "01238ae73ba19511011eded5173f9f03a75909d238ace2dba81bbd063afa93c0",
+    "backend/app/api/quiz.py": "9369e4720bec46a4343b76c26eef3b071ffcb65a3254dbd7bbc178f665d1273b",
+    "backend/app/core/__init__.py": "1ee11fb0a82ff3791094a27ecd63ce15ca82ca79757f97f0edab668593985203",
+    "backend/app/core/auth.py": "532480befa2d49b18ed20393114817d84d1deb8edeb3b00f5baf5df659565a75",
+    "backend/app/core/config.py": "39cf03a33424963905d12ff0edcf7e646ba6d6fab6c6f64e4290ca37eacde399",
+    "backend/app/core/database.py": "83385409e5b1397d4e04702f908eb4ad84a2438b818e19450d7e134d1662c694",
+    "backend/app/core/product_mode.py": "80e55a0368808cfbaca9cc704c5c6849b82cc554fb6702a8d10747830a129cd4",
+    "backend/app/core/provider_factory.py": "a42cd8a486c5a092090ed1216b198e2d7fed2d96fb6277c8155cb7460ed734fc",
+    "backend/app/core/provider_target.py": "976388e6043bd9c7febb1a10c583bb8031fd23e18dbd3e980cd15002df6c1510",
+    "backend/app/core/review_candidate_factory.py": "a7889afed256e9003566c6d3cdb0690ca21cafe57b1f3a7692eadf31ee7cb10d",
+    "backend/app/main.py": "3df7f10a2e99bab432373db91e5615d6aae38bef01a3dca65471493bdad1dcef",
+    "backend/app/models/__init__.py": "d096d5cfaace7ff318c45111ccdf9febebaadf53b87ea486fdacaf9a4b127a2a",
+    "backend/app/models/animation.py": "0938341c2d36ef1445dfad1ce599ce34a5119656678b27292a4aeac863c43f57",
+    "backend/app/models/auth.py": "559fdf648de6fe0736ac2ab13cf04bc7c662dccdd97d2783c14bc22274aded93",
+    "backend/app/models/catalog.py": "5fd072caad502e1db4bc81bc4568159c95a5734062544d97421d26694c799d78",
+    "backend/app/models/classroom.py": "9eb1dfa9c5527924bc48ffdbdbccec9533d1f8735f6823bcd56873c527d62689",
+    "backend/app/models/learning.py": "374876fd78148aa1a08fd32e4228bec94ddc45af0f95825f5a4e6a241a15ad06",
+    "backend/app/models/learning_state.py": "1188ce9c5ef8421038f1fe70afd7f6fe1d00f239183ea03ec5e68c47d83cc2ab",
+    "backend/app/services/__init__.py": "d68a8cb13bf55b77dfd8bdac3fcc5fa641d503e73f2e4233e1b2d41fbb6b2055",
+    "backend/app/services/animation_cache.py": "753ac7a381069d637564f37ab9b900e4d243894fe11a868b759584d6c1903bbe",
+    "backend/app/services/animation_jobs.py": "2977d58d32233d87e0ae3f7d951e12d021a47c1adf190d9ec87c219200c118b6",
+    "backend/app/services/animation_lifecycle.py": "2936c6611774f69eb78fb8f007efe166dec0d2a7ed6bd8a9a63fec2f5e9f95f0",
+    "backend/app/services/animation_media.py": "ccf79d4da0f85d7bd6d011b0cedc392aeb6e5a6a2145c42d8d39f02842eaa034",
+    "backend/app/services/animation_publication.py": "d4c573077b8e7eebb96c2d67836731f38c06691170d320f7dbeac65d301d7037",
+    "backend/app/services/animation_renderer.py": "a2dff6a8560a6ddc503ff83a39797e089955281ec0a5da20e0d35ff905d94483",
+    "backend/app/services/animation_templates.py": "7cb394aac68250b8d49cfe1ab3f49e6ff936f7d2ac41f2e351d0979bd490aa77",
+    "backend/app/services/animation_worker.py": "00e4d9cff8af3082a5aba3778ffc9821d2fe295f3bff8a0fb31a4cd5b8cf4611",
+    "backend/app/services/bailian_review_candidate.py": "5a4b14091c8f1984eb3f41ecf1e804f413fc493c97a4579bc94ba499561d83ce",
+    "backend/app/services/catalog_animation_access.py": "eb6b696c6d8b31edc9284a325613956735b2c64787fef9a1858bafa755642034",
+    "backend/app/services/catalog_assessment.py": "e5387272edb1dd07e3bdce7e7da083bb6018276c954178700f6dba284e5a12f0",
+    "backend/app/services/catalog_demo.py": "05219223c86983b9f36f5702a69d3551af2c38b776273fb830e7590adc94b03f",
+    "backend/app/services/catalog_package.py": "764cf7e0cbb3b987a98fd5301f125751478f2b0e76875add5b76a4f348c801a2",
+    "backend/app/services/catalog_publication.py": "7cb6befdbee00524f6058c35abf7617e4857655a0ddcf6eefe1dc5d0a7a1359b",
+    "backend/app/services/catalog_sessions.py": "3da4b31c3b22e9e72902c001dd86b54c56974937d75cc254a25286e89202e4e8",
+    "backend/app/services/classroom.py": "55d55ae3db4c58e612cf8b24dde9a4c91848613a98487ecd594ee03f66693c23",
+    "backend/app/services/classroom_controls.py": "60c59ac6aba5155e65bdeb637281fe9dd387a1b1503a2a7eccb141b2fd182b2d",
+    "backend/app/services/classroom_speech.py": "ad3382713e82f148dd922e6d11d3136f76188654722b16057aa61f2a3c7d8f8b",
+    "backend/app/services/debate_feedback.py": "e7cd0f488b33a50b8367e81a514edcce696be0956d73f2a562e6ca0a454c9ed9",
+    "backend/app/services/debate_publication.py": "f7c217b84243015984795518e376dd963babdf990c8af81aa29abdc0d6d6b402",
+    "backend/app/services/deepseek_beta_tools.py": "3fbc95ec7c62919b0440fee659728f430ca0c2cdde329f37b8caa9a304b1792d",
+    "backend/app/services/deepseek_responses.py": "73962aa7a26e79c126c894d0f20fddbe607d71a63b5b479a6260e797382776d7",
+    "backend/app/services/file_lock.py": "fe402cbb461a63c350ed21287cc2653dcfee99a6a4590b6be68bcefbde5d522d",
+    "backend/app/services/first_learning.py": "0169bf5acbbabd38a2c8da2e66b0f70c3d73ba1babdc20bc443f177a2312a57c",
+    "backend/app/services/knowledge_graph.py": "7b50ea44297e9f7de1de9cc2f82bd6640c15c8d9b6e3714a13eb85850fc48c06",
+    "backend/app/services/learning_events.py": "2339e89d6b4f7a1f7b148be2fd25fa78ec4b974ae9bcf91df67e005bdac99726",
+    "backend/app/services/learning_finalization.py": "df3b7844495a12cfa14241bc09db479c4d4e5492f21d1cb73e59a6af2faed5e3",
+    "backend/app/services/learning_operations.py": "49f7da53ec698ee0300277c405c2208586bb89e304f03a33261474b99d82cf58",
+    "backend/app/services/learning_owner_lock.py": "10f31e6f9b66b7c8593437748d4e8ec6b9bd50e3ba05e7c14c6587024c7fe9b6",
+    "backend/app/services/markdown_notes.py": "5b53db98fbe892fdc798f1786e1f45f80040e491941d91c088eb480d05fdcfc6",
+    "backend/app/services/mastery_rules.py": "889e4672aaf9c9f0b8ed3255ebc48dfdf5e45770dbf9a2137d7c98ea199a161a",
+    "backend/app/services/mastery_updates.py": "2b06af64e0431be1b402e509dc91f65b3f9ab15dc5df562b52b7e38d48d02f0f",
+    "backend/app/services/owned_learning.py": "652630b397e357aff4751d92c378cb6073bf1bb0527625a2f24f278e0d56ef08",
+    "backend/app/services/path_commands.py": "3ff19a9a7004d096c01c87c417ba8948818d50b4892fbb99a6222e1ba6659ebd",
+    "backend/app/services/path_rules.py": "05cf961a7a01e4ecbf6147852156012e38a1419e7679e1f786a3ebc64cf6f3f6",
+    "backend/app/services/path_versions.py": "a31c5b465c42bd849ada4203a92f7993e4c1ea32a25ab32025acb50d7c6b4f07",
+    "backend/app/services/profile_behavior_updates.py": "116581f80d908b0fd43768dd51bec7f7b73d1bde2e35996b809ecbfa758fcbdd",
+    "backend/app/services/profile_updates.py": "4e764f27ea67df341a4fc4d2578d88a9806d40cf74af3e696574604ddbf638d6",
+    "backend/app/services/provider_gateway.py": "ca3c5b058d07a136fd99a70f895c6a3180098302670775c689666ad57a207d92",
+    "backend/app/services/quiz_scoring.py": "c79b15593dd44c79183d8047e31ba07e46c82af36689aeea20cc5667e9885bb6",
+    "backend/app/services/quiz_submissions.py": "15111e91a64f60d2f5501b45af9251652d5a060c7e85bdc5dbafb710af23bc0f",
+    "backend/app/services/resource_publication.py": "f3017813013e591bda91e7217f480dacb8f11476f6f0b1dfd41fb0bddd4fd16a",
+    "backend/app/services/scene_reexplanation.py": "d70bd61bedfabefe66e25c34d7d7f20a701290ee8ec9964c278a1ed4c982f7c3",
+    "backend/app/services/transient_profiles.py": "12aaa811b8f7d52e09b7ba5d38dd24c3e1f111b0009d0c2abe5f18074853526b",
+    "backend/pyproject.toml": "3834d4cc1bb5cc574aee0d7534a9b07b38d6a0595e14fdac0da2451d903a892e",
+    "backend/tests/run_mvp03_animation_quality.py": "f85b00aaa8d7fcba56ea0fd74ffd1d827bb8649d8ea561bca532b4548e7f9fa1",
+    "backend/uv.lock": "0753a353cf03c21dba4df41fde32ab4eba4a21452330f441e4bfe26a746ac4c1",
+    "data/animation_templates/linked-list-deletion.json": "de311eeb6acc86187374709e6748affff778d4a5d10cfea3c9ed9968d2abc39c",
+    "data/animation_templates/linked-list-insertion.json": "1fe8ef6e4d5d7024978189d722fabf7dbf0615d798c3384c62ce1e52901f6438",
+    "data/course_catalog/linear-v1/README.md": "913bdcbebe887e1e97fbd429744c6608bc870639231b4a44bd0164b523a022aa",
+    "data/course_catalog/linear-v1/array.json": "9ee7112a7d2357775e2a36fbc7d8f83694fc7d44f5079b20b8835b55d90d9f65",
+    "data/course_catalog/linear-v1/c-pointer.json": "52ed0623e2bf782ba51abb4824dfd4591578d0930a196bb337d381cd79699e44",
+    "data/course_catalog/linear-v1/circular-queue.json": "b3f7bc8fd1aa1fee8e4ab8c56889a7dcc93f29c246d5e066b63ceac6d3744b94",
+    "data/course_catalog/linear-v1/demo.json": "7c0a83bfee05c08596fbc17fcdd180e4ea15239ffc655b158723b0aad9e7addb",
+    "data/course_catalog/linear-v1/linked-list-concept.json": "5981d4e08b8d28aefd389579d96129169d8fc7b5cf8201e320a100208bff4d31",
+    "data/course_catalog/linear-v1/linked-list-deletion.json": "dc8dbf6d672b2bf2675c5f1d3d8b8d9b92e2fc30982bd06f5ca048725570fb9a",
+    "data/course_catalog/linear-v1/linked-list-insertion.json": "9a926f511c4d207b8d021c08aa1fcfa7207dff7fcf1a6c6e980de550091cf529",
+    "data/course_catalog/linear-v1/linked-list-traversal.json": "0ef93071fc3377c08e05e0621112224d9d93edb19930001137c3f317eb43cc73",
+    "data/course_catalog/linear-v1/manifest.json": "82a4d0329ee55765caad7af4fc90be63b4cd4c0a80ee8c7dc5e2b6fc5ad105b2",
+    "data/course_catalog/linear-v1/queue.json": "ac434954c7a7138e5e3798bdc0e494bf454f1d7afac5b4f1398753601a0b665f",
+    "data/course_catalog/linear-v1/review-status.json": "5e8c6c322200333e8f164558a913aaf6836711adaf3111c4eab4dc72f647be13",
+    "data/course_catalog/linear-v1/single-linked-list.json": "9c8086e48ae08e76d4cf081704dbde332e061497f57191e6b6d1684498a6b727",
+    "data/course_catalog/linear-v1/stack.json": "11fbd29aa2e365bd60e7cb613f7273880a4aa5b02ef5fcb9e28c19270369aeb6",
+    "data/knowledge_graph.yaml": "84ac4c08297623a3a6e167ef9775b67ab195c43048e23be1e2874b26a6f63dc7",
+    "scripts/catalog_acceptance_protocol.py": "4a45e3141a06f3c295a111805d1a800a098cc0c58af249c210d129622073e394",
+    "scripts/run_catalog_acceptance.py": "e91909c9590ca011fe7383064f9ff7ee32897e2fd8ecd15152d5ef0391dcf1e7",
+    "scripts/run_catalog_db_tests.py": "f03ed603844920b7a6e5ab2b87be8a9724fae5ea9ce5d3c1076cb959bb70e85e",
+    "scripts/verify_catalog_acceptance.py": "e158576e850088d27d22ebbca40273a1390213eca247dbaea97aa6445693564f",
+    "web/package.json": "94d0ad76c56eac64a5e8ee51741208c28319472832c2fa5ac816a5428519a2e0",
+    "web/pnpm-lock.yaml": "695c3e8402a5582d4fbdded2ef46cee3fdcd550cbd8f08bca800b9a1d8374705",
+    "web/src/App.vue": "61c1933d3a614ea68d1f59bfe6ce960badf52d2bb8ad7841d11dfcd6438d2dc9",
+    "web/src/ProductApp.vue": "b1f1deaf98263aded2735205bf39630c21b5a0cf97c5460e99bac063838a847d",
+    "web/src/api/animationJobs.ts": "cd72f33009b8eaef1e27c1f63c5810a76a674e3053f58de93b733521e0cfdfaf",
+    "web/src/api/catalog.ts": "6d44ce24599fb3f1b58338807d18b469daa89f71dcf1d3065410f0a2e97ea7de",
+    "web/src/api/classroom.ts": "4dd5e5a4ac5f3791d42554010d57d1b224b42f5b958c6def78a21115efec9f36",
+    "web/src/api/downloads.ts": "8267a3c6c2b57398f198ecd10fa43dbce7c4156e61c6c5ffdb6f27f2c13de4f4",
+    "web/src/api/learningSessions.ts": "30d3c2b835507ebce02e76695547fbe98a6cea2e988d27d85f1c48c630903a30",
+    "web/src/api/paths.ts": "86fbe42ee3f169c6a4ef5366e75f8923561b9d522d10c2fe396b3fb820e6a7e0",
+    "web/src/api/profile.ts": "b7622277e1974765ac8071fffe7ced11cf4936235e98f41dffd37f6be6230ece",
+    "web/src/api/quiz.ts": "1c794b5b702dc680aadb19df29c68e4f2bd098450222d2b6a579f6ac26edafc6",
+    "web/src/components/AnimationPanel.vue": "af99c97f7bce43d67e6113d72a4fc190755510319dcba730d89530af3883857e",
+    "web/src/components/CatalogPage.vue": "f07827c45a9a2f567c36b3b5d75fbcf5ad39bccd05ccaadfca3106d1a50ad4e2",
+    "web/src/components/ClassroomPanel.vue": "26c30d921e644a88018572a316e38f407a223f4a70458979b33275c8882f88b2",
+    "web/src/components/DebatePanel.vue": "2ce0d6b30a9abf691142ae3ac5dfb1360f8430526778c6342391f617b1d3aaeb",
+    "web/src/components/LearningControlsPanel.vue": "29193dd14dbe6cb95435adc925effe77170c417e0f6500677de236054875365f",
+    "web/src/components/LearningPathPanel.vue": "3abf82abbe4b5b4104cb7c7a6861975d111d7376a8724cc89ba3329fb66e88f7",
+    "web/src/components/LearningProgressPanel.vue": "b458e45b794ef0541818a8b7fc2d39fc1571314eea7e829ec29b4c28ae2aafcf",
+    "web/src/components/NotesDownload.vue": "69639092c20693889216a792a8a3190d21a4d4a6ac313fa26f290fe034aeb843",
+    "web/src/components/ProfileCard.vue": "decda0229d91a5feffb2edbd05858b0e84898efc493e81fc813c60e460818328",
+    "web/src/components/PublishedLearningWorkspace.vue": "01536c5b01265b845269e52adf7c53a9546bb611771e9bb8f636e2efd6200466",
+    "web/src/main.ts": "1be0df83e2ae3054050fe7fa48bef6c2c2e0c62d581eb610177422e8096e7374",
+    "web/src/styles.css": "4d51e3cdc828932b05c8b4857f7ce03afa6d8932c6cacd0c181ee7a7418fe921",
+    "web/tests/e2e/animation_benchmark.py": "2509936f3e1c14b82b667f03bb4f110956ac59bbfbdaa59c041748341f2cab19",
+    "web/tests/e2e/catalog_acceptance.py": "f25f24b795f574d27cb8ce6c90a72ee27984541224a127aa5c428661de565800",
+    "web/vite.config.ts": "643c70773b45554c3e6d104043900ffc33a06bf6bdf96ae47646378bbb3e4379"
+  },
+  "protected_hashes": {
+    "docs/acceptance/analyze_t033_review_completion_offline.py": "48a14034637baeb176d3085dc71bbbd8e36912b0556de64a3a098e4dbe356477",
+    "docs/acceptance/freeze_t033_qwen_review_candidate.py": "a195e40cbb2672d7cd50b2cda578a332c6ce70f95394478f4784bb54332ceaf6",
+    "docs/acceptance/freeze_t033_review_completion.py": "55b3e233d44189ad9c53720205474d4cf86f83647d8b3771dfc79bfb9ac064e9",
+    "docs/acceptance/freeze_t033_schema_dedup.py": "365a99c278f7468d6edd426e7e3b25b69a8db93901e14f0d5f23b065da97a898",
+    "docs/acceptance/mvp-0.2-t033-diagnostics-v2.json": "919f03de4827c45434cb62d2f0fd1e3b8e0cd5c61204356d7d884735d0d8541b",
+    "docs/acceptance/mvp-0.2-t033-diagnostics-v3.json": "588f536396d6604c326159bcd49c3843ad074448e662b241a00b51fc69d19f11",
+    "docs/acceptance/mvp-0.2-t033-diagnostics.json": "6b482bce2893619f9ef65d8806c9e13edf7ad99714540782cf25bb9338c9cfb0",
+    "docs/acceptance/mvp-0.2-t033-nonbillable-diagnosis.md": "d42b10df002a8cc2ecb1d0d515280cdac51f0fe9636344fe0c920cf043a1ea2e",
+    "docs/acceptance/mvp-0.3-t033-candidate-correctness-audit-20261002.md": "9a05eeac73dd925a69cc5dd7dae839f9dd0c78a99dbb0c2fe22ebd093d016abe",
+    "docs/acceptance/mvp-0.3-t033-candidate-correctness-protocol-20261002.json": "853b6509ae24602c0806c6202a5a037e0f274034434ba1db2e83e25a8d61ee85",
+    "docs/acceptance/mvp-0.3-t033-candidate-correctness-result-20261002.json": "55d776a97cab35e3086ae5e016a46b58dc0cd67ed6bae7f0d2262ebdae3d4886",
+    "docs/acceptance/mvp-0.3-t033-dom-offline-smoke-20260930.json": "bfd37046f04d5350358edada3b285f2a0e88a20822b2b317a4d546d6c8cfde8d",
+    "docs/acceptance/mvp-0.3-t033-early-stop-implementation-20261001.md": "66c2246167ab6cfc126084cfa90c4d915fac34be6df5eca8fc76707efe34a6c8",
+    "docs/acceptance/mvp-0.3-t033-early-stop-protocol-20261001.json": "f3c19d56577ffb582eec0638d354aa3f33d30c5481f05768912bf8f7e275f241",
+    "docs/acceptance/mvp-0.3-t033-early-stop-rehearsal-20261001.json": "4ed79e557354f442866854c620850047a8013d455ffce6665f97927713888d66",
+    "docs/acceptance/mvp-0.3-t033-flash-0731-first-screen-20260930.json": "89eb660a47e63c5e7adac4ddc6eb3a88a8b13331b440bdbf7347ce46cae314ed",
+    "docs/acceptance/mvp-0.3-t033-flash-0731-first-screen-harness-failure-20260930.json": "29f9465ef3f91d7fbc8116ad7260a3ad42232f99642bccbc066fa7fa4db619b9",
+    "docs/acceptance/mvp-0.3-t033-flash-0731-freeze-20260930.md": "e5f502f1185cf3691af9f87943208cedc577ae2053c948a6a36217fb1678a437",
+    "docs/acceptance/mvp-0.3-t033-flash-0731-preflight-20260930.json": "99d1c69825ae537284df4b0eb6c61fee614bb233f81fb3f9162c06108d9d4e34",
+    "docs/acceptance/mvp-0.3-t033-flash-0731-quality-20260930.json": "783884f982152e2f611f5a3689423c08a7d4f1141cf78c02c4492094eef799e9",
+    "docs/acceptance/mvp-0.3-t033-flash-0731-review-20260930.json": "853df5ce5336926c8bab7079fd93f1783e3ba0c73a5671287e35a2e52b423a15",
+    "docs/acceptance/mvp-0.3-t033-flash-0731-review-v3-diagnostic-20260930.json": "25d585bdc7d3ce41bf121aaeff82414bf8e12ad971a85d83f828017f217e5e40",
+    "docs/acceptance/mvp-0.3-t033-flash-v3-auth-halt-20260930.md": "5ca6818beab4f80affa7d678cd487d25bbc9c4085b600d00b1be03806d41b807",
+    "docs/acceptance/mvp-0.3-t033-flash-v3-first-screen-20260930.json": "abf391a22ba7af5beecced8fecb8ae80ba2f00efaa8e230b058792404174196f",
+    "docs/acceptance/mvp-0.3-t033-flash-v3-freeze-20260930.md": "0e0e7bb5ddb63903df5e666231f16ef062e068d3b6157233c02dd4c30b204bf6",
+    "docs/acceptance/mvp-0.3-t033-flash-v3-quality-20260930.json": "ce2775aca83ee7fab292812e74ceac5d0bb498b98d160c0ebc2cb563a79d79c2",
+    "docs/acceptance/mvp-0.3-t033-flash-v3-rerun-proposal-20260930.md": "dca605f5938e9b67b685ca672edeb346a934b4776a2e448eb565d16fe70ee9db",
+    "docs/acceptance/mvp-0.3-t033-flash-v3-review-20260930.json": "b1ec0ced359bb147946908da494ec084ffff30840828116114b039083af3a284",
+    "docs/acceptance/mvp-0.3-t033-flash41-consistency-diagnostic-20260930.json": "061745ec88e0874e9727b4e91155e5d5023062b89f3d85a4f138fc4cb2f2f6cb",
+    "docs/acceptance/mvp-0.3-t033-flash41-consistency-v4-freeze-20260930.md": "5469afa6e688ed5f9a707f5133989f5f025b012ae1f8fd0e1f307a1046476bf7",
+    "docs/acceptance/mvp-0.3-t033-flash41-consistency-v4-manual-halt-20260930.json": "705f22368b434e238a035ab821f94fafda8435c0cf16787adf073b7b7a65810c",
+    "docs/acceptance/mvp-0.3-t033-flash41-consistency-v4-quality-20260930.json": "58ff24b43e872f283f64fead0746482b926418ea642311b7c1ef20f7cb6ad55b",
+    "docs/acceptance/mvp-0.3-t033-flash41-consistency-v4-review-20260930.json": "b6d58bc2a0b2d6f0bf43b0eb0b9baeebe31f04b92c732beeb4dda84e5a6fc931",
+    "docs/acceptance/mvp-0.3-t033-flash41-diagnostic-preflight-20260930.json": "435a7c8b6ee591306962d35682d9d244e7ccc6d077fa01d1d10abdf57f9a551c",
+    "docs/acceptance/mvp-0.3-t033-flash41-formal-freeze-20260930.md": "edf358f46dd337ec5628d908cae9e1fb57aa4b420f28e904bdf03003eec16259",
+    "docs/acceptance/mvp-0.3-t033-flash41-formal-preflight-20260930.json": "6711821ec73af29472f239f1e3a78c91aec51ef175273534157b861f957b1b71",
+    "docs/acceptance/mvp-0.3-t033-flash41-formal-quality-20260930.json": "52140b8ce52901294b6aec7343ef142cd6c1f99f5e47d7215f119e31cf63bd73",
+    "docs/acceptance/mvp-0.3-t033-flash41-http-diagnostic-20260930.json": "435feb3d645f71082d7be15b306a28db5774fce42edcb5c02619f48acd7022ed",
+    "docs/acceptance/mvp-0.3-t033-flash41-json-object-preflight-20260930.json": "ed0ed5998213fec111c2ab22abd64e23799e9866254ef191c091d79c2a8c456d",
+    "docs/acceptance/mvp-0.3-t033-flash41-manual-findings-20260930.json": "410c95349e943ee83a8aa9e2a61ed20691a12d0978962aaa04693f662d90994b",
+    "docs/acceptance/mvp-0.3-t033-flash41-preflight-20260930.json": "48ae6cb17422c4747770e68c0ef3e78a5883865ce99a378014f097500f9482a9",
+    "docs/acceptance/mvp-0.3-t033-flash41-preflight-audit-20260930.md": "8faa9fe14ae3c096d6d9f17e7a8f53e564ec92f2eee23730a34b19098908ad0d",
+    "docs/acceptance/mvp-0.3-t033-flash41-review-repair-proposal-20260930.md": "9a8f23158fed814c90666559e190dd3a49cefcc6bc1110d7cb7ee012536235a1",
+    "docs/acceptance/mvp-0.3-t033-frozen-plan.md": "6d55071dddd41fa68fda63a5c9170285c0a7d3b9b517c8510185980bccf5926e",
+    "docs/acceptance/mvp-0.3-t033-generation-pilot-20260930.json": "dbb1976ad0c6ad9ff7e66ac78544c6fca1c0e5c204bbb48a304cd7ab492f6277",
+    "docs/acceptance/mvp-0.3-t033-interim-audit-20260930.md": "bcbd7507de3596b7e839414a395b66696b113ec106ed4d8cd93f411b5e373689",
+    "docs/acceptance/mvp-0.3-t033-ledger-20260930.json": "393883892e51297d9c666ed7254361a1598b8e7c818bd782b7b13a89e15c8702",
+    "docs/acceptance/mvp-0.3-t033-ledger-v10-flash41-diagnostic-20260930.json": "902b0725606407f79873c18c1475f8a2666b21772d3dca7183d05fc433d71ab8",
+    "docs/acceptance/mvp-0.3-t033-ledger-v11-flash41-json-object-20260930.json": "5e08263a3d8d2418c6ef7635814ad651ade18cc3d1da00bac2094e61b3590846",
+    "docs/acceptance/mvp-0.3-t033-ledger-v12-flash41-formal-20260930.json": "c72d73a66ffd4f51df565d705dd7f5ea672b7548e16bc985de9f7ab833f47cf1",
+    "docs/acceptance/mvp-0.3-t033-ledger-v13-flash41-consistency-v4-20260930.json": "43636f8604517f4d27fe3e50f3d9076f32e57cf249c7be2063ecf6c87ba9baa1",
+    "docs/acceptance/mvp-0.3-t033-ledger-v14-review-low-pending-20260930.json": "cf2e102b5a37401ced1ef3ebeaeecfb3c0f0ad20a149617a670e9099080e2bb5",
+    "docs/acceptance/mvp-0.3-t033-ledger-v15-low-small-sample-20260930.json": "13fb100ebcbdad3acf178b48a970cce567ff6d4d11ccdc14ef2d43fbbf6a7bc4",
+    "docs/acceptance/mvp-0.3-t033-ledger-v16-peek-8192-20260930.json": "b5034f66841bc37f2ef4ca52bb70ea439372403306006218e74b24fc578950b2",
+    "docs/acceptance/mvp-0.3-t033-ledger-v17-low-stability-20260930.json": "b173a5dd7fa6500cc2f7bc33fc64430fe70b693eab7177bc846e14ee50d1d559",
+    "docs/acceptance/mvp-0.3-t033-ledger-v18-pilot-browser-20260930.json": "def5a288173c65ed4af0d373b383f4e7536481a47c26090d1dac77414d1c5a1b",
+    "docs/acceptance/mvp-0.3-t033-ledger-v19-low-full-20260930.json": "7c1f22622c781207e1c9765bbbedfc0c51bc270f5206ccb4a50b5c0422de5ca2",
+    "docs/acceptance/mvp-0.3-t033-ledger-v2-20260930.json": "dec7a366a494006f40b24dbef68c1986a6d5bbe411f3683891680e5a6916ba25",
+    "docs/acceptance/mvp-0.3-t033-ledger-v20-review-v6-20261001.json": "ed4089afa3988f2ebb6cc1757e924c568c44f9bf6a292bb3bb254fac8e1e2290",
+    "docs/acceptance/mvp-0.3-t033-ledger-v21-review-v7-20261001.json": "8e3eecec0a38c8bc7d528274358b80b9b8c13d4d24b48858305ed3a750084751",
+    "docs/acceptance/mvp-0.3-t033-ledger-v22-long-review-20261001.json": "76306016cebe39a106bde32edc88d2679662b47ee1bc30ae16f72cc8ba6638f0",
+    "docs/acceptance/mvp-0.3-t033-ledger-v23-completion-candidate-20261001.json": "c99ff9ea387c1183aa037c424779d6c1aa62fe966a9fa068a578063119d465fd",
+    "docs/acceptance/mvp-0.3-t033-ledger-v24-candidate-correctness-20261002.json": "97bbe9b31681e9d67f3ca8d8c3713a49503001d6ffd5496a60628266ef8405ec",
+    "docs/acceptance/mvp-0.3-t033-ledger-v25-schema-dedup-20261002.json": "0118bcc0d697dfb7dbd0bf2b764213289107fac6dcbaedda3677b72283e7a66f",
+    "docs/acceptance/mvp-0.3-t033-ledger-v26-qwen-a2-20261002.json": "44e57c5ae7e57156132616949647ac27c0b21ea6fb60f41abadceb11379e4e9c",
+    "docs/acceptance/mvp-0.3-t033-ledger-v27-qwen-repeat-20261002.json": "b202d09e4bacef6c45c57262bc5c36270556e5e3ef7b402011dea90472382eed",
+    "docs/acceptance/mvp-0.3-t033-ledger-v3-20260930.json": "5347470cb3271c51f89b8c51f063fed8a6837c173ff04fe6419254b03204b4dd",
+    "docs/acceptance/mvp-0.3-t033-ledger-v4-20260930.json": "5e1240dce66819da0433b46930ce75d4355b2615e98cb8284a33652406c0a219",
+    "docs/acceptance/mvp-0.3-t033-ledger-v5-20260930.json": "cae82db95971a6729f1b9a629176ec2e08266e0a9a04fb316a1dd80069211ff9",
+    "docs/acceptance/mvp-0.3-t033-ledger-v6-flash-0731-20260930.json": "7e57f76e1f1b9db30a95916ca2c020ad65dc6bf150198cdfc6acd5245a388b18",
+    "docs/acceptance/mvp-0.3-t033-ledger-v7-review-v3-diagnostic-20260930.json": "f1960585dd41d715217a11e62fea0d5675b1fb77c7531d73a4f79b7943735647",
+    "docs/acceptance/mvp-0.3-t033-ledger-v8-flash-review-v3-20260930.json": "72177b14c68bfcc9dbacf8ec395030e76ee2c6a473fd5a80bd99edea659b6c05",
+    "docs/acceptance/mvp-0.3-t033-ledger-v9-flash41-20260930.json": "68bd32e9ebeee0e31e2412a2516cf08b1706fdb844aceb8eb9756d1c1024654d",
+    "docs/acceptance/mvp-0.3-t033-low-full-audit-20260930.md": "6916ae0520e979afb0dcea8a37064c05482b0fceef4fc10aa99e4ee2d8ab0475",
+    "docs/acceptance/mvp-0.3-t033-low-full-browser-20260930.json": "41c01ce48c0a8cfe596b574759414c280befb654ec6ca28dc05fde0ca863ea18",
+    "docs/acceptance/mvp-0.3-t033-low-full-classroom-20260930.json": "c49471f69bc92f1298ab3998bec82c39f774db083a5c046b49cdc2d1154d2705",
+    "docs/acceptance/mvp-0.3-t033-low-full-execution-20260930.json": "5590aa789d054cba7a66f8c157fe4bf0085722dcb24145389e8f590d4b1469ac",
+    "docs/acceptance/mvp-0.3-t033-low-full-execution-browser-continuation-20260930.json": "36df274f1339c16b3ad07ea7deade03684d36b10514f614d4a008715362594e5",
+    "docs/acceptance/mvp-0.3-t033-low-full-execution-classroom-browser-20261001.json": "309030d0b57f06c5023b5a9eb9365901399806d8ea6e94f2220b42086bbb61e2",
+    "docs/acceptance/mvp-0.3-t033-low-full-execution-remaining-20261001.json": "ff86e47b4120057939dbf459494c28addcf80fa3c4adbfc0ed2332ce959aebb8",
+    "docs/acceptance/mvp-0.3-t033-low-full-execution-resume-20260930.json": "4da93a1b3f8f89a5441e7c76e6bdf077d1e4959692a501261cad970296eb89e8",
+    "docs/acceptance/mvp-0.3-t033-low-full-final-summary-20261001.json": "bc363add1b174db5bc50ca073b446a621cf3c3161cae590d82f1dc4a00f5573a",
+    "docs/acceptance/mvp-0.3-t033-low-full-first-screen-assessment-20261001.json": "10e1b3b50cdecd98110f8729eb2fdb0d4a2f6ac1fd5ea63e9001ee5311a6c9cf",
+    "docs/acceptance/mvp-0.3-t033-low-full-first_screen_dom-20260930.json": "6dce53399d8360977f4d44f1c41f963e481b57aedebb92edbb34eadf8d29ef07",
+    "docs/acceptance/mvp-0.3-t033-low-full-first_screen_dom-continued-20260930.json": "421542ac8fe5d6528d0b8447a59f2d5b227dc8347179510b24cab4a69f4ffeca",
+    "docs/acceptance/mvp-0.3-t033-low-full-freeze-20260930.md": "571b95ddad2e98589f671a2196163736a3f8d776ff639b9a7920a2ed59df5510",
+    "docs/acceptance/mvp-0.3-t033-low-full-manual-audit-20260930.json": "917e87a3f46e3f9343e8bc01b0abbee22225f1430cdcd95c2c6da938da805c07",
+    "docs/acceptance/mvp-0.3-t033-low-full-preflight-20260930.json": "1cfd6128f800661f2520fbca004aca7f28c65a135ad1ae53627d42479ebabd4a",
+    "docs/acceptance/mvp-0.3-t033-low-full-quality-20260930.json": "45236305cf3c66a2472e4c4f27711cbcc7914dbda20e4773587a06bdc1fb2920",
+    "docs/acceptance/mvp-0.3-t033-low-full-review-20260930.json": "1c1c0d3195f6af4afad11cc7844934203ff038f1aa92933b1b5c719edd185440",
+    "docs/acceptance/mvp-0.3-t033-low-peek-8192-retest-20260930.json": "2b7da51be259ed3a589564fc47260f239409c19c38089407750a8066f331d347",
+    "docs/acceptance/mvp-0.3-t033-low-peek-8192-retest-audit-20260930.md": "07a42fe6eee2eb387d62aa8bcf3c073e7b597ec84f087c49befb6677dded4e7e",
+    "docs/acceptance/mvp-0.3-t033-low-peek-retest-freeze-20260930.md": "9eeb253161a4df1cf3583f5b97d05f6aa582540e470e375bcaf91d4d59a64ce5",
+    "docs/acceptance/mvp-0.3-t033-low-plan-offline-measurement-20261002.json": "b4f45efdd16feac7a931b0fc8d2f302a8c06b706b08610e0553cdf9fca4e849e",
+    "docs/acceptance/mvp-0.3-t033-low-plan-offline-verification-20261002.json": "33635eed2afddbffb1a365ef36c23e97ab0a198aacc69f525e5f5482f7e6ebf6",
+    "docs/acceptance/mvp-0.3-t033-low-policy-stability-audit-20260930.md": "8736d9ddffa634adb8bd84b7aeefe7ce30ab998b4fbd422c1ed792e0f647075f",
+    "docs/acceptance/mvp-0.3-t033-low-policy-stability-freeze-20260930.md": "ee7cd6ba7215d65a8b8618d2ce69231a8975038187b41d5990db5446e536d1bc",
+    "docs/acceptance/mvp-0.3-t033-low-production-stability-20260930.json": "6dd11bd2bf9ed2d5dd7b2071716686eeed911e1de35bb22dc70ee0074c76ea23",
+    "docs/acceptance/mvp-0.3-t033-low-review-options-20261002.md": "fa36b13f2bb56370aa9b77d271164b040f7695280bdc80c4c6c382047b58f84c",
+    "docs/acceptance/mvp-0.3-t033-low-small-sample-20260930.json": "be43b13ea3b021b7d3a6902379d72e971f8c8d42dec2c8f939c85b0078f62bb0",
+    "docs/acceptance/mvp-0.3-t033-low-small-sample-audit-20260930.md": "5a5e923b7894610a215e64573751ce263c2e8f25f6317d47b78bd1c6fb13b9f6",
+    "docs/acceptance/mvp-0.3-t033-low-small-sample-freeze-20260930.md": "a61bcbaa77c39c493dcc32829286322b2292bc151f6ee4c1514563ddb641069b",
+    "docs/acceptance/mvp-0.3-t033-measurement-offline-20261001.json": "ae5f9e62d68fa5fc7dddf37ccc074db7fec6d4b5888f1b155519dbad96727816",
+    "docs/acceptance/mvp-0.3-t033-offline-replay-20261001.json": "9cbb2cc4596b307b7ac7e82fb83d521c6e71a6c670528bd244d5271d58ceacb5",
+    "docs/acceptance/mvp-0.3-t033-offline-replay-and-diagnostic-freeze-20261001.md": "ad6a3af8b77d8cad3ac578dc57d2647730709dcbc06bdb4209ebdd4c3d647438",
+    "docs/acceptance/mvp-0.3-t033-offline-root-cause-20261001.md": "f4bcf5a3f6cdede5390607161e24442b54384b72b17e914467aa61c8e6f52b1e",
+    "docs/acceptance/mvp-0.3-t033-output-diagnostic-20260930.json": "c255a044cb5b01f64b49a419f43f41808f9dfc8aae1702e742103e24c2c0c1a4",
+    "docs/acceptance/mvp-0.3-t033-paid-stop-and-retirement-20261002.json": "667bdaa5c3a89a15969030d6b31fffa620c5cfea9ece0af08fc80b1e64a78946",
+    "docs/acceptance/mvp-0.3-t033-pilot-browser-audit-20260930.md": "84c76d1a0627ffe374cd0a893cf30d441ea56afc79cf74f7cf6a8f3d3a3ea5ae",
+    "docs/acceptance/mvp-0.3-t033-pilot-browser-freeze-20260930.md": "484b91d2f81ab6b15b4074dc4d07f0f24522b4f061270bf7e5ae1201740ba6a9",
+    "docs/acceptance/mvp-0.3-t033-pilot-browser-summary-20260930.json": "efd31e3df71bee152b0fa522bdd00c28dfbfe42fead981d972964bc89834669b",
+    "docs/acceptance/mvp-0.3-t033-pilot-real-browser-20260930.json": "3856c61520006361301b11a305df4609cbb8542100dd597e18701919dfb6f8f7",
+    "docs/acceptance/mvp-0.3-t033-pilot-real-browser-unique-goal-20260930.json": "964648fb3f3f2af60d29955aef094c0963bff93225280db396c19eb49544bf8d",
+    "docs/acceptance/mvp-0.3-t033-quality-v2-20260930.json": "f04d76a59c254ab229d7d2c98cdcc3fb8679c0776ce7e7ba04450fcfefa310e9",
+    "docs/acceptance/mvp-0.3-t033-quality-v3-20260930.json": "6a1beb2dee433df4c7c0fa9a1e3932b0136acdc1b29fc9e05b7ef455c8e73d9d",
+    "docs/acceptance/mvp-0.3-t033-quality-v4-20260930.json": "9f68f886e059cf7df7b71a1c755292ff19656425058c20b595ce526cc1088426",
+    "docs/acceptance/mvp-0.3-t033-quality-v5-20260930.json": "6e17e0a7bd23162b809e62acab3962d3e8b6e509750b4d8f6e7e94799c3f822f",
+    "docs/acceptance/mvp-0.3-t033-qwen-a1-freeze-20261002.json": "1b4990d7b589ca3f399d4433c78e16b71acbc2fe85ea923e1d6e2308336bfccb",
+    "docs/acceptance/mvp-0.3-t033-qwen-a1-offline-result-20261002.json": "16926e5b11efced7ec25a34f2f2ea18a65aee125a8721e25565238569f776a35",
+    "docs/acceptance/mvp-0.3-t033-qwen-a2-real-audit-20261002.md": "72b892431bac581d625dc7e42465e49d41cce1613455896a6276134d6588f44f",
+    "docs/acceptance/mvp-0.3-t033-qwen-a2-real-result-20261002-slot-1.json": "945596dae2738e7ed202cfd5052f863185e3ea2349398cf12fa08bf4e27881e4",
+    "docs/acceptance/mvp-0.3-t033-qwen-a2-real-result-20261002.json": "a47882f2d02c54dff309ffb7d328b035d2c4a5353ee58986bf25300e93076424",
+    "docs/acceptance/mvp-0.3-t033-qwen-a2-retired-20261002.json": "7571f52d735ad33d0b239c0db048634ad7b10a8d07ff5a93a5a6bf75f10a0445",
+    "docs/acceptance/mvp-0.3-t033-qwen-a2-run-offline-verification-20261002.json": "f66f4f4c1dcb9b357a62baeeea82c845b73a36f814ae6002e22f389765a7a19b",
+    "docs/acceptance/mvp-0.3-t033-qwen-a2-run-protocol-20261002.json": "3fe6cb7d295d54a6afb10a5f4a614a4b32b0f9e302865d3c39a65aaae92c50af",
+    "docs/acceptance/mvp-0.3-t033-qwen-a2-run-verification-20261002.json": "32386da909fc87b67047f44272709c7f4c40b1e990059d16e03cbb00829befdf",
+    "docs/acceptance/mvp-0.3-t033-qwen-a2-target-freeze-20261002.json": "99975d772e1be86cf30af76953627e5950959ce98d5775f125d89d50314f509a",
+    "docs/acceptance/mvp-0.3-t033-qwen-repeat-audit-20261002.json": "3992ba824e1c101c9c1c82310dffe54528e6b61dbb0277a4eed1828d0016d15e",
+    "docs/acceptance/mvp-0.3-t033-qwen-repeat-offline-20261002.json": "c862cba6c2b7fa302507d5d169a6f456d2d4cc8a773c99eb24c4646e05e84cf0",
+    "docs/acceptance/mvp-0.3-t033-qwen-repeat-protocol-20261002.json": "3ad0035519c85699e5b27b6ed2cf1ca67c742186dc303e3c8329ae41d409bf10",
+    "docs/acceptance/mvp-0.3-t033-qwen-repeat-result-20261002-slot-1.json": "02c093602dc55063199b475b483f28df05d5925cf59532388c596ba275eccfc9",
+    "docs/acceptance/mvp-0.3-t033-qwen-repeat-result-20261002.json": "e9f727bb7e681f5f5d6a00dbbe69c396334684be54bd5474767928d77f992220",
+    "docs/acceptance/mvp-0.3-t033-raw-shape-diagnostic-20260930.json": "57574f3c690bd0c90f455ae126e8df35fbdf8cc080be311083bc2645c3647845",
+    "docs/acceptance/mvp-0.3-t033-review-area-semantics-20261001.md": "3d6e54e7367bbb139c22caf8fc150287a5fae343ffcdeaa46dfde2d01170ae38",
+    "docs/acceptance/mvp-0.3-t033-review-category-proposal-20261001.md": "c572162bef2c650ef3a0231ba5a7c779043813e95b956efda5b4e0e17c009f12",
+    "docs/acceptance/mvp-0.3-t033-review-completion-attribution-20261001.md": "24dddff8274baa48566708419de73f841c5b2c91675d81eef477b03091e1e9c2",
+    "docs/acceptance/mvp-0.3-t033-review-completion-candidate-20261001.json": "243d04b50e33afc665c077f4898bb20c4043ac4ea1dbc9a70b0c96efaa8507c8",
+    "docs/acceptance/mvp-0.3-t033-review-completion-freeze-20261001.json": "066745f0b7bcfae3be316e070e178a99758eb5c1884d4aaf024b6feb4d79a78f",
+    "docs/acceptance/mvp-0.3-t033-review-completion-implementation-20261001.md": "886b1200eb27a8e9c56fade080d4fbf1f74c71a561aef28a5c690bd487ae7f06",
+    "docs/acceptance/mvp-0.3-t033-review-completion-offline-20261001.json": "42a334698589afbc894b3e1f195ad63f0915dab091888b6c87cf458ea8a1b37e",
+    "docs/acceptance/mvp-0.3-t033-review-completion-offline-result-20261001.json": "770c3564477d2cb6808363dc02158b6b7c65c3ab539b5d9daa38dc8d14d532ad",
+    "docs/acceptance/mvp-0.3-t033-review-completion-real-audit-20261001.md": "e4fda027c2d026d52d0add880f4f70aee84e8b5e30c2e42383c84c482819af57",
+    "docs/acceptance/mvp-0.3-t033-review-completion-real-result-20261001.json": "346b5166a86942fa0f80be979e7616c64df181c790d15518ea7bfc52e16a0e41",
+    "docs/acceptance/mvp-0.3-t033-review-completion-run-protocol-20261001.json": "e0dbfc2f5fd09a443db4051390c45bea5783f51f8b53754a24cd900955f515f1",
+    "docs/acceptance/mvp-0.3-t033-review-diagnostic-freeze-20261001.json": "1feca43b980531a55ff102126147cc42504bacf74d27c4ecc463e3f61c19795d",
+    "docs/acceptance/mvp-0.3-t033-review-group-protocol-20261001.json": "77f63e77f3f9e86de2dac4d444fa3f56e72b6f2437da1a7e2e551c5af474a58d",
+    "docs/acceptance/mvp-0.3-t033-review-groups-offline-result-20261001.json": "b2f49a56f7238bfb916447e994092467775ac65effbf15216809e276d6f05d56",
+    "docs/acceptance/mvp-0.3-t033-review-groups-post-long-20261001.json": "57cbe3719c4a39f60c45c30b7cd2f403498fd6ad19ad3f5cf3cc0bc8b0974d0c",
+    "docs/acceptance/mvp-0.3-t033-review-long-audit-20261001.md": "e4e79078a60ffcc847347bcd37cb1c0c363fba28fa92a0009342332f114b8be3",
+    "docs/acceptance/mvp-0.3-t033-review-long-result-20261001.json": "c2efefb72ae0e68462d15cd3d948b14735bc4257119e8cbaeb93034ab39c4385",
+    "docs/acceptance/mvp-0.3-t033-review-long-run-protocol-20261001.json": "0c7570a2ea1e5d2ce169679c2f92a62bac5e4faeb4b5a0c0863a5b67ff55e3d4",
+    "docs/acceptance/mvp-0.3-t033-review-low-hold-20260930.md": "ca6c0270d30e098fcbcb5c2855dc3470a246063c0d72d78cb2a16bc42c34a5e5",
+    "docs/acceptance/mvp-0.3-t033-review-model-decision-offline-20261002.json": "d70a221ee8eab181f6294a0d5c28ad389e90731f0bf8c79fe594c6b1dfa2f46e",
+    "docs/acceptance/mvp-0.3-t033-review-pending-five-freeze-20261001.json": "1fe8dd38713f1f6b6e1c47cfe258657f26cecac47cd903e0e5da1e218d782e2b",
+    "docs/acceptance/mvp-0.3-t033-review-v6-audit-20261001.md": "82de0616793cf89a36667b9d1e9199f0569c1c14013554d70d43487043790a0e",
+    "docs/acceptance/mvp-0.3-t033-review-v6-diagnostic-20261001.json": "8b5c6833fdf2ff29affadf7f503824e7c2a485fb828d26a611a04a50b5a2a3b4",
+    "docs/acceptance/mvp-0.3-t033-review-v6-diagnostic-protocol-20261001.json": "95391a8d30503ec407b3fd0413ec402a633e07fb1be0f78b2719abfefaf12dbc",
+    "docs/acceptance/mvp-0.3-t033-review-v7-audit-20261001.md": "9af6498bb441785d52833d3a7405415e4cf8057b36add3f6b231ce7db9f2acb9",
+    "docs/acceptance/mvp-0.3-t033-review-v7-diagnostic-20261001.json": "ae30562b729b62e388a5790043399b50f0f14e41fc68add28cfbe70d89411e56",
+    "docs/acceptance/mvp-0.3-t033-review-v7-diagnostic-protocol-20261001.json": "f74ce3f4b26e8d25a27c2ddedda2c928144d8f7aecea95dd33e938f4f134e08b",
+    "docs/acceptance/mvp-0.3-t033-schema-dedup-freeze-20261002.json": "ccf35eb3b018c8d8ed5199ec037971c8e5adb779fe0d12c44559c6f4592b7f37",
+    "docs/acceptance/mvp-0.3-t033-schema-dedup-offline-20261002.md": "bf4168da0a520bb10bad978254bfc947843531e6ae47b95366fa3760e98abdec",
+    "docs/acceptance/mvp-0.3-t033-schema-dedup-offline-measurement-20261002.json": "558b2b637bf94198627de38e0e8ca35cbe63e29e0bf2ec94d26b8552e40acd3a",
+    "docs/acceptance/mvp-0.3-t033-schema-dedup-offline-result-20261002.json": "726c67951fc7da56115f2ed3ac7e01766c20e5c4666206e6c21536cad515315b",
+    "docs/acceptance/mvp-0.3-t033-schema-dedup-real-audit-20261002.md": "c35a6fa0f0c08e98bb3204ee9260594db10328d0bf9a6eb1491e6f329f3022de",
+    "docs/acceptance/mvp-0.3-t033-schema-dedup-real-result-20261002-slot-1.json": "6c5c8b6f8eef0bc4370572e7470788968169fa72872a09d2d4beee6da342ff13",
+    "docs/acceptance/mvp-0.3-t033-schema-dedup-real-result-20261002-slot-2.json": "40ab8d85696d72b87cda4a44f6c159931aef1adf4f977210fcb13b8982a2a3b8",
+    "docs/acceptance/mvp-0.3-t033-schema-dedup-real-result-20261002.json": "a93f15eb270b318cf1dc6934659128db2bc4c9c829ac13b580b204efb89fb616",
+    "docs/acceptance/mvp-0.3-t033-schema-dedup-retired-20261002.json": "8efb842f4e1c9670588284ae88bc8d66f83fc3261250c8308be086ca7fb42af3",
+    "docs/acceptance/mvp-0.3-t033-schema-dedup-run-protocol-20261002.json": "7751090c28dc09e3af49d8f0e78191fefb22effb0d595eeabbf1ce995a08de68",
+    "docs/acceptance/mvp-0.3-t033-schema-dedup-run-verification-20261002.json": "6a1155caa33591331fa4483d58d6c2bb6671e3ce9794945fc323b2cae5f37b09",
+    "docs/acceptance/mvp-0.3-t033-slots.json": "5786e38441f9a2b1835198f60f3322bf6c2c6b2cf1fdbaf8c5ea456cc032a188",
+    "docs/acceptance/mvp-0.3-t033-temp0-diagnostics-20260930.json": "d81ef0e214169ccac8994c2ed3a0c784b50ce8d07767f6c363dcb03118298612",
+    "docs/acceptance/mvp-0.3-t033-v10-diagnostics-20260930.json": "b407c974d10afefc61ba97067ffeb77247d01272ce6ba8a2fe3768bc1e260c57",
+    "docs/acceptance/mvp-0.3-t033-v10-raw-shapes-20260930.json": "29acb2017bc8172e8e226124cd47b7accc752b7d6baf30586a132ba7d783e5e1",
+    "docs/acceptance/mvp-0.3-t033-v11-auth-halt-20260930.md": "f05bad07b7015b0a6a0a39acc5e8516f2743a1c106d8c2e9810cf08816a28cd9",
+    "docs/acceptance/mvp-0.3-t033-v9-diagnostic-20260930.json": "6da37aba096f0775a27785e25d1cc353af0404a7d5b7c6f179eb91860b5a1e79",
+    "docs/acceptance/replay_t033_offline.py": "1bf2a569eba408fc91c8d71908d44890776d2463b985d357c8e8b17b9080e13a",
+    "docs/acceptance/run_t033_benchmark.py": "95b5770c7683b905241c88eaab23daad30e786127425030248d90d0f1722d9e0",
+    "docs/acceptance/run_t033_candidate_correctness.py": "a05274def79cfd03f684f381f92897dd62c720248bb4a237fbd9beb3cef5a227",
+    "docs/acceptance/run_t033_classroom_browser_finish.py": "8697d136e8a7ff888fa0abbc316519d8b83e6da09ef282a62af35aa0814108d0",
+    "docs/acceptance/run_t033_first_screen.py": "0911ed01c37e27b1543d61b6ed0e0bf9049a50ca00401c56b1c9f3a6fe2f15f5",
+    "docs/acceptance/run_t033_low_browser_continuation.py": "6d2906a234a7d44fab3e4578629bc01715aa697f59b8a43c336e22f0dd97f9e7",
+    "docs/acceptance/run_t033_low_full.py": "f54684e961fd615f1b3e606c62376245982920cdc8885785e8da9975d4770a17",
+    "docs/acceptance/run_t033_phase.py": "f221918ba3ce241c300fd1478f08128979cb0797ed8e5e2dae8621136c312079",
+    "docs/acceptance/run_t033_qwen_a2.py": "680badab3f6f6f30a994c63459d4b708a0089820355d0b31e4b9c6de30fe5f21",
+    "docs/acceptance/run_t033_qwen_repeat.py": "0e1e4448b1b431d7cfdf87812d5ae1cfbfbc1970c1354f671329cfc1fff81480",
+    "docs/acceptance/run_t033_remaining.py": "dc6ca3e5dd8a6c00de92fec0e93cfe629d8167348016df40aaefa186ed41ba8e",
+    "docs/acceptance/run_t033_review_completion.py": "90cf388d2dbc7d62eb3f32c4d58fa9a679f19a019e3b40ff8317fcea310e3e45",
+    "docs/acceptance/run_t033_schema_dedup.py": "4a167316781f7ea567c2ab9d23ea9d8c43ba075237fb6a249f602c4e7c7d537f",
+    "docs/acceptance/serve_t033.py": "0968f914211869b5ae0d66b8c5dd5dcd8e63d5c50c6d0cc0d3b90c0947388cb7",
+    "docs/acceptance/t033_adapter.py": "107bfc68fd792e633762ded9c51638742147adee8bef3d3d877dcb17d559bbf7",
+    "docs/acceptance/t033_budget.py": "7a85fe119ba44b1e021bcae201077bef3259fb08ba7504f4f2c3e9281fcc2d70",
+    "docs/acceptance/t033_early_stop.py": "c446c0e894878ac9c4e7ea05c42c2b2b111d269261e851c4787d917ed23bd3ce",
+    "docs/acceptance/t033_phase_gate.py": "fcb2326dc3acc3b0881a8eab0d0221d065c2f7772ce72cc92edb8b27344a0e1d",
+    ".env": "a9002fb91754cad18ec6094892b9b2131f46b759cc7ba994e619915ced8501ec"
+  },
+  "first_screen_slots": [
+    {
+      "id": "array-cold",
+      "node_id": "array",
+      "mode": "cold"
+    },
+    {
+      "id": "array-warm",
+      "node_id": "array",
+      "mode": "warm"
+    },
+    {
+      "id": "c-pointer-cold",
+      "node_id": "c-pointer",
+      "mode": "cold"
+    },
+    {
+      "id": "c-pointer-warm",
+      "node_id": "c-pointer",
+      "mode": "warm"
+    },
+    {
+      "id": "linked-list-concept-cold",
+      "node_id": "linked-list-concept",
+      "mode": "cold"
+    },
+    {
+      "id": "linked-list-concept-warm",
+      "node_id": "linked-list-concept",
+      "mode": "warm"
+    },
+    {
+      "id": "single-linked-list-cold",
+      "node_id": "single-linked-list",
+      "mode": "cold"
+    },
+    {
+      "id": "single-linked-list-warm",
+      "node_id": "single-linked-list",
+      "mode": "warm"
+    },
+    {
+      "id": "linked-list-traversal-cold",
+      "node_id": "linked-list-traversal",
+      "mode": "cold"
+    },
+    {
+      "id": "linked-list-traversal-warm",
+      "node_id": "linked-list-traversal",
+      "mode": "warm"
+    },
+    {
+      "id": "linked-list-insertion-cold",
+      "node_id": "linked-list-insertion",
+      "mode": "cold"
+    },
+    {
+      "id": "linked-list-insertion-warm",
+      "node_id": "linked-list-insertion",
+      "mode": "warm"
+    },
+    {
+      "id": "linked-list-deletion-cold",
+      "node_id": "linked-list-deletion",
+      "mode": "cold"
+    },
+    {
+      "id": "linked-list-deletion-warm",
+      "node_id": "linked-list-deletion",
+      "mode": "warm"
+    },
+    {
+      "id": "stack-cold",
+      "node_id": "stack",
+      "mode": "cold"
+    },
+    {
+      "id": "stack-warm",
+      "node_id": "stack",
+      "mode": "warm"
+    },
+    {
+      "id": "queue-cold",
+      "node_id": "queue",
+      "mode": "cold"
+    },
+    {
+      "id": "queue-warm",
+      "node_id": "queue",
+      "mode": "warm"
+    },
+    {
+      "id": "circular-queue-cold",
+      "node_id": "circular-queue",
+      "mode": "cold"
+    },
+    {
+      "id": "circular-queue-warm",
+      "node_id": "circular-queue",
+      "mode": "warm"
+    }
+  ],
+  "first_screen_definition": {
+    "cold": "New browser context/owner; no enrollment or browser HTTP cache; timer starts navigation, selects node immediately when ready; API/DB processes remain warm.",
+    "warm": "Same owner/unit/tab, page reload, browser HTTP cache still disabled; timer starts reload.",
+    "dom": "Navigation to exact full candidate explanation visible after two animation frames; includes catalog/JS/auth/enrollment, no human think time.",
+    "http": "Sum requestStart..responseEnd for required auth/session, guest, catalog, catalog/sessions, and GET learning-unit responses completed before readable DOM; includes proxy. Runtime/demo/classroom/path are auxiliary and excluded.",
+    "failure": "Every failed/missing slot is +inf in fixed denominator 20; nearest-rank P95.",
+    "thresholds": {
+      "http_p95_seconds": 2,
+      "dom_p95_seconds": 10
+    }
+  },
+  "quality_slots": [
+    {
+      "id": "insert-empty-4-r1",
+      "template_id": "linked-list-insertion",
+      "case": "empty",
+      "parameters": {
+        "values": [],
+        "index": 0,
+        "value": 4
+      }
+    },
+    {
+      "id": "insert-empty-9-r1",
+      "template_id": "linked-list-insertion",
+      "case": "empty",
+      "parameters": {
+        "values": [],
+        "index": 0,
+        "value": 9
+      }
+    },
+    {
+      "id": "insert-head-4-r1",
+      "template_id": "linked-list-insertion",
+      "case": "head",
+      "parameters": {
+        "values": [
+          1,
+          3,
+          5
+        ],
+        "index": 0,
+        "value": 4
+      }
+    },
+    {
+      "id": "insert-head-9-r1",
+      "template_id": "linked-list-insertion",
+      "case": "head",
+      "parameters": {
+        "values": [
+          1,
+          3,
+          5
+        ],
+        "index": 0,
+        "value": 9
+      }
+    },
+    {
+      "id": "insert-middle-4-r1",
+      "template_id": "linked-list-insertion",
+      "case": "middle",
+      "parameters": {
+        "values": [
+          1,
+          3,
+          5
+        ],
+        "index": 1,
+        "value": 4
+      }
+    },
+    {
+      "id": "insert-middle-9-r1",
+      "template_id": "linked-list-insertion",
+      "case": "middle",
+      "parameters": {
+        "values": [
+          1,
+          3,
+          5
+        ],
+        "index": 1,
+        "value": 9
+      }
+    },
+    {
+      "id": "insert-tail-4-r1",
+      "template_id": "linked-list-insertion",
+      "case": "tail",
+      "parameters": {
+        "values": [
+          1,
+          3,
+          5
+        ],
+        "index": 3,
+        "value": 4
+      }
+    },
+    {
+      "id": "insert-tail-9-r1",
+      "template_id": "linked-list-insertion",
+      "case": "tail",
+      "parameters": {
+        "values": [
+          1,
+          3,
+          5
+        ],
+        "index": 3,
+        "value": 9
+      }
+    },
+    {
+      "id": "insert-single-4-r1",
+      "template_id": "linked-list-insertion",
+      "case": "single",
+      "parameters": {
+        "values": [
+          7
+        ],
+        "index": 1,
+        "value": 4
+      }
+    },
+    {
+      "id": "insert-single-9-r1",
+      "template_id": "linked-list-insertion",
+      "case": "single",
+      "parameters": {
+        "values": [
+          7
+        ],
+        "index": 1,
+        "value": 9
+      }
+    },
+    {
+      "id": "delete-single-1-r1",
+      "template_id": "linked-list-deletion",
+      "case": "single",
+      "parameters": {
+        "values": [
+          1
+        ],
+        "index": 0
+      }
+    },
+    {
+      "id": "delete-single-6-r1",
+      "template_id": "linked-list-deletion",
+      "case": "single",
+      "parameters": {
+        "values": [
+          6
+        ],
+        "index": 0
+      }
+    },
+    {
+      "id": "delete-head-1-r1",
+      "template_id": "linked-list-deletion",
+      "case": "head",
+      "parameters": {
+        "values": [
+          1,
+          3,
+          5
+        ],
+        "index": 0
+      }
+    },
+    {
+      "id": "delete-head-6-r1",
+      "template_id": "linked-list-deletion",
+      "case": "head",
+      "parameters": {
+        "values": [
+          6,
+          8,
+          10
+        ],
+        "index": 0
+      }
+    },
+    {
+      "id": "delete-middle-1-r1",
+      "template_id": "linked-list-deletion",
+      "case": "middle",
+      "parameters": {
+        "values": [
+          1,
+          3,
+          5
+        ],
+        "index": 1
+      }
+    },
+    {
+      "id": "delete-middle-6-r1",
+      "template_id": "linked-list-deletion",
+      "case": "middle",
+      "parameters": {
+        "values": [
+          6,
+          8,
+          10
+        ],
+        "index": 1
+      }
+    },
+    {
+      "id": "delete-tail-1-r1",
+      "template_id": "linked-list-deletion",
+      "case": "tail",
+      "parameters": {
+        "values": [
+          1,
+          3,
+          5
+        ],
+        "index": 2
+      }
+    },
+    {
+      "id": "delete-tail-6-r1",
+      "template_id": "linked-list-deletion",
+      "case": "tail",
+      "parameters": {
+        "values": [
+          6,
+          8,
+          10
+        ],
+        "index": 2
+      }
+    },
+    {
+      "id": "delete-two-1-r1",
+      "template_id": "linked-list-deletion",
+      "case": "two",
+      "parameters": {
+        "values": [
+          1,
+          3
+        ],
+        "index": 1
+      }
+    },
+    {
+      "id": "delete-two-6-r1",
+      "template_id": "linked-list-deletion",
+      "case": "two",
+      "parameters": {
+        "values": [
+          6,
+          8
+        ],
+        "index": 1
+      }
+    },
+    {
+      "id": "insert-empty-4-r2",
+      "template_id": "linked-list-insertion",
+      "case": "empty",
+      "parameters": {
+        "values": [],
+        "index": 0,
+        "value": 4
+      }
+    },
+    {
+      "id": "insert-empty-9-r2",
+      "template_id": "linked-list-insertion",
+      "case": "empty",
+      "parameters": {
+        "values": [],
+        "index": 0,
+        "value": 9
+      }
+    },
+    {
+      "id": "insert-head-4-r2",
+      "template_id": "linked-list-insertion",
+      "case": "head",
+      "parameters": {
+        "values": [
+          1,
+          3,
+          5
+        ],
+        "index": 0,
+        "value": 4
+      }
+    },
+    {
+      "id": "insert-head-9-r2",
+      "template_id": "linked-list-insertion",
+      "case": "head",
+      "parameters": {
+        "values": [
+          1,
+          3,
+          5
+        ],
+        "index": 0,
+        "value": 9
+      }
+    },
+    {
+      "id": "insert-middle-4-r2",
+      "template_id": "linked-list-insertion",
+      "case": "middle",
+      "parameters": {
+        "values": [
+          1,
+          3,
+          5
+        ],
+        "index": 1,
+        "value": 4
+      }
+    },
+    {
+      "id": "insert-middle-9-r2",
+      "template_id": "linked-list-insertion",
+      "case": "middle",
+      "parameters": {
+        "values": [
+          1,
+          3,
+          5
+        ],
+        "index": 1,
+        "value": 9
+      }
+    },
+    {
+      "id": "insert-tail-4-r2",
+      "template_id": "linked-list-insertion",
+      "case": "tail",
+      "parameters": {
+        "values": [
+          1,
+          3,
+          5
+        ],
+        "index": 3,
+        "value": 4
+      }
+    },
+    {
+      "id": "insert-tail-9-r2",
+      "template_id": "linked-list-insertion",
+      "case": "tail",
+      "parameters": {
+        "values": [
+          1,
+          3,
+          5
+        ],
+        "index": 3,
+        "value": 9
+      }
+    },
+    {
+      "id": "insert-single-4-r2",
+      "template_id": "linked-list-insertion",
+      "case": "single",
+      "parameters": {
+        "values": [
+          7
+        ],
+        "index": 1,
+        "value": 4
+      }
+    },
+    {
+      "id": "insert-single-9-r2",
+      "template_id": "linked-list-insertion",
+      "case": "single",
+      "parameters": {
+        "values": [
+          7
+        ],
+        "index": 1,
+        "value": 9
+      }
+    },
+    {
+      "id": "delete-single-1-r2",
+      "template_id": "linked-list-deletion",
+      "case": "single",
+      "parameters": {
+        "values": [
+          1
+        ],
+        "index": 0
+      }
+    },
+    {
+      "id": "delete-single-6-r2",
+      "template_id": "linked-list-deletion",
+      "case": "single",
+      "parameters": {
+        "values": [
+          6
+        ],
+        "index": 0
+      }
+    },
+    {
+      "id": "delete-head-1-r2",
+      "template_id": "linked-list-deletion",
+      "case": "head",
+      "parameters": {
+        "values": [
+          1,
+          3,
+          5
+        ],
+        "index": 0
+      }
+    },
+    {
+      "id": "delete-head-6-r2",
+      "template_id": "linked-list-deletion",
+      "case": "head",
+      "parameters": {
+        "values": [
+          6,
+          8,
+          10
+        ],
+        "index": 0
+      }
+    },
+    {
+      "id": "delete-middle-1-r2",
+      "template_id": "linked-list-deletion",
+      "case": "middle",
+      "parameters": {
+        "values": [
+          1,
+          3,
+          5
+        ],
+        "index": 1
+      }
+    },
+    {
+      "id": "delete-middle-6-r2",
+      "template_id": "linked-list-deletion",
+      "case": "middle",
+      "parameters": {
+        "values": [
+          6,
+          8,
+          10
+        ],
+        "index": 1
+      }
+    },
+    {
+      "id": "delete-tail-1-r2",
+      "template_id": "linked-list-deletion",
+      "case": "tail",
+      "parameters": {
+        "values": [
+          1,
+          3,
+          5
+        ],
+        "index": 2
+      }
+    },
+    {
+      "id": "delete-tail-6-r2",
+      "template_id": "linked-list-deletion",
+      "case": "tail",
+      "parameters": {
+        "values": [
+          6,
+          8,
+          10
+        ],
+        "index": 2
+      }
+    },
+    {
+      "id": "delete-two-1-r2",
+      "template_id": "linked-list-deletion",
+      "case": "two",
+      "parameters": {
+        "values": [
+          1,
+          3
+        ],
+        "index": 1
+      }
+    },
+    {
+      "id": "delete-two-6-r2",
+      "template_id": "linked-list-deletion",
+      "case": "two",
+      "parameters": {
+        "values": [
+          6,
+          8
+        ],
+        "index": 1
+      }
+    },
+    {
+      "id": "insert-empty-4-r3",
+      "template_id": "linked-list-insertion",
+      "case": "empty",
+      "parameters": {
+        "values": [],
+        "index": 0,
+        "value": 4
+      }
+    },
+    {
+      "id": "insert-empty-9-r3",
+      "template_id": "linked-list-insertion",
+      "case": "empty",
+      "parameters": {
+        "values": [],
+        "index": 0,
+        "value": 9
+      }
+    },
+    {
+      "id": "insert-head-4-r3",
+      "template_id": "linked-list-insertion",
+      "case": "head",
+      "parameters": {
+        "values": [
+          1,
+          3,
+          5
+        ],
+        "index": 0,
+        "value": 4
+      }
+    },
+    {
+      "id": "insert-head-9-r3",
+      "template_id": "linked-list-insertion",
+      "case": "head",
+      "parameters": {
+        "values": [
+          1,
+          3,
+          5
+        ],
+        "index": 0,
+        "value": 9
+      }
+    },
+    {
+      "id": "insert-middle-4-r3",
+      "template_id": "linked-list-insertion",
+      "case": "middle",
+      "parameters": {
+        "values": [
+          1,
+          3,
+          5
+        ],
+        "index": 1,
+        "value": 4
+      }
+    },
+    {
+      "id": "insert-middle-9-r3",
+      "template_id": "linked-list-insertion",
+      "case": "middle",
+      "parameters": {
+        "values": [
+          1,
+          3,
+          5
+        ],
+        "index": 1,
+        "value": 9
+      }
+    },
+    {
+      "id": "insert-tail-4-r3",
+      "template_id": "linked-list-insertion",
+      "case": "tail",
+      "parameters": {
+        "values": [
+          1,
+          3,
+          5
+        ],
+        "index": 3,
+        "value": 4
+      }
+    },
+    {
+      "id": "insert-tail-9-r3",
+      "template_id": "linked-list-insertion",
+      "case": "tail",
+      "parameters": {
+        "values": [
+          1,
+          3,
+          5
+        ],
+        "index": 3,
+        "value": 9
+      }
+    },
+    {
+      "id": "insert-single-4-r3",
+      "template_id": "linked-list-insertion",
+      "case": "single",
+      "parameters": {
+        "values": [
+          7
+        ],
+        "index": 1,
+        "value": 4
+      }
+    },
+    {
+      "id": "insert-single-9-r3",
+      "template_id": "linked-list-insertion",
+      "case": "single",
+      "parameters": {
+        "values": [
+          7
+        ],
+        "index": 1,
+        "value": 9
+      }
+    },
+    {
+      "id": "delete-single-1-r3",
+      "template_id": "linked-list-deletion",
+      "case": "single",
+      "parameters": {
+        "values": [
+          1
+        ],
+        "index": 0
+      }
+    },
+    {
+      "id": "delete-single-6-r3",
+      "template_id": "linked-list-deletion",
+      "case": "single",
+      "parameters": {
+        "values": [
+          6
+        ],
+        "index": 0
+      }
+    },
+    {
+      "id": "delete-head-1-r3",
+      "template_id": "linked-list-deletion",
+      "case": "head",
+      "parameters": {
+        "values": [
+          1,
+          3,
+          5
+        ],
+        "index": 0
+      }
+    },
+    {
+      "id": "delete-head-6-r3",
+      "template_id": "linked-list-deletion",
+      "case": "head",
+      "parameters": {
+        "values": [
+          6,
+          8,
+          10
+        ],
+        "index": 0
+      }
+    },
+    {
+      "id": "delete-middle-1-r3",
+      "template_id": "linked-list-deletion",
+      "case": "middle",
+      "parameters": {
+        "values": [
+          1,
+          3,
+          5
+        ],
+        "index": 1
+      }
+    },
+    {
+      "id": "delete-middle-6-r3",
+      "template_id": "linked-list-deletion",
+      "case": "middle",
+      "parameters": {
+        "values": [
+          6,
+          8,
+          10
+        ],
+        "index": 1
+      }
+    },
+    {
+      "id": "delete-tail-1-r3",
+      "template_id": "linked-list-deletion",
+      "case": "tail",
+      "parameters": {
+        "values": [
+          1,
+          3,
+          5
+        ],
+        "index": 2
+      }
+    },
+    {
+      "id": "delete-tail-6-r3",
+      "template_id": "linked-list-deletion",
+      "case": "tail",
+      "parameters": {
+        "values": [
+          6,
+          8,
+          10
+        ],
+        "index": 2
+      }
+    },
+    {
+      "id": "delete-two-1-r3",
+      "template_id": "linked-list-deletion",
+      "case": "two",
+      "parameters": {
+        "values": [
+          1,
+          3
+        ],
+        "index": 1
+      }
+    },
+    {
+      "id": "delete-two-6-r3",
+      "template_id": "linked-list-deletion",
+      "case": "two",
+      "parameters": {
+        "values": [
+          6,
+          8
+        ],
+        "index": 1
+      }
+    },
+    {
+      "id": "insert-empty-4-r4",
+      "template_id": "linked-list-insertion",
+      "case": "empty",
+      "parameters": {
+        "values": [],
+        "index": 0,
+        "value": 4
+      }
+    },
+    {
+      "id": "insert-empty-9-r4",
+      "template_id": "linked-list-insertion",
+      "case": "empty",
+      "parameters": {
+        "values": [],
+        "index": 0,
+        "value": 9
+      }
+    },
+    {
+      "id": "insert-head-4-r4",
+      "template_id": "linked-list-insertion",
+      "case": "head",
+      "parameters": {
+        "values": [
+          1,
+          3,
+          5
+        ],
+        "index": 0,
+        "value": 4
+      }
+    },
+    {
+      "id": "insert-head-9-r4",
+      "template_id": "linked-list-insertion",
+      "case": "head",
+      "parameters": {
+        "values": [
+          1,
+          3,
+          5
+        ],
+        "index": 0,
+        "value": 9
+      }
+    },
+    {
+      "id": "insert-middle-4-r4",
+      "template_id": "linked-list-insertion",
+      "case": "middle",
+      "parameters": {
+        "values": [
+          1,
+          3,
+          5
+        ],
+        "index": 1,
+        "value": 4
+      }
+    },
+    {
+      "id": "insert-middle-9-r4",
+      "template_id": "linked-list-insertion",
+      "case": "middle",
+      "parameters": {
+        "values": [
+          1,
+          3,
+          5
+        ],
+        "index": 1,
+        "value": 9
+      }
+    },
+    {
+      "id": "insert-tail-4-r4",
+      "template_id": "linked-list-insertion",
+      "case": "tail",
+      "parameters": {
+        "values": [
+          1,
+          3,
+          5
+        ],
+        "index": 3,
+        "value": 4
+      }
+    },
+    {
+      "id": "insert-tail-9-r4",
+      "template_id": "linked-list-insertion",
+      "case": "tail",
+      "parameters": {
+        "values": [
+          1,
+          3,
+          5
+        ],
+        "index": 3,
+        "value": 9
+      }
+    },
+    {
+      "id": "insert-single-4-r4",
+      "template_id": "linked-list-insertion",
+      "case": "single",
+      "parameters": {
+        "values": [
+          7
+        ],
+        "index": 1,
+        "value": 4
+      }
+    },
+    {
+      "id": "insert-single-9-r4",
+      "template_id": "linked-list-insertion",
+      "case": "single",
+      "parameters": {
+        "values": [
+          7
+        ],
+        "index": 1,
+        "value": 9
+      }
+    },
+    {
+      "id": "delete-single-1-r4",
+      "template_id": "linked-list-deletion",
+      "case": "single",
+      "parameters": {
+        "values": [
+          1
+        ],
+        "index": 0
+      }
+    },
+    {
+      "id": "delete-single-6-r4",
+      "template_id": "linked-list-deletion",
+      "case": "single",
+      "parameters": {
+        "values": [
+          6
+        ],
+        "index": 0
+      }
+    },
+    {
+      "id": "delete-head-1-r4",
+      "template_id": "linked-list-deletion",
+      "case": "head",
+      "parameters": {
+        "values": [
+          1,
+          3,
+          5
+        ],
+        "index": 0
+      }
+    },
+    {
+      "id": "delete-head-6-r4",
+      "template_id": "linked-list-deletion",
+      "case": "head",
+      "parameters": {
+        "values": [
+          6,
+          8,
+          10
+        ],
+        "index": 0
+      }
+    },
+    {
+      "id": "delete-middle-1-r4",
+      "template_id": "linked-list-deletion",
+      "case": "middle",
+      "parameters": {
+        "values": [
+          1,
+          3,
+          5
+        ],
+        "index": 1
+      }
+    },
+    {
+      "id": "delete-middle-6-r4",
+      "template_id": "linked-list-deletion",
+      "case": "middle",
+      "parameters": {
+        "values": [
+          6,
+          8,
+          10
+        ],
+        "index": 1
+      }
+    },
+    {
+      "id": "delete-tail-1-r4",
+      "template_id": "linked-list-deletion",
+      "case": "tail",
+      "parameters": {
+        "values": [
+          1,
+          3,
+          5
+        ],
+        "index": 2
+      }
+    },
+    {
+      "id": "delete-tail-6-r4",
+      "template_id": "linked-list-deletion",
+      "case": "tail",
+      "parameters": {
+        "values": [
+          6,
+          8,
+          10
+        ],
+        "index": 2
+      }
+    },
+    {
+      "id": "delete-two-1-r4",
+      "template_id": "linked-list-deletion",
+      "case": "two",
+      "parameters": {
+        "values": [
+          1,
+          3
+        ],
+        "index": 1
+      }
+    },
+    {
+      "id": "delete-two-6-r4",
+      "template_id": "linked-list-deletion",
+      "case": "two",
+      "parameters": {
+        "values": [
+          6,
+          8
+        ],
+        "index": 1
+      }
+    },
+    {
+      "id": "insert-empty-4-r5",
+      "template_id": "linked-list-insertion",
+      "case": "empty",
+      "parameters": {
+        "values": [],
+        "index": 0,
+        "value": 4
+      }
+    },
+    {
+      "id": "insert-empty-9-r5",
+      "template_id": "linked-list-insertion",
+      "case": "empty",
+      "parameters": {
+        "values": [],
+        "index": 0,
+        "value": 9
+      }
+    },
+    {
+      "id": "insert-head-4-r5",
+      "template_id": "linked-list-insertion",
+      "case": "head",
+      "parameters": {
+        "values": [
+          1,
+          3,
+          5
+        ],
+        "index": 0,
+        "value": 4
+      }
+    },
+    {
+      "id": "insert-head-9-r5",
+      "template_id": "linked-list-insertion",
+      "case": "head",
+      "parameters": {
+        "values": [
+          1,
+          3,
+          5
+        ],
+        "index": 0,
+        "value": 9
+      }
+    },
+    {
+      "id": "insert-middle-4-r5",
+      "template_id": "linked-list-insertion",
+      "case": "middle",
+      "parameters": {
+        "values": [
+          1,
+          3,
+          5
+        ],
+        "index": 1,
+        "value": 4
+      }
+    },
+    {
+      "id": "insert-middle-9-r5",
+      "template_id": "linked-list-insertion",
+      "case": "middle",
+      "parameters": {
+        "values": [
+          1,
+          3,
+          5
+        ],
+        "index": 1,
+        "value": 9
+      }
+    },
+    {
+      "id": "insert-tail-4-r5",
+      "template_id": "linked-list-insertion",
+      "case": "tail",
+      "parameters": {
+        "values": [
+          1,
+          3,
+          5
+        ],
+        "index": 3,
+        "value": 4
+      }
+    },
+    {
+      "id": "insert-tail-9-r5",
+      "template_id": "linked-list-insertion",
+      "case": "tail",
+      "parameters": {
+        "values": [
+          1,
+          3,
+          5
+        ],
+        "index": 3,
+        "value": 9
+      }
+    },
+    {
+      "id": "insert-single-4-r5",
+      "template_id": "linked-list-insertion",
+      "case": "single",
+      "parameters": {
+        "values": [
+          7
+        ],
+        "index": 1,
+        "value": 4
+      }
+    },
+    {
+      "id": "insert-single-9-r5",
+      "template_id": "linked-list-insertion",
+      "case": "single",
+      "parameters": {
+        "values": [
+          7
+        ],
+        "index": 1,
+        "value": 9
+      }
+    },
+    {
+      "id": "delete-single-1-r5",
+      "template_id": "linked-list-deletion",
+      "case": "single",
+      "parameters": {
+        "values": [
+          1
+        ],
+        "index": 0
+      }
+    },
+    {
+      "id": "delete-single-6-r5",
+      "template_id": "linked-list-deletion",
+      "case": "single",
+      "parameters": {
+        "values": [
+          6
+        ],
+        "index": 0
+      }
+    },
+    {
+      "id": "delete-head-1-r5",
+      "template_id": "linked-list-deletion",
+      "case": "head",
+      "parameters": {
+        "values": [
+          1,
+          3,
+          5
+        ],
+        "index": 0
+      }
+    },
+    {
+      "id": "delete-head-6-r5",
+      "template_id": "linked-list-deletion",
+      "case": "head",
+      "parameters": {
+        "values": [
+          6,
+          8,
+          10
+        ],
+        "index": 0
+      }
+    },
+    {
+      "id": "delete-middle-1-r5",
+      "template_id": "linked-list-deletion",
+      "case": "middle",
+      "parameters": {
+        "values": [
+          1,
+          3,
+          5
+        ],
+        "index": 1
+      }
+    },
+    {
+      "id": "delete-middle-6-r5",
+      "template_id": "linked-list-deletion",
+      "case": "middle",
+      "parameters": {
+        "values": [
+          6,
+          8,
+          10
+        ],
+        "index": 1
+      }
+    },
+    {
+      "id": "delete-tail-1-r5",
+      "template_id": "linked-list-deletion",
+      "case": "tail",
+      "parameters": {
+        "values": [
+          1,
+          3,
+          5
+        ],
+        "index": 2
+      }
+    },
+    {
+      "id": "delete-tail-6-r5",
+      "template_id": "linked-list-deletion",
+      "case": "tail",
+      "parameters": {
+        "values": [
+          6,
+          8,
+          10
+        ],
+        "index": 2
+      }
+    },
+    {
+      "id": "delete-two-1-r5",
+      "template_id": "linked-list-deletion",
+      "case": "two",
+      "parameters": {
+        "values": [
+          1,
+          3
+        ],
+        "index": 1
+      }
+    },
+    {
+      "id": "delete-two-6-r5",
+      "template_id": "linked-list-deletion",
+      "case": "two",
+      "parameters": {
+        "values": [
+          6,
+          8
+        ],
+        "index": 1
+      }
+    }
+  ],
+  "cache_browser_slots": [
+    {
+      "id": "cache-linked-list-insertion-01",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "cache-linked-list-insertion-02",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "cache-linked-list-insertion-03",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "cache-linked-list-insertion-04",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "cache-linked-list-insertion-05",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "cache-linked-list-insertion-06",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "cache-linked-list-insertion-07",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "cache-linked-list-insertion-08",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "cache-linked-list-insertion-09",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "cache-linked-list-insertion-10",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "cache-linked-list-insertion-11",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "cache-linked-list-insertion-12",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "cache-linked-list-insertion-13",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "cache-linked-list-insertion-14",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "cache-linked-list-insertion-15",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "cache-linked-list-insertion-16",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "cache-linked-list-insertion-17",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "cache-linked-list-insertion-18",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "cache-linked-list-insertion-19",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "cache-linked-list-insertion-20",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "cache-linked-list-insertion-21",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "cache-linked-list-insertion-22",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "cache-linked-list-insertion-23",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "cache-linked-list-insertion-24",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "cache-linked-list-insertion-25",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "cache-linked-list-insertion-26",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "cache-linked-list-insertion-27",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "cache-linked-list-insertion-28",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "cache-linked-list-insertion-29",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "cache-linked-list-insertion-30",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "cache-linked-list-insertion-31",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "cache-linked-list-insertion-32",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "cache-linked-list-insertion-33",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "cache-linked-list-insertion-34",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "cache-linked-list-insertion-35",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "cache-linked-list-insertion-36",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "cache-linked-list-insertion-37",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "cache-linked-list-insertion-38",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "cache-linked-list-insertion-39",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "cache-linked-list-insertion-40",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "cache-linked-list-insertion-41",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "cache-linked-list-insertion-42",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "cache-linked-list-insertion-43",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "cache-linked-list-insertion-44",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "cache-linked-list-insertion-45",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "cache-linked-list-insertion-46",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "cache-linked-list-insertion-47",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "cache-linked-list-insertion-48",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "cache-linked-list-insertion-49",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "cache-linked-list-insertion-50",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "cache-linked-list-deletion-01",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "cache-linked-list-deletion-02",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "cache-linked-list-deletion-03",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "cache-linked-list-deletion-04",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "cache-linked-list-deletion-05",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "cache-linked-list-deletion-06",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "cache-linked-list-deletion-07",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "cache-linked-list-deletion-08",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "cache-linked-list-deletion-09",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "cache-linked-list-deletion-10",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "cache-linked-list-deletion-11",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "cache-linked-list-deletion-12",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "cache-linked-list-deletion-13",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "cache-linked-list-deletion-14",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "cache-linked-list-deletion-15",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "cache-linked-list-deletion-16",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "cache-linked-list-deletion-17",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "cache-linked-list-deletion-18",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "cache-linked-list-deletion-19",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "cache-linked-list-deletion-20",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "cache-linked-list-deletion-21",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "cache-linked-list-deletion-22",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "cache-linked-list-deletion-23",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "cache-linked-list-deletion-24",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "cache-linked-list-deletion-25",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "cache-linked-list-deletion-26",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "cache-linked-list-deletion-27",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "cache-linked-list-deletion-28",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "cache-linked-list-deletion-29",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "cache-linked-list-deletion-30",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "cache-linked-list-deletion-31",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "cache-linked-list-deletion-32",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "cache-linked-list-deletion-33",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "cache-linked-list-deletion-34",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "cache-linked-list-deletion-35",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "cache-linked-list-deletion-36",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "cache-linked-list-deletion-37",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "cache-linked-list-deletion-38",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "cache-linked-list-deletion-39",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "cache-linked-list-deletion-40",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "cache-linked-list-deletion-41",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "cache-linked-list-deletion-42",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "cache-linked-list-deletion-43",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "cache-linked-list-deletion-44",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "cache-linked-list-deletion-45",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "cache-linked-list-deletion-46",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "cache-linked-list-deletion-47",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "cache-linked-list-deletion-48",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "cache-linked-list-deletion-49",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "cache-linked-list-deletion-50",
+      "template_id": "linked-list-deletion"
+    }
+  ],
+  "render_browser_slots": [
+    {
+      "id": "render-linked-list-insertion-01",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "render-linked-list-insertion-02",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "render-linked-list-insertion-03",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "render-linked-list-insertion-04",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "render-linked-list-insertion-05",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "render-linked-list-insertion-06",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "render-linked-list-insertion-07",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "render-linked-list-insertion-08",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "render-linked-list-insertion-09",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "render-linked-list-insertion-10",
+      "template_id": "linked-list-insertion"
+    },
+    {
+      "id": "render-linked-list-deletion-01",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "render-linked-list-deletion-02",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "render-linked-list-deletion-03",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "render-linked-list-deletion-04",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "render-linked-list-deletion-05",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "render-linked-list-deletion-06",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "render-linked-list-deletion-07",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "render-linked-list-deletion-08",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "render-linked-list-deletion-09",
+      "template_id": "linked-list-deletion"
+    },
+    {
+      "id": "render-linked-list-deletion-10",
+      "template_id": "linked-list-deletion"
+    }
+  ],
+  "animation_definition": "Independent new cache, 100 matrix slots (20 unique real renders +80 validated cache repeats); 100 cached browser plays; 20 renders each new cache. Click to loadeddata AND playing, owner curated binding, HTTP cache disabled, one concurrent render. Failure/missing +inf, availability fixed denominator100.",
+  "animation_thresholds": {
+    "availability": 0.98,
+    "cache_p95_seconds": 2,
+    "cache_each_seconds": 2,
+    "render_p95_seconds": 90
+  },
+  "journey": [
+    "10nodes/30resources/30questions exact content and answers hidden",
+    "real quiz feedback/mastery/path/repeat no new mastery",
+    "preset begin/reload/exit and return tab",
+    "notes wrong questions/manual provenance",
+    "two real Worker bindings/video/MP4/SRT downloads/reload",
+    "cross owner/CSRF/dynamic409/revocation",
+    "backend and browser external network attempts zero"
+  ],
+  "limits": "Local fixed media/CPU only, no Provider/key, no retries or automatic paid stages; no production publish/deploy; preserve all failures and old evidence."
+}

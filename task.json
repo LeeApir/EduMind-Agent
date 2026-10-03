@@ -1968,7 +1968,7 @@
       "id": "MVP-0.3-T045",
       "phase": "MVP 0.3",
       "title": "目录版独立核心集成验收",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "MVP-0.3-T037",
@@ -1983,7 +1983,14 @@
       "scope": [
         "docs/acceptance/",
         "backend/tests/",
-        "web/tests/e2e/"
+        "web/tests/e2e/",
+        "scripts/",
+        "web/src/api/catalog.ts",
+        "web/src/api/quiz.ts",
+        "web/src/api/paths.ts",
+        "web/tests/catalog.spec.ts",
+        "web/tests/quiz.spec.ts",
+        "web/tests/paths.spec.ts"
       ],
       "prd_source": "PRD v2.2 §0（目录版增补）",
       "acceptance_criteria": [
@@ -1993,9 +2000,15 @@
       "verification": [
         "python3 scripts/verify_catalog_acceptance.py"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "独立v2质量100/100（20种新渲染＋80缓存）；v4完整20首屏/100缓存播放/20独立新缓存真实Worker播放全部通过；v5核心旅程全10节点/30资源/30题与2额外真实Worker通过，TEST_ONLY批准，仅工程验证。",
+        "python3 scripts/verify_catalog_acceptance.py：冻结hash/原始组件/固定分母/零出口校验通过；HTTP P95 0.107111s/DOM0.959118s/缓存0.1506s/渲染8.0897s。v5仅核心旅程，引用同一未变生产/内容/模板的已完整测量组件，不把v4核心身份测试失败改通过。",
+        "135前端测试、typecheck/build/定向ESLint与Ruff通过，6离线分母/组件闸门测试通过；修复401及quiz/path404未读响应正文造成浏览器悬挂，3条回归覆盖。",
+        "首轮质量92/100底层RENDER_UNAVAILABLE未知、localhost502、401正文未读、队列匹配歧义及Node客户端Secure Cookie未携带全部保留；v3中断18缓存槽、20新渲染未运行，独立停止记录。最终跨owner使用实际已登录Chromium身份，不改生产cookie安全。",
+        "证据docs/acceptance/mvp-0.3-catalog-engineering-20261003.md及v1–v5各自冻结/raw JSON；Provider 0累计2033/2500、旧T033冻结/.env保护hash全部相同；原T033blocked，真实人工签核T046待处理。"
+      ],
+      "started_at": "2026-10-03T12:43:10",
+      "completed_at": "2026-10-03T14:55:23",
       "blocker": null,
       "commit_lookup": "Task-Completed: MVP-0.3-T045"
     },

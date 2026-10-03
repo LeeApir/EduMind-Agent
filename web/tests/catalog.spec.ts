@@ -14,6 +14,14 @@ describe("fixed catalog transport", () => {
     await expect(ensureCatalogSession(failure)).rejects.toThrow();
     expect(failure).toHaveBeenCalledTimes(1);
   });
+  it("finishes the 401 response before creating a guest", async () => {
+    const unauthorized = json({ code: "UNAUTHORIZED" }, 401);
+    const fetch = vi.fn().mockResolvedValueOnce(unauthorized).mockImplementationOnce(async () => {
+      expect(unauthorized.bodyUsed).toBe(true);
+      return json({ user: { id: "owner" }, csrf_token: "csrf" });
+    });
+    await ensureCatalogSession(fetch);
+  });
   it("fails closed on an unknown runtime or a generated resource unit", async () => {
     await expect(loadProductMode(vi.fn().mockResolvedValue(json({ mode: "unknown" })))).rejects.toThrow();
     await expect(loadCatalogUnit("unit", vi.fn().mockResolvedValue(json({ id: "unit", status: "ready",

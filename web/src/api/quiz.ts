@@ -125,7 +125,10 @@ export async function loadLatestQuizResult({ resourceId, resourceVersion, fetchI
   } catch {
     throw new QuizRequestError("已提交的练习结果暂时无法读取，请重试读取。");
   }
-  if (response.status === 404) return null;
+  if (response.status === 404) {
+    await response.text();
+    return null;
+  }
   if (!response.ok) throw await responseError(response);
   return readReceipt(response, resourceId, resourceVersion);
 }

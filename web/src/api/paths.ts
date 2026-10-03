@@ -109,7 +109,10 @@ async function payload(response: Response): Promise<unknown> {
 const readHeaders = { Accept: "application/json" };
 export async function loadCurrentPath(targetNodeId: string, fetchImpl: FetchLike = fetch): Promise<LearningPath | null> {
   const response = await request(`/api/path/current?${new URLSearchParams({ target_node_id: targetNodeId })}`, { headers: readHeaders }, fetchImpl);
-  if (response.status === 404) return null;
+  if (response.status === 404) {
+    await response.text();
+    return null;
+  }
   const path = parseLearningPath(await payload(response));
   if (path.target_node_id !== targetNodeId) invalid();
   return path;

@@ -32,6 +32,12 @@ describe("quiz API client", () => {
     expect(await loadLatestQuizResult({ ...options, fetchImpl })).toBeNull();
   });
 
+  it("finishes an absent receipt response before returning empty state", async () => {
+    const missing = Response.json({ code: "NOT_FOUND" }, { status: 404 });
+    expect(await loadLatestQuizResult({ ...options, fetchImpl: vi.fn().mockResolvedValue(missing) })).toBeNull();
+    expect(missing.bodyUsed).toBe(true);
+  });
+
   it("keeps conflict and connection errors explicit", async () => {
     const conflict = vi.fn().mockResolvedValue(Response.json({ code: "IDEMPOTENCY_CONFLICT", message: "请求键冲突" }, { status: 409 }));
     await expect(submitQuizAttempt({ ...options, fetchImpl: conflict })).rejects.toMatchObject({ code: "IDEMPOTENCY_CONFLICT" });
