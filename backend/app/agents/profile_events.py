@@ -6,7 +6,7 @@ import re
 from collections.abc import Mapping
 from typing import Final
 
-PROFILE_EVENT_SCHEMA_VERSION: Final = 1
+PROFILE_EVENT_SCHEMA_VERSION: Final = 2
 PROFILE_MERGE_RULE_VERSION: Final = "profile-merge-v1"
 
 PROFILE_EVENT_TYPES: Final = (
@@ -19,7 +19,7 @@ PROFILE_EVENT_TYPES: Final = (
 PROFILE_EVENT_ACTIONS_BY_TYPE: Final = {
     "hint_used": frozenset({"hint_level_1", "hint_level_2"}),
     "reexplanation_requested": frozenset({"simpler", "deeper", "different_example"}),
-    "resource_selected": frozenset({"code", "exercise"}),
+    "resource_selected": frozenset({"explanation", "code", "exercise", "animation"}),
     "explicit_feedback": frozenset(
         {"too_easy", "too_hard", "liked_explanation", "skip", "mark_known"}
     ),

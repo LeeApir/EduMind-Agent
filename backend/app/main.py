@@ -1,26 +1,41 @@
 """Application entry point for the EduMind MVP API."""
 
-from fastapi import FastAPI, Request
+from fastapi import Depends, FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
+from app.api.animation_events import router as animation_events_router
+from app.api.animation_jobs import router as animation_jobs_router
+from app.api.animation_media import router as animation_media_router
 from app.api.auth import router as auth_router
+from app.api.catalog import router as catalog_router
+from app.api.classroom import router as classroom_router
+from app.api.debate import router as debate_router
 from app.api.knowledge_graph import router as knowledge_graph_router
 from app.api.learning_events import router as learning_events_router
 from app.api.learning_reads import router as learning_reads_router
 from app.api.learning_sessions import router as learning_sessions_router
+from app.api.markdown_notes import router as markdown_notes_router
 from app.api.paths import router as paths_router
 from app.api.profile import router as profile_router
 from app.api.quiz import router as quiz_router
 from app.core.auth import AuthFailure
 from app.core.database import database_lifespan
+from app.core.product_mode import catalog_only, require_dynamic_mode
 
 app = FastAPI(title="EduMind Agent API", version="0.1.0", lifespan=database_lifespan)
 app.include_router(auth_router)
+app.include_router(catalog_router)
+app.include_router(classroom_router)
+app.include_router(debate_router, dependencies=[Depends(require_dynamic_mode)])
+app.include_router(animation_jobs_router)
+app.include_router(animation_media_router)
+app.include_router(animation_events_router)
 app.include_router(knowledge_graph_router)
 app.include_router(learning_reads_router)
 app.include_router(learning_events_router)
-app.include_router(learning_sessions_router)
+app.include_router(learning_sessions_router, dependencies=[Depends(require_dynamic_mode)])
+app.include_router(markdown_notes_router)
 app.include_router(profile_router)
 app.include_router(paths_router)
 app.include_router(quiz_router)
@@ -56,3 +71,8 @@ async def validation_error_handler(
 async def health_check() -> dict[str, str]:
     """Return process health without contacting a model provider."""
     return {"status": "ok"}
+
+
+@app.get("/api/runtime", tags=["system"])
+async def runtime_scope() -> dict[str, str]:
+    return {"mode": "catalog_only" if catalog_only() else "dynamic"}

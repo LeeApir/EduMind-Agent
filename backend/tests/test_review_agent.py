@@ -7,7 +7,12 @@ from app.agents.learning_resource_schema import LearningResourceType
 from app.agents.learning_unit_generator import PendingLearningResource
 from app.agents.review_agent import REVIEW_INSTRUCTION_VERSION, ReviewAgent
 from app.agents.review_schema import REVIEW_PROMPT_VERSION, ReviewVerdict, review_output_schema
-from app.services.provider_gateway import StructuredRequest, StructuredResult
+from app.services.provider_gateway import (
+    ProviderError,
+    ProviderErrorCode,
+    StructuredRequest,
+    StructuredResult,
+)
 
 
 def review(verdict: str, issues: list[dict[str, str]]) -> StructuredResult:
@@ -34,7 +39,7 @@ def code_candidate(source: str = 'printf("ok\\n");') -> PendingLearningResource:
 
 
 class QueueGateway:
-    def __init__(self, outcomes: list[StructuredResult]) -> None:
+    def __init__(self, outcomes: list[StructuredResult | ProviderError]) -> None:
         self.outcomes = outcomes
         self.requests: list[StructuredRequest] = []
 
@@ -43,7 +48,10 @@ class QueueGateway:
     ) -> StructuredResult:
         assert retry_safe is True
         self.requests.append(request)
-        return self.outcomes.pop(0)
+        outcome = self.outcomes.pop(0)
+        if isinstance(outcome, ProviderError):
+            raise outcome
+        return outcome
 
 
 def test_passed_review_approves_candidate() -> None:
@@ -140,5 +148,33 @@ def test_correction_limit_rejects_unresolved_candidate() -> None:
         assert outcome.verdict is ReviewVerdict.REJECT
         assert outcome.correction_attempts == 2
         assert outcome.issues[-1]["message"] == "Correction limit reached."
+
+    asyncio.run(exercise())
+
+
+def test_failed_final_review_does_not_attribute_earlier_model() -> None:
+    issue = {"area": "fact", "severity": "major", "message": "Correct the example."}
+    corrected = {
+        "resource_type": "code",
+        "prompt_version": "learning-resources-v1",
+        "content": {
+            "language": "C", "source": "int value = 1;",
+            "expected_output": "无标准输出", "key_steps": ["声明变量"],
+            "display_only": True,
+        },
+    }
+
+    async def exercise() -> None:
+        gateway = QueueGateway([
+            review("revise", [issue]),
+            StructuredResult(value=corrected, model_id="generation-model"),
+            ProviderError(ProviderErrorCode.INVALID_OUTPUT),
+        ])
+        outcome = await ReviewAgent(gateway).review(code_candidate())
+        assert outcome.verdict is ReviewVerdict.REJECT
+        assert outcome.unavailable is True
+        assert outcome.review_model_id is None
+        assert outcome.correction_attempts == 1
+        assert len(gateway.requests) == 3
 
     asyncio.run(exercise())

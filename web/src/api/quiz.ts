@@ -21,6 +21,7 @@ export interface QuizSubmissionResult {
   mastery_changes: MasteryChange[];
   path_replan_required: boolean;
   profile_update_status: "updated" | "no_change" | "provider_failed" | "conflict";
+  catalog_assessment?: { version: string; question_set_digest: string; eligible_for_mastery: boolean; reason: "first_complete" | "repeat" | "incomplete" };
 }
 export interface QuizResourceRef { resourceId: string; resourceVersion: number; }
 type FetchLike = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
@@ -52,6 +53,14 @@ function isMasteryChange(value: unknown): value is MasteryChange {
     && typeof value.rule_version === "string";
 }
 export function parseQuizResult(value: unknown): QuizSubmissionResult {
+  if (record(value) && value.catalog_assessment !== undefined) {
+    const assessment = value.catalog_assessment;
+    if (!record(assessment) || assessment.version !== "catalog-first-complete-v1"
+      || typeof assessment.question_set_digest !== "string" || typeof assessment.eligible_for_mastery !== "boolean"
+      || !["first_complete", "repeat", "incomplete"].includes(String(assessment.reason))) {
+      throw new QuizRequestError("练习资格响应无效，请重新读取。", "INVALID_RESPONSE");
+    }
+  }
   if (!record(value) || typeof value.evidence_id !== "string" || typeof value.resource_id !== "string"
     || !Number.isInteger(value.resource_version) || Number(value.resource_version) < 1
     || !unitScore(value.score) || !Number.isInteger(value.correct_count)
@@ -116,7 +125,10 @@ export async function loadLatestQuizResult({ resourceId, resourceVersion, fetchI
   } catch {
     throw new QuizRequestError("已提交的练习结果暂时无法读取，请重试读取。");
   }
-  if (response.status === 404) return null;
+  if (response.status === 404) {
+    await response.text();
+    return null;
+  }
   if (!response.ok) throw await responseError(response);
   return readReceipt(response, resourceId, resourceVersion);
 }

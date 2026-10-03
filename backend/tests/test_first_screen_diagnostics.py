@@ -11,7 +11,7 @@ from uuid import uuid4
 import httpx
 import pytest
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "docs/acceptance"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "scripts/acceptance_support"))
 
 from first_screen_diagnostics import CURRENT, Timeline, install
 from test_learning_sessions import FakeAdapter

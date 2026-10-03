@@ -173,21 +173,21 @@ VERIFIED 表示验证通过并准备提交，完成以 Git 中的 Task-Completed
 领取“提供知识结构只读 API” | T002、T004 完成提交已确认，OpenAPI 契约和 Repository 校验边界已存在 | 暂无 | 注入图谱 Repository，新增稳定排序的公共读端点、未知节点安全错误和 API 集成测试
 [2026-09-21T22:59:56] [MVP-0.2-T005] VERIFIED | executor=Lee
 新增 `GET /api/graph` 和 `GET /api/graph/node/{nodeId}`，注入已校验 Repository，稳定返回公共图谱并以 `GRAPH_NODE_NOT_FOUND` 隐藏未知节点的内部细节 | 图谱 API/Repository 9 测试、Ruff、Mypy（34 个 source）、全量后端 122 passed/15 skipped、OpenAPI JSON 和 `git diff --check` 均通过 | 仅 JSON 兼容 YAML 受 P0 支持；通用 YAML 语法解析需新的明确依赖决策 | 创建含 Task-Completed 标记的本地提交；T001–T005 已完成，下一个可领取任务为 T006
-[2026-09-23T15:05:25] [MVP-0.2-T006] START | executor=Lee | branch=codex/mvp-0.2-t006
+[2026-09-23T15:05:25] [MVP-0.2-T006] START | executor=Xerneus111 | branch=codex/mvp-0.2-t006
 领取"定义渐进画像事件与合并规则" | T001–T005 完成提交已确认，已核对 PRD §3.2、ADR-0003 与 OpenAPI 画像事件/修正契约 | 暂无 | 定义版本化画像事件 schema 与确定性合并规则，覆盖行为事件与显式修正优先级
-[2026-09-23T15:20:23] [MVP-0.2-T006] VERIFIED | executor=Lee
+[2026-09-23T15:20:23] [MVP-0.2-T006] VERIFIED | executor=Xerneus111
 新增 `backend/app/agents/profile_events.py`（版本化事件 schema、事件类型/动作一致性、幂等摘要），扩展 `profile_schema.py`（EDITABLE_PROFILE_FIELDS、EVIDENCE_SOURCE_PRECEDENCE、strongest_evidence_source、apply_manual_correction，证据版本放宽为 ≤ 画像版本），新增 `docs/agents/prompts/profile-events-v1.md` | 新增 test_profile_events.py + test_profile_merge.py；ruff、mypy（35 个 source）通过；全量后端 147 passed/15 skipped | 事件仅完成 schema 与合并层；持久化、读取/修正 API 与前端卡片留待 T007–T009 | 领取 T007，新增 ProfileEvent 模型、Alembic 迁移与持久化服务
-[2026-09-23T15:25:26] [MVP-0.2-T007] START | executor=Lee | branch=codex/mvp-0.2-t006
+[2026-09-23T15:25:26] [MVP-0.2-T007] START | executor=Xerneus111 | branch=codex/mvp-0.2-t006
 领取"持久化画像事件与不可变画像版本" | T006 完成提交 0aa65a1 已确认，事件 schema 与合并规则已存在 | 暂无 | 新增 ProfileEvent 模型、Alembic 迁移与持久化服务，覆盖 owner 隔离、幂等与不可变版本
-[2026-09-23T17:30:46] [MVP-0.2-T007] VERIFIED | executor=Lee
+[2026-09-23T17:30:46] [MVP-0.2-T007] VERIFIED | executor=Xerneus111
 新增 ProfileEvent 模型（owner+idempotency_key 唯一、event_type 约束）、Alembic 0005_profile_events 迁移（含 downgrade 往返）与 profile_updates 服务（record_profile_event、persist_profile_version、ProfileVersionConflict） | 临时 PostgreSQL（镜像 sha256:cf78e766…，端口 55432）上 alembic upgrade/downgrade 往返通过，test_profile_persistence.py 5 项幂等/owner 隔离/不可变版本/冲突测试通过，全量后端 167 passed；ruff、mypy（36 个 source）通过 | 事件只持久化、尚未触发画像更新（T015 Provider 更新）；读取/修正/历史 API 与前端卡片留待 T008、T009 | 领取 T008，实现画像读取、历史与手动修正 API（GET/PATCH/profile/me、history、events）
-[2026-09-23T17:55:25] [MVP-0.2-T008] START | executor=Lee | branch=codex/mvp-0.2-t006
+[2026-09-23T17:55:25] [MVP-0.2-T008] START | executor=Xerneus111 | branch=codex/mvp-0.2-t006
 领取"实现画像读取、历史与手动修正 API" | T002、T007 完成提交已确认，OpenAPI 画像四端点契约与幂等/版本服务已存在 | 暂无 | 新增 profile 路由、幂等修正服务与 owner 隔离的读取/历史/事件端点，补齐 VALIDATION_ERROR 稳定响应
-[2026-09-23T18:31:44] [MVP-0.2-T008] VERIFIED | executor=Lee
+[2026-09-23T18:31:44] [MVP-0.2-T008] VERIFIED | executor=Xerneus111
 新增 app/api/profile.py 四端点（GET/PATCH /me、GET /me/history、POST /events），GET /me 从 learning_reads 迁出；main.py 注册 profile 路由并新增 RequestValidationError 处理器返回稳定 VALIDATION_ERROR；student_profiles 增加幂等列与 Alembic 0006 迁移，profile_updates 新增 correct_profile（幂等重放 + 乐观并发） | 新增 test_profile_api.py 7 项（owner 隔离/404/白名单修正/非法字段 422/CSRF 403/版本冲突 409/幂等重放/事件回执）；临时 PostgreSQL 上 alembic upgrade + 0006 往返通过，全量后端 174 passed；ruff、mypy（37 个 source）通过 | 事件端点仅持久化并返回 queued，Provider 驱动的画像更新留待 T015；前端画像卡片留待 T009 | 领取 T009，实现可查看和修正的画像卡片（ProfileCard + profile API 客户端）
-[2026-09-23T18:32:45] [MVP-0.2-T009] START | executor=Lee | branch=codex/mvp-0.2-t006
+[2026-09-23T18:32:45] [MVP-0.2-T009] START | executor=Xerneus111 | branch=codex/mvp-0.2-t006
 领取"实现可查看和修正的画像卡片" | T008 完成提交 80b2d16 已确认，画像四端点契约（GET/PATCH /me、history、events）与白名单修正服务已存在 | 暂无 | 新增 profile API 客户端与 ProfileCard 组件，区分已知/未知/推断/用户修正字段并支持白名单修正保存与清晰加载/冲突/失败/重试状态
-[2026-09-23T19:14:16] [MVP-0.2-T009] VERIFIED | executor=Lee
+[2026-09-23T19:14:16] [MVP-0.2-T009] VERIFIED | executor=Xerneus111
 新增 web/src/api/profile.ts（Profile/证据类型、字段四态分类 profileFieldStatus、fetchProfile/correctProfile/fetchProfileHistory/ensureProfileSession 与 ProfileRequestError），web/src/components/ProfileCard.vue（六维字段区分未知/已知/推断/用户修正，白名单字段 JSON 编辑保存，加载/空态/冲突/失败/重试状态清晰，仅展示来源标签不渲染证据原文），并在 App.vue 接入画像卡片 | pnpm test 30 passed（含 profile.spec 9、ProfileCard.spec 7、App.spec 新增卡片断言）；typecheck 通过；lint 0 error/97 非阻塞格式 warning；build 通过；git diff --check 通过 | 画像历史仅提供 API 客户端，未在卡片内做历史版本 UI；事件上报的前端调用留待后续任务 | 提交 T009，T006–T009 画像查看与修正批次完成
 [2026-09-25T18:46:34] [WORKFLOW-PROFILE-REVIEW] VERIFIED | executor=Lee | branch=codex/mvp-0.2-profile-audit
 更正 T008 账本状态：完成提交 80b2d16 与 VERIFIED 日志已存在，但提交内误留 in_progress；新增画像审查记录及 T026–T029 回归任务，历史日志未改写 | 已核对完成标记、完成时间、29 个唯一任务 ID、JSON 语法及 git diff --check；本次代码回归尚待执行 | R1–R4 审查问题仍待独立回归和修复，尚未合入 main | 创建治理提交，随后按用户授权优先领取 T026
@@ -425,3 +425,363 @@ T038正式v2采样审计完成，未更改口径或阈值；修复无损正文�
 用户明确yes批准附加教学token2秒转后续优化、不阻塞收尾；解除治理阻塞，同步批准后的任务范围和追加阶段说明 | PRD HTTP/首段指标已达标，原冻结gate=false/全部失败证据继续保留，本轮0计费 | 首token优化未完成，Pro闭环/Flash性能不混证；不更改PRD/画像路径/真实配置或计时规则 | 验证证据不可变与治理引用，按新范围创建本地T032完成提交；不归档/跨阶段/push/merge
 [2026-09-27T19:14:09] [MVP-0.2-T032] VERIFIED | executor=Lee
 按用户yes批准后的范围结题，首token2秒失败转后续优化，追加收尾决定与阶段说明 | 离线重算一致且旧audit=false不变；113历史文件逐字节核对，报告仅追加；JSON/依赖/37既有完成提交/10引用/diff检查通过，独立文档读者四项核对通过；0新付费 | token P95 2632.575ms仍失败，不混Pro/Flash证据，不冒充重新跑工程或真实模型测试；活动账本仍MVP0.2，未归档 | 明确四文件自查暂存，创建本地Task-Completed T032治理提交并核对；未来优化及阶段归档/切换/push/merge待另行授权
+[2026-09-27T19:25:28] [WORKFLOW-MVP-0.3-PLANNING] START | executor=Lee | branch=codex/mvp-0.3
+用户授权归档MVP0.2并拆分MVP0.3，在收尾提交f7cacc2上建立功能分支 | 开始时工作区干净，0.2共38项done且无阻塞 | 本次仅治理规划，不领取实现任务、不调用Provider | 原样归档并生成新阶段任务，核对PRD范围与依赖
+[2026-09-27T19:25:28] [WORKFLOW-MVP-0.3-PLANNING] VERIFIED | executor=Lee
+docs/tasks/mvp-0.2.json原样归档，根task.json切换MVP0.3并细化34项todo；同步AGENTS/CLAUDE/README及归档索引 | Python离线检查归档与git show f7cacc2:task.json字节一致、38完成提交存在、34唯一ID/无环依赖/2–5验收条件/空验证记录及引用通过，git diff --check通过；纯文档未跑业务测试，0付费 | 教学token P95 2632.575ms仍未达2秒，保留非阻塞后续项；Pro质量与Flash性能不混证，新API/安全/持久化决策待ADR批准 | 明确文件本地治理提交，不push/merge；后续获授权从MVP-0.3-T001固定验收口径开始，全部实现任务尚未领取
+
+[2026-09-27T19:55:26] [WORKFLOW-DOCS-CONSISTENCY] START | executor=Lee | branch=codex/mvp-0.3
+用户授权整理文档；统一已批准契约、待决项与历史证据入口 | 起始工作区干净，已核对ADR/OpenAPI/收尾决定/任务账本 | 不新增批准、不领取MVP0.3任务 | 整理文档并检查引用、历史证据与差异，独立本地治理提交
+[2026-09-28T02:33:11] [WORKFLOW-DOCS-CONSISTENCY] RESUME | executor=Lee | branch=codex/mvp-0.3
+用户要求继续整理，恢复既有文档改动并完成独立阅读检查 | git diff检查发现Provider文末空行已修；45引用及111验收文件内容边界检查通过 | 原ADR待决项保留，34任务仍todo | 完成阅读检查、追加验证交接并本地提交
+[2026-09-28T02:34:31] [WORKFLOW-DOCS-CONSISTENCY] VERIFIED | executor=Lee
+新增ADR索引，统一ADR02批准/提案/计时边界，更新架构/README/Provider/Compose入口并修正收尾决定链接大小写；按代码纠正最多3次总尝试，业务代码未改 | python3 /tmp/edumind_check_docs.py通过45个大小写敏感本地引用、111份验收文件仅一处链接修正、PRD/API/ADR03/活动及归档账本不变、34项todo、日志只追加；git diff --check通过；独立读者五项核对通过并补清重解释证据与生成服务区别；纯文档未跑业务测试，0Provider调用 | ADR未批准项保留，未扩大恢复或模型质量承诺 | 明确八文件暂存并检查后本地chore(workflow)提交；后续从T001固定口径开始，索引见docs/ADR/README.md，不push/merge
+
+[2026-09-28T02:43:54] [MVP-0.3-T001] START | executor=Lee | branch=codex/mvp-0.3
+用户授权T001–T004，先固定验收口径 | 工作区干净、PRD/账本/最近日志已核对 | 新ADR需具体批准，0Provider调用 | 完成范围映射与离线文档检查
+[2026-09-28T02:46:53] [MVP-0.3-T001] VERIFIED | executor=Lee
+固定阶段范围/34项PRD索引/计时与失败分母/零调用预算，落实独立读者四项反馈 | 本地引用/全部任务索引/状态与diff检查通过；初次字符串检查因范围未展开失败，补索引后通过；纯文档未运行业务测试 | 真实采样未授权，ADR待批准 | 本地T001完成提交，随后T002可信模板与Job设计；证据docs/acceptance/mvp-0.3-acceptance-plan.md
+[2026-09-28T02:47:18] [MVP-0.3-T002] START | executor=Lee | branch=codex/mvp-0.3
+核对T001 d83353a完成提交，领取模板与Job安全边界 | T001独立文档审查与离线检查通过 | 新安全决定尚未批准 | 编写具体ADR与正常/异常/重启威胁检查，不实施后续任务
+[2026-09-28T02:48:38] [MVP-0.3-T002] BLOCKED | executor=Lee
+完成ADR-0004具体A–D提案及设计自查，补租约过期/事件快照/输出配额/安全发布与GC边界 | 引用/串行任务/diff检查通过，独立读者四项反馈已补；0Provider调用，未做实现验收 | 任务验收要求新安全决定获批准，具体方案待用户确认 | 本地chore保存提案无Task-Completed；批准后完成T002再串行T003/T004，交接docs/acceptance/mvp-0.3-t002-design-review.md
+[2026-09-28T07:46:55] [MVP-0.3-T002] RESUME | executor=Lee | branch=codex/mvp-0.3
+用户明确批准 ADR-0004 A–D，原阻塞解除，恢复T002 | 已核对提案准备提交157eae9与干净工作区 | 设计批准不等于未来实现验收，不扩展到T005或付费采样 | 标记Accepted、完成文档/状态检查并独立完成提交，随后T003
+[2026-09-28T07:47:05] [MVP-0.3-T002] VERIFIED | executor=Lee
+ADR-0004 A–D获用户明确批准并标记Accepted，更新架构/索引/交接；原设计及历史准备提交保留 | 链接/批准状态/单执行者/diff检查通过；纯文档无业务测试、0Provider调用 | 实现尚未开始，资源限额需T008实测；T003课堂新数据/API决定另行审批 | 明确路径本地Task-Completed提交，随后领取T003；交接docs/acceptance/mvp-0.3-t002-design-review.md
+[2026-09-28T07:48:12] [MVP-0.3-T003] START | executor=Lee | branch=codex/mvp-0.3
+T002 dfe91bd完成提交已核对，领取课堂会话与场景边界 | PRD §3.3/§3.5、现有场景/证据/恢复模型已核对，工作区干净 | 新课堂数据/API决定待形成具体方案 | 起草ADR，审查模式切换/断线/重解释/辩论返回，再请求明确批准
+[2026-09-28T07:49:32] [MVP-0.3-T003] BLOCKED | executor=Lee
+完成ADR-0005 A–D具体提案与场景自查，补单调消息游标/角色状态/幂等顺序/失败证据含义/临时撤回 | 本地引用/串行依赖/diff检查通过，独立读者五项反馈已补；纯文档0Provider调用 | 新课堂持久化/API/审核决定需用户批准，T004依赖T003不得领取 | 本地chore保存提案无Task-Completed；获批后完成T003并实施T004契约；交接docs/acceptance/mvp-0.3-t003-design-review.md
+[2026-09-28T07:50:17] [MVP-0.3-T003] RESUME | executor=Lee | branch=codex/mvp-0.3
+用户明确批准ADR-0005 A–D，T003原阻塞解除 | 已核对b30f1d0准备提交与干净工作区 | 设计批准不等于T016–T026实现验收 | 更新Accepted、完成引用/状态检查并独立完成提交，随后领取T004
+[2026-09-28T07:50:53] [MVP-0.3-T003] VERIFIED | executor=Lee
+ADR-0005 A–D获用户批准并标记Accepted，更新架构/索引/交接 | 批准状态/引用/串行任务/diff检查通过；纯文档无业务测试、0Provider调用；首轮验证脚本因p变量复用断言失败，改为明确adr变量后通过 | 课堂和场景仍待实现，ADR-0002其他未批准边界不扩展 | 明确路径本地Task-Completed提交，随后领取T004；交接docs/acceptance/mvp-0.3-t003-design-review.md
+[2026-09-28T07:51:24] [MVP-0.3-T004] START | executor=Lee | branch=codex/mvp-0.3
+核对T003 0028f53完成，领取MVP0.3 API/SSE契约 | ADR-0004/0005已批准，既有OpenAPI为0.2契约 | 本任务固定规范，不冒充端点已实现或运行真实Provider | 编写OpenAPI路径/schema/错误/事件及静态契约测试，完成验证和独立本地提交
+[2026-09-28T07:59:00] [MVP-0.3-T004] VERIFIED | executor=Lee
+OpenAPI 0.3.0固定动画Job/媒体/导出/课堂/场景/辩论与SSE契约，新增静态契约测试及交接；端点尚未实现 | 7契约测试通过、Ruff/Mypy55、43唯一操作/49schema/链接/diff通过；额外DB集成试跑4通过27跳过，不计集成通过；初始uv默认缓存权限失败改隔离缓存，若干辅助脚本错工作目录后纠正；0Provider调用 | 新端点实现/真实容器/浏览器/Provider验证属于后续任务；本批次到T004停止 | 明确路径暂存本地Task-Completed提交，核对提交内容并报告；交接docs/acceptance/mvp-0.3-t004-api-contract.md，不push/merge/领取T005
+[2026-09-28T08:02:35] [MVP-0.3-T005] START | executor=Lee | branch=codex/mvp-0.3
+用户授权连续推进MVP0.3动画T005–T015；核对T001–T004完成提交及干净工作区，领取T005 | Docker可用但宿主无Manim命令；ADR-0004已批准，现有API参数边界待与T005同步 | 本次不调用Provider或冒充真实渲染 | 建立可信模板注册/严格校验/版本化缓存标识，运行针对性测试并独立本地提交
+[2026-09-28T08:08:25] [MVP-0.3-T005] VERIFIED | executor=Lee
+固定插入/删除模板清单、设计事实步骤/源码待审状态、严格参数与运行版本缓存标识，并同步OpenAPI和文档 | 37针对性+契约测试/Ruff/Mypy56/清单及链接/diff通过；宿主无Manim，本任务无渲染验收；0Provider调用 | 实际Manim源/视频审核属T006/T007，源码未审时执行入口拒绝 | 明确路径本地T005完成提交，核对后领取T006；交接docs/animation-templates.md，不push/merge
+[2026-09-28T08:10:13] [MVP-0.3-T006] START | executor=Lee | branch=codex/mvp-0.3
+T005 06fb962完成提交且工作区干净，领取链表插入模板 | 官方Manim版本化镜像拉取进行中，Docker daemon可用；模板方案已核对 | 真实帧/字幕审核未做，不预设通过 | 实现固定插入步骤与SRT、固定容器渲染命令，真实渲染后人工逐帧/字幕核对并提交
+[2026-09-28T08:43:39] [MVP-0.3-T006] VERIFIED | executor=Lee
+链表插入确定性步骤、固定Manim场景、参数化渲染入口、源码摘要绑定和事实/画面/SRT审核完成 | 47针对性测试、全量407通过74跳过、Ruff/Mypy5、四种真实Docker渲染36秒、15秒/21秒帧及SRT复查、diff/媒体忽略通过；初次全量测试受沙箱回环监听限制，允许本地监听后通过；0Provider调用 | 正式Job/通用静态检查/缓存发布属T008–T010，不将本地渲染视作上线 | 明确路径本地T006完成提交，核对后领取T007；交接docs/acceptance/mvp-0.3-t006-insertion.md，不push/merge
+[2026-09-28T08:46:44] [MVP-0.3-T007] START | executor=Lee | branch=codex/mvp-0.3
+T006 091c504完成提交已核对且工作区干净，领取链表删除模板 | 固定Manim镜像与插入模板构建入口已就绪，删除清单仍pending | 删除边界/真实渲染与字幕审核待做 | 复用确定性步骤和固定容器，覆盖头/中/尾/单节点及非法空表，审核后独立本地提交
+[2026-09-28T08:55:52] [MVP-0.3-T007] VERIFIED | executor=Lee
+删除模板按保存后继/改连接/释放目标生成42秒MP4与中文SRT，完成四边界真实渲染、帧审核及源码摘要绑定 | 57针对性、全量417通过74跳过、Ruff/Mypy7、四次Docker渲染及15/21/27秒帧、媒体忽略/diff检查通过；0Provider调用 | 正式Job/通用静态规则/超时清理和媒体发布属T008–T010 | 明确路径本地T007完成提交，核对后领取T008；交接docs/acceptance/mvp-0.3-t007-deletion.md，不push/merge
+[2026-09-28T08:59:01] [MVP-0.3-T008] START | executor=Lee | branch=codex/mvp-0.3
+T007 615f814完成提交且工作区干净，领取受限模板渲染执行器 | ADR-0004 A要求非root、只读/禁网、输出256MiB硬配额、120秒超时与整容器终止，当前T006/T007本地脚本并非正式Worker | Docker tmpfs输出复制与只挂单次输入需实测，不预设可行 | 实现审核源码AST、单次输入目录与配额隔离，负向测试和真实渲染后独立提交
+[2026-09-28T09:37:56] [MVP-0.3-T008] VERIFIED | executor=Lee
+已审核源码按字面量编译并AST检查，仅挂单次只读输入，非root/禁网/只读根/双256MiB tmpfs硬配额容器渲染，媒体校验后有上限复制候选，失败清理本次尝试 | Docker集成18通过、全量433通过76跳过、Ruff/Mypy2、两模板哈希与T006/T007一致；真实禁网/根目录写入/超额输出失败且超时后无容器或尝试残留；0Provider调用 | 候选尚未正式缓存/owner绑定，属T009/T010；Docker cp无法读取tmpfs已改为容器内cat受限传输，无放宽硬配额 | 明确路径本地T008完成提交，核对后领取T009；交接docs/acceptance/mvp-0.3-t008-renderer.md，不push/merge
+[2026-09-28T09:40:35] [MVP-0.3-T009] START | executor=Lee | branch=codex/mvp-0.3
+T008 bac0d8e完成提交且工作区干净，领取预渲染缓存与审核资源复用 | 已有两种已审核模板和隔离候选渲染，媒体缓存尚未实现 | owner授权属于后续Job/接口，缓存不得直接公开绝对路径或跨owner资源 | 建立版本化公共缓存和损坏拒绝/重建、并发复用及基准媒体准备命令，验证后独立提交
+[2026-09-28T10:20:15] [MVP-0.3-T009] VERIFIED | executor=Lee
+公共已审核模板媒体先查版本化私有缓存再隔离渲染，内容摘要校验/损坏重建/同键锁与基准媒体准备入口完成 | 缓存+执行器22通过2 Docker-only跳过、全量439通过76跳过、Ruff/Mypy2；两基准真实渲染后第二次均命中，元数据无owner字段且媒体Git忽略；0Provider调用 | 数据库Job、owner资源绑定/下载鉴权与GC属T010–T014，缓存对象不得直接对外 | 明确路径本地T009完成提交，核对后领取T010；交接docs/acceptance/mvp-0.3-t009-cache.md，不push/merge
+[2026-09-28T10:23:27] [MVP-0.3-T010] START | executor=Lee | branch=codex/mvp-0.3
+T009 89895f5完成提交且工作区干净，领取动画Job/事件/资源持久化 | ADR-0004 B–D与OpenAPI契约已批准；宿主未配置测试库但Docker可启动独立PostgreSQL | 不能用现有MVP0.2运行库进行破坏性迁移测试 | 建立新模型和Alembic迁移、幂等及事件持久事务，独立PG升降级/重连/owner约束实测后提交
+[2026-09-28T13:36:24] [MVP-0.3-T010] VERIFIED | executor=Lee
+新增动画Job/事件/共享媒体/owner绑定模型及0010迁移，按owner锁幂等预约、同事务queued事件与游标重放，事件载荷限白名单 | 独立PG空库升级/降级到0009/四表消失/再升级通过，重连和并发幂等/约束集成2通过，全量连接PG后端515通过2项Docker专项跳过，Ruff/Mypy2/diff通过；首次重复集成因共享媒体fixture重复键失败，改为复用该媒体后通过；0Provider调用 | Worker租约/取消/发布与API仍属T011–T014；测试PG独立容器不触碰现有运行库 | 明确路径本地T010完成提交，核对后领取T011；交接docs/acceptance/mvp-0.3-t010-job-persistence.md，不push/merge
+[2026-09-28T13:38:27] [MVP-0.3-T011] START | executor=Lee | branch=codex/mvp-0.3
+T010 2c55172完成提交且工作区干净，领取持久Job领取与渲染发布 | PostgreSQL模型/租约字段/事件水位、受限执行器和私有缓存已就绪；独立测试PG仍运行 | 旧租约/取消/并发发布必须通过DB行锁和实际媒体检查，不能以进程内存判定成功 | 实现短事务领取、心跳/回收、受限渲染与当前尝试CAS发布，测试并发/重启/损坏及真实Job后独立提交
+[2026-09-28T13:53:37] [MVP-0.3-T011] VERIFIED | executor=Lee
+独立Worker短事务领取/心跳/回收、真实受限模板渲染、当前尝试CAS发布及owner媒体绑定完成，补宿主中断后容器自退兜底 | 独立PG+Docker专项6通过、全量后端519通过4项Docker专项跳过、Ruff/Mypy4/diff检查通过；新引擎恢复与独立Worker进程均实测，0Provider调用 | 用户取消与发布互斥、HTTP/SSE和媒体下载鉴权待T012–T014；独立PG未触碰既有运行库 | 明确路径本地T011完成提交，核对后领取T012；交接docs/acceptance/mvp-0.3-t011-worker.md，不push/merge
+[2026-09-28T13:56:00] [MVP-0.3-T012] START | executor=Lee | branch=codex/mvp-0.3
+T011 fc970df完成提交且工作区干净，领取动画创建与Job生命周期API | ADR-0004/OpenAPI已有创建、查询、取消、重试契约；独立PG与真实Worker已就绪 | 缓存命中必须有owner绑定，取消/发布需要同锁排序，API不得直接运行渲染 | 实现服务及受鉴权路由，集成测试命中/竞态/重试/幂等/越权，验证后独立提交
+[2026-09-28T14:12:33] [MVP-0.3-T012] VERIFIED | executor=Lee
+动画创建/缓存命中/查询/取消/失败重试API与0011取消键迁移完成；owner/CSRF/幂等与同Job行锁竞争受控，运行中取消由Worker停当前容器 | 独立PG迁移升降升通过，Docker专项12通过、全量后端524通过5跳过、OpenAPI7/Ruff/Mypy9/diff通过；首轮迁移修复超长revision，真并发测试发现逆序锁死锁后改唯一约束并通过；0Provider调用 | Job SSE/媒体下载与播放器待T013–T015；本次未触碰既有运行库 | 明确路径本地T012完成提交，核对后领取T013；交接docs/acceptance/mvp-0.3-t012-job-api.md，不push/merge
+[2026-09-28T14:15:00] [MVP-0.3-T013] START | executor=Lee | branch=codex/mvp-0.3
+T012 980caf7完成提交且工作区干净，领取Job SSE进度与断线恢复 | T010持久事件表/单调游标、T012 owner Job快照和认证依赖已就绪 | GET订阅不能创建/取消Job，不能长期延长失效会话，终态不得占连接 | 实现有界轮询SSE和游标/会话校验，真实DB断线重连/跨owner/终态测试后独立提交
+[2026-09-28T14:19:56] [MVP-0.3-T013] VERIFIED | executor=Lee
+owner范围GET SSE从持久事件游标回放实时进度/终态，处理无效与缺口游标、会话过期和有界连接/轮询；关闭订阅不动Job | 独立PG专项5通过、全量后端529通过5跳过、OpenAPI7/Ruff/Mypy3/diff通过；初次测试fixture提交后对象过期，改session不自动过期后通过；0Provider调用 | HTTP媒体读取/浏览器播放仍待T014/T015；当前不自动删除事件 | 明确路径本地T013完成提交，核对后领取T014；交接docs/acceptance/mvp-0.3-t013-job-sse.md，不push/merge
+[2026-09-28T14:22:00] [MVP-0.3-T014] START | executor=Lee | branch=codex/mvp-0.3
+T013 c495e89完成提交且工作区干净，领取已审核媒体读取 | T009私有内容地址缓存、T010 owner绑定/T011真实发布/T012鉴权API已就绪 | 缓存键/媒体ID不能代替owner授权，缺失损坏字节不得声称可播放 | 实现授权MP4 Range/SRT读取与固定响应头，隔离DB和真实浏览器播放验证后独立提交
+[2026-09-28T14:30:33] [MVP-0.3-T014] VERIFIED | executor=Lee
+owner/成功Job/已审核场景绑定授权MP4和SRT，内容地址安全打开并校验摘要，支持单段Range及安全响应头，损坏/缺失统一MEDIA_UNAVAILABLE | 独立PG专项+OpenAPI9通过、全量后端531通过5跳过、Ruff/Mypy3/diff通过；真实Docker媒体由Chromium播放readyState4/currentTime1.216558/36秒无错误且SRT200；首次浏览器脚本模块路径/事件循环问题修复后通过；0Provider调用 | T015按需播放器尚待接入；不提交生成媒体或临时浏览器脚本 | 明确路径本地T014完成提交，核对后领取T015；交接docs/acceptance/mvp-0.3-t014-media-read.md，不push/merge
+[2026-09-28T14:33:00] [MVP-0.3-T015] START | executor=Lee | branch=codex/mvp-0.3
+T014 98e6571完成提交且工作区干净，领取按需动画播放器与Job操作 | 创建/查询/取消/重试/SSE/媒体接口已实测，现有Vue学习页尚无动画入口 | 不得页面载入即创建Job，刷新/断线只按已有Job查询与事件游标恢复，旧节点事件不得覆盖当前页 | 接入状态组件和SRT播放，组件/类型/构建与浏览器播放取消重试断网验证后独立提交
+[2026-09-28T14:53:44] [MVP-0.3-T015] VERIFIED | executor=Lee
+按需动画入口、持久Job恢复/SSE游标、取消重试、MP4与SRT播放和节点切换隔离接入Web；EventSource首订阅补after查询游标 | 前端77通过/类型构建/ESLint通过，后端全量531通过5跳过、Ruff/Mypy通过；真实Chromium仅显式创建1次、36秒媒体播放/字幕、刷新无新Job、取消重试与离线恢复通过；0Provider调用 | 固定教学参数仅为P0模板样例，课堂与导出仍待T016后续；一次性测试库与生成媒体不提交 | 明确路径本地T015完成提交，核对后领取T016；交接docs/acceptance/mvp-0.3-t015-player.md，不push/merge
+[2026-09-28T21:56:00] [MVP-0.3-T016] START | executor=Xerneus111 | branch=codex/mvp-0.3-t015
+T015 26409aa完成提交且工作区干净，领取持久化课堂会话与角色上下文 | ADR-0005决定A与OpenAPI课堂快照/消息/操作契约已批准，T003/T004完成；宿主Docker守护未启动、无独立测试PG可用 | 只能以临时PG容器验证迁移与owner隔离，不可用现有运行库做破坏性迁移 | 建立课堂会话/消息/角色上下文模型与0012迁移，会话隔离/消息游标/重启恢复数据库测试通过后独立提交
+[2026-09-28T22:04:00] [MVP-0.3-T016] VERIFIED | executor=Xerneus111
+新增课堂会话/只追加消息/角色上下文模型与0012迁移：owner+单元唯一当前课堂、revision乐观版本、全局message_cursor、focus默认、enabled_roles/generation_id/paused/detour；消息按会话单调游标+role+session_revision+scene_version+text/resource_id+visible；角色上下文以context_kind区分课堂角色与多视角职责并CHECK互斥 | 空库升0001–0012、降0011三表消失、再升恢复三表；4项数据库测试通过（owner/单元唯一、跨owner复合外键拒绝、游标单调、角色kind分离、重启读回模式/版本/游标/暂停/消息）；ruff/mypy通过 | 本Windows宿主app/main因动画缓存animation_cache.py的POSIX fcntl无法导入（前序980caf7于macOS验证），全量后端无法在此收集，属既有跨平台缺口非本任务回归；T016仅交付持久原语 | 明确路径本地T016完成提交，核对后领取T017；交接docs/acceptance/mvp-0.3-t016-classroom-persistence.md，不push/merge；T017前需先决策或修复fcntl以便API测试在本机可收集
+[2026-09-28T22:26:00] [MVP-0.3-T017] START | executor=Xerneus111 | branch=codex/mvp-0.3-t015
+T016 3903676与fcntl跨平台修复166a158完成提交且工作区仅task.json已标记，领取专注与互动模式切换 | ADR-0005决定B与OpenAPI课堂GET/POST/PATCH契约已批准；T016课堂模型/owner锁/幂等与CSRF依赖已就绪 | 幂等命中先于版本检查，focus要求空角色，切模式需CAS+新generation_id并标记旧generation_id作废 | 实现owner范围课堂读/建/切模式服务与受鉴权路由、迁移0013、真PG幂等/并发/门禁测试后独立提交
+[2026-09-28T22:38:06] [MVP-0.3-T017] VERIFIED | executor=Xerneus111 | branch=codex/mvp-0.3-t015
+新增classroom_operations幂等表(0013)、服务classroom.py(owner课堂读/建/切模式)与API GET/POST/PATCH；幂等命中先于版本检查、owner行锁后重查幂等再revision CAS，切模式revision+1并换generation_id，focus强制空角色，纯数据库事务不调Provider | 迁移0013升降升通过；classroom_mode_api 11项、OpenAPI契约7项、T016持久化4项通过；ruff app+tests与strict mypy 77源通过；并发同键幂等/异键CAS/旧响应门禁/跨owner404/同键异摘要409全部实测 | 全量后端48失败均为既有问题非回归：动画/链表模板CRLF摘要不匹配+首屏毫秒计时抖动+Docker镜像缺失；无Provider调用 | 明确路径本地T017完成提交，核对后领取T018；交接docs/acceptance/mvp-0.3-t017-classroom-mode.md，不push/merge
+[2026-09-29T00:32:00] [MVP-0.3-T018] START | executor=Xerneus111 | branch=codex/mvp-0.3-t015
+T017 aea2cf5完成提交且工作区干净，领取单Tutor按需角色编排 | T003学习单元生成、T017课堂模式/角色开关与ADR-0005语义已就绪 | 一次课堂动作只由一个Tutor编排，专注仅导师，互动按需角色；仅用当前目标/已审核资源/必要画像/路径上下文；模型失败返回可恢复状态不动已有资源 | 实现版本化角色画像、角色选择、上下文最小化、turn输出schema与Tutor编排agent，角色选择/上下文/冗余/Provider失败单测通过后独立提交
+[2026-09-29T00:38:00] [MVP-0.3-T018] VERIFIED | executor=Xerneus111 | branch=codex/mvp-0.3-t015
+新增classroom_roles(版本化导师/基础/进阶画像+发言资格选择)、classroom_turn_schema(turn schema+冗余守卫)、classroom_context(最小化上下文)、tutor_agent(单Tutor编排)；专注恒仅导师、互动按产品序按需同学、不强制全发言、结构层禁止跨角色重复改写、Provider失败返回可恢复状态不动已审核资源 | 27项新单测通过(角色选择5+上下文7+编排/schema/冗余/失败15)、与既有agent层合计79通过、ruff app+tests与strict mypy 81源通过；纯agent层无API/迁移/Provider实调 | 全量后端既有48环境失败与T017相同非回归；T019接SSE分级审核与持久化、T020接真实API/SSE前端 | 明确路径本地T018完成提交，核对后领取T019；交接docs/acceptance/mvp-0.3-t018-classroom-orchestration.md，不push/merge
+[2026-09-29T08:41:00] [MVP-0.3-T019] START | executor=Xerneus111 | branch=codex/mvp-0.3-t015
+T018 34151ab完成提交且工作区干净，领取分级审核课堂流式发言 | T018单Tutor编排+classroom_context、T017课堂模式/幂等/owner锁、ADR-0005决定D分级审核语义与T004 SSE契约已就绪 | 普通对话走版本化轻量规则、高风险升级审核且不把未审核对话冒充正式资源；POST SSE无损传正文+持久化消息/游标+幂等恢复；取消/断线/切模式不让旧发言覆盖新状态，保留owner与凭据边界 | 实现轻量规则+speech服务(幂等/CAS/generation_id门禁/提交消息/游标)+POST SSE与GET消息/操作路由，轻量/升级审核、拒绝/Provider失败、SSE分块/重连/重复提交/模式竞态测试通过后独立提交
+[2026-09-29T08:57:33] [MVP-0.3-T019] VERIFIED | executor=Xerneus111 | branch=codex/mvp-0.3-t015
+新增classroom_speech_rules(版本化轻量规则)、classroom_speech_review(高风险升级有界审核)、classroom_speech.py服务(幂等/CAS/generation_id门禁/提交消息/游标)与POST SSE+GET消息/操作路由；普通对话走确定性规则，高风险升级审核且未通过绝不发布；POST SSE分块无损传正文、持久化student+tutor消息与单调游标、同键幂等重放；切模式/断线让旧commit降级superseded，owner与CSRF边界全程保留 | 新单测31项通过(规则15+审核6+API 11)；课堂相关合计73通过；OpenAPI契约7通过(补记token.data.role)；ruff app+tests与strict mypy 84源通过；全量后端557通过/48失败/5跳过，48失败均为既有环境非回归(动画/链表CRLF摘要+首屏计时抖动+Docker镜像缺失)与T017/T018一致；0 Provider实调 | 前端真实API/SSE课堂界面尚待T020，不得只做静态UI；教学正文首token P95≤2秒为非阻塞后续优化 | 明确路径本地T019完成提交，核对后领取T020；交接docs/acceptance/mvp-0.3-t019-classroom-speech.md，不push/merge
+[2026-09-29T09:06:00] [MVP-0.3-T020] START | executor=Xerneus111 | branch=codex/mvp-0.3-t015
+T019 2894446完成提交且工作区干净，领取专注与按需角色课堂界面 | T017课堂模式/幂等/T019分级审核流式发言与SSE契约已就绪，现有Vue学习页尚无课堂入口 | 默认导师视图、互动才按需显示同学角色与当前发言者、可随时关闭；接通真实API/SSE+错误重试与课堂恢复，不得只交付静态组件；页面转义模型内容防XSS，保留讲解/代码/练习/路径进度，支持键盘与移动端 | 实现classroom API模块与ClassroomPanel组件、接入App.vue共存于已审核资源，模式/流式/迟到响应/XSS/键盘组件测试与真实后端mock Provider联调通过后独立提交
+[2026-09-29T09:38:00] [MVP-0.3-T020] VERIFIED | executor=Xerneus111 | branch=codex/mvp-0.3-t015
+新增web/src/api/classroom.ts(课堂快照/建/切模式/消息分页/操作读取/流式发言+ClassroomSpeechError错误码映射)与web/src/components/ClassroomPanel.vue(默认专注视图、互动才按需显示同学角色与当前发言者、SSE token累积、content_retracted、幂等键重试与sessionStorage恢复、纯文本插值转义防XSS、键盘Enter/Shift+Enter、响应式移动端)，接入App.vue与已审核讲解/代码/练习/路径/动画面板共存 | 前端96项测试通过(16文件：ClassroomPanel 12项组件测试覆盖模式/流式当前发言者/迟到响应丢弃/XSS/键盘/错误重试恢复，classroom API 7项客户端测试覆盖SSE事件与HTTP错误)；浏览器classroom_flow.py(headless Chromium路由mock)联调通过：默认专注→互动角色开关→流式发言提交→XSS转义→键盘提交→Provider故障换新幂等键重试→移动端无横向溢出；后端58项课堂测试通过(真实app+PostgreSQL+FakeAdapter mock Provider：SSE契约/模式CAS/持久化/上下文/角色/审核规则)；ESLint 0错误，vue-tsc+vite build通过 | 浏览器联调沿用learning_flow.py路由mock既有约定，真实后端mock Provider由58项后端课堂测试覆盖；教学正文首token P95≤2秒为非阻塞后续优化 | 明确路径本地T020完成提交，不push/merge；交接docs/acceptance/mvp-0.3-t020-classroom-ui.md
+[2026-09-29T10:10:07] [MVP-0.3-T016] RESUME | executor=Lee | branch=codex/mvp-0.3-t015
+队友完成提交后的代码复核，接手修正跨平台文件锁测试误判 | macOS flock 空文件行为已复现 | 原任务完成状态保留，本次为补丁复核 | 修改测试并验证，不伪造新的任务完成提交
+[2026-09-29T10:10:08] [MVP-0.3-T016] VERIFIED | executor=Lee
+文件锁测试按平台检查锁文件字节，并整理Windows模块动态导入以通过严格类型检查 | 文件锁测试通过、Ruff及Mypy通过；全量后端606通过5跳过；证据docs/acceptance/mvp-0.3-t016-t020-review.md | 无真实Windows运行环境，Windows分支仅静态检查 | 与T017课堂补丁一起本地提交，不push/merge
+[2026-09-29T10:10:09] [MVP-0.3-T017] RESUME | executor=Lee | branch=codex/mvp-0.3-t015
+队友完成提交后的代码复核，接手修正幂等回放与未发布资源门禁 | 旧键在模式变化后返回当前快照、无正式资源也能建课堂，均已复现 | 迁移前操作缺原回执，不能无损恢复 | 新增0014回执迁移与回归测试，同步OpenAPI
+[2026-09-29T10:10:10] [MVP-0.3-T017] VERIFIED | executor=Lee
+创建/模式命令持久化原回执、发布资源门禁及旧记录明确409完成 | 独立PG迁移升降升、定向35通过、全量606通过5跳过、Ruff/Mypy/diff通过；证据docs/acceptance/mvp-0.3-t016-t020-review.md | 迁移前无回执记录无法回放原快照，返回IDEMPOTENCY_RESULT_UNAVAILABLE；无真实Provider调用 | 自查并提交本地补丁，不push/merge；后续T021按任务协议领取
+[2026-09-29T10:20:26] [MVP-0.3-T021] START | executor=Lee | branch=codex/mvp-0.3
+T020与T016依赖已完成，领取当前场景重解释版本服务 | 工作区干净，ADR-0005决定C与OpenAPI契约已批准 | 旧场景须只读可回溯，证据先提交，候选经schema/Review后CAS发布 | 实现持久操作与场景版本，覆盖重复、并发、拒绝、越权和其他场景，验证后本地提交
+[2026-09-29T10:37:18] [MVP-0.3-T021] VERIFIED | executor=Lee
+当前场景重解释先持久化幂等操作及学习证据，仅重写讲解；正式新版本经schema/Review与owner锁CAS发布，原场景/其他场景只读保留，学习单元返回scene_key/is_current | 独立PG迁移head、定向36通过、后端全量612通过5跳过、Ruff/Mypy85源/OpenAPI解析/diff通过；证据docs/acceptance/mvp-0.3-t021-scene-reexplanation.md；0真实Provider调用 | 运行中操作断线只恢复持久状态，临时token不重放；T022仍需前端学习控制 | 明确路径本地完成提交后领取T022，不push/merge
+[2026-09-29T10:40:02] [MVP-0.3-T035] START | executor=Lee | branch=codex/mvp-0.3
+复核T022前端接入条件发现已批准controls端点尚未实现；在账本增加前置T035并更新T022依赖 | 对照backend/app/api与ADR-0005/OpenAPI确认缺口，T021 d1c6c35已完成且工作区干净 | T022不能以静态UI或客户端本地状态替代持久控制API | 先完成owner范围持久控制API并验证，再恢复T022；不push/merge
+[2026-09-29T10:49:04] [MVP-0.3-T035] VERIFIED | executor=Lee
+已批准controls端点落地：owner/CAS/幂等原回执、暂停/继续/跳过、正式资源选择和路径前置返回点；ProfileEvent schema v2记录新增资源类别 | 独立PG定向26通过、后端全量617通过5跳过、Ruff/Mypy86源/OpenAPI与task JSON解析/diff通过；证据docs/acceptance/mvp-0.3-t035-classroom-controls.md；0真实Provider调用 | 前置目标仅保存导航与返回点，不自动生成教学资源；T022界面仍需接入 | 自查并本地完成提交后领取T022，不push/merge
+[2026-09-29T10:53:04] [MVP-0.3-T022] START | executor=Lee | branch=codex/mvp-0.3
+T021 d1c6c35与新前置T035 4d407d5已完成提交且工作区干净，领取学习控制与版本界面 | T021流式重解释/旧版只读、T035持久控制API与T020课堂UI已可用 | App现将所有场景版本资源扁平合并，须避免新旧练习/代码混显；迟到响应和刷新不得覆盖用户版本选择 | 接入当前版本/历史视图、控制与SSE状态，保留练习回执与其他场景，组件/浏览器/构建验证后本地提交
+[2026-09-29T13:41:31] [MVP-0.3-T022] VERIFIED | executor=Lee
+学习页按场景版本隔离正式资源并记住用户选择；接通持久暂停/继续/跳过/资源选择和重解释SSE，恢复未确认操作、收回未审核候选、刷新后保留旧版作答，课堂迟到发言不再显示 | 前端105测试通过、构建/改动文件ESLint/diff通过，Chromium路由mock E2E覆盖新旧版/刷新/失败并留截图；证据docs/acceptance/mvp-0.3-t022-learning-controls-ui.md | 浏览器联调使用路由mock，后端T021/T035已有数据库与mock Provider验证；0真实Provider调用 | 自查并本地完成提交，再领取下一依赖已满足任务；不push/merge
+[2026-09-29T13:43:11] [MVP-0.3-T023] START | executor=Lee | branch=codex/mvp-0.3
+T022已本地完成提交9ec85db且工作区干净，T004/T018依赖已完成，领取数组与链表结构化多视角候选 | PRD§3.5与ADR-0005批准P0一次结构化生成、三视角和主持人候选，T024另负责审核与发布 | 必须显式保留题目条件/图谱依据，不把画像偏好写成算法事实，不接真并行子图 | 实现版本化schema/Prompt/错误边界与单次Provider调用，测试后本地提交
+[2026-09-29T14:25:41] [MVP-0.3-T023] VERIFIED | executor=Lee
+数组vs链表预设一次结构化生成三视角与主持人待审核候选；问题已给/未给条件分离，权威图谱节点与关系附候选，证据画像字段最小化，schema/指令版本及Provider/格式错误稳定 | 定向11通过、后端全量498通过135跳过（无独立数据库URL）、Ruff/Mypy89源/JSON Schema/diff通过；证据docs/acceptance/mvp-0.3-t023-debate-candidate.md；0真实Provider调用 | 待审核候选不发布；T024需整体审核发布，数据库集成在后续任务验证 | 自查并本地完成提交后领取T024；不push/merge
+[2026-09-29T15:56:09] [MVP-0.3-T024] START | executor=Lee | branch=codex/mvp-0.3
+T023 eaf74a2与T016依赖完成提交且工作区干净，领取多视角审核与发布门禁 | T023已有待审核完整候选，ADR-0005要求整体审核、失败保留课堂、owner/幂等回放 | T025仅前端实现，T024须交付持久正式结果与已批准的API/SSE，不得直接展示pending候选 | 核对Review和课堂操作模型后实现有界审核、原子发布及失败恢复，独立数据库与Provider mock验证后本地提交
+[2026-09-29T16:26:03] [MVP-0.3-T024] VERIFIED | executor=Lee
+独立Review有界修正并整体发布三视角与主持人结果；owner/CAS/幂等、断流清理、失败保留课堂和退出恢复返回点；新增结果表迁移及OpenAPI契约 | 独立PG升级head及后端全量640通过5跳过、新增API定向7通过，Ruff/Mypy92源/OpenAPI Schema与JSON/diff通过；证据docs/acceptance/mvp-0.3-t024-reviewed-debate.md；0真实Provider调用 | T025需前端展示与刷新恢复，T026需显式偏好反馈；旧回执缺失仍409 | 自查并本地完成提交，再领取T025；不push/merge
+[2026-09-29T16:27:47] [MVP-0.3-T025] START | executor=Lee | branch=codex/mvp-0.3
+T020与T024 0cbfa4f已完成且工作区干净，领取多视角展示及课堂返回 | 后端已有正式结果GET、debate POST SSE、exit POST和detour回执 | 页面需只展示审核通过结果，刷新/断流恢复，不丢失原课堂进度与资源 | 接入API和安全渲染，完成组件及浏览器验证后本地提交；不push/merge
+[2026-09-29T16:45:51] [MVP-0.3-T025] VERIFIED | executor=Lee
+学习页接入主动演示、正式三视角/主持人展示、状态恢复和幂等退出；切换时保留原组件，审核拒绝或Provider故障不展示候选，模型文本安全转义 | 前端全量113通过、构建/改动文件ESLint通过；Chromium路由模拟进入退出/刷新/失败/XSS/草稿保持及隔离PG真实HTTP联调通过；E2E Python Ruff/diff通过；证据docs/acceptance/mvp-0.3-t025-debate-ui.md；0真实Provider调用 | T026需显式偏好提交；当前按需演示不自动触发，也不推断画像偏好 | 自查并本地完成提交，再领取下一依赖满足任务；不push/merge
+[2026-09-29T16:47:31] [MVP-0.3-T026] START | executor=Lee | branch=codex/mvp-0.3
+T018与T024已完成且T025 afc3c67已本地提交、工作区干净，领取显式视角偏好证据 | ADR-0005批准owner结果ID+视角枚举、explicit_feedback与画像版本化合并；现有ProfileEvent/画像更新规则可复用 | 不从浏览行为推断偏好，不修改算法事实或直接增加掌握度，人工修正优先 | 核对既有画像schema与事件事务，接入反馈API/UI及后续Tutor表达并验证隔离/幂等/修正
+[2026-09-29T17:03:31] [MVP-0.3-T026] VERIFIED | executor=Lee
+显式有帮助视角反馈写owner证据并合并版本化画像，人工修正优先；前端按钮调用API，后续Tutor读取有证据偏好且限制为表达方式，未知保持未知 | 隔离PG定向26通过、后端全量645通过5跳过；Tutor提示词专项15通过；前端115通过、构建/ESLint、Ruff/Mypy93源、OpenAPI校验及真实HTTP浏览器反馈流程通过；证据docs/acceptance/mvp-0.3-t026-perspective-feedback.md；0真实Provider调用 | 无已知阻塞；T027仍todo | 自查并本地完成提交，随后按用户要求暂停；不push/merge
+[2026-09-29T17:50:48] [MVP-0.3-T027] START | executor=Lee | branch=codex/mvp-0.3
+T004与T024已完成且T026 5ee6c0f已本地提交、工作区干净，领取已审核Markdown笔记导出 | 已批准OpenAPI以只读GET /notes.md下载；PRD描述的POST为早期路径，CSRF只校验写请求 | 仅组合owner已发布版本及本人错题，不泄露答案、原始作答、临时或拒绝内容，不调用Provider | 实现确定性导出、固定安全文件名和来源记录，验证版本/归属/下载正文后本地提交
+[2026-09-29T18:02:09] [MVP-0.3-T027] VERIFIED | executor=Lee
+只读GET组合当前已审核讲解、知识摘录、本人的合法版本错题和可选已审核主持人总结；记录模型/时间/版本，转义活动HTML/链接，安全文件名并对齐PRD与OpenAPI | 隔离PG后端全量649通过5跳过，最终导出与OpenAPI专项11通过；Ruff、Mypy95源、OpenAPI JSON及diff检查通过；真实FastAPI下载字节与owner/版本/错题归属/无额外Provider测试通过；证据docs/acceptance/mvp-0.3-t027-markdown-notes.md | 无已知阻塞；前端下载入口由T029负责 | 自查并本地完成T027提交后停止，不领取T028；不push/merge
+[2026-09-29T18:05:13] [MVP-0.3-T028] START | executor=Lee | branch=codex/mvp-0.3
+T014已完成且T027 bddcd42已本地提交、工作区干净，领取已生成MP4/SRT导出 | 现有媒体GET已有owner绑定、哈希校验、Range、nosniff与安全文件名；缺少显式版本/生成来源回执及恢复提示 | 保留只读且不触发模型/渲染，跨owner与未知媒体统一404，已绑定缺失媒体使用稳定错误码 | 补下载来源头、缺失恢复语义及真实字节/版本/路径回归后本地提交
+[2026-09-29T18:10:46] [MVP-0.3-T028] VERIFIED | executor=Lee
+MP4/SRT同媒体ID下载回执加入模板/字幕/审核版本、各格式完整字节哈希、来源与发布时间；缺失媒体返回明确重新请求动画提示，不在GET渲染 | 隔离PG媒体/OpenAPI定向9通过、后端全量649通过5跳过；真实MP4/SRT字节与Range、owner/路径/文件名/损坏/单格式缺失、零重渲染测试通过；Ruff、Mypy95源、OpenAPI JSON及diff检查通过；证据docs/acceptance/mvp-0.3-t028-media-export.md；0真实Provider调用 | 无已知阻塞；前端入口与恢复提示由T029负责 | 自查并本地完成T028提交后停止，不领取T029；不push/merge
+[2026-09-29T21:36:22] [MVP-0.3-T029] START | executor=Lee | branch=codex/mvp-0.3
+T015/T025/T027/T028已完成提交且工作区干净，领取笔记与动画下载入口 | 后端只读笔记/媒体端点已有owner与正式审核门禁，前端缺入口及状态反馈 | 笔记导出当前正式单元，历史场景选择须明确范围；动画按媒体ID绑定当前场景，缺失/失败可重试下载 | 实现可访问下载入口与状态/文件名处理，组件及真实后端浏览器验证后本地提交
+[2026-09-29T21:55:45] [MVP-0.3-T029] VERIFIED | executor=Lee
+学习页笔记/MP4/SRT下载入口、服务端安全文件名、状态/重试与历史场景隔离完成；媒体缺失可显式重新请求动画 | 前端121测试、构建/类型检查/改动ESLint、Chromium移动键盘mock全流程、隔离PG真实HTTP三格式浏览器字节下载及重复运行、Ruff/diff通过；证据docs/acceptance/mvp-0.3-t029-download-ui.md；0真实Provider调用 | 真实Manim端到端旅程由T030验收，无已知阻塞 | 自查并本地完成提交后领取T030；不push/merge
+[2026-09-29T21:57:10] [MVP-0.3-T030] START | executor=Lee | branch=codex/mvp-0.3
+T022/T025/T026/T029均已完成提交且工作区干净，领取MVP 0.3核心集成验收 | 已有真实后端多视角与下载浏览器验证、真实模板动画播放、各模块隔离回归；缺同一次真实全旅程证据 | 真实Provider可mock，必须区分模板媒体真渲染与模型mock，不把路由模拟当完整集成 | 构建完整浏览器旅程及异常回归，执行全量前后端与静态检查，逐项记录后本地提交
+[2026-09-29T22:05:02] [MVP-0.3-T030] BLOCKED | executor=Lee
+已完成完整真实浏览器脚本、README及进行中验收矩阵；前端121测试、构建，后端Ruff/Mypy与无DB 505通过/149跳过 | T030新隔离库命令被自动审批拒绝，已请求用户单独批准；未运行真实数据库全量与全旅程，不能计为通过 | 无法完成T030或领取T031，保留未提交代码及账本状态 | 获授权后追加RESUME，迁移独立库并运行完整验证，再自查提交；不push/merge
+[2026-09-29T22:06:12] [MVP-0.3-T030] RESUME | executor=Lee | branch=codex/mvp-0.3
+用户明确批准T030读取测试容器凭据并新建隔离数据库，解除自动审批阻塞 | 已有完整旅程脚本与无DB回归/静态检查，数据库全量与真实浏览器尚待运行 | 仅在进程内传递测试库连接信息，真实Provider仍为mock | 新建迁移独立库，运行真实集成与全量回归后自查提交
+[2026-09-29T22:15:45] [MVP-0.3-T030] VERIFIED | executor=Lee
+隔离PG真实前后端完整旅程通过，修复辩论旧revision 409并加回归；覆盖课堂、练习、真实缓存模板播放和三格式下载 | 后端649通过/5项Docker-gated跳过，前端122通过、pnpm e2e/构建、Ruff/Mypy/ESLint通过；异常矩阵及命令见docs/acceptance/mvp-0.3-t030-core-integration.md；真实Provider未调用 | 5项Docker-gated渲染/Worker用例由T031/T032专项验证，T033真实模型质量待预算授权 | 自查diff并本地完成提交后领取T031；不push/merge
+[2026-09-29T22:17:00] [MVP-0.3-T031] START | executor=Lee | branch=codex/mvp-0.3
+T030已完成提交且工作区干净，领取隔离Compose重启恢复验收 | 现有Compose仅挂知识图谱，未把动画缓存挂给API；渲染Worker为宿主独立进程且需Docker CLI | 使用独立Compose项目与媒体目录避免触碰开发卷，保持Worker与API分离和已批准容器隔离边界 | 修正媒体部署说明与挂载，建立课堂/Job/导出跨重启检查并真实执行
+[2026-09-29T22:33:26] [MVP-0.3-T031] VERIFIED | executor=Lee
+修正容器仓库目录与只读媒体挂载，固定基础镜像摘要并文档化宿主独立Worker及成对备份；真实重启PG/API/Worker验收课堂与三类Job | 独立Compose迁移、seed、重启、check通过；在途attempt2真实Manim发布，旧attempt拒绝，取消不重开；最终镜像重建复查、相关22通过/3项Docker开关跳过、Ruff/Mypy/Compose配置通过；证据docs/acceptance/mvp-0.3-t031-compose-recovery.md | 批量模板可用率与性能归T032，真实Provider质量仍归T033；隔离项目已down且保留独立证据卷 | 自查并本地完成提交后领取T032；不push/merge
+[2026-09-29T22:35:00] [MVP-0.3-T032] START | executor=Lee | branch=codex/mvp-0.3
+T031已完成提交且工作区干净，领取两模板可用率与动画性能验收 | T001冻结100模板/100缓存播放/20按需渲染槽及nearest-rank P95，合法边界已有单元覆盖，尚缺真实批量浏览器指标 | 所有计划槽计入分母，失败为无穷大；独立缓存目录与隔离库，0 Provider调用，不把T031单次渲染冒充性能通过 | 先固定输入清单和脚本，再运行真实渲染/浏览器计时并保留原始证据
+[2026-09-29T22:54:10] [MVP-0.3-T032] VERIFIED | executor=Lee
+冻结100模板/100缓存/20按需渲染槽并实测；20组真实渲染与80复用均通过，另证实运行中讲解/测验2/2不阻塞 | 模板可用率100%；Chromium禁缓存P95=0.0486s且逐槽≤2s，独立缓存新渲染P95=9.1521s；Docker模板/渲染/缓存57通过，Ruff/编译/JSON检查通过；首次定位器故障原始20槽失败报告保留，完整重跑见docs/acceptance/mvp-0.3-t032-animation-performance.md | 单机单并发结果不推断公网/高并发；质量矩阵20不同参数重复5次；T033真实Provider仍需批准费用预算 | 自查并本地完成提交后准备T033冻结配置/预算；不push/merge
+[2026-09-29T22:56:00] [MVP-0.3-T033] START | executor=Lee | branch=codex/mvp-0.3
+T031/T032已完成提交且工作区干净，领取当前真实课堂与质量验收 | T001要求冻结至少100正式生成/Schema槽、20严重错误样本及20普通发言，并单列首屏口径；真实Provider预算尚未批准 | 只做脱敏配置核对、样本/调用上限与费用预检，未获明确预算授权前不发付费请求 | 形成可审查的冻结附件及一次有界运行方案，再请求用户决定预算
+[2026-09-30T08:58:00] [MVP-0.3-T033] RESUME | executor=Lee | branch=codex/mvp-0.3
+用户批准最多600次真实Provider请求，并在发现当前配置为阿里云百炼deepseek-v4-pro-0813后明确不考虑费用；沿用单一模型与累计次数上限 | 独立T033库Alembic head、离线预算测试通过；v8/v9真实质量批次因输出超限及能力类错误未通过，原始报告保留，v10三个旧失败槽诊断合法 | 尚需v10完整120槽、严重错误、首屏、课堂和浏览器旅程验收；不得混合版本判定 | 按冻结v10清单完成一次有界采样与人工审计；完成T033后停止，不领取T034
+[2026-09-30T09:11:22] [MVP-0.3-T033] BLOCKED | executor=Lee
+当前Pro模型三轮固定资源基准均未过98%首候选schema；v10在63个完成槽中3次失败，累计182次实际请求（含1次中断状态未知），保留原始账本和审计报告 | T033预算/提示词/适配器离线定向88通过；真实v10正式发布57/63、schema60/63，剩余57槽未运行，不能外推或算通过；严重错误、首屏、课堂、浏览器尚未运行 | 两次不同修复仍失败，当前600次上限剩余418次，重跑完整120槽及其余指标预计不足；需要模型/额度决策，不领取T034 | 待用户指定保持Pro并提高累计上限或切换明确模型后，新增独立基准并完成其余T033验收；不push/merge
+[2026-09-30T09:12:36] [MVP-0.3-T033] BLOCKED | executor=Lee
+更正上一条验证计数：将重复计入的测试合并去重后，资源schema/审核/质量/预算/Responses适配器定向共85通过，不是88；原历史记录保留 | 同一次组合pytest 85通过，相关Ruff和git diff --check通过；三轮真实失败原始证据及边界见docs/acceptance/mvp-0.3-t033-interim-audit-20260930.md | 当前配置仍无法满足首候选schema门槛，T033保持blocked，T034不领取 | 等待用户决定模型及新的累计请求上限，再恢复独立基准
+[2026-09-30T09:15:18] [MVP-0.3-T033] RESUME | executor=Lee | branch=codex/mvp-0.3
+用户明确选择保持阿里云百炼deepseek-v4-pro-0813，并把本轮累计真实请求硬上限由600提高到800；T033阻塞已解除 | 旧v8/v9/v10原始失败报告和182次累计尝试保留，不拼接成功槽；剩余618次用于诊断、新完整质量批次及其余专项 | 当前指令仍需处理解释/代码偶发重复，质量及首屏/课堂/浏览器门槛未达 | 冻结新指令与限额、做有界诊断和独立120槽基准，完成T033后停止
+[2026-09-30T09:36:34] [MVP-0.3-T033] BLOCKED | executor=Lee
+v11独立120槽质量批次在第94槽收到Provider AUTHENTICATION_FAILED，按冻结规则立即停机；不替换失败槽 | 已完成93槽首稿schema93/93、发布92/93；另1槽认证失败、26槽未尝试；累计383/800次，脱敏证据见docs/acceptance/mvp-0.3-t033-v11-auth-halt-20260930.md | 401/403具体原因未知，严重错误/首屏/课堂/浏览器未运行，T033不能判通过；不领取T034 | 用户检查百炼密钥与账号/模型权限后做有界认证预检，保留旧证据并重新跑独立完整基准
+[2026-09-30T09:40:00] [MVP-0.3-T033] BLOCKED | executor=Lee
+用户确认Pro模型额度已用完，补充上一条停机原因；未发起新Provider请求 | 累计仍为383/800次，v11已完成93槽数据和认证失败证据保持原样 | Pro不能继续完成剩余验收；替代模型需单独冻结并重跑完整120槽，T034仍为todo | 等待用户选择补充Pro额度或指定有额度的替代模型，再进行有界预检并恢复T033
+[2026-09-30T09:43:34] [MVP-0.3-T033] RESUME | executor=Lee | branch=codex/mvp-0.3
+用户最新指定deepseek-v4-flash-0731并已更新.env，解除Pro额度阻塞；新v6账本保留383次Pro历史尝试并隔离Flash槽计数 | 脱敏配置核对为北京百炼Responses JSON Schema，服务端密钥存在；新模型尚未发送真实请求 | 剩余全局上限417次，Flash兼容性、质量和性能待验证；T034不领取 | 冻结Flash配置并做不超过5次预检，再独立运行T033全部固定验收
+[2026-09-30T10:15:16] [MVP-0.3-T033] BLOCKED | executor=Lee
+Flash正式质量120槽首稿结构119/120、发布117/120均过线；严重错误审核16/20未达90%，已将危险指针分类规则升级审核指令v3并用原4个漏计案例独立诊断4/4 | 首屏完整5槽均发布，第6槽因预计剩余额度不足中断；全部历史/失败证据保留，累计710/800次，离线审核/预算定向检查通过；方案见docs/acceptance/mvp-0.3-t033-flash-v3-rerun-proposal-20260930.md | 新指令必须重跑全部固定验收，剩余90次不足；T033未完成，T034不领取 | 等待用户决定是否把全项目累计实际请求硬上限提高到1400次，再用新隔离库/新run_id重跑；不push/merge
+[2026-09-30T10:17:21] [MVP-0.3-T033] RESUME | executor=Lee | branch=codex/mvp-0.3
+用户批准T033累计真实Provider请求硬上限1400次，解除v3完整重跑预算阻塞；旧710次全部续记 | v3四个固定安全分类诊断4/4，正式质量/审核/首屏/课堂/浏览器仍需独立验收 | 新批次不得拼接Pro或Flash审核v2成绩，费用不作为停机条件 | 新建隔离库并冻结v3代码/样本哈希，按固定顺序完整运行，T033完成后停止
+[2026-09-30T14:20:22] [MVP-0.3-T033] BLOCKED | executor=Lee
+Flash v3正式质量120槽及审核30槽指标达到门槛，首屏第14槽在累计第1095次请求返回AUTHENTICATION_FAILED并立即停机 | 质量schema120/120、发布117/120；严重错误20/20、对照10/10；首屏13发布、1失败、6未尝试；新增DOM脚本静态检查和预算4测试通过，证据见docs/acceptance/mvp-0.3-t033-flash-v3-auth-halt-20260930.md | 仍有305次项目请求预算，但Provider鉴权/权限/额度原因待确认，首屏DOM、课堂和浏览器未完成，T033不得判通过 | 用户检查百炼并解除阻塞后再有界预检和完整首屏验收；保留失败槽，不领取T034，不创建完成提交，不push/merge
+[2026-09-30T14:23:28] [MVP-0.3-T033] BLOCKED | executor=Lee
+补充离线Chromium测量器检查，按产品pre-wrap样式捕获2次可见更新及2个段落候选 | 合成页面smoke通过、零Provider调用；首次缺少样式的测试失败不计通过，补正测试页面后通过，证据见mvp-0.3-t033-dom-offline-smoke-20260930.json | 账本仍AUTH_QUOTA_OR_CAPABILITY，累计1095/1400次，Provider阻塞未解除，离线证据不代替真实验收 | 等待用户检查Flash额度/权限/密钥后恢复；不领取T034
+[2026-09-30T14:29:31] [MVP-0.3-T033] BLOCKED | executor=Lee
+用户确认旧模型额度用完并换为deepseek-v4.1-flash，创建保留历史1095次的新模型账本并运行一次结构化预检 | 第1096次请求CAPABILITY_UNAVAILABLE，流式预检未运行，已立即停机；证据见docs/acceptance/mvp-0.3-t033-flash41-preflight-audit-20260930.md | 具体模型/参数/接口问题无法由通用错误确定，剩余304次不足独立完整验收；旧Flash成绩不能混用 | 用户确认新模型开通/额度并决定后续诊断及请求上限；不领取T034，不push/merge
+[2026-09-30T14:31:48] [MVP-0.3-T033] BLOCKED | executor=Lee
+用户批准此前提出的累计2000次真实请求上限，代码与当前v9账本同步，历史1096次全部保留 | 预算剩余904次；未发起新Provider请求，停机标记保持 | 预算阻塞解除，但deepseek-v4.1-flash预检CAPABILITY_UNAVAILABLE待确认模型开通/额度和后续诊断 | 确认模型服务可用后继续有界诊断及独立完整验收；不领取T034，不push/merge
+[2026-09-30T14:37:47] [MVP-0.3-T033] RESUME | executor=Lee | branch=codex/mvp-0.3
+用户确认deepseek-v4.1-flash已开通，累计上限2000次已批准，恢复有界兼容性诊断 | 当前1096次历史全部保留，新诊断run_id隔离；旧CAPABILITY_UNAVAILABLE原始证据保留 | 新模型质量/审核/首屏/课堂/浏览器仍未验收；诊断失败按规则停机 | 先记录HTTP状态及脱敏参数错误原因，再决定必要修复；完成T033后停止，不领取T034
+[2026-09-30T15:25:43] [MVP-0.3-T033] BLOCKED | executor=Lee
+Flash4.1接口改为显式JSON Object且本地schema保持，首轮120槽统计过线但漏检栈顺序错误；生成v11/审核v4修复后原案例诊断2/2、固定审核20/20与对照10/10通过，第二轮人工仍发现已发布空栈peek越界，精确测试进程SIGINT停机 | 第二轮71终结、1中断、48未尝试；累计1546/2000次，中断请求仍计入；Responses/预算/生成/审核72定向测试通过（71后新增1全局上限回归），失败和派生120槽证据全部保留 | 固定召回过线不足证明安全，剩余454次不足新完整验收，首屏/课堂/浏览器未运行；T033不能完成，T034不领取 | 请用户决定仅审核档位low思考及累计2500次方案，附件docs/acceptance/mvp-0.3-t033-flash41-review-repair-proposal-20260930.md；不创建完成提交，不push/merge
+[2026-09-30T15:32:01] [MVP-0.3-T033] BLOCKED | executor=Lee
+用户批准仅审核low及累计2500次后明确要求先不用跑，保存修改并暂停T033真实验收 | 新审核v5/生成v12与REVIEW档位low实现，相关76离线测试及Ruff通过；累计仍1546次，v14账本USER_REQUESTED_HOLD，未做新真实调用 | 新配置尚无真实质量/性能证据，T033未完成，不创建完成提交，T034不领取 | 等待用户明确继续；交接docs/acceptance/mvp-0.3-t033-review-low-hold-20260930.md；不push/merge
+[2026-09-30T15:52:02] [MVP-0.3-T033] RESUME | executor=Lee | branch=codex/mvp-0.3
+用户明确授权仅测试审核low小样本，完整基准保持暂停；复用6错误与6对照，最多12次调用，不生成资源 | 12个固定样本装配检查、Ruff通过，冻结附件docs/acceptance/mvp-0.3-t033-low-small-sample-freeze-20260930.md，旧1546次续记 | 此诊断不能替代120/30/20/20完整验收，也不能单独归因思考效果 | 记录真实出站low、usage与审核结果，完成12槽后保存并停止，不领取T034
+[2026-09-30T15:57:51] [MVP-0.3-T033] BLOCKED | executor=Lee
+完成用户限定审核low小样本12次，0生成/发布，所有出站low已核验，不扩展完整基准 | 6错误5有效检出、6对照5有效放行；空栈peek错误/修正版均INVALID_OUTPUT且输出4096到上限，model=null失败关闭；输入18638+输出14703，按用户¥1/M假设约¥0.033341；累计1558/2500，证据docs/acceptance/mvp-0.3-t033-low-small-sample-audit-20260930.md | 小样本不证明正式验收通过，输出预算耗尽尚需终止原因确认，完整验收保持暂停 | 后续可仅复测2条并提高审核输出预算，当前不发新调用、不领取T034、不创建完成提交、不push/merge
+[2026-09-30T16:01:03] [MVP-0.3-T033] RESUME | executor=Lee | branch=codex/mvp-0.3
+用户授权仅复测2条空栈peek错误/修正版，保持内容和审核v5/low，只提高诊断输出上限8192 | 独立step2次上限、旧1558次续记，预算5测试通过；冻结附件docs/acceptance/mvp-0.3-t033-low-peek-retest-freeze-20260930.md | 原4096失败证据保留，本轮不证明正式验收通过，不修改生产默认输出上限 | 仅执行2次复测后保存并停止，不启动完整基准、不领取T034
+[2026-09-30T16:03:47] [MVP-0.3-T033] BLOCKED | executor=Lee
+完成用户限定2条low+8192复测，内容哈希与原小样本相同，原空栈peek越界major code_safety revise、修正版pass | 2/2有效，出站low与8192核验，耗时24.655/26.596秒；输入3371+输出3712，按用户¥1/M假设约¥0.007083；累计1560/2500；证据docs/acceptance/mvp-0.3-t033-low-peek-8192-retest-audit-20260930.md | 原12槽失败保留，不能拼合正式通过；生产默认仍4096，完整基准保持暂停，T033未完成 | 保存后停止，等待用户后续范围，不领取T034、不创建完成提交、不push/merge
+[2026-09-30T16:19:33] [MVP-0.3-T033] RESUME | executor=Lee | branch=codex/mvp-0.3
+用户只授权审核配置和稳定性步骤1/2，接入服务端REVIEW默认low+8192，其他默认none+4096，预算预留同步；显式请求上限优先 | 相关86离线测试通过，Ruff与10样本装配通过；固定原2例各3次+4新例，冻结docs/acceptance/mvp-0.3-t033-low-policy-stability-freeze-20260930.md | 小样本不能代替整体验收，累计1560/2500，最多新增10调用；真实.env不提交 | 从实际工厂策略执行10次诊断，记录wire/usage/时延后停止，不启动步骤3/4或完整基准
+[2026-09-30T16:30:22] [MVP-0.3-T033] BLOCKED | executor=Lee
+用户限定步骤1/2已完成，生产审核low+8192配置接入，默认生成/普通文本隔离；保存后停止 | 86离线测试通过，实际工厂10次稳定性5错误/5对照均符合预期，原两例各3次和4新例均通过，无格式失败/上限耗尽；耗时10.385–48.897秒；输入16377+输出16196，按用户¥1/M假设约¥0.032573；累计1570/2500；证据docs/acceptance/mvp-0.3-t033-low-policy-stability-audit-20260930.md | 小样本不代表正式T033验收完成，完整基准仍按用户范围暂停，T034未领取 | 等待后续范围授权，不自动推进步骤3/4或完整基准，不创建完成提交，不push/merge
+[2026-09-30T16:35:50] [MVP-0.3-T033] RESUME | executor=Lee | branch=codex/mvp-0.3
+用户授权步骤3/4，固定15资源真实生成/审核/发布并人工检查，再跑一次真实浏览器小流程及计时；不启动完整基准 | 审核生产low+8192稳定性10/10和86离线回归已有证据，15槽装配/Ruff通过，历史1570次续记，新v18独立run_id；冻结docs/acceptance/mvp-0.3-t033-pilot-browser-freeze-20260930.md | pilot和单次浏览器不足正式质量/召回或P95验收，T033未完成 | 串行执行15槽与一次浏览器诊断，记录公开内容/usage/时延后保存停止，不领取T034
+[2026-09-30T16:58:41] [MVP-0.3-T033] BLOCKED | executor=Lee
+用户限定步骤3/4已执行，保留15资源与两次浏览器尝试（第一次422零调用，唯一目标真实旅程180秒未发布）；保存停止 | 首次schema15/15、发布12/15、发布schema12/12，人工明确2条已发布事实错误、2次审核8192截断；78预算/Responses离线测试、脚本Ruff/py_compile及diff检查通过；新增41次累计1611/2500，已知128608token约¥0.128608且2调用usage未知；证据docs/acceptance/mvp-0.3-t033-pilot-browser-audit-20260930.md | 浏览器后续步骤未运行，失败首屏计时未保存无法判≤2s/≤10s或P95，T033不得判通过，完整基准仍暂停 | 后续先离线回归和策略设计再由用户决定小范围复测，不自行重跑、不领取T034、不创建完成提交、不push/merge
+[2026-09-30T21:25:24] [MVP-0.3-T033] RESUME | executor=Lee | branch=codex/mvp-0.3
+用户明确直接运行当前配置完整基准，保持已知问题，解除仅诊断/暂停范围；新v19账本保留历史1611次 | 冻结120质量/30审核/20首屏/20课堂/1浏览器，当前模型low+8192不变，预算889次足够805最坏预留；测量器Ruff通过 | 已知漏检/截断/等待问题未修复，未运行不算通过；鉴权/能力/预算异常仍停机 | 建立新隔离库并一次串行执行，审计保存后停止，不领取T034，不push/merge
+[2026-09-30T21:28:56] [MVP-0.3-T033] BLOCKED | executor=Lee
+完整基准启动前配置保护拒绝：当前.env模型deepseek-flash与冻结deepseek-v4.1-flash不一致，未改动用户.env | 新隔离库迁移成功，0新增Provider请求，累计1611/2500，完整执行证据记录preflight exit2；测量器Ruff与预算6测试通过 | 等待用户确认当前env模型或恢复上轮模型，不能把不同模型成绩混用 | 收到选择后重新冻结并执行已授权完整基准，保留本次零调用失败，不领取T034、不push/merge
+[2026-09-30T21:32:10] [MVP-0.3-T033] RESUME | executor=Lee | branch=codex/mvp-0.3
+用户声明两个供应商命名属同模型并要求接着跑，继续原v19正式计划，不重复小样本或清零账本 | 当前.env deepseek-flash/api.deepseek.com，累计仍1611，新隔离库已完成迁移，原零调用失败执行记录保留 | 新供应商接口需有界预检，传输/指令/输出预算不变 | 预检后继续120质量/30审核/20首屏/20课堂/1浏览器，实际异常停止；不领取T034
+[2026-09-30T23:04:52] [MVP-0.3-T033] RESUME | executor=Lee | branch=codex/mvp-0.3
+资源120槽/审核30槽已完成，继续浏览器阶段；初次DOM脚本因networkidle等待未满足停下，前4槽与第5启动均零Provider调用的原证据保留 | 本轮schema118/120、发布111/120、审核冻结计分19/20、对照10/10；定位器只读实页检查有效，页面可操作；三浏览器脚本改domcontentloaded并通过Ruff | 已发布3条major问题保留，T033未通过；此次修正只影响测量器启动，不修改业务/模型策略 | 使用独立continued首屏报告接着20首屏/20课堂/1旅程，累计账本不清零，不重跑120/30，不领取T034
+[2026-10-01T09:53:03] [MVP-0.3-T033] RESUME | executor=Lee | branch=codex/mvp-0.3
+首屏前17槽失败保持，Docker健康检查5秒超时、数据库查询延迟；停止后pg_isready恢复成功，继续未发模型请求的18至20槽和课堂/旅程 | 累计1979/2500，实际本轮started调用2条标interrupted且不减请求，原历史started不改；测量器显式resume守卫同run/model及已完成槽位，Ruff通过 | 环境超时不可归因模型；17槽不替换，完整正式验收仍未通过 | 继续同账本剩余槽，新增execution-remaining证据，完成后保存停止，不领取T034
+[2026-10-01T11:06:33] [MVP-0.3-T033] BLOCKED | executor=Lee
+按用户要求续跑而未重跑资源/审核；保存120质量、30审核、20首屏及课堂/旅程尝试，日志中环境恢复/首屏末槽卡死完整保留，现停止 | 首次schema98.33%、发布92.5%未达95%、发布schema100%，人工3条major漏检；审核19/20、对照10/10；首屏20未发布含环境/中断，课堂20发言因真实建场审核失败未执行，旅程首次发布失败；测量器Ruff/diff检查通过，证据docs/acceptance/mvp-0.3-t033-low-full-audit-20260930.md；新增405累计2016/2500、已知1247176token/21次usage未知 | T033验收失败仍blocked，不创建完成提交，T034保持todo；失败不替换、环境失败不可全归因模型 | 等待用户后续修复/复测范围，本轮停止，不push/merge
+[2026-10-01T11:29:43] [MVP-0.3-T033] BLOCKED | executor=Lee
+按用户要求离线归因已有基准并窄修复最终审核模型归属与访客会话并发竞争，未调用Provider | 9个未发布槽分为6个审核8192上限、2个首次生成格式无效、1个修正未过；后端81和前端122单测通过，类型检查/构建及路由模拟E2E通过，lint 0错误/67既有警告，证据docs/acceptance/mvp-0.3-t033-offline-root-cause-20261001.md，累计仍2016/2500 | 3条已发布major漏检、真实首屏/课堂/旅程验收失败；浏览器未见发布与服务端一次约74.1秒落库不一致，缺逐帧证据；T033仍blocked、T034仍todo，不创建完成提交 | 保留原始成绩与工作区成果，后续需基于模型/审核能力及浏览器观测单独决定修复与复测，不自动继续付费基准
+[2026-10-01T12:33:17] [MVP-0.3-T033] BLOCKED | executor=Lee
+按用户要求先执行零调用归档回放与首屏测量器检查，再单独冻结10槽审核诊断输入/哈希和判定；移除可使SSE槽位悬挂的response.finished等待，增加失败阶段、页面路径及API状态记录 | 回放复核120资源、30审核、20首屏原分与9槽6+2+1归因，模拟Chromium成功/拒绝两路径通过；Ruff、编译、JSON和diff检查通过；证据docs/acceptance/mvp-0.3-t033-offline-replay-and-diagnostic-freeze-20261001.md；本轮0 Provider调用，累计2016/2500 | 原3条已发布major问题及正式质量/P95/课堂验收仍未解决；模拟不能解释旧第20槽卡住原因；诊断批次未执行，T033仍blocked、T034仍todo，不创建完成提交 | 后续仅在候选审核修复及实际请求上限独立固定后运行10槽诊断，再决定是否值得独立正式重测；不以小样本替代正式比例或P95
+[2026-10-01T13:05:48] [MVP-0.3-T033] BLOCKED | executor=Lee
+按用户要求仅改T033测试执行器：固定分母最佳可能结果不足阈值即停、10槽诊断首败即停，保存已执行和unattempted槽、停止原因，并以阶段闸门阻断后续付费阶段；独立冻结新执行协议及19文件哈希，旧冻结/成绩不覆盖 | 24项离线边界测试、Ruff、Python编译、diff检查通过；旧111/120质量证据只读演练触发PUBLISHED_BEST_POSSIBLE_BELOW_THRESHOLD，后续4阶段模拟为unattempted；报告docs/acceptance/mvp-0.3-t033-early-stop-implementation-20261001.md，本轮0 Provider请求，累计2016/2500 | 模型内容3条major漏检和正式质量/真实P95验收未解决；10槽诊断及完整正式验收均未执行，T033仍blocked、T034仍todo，不创建完成提交 | 未来执行先核验新协议/代码/账本与独立授权；诊断通过也需另冻正式基准，不自动续费阶段
+[2026-10-01T13:08:20] [MVP-0.3-T033] BLOCKED | executor=Lee
+补充独立协议冻结范围：除原19个文件外再加入Provider工厂、传输、网关、审核上下文/Schema及资源Schema共6个代码哈希；不改旧冻结/旧账本 | 新协议共25文件哈希，SHA256为f3c19d56577ffb582eec0638d354aa3f33d30c5481f05768912bf8f7e275f241，离线协议完整性复核通过；本轮仍0 Provider请求、累计2016/2500 | 前一条日志中的19文件哈希数量已由此记录更正；诊断和正式验收仍未运行，T033仍blocked | 后续按新协议哈希核验后再独立决策调用，不以离线回放或诊断小样本代替正式验收
+[2026-10-01T15:14:38] [MVP-0.3-T033] RESUME | executor=Lee | branch=codex/mvp-0.3
+用户授权候选审核修复及冻结最多10槽诊断，原正式验收失败证据保留 | v6通用核查指令、24项离线测试、Ruff及10份输入哈希核验通过；新协议固定25文件/指令/非密钥配置哈希，累计2016/2500尚未新增调用 | 本轮诊断只能决定后续是否值得小批验证，不替代正式质量/P95验收 | 首败即停运行冻结10槽并保存全部已执行与未运行证据；不自动进入生成或浏览器
+[2026-10-01T15:19:09] [MVP-0.3-T033] BLOCKED | executor=Lee
+候选审核v6完成通用漏检/截断指令修复并单独冻结，诊断第4槽面积分类失败首败即停，未进入后续付费阶段 | 离线24测试/Ruff/编译/diff通过，前3条历史major正确检出，第4条严重错误未报code_safety；新增4次累计2020/2500，6槽unattempted，独立账本halted，报告docs/acceptance/mvp-0.3-t033-review-v6-audit-20261001.md | 长审核截断尚未验证，正式质量/P95/课堂/浏览器仍未通过，T033不完成 | 保留本轮证据；后续若再修复需另冻候选和账本，不自动生成、浏览器或正式验收，不领取T034、不push/merge
+[2026-10-01T15:52:22] [MVP-0.3-T033] RESUME | executor=Lee | branch=codex/mvp-0.3
+用户限定先零调用厘清area语义，再有界测试分类/对照/长审核；确认生产发布只依赖verdict，area参与修正提示与冻结评分，旧标准/成绩不改 | 离线同一reject的fact/code_safety均不发布、冻结得分不同；候选v7 36项测试/Ruff/编译通过，27文件/指令/非密钥配置哈希新协议冻结，累计2020/2500未新增调用 | 本轮诊断最多10次无重试，失败即停并重新评估，不以诊断代正式验收 | 运行新冻结10槽；通过后再单独考虑小批生成与一次真实浏览器流程
+[2026-10-01T15:54:54] [MVP-0.3-T033] BLOCKED | executor=Lee
+零调用厘清area语义后冻结v7通用分类候选；第5槽只报code_safety未报冻结fact，首败即停且不再微调/续费 | 36项离线测试/Ruff/编译/diff通过，前4槽通过、第5槽失败、5槽unattempted；新增5次累计2025/2500，v21账本halted，审计docs/acceptance/mvp-0.3-t033-review-v7-audit-20261001.md | 正确对照/长审核无新证据，正式质量/P95/课堂/浏览器仍未通过；旧成绩和评分未改 | 暂停并离线重新设计交叉类别审核契约，后续决策前不运行生成/浏览器/正式验收，不领取T034、不push/merge
+[2026-10-01T16:12:01] [MVP-0.3-T033] BLOCKED | executor=Lee
+按用户限定仅做离线：形成交叉类别判定提案并拆分检出/分类记录，建立错误检出、正确对照、长审核三组独立执行与正式闸门；另冻未运行3+2槽、最多5次无重试，不改v7或旧评分 | 41项离线测试/Ruff/编译/diff通过，旧v7检出5/5、类别4/5、旧严分4/5；协议FROZEN_NOT_EXECUTABLE、正式闸门关闭；新增Provider 0、累计2025/2500，证据docs/acceptance/mvp-0.3-t033-review-group-protocol-20261001.json及同日proposal/freeze/offline-result | 两组未执行且错误组failed，正式质量/P95/课堂/浏览器仍未通过，T033保持blocked | 保存后停止；未来每个付费组须独立显式启动并新冻运行账本，失败阻止正式验收，不领取T034、不push/merge
+[2026-10-01T19:11:56] [MVP-0.3-T033] RESUME | executor=Lee | branch=codex/mvp-0.3
+用户授权已冻剩余5槽，先显式2长审核、全通过后再显式3正确对照；总最多5次无重试，任一失败即停 | v7/配置/30文件哈希及输入哈希预检匹配，v21历史2025次续记，长审核独立协议上限2和新账本已冻结，尚无新请求 | 旧错误组failed，正式闸门即使本轮全通过仍关闭；不生成/浏览器/正式验收 | 运行长审核并核对输出用量和截断；只有全通过再创建对照组独立协议
+[2026-10-01T19:14:41] [MVP-0.3-T033] BLOCKED | executor=Lee
+按用户限定先运行已冻长审核2槽；第1槽输出8192/8192报INVALID_OUTPUT与OUTPUT_TOKEN_LIMIT，组内首败即停，第2长审核和3正确对照未运行 | v7/配置/30文件及输入哈希预检匹配；实际新增1次累计2026/2500，输入3099/output8192，v22账本halted；证据docs/acceptance/mvp-0.3-t033-review-long-audit-20261001.md及同日长审核原始结果/分组汇总 | 误拒率未测，错误组与长审核组failed，正式闸门关闭；T033不完成 | 本轮停止，不重试、不生成/浏览器/正式验收、不领取T034、不push/merge
+[2026-10-01T19:31:28] [MVP-0.3-T033] BLOCKED | executor=Lee
+按用户限定只做离线审核结束归因：8192总输出的推理/最终正文明细缺失，明确未知；Mock确认系统4492字符、完整schema两份、候选一次；形成none+2048/单schema/简短审核/有界issues及数值观测候选提案，未实施、未冻结，分类暂缓 | 4项定向离线测试、Mock归因断言、Ruff/编译/diff通过，原30文件哈希及v22账本不变；本轮0 Provider请求、累计2026/2500；报告docs/acceptance/mvp-0.3-t033-review-completion-attribution-20261001.md | 不能确定8192组成或截断具体成因；候选效果未验证，T033仍blocked、正式闸门关闭，旧v7/配置/评分不改 | 本轮停止；建议未来候选及观测实施后先离线检查、另冻协议再独立授权最多2条长审核首败即停，不自动生成/浏览器/正式验收、不领取T034、不push/merge
+[2026-10-01T19:40:05] [MVP-0.3-T033] BLOCKED | executor=Lee
+用户授权开始离线实现审核完成观测与独立候选，范围为数值用量/结束信息、单schema/none/2048候选、离线边界检查及新冻结；不调用Provider | 已核对分支codex/mvp-0.3、已有未提交改动和v22累计2026次；保存v7/生产schema/env/账本基线哈希 | 历史截断和质量失败仍未解除，T033保持blocked | 完成候选离线验证与独立冻结后停止，不运行付费诊断或后续阶段
+[2026-10-01T22:11:21] [MVP-0.3-T033] BLOCKED | executor=Lee
+完成离线审核完成观测和独立诊断候选：新请求记录可空推理/正文tokens、正文计数/状态/耗时；候选none+2048/单schema/919字符指令/有界issues/60秒/零重试，最多2槽首败即停，未接入生产 | 最终196项相关离线测试、Ruff、95文件mypy、编译/diff通过；另冻33文件及指令/schema/配置/完整请求哈希，状态FROZEN_NOT_EXECUTABLE，SHA256 066745f0b7bcfae3be316e070e178a99758eb5c1884d4aaf024b6feb4d79a78f；交接docs/acceptance/mvp-0.3-t033-review-completion-implementation-20261001.md；新增0 Provider请求、累计2026/2500 | v7/生产schema/env/v22账本/旧证据不改，8192分量仍未知；真实完成可靠性/none遵从/内容质量未验证，T033保持blocked、正式闸门关闭 | 保存后停止，未来先新授权/ready协议/账本再显式最多2条长审核，不自动对照/生成/浏览器/正式验收、不领取T034、不push/merge、不创建完成提交
+[2026-10-01T23:15:29] [MVP-0.3-T033] BLOCKED | executor=Lee
+用户授权已冻完成候选2条长审核，最多2次、首败即停、零重试；新运行协议和v23续记账本已独立创建，生产v7/low/8192不切换 | 原33文件/指令/schema/完整请求哈希匹配；实际模型deepseek-flash、api.deepseek.com，与候选none/2048/60秒配置一致；累计2026/2500，尚无新请求；仅语法/配置/哈希预检，不启动其他测试 | 正式质量阻塞未解除，T033仍blocked、正式闸门关闭 | 只显式运行已冻2长审核，保存明细/耗时/结构化结果，缺失记未知，更新累计后停止，不进入其他组或生产
+[2026-10-01T23:18:54] [MVP-0.3-T033] BLOCKED | executor=Lee
+按授权显式运行冻结完成候选2条长审核，同模型/原目标，候选none+2048/60秒/单schema/零重试；两条完整返回合法pass且空issues，无截断，未切换生产v7 | 实际新增2次累计2028/2500；输入2432/1866、总输出各22、显式推理各0、正文token未知、正文各73字符，耗时0.954/0.892秒；新v23账本halted，原v22前2026条/冻结/v7/env/schema哈希不变；仅预检与证据核对，没有其他测试；报告docs/acceptance/mvp-0.3-t033-review-completion-real-audit-20261001.md | 仅证明两样本能完成，未验证质量/严重错误召回/P95，不能拼v7成绩；T033仍blocked、正式闸门关闭 | 保存后停止，不继续任何测试/付费组/生成/浏览器/正式验收、不切换生产、不领取T034、不push/merge、不创建完成提交
+[2026-10-02T00:19:07] [MVP-0.3-T033] BLOCKED | executor=Lee
+用户授权只测新完成候选审核正确性，最多8请求；沿用原5错误含3major漏检与3正确对照，固定输入/指令/配置/代码和具体错误判据新协议，v24从v23续记 | 33文件候选哈希与同模型deepseek-flash/api.deepseek.com/none/2048/60秒配置匹配；新包装器Ruff/编译通过，准备阶段0 Provider请求、累计2028/2500 | 本轮错误检出与误拒诊断不改变旧分类/旧严分，不替代正式质量验收；T033仍blocked | 逐条显式请求，错误须人工核对具体机制后才续；首败即停、零重试、最多8次，不自动生产/生成/浏览器/正式验收，完成后停止
+[2026-10-02T00:56:47] [MVP-0.3-T033] BLOCKED | executor=Lee
+新完成候选正确性诊断首槽漏检：malloc失败后main把已有head覆盖为NULL造成链丢失/泄漏，候选返回合法pass/空issues；按首败停止，余4错误+3对照共7槽unattempted，未改指令/配置/生产v7 | 实际新增1次累计2029/2500；输入2083、总输出22、显式推理0、正文token未知、73字符、1.006秒，无截断；v24 halted，原v23前2028条/候选33文件/env/schema哈希不变；包装器Ruff/编译和证据核对通过；报告docs/acceptance/mvp-0.3-t033-candidate-correctness-audit-20261002.md | 检出组未完整比例null，正确对照未测误拒未知；两条长审核完成不代表质量，未拼旧成绩，T033仍blocked、正式闸门关闭 | 保存后停止，不重试/补替/继续其他测试、不微调候选/切换生产、不生成/浏览器/正式验收、不领取T034、不push/merge、不创建完成提交
+[2026-10-02T01:29:09] [MVP-0.3-T033] BLOCKED | executor=Lee
+用户停止全部付费测试、淘汰none+2048候选并不跑余7槽；只形成保留v7+low单次完整上下文、传输schema去重的离线推荐，未实现架构或调提示词，评估拆分须全上下文重复且可能更耗费 | 纯字符串测量：两份schema、传输重复消息591字符，移除仅减少长队列/单链表消息字符6.42%/7.27%；v7具体检出5/5、旧严分4/5不改，8192推理/正文历史明细仍未知；本轮0 Provider调用、累计2029/2500；报告docs/acceptance/mvp-0.3-t033-low-review-options-20261002.md及同日测量/停付费淘汰治理记录 | 省输入不保证省推理或可靠结束；拆分可能把输出上限从8192增至16384，质量/P95未解决，T033仍blocked、正式闸门关闭 | 仅文档/来源哈希核对后停止；旧授权已终止，任何未来调用需新决定；不运行余7槽、不实现/调参/切换生产、不进入其他阶段、不领取T034、不push/merge
+[2026-10-02T01:31:26] [MVP-0.3-T033] BLOCKED | executor=Lee
+离线方案和淘汰/停付费决定已保存，未实现任何新逻辑 | JSON/引用/来源哈希、33原冻结代码、v7/schema/env/旧账本及7槽未运行状态核对通过，git diff --check通过；验证证据docs/acceptance/mvp-0.3-t033-low-plan-offline-verification-20261002.json；新增Provider 0、累计仍2029/2500 | low长审核推理/正文历史消耗仍未知，去重收益仅字符测量，T033保持blocked | 本轮结束并停止，不重启任何付费测试或淘汰候选
+[2026-10-02T02:04:10] [MVP-0.3-T033] BLOCKED | executor=Lee | branch=codex/mvp-0.3
+按用户只实现schema去重并离线验证：诊断可信系统文本/完整schema唯一精确匹配才去重，生产默认关闭；保留原v7/low+8192与完整跨函数上下文，独立冻结最后2长审核→1复杂缺陷→1正确对照，最多4、零重试、首败永久终止路线不微调重测 | 185项相关离线测试（35新增）、Ruff、95文件mypy、36代码哈希/四原输入传输等价/109受保护文件/diff核对通过；重复消息591字符，两长输入仅字符省6.42%/7.27%；本轮Provider 0、累计2029/2500；交接docs/acceptance/mvp-0.3-t033-schema-dedup-offline-20261002.md | 真实输出/结束收益未知，四槽unattempted、FROZEN_NOT_EXECUTABLE；原质量/漏检/P95未解除，T033保持blocked、正式闸门关闭，none+2048仍淘汰 | 保存后停止，未来显式开始才建ready协议/持久计数账本，失败后不再调参或续跑；不生成/浏览器/正式验收、不切生产、不领取T034、不push/merge、不创建完成提交
+[2026-10-02T13:00:13] [MVP-0.3-T033] BLOCKED | executor=Lee | branch=codex/mvp-0.3
+用户明确授权已冻最后4槽去重诊断，严格2长审核/1复杂缺陷/1正确对照、最多4单次请求、零重试、首败永久终止路线；只新增单槽计数/安全原始最终输出证据包装器，未调候选配置 | 原冻结36文件和输入哈希、live同模型deepseek-flash/api.deepseek.com/low+8192核验通过；单槽包装器及候选51项离线测试、Ruff通过；38代码文件/新ready协议/v25续记账本已保存，协议摘要e24005c96d25e672d2c1e9fdff8d842ce91af34c6096cca33b1b7a51d40271a4；尚未真实请求，累计2029/2500 | 正式质量阻塞未解除，T033仍blocked、正式闸门关闭，生产默认不启用去重 | 每次显式只执行下一槽，复杂检错须人工确认；失败后保留未运行槽，不微调/重测，不切生产或自动学习/生成/浏览器/正式验收；本批后停止
+[2026-10-02T13:38:07] [MVP-0.3-T033] BLOCKED | executor=Lee
+按授权严格顺序单槽执行schema去重最后4槽：第1长队列完成，第2单链表8192推理/8192总输出截断，无最终正文；首败永久终止去重配置路线，不微调重测，余复杂缺陷/正确对照unattempted | 实际新增2请求、零重试，累计2031/2500；第1输入2930/output993/reasoning970/5.048秒，第2输入2364/output8192/reasoning8192/40.995秒，两槽正文token未知；总输入5294/output9185/reasoning9162；51离线回归/Ruff/diff通过，38代码/输入/144旧证据及.env哈希不变，v25前2029条等于v24；报告docs/acceptance/mvp-0.3-t033-schema-dedup-real-audit-20261002.md及同日原始最终输出/账本/retired证据 | 检错/误拒未执行且未知，第二槽OUTPUT_TOKEN_LIMIT，结果STOPPED/retired、v25 halted，T033仍blocked、正式闸门关闭，生产/旧评分未改 | 保存后停止，不执行余槽、不微调/重测/切生产，不学习流程/生成/浏览器/正式验收、不领取T034、不push/merge、不创建完成提交
+[2026-10-02T15:21:59] [MVP-0.3-T033] BLOCKED | executor=Lee | branch=codex/mvp-0.3
+仅形成ADR-0006决策提案：推荐独立审核模型候选Qwen3.8-Max的A1隔离接入/离线验证；备选人工审核课程目录版B仅规划，未实施/切生产/调当前配置/扩大输出预算 | 官方模型与参数文档、引用/算术/255生产及旧证据哈希/diff和独立读者审核通过；本轮Provider 0、累计2031/2500；提案docs/ADR/0006-review-model-or-curated-scope-proposal.md，证据docs/acceptance/mvp-0.3-t033-review-model-decision-offline-20261002.json | 候选项目质量与账号可用性未验证，原正式失败未解除，T033仍blocked、正式闸门关闭，两淘汰路线不恢复 | 等待用户选择A1或B；任何未来真实请求/生产例外/范围变更另行决定，本轮保存后停止，不领取T034、不push/merge、不创建完成提交
+[2026-10-02T15:30:06] [MVP-0.3-T033] BLOCKED | executor=Lee | branch=codex/mvp-0.3
+用户选择A1与qwen3.8-max-0902，只授权隔离适配器/审核路由离线验证与候选冻结；不改生产工厂/env/v7或原验收口径 | 已读取AGENTS/PRD/任务/日志/Git，保存本轮生产及旧证据哈希基线；尚无新增Provider，累计2031/2500 | 原正式质量/P95阻塞仍在，T033不恢复为in_progress；生产双目标例外和真实请求均未授权 | 完成有界思考/总输出/严格schema/三种审核失败关闭离线验证，单独冻结不可执行候选后停止
+[2026-10-02T16:26:01] [MVP-0.3-T033] BLOCKED | executor=Lee | branch=codex/mvp-0.3
+完成用户批准A1/qwen3.8-max-0902的隔离适配器/审核路由，仅Mock离线接入；生产工厂/env/v7/原schema不改，4096思考/8182含推理输出请求限制+10余量/180秒/零重试，无审核回退，其他档位和纠错原网关 | 273相关离线测试/Ruff/97文件mypy/编译/diff通过；三原审核消费者失败关闭、完整跨函数输入、用量未知与预算边界验证；250生产及旧证据文件不变；另冻128代码/指令/schema/配置/8完整请求，SHA256 1b4990d7b589ca3f399d4433c78e16b71acbc2fe85ea923e1d6e2308336bfccb，FROZEN_NOT_EXECUTABLE且全unattempted；新增Provider 0、累计2031/2500，证据docs/acceptance/mvp-0.3-t033-qwen-a1-offline-result-20261002.json，交接docs/ADR/0006-a1-offline-review-candidate.md | 账户/参数组合/真实检错质量未验证，原正式质量与P95阻塞未解除，T033仍blocked、正式闸门关闭；生产双目标例外未批准 | 本轮停止，A2真实请求及外发地域/独立凭据另行授权并新建READY协议/持久账本；不自动生成/浏览器/正式验收、不切生产、不领取T034、不push/merge、不创建T033完成提交
+[2026-10-02T17:31:18] [MVP-0.3-T033] BLOCKED | executor=Lee | branch=codex/mvp-0.3
+用户yes明确授权A2百炼北京/qwen3.8-max-0902已冻8槽，最多8、零重试、首败淘汰、不切生产或后续阶段；本地主.env已由用户配置为百炼北京业务空间/Qwen，凭据只用于隔离审核，不构造默认生成网关；因实际域名不同于A1占位域名另冻目标及READY协议/v26账本，旧冻结原样保留 | 124项定向离线测试/Ruff/编译/diff通过，原128代码与全部来源匹配、262旧文件及.env不变；130文件的新执行闭包冻结，持久计数在HTTP派发边界，8槽/累计2039硬限制，无额外探针；当前新增0，累计2031/2500 | 账户/远端参数组合仍未调用核验，原正式质量/P95阻塞未解除，T033仍blocked、正式闸门关闭；生产双目标例外未批准 | 每次显式仅执行下一槽，错误样本人工确认机制再推进；任何失败保存全部证据/unattempted并停止，至多8次后停止
+[2026-10-02T17:32:02] [MVP-0.3-T033] BLOCKED | executor=Lee
+更正上一条准备日志的离线测试数量：实际为122项，不是124项，不修改历史记录 | pytest实际输出122 passed in 3.13s，Ruff/编译/diff通过；目前仍0新增Provider、2031/2500 | 真实候选审核尚未执行，正式闸门关闭 | 按已批准冻结顺序仅执行第1槽，首败停止
+[2026-10-02T18:11:14] [MVP-0.3-T033] BLOCKED | executor=Lee
+A2按授权首槽qwen3.8-max-0902返回合法pass但漏检malloc失败后main覆盖head导致丢链/泄漏，首败停止并淘汰冻结候选，余4错误/2长审核/1正确对照共7槽unattempted，不微调重测；旧v7/评分/冻结不改 | 实际新增1次零重试，累计2032/2500；输入2559/output1389/reasoning1369/正文token未知/68字符，34.960303秒，HTTP200/stop，无截断；运行前122离线测试/Ruff/编译通过，运行后0调用核验130代码/8来源/262旧生产历史与.env哈希不变、v26前2031条等于v25；报告docs/acceptance/mvp-0.3-t033-qwen-a2-real-audit-20261002.md及原始最终输出/账本/retired/run-verification | 长审核与误拒未测，候选不能作为质量通过，T033仍blocked、正式闸门关闭；用户已改env而执行器未改/未切生产，无生成网关启动 | 保存后停止，不跑剩余槽、不调参重测/扩大输出，不生成/浏览器/正式验收，不领取T034，不push/merge，不创建完成提交
+[2026-10-02T18:59:55] [MVP-0.3-T033] BLOCKED | executor=Lee | branch=codex/mvp-0.3
+用户另行授权qwen3.8-max-0902原main/head漏检槽单次复测，最多1次零重试，不运行余7槽，不恢复已淘汰路线；新单槽执行包装器复用旧HTTP/用量/语义引擎，v7/配置/原输入不改 | 36项离线测试、Ruff/编译/diff通过，441保护文件未变；新协议/132代码哈希/v27续账本已保存；当前新增0、累计2032/2500 | 仅重复性诊断，原正式失败和T033 blocked保持、正式闸门关闭 | 显式执行一次；原始结论/数值用量保存，具体机制离线核对，之后停止，不切生产/生成/浏览器/正式验收
+[2026-10-02T19:02:18] [MVP-0.3-T033] BLOCKED | executor=Lee
+按用户新的单次授权原样复测qwen3.8-max-0902/main-head，合法pass/空issues再次漏检malloc失败后main丢失已有链；只此1次零重试，旧路线仍retired，余7槽不跑，旧成绩不改 | 输入2559/output1334/reasoning1314/正文token未知/68字符，30.649966秒，HTTP200/stop，无截断；累计2033/2500。36离线测试/Ruff/编译通过，441保护/132冻结代码哈希不变，v27前2032条等于v26；运行后0调用核验，审计docs/acceptance/mvp-0.3-t033-qwen-repeat-audit-20261002.json及单槽原始最终输出/协议/账本保存 | 长审核/误拒未测、单槽重复不代表整体比例，T033 blocked、正式闸门关闭，B仅讨论未批准实施 | 本轮停止，不再付费/调参/重测，不生成/浏览器/正式验收/切生产，不领取T034，不push/merge，不创建完成提交
+[2026-10-02T20:08:13] [MVP-0.3-T036] START | executor=Lee | branch=codex/mvp-0.3
+用户执行B批准既定课程目录范围，先同步治理与单行为任务；不另写长提案 | 已读PRD/任务/历史日志/Git；Provider新增0累计2033/2500 | 原T033仍blocked，既有未提交改动保留，正式课程须实际人工签核 | 完成简短PRD增补/ADR与任务验证后本地治理提交，再串行实施
+[2026-10-02T20:08:41] [MVP-0.3-T036] VERIFIED | executor=Lee
+完成简短PRD v2.2增补/Accepted ADR-0007/目录实施任务，保留原T034定义与T033失败 | python3 scripts/check_catalog_workflow.py和git diff --check通过，新增Provider 0累计2033/2500 | 功能尚未实施，内容须实际人工签核 | 本地范围提交后领取T037，逐项测试提交；不push/merge
+[2026-10-02T20:09:24] [MVP-0.3-T037] START | executor=Lee | branch=codex/mvp-0.3
+建立课程包校验/人工来源/批准与撤回，不修改模型审核链 | T036完成提交9003864；本轮Provider 0 | 固定内容尚未人工签核 | 实现迁移与受信发布服务，先离线再隔离数据库验证
+[2026-10-02T20:17:28] [MVP-0.3-T037] VERIFIED | executor=Lee
+实现数据包完整性/人工签核digest校验、独立CatalogRelease发布/撤回、curated资源及单元FK来源、只读来源门禁；旧模型发布不改 | 25离线测试/Ruff/4文件mypy通过；独立PostgreSQL新库迁移0016/0017，2数据库测试通过；初次篡改测试被旧不可变约束拒绝，改为明确断言该拒绝；Provider 0累计2033/2500 | 真实课程尚无人工批准，不发布 | 提交后领取T038，准备10节点课程候选与受限C验证；人工签核在最终T046
+[2026-10-02T20:18:24] [MVP-0.3-T038] START | executor=Lee | branch=codex/mvp-0.3
+准备10节点原创候选课程，保持待人工审核；不复用旧模型错误候选 | T037完成ad6966a，Provider 0 | 不代用户签核、不发布课程 | 写完整C示例/边界断言/固定唯一答案题与预设脚本，schema/hash与受限运行验证
+[2026-10-02T20:26:18] [MVP-0.3-T038] VERIFIED | executor=Lee
+完成10节点原创候选包/30资源30题/1脚本及2模板引用，真实审核人仍null | 30项离线/真实容器测试通过，19 C运行含9分配失败注入，固定本地编译镜像/禁网/只读/低权限/ASan/UBSan；初次tmpfs noexec测试环境失败保留，修正tmpfs后完整重跑；Ruff/diff通过；Provider 0累计2033/2500 | 只证明自动检查；正式发布待T046用户签核，不能算人工通过 | 提交后实施T039无模型目录学习入口，使用明确TEST_ONLY批准夹具验开发行为
+[2026-10-02T20:30:42] [MVP-0.3-T039] START | executor=Lee | branch=codex/mvp-0.3
+接入固定node/版本目录与owner资源快照，原子幂等及答案隐藏 | T038完成194f227，Provider 0累计2033/2500 | 实际课程尚未签核，仅TEST_ONLY夹具验证 | 实现REST后运行实际数据库与安全回归
+[2026-10-02T21:00:29] [MVP-0.3-T039] VERIFIED | executor=Lee
+目录REST与固定owner资源/路径原子快照接入；版本锁定，无自由目标/Provider依赖，契约同步 | 实际数据库REST复合场景1 passed，Ruff/2文件mypy/workflow/diff通过；初次字段及测试包长度修正后复验；Provider 0累计2033/2500 | 正式包待人工签核，练习审核资格/去重下一任务实现 | 提交后T040服务端关闭动态入口
+[2026-10-02T21:01:11] [MVP-0.3-T039] VERIFIED | executor=Lee
+更正：99aebd6中REST实现与测试已通过，但契约生成误用系统Python缺少FastAPI，未更新契约；本条不覆盖历史 | 改用backend虚拟环境生成目录两端点与请求schema并实际解析验证通过，git diff --check通过，Provider 0 | 契约补充单独提交，不amend | 完成契约提交再开始T040
+[2026-10-02T21:01:45] [MVP-0.3-T040] START | executor=Lee | branch=codex/mvp-0.3
+目录版关闭动态入口与画像模型更新，模式默认catalog_only | T039契约补充ed13e27完成；Provider 0 | 旧模型WIP保留不纳入提交 | 模式门禁/历史资源过滤/离线HTTP失败关闭验证
+[2026-10-02T21:25:34] [MVP-0.3-T040] VERIFIED | executor=Lee
+默认catalog_only/无效值关闭，动态入口在Provider依赖前拒绝，Provider工厂也关闭，行为画像更新退出，旧generated资源不作为目录内容 | 8隔离DB/HTTP/门禁测试与显式dynamic的3mock回归通过，Ruff/5文件mypy/OpenAPI解析/workflow/diff通过；Provider 0累计2033/2500 | 导出/动画旧资源资格由T044补齐；生产候选未人工签核 | 本地只暂存新增模式guard，旧T033工厂参数WIP不纳入；之后T041固定题掌握度去重
+[2026-10-02T21:25:56] [MVP-0.3-T041] START | executor=Lee | branch=codex/mvp-0.3
+固定题服务端资格/评分与重复练习掌握度去重 | T040完成5729a3f，Provider 0 | 重复答题不得伪造新独立能力证据 | 保留旧公式/历史，新增目录事实资格和真实DB回归
+[2026-10-02T21:32:48] [MVP-0.3-T041] VERIFIED | executor=Lee
+curated题集人工来源资格/版本/撤回服务端计分，独立目录题集资格阻止重复与重开刷分，错题/回执保留，原mastery-v1不改 | 最终29实际PG/旧mock回归通过，Ruff/4文件mypy/diff通过；首轮新增早锁触发旧竞态屏障超时，调整锁顺序并复读原回执后完整复验；Provider 0累计2033/2500 | 正式课程待人工审核，完成题集≠掌握 | 本地提交后T042预设演示与返回点
+[2026-10-02T21:33:13] [MVP-0.3-T042] START | executor=Lee | branch=codex/mvp-0.3
+固定脚本使用已批准release，持久返回点复用课堂detour/控制回执，不伪造动态DebateResult | T041完成3969d12，Provider 0 | 原模型辩论证据保留 | 预设开始/读取/退出与owner/revision/重放/撤回验证
+[2026-10-03T00:33:16] [MVP-0.3-T042] VERIFIED | executor=Lee
+批准脚本独立目录REST，明确preset，复用课堂detour/control不可变回执，持久暂停/场景/进度/资源返回点；课堂读取/创建加课程撤回门禁 | 12目录实际DB/REST、21旧mock课堂回归通过，Ruff/3文件mypy/契约JSON/diff通过；Provider 0累计2033/2500 | 预设不是动态AI总结；正式内容待签核 | 提交后T043前端目录学习与动画/进度
+[2026-10-03T00:33:46] [MVP-0.3-T043] START | executor=Lee | branch=codex/mvp-0.3
+建立目录版入口/固定练习/动画/路径/预设演示，无自由AI交互 | T042完成6a8794d，Provider 0 | App.vue有旧T033 WIP，采用运行范围wrapper避免覆盖 | 组件/API测试、类型lint构建，真实浏览器留T045
+[2026-10-03T00:47:15] [MVP-0.3-T043] VERIFIED | executor=Lee
+范围先读的ProductApp与课程目录入口，固定正文/C步骤/输出/练习、路径、动画、笔记按钮与明确预设演示，owner缓存/返回tab恢复及重复证据提示，旧App.vue WIP保留 | 132前端测试/类型/构建通过，lint 0 errors+既有67 warnings，新文件定向eslint通过；来源字段5实际DB/REST回归/Ruff/diff通过；Provider 0累计2033/2500 | 真浏览器/Worker/首屏独立测试T045，人工签核前课程not_ready | 本地提交后T044导出真实来源及动画撤回门禁
+[2026-10-03T00:48:00] [MVP-0.3-T044] START | executor=Lee | branch=codex/mvp-0.3
+目录笔记/错题/预设演示来源、动画与媒体撤回资格 | T043完成9aa2d48，Provider 0 | 旧模型/媒体证据不改，不伪造新人工签核 | owner/来源/撤回/导出格式实际DB回归
+[2026-10-03T12:42:29] [MVP-0.3-T044] VERIFIED | executor=Lee
+目录笔记人工来源/摘要/错题/已查看预设，动画请求/回执/事件/媒体与迟到发布校验批准版本；共享媒体仍按有效本人绑定授权 | 23实际PG/HTTP及旧mock回归通过/3未启用Docker跳过，最终目录1复验通过；Ruff/7文件mypy/契约/diff通过；初次转义/mock参数与内部事件误拦失败保留，修正后完整复验；Provider 0累计2033/2500 | 真Worker/浏览器T045，正式签核T046 | 本地提交后独立冻结目录测试协议
+[2026-10-03T12:43:10] [MVP-0.3-T045] START | executor=Lee | branch=codex/mvp-0.3
+冻结独立目录工程验收，专用隔离DB/真实Worker/浏览器/固定20首屏与动画矩阵 | T044完成84a16a6，Provider 0累计2033/2500 | TEST_ONLY批准仅测试用途，实际内容待T046 | 先协议代码哈希再执行，不拼旧成绩
+[2026-10-03T14:55:23] [MVP-0.3-T045] VERIFIED | executor=Lee
+独立目录质量/性能/实际核心旅程通过，修复前端未读错误响应；冻结组件与失败证据分开保存，不改旧T033 | 质量100/100，首屏20/20，缓存100/100，真实渲染20/20，核心10节点/30资源/30题/2额外Worker；HTTP/DOM/缓存/渲染P95为0.107111/0.959118/0.1506/8.0897秒；135前端/6离线闸门/typebuild/Ruff/定向lint通过；Provider 0累计2033/2500 | 仅TEST_ONLY批准/本机单并发冻结工作树，T033blocked，正式内容待人签核；旧失败全保留 | 本地提交后T046准备可审阅内容及发布预检，待实际人签核后才能退出；交接docs/acceptance/mvp-0.3-catalog-engineering-20261003.md
+[2026-10-03T14:57:30] [MVP-0.3-T046] START | executor=Lee | branch=codex/mvp-0.3
+准备人工内容签核和可发布状态核验 | T045完成05d5f87，独立工程组件全部通过；Provider 0 | 人工内容审核不得由AI伪签 | 展示完整候选/摘要，验证签核前失败关闭
+[2026-10-03T14:57:30] [MVP-0.3-T046] BLOCKED | executor=Lee
+具体课程人工批准尚未到，保留pending及无正式发布；可审阅HTML/本地只读预览/离线发布预检准备完成 | 2离线预检测试/Ruff通过；Chromium11节/30答案/桌面手机无溢出；python3发布预检退出2、publishable=false为预期阻塞；Provider 0累计2033/2500 | 用户须实际审阅并签核92bb0dd4778391e23aae978b8a411b466d8b5988d1cff61cff01654604af21a1，不能用TEST_ONLY或工程测试替代 | 审阅docs/acceptance/catalog-course-review-20261003.html后批准具体digest或反馈；获批再受信登记/核验并T034退出，不部署或跨阶段
+[2026-10-03T15:30:26] [MVP-0.3-T046] RESUME | executor=Lee | branch=codex/mvp-0.3
+用户明确实际审阅并由Lee签核linear-course v0.1.0及92bb0dd4778391e23aae978b8a411b466d8b5988d1cff61cff01654604af21a1；独立签核/受信allowlist不覆盖原pending快照 | 签核schema/hash一致，Provider 0累计2033/2500 | 不部署/push/merge，T033状态成绩不改 | 隔离测试库核验真实批准版本登记/核心旅程/撤回后本地完成提交
+[2026-10-03T15:38:59] [MVP-0.3-T046] VERIFIED | executor=Lee
+内容签核人Lee（用户明确实际审阅）；独立批准记录及受信allowlist，实际批准版本仅隔离测试库登记/撤回 | v3实际PG/HTTPS6通过，16离线通过/19Docker项未启用跳过，Ruff及T045冻结/保护hash通过；v1/v2测试契约误判失败证据保留；Provider 0累计2033/2500 | T033旧状态成绩完全不变，未部署/push/merge；原pending历史快照保留 | 本地完成提交后停止，T034仍todo；交接docs/acceptance/mvp-0.3-catalog-signed-handoff-20261003.md
+[2026-10-03T15:45:19] [MVP-0.3-T034] START | executor=Lee | branch=codex/mvp-0.3
+核对目录版依赖/完成提交/课程签核/固定验收证据并同步README、部署和已知限制 | 直接依赖T032/T045/T046均done有完成标记；Provider授权0，累计2033/2500 | 原T033 blocked及工作树遗留改动不纳入本次提交；不重跑完整基准或部署 | 补必要离线一致性检查，形成退出报告，本地完成提交后停止，不归档/进入Phase1
+[2026-10-03T15:52:48] [MVP-0.3-T034] VERIFIED | executor=Lee
+课程目录版阶段退出；核对44个前置done完成提交、直接依赖/实际Lee签核/不可变来源，同步README部署ADR及已知限制 | 11离线测试/Ruff/依赖/文档引用/hash/diff通过，复用T045质量100/100、首屏20/20、缓存100/100、新渲染20/20及T046签核v3，不重跑基准；235旧文件hash/T033任务不变，Provider0累计2033/2500 | T033 blocked、动态生成/重解释/实时AI暂缓；冻结工作树非洁净checkout/公网背书，旧未提交改动保留；未部署/push/merge | 本地完成提交后停止，45done/1blocked，账本保留不归档/Phase1；退出报告docs/acceptance/mvp-0.3-catalog-exit-20261003.md
+[2026-10-03T16:20:23] [WORKFLOW-LEGACY-CLEANUP] START | executor=Lee | branch=codex/mvp-0.3
+按用户授权整理236个遗留文件：通用修复/实验代码/失败证据分别保存；当前分支仅交付修复、实验与证据保存本地归档分支 | 两通用修复从HEAD独立提取，5后端/15前端测试及typecheck/ESLint/Ruff通过；凭据比对0命中 | 旧冻结hash要求原路径保留，暂不清理工作树；T033仍blocked累计2033/2500 | 先本地交付修复，再归档实验及失败证据，最后清单/哈希核验；不Provider/push/merge/部署
+[2026-10-03T16:30:21] [WORKFLOW-LEGACY-CLEANUP] VERIFIED | executor=Lee
+交付e1e6052仅共享会话/最终审核归属修复；本地代码归档29d5bf5（64文件）与证据归档588f5dc（169份），独立临时index保存，当前分支未切换/未合并 | 236原始文件与Git归档逐字节hash一致；独立HEAD+修复快照5后端/42前端及typecheck/ESLint/Ruff通过；临时快照缺旧离线SSE夹具初败保留，补精确已提交夹具后4通过；旧目录退出235保护hash通过，Provider0累计2033/2500 | T033仍blocked/任务账本不变；原实验文件与证据路径留工作区满足旧冻结核验，不宣称工作树已清洁；真实env/媒体未入Git | 本地保存清单/核验后停止，不push/merge/部署/运行退役诊断；交接docs/maintenance/legacy-worktree-cleanup-20261003.md
+[2026-10-03T16:52:13] [WORKFLOW-CLEAN-CHECKOUT] START | executor=Lee | branch=codex/mvp-0.3
+用户授权验证已提交版本；固定c7831d1独立干净checkout，未带env/实验/原依赖目录 | 锁文件离线新安装及逐字节源码快照协议先保存 | 不Provider/部署/push/merge，不修改开发数据库；T033blocked | 安装/构建/离线/新库/实际构建产物浏览器冒烟，保存失败及结果
+[2026-10-03T16:52:13] [WORKFLOW-CLEAN-CHECKOUT] VERIFIED | executor=Lee
+提交c7831d1目录版新环境安装/构建/运行通过，566跟踪文件hash及Git clean；新建隔离库、真实Lee签核仅测试登记，源工作区实验保留 | 136前端、84后端离线/21跳过、14DB通过（套件有重叠），0017迁移/Ruff/ESLint0errors67warnings/45完成提交/精确签核/真实构建UI闭环通过；Provider0累计2033/2500；探测v1/v2系统代理502及旧退出脚本缺env失败全保留，执行器直连修正v3通过 | 无新Manim/媒体性能矩阵/部署镜像或公网验证；旧冻结核验只适用原工作树；T033blocked | 仅本地提交新证据/部署说明/日志后停止；交接docs/acceptance/mvp-0.3-clean-checkout-20261003.md，独立checkout保留且测试服务已关闭
+[2026-10-03T17:09:00] [WORKFLOW-CATALOG-PR] START | executor=Lee | branch=codex/mvp-0.3-release
+用户授权更新远程基线、审查目录版差异并提PR，通过后合并；独立干净工作区基于3a2155b接入origin/main=4bbded9（3个合并提交） | 合并83d9a93无冲突、源码树与3a2155b逐文件相同；原实验工作区与c783验证checkout保留 | T033blocked/累计2033/2500、归档64代码/169证据不入PR、不Provider/部署 | 最终差异审查及必要离线回归、修正文档入口、保存审查证据后推送PR并核对闸门再合并
+[2026-10-03T17:27:43] [WORKFLOW-CATALOG-PR] VERIFIED | executor=Lee
+最新main=4bbded9已接入；目录安全/签核/权限/去重/撤回/前端/模板/依赖最终差异自查通过，修正4个旧工厂测试前提/OpenAPI未解析schema和operationId/README检查入口，不改运行代码 | 548后端通过177跳过、136前端/typebuild/Ruff/ESLint0errors67warnings/任务签核通过；174运行文件等于c783，复用14DB/构建UI有效证据；首轮4失败及第二轮1失败保存，Provider0累计2033/2500；52新增实验/12已有交付版本/169证据排除/归档非祖先 | T033blocked/旧成绩hash不改；本地自查非独立GitHub批准，main要求1审核及最后推送他人批准 | 本地提交本轮修复/审查后推送PR；仅满足远端审核闸门后普通合并，不绕过规则；交接docs/acceptance/mvp-0.3-pr-review-20261003.md
+[2026-10-03T17:57:59] [WORKFLOW-CATALOG-PR] BLOCKED | executor=Lee
+目录PR #4已推送codex/mvp-0.3-release并附加当前聊天，普通merge commit绑定78e7a32尝试被GitHub main规则集24072571拦截 | 本地548后端/136前端及构建lint通过、原236文件归档hash不变；远端MERGEABLE/REVIEW_REQUIRED/无reviews，无CI checks不能称通过 | main要求1个独立批准和最后推送他人批准，auto_merge=false；未管理员绕过或改规则；T033blocked/累计2033/2500不变 | 等待他人GitHub批准或用户明确授权仅本次管理员合并；PR https://github.com/LeeApir/EduMind-Agent/pull/4，证据docs/acceptance/mvp-0.3-pr-remote-gate-20261003.json；不Provider/部署/实验归档推送
+[2026-10-03T21:08:22] [WORKFLOW-ACCEPTANCE-MATERIALS] START | executor=Lee | branch=codex/mvp-0.3-release
+用户授权只保留必要报告，其余移入本地材料；254原件先备份并逐文件核对，另保存169份未上传T033证据 | 15报告/签核保留，239移出验收目录，其中14工具/4原样夹具迁入回归目录；旧成绩/协议/任务不改，Provider0累计2033/2500 | 原T033路径为旧冻结核验暂留，实验归档不推送；PR仍等他人批准 | 补全量离线回归及引用/哈希自查，维护提交后更新已有PR，不管理员绕过或自动合并
+[2026-10-03T21:46:25] [WORKFLOW-ACCEPTANCE-MATERIALS] VERIFIED | executor=Lee
+254验收原件＋169未上传T033证据保存在local-materials/acceptance-20261003；Git验收目录保留15报告/签核及索引，239移出（14工具/4原样夹具保留回归目录，其余221本地），当前文件树精简、历史不重写 | 440原件SHA逐字节一致，4夹具原样/14工具AST仅导入排序/74链接通过；548后端通过177跳过、136前端/Ruff/签核/工作流通过；原236遗留核验仍通过，生产/签核/任务不变，Provider0累计2033/2500；首次lint/缓存计数失败留本地 | T033blocked；原冻结路径保留，不重跑完整基准/数据库/浏览器/媒体；远端main4bbded9与PR2537e4c无更新，无独立批准/无CI | 本地维护提交后更新PR #4；遵守用户决定等待他人GitHub批准，不管理员绕过、merge或部署；入口docs/acceptance/README.md，本地manifest及checks/

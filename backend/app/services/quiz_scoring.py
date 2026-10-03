@@ -8,6 +8,7 @@ from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.agents.learning_resource_schema import RESOURCE_PROMPT_VERSION
+from app.models.learning import GeneratedResource
 from app.services.owned_learning import published_resource
 
 QUIZ_SCHEMA_VERSION: Final = 1
@@ -19,6 +20,16 @@ class QuizScoringError(ValueError):
 
     def __init__(self) -> None:
         super().__init__("Quiz submission does not match a published exercise.")
+
+
+def exercise_is_qualified(resource: GeneratedResource) -> bool:
+    metadata = resource.generation_metadata
+    if not isinstance(metadata, dict):
+        return False
+    if resource.origin_type == "curated":
+        return metadata.get("content_schema_version") == "catalog-content-v1"
+    return (resource.origin_type == "generated"
+            and metadata.get("prompt_version") == RESOURCE_PROMPT_VERSION)
 
 
 @dataclass(frozen=True, slots=True)
@@ -159,8 +170,7 @@ async def score_published_exercise(
         resource is None
         or resource.resource_type != "exercise"
         or resource.version != resource_version
-        or not isinstance(resource.generation_metadata, dict)
-        or resource.generation_metadata.get("prompt_version") != RESOURCE_PROMPT_VERSION
+        or not exercise_is_qualified(resource)
     ):
         raise QuizScoringError
     return score_exercise_content(

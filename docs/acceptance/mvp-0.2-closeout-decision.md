@@ -1,5 +1,7 @@
 # MVP 0.2 收尾决定（2026-09-27）
 
+> 2026-10-03 整理：下列本地材料路径沿用原仓库相对路径；读取及历史恢复方式见[材料索引](README.md)。旧指标、失败与判定不变。
+
 结论：MVP 0.2 的 PRD 学习闭环退出验收通过；T032 按用户批准的范围调整结题。
 独立教学正文首 token ≤2 秒仍未达标，转为后续优化项，不再阻塞本阶段收尾。
 这不是一次新的性能通过报告，也不表示旧冻结综合 gate 通过。
@@ -13,10 +15,10 @@
 
 [PRD](../PRD.md) §8.1 的 HTTP 首字节 ≤2 秒、可学习首段 ≤10 秒不变；§9.1 的 MVP 0.2
 退出条件仍是“输入→学习→练习→掌握度更新→下一步推荐”，未修改 PRD。
-[ADR-0002](../adr/0002-streaming-first-screen-and-resource-review.md):61 曾将有效 token 到达命名为 TTFB，整体仍 Proposed。
+[ADR-0002](../ADR/0002-streaming-first-screen-and-resource-review.md):61 曾将有效 token 到达命名为 TTFB，整体仍 Proposed。
 原计划记录的首次“同意”确认段落规则、起点和预算，不足以证明独立批准新的阶段退出条款。
-[T033口径纠正](mvp-0.2-t033-nonbillable-diagnosis.md)后保留该历史内容门槛，
-[v2计划](mvp-0.2-t032-retest-plan-v2.md):25及本轮执行授权将其作为附加门槛审计。
+T033口径纠正（本地材料 `docs/acceptance/mvp-0.2-t033-nonbillable-diagnosis.md`）后保留该历史内容门槛，
+v2计划（本地材料 `docs/acceptance/mvp-0.2-t032-retest-plan-v2.md`）:25及本轮执行授权将其作为附加门槛审计。
 此次是采样结束后的治理决定：不改采样前冻结文件、不改原始结果、不重新计算一个“通过”gate，
 也不批准 ADR 其他待决项。
 
@@ -40,9 +42,9 @@ T025质量v11/闭环v10及T031真实浏览器闭环是 Pro 的历史验证；T03
 
 以下证据全部不变：T032旧20样本及其失败报告、T035三诊断原始证据、
 T038 frozen-plan/raw/ledger/decisions/audit/formal-retest。
-[正式复测报告](mvp-0.2-t038-formal-retest.md)、[原始指标](mvp-0.2-t038-raw.json)、
-[尝试账本](mvp-0.2-t038-ledger.json)、[语义评审](mvp-0.2-t038-decisions.json)、
-[原始审计](mvp-0.2-t038-audit.json)可独立查阅。
+正式复测报告（本地材料 `docs/acceptance/mvp-0.2-t038-formal-retest.md`）、原始指标（本地材料 `docs/acceptance/mvp-0.2-t038-raw.json`）、
+尝试账本（本地材料 `docs/acceptance/mvp-0.2-t038-ledger.json`）、语义评审（本地材料 `docs/acceptance/mvp-0.2-t038-decisions.json`）、
+原始审计（本地材料 `docs/acceptance/mvp-0.2-t038-audit.json`）可独立查阅。
 T038四个JSON SHA256与采样提交cc70532一致：
 
 - raw：71b0919eef6713eece5e3526c6aea3e96d833f6e3c262eea4c3071596d1f1a84

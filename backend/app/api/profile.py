@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.agents.profile_agent import StructuredProfileGateway
 from app.agents.profile_events import ProfileEventSchemaError
+from app.agents.profile_schema import ProfileSchemaError
 from app.core.auth import AuthenticatedSession, AuthFailure, require_authenticated_session
 from app.core.database import database_session_factory
 from app.models.learning import StudentProfile
@@ -36,6 +37,7 @@ class ProfileCorrectionRequest(BaseModel):
     learning_goals: dict[str, object] | None = None
     error_preferences: list[object] | None = None
     engineering_preference: dict[str, object] | None = None
+    cognitive_style: dict[str, object] | None = None
 
 
 class ProfileEventRequest(BaseModel):
@@ -139,6 +141,8 @@ async def correct_my_profile(
             raise AuthFailure(
                 409, "PROFILE_VERSION_CONFLICT", "Profile version no longer matches."
             ) from None
+        except ProfileSchemaError:
+            raise AuthFailure(422, "VALIDATION_ERROR", "Profile correction is invalid.") from None
     return profile_payload(profile)
 
 

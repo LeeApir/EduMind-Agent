@@ -3,6 +3,7 @@ import { computed, onMounted, ref } from "vue";
 import { NButton, NInput, NTag } from "naive-ui";
 
 import { LearningRequestError, startLearningSession, type LearningEvent } from "./api/learningSessions";
+import { ensureProfileSession } from "./api/profile";
 import LearningProgressPanel, {
   type PublishedResource,
   type ReviewState,
@@ -10,6 +11,12 @@ import LearningProgressPanel, {
 import ProfileCard from "./components/ProfileCard.vue";
 import PublishedLearningWorkspace from "./components/PublishedLearningWorkspace.vue";
 import LearningPathPanel from "./components/LearningPathPanel.vue";
+import AnimationPanel from "./components/AnimationPanel.vue";
+import ClassroomPanel from "./components/ClassroomPanel.vue";
+import DebatePanel from "./components/DebatePanel.vue";
+import LearningControlsPanel from "./components/LearningControlsPanel.vue";
+import NotesDownload from "./components/NotesDownload.vue";
+import { ClassroomSpeechError, controlClassroom, loadClassroom, type LearningResourceType } from "./api/classroom";
 
 type StartLearningRequest = (goal: string) => Promise<void>;
 
@@ -19,12 +26,23 @@ interface Resource extends PublishedResource {
 }
 
 interface LearningUnitPayload {
-  scenes: Array<{ resources: Resource[] }>;
+  scenes: Array<{
+    id?: string;
+    scene_key?: string;
+    version?: number;
+    is_current?: boolean;
+    resources: Resource[];
+  }>;
+  knowledge_node_id?: string | null;
   path_target_node_id?: string | null;
 }
 
-interface SessionPayload {
-  csrf_token: string;
+interface SceneVersion {
+  id: string;
+  sceneKey: string;
+  version: number;
+  isCurrent: boolean;
+  resources: Resource[];
 }
 
 const props = defineProps<{ startLearningRequest?: StartLearningRequest }>();
@@ -34,8 +52,12 @@ const requestState = ref<"idle" | "loading" | "error">("idle");
 const requestError = ref("");
 const temporaryText = ref("");
 const reviewState = ref<ReviewState>("idle");
-const resources = ref<Resource[]>([]);
+const scenes = ref<SceneVersion[]>([]);
+const selectedSceneId = ref("");
 const learningUnitId = ref("");
+const animationNodeId = ref("");
+const classroomRefreshToken = ref(0);
+const debateActive = ref(false);
 const operationId = ref("");
 const idempotencyKey = ref("");
 const csrfToken = ref("");
@@ -45,11 +67,27 @@ const pathRefreshToken = ref(0);
 const restoringUnit = ref(false);
 const restoreUnitError = ref("");
 let learningGeneration = 0;
+let pendingResourceSelection: {
+  signature: string;
+  key: string;
+  revision: number;
+} | null = null;
 const canSubmit = computed(() => Boolean(goal.value.trim())
   && (requestState.value !== "loading" || goal.value.trim() !== submittedGoal.value));
+const selectedScene = computed(() => scenes.value.find((scene) => scene.id === selectedSceneId.value));
+const resources = computed<Resource[]>(() => selectedScene.value?.resources ?? []);
+const animationSceneVersion = computed(() => selectedScene.value?.version ?? 0);
+const classroomSceneVersion = computed(() => scenes.value.find((scene) => scene.isCurrent && scene.sceneKey === "intro")?.version ?? animationSceneVersion.value);
 const publishedResources = computed<PublishedResource[]>(() =>
   resources.value.map(({ id, type, version }) => ({ id, type, version })),
 );
+
+function selectionStorageKey(unitId: string): string { return `edumind:scene-selection:${unitId}`; }
+function selectScene(sceneId: string): void {
+  if (!scenes.value.some((scene) => scene.id === sceneId)) return;
+  selectedSceneId.value = sceneId;
+  try { sessionStorage.setItem(selectionStorageKey(learningUnitId.value), sceneId); } catch { /* Optional. */ }
+}
 
 async function startLearning(): Promise<void> {
   if (!canSubmit.value) return;
@@ -90,9 +128,13 @@ function resetAttempt(): void {
   requestError.value = "";
   temporaryText.value = "";
   reviewState.value = "idle";
-  resources.value = [];
+  scenes.value = [];
+  selectedSceneId.value = "";
+  pendingResourceSelection = null;
   pathTargetNodeId.value = "";
   learningUnitId.value = "";
+  animationNodeId.value = "";
+  classroomRefreshToken.value += 1;
   operationId.value = "";
   idempotencyKey.value = crypto.randomUUID();
 }
@@ -175,20 +217,7 @@ function applyLearningEvent(event: LearningEvent): string {
 
 async function ensureSession(): Promise<string> {
   if (csrfToken.value) return csrfToken.value;
-  let response = await fetch("/api/auth/session", { credentials: "same-origin" });
-  if (response.status === 401) {
-    response = await fetch("/api/auth/guest", {
-      method: "POST",
-      credentials: "same-origin",
-      headers: { Accept: "application/json" },
-    });
-  }
-  if (!response.ok) throw new Error("无法建立安全学习会话，请刷新页面后重试。");
-  const payload = await response.json() as Partial<SessionPayload>;
-  if (typeof payload.csrf_token !== "string") {
-    throw new Error("学习会话响应无效，请刷新页面后重试。");
-  }
-  csrfToken.value = payload.csrf_token;
+  csrfToken.value = await ensureProfileSession();
   return csrfToken.value;
 }
 
@@ -214,7 +243,11 @@ async function recoverPublishedOperation(generation: number): Promise<void> {
   throw new Error("原请求尚未发布，请等待后重试恢复；不会重复生成。");
 }
 
-async function loadPublishedUnit(unitId = learningUnitId.value, expectedGeneration = learningGeneration): Promise<void> {
+async function loadPublishedUnit(
+  unitId = learningUnitId.value,
+  expectedGeneration = learningGeneration,
+  published?: { startedSelectionId: string; sceneKey: string; sceneVersion: number },
+): Promise<void> {
   if (!unitId) throw new Error("正式学习资源缺少单元标识，请重新开始。");
   const response = await fetch(`/api/learning-units/${encodeURIComponent(unitId)}`, {
     credentials: "same-origin",
@@ -224,14 +257,67 @@ async function loadPublishedUnit(unitId = learningUnitId.value, expectedGenerati
     throw new LearningRequestError({ message: "正式资源暂时无法读取，请重试。" });
   }
   const payload = await response.json() as LearningUnitPayload;
-  const loaded = payload.scenes.flatMap((scene) => scene.resources).filter(isPublishedResource);
+  const loaded = payload.scenes.map((scene, index): SceneVersion => ({
+    id: typeof scene.id === "string" ? scene.id : `legacy-${index}`,
+    sceneKey: typeof scene.scene_key === "string" ? scene.scene_key : "intro",
+    version: Number.isInteger(scene.version) ? scene.version as number : 0,
+    isCurrent: scene.is_current !== false,
+    resources: scene.resources.filter(isPublishedResource),
+  })).filter((scene) => scene.resources.length);
   if (!loaded.length) throw new Error("正式学习资源为空，请重新开始。");
   if (expectedGeneration !== learningGeneration) return;
+  let priorSelection = learningUnitId.value === unitId ? selectedSceneId.value : "";
+  if (!priorSelection) {
+    try { priorSelection = sessionStorage.getItem(selectionStorageKey(unitId)) ?? ""; } catch { /* Optional. */ }
+  }
+  const current = loaded.find((scene) => scene.isCurrent && scene.sceneKey === "intro")
+    ?? loaded.find((scene) => scene.isCurrent) ?? loaded[0];
+  const publishedScene = published && priorSelection === published.startedSelectionId
+    ? loaded.find((scene) => scene.version === published.sceneVersion && scene.sceneKey === published.sceneKey)
+    : undefined;
+  const selected = publishedScene ?? loaded.find((scene) => scene.id === priorSelection) ?? current;
   learningUnitId.value = unitId;
-  resources.value = loaded;
+  scenes.value = loaded;
+  selectedSceneId.value = selected.id;
+  try { sessionStorage.setItem(selectionStorageKey(unitId), selected.id); } catch { /* Optional. */ }
+  animationNodeId.value = typeof payload.knowledge_node_id === "string" ? payload.knowledge_node_id : "";
   pathTargetNodeId.value = typeof payload.path_target_node_id === "string" ? payload.path_target_node_id : "";
   reviewState.value = "published";
   try { sessionStorage.setItem("edumind:last-learning-unit", unitId); } catch { /* Storage is optional; server state remains authoritative. */ }
+}
+
+async function handleScenePublished(startedSelectionId: string, sceneKey: string, sceneVersion: number): Promise<void> {
+  const generation = learningGeneration;
+  const unitId = learningUnitId.value;
+  await loadPublishedUnit(unitId, generation, { startedSelectionId, sceneKey, sceneVersion });
+  if (generation === learningGeneration) classroomRefreshToken.value += 1;
+}
+
+async function selectResource(type: LearningResourceType): Promise<void> {
+  if (!selectedScene.value?.isCurrent || !learningUnitId.value || !csrfToken.value) return;
+  const signature = `${learningUnitId.value}:${selectedScene.value.id}:${type}`;
+  if (!pendingResourceSelection || pendingResourceSelection.signature !== signature) {
+    const snapshot = await loadClassroom(learningUnitId.value);
+    if (snapshot.scene_key !== selectedScene.value.sceneKey
+      || snapshot.scene_version !== selectedScene.value.version) {
+      throw new Error("课堂版本已更新，请刷新后选择资源。");
+    }
+    pendingResourceSelection = { signature, key: crypto.randomUUID(), revision: snapshot.revision };
+  }
+  try {
+    await controlClassroom({
+      unitId: learningUnitId.value, action: "select_resource", resourceType: type,
+      revision: pendingResourceSelection.revision, csrfToken: csrfToken.value,
+      idempotencyKey: pendingResourceSelection.key,
+    });
+    pendingResourceSelection = null;
+    classroomRefreshToken.value += 1;
+  } catch (error) {
+    if (error instanceof ClassroomSpeechError && !error.retryable) {
+      pendingResourceSelection = null;
+    }
+    throw error;
+  }
 }
 
 async function restoreRecentUnit(): Promise<void> {
@@ -379,12 +465,56 @@ function stringValue(value: unknown): string {
       :published-resources="publishedResources"
       :reload-published="learningUnitId ? loadPublishedUnit : undefined"
     />
-    <PublishedLearningWorkspace
-      v-if="resources.length"
-      :resources="resources"
+    <DebatePanel
+      v-if="resources.length && learningUnitId && csrfToken"
+      :unit-id="learningUnitId"
       :csrf-token="csrfToken"
-      @quiz-submitted="handleQuizSubmitted"
+      :refresh-token="classroomRefreshToken"
+      @active="debateActive = $event"
+      @changed="classroomRefreshToken += 1"
+      @profile-changed="profileRefreshToken += 1"
     />
+    <div v-show="!debateActive">
+      <PublishedLearningWorkspace
+        v-if="resources.length"
+        :key="selectedSceneId"
+        :resources="resources"
+        :csrf-token="csrfToken"
+        :select-resource="selectResource"
+        @quiz-submitted="handleQuizSubmitted"
+      />
+      <NotesDownload
+        v-if="resources.length && learningUnitId"
+        :unit-id="learningUnitId"
+        :current="Boolean(selectedScene?.isCurrent)"
+      />
+      <LearningControlsPanel
+        v-if="resources.length && learningUnitId && csrfToken"
+        :unit-id="learningUnitId"
+        :csrf-token="csrfToken"
+        :scenes="scenes"
+        :selected-scene-id="selectedSceneId"
+        @select-scene="selectScene"
+        @scene-changed="handleScenePublished"
+        @classroom-changed="classroomRefreshToken += 1"
+      />
+      <AnimationPanel
+        v-if="resources.length && learningUnitId && animationSceneVersion >= 1"
+        :unit-id="learningUnitId"
+        :node-id="animationNodeId"
+        :scene-version="animationSceneVersion"
+        :scene-id="selectedSceneId"
+        :scene-key="selectedScene?.sceneKey"
+        :csrf-token="csrfToken"
+      />
+      <ClassroomPanel
+        v-if="resources.length && learningUnitId && csrfToken"
+        :unit-id="learningUnitId"
+        :csrf-token="csrfToken"
+        :scene-version="classroomSceneVersion"
+        :refresh-token="classroomRefreshToken"
+      />
+    </div>
     <p
       v-if="restoringUnit"
       role="status"

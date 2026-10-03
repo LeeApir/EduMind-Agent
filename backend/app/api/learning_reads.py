@@ -58,12 +58,19 @@ async def get_learning_unit(
             raise not_found()
         pairs = await published_scenes(db, current.user.id, unit_id)
     scenes: dict[str, dict[str, object]] = {}
+    current_versions: dict[str, int] = {}
+    for scene, _ in pairs:
+        current_versions[scene.scene_key] = max(
+            current_versions.get(scene.scene_key, 0), scene.version
+        )
     for scene, resource in pairs:
         scene_key = str(scene.id)
         if scene_key not in scenes:
             scenes[scene_key] = {
                 "id": scene_key,
+                "scene_key": scene.scene_key,
                 "version": scene.version,
+                "is_current": scene.version == current_versions[scene.scene_key],
                 "review_status": scene.review_status,
                 "resources": [],
             }
@@ -76,6 +83,8 @@ async def get_learning_unit(
         "status": unit.status,
         "scenes": list(scenes.values()),
         "knowledge_node_id": unit.knowledge_point_id,
+        "origin_type": "curated" if unit.catalog_release_id else "generated",
+        "catalog_release_id": str(unit.catalog_release_id) if unit.catalog_release_id else None,
         "path_target_node_id": path_snapshot.get("target_node_id")
         if isinstance(path_snapshot, dict)
         else None,

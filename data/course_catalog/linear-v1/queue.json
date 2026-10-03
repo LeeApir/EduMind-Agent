@@ -1,0 +1,38 @@
+{
+  "explanation": {
+    "markdown": "# 队列\n\n队列遵循先进先出FIFO：enqueue从队尾入队，dequeue从队首移除并返回，peek只看队首。抽象顺序与具体实现复杂度要分开。\n\n示例使用连续数组，入队加到末尾，出队后整体左移，因此enqueue/peek为O(1)、dequeue最坏O(n)。空/满必须在访问前检查，失败不修改输出参数。若使用循环数组可避免搬移，但需正确区分空与满，见循环队列节点。"
+  },
+  "code": {
+    "language": "C",
+    "source": "#include <assert.h>\n#include <stdbool.h>\n#include <stddef.h>\n#include <stdio.h>\nenum { CAP = 3 };\ntypedef struct { int data[CAP]; size_t count; } Queue;\nstatic bool enqueue(Queue *q, int value) {\n    if (q->count == CAP) return false;\n    q->data[q->count++] = value; return true;\n}\nstatic bool peek(const Queue *q, int *out) {\n    if (q->count == 0) return false;\n    *out = q->data[0]; return true;\n}\nstatic bool dequeue(Queue *q, int *out) {\n    if (q->count == 0) return false;\n    *out = q->data[0];\n    for (size_t i = 1; i < q->count; ++i) q->data[i - 1] = q->data[i];\n    --q->count; return true;\n}\nint main(void) {\n    Queue q = {{0}, 0}; int value = -1;\n    assert(!peek(&q, &value) && value == -1); assert(!dequeue(&q, &value));\n    assert(enqueue(&q, 1)); assert(enqueue(&q, 2)); assert(enqueue(&q, 3));\n    assert(!enqueue(&q, 4)); assert(peek(&q, &value) && value == 1);\n    for (int i = 1; i <= 3; ++i) { assert(dequeue(&q, &value) && value == i); printf(\"%d\\n\", value); }\n    assert(!dequeue(&q, &value)); return 0;\n}",
+    "expected_output": "1\n2\n3",
+    "key_steps": [
+      "先验证操作的边界与表示约定。",
+      "检查每次操作的成功状态。",
+      "仅在指针和索引有效时访问对象；保留已有状态并正确释放所拥有的内存。"
+    ],
+    "display_only": true
+  },
+  "exercise": {
+    "items": [
+      {
+        "id": "queue-q1",
+        "question": "队列的出元素顺序缩写是什么？",
+        "answer": "FIFO",
+        "explanation": "First In First Out，先进先出。"
+      },
+      {
+        "id": "queue-q2",
+        "question": "依次入队1、2、3，首次出队值是多少？",
+        "answer": "1",
+        "explanation": "最先入队的1最先出队。"
+      },
+      {
+        "id": "queue-q3",
+        "question": "本文出队后搬移数组的dequeue最坏时间复杂度是多少？",
+        "answer": "O(n)",
+        "explanation": "余下元素需要向前搬移。"
+      }
+    ]
+  }
+}

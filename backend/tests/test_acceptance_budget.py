@@ -9,7 +9,7 @@ from types import SimpleNamespace
 import httpx
 import pytest
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "docs/acceptance"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "scripts/acceptance_support"))
 
 from acceptance_budget import GuardedBudget, install_status_guard
 from serve_real_browser import CountingAdapter

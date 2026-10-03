@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "template_id": "linked-list-deletion",
+  "knowledge_point_id": "linked-list-deletion",
+  "template_version": "1.0.0",
+  "language": "zh-CN",
+  "operation": "delete",
+  "parameter_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["values", "index"],
+    "properties": {
+      "values": {"type": "array", "minItems": 1, "maxItems": 8, "items": {"type": "integer", "minimum": -99, "maximum": 99}},
+      "index": {"type": "integer", "minimum": 0, "maximum": 7}
+    }
+  },
+  "teaching_steps": [
+    {"id": "before", "fact": "展示删除前 head、前驱、目标和后继。"},
+    {"id": "save_successor", "fact": "先保存目标节点的 next，删除尾节点时后继为 NULL。"},
+    {"id": "relink", "fact": "再更新前驱 next 或 head 指向已保存后继。"},
+    {"id": "release", "fact": "只在链接更新后释放目标，之后不再访问它。"},
+    {"id": "after", "fact": "展示删除后节点顺序与连接。"}
+  ],
+  "review": {
+    "design_status": "fact_checked",
+    "source_status": "approved",
+    "source_sha256": "9cc7219e43d482b54b4886fcefcd937ef3c84c02b54d45247d3113258b02de6d",
+    "fact_source": "data/knowledge_graph.yaml#linked-list-deletion",
+    "rule_version": "animation-template-review-v1",
+    "evidence": "docs/acceptance/mvp-0.3-t007-deletion.md"
+  }
+}

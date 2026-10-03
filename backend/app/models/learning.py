@@ -97,6 +97,7 @@ class LearningUnit(Base):
 
     __tablename__ = "learning_units"
     __table_args__ = (
+        UniqueConstraint("user_id", "id", name="uq_learning_units_owner_id"),
         CheckConstraint("version >= 1", name="ck_learning_units_version_positive"),
         CheckConstraint("outline_version >= 1", name="ck_learning_units_outline_version_positive"),
     )
@@ -105,6 +106,8 @@ class LearningUnit(Base):
     user_id: Mapped[UUID] = mapped_column(
         PostgreSQLUUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
+    catalog_release_id: Mapped[UUID | None] = mapped_column(
+        PostgreSQLUUID(as_uuid=True), ForeignKey("catalog_releases.id"))
     knowledge_point_id: Mapped[str | None] = mapped_column(String(64))
     title: Mapped[str | None] = mapped_column(String(200))
     learning_objectives: Mapped[dict[str, object] | None] = mapped_column(JSONB)
@@ -159,6 +162,9 @@ class LearningScene(Base):
         UniqueConstraint(
             "learning_unit_id", "scene_key", "version", name="uq_learning_scenes_unit_key_version"
         ),
+        UniqueConstraint(
+            "learning_unit_id", "id", "version", name="uq_learning_scenes_unit_id_version"
+        ),
         CheckConstraint("version >= 1", name="ck_learning_scenes_version_positive"),
     )
 
@@ -195,6 +201,12 @@ class GeneratedResource(Base):
             "published_at IS NULL OR review_status = 'passed'",
             name="ck_generated_resources_published_reviewed",
         ),
+        CheckConstraint(
+            "(origin_type = 'generated' AND catalog_release_id IS NULL "
+            "AND catalog_content_digest IS NULL) OR (origin_type = 'curated' "
+            "AND catalog_release_id IS NOT NULL AND catalog_content_digest IS NOT NULL)",
+            name="ck_generated_resources_origin",
+        ),
     )
 
     id: Mapped[UUID] = mapped_column(PostgreSQLUUID(as_uuid=True), primary_key=True, default=uuid4)
@@ -211,6 +223,11 @@ class GeneratedResource(Base):
         ForeignKey("learning_scenes.id", ondelete="CASCADE"),
         nullable=False,
     )
+    origin_type: Mapped[str] = mapped_column(String(16), default="generated",
+                                           server_default="generated", nullable=False)
+    catalog_release_id: Mapped[UUID | None] = mapped_column(
+        PostgreSQLUUID(as_uuid=True), ForeignKey("catalog_releases.id"))
+    catalog_content_digest: Mapped[str | None] = mapped_column(String(64))
     knowledge_point_id: Mapped[str | None] = mapped_column(String(64))
     resource_type: Mapped[str] = mapped_column(String(20), nullable=False)
     content: Mapped[dict[str, object]] = mapped_column(JSONB, nullable=False)

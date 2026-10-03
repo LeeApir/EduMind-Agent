@@ -1,0 +1,38 @@
+{
+  "explanation": {
+    "markdown": "# C 指针\n\n指针变量保存地址，&value取得对象的地址，*p在p有效时访问所指对象。指针变量、它保存的地址、该地址中的值是不同概念。不能解引用未初始化指针或NULL。\n\n示例p指向main中的value，该对象的生存期覆盖全部使用过程。修改*p会修改value。自动对象不能free；malloc获得的对象由拥有者在使用完后free。释放后的指针不能继续解引用，函数不能返回局部自动对象的地址供调用者使用。"
+  },
+  "code": {
+    "language": "C",
+    "source": "#include <assert.h>\n#include <stdbool.h>\n#include <stddef.h>\n#include <stdio.h>\nint main(void) {\n    int value = 4; int *p = &value;\n    assert(p != NULL);\n    printf(\"%d\\n\", *p);\n    *p = 5;\n    assert(value == 5);\n    int *empty = NULL;\n    if (empty != NULL) puts(\"This branch is not reached.\");\n    printf(\"%d\\n\", value);\n    return 0;\n}",
+    "expected_output": "4\n5",
+    "key_steps": [
+      "先验证操作的边界与表示约定。",
+      "检查每次操作的成功状态。",
+      "仅在指针和索引有效时访问对象；保留已有状态并正确释放所拥有的内存。"
+    ],
+    "display_only": true
+  },
+  "exercise": {
+    "items": [
+      {
+        "id": "c-pointer-q1",
+        "question": "C中取得变量x地址的表达式是什么？",
+        "answer": "&x",
+        "explanation": "&是取地址运算符。"
+      },
+      {
+        "id": "c-pointer-q2",
+        "question": "指针p有效时，读取所指对象使用什么表达式？",
+        "answer": "*p",
+        "explanation": "*在此表示解引用。"
+      },
+      {
+        "id": "c-pointer-q3",
+        "question": "空指针可以直接解引用吗？回答yes或no。",
+        "answer": "no",
+        "explanation": "NULL不指向可访问对象。"
+      }
+    ]
+  }
+}

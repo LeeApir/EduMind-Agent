@@ -89,6 +89,18 @@ def _validate_exercise(content: object) -> dict[str, object]:
     return {"items": validated_items}
 
 
+def validate_resource_content(
+    resource_type: LearningResourceType | str, content: object
+) -> dict[str, object]:
+    """Validate display content independently of how it was authored or reviewed."""
+    kind = _resource_type(resource_type)
+    if kind is LearningResourceType.EXPLANATION:
+        return deepcopy(_validate_explanation(content))
+    if kind is LearningResourceType.CODE:
+        return deepcopy(_validate_code(content))
+    return deepcopy(_validate_exercise(content))
+
+
 def validate_learning_resource(
     value: object, *, expected_type: LearningResourceType | str
 ) -> dict[str, object]:

@@ -1,0 +1,38 @@
+{
+  "explanation": {
+    "markdown": "# 数组\n\n数组把同类型元素放在连续空间中。有效下标是0到n-1；长度n和容量cap不是同一个数。知道下标时访问是O(1)。中间插入需要搬移后面的元素，最坏O(n)；末尾插入只有在尚有容量且不扩容时才是O(1)。\n\n示例先检查容量和插入位置，再从后向前移动，避免覆盖尚未搬移的值。空数组只能在0处插入，满数组拒绝插入。示例展示固定容量，不承诺自动扩容。"
+  },
+  "code": {
+    "language": "C",
+    "source": "#include <assert.h>\n#include <stdbool.h>\n#include <stddef.h>\n#include <stdio.h>\nstatic bool insert(int *a, size_t *n, size_t cap, size_t pos, int value) {\n    if (*n >= cap || pos > *n) return false;\n    for (size_t i = *n; i > pos; --i) a[i] = a[i - 1];\n    a[pos] = value;\n    ++*n;\n    return true;\n}\nint main(void) {\n    int a[3] = {0}; size_t n = 0;\n    assert(!insert(a, &n, 3, 1, 7));\n    assert(insert(a, &n, 3, 0, 1));\n    assert(insert(a, &n, 3, 1, 2));\n    assert(insert(a, &n, 3, 1, 9));\n    assert(!insert(a, &n, 3, 0, 8));\n    for (size_t i = 0; i < n; ++i) printf(\"%d%s\", a[i], i + 1 == n ? \"\\n\" : \" \");\n    return 0;\n}",
+    "expected_output": "1 9 2",
+    "key_steps": [
+      "先验证操作的边界与表示约定。",
+      "检查每次操作的成功状态。",
+      "仅在指针和索引有效时访问对象；保留已有状态并正确释放所拥有的内存。"
+    ],
+    "display_only": true
+  },
+  "exercise": {
+    "items": [
+      {
+        "id": "array-q1",
+        "question": "知道有效下标时，数组访问的时间复杂度是什么？用O(...)作答。",
+        "answer": "O(1)",
+        "explanation": "地址可由起始地址和元素大小直接计算。"
+      },
+      {
+        "id": "array-q2",
+        "question": "长度为3的数组，最后一个有效下标是多少？",
+        "answer": "2",
+        "explanation": "下标从0开始，到n-1结束。"
+      },
+      {
+        "id": "array-q3",
+        "question": "在数组中间插入并搬移后续元素，最坏时间复杂度是多少？",
+        "answer": "O(n)",
+        "explanation": "需要移动的元素数量随数组长度增长。"
+      }
+    ]
+  }
+}

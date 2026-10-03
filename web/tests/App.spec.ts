@@ -2,6 +2,7 @@ import { flushPromises, mount } from "@vue/test-utils";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import App from "../src/App.vue";
+import LearningControlsPanel from "../src/components/LearningControlsPanel.vue";
 
 const stubs = {
   NButton: {
@@ -94,6 +95,17 @@ describe("learning entry", () => {
     const fetchImpl = vi.fn(async (input: RequestInfo | URL) => {
       const url = String(input);
       if (url === "/api/auth/session") return Response.json({ csrf_token: "csrf" });
+      if (url === "/api/learning-units/unit-restored-0001/classroom") return Response.json({
+        learning_unit_id: "unit-restored-0001", revision: 1, message_cursor: 0,
+        scene_key: "intro", scene_version: 0, scene_progress: 0,
+        mode: "focus", enabled_roles: [], paused: false,
+      });
+      if (url === "/api/learning-units/unit-restored-0001/classroom/controls") return Response.json({
+        learning_unit_id: "unit-restored-0001", revision: 2, message_cursor: 0,
+        scene_key: "intro", scene_version: 0, scene_progress: 0,
+        mode: "focus", enabled_roles: [], paused: false,
+      });
+      if (url === "/api/learning-units/unit-restored-0001/classroom/messages") return Response.json({ messages: [], last_message_cursor: 0 });
       if (url === "/api/learning-units/unit-restored-0001") return Response.json({ scenes: [{ resources: [
         { id: "exercise-resource-001", type: "exercise", version: 1, review_status: "passed", content: { items: [{ id: "q1", question: "指针是什么？" }] } },
       ] }] });
@@ -110,9 +122,51 @@ describe("learning entry", () => {
     const wrapper = mount(App, { global: { stubs } });
     await flushPromises();
     await wrapper.get(".published-workspace nav button:nth-child(3)").trigger("click");
+    await flushPromises();
     expect(wrapper.text()).toContain("服务端反馈");
     expect(wrapper.text()).toContain("0% → 55%");
     expect(fetchImpl.mock.calls.some(([url]) => String(url).startsWith("/api/quiz-submissions/latest?"))).toBe(true);
-    expect(sessionStorage.length).toBe(1);
+    expect(sessionStorage.getItem("edumind:last-learning-unit")).toBe("unit-restored-0001");
+  });
+
+  it("keeps a manual history selection when a late new version arrives", async () => {
+    sessionStorage.setItem("edumind:last-learning-unit", "unit-history");
+    let published = false;
+    vi.stubGlobal("fetch", vi.fn(async (input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url === "/api/auth/session") return Response.json({ csrf_token: "csrf" });
+      if (url === "/api/learning-units/unit-history") return Response.json({ scenes: [
+        ...(published ? [{
+          id: "new", scene_key: "intro", version: 3, is_current: true,
+          resources: [{ id: "explanation-new", type: "explanation", version: 3,
+            review_status: "passed", content: { markdown: "第三版讲解" } }],
+        }] : []),
+        { id: "current", scene_key: "intro", version: 2, is_current: !published,
+          resources: [{ id: "explanation-current", type: "explanation", version: 2,
+            review_status: "passed", content: { markdown: "第二版讲解" } }] },
+        { id: "old", scene_key: "intro", version: 1, is_current: false,
+          resources: [{ id: "explanation-old", type: "explanation", version: 1,
+            review_status: "passed", content: { markdown: "第一版讲解" } }] },
+      ] });
+      if (url === "/api/learning-units/unit-history/classroom") return Response.json({
+        learning_unit_id: "unit-history", revision: 1, message_cursor: 0,
+        scene_key: "intro", scene_version: 2, scene_progress: 0,
+        mode: "focus", enabled_roles: [], paused: false,
+      });
+      if (url === "/api/learning-units/unit-history/classroom/messages") return Response.json({ messages: [], last_message_cursor: 0 });
+      if (url.startsWith("/api/quiz-submissions/latest")) return Response.json({ code: "NOT_FOUND" }, { status: 404 });
+      throw new Error(`unexpected request ${url}`);
+    }));
+    const wrapper = mount(App, { global: { stubs } });
+    await flushPromises();
+    expect(wrapper.get('[data-testid="explanation-tab"]').text()).toContain("第二版讲解");
+    const controls = wrapper.getComponent(LearningControlsPanel);
+    controls.vm.$emit("select-scene", "old");
+    await flushPromises();
+    published = true;
+    controls.vm.$emit("scene-changed", "current", "intro", 3);
+    await flushPromises();
+    expect(wrapper.get('[data-testid="explanation-tab"]').text()).toContain("第一版讲解");
+    expect(sessionStorage.getItem("edumind:scene-selection:unit-history")).toBe("old");
   });
 });

@@ -12,19 +12,30 @@ const props = withDefaults(defineProps<{
   csrfToken?: string;
   submitQuiz?: (options: SubmitQuizOptions) => Promise<QuizSubmissionResult>;
   loadQuizResult?: (options: QuizResourceRef) => Promise<QuizSubmissionResult | null>;
+  selectResource?: (type: ResourceType) => Promise<void>;
+  selectedResource?: ResourceType;
 }>(), {
   csrfToken: "",
   submitQuiz: (options: SubmitQuizOptions) => submitQuizAttempt(options),
   loadQuizResult: (options: QuizResourceRef) => loadLatestQuizResult(options),
+  selectResource: undefined,
+  selectedResource: undefined,
 });
-const emit = defineEmits<{ "quiz-submitted": [result: QuizSubmissionResult] }>();
+const emit = defineEmits<{
+  "quiz-submitted": [result: QuizSubmissionResult];
+  "quiz-restored": [result: QuizSubmissionResult];
+  "resource-selected": [type: ResourceType];
+}>();
 const activeTab = ref<ResourceType>("explanation");
+watch(() => props.selectedResource, (value) => { if (value) activeTab.value = value; }, { immediate: true });
 const answers = ref<Record<string, string>>({});
 const result = ref<QuizSubmissionResult | null>(null);
 const restoring = ref(false);
 const restoreError = ref("");
 const submitting = ref(false);
 const requestError = ref("");
+const selectionError = ref("");
+const selecting = ref(false);
 let generation = 0;
 let pending: { signature: string; key: string; answers: SubmitQuizOptions["answers"] } | null = null;
 onBeforeUnmount(() => { generation += 1; });
@@ -67,7 +78,10 @@ async function restoreResult(): Promise<void> {
   restoring.value = true;
   try {
     const restored = await props.loadQuizResult(current);
-    if (token === generation) result.value = restored;
+    if (token === generation) {
+      result.value = restored;
+      if (restored) emit("quiz-restored", restored);
+    }
   } catch (error) {
     if (token === generation) restoreError.value = errorMessage(error);
   } finally {
@@ -105,6 +119,24 @@ function beginNewAttempt(): void {
   pending = null;
   requestError.value = "";
 }
+
+async function switchTab(tab: ResourceType): Promise<void> {
+  if (tab === activeTab.value || selecting.value) return;
+  selectionError.value = "";
+  if (props.selectResource) {
+    selecting.value = true;
+    try {
+      await props.selectResource(tab);
+    } catch (error) {
+      selectionError.value = errorMessage(error);
+      return;
+    } finally {
+      selecting.value = false;
+    }
+  }
+  activeTab.value = tab;
+  emit("resource-selected", tab);
+}
 </script>
 
 <template>
@@ -118,11 +150,18 @@ function beginNewAttempt(): void {
         :key="tab"
         :type="activeTab === tab ? 'primary' : 'default'"
         :aria-pressed="activeTab === tab"
-        @click="activeTab = tab"
+        :disabled="selecting"
+        @click="switchTab(tab)"
       >
         {{ ({ explanation: '讲解', code: '代码', exercise: '练习' })[tab] }}
       </NButton>
     </nav>
+    <p
+      v-if="selectionError"
+      role="alert"
+    >
+      {{ selectionError }}
+    </p>
     <article
       v-if="activeTab === 'explanation'"
       data-testid="explanation-tab"
@@ -140,6 +179,17 @@ function beginNewAttempt(): void {
       <pre v-if="code"><code>{{ code }}</code></pre><p v-else>
         正式代码正在加载。
       </p>
+      <template v-if="code">
+        <h3>预期输出</h3><pre>{{ stringField(byType.get('code')?.content, 'expected_output') }}</pre>
+        <h3>关键步骤</h3><ul>
+          <li
+            v-for="(step, index) in byType.get('code')?.content.key_steps as string[]"
+            :key="index"
+          >
+            {{ step }}
+          </li>
+        </ul>
+      </template>
     </article>
     <section
       v-else
@@ -221,6 +271,11 @@ function beginNewAttempt(): void {
         </p>
         <p>这里展示服务端回执，原始作答不保存在浏览器。点击“再做一次”可填写新答案。</p>
         <p>{{ result.correct_count }} / {{ result.question_count }} 题正确</p>
+        <p v-if="result.catalog_assessment">
+          {{ result.catalog_assessment.eligible_for_mastery
+            ? '首次完整作答已计入学习证据；完成练习与已掌握分别记录。'
+            : '本次为练习记录，保留评分与反馈，不重复计入掌握度。' }}
+        </p>
         <div
           v-for="change in result.mastery_changes"
           :key="change.knowledge_node_id"

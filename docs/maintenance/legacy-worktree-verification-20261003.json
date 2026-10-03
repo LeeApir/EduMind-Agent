@@ -1,0 +1,48 @@
+{
+  "recorded_at": "2026-10-03T16:30:21+08:00",
+  "passed": true,
+  "provider_requests": 0,
+  "cumulative_requests": 2033,
+  "request_limit": 2500,
+  "t033_status": "blocked",
+  "original_files_unchanged": 236,
+  "archive_blob_verification": "236 original files covered across delivery + code/evidence archive commits; full byte SHA256 checked",
+  "delivery_source": "3cf8169 + only delivery changes; temporary snapshot does not include T033 experiments",
+  "tests": [
+    {
+      "command": "/Users/apir/Code/EduMind_Agent/backend/.venv/bin/python -m pytest -q tests/test_review_agent.py",
+      "cwd": "/private/tmp/edumind-cleanup-delivery-20261003/backend",
+      "passed": 5
+    },
+    {
+      "command": "pnpm exec vitest run tests/profile.spec.ts tests/session_initialization.spec.ts tests/catalog.spec.ts",
+      "cwd": "/private/tmp/edumind-cleanup-delivery-20261003/web",
+      "passed": 15
+    },
+    {
+      "command": "pnpm exec vitest run tests/App.spec.ts tests/CatalogPage.spec.ts tests/learningRecovery.spec.ts tests/streamWhitespace.spec.ts",
+      "cwd": "/private/tmp/edumind-cleanup-delivery-20261003/web",
+      "passed": 23,
+      "failed_suites": 1,
+      "failure": "ENOENT missing docs/acceptance/mvp-0.2-t036-offline-sse.json in temporary snapshot; setup-only error, source unchanged"
+    },
+    {
+      "command": "pnpm exec vitest run tests/streamWhitespace.spec.ts",
+      "cwd": "/private/tmp/edumind-cleanup-delivery-20261003/web",
+      "passed": 4,
+      "repair": "Exact committed offline SSE fixture from3cf8169 copied into temporary snapshot"
+    }
+  ],
+  "checks": [
+    "typecheck / targeted ESLint passed on delivery-only snapshot",
+    "Ruff passed for isolated review files and new archive verifier",
+    "Experimental Python AST parsing and evidence JSON parsing passed, no executor run",
+    "No current configured credentials found in archive candidates; authorization fields checked as permission descriptions, no sensitive HTTP credential headers",
+    "python3 scripts/verify_legacy_archives.py passed",
+    "python3 scripts/verify_catalog_exit.py passed; 235 protected original files unchanged",
+    "git diff --check passed"
+  ],
+  "inventory_sha256": "4e64c44c7487fba5566311933e3c1e72850ff33fe116d90e26729513a9e477eb",
+  "verifier_sha256": "416203df8a2665954baa2c28e80215bae1390147d734aa0a44b7ef5dfed7124f",
+  "notes": "No cleanup/removal of original frozen paths; archives are local only and do not authorize running diagnostics or promote configurations."
+}

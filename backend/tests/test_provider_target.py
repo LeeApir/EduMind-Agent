@@ -185,6 +185,7 @@ def test_redirect_revalidates_destination_and_dns_before_another_request() -> No
 def test_factory_rejects_unsafe_target_before_adapter_receives_credentials(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    monkeypatch.setenv("EDUMIND_PRODUCT_MODE", "dynamic")
     monkeypatch.setenv("EDUMIND_PROVIDER_BASE_URL", "http://169.254.169.254/latest")
     monkeypatch.setenv("EDUMIND_PROVIDER_MODEL", "test-model")
     monkeypatch.setenv("EDUMIND_PROVIDER_API_KEY", "sensitive-key")

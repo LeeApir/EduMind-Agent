@@ -22,6 +22,12 @@ describe("path API client", () => {
     expect(fetchImpl.mock.calls[0][1].credentials).toBe("same-origin");
     expect(await loadCurrentPath("linked-list-concept", fetchImpl)).toBeNull();
   });
+  it("finishes an absent path response before returning empty state", async () => {
+    const missing = Response.json({ code: "NOT_FOUND" }, { status: 404 });
+    expect(await loadCurrentPath("array", vi.fn().mockResolvedValue(missing))).toBeNull();
+    expect(missing.bodyUsed).toBe(true);
+  });
+
   it("sends immutable replan command parameters and preserves version conflicts", async () => {
     const fetchImpl = vi.fn().mockResolvedValueOnce(Response.json(pathFixture)).mockResolvedValueOnce(Response.json({ code: "PATH_VERSION_CONFLICT" }, { status: 409 }));
     const options = { targetNodeId: "linked-list-concept", expectedVersion: 1, csrfToken: "csrf", idempotencyKey: "path-key-00000001", reason: "mastery_changed" as const };

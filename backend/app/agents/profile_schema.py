@@ -38,6 +38,7 @@ EDITABLE_PROFILE_FIELDS: Final = (
     "learning_goals",
     "error_preferences",
     "engineering_preference",
+    "cognitive_style",
 )
 # Strongest first. A manual correction always outranks any inferred source.
 EVIDENCE_SOURCE_PRECEDENCE: Final = (
@@ -287,6 +288,16 @@ def apply_manual_correction(
     for field in corrections:
         if field not in EDITABLE_PROFILE_FIELDS:
             raise ProfileSchemaError
+        if field == "cognitive_style":
+            style = corrections[field]
+            if (
+                not isinstance(style, dict)
+                or set(style) != {"preference_persona"}
+                or style["preference_persona"] not in {
+                    "performance", "engineering", "academic",
+                }
+            ):
+                raise ProfileSchemaError
 
     current_version = profile["profile_version"]
     if not isinstance(current_version, int) or isinstance(current_version, bool):
@@ -301,7 +312,16 @@ def apply_manual_correction(
         raise ProfileSchemaError
     merged_evidence: dict[str, object] = deepcopy(evidence)
     for field in corrections:
-        merged[field] = deepcopy(corrections[field])
+        if field == "cognitive_style":
+            current_style = merged[field]
+            correction_style = corrections[field]
+            assert isinstance(correction_style, dict)
+            merged[field] = {
+                **(current_style if isinstance(current_style, dict) else {}),
+                **deepcopy(correction_style),
+            }
+        else:
+            merged[field] = deepcopy(corrections[field])
         records = merged_evidence.get(field)
         if records is None:
             records = []

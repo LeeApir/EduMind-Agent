@@ -9,13 +9,20 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.agents.learning_resource_schema import RESOURCE_PROMPT_VERSION
+from app.models.catalog import CatalogRelease
 from app.models.learning import LearningUnit
 from app.models.learning_state import LearningEvidence
+from app.services.catalog_assessment import fixed_quiz_qualification
+from app.services.catalog_package import CatalogError
+from app.services.catalog_publication import release_package
 from app.services.learning_operations import IdempotencyConflict
 from app.services.mastery_updates import apply_mastery_evidence, lock_mastery_node
 from app.services.owned_learning import published_resource
-from app.services.quiz_scoring import QuizScoringError, score_exercise_content
+from app.services.quiz_scoring import (
+    QuizScoringError,
+    exercise_is_qualified,
+    score_exercise_content,
+)
 
 
 class QuizResourceNotFound(ValueError):
@@ -54,6 +61,8 @@ def quiz_receipt(record: LearningEvidence) -> dict[str, object]:
         "scoring_rule_version": record.rule_version,
         "mastery_changes": payload.get("mastery_changes", []),
         "path_replan_required": payload.get("path_replan_required", False),
+        **({"catalog_assessment": payload["catalog_assessment"]}
+           if "catalog_assessment" in payload else {}),
     }
 
 
@@ -115,6 +124,9 @@ async def submit_quiz_attempt(
         db, owner_id=owner_id, idempotency_key=idempotency_key, digest=digest
     )
     if existing is not None:
+        if "catalog_assessment" in existing.payload:
+            if await published_resource(db, owner_id, resource_id) is None:
+                raise QuizResourceNotFound
         return existing, False
 
     resource = await published_resource(db, owner_id, resource_id)
@@ -123,14 +135,29 @@ async def submit_quiz_attempt(
     if (
         resource.resource_type != "exercise"
         or resource.version != resource_version
-        or not isinstance(resource.generation_metadata, dict)
-        or resource.generation_metadata.get("prompt_version") != RESOURCE_PROMPT_VERSION
+        or not exercise_is_qualified(resource)
     ):
         raise QuizScoringError
     unit = await db.get(LearningUnit, resource.learning_unit_id)
     knowledge_node_id = resource.knowledge_point_id or (unit.knowledge_point_id if unit else None)
     if not knowledge_node_id:
         raise QuizScoringError
+    await lock_mastery_node(db, owner_id=owner_id, node_id=knowledge_node_id)
+    raced = await _existing_receipt(
+        db, owner_id=owner_id, idempotency_key=idempotency_key, digest=digest)
+    if resource.origin_type == "curated":
+        # Lock order is owner -> release, matching enrollment and avoiding stale approval.
+        assert resource.catalog_release_id is not None
+        release = await db.get(CatalogRelease, resource.catalog_release_id,
+                               with_for_update=True, populate_existing=True)
+        if release is None:
+            raise QuizResourceNotFound
+        try:
+            release_package(release)
+        except CatalogError:
+            raise QuizResourceNotFound from None
+    if raced is not None:
+        return raced, False
 
     scored = score_exercise_content(
         resource_id=resource.id,
@@ -167,7 +194,9 @@ async def submit_quiz_attempt(
         rule_version=scored.rule_version,
         payload=payload,
     )
-    await lock_mastery_node(db, owner_id=owner_id, node_id=knowledge_node_id)
+    if resource.origin_type == "curated":
+        payload["catalog_assessment"] = await fixed_quiz_qualification(db, owner_id=owner_id,
+            node_id=knowledge_node_id, content=resource.content, answers=answers)
     db.add(record)
     try:
         await db.flush()
