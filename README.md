@@ -2,10 +2,13 @@
 
 启智学伴：面向数据结构学习的个性化学习系统。
 
-当前阶段：MVP 0.3 集成验收中，已实现两个链表动画模板、专注/互动课堂、数组与链表多视角演示及 Markdown/MP4/SRT 导出；任务状态以根目录 [task.json](task.json) 为准。MVP 0.2 的 38 项任务已完成并[原样归档](docs/tasks/mvp-0.2.json)；[收尾决定](docs/acceptance/mvp-0.2-closeout-decision.md)保留 Pro 质量/闭环与 Flash 性能的证据边界，独立教学首 token 目标转为非阻塞后续优化。
-学习链路连接一句话目标、10 节点知识结构、渐进画像、正式资源审核、服务端测验、
-掌握度与可解释推荐。计分题只使用明确格式的客观唯一答案；不让 LLM 判定对错。
-阶段状态与失败/修复证据见 [MVP 0.2 验收记录](docs/acceptance/mvp-0.2-stage-acceptance.md)。架构决定的批准状态、待决项及后续入口见 [ADR 索引](docs/ADR/README.md)。
+当前交付：**MVP 0.3 课程目录版**，范围依据 [PRD v2.2 §0](docs/PRD.md) 与 [ADR-0007](docs/ADR/0007-curated-course-catalog.md)。从10节固定课程选择节点，阅读讲解/完整C示例、完成每节3道固定练习，查看进度与路径推荐；保留两个链表动画模板、预设数组 vs 链表演示及 Markdown/MP4/SRT 导出。核心学习流程无需 Provider key，模型调用为0。
+
+`linear-course v0.1.0` 已由 Lee 实际审阅并签核具体摘要；[签核记录](docs/acceptance/mvp-0.3-catalog-human-signoff-20261003.json)与[受信发布清单](data/course_catalog/release-allowlist.json)独立保存。当前通过的是目录版阶段退出，见[退出报告](docs/acceptance/mvp-0.3-catalog-exit-20261003.md)；课程只在隔离测试库核验登记/撤回，尚未部署。
+
+**动态生成、重解释、实时AI互动及动态辩论仍暂缓**；服务端默认 `catalog_only`，在构建模型依赖前拒绝动态入口。T033 保持 blocked，原模型质量/延迟成绩不变，目录静态性能不作为动态生成通过。固定题由服务端确定性计分，首次完整作答形成掌握度证据，重复练习有反馈但不刷掌握度；做完课程不等于已掌握。
+
+任务状态以根目录 [task.json](task.json) 为准，目录版退出后保持此账本，不自动进入 Phase 1。MVP 0.2 的38项任务已[原样归档](docs/tasks/mvp-0.2.json)，其[收尾决定](docs/acceptance/mvp-0.2-closeout-decision.md)保留 Pro 质量/闭环与 Flash 性能的证据边界。架构状态和待决项见 [ADR 索引](docs/ADR/README.md)。
 
 ## 后端
 
@@ -48,18 +51,19 @@ pnpm --dir web build
 
 ## Compose 开发启动
 
-需要 Docker Compose（OrbStack 兼容）。先准备本地环境文件，真实 Provider 凭据只保留在该未提交文件中：
+需要 Docker Compose（OrbStack 兼容）。这是本地开发栈；目录版启动、签核登记、Worker和撤回步骤见[部署说明](docs/DEPLOYMENT.md)。先准备本地私有环境文件：
 
 ```bash
 cp .env.example .env
-# 编辑 .env，至少替换 EDUMIND_POSTGRES_PASSWORD；需要生成时再填写 Provider 三项
-docker compose up --build -d
+# 编辑 .env，替换 EDUMIND_POSTGRES_PASSWORD；目录版不填 Provider 凭据
+EDUMIND_PRODUCT_MODE=catalog_only EDUMIND_PROVIDER_BASE_URL= \
+EDUMIND_PROVIDER_API_KEY= EDUMIND_PROVIDER_MODEL= docker compose up --build -d
 docker compose ps
 curl --fail http://127.0.0.1:8000/health
 curl --fail http://127.0.0.1:5173/
 ```
 
-PostgreSQL 仅向宿主回环地址的 15432 端口开放，供独立动画 Worker 连接；API、Web 分别仅在回环地址暴露 8000、5173。端口可用 `EDUMIND_POSTGRES_PORT`、`EDUMIND_API_PORT`、`EDUMIND_WEB_PORT` 覆盖。Compose 会先等待数据库与 API 健康检查，API 启动时自动执行 `alembic upgrade head`。仅检查健康状态时不需要 Provider 凭据；实际学习生成需要在 `.env` 设置三项 `EDUMIND_PROVIDER_*`。
+PostgreSQL 仅向宿主回环地址的 15432 端口开放，供独立动画 Worker 连接；API、Web 分别仅在回环地址暴露 8000、5173。端口可用 `EDUMIND_POSTGRES_PORT`、`EDUMIND_API_PORT`、`EDUMIND_WEB_PORT` 覆盖。Compose 会先等待数据库与 API 健康检查，API 启动时自动执行 `alembic upgrade head`。目录学习不需要 Provider 凭据。健康检查不证明课程已登记；API不会自动导入课程，须受信操作者在部署另行获授权后登记已签核版本。没有批准课程时目录为空，不能用自由生成补齐。
 
 MVP 0.3 动画 Worker 是宿主机上的独立进程，需要可用的 Docker CLI、已拉取的固定 Manim 镜像和仅含本地数据库 URL 的私有 `.env.worker`（不要提交）。先创建可写媒体目录 `mkdir -p data/videos/cache/approved`；Compose 以只读方式把同一目录挂给 API，Worker 在宿主机写入经审核媒体。`.env.worker` 中将 `EDUMIND_DATABASE_URL` 指向 `127.0.0.1:15432/edumind_dev`，然后另开终端运行：
 
@@ -72,7 +76,7 @@ Worker 不接收 Provider 密钥；渲染时启动的固定 Manim 容器不挂 D
 
 两个模板的合法边界、缓存播放和按需渲染单机验收结果见 [T032 动画报告](docs/acceptance/mvp-0.3-t032-animation-performance.md)；报告保留每槽数据、首次测量脚本失败和当前环境限制。
 
-仓库示例配置使用 DeepSeek Responses API、`https://api.deepseek.com` 和 `deepseek-flash`；实际模型以服务端配置及验收记录为准，示例不代表该模型通过所有质量指标。API Key 只留在服务端 `.env`，不要提交或放入浏览器。支持的传输与安全边界见 [Provider 说明](docs/PROVIDERS.md)。
+仅保留用于历史动态开发的仓库示例配置使用 DeepSeek Responses API、`https://api.deepseek.com` 和 `deepseek-flash`；实际模型以服务端配置及验收记录为准，示例不代表该模型通过所有质量指标。API Key 只留在服务端 `.env`，不要提交或放入浏览器。支持的传输与安全边界见 [Provider 说明](docs/PROVIDERS.md)。
 
 最近阶段证据见 [MVP 0.2 收尾决定](docs/acceptance/mvp-0.2-closeout-decision.md)；其中 Pro 质量/闭环与 Flash 性能分别报告。[MVP 0.1 Provider 报告](docs/acceptance/mvp-0.1-provider-acceptance.md) 仅作为历史证据。
 
@@ -127,9 +131,11 @@ pnpm --dir web install --frozen-lockfile
 pnpm --dir web e2e
 ```
 
-该套件使用浏览器路由级 mock API，稳定覆盖一句话开始、正式资源、课堂模式与多视角、练习、文件下载、Provider 故障、审核拒绝和 SSE 异常恢复，不会调用或计费真实 Provider。隔离 PostgreSQL 后端测试负责审核、owner、幂等和持久恢复。真实前后端集成需要另外运行 `web/tests/e2e/real_stage_flow.py`：先迁移隔离测试库、准备已审核的真实模板媒体缓存，再设置 `EDUMIND_TEST_DATABASE_URL` 和 `EDUMIND_DATABASE_URL` 指向该库，从 `backend/` 执行 `uv run python ../web/tests/e2e/real_stage_flow.py`。这条流程使用确定性 mock Provider，不能替代真实模型质量或首段 P95 验收；真实模型证据由 T033 单独记录。
+这是历史动态流程的回归套件，不能替代目录版真实集成证据；当前目录版复核运行 `python3 scripts/verify_catalog_exit.py`（只读离线，不启动浏览器/数据库/Provider）。该历史套件使用浏览器路由级 mock API，稳定覆盖一句话开始、正式资源、课堂模式与多视角、练习、文件下载、Provider 故障、审核拒绝和 SSE 异常恢复，不会调用或计费真实 Provider。隔离 PostgreSQL 后端测试负责审核、owner、幂等和持久恢复。真实前后端集成需要另外运行 `web/tests/e2e/real_stage_flow.py`：先迁移隔离测试库、准备已审核的真实模板媒体缓存，再设置 `EDUMIND_TEST_DATABASE_URL` 和 `EDUMIND_DATABASE_URL` 指向该库，从 `backend/` 执行 `uv run python ../web/tests/e2e/real_stage_flow.py`。这条流程使用确定性 mock Provider，不能替代真实模型质量或首段 P95 验收；真实模型证据由 T033 单独记录。
 
-## MVP 0.2 验证入口
+## MVP 0.2 历史验证入口（当前暂缓付费测试）
+
+以下命令仅保留历史复现说明；目录版退出不执行，不恢复旧付费授权。T033仍blocked，任何新的Provider测试须另行明确授权。
 
 后端数据库测试必须设置 `EDUMIND_TEST_DATABASE_URL` 为已经迁移的隔离 PostgreSQL
 URL；未设置会跳过 DB 测试，不能视为全量通过。测试数据库会写入合成夹具，不可指向生产库。

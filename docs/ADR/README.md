@@ -12,7 +12,9 @@
 
 [ADR-0004：可信动画 Job](0004-trusted-animation-jobs.md) 已获用户批准 A–D，状态 Accepted；容器资源限制、租约/取消/重启、缓存授权及事件游标成为 T004 与后续实现边界。T001 验收基线见 [范围与测量计划](../acceptance/mvp-0.3-acceptance-plan.md)，已完成并不授予真实采样预算。
 
-[ADR-0005：课堂会话与场景版本](0005-classroom-session-and-scene-version.md) 已获用户批准 A–D，状态 Accepted；尚未实施，不改变现有操作恢复或已发布课堂API。
+[ADR-0005：课堂会话与场景版本](0005-classroom-session-and-scene-version.md) 已获用户批准 A–D，状态 Accepted；MVP 0.3已实现持久化课堂/控制与版本边界。目录模式只开放批准课程的学习控制和预设演示，动态互动仍关闭。
+
+[ADR-0007：课程目录版](0007-curated-course-catalog.md) 为当前已批准交付范围：10节点、固定C示例/练习、两个动画模板、进度推荐及导出，新增受信人工签核来源和撤回边界。Lee已实际签核linear-course v0.1.0的准确digest，见[签核记录](../acceptance/mvp-0.3-catalog-human-signoff-20261003.json)。[目录版退出报告](../acceptance/mvp-0.3-catalog-exit-20261003.md)复用T045/T046独立证据；T033仍blocked，动态生成/重解释/实时AI暂缓。此退出不批准部署或Phase 1。
 
 ## 性能与历史证据
 
@@ -27,6 +29,4 @@
 - T003：制定课堂会话、场景版本及学习控制边界；明确暂停、跳过、资源选择和旧版本恢复的后端职责。
 - T004：在相关决定批准后固定 API/SSE 契约，包括 Job 事件重放。
 
-T001 已完成验收口径冻结；T002 已完成并批准，T003 已获批准，T004 正在固定 [OpenAPI 0.3.0](../api/openapi.yaml)，新增运行端点仍待后续任务实现。Markdown 导出不要求学生先运行多视角；T027 对 T024 的开发依赖保留用于可选结果适配。ADR-0004 只批准动画设计边界，当前实现仍以已发布 OpenAPI 为准；课堂与场景边界需另行决定。
-
-[ADR-0007：课程目录版](0007-curated-course-catalog.md) 已按用户“执行B”批准有限范围；PRD v2.2 §0优先限定当前交付。原T033 blocked不改，课程内容最终人工签核仍须实际完成。
+上列T001–T004为历史设计入口，当前均已完成，接口以[OpenAPI](../api/openapi.yaml)及活动任务账本为准。Markdown导出不要求学生先运行多视角；目录版仅记录已查看的预设演示。当前后续操作是另行获授权后的部署准备，不自动归档账本或领取Phase 1任务。
