@@ -1,0 +1,360 @@
+{
+  "target_commit": "c7831d1dbf34219f22c6f7da30913002fa46966d",
+  "checkout": "/Users/apir/.codex/worktrees/mvp03-clean-checkout/EduMind_Agent",
+  "recorded_at": "2026-10-03T16:52:13.957826+08:00",
+  "scope": "committed catalog_only source: fresh locked installation, build, offline checks, isolated PostgreSQL and built UI smoke",
+  "passed": true,
+  "provider_requests": 0,
+  "cumulative_requests": 2033,
+  "request_limit": 2500,
+  "t033_status": "blocked",
+  "task_counts": {
+    "done": 45,
+    "blocked": 1
+  },
+  "installation": {
+    "tracked_files_identical": 566,
+    "changed": [],
+    "status": "clean",
+    "env_absent": true,
+    "venv_fresh": true,
+    "node_modules_fresh": true,
+    "locks_unchanged": true,
+    "uv_install": {
+      "command": "uv sync --frozen --offline --python 3.11",
+      "exit_code": 0,
+      "python": "3.11.16",
+      "packages_installed": 41,
+      "cache": "existing uv offline cache",
+      "fresh_venv": true
+    },
+    "pnpm_install": {
+      "command": "pnpm install --frozen-lockfile --offline",
+      "exit_code": 0,
+      "version": "10.33.0",
+      "packages_added": 311,
+      "downloaded": 0,
+      "warning": "esbuild@0.24.2 build script ignored; production build subsequently passed"
+    }
+  },
+  "checks": {
+    "build": {
+      "name": "build",
+      "command": [
+        "pnpm",
+        "build"
+      ],
+      "cwd": "web",
+      "exit_code": 0,
+      "seconds": 9.614,
+      "log": "build.log"
+    },
+    "frontend-tests": {
+      "name": "frontend-tests",
+      "command": [
+        "pnpm",
+        "test",
+        "--run"
+      ],
+      "cwd": "web",
+      "exit_code": 0,
+      "seconds": 7.191,
+      "log": "frontend-tests.log"
+    },
+    "backend-offline": {
+      "name": "backend-offline",
+      "command": [
+        ".venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "tests/test_catalog_package.py",
+        "tests/test_catalog_content.py",
+        "tests/test_catalog_release_preflight.py",
+        "tests/test_catalog_mode.py",
+        "tests/test_catalog_acceptance_metrics.py",
+        "tests/test_catalog_component_gate.py",
+        "tests/test_animation_templates.py",
+        "tests/test_animation_cache.py",
+        "tests/test_review_agent.py"
+      ],
+      "cwd": "backend",
+      "exit_code": 0,
+      "seconds": 4.976,
+      "log": "backend-offline.log"
+    },
+    "catalog-db": {
+      "name": "catalog-db",
+      "command": [
+        "/Users/apir/.codex/worktrees/mvp03-clean-checkout/EduMind_Agent/backend/.venv/bin/python",
+        "/private/tmp/edumind-clean-checkout-20261003/guarded_pytest.py"
+      ],
+      "cwd": "backend",
+      "database": "edumind_catalog_clean_checks_20261003",
+      "exit_code": 0,
+      "seconds": 2.947,
+      "log": "catalog-db.log"
+    },
+    "migration": {
+      "name": "migration",
+      "command": [
+        "/Users/apir/.codex/worktrees/mvp03-clean-checkout/EduMind_Agent/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "cwd": "backend",
+      "database": "edumind_catalog_clean_checks_20261003",
+      "exit_code": 0,
+      "seconds": 0.773,
+      "log": "migration.log"
+    },
+    "ruff": {
+      "name": "ruff",
+      "command": [
+        ".venv/bin/ruff",
+        "check",
+        "app",
+        "tests"
+      ],
+      "cwd": "backend",
+      "exit_code": 0,
+      "seconds": 0.426,
+      "log": "ruff.log"
+    },
+    "frontend-lint": {
+      "name": "frontend-lint",
+      "command": [
+        "pnpm",
+        "lint"
+      ],
+      "cwd": "web",
+      "exit_code": 0,
+      "seconds": 1.701,
+      "log": "frontend-lint.log"
+    },
+    "workflow": {
+      "name": "workflow",
+      "command": [
+        "backend/.venv/bin/python",
+        "scripts/check_catalog_workflow.py"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 0.046,
+      "log": "workflow.log"
+    },
+    "signature": {
+      "name": "signature",
+      "command": [
+        "backend/.venv/bin/python",
+        "scripts/verify_catalog_release.py"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 0.522,
+      "log": "signature.log"
+    }
+  },
+  "counts": {
+    "frontend": {
+      "passed": 136,
+      "failed": 0
+    },
+    "backend_offline": {
+      "passed": 84,
+      "skipped": 21,
+      "failed": 0
+    },
+    "catalog_db": {
+      "passed": 14,
+      "failed": 0,
+      "overlap_with_offline": true
+    },
+    "eslint": {
+      "errors": 0,
+      "warnings": 67
+    }
+  },
+  "runtime": {
+    "target_commit": "c7831d1dbf34219f22c6f7da30913002fa46966d",
+    "database": "edumind_catalog_clean_runtime_164919",
+    "manifest_digest": "92bb0dd4778391e23aae978b8a411b466d8b5988d1cff61cff01654604af21a1",
+    "reviewer": "Lee",
+    "provider_requests": 0,
+    "external_attempts": [],
+    "page_errors": [],
+    "assets": [
+      "/assets/index-DhbLQ5Dd.css",
+      "/assets/index-DqbVZAKW.js",
+      "/assets/index-DhbLQ5Dd.css",
+      "/assets/index-DqbVZAKW.js",
+      "/assets/index-DhbLQ5Dd.css",
+      "/assets/index-DqbVZAKW.js"
+    ],
+    "checks": [
+      "Real loopback API health/runtime and built Vite preview started without Provider key",
+      "Built UI: exact C code, fixed quiz 3/3, repeat mastery unchanged, reload receipts/demo, signed notes and path",
+      "All 10 signed nodes/30 resources/30 hidden answers, dynamic 409, CSRF 403, foreign owner 404"
+    ],
+    "nodes": [
+      {
+        "node_id": "array",
+        "resources": 3,
+        "questions_without_answers": 3
+      },
+      {
+        "node_id": "c-pointer",
+        "resources": 3,
+        "questions_without_answers": 3
+      },
+      {
+        "node_id": "linked-list-concept",
+        "resources": 3,
+        "questions_without_answers": 3
+      },
+      {
+        "node_id": "single-linked-list",
+        "resources": 3,
+        "questions_without_answers": 3
+      },
+      {
+        "node_id": "linked-list-traversal",
+        "resources": 3,
+        "questions_without_answers": 3
+      },
+      {
+        "node_id": "linked-list-insertion",
+        "resources": 3,
+        "questions_without_answers": 3
+      },
+      {
+        "node_id": "linked-list-deletion",
+        "resources": 3,
+        "questions_without_answers": 3
+      },
+      {
+        "node_id": "stack",
+        "resources": 3,
+        "questions_without_answers": 3
+      },
+      {
+        "node_id": "queue",
+        "resources": 3,
+        "questions_without_answers": 3
+      },
+      {
+        "node_id": "circular-queue",
+        "resources": 3,
+        "questions_without_answers": 3
+      }
+    ],
+    "passed": true,
+    "media_rendered": false,
+    "benchmark_rerun": false,
+    "production_published": false,
+    "release_id": "b02db3f2-8aef-4d58-89d9-e70ca0e6a238",
+    "startup_probes": [
+      {
+        "url": "http://127.0.0.1:8329/health",
+        "status": 200,
+        "body": "{\"status\":\"ok\"}"
+      },
+      {
+        "url": "http://127.0.0.1:4329",
+        "status": 200,
+        "body": "<script type=\"module\" crossorigin src=\"/assets/index-DqbVZAKW.js\"></script>\n<link rel=\"stylesheet\" crossorigin href=\"/assets/index-DhbLQ5Dd.css\">\n<div id=\"app\"></div>\n"
+      }
+    ],
+    "notes_sha256": "5c111ae156731dee35b9fc9408473164ba0913ea7dce4628bad19784ed357c39",
+    "servers_stopped": true,
+    "seconds": 7.239
+  },
+  "historical_exit_verifier": {
+    "exit_code": 1,
+    "cause": "Old frozen working-tree audit requires original .env and old experimental evidence; those intentionally absent from this clean checkout. Not counted as passing.",
+    "log": "historical-exit.log",
+    "old_protocols_modified": false
+  },
+  "failures_preserved": [
+    "runtime-v1-runtime-result.json",
+    "runtime-v2-runtime-result.json"
+  ],
+  "harness_correction": "macOS system proxy caused HTTPX trust_env=True loopback health probe to return 502. Explicit trust_env=False returned 200; Chromium also used --no-proxy-server. Only test harness changed.",
+  "limitations": [
+    "No new Docker/Manim Worker render or MP4/SRT media benchmark",
+    "21 initial offline skips: 19 Docker content/render cases plus 2 DB mode cases; DB cases later executed successfully",
+    "Vite built-output preview on loopback is not a public deployment or new image/production acceptance",
+    "Historical frozen worktree audit cannot run directly from delivery checkout",
+    "Existing local Python/package caches and local PostgreSQL/Chromium are prerequisites; new environments installed from locks, not reused original node_modules/venv",
+    "Original experimental worktree unchanged; no archived experiments brought into delivery checkout"
+  ],
+  "artifact_hashes": {
+    "historical-exit.log": "84c98574772a495325ae0f1afd344a91be1088b4c25f9e92878e5fcefc0681b1",
+    "workflow.json": "31d1a6435c44fea1064fa2a48dd668c4d77d6af019c1412b25091620bf4abc2c",
+    "workflow.log": "c8d8a72221e73e926746ef2825ba4fcb8e809c511a43240c4506c54557bb371f",
+    "runtime-v2-freeze.json": "c4fe3f5786f87c0c9675bbac4441af5c0621270cd3b81d13f46fb6ee872b2dab",
+    "ruff.json": "ddb7c0d651581798a46d082d05a30c5e66262f92a03dd62c73c622eb5e52dc46",
+    "catalog-db.log": "6f5ccd94695e235f1ed6f2fba75cabed0aee6160765156a7a84cd652dc88aab0",
+    "migration.log": "5b345a144e4fbacc8637d444715671016bf137ebdbe3f46beddcfbcb2aa64566",
+    "runtime-migration.log": "5b345a144e4fbacc8637d444715671016bf137ebdbe3f46beddcfbcb2aa64566",
+    "signature.log": "df9b1bef4a3d231bd7a408e0cc47d4d112c24bc3d2f03a9bf0fe0037a6e166fb",
+    "catalog-db.json": "445cdd2c23e6ab5be62629ea3224db8b3904804127a85e2bf6af956377c78757",
+    "migration.json": "f2249eb0103d5fcb4a521e03e677887754401cb79966f6e07a18875c228ef25e",
+    "commits.json": "c57178275bcbf16c5832d275cd500968dccee82290473a136e29789627e12623",
+    "runtime-v1-runtime_smoke.py": "2c542d3761b53944606f2e5da3439599c99a0b87474729d5aa4be81f76dbdf2a",
+    "runtime-result.json": "663b4922fb4f620f41f5bc9191d52386477ec6c0fad01baae17c5a75e5c43b47",
+    "runtime-v1-runtime-migration.log": "5b345a144e4fbacc8637d444715671016bf137ebdbe3f46beddcfbcb2aa64566",
+    "runtime_smoke.py": "5be5fffe75199ac9418e0926a400ed9749c770c7b82cda9d0c41717f57dbba1a",
+    "runtime-v2-api-server.log": "c437c1d304733554534bb4a034b400f8aab914d4e9c3aadcd6343c059c55b492",
+    "runtime-v2-runtime-result.json": "3df29870471628d0205b43620b2cb47e84bf93a21ceca2a92161acb3ffb25ff4",
+    "runtime-v2-web-server.log": "947fdff0aebf7d8e96263a06f3a79e7ff3188baaf2ebab32595a1985ceb99ffe",
+    "runtime-v1-runtime-result.json": "8039b9441ccbca73daf3906745bc22d4d5c7948d29d59111ef573f8ff078f49b",
+    "frontend-lint.json": "7f0ae682ea55abfe5308a373777793601bab78a89d1c87fe7535ae89e86556b2",
+    "harness-freeze.json": "5b610eedfa7e800634b5db6023a9caa612bd2da99beada7de528af09750dac94",
+    "runtime-v3-freeze.json": "8895287d16b0b73970507bf45c25be272e3536e6428f132eccec40ec82f4995c",
+    "ruff.log": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+    "historical-exit.json": "3e87689fba137e50cee3390bce6d6e197bfda1f27a7746a582eeae770bb595fd",
+    "frontend-tests.log": "dd451998372617be7a5adcfb8b8e34ce4cb7b3b08fe607656299aba3b612fe13",
+    "runtime-v2-runtime_smoke.py": "a51220c154f05d41178e3827814b0afe6f0aedc875729468ae8a4efe6850a686",
+    "protocol.json": "8afa745e7622271c1545fdabf15cc7abd8aa927bbd36994a30e30e75c445487e",
+    "frontend-tests.json": "b863f256f4430af3e419ef2502fb2dda36118fba0881440a1737241afe3be69a",
+    "runtime-v1-web-server.log": "947fdff0aebf7d8e96263a06f3a79e7ff3188baaf2ebab32595a1985ceb99ffe",
+    "db_checks.py": "2386764a286a9c7ceab305f14df0f58670f332d439f31e3220df95978ae74e6f",
+    "runtime-v1-api-server.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "run_check.py": "07c043b5550c5ad34d4b5d870d687bff44ac2b52aa7be6d1c80f11f7f63de911",
+    "runtime-v2-runtime-migration.log": "5b345a144e4fbacc8637d444715671016bf137ebdbe3f46beddcfbcb2aa64566",
+    "backend-offline.json": "c43d4e7444462aa3233044ef94dca46fb1717e709e22cd6d9f79bab2241d5081",
+    "api-server.log": "4a07e43318a2794b55275ef6c2ce0105f45ac1e08cf05986f384ac27050e8859",
+    "guarded_pytest.py": "a5d45830bc5701556359c1c60db77106603d48eff4c885fa464fe25d2e6cb3f3",
+    "web-server.log": "947fdff0aebf7d8e96263a06f3a79e7ff3188baaf2ebab32595a1985ceb99ffe",
+    "frontend-lint.log": "f81164eeed19d680b3d619f6370653bcbc246201d2e7d6f96c854ae6968d4dc1",
+    "signature.json": "56f103a9bc98739fde50b355cc34e873d9cb9f4c8a4ea8d79e240b64b26a14f4",
+    "build.json": "2bd06e8162bda7e705e0bec8f83bc8851fc59f3cd5b6f183c4ddffa5554ea79a",
+    "build.log": "01a69d98996003fd6afd71289ee2901c97084f3a4c5ad087c5a6239752fd7144",
+    "backend-offline.log": "35d1c4bde3eed4996df01572ae7612e1d4d219152a0f367395e3a38b730a2385",
+    "integrity.json": "40a2d51607f9b98242c47824557a954a1490a84c0f7c84d54fff8d8e2190b31b",
+    "final-verification.json": "2a9fd1b0440f86e8d655117c8651afdb1e3425c67e9dbbcb846d33a1937192e1",
+    ".gitattributes": "4de163bd19bfdaa6ee06723dd3bd4aba8cd0648b7d5c687e13c5b120add92273"
+  },
+  "test_source_unchanged": true,
+  "services_stopped": true,
+  "production_published": false,
+  "push": false,
+  "merge": false,
+  "original_worktree_preservation": {
+    "passed": true,
+    "artifact_hashes_valid": 44,
+    "runtime_harness_versions_preserved_and_hashes_valid": true,
+    "artifact_python_syntax_json_and_links_valid": true,
+    "credential_urls_detected": 0,
+    "original_legacy_files_verified": 236,
+    "original_experiment_archive_files_verified": 64,
+    "original_evidence_archive_files_verified": 169,
+    "task_json_unchanged": true,
+    "target_checkout_git_status": "",
+    "provider_requests": 0
+  },
+  "raw_log_storage": "Original captured stdout/stderr preserved byte-for-byte; scoped whitespace attribute permits their emitted final blank lines only."
+}

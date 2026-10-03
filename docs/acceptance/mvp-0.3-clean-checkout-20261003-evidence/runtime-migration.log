@@ -1,0 +1,19 @@
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 0001_initial, Initialize the Alembic revision chain.
+INFO  [alembic.runtime.migration] Running upgrade 0001_initial -> 0002_auth_sessions, Create users and server-side authentication sessions.
+INFO  [alembic.runtime.migration] Running upgrade 0002_auth_sessions -> 0003_learning_snapshots, Persist versioned profiles, learning scenes, and reviewed resources.
+INFO  [alembic.runtime.migration] Running upgrade 0003_learning_snapshots -> 0004_learning_operations, Persist idempotent and recoverable learning operations.
+INFO  [alembic.runtime.migration] Running upgrade 0004_learning_operations -> 0005_profile_events, Persist idempotent, owner-scoped profile behavior summaries.
+INFO  [alembic.runtime.migration] Running upgrade 0005_profile_events -> 0006_profile_correction, Track idempotency for manual profile corrections.
+INFO  [alembic.runtime.migration] Running upgrade 0006_profile_correction -> 0007_profile_provenance, Persist profile event schema and snapshot lineage.
+INFO  [alembic.runtime.migration] Running upgrade 0007_profile_provenance -> 0008_learning_state, Create owner-scoped learning evidence, mastery, and path state.
+INFO  [alembic.runtime.migration] Running upgrade 0008_learning_state -> 0009_path_commands, Persist owner-scoped path command idempotency receipts.
+INFO  [alembic.runtime.migration] Running upgrade 0009_path_commands -> 0010_animation_jobs, Persist reviewed animation jobs, local event cursors and owner media bindings.
+INFO  [alembic.runtime.migration] Running upgrade 0010_animation_jobs -> 0011_animation_cancel_key, Remember the owner-scoped cancellation key on its immutable job receipt.
+INFO  [alembic.runtime.migration] Running upgrade 0011_animation_cancel_key -> 0012_classroom_sessions, Create classroom sessions, append-only messages, and per-role contexts.
+INFO  [alembic.runtime.migration] Running upgrade 0012_classroom_sessions -> 0013_classroom_operations, Create owner-scoped classroom operation idempotency records.
+INFO  [alembic.runtime.migration] Running upgrade 0013_classroom_operations -> 0014_classroom_receipts, Keep immutable classroom command receipts for idempotent replay.
+INFO  [alembic.runtime.migration] Running upgrade 0014_classroom_receipts -> 0015_debate_results, Store only reviewed, immutable multi-perspective results.
+INFO  [alembic.runtime.migration] Running upgrade 0015_debate_results -> 0016_catalog_releases, Add explicit curated provenance without rewriting generated approval history.
+INFO  [alembic.runtime.migration] Running upgrade 0016_catalog_releases -> 0017_catalog_immutability, Keep catalog provenance immutable; withdrawal never permits reapproval.
