@@ -205,7 +205,7 @@ def test_rejection_before_outbound(catalog_api, mutation):
         client,
         headers,
         enabled=mutation != "disabled",
-        provider_type="anthropic" if mutation == "unsupported" else "openai-compatible",
+        provider_type="gemini" if mutation == "unsupported" else "openai-compatible",
     )
     body = probe()
     expected = 409

@@ -79,14 +79,16 @@ class ModelCapabilities:
     streaming: bool | None = None
     structured_output: bool | None = None
     structured_transport: str = "json_schema"
+    tool_calling: bool | None = None
 
     def __post_init__(self) -> None:
         if (
             not 1 <= len(self.version) <= 100
-            or self.structured_transport not in {"json_schema", "json_object", "text_json"}
+            or self.structured_transport
+            not in {"json_schema", "json_object", "text_json", "tool_schema"}
             or any(
                 v is not None and type(v) is not bool
-                for v in (self.streaming, self.structured_output)
+                for v in (self.streaming, self.structured_output, self.tool_calling)
             )
         ):
             raise CredentialFailure("VALIDATION_ERROR")
@@ -189,7 +191,7 @@ class ConnectionOperation(MemoryOnly):
         view = await self.store.read(r.identity, r.route.connection_id)
         if view["config_version"] != r.route.config_version:
             raise CredentialFailure("VERSION_CONFLICT")
-        if view["provider_type"] not in {"openai-compatible", "ollama"}:
+        if view["provider_type"] not in {"openai-compatible", "ollama", "anthropic"}:
             raise ProviderError(ProviderErrorCode.CAPABILITY_UNAVAILABLE)
         self.provider_type = str(view["provider_type"])
         if not view["enabled"]:
@@ -345,7 +347,15 @@ class ConnectionOperation(MemoryOnly):
                     ),
                 }
                 if secret:
-                    headers["Authorization"] = "Bearer " + secret["api_key"]
+                    headers[
+                        "x-api-key" if row.provider_type == "anthropic" else "Authorization"
+                    ] = (
+                        secret["api_key"]
+                        if row.provider_type == "anthropic"
+                        else "Bearer " + secret["api_key"]
+                    )
+                if row.provider_type == "anthropic":
+                    headers["anthropic-version"] = "2023-06-01"
                 sent = False
 
                 async def trace(event: str, info: dict[str, Any]) -> None:
@@ -395,6 +405,7 @@ class ConnectionOperation(MemoryOnly):
             secret.clear()
             if wire is not None:
                 wire.headers.pop("Authorization", None)
+                wire.headers.pop("x-api-key", None)
             if response is not None:
                 await response.aclose()
             self._response = None
@@ -410,6 +421,9 @@ class ConnectionOperation(MemoryOnly):
         authorization = self._wire.headers.get("Authorization", "")
         if authorization.startswith("Bearer ") and authorization[7:] in value:
             raise ProviderError(ProviderErrorCode.INVALID_OUTPUT)
+        api_key = self._wire.headers.get("x-api-key", "")
+        if api_key and api_key in value:
+            raise ProviderError(ProviderErrorCode.INVALID_OUTPUT)
 
 
 def wire_target(
@@ -424,9 +438,13 @@ def wire_target(
     ip = target.connect_ip
     netloc = f"[{ip}]" if ":" in ip else ip
     suffix = (
-        {"openai-compatible": "/models", "ollama": "/api/tags"}
+        {"openai-compatible": "/models", "ollama": "/api/tags", "anthropic": "/models"}
         if listing
-        else {"openai-compatible": "/chat/completions", "ollama": "/api/chat"}
+        else {
+            "openai-compatible": "/chat/completions",
+            "ollama": "/api/chat",
+            "anthropic": "/messages",
+        }
     ).get(provider_type)
     if suffix is None:
         raise ProviderError(ProviderErrorCode.CAPABILITY_UNAVAILABLE)
@@ -435,7 +453,7 @@ def wire_target(
             parsed.scheme,
             f"{netloc}:{target.port}",
             parsed.path.rstrip("/") + suffix,
-            "",
+            "limit=1000" if listing and provider_type == "anthropic" else "",
             "",
         )
     )

@@ -79,6 +79,7 @@ async def build_connection_provider_gateway(
     target_observer: Callable[[ApprovedTarget], None] | None = None,
 ) -> AsyncIterator[ProviderGateway]:
     """Only an explicitly selected and budget-authorized route gets credentials."""
+    from app.services.anthropic import AnthropicAdapter
     from app.services.ollama import OllamaAdapter
     from app.services.openai_compatible import OpenAICompatibleAdapter
 
@@ -86,9 +87,11 @@ async def build_connection_provider_gateway(
         store, request, authorize_attempt, transport=transport, target_observer=target_observer
     )
     async with operation.activate(registry):
-        adapter: ProviderAdapter = (
-            OllamaAdapter(operation)
-            if operation.provider_type == "ollama"
-            else OpenAICompatibleAdapter(operation)
-        )
+        adapter: ProviderAdapter
+        if operation.provider_type == "anthropic":
+            adapter = AnthropicAdapter(operation)
+        elif operation.provider_type == "ollama":
+            adapter = OllamaAdapter(operation)
+        else:
+            adapter = OpenAICompatibleAdapter(operation)
         yield ProviderGateway(adapter)

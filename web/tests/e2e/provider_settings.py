@@ -11,6 +11,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--url", default="http://127.0.0.1:4187")
     parser.add_argument("--evidence", required=True)
+    parser.add_argument("--native-type", choices=["anthropic"])
     args = parser.parse_args()
     evidence = Path(args.evidence)
     evidence.mkdir(parents=True, exist_ok=True)
@@ -87,6 +88,8 @@ def main() -> None:
             assert not any(method == "POST" for method, path in calls if path.startswith("/api/providers"))
             expect(page.get_by_role("button", name="测试连接一次")).to_be_disabled()
             expect(page.locator(".provider-capabilities dd")).to_have_text(["未知"] * 7)
+            if args.native_type:
+                page.get_by_label("服务类型", exact=True).select_option(args.native_type)
             page.get_by_label("替换 Key", exact=False).fill("synthetic-secret")
             assert page.locator("#provider-key").get_attribute("type") == "password"
             page.get_by_role("button", name="保存连接", exact=True).click()

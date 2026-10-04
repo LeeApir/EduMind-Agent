@@ -808,7 +808,7 @@
       "id": "PHASE-1-T015",
       "phase": "Phase 1",
       "title": "接入Anthropic原生适配器",
-      "status": "todo",
+      "status": "done",
       "priority": "P1",
       "depends_on": [
         "PHASE-1-T007",
@@ -820,7 +820,10 @@
         "backend/tests/",
         "docs/PROVIDERS.md",
         "backend/pyproject.toml",
-        "backend/uv.lock"
+        "backend/uv.lock",
+        "backend/app/core/provider_factory.py",
+        "web/src/components/ProviderSettings.vue",
+        "web/tests/"
       ],
       "prd_source": "PRD §3.8 Provider类型",
       "acceptance_criteria": [
@@ -832,9 +835,25 @@
         "cd backend && .venv/bin/python -m pytest -q tests/test_anthropic_adapter.py",
         "对本任务改动运行Ruff和mypy；涉及持久化时在隔离PostgreSQL核验迁移及并发。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "backend/.venv/bin/python scripts/run_provider_storage_tests.py edumind_catalog_phase1_t015_v2 tests/test_anthropic_adapter.py tests/test_provider_model_catalog.py tests/test_provider_connection_test_api.py tests/test_provider_connections_api.py tests/test_provider_connection_gateway.py tests/test_ollama_adapter.py tests/test_model_preferences.py; final edumind_catalog_phase1_t015_v3 tests/test_anthropic_adapter.py",
+          "result": "passed: 308 joint regressions and final65 native contracts, no skips; migration roundtrip0020/down0017/up0020. Native messages/system, strict JSON/schema/fixed tool mode, SSE state/hidden thinking, errors/cancellation, owner/budget/catalog rejection, pinned IP/x-api-key cleanup, temporary once use and models projection/cache echo rejection. Initial pytest reserved request parameter fixed; joint v1 still-unimplemented-type fixture switched Anthropic to Gemini after native implementation, same rejection assertions. Mock only, actual Provider0.",
+          "evidence": "local-materials/phase-1-t015/checks/pytest-unit-v1.log; pytest-unit-v2.log; pg-v1.log; pg-v2.log; pg-final.log"
+        },
+        {
+          "command": "Ruff10 changed Python files; mypy7 application sources; check_provider_contract.py; check_catalog_workflow.py; git diff --check",
+          "result": "passed: lint/types, 532refs/60operations/84examples/12 runtime routes and ledger. Existing HTTPX0.28.1/jsonschema4.25.1 locks reused, no new dependency; companion factory/native settings option added within same behavior, no new generation endpoint or public contract. Fixed native probe omits deprecated sampling but explicit user setting is never dropped.",
+          "evidence": "local-materials/phase-1-t015/checks/"
+        },
+        {
+          "command": "cd web && pnpm test --run tests/provider-settings.spec.ts; pnpm typecheck && pnpm build; ESLint2; with_server.py local4187 -- web/tests/e2e/provider_settings.py --native-type anthropic --evidence local-materials/phase-1-t015/checks/browser-final",
+          "result": "passed: 15 settings tests; build/types/lint; native option/version-prefix hint and Mock browser Key clearing, failures, mobile fit and catalog return. Final mobile PNG visually checked. No Provider request; source doc links in PROVIDERS.",
+          "evidence": "local-materials/phase-1-t015/checks/web-tests-final.log; web-build-final.log; browser-final.log; browser-final/"
+        }
+      ],
+      "started_at": "2026-10-04T22:21:52",
+      "completed_at": "2026-10-04T22:47:19",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T015"
     },

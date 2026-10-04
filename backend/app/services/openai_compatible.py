@@ -128,6 +128,8 @@ class OpenAICompatibleAdapter:
             ) from None
         body = self._body(request.prompt)
         mode = self._operation.request.capabilities.structured_transport
+        if mode not in {"json_schema", "json_object", "text_json"}:
+            raise ProviderError(ProviderErrorCode.CAPABILITY_UNAVAILABLE)
         if mode == "json_schema":
             body["response_format"] = {
                 "type": "json_schema",

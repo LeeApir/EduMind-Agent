@@ -10,7 +10,7 @@ from sqlalchemy.dialects.postgresql import insert
 from app.core.credential_crypto import CredentialFailure
 from app.core.temporary_credentials import TemporaryCredentialRegistry
 from app.models.provider_model_snapshots import ProviderModelSnapshot
-from app.services.openai_compatible import _check_status
+from app.services.deepseek_responses import _check_status
 from app.services.provider_connection_dispatch import (
     ConnectionConsent,
     ConnectionOperation,
@@ -33,6 +33,9 @@ FLAGS = ("streaming", "structured_output", "tool_calling", "vision", "embedding"
 def model_metadata(raw: object, provider_type: str) -> list[dict[str, object]]:
     if not isinstance(raw, dict):
         raise invalid_output()
+    if provider_type == "anthropic" and (type(raw.get("has_more")) is not bool or raw["has_more"]):
+        # A refresh is one page/one request; never silently publish an incomplete list.
+        raise invalid_output()
     items = raw.get("models" if provider_type == "ollama" else "data")
     if not isinstance(items, list) or len(items) > MAX_MODELS:
         raise invalid_output()
@@ -54,6 +57,24 @@ def model_metadata(raw: object, provider_type: str) -> list[dict[str, object]]:
         ):
             raise invalid_output()
         flags = {flag: (declaration or {}).get(flag) for flag in FLAGS}
+        version = CAPABILITY_VERSION
+        if provider_type == "anthropic":
+            native = entry.get("capabilities")
+            if native is not None and not isinstance(native, dict):
+                raise invalid_output()
+            for source, flag in (
+                ("structured_outputs", "structured_output"),
+                ("image_input", "vision"),
+            ):
+                detail = (native or {}).get(source)
+                if detail is None:
+                    continue
+                if not isinstance(detail, dict) or type(detail.get("supported")) is not bool:
+                    raise invalid_output()
+                if flags[flag] is not None and flags[flag] != detail["supported"]:
+                    raise invalid_output()
+                flags[flag] = detail["supported"]
+            version = "anthropic-model-capabilities-v1"
         models.append(
             {
                 "id": model,
@@ -62,7 +83,7 @@ def model_metadata(raw: object, provider_type: str) -> list[dict[str, object]]:
                     "source": "declared"
                     if any(v is not None for v in flags.values())
                     else "unknown",
-                    "version": CAPABILITY_VERSION,
+                    "version": version,
                 },
             }
         )
@@ -108,6 +129,7 @@ async def resolve_capabilities(
                     str(caps["version"]),
                     caps["streaming"],
                     caps["structured_output"],
+                    tool_calling=caps.get("tool_calling"),
                 )
     raise ProviderError(ProviderErrorCode.CAPABILITY_UNAVAILABLE)
 
@@ -131,7 +153,7 @@ async def refresh_models(
                 raise CredentialFailure("VERSION_CONFLICT")
             if accepted is not True or route.data_categories != frozenset({"probe"}):
                 raise CredentialFailure("CONSENT_REQUIRED")
-            if view["provider_type"] not in {"openai-compatible", "ollama"}:
+            if view["provider_type"] not in {"openai-compatible", "ollama", "anthropic"}:
                 raise ProviderError(ProviderErrorCode.CAPABILITY_UNAVAILABLE)
             if not view["enabled"]:
                 raise CredentialFailure("CREDENTIAL_UNAVAILABLE")

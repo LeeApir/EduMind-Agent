@@ -253,6 +253,8 @@ onBeforeUnmount(() => { active = false; ++revision; erase(); resetConfirmation()
                 OpenAI-compatible
               </option><option value="ollama">
                 Ollama（服务端本地白名单）
+              </option><option value="anthropic">
+                Anthropic（原生 Messages）
               </option>
             </select>
             <label for="provider-url">服务地址</label><input
@@ -264,7 +266,7 @@ onBeforeUnmount(() => { active = false; ++revision; erase(); resetConfirmation()
               :placeholder="form.provider_type === 'ollama' ? 'http://127.0.0.1:11434' : 'https://服务地址/v1'"
             >
             <p class="provider-hint">
-              Ollama 使用服务根地址。地址相对于学伴服务端，本地地址需管理员明确放行。
+              {{ form.provider_type === 'anthropic' ? 'Anthropic 地址需包含版本前缀（如 /v1）。' : 'Ollama 使用服务根地址。' }}地址相对于学伴服务端，本地地址需管理员明确放行。
             </p>
             <label for="provider-mode">Key 保存方式</label><select
               id="provider-mode"

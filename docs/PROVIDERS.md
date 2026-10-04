@@ -26,6 +26,18 @@ T008 为 `provider_type=ollama` 选择原生适配器，其他业务接口仍是
 
 Ollama 复用 T007 的 owner/会话/配置版本/同意、每次预算授权、发送行锁、撤销和临时 Key 生命周期；无 Key 连接不借用系统凭据。T008 只提供内部适配，没有增加对外生成端点或解除 `catalog_only`。真实本地实例可用性属于后续独立接入验收；本任务实际模型请求为 0。
 
+## Anthropic 原生适配（T015）
+
+连接管理可选Anthropic，Base URL包含版本前缀（例如供应商的`/v1`），原生适配只追加`/messages`。发送层使用`x-api-key`和`anthropic-version: 2023-06-01`，固定已批准IP、原Host/TLS SNI，关闭环境代理、重定向和自动重试；成功/失败/取消均移除Key头。复用HTTPX 0.28.1及jsonschema 4.25.1锁定依赖，无新增SDK或固定模型。模型来自确切连接选择，业务仍只依赖Gateway。依据：[Messages协议](https://platform.claude.com/docs/en/api/messages/create)。
+
+前置system消息映射为顶层文本块，不将后置system指令跨轮提升。无用户消息、assistant前缀补全及超出原生0–1范围的温度在发送前拒绝；用户明确温度仍照传，较新模型不支持时返回安全能力错误，不能删除参数重放。固定8token/10秒/一次连接探测对Anthropic不设置已弃用的采样参数，不发送学生上下文。只返回正常end_turn的可见文本；max_tokens、refusal、pause_turn、非文本/工具结果拒绝。用量仅映射实际input_tokens/output_tokens，缺失保持未知，不推算价格或缓存账单。
+
+流式解析有界SSE，核验message_start、顺序索引的内容块及其关闭、正常message_delta和最终message_stop；只转发text_delta，隐藏thinking/signature块。截断、错误、工具块与失序关闭连接，已输出后仍不会重试或拼接其他目标。共享1MiB请求/单帧及2MiB累计响应限制；客户端取消和临时凭据一次性清理由发送层执行。依据：[流式事件与错误](https://platform.claude.com/docs/en/build-with-claude/streaming)、[HTTP错误](https://platform.claude.com/docs/en/api/errors)。
+
+结构化能力必须明确声明并绑定版本/模型。json_schema使用原生`output_config.format`；text_json只在明确选择时发送JSON指令。新增内部tool_schema模式还必须声明tool_calling=true，只允许固定`edumind_result`、strict input_schema及禁止并行的强制选择，返回单个同名tool_use输入作为结构化值，不执行工具。所有模式都严格解析JSON并在本地按原schema校验；不削弱schema、不自动换模式，其他适配器拒绝tool_schema。上游不支持的schema返回安全错误，正式资源仍需ReviewAgent。依据：[JSON与严格工具结构化输出](https://platform.claude.com/docs/en/build-with-claude/structured-outputs)。
+
+显式模型刷新使用一次`GET <base>/models?limit=1000`；has_more=true或格式无效时保留旧缓存，不自动翻页。仅映射官方明确的structured_outputs.supported与image_input.supported为声明能力，streaming/tool_calling等无明确字段仍未知；项目扩展声明可补充，但与官方声明冲突则拒绝。规则版本anthropic-model-capabilities-v1，不把声明当真实验证；当前Key回显禁止进入模型缓存或生成结果。依据：[模型列表及能力字段](https://platform.claude.com/docs/en/api/models/list)。默认生产预算仍拒绝，catalog_only持续，本任务真实Provider请求0；实际模型质量和连通性待独立授权验收。
+
 ## 显式连接测试
 
 T010 的 POST `/api/providers/connections/{id}/test` 只接受操作ID、精确版本/模型/probe-only同意和可选临时handle；固定短提示、最多8输出token、10秒总期限、一次尝试、不回退。target是发送当时批准的Base URL，is_local来自该次DNS全部地址，不证明服务离线；文本成功仍将所有高级能力标为未知，不返回上游生成正文。响应private/no-store并提示可能调用服务。默认预算拒绝出站；Mock测试注入的授权不是生产预算或真实Provider验收，实际预算与计数由T035交付。

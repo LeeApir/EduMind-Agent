@@ -121,6 +121,18 @@ describe("safe provider transport", () => {
 });
 
 describe("connection settings", () => {
+  it("adds an implemented native Anthropic connection with a cleared password field", async () => {
+    const wrapper = mounted(); await flushPromises(); await click(wrapper, "新增连接");
+    await wrapper.get("#provider-name").setValue("原生审核服务");
+    await wrapper.get("#provider-type").setValue("anthropic");
+    await wrapper.get("#provider-url").setValue("https://provider.example/v1");
+    await wrapper.get("#provider-key").setValue("synthetic-native-secret");
+    await wrapper.get("form").trigger("submit"); await flushPromises();
+    const body = JSON.parse(providerPosts()[0][1].body);
+    expect(body.provider_type).toBe("anthropic"); expect(body.secret.api_key).toBe("synthetic-native-secret");
+    expect((wrapper.get("#provider-key").element as HTMLInputElement).value).toBe("");
+    expect(wrapper.html()).not.toContain("synthetic-native-secret"); expect(providerPosts()).toHaveLength(1);
+  });
   it("opens with only cache reads, no Provider operation, and preserves unrelated learning storage", async () => {
     sessionStorage.setItem("edumind:catalog:last:owner", "unit");
     const wrapper = mounted(); await flushPromises();

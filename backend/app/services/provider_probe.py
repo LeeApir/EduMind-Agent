@@ -2,6 +2,7 @@
 
 import asyncio
 import ipaddress
+from dataclasses import replace
 from typing import Protocol
 from uuid import UUID
 
@@ -71,7 +72,7 @@ async def probe_connection(
                 raise CredentialFailure("CREDENTIAL_UNAVAILABLE")
             if view["credential_state"] == "expired":
                 raise CredentialFailure("CREDENTIAL_EXPIRED")
-            if view["provider_type"] not in {"openai-compatible", "ollama"}:
+            if view["provider_type"] not in {"openai-compatible", "ollama", "anthropic"}:
                 raise ProviderError(ProviderErrorCode.CAPABILITY_UNAVAILABLE)
             if view["credential_mode"] == "persistent" and view["credential_state"] != "present":
                 raise CredentialFailure("CREDENTIAL_MISSING")
@@ -98,7 +99,14 @@ async def probe_connection(
                 transport=transport,
                 target_observer=observed.append,
             ) as gateway:
-                result = await gateway.generate_text(PROBE_PROMPT)  # retry_safe remains False.
+                # Native sampling is deprecated on newer models. Probe policy needs
+                # bounded output, not deterministic sampling; no user setting is dropped.
+                prompt = (
+                    replace(PROBE_PROMPT, temperature=None)
+                    if view["provider_type"] == "anthropic"
+                    else PROBE_PROMPT
+                )
+                result = await gateway.generate_text(prompt)  # retry_safe remains False.
             assert len(observed) == 1
             target = observed[0]
             # Text success cannot establish streaming/structured/multimodal model capabilities.
