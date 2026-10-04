@@ -16,6 +16,7 @@ from sqlalchemy.ext.asyncio import (
 )
 
 from app.core.config import ConfigurationError
+from app.core.temporary_credentials import TemporaryCredentialRegistry
 
 
 def get_database_url() -> str:
@@ -55,6 +56,7 @@ class DatabaseRuntime:
     engine: AsyncEngine | None = None
     factory: async_sessionmaker[AsyncSession] | None = None
     credential_cleanup_task: asyncio.Task[None] | None = None
+    temporary_credentials: TemporaryCredentialRegistry | None = None
 
     def session_factory(self) -> async_sessionmaker[AsyncSession]:
         # No await between creation and publication, so first concurrent calls cannot race.
@@ -70,12 +72,14 @@ class DatabaseRuntime:
 @asynccontextmanager
 async def database_lifespan(_app: FastAPI) -> AsyncIterator[dict[str, DatabaseRuntime]]:
     """Lazy DB configuration keeps /health usable without a configured database."""
-    runtime = DatabaseRuntime()
+    runtime = DatabaseRuntime(temporary_credentials=TemporaryCredentialRegistry())
     try:
         # ASGI copies this lifespan state into each request on the owning loop.
         # app.state alone is unsafe when embedded hosts have multiple lifespan loops.
         yield {"database_runtime": runtime}
     finally:
+        if runtime.temporary_credentials is not None:
+            await runtime.temporary_credentials.close()
         if runtime.credential_cleanup_task is not None:
             runtime.credential_cleanup_task.cancel()
             with suppress(asyncio.CancelledError):

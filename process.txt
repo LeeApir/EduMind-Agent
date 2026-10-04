@@ -818,3 +818,7 @@ ADR-0008 A–D获用户批准，安全边界与PRD/Provider/ADR索引同步，T0
 实现匿名会话隔离Provider连接、AES-GCM信封/主密钥轮换、版本变更/删除和到期清理，保持API后续任务边界 | T003完成aad3b2f；已确认现有测试PG容器可用；Provider0 | 不读取真实env/Key、不调用Provider；迁移和并发只用新隔离库 | 锁定加密依赖、编写模型/迁移/服务/清理/CLI与风险测试，实际PG验收后独立提交
 [2026-10-04T11:06:18] [PHASE-1-T004] VERIFIED | executor=Lee
 连接模型/0018迁移、AES-GCM随机信封、owner/原会话绑定/版本锁、keyless墓碑与到期清理、100条DEK轮换CLI及固定依赖完成 | 隔离PG v4迁移往返及30测试无跳过通过；Ruff/6模块mypy/契约/治理/diff通过；v2文件名和v3旧Mock测试模式前置修正，原失败证据保留；Provider0累计2033/2500 | HTTP端点/发送锁在T007/T009后续实现；Python内存擦除与备份退役边界按ADR；不填人工reviewer | 本地完成提交后T005临时Key，交接docs/PROVIDERS.md及local-materials/phase-1-t004/checks/，不push/merge/部署
+[2026-10-04T11:08:49] [PHASE-1-T005] START | executor=Lee | branch=codex/phase-1-t002-t005
+提供进程/owner/session/连接版本/operation绑定的单次临时Key、5min待领取/4个上限、180s绝对deadline/到期/撤销/取消清理 | T004完成7e0a586且工作区干净；Provider0 | 只实现内部生命周期与后续API集成入口，不序列化/队列转发或运行真实模型 | 单元并发/失败/取消/计时器及隔离PG持久Key不误清理验证后完成批次
+[2026-10-04T11:23:11] [PHASE-1-T005] VERIFIED | executor=Lee
+临时注册表绑定loop/owner/session/连接版本/operation/purpose/model，单次领取/4待领取上限/300s等待/180s绝对deadline、受控buffer清理与禁序列化，lifespan退出及提交后撤销通知完成 | 最终隔离PG v3迁移往返与53测试无跳过通过；离线22通过/1PG跳过由v3覆盖；Ruff/5模块mypy/532ref契约/治理/diff通过；初始格式及Awaitable标注修正；Provider新增0累计2033/2500 | 内部服务不授予出站许可；T007发送锁/T009 HTTP接入仍planned，Python副本按ADR有限擦除；T033仍blocked，不填人工reviewer | 完成本地提交并结束授权T002–T005批次；下一T006待用户授权，交接docs/PROVIDERS.md、backend/app/core/temporary_credentials.py及local-materials/phase-1-t005/checks/，不push/merge/部署

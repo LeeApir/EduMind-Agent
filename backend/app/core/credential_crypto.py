@@ -96,7 +96,8 @@ def envelope_key_id(envelope: bytes) -> str:
     return key_id
 
 
-def encrypt_secret(secret: Mapping[str, str], context: bytes, keyring: CredentialKeyring) -> bytes:
+def serialize_secret(secret: Mapping[str, str]) -> bytes:
+    """Strict internal encoding shared by persistent and memory-only credentials."""
     if not secret or set(secret) - {"api_key", "api_secret", "app_id"} or "api_key" not in secret:
         raise CredentialFailure("VALIDATION_ERROR")
     if any(not isinstance(v, str) or not 1 <= len(v) <= 4096 for v in secret.values()):
@@ -104,6 +105,11 @@ def encrypt_secret(secret: Mapping[str, str], context: bytes, keyring: Credentia
     raw = json.dumps(dict(secret), separators=(",", ":"), sort_keys=True).encode()
     if len(raw) > 8192:
         raise CredentialFailure("VALIDATION_ERROR")
+    return raw
+
+
+def encrypt_secret(secret: Mapping[str, str], context: bytes, keyring: CredentialKeyring) -> bytes:
+    raw = serialize_secret(secret)
     dek = AESGCM.generate_key(bit_length=256)
     nonce, wrap_nonce = urandom(12), urandom(12)
     return json.dumps(

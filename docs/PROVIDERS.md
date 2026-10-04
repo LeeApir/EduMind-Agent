@@ -128,3 +128,15 @@ Provider失败只携带固定输出类别与验证过的非负整数token用量�
 凭据服务每次访问前幂等清理到期/丢失父会话的密文，API数据库runtime从首次使用开始每60s后台清理，退出时取消清理task；不加载KEK，失败只记录固定错误。过期使用独立逻辑检查，不依赖物理清理及时性。数据库/服务停机不能保证物理清空时限，恢复后先清理再操作。清理不删User或学习历史，不处理备份擦除。
 
 隔离验证入口：`backend/.venv/bin/python scripts/run_provider_storage_tests.py edumind_catalog_phase1_<新轮次> tests/test_provider_connections_persistence.py tests/test_auth.py`，只接受专用测试库名，复用既有测试PG容器，运行迁移升/降/升与实际测试，移除Provider/主密钥环境配置；不要指向用户开发或生产库。HTTP连接管理仍由T009实现，T004只交付内部存储/维护服务。
+
+## Phase 1临时凭据生命周期（T005）
+
+每个ASGI lifespan拥有独立`DatabaseRuntime.temporary_credentials`注册表，关闭lifespan清除所有条目并取消活动operation；无需数据库/主密钥即可维持health。`TemporaryCredentialService`以服务端认证身份读取连接，要求当前版本、enabled与temporary模式，使用原始会话期限注册；不允许用临时清理路径改动持久信封或系统Key。后续HTTP依赖必须复用该lifespan注册表，嵌入式无lifespan调用不能临时创建另一个注册表冒充可恢复状态。
+
+handle为32随机字节的URL-safe编码，只在所属进程/loop有效。绑定owner/session/connection/version/operation/purpose/model，不能独立鉴权。每会话最多4个待领取条目，等待最多300s或会话到期；原子单次领取后最长180s或会话到期，使用独立绝对计时器，持续token不能延长期限。所有终止路径清零并清空受控bytearray、释放条目；Python和HTTP库产生的明文副本仍遵循ADR-B7的有限保证。
+
+后续T009连接修改/删除依赖必须使用`ProviderConnectionStore(..., on_change=registry.revoke)`，事务成功提交后同步通知所属注册表；`TemporaryCredentialService`也会为自己的store配置该回调，拒绝混用另一注册表回调。失败事务不通知。每秒另行检查DB owner/session/连接版本，检查1s未完成或失败即触发取消；取消慢的数据库检查不会延迟取消operation或等待无限清理，检查task被取消且异常不输出。session/operation绝对计时器独立于DB检查。业务代码必须在`async with registry.lease(handle, binding)`内管理并关闭上游流；租约只允许所属operation task读取secret。
+
+注册表/条目/租约拒绝pickle与默认JSON序列化，不提供转发、恢复或持久Key替代路径。API/队列实现仍须遵守ADR-C6：不得把原始secret、handle或租约放进后台模型任务，只能移交已审核且不含凭据的DSL/Job ID。注册表与内部解密均不授予出站许可，T007须在实际发送边界实施锁、同意、目标校验和预算；T009接入HTTP时还须落实Cookie/CSRF、no-store、输入错误脱敏与前端表单清空。
+
+测试入口：`cd backend && .venv/bin/python -m pytest -q tests/test_temporary_provider_credentials.py`运行离线生命周期测试，PG项在未配置隔离库时明确跳过；完整验收使用`backend/.venv/bin/python scripts/run_provider_storage_tests.py edumind_catalog_phase1_<新轮次> tests/test_temporary_provider_credentials.py tests/test_provider_connections_persistence.py tests/test_auth.py tests/test_catalog_mode.py tests/test_database_lifespan.py tests/test_health.py`。仅测试标记secret、受控DNS和FakeAdapter，无真实模型调用。

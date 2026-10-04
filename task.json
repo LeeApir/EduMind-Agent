@@ -318,7 +318,7 @@
       "id": "PHASE-1-T005",
       "phase": "Phase 1",
       "title": "提供会话临时Key生命周期",
-      "status": "todo",
+      "status": "done",
       "priority": "P1",
       "depends_on": [
         "PHASE-1-T002",
@@ -327,7 +327,8 @@
       "scope": [
         "backend/app/core/",
         "backend/app/services/",
-        "backend/tests/"
+        "backend/tests/",
+        "docs/PROVIDERS.md"
       ],
       "prd_source": "PRD §3.8 API Key与隐私",
       "acceptance_criteria": [
@@ -337,11 +338,38 @@
       ],
       "verification": [
         "cd backend && .venv/bin/python -m pytest -q tests/test_temporary_provider_credentials.py",
-        "对本任务改动运行Ruff和mypy；涉及持久化时在隔离PostgreSQL核验迁移及并发。"
+        "对本任务改动运行Ruff和mypy；涉及持久化时在隔离PostgreSQL核验迁移及并发。",
+        "backend/.venv/bin/python scripts/run_provider_storage_tests.py edumind_catalog_phase1_t005_v3 tests/test_temporary_provider_credentials.py tests/test_provider_connections_persistence.py tests/test_auth.py tests/test_catalog_mode.py tests/test_database_lifespan.py tests/test_health.py"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "cd backend && .venv/bin/python -m pytest -q tests/test_temporary_provider_credentials.py",
+          "result": "22 passed, 1 PG skipped in offline run; skip is not counted as passed; PG covered in dedicated v3 run",
+          "evidence": "local-materials/phase-1-t005/checks/unit.txt"
+        },
+        {
+          "command": "backend/.venv/bin/python scripts/run_provider_storage_tests.py edumind_catalog_phase1_t005_v3 tests/test_temporary_provider_credentials.py tests/test_provider_connections_persistence.py tests/test_auth.py tests/test_catalog_mode.py tests/test_database_lifespan.py tests/test_health.py",
+          "result": "passed: 53 tests, no skips; migration roundtrip, loop/owner/session/operation bindings, atomic claim/quota, expiry/deadline despite tokens, all termination paths, slow DB/error/cancellation safety, real DB commit notification and cross-process polling simulated by an independent store and persistent envelope preserved; Provider 0",
+          "evidence": "local-materials/phase-1-t005/checks/pg-v3.txt"
+        },
+        {
+          "command": "backend/.venv/bin/ruff check backend/app/core/temporary_credentials.py backend/app/services/temporary_credentials.py backend/app/services/provider_connections.py backend/app/core/credential_crypto.py backend/app/core/database.py backend/tests/test_temporary_provider_credentials.py",
+          "result": "passed",
+          "evidence": "local-materials/phase-1-t005/checks/ruff.txt"
+        },
+        {
+          "command": "cd backend && .venv/bin/mypy app/core/temporary_credentials.py app/services/temporary_credentials.py app/services/provider_connections.py app/core/credential_crypto.py app/core/database.py",
+          "result": "passed: 5 modules; initial Awaitable/create_task annotation corrected with an async wrapper",
+          "evidence": "local-materials/phase-1-t005/checks/mypy.txt"
+        },
+        {
+          "command": "backend/.venv/bin/python scripts/check_provider_contract.py; python3 scripts/check_catalog_workflow.py; git diff --check",
+          "result": "passed: 532 refs/60 operations/84 examples, DAG/catalog workflow and diff; HTTP contract stays planned, archived ledgers unchanged",
+          "evidence": "local-materials/phase-1-t005/checks/contract.txt; local-materials/phase-1-t005/checks/workflow.txt"
+        }
+      ],
+      "started_at": "2026-10-04T11:08:49",
+      "completed_at": "2026-10-04T11:23:11",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T005"
     },

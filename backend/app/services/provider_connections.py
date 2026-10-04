@@ -4,7 +4,7 @@ import ipaddress
 import json
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from typing import Mapping
+from typing import Callable, Mapping
 from urllib.parse import urlsplit, urlunsplit
 from uuid import UUID, uuid4
 
@@ -114,11 +114,13 @@ class ProviderConnectionStore:
         *,
         policy: TargetPolicy | None = None,
         resolver: Resolver = resolve_addresses,
+        on_change: Callable[[UUID], None] | None = None,
     ) -> None:
         self.factory = factory
         self.keyring = keyring
         self.policy = policy or TargetPolicy()
         self.resolver = resolver
+        self.on_change = on_change
 
     def _keys(self) -> CredentialKeyring:
         if self.keyring is None:
@@ -286,7 +288,10 @@ class ProviderConnectionStore:
             row.config_version += 1
             row.updated_at = datetime.now(timezone.utc)
             await db.flush()
-            return connection_view(row)
+            view = connection_view(row)
+        if self.on_change is not None:
+            self.on_change(connection_id)
+        return view
 
     async def delete(
         self, identity: CredentialIdentity, connection_id: UUID, expected_version: int
@@ -304,6 +309,8 @@ class ProviderConnectionStore:
             row.config_version += 1
             row.credential_version += 1
             row.updated_at = datetime.now(timezone.utc)
+        if self.on_change is not None:
+            self.on_change(connection_id)
 
     async def decrypt(
         self,
