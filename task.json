@@ -926,7 +926,7 @@
       "id": "PHASE-1-T022",
       "phase": "Phase 1",
       "title": "确定动画DSL与审核安全契约",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1-T001",
@@ -947,9 +947,25 @@
       "verification": [
         "审核DSL有效/无效示例、资源上限、发布与降级时序，核对批准记录。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "只读核对模板/renderer/runner/Review/Job/media/目录边界及官方JSON Schema/Python AST/Manim Text/Docker文档；doc-coauthoring独立读者检查、五处修订后复核",
+          "result": "document review passed after clarifying original-session fallback authority, holder/observer disconnect, count-limit code, revise vs reject fixture and compare lifetime; exact temporary credential binding and fallback denominator clarified; not user approval or runtime validation",
+          "evidence": "docs/ADR/0010-constrained-animation-dsl.md; docs/agents/animation-dsl-v1/README.md; local-materials/phase-1-t022/checks/reader-review.txt"
+        },
+        {
+          "command": "backend/.venv/bin/python local-materials/phase-1-t022/checks/verify_document.py; backend/.venv/bin/python scripts/check_provider_contract.py; python3 scripts/check_catalog_workflow.py; git diff --check",
+          "result": "passed: 8-file manifest, 62 local links, 27 local schema refs, nine-action candidate 30.8s, 22 negative examples (2 need independent review, not run), strict review output examples, public API unchanged, 532 refs/60 operations/84 examples, only other task change T025 adds T024 dependency, archives and runtime unchanged, append-only log; Provider 0; specific ADR approval missing",
+          "evidence": "docs/agents/animation-dsl-v1/proposal-manifest.json; local-materials/phase-1-t022/checks/document-check.json; contract.txt; workflow.txt"
+        },
+        {
+          "command": "backend/.venv/bin/python local-materials/phase-1-t022/checks/verify_approval.py; backend/.venv/bin/python scripts/check_provider_contract.py; python3 scripts/check_catalog_workflow.py; git diff --check",
+          "result": "passed: actual user approval and exact original 8-file manifest registered, A–D decisions and seven attachments unchanged, 65 local links, nine-action 30.8s example and 22 negatives, public API unchanged, 532 refs/60 operations/84 examples, archives/runtime unchanged; first approval-check assertion incorrectly expected proposed status, corrected; Provider 0",
+          "evidence": "docs/ADR/0010-dsl-approval-20261004.json; docs/agents/animation-dsl-v1/proposal-manifest.json; local-materials/phase-1-t022/checks/approval-check.json"
+        }
+      ],
+      "started_at": "2026-10-04T13:33:35",
+      "completed_at": "2026-10-04T13:55:28",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T022"
     },
@@ -1021,7 +1037,8 @@
       "priority": "P1",
       "depends_on": [
         "PHASE-1-T012",
-        "PHASE-1-T023"
+        "PHASE-1-T023",
+        "PHASE-1-T024"
       ],
       "scope": [
         "backend/app/agents/",

@@ -836,3 +836,13 @@ ADR-0008 A–D获用户批准，安全边界与PRD/Provider/ADR索引同步，T0
 ADR-0009 A–D获实际用户批准，登记准确提案digest，保留PG状态/outbox/租约/取消/媒体/迁移回滚边界；架构与OpenAPI内部注记同步 | 批准字节/A–D不变、42本地链接、532ref/60operation/84示例、治理/归档/只追加日志/后端未改/diff通过；Provider0累计2033/2500 | Redis/Celery实现及故障矩阵留T019–T021/T036；无人工reviewer | 本地完成提交后领取P0 T022 DSL契约；交接docs/ADR/0009-durable-animation-queue.md、批准JSON及local-materials/phase-1-t018/checks/，不push/merge/部署
 [2026-10-04T13:32:50] [PHASE-1-T018] VERIFIED | executor=Lee
 纠正上一条核验计数文字，实际批准后本地链接为43而非42；不改变原始输出 | approval-check.json及复跑均43，其余验证结论不变，Provider0 | 无新增问题 | 完成T018本地提交后T022
+[2026-10-04T13:33:35] [PHASE-1-T022] START | executor=Lee | branch=codex/phase-1-continued
+T018完成6645239后按P0/文件顺序领取DSL设计任务，继承ADR-0008/0009已批准凭据/队列边界 | 依赖T001/T018完成且领取前工作区干净；Provider0 | 九动作/schema/审核/编译/AST/缓存/撤回的新安全决定需具体批准，设计不等于实施 | 核对现有模板/审核/缓存/发布协议，准备有效无效示例与资源上限，独立读者检查后提交可审阅方案
+[2026-10-04T13:51:27] [PHASE-1-T022] BLOCKED | executor=Lee
+ADR-0010 A–D与九动作schema/审核schema/有效和22拒绝示例/两个Prompt共8文件提案已准备；owner私有缓存/精确临时凭据/撤回/模型准备与渲染分离/一次模板降级边界明确；清单SHA256=25d44d3a80967fe1f95a6fbe8a81168145aa43902e00801b627b5861b5e94c3f | 62本地链接/27内部schema引用/30.8s九动作/22示例/532ref/60operation/84示例/治理/归档/只追加日志/运行时未改/diff通过；独立读者五问题修订后复核；OpenAPI拼接初错未落盘后修正；Provider0累计2033/2500 | 验收要求获得ADR批准，缺具体用户批准，不创建Task-Completed；非模型/容器/媒体验收；不填人工reviewer | 请审阅docs/ADR/0010-constrained-animation-dsl.md批准A–D及附件；获批登记清单digest后完成T022，再按依赖/优先级串行推进；T025增加T024前置，保留local-materials/phase-1-t022/checks/及原始提案备份，不push/merge/部署
+[2026-10-04T13:53:02] [PHASE-1-T022] BLOCKED | executor=Lee
+连续三轮目标回合确认同一具体ADR批准缺失，持续目标已由update_goal返回blocked，停止自动续跑等待用户决定 | 八文件提案及清单digest不变，T022无完成提交/无批准登记/无in_progress；Provider0 | T022验收需要用户批准ADR-0010 A–D及附件，不能用持续授权替代 | 用户明确批准后登记准确清单digest、RESUME并完成T022；现有提案及证据保留，不push/merge/部署
+[2026-10-04T13:54:21] [PHASE-1-T022] RESUME | executor=Lee | branch=codex/phase-1-continued
+用户明确批准ADR-0010 A–D及8文件附件，登记原始清单SHA256=25d44d3a80967fe1f95a6fbe8a81168145aa43902e00801b627b5861b5e94c3f；按已有持续Phase 1授权恢复 | 原提案八文件digest与备份一致；Provider0 | 批准不代表运行时/实际模型/容器/动态开放完成 | 核验批准记录、契约/治理与diff后完成T022本地提交，再按优先级/依赖推进
+[2026-10-04T13:55:28] [PHASE-1-T022] VERIFIED | executor=Lee
+ADR-0010 A–D及附件获实际用户批准，保留准确原始8文件清单与批准登记，架构/索引/OpenAPI同步；T025增加T024编译前置 | 原清单/A–D/7附件不变、65链接、九动作30.8s/22示例、532ref/60operation/84示例/治理/归档/只追加日志/运行时未改/diff通过；批准脚本首轮旧proposed断言修正后通过；Provider0累计2033/2500 | 具体DSL/容器/模型/动态开放仍待后续任务验证；不填人工reviewer | 本地完成提交后按文件顺序领取P1 T007连接路由；交接docs/ADR/0010-constrained-animation-dsl.md、批准JSON、docs/agents/animation-dsl-v1/与local-materials/phase-1-t022/checks/，不push/merge/部署

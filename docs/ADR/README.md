@@ -39,6 +39,8 @@
 
 ## Phase 1决定
 
+[ADR-0010：受约束动画DSL、审核与来源隔离](0010-constrained-animation-dsl.md)为PHASE-1-T022的Accepted方案，用户于2026-10-04批准A–D及准确附件，见[批准登记](0010-dsl-approval-20261004.json)：九动作/资源上限、独立审核/固定编译/沙箱、owner私有DSL缓存/撤回、有界API生成与无凭据队列及模板降级。未实施DSL或开放动态入口。
+
 [ADR-0009：持久化动画队列、恢复与迁移](0009-durable-animation-queue.md)为PHASE-1-T018的Accepted方案，用户于2026-10-04批准A–D，提案digest及原话见[批准登记](0009-queue-approval-20261004.json)：PG唯一状态源/最小消息、事务outbox与Redis丢失恢复、Worker租约/取消/媒体发布、增量切换与回滚。尚未实施Redis/Celery，后续按T019–T021验证；批准不授予真实Provider预算或部署。
 
 [ADR-0008：Provider身份、凭据与出站数据边界](0008-provider-credentials-and-egress-boundary.md)为PHASE-1-T002的Accepted方案，用户于2026-10-04明确批准A–D，具体提案digest及原话见[批准登记](0008-provider-approval-20261004.json)。批准2h匿名凭据留存、加密轮换、临时Key与发送/回退边界；按T002至T005批次实现，实际Provider调用仍须独立授权。
