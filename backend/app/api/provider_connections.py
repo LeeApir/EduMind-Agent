@@ -24,6 +24,7 @@ from app.core.provider_target import (
 from app.core.temporary_credentials import TemporaryCredentialRegistry
 from app.services.provider_connection_dispatch import ConnectionRoute
 from app.services.provider_connections import CredentialIdentity, ProviderConnectionStore
+from app.services.provider_gateway import ProviderError
 from app.services.temporary_credentials import TemporaryCredentialService
 
 CACHE_HEADERS = {"Cache-Control": "private, no-store"}
@@ -35,6 +36,7 @@ Category = Literal[
 
 # All messages are fixed; none interpolate client input, secrets or SQL/library errors.
 ERRORS = {
+    "BUDGET_NOT_AUTHORIZED": (403, "Provider request budget is not authorized."),
     "UNAUTHORIZED": (401, "Session missing or expired."),
     "NOT_FOUND": (404, "Resource not found."),
     "VERSION_CONFLICT": (409, "Connection version no longer matches."),
@@ -42,10 +44,15 @@ ERRORS = {
     "CREDENTIAL_EXPIRED": (409, "Provider credential expired."),
     "VALIDATION_ERROR": (422, "Request did not satisfy the schema."),
     "INVALID_TARGET": (422, "Provider target is not permitted."),
+    "CAPABILITY_UNAVAILABLE": (422, "Selected provider capability is unavailable."),
+    "RATE_LIMITED": (429, "Selected provider is rate limited."),
+    "AUTHENTICATION_FAILED": (502, "Selected provider rejected authentication."),
+    "INVALID_OUTPUT": (502, "Selected provider returned invalid output."),
+    "TIMEOUT": (504, "Selected provider operation timed out."),
     "CONFIGURATION_MISSING": (503, "Provider credential configuration is unavailable."),
     "CREDENTIAL_MISSING": (503, "Provider credential is missing."),
     "CREDENTIAL_UNAVAILABLE": (503, "Provider credential is unavailable."),
-    "TEMPORARILY_UNAVAILABLE": (503, "Provider storage is temporarily unavailable."),
+    "TEMPORARILY_UNAVAILABLE": (503, "Provider service is temporarily unavailable."),
 }
 
 
@@ -81,6 +88,8 @@ class ProviderRoute(APIRoute):
                 )
             except CredentialFailure as error:
                 return safe_error(error.code)
+            except ProviderError as error:
+                return safe_error(error.code.value)
             except TargetValidationError:
                 return safe_error("INVALID_TARGET")
             except RequestValidationError:

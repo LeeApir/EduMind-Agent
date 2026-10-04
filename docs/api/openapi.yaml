@@ -1433,7 +1433,7 @@
       ],
       "responses": {
         "200": {
-          "description": "Successful operation.",
+          "description": "One explicit text probe; this action may contact the selected service. Other capabilities remain unknown.",
           "headers": {
             "Cache-Control": {
               "schema": {
@@ -1658,9 +1658,9 @@
           }
         }
       },
-      "description": "Explicit consent for selected version/model and probe-only data. At most one bounded outbound attempt, no retry/fallback/download. Budget must be separately authorized; otherwise 403 BUDGET_NOT_AUTHORIZED. Temporary handle only for same operation/purpose; unavailable process requires re-entry.",
+      "description": "Explicit consent for selected version/model and probe-only data. This action may contact the selected service: one fixed short text prompt, maximum 8 output tokens and 10 seconds overall, no retry/fallback/download. Text reachability cannot verify streaming/structured/multimodal capabilities; those stay unknown. target is the actual approved Base URL, is_local reflects all DNS answers at send time and does not prove an offline service. Budget must be separately authorized; otherwise 403 BUDGET_NOT_AUTHORIZED. Temporary handle only for same operation/purpose; unavailable process requires re-entry.",
       "x-implementation-task": "PHASE-1-T010",
-      "x-runtime-status": "planned",
+      "x-runtime-status": "implemented",
       "requestBody": {
         "required": true,
         "content": {

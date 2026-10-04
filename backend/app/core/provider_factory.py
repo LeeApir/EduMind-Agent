@@ -9,6 +9,7 @@ import httpx
 from app.core.config import ConfigurationError, ProviderSettings, get_provider_settings
 from app.core.product_mode import catalog_only
 from app.core.provider_target import (
+    ApprovedTarget,
     ProviderTargetGuard,
     TargetValidationError,
     target_policy_from_environment,
@@ -75,12 +76,15 @@ async def build_connection_provider_gateway(
     *,
     registry: TemporaryCredentialRegistry | None = None,
     transport: httpx.AsyncBaseTransport | None = None,
+    target_observer: Callable[[ApprovedTarget], None] | None = None,
 ) -> AsyncIterator[ProviderGateway]:
     """Only an explicitly selected and budget-authorized route gets credentials."""
     from app.services.ollama import OllamaAdapter
     from app.services.openai_compatible import OpenAICompatibleAdapter
 
-    operation = ConnectionOperation(store, request, authorize_attempt, transport=transport)
+    operation = ConnectionOperation(
+        store, request, authorize_attempt, transport=transport, target_observer=target_observer
+    )
     async with operation.activate(registry):
         adapter: ProviderAdapter = (
             OllamaAdapter(operation)

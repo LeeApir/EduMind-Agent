@@ -576,7 +576,7 @@
       "id": "PHASE-1-T010",
       "phase": "Phase 1",
       "title": "提供有界连接测试API",
-      "status": "todo",
+      "status": "done",
       "priority": "P1",
       "depends_on": [
         "PHASE-1-T007",
@@ -587,7 +587,11 @@
         "backend/app/api/",
         "backend/app/services/",
         "backend/tests/",
-        "docs/api/openapi.yaml"
+        "docs/api/openapi.yaml",
+        "backend/app/core/provider_factory.py",
+        "backend/app/main.py",
+        "docs/ADR/0008-provider-api-contract.md",
+        "docs/PROVIDERS.md"
       ],
       "prd_source": "PRD §7.8 POST connections/{id}/test",
       "acceptance_criteria": [
@@ -599,9 +603,20 @@
         "cd backend && .venv/bin/python -m pytest -q tests/test_provider_connection_test_api.py",
         "对本任务改动运行Ruff和mypy；涉及持久化时在隔离PostgreSQL核验迁移及并发。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "backend/.venv/bin/python scripts/run_provider_storage_tests.py edumind_catalog_phase1_t010_v6 tests/test_provider_connection_test_api.py tests/test_provider_connections_api.py tests/test_provider_connection_gateway.py tests/test_ollama_adapter.py",
+          "result": "passed: isolated PG migration upgrade/downgrade/upgrade; 183 tests including 29 probe API cases, no skips. Strict Mock responses fixed (role/model/index/normal done), production assertions unchanged. Earlier v1/v2 nonexistent test path and v3/v4 fixture failures retained. Actual Provider requests 0.",
+          "evidence": "local-materials/phase-1-t010/checks/pg-v6.txt"
+        },
+        {
+          "command": "Ruff changed 7 Python files; mypy 6 application sources; check_provider_contract.py; check_catalog_workflow.py; git diff --check",
+          "result": "passed: Ruff, mypy6, 532 refs/60 operation IDs/84 examples/7 runtime route-ID matches; active workflow and diff. No real budget grant or dynamic recovery.",
+          "evidence": "local-materials/phase-1-t010/checks/"
+        }
+      ],
+      "started_at": "2026-10-04T16:04:03",
+      "completed_at": "2026-10-04T16:25:56",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T010"
     },

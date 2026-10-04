@@ -133,9 +133,11 @@ class ConnectionOperation(MemoryOnly):
         authorize_attempt: AttemptAuthorizer,
         *,
         transport: httpx.AsyncBaseTransport | None,
+        target_observer: Callable[[ApprovedTarget], None] | None = None,
     ) -> None:
         self.store, self.request = store, request
         self.authorize_attempt, self.transport = authorize_attempt, transport
+        self.target_observer = target_observer
         self._task = asyncio.current_task()
         self._lease: TemporaryLease | None = None
         self._active = False
@@ -297,6 +299,8 @@ class ConnectionOperation(MemoryOnly):
                     )
                 ):
                     raise ProviderError(ProviderErrorCode.INVALID_TARGET)
+                if self.target_observer is not None:
+                    self.target_observer(target)
                 await self.store._session(db, r.identity)
                 self._check()
                 # Mandatory injected budget/operation authorization, no default grant.

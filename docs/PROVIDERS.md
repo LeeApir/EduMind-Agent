@@ -1,6 +1,6 @@
 # Provider Gateway：现行契约与验证边界
 
-PRD §3.8 规定 P0 使用单一服务端 OpenAI-compatible Provider。系统默认连接由服务端配置的 DeepSeek 模型，使用 Responses 传输；Phase 1 新增内部连接网关，连接管理 API 和模型选择页由后续任务交付。两条路径均不自动跨厂商回退。
+PRD §3.8 规定 P0 使用单一服务端 OpenAI-compatible Provider。系统默认连接由服务端配置的 DeepSeek 模型，使用 Responses 传输；Phase 1 新增内部连接网关与连接管理/显式测试 API，模型选择页由后续任务交付。两条路径均不自动跨厂商回退。
 
 ## Phase 1已批准边界
 
@@ -25,6 +25,10 @@ T008 为 `provider_type=ollama` 选择原生适配器，其他业务接口仍是
 模型能力仍显式绑定连接配置版本、模型 ID 和声明版本，不根据模型名称推断。声明支持结构化输出时，`json_schema` 使用原生 `format=<schema>`，`json_object` 使用 `format="json"`，`text_json` 仅注入 JSON 指令；三种传输必须由能力声明明确选择，不自动降级。全部结果继续经过本地严格 JSON/schema 校验与业务审核。JSON/消息参数/字节限制提取为厂商无关共享校验，兼容适配器继续使用相同规则，网络 JSON 只接受 UTF-8。依据：[Ollama 结构化输出](https://docs.ollama.com/capabilities/structured-outputs)。
 
 Ollama 复用 T007 的 owner/会话/配置版本/同意、每次预算授权、发送行锁、撤销和临时 Key 生命周期；无 Key 连接不借用系统凭据。T008 只提供内部适配，没有增加对外生成端点或解除 `catalog_only`。真实本地实例可用性属于后续独立接入验收；本任务实际模型请求为 0。
+
+## 显式连接测试
+
+T010 的 POST `/api/providers/connections/{id}/test` 只接受操作ID、精确版本/模型/probe-only同意和可选临时handle；固定短提示、最多8输出token、10秒总期限、一次尝试、不回退。target是发送当时批准的Base URL，is_local来自该次DNS全部地址，不证明服务离线；文本成功仍将所有高级能力标为未知，不返回上游生成正文。响应private/no-store并提示可能调用服务。默认预算拒绝出站；Mock测试注入的授权不是生产预算或真实Provider验收，实际预算与计数由T035交付。
 
 ## 内部调用边界
 
