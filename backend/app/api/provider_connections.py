@@ -40,6 +40,7 @@ ERRORS = {
     "UNAUTHORIZED": (401, "Session missing or expired."),
     "NOT_FOUND": (404, "Resource not found."),
     "VERSION_CONFLICT": (409, "Connection version no longer matches."),
+    "FEATURE_UNAVAILABLE": (409, "Dynamic generation is not enabled."),
     "CONSENT_REQUIRED": (409, "Consent does not match the selected route."),
     "CREDENTIAL_EXPIRED": (409, "Provider credential expired."),
     "VALIDATION_ERROR": (422, "Request did not satisfy the schema."),

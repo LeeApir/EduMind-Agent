@@ -303,8 +303,6 @@ class ConnectionOperation(MemoryOnly):
                     )
                 ):
                     raise ProviderError(ProviderErrorCode.INVALID_TARGET)
-                if self.target_observer is not None:
-                    self.target_observer(target)
                 await self.store._session(db, r.identity)
                 self._check()
                 # Mandatory injected budget/operation authorization, no default grant.
@@ -381,6 +379,8 @@ class ConnectionOperation(MemoryOnly):
                     secret.clear()
                     headers.clear()
                     response = await client.send(wire, stream=True, follow_redirects=False)
+                    if self.target_observer is not None:
+                        self.target_observer(target)
                     # Mock/custom transports may not implement trace: never release early.
                     if not sent:
                         await db.commit()

@@ -38,6 +38,14 @@ T011提供认证静态类型目录GET `/api/providers/catalog`、owner/原会话
 
 官方列表协议只提供模型ID等元数据，不能据名称或family推断能力：[OpenAI列表](https://developers.openai.com/api/reference/resources/models/methods/list)、[Ollama列表](https://docs.ollama.com/api/tags)。若兼容服务显式提供项目可选字段 `edumind_capabilities`，只读取已定义的streaming/structured_output/tool_calling/vision/embedding/tts/asr布尔或null；这不是官方字段。输出source=declared与本地解析规则版本model-list-declarations-v1；绝不接受上游自称verified，缺字段仍null/source=unknown，不把声明当真实质量验收。`resolve_capabilities`只解析owner/当前配置/确切模型的缓存声明，流式/结构化能力未知或不匹配由网关在预算/发送前拒绝。后续原生声明和真实验证仍各自验收。
 
+## 四档偏好与选择
+
+T012提供GET `/api/model-preferences` 与CSRF PUT `/api/model-preferences/{task_profile}`，保存fast/default/quality/review四档。Alembic0020的偏好按owner/原会话隔离，expected_version=0仅首次创建，随后精确比较当前单调版本；同owner行锁保护首次创建竞争。route和最多3个有序fallback包含连接/配置版本/模型/数据类别，必须明确同意，不能重复同一连接版本与模型或把鉴权/无效输出列入回退条件。不存Key/handle/响应正文，不读取主密钥或接触模型。GET只列已有档位；state=available是配置资格，能力/真实连通性仍须另验。禁用/删除/过期/缺凭据返回unavailable；有效连接版本变化为consent_required，原偏好保留便于解释和重选。
+
+`select_route`返回内部临时覆盖→用户该档位→default用户默认→系统默认来源；未配置才继续查下一层，已保存的失效选择不自动降级。review可独立选择连接/模型。`generate_selected`只处理非流式文本/结构化请求；当前catalog_only先拒绝，所有被选目标先核验owner/会话、当前版本/资格、精确模型缓存能力、本次独立同意和实际数据类别，再由发送锁进行逐次预算授权。只有RATE_LIMITED/TIMEOUT/TEMPORARILY_UNAVAILABLE匹配用户有序fallback的on_errors时尝试对应目标，每目标一次；最多主路由+3个fallback，无同意/能力/预算即停止，无默认系统Key回退。审核结构化能力未知或不可用不返回审核结果，不能发布正式资源。临时Key分别绑定每一目标的本次操作，流式仍只用原目标、不拼接回退正文。
+
+安全记录回调只包含所用route、收到上游响应的实际Base URL、选择来源、固定回退原因与结果码；无请求/响应正文或秘密。连接失败未收到响应则target=null，不把批准但未发送的目标记为完成。系统默认分支需调用方显式提供独立authorize_system与网关，缺少即拒绝，旧学习路由不因此切换。T013/T014负责前端与业务组装，真实预算/动态开放仍单独验收。
+
 ## 内部调用边界
 
 业务服务只依赖 `backend/app/services/provider_gateway.py` 中的 `ProviderGateway`、请求/结果类型与 `ProviderError`，不得直接导入厂商 SDK 或处理厂商响应格式。`ProviderAdapter` 是可替换的单次调用边界；现有具体适配器由服务端工厂按结构化传输配置组装。
