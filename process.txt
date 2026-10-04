@@ -814,3 +814,7 @@ ADR-0008 A–D获用户批准，安全边界与PRD/Provider/ADR索引同步，T0
 依据Accepted ADR-0008冻结Provider API契约，复用Cookie/CSRF并定义临时handle/版本/删除/能力/同意/错误语义 | T002完成73d92b3；现有OpenAPI为JSON兼容YAML，Provider0 | 本任务不实现HTTP端点或解除目录门禁 | 校验全部ref/operationId/请求与响应示例及secret写入边界，独立提交后T004
 [2026-10-04T00:33:02] [PHASE-1-T003] VERIFIED | executor=Lee
 冻结12项Provider连接/临时上传/探测/缓存与显式刷新/档位API，owner/CSRF/no-store、版本冲突/墓碑删除/只写secret/同意/错误/未知能力及planned状态同步 | 532引用/60唯一operationId/84示例及负例检查、Ruff/diff通过；初次本地生成脚本括号错误修正后通过；Provider0 | 本任务只有契约，实际端点由T009至T012实现；目录门禁不变 | 本地完成提交后T004，交接docs/ADR/0008-provider-api-contract.md与scripts/check_provider_contract.py
+[2026-10-04T00:33:33] [PHASE-1-T004] START | executor=Lee | branch=codex/phase-1-t002-t005
+实现匿名会话隔离Provider连接、AES-GCM信封/主密钥轮换、版本变更/删除和到期清理，保持API后续任务边界 | T003完成aad3b2f；已确认现有测试PG容器可用；Provider0 | 不读取真实env/Key、不调用Provider；迁移和并发只用新隔离库 | 锁定加密依赖、编写模型/迁移/服务/清理/CLI与风险测试，实际PG验收后独立提交
+[2026-10-04T11:06:18] [PHASE-1-T004] VERIFIED | executor=Lee
+连接模型/0018迁移、AES-GCM随机信封、owner/原会话绑定/版本锁、keyless墓碑与到期清理、100条DEK轮换CLI及固定依赖完成 | 隔离PG v4迁移往返及30测试无跳过通过；Ruff/6模块mypy/契约/治理/diff通过；v2文件名和v3旧Mock测试模式前置修正，原失败证据保留；Provider0累计2033/2500 | HTTP端点/发送锁在T007/T009后续实现；Python内存擦除与备份退役边界按ADR；不填人工reviewer | 本地完成提交后T005临时Key，交接docs/PROVIDERS.md及local-materials/phase-1-t004/checks/，不push/merge/部署

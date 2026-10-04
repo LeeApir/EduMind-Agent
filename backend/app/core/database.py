@@ -1,7 +1,8 @@
 """Asynchronous PostgreSQL connection utilities."""
 
+import asyncio
 from collections.abc import AsyncIterator
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager, suppress
 from dataclasses import dataclass
 from os import getenv
 
@@ -32,7 +33,9 @@ def get_database_url() -> str:
 
 def create_database_engine(database_url: str | None = None) -> AsyncEngine:
     """Create an engine for an explicit test URL or the server environment URL."""
-    return create_async_engine(database_url or get_database_url(), pool_pre_ping=True)
+    return create_async_engine(
+        database_url or get_database_url(), pool_pre_ping=True, hide_parameters=True
+    )
 
 
 async def check_database_connection(database_url: str | None = None) -> None:
@@ -51,12 +54,16 @@ class DatabaseRuntime:
 
     engine: AsyncEngine | None = None
     factory: async_sessionmaker[AsyncSession] | None = None
+    credential_cleanup_task: asyncio.Task[None] | None = None
 
     def session_factory(self) -> async_sessionmaker[AsyncSession]:
         # No await between creation and publication, so first concurrent calls cannot race.
         if self.factory is None:
             self.engine = create_database_engine()
             self.factory = async_sessionmaker(self.engine, expire_on_commit=False)
+            from app.core.credential_cleanup import cleanup_loop
+
+            self.credential_cleanup_task = asyncio.create_task(cleanup_loop(self.factory))
         return self.factory
 
 
@@ -69,6 +76,10 @@ async def database_lifespan(_app: FastAPI) -> AsyncIterator[dict[str, DatabaseRu
         # app.state alone is unsafe when embedded hosts have multiple lifespan loops.
         yield {"database_runtime": runtime}
     finally:
+        if runtime.credential_cleanup_task is not None:
+            runtime.credential_cleanup_task.cancel()
+            with suppress(asyncio.CancelledError):
+                await runtime.credential_cleanup_task
         if runtime.engine is not None:
             await runtime.engine.dispose()
 

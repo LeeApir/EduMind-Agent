@@ -116,3 +116,15 @@ Provider失败只携带固定输出类别与验证过的非负整数token用量�
 ## Phase 1 API契约
 
 [T003契约落实](ADR/0008-provider-api-contract.md)与[OpenAPI](api/openapi.yaml)定义12个Provider操作，包括临时凭据提交及GET模型缓存/POST显式刷新。If-Match/配置版本、owner与CSRF、只写secret、同意与统一错误均固定；x-runtime-status=planned端点尚未实现。可运行 `backend/.venv/bin/python scripts/check_provider_contract.py` 离线核验引用/示例/安全字段，不能替代实际HTTP验收。
+
+## Phase 1持久化与管理员轮换（T004）
+
+迁移`0018_provider_connections`保存owner/原会话/到期时间、配置与凭据版本、非敏感KEK ID和AES-GCM信封；元数据只读响应不含secret/密文。`ProviderConnectionStore`在创建/更新/读取/解密/删除时验证会话与owner，行锁和版本检查防止并发覆盖；目标变更清除旧凭据，删除留禁用墓碑。内部`decrypt`不提供出站许可，T007仍须实现发送边界锁/同意与预算门禁。
+
+依赖固定为[cryptography 50.0.2](https://pypi.org/project/cryptography/50.0.2/)，由pyproject/uv.lock锁定。服务端配置：`EDUMIND_CREDENTIAL_ACTIVE_KEY_ID`指向`EDUMIND_CREDENTIAL_KEYRING_JSON`中的KEK ID；JSON值为32字节KEK的标准base64。不要把真实值写入文档/仓库/输出。无配置不生成替代密钥，目录与health继续可用，凭据写入/解密失败关闭。
+
+管理员从安全配置注入新旧KEK，设新active后在backend运行 `.venv/bin/python -m app.core.rotate_provider_credentials`。CLI按100行批次锁定并重包裹DEK，保留payload密文；中断可重入，失败只输出安全代码或计数，非零退出。仅所有有效凭据不再引用旧KEK、并明确处理历史备份后才退役旧KEK；提前移除会使旧信封不可解密。此CLI不创建/调用Provider，学生没有轮换HTTP入口。
+
+凭据服务每次访问前幂等清理到期/丢失父会话的密文，API数据库runtime从首次使用开始每60s后台清理，退出时取消清理task；不加载KEK，失败只记录固定错误。过期使用独立逻辑检查，不依赖物理清理及时性。数据库/服务停机不能保证物理清空时限，恢复后先清理再操作。清理不删User或学习历史，不处理备份擦除。
+
+隔离验证入口：`backend/.venv/bin/python scripts/run_provider_storage_tests.py edumind_catalog_phase1_<新轮次> tests/test_provider_connections_persistence.py tests/test_auth.py`，只接受专用测试库名，复用既有测试PG容器，运行迁移升/降/升与实际测试，移除Provider/主密钥环境配置；不要指向用户开发或生产库。HTTP连接管理仍由T009实现，T004只交付内部存储/维护服务。
