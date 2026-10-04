@@ -5,7 +5,7 @@ import json
 from collections.abc import AsyncIterator, Awaitable, Callable, Mapping
 from contextlib import asynccontextmanager, suppress
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from secrets import token_urlsafe
 from typing import Any
 from uuid import UUID
@@ -195,6 +195,17 @@ class TemporaryCredentialRegistry(MemoryOnly):
         self._observers.add(entry.observer)
         entry.observer.add_done_callback(self._observers.discard)
         return handle
+
+    def pending_expires_at(self, handle: str, binding: TemporaryBinding) -> datetime:
+        """Safe receipt metadata for the authenticated uploader; never returns payload."""
+        self._assert_loop()
+        self._purge()
+        entry = self._entries.get(handle)
+        if entry is None or entry.active or entry.binding != binding:
+            raise CredentialFailure("CREDENTIAL_UNAVAILABLE")
+        return datetime.now(timezone.utc) + timedelta(
+            seconds=max(0.0, entry.deadline - self._loop.time())
+        )
 
     @asynccontextmanager
     async def lease(self, handle: str, binding: TemporaryBinding) -> AsyncIterator[TemporaryLease]:

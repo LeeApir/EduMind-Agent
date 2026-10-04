@@ -1,5 +1,6 @@
 """Offline OpenAPI integrity and secret/consent example validation."""
 import json
+import sys
 from copy import deepcopy
 from pathlib import Path
 
@@ -13,6 +14,12 @@ def check_contract() -> dict[str, int]:
     doc = json.loads((ROOT / 'docs/api/openapi.yaml').read_text())
     operation_ids: set[str] = set()
     refs = 0
+    implemented = 0
+    # Import registration only: lazy lifespan/credentials never touch DB/Provider here.
+    sys.path.insert(0, str(ROOT / 'backend'))
+    from fastapi.routing import APIRoute
+
+    from app.main import app
 
     def walk(value: object) -> None:
         nonlocal refs
@@ -44,7 +51,14 @@ def check_contract() -> dict[str, int]:
             operation_ids.add(oid)
             if 'x-implementation-task' not in operation:
                 continue
-            assert operation['x-runtime-status'] == 'planned'
+            status = operation['x-runtime-status']
+            assert status in {'planned', 'implemented'}
+            if status == 'implemented':
+                matches = [route for route in app.routes if isinstance(route, APIRoute)
+                           and route.path == path and method.upper() in route.methods
+                           and route.operation_id == oid]
+                assert len(matches) == 1, (path, method, oid)
+                implemented += 1
             assert operation['security'] == [{'sessionCookie': []}]
             if method != 'get':
                 assert any(p.get('$ref', '').endswith('/CsrfToken') for p in operation['parameters'])
@@ -88,7 +102,8 @@ def check_contract() -> dict[str, int]:
         if key not in {'source', 'version'}:
             assert schemas['ProviderCapability']['properties'][key]['type'] == ['boolean', 'null']
     assert 'get' not in doc['paths']['/api/providers/connections/{connection_id}/models/refresh']
-    return {'references': refs, 'unique_operations': len(operation_ids), 'validated_examples': examples}
+    return {'references': refs, 'unique_operations': len(operation_ids),
+            'validated_examples': examples, 'implemented_operations': implemented}
 
 
 if __name__ == '__main__':

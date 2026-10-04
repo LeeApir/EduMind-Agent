@@ -1,8 +1,10 @@
 # ADR-0008 API契约落实（PHASE-1-T003）
 
-依据已批准[ADR-0008](0008-provider-credentials-and-egress-boundary.md) A–D与[批准记录](0008-provider-approval-20261004.json)，新增契约保存于[OpenAPI](../api/openapi.yaml)。本文件不新增安全批准，也不声称端点已运行；新增操作以`x-runtime-status=planned`及实施任务注明未来交付。
+依据已批准[ADR-0008](0008-provider-credentials-and-egress-boundary.md) A–D与[批准记录](0008-provider-approval-20261004.json)，契约保存于[OpenAPI](../api/openapi.yaml)。本文件不新增安全批准；各操作由`x-runtime-status`及实施任务注明交付状态。
 
 连接集合/单项CRUD归T009，显式一次连接测试归T010，静态类型/能力及缓存模型列表/显式POST刷新归T011，四档偏好归T012。T004只建立持久化服务，T005只建立内存生命周期；临时secret上传HTTP入口也由T009交付。普通GET不访问Provider；测试/刷新POST需CSRF、单独预算及选中版本/模型/data categories的同意。
+
+T009已实现集合/单项CRUD和临时secret上传六个操作，始终返回`Cache-Control: private, no-store`；列表最多100条，只过滤当前owner与原创建会话的未删除连接，不接触模型。PATCH/DELETE的`If-Match`为1–20字符的正十进制版本。新建可显式禁用；目标/类型变更及secret=null后安全查询显示missing。读取/删除不要求主密钥，创建/更新仍按ADR-0008失败关闭；主密钥只在身份/连接归属验证后加载。DNS资格检查在线程中执行，结束后重新检查数据库会话（强制刷新已载入状态），到期时回滚修改。临时凭据的短期handle与真实等待到期时间仅由上传响应返回；达到4个待领取上限时503 CREDENTIAL_UNAVAILABLE，更新/删除立即撤销，重启不能恢复secret。测试、模型刷新、偏好及真实模型验收仍由后续任务交付；目录门禁持续有效。
 
 ## 版本与凭据
 

@@ -1,5 +1,6 @@
 """Transactional credential storage; network invocation remains a later task."""
 
+import asyncio
 import ipaddress
 import json
 from dataclasses import dataclass, field
@@ -116,15 +117,19 @@ class ProviderConnectionStore:
         policy: TargetPolicy | None = None,
         resolver: Resolver = resolve_addresses,
         on_change: Callable[[UUID], None] | None = None,
+        keyring_loader: Callable[[], CredentialKeyring] | None = None,
     ) -> None:
         self.factory = factory
         self.keyring = keyring
         self.policy = policy or TargetPolicy()
         self.resolver = resolver
         self.on_change = on_change
+        self.keyring_loader = keyring_loader
 
     def _keys(self) -> CredentialKeyring:
         if self.keyring is None:
+            if self.keyring_loader is not None:
+                return self.keyring_loader()
             raise CredentialFailure("CONFIGURATION_MISSING")
         return self.keyring
 
@@ -135,10 +140,12 @@ class ProviderConnectionStore:
 
     async def _session(self, db: AsyncSession, identity: CredentialIdentity) -> GuestSessionRecord:
         auth = await db.scalar(
-            select(GuestSessionRecord).where(
+            select(GuestSessionRecord)
+            .where(
                 GuestSessionRecord.token_hash == identity.session_hash,
                 GuestSessionRecord.user_id == identity.user_id,
             )
+            .execution_options(populate_existing=True)
         )
         if auth is None or auth.expires_at <= datetime.now(timezone.utc):
             raise CredentialFailure("UNAUTHORIZED")
@@ -201,15 +208,16 @@ class ProviderConnectionStore:
         base_url: str,
         mode: str,
         secret: Mapping[str, str] | None = None,
+        enabled: bool = True,
     ) -> dict[str, object]:
         await self._prepare()
-        keys = self._keys()
         self._validate(provider_type, display_name, mode)
         if (mode == "persistent") != (secret is not None):
             raise CredentialFailure("VALIDATION_ERROR")
         async with self.factory() as db, db.begin():
             auth = await self._session(db, identity)
-            target, local = self._target(base_url)
+            keys = self._keys()
+            target, local = await asyncio.to_thread(self._target, base_url)
             await self._session(db, identity)
             now = datetime.now(timezone.utc)
             row = ProviderConnection(
@@ -220,7 +228,7 @@ class ProviderConnectionStore:
                 display_name=display_name,
                 base_url=target,
                 is_local=local,
-                enabled=True,
+                enabled=enabled,
                 deleted=False,
                 config_version=1,
                 credential_version=1,
@@ -241,6 +249,25 @@ class ProviderConnectionStore:
         async with self.factory() as db, db.begin():
             return connection_view(await self._row(db, identity, connection_id))
 
+    async def list(self, identity: CredentialIdentity) -> list[dict[str, object]]:
+        await self._prepare()
+        async with self.factory() as db, db.begin():
+            await self._session(db, identity)
+            rows = (
+                await db.scalars(
+                    select(ProviderConnection)
+                    .where(
+                        ProviderConnection.user_id == identity.user_id,
+                        ProviderConnection.originating_session_hash == identity.session_hash,
+                        ProviderConnection.deleted.is_(False),
+                    )
+                    .order_by(ProviderConnection.created_at, ProviderConnection.id)
+                    .limit(100)
+                )
+            ).all()
+            await self._session(db, identity)
+            return [connection_view(row) for row in rows]
+
     async def replace(
         self,
         identity: CredentialIdentity,
@@ -256,9 +283,9 @@ class ProviderConnectionStore:
         mode: str | None = None,
     ) -> dict[str, object]:
         await self._prepare()
-        keys = self._keys()
         async with self.factory() as db, db.begin():
             row = await self._row(db, identity, connection_id, expected_version)
+            keys = self._keys()
             if row.credential_expires_at <= datetime.now(timezone.utc):
                 raise CredentialFailure("CREDENTIAL_EXPIRED")
             kind, name, new_mode = (
@@ -267,7 +294,10 @@ class ProviderConnectionStore:
                 mode or row.credential_mode,
             )
             self._validate(kind, name, new_mode)
-            target, local = self._target(base_url or row.base_url)
+            target, local = await asyncio.to_thread(self._target, base_url or row.base_url)
+            await self._session(db, identity)
+            if row.credential_expires_at <= datetime.now(timezone.utc):
+                raise CredentialFailure("CREDENTIAL_EXPIRED")
             changed = (
                 kind != row.provider_type
                 or target != row.base_url
@@ -301,8 +331,10 @@ class ProviderConnectionStore:
         await self._prepare()
         async with self.factory() as db, db.begin():
             row = await self._row(db, identity, connection_id, include_deleted=True)
-            if row.deleted and row.config_version == expected_version + 1:
-                return
+            if row.deleted:
+                if row.config_version == expected_version + 1:
+                    return
+                raise CredentialFailure("VERSION_CONFLICT")
             if row.config_version != expected_version:
                 raise CredentialFailure("VERSION_CONFLICT")
             row.encrypted_api_key = None
@@ -341,10 +373,16 @@ class ProviderConnectionStore:
         async with self.factory() as db:
             row = await db.scalar(
                 select(ProviderConnection.id)
-                .join(GuestSessionRecord, (
-                    (GuestSessionRecord.token_hash == ProviderConnection.originating_session_hash)
-                    & (GuestSessionRecord.user_id == ProviderConnection.user_id)
-                ))
+                .join(
+                    GuestSessionRecord,
+                    (
+                        (
+                            GuestSessionRecord.token_hash
+                            == ProviderConnection.originating_session_hash
+                        )
+                        & (GuestSessionRecord.user_id == ProviderConnection.user_id)
+                    ),
+                )
                 .where(
                     ProviderConnection.id == connection_id,
                     ProviderConnection.user_id == identity.user_id,

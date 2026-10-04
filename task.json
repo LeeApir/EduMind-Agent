@@ -522,7 +522,7 @@
       "id": "PHASE-1-T009",
       "phase": "Phase 1",
       "title": "提供owner隔离的连接管理API",
-      "status": "todo",
+      "status": "done",
       "priority": "P1",
       "depends_on": [
         "PHASE-1-T003",
@@ -534,7 +534,11 @@
         "backend/app/api/",
         "backend/app/services/",
         "backend/tests/",
-        "docs/api/openapi.yaml"
+        "docs/api/openapi.yaml",
+        "backend/app/main.py",
+        "backend/app/core/temporary_credentials.py",
+        "docs/ADR/0008-provider-api-contract.md",
+        "scripts/check_provider_contract.py"
       ],
       "prd_source": "PRD §7.8",
       "acceptance_criteria": [
@@ -546,9 +550,25 @@
         "cd backend && .venv/bin/python -m pytest -q tests/test_provider_connections_api.py",
         "对本任务改动运行Ruff和mypy；涉及持久化时在隔离PostgreSQL核验迁移及并发。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "backend/.venv/bin/python scripts/run_provider_storage_tests.py edumind_catalog_phase1_t009_v2 tests/test_provider_connections_api.py tests/test_provider_connections_persistence.py tests/test_temporary_provider_credentials.py tests/test_provider_connection_gateway.py tests/test_ollama_adapter.py tests/test_auth.py tests/test_database_lifespan.py",
+          "result": "passed: 194 tests, no skips; dedicated PG migration roundtrip; HTTP CRUD/private no-store/owner/CSRF/version/target/change/clear/deletion retry/concurrent patch/restart/temporary upload capacity/revoke, provider and auth/lifespan regressions. v1 found real deleted-tombstone current-version re-delete bug: fixed branch to allow only last pre-delete version, preserved assertion. Mock DNS and no Provider calls.",
+          "evidence": "local-materials/phase-1-t009/checks/pg-v1.txt; local-materials/phase-1-t009/checks/pg-v2.txt"
+        },
+        {
+          "command": "backend/.venv/bin/python scripts/run_provider_storage_tests.py edumind_catalog_phase1_t009_v4 tests/test_provider_connections_api.py",
+          "result": "passed: 40 tests, no skips; added same-owner second originating session isolation, actual PG session expiry during threaded DNS create/patch rolls back, 100-record limit, SQL error fixed/redacted, health/catalog usable without KEK. v3 extra tests initially missed select import: corrected without changing assertions. Three warnings: existing Starlette deprecation and FastAPI/Pydantic repr metadata warning; explicit model/error/log redaction tests passed.",
+          "evidence": "local-materials/phase-1-t009/checks/pg-v3.txt; local-materials/phase-1-t009/checks/pg-v4.txt"
+        },
+        {
+          "command": "backend/.venv/bin/ruff check backend/tests/test_provider_connections_api.py backend/app/api/provider_connections.py backend/app/services/provider_connections.py backend/app/core/temporary_credentials.py backend/app/main.py; backend/.venv/bin/mypy backend/app/api/provider_connections.py backend/app/services/provider_connections.py backend/app/core/temporary_credentials.py backend/app/main.py; backend/.venv/bin/python scripts/check_provider_contract.py; python3 scripts/check_catalog_workflow.py; git diff --check",
+          "result": "passed: mypy 4 sources, Ruff, 532 references/60 unique operations/84 examples/6 implemented route-ID matches, workflow/diff. Original planned-only verifier assertion updated to verify actual registration rather than claim planned. OpenAPI original formatting retained; only 6 runtime statuses and 2 max header lengths changed. Real Provider 0; T010/11/12 remain future, catalog_only unchanged.",
+          "evidence": "local-materials/phase-1-t009/checks/ruff.txt; local-materials/phase-1-t009/checks/mypy.txt; local-materials/phase-1-t009/checks/contract-v1.txt; local-materials/phase-1-t009/checks/contract.txt; local-materials/phase-1-t009/checks/workflow.txt"
+        }
+      ],
+      "started_at": "2026-10-04T15:39:20",
+      "completed_at": "2026-10-04T16:03:25",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T009"
     },

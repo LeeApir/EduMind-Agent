@@ -409,7 +409,7 @@
       },
       "description": "Current owner only; at most 100 connections; no secret/handle/ciphertext fields and no network probe.",
       "x-implementation-task": "PHASE-1-T009",
-      "x-runtime-status": "planned"
+      "x-runtime-status": "implemented"
     },
     "post": {
       "tags": [
@@ -586,7 +586,7 @@
       },
       "description": "Owner/session derived from cookie. Persistent mode requires secret, temporary/none forbid it. Syntax and target eligibility only; no automatic model probe. Credential expiry cannot exceed original session.",
       "x-implementation-task": "PHASE-1-T009",
-      "x-runtime-status": "planned",
+      "x-runtime-status": "implemented",
       "requestBody": {
         "required": true,
         "content": {
@@ -790,7 +790,7 @@
       },
       "description": "Current owner and originating session; foreign or deleted connection is 404; missing/expired session is 401.",
       "x-implementation-task": "PHASE-1-T009",
-      "x-runtime-status": "planned"
+      "x-runtime-status": "implemented"
     },
     "patch": {
       "tags": [
@@ -821,7 +821,8 @@
           "required": true,
           "schema": {
             "type": "string",
-            "pattern": "^[1-9][0-9]*$"
+            "pattern": "^[1-9][0-9]*$",
+            "maxLength": 20
           },
           "description": "Current positive config_version as an unquoted decimal integer."
         }
@@ -986,7 +987,7 @@
       },
       "description": "If-Match mandatory. Target/type change clears old credentials and consent; replacement secret must be explicitly provided for persistent mode. null clears secret. Reject secret in temporary/none mode. All changes increment config_version and invalidate old consent/temporary handles; no model call.",
       "x-implementation-task": "PHASE-1-T009",
-      "x-runtime-status": "planned",
+      "x-runtime-status": "implemented",
       "requestBody": {
         "required": true,
         "content": {
@@ -1030,7 +1031,8 @@
           "required": true,
           "schema": {
             "type": "string",
-            "pattern": "^[1-9][0-9]*$"
+            "pattern": "^[1-9][0-9]*$",
+            "maxLength": 20
           },
           "description": "Current positive config_version as an unquoted decimal integer."
         }
@@ -1188,7 +1190,7 @@
       },
       "description": "Transaction clears secret, disables and tombstones connection, increments version, invalidates preferences/consent. Repeated delete with last pre-delete If-Match returns 204; another version returns 409. Cross-owner 404. Already sent data cannot be recalled; see ADR-0008 cancellation boundary.",
       "x-implementation-task": "PHASE-1-T009",
-      "x-runtime-status": "planned"
+      "x-runtime-status": "implemented"
     }
   },
   "/api/providers/connections/{connection_id}/temporary-credentials": {
@@ -1376,7 +1378,7 @@
       },
       "description": "Only temporary connection at matching consent/config version. Process-local handle bound to authenticated owner/session/operation; pending <=5min, <=4 per session; one claim, total operation <=180s and session deadline. No persistence/network call.",
       "x-implementation-task": "PHASE-1-T009",
-      "x-runtime-status": "planned",
+      "x-runtime-status": "implemented",
       "requestBody": {
         "required": true,
         "content": {

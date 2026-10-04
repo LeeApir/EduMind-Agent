@@ -18,6 +18,7 @@ from app.api.learning_sessions import router as learning_sessions_router
 from app.api.markdown_notes import router as markdown_notes_router
 from app.api.paths import router as paths_router
 from app.api.profile import router as profile_router
+from app.api.provider_connections import router as provider_connections_router
 from app.api.quiz import router as quiz_router
 from app.core.auth import AuthFailure
 from app.core.database import database_lifespan
@@ -37,6 +38,7 @@ app.include_router(learning_events_router)
 app.include_router(learning_sessions_router, dependencies=[Depends(require_dynamic_mode)])
 app.include_router(markdown_notes_router)
 app.include_router(profile_router)
+app.include_router(provider_connections_router)
 app.include_router(paths_router)
 app.include_router(quiz_router)
 
