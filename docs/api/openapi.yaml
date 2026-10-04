@@ -221,7 +221,7 @@
       },
       "description": "Static adapter types; no model calls, no private connection data.",
       "x-implementation-task": "PHASE-1-T011",
-      "x-runtime-status": "planned"
+      "x-runtime-status": "implemented"
     }
   },
   "/api/providers/connections": {
@@ -1866,7 +1866,7 @@
       },
       "description": "Read existing owner-scoped snapshot only, never refresh or contact Provider. Unknown/undeclared capability is null; empty cache is empty models with refreshed_at=null.",
       "x-implementation-task": "PHASE-1-T011",
-      "x-runtime-status": "planned"
+      "x-runtime-status": "implemented"
     }
   },
   "/api/providers/connections/{connection_id}/models/refresh": {
@@ -2121,9 +2121,9 @@
           }
         }
       },
-      "description": "Explicit consent/budget. One bounded outbound model-list attempt, no background poll or fallback. Error retains previous snapshot. GET never refreshes. Missing usage stays unknown.",
+      "description": "Explicit consent/budget; this action may contact the selected service. One GET models or api/tags attempt, 10 second total deadline, 2 MiB body and 1000 unique model IDs maximum, no poll/retry/fallback/download. Only sanitized IDs and capability booleans are cached in PostgreSQL for the selected config version; error retains previous snapshot. Standard lists do not declare capabilities. Optional edumind_capabilities boolean/null metadata is source=declared, never verified; parser rule version is retained, no name inference. GET never refreshes; changed config returns an empty current-version cache. No usage supplied by list endpoints.",
       "x-implementation-task": "PHASE-1-T011",
-      "x-runtime-status": "planned",
+      "x-runtime-status": "implemented",
       "requestBody": {
         "required": true,
         "content": {

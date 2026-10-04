@@ -30,6 +30,14 @@ Ollama 复用 T007 的 owner/会话/配置版本/同意、每次预算授权、�
 
 T010 的 POST `/api/providers/connections/{id}/test` 只接受操作ID、精确版本/模型/probe-only同意和可选临时handle；固定短提示、最多8输出token、10秒总期限、一次尝试、不回退。target是发送当时批准的Base URL，is_local来自该次DNS全部地址，不证明服务离线；文本成功仍将所有高级能力标为未知，不返回上游生成正文。响应private/no-store并提示可能调用服务。默认预算拒绝出站；Mock测试注入的授权不是生产预算或真实Provider验收，实际预算与计数由T035交付。
 
+## 模型缓存与声明
+
+T011提供认证静态类型目录GET `/api/providers/catalog`、owner/原会话过滤的缓存GET `/api/providers/connections/{id}/models`，以及显式POST `.../models/refresh`。类型目录包含后续原生类型，不承诺尚未实现的适配器可调用；不加载主密钥或调用模型。缓存绑定连接配置版本，存PostgreSQL `provider_model_snapshots`（Alembic0019）；空缓存/配置变更返回models=[]、refreshed_at=null，不证明供应商没有模型。读取不刷新、不做DNS/模型出口，重启可恢复同一有效会话的快照。
+
+刷新只在精确版本/模型/probe-only同意和预算授权后，复用发送行锁、凭据/临时handle和固定IP边界。固定GET `<base>/models` 或原生 `<base>/api/tags`，不发送学生上下文；10秒总期限、2MiB累计响应、最多1000唯一模型ID，无重试/分页/回退/下载。全部响应校验后，在同一连接行锁及会话/版本复核下原子更新；错误保留旧快照，配置变更或撤销禁止发布。模型ID只允许有界无控制字符文本；原始owned_by/digest/details/secret等元数据丢弃，当前Key回显被拒绝而不是缓存/返回。用量未提供，不伪造token计数。默认预算仍拒绝，实际Provider调用0。
+
+官方列表协议只提供模型ID等元数据，不能据名称或family推断能力：[OpenAI列表](https://developers.openai.com/api/reference/resources/models/methods/list)、[Ollama列表](https://docs.ollama.com/api/tags)。若兼容服务显式提供项目可选字段 `edumind_capabilities`，只读取已定义的streaming/structured_output/tool_calling/vision/embedding/tts/asr布尔或null；这不是官方字段。输出source=declared与本地解析规则版本model-list-declarations-v1；绝不接受上游自称verified，缺字段仍null/source=unknown，不把声明当真实质量验收。`resolve_capabilities`只解析owner/当前配置/确切模型的缓存声明，流式/结构化能力未知或不匹配由网关在预算/发送前拒绝。后续原生声明和真实验证仍各自验收。
+
 ## 内部调用边界
 
 业务服务只依赖 `backend/app/services/provider_gateway.py` 中的 `ProviderGateway`、请求/结果类型与 `ProviderError`，不得直接导入厂商 SDK 或处理厂商响应格式。`ProviderAdapter` 是可替换的单次调用边界；现有具体适配器由服务端工厂按结构化传输配置组装。

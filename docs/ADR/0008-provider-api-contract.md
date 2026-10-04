@@ -4,9 +4,11 @@
 
 连接集合/单项CRUD归T009，显式一次连接测试归T010，静态类型/能力及缓存模型列表/显式POST刷新归T011，四档偏好归T012。T004只建立持久化服务，T005只建立内存生命周期；临时secret上传HTTP入口也由T009交付。普通GET不访问Provider；测试/刷新POST需CSRF、单独预算及选中版本/模型/data categories的同意。
 
-T009已实现集合/单项CRUD和临时secret上传六个操作，始终返回`Cache-Control: private, no-store`；列表最多100条，只过滤当前owner与原创建会话的未删除连接，不接触模型。PATCH/DELETE的`If-Match`为1–20字符的正十进制版本。新建可显式禁用；目标/类型变更及secret=null后安全查询显示missing。读取/删除不要求主密钥，创建/更新仍按ADR-0008失败关闭；主密钥只在身份/连接归属验证后加载。DNS资格检查在线程中执行，结束后重新检查数据库会话（强制刷新已载入状态），到期时回滚修改。临时凭据的短期handle与真实等待到期时间仅由上传响应返回；达到4个待领取上限时503 CREDENTIAL_UNAVAILABLE，更新/删除立即撤销，重启不能恢复secret。模型刷新、偏好及真实模型验收仍由后续任务交付；目录门禁持续有效。
+T009已实现集合/单项CRUD和临时secret上传六个操作，始终返回`Cache-Control: private, no-store`；列表最多100条，只过滤当前owner与原创建会话的未删除连接，不接触模型。PATCH/DELETE的`If-Match`为1–20字符的正十进制版本。新建可显式禁用；目标/类型变更及secret=null后安全查询显示missing。读取/删除不要求主密钥，创建/更新仍按ADR-0008失败关闭；主密钥只在身份/连接归属验证后加载。DNS资格检查在线程中执行，结束后重新检查数据库会话（强制刷新已载入状态），到期时回滚修改。临时凭据的短期handle与真实等待到期时间仅由上传响应返回；达到4个待领取上限时503 CREDENTIAL_UNAVAILABLE，更新/删除立即撤销，重启不能恢复secret。偏好及真实模型验收仍由后续任务交付；目录门禁持续有效。
 
 T010已实现POST connections/{id}/test：显式选中版本/模型/probe-only同意，固定短提示、最多8输出token、总期限10秒、最多一次尝试；上游正文不返回。成功响应通过X-Provider-Probe-Notice提示可能调用服务。target为发送当时批准的Base URL，is_local取当次DNS全部地址的分类，不复用保存时的分类，也不证明服务离线。文本成功不证明流式/结构化/多模态能力，各字段仍null/source=unknown。ProbeBudget要求领取临时handle前非消耗检查和发送锁内重新授权；当前默认全部拒绝BUDGET_NOT_AUTHORIZED，真实预算待T035及单独批准。本次仅Mock出口与隔离PG，无真实模型请求。
+
+T011落实三项模型目录操作及Alembic0019的连接版本绑定模型快照：静态类型与缓存GET无DNS/模型调用；刷新显式一次GET、10秒/2MiB/1000唯一ID上限，默认预算拒绝。失败保留旧快照，变更配置使旧快照不可用于当前能力解析，发布前连接行锁/版本/会话复核。只存脱敏ID与规则化能力；可选edumind_capabilities是兼容服务的项目元数据扩展而非官方字段，仅布尔/null，source始终declared或unknown，规则版本由服务端确定、不推断名称、不承认上游verified。缓存和能力解析始终过滤当前owner与创建会话，不新增凭据/队列数据或改变匿名期限。
 
 ## 版本与凭据
 

@@ -147,6 +147,7 @@ class ConnectionOperation(MemoryOnly):
         self._busy = False
         self._response: httpx.Response | None = None
         self._client: httpx.AsyncClient | None = None
+        self._wire: httpx.Request | None = None
         self.provider_type: str | None = None
 
     def __repr__(self) -> str:
@@ -259,11 +260,14 @@ class ConnectionOperation(MemoryOnly):
     @asynccontextmanager
     async def send(
         self,
-        body: dict[str, object],
+        body: dict[str, object] | None,
         *,
         stream: bool = False,
     ) -> AsyncIterator[httpx.Response]:
         self._check()
+        listing = body is None
+        if listing != (self.request.purpose == "model_refresh") or (listing and stream):
+            raise CredentialFailure("VALIDATION_ERROR")
         if self._busy:
             raise CredentialFailure("CREDENTIAL_UNAVAILABLE")
         self._busy = True
@@ -327,7 +331,9 @@ class ConnectionOperation(MemoryOnly):
                     or any(ord(c) < 33 or ord(c) > 126 for c in secret["api_key"])
                 ):
                     raise CredentialFailure("CREDENTIAL_UNAVAILABLE")
-                endpoint, host = wire_target(target, provider_type=row.provider_type)
+                endpoint, host = wire_target(
+                    target, provider_type=row.provider_type, listing=listing
+                )
                 headers = {
                     "Host": host,
                     "Accept": (
@@ -365,7 +371,12 @@ class ConnectionOperation(MemoryOnly):
                     http2=False,
                 ) as client:
                     self._client = client
-                    wire = client.build_request("POST", endpoint, headers=headers, json=body)
+                    wire = (
+                        client.build_request("GET", endpoint, headers=headers)
+                        if listing
+                        else client.build_request("POST", endpoint, headers=headers, json=body)
+                    )
+                    self._wire = wire
                     wire.extensions.update(sni_hostname=target.hostname, trace=trace)
                     secret.clear()
                     headers.clear()
@@ -388,20 +399,35 @@ class ConnectionOperation(MemoryOnly):
                 await response.aclose()
             self._response = None
             self._client = None
+            self._wire = None
             self._busy = False
+
+    def check_public_metadata(self, value: str) -> None:
+        """Reject credential echoes while the header still exists inside send context."""
+        self._check()
+        if self._wire is None:
+            raise CredentialFailure("CREDENTIAL_UNAVAILABLE")
+        authorization = self._wire.headers.get("Authorization", "")
+        if authorization.startswith("Bearer ") and authorization[7:] in value:
+            raise ProviderError(ProviderErrorCode.INVALID_OUTPUT)
 
 
 def wire_target(
     target: ApprovedTarget,
     *,
     provider_type: str = "openai-compatible",
+    listing: bool = False,
 ) -> tuple[str, str]:
     from urllib.parse import urlsplit, urlunsplit
 
     parsed = urlsplit(target.url)
     ip = target.connect_ip
     netloc = f"[{ip}]" if ":" in ip else ip
-    suffix = {"openai-compatible": "/chat/completions", "ollama": "/api/chat"}.get(provider_type)
+    suffix = (
+        {"openai-compatible": "/models", "ollama": "/api/tags"}
+        if listing
+        else {"openai-compatible": "/chat/completions", "ollama": "/api/chat"}
+    ).get(provider_type)
     if suffix is None:
         raise ProviderError(ProviderErrorCode.CAPABILITY_UNAVAILABLE)
     endpoint = urlunsplit(

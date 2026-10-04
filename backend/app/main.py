@@ -19,6 +19,7 @@ from app.api.markdown_notes import router as markdown_notes_router
 from app.api.paths import router as paths_router
 from app.api.profile import router as profile_router
 from app.api.provider_connections import router as provider_connections_router
+from app.api.provider_model_catalog import router as provider_model_catalog_router
 from app.api.provider_probe import router as provider_probe_router
 from app.api.quiz import router as quiz_router
 from app.core.auth import AuthFailure
@@ -40,6 +41,7 @@ app.include_router(learning_sessions_router, dependencies=[Depends(require_dynam
 app.include_router(markdown_notes_router)
 app.include_router(profile_router)
 app.include_router(provider_connections_router)
+app.include_router(provider_model_catalog_router)
 app.include_router(provider_probe_router)
 app.include_router(paths_router)
 app.include_router(quiz_router)
