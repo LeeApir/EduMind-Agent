@@ -22,6 +22,7 @@ from app.core.credential_crypto import (
 from app.core.provider_target import Resolver, TargetPolicy, approve_target, resolve_addresses
 from app.models.auth import GuestSessionRecord
 from app.models.provider_connections import ProviderConnection
+from app.services.provider_connection_events import notify
 
 PROVIDER_TYPES = {"openai-compatible", "ollama", "anthropic", "gemini", "spark"}
 
@@ -289,6 +290,7 @@ class ProviderConnectionStore:
             row.updated_at = datetime.now(timezone.utc)
             await db.flush()
             view = connection_view(row)
+        notify(connection_id)
         if self.on_change is not None:
             self.on_change(connection_id)
         return view
@@ -309,6 +311,7 @@ class ProviderConnectionStore:
             row.config_version += 1
             row.credential_version += 1
             row.updated_at = datetime.now(timezone.utc)
+        notify(connection_id)
         if self.on_change is not None:
             self.on_change(connection_id)
 
@@ -332,12 +335,28 @@ class ProviderConnectionStore:
         self, identity: CredentialIdentity, connection_id: UUID, version: int
     ) -> bool:
         """Revocation observer for local operations, not a network send permission."""
-        try:
-            async with self.factory() as db, db.begin():
-                row = await self._row(db, identity, connection_id, version)
-                return row.enabled and row.credential_expires_at > datetime.now(timezone.utc)
-        except CredentialFailure:
-            return False
+        now = datetime.now(timezone.utc)
+        # MVCC read: observers must not wait on their own sender's row lock.
+        # This snapshot cannot authorize sending; dispatch uses _row + row lock.
+        async with self.factory() as db:
+            row = await db.scalar(
+                select(ProviderConnection.id)
+                .join(GuestSessionRecord, (
+                    (GuestSessionRecord.token_hash == ProviderConnection.originating_session_hash)
+                    & (GuestSessionRecord.user_id == ProviderConnection.user_id)
+                ))
+                .where(
+                    ProviderConnection.id == connection_id,
+                    ProviderConnection.user_id == identity.user_id,
+                    ProviderConnection.originating_session_hash == identity.session_hash,
+                    ProviderConnection.config_version == version,
+                    ProviderConnection.enabled.is_(True),
+                    ProviderConnection.deleted.is_(False),
+                    ProviderConnection.credential_expires_at > now,
+                    GuestSessionRecord.expires_at > now,
+                )
+            )
+            return row is not None
 
     async def rotate_batch(self, *, limit: int = 100) -> tuple[int, int]:
         await self._prepare()

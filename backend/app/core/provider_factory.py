@@ -1,7 +1,10 @@
 """Server-only composition root for configured Provider Gateway calls."""
 
-from collections.abc import Callable
+from collections.abc import AsyncIterator, Callable
+from contextlib import asynccontextmanager
 from os import getenv
+
+import httpx
 
 from app.core.config import ConfigurationError, ProviderSettings, get_provider_settings
 from app.core.product_mode import catalog_only
@@ -10,6 +13,13 @@ from app.core.provider_target import (
     TargetValidationError,
     target_policy_from_environment,
 )
+from app.core.temporary_credentials import TemporaryCredentialRegistry
+from app.services.provider_connection_dispatch import (
+    AttemptAuthorizer,
+    ConnectionOperation,
+    DispatchRequest,
+)
+from app.services.provider_connections import ProviderConnectionStore
 from app.services.provider_gateway import (
     ProviderAdapter,
     ProviderError,
@@ -55,3 +65,20 @@ def configured_provider_adapter(
 
         return DeepSeekBetaToolsAdapter(settings, guard)
     raise ProviderError(ProviderErrorCode.CONFIGURATION_MISSING)
+
+
+@asynccontextmanager
+async def build_connection_provider_gateway(
+    store: ProviderConnectionStore,
+    request: DispatchRequest,
+    authorize_attempt: AttemptAuthorizer,
+    *,
+    registry: TemporaryCredentialRegistry | None = None,
+    transport: httpx.AsyncBaseTransport | None = None,
+) -> AsyncIterator[ProviderGateway]:
+    """Only an explicitly selected and budget-authorized route gets credentials."""
+    from app.services.openai_compatible import OpenAICompatibleAdapter
+
+    operation = ConnectionOperation(store, request, authorize_attempt, transport=transport)
+    async with operation.activate(registry):
+        yield ProviderGateway(OpenAICompatibleAdapter(operation))

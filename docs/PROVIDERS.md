@@ -1,10 +1,20 @@
 # Provider Gateway：现行契约与验证边界
 
-PRD §3.8 规定 P0 使用单一服务端 OpenAI-compatible Provider。当前实现连接一个由服务端配置的 DeepSeek 模型，默认使用 Responses 传输；本文件定义业务代码和网络适配器之间的内部契约，不开放 BYOK、模型选择页或自动跨厂商回退。
+PRD §3.8 规定 P0 使用单一服务端 OpenAI-compatible Provider。系统默认连接由服务端配置的 DeepSeek 模型，使用 Responses 传输；Phase 1 新增内部连接网关，连接管理 API 和模型选择页由后续任务交付。两条路径均不自动跨厂商回退。
 
 ## Phase 1已批准边界
 
 用户已授权串行推进PHASE-1-T002至T005；[ADR-0008](ADR/0008-provider-credentials-and-egress-boundary.md)已于2026-10-04获用户A–D批准。确定匿名持久BYOK随原2h会话失效/清理、主密钥信封加密与显式轮换、进程/会话/单次操作内临时Key，以及配置版本绑定的数据去向同意和明确回退。批准登记见[具体记录](ADR/0008-provider-approval-20261004.json)。API/持久化/临时Key由T003至T005分别交付；批准不代表BYOK已可用，也不授权实际模型出口。
+
+用户随后授权持续串行完成 Phase 1。T007 的 `build_connection_provider_gateway` 接受服务端解析的 owner/原会话、连接 ID/配置版本、精确模型和数据类别同意，以及绑定同一连接版本与模型的能力声明。未知或未声明的流式/结构化能力拒绝调用；能力声明不等于真实模型验收。调用方必须注入每次尝试的预算/操作授权函数，没有默认授权；持久预算账本由 T035 交付。当前没有新增对外生成端点，`catalog_only` 仍拒绝生成，仅允许声明为 `probe` 的连接测试/模型刷新操作；真实模型出口仍需独立预算授权。
+
+内部操作与网关消费必须放在同一个 asyncio task 的上下文内；SSE 调用方应在消费任务内创建网关，不能跨任务借用已激活的凭据。每次重试都重新锁定连接、核验会话/版本/启用状态，重新解析并固定目标 IP，然后取得该次授权并读取凭据。持久 Key 不缓存，临时 Key 绑定原操作/用途/模型；明确无 Key 的连接不会借用系统 Key。禁用环境代理及跳转，保留原始 Host 与 TLS SNI。
+
+发送与删除/禁用共用 PostgreSQL 行锁；HTTPX 异步 trace 在实际 headers/body 发送开始前再次检查会话和期限，在请求体发送完成后提交并释放锁。流式读取不长期持锁。没有 trace 的测试传输保守地保持锁至响应头返回。每个操作最长 180 秒，或原会话/凭据更早的期限；同进程提交撤销立即取消，跨进程每 0.9 秒作无锁 MVCC 状态检查，检查最多 1 秒，失败同样取消。无锁观察不授予发送权限，避免观察者等待自己持有的发送锁。取消、消费者关闭、失败和正常结束均关闭上游并清理授权头/临时凭据。依据：[HTTPX trace 与 SNI](https://www.python-httpx.org/advanced/extensions/)。
+
+连接适配器固定调用所选 Base URL 的 `/chat/completions`，只发送本次消息、选定模型和受限参数（请求 1 MiB、响应累计 2 MiB、SSE 单帧 1 MiB）。文本只接受单个 assistant 结果与 `finish_reason=stop`；流式只转发可见 content，必须收到正常 finish 和 `[DONE]`。结构化传输显式声明为 `json_schema`、`json_object` 或 `text_json`，没有自动试探/降级；三种模式都做本地 JSON/schema 校验，重复键、非有限数、工具/拒绝输出与截断均拒绝。依据：[OpenAI 结构化输出](https://developers.openai.com/api/docs/guides/structured-outputs)、[流式输出](https://developers.openai.com/api/docs/guides/streaming-responses)。正式资源仍需业务审核。
+
+T007 验证：隔离 PostgreSQL 迁移往返及连接/临时凭据/系统 Provider 回归 276 项通过，无跳过；包括真实 HTTPX 到本机合成 HTTP 服务的发送事件测试。其余出站均为 Mock/受控 DNS，真实 Provider 请求 0。这些证据证明协议和并发边界，不证明供应商或模型可用性。
 
 ## 内部调用边界
 
