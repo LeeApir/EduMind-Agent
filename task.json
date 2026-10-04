@@ -782,7 +782,7 @@
       "id": "PHASE-1-T018",
       "phase": "Phase 1",
       "title": "确定持久化队列与迁移边界",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1-T001",
@@ -802,9 +802,25 @@
       "verification": [
         "逐情形评审任务时序与恢复方案，记录批准的ADR及API差异。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "只读核对animation Job/worker/lifecycle/SSE与官方Celery任务/Redis broker机制；doc-coauthoring独立读者检查及修订复核",
+          "result": "document review passed after fixing container launch-after-cleanup race, backend-scoped outbox and publish-time approval recheck; lock ordering and durable cleanup ownership clarified; AI review is not user approval; no runtime queue validation",
+          "evidence": "docs/ADR/0009-durable-animation-queue.md B/C/D; local-materials/phase-1-t018/checks/reader-review.txt"
+        },
+        {
+          "command": "python3 local-materials/phase-1-t018/checks/verify_proposal.py; backend/.venv/bin/python scripts/check_provider_contract.py; python3 scripts/check_catalog_workflow.py; git diff --check",
+          "result": "passed: all 40 local links, public API semantically unchanged, 532 refs/60 operation IDs/84 examples, other tasks and read-only archives unchanged, append-only log and no backend changes; Provider 0; approval missing",
+          "evidence": "local-materials/phase-1-t018/checks/proposal-check.json; docs/api/openapi.yaml x-queue-migration"
+        },
+        {
+          "command": "python3 local-materials/phase-1-t018/checks/verify_approval.py; backend/.venv/bin/python scripts/check_provider_contract.py; python3 scripts/check_catalog_workflow.py; git diff --check",
+          "result": "passed: exact preapproval digest and unchanged A–D decisions, actual user approval registered, 43 local links, public API unchanged, 532 refs/60 operations/84 examples, other tasks/archives unchanged, append-only log, no runtime changes; Provider 0",
+          "evidence": "docs/ADR/0009-queue-approval-20261004.json; local-materials/phase-1-t018/checks/approval-check.json"
+        }
+      ],
+      "started_at": "2026-10-04T11:32:52",
+      "completed_at": "2026-10-04T13:32:34",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T018"
     },

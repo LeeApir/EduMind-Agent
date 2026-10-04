@@ -826,3 +826,13 @@ ADR-0008 A–D获用户批准，安全边界与PRD/Provider/ADR索引同步，T0
 用户授权持续Phase 1串行任务，领取已满足T002批准依赖的T006目标策略回归；更新活动授权边界 | 工作区干净，T001–T005完成提交齐备，真实Provider预算0 | 保持catalog_only与后续重大决定具体批准；不push/merge | 加强特殊IP/目标拼接/重定向/固定IP/环境代理测试并本地独立提交，再领取可执行任务
 [2026-10-04T11:30:43] [PHASE-1-T006] VERIFIED | executor=Lee
 公网单播策略补全组播/site-local/保留与转换IP阻断，IPv4-mapped分类；云端HTTP DNS前拒绝；管理员精确本地IPv4/IPv6白名单回归 | 177目标/重试/流/Responses/beta Mock测试无跳过、Ruff/mypy/治理/diff通过；初次3失败和类型标注修正，未弱化断言；Provider0累计2033/2500 | Mock不证明真实实例可用性或动态开放；旧T033保持blocked；不填人工reviewer | 本地完成提交后按优先级领取T018队列设计（P0），需具体批准；交接docs/PROVIDERS.md、tests/test_provider_target_policy.py及local-materials/phase-1-t006/checks/
+[2026-10-04T11:32:52] [PHASE-1-T018] START | executor=Lee | branch=codex/phase-1-continued
+按P0/文件顺序准备Redis/Celery迁移具体ADR，不先实施未批准的数据/安全变更 | T001/T002前置完成；现有Job PG状态/owner幂等/30s租约/10s心跳/最多两尝试及SSE证据已查；Provider0 | T018验收需用户批准具体ADR，持续授权不替代该门禁 | 准备事务outbox/重复投递/租约/取消/Redis丢失恢复/迁移与回滚，核对官方文档并做独立读者检查
+[2026-10-04T11:46:58] [PHASE-1-T018] BLOCKED | executor=Lee
+具体Proposed ADR-0009 A–D及架构/索引/OpenAPI迁移注记已准备，公开API不改；提案SHA256=215dd4aa313a9c2e953f869216694bf4cc72689a91ee075adf3da5fddaa7c2b9 | 40本地链接/532ref/60operation/84示例/治理/归档/只追加日志/后端未改/diff通过；独立读者三处问题已修正复核，锁/启动/清理责任明确；未跑Redis/Celery，Provider0累计2033/2500 | T018验收“获得涉及数据/安全边界的ADR批准后实施”仍缺用户批准，不创建完成提交；持续目标首次具体决策阻塞，goal保持active等待 | 请审阅docs/ADR/0009-durable-animation-queue.md批准A–D或指定修改；获批RESUME/登记具体digest再完成T018提交；后续T019–T022不领取，保留提案与本地检查，不push/merge
+[2026-10-04T13:31:55] [PHASE-1-T018] RESUME | executor=Lee | branch=codex/phase-1-continued
+用户明确“批准”ADR-0009 A–D，登记准确提案SHA256=215dd4aa313a9c2e953f869216694bf4cc72689a91ee075adf3da5fddaa7c2b9并解除原决策阻塞 | 原提案字节与候选备份一致，Provider0 | 批准不代表Redis/Celery实施或真实恢复验收；DSL新契约须另批 | 核验批准登记/契约/归档/日志后完成T018本地提交，再按P0优先领取T022
+[2026-10-04T13:32:34] [PHASE-1-T018] VERIFIED | executor=Lee
+ADR-0009 A–D获实际用户批准，登记准确提案digest，保留PG状态/outbox/租约/取消/媒体/迁移回滚边界；架构与OpenAPI内部注记同步 | 批准字节/A–D不变、42本地链接、532ref/60operation/84示例、治理/归档/只追加日志/后端未改/diff通过；Provider0累计2033/2500 | Redis/Celery实现及故障矩阵留T019–T021/T036；无人工reviewer | 本地完成提交后领取P0 T022 DSL契约；交接docs/ADR/0009-durable-animation-queue.md、批准JSON及local-materials/phase-1-t018/checks/，不push/merge/部署
+[2026-10-04T13:32:50] [PHASE-1-T018] VERIFIED | executor=Lee
+纠正上一条核验计数文字，实际批准后本地链接为43而非42；不改变原始输出 | approval-check.json及复跑均43，其余验证结论不变，Provider0 | 无新增问题 | 完成T018本地提交后T022
