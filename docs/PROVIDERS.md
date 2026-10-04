@@ -1,6 +1,6 @@
 # Provider Gateway：现行契约与验证边界
 
-PRD §3.8 规定 P0 使用单一服务端 OpenAI-compatible Provider。系统默认连接由服务端配置的 DeepSeek 模型，使用 Responses 传输；Phase 1 新增内部连接网关、连接管理/显式测试 API 与连接管理页面，四档偏好界面由 T014 交付。两条路径均不自动跨厂商回退。
+PRD §3.8 规定 P0 使用单一服务端 OpenAI-compatible Provider。系统默认连接由服务端配置的 DeepSeek 模型，使用 Responses 传输；Phase 1 新增内部连接网关、连接管理/显式测试 API 与连接管理、四档偏好页面。两条路径均不自动跨厂商回退。
 
 ## Phase 1已批准边界
 
@@ -55,6 +55,14 @@ T012提供GET `/api/model-preferences` 与CSRF PUT `/api/model-preferences/{task
 每次测试或刷新前，需选择精确模型ID并明确同意只发送探测数据。改动配置或模型、操作结束后重置同意；未保存配置不能测试。页面显示保存的Base URL与服务端白名单/公网属性，成功测试再展示该次实际目标；能力分别显示支持/不支持/未知和声明来源，不从模型名称或文本成功推断高级能力。默认预算拒绝时给出管理员授权提示，不自动重试。响应只保留安全字段，供应商原始错误不展示，所有服务文本默认转义。
 
 验证入口：`cd web && pnpm test --run tests/provider-settings.spec.ts`；浏览器Mock流程为`web/tests/e2e/provider_settings.py`，可通过webapp-testing的`with_server.py`启动本机Vite并传入`--evidence`目录。该核验只证明界面协议、Key清空、手机布局和目录返回，不证明真实Provider可用。
+
+## 档位与数据去向页面（T014）
+
+“档位与数据去向”设置fast/default/quality/review四档，default同时作为用户默认连接，review可选择独立审核模型。打开仅读取会话、连接、偏好和所选连接的模型缓存，不测试/刷新/生成。未配置档位才继承default或服务端系统默认；已有的unavailable/consent_required选择显示阻塞原因，不自动换模型。页面按服务端保存回执和T012相同优先级展示配置解析，尚未发生请求的目标不称为实际调用记录。旧配置版本匹配失败时，不用新Base URL冒充旧目标。
+
+每个主/回退目标分别显示服务类型、确切模型、Base URL、白名单/公网属性、配置版本、凭据方式和允许的数据类型。回退初始为空，可明确添加最多3个有序目标并分别选择限流/超时/暂时不可用条件；其他错误和流式输出不跨目标。改动连接、模型、数据类别、条件或顺序后取消同意，保存需重新确认全部目标。偏好只存路由元数据；临时Key仍需在调用时逐目标单次输入，保存同意不替代本次数据去向确认、能力校验、预算或动态开放批准。
+
+验证入口：`cd web && pnpm test --run tests/model-preferences.spec.ts`；`web/tests/e2e/model_preferences.py`覆盖用户默认继承、显式回退、独立审核、目标/数据回执、手机布局及返回目录，全部API为Mock，真实Provider请求为0。
 
 ## 内部调用边界
 

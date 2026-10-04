@@ -766,7 +766,7 @@
       "id": "PHASE-1-T014",
       "phase": "Phase 1",
       "title": "提供任务档位与数据去向设置",
-      "status": "todo",
+      "status": "done",
       "priority": "P1",
       "depends_on": [
         "PHASE-1-T012",
@@ -774,7 +774,8 @@
       ],
       "scope": [
         "web/src/",
-        "web/tests/"
+        "web/tests/",
+        "docs/PROVIDERS.md"
       ],
       "prd_source": "PRD §3.8 模型能力注册与隐私",
       "acceptance_criteria": [
@@ -786,9 +787,20 @@
         "cd web && pnpm test --run tests/model-preferences.spec.ts",
         "cd web && pnpm typecheck && pnpm build；对本任务改动运行ESLint。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "cd web && pnpm test --run tests/model-preferences.spec.ts; pnpm test --run; pnpm typecheck && pnpm build; ESLint6 changed files",
+          "result": "passed: final11 dedicated plus161 tests across24 frontend files. Config receipt/version binding, default priority, explicit unavailable never bypassed, per-route data/error consent, no implicit fallback, independent review, duplicate/missing data rejected. Initial auth fixture reused consumed Response; new Response per request preserves expiry assertion and passes.",
+          "evidence": "local-materials/phase-1-t014/checks/vitest-v1.log; vitest-final.log; vitest-v3.log; vitest-all-pass.log; build.log"
+        },
+        {
+          "command": "with_server.py local Vite4188 -- web/tests/e2e/model_preferences.py --evidence local-materials/phase-1-t014/checks/browser-v1; Ruff E2E; check_catalog_workflow.py; git diff --check",
+          "result": "passed: Mock browser default inheritance, ordered explicit TIMEOUT fallback, separate review content/model, destination/data receipt, mobile fit and catalog return; desktop/mobile screenshot visually checked. No test/refresh/generation API called, actual Provider0. Documentation scope added for delivered settings workflow.",
+          "evidence": "local-materials/phase-1-t014/checks/browser-v1.log; browser-v1/"
+        }
+      ],
+      "started_at": "2026-10-04T22:03:12",
+      "completed_at": "2026-10-04T22:21:05",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T014"
     },

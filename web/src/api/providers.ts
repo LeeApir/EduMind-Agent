@@ -94,6 +94,7 @@ async function request(path: string, init: RequestInit, fetchImpl: FetchLike): P
   if (!response.ok) throw new ProviderSettingsError(object(value) && typeof value.code === "string" ? value.code : "REQUEST_FAILED");
   return value;
 }
+export { request as providerRequest };
 function headers(csrf: string, version?: number): Record<string, string> {
   return { "Content-Type": "application/json", "X-CSRF-Token": csrf,
     ...(version === undefined ? {} : { "If-Match": String(version) }) };
