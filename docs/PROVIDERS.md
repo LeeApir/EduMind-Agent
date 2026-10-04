@@ -16,6 +16,16 @@ PRD §3.8 规定 P0 使用单一服务端 OpenAI-compatible Provider。系统默
 
 T007 验证：隔离 PostgreSQL 迁移往返及连接/临时凭据/系统 Provider 回归 276 项通过，无跳过；包括真实 HTTPX 到本机合成 HTTP 服务的发送事件测试。其余出站均为 Mock/受控 DNS，真实 Provider 请求 0。这些证据证明协议和并发边界，不证明供应商或模型可用性。
 
+## Phase 1 Ollama 原生适配
+
+T008 为 `provider_type=ollama` 选择原生适配器，其他业务接口仍是同一个 `ProviderGateway`。Base URL 是服务根或代理前缀，例如 `http://127.0.0.1:11434`，适配器只追加 `/api/chat`；不会访问 `/api/pull`、下载模型或自动探测能力。管理员必须同时启用 `EDUMIND_PROVIDER_DEPLOYMENT=local` 与精确 `EDUMIND_PROVIDER_LOCAL_ALLOWLIST=127.0.0.1:11434`。每次出站重新核验全部 DNS 答案，全部必须在白名单；即使是合法公网 HTTPS，也不能作为 Ollama 原生目标。通用连接元数据保存仍遵循 SSRF 资格校验，保存不证明其能通过 Ollama 的发送门禁。本地只指已批准的服务端连接目标，不保证该服务不转发到云端。
+
+原生文本请求显式发送 `stream=false`，输出上限映射到 `options.num_predict`，温度放在 `options.temperature`；token 用量来自 `prompt_eval_count`/`eval_count`，缺失保持未知。单个完成结果必须是 assistant 文本、`done=true` 和 `done_reason=stop`。流式显式开启 `stream=true`，解析有界 UTF-8 NDJSON（含 CRLF 和无末尾换行的完整记录），只暴露 `message.content`，忽略独立 `thinking`，在正常 done 结束；截断、错误记录、工具/非文本输出均以统一安全错误终止，不自动重放。模型缺失的 404 映射为 `CAPABILITY_UNAVAILABLE`，连接失败为 `TEMPORARILY_UNAVAILABLE`，超时为 `TIMEOUT`，不回显原始错误正文。依据：[Ollama Chat](https://docs.ollama.com/api/chat)、[流式协议](https://docs.ollama.com/api/streaming)、[错误协议](https://docs.ollama.com/api/errors)。
+
+模型能力仍显式绑定连接配置版本、模型 ID 和声明版本，不根据模型名称推断。声明支持结构化输出时，`json_schema` 使用原生 `format=<schema>`，`json_object` 使用 `format="json"`，`text_json` 仅注入 JSON 指令；三种传输必须由能力声明明确选择，不自动降级。全部结果继续经过本地严格 JSON/schema 校验与业务审核。JSON/消息参数/字节限制提取为厂商无关共享校验，兼容适配器继续使用相同规则，网络 JSON 只接受 UTF-8。依据：[Ollama 结构化输出](https://docs.ollama.com/capabilities/structured-outputs)。
+
+Ollama 复用 T007 的 owner/会话/配置版本/同意、每次预算授权、发送行锁、撤销和临时 Key 生命周期；无 Key 连接不借用系统凭据。T008 只提供内部适配，没有增加对外生成端点或解除 `catalog_only`。真实本地实例可用性属于后续独立接入验收；本任务实际模型请求为 0。
+
 ## 内部调用边界
 
 业务服务只依赖 `backend/app/services/provider_gateway.py` 中的 `ProviderGateway`、请求/结果类型与 `ProviderError`，不得直接导入厂商 SDK 或处理厂商响应格式。`ProviderAdapter` 是可替换的单次调用边界；现有具体适配器由服务端工厂按结构化传输配置组装。

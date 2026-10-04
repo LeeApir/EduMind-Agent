@@ -333,7 +333,15 @@ def test_external_schema_ref_and_response_size_are_bounded():
 
 
 @asynccontextmanager
-async def pg_context(mode="persistent", *, expires=None, policy=None, base_url=None, resolver=None):
+async def pg_context(
+    mode="persistent",
+    *,
+    expires=None,
+    policy=None,
+    base_url=None,
+    resolver=None,
+    provider_type="openai-compatible",
+):
     engine = create_database_engine(DB_URL)
     factory = async_sessionmaker(engine, expire_on_commit=False)
     now = datetime.now(timezone.utc)
@@ -359,7 +367,7 @@ async def pg_context(mode="persistent", *, expires=None, policy=None, base_url=N
     )
     view = await store.create(
         owner,
-        provider_type="openai-compatible",
+        provider_type=provider_type,
         display_name="synthetic",
         base_url=base_url or "https://chosen.test/v1",
         mode=mode,

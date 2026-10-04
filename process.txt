@@ -850,3 +850,7 @@ ADR-0010 A–D及附件获实际用户批准，保留准确原始8文件清单�
 T022完成95fcc65后按依赖/文件顺序领取OpenAI-compatible连接网关；保持系统Provider构造与厂商无关业务协议 | T004/T005/T006前置完成；领取前干净；Provider0 | 发送锁/owner会话版本/临时单次绑定/撤销与绝对deadline按ADR-0008落实；Mock和隔离PG不证明真实兼容性 | 固定Chat Completions适配、能力需求校验及连接凭据出站生命周期，运行取消/重试/目标竞态回归后独立本地提交
 [2026-10-04T14:19:10] [PHASE-1-T007] VERIFIED | executor=Lee
 实现精确连接/模型/数据类别同意的Chat Completions网关、显式能力和结构化模式、同task临时Key、每尝试重新授权/固定IP、实际发送期间行锁与提交后撤销；保留系统默认Provider | 隔离PG迁移往返和276项回归无跳过、真实HTTPX本机合成服务、Ruff/mypy/治理/diff通过；早期fixture污染和HTTP头大小写问题修复并保留证据；Provider0累计2033/2500 | 外部API/持久预算/真实模型验收仍由后续任务交付，catalog_only持续有效；不填人工reviewer | 用户最新要求完成T007停止；本地提交并检查后暂停，不领取T008，不push/merge/部署；交接docs/PROVIDERS.md、dispatch/adapter/events代码和local-materials/phase-1-t007/checks/
+[2026-10-04T15:23:45] [PHASE-1-T008] START | executor=Lee | branch=codex/phase-1-continued
+用户继续Phase 1，T007完成f9f2421且暂停后工作区干净，按依赖/文件顺序领取Ollama；范围补充现有工厂以组装内部适配器 | 前置T007已提交，当前无其他in_progress；Provider0 | 本次只做Mock契约与隔离PG权限/目标集成，真实Ollama可用性和预算另验；不自动下载模型 | 按官方原生/api/chat映射文本/NDJSON/结构化输出，复用发送锁/撤销/临时Key，强制精确本地白名单后验证并本地提交
+[2026-10-04T15:38:40] [PHASE-1-T008] VERIFIED | executor=Lee
+Ollama原生/api/chat文本/NDJSON/显式format结构化适配，同一工厂按已验证类型组装；每尝试仅精确本地白名单，复用发送锁/取消/临时Key，抽取纯JSON/消息校验；无模型下载/新SDK | 隔离PG迁移往返与333项联合回归、最终114项修订复验无跳过，Ruff/mypy/治理/diff通过；NDJSON空行性能和三处错误重命名已修复并保留失败证据；Provider0累计2033/2500 | 真实Ollama实例可用性、API/预算账本/动态恢复仍待后续独立验收；不填人工reviewer | 完成本地提交并核对后T009连接管理API；交接docs/PROVIDERS.md、ollama/provider_protocol/dispatch/factory及local-materials/phase-1-t008/checks/，不push/merge/部署

@@ -77,8 +77,14 @@ async def build_connection_provider_gateway(
     transport: httpx.AsyncBaseTransport | None = None,
 ) -> AsyncIterator[ProviderGateway]:
     """Only an explicitly selected and budget-authorized route gets credentials."""
+    from app.services.ollama import OllamaAdapter
     from app.services.openai_compatible import OpenAICompatibleAdapter
 
     operation = ConnectionOperation(store, request, authorize_attempt, transport=transport)
     async with operation.activate(registry):
-        yield ProviderGateway(OpenAICompatibleAdapter(operation))
+        adapter: ProviderAdapter = (
+            OllamaAdapter(operation)
+            if operation.provider_type == "ollama"
+            else OpenAICompatibleAdapter(operation)
+        )
+        yield ProviderGateway(adapter)

@@ -145,6 +145,7 @@ class ConnectionOperation(MemoryOnly):
         self._busy = False
         self._response: httpx.Response | None = None
         self._client: httpx.AsyncClient | None = None
+        self.provider_type: str | None = None
 
     def __repr__(self) -> str:
         return "ConnectionOperation(<redacted>)"
@@ -185,8 +186,9 @@ class ConnectionOperation(MemoryOnly):
         view = await self.store.read(r.identity, r.route.connection_id)
         if view["config_version"] != r.route.config_version:
             raise CredentialFailure("VERSION_CONFLICT")
-        if view["provider_type"] != "openai-compatible":
+        if view["provider_type"] not in {"openai-compatible", "ollama"}:
             raise ProviderError(ProviderErrorCode.CAPABILITY_UNAVAILABLE)
+        self.provider_type = str(view["provider_type"])
         if not view["enabled"]:
             raise CredentialFailure("CREDENTIAL_UNAVAILABLE")
         expiry = datetime.fromisoformat(str(view["credential_expires_at"]))
@@ -274,7 +276,7 @@ class ConnectionOperation(MemoryOnly):
                     db, r.identity, r.route.connection_id, r.route.config_version
                 )
                 self._check()
-                if not row.enabled or row.provider_type != "openai-compatible":
+                if not row.enabled or row.provider_type != self.provider_type:
                     raise CredentialFailure("CREDENTIAL_UNAVAILABLE")
                 if row.credential_expires_at <= datetime.now(timezone.utc):
                     raise CredentialFailure("CREDENTIAL_EXPIRED")
@@ -287,6 +289,14 @@ class ConnectionOperation(MemoryOnly):
                     )
                 except TargetValidationError:
                     raise ProviderError(ProviderErrorCode.INVALID_TARGET) from None
+                if row.provider_type == "ollama" and (
+                    self.store.policy.deployment != "local"
+                    or not all(
+                        (ip, target.port) in self.store.policy.local_allowlist
+                        for ip in target.addresses
+                    )
+                ):
+                    raise ProviderError(ProviderErrorCode.INVALID_TARGET)
                 await self.store._session(db, r.identity)
                 self._check()
                 # Mandatory injected budget/operation authorization, no default grant.
@@ -313,10 +323,18 @@ class ConnectionOperation(MemoryOnly):
                     or any(ord(c) < 33 or ord(c) > 126 for c in secret["api_key"])
                 ):
                     raise CredentialFailure("CREDENTIAL_UNAVAILABLE")
-                endpoint, host = wire_target(target)
+                endpoint, host = wire_target(target, provider_type=row.provider_type)
                 headers = {
                     "Host": host,
-                    "Accept": ("text/event-stream" if stream else "application/json"),
+                    "Accept": (
+                        (
+                            "application/x-ndjson"
+                            if row.provider_type == "ollama"
+                            else "text/event-stream"
+                        )
+                        if stream
+                        else "application/json"
+                    ),
                 }
                 if secret:
                     headers["Authorization"] = "Bearer " + secret["api_key"]
@@ -369,17 +387,24 @@ class ConnectionOperation(MemoryOnly):
             self._busy = False
 
 
-def wire_target(target: ApprovedTarget) -> tuple[str, str]:
+def wire_target(
+    target: ApprovedTarget,
+    *,
+    provider_type: str = "openai-compatible",
+) -> tuple[str, str]:
     from urllib.parse import urlsplit, urlunsplit
 
     parsed = urlsplit(target.url)
     ip = target.connect_ip
     netloc = f"[{ip}]" if ":" in ip else ip
+    suffix = {"openai-compatible": "/chat/completions", "ollama": "/api/chat"}.get(provider_type)
+    if suffix is None:
+        raise ProviderError(ProviderErrorCode.CAPABILITY_UNAVAILABLE)
     endpoint = urlunsplit(
         (
             parsed.scheme,
             f"{netloc}:{target.port}",
-            parsed.path.rstrip("/") + "/chat/completions",
+            parsed.path.rstrip("/") + suffix,
             "",
             "",
         )

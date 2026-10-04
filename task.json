@@ -473,13 +473,14 @@
       "id": "PHASE-1-T008",
       "phase": "Phase 1",
       "title": "接入Ollama文本与能力适配",
-      "status": "todo",
+      "status": "done",
       "priority": "P1",
       "depends_on": [
         "PHASE-1-T007"
       ],
       "scope": [
         "backend/app/services/",
+        "backend/app/core/provider_factory.py",
         "backend/tests/",
         "docs/PROVIDERS.md",
         "backend/pyproject.toml",
@@ -495,9 +496,25 @@
         "cd backend && .venv/bin/python -m pytest -q tests/test_ollama_adapter.py",
         "对本任务改动运行Ruff和mypy；涉及持久化时在隔离PostgreSQL核验迁移及并发。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "backend/.venv/bin/python scripts/run_provider_storage_tests.py edumind_catalog_phase1_t008_v1 tests/test_ollama_adapter.py tests/test_provider_connection_gateway.py tests/test_provider_connections_persistence.py tests/test_temporary_provider_credentials.py tests/test_provider_target_policy.py tests/test_provider_target.py tests/test_provider_gateway.py tests/test_provider_retry.py tests/test_provider_stream.py tests/test_config.py tests/test_deepseek_responses.py tests/test_deepseek_beta_tools.py",
+          "result": "passed: 333 tests, no skips; migration roundtrip and actual PG local/target/temporary integration, existing provider/credential regressions; Mock/controlled DNS, real Provider 0",
+          "evidence": "local-materials/phase-1-t008/checks/pg-v1.txt"
+        },
+        {
+          "command": "backend/.venv/bin/python scripts/run_provider_storage_tests.py edumind_catalog_phase1_t008_v3 tests/test_ollama_adapter.py tests/test_provider_connection_gateway.py",
+          "result": "passed: 114 tests, no skips; final linear-offset NDJSON parser, shared helper names, explicit capability/format, invalid output/limits/UTF8, missing model, proxy-independent exact local pinning, public and changed DNS denied before second authorization, temporary stream cancel wipe, safe connection/timeout errors. Initial offline 89 passed/23 PG skipped was not PG evidence; excessive empty-line parser took 41s before improvement. v2 failed after automated helper rename mistakenly changed bounded_json at 3 sites; fixed exact names without weakening tests, v3 passed. No real Ollama availability claim.",
+          "evidence": "local-materials/phase-1-t008/checks/pg-v2.txt; local-materials/phase-1-t008/checks/pg-v3.txt"
+        },
+        {
+          "command": "backend/.venv/bin/ruff check backend/app/services/provider_protocol.py backend/app/services/openai_compatible.py backend/app/services/ollama.py backend/app/services/provider_connection_dispatch.py backend/app/core/provider_factory.py backend/tests/test_ollama_adapter.py backend/tests/test_provider_connection_gateway.py; backend/.venv/bin/mypy backend/app/services/provider_protocol.py backend/app/services/openai_compatible.py backend/app/services/ollama.py backend/app/services/provider_connection_dispatch.py backend/app/core/provider_factory.py; python3 scripts/check_catalog_workflow.py; git diff --check",
+          "result": "passed: Ruff and mypy 5 sources, governance, diff; initial import/format and rename errors corrected with original failed output retained. No new SDK or dependency version changes.",
+          "evidence": "local-materials/phase-1-t008/checks/ruff.txt; local-materials/phase-1-t008/checks/mypy.txt; local-materials/phase-1-t008/checks/ruff-rename-failure.txt; local-materials/phase-1-t008/checks/mypy-rename-failure.txt"
+        }
+      ],
+      "started_at": "2026-10-04T15:23:45",
+      "completed_at": "2026-10-04T15:38:40",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T008"
     },
