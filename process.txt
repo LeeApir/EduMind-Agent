@@ -822,3 +822,7 @@ ADR-0008 A–D获用户批准，安全边界与PRD/Provider/ADR索引同步，T0
 提供进程/owner/session/连接版本/operation绑定的单次临时Key、5min待领取/4个上限、180s绝对deadline/到期/撤销/取消清理 | T004完成7e0a586且工作区干净；Provider0 | 只实现内部生命周期与后续API集成入口，不序列化/队列转发或运行真实模型 | 单元并发/失败/取消/计时器及隔离PG持久Key不误清理验证后完成批次
 [2026-10-04T11:23:11] [PHASE-1-T005] VERIFIED | executor=Lee
 临时注册表绑定loop/owner/session/连接版本/operation/purpose/model，单次领取/4待领取上限/300s等待/180s绝对deadline、受控buffer清理与禁序列化，lifespan退出及提交后撤销通知完成 | 最终隔离PG v3迁移往返与53测试无跳过通过；离线22通过/1PG跳过由v3覆盖；Ruff/5模块mypy/532ref契约/治理/diff通过；初始格式及Awaitable标注修正；Provider新增0累计2033/2500 | 内部服务不授予出站许可；T007发送锁/T009 HTTP接入仍planned，Python副本按ADR有限擦除；T033仍blocked，不填人工reviewer | 完成本地提交并结束授权T002–T005批次；下一T006待用户授权，交接docs/PROVIDERS.md、backend/app/core/temporary_credentials.py及local-materials/phase-1-t005/checks/，不push/merge/部署
+[2026-10-04T11:26:12] [PHASE-1-T006] START | executor=Lee | branch=codex/phase-1-continued
+用户授权持续Phase 1串行任务，领取已满足T002批准依赖的T006目标策略回归；更新活动授权边界 | 工作区干净，T001–T005完成提交齐备，真实Provider预算0 | 保持catalog_only与后续重大决定具体批准；不push/merge | 加强特殊IP/目标拼接/重定向/固定IP/环境代理测试并本地独立提交，再领取可执行任务
+[2026-10-04T11:30:43] [PHASE-1-T006] VERIFIED | executor=Lee
+公网单播策略补全组播/site-local/保留与转换IP阻断，IPv4-mapped分类；云端HTTP DNS前拒绝；管理员精确本地IPv4/IPv6白名单回归 | 177目标/重试/流/Responses/beta Mock测试无跳过、Ruff/mypy/治理/diff通过；初次3失败和类型标注修正，未弱化断言；Provider0累计2033/2500 | Mock不证明真实实例可用性或动态开放；旧T033保持blocked；不填人工reviewer | 本地完成提交后按优先级领取T018队列设计（P0），需具体批准；交接docs/PROVIDERS.md、tests/test_provider_target_policy.py及local-materials/phase-1-t006/checks/

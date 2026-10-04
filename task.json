@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "用户已选择Phase 1功能开发并完成阶段归档规划；当前聊天已授权串行执行PHASE-1-T002至T005，前置T001已完成，后续任务按用户授权及依赖逐项领取。重大API/数据/安全决定按设计任务取得批准；真实Provider调用须独立预算和授权。catalog_only基线维持，动态开放由新质量/性能证据与批准决定，不因阶段切换自动开启。不自动push/merge/部署或进入Phase 2。",
+    "phase_gate": "用户已授权持续完成Phase 1中依赖满足的任务：单工作区逐项领取、验证及本地提交后继续；直到阶段验收完成、需要用户决策的阻塞或额度耗尽。重大决定和真实Provider验证仍需具体批准及独立预算，catalog_only持续，不自动push/merge/部署或跨入Phase 2。",
     "task_granularity": "一个可独立验证的行为，包含实现、对应测试和必要文档；验收通过后一个本地完成提交。",
     "completion_rule": "验收通过，且 Git 历史存在 Task-Completed 标记的提交。工作区 done 仅是待提交状态。",
     "verification_note": "任务verification是待建立和执行的验收接口，并非已通过；文件/命令不存在时须在对应任务完成前建立并实际运行。规划切换仅运行治理与归档离线检查。"
@@ -57,7 +57,7 @@
     }
   ],
   "stage_scope": {
-    "authorization": "2026-10-03 用户明确选择“还是继续Phase 1 功能开发”，授权本轮归档和细化任务。 当前聊天用户进一步授权“开始T01”，仅领取并完成PHASE-1-T001。 2026-10-04用户授权“继续T02-05”，按依赖串行推进T002至T005；重大安全方案仍需具体批准。",
+    "authorization": "2026-10-03 用户明确选择“还是继续Phase 1 功能开发”，授权本轮归档和细化任务。 当前聊天用户进一步授权“开始T01”，仅领取并完成PHASE-1-T001。 2026-10-04用户授权“继续T02-05”，按依赖串行推进T002至T005；重大安全方案仍需具体批准。 2026-10-04用户授权持续完成Phase 1依赖已满足任务，逐项验收/本地提交，遇需决策阻塞或额度耗尽停止。",
     "baseline": "MVP 0.3已签核课程目录版；PR #4已合并，本地维护基线30fcd4e1f9384359a72b451bb40243a2095691cf。",
     "included": [
       "兼容Provider/Ollama、持久及临时BYOK、任务档位与显式回退、Anthropic/Gemini/星火可选原生适配器",
@@ -67,7 +67,7 @@
       "目录零调用回归与独立授权的动态质量/性能验收"
     ],
     "excluded": [
-      "未授权批次之外的任务执行及真实Provider调用（当前批次T002至T005）",
+      "未经具体批准的重大决定、未独立授权的真实Provider调用；持续任务授权不替代安全/队列/DSL/图谱/动态批准与模型预算。",
       "公网部署与试用运营",
       "账户系统/跨设备账号合并",
       "真并行辩论、RAG、学习报告和更多课程（沿用§9.1后续阶段）",
@@ -377,7 +377,7 @@
       "id": "PHASE-1-T006",
       "phase": "Phase 1",
       "title": "验证云端目标与本地模型白名单",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1-T002"
@@ -398,9 +398,20 @@
         "cd backend && .venv/bin/python -m pytest -q tests/test_provider_target_policy.py",
         "对本任务改动运行Ruff和mypy；涉及持久化时在隔离PostgreSQL核验迁移及并发。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "cd backend && .venv/bin/python -m pytest -q tests/test_provider_target_policy.py tests/test_provider_target.py tests/test_provider_retry.py tests/test_provider_stream.py tests/test_deepseek_responses.py tests/test_deepseek_beta_tools.py",
+          "result": "passed: 177 tests, no skips, controlled DNS/Mock only, Provider 0; public IPv4/IPv6 pinning with Host/TLS and disabled env proxies/redirects, rebinding retries rejected before second send, exact local IPv4/IPv6 allowlist, special-address and secret redaction regressions",
+          "evidence": "local-materials/phase-1-t006/checks/tests.txt"
+        },
+        {
+          "command": "backend/.venv/bin/ruff check backend/app/core/provider_target.py backend/tests/test_provider_target_policy.py; cd backend && .venv/bin/mypy app/core/provider_target.py; python3 scripts/check_catalog_workflow.py; git diff --check",
+          "result": "passed; initial 3 failures corrected without weakening assertions: deny cloud HTTP before DNS, preserve explicit ::1 local allowlist, fix synthetic completed Responses fixture; union annotation fixed",
+          "evidence": "backend/tests/test_provider_target_policy.py; docs/PROVIDERS.md"
+        }
+      ],
+      "started_at": "2026-10-04T11:26:12",
+      "completed_at": "2026-10-04T11:30:43",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T006"
     },

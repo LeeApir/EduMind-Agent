@@ -140,3 +140,11 @@ handle为32随机字节的URL-safe编码，只在所属进程/loop有效。绑�
 注册表/条目/租约拒绝pickle与默认JSON序列化，不提供转发、恢复或持久Key替代路径。API/队列实现仍须遵守ADR-C6：不得把原始secret、handle或租约放进后台模型任务，只能移交已审核且不含凭据的DSL/Job ID。注册表与内部解密均不授予出站许可，T007须在实际发送边界实施锁、同意、目标校验和预算；T009接入HTTP时还须落实Cookie/CSRF、no-store、输入错误脱敏与前端表单清空。
 
 测试入口：`cd backend && .venv/bin/python -m pytest -q tests/test_temporary_provider_credentials.py`运行离线生命周期测试，PG项在未配置隔离库时明确跳过；完整验收使用`backend/.venv/bin/python scripts/run_provider_storage_tests.py edumind_catalog_phase1_<新轮次> tests/test_temporary_provider_credentials.py tests/test_provider_connections_persistence.py tests/test_auth.py tests/test_catalog_mode.py tests/test_database_lifespan.py tests/test_health.py`。仅测试标记secret、受控DNS和FakeAdapter，无真实模型调用。
+
+## Phase 1目标策略回归（T006）
+
+云端目标须为公网单播HTTPS。除原有私网/回环/链路本地/元数据阻断外，拒绝组播、IPv6 site-local、带scope的DNS答案、保留地址、NAT64/6to4/Teredo转换地址；IPv4-mapped IPv6按内嵌IPv4分类。不能只用`is_global`判定；[Python官方ipaddress说明](https://docs.python.org/3/library/ipaddress.html)区分全球可达、组播、保留和site-local属性，分类也曾跨版本修正。本项目对转换地址采用保守拒绝，不宣称能够验证转换后的实际路由。云端HTTP在DNS前拒绝。
+
+本地访问必须管理员设置`EDUMIND_PROVIDER_DEPLOYMENT=local`及精确IP:port白名单；回环IPv4/IPv6可以显式允许，危险特殊地址仍不能放行。域名全部A/AAAA须在白名单，混合公网/本地答案拒绝HTTP。本地判定不能由客户端标记扩大。每次实际尝试重新校验DNS，传给HTTP库的是固定IP URL，Host及TLS SNI保留原域名与端口，`trust_env=False`、`follow_redirects=False`；所有3xx（含同源）停止，无自动第二请求。
+
+运行`cd backend && .venv/bin/python -m pytest -q tests/test_provider_target_policy.py tests/test_provider_target.py tests/test_provider_retry.py tests/test_provider_stream.py tests/test_deepseek_responses.py tests/test_deepseek_beta_tools.py`验证受控DNS、HTTPX Mock及实际构造的请求，不创建真实网络连接。后续T007/T008/原生适配器必须继续遵守同一目标策略与固定IP传输，不把保存连接时的DNS检查当成永久发送许可。
