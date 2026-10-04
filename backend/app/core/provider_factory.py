@@ -80,6 +80,7 @@ async def build_connection_provider_gateway(
 ) -> AsyncIterator[ProviderGateway]:
     """Only an explicitly selected and budget-authorized route gets credentials."""
     from app.services.anthropic import AnthropicAdapter
+    from app.services.gemini import GeminiAdapter
     from app.services.ollama import OllamaAdapter
     from app.services.openai_compatible import OpenAICompatibleAdapter
 
@@ -90,6 +91,8 @@ async def build_connection_provider_gateway(
         adapter: ProviderAdapter
         if operation.provider_type == "anthropic":
             adapter = AnthropicAdapter(operation)
+        elif operation.provider_type == "gemini":
+            adapter = GeminiAdapter(operation)
         elif operation.provider_type == "ollama":
             adapter = OllamaAdapter(operation)
         else:

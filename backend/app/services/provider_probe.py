@@ -72,7 +72,7 @@ async def probe_connection(
                 raise CredentialFailure("CREDENTIAL_UNAVAILABLE")
             if view["credential_state"] == "expired":
                 raise CredentialFailure("CREDENTIAL_EXPIRED")
-            if view["provider_type"] not in {"openai-compatible", "ollama", "anthropic"}:
+            if view["provider_type"] not in {"openai-compatible", "ollama", "anthropic", "gemini"}:
                 raise ProviderError(ProviderErrorCode.CAPABILITY_UNAVAILABLE)
             if view["credential_mode"] == "persistent" and view["credential_state"] != "present":
                 raise CredentialFailure("CREDENTIAL_MISSING")

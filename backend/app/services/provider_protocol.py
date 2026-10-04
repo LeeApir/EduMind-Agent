@@ -71,9 +71,13 @@ def normal_finish(reason: object) -> None:
         raise invalid_output()
 
 
-def message_parameters(request: TextRequest) -> tuple[list[dict[str, str]], int, float | None]:
+def message_parameters(
+    request: TextRequest, *, allow_images: bool = False
+) -> tuple[list[dict[str, str]], int, float | None]:
     if (
         not request.messages
+        or not allow_images
+        and (request.images or request.image_consent is not None)
         or len(request.messages) > 64
         or any(
             m.role not in {"system", "user", "assistant"} or not isinstance(m.content, str)

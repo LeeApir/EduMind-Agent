@@ -36,7 +36,9 @@ def model_metadata(raw: object, provider_type: str) -> list[dict[str, object]]:
     if provider_type == "anthropic" and (type(raw.get("has_more")) is not bool or raw["has_more"]):
         # A refresh is one page/one request; never silently publish an incomplete list.
         raise invalid_output()
-    items = raw.get("models" if provider_type == "ollama" else "data")
+    if provider_type == "gemini" and raw.get("nextPageToken") not in (None, ""):
+        raise invalid_output()
+    items = raw.get("models" if provider_type in {"ollama", "gemini"} else "data")
     if not isinstance(items, list) or len(items) > MAX_MODELS:
         raise invalid_output()
     models: list[dict[str, object]] = []
@@ -44,7 +46,14 @@ def model_metadata(raw: object, provider_type: str) -> list[dict[str, object]]:
     for entry in items:
         if not isinstance(entry, dict):
             raise invalid_output()
-        model = validated_model(entry.get("name" if provider_type == "ollama" else "id"))
+        model = validated_model(
+            entry.get("name" if provider_type in {"ollama", "gemini"} else "id")
+        )
+        if provider_type == "gemini":
+            from app.services.gemini import model_resource
+
+            if not model.startswith("models/") or model_resource(model) != model:
+                raise invalid_output()
         if model in seen:
             raise invalid_output()
         seen.add(model)
@@ -58,6 +67,22 @@ def model_metadata(raw: object, provider_type: str) -> list[dict[str, object]]:
             raise invalid_output()
         flags = {flag: (declaration or {}).get(flag) for flag in FLAGS}
         version = CAPABILITY_VERSION
+        if provider_type == "gemini":
+            # Methods do not declare per-model streaming, JSON Schema or vision support.
+            methods = entry.get("supportedGenerationMethods")
+            if methods is not None and (
+                not isinstance(methods, list)
+                or len(methods) > 64
+                or any(
+                    not isinstance(method, str) or not 1 <= len(method) <= 100 for method in methods
+                )
+            ):
+                raise invalid_output()
+            if methods is not None and "streamGenerateContent" in methods:
+                if flags["streaming"] is False:
+                    raise invalid_output()
+                flags["streaming"] = True
+            version = "gemini-model-capabilities-v1"
         if provider_type == "anthropic":
             native = entry.get("capabilities")
             if native is not None and not isinstance(native, dict):
@@ -130,6 +155,7 @@ async def resolve_capabilities(
                     caps["streaming"],
                     caps["structured_output"],
                     tool_calling=caps.get("tool_calling"),
+                    vision=caps.get("vision"),
                 )
     raise ProviderError(ProviderErrorCode.CAPABILITY_UNAVAILABLE)
 
@@ -153,7 +179,7 @@ async def refresh_models(
                 raise CredentialFailure("VERSION_CONFLICT")
             if accepted is not True or route.data_categories != frozenset({"probe"}):
                 raise CredentialFailure("CONSENT_REQUIRED")
-            if view["provider_type"] not in {"openai-compatible", "ollama", "anthropic"}:
+            if view["provider_type"] not in {"openai-compatible", "ollama", "anthropic", "gemini"}:
                 raise ProviderError(ProviderErrorCode.CAPABILITY_UNAVAILABLE)
             if not view["enabled"]:
                 raise CredentialFailure("CREDENTIAL_UNAVAILABLE")

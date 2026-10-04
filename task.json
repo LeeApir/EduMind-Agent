@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "用户已授权持续完成Phase 1中依赖满足的任务：单工作区逐项领取、验证及本地提交后继续；直到阶段验收完成、需要用户决策的阻塞或额度耗尽。重大决定和真实Provider验证仍需具体批准及独立预算，catalog_only持续，不自动push/merge/部署或跨入Phase 2。",
+    "phase_gate": "此前用户授权持续串行完成Phase 1；最新指示为完成T016后停止。本次仅交付T016并本地提交，不领取T017或其他任务；后续继续需用户指示。重大决定与真实Provider验证仍需具体批准及独立预算，catalog_only持续，不自动push/merge/部署或跨Phase 2。",
     "task_granularity": "一个可独立验证的行为，包含实现、对应测试和必要文档；验收通过后一个本地完成提交。",
     "completion_rule": "验收通过，且 Git 历史存在 Task-Completed 标记的提交。工作区 done 仅是待提交状态。",
     "verification_note": "任务verification是待建立和执行的验收接口，并非已通过；文件/命令不存在时须在对应任务完成前建立并实际运行。规划切换仅运行治理与归档离线检查。"
@@ -861,7 +861,7 @@
       "id": "PHASE-1-T016",
       "phase": "Phase 1",
       "title": "接入Gemini原生适配器",
-      "status": "todo",
+      "status": "done",
       "priority": "P1",
       "depends_on": [
         "PHASE-1-T007",
@@ -873,7 +873,11 @@
         "backend/tests/",
         "docs/PROVIDERS.md",
         "backend/pyproject.toml",
-        "backend/uv.lock"
+        "backend/uv.lock",
+        "backend/app/core/provider_factory.py",
+        "web/src/components/ProviderSettings.vue",
+        "web/tests/provider-settings.spec.ts",
+        "web/tests/e2e/provider_settings.py"
       ],
       "prd_source": "PRD §3.8 Provider类型",
       "acceptance_criteria": [
@@ -885,9 +889,25 @@
         "cd backend && .venv/bin/python -m pytest -q tests/test_gemini_adapter.py",
         "对本任务改动运行Ruff和mypy；涉及持久化时在隔离PostgreSQL核验迁移及并发。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "backend/.venv/bin/python scripts/run_provider_storage_tests.py edumind_catalog_phase1_t016_v3 tests/test_gemini_adapter.py tests/test_anthropic_adapter.py tests/test_provider_connection_gateway.py tests/test_provider_model_catalog.py tests/test_provider_connection_test_api.py tests/test_ollama_adapter.py tests/test_model_preferences.py tests/test_provider_gateway.py tests/test_provider_retry.py tests/test_deepseek_responses.py tests/test_deepseek_beta_tools.py; final edumind_catalog_phase1_t016_final tests/test_gemini_adapter.py",
+          "result": "passed: 455 joint regressions, final96 Gemini contracts, no skips; migration0020/down0017/up0020. Text/system/model path, native responseFormat/original schema snapshot, strict JSON/output/usage, bounded incremental SSE and cancellation, synthetic inline image manifest/target/operation/vision consent, no retry/upload URI, fixed IP/x-goog-api-key cleanup, temporary one-use, exact probe and model cache. Initial async-join fixture and probe receipt field fixed with original assertions preserved; nonexistent probe test command replaced by actual connection-test module. Mock only, real Provider0.",
+          "evidence": "local-materials/phase-1-t016/checks/unit-v1.log; pg-v1.log; pg-v2.log; pg-v3.log; pg-final.log"
+        },
+        {
+          "command": "Ruff11 changed Python files; mypy8 application sources; scripts/check_provider_contract.py; scripts/check_catalog_workflow.py; git diff --check",
+          "result": "passed: lint/types, 532refs/60operations/84examples/12 runtime routes and ledger. Locked HTTPX0.28.1/jsonschema4.25.1 reused, no new dependency/migration/public API. T001 permits Mock multimodal adapter without a new product upload entrance; internal consent keeps exact bytes/prompt/schema and route/version/operation, actual uploading remains separately authorized/budgeted. Factory and settings native option are necessary companion scope.",
+          "evidence": "local-materials/phase-1-t016/checks/mypy-final.log; docs/PROVIDERS.md"
+        },
+        {
+          "command": "cd web && pnpm test --run tests/provider-settings.spec.ts; pnpm typecheck && pnpm build; pnpm exec eslint src/components/ProviderSettings.vue tests/provider-settings.spec.ts; with_server.py local4187 -- web/tests/e2e/provider_settings.py --native-type gemini --evidence local-materials/phase-1-t016/checks/browser",
+          "result": "passed: 16 settings tests, types/build/lint; Mock Chromium native option/version hint, Key clear/no browser persistence, exact consent, safe failures, 390px fit and course return. Desktop/mobile PNG visually reviewed; browser/server closed. No real Provider request or dynamic gate change.",
+          "evidence": "local-materials/phase-1-t016/checks/web-tests.log; web-build.log; browser.log; browser/requests.json; browser/desktop.png; browser/mobile.png"
+        }
+      ],
+      "started_at": "2026-10-04T22:48:30",
+      "completed_at": "2026-10-04T23:29:47",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T016"
     },

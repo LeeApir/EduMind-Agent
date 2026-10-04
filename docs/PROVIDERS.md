@@ -38,6 +38,20 @@ Ollama 复用 T007 的 owner/会话/配置版本/同意、每次预算授权、�
 
 显式模型刷新使用一次`GET <base>/models?limit=1000`；has_more=true或格式无效时保留旧缓存，不自动翻页。仅映射官方明确的structured_outputs.supported与image_input.supported为声明能力，streaming/tool_calling等无明确字段仍未知；项目扩展声明可补充，但与官方声明冲突则拒绝。规则版本anthropic-model-capabilities-v1，不把声明当真实验证；当前Key回显禁止进入模型缓存或生成结果。依据：[模型列表及能力字段](https://platform.claude.com/docs/en/api/models/list)。默认生产预算仍拒绝，catalog_only持续，本任务真实Provider请求0；实际模型质量和连通性待独立授权验收。
 
+## Gemini 原生适配（T016）
+
+连接管理可选Google Gemini。Base URL包含版本前缀（例如`https://generativelanguage.googleapis.com/v1beta`），不包含模型路径或Key；适配器追加`models/<选定模型>:generateContent`，流式改为`:streamGenerateContent?alt=sse`。允许短模型ID或规范`models/<ID>`，拒绝斜线、查询、百分号编码和方法注入；不固定型号。发送层使用`x-goog-api-key`头，Key不进入URL，继续固定批准IP与原Host/TLS SNI，关闭环境代理和重定向，终止后清除Key头。复用已锁定HTTPX 0.28.1、jsonschema 4.25.1，不新增SDK。协议于2026-10-04核对：[GenerateContent及流式API](https://ai.google.dev/api/generate-content)、[API认证](https://ai.google.dev/api)。
+
+前置system映射为`systemInstruction.parts`，assistant映射为`model`，不跨轮提升后置system；只接受以user开始和结束的对话。`generationConfig`保留显式温度、受限`maxOutputTokens`，固定单候选和TEXT输出，不配置工具、搜索、代码执行或安全阈值覆盖。只发布正常STOP的可见text，thought/signature保持内部；MAX_TOKENS、拒绝、工具/二进制输出和畸形候选失败。SSE解析有界UTF-8帧，按增量转发，必须正常STOP且EOF；可接受无正文的用量尾帧，禁止完成后的额外正文或模型版本变化。取消/截断/错误关闭连接，不重放流。请求及单帧1MiB、累计响应2MiB；错误只返回安全枚举，JSON转义后的当前Key回显也在发送上下文内拒绝。
+
+结构化需明确能力与传输声明：`json_schema`使用当前官方`generationConfig.responseFormat.text={mimeType:"application/json",schema:<原schema>}`，`text_json`仅在明确选择时追加JSON指令；不使用自动模式探测或降级，不削弱schema。全部结果在本地严格解析并校验原schema，正式资源仍需ReviewAgent。用量仅映射实际`promptTokenCount`和`candidatesTokenCount`，如同时报告`thoughtsTokenCount`则计入输出；缺失保持未知，不用total反推或推算费用。依据：[结构化REST示例](https://ai.google.dev/gemini-api/docs/generate-content/structured-output)、[响应及用量字段](https://ai.google.dev/api/generate-content)。
+
+按[T001冻结计划](acceptance/phase-1-acceptance-plan.md)的多模态边界，内部厂商无关`TextRequest`可携带`InlineImage`及`InlineImageConsent`，仅支持PNG/JPEG/WEBP内存字节，最多4张、合计512KiB，校验MIME与文件头且整个请求仍受1MiB限制。图片仅加入最后一条user消息，不读取文件/URL、不调用Files API；HEIC/HEIF、音频、视频、PDF及工具消费入口未实现，明确拒绝而非降级。依据：[官方内联图片与格式](https://ai.google.dev/gemini-api/docs/generate-content/image-understanding)。
+
+图片必须有vision=true声明、generation用途与`content_for_review`类别，同时满足原连接同意和独立图片同意。后者绑定connection/config/model/operation及SHA256清单（有序图片的MIME和字节摘要、完整消息、档位、参数、结构化schema）；改变任一项须重新授权，计算摘要本身不授予同意。每个网关图片操作只发送一次，包括失败/取消，不因retry_safe自动重传；其他适配器与Gateway拒绝携图请求，避免静默丢弃。没有新增HTTP/前端上传入口，当前没有产品调用方替用户构造图片同意。未来调用方必须先取得明确目标与具体数据授权，不能把文本类别勾选视为上传授权；真实上传及云端探测仍须T035/T039单独预算和授权。
+
+显式模型刷新为单次`GET <base>/models?pageSize=1000`；非空nextPageToken、畸形数据或Key回显失败并保留旧缓存，不自动分页。缓存保留规范`models/<ID>`，能力规则`gemini-model-capabilities-v1`；只映射明确声明的streamGenerateContent或项目布尔声明，generateContent本身不证明vision/structured_output/streaming，未声明保持未知。依据：[Models列表和字段](https://ai.google.dev/api/models)。固定8token/10秒/一次的文本探测不含图片/学生上下文，也不能将成功当成多模态或结构化证明。生产预算默认拒绝、catalog_only持续；本任务真实Provider请求0。
+
 ## 显式连接测试
 
 T010 的 POST `/api/providers/connections/{id}/test` 只接受操作ID、精确版本/模型/probe-only同意和可选临时handle；固定短提示、最多8输出token、10秒总期限、一次尝试、不回退。target是发送当时批准的Base URL，is_local来自该次DNS全部地址，不证明服务离线；文本成功仍将所有高级能力标为未知，不返回上游生成正文。响应private/no-store并提示可能调用服务。默认预算拒绝出站；Mock测试注入的授权不是生产预算或真实Provider验收，实际预算与计数由T035交付。

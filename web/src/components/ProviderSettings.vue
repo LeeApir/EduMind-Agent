@@ -255,6 +255,8 @@ onBeforeUnmount(() => { active = false; ++revision; erase(); resetConfirmation()
                 Ollama（服务端本地白名单）
               </option><option value="anthropic">
                 Anthropic（原生 Messages）
+              </option><option value="gemini">
+                Google Gemini（原生 GenerateContent）
               </option>
             </select>
             <label for="provider-url">服务地址</label><input
@@ -263,10 +265,10 @@ onBeforeUnmount(() => { active = false; ++revision; erase(); resetConfirmation()
               maxlength="500"
               autocomplete="off"
               spellcheck="false"
-              :placeholder="form.provider_type === 'ollama' ? 'http://127.0.0.1:11434' : 'https://服务地址/v1'"
+              :placeholder="form.provider_type === 'ollama' ? 'http://127.0.0.1:11434' : form.provider_type === 'gemini' ? 'https://服务地址/v1beta' : 'https://服务地址/v1'"
             >
             <p class="provider-hint">
-              {{ form.provider_type === 'anthropic' ? 'Anthropic 地址需包含版本前缀（如 /v1）。' : 'Ollama 使用服务根地址。' }}地址相对于学伴服务端，本地地址需管理员明确放行。
+              {{ form.provider_type === 'anthropic' ? 'Anthropic 地址需包含版本前缀（如 /v1）。' : form.provider_type === 'gemini' ? 'Gemini 地址需包含版本前缀（如 /v1beta）；不要包含模型路径或 Key。' : 'Ollama 使用服务根地址。' }}地址相对于学伴服务端，本地地址需管理员明确放行。
             </p>
             <label for="provider-mode">Key 保存方式</label><select
               id="provider-mode"

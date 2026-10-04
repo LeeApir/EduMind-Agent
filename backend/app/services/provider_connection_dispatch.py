@@ -80,6 +80,7 @@ class ModelCapabilities:
     structured_output: bool | None = None
     structured_transport: str = "json_schema"
     tool_calling: bool | None = None
+    vision: bool | None = None
 
     def __post_init__(self) -> None:
         if (
@@ -88,7 +89,7 @@ class ModelCapabilities:
             not in {"json_schema", "json_object", "text_json", "tool_schema"}
             or any(
                 v is not None and type(v) is not bool
-                for v in (self.streaming, self.structured_output, self.tool_calling)
+                for v in (self.streaming, self.structured_output, self.tool_calling, self.vision)
             )
         ):
             raise CredentialFailure("VALIDATION_ERROR")
@@ -191,7 +192,7 @@ class ConnectionOperation(MemoryOnly):
         view = await self.store.read(r.identity, r.route.connection_id)
         if view["config_version"] != r.route.config_version:
             raise CredentialFailure("VERSION_CONFLICT")
-        if view["provider_type"] not in {"openai-compatible", "ollama", "anthropic"}:
+        if view["provider_type"] not in {"openai-compatible", "ollama", "anthropic", "gemini"}:
             raise ProviderError(ProviderErrorCode.CAPABILITY_UNAVAILABLE)
         self.provider_type = str(view["provider_type"])
         if not view["enabled"]:
@@ -332,7 +333,11 @@ class ConnectionOperation(MemoryOnly):
                 ):
                     raise CredentialFailure("CREDENTIAL_UNAVAILABLE")
                 endpoint, host = wire_target(
-                    target, provider_type=row.provider_type, listing=listing
+                    target,
+                    provider_type=row.provider_type,
+                    listing=listing,
+                    stream=stream,
+                    model_id=r.route.model_id,
                 )
                 headers = {
                     "Host": host,
@@ -347,12 +352,11 @@ class ConnectionOperation(MemoryOnly):
                     ),
                 }
                 if secret:
-                    headers[
-                        "x-api-key" if row.provider_type == "anthropic" else "Authorization"
-                    ] = (
-                        secret["api_key"]
-                        if row.provider_type == "anthropic"
-                        else "Bearer " + secret["api_key"]
+                    native_header = {"anthropic": "x-api-key", "gemini": "x-goog-api-key"}.get(
+                        row.provider_type
+                    )
+                    headers[native_header or "Authorization"] = (
+                        secret["api_key"] if native_header else "Bearer " + secret["api_key"]
                     )
                 if row.provider_type == "anthropic":
                     headers["anthropic-version"] = "2023-06-01"
@@ -406,6 +410,7 @@ class ConnectionOperation(MemoryOnly):
             if wire is not None:
                 wire.headers.pop("Authorization", None)
                 wire.headers.pop("x-api-key", None)
+                wire.headers.pop("x-goog-api-key", None)
             if response is not None:
                 await response.aclose()
             self._response = None
@@ -421,9 +426,10 @@ class ConnectionOperation(MemoryOnly):
         authorization = self._wire.headers.get("Authorization", "")
         if authorization.startswith("Bearer ") and authorization[7:] in value:
             raise ProviderError(ProviderErrorCode.INVALID_OUTPUT)
-        api_key = self._wire.headers.get("x-api-key", "")
-        if api_key and api_key in value:
-            raise ProviderError(ProviderErrorCode.INVALID_OUTPUT)
+        for name in ("x-api-key", "x-goog-api-key"):
+            api_key = self._wire.headers.get(name, "")
+            if api_key and api_key in value:
+                raise ProviderError(ProviderErrorCode.INVALID_OUTPUT)
 
 
 def wire_target(
@@ -431,6 +437,8 @@ def wire_target(
     *,
     provider_type: str = "openai-compatible",
     listing: bool = False,
+    stream: bool = False,
+    model_id: str = "",
 ) -> tuple[str, str]:
     from urllib.parse import urlsplit, urlunsplit
 
@@ -446,6 +454,18 @@ def wire_target(
             "anthropic": "/messages",
         }
     ).get(provider_type)
+    query = "limit=1000" if listing and provider_type == "anthropic" else ""
+    if provider_type == "gemini":
+        from app.services.gemini import model_resource
+
+        suffix = (
+            "/models"
+            if listing
+            else "/"
+            + model_resource(model_id)
+            + (":streamGenerateContent" if stream else ":generateContent")
+        )
+        query = "pageSize=1000" if listing else "alt=sse" if stream else ""
     if suffix is None:
         raise ProviderError(ProviderErrorCode.CAPABILITY_UNAVAILABLE)
     endpoint = urlunsplit(
@@ -453,7 +473,7 @@ def wire_target(
             parsed.scheme,
             f"{netloc}:{target.port}",
             parsed.path.rstrip("/") + suffix,
-            "limit=1000" if listing and provider_type == "anthropic" else "",
+            query,
             "",
         )
     )
