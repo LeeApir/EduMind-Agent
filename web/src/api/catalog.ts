@@ -38,7 +38,15 @@ export async function loadProductMode(fetchImpl: FetchLike = fetch): Promise<"ca
   if (!object(data) || !["catalog_only", "dynamic"].includes(String(data.mode))) invalid();
   return data.mode as "catalog_only" | "dynamic";
 }
-export async function ensureCatalogSession(fetchImpl: FetchLike = fetch): Promise<{ owner: string; csrf: string }> {
+const pendingSessions = new WeakMap<FetchLike, Promise<{ owner: string; csrf: string }>>();
+export function ensureCatalogSession(fetchImpl: FetchLike = fetch): Promise<{ owner: string; csrf: string }> {
+  const pending = pendingSessions.get(fetchImpl);
+  if (pending) return pending;
+  const operation = readCatalogSession(fetchImpl).finally(() => pendingSessions.delete(fetchImpl));
+  pendingSessions.set(fetchImpl, operation);
+  return operation;
+}
+async function readCatalogSession(fetchImpl: FetchLike): Promise<{ owner: string; csrf: string }> {
   let data: unknown;
   try { data = await request("/api/auth/session", {}, fetchImpl); }
   catch (error) {

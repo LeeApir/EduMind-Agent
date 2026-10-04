@@ -723,7 +723,7 @@
       "id": "PHASE-1-T013",
       "phase": "Phase 1",
       "title": "提供连接管理界面",
-      "status": "todo",
+      "status": "done",
       "priority": "P1",
       "depends_on": [
         "PHASE-1-T009",
@@ -745,9 +745,20 @@
         "cd web && pnpm test --run tests/provider-settings.spec.ts",
         "cd web && pnpm typecheck && pnpm build；对本任务改动运行ESLint。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "cd web && pnpm test --run; final pnpm test --run tests/provider-settings.spec.ts; pnpm typecheck && pnpm build; ESLint5 changed files",
+          "result": "passed: 150 tests across23 files plus final14 dedicated tests; strict transport receipts, safe errors, exact consent, persistent/temporary cleanup and course retention. First fixtures hit Node native localStorage without clear; complete Storage mock fixes fixture without weakening assertions, browser uses real Storage.",
+          "evidence": "local-materials/phase-1-t013/checks/vitest-all.log; vitest-v2.log; vitest-final.log; build-final.log"
+        },
+        {
+          "command": "with_server.py --server local Vite4187 --port4187 -- web/tests/e2e/provider_settings.py --evidence local-materials/phase-1-t013/checks/browser-final; Ruff Python E2E; check_catalog_workflow.py; git diff --check",
+          "result": "passed: Mock browser CRUD edit, persistent/temporary Key cleared, fixed budget/unsafe-target errors, actual target/unknown capabilities, mobile fit and catalog return. Desktop/mobile PNG visually checked; initial sandbox bind failed, escalation succeeded; initial wildcard intercepted src/api modules then restricted to /api/ root. Actual Provider0; no dynamic reopening.",
+          "evidence": "local-materials/phase-1-t013/checks/browser-v2.log; browser-v3.log; browser-final.log; browser-final/"
+        }
+      ],
+      "started_at": "2026-10-04T21:29:18",
+      "completed_at": "2026-10-04T22:01:38",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T013"
     },
