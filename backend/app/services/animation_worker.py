@@ -70,7 +70,8 @@ async def claim_animation_job(
     async with sessions() as db:
         job = await db.scalar(
             select(AnimationJob)
-            .where(AnimationJob.status == "queued", AnimationJob.attempt < 2,
+            .where(AnimationJob.dispatch_backend == "pg_poll",
+                   AnimationJob.status == "queued", AnimationJob.attempt < 2,
                    AnimationJob.cancel_requested.is_(False))
             .order_by(AnimationJob.created_at, AnimationJob.id)
             .limit(1)
@@ -185,6 +186,7 @@ async def reclaim_expired_animation_jobs(
     async with sessions() as db:
         jobs = (
             await db.scalars(select(AnimationJob).where(
+                AnimationJob.dispatch_backend == "pg_poll",
                 AnimationJob.status == "running",
                 AnimationJob.lease_expires_at <= func.clock_timestamp(),
             ).order_by(AnimationJob.lease_expires_at).limit(limit)

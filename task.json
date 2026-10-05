@@ -1015,7 +1015,7 @@
       "id": "PHASE-1-T019",
       "phase": "Phase 1",
       "title": "可靠投递已提交的长任务",
-      "status": "todo",
+      "status": "done",
       "priority": "P1",
       "depends_on": [
         "PHASE-1-T018"
@@ -1028,7 +1028,11 @@
         "backend/tests/",
         "backend/pyproject.toml",
         "backend/uv.lock",
-        "docker-compose.yml"
+        "docker-compose.yml",
+        "backend/scripts/run_animation_dispatcher.py",
+        "scripts/run_queue_storage_tests.py",
+        "docs/ANIMATION_QUEUE.md",
+        "docs/ARCHITECTURE.md"
       ],
       "prd_source": "PRD §5.7、§9.1",
       "acceptance_criteria": [
@@ -1040,9 +1044,20 @@
         "cd backend && .venv/bin/python -m pytest -q tests/test_durable_job_dispatch.py",
         "对本任务改动运行Ruff和mypy；涉及持久化时在隔离PostgreSQL核验迁移及并发。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "EDUMIND_RUN_QUEUE_BROKER_TESTS=1 EDUMIND_DOCKER_TESTS=1 backend/.venv/bin/python scripts/run_queue_storage_tests.py edumind_catalog_phase1_t019_final tests/test_durable_job_dispatch.py tests/test_animation_job_persistence.py tests/test_animation_worker.py tests/test_animation_job_api.py tests/test_animation_events_api.py",
+          "result": "passed: 42 tests, no skips; isolated PG0021/down0020/up0021, nonempty historical backfill and active Celery downgrade refusal. Atomic commit/rollback, idempotent outbox, broker unavailable bounded backoff without render attempt, concurrent SKIP LOCKED/token CAS, publisher death, sent message loss, missing-row reconciliation, no live lease overwrite, obsolete cancellation/epoch and queued-only routing rollback/retry/cache hit. Actual fixed Celery publication to dedicated Redis7.4.7 with ACL refusal of flush/outside namespace, message removal and same ID retransmission; real approved Manim render, separate PG Worker and cancellation container removal regressions. Initial Provider-only helper rejected legacy non-catalog fixture; corrected with dedicated queue test subprocess dynamic and no Provider env, no assertion weakened.",
+          "evidence": "local-materials/phase-1-t019/checks/pg-v1.log; pg-v2.log; pg-broker-v3.log; pg-broker-docker-final.log"
+        },
+        {
+          "command": "uv lock --project backend --cache-dir /private/tmp/edumind-phase1-uv-cache; uv sync --project backend --frozen --cache-dir /private/tmp/edumind-phase1-uv-cache; Ruff11 Python sources; mypy6 application sources; docker compose --profile animation-queue config --quiet; scripts/check_catalog_workflow.py; scripts/check_provider_contract.py; git diff --check",
+          "result": "passed: Celery5.6.3/Kombu5.6.2/redis-py6.4.0/hash lock installed; Redis official manifest02f2cc4 obtained via environment transport and digest-pull verified after direct registry timeouts. Ruff/mypy strict application sources; two library imports lack upstream stubs and have localized import-untyped annotations only. Fixed payload/queue/task/result disabled, publisher child whitelisted env/4.5s wait/cancel cleanup, private optional compose broker/AOF/noeviction/ACL profile syntax. Default pg_poll/catalog_only unchanged; no API change or production queue deployment, Provider0.",
+          "evidence": "local-materials/phase-1-t019/checks/ruff-final.log; mypy-v1.log; mypy-final.log; docs/ANIMATION_QUEUE.md"
+        }
+      ],
+      "started_at": "2026-10-05T17:01:39",
+      "completed_at": "2026-10-05T17:22:57",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T019"
     },

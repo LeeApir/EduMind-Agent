@@ -1,0 +1,25 @@
+# 动画投递运行说明（T019）
+
+依据已批准[ADR-0009](ADR/0009-durable-animation-queue.md)。T019交付PG事务outbox和独立publisher/reconciler；Celery渲染消费者/尝试清理由T020交付，取消联动/SSE由T021完成。此文不表示队列阶段验收或生产部署完成。默认`EDUMIND_ANIMATION_DISPATCH=pg_poll`与`catalog_only`继续有效。
+
+## 事务与故障语义
+
+新Job或显式重试按当前服务端路由开关，Job内部保存backend和epoch，celery模式在同一事务保存queued事件与唯一(job_id,epoch)outbox；缓存命中/幂等重放不增加outbox。API仍在commit后返回202，不联系broker。旧PG领取器及其reaper只处理pg_poll。既有Job迁移回填pg_poll/epoch1，公共Job响应不暴露路由字段。
+
+独立`backend/scripts/run_animation_dispatcher.py`每轮短事务领取到期行（SKIP LOCKED），随机token/30秒数据库租约，在锁外发送固定Celery任务。每次传输在隔离子进程执行，总等待4.5秒，进程超时/失败/确认丢失均仅记录BROKER_UNAVAILABLE，退避1/2/4/…/60秒，不增加render attempt。正常发送再以当前未过期token CAS标sent。进程死亡时sending可在租约过期后重新领取；已发送但未领取的queued行60秒后可恢复pending。reconciler每30秒扫描最多100个需修复Job；缺失outbox补建，活跃publisher租约不覆盖，终态/取消/旧epoch置obsolete。broker丢失已发送消息也可从PG重新投递，不承诺恰好一次执行。publisher逐次领取，避免大批顺序发送导致尚未发送的租约预先过期。
+
+消息只有`schema_version=1`、规范UUID的`job_id`、正整数`dispatch_epoch`；唯一固定任务`edumind.render_animation.v1`/队列`edumind.animation.v1`，task ID为outbox ID。消息无owner、路径、源码、DSL、Provider凭据或上下文；严格JSON且不接受额外字段。Celery result backend关闭，API不读AsyncResult。发送子进程只接收PATH/SYSTEMROOT及broker URL环境，不继承Provider、数据库或KEK。错误、URL、任务异常原文不进日志或outbox。
+
+## 固定依赖与隔离运行
+
+Python锁定Celery5.6.3、Kombu5.6.2、redis-py6.4.0，所有传递依赖/hash在uv.lock。Redis7.4.7-alpine的官方manifest摘要为`sha256:02f2cc4882f8bf87c79a220ac958f58c700bdec0dfb9b9ea61b62fb0e8f1bfcf`，compose按摘要引用。配置依据[Celery Redis文档](https://docs.celeryq.dev/en/stable/getting-started/backends-and-brokers/redis.html)、[Celery配置](https://docs.celeryq.dev/en/stable/userguide/configuration.html)、[Redis ACL](https://redis.io/docs/latest/manual/security/acl/)及[内存策略](https://redis.io/docs/latest/develop/reference/eviction/)。visibility_timeout=300仅是运输重送参数；业务恢复依赖PG。
+
+compose新增可选`animation-queue` profile，Redis只连接私有internal网络、不绑定宿主端口，独立持久卷/AOF/everysec、128MiB/noeviction，容器256MiB；publisher只连接PG与broker，不注入Provider配置。启用前部署者提供私有ACL文件`EDUMIND_REDIS_ACL_FILE`（默认路径local-materials/redis/users.acl并被Git忽略）和publisher专用broker URL，不在命令输出、Git或公开文档放真实密码。ACL必须禁用default用户，为publisher与后续worker分别设置密码及`~edumind.animation:*`键域，授予实际broker所需命令，拒绝管理/flush命令；文件缺失时Redis不得启动。只启publisher而没有T020消费者会持续保留queued并重投，因此本任务不授权生产切换。
+
+本地显式运行接口（仅在迁移完成和私有broker配置存在后）：`cd backend && uv run --frozen python scripts/run_animation_dispatcher.py`；`--once`执行一次巡检/投递。publisher/reconciler是单独进程，API lifespan不启动隐式工作。默认compose不用新profile。
+
+## 操作回滚与验证
+
+管理员先设新Job默认pg_poll、暂停Celery消费者、排空当前lease及容器，再使用内部`route_queued_template_jobs(sessions, ids, backend='pg_poll')`迁移最多100个queued模板Job。它锁Job后锁outbox，改backend/epoch并obsolete旧行；反向切换celery同事务新增outbox。running/终态不改写、审核目标失效拒绝、不把DSL交给旧模板执行器。切换函数没有HTTP入口，不以清空Redis作为正确性条件。实际在途容器与尝试账本迁移由T020/T036核验。
+
+Alembic0021只在开发/隔离数据库验证upgrade/down0020/upgrade；存在活跃celery Job时downgrade明确拒绝，避免删除已接受任务的投递信息。常规功能回滚保持增量schema，不能以downgrade替代运行回滚。专用`scripts/run_queue_storage_tests.py`只接受新隔离DB名；旧合成动画fixture使用测试子进程dynamic、无Provider/KEK/broker配置，实际服务器和compose仍默认catalog_only。Mock、隔离PG、实际broker及真实渲染证据须分别记录；T036负责完整Redis/Celery/渲染故障矩阵。

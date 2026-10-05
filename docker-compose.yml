@@ -22,6 +22,7 @@ services:
       - ${EDUMIND_MEDIA_CACHE_HOST_PATH:-./data/videos/cache}:/workspace/data/videos/cache:ro
     environment:
       EDUMIND_KNOWLEDGE_GRAPH_PATH: /workspace/data/knowledge_graph.yaml
+      EDUMIND_ANIMATION_DISPATCH: ${EDUMIND_ANIMATION_DISPATCH:-pg_poll}
       EDUMIND_PRODUCT_MODE: ${EDUMIND_PRODUCT_MODE:-catalog_only}
       EDUMIND_DATABASE_URL: postgresql+asyncpg://edumind:${EDUMIND_POSTGRES_PASSWORD:-edumind_dev_password}@postgres:5432/edumind_dev
       EDUMIND_PROVIDER_BASE_URL: ${EDUMIND_PROVIDER_BASE_URL:-}
@@ -54,5 +55,37 @@ services:
       timeout: 3s
       retries: 20
 
+  animation-broker:
+    profiles: [animation-queue]
+    image: redis@sha256:02f2cc4882f8bf87c79a220ac958f58c700bdec0dfb9b9ea61b62fb0e8f1bfcf
+    command: [redis-server, --appendonly, "yes", --appendfsync, everysec, --maxmemory, 128mb, --maxmemory-policy, noeviction, --aclfile, /run/secrets/animation-redis.acl]
+    volumes:
+      - edumind_animation_broker_data:/data
+      - ${EDUMIND_REDIS_ACL_FILE:-./local-materials/redis/users.acl}:/run/secrets/animation-redis.acl:ro
+    networks: [animation_queue]
+    mem_limit: 256m
+    cpus: 1
+    restart: unless-stopped
+
+  animation-dispatcher:
+    profiles: [animation-queue]
+    build: ./backend
+    command: [uv, run, --no-dev, python, scripts/run_animation_dispatcher.py]
+    environment:
+      EDUMIND_DATABASE_URL: postgresql+asyncpg://edumind:${EDUMIND_POSTGRES_PASSWORD:-edumind_dev_password}@postgres:5432/edumind_dev
+      EDUMIND_ANIMATION_BROKER_URL: ${EDUMIND_ANIMATION_BROKER_URL:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      animation-broker:
+        condition: service_started
+    networks: [default, animation_queue]
+    restart: unless-stopped
+
+networks:
+  animation_queue:
+    internal: true
+
 volumes:
   edumind_postgres_data:
+  edumind_animation_broker_data:

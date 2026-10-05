@@ -8,7 +8,7 @@
 
 [ADR-0009](ADR/0009-durable-animation-queue.md)确定保留PostgreSQL为Job/owner/租约/媒体/SSE唯一事实源，以同事务outbox和Redis/Celery投递已审核动画的Job ID/epoch；重复投递由数据库条件领取与版本隔离处理。凭据、临时handle、学习上下文和待模型审核阶段不进入队列。30s租约/10s心跳/最多两次领取、取消与发布行锁排序及既有媒体隔离继承ADR-0004，具体切换/回滚与失败矩阵见提案。
 
-该方案已获用户批准A–D，具体提案digest及原话见[批准登记](ADR/0009-queue-approval-20261004.json)；未安装或实施Celery/Redis。公开API路径、响应状态和PG事件游标保留；OpenAPI中的`x-queue-migration`只记录已批准内部迁移计划，不变更现行运行行为。T019–T021按本批准逐项实施并验证，T036须提供真实故障恢复；目录与2h匿名会话继续按既有批准，不新增Redis会话/LLM缓存或模型队列。
+该方案已获用户批准A–D，具体提案digest及原话见[批准登记](ADR/0009-queue-approval-20261004.json)；T019已交付锁定的Celery/Redis运输依赖、Job路由增量迁移、事务outbox、独立publisher/reconciler及兼容PG领取过滤，运行说明见[ANIMATION_QUEUE](ANIMATION_QUEUE.md)。默认仍pg_poll，T020消费者/尝试清理与T021取消联动尚未交付。公开API路径、响应状态和PG事件游标保留；OpenAPI中的`x-queue-migration`只记录已批准内部迁移计划，公开接口不暴露内部投递字段。T019–T021按本批准逐项实施并验证，T036须提供真实故障恢复；目录与2h匿名会话继续按既有批准，不新增Redis会话/LLM缓存或模型队列。
 
 ## Phase 1 DSL决定（ADR-0010已批准）
 

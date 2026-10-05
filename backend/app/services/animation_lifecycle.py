@@ -19,6 +19,7 @@ from app.services.animation_jobs import (
 )
 from app.services.animation_templates import cache_identity, load_template
 from app.services.catalog_animation_access import animation_target_approved
+from app.services.durable_job_dispatch import dispatch_backend, enqueue_animation_job
 from app.services.learning_owner_lock import lock_learning_owner
 
 
@@ -132,6 +133,7 @@ async def retry_animation_job(
             renderer_config_sha256=runtime.renderer_config_sha256,
             subtitle_version=runtime.subtitle_version,
             cache_key=cache_identity(spec, original.parameters, runtime),
+            dispatch_backend=dispatch_backend(), dispatch_epoch=1,
             status="queued", attempt=0, progress=0.0, last_event_id=0,
             cancel_requested=False, retry_of=original.id,
         )
@@ -141,6 +143,7 @@ async def retry_animation_job(
             db, owner_id=owner_id, job_id=job.id,
             event_type="queued", payload={"stage": "queued", "progress": 0.0},
         )
+        enqueue_animation_job(db, job)
         await db.commit()
         return job, True
     except Exception:

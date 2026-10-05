@@ -9,9 +9,11 @@ from sqlalchemy import (
     Float,
     ForeignKey,
     ForeignKeyConstraint,
+    Index,
     Integer,
     String,
     UniqueConstraint,
+    func,
 )
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.dialects.postgresql import UUID as PostgreSQLUUID
@@ -82,6 +84,9 @@ class AnimationJob(Base):
             ["user_id", "retry_of"], ["animation_jobs.user_id", "animation_jobs.id"],
             name="fk_animation_job_retry_owner",
         ),
+        CheckConstraint("dispatch_backend IN ('pg_poll','celery')",
+                        name="ck_animation_job_dispatch_backend"),
+        CheckConstraint("dispatch_epoch >= 1", name="ck_animation_job_dispatch_epoch"),
         CheckConstraint("status IN ('queued','running','succeeded','failed','cancelled')",
                         name="ck_animation_job_status"),
         CheckConstraint("action_kind IN ('request','retry')", name="ck_animation_job_action"),
@@ -117,6 +122,12 @@ class AnimationJob(Base):
     renderer_config_sha256: Mapped[str] = mapped_column(String(64), nullable=False)
     subtitle_version: Mapped[str] = mapped_column(String(40), nullable=False)
     cache_key: Mapped[str] = mapped_column(String(64), nullable=False)
+    dispatch_backend: Mapped[str] = mapped_column(
+        String(16), default="pg_poll", server_default="pg_poll", nullable=False,
+    )
+    dispatch_epoch: Mapped[int] = mapped_column(
+        Integer, default=1, server_default="1", nullable=False,
+    )
     status: Mapped[str] = mapped_column(String(16), nullable=False, default="queued")
     attempt: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     progress: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
@@ -186,3 +197,49 @@ class AnimationResourceBinding(Base):
     scene_id: Mapped[UUID] = mapped_column(PostgreSQLUUID(as_uuid=True), nullable=False)
     scene_version: Mapped[int] = mapped_column(Integer, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
+
+
+class AnimationDispatchOutbox(Base):
+    """Bounded transport bookkeeping, never a second Job state or sensitive payload."""
+
+    __tablename__ = "animation_dispatch_outbox"
+    __table_args__ = (
+        UniqueConstraint("job_id", "dispatch_epoch", name="uq_animation_dispatch_job_epoch"),
+        CheckConstraint("dispatch_epoch >= 1", name="ck_animation_dispatch_epoch"),
+        CheckConstraint(
+            "schema_version = 1 AND task_name = 'edumind.render_animation.v1'",
+            name="ck_animation_dispatch_protocol",
+        ),
+        CheckConstraint(
+            "state IN ('pending','sending','sent','obsolete')", name="ck_animation_dispatch_state"
+        ),
+        CheckConstraint("transport_attempts >= 0", name="ck_animation_dispatch_attempts"),
+        CheckConstraint(
+            "(state = 'sending') = (publisher_token IS NOT NULL AND "
+            "publisher_expires_at IS NOT NULL)",
+            name="ck_animation_dispatch_lease",
+        ),
+        CheckConstraint(
+            "error_code IS NULL OR error_code = 'BROKER_UNAVAILABLE'",
+            name="ck_animation_dispatch_error",
+        ),
+        Index("ix_animation_dispatch_due", "state", "next_attempt_at"),
+    )
+    id: Mapped[UUID] = mapped_column(PostgreSQLUUID(as_uuid=True), primary_key=True, default=uuid4)
+    job_id: Mapped[UUID] = mapped_column(
+        PostgreSQLUUID(as_uuid=True),
+        ForeignKey("animation_jobs.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    dispatch_epoch: Mapped[int] = mapped_column(Integer, nullable=False)
+    schema_version: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    task_name: Mapped[str] = mapped_column(String(64), nullable=False)
+    state: Mapped[str] = mapped_column(String(16), nullable=False, default="pending")
+    publisher_token: Mapped[UUID | None] = mapped_column(PostgreSQLUUID(as_uuid=True))
+    publisher_expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    next_attempt_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+    last_sent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    transport_attempts: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    error_code: Mapped[str | None] = mapped_column(String(32))
