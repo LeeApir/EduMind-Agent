@@ -72,7 +72,13 @@ async def probe_connection(
                 raise CredentialFailure("CREDENTIAL_UNAVAILABLE")
             if view["credential_state"] == "expired":
                 raise CredentialFailure("CREDENTIAL_EXPIRED")
-            if view["provider_type"] not in {"openai-compatible", "ollama", "anthropic", "gemini"}:
+            if view["provider_type"] not in {
+                "openai-compatible",
+                "ollama",
+                "anthropic",
+                "gemini",
+                "spark",
+            }:
                 raise ProviderError(ProviderErrorCode.CAPABILITY_UNAVAILABLE)
             if view["credential_mode"] == "persistent" and view["credential_state"] != "present":
                 raise CredentialFailure("CREDENTIAL_MISSING")
@@ -103,7 +109,7 @@ async def probe_connection(
                 # bounded output, not deterministic sampling; no user setting is dropped.
                 prompt = (
                     replace(PROBE_PROMPT, temperature=None)
-                    if view["provider_type"] == "anthropic"
+                    if view["provider_type"] in {"anthropic", "spark"}
                     else PROBE_PROMPT
                 )
                 result = await gateway.generate_text(prompt)  # retry_safe remains False.

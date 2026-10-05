@@ -257,6 +257,8 @@ onBeforeUnmount(() => { active = false; ++revision; erase(); resetConfirmation()
                 Anthropic（原生 Messages）
               </option><option value="gemini">
                 Google Gemini（原生 GenerateContent）
+              </option><option value="spark">
+                讯飞星火（HTTP APIPassword）
               </option>
             </select>
             <label for="provider-url">服务地址</label><input
@@ -268,7 +270,7 @@ onBeforeUnmount(() => { active = false; ++revision; erase(); resetConfirmation()
               :placeholder="form.provider_type === 'ollama' ? 'http://127.0.0.1:11434' : form.provider_type === 'gemini' ? 'https://服务地址/v1beta' : 'https://服务地址/v1'"
             >
             <p class="provider-hint">
-              {{ form.provider_type === 'anthropic' ? 'Anthropic 地址需包含版本前缀（如 /v1）。' : form.provider_type === 'gemini' ? 'Gemini 地址需包含版本前缀（如 /v1beta）；不要包含模型路径或 Key。' : 'Ollama 使用服务根地址。' }}地址相对于学伴服务端，本地地址需管理员明确放行。
+              {{ form.provider_type === 'anthropic' ? 'Anthropic 地址需包含版本前缀（如 /v1）。' : form.provider_type === 'gemini' ? 'Gemini 地址需包含版本前缀（如 /v1beta）；不要包含模型路径或 Key。' : form.provider_type === 'spark' ? '星火使用对应模型的 HTTP 服务前缀（如 /v1、/v2 或 /x2），Key 填 HTTP APIPassword；不支持 WebSocket 签名凭据。' : 'Ollama 使用服务根地址。' }}地址相对于学伴服务端，本地地址需管理员明确放行。
             </p>
             <label for="provider-mode">Key 保存方式</label><select
               id="provider-mode"

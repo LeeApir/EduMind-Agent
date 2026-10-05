@@ -83,6 +83,7 @@ async def build_connection_provider_gateway(
     from app.services.gemini import GeminiAdapter
     from app.services.ollama import OllamaAdapter
     from app.services.openai_compatible import OpenAICompatibleAdapter
+    from app.services.spark import SparkAdapter
 
     operation = ConnectionOperation(
         store, request, authorize_attempt, transport=transport, target_observer=target_observer
@@ -93,6 +94,8 @@ async def build_connection_provider_gateway(
             adapter = AnthropicAdapter(operation)
         elif operation.provider_type == "gemini":
             adapter = GeminiAdapter(operation)
+        elif operation.provider_type == "spark":
+            adapter = SparkAdapter(operation)
         elif operation.provider_type == "ollama":
             adapter = OllamaAdapter(operation)
         else:

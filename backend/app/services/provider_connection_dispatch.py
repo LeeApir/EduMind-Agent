@@ -192,7 +192,13 @@ class ConnectionOperation(MemoryOnly):
         view = await self.store.read(r.identity, r.route.connection_id)
         if view["config_version"] != r.route.config_version:
             raise CredentialFailure("VERSION_CONFLICT")
-        if view["provider_type"] not in {"openai-compatible", "ollama", "anthropic", "gemini"}:
+        if view["provider_type"] not in {
+            "openai-compatible",
+            "ollama",
+            "anthropic",
+            "gemini",
+            "spark",
+        }:
             raise ProviderError(ProviderErrorCode.CAPABILITY_UNAVAILABLE)
         self.provider_type = str(view["provider_type"])
         if not view["enabled"]:
@@ -452,6 +458,7 @@ def wire_target(
             "openai-compatible": "/chat/completions",
             "ollama": "/api/chat",
             "anthropic": "/messages",
+            "spark": "/chat/completions",
         }
     ).get(provider_type)
     query = "limit=1000" if listing and provider_type == "anthropic" else ""

@@ -52,6 +52,18 @@ Ollama 复用 T007 的 owner/会话/配置版本/同意、每次预算授权、�
 
 显式模型刷新为单次`GET <base>/models?pageSize=1000`；非空nextPageToken、畸形数据或Key回显失败并保留旧缓存，不自动分页。缓存保留规范`models/<ID>`，能力规则`gemini-model-capabilities-v1`；只映射明确声明的streamGenerateContent或项目布尔声明，generateContent本身不证明vision/structured_output/streaming，未声明保持未知。依据：[Models列表和字段](https://ai.google.dev/api/models)。固定8token/10秒/一次的文本探测不含图片/学生上下文，也不能将成功当成多模态或结构化证明。生产预算默认拒绝、catalog_only持续；本任务真实Provider请求0。
 
+## 讯飞星火可选 HTTP 适配（T017）
+
+`provider_type=spark`选择独立SparkAdapter，业务仍只依赖Gateway。按2026-10-05核对的[官方HTTP文档](https://www.xfyun.cn/doc/spark/HTTP%E8%B0%83%E7%94%A8%E6%96%87%E6%A1%A3.html)、[X2 HTTP文档](https://www.xfyun.cn/doc/spark/X1http.html)和[星辰MaaS接入说明](https://www.xfyun.cn/doc/spark/%E4%BA%A7%E5%93%81%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.html)，使用所选模型对应的HTTP服务前缀（例如`/v1`、`/v2`或`/x2`），只追加`/chat/completions`，不固定域名或型号、不跨端点自动切换。只写secret.api_key承载HTTP APIPassword/API Key，通过Bearer头发送；不消费APISecret/AppID三件套或生成WebSocket/HMAC签名URL，传入额外凭据在发送前拒绝。复用锁定HTTPX0.28.1，不新增SDK/迁移。
+
+请求保持原消息、模型、受限max_tokens及显式温度，不发送owner/session/user标识。明确设置web_search.enable=false和tool_choice=none，因为官方部分型号默认允许搜索；不注册或执行工具。若目标不支持这些禁止参数，返回能力错误，不删除参数重放。探测只发固定8token/一次/10秒的合成文本，不设置跨版本范围不同的温度，不含学生上下文。设置页可选星火并提示HTTP凭据方式；保存、打开页面和读取缓存都不触发模型请求。
+
+原生文档的完整非流式响应没有model/finish_reason，因此以完整合法HTTP JSON响应、成功code（出现时必须整数0）、单个assistant文本作为完成依据；显式finish_reason出现时仍须stop，length/拒绝/工具/二进制/异常状态拒绝。TextResult.model_id记录所选路由，不将缺失的上游型号伪造为独立模型验证。流式按有界SSE增量处理，必须收到[DONE]且自然读到EOF，只有可见content转发；reasoning_content和HIDE_CONTINUE思考块隐藏，带隐藏建议的正文拒绝。完成后额外正文、版本变化、截断、工具/搜索、非法JSON及取消都终止并关闭，不自动重试或拼接另一Provider。
+
+实际prompt_tokens/completion_tokens映射到中立用量，缺失保持未知；非零search_prompt_tokens或搜索输出违反禁搜索范围而失败，不推算费用。原生code10007/11201/11202/11203映射限流，11200为鉴权失败，10907为能力不支持，10013/10014/10019为无效输出；未知错误码保守拒绝，HTTP状态使用统一映射，错误正文/sid不公开。当前Key的转义回显在凭据上下文内拒绝。共用1MiB请求/帧、2MiB响应上限、目标固定IP/Host/SNI、禁代理/重定向、owner/会话/配置版本/同意、发送行锁/撤销和临时凭据单次清理。
+
+本任务只开放已核对的文本/流式契约，结构化、图片、函数/搜索执行及模型列表刷新显式CAPABILITY_UNAVAILABLE；不因官方提到JSON/工具能力自动推断具体模型已可用于正式生成。Spark的GET模型缓存仍只读，POST刷新在出站前拒绝，不假设存在未记录的/models接口。生产预算默认拒绝、catalog_only持续；真实账号、所选型号/协议及禁搜索参数是否实际生效留T039独立授权验收，本任务真实Provider请求0。
+
 ## 显式连接测试
 
 T010 的 POST `/api/providers/connections/{id}/test` 只接受操作ID、精确版本/模型/probe-only同意和可选临时handle；固定短提示、最多8输出token、10秒总期限、一次尝试、不回退。target是发送当时批准的Base URL，is_local来自该次DNS全部地址，不证明服务离线；文本成功仍将所有高级能力标为未知，不返回上游生成正文。响应private/no-store并提示可能调用服务。默认预算拒绝出站；Mock测试注入的授权不是生产预算或真实Provider验收，实际预算与计数由T035交付。

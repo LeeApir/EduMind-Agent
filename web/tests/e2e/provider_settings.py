@@ -11,7 +11,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--url", default="http://127.0.0.1:4187")
     parser.add_argument("--evidence", required=True)
-    parser.add_argument("--native-type", choices=["anthropic", "gemini"])
+    parser.add_argument("--native-type", choices=["anthropic", "gemini", "spark"])
     args = parser.parse_args()
     evidence = Path(args.evidence)
     evidence.mkdir(parents=True, exist_ok=True)

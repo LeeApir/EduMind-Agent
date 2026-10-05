@@ -121,7 +121,7 @@ describe("safe provider transport", () => {
 });
 
 describe("connection settings", () => {
-  it.each(["anthropic", "gemini"])("adds an implemented native %s connection with a cleared password field", async (providerType) => {
+  it.each(["anthropic", "gemini", "spark"])("adds an implemented native %s connection with a cleared password field", async (providerType) => {
     const wrapper = mounted(); await flushPromises(); await click(wrapper, "新增连接");
     await wrapper.get("#provider-name").setValue("原生审核服务");
     await wrapper.get("#provider-type").setValue(providerType);
