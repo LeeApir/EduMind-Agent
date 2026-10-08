@@ -1618,7 +1618,7 @@
       "id": "PHASE-1-T035",
       "phase": "Phase 1",
       "title": "冻结动态能力恢复与独立验收门禁",
-      "status": "todo",
+      "status": "blocked",
       "priority": "P0",
       "depends_on": [
         "PHASE-1-T001",
@@ -1644,10 +1644,46 @@
       "verification": [
         "以模拟出站证明未授权/超预算/不达标即停，审核独立冻结协议及动态恢复ADR；保存离线结果。"
       ],
-      "verification_results": [],
-      "started_at": null,
+      "verification_results": [
+        {
+          "command": "backend/.venv/bin/pytest -q backend/tests/test_phase1_dynamic_gate.py backend/tests/test_acceptance_budget.py",
+          "result": "passed: 34 tests; offline, no skips, no Provider requests",
+          "evidence": "local-materials/phase-1-t035/checks/pytest-final.txt"
+        },
+        {
+          "command": "backend/.venv/bin/python scripts/verify_phase1_dynamic_freeze.py",
+          "result": "passed: exact proposal hashes, 8 archived cases, 9 historical failed slots, 50 review cases, 100 generation slots; approval pending",
+          "evidence": "local-materials/phase-1-t035/checks/freeze.txt"
+        },
+        {
+          "command": "python3 scripts/verify_legacy_archives.py",
+          "result": "passed: 236 originals, 64 experiments, 169 evidence files; T033 remains blocked",
+          "evidence": "local-materials/phase-1-t035/checks/history.txt"
+        },
+        {
+          "command": "backend/.venv/bin/ruff check scripts/acceptance_support/phase1_budget.py scripts/acceptance_support/phase1_metrics.py scripts/verify_phase1_dynamic_freeze.py backend/tests/test_phase1_dynamic_gate.py",
+          "result": "passed: 4 files",
+          "evidence": "local-materials/phase-1-t035/checks/ruff-final.txt"
+        },
+        {
+          "command": "MYPYPATH=scripts backend/.venv/bin/mypy --explicit-package-bases --follow-imports=silent scripts/acceptance_support/phase1_budget.py scripts/acceptance_support/phase1_metrics.py",
+          "result": "passed: 2 files; initial missing package resolution fixed with explicit namespace roots",
+          "evidence": "local-materials/phase-1-t035/checks/mypy-final.txt"
+        },
+        {
+          "command": "python3 scripts/check_catalog_workflow.py",
+          "result": "passed: current dependencies and catalog ledger",
+          "evidence": "local-materials/phase-1-t035/checks/governance.txt"
+        },
+        {
+          "command": "backend/.venv/bin/python scripts/check_provider_contract.py",
+          "result": "passed: 532 refs / 60 operations / 84 examples / 12 implemented; system Python missing jsonschema corrected by locked venv",
+          "evidence": "local-materials/phase-1-t035/checks/contracts-final.txt"
+        }
+      ],
+      "started_at": "2026-10-08T14:05:42",
       "completed_at": null,
-      "blocker": null,
+      "blocker": "待用户审阅并批准 ADR-0011 A–D 及 phase-1-dynamic-v1/manifest.json 绑定附件（新增分类/对照/长审核准入、样本标签及测试开放边界）；已批准 Phase 1 验收计划 §5 明确要求该设计审批。真实调用预算仍为 0，未领取依赖任务。",
       "commit_lookup": "Task-Completed: PHASE-1-T035"
     },
     {

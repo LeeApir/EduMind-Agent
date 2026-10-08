@@ -40,3 +40,7 @@
 PR #4已合并到main `a836ab4`。原工作目录也已同步该版本并清理到上述16份必要文件；T033的12处实验覆盖已还原、52个未跟踪实验文件及169份证据已从原路径移除。完整历史树已实际恢复，236份原件哈希一致。详情见[工作区清理记录](../maintenance/worktree-cleanup-20261003.md)。
 
 `verify_legacy_archives.py` 现在默认只读核验本地Git归档，也可通过 `--restored-root` 核对独立恢复目录，当前checkout无需再保留旧实验原件。历史分支及两批本地材料保留，T033仍blocked，Provider请求0。旧冻结协议和成绩不回写。
+
+## Phase 1 动态恢复提案
+
+[T035 固定集合与离线门禁](phase-1-dynamic-v1/README.md)及[ADR-0011](../ADR/0011-independent-dynamic-acceptance.md)等待批准；当前额度 0，旧 T033 保持 blocked，动态入口未开放。
