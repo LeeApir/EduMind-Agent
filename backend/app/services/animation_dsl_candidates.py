@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import hashlib
+import json
 import platform
 from dataclasses import asdict
 from pathlib import Path
@@ -59,6 +60,24 @@ def policy_manifest() -> dict[str, object]:
         "candidate_store": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
         "review_gateway": hashlib.sha256(
             (Path(__file__).parent / "animation_dsl_review_gateway.py").read_bytes()
+        ).hexdigest(),
+        "candidate_cache": hashlib.sha256(
+            (Path(__file__).parent / "animation_dsl_candidate_cache.py").read_bytes()
+        ).hexdigest(),
+        "intent_validator": hashlib.sha256(
+            (Path(__file__).parent / "animation_intent.py").read_bytes()
+        ).hexdigest(),
+        "generator": hashlib.sha256(
+            (Path(__file__).parents[1] / "agents/animation_dsl_generation.py").read_bytes()
+        ).hexdigest(),
+        "generation_gateway": hashlib.sha256(
+            (Path(__file__).parent / "animation_dsl_generation_gateway.py").read_bytes()
+        ).hexdigest(),
+        "generation_prompt": hashlib.sha256(
+            (Path(__file__).parents[3] / "data/animation_dsl/generate-v1/prompt.md").read_bytes()
+        ).hexdigest(),
+        "video_planner": hashlib.sha256(
+            (Path(__file__).parent / "video_dsl_generation.py").read_bytes()
         ).hexdigest(),
         "schema": SCHEMA_SHA256,
         "validator": VALIDATOR_SHA256,
@@ -214,6 +233,9 @@ async def _policy(db: AsyncSession, key: str, *, lock: bool) -> DSLPolicy:
 def evidence(outcome: DSLReviewOutcome) -> dict[str, object]:
     compiled, valid = outcome.compiled, outcome.compiled.validated
     return {
+        "animation_intent": json.loads(outcome.animation_intent_json)
+        if outcome.animation_intent_json
+        else None,
         "dsl": valid.dsl_sha256,
         "trace": valid.trace_sha256,
         "schema": valid.schema_sha256,
@@ -256,7 +278,10 @@ async def save_dsl_review(
     )
     if (
         checked != outcome.compiled
-        or binding(checked, outcome.reference, outcome.generation_source) != outcome.binding_sha256
+        or binding(
+            checked, outcome.reference, outcome.generation_source, outcome.animation_intent_json
+        )
+        != outcome.binding_sha256
         or outcome.review_sha256
         != digest(
             {

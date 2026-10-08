@@ -1334,7 +1334,7 @@
       "id": "PHASE-1-T026",
       "phase": "Phase 1",
       "title": "生成受约束DSL并提供模板降级",
-      "status": "todo",
+      "status": "done",
       "priority": "P1",
       "depends_on": [
         "PHASE-1-T024",
@@ -1355,9 +1355,30 @@
         "cd backend && .venv/bin/python -m pytest -q tests/test_video_dsl_generation.py",
         "对本任务改动运行Ruff和mypy；涉及持久化时在隔离PostgreSQL核验迁移及并发。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "backend/.venv/bin/python /private/tmp/edumind-t026-pg.py (isolated DB, alembic upgrade head; cd backend && .venv/bin/python -m pytest -q tests/test_video_dsl_generation.py tests/test_animation_dsl_review.py tests/test_animation_dsl_compiler.py tests/test_animation_dsl_validation.py tests/test_animation_templates.py; EDUMIND_DOCKER_TESTS=1)",
+          "result": "passed: 318 tests, no skips, actual PostgreSQL and Linux Docker, all Provider sends MockTransport; helper snapshot local-materials/phase-1-t026/run_checks.py",
+          "evidence": "local-materials/phase-1-t026/checks/pg-complete.txt"
+        },
+        {
+          "command": "cd backend && .venv/bin/mypy app/agents/animation_dsl_generation.py app/agents/animation_dsl_review.py app/services/animation_dsl_generation_gateway.py app/services/video_dsl_generation.py app/services/animation_intent.py app/services/animation_dsl_candidate_cache.py app/services/animation_dsl_candidates.py",
+          "result": "passed: 7 files",
+          "evidence": "local-materials/phase-1-t026/checks/mypy-final.txt"
+        },
+        {
+          "command": "backend/.venv/bin/ruff check backend/app/agents/animation_dsl_generation.py backend/app/agents/animation_dsl_review.py backend/app/services/animation_dsl_generation_gateway.py backend/app/services/video_dsl_generation.py backend/app/services/animation_intent.py backend/app/services/animation_dsl_candidate_cache.py backend/app/services/animation_dsl_candidates.py backend/tests/test_video_dsl_generation.py",
+          "result": "passed: 8 files",
+          "evidence": "local-materials/phase-1-t026/checks/ruff-final.txt"
+        },
+        {
+          "command": "backend/.venv/bin/python scripts/check_provider_contract.py; python3 scripts/check_catalog_workflow.py; backend/.venv/bin/python scripts/verify_phase1_dynamic_approval.py",
+          "result": "passed: public contracts unchanged, dependencies valid, T035 approved historical proposal verified independently of evolving implementation",
+          "evidence": "local-materials/phase-1-t026/checks/"
+        }
+      ],
+      "started_at": "2026-10-08T15:16:35",
+      "completed_at": "2026-10-08T15:52:58",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T026"
     },

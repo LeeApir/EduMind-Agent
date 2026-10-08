@@ -78,3 +78,13 @@ HTTP 首字节 P95≤2 秒、完整教学首段 P95≤10 秒与独立教学首 t
 ## MVP 0.3 API 契约（T004）
 
 [OpenAPI 0.3.0](api/openapi.yaml) 固定动画Job、媒体/导出及课堂/场景接口，当前交付范围与验证见[目录版退出报告](acceptance/mvp-0.3-catalog-exit-20261003.md)；目录模式下动态课堂与重解释仍关闭。POST课堂流使用fetch；GET持久动画Job事件使用EventSource及游标重放。
+
+### Phase 1：动画意图与有界生成（T026）
+
+内部 `VideoDSLPlanner` 接受服务端目标对应的知识点、六种有限操作和有界整数参数，不接受 DSL/Python/模板路径；标准请求先检查已审核缓存与两个适用模板，只有无法满足时才进入 quality 生成。`detailed_trace` 是额外的呈现偏好，失败时可明确省略它，仍保持原知识点、操作和参数；不适用的模板不能用来替代原目标。返回值区分 reviewed_cache、reviewed_dsl_cache、parameterized_template、generated_dsl、template_fallback 与 unavailable，候选和模板计划均不声称媒体已生成。
+
+quality 路由在每次调用前重查 T012 选择；实际 Factory 继续执行 owner/session/配置版本、数据去向同意、SSRF/固定目标、发送锁和默认拒绝预算，不使用隐式厂商回退。生成按声明能力使用一次结构化调用或一次有界 JSON 文本调用，结构化失败不再切换文本补发。初次及最多两次定向修正都使用完整本地 schema/规则与最小参考；单次生成 60 秒、整条流程 180 秒，审核独立保持 60 秒。仅 strict revise 可修正，reject、审核不可用或本地错误直接结束；取消向上传播。最终 source 绑定实际 adapter/能力/模型/目标和完整输入 Prompt、采样摘要。
+
+独立审核另收原动画意图并将其规范字节纳入审核 binding；现有审核 evidence 保存有界纯数字/枚举意图，无新数据库列。缓存仅在 owner、场景/课程当前资格、图谱、意图与现行已登记规则均匹配时复用审核候选，重编译核对 binding/源码身份；撤回或版本变化即失效。规则 manifest 增加实际意图校验器、生成器、Gateway、Prompt、planner/cache 源摘要，不自动登记新政策。缓存只是内部规划读取，T028 正式 Job/媒体绑定仍须在事务发布锁内再次核验资格。
+
+T026 未新增 HTTP、Job 或渲染执行入口；候选存储仍使用 T025 的不可变表及增量 migration，不运行生成源码。当前 catalog_only 和未独立授权调用额度 0 保持，实际动态恢复遵守已批准 ADR-0011；T027/T028/T037 的 Worker、发布、实际画面与正式模型质量证据不能由这些 Mock 流程代替。

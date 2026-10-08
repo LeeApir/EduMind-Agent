@@ -15,6 +15,7 @@ from jsonschema import Draft202012Validator, validators  # type: ignore[import-u
 
 from app.core.credential_crypto import CredentialFailure
 from app.services.animation_dsl_compiler import CompiledDSL, compile_animation_dsl
+from app.services.animation_intent import intent_from_payload
 from app.services.provider_gateway import (
     ChatMessage,
     ProviderError,
@@ -183,15 +184,22 @@ class DSLReviewOutcome:
     binding_sha256: str
     review_sha256: str
     error_code: str | None = None
+    animation_intent_json: str | None = field(default=None, repr=False)
 
     @property
     def approved(self) -> bool:
         return self.verdict == "pass" and self.error_code is None
 
 
-def binding(compiled: CompiledDSL, reference: DSLReference, generation: GenerationSource) -> str:
+def binding(
+    compiled: CompiledDSL,
+    reference: DSLReference,
+    generation: GenerationSource,
+    animation_intent_json: str | None = None,
+) -> str:
     return digest(
         {
+            "animation_intent": animation_intent_json,
             "compiled": compiled.identity_sha256,
             "reference": reference.sha256,
             "target": reference.target_sha256,
@@ -228,7 +236,12 @@ class AnimationDSLReviewAgent:
         self.gateway = gateway
 
     async def review(
-        self, raw: bytes | str, *, reference: DSLReference, generation_source: GenerationSource
+        self,
+        raw: bytes | str,
+        *,
+        reference: DSLReference,
+        generation_source: GenerationSource,
+        animation_intent: dict[str, object] | None = None,
     ) -> DSLReviewOutcome:
         # Fresh local checks. No caller-supplied frames, Python, or earlier pass is accepted.
         compiled = await asyncio.to_thread(
@@ -236,6 +249,7 @@ class AnimationDSLReviewAgent:
         )
         bound = binding(compiled, reference, generation_source)
         source = None
+        intent_json = None
         try:
             payload = reference.payload()
             if (
@@ -244,19 +258,25 @@ class AnimationDSLReviewAgent:
                 or hashlib.sha256(Path(__file__).read_bytes()).hexdigest() != REVIEWER_SHA256
             ):
                 raise ValueError("DSL_REVIEW_UNAVAILABLE")
+            review_payload = {
+                "dsl": compiled.validated.candidate,
+                "frames": json.loads(compiled.validated.trace_json),
+                "reference": payload,
+            }
+            if animation_intent is not None:
+                intent = intent_from_payload(animation_intent)
+                if intent.knowledge_point_id != reference.knowledge_point_id:
+                    raise ValueError("DSL_REVIEW_UNAVAILABLE")
+                review_payload["intent"] = intent.payload()
+                intent_json = canonical(intent.payload())
+                bound = binding(compiled, reference, generation_source, intent_json)
             request = StructuredRequest(
                 TextRequest(
                     (
                         ChatMessage("system", INSTRUCTIONS),
                         ChatMessage(
                             "user",
-                            canonical(
-                                {
-                                    "dsl": compiled.validated.candidate,
-                                    "frames": json.loads(compiled.validated.trace_json),
-                                    "reference": payload,
-                                }
-                            ),
+                            canonical(review_payload),
                         ),
                     ),
                     task_profile=TaskProfile.REVIEW,
@@ -305,4 +325,5 @@ class AnimationDSLReviewAgent:
             bound,
             review_hash,
             "DSL_REVIEW_UNAVAILABLE" if verdict == "unavailable" else None,
+            animation_intent_json=intent_json,
         )
