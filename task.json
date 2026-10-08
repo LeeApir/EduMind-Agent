@@ -1286,7 +1286,7 @@
       "id": "PHASE-1-T025",
       "phase": "Phase 1",
       "title": "审核并保存DSL正式候选",
-      "status": "todo",
+      "status": "done",
       "priority": "P1",
       "depends_on": [
         "PHASE-1-T012",
@@ -1298,7 +1298,10 @@
         "backend/app/services/",
         "backend/app/models/",
         "backend/alembic/",
-        "backend/tests/"
+        "backend/tests/",
+        "data/animation_dsl/review-v1/",
+        "scripts/run_queue_storage_tests.py",
+        "docs/ARCHITECTURE.md"
       ],
       "prd_source": "PRD §3.3正式资源审核、§8.2",
       "acceptance_criteria": [
@@ -1310,9 +1313,20 @@
         "cd backend && .venv/bin/python -m pytest -q tests/test_animation_dsl_review.py",
         "对本任务改动运行Ruff和mypy；涉及持久化时在隔离PostgreSQL核验迁移及并发。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "EDUMIND_DOCKER_TESTS=1 backend/.venv/bin/python scripts/run_queue_storage_tests.py edumind_catalog_phase1_t025_re5 tests/test_animation_dsl_review.py tests/test_model_preferences.py tests/test_animation_dsl_validation.py tests/test_animation_dsl_compiler.py tests/test_animation_templates.py tests/test_animation_cache.py; dedicated re6 review/preferences and re7 review/storage final runs",
+          "result": "passed: 310 joint tests with actual Linux Docker, then 69 review/preferences and 44 final review/storage tests, no skips in these final runs. Migration0023/down0020/up0023; bound pass/owner/target/scene/hash insert constraints, immutable UPDATE and permanent revoke, qualification lock race, graph/policy/source/scene change invalidation, same-session scene refresh, owner cascade and data-preserving downgrade refusal. Strict output/index/NFC/secret/echo checks, missing/oversize/mismatched references zero send, cancellation, independent calls and actual selected-review Gateway/adapter with MockTransport; denied budget zero send, actual source hashes with unknown revision. Earlier socket denial, fixture arrays vs graph array mismatch and intermediate two Docker skips retained, corrected or executed explicitly. Provider0; mock content review is not real-model quality acceptance.",
+          "evidence": "local-materials/phase-1-t025/checks/pg-v1.log; pg-v2.log; pg-v3.log; pg-v4.log; pg-final.log; review-final.log; review-storage-final.log"
+        },
+        {
+          "command": "Ruff7 changed Python sources; mypy4 application sources; backend/.venv/bin/python scripts/check_provider_contract.py; python3 scripts/check_catalog_workflow.py; git diff --check",
+          "result": "passed: lint/types, unchanged 532refs/60operations/84examples/12 runtime routes, workflow/diff; exact approved Prompt/schema bytes copied to runtime, companion architecture/storage test helper included. Policy admission explicit internal maintenance action, no automatic readmission, no HTTP/Job/media/new dependency or production mode change. T026 corrections/generation and T027/T028 rendering/publication remain pending. User requested pause after this repair; commit/check then pause, do not claim T026.",
+          "evidence": "local-materials/phase-1-t025/checks/ruff-final.log; mypy-final.log; contract.log; workflow.log; data/animation_dsl/review-v1/README.md"
+        }
+      ],
+      "started_at": "2026-10-08T12:09:40",
+      "completed_at": "2026-10-08T12:36:17",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T025"
     },

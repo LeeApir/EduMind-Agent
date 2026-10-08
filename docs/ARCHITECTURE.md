@@ -14,13 +14,16 @@
 
 [ADR-0010](ADR/0010-constrained-animation-dsl.md)及[DSL v1契约/schema/示例](agents/animation-dsl-v1/README.md)确定九动作有限JSON、逐步状态模拟、独立审核与确定性编译/AST、同等隔离容器；模型不能提交Python。资源上限为64KiB/深度12/8节点/4指针/16累计边/120动作/30–90s，具体引用/字幕/严格解码见附件。
 
-DSL自由文本采用owner私有缓存及准确生成/审核来源，候选/规则/课程撤回实时阻断新发布与读取；API内有界模型准备操作不进Celery，只有已审核无凭据渲染Job进入ADR-0009队列。失败只一次降级到同目标已审核模板，无适用模板则不可用。方案已获用户批准A–D及附件，见[批准登记](ADR/0010-dsl-approval-20261004.json)；T023已实现本地严格校验/冻结轨迹，T024实现确定性编译与受限静态检查，其余按任务逐项实施；OpenAPI扩展只标已批准计划，T025增加T024编译前置，T023等逐项实施并验证。真实Provider预算0、catalog_only与T035独立开放门禁不变。
+DSL自由文本采用owner私有缓存及准确生成/审核来源，候选/规则/课程撤回实时阻断新发布与读取；API内有界模型准备操作不进Celery，只有已审核无凭据渲染Job进入ADR-0009队列。失败只一次降级到同目标已审核模板，无适用模板则不可用。方案已获用户批准A–D及附件，见[批准登记](ADR/0010-dsl-approval-20261004.json)；T023已实现本地严格校验/冻结轨迹，T024实现确定性编译与受限静态检查，T025实现独立审核与不可变候选/资格目录，其余按任务逐项实施；OpenAPI扩展只标已批准计划，T025增加T024编译前置，T023等逐项实施并验证。真实Provider预算0、catalog_only与T035独立开放门禁不变。
 
 T024的`animation_dsl_compiler`仅通过AST构造固定Manim `DSLScene.construct`，按可信轨迹逐动作更新对象；ID映射由编译器分配`m0…`，自由文字只进入Constant。实际最小属性集为`move_to`、`add/remove/play/wait`和已核对来源的`animate.set_color`（group）/`animate.set_fill`（box）；交换仅Transform两个值Text，访问标记单独保留，compare结果下一动作移除，字幕覆盖duration+hold。只允许固定Text/RoundedRectangle/Arrow/VGroup/FadeIn/FadeOut/Transform及Scene导入，构造器/坐标/色表/字体/时长参数逐项核验，未知节点/接收者/参数拒绝。
 
 `animation_dsl_static.py`作为stdlib可信子进程解析源码，不import/run生成模块，`-I`且空环境，不继承Provider/PG/KEK。父进程复核当前源码/政策与加载时摘要，子进程再次核对传入的静态源码/政策摘要，版本漂移即拒绝，需重新加载新版本。先限制256KiB，再核验≤20000 AST节点；CPU1s、栈8MiB、零文件输出及32描述符，Linux额外384MiB DATA/AS上限，macOS不声称内存rlimit已生效。父进程0.9s截止并强制kill/wait，为1s总预算留清理余量。后端Python3.11与固定渲染镜像实测Python3.14均拒绝额外type_params；其他解释器版本不可确认即拒绝。AST摘要包含实际解释器结构，编译身份另绑定Python版本、实际源码/静态政策/schema/轨迹/SRT、固定镜像/字体/布局/帧率；跨解释器不转授旧摘要。
 
-成功结果仍是待审核候选，T025须绑定本次完整编译/轨迹摘要；T027再核对同版本重新编译与静态检查，并在受限容器验证字体/导入/真实MP4与字幕，T037补实际画面。T024未执行生成Scene、渲染或开放新请求/动态能力；静态失败只有固定内部码`DSL_COMPILE_REJECTED`/`DSL_RESOURCE_LIMIT`/`DSL_COMPILE_UNAVAILABLE`，不回显源码、异常或路径。
+编译成功结果仍须通过T025独立审核并绑定本次完整编译/轨迹摘要；T027再核对同版本重新编译与静态检查，并在受限容器验证字体/导入/真实MP4与字幕，T037补实际画面。T024未执行生成Scene、渲染或开放新请求/动态能力；静态失败只有固定内部码`DSL_COMPILE_REJECTED`/`DSL_RESOURCE_LIMIT`/`DSL_COMPILE_UNAVAILABLE`，不回显源码、异常或路径。
+
+T025通过`animation_dsl_review`和服务端`SelectedDSLReviewGateway`将完整DSL/可信轨迹/≤8KiB版本化参考交给T012实际review档位，单次60秒、不隐式回退；生成Python不发送或执行。严格审核输出与动作索引/安全文字检查失败返回`DSL_REVIEW_UNAVAILABLE`，与事实reject分开。`0023_animation_dsl_reviews`建立owner/单元/场景版本复合外键、pass绑定与内容摘要插入复核、不可变候选/审核/政策，以及追加撤回记录；失败仅存固定类别/索引/摘要，不存未审核文字。已有审核数据的迁移降级拒绝，正常owner学习数据删除可级联。当前政策须受信维护代码显式登记，读/存不自动复活；资格检查刷新当前课程/场景/参考/图谱及政策，锁顺序遵守ADR-0010。详见[运行审核材料](../data/animation_dsl/review-v1/README.md)。T026生成/修正、T027实际渲染和T028 Job/媒体发布仍待交付，尚无新HTTP或媒体，也未开放动态入口。
+
 
 ## 身份与学习状态（ADR-0001 部分批准）
 
