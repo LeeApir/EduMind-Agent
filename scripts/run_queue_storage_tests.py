@@ -11,8 +11,8 @@ from run_catalog_db_tests import ROOT, test_environment
 
 def main() -> None:
     database = sys.argv[1]
-    if not re.fullmatch(r"edumind_catalog_phase1_t019_[a-z0-9_]{1,15}", database):
-        raise ValueError("Dedicated T019 queue database required")
+    if not re.fullmatch(r"edumind_catalog_phase1_t0(?:19|20)_[a-z0-9_]{1,15}", database):
+        raise ValueError("Dedicated queue database required")
     env = test_environment(database)
     env = {
         k: v

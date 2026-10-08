@@ -1065,7 +1065,7 @@
       "id": "PHASE-1-T020",
       "phase": "Phase 1",
       "title": "恢复Celery Worker中断任务",
-      "status": "todo",
+      "status": "done",
       "priority": "P1",
       "depends_on": [
         "PHASE-1-T019"
@@ -1074,7 +1074,12 @@
         "backend/app/workers/",
         "backend/app/services/",
         "backend/tests/",
-        "docs/DEPLOYMENT.md"
+        "docs/DEPLOYMENT.md",
+        "backend/app/models/animation.py",
+        "backend/alembic/",
+        "backend/scripts/",
+        "scripts/run_queue_storage_tests.py",
+        "docs/ANIMATION_QUEUE.md"
       ],
       "prd_source": "PRD §9.1长任务可恢复、ADR-0004",
       "acceptance_criteria": [
@@ -1086,9 +1091,20 @@
         "cd backend && .venv/bin/python -m pytest -q tests/test_celery_job_recovery.py",
         "对本任务改动运行Ruff和mypy；涉及持久化时在隔离PostgreSQL核验迁移及并发。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "EDUMIND_DOCKER_TESTS=1 EDUMIND_RUN_QUEUE_BROKER_TESTS=1 backend/.venv/bin/python scripts/run_queue_storage_tests.py edumind_catalog_phase1_t020_re6 tests/test_celery_job_recovery.py tests/test_animation_worker.py tests/test_animation_job_api.py tests/test_durable_job_dispatch.py tests/test_animation_renderer.py tests/test_animation_cache.py --basetemp=/private/tmp/edumind-t020-re6; cd backend && EDUMIND_DOCKER_TESTS=1 .venv/bin/python -m pytest -q tests/test_animation_renderer.py::test_real_container_denies_network_root_write_and_output_over_quota",
+          "result": "passed across final joint run and unchanged targeted retry: 67 joint tests plus 1 isolation probe, no skips. Actual Celery solo parent death/prefork child death and dedicated Redis restart, real Manim single binding, bounded two attempts/epoch fencing, actual late container and launch-confirmation-loss cleanup under10s; migration0022/down0020/up0022 plus running token backfill and active downgrade rejection. Joint v6 probe alone timed out30s; original output retained and unchanged rerun passed0.49s. Earlier Docker unavailable, prefork empty trace cache and child PID fixture resource tracker failures preserved and corrected. Provider0.",
+          "evidence": "local-materials/phase-1-t020-restart/checks/pg-v6.log; isolation-retry.log; worker-v6/; pg-v1.log; pg-v2.log; recovery-v3.log; pg-v4.log; recovery-v5.log"
+        },
+        {
+          "command": "Ruff11 changed Python sources; mypy8 application/script sources; backend/.venv/bin/python scripts/check_provider_contract.py; python3 scripts/check_catalog_workflow.py; git diff --check",
+          "result": "passed: lint/types, 532 refs/60 operations/84 examples/12 runtime routes, ledger and diff. Accepted ADR-0009 attempt ledger/host controller, fixed task registry, no new dependency or public HTTP change; production catalog_only/pg_poll unchanged. T021 cancellation transaction/SSE and T036 complete fault matrix remain pending.",
+          "evidence": "local-materials/phase-1-t020-restart/checks/ruff-final.log; mypy-v2.log; contract.log; workflow.log; docs/ANIMATION_QUEUE.md"
+        }
+      ],
+      "started_at": "2026-10-08T10:32:13",
+      "completed_at": "2026-10-08T11:05:44",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T020"
     },

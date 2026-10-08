@@ -13,7 +13,7 @@ import time
 import uuid
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Mapping
+from typing import Mapping, Protocol
 
 from app.services.animation_templates import load_template, normalize_parameters
 
@@ -211,6 +211,11 @@ def _stream_artifact(container_id: str, relative: str, target: Path) -> str:
     return digest.hexdigest()
 
 
+class RenderController(Protocol):
+    def launch(self, command: list[str]) -> str: ...
+    def stop(self) -> bool: ...
+
+
 def render_template(
     template_id: str,
     parameters: dict[str, object],
@@ -218,6 +223,7 @@ def render_template(
     work_root: Path | None = None,
     timeout_seconds: float = 120,
     container_name: str | None = None,
+    controller: RenderController | None = None,
 ) -> RenderedCandidate:
     """Return only validated local candidate bytes; publication is a later task."""
     spec = load_template(template_id, require_executable=True)
@@ -251,7 +257,8 @@ def render_template(
             IMAGE, "python", "/input/backend/app/animation_templates/container_runner.py",
             template_id,
         ]
-        started = _docker(command, timeout=15, check=True).stdout.decode("ascii").strip()
+        started = (controller.launch(command) if controller else
+                   _docker(command, timeout=15, check=True).stdout.decode("ascii").strip())
         if len(started) != 64 or any(char not in "0123456789abcdef" for char in started):
             raise RenderError("RENDER_UNAVAILABLE")
         container_id = started
@@ -288,7 +295,9 @@ def render_template(
         raise RenderError("RENDER_FAILED") from error
     finally:
         cleanup_failed = False
-        if container_id is not None:
+        if controller is not None:
+            cleanup_failed = not controller.stop()
+        elif container_id is not None:
             try:
                 removed = _docker(["rm", "-f", container_id], timeout=10)
                 cleanup_failed = removed.returncode != 0

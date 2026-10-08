@@ -6,7 +6,7 @@
 
 后端依赖使用 `backend/uv.lock`，前端使用 `web/pnpm-lock.yaml`。安装和Compose启动见[README](../README.md)。私有 `.env` 只配置本地数据库密码；目录版显式设置 `EDUMIND_PRODUCT_MODE=catalog_only` 并将三项 `EDUMIND_PROVIDER_*` 连接凭据置空。缺少或无效产品模式也关闭动态能力；`dynamic` 只保留给另行授权的历史开发回归，不用于目录交付。
 
-Compose的API启动先执行 `alembic upgrade head`；当前迁移链到 `0017_catalog_immutability`。API、Web、PostgreSQL只绑定 `127.0.0.1` 的8000、5173、15432，可用配置覆盖端口。数据目录和媒体只读挂给API；学生无上传课程或在线发布接口。健康检查只表示服务活着，不表示已登记课程。
+Compose的API启动先执行 `alembic upgrade head`；目录版退出时迁移链到 `0017_catalog_immutability`；Phase 1 开发链现增量到 `0022_animation_attempts`（目标部署仍需另行核验）。API、Web、PostgreSQL只绑定 `127.0.0.1` 的8000、5173、15432，可用配置覆盖端口。数据目录和媒体只读挂给API；学生无上传课程或在线发布接口。健康检查只表示服务活着，不表示已登记课程。
 
 ## 人工签核和受信登记
 
@@ -35,6 +35,8 @@ uv run --env-file ../.env.worker python scripts/run_animation_worker.py
 ```
 
 没有Worker时缓存媒体仍可读，新渲染会排队。Job写PostgreSQL，Worker重启回收过期租约，最多自动尝试两次；取消或旧尝试迟到结果不能发布。媒体必须经认证API获取MP4/SRT；学习单元撤回后已有资源、笔记、演示、新计分和对应媒体绑定均停止授权。
+
+Phase 1 T020增加固定Celery消费者与独立宿主控制器，运行接口、共享token锁目录、账本迁移和故障恢复边界见[动画队列说明](ANIMATION_QUEUE.md#t020消费者与宿主恢复)。消费者复用现有模板/容器限制，PG仍是任务事实来源；Worker父进程或子进程死亡后由独立控制器回收过期租约与残留容器。默认pg_poll及catalog_only不变，未执行生产切换。启用Celery时必须分别监管publisher、消费者和控制器；不能只启动Redis/消费者而遗漏宿主清理。
 
 ## 撤回与恢复
 

@@ -243,3 +243,28 @@ class AnimationDispatchOutbox(Base):
     last_sent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     transport_attempts: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     error_code: Mapped[str | None] = mapped_column(String(32))
+
+
+class AnimationJobAttempt(Base):
+    """Durable launch/cleanup evidence, subordinate to the current PG Job lease."""
+
+    __tablename__ = "animation_job_attempts"
+    __table_args__ = (
+        UniqueConstraint("job_id", "attempt", name="uq_animation_attempt_number"),
+        CheckConstraint("attempt BETWEEN 1 AND 2", name="ck_animation_attempt_number"),
+        CheckConstraint("dispatch_epoch > 0", name="ck_animation_attempt_epoch"),
+        CheckConstraint("dispatch_backend IN ('pg_poll','celery')",
+                        name="ck_animation_attempt_backend"),
+        CheckConstraint("launch_state IN ('prepared','starting','started',"
+                        "'cleanup_requested','absent')", name="ck_animation_attempt_state"),
+    )
+    token: Mapped[UUID] = mapped_column(PostgreSQLUUID(as_uuid=True), primary_key=True)
+    job_id: Mapped[UUID] = mapped_column(PostgreSQLUUID(as_uuid=True),
+        ForeignKey("animation_jobs.id", ondelete="CASCADE"), nullable=False)
+    attempt: Mapped[int] = mapped_column(Integer, nullable=False)
+    dispatch_backend: Mapped[str] = mapped_column(String(16), nullable=False)
+    dispatch_epoch: Mapped[int] = mapped_column(Integer, nullable=False)
+    launch_state: Mapped[str] = mapped_column(String(24), nullable=False)
+    started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    cleanup_requested_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    cleanup_done_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
