@@ -46,3 +46,5 @@
 [ADR-0008：Provider身份、凭据与出站数据边界](0008-provider-credentials-and-egress-boundary.md)为PHASE-1-T002的Accepted方案，用户于2026-10-04明确批准A–D，具体提案digest及原话见[批准登记](0008-provider-approval-20261004.json)。批准2h匿名凭据留存、加密轮换、临时Key与发送/回退边界；按T002至T005批次实现，实际Provider调用仍须独立授权。
 
 [ADR-0011：独立动态验收](0011-independent-dynamic-acceptance.md) 为 T035 待批准提案。固定历史/新例、分组准入、预算计数器及测试开放边界；设计批准不等于调用授权或正式开放。
+
+2026-10-08：[ADR-0011 批准记录](0011-dynamic-approval-20261008.json)将具体提案 A–D、样本标签和新增准入规则批准为 Accepted。原提案/manifest保留批准时字节（其中 Proposed/pending 是历史状态），状态以本批准记录为准。实际轮次目标/模型及调用额度尚未批准，仍为 0；不开放测试或生产动态入口。

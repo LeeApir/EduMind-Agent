@@ -1618,7 +1618,7 @@
       "id": "PHASE-1-T035",
       "phase": "Phase 1",
       "title": "冻结动态能力恢复与独立验收门禁",
-      "status": "blocked",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1-T001",
@@ -1679,11 +1679,31 @@
           "command": "backend/.venv/bin/python scripts/check_provider_contract.py",
           "result": "passed: 532 refs / 60 operations / 84 examples / 12 implemented; system Python missing jsonschema corrected by locked venv",
           "evidence": "local-materials/phase-1-t035/checks/contracts-final.txt"
+        },
+        {
+          "command": "backend/.venv/bin/python scripts/verify_phase1_dynamic_approval.py",
+          "result": "passed: user approved A-D and labels; immutable proposal commit/manifest and all 33 file hashes verified; requests/cost=0, dynamic opening=false",
+          "evidence": "local-materials/phase-1-t035/checks/approval.txt"
+        },
+        {
+          "command": "backend/.venv/bin/pytest -q backend/tests/test_phase1_dynamic_gate.py backend/tests/test_acceptance_budget.py",
+          "result": "passed after approval: 34 tests, no skips or real calls",
+          "evidence": "local-materials/phase-1-t035/checks/approved-pytest.txt"
+        },
+        {
+          "command": "backend/.venv/bin/ruff check scripts/verify_phase1_dynamic_approval.py",
+          "result": "passed",
+          "evidence": "local-materials/phase-1-t035/checks/approval-ruff.txt"
+        },
+        {
+          "command": "python3 scripts/check_catalog_workflow.py",
+          "result": "passed after approval",
+          "evidence": "local-materials/phase-1-t035/checks/approved-governance.txt"
         }
       ],
       "started_at": "2026-10-08T14:05:42",
-      "completed_at": null,
-      "blocker": "待用户审阅并批准 ADR-0011 A–D 及 phase-1-dynamic-v1/manifest.json 绑定附件（新增分类/对照/长审核准入、样本标签及测试开放边界）；已批准 Phase 1 验收计划 §5 明确要求该设计审批。真实调用预算仍为 0，未领取依赖任务。",
+      "completed_at": "2026-10-08T15:15:31",
+      "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T035"
     },
     {

@@ -44,3 +44,5 @@ PR #4已合并到main `a836ab4`。原工作目录也已同步该版本并清理�
 ## Phase 1 动态恢复提案
 
 [T035 固定集合与离线门禁](phase-1-dynamic-v1/README.md)及[ADR-0011](../ADR/0011-independent-dynamic-acceptance.md)等待批准；当前额度 0，旧 T033 保持 blocked，动态入口未开放。
+
+2026-10-08：用户已[全部批准 T035 设计与附件](../ADR/0011-dynamic-approval-20261008.json)。提案原字节不改，正式执行前仍须逐阶段绑定实际配置、预算与批准；真实调用和动态开放未授权。
