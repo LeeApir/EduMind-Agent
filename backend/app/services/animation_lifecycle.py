@@ -8,8 +8,9 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.animation import AnimationJob
+from app.models.animation import AnimationDispatchOutbox, AnimationJob
 from app.models.learning import LearningScene, LearningUnit
+from app.services.animation_attempts import request_cleanup
 from app.services.animation_cache import runtime_identity
 from app.services.animation_jobs import (
     AnimationIdempotencyConflict,
@@ -62,6 +63,13 @@ async def cancel_animation_job(
             return job
         if job.status not in {"queued", "running"}:
             raise AnimationJobStateConflict("Animation job cannot be cancelled.")
+        await request_cleanup(db, job)
+        outboxes = (await db.scalars(select(AnimationDispatchOutbox).where(
+            AnimationDispatchOutbox.job_id == job.id,
+        ).with_for_update())).all()
+        for row in outboxes:
+            row.state = "obsolete"
+            row.publisher_token = row.publisher_expires_at = None
         job.status = "cancelled"
         job.cancel_requested = True
         job.cancel_idempotency_key = idempotency_key

@@ -1,6 +1,6 @@
-# 动画投递与恢复运行说明（T019–T020）
+# 动画投递与恢复运行说明（T019–T021）
 
-依据已批准[ADR-0009](ADR/0009-durable-animation-queue.md)。T019交付PG事务outbox和独立publisher/reconciler；T020交付固定Celery消费者、持久尝试账本和独立宿主清理器，取消联动/SSE由T021完成。此文不表示队列阶段验收或生产部署完成。默认`EDUMIND_ANIMATION_DISPATCH=pg_poll`与`catalog_only`继续有效。
+依据已批准[ADR-0009](ADR/0009-durable-animation-queue.md)。T019交付PG事务outbox和独立publisher/reconciler；T020交付固定Celery消费者、持久尝试账本和独立宿主清理器，T021接入同事务取消与既有SSE恢复语义。此文不表示队列阶段验收或生产部署完成。默认`EDUMIND_ANIMATION_DISPATCH=pg_poll`与`catalog_only`继续有效。
 
 ## 事务与故障语义
 
@@ -43,4 +43,11 @@ uv run --frozen --env-file ../.env.worker python -m app.workers.animation_consum
 
 Docker启动/停止按token文件锁跨进程串行，所有账本变更在宿主锁外按Job→尝试行顺序提交。启动前后都复核租约。控制器每轮枚举本应用可见容器，失效token强制移除并重新核验不存在；已写absent后迟到出现的容器也会重新清理。单次PG检查1秒、启动RPC3秒、停止RPC2秒、库存RPC1秒；取消观察1秒。Docker/PG不可确认时只记录固定告警并保留意图，不把检查失败视为不存在。枚举超过100个容器时拒绝确认并告警，需运维排查容量；这不是多宿主调度或无限积压清理方案。
 
-0022为迁移时已有running token补建starting账本；任何无法对应账本的旧容器都要求人工核对/排空，不能按前缀批量删除。存在running Job时0022 downgrade拒绝。运行回滚先停新投递、排空租约/容器再切回pg_poll，保留增量schema。T020隔离测试覆盖实际父进程死亡、prefork子进程死亡、Redis重启、两次租约耗尽、迟到容器重清及单一正式绑定；完整故障矩阵/控制器重启验收留在T036，取消事务与SSE联动留在T021。
+0022为迁移时已有running token补建starting账本；任何无法对应账本的旧容器都要求人工核对/排空，不能按前缀批量删除。存在running Job时0022 downgrade拒绝。运行回滚先停新投递、排空租约/容器再切回pg_poll，保留增量schema。T020隔离测试覆盖实际父进程死亡、prefork子进程死亡、Redis重启、两次租约耗尽、迟到容器重清及单一正式绑定；完整故障矩阵/控制器重启验收留在T036，T021补齐取消事务与SSE联动。
+
+
+## T021：取消与事件恢复
+
+取消queued/running任务时，同一PG事务先登记当前尝试的清理意图、将所有旧投递置obsolete并清除publisher租约，再清Job租约、写cancelled事件并提交；数据库提交失败时这些变化全部回滚。已在锁外发送的消息仍可能到达，消费者按PG终态拒绝，不声称broker消息已被网络原子撤回。重复取消保留原事件游标。显式重试仍创建新Job/retry_of/幂等回执及唯一新outbox，原cancelled/failed回执不改写。
+
+GET/SSE继续只读PG：Last-Event-ID优先于after、逐轮owner/会话校验、单调事件重放、过期游标410后取快照恢复。连接断开或会话到期不取消后台任务；broker失败只影响投递，不能生成succeeded事件或媒体引用。T021将既有五组SSE契约在Celery路由下原断言重跑，覆盖跨owner、客户端重启、游标缺口、活跃进度/终态、连接上限与会话到期；另核验queued/running取消、在途发送确认迟到、显式重试及提交/发送故障注入。完整实际DB失联、取消/发布并发及课程撤回矩阵仍由T036完成。

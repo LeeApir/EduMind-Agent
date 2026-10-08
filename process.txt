@@ -900,3 +900,7 @@ T017提交8679c09核验且干净后领取可靠长任务投递，按已批准ADR
 用户撤回上轮未提交T020后明确重新继续，从干净T019提交6e25605领取 | T019完成提交及ADR-0009批准已核对；Provider0 | 本次只推进T020，持久尝试账本/宿主清理及固定消费者共同验收 | 实现并实际隔离验证Worker中断与broker恢复后本地提交
 [2026-10-08T11:05:44] [PHASE-1-T020] VERIFIED | executor=Lee
 固定Celery消费者复用模板隔离、PG backend/epoch/token租约与持久尝试账本；独立宿主控制器有界回收及迟到容器重清，Job→账本与跨进程token宿主锁不交叉持有，0022在途回填及降级保护，运行文档齐备 | 联合67项+原断言隔离探针单独重跑1项，无跳过；实际solo父/prefork子死亡、专用Redis重启、真实Manim单绑定、10秒内迟到/启动确认丢失清理与迁移并发，Ruff11/mypy8/契约/治理/diff通过；失败原始日志保留，Provider0累计2033/2500 | 默认目录/pg_poll持续；T021补取消事务/SSE，T036补完整故障矩阵/控制器重启；未部署或真实Provider调用，不填人工reviewer | 本地独立提交并核验；按当前持续目标后续T021，交接animation_consumer/animation_attempts/animation_host、0022、host_controller、test_celery_job_recovery和local-materials/phase-1-t020-restart/checks/，不push/merge
+[2026-10-08T11:07:58] [PHASE-1-T021] START | executor=Lee | branch=codex/phase-1-continued
+按用户当前持续Phase 1目标，在T020完成提交8a8ea08及干净工作区核验后领取取消/SSE同语义 | T020实际故障演练已通过，依赖完成，Provider0 | 取消同事务登记尝试清理意图及outbox obsolete；SSE只读PG，既有公共契约不改，默认目录/pg_poll持续 | 补队列取消/重试/回放并发与故障回归后独立本地提交
+[2026-10-08T11:15:54] [PHASE-1-T021] VERIFIED | executor=Lee
+取消同事务持久尝试清理/outbox obsolete/失效Job租约/取消事件；保留新Job显式重试与PG唯一事件源，公共REST/SSE不变 | 隔离PG49联合+最终11队列契约无跳过，迁移往返，Celery路由原SSE断言、owner/游标/重启/会话/连接上限，迟到发送/结果拒绝、取消发布单终态并发及真实容器10秒清理、提交/发送故障注入，Ruff3/mypy1/契约/治理/diff通过；初始新测试处理计数含义误判已修复留证，Provider0累计2033/2500 | 实际DB失联/复杂故障全矩阵仍T036，默认目录/pg_poll持续，不填人工reviewer | 本地提交核验后按持续目标推进T023（T022已批准完成）；交接animation_lifecycle、test_queued_job_events、ANIMATION_QUEUE及local-materials/phase-1-t021/checks/，不push/merge/部署
