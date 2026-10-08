@@ -904,3 +904,7 @@ T017提交8679c09核验且干净后领取可靠长任务投递，按已批准ADR
 按用户当前持续Phase 1目标，在T020完成提交8a8ea08及干净工作区核验后领取取消/SSE同语义 | T020实际故障演练已通过，依赖完成，Provider0 | 取消同事务登记尝试清理意图及outbox obsolete；SSE只读PG，既有公共契约不改，默认目录/pg_poll持续 | 补队列取消/重试/回放并发与故障回归后独立本地提交
 [2026-10-08T11:15:54] [PHASE-1-T021] VERIFIED | executor=Lee
 取消同事务持久尝试清理/outbox obsolete/失效Job租约/取消事件；保留新Job显式重试与PG唯一事件源，公共REST/SSE不变 | 隔离PG49联合+最终11队列契约无跳过，迁移往返，Celery路由原SSE断言、owner/游标/重启/会话/连接上限，迟到发送/结果拒绝、取消发布单终态并发及真实容器10秒清理、提交/发送故障注入，Ruff3/mypy1/契约/治理/diff通过；初始新测试处理计数含义误判已修复留证，Provider0累计2033/2500 | 实际DB失联/复杂故障全矩阵仍T036，默认目录/pg_poll持续，不填人工reviewer | 本地提交核验后按持续目标推进T023（T022已批准完成）；交接animation_lifecycle、test_queued_job_events、ANIMATION_QUEUE及local-materials/phase-1-t021/checks/，不push/merge/部署
+[2026-10-08T11:17:58] [PHASE-1-T023] START | executor=Lee | branch=codex/phase-1-continued
+T021完成提交90556cf及干净工作区核验后，按持续目标领取DSL本地校验；T022批准提交95fcc65已核对 | 已阅读批准ADR-0010/DSL README，开始严格JSON/schema/逐步状态与资源上限实现，Provider0 | 九动作/30–90秒/对象限额与固定错误码沿用批准附件，不扩范围或运行输入源码；T024编译/T025审核不混入 | 完整读取schema/有效与22个负例，建立可追溯校验器及边界/恶意输入回归后验证、本地提交
+[2026-10-08T11:30:44] [PHASE-1-T023] VERIFIED | executor=Lee
+严格有界JSON/本地批准schema/文本与九动作逐步状态校验，固定错误码/动作索引、历史ID/累计对象限额、冻结轨迹与实际规则/源码摘要；运行schema原字节复制和data说明齐备 | 176项本地回归无跳过，批准22例/独立边界与恶意JSON/Unicode/类型/量化/引用/状态/不可变摘要/代码字面量不执行，Ruff2/mypy1/契约/治理/diff通过；初始测试临时绝对路径超160字幕已改短相对路径留证，Provider0累计2033/2500 | 本地校验不授予事实审核/正式发布，T024编译AST/T025独立审核待交付；无新依赖/数据库/HTTP，默认目录不变，不填人工reviewer | 本地提交核验后T024确定性编译与AST白名单；交接animation_dsl_validation、data/animation_dsl/v1、test_animation_dsl_validation及local-materials/phase-1-t023/checks/，不push/merge/部署
