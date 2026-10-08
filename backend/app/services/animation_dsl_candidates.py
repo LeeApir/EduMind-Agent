@@ -61,6 +61,18 @@ def policy_manifest() -> dict[str, object]:
         "review_gateway": hashlib.sha256(
             (Path(__file__).parent / "animation_dsl_review_gateway.py").read_bytes()
         ).hexdigest(),
+        "dsl_renderer": hashlib.sha256(
+            (Path(__file__).parent / "animation_dsl_renderer.py").read_bytes()
+        ).hexdigest(),
+        "dsl_worker": hashlib.sha256(
+            (Path(__file__).parents[1] / "workers/dsl_render.py").read_bytes()
+        ).hexdigest(),
+        "dsl_runner": hashlib.sha256(
+            (Path(__file__).parents[1] / "dsl_runtime/container_runner.py").read_bytes()
+        ).hexdigest(),
+        "dsl_media_verifier": hashlib.sha256(
+            (Path(__file__).parents[1] / "dsl_runtime/verify_media.py").read_bytes()
+        ).hexdigest(),
         "candidate_cache": hashlib.sha256(
             (Path(__file__).parent / "animation_dsl_candidate_cache.py").read_bytes()
         ).hexdigest(),
