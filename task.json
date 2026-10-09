@@ -1727,10 +1727,15 @@
           "command": "offline graph/catalog/path regression; changed Ruff/format/mypy3; provider contract/workflow/legacy archives/diff self-review",
           "result": "passed: offline76, 571 refs/63 operations/85 examples. Initial PG v1 failed two test assumptions (node spelling and public-graph fixture); fixture bound to catalog baseline. Added-resource v3 test tried mutating immutable publication, corrected by appending resource version; DB safety preserved. v2/v4/v5 passed and final v6 all20 passed. No new migration/schema, no Provider calls.",
           "evidence": "local-materials/phase-1-t033/checks/; backend/tests/test_expanded_learning_paths.py"
+        },
+        {
+          "command": "backend/.venv/bin/python scripts/run_provider_storage_tests.py edumind_catalog_phase1_t033_v8 tests/test_expanded_learning_paths.py tests/test_path_versions.py tests/test_paths_api.py tests/test_path_rules.py tests/test_catalog_publication.py; version repository19 tests; changed Ruff/format; git diff --check",
+          "result": "passed: PG20 no skips, migrations roundtrip; full independent100 slots (30plans/30current reads/40historical replay; legacy20/expanded40/historical40); P95 65.6567/44.1448/44.0254ms; P99 65.8647/45.6211/89.0438ms <=200; source hashes/hardware/rawslots pinned. Initial60 sample result insufficient and completion reopened; v7 Docker RPC unavailable before migration/testing (100 slots unrun), own hung processes terminated and existing OrbStack restarted, then independent full v8 completed. No fake replacement of failed sample; Provider0. Original60 summary retained in history; its raw latency file had been overwritten, not used in formal100 denominator.",
+          "evidence": "local-materials/phase-1-t033/checks/pg-v8.log; latency.json; latency-confirmation.json; version-layers.log"
         }
       ],
       "started_at": "2026-10-09T14:22:05",
-      "completed_at": "2026-10-09T14:30:18",
+      "completed_at": "2026-10-09T15:24:36",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T033"
     },

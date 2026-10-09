@@ -66,11 +66,20 @@ def test_queries_and_measurement():
             for node in graph.all_nodes():
                 query(node.id)
             timings[name].append((perf_counter_ns() - started) / 30 / 1e6)
+    historical_samples = []
+    for _ in range(100):
+        started = perf_counter_ns()
+        old = versions.graph_repository_for_version("mvp-0.2.0", None)
+        assert old.get_node("array") is not None
+        historical_samples.append((perf_counter_ns() - started) / 1e6)
     report = {
         "graph_version": graph.graph_version,
         "nodes": 30,
         "edges": 69,
         "queries_per_kind": 15000,
+        "queries_per_kind_by_node_layer": {"legacy_ids": 5000, "expanded_ids": 10000},
+        "explicit_historical_version_reads": 100,
+        "historical_read_p95_ms": quantiles(historical_samples, n=100)[94],
         "unit": "batch-amortized milliseconds",
         "p95": {name: quantiles(samples, n=100)[94] for name, samples in timings.items()},
         "qualification": "in-memory query evidence only; no HTTP/PG/Neo4j comparison",

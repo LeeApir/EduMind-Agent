@@ -225,19 +225,73 @@ def test_expanded_ordinary_path_request_p95(monkeypatch):
             return release.id
 
     release_id = run_db(publish)
-    timings = {"plan": [], "read": []}
+    legacy = graph_repository_for_version("mvp-0.2.0")
+    monkeypatch.setenv("EDUMIND_KNOWLEDGE_GRAPH_VERSION", "mvp-0.2.0")
+    historical_keys = {}
+    for index, node in enumerate(legacy.all_nodes()):
+        key = f"expanded-history-{index:03d}"
+        historical_keys[node.id] = key
+        result = client.post(
+            "/api/path/plan", json={"target_node_id": node.id}, headers=headers(csrf, key)
+        )
+        assert result.status_code == 201 and result.json()["version"] == 1
+    monkeypatch.setenv("EDUMIND_KNOWLEDGE_GRAPH_VERSION", "phase-1.1.0")
+    timings = {"plan": [], "read": [], "historical_replay": []}
+    slots = []
+    legacy_ids = set(historical_keys)
     for index, node in enumerate(graph_repository_for_version("phase-1.1.0").all_nodes()):
         target = {"target_node_id": node.id}
         started = perf_counter()
         result = client.post(
             "/api/path/plan", json=target, headers=headers(csrf, f"expanded-latency-{index:03d}")
         )
-        timings["plan"].append((perf_counter() - started) * 1000)
+        elapsed = (perf_counter() - started) * 1000
+        timings["plan"].append(elapsed)
         assert result.status_code == 201
+        slots.append(
+            {
+                "kind": "plan",
+                "target": node.id,
+                "layer": "legacy" if node.id in legacy_ids else "expanded",
+                "ms": elapsed,
+            }
+        )
         started = perf_counter()
         result = client.get("/api/path/current", params=target)
-        timings["read"].append((perf_counter() - started) * 1000)
+        elapsed = (perf_counter() - started) * 1000
+        timings["read"].append(elapsed)
         assert result.status_code == 200
+        slots.append(
+            {
+                "kind": "read",
+                "target": node.id,
+                "layer": "legacy" if node.id in legacy_ids else "expanded",
+                "ms": elapsed,
+            }
+        )
+    for repeat in range(4):
+        for node in legacy.all_nodes():
+            started = perf_counter()
+            result = client.post(
+                "/api/path/plan",
+                json={"target_node_id": node.id},
+                headers=headers(csrf, historical_keys[node.id]),
+            )
+            elapsed = (perf_counter() - started) * 1000
+            timings["historical_replay"].append(elapsed)
+            assert result.status_code == 201
+            assert result.json()["version"] == 1
+            assert result.json()["graph_version"] == "mvp-0.2.0"
+            assert result.json()["is_stale"] is True
+            slots.append(
+                {
+                    "kind": "historical_replay",
+                    "target": node.id,
+                    "repeat": repeat,
+                    "layer": "historical",
+                    "ms": elapsed,
+                }
+            )
 
     async def withdraw(sessions):
         async with sessions() as db:
@@ -245,16 +299,30 @@ def test_expanded_ordinary_path_request_p95(monkeypatch):
             await db.commit()
 
     run_db(withdraw)
-    p95 = {kind: sorted(samples)[28] for kind, samples in timings.items()}
+    from math import ceil
+
+    p95 = {
+        kind: sorted(samples)[ceil(0.95 * len(samples)) - 1] for kind, samples in timings.items()
+    }
+    p99 = {
+        kind: sorted(samples)[ceil(0.99 * len(samples)) - 1] for kind, samples in timings.items()
+    }
+    assert len(slots) == 100
+    assert {
+        layer: sum(slot["layer"] == layer for slot in slots)
+        for layer in ("legacy", "expanded", "historical")
+    } == {"legacy": 20, "expanded": 40, "historical": 40}
     evidence = Path(__file__).resolve().parents[2] / "local-materials/phase-1-t033/latency.json"
     evidence.parent.mkdir(parents=True, exist_ok=True)
     evidence.write_text(
         json.dumps(
             {
                 "environment": "TestClient + isolated PG + signed TEST_ONLY catalog",
-                "denominator": {"plan": 30, "read": 30},
+                "denominator": {"plan": 30, "read": 30, "historical_replay": 40},
+                "slots": slots,
                 "samples_ms": timings,
                 "nearest_rank_p95_ms": p95,
+                "nearest_rank_p99_ms": p99,
                 "provider_requests": 0,
             },
             indent=2,
@@ -262,6 +330,7 @@ def test_expanded_ordinary_path_request_p95(monkeypatch):
         + "\n"
     )
     assert all(value <= 200 for value in p95.values()), p95
+    assert all(value <= 200 for value in p99.values()), p99
 
 
 @pg
