@@ -90,3 +90,7 @@ quality 路由在每次调用前重查 T012 选择；实际 Factory 继续执行
 T026 未新增 HTTP、Job 或渲染执行入口；候选存储仍使用 T025 的不可变表及增量 migration，不运行生成源码。当前 catalog_only 和未独立授权调用额度 0 保持，实际动态恢复遵守已批准 ADR-0011；T027/T028/T037 的 Worker、发布、实际画面与正式模型质量证据不能由这些 Mock 流程代替。
 
 T028的开发接口、API-only准备操作、原session/holder取消、无凭据Job原子交付、私有缓存/GC以及有界渲染降级实现见[DSL Job v1](agents/animation-dsl-jobs-v1.md)。T025段末所述后续任务属于当时状态；T026/T027/T028已逐步实现，动态生产入口与真实模型额度仍须独立门禁。当前迁移开发链到0025；旧模板入口及目录基线保持原契约。
+
+## Phase 1 图谱扩展提案（T030，待批准）
+
+[ADR-0012](ADR/0012-expanded-knowledge-graph.md)拟冻结30节点/69有向关系及来源，保留默认10节点图与目录包，独立发布扩展版本。结构查询微基准支持复用不可变YAML Repository+PostgreSQL用户状态，未据此引入Neo4j。扩展元数据不授予课程资格；无正式课程须在路径/UI明确不可学习。schema/version兼容、catalog图固定与扩展查询配置隔离、503图故障和恢复边界仅为Proposed，未实施/未批准；具体清单及测量见[报告](acceptance/phase-1-graph-plan-v1.md)。

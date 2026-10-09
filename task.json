@@ -1548,7 +1548,7 @@
       "id": "PHASE-1-T030",
       "phase": "Phase 1",
       "title": "确定约30节点图谱与后端选型",
-      "status": "todo",
+      "status": "blocked",
       "priority": "P1",
       "depends_on": [
         "PHASE-1-T001"
@@ -1568,10 +1568,21 @@
       "verification": [
         "审阅节点清单、先修无环与查询场景；保存存储选型和批准记录。"
       ],
-      "verification_results": [],
-      "started_at": null,
+      "verification_results": [
+        {
+          "command": "backend/.venv/bin/python data/knowledge/expansion-v1/check_plan.py",
+          "result": "passed structural proposal checks: 30 unique IDs / 69 directed relations; existing10 node identity/prerequisites and16 relations retained; source mapping valid; DEPENDS_ON DAG; explicit similarity reverse edges and BFS/DFS prerequisite closure. 5 query classes×15000 calls on current Repository/structural adapters, Linux/DB/HTTP/Neo4j not tested, no curriculum review fabricated.",
+          "evidence": "local-materials/phase-1-t030/measurement.json; measurement-confirmation.json; docs/acceptance/phase-1-graph-plan-v1.md"
+        },
+        {
+          "command": "backend/.venv/bin/ruff check data/knowledge/expansion-v1/check_plan.py; backend/.venv/bin/ruff format --check data/knowledge/expansion-v1/check_plan.py; python3 scripts/check_catalog_workflow.py; new Markdown local-reference and manifest/seed SHA256 validation; git diff --check",
+          "result": "passed lint/format, dependencies, new local references, exact proposal attachment digests and unchanged runtime seed. GNU/OpenDSA unavailable direct fetches explicitly distinguished from verified official pages/index references. ADR user approval pending; NOT T030 completion, no Provider/runtime/DB changes.",
+          "evidence": "data/knowledge/expansion-v1/manifest.json; docs/ADR/0012-expanded-knowledge-graph.md"
+        }
+      ],
+      "started_at": "2026-10-09T13:27:49",
       "completed_at": null,
-      "blocker": null,
+      "blocker": "ADR-0012 A–D及准确manifest附件待用户批准：30节点/69关系，YAML/PostgreSQL选型、独立图版本与catalog隔离、schema/API错误和课程资格边界。提案完成静态/结构/微基准核验；未取得本ADR批准，不可记done或领取T031。",
       "commit_lookup": "Task-Completed: PHASE-1-T030"
     },
     {
