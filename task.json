@@ -1548,7 +1548,7 @@
       "id": "PHASE-1-T030",
       "phase": "Phase 1",
       "title": "确定约30节点图谱与后端选型",
-      "status": "blocked",
+      "status": "done",
       "priority": "P1",
       "depends_on": [
         "PHASE-1-T001"
@@ -1578,11 +1578,16 @@
           "command": "backend/.venv/bin/ruff check data/knowledge/expansion-v1/check_plan.py; backend/.venv/bin/ruff format --check data/knowledge/expansion-v1/check_plan.py; python3 scripts/check_catalog_workflow.py; new Markdown local-reference and manifest/seed SHA256 validation; git diff --check",
           "result": "passed lint/format, dependencies, new local references, exact proposal attachment digests and unchanged runtime seed. GNU/OpenDSA unavailable direct fetches explicitly distinguished from verified official pages/index references. ADR user approval pending; NOT T030 completion, no Provider/runtime/DB changes.",
           "evidence": "data/knowledge/expansion-v1/manifest.json; docs/ADR/0012-expanded-knowledge-graph.md"
+        },
+        {
+          "command": "Approved manifest/attachment/seed digest validation; backend/.venv/bin/python data/knowledge/expansion-v1/check_plan.py; Ruff check/format; check_catalog_workflow.py; verify_legacy_archives.py; git diff --check",
+          "result": "passed: user direct approval recorded as Accepted for ADR-0012 A–D and exact manifest; 30 nodes/69 relations/DAG/legacy retention, 75000 structural queries; no runtime seed or course package change, Provider0. Earlier pending entries are historical; approval now resolves task gate.",
+          "evidence": "docs/ADR/0012-graph-approval-20261009.json; local-materials/phase-1-t030/approved-measurement.json"
         }
       ],
       "started_at": "2026-10-09T13:27:49",
-      "completed_at": null,
-      "blocker": "ADR-0012 A–D及准确manifest附件待用户批准：30节点/69关系，YAML/PostgreSQL选型、独立图版本与catalog隔离、schema/API错误和课程资格边界。提案完成静态/结构/微基准核验；未取得本ADR批准，不可记done或领取T031。",
+      "completed_at": "2026-10-09T14:06:53",
+      "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T030"
     },
     {
@@ -1596,6 +1601,7 @@
       ],
       "scope": [
         "data/knowledge_graph.yaml",
+        "data/knowledge/phase-1.1.0.json及来源sidecar（ADR-0012：保留原seed）",
         "backend/app/services/",
         "backend/tests/",
         "docs/"

@@ -50,3 +50,5 @@
 2026-10-08：[ADR-0011 批准记录](0011-dynamic-approval-20261008.json)将具体提案 A–D、样本标签和新增准入规则批准为 Accepted。原提案/manifest保留批准时字节（其中 Proposed/pending 是历史状态），状态以本批准记录为准。实际轮次目标/模型及调用额度尚未批准，仍为 0；不开放测试或生产动态入口。
 
 2026-10-09：[ADR-0012：30节点知识结构、存储与课程资格](0012-expanded-knowledge-graph.md)为T030的Proposed方案，待批准A–D及准确附件。推荐复用YAML/PostgreSQL；默认10节点seed/签核目录保持，独立扩展图；元数据不等于课程资格。未完成T030、未开放动态或授权真实模型。
+
+2026-10-09：用户明确回复“批准”，[ADR-0012批准登记](0012-graph-approval-20261009.json)将A–D与准确manifest附件批准为Accepted。原提案/报告/manifest保留Proposed历史字节，当前状态以本登记为准；按T031–T033实施，真实Provider授权0、动态入口未开放。
