@@ -18,7 +18,6 @@ from app.agents.animation_dsl_review import (
 from app.core.database import create_database_engine
 from app.models.animation import AnimationJob
 from app.services import animation_dsl_renderer as renderer
-from app.services.animation_cache import FONT_DIGEST
 from app.services.animation_dsl_candidates import (
     admit_current_policy,
     build_dsl_reference,
@@ -26,7 +25,8 @@ from app.services.animation_dsl_candidates import (
     save_dsl_review,
 )
 from app.services.animation_dsl_compiler import compile_animation_dsl
-from app.services.animation_renderer import IMAGE, RenderedCandidate, RenderError
+from app.services.animation_dsl_runtime import FONT_DIGEST, IMAGE
+from app.services.animation_renderer import RenderedCandidate, RenderError
 from app.services.animation_worker import claim_animation_job, fail_animation_job
 from app.services.knowledge_graph import KnowledgeGraphRepository
 from app.workers.dsl_render import dsl_cache_key, render_dsl_job
@@ -71,6 +71,7 @@ def test_unavailable_docker_has_exact_isolation_flags_and_no_model_secrets(
         renderer.render_compiled_dsl(compiled, work_root=tmp_path)
     command = calls[0]
     assert command[:3] == ["run", "-d", "--rm"]
+    assert command[-3:] == [IMAGE, "python", "/input/container_runner.py"]
     for flag, value in [
         ("--network", "none"),
         ("--cpus", "2"),
@@ -476,3 +477,53 @@ def test_pg_cancellation_reaps_late_thread_output(monkeypatch, tmp_path, dynamic
 
     asyncio.run(exercise())
     assert list(tmp_path.iterdir()) == []
+
+
+@pytest.mark.skipif(not DOCKER, reason="actual Docker required")
+@pytest.mark.parametrize("mode", ["chinese", "missing_font", "missing_glyph"])
+def test_real_fixed_font_gate(mode, tmp_path):
+    from app.services.animation_renderer import IMAGE as BASE_IMAGE
+
+    (tmp_path / "font_check.py").write_bytes(
+        (ROOT / "backend/app/dsl_runtime/font_check.py").read_bytes()
+    )
+    text = "中文标题字幕访问" if mode != "missing_glyph" else chr(0x10FFFF)
+    source = "Text(" + repr(text) + ")"
+    command = [
+        "docker",
+        "run",
+        "--rm",
+        "--network",
+        "none",
+        "--read-only",
+        "--user",
+        "10001:10001",
+        "--cpus",
+        "1",
+        "--memory",
+        "512m",
+        "--pids-limit",
+        "32",
+        "--cap-drop",
+        "ALL",
+        "--security-opt",
+        "no-new-privileges",
+        "--tmpfs",
+        "/tmp:rw,nosuid,nodev,size=32m,mode=1777",
+        "--mount",
+        f"type=bind,source={tmp_path},destination=/input,readonly",
+        "-e",
+        "XDG_CACHE_HOME=/tmp",
+        "--entrypoint",
+        "python",
+        BASE_IMAGE if mode == "missing_font" else IMAGE,
+        "-c",
+        "import sys;sys.path.insert(0,'/input');from font_check import check_font;"
+        "check_font(" + repr(source.encode()) + ");print('FONT_OK')",
+    ]
+    result = subprocess.run(command, capture_output=True, timeout=15)
+    if mode == "chinese":
+        assert result.returncode == 0 and result.stdout.strip() == b"FONT_OK"
+    else:
+        assert result.returncode != 0 and b"DSL_RENDER_UNAVAILABLE" in result.stderr
+        assert b"FONT_OK" not in result.stdout

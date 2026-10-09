@@ -1979,7 +1979,13 @@
         "backend/tests/",
         "web/tests/e2e/",
         "scripts/",
-        "docs/acceptance/"
+        "docs/acceptance/",
+        "backend/app/dsl_runtime/",
+        "backend/app/services/animation_dsl*.py",
+        "backend/app/workers/dsl_render.py",
+        "backend/docker/dsl/",
+        "docs/ARCHITECTURE.md",
+        "docs/agents/animation-dsl-v1/README.md"
       ],
       "prd_source": "PRD §3.3、§8.2、§9.4",
       "acceptance_criteria": [
@@ -2015,11 +2021,51 @@
           "command": "backend/.venv/bin/ruff format --check backend/tests/dsl_acceptance_matrix.py scripts/run_phase1_dsl_safety.py scripts/run_phase1_dsl_matrix.py scripts/verify_phase1_dsl_matrix.py",
           "result": "passed:4 files",
           "evidence": "docs/acceptance/phase-1-dsl-v1/README.md"
+        },
+        {
+          "command": "EDUMIND_CATALOG_TEST_PG_CONTAINER=edumind-phase1-t037-pg backend/.venv/bin/python scripts/run_phase1_dsl_safety.py --run-id r04",
+          "result": "285 passed /0 failures/errors/skipped; prior image and source; not transferred to fixed font version",
+          "evidence": "docs/acceptance/phase-1-dsl-v1/results/safety-r04.json"
+        },
+        {
+          "command": "EDUMIND_CATALOG_TEST_PG_CONTAINER=edumind-phase1-t037-pg backend/.venv/bin/python scripts/run_phase1_dsl_safety.py --run-id r05",
+          "result": "288 tests /282 passed/6 failed/0 skipped; image migration startup argument omitted fixed IMAGE; original failures retained",
+          "evidence": "docs/acceptance/phase-1-dsl-v1/results/safety-r05.json"
+        },
+        {
+          "command": "EDUMIND_CATALOG_TEST_PG_CONTAINER=edumind-phase1-t037-pg backend/.venv/bin/python scripts/run_phase1_dsl_safety.py --run-id r06",
+          "result": "288 passed /0 failures/errors/skipped; fixed DSL CJK image + exact launch image regression + real font/glyph gate; Provider0",
+          "evidence": "docs/acceptance/phase-1-dsl-v1/results/safety-r06.json"
+        },
+        {
+          "command": "EDUMIND_CATALOG_TEST_PG_CONTAINER=edumind-phase1-t037-pg backend/.venv/bin/python scripts/run_phase1_dsl_matrix.py --run-id r04",
+          "result": "300 automatic slots passed; actual Chinese text missing glyph boxes; media-quality failure, not accepted; preserved raw video and visual correction",
+          "evidence": "docs/acceptance/phase-1-dsl-v1/results/matrix-r04-visual-failure.json"
+        },
+        {
+          "command": "EDUMIND_CATALOG_TEST_PG_CONTAINER=edumind-phase1-t037-pg backend/.venv/bin/python scripts/run_phase1_dsl_matrix.py --run-id r05",
+          "result": "automatic300/300 passed; DSL coldP95 upper bound5.063s; DSL/template cacheP95 upper bounds0.403/0.224s; humanpending; Provider0",
+          "evidence": "docs/acceptance/phase-1-dsl-v1/results/matrix-r05.json"
+        },
+        {
+          "command": "backend/.venv/bin/python scripts/build_phase1_dsl_review.py local-materials/phase-1-t037/matrix-r05",
+          "result": "20 real MP4/SRT/VTT/DSL +220 step frames and immutable manifest prepared; AI spot check confirms encoded Chinese readability, not human review",
+          "evidence": "docs/acceptance/phase-1-dsl-v1/results/visual-spot-check-r05.json"
+        },
+        {
+          "command": "backend/.venv/bin/python scripts/verify_phase1_dsl_evidence.py local-materials/phase-1-t037/matrix-r05 local-materials/phase-1-t037/safety-r06",
+          "result": "passed complete automatic hashes/counts/source freezes; full_task_complete=false,humanpending",
+          "evidence": "docs/acceptance/phase-1-dsl-v1/results/automatic-evidence-r05.json"
+        },
+        {
+          "command": "backend/.venv/bin/python scripts/check_catalog_workflow.py; git diff --check; Ruff check/format --check on12 modified Python files; native Chromium review-page check",
+          "result": "passed workflow/dependencies/diff/source checks and review HTTP200,20 videos/220frames/20 tracks,actual first video playback",
+          "evidence": "docs/acceptance/phase-1-dsl-v1/README.md"
         }
       ],
       "started_at": "2026-10-09T17:12:40",
       "completed_at": null,
-      "blocker": "Docker runtime remains unresponsive (bounded10s probe timeout); CUA reports Mac locked. Manual unlock/OrbStack recovery required before fresh per-file safety re-run and actual media matrices. First combined run285/262pass/23fail retained; fixture isolation correction not yet verified.",
+      "blocker": "Automated safety288 and matrix300 passed; human actual-media review required by acceptance criterion2 is pending for20 videos/220 frames, manifest0669d0ce5a4c2dd78225bc351d09470243a4db92fd75889d1d1a33123cbb92f0; no Task-Completed until specific review confirmation.",
       "commit_lookup": "Task-Completed: PHASE-1-T037"
     },
     {

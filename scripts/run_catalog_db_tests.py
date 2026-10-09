@@ -12,18 +12,30 @@ from urllib.parse import quote
 import asyncpg
 
 ROOT = Path(__file__).resolve().parents[1]
-CONTAINER = "edumind-mvp03-t010-pg"
+CONTAINER = os.getenv("EDUMIND_CATALOG_TEST_PG_CONTAINER", "edumind-mvp03-t010-pg")
 DATABASE = "edumind_catalog_20261002"
 
 
 def test_environment(database: str = DATABASE) -> dict[str, str]:
     if not re.fullmatch(r"edumind_catalog_[a-z0-9_]{1,40}", database):
         raise ValueError("Only dedicated catalog test databases are allowed")
+    if CONTAINER not in {"edumind-mvp03-t010-pg", "edumind-phase1-t037-pg"}:
+        raise ValueError("Only explicitly dedicated test PG containers are allowed")
     info = json.loads(
         subprocess.run(
-            ["docker", "inspect", CONTAINER], capture_output=True, text=True, check=True
+            ["docker", "inspect", CONTAINER],
+            capture_output=True,
+            text=True,
+            check=True,
+            timeout=10,
         ).stdout
     )[0]
+    if CONTAINER == "edumind-phase1-t037-pg":
+        if info["Config"]["Labels"].get("edumind.test-only") != "phase1-dsl":
+            raise ValueError("Dedicated DSL test label required")
+        ports = info["NetworkSettings"]["Ports"]["5432/tcp"]
+        if ports != [{"HostIp": "127.0.0.1", "HostPort": "15437"}]:
+            raise ValueError("Dedicated DSL loopback binding required")
     settings = dict(line.split("=", 1) for line in info["Config"]["Env"] if "=" in line)
     bindings = info["NetworkSettings"]["Ports"]["5432/tcp"]
     binding = next(b for b in bindings if b["HostIp"] in {"127.0.0.1", "0.0.0.0"})

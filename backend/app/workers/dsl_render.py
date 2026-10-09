@@ -13,12 +13,12 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from app.agents.animation_dsl_review import REVIEW_VERSION, digest
 from app.models.animation import AnimationJob
 from app.models.animation_dsl import DSLReviewRecord
-from app.services.animation_cache import FONT_DIGEST
 from app.services.animation_dsl_candidates import DSLCandidateUnavailable, qualified_candidate
 from app.services.animation_dsl_compiler import CompiledDSL, compile_animation_dsl
 from app.services.animation_dsl_renderer import render_compiled_dsl, renderer_identity
+from app.services.animation_dsl_runtime import FONT_DIGEST, IMAGE
 from app.services.animation_host import RenderHost
-from app.services.animation_renderer import IMAGE, RenderedCandidate, RenderError
+from app.services.animation_renderer import RenderedCandidate, RenderError
 from app.services.animation_worker import (
     JobLease,
     _heartbeat_until_stopped,

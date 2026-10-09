@@ -15,8 +15,8 @@ from pathlib import Path
 from typing import cast
 
 from app.services.animation_dsl_compiler import CompiledDSL, compile_animation_dsl
+from app.services.animation_dsl_runtime import IMAGE
 from app.services.animation_renderer import (
-    IMAGE,
     MAX_FILE_BYTES,
     OUTPUT_QUOTA_BYTES,
     ROOT,
@@ -28,6 +28,7 @@ from app.services.animation_renderer import (
 _RUNTIME = ROOT / "backend/app/dsl_runtime"
 _SERVICES = Path(__file__).parent
 _STAGED = {
+    "font_check.py": _RUNTIME / "font_check.py",
     "container_runner.py": _RUNTIME / "container_runner.py",
     "verify_media.py": _RUNTIME / "verify_media.py",
     "animation_dsl_static.py": _SERVICES / "animation_dsl_static.py",

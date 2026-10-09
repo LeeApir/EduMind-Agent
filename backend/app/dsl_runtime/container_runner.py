@@ -9,6 +9,8 @@ import sys
 import time
 from pathlib import Path
 
+from font_check import check_font
+
 INPUT = Path("/input")
 OUTPUT = Path("/output")
 MAX_FILE = 64 * 1024 * 1024
@@ -38,6 +40,7 @@ def main() -> None:
     )
     if checked.returncode or json.loads(checked.stdout).get("nodes") != expected["ast_nodes"]:
         raise ValueError("DSL_COMPILE_REJECTED")
+    check_font(source)
     # Native syntax/import validation happens only here, never in the host process.
     py_compile.compile(str(INPUT / "DSLScene.py"), cfile="/tmp/DSLScene.pyc", doraise=True)
     try:

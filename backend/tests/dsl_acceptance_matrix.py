@@ -6,6 +6,7 @@ import os
 import signal
 import sys
 import time
+from concurrent.futures import ThreadPoolExecutor
 from uuid import UUID
 
 import httpx
@@ -26,6 +27,7 @@ from app.services.animation_dsl_candidates import (  # noqa: E402
     build_dsl_reference,
 )
 from app.services.animation_dsl_handoff import handoff_video_plan  # noqa: E402
+from app.services.animation_dsl_media_cache import AnimationDSLMediaCache  # noqa: E402
 from app.services.animation_intent import intent_from_payload  # noqa: E402
 from app.services.animation_preparation import reserve_preparation  # noqa: E402
 from app.services.knowledge_graph_versions import configured_graph_repository  # noqa: E402
@@ -41,6 +43,19 @@ scene = None
 
 def save():
     m.save()
+
+
+def database(work):
+    # Playwright sync owns an event loop on the caller thread. Database work must
+    # use its own loop/thread, with engine creation and disposal together.
+    with ThreadPoolExecutor(max_workers=1) as runner:
+        return runner.submit(m.database, work).result(timeout=30)
+
+
+def operation_key(label):
+    key = "T037-acceptance-" + label
+    assert 16 <= len(key) <= 128
+    return key
 
 
 def prepare_target(sessions):
@@ -86,7 +101,7 @@ def handoff(sessions, case, key, cold):
                 scene_id=scene,
                 scene_version=1,
                 intent=intent,
-                idempotency_key=key,
+                idempotency_key=operation_key(key),
             )
             reference = await build_dsl_reference(
                 db, GRAPH, owner=m.owner, unit_id=unit, scene_id=scene, version=1
@@ -114,6 +129,7 @@ def handoff(sessions, case, key, cold):
                 operation_id=reservation.operation.id,
                 execution_token=reservation.operation.execution_token,
                 plan=plan,
+                dsl_cache=AnimationDSLMediaCache(m.CACHE),
             )
             assert job is not None and job.render_kind == "dsl"
             assert job.status == ("queued" if cold else "succeeded")
@@ -161,7 +177,7 @@ def main():
             "actual PG/Celery/Manim/HTTP/Chromium"
         ),
     )
-    m.release_id = m.database(m.signed_release)
+    m.release_id = database(m.signed_release)
     import subprocess
 
     subprocess.run(
@@ -191,7 +207,7 @@ def main():
     assert auth.status_code == 201
     m.csrf, m.owner = auth.json()["csrf_token"], UUID(auth.json()["user"]["id"])
     session_hash = token_hash(m.client.cookies.get("edumind_session"))
-    unit, scene = m.database(prepare_target)
+    unit, scene = database(prepare_target)
     template_units = {
         name: m.enroll(name) for name in ("linked-list-insertion", "linked-list-deletion")
     }
@@ -224,7 +240,7 @@ def main():
             row = {**slot, "ok": False}
             start = time.monotonic()
             try:
-                receipt = m.database(
+                receipt = database(
                     lambda sessions: handoff(sessions, case, slot["id"], slot["cold"])
                 )
                 check_media(page, receipt["job_id"], row, receipt["srt"])
@@ -257,7 +273,7 @@ def main():
                         "scene_version": 1,
                         "parameters": slot["parameters"],
                     },
-                    key=slot["id"],
+                    key=operation_key(slot["id"]),
                 )
                 assert response.status_code == (202 if slot["cold"] else 200), response.text
                 check_media(page, response.json()["id"], row)
@@ -274,9 +290,7 @@ def main():
             try:
                 if slot["source"] == "dsl":
                     case = plan["trusted_cases"][slot["case_index"]]
-                    receipt = m.database(
-                        lambda sessions: handoff(sessions, case, slot["id"], False)
-                    )
+                    receipt = database(lambda sessions: handoff(sessions, case, slot["id"], False))
                     job_id, subtitles = receipt["job_id"], receipt["srt"]
                 else:
                     case = plan["template_slots"][slot["case_index"]]
@@ -288,7 +302,7 @@ def main():
                             "scene_version": 1,
                             "parameters": case["parameters"],
                         },
-                        key=slot["id"],
+                        key=operation_key(slot["id"]),
                     )
                     assert response.status_code == 200
                     job_id, subtitles = response.json()["id"], None
@@ -319,7 +333,7 @@ def main():
                         == 1
                     )
 
-    m.database(bindings)
+    database(bindings)
     m.report["automatic_matrix_passed"] = True
     save()
 

@@ -13,7 +13,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import cast
 
-from app.services.animation_cache import FONT_DIGEST
+from app.services.animation_dsl_runtime import FONT_DIGEST, IMAGE
 from app.services.animation_dsl_validation import (
     EdgeState,
     NodeState,
@@ -21,7 +21,6 @@ from app.services.animation_dsl_validation import (
     ValidatedDSL,
     validate_animation_dsl,
 )
-from app.services.animation_renderer import IMAGE
 
 _DIRECTORY = Path(__file__).parent
 _POLICY_BYTES = (_DIRECTORY / "animation_dsl_compiler_policy.json").read_bytes()

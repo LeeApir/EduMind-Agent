@@ -17,7 +17,7 @@ from app.agents.animation_dsl_review import REVIEW_VERSION, binding, canonical, 
 from app.models.animation import AnimationJob, AnimationMedia
 from app.models.animation_dsl import DSLCandidate, DSLCandidateRevocation, DSLReviewRecord
 from app.models.animation_generation import AnimationPreparation
-from app.services.animation_cache import FONT_DIGEST, AnimationCache, runtime_identity
+from app.services.animation_cache import AnimationCache, runtime_identity
 from app.services.animation_dsl_candidates import (
     DSLCandidateUnavailable,
     build_dsl_reference,
@@ -29,11 +29,11 @@ from app.services.animation_dsl_compiler import compile_animation_dsl
 from app.services.animation_dsl_media_cache import AnimationDSLMediaCache
 from app.services.animation_dsl_publication import dsl_media_values, private_cache_lock
 from app.services.animation_dsl_renderer import renderer_identity
+from app.services.animation_dsl_runtime import FONT_DIGEST, IMAGE
 from app.services.animation_intent import intent_from_payload
 from app.services.animation_jobs import append_animation_event
 from app.services.animation_preparation import _ACTIVE, _now, owned_preparation
 from app.services.animation_publication import bind_media, reviewed_media_row
-from app.services.animation_renderer import IMAGE
 from app.services.animation_templates import cache_identity, load_template, normalize_parameters
 from app.services.durable_job_dispatch import dispatch_backend, enqueue_animation_job
 from app.services.knowledge_graph import KnowledgeGraphRepository
