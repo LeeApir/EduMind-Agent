@@ -3310,6 +3310,7 @@
         "summary": "读取当前版本的公共知识结构",
         "description": "公共种子图谱不包含任何用户掌握度、画像或学习记录；节点和关系均按稳定 ID 排序。",
         "operationId": "getKnowledgeGraph",
+        "parameters": [{"name": "version", "in": "query", "required": false, "description": "只读明确的已批准历史图版本；省略读取当前配置，未知版本503，不切换配置。", "schema": {"type": "string"}}],
         "responses": {
           "503": {"description": "配置图版本缺失、损坏或未批准；不回退、不返回空路径。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},
           "200": {"description": "已校验的版本化图谱。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/KnowledgeGraph"}}}}
@@ -3321,7 +3322,7 @@
         "tags": ["Knowledge Graph"],
         "summary": "读取公共知识节点详情",
         "operationId": "getKnowledgeNode",
-        "parameters": [{"$ref": "#/components/parameters/NodeId"}],
+        "parameters": [{"$ref": "#/components/parameters/NodeId"}, {"name": "version", "in": "query", "required": false, "description": "只读明确的已批准历史图版本；省略读取当前配置，未知版本503，不切换配置。", "schema": {"type": "string"}}],
         "responses": {
           "503": {"description": "配置图版本缺失、损坏或未批准；不回退、不返回空路径。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},
           "200": {"description": "节点及其稳定排序的入/出关系。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/KnowledgeNodeDetail"}}}},

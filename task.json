@@ -1738,7 +1738,7 @@
       "id": "PHASE-1-T034",
       "phase": "Phase 1",
       "title": "展示扩展路径与学习可用性",
-      "status": "todo",
+      "status": "done",
       "priority": "P1",
       "depends_on": [
         "PHASE-1-T033"
@@ -1747,7 +1747,12 @@
         "web/src/",
         "web/tests/",
         "web/package.json",
-        "web/pnpm-lock.yaml"
+        "web/pnpm-lock.yaml",
+        "backend/app/api/knowledge_graph.py",
+        "backend/tests/test_expanded_graph_repository.py",
+        "docs/api/openapi.yaml",
+        "docs/ARCHITECTURE.md",
+        "docs/PRD.md"
       ],
       "prd_source": "PRD §3.4路径可视化",
       "acceptance_criteria": [
@@ -1759,9 +1764,25 @@
         "cd web && pnpm test --run tests/expanded-path.spec.ts",
         "cd web && pnpm typecheck && pnpm build；对本任务改动运行ESLint。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "cd web && pnpm test --run tests/expanded-path.spec.ts; pnpm test --run; pnpm typecheck; pnpm build; changed ESLint --max-warnings 0",
+          "result": "passed: 8 dedicated expanded-path cases, full26 files/189 tests, types/build/lint zero warnings; actual30-node release fixture, missing/invalid course qualification, retry/late selection/session isolation, explicit historical read without automatic replan; initial jsdom import.meta URL fixture issue fixed by filesystem path, no assertions removed",
+          "evidence": "local-materials/phase-1-t034/checks/web-tests-final.log; build.log; web/tests/expanded-path.spec.ts"
+        },
+        {
+          "command": "backend/.venv/bin/python webapp-testing/scripts/with_server.py --server temporary Vite --port 4189 -- backend/.venv/bin/python web/tests/e2e/expanded_path_flow.py",
+          "result": "passed: actual Chromium, explicit mock HTTP,30 nodes/native Enter prerequisite navigation/375px no overflow/history version GET/no initial POST; mobile and desktop screenshots inspected; temporary server stopped; Provider0",
+          "evidence": "local-materials/phase-1-t034/checks/browser.log; local-materials/phase-1-t034/browser/"
+        },
+        {
+          "command": "cd backend && pytest tests/test_expanded_graph_repository.py tests/test_knowledge_graph_api.py; changed Ruff/format/mypy; provider contract/governance/legacy archives/diff self-review",
+          "result": "passed:21 API/repository tests, requested approved historical graph does not change active configuration, unknown503; mypy1,571refs/63ops/85examples; no DB schema or Provider calls",
+          "evidence": "local-materials/phase-1-t034/checks/api-tests.log; docs/api/openapi.yaml"
+        }
+      ],
+      "started_at": "2026-10-09T14:31:54",
+      "completed_at": "2026-10-09T14:43:11",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T034"
     },

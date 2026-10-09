@@ -11,6 +11,7 @@ import LearningProgressPanel, {
 import ProfileCard from "./components/ProfileCard.vue";
 import PublishedLearningWorkspace from "./components/PublishedLearningWorkspace.vue";
 import LearningPathPanel from "./components/LearningPathPanel.vue";
+import KnowledgeExplorer from "./components/KnowledgeExplorer.vue";
 import AnimationPanel from "./components/AnimationPanel.vue";
 import ClassroomPanel from "./components/ClassroomPanel.vue";
 import DebatePanel from "./components/DebatePanel.vue";
@@ -531,6 +532,13 @@ function stringValue(value: unknown): string {
         重新读取上次学习
       </NButton>
     </section>
+    <KnowledgeExplorer
+      v-if="csrfToken"
+      :csrf-token="csrfToken"
+      :can-plan="Boolean(learningUnitId)"
+      :current-node-id="animationNodeId"
+      :refresh-token="pathRefreshToken"
+    />
     <LearningPathPanel
       v-if="pathTargetNodeId"
       :target-node-id="pathTargetNodeId"

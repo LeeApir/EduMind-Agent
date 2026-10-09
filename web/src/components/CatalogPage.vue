@@ -10,6 +10,7 @@ import { downloadFile, notesUrl } from "../api/downloads";
 import type { QuizSubmissionResult } from "../api/quiz";
 import AnimationPanel from "./AnimationPanel.vue";
 import LearningPathPanel from "./LearningPathPanel.vue";
+import KnowledgeExplorer from "./KnowledgeExplorer.vue";
 import PublishedLearningWorkspace from "./PublishedLearningWorkspace.vue";
 
 const catalog = ref<CatalogListing | null>(null);
@@ -104,6 +105,12 @@ async function chooseNode(nodeId: string): Promise<void> {
   } catch (failure) { if (token === generation) error.value = message(failure); }
   finally { if (token === generation) busy.value = false; }
 }
+async function chooseExplorerCourse(releaseId: string, nodeId: string): Promise<void> {
+  if (busy.value || error.value || demoActive.value || !catalog.value?.releases.some(item => item.id === releaseId && item.nodes.some(node => node.id === nodeId))) return;
+  selectedRelease.value = releaseId;
+  await chooseNode(nodeId);
+}
+
 function selectResource(type: ResourceType): void {
   resourceType.value = type;
   if (unit.value) store(`${storageKey()}:tab:${unit.value.id}`, type);
@@ -174,6 +181,18 @@ onBeforeUnmount(() => { generation += 1; });
     >
       正在准备课程。
     </p>
+    <KnowledgeExplorer
+      v-if="csrf && catalog"
+      :csrf-token="csrf"
+      :catalog="catalog"
+      :catalog-ready="!busy && !error && !demoActive"
+      :can-enroll="true"
+      :can-plan="Boolean(unit)"
+      :current-node-id="unit?.knowledge_node_id ?? ''"
+      :fixed-completed-node-id="receipt?.catalog_assessment?.reason !== 'incomplete' && receipt?.catalog_assessment ? unit?.knowledge_node_id : ''"
+      :refresh-token="refreshToken"
+      @learn="chooseExplorerCourse"
+    />
     <section
       v-if="catalog?.status === 'not_ready'"
       class="catalog-empty"

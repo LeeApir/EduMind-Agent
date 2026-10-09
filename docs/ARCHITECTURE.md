@@ -110,3 +110,11 @@ T031已发布独立`data/knowledge/phase-1.1.0.json`及来源sidecar/摘要manif
 规划继续使用PG掌握度投影：无证据节点保留unseen与算法默认score0，新增快照`mastery_known`用于明确未知，不新增证据/重评分。历史快照不回填字段，不重写；当前查询与命令重放按原graph_version独立读取已批准Repository，选择变化仅标记stale，显式replan追加新版本，旧幂等键仍返回原版本。
 
 路径响应新增可选`learning_availability`（旧契约字段保留），作为当前读取投影而非路径历史内容：实际验证approved catalog完整签核/摘要/节点；非catalog_only时可复用owner内ready单元及passed已发布场景资源，要求节点匹配并具备讲解/代码/练习三类。来源标签、graph metadata_only或一个passed资源都不构成完整课程资格。撤回即时影响该投影，不改路径版本；目录损坏明确503 LEARNING_AVAILABILITY_UNAVAILABLE，不把校验失败伪装成“无课程”。元数据缺正式课程返回unavailable/no_reviewed_course，UI接续T034。无新增迁移、Provider或动态开放。
+
+### T034 扩展路径浏览与历史读取
+
+Web继续使用原生按钮/列表轻量视图，不引入G6或新依赖；KnowledgeExplorer展示当前配置图的完整节点/先修关系、PG有据掌握度与明确未知、实际目录课程资格，完成固定题不等于已掌握。选择元数据节点只浏览，缺课程不入课；已开始课程或有现有学习单元后可明确请求该目标路径，不生成伪学习单元。目录错误/重读期间资格待确认，不按“缺课程”处理。目录学习入口仍由父组件重新核对release/node及原入课协议。
+
+`GET /api/graph`及节点详情增加可选version参数，只读注册的历史版本，不修改当前配置；省略仍读当前图，未知版本503。前端读取当前图用no-store避免配置切换后的缓存版本混用。路径绑定旧图时按明确版本恢复并保留原推荐/证据快照，图切换不自动replan；学生明确请求当前结构重新规划，才追加新版本。同版本的掌握度/画像更新沿用既有重规划协议。失败保留旧视图并标识，晚返回/选择切换/会话切换清理防陈旧状态。
+
+验证包括expanded-path.spec.ts、全部前端回归与真实Chromium mock HTTP测试expanded_path_flow.py：30节点、Enter键选择和先修导航、375px无横向溢出、历史version读取及初始无POST；不代表真实模型、生产课程签核或部署验收。

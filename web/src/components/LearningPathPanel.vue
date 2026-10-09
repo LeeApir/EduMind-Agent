@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref, shallowRef, watch } from "vue";
 import { NButton } from "naive-ui";
-import { loadCurrentPath, loadGraph, loadMastery, PathRequestError, replanPath,
+import { loadCurrentPath, loadGraph, loadGraphVersion, loadMastery, PathRequestError, replanPath,
   type GraphSnapshot, type LearningPath, type MasterySnapshot, type ReplanOptions } from "../api/paths";
 import type { MasteryStatus } from "../api/quiz";
 
@@ -10,11 +10,11 @@ const props = withDefaults(defineProps<{
   csrfToken: string;
   refreshToken?: number;
   readPath?: (targetNodeId: string) => Promise<LearningPath | null>;
-  readGraph?: () => Promise<GraphSnapshot>;
+  readGraph?: (version?: string) => Promise<GraphSnapshot>;
   readMastery?: () => Promise<MasterySnapshot>;
   replan?: (options: ReplanOptions) => Promise<LearningPath>;
-}>(), { refreshToken: 0, readPath: loadCurrentPath, readGraph: loadGraph, readMastery: loadMastery, replan: replanPath });
-interface ViewNode { id: string; name: string; status: MasteryStatus; score: number; role: string; reasons: string[]; evidence: string[]; resource: string; minutes: number | null; }
+}>(), { refreshToken: 0, readPath: loadCurrentPath, readGraph: (version?: string) => version ? loadGraphVersion(version) : loadGraph(), readMastery: loadMastery, replan: replanPath });
+interface ViewNode { id: string; name: string; status: MasteryStatus; score: number; known: boolean; availability: string; role: string; reasons: string[]; evidence: string[]; resource: string; minutes: number | null; }
 const path = shallowRef<LearningPath | null>(null);
 const nodes = shallowRef<ViewNode[]>([]);
 const selectedId = ref("");
@@ -22,6 +22,7 @@ const changedIds = ref<string[]>([]);
 const loading = ref(false);
 const error = ref("");
 const empty = ref(false);
+const historicalView = ref(false);
 let graph: GraphSnapshot | null = null;
 let generation = 0;
 let pending: ReplanOptions | null = null;
@@ -31,10 +32,10 @@ const selected = computed(() => nodes.value.find((node) => node.id === selectedI
 onBeforeUnmount(() => { generation += 1; });
 
 function project(next: LearningPath, mastery: MasterySnapshot, structure: GraphSnapshot): ViewNode[] {
-  if (structure.graph_version !== next.graph_version || mastery.graph_version !== next.graph_version) {
+  if (structure.graph_version !== next.graph_version || (!historicalView.value && mastery.graph_version !== next.graph_version)) {
     throw new PathRequestError("知识结构版本已变化，请重新读取推荐。", "GRAPH_VERSION_CHANGED");
   }
-  if (mastery.items.reduce((total, item) => total + item.revision, 0) !== next.mastery_revision_watermark) {
+  if (!historicalView.value && mastery.items.reduce((total, item) => total + item.revision, 0) !== next.mastery_revision_watermark) {
     throw new PathRequestError("掌握度已变化，请重新读取最新推荐。", "MASTERY_VERSION_CHANGED");
   }
   const graphNodes = new Map(structure.nodes.map((node) => [node.id, node]));
@@ -52,7 +53,8 @@ function project(next: LearningPath, mastery: MasterySnapshot, structure: GraphS
   }
   visit(next.target_node_id);
   if (next.nodes.some((id) => !seen.has(id))) throw new PathRequestError("推荐与目标依赖不一致。", "INVALID_RESPONSE");
-  const currentStates = new Map(mastery.items.map((item) => [item.knowledge_node_id, item]));
+  const usableMastery = !historicalView.value || mastery.items.reduce((total, item) => total + item.revision, 0) === next.mastery_revision_watermark;
+  const currentStates = new Map((usableMastery ? mastery.items : []).map((item) => [item.knowledge_node_id, item]));
   const details = new Map(next.node_details.map((item) => [item.node_id, item]));
   const ordered = [...closure.filter((id) => !next.nodes.includes(id)), ...next.nodes];
   return ordered.map((id) => {
@@ -69,7 +71,9 @@ function project(next: LearningPath, mastery: MasterySnapshot, structure: GraphS
       if (dependent.length) reasons.push(`${node.name}是${dependent.join("、")}的前置知识。`);
     }
     if (!reasons.length) reasons.push(...next.reasons.filter((reason) => !reason.knowledge_node_id).map((reason) => reason.summary));
-    return { id, name: node.name, status, score: state?.score ?? detail?.score ?? 0, role, reasons,
+    const eligibility = next.learning_availability?.find(item => item.node_id === id);
+    return { id, name: node.name, status, known: Boolean(state) || (detail ? detail.mastery_known ?? detail.status !== "unseen" : false),
+      availability: eligibility?.status ?? "unknown", score: state?.score ?? detail?.score ?? 0, role, reasons,
       evidence: state?.evidence_summary ?? [], resource: detail ? resources[detail.recommended_resource] : "",
       minutes: detail?.estimated_minutes ?? null };
   });
@@ -88,6 +92,23 @@ function applySnapshot(next: LearningPath, mastery: MasterySnapshot, structure: 
   path.value = next;
   if (!nodes.value.some((node) => node.id === selectedId.value)) selectedId.value = next.current_node_id ?? nodes.value[0]?.id ?? "";
 }
+async function replanCurrentGraph(): Promise<void> {
+  if (!path.value || !props.csrfToken || loading.value) return;
+  const token = ++generation;
+  loading.value = true; error.value = "";
+  try {
+    if (!pending) pending = { targetNodeId: props.targetNodeId, expectedVersion: path.value.version,
+      csrfToken: props.csrfToken, idempotencyKey: crypto.randomUUID(), reason: "learner_request" };
+    await props.replan(pending);
+    if (token !== generation) return;
+    pending = null;
+    await refresh();
+  } catch (cause) {
+    if (token !== generation) return;
+    if (cause instanceof PathRequestError && cause.code === "PATH_VERSION_CONFLICT") pending = null;
+    error.value = cause instanceof Error ? cause.message : "重新规划失败，请重试。";
+  } finally { if (token === generation) loading.value = false; }
+}
 async function refresh(): Promise<void> {
   const token = ++generation;
   const target = props.targetNodeId;
@@ -98,7 +119,10 @@ async function refresh(): Promise<void> {
     if (token !== generation) return;
     if (!next) { path.value = null; nodes.value = []; empty.value = true; return; }
     empty.value = false;
-    if (next.is_stale) {
+    const mastery = await props.readMastery();
+    if (token !== generation) return;
+    historicalView.value = mastery.graph_version !== next.graph_version;
+    if (next.is_stale && !historicalView.value) {
       if (!props.csrfToken) throw new PathRequestError("学习会话暂未就绪，请重新读取。", "SESSION_REQUIRED");
       // Retain a failed command verbatim until its durable receipt is recovered.
       if (!pending) pending = { targetNodeId: target, expectedVersion: next.version, csrfToken: props.csrfToken,
@@ -108,7 +132,7 @@ async function refresh(): Promise<void> {
       pending = null;
       if (next.is_stale) throw new PathRequestError("推荐已再次变化，请重新读取最新版本。", "PATH_STALE");
     } else pending = null;
-    const [mastery, structure] = await Promise.all([props.readMastery(), graph?.graph_version === next.graph_version ? Promise.resolve(graph) : props.readGraph()]);
+    const structure = graph?.graph_version === next.graph_version ? graph : await props.readGraph(historicalView.value ? next.graph_version : undefined);
     if (token !== generation) return;
     applySnapshot(next, mastery, structure);
     graph = structure;
@@ -157,6 +181,18 @@ watch(() => props.refreshToken, () => { void refresh(); });
       该目标暂无已保存路径。请重新输入学习目标，建立学习推荐。
     </p>
     <template v-if="path">
+      <div
+        v-if="historicalView"
+        role="status"
+      >
+        <p>正在查看历史路径。知识结构已切换，原推荐和证据快照保留。</p>
+        <NButton
+          :disabled="loading || !csrfToken"
+          @click="replanCurrentGraph"
+        >
+          按当前知识结构重新规划
+        </NButton>
+      </div>
       <p v-if="path.current_node_id === null">
         这条目标路径已完成。已掌握状态来自服务端学习证据。
       </p>
@@ -196,7 +232,7 @@ watch(() => props.refreshToken, () => { void refresh(); });
           >
             <span class="node-role">{{ node.role }}</span>
             <strong>{{ node.name }}</strong>
-            <span>{{ labels[node.status] }} · {{ Math.round(node.score * 100) }}%</span>
+            <span>{{ node.known ? `${labels[node.status]} · ${Math.round(node.score * 100)}%` : "掌握度未知 · 待学习" }}</span>
             <span
               v-if="changedIds.includes(node.id)"
               class="node-updated"
@@ -218,7 +254,13 @@ watch(() => props.refreshToken, () => { void refresh(); });
             {{ reason }}
           </li>
         </ul>
-        <p v-if="selected.resource">
+        <p v-if="selected.availability === 'unavailable'">
+          该知识点暂未提供已审核课程。
+        </p>
+        <p v-else-if="selected.availability === 'available'">
+          已有已审核课程。
+        </p>
+        <p v-if="selected.resource && selected.availability !== 'unavailable'">
           建议先看{{ selected.resource }} · 预计 {{ selected.minutes }} 分钟
         </p>
         <h4>学习证据摘要</h4>

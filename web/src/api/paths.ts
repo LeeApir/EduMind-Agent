@@ -2,6 +2,7 @@ import type { MasteryChange, MasteryStatus } from "./quiz";
 
 export interface PathNode {
   node_id: string;
+  mastery_known?: boolean;
   score: number;
   status: MasteryStatus;
   cost: number;
@@ -13,7 +14,9 @@ export interface PathReason {
   summary: string;
   knowledge_node_id?: string;
 }
+export interface LearningAvailability { node_id: string; status: "available" | "unavailable"; reason: "approved_catalog" | "reviewed_owner_unit" | "no_reviewed_course"; catalog_release_id: string | null; learning_unit_id: string | null; }
 export interface LearningPath {
+  learning_availability?: LearningAvailability[];
   version: number;
   target_node_id: string;
   graph_version: string;
@@ -61,6 +64,7 @@ export function parseLearningPath(value: unknown): LearningPath {
     || !(value.next_node_id === null || typeof value.next_node_id === "string") || typeof value.is_stale !== "boolean"
     || !Array.isArray(value.node_details) || !value.node_details.every((item: unknown) => object(item)
       && typeof item.node_id === "string" && score(item.score) && status(item.status)
+      && (item.mastery_known === undefined || typeof item.mastery_known === "boolean")
       && typeof item.cost === "number" && Number.isFinite(item.cost)
       && ["explanation", "code", "exercise", "review"].includes(String(item.recommended_resource))
       && positiveInteger(item.estimated_minutes))
@@ -75,6 +79,19 @@ export function parseLearningPath(value: unknown): LearningPath {
     || value.node_details.some((item, index) => item.node_id !== nodes[index])
     || (value.current_node_id !== null && !value.nodes.includes(value.current_node_id))
     || (value.next_node_id !== null && !value.nodes.includes(value.next_node_id))) invalid();
+  if (value.learning_availability !== undefined) {
+    if (!Array.isArray(value.learning_availability) || !value.learning_availability.every((item: unknown) => object(item)
+      && typeof item.node_id === "string" && nodes.includes(item.node_id)
+      && ["available", "unavailable"].includes(String(item.status))
+      && ["approved_catalog", "reviewed_owner_unit", "no_reviewed_course"].includes(String(item.reason))
+      && (item.catalog_release_id === null || typeof item.catalog_release_id === "string")
+      && (item.learning_unit_id === null || typeof item.learning_unit_id === "string")
+      && (item.status === "unavailable" ? item.reason === "no_reviewed_course" && item.catalog_release_id === null && item.learning_unit_id === null
+        : item.reason === "approved_catalog" ? Boolean(item.catalog_release_id) && item.learning_unit_id === null
+          : item.reason === "reviewed_owner_unit" && Boolean(item.learning_unit_id) && item.catalog_release_id === null))) invalid();
+    if (new Set(value.learning_availability.map((item) => item.node_id)).size !== value.learning_availability.length
+      || value.learning_availability.length !== nodes.length) invalid();
+  }
   return value as unknown as LearningPath;
 }
 export function parseGraph(value: unknown): GraphSnapshot {
@@ -118,7 +135,7 @@ export async function loadCurrentPath(targetNodeId: string, fetchImpl: FetchLike
   return path;
 }
 export async function loadGraph(fetchImpl: FetchLike = fetch): Promise<GraphSnapshot> {
-  const response = await request("/api/graph", { headers: readHeaders }, fetchImpl);
+  const response = await request("/api/graph", { headers: readHeaders, cache: "no-store" }, fetchImpl);
   if (!response.ok) throw new PathRequestError("知识结构暂时无法读取。", "NOT_FOUND");
   return parseGraph(await payload(response));
 }
@@ -137,5 +154,22 @@ export async function replanPath(options: ReplanOptions, fetchImpl: FetchLike = 
   if (!response.ok) throw new PathRequestError("推荐已不存在，请重新读取。", "NOT_FOUND");
   const path = parseLearningPath(await payload(response));
   if (path.target_node_id !== options.targetNodeId) invalid();
+  return path;
+}
+
+export async function loadGraphVersion(version: string, fetchImpl: FetchLike = fetch): Promise<GraphSnapshot> {
+  const response = await request(`/api/graph?${new URLSearchParams({ version })}`, { headers: readHeaders }, fetchImpl);
+  if (!response.ok) throw new PathRequestError("历史知识结构暂时无法读取。", "GRAPH_UNAVAILABLE");
+  const graph = parseGraph(await payload(response));
+  if (graph.graph_version !== version) invalid();
+  return graph;
+}
+export async function planPath(targetNodeId: string, csrfToken: string, key: string, fetchImpl: FetchLike = fetch): Promise<LearningPath> {
+  const response = await request("/api/path/plan", { method: "POST", headers: { ...readHeaders,
+    "Content-Type": "application/json", "X-CSRF-Token": csrfToken, "Idempotency-Key": key },
+    body: JSON.stringify({ target_node_id: targetNodeId }) }, fetchImpl);
+  if (!response.ok) throw new PathRequestError("该目标暂时无法规划。", "GRAPH_NODE_NOT_FOUND");
+  const path = parseLearningPath(await payload(response));
+  if (path.target_node_id !== targetNodeId) invalid();
   return path;
 }

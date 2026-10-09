@@ -159,3 +159,19 @@ def test_legacy_path_and_conflict(monkeypatch, tmp_path):
     versions.graph_repository_for_version.cache_clear()
     with pytest.raises(KnowledgeGraphValidationError):
         versions.configured_graph_repository()
+
+
+def test_explicit_historical_graph_does_not_change_configuration(monkeypatch):
+    monkeypatch.setenv("EDUMIND_KNOWLEDGE_GRAPH_VERSION", "mvp-0.2.0")
+    with TestClient(app) as client:
+        expanded = client.get("/api/graph", params={"version": "phase-1.1.0"})
+        assert expanded.status_code == 200 and len(expanded.json()["nodes"]) == 30
+        assert client.get("/api/graph").json()["graph_version"] == "mvp-0.2.0"
+        assert (
+            client.get(
+                "/api/graph/node/breadth-first-search", params={"version": "phase-1.1.0"}
+            ).status_code
+            == 200
+        )
+        assert client.get("/api/graph/node/breadth-first-search").status_code == 404
+        assert client.get("/api/graph", params={"version": "unknown"}).status_code == 503

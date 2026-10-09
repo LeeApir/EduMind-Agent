@@ -1,6 +1,6 @@
 """Public, deterministic read APIs for the versioned knowledge graph."""
 
-from fastapi import APIRouter, Depends, Response
+from fastapi import APIRouter, Depends, Query, Response
 from fastapi.responses import JSONResponse
 
 from app.services.knowledge_graph import (
@@ -9,6 +9,7 @@ from app.services.knowledge_graph import (
     KnowledgeRelation,
     default_knowledge_graph_repository,
 )
+from app.services.knowledge_graph_versions import graph_repository_for_version
 
 router = APIRouter(tags=["Knowledge Graph"])
 
@@ -16,6 +17,17 @@ router = APIRouter(tags=["Knowledge Graph"])
 def knowledge_graph_repository() -> KnowledgeGraphRepository:
     """Expose the process-local, validated public graph through dependency injection."""
     return default_knowledge_graph_repository()
+
+
+def requested_graph_repository(
+    version: str | None = Query(default=None),
+) -> KnowledgeGraphRepository:
+    """Read a registered historical release without changing active configuration."""
+    return (
+        knowledge_graph_repository()
+        if version is None
+        else graph_repository_for_version(version, None)
+    )
 
 
 def node_payload(node: KnowledgeNode) -> dict[str, object]:
@@ -58,7 +70,7 @@ def graph_node_not_found() -> JSONResponse:
 @router.get("/api/graph")
 def get_knowledge_graph(
     response: Response,
-    repository: KnowledgeGraphRepository = Depends(knowledge_graph_repository),
+    repository: KnowledgeGraphRepository = Depends(requested_graph_repository),
 ) -> dict[str, object]:
     """Return only public graph data in deterministic order, without authentication."""
     response.headers["Cache-Control"] = "public, max-age=300"
@@ -74,7 +86,7 @@ def get_knowledge_graph(
 def get_knowledge_node(
     node_id: str,
     response: Response,
-    repository: KnowledgeGraphRepository = Depends(knowledge_graph_repository),
+    repository: KnowledgeGraphRepository = Depends(requested_graph_repository),
 ) -> dict[str, object] | JSONResponse:
     """Return one public node and its stable incoming and outgoing relations."""
     node = repository.get_node(node_id)
