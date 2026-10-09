@@ -1887,7 +1887,7 @@
       "id": "PHASE-1-T036",
       "phase": "Phase 1",
       "title": "验证队列故障恢复与模板兼容",
-      "status": "todo",
+      "status": "done",
       "priority": "P1",
       "depends_on": [
         "PHASE-1-T021",
@@ -1908,9 +1908,60 @@
       "verification": [
         "建立并运行隔离队列集成脚本，保留各故障注入及恢复证据；不触碰用户开发/生产数据。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "backend/.venv/bin/python scripts/run_phase1_queue_acceptance.py --run-id r01",
+          "result": "passed: 55 tests, zero failures/errors/skips; real PG/Redis/Celery/Manim faults and separate PG/unit injections; Provider0",
+          "evidence": "local-materials/phase-1-t036/r01/fault-tests.xml"
+        },
+        {
+          "command": "backend/.venv/bin/python scripts/run_phase1_queue_matrix.py --run-id r02",
+          "result": "passed: template100/100, insertion/deletion50 each, cold20 P95=9.522318s; actual HTTP/Chromium MP4/SRT; SSE100/100 Job50/classroom50; explicit classroom MockProvider, real Provider0",
+          "evidence": "docs/acceptance/phase-1-queue-v1/results/template-sse-matrix.json"
+        },
+        {
+          "command": "backend/.venv/bin/python scripts/run_phase1_queue_fault_matrix.py --run-id r01",
+          "result": "passed: 7 actual fault windows, API accepted-before-send death, real ACK before/after, Worker PG loss, rolling rollback, signed course withdrawal and notes/owner exports; DB-loss container cleanup0.82828s",
+          "evidence": "docs/acceptance/phase-1-queue-v1/results/actual-fault-windows.json"
+        },
+        {
+          "command": "backend/.venv/bin/python scripts/run_phase1_queue_publish_fault.py --run-id r01",
+          "result": "passed: actual publisher after-send death, real30s lease expiry, >=2 Redis deliveries, one render attempt/binding",
+          "evidence": "docs/acceptance/phase-1-queue-v1/results/publisher-death.json"
+        },
+        {
+          "command": "backend/.venv/bin/python scripts/verify_phase1_queue_evidence.py",
+          "result": "passed: fixed source and evidence hashes, exact denominators, hardware M3/8/16GiB; first API-start failure100+100 unrun preserved; path fix and approved hardware read resolved aggregation failures",
+          "evidence": "docs/acceptance/phase-1-queue-v1/results/complete-evidence.json"
+        },
+        {
+          "command": "backend/.venv/bin/python backend/tests/queue_media_frames.py local-materials/phase-1-t036/matrix-r02",
+          "result": "passed: generated MP4 step-frame extraction and self-inspection; no fabricated human signoff",
+          "evidence": "local-materials/phase-1-t036/matrix-r02/visual-frames.json"
+        },
+        {
+          "command": "backend/.venv/bin/ruff check backend/tests/queue_*.py scripts/run_phase1_queue*.py scripts/verify_phase1_queue_evidence.py scripts/run_queue_storage_tests.py",
+          "result": "passed: acceptance sources",
+          "evidence": "docs/acceptance/phase-1-queue-v1/README.md"
+        },
+        {
+          "command": "backend/.venv/bin/ruff format --check backend/tests/queue_*.py scripts/run_phase1_queue*.py scripts/verify_phase1_queue_evidence.py scripts/run_queue_storage_tests.py",
+          "result": "passed after evidence-verifier formatting correction",
+          "evidence": "docs/acceptance/phase-1-queue-v1/README.md"
+        },
+        {
+          "command": "python3 scripts/check_catalog_workflow.py",
+          "result": "passed: dependencies and catalog ledger",
+          "evidence": "docs/acceptance/phase-1-queue-v1/README.md"
+        },
+        {
+          "command": "python3 scripts/verify_legacy_archives.py",
+          "result": "passed:236 originals/64 experiments/169 evidence; old T033 remainsblocked",
+          "evidence": "docs/acceptance/phase-1-queue-v1/README.md"
+        }
+      ],
+      "started_at": "2026-10-09T15:25:33",
+      "completed_at": "2026-10-09T17:10:58",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T036"
     },

@@ -11,19 +11,24 @@ from run_catalog_db_tests import ROOT, test_environment
 
 def main() -> None:
     database = sys.argv[1]
-    if not re.fullmatch(r"edumind_catalog_phase1_t0(?:19|20|21|25)_[a-z0-9_]{1,15}", database):
+    if not re.fullmatch(
+        r"edumind_catalog_phase1_t0(?:19|20|21|25|36)_[a-z0-9_]{1,15}", database
+    ):
         raise ValueError("Dedicated queue database required")
     env = test_environment(database)
     env = {
         k: v
         for k, v in env.items()
-        if not k.startswith(("EDUMIND_PROVIDER", "EDUMIND_CREDENTIAL", "EDUMIND_ANIMATION_BROKER"))
+        if not k.startswith(
+            ("EDUMIND_PROVIDER", "EDUMIND_CREDENTIAL", "EDUMIND_ANIMATION_BROKER")
+        )
     }
     if os.getenv("EDUMIND_RUN_QUEUE_BROKER_TESTS") == "1":
         info = json.loads(
             subprocess.run(
                 ["docker", "inspect", "edumind-phase1-queue-test-redis"],
                 capture_output=True,
+                timeout=10,
                 text=True,
                 check=True,
             ).stdout
@@ -46,7 +51,9 @@ def main() -> None:
         ["-m", "alembic", "upgrade", "head"],
         ["-m", "pytest", "-q", "-rs", *sys.argv[2:]],
     ]:
-        subprocess.run([sys.executable, *command], cwd=ROOT / "backend", env=env, check=True)
+        subprocess.run(
+            [sys.executable, *command], cwd=ROOT / "backend", env=env, check=True
+        )
     print("Dedicated queue migration roundtrip/PG tests passed; Provider0")
 
 
