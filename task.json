@@ -1969,7 +1969,7 @@
       "id": "PHASE-1-T037",
       "phase": "Phase 1",
       "title": "验证DSL容器安全与动作正确性",
-      "status": "todo",
+      "status": "blocked",
       "priority": "P1",
       "depends_on": [
         "PHASE-1-T028",
@@ -1990,10 +1990,36 @@
       "verification": [
         "建立并运行DSL隔离集成与动画验证脚本；冻结版本/样本/硬件，保存真实媒体验证证据。"
       ],
-      "verification_results": [],
-      "started_at": null,
+      "verification_results": [
+        {
+          "command": "backend/.venv/bin/python scripts/run_phase1_dsl_safety.py --run-id r01",
+          "result": "failed:285 tests/262 passed/23 failed/0 skipped; global policy revocation contaminated later files and historical migration namespace assertion; failures retained",
+          "evidence": "docs/acceptance/phase-1-dsl-v1/results/first-safety-failure.json"
+        },
+        {
+          "command": "backend/.venv/bin/python scripts/run_phase1_dsl_safety.py --run-id r02",
+          "result": "not run: database initialization timed out20s, zero files/tests; per-file fresh database fix awaits actual verification",
+          "evidence": "docs/acceptance/phase-1-dsl-v1/results/second-initialization-failure.json"
+        },
+        {
+          "command": "backend/.venv/bin/python scripts/verify_phase1_dsl_matrix.py",
+          "result": "passed offline:20 fixed cases, nine ops, expected final state and compiler/SRT, exact100/100/100 denominators; no media or human approval claim",
+          "evidence": "docs/acceptance/phase-1-dsl-v1/results/offline-plan.json"
+        },
+        {
+          "command": "backend/.venv/bin/ruff check backend/tests/dsl_acceptance_matrix.py scripts/run_phase1_dsl_safety.py scripts/run_phase1_dsl_matrix.py scripts/verify_phase1_dsl_matrix.py",
+          "result": "passed:4 files",
+          "evidence": "docs/acceptance/phase-1-dsl-v1/README.md"
+        },
+        {
+          "command": "backend/.venv/bin/ruff format --check backend/tests/dsl_acceptance_matrix.py scripts/run_phase1_dsl_safety.py scripts/run_phase1_dsl_matrix.py scripts/verify_phase1_dsl_matrix.py",
+          "result": "passed:4 files",
+          "evidence": "docs/acceptance/phase-1-dsl-v1/README.md"
+        }
+      ],
+      "started_at": "2026-10-09T17:12:40",
       "completed_at": null,
-      "blocker": null,
+      "blocker": "Docker runtime remains unresponsive (bounded10s probe timeout); CUA reports Mac locked. Manual unlock/OrbStack recovery required before fresh per-file safety re-run and actual media matrices. First combined run285/262pass/23fail retained; fixture isolation correction not yet verified.",
       "commit_lookup": "Task-Completed: PHASE-1-T037"
     },
     {
