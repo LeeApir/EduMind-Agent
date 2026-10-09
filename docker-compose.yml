@@ -21,7 +21,7 @@ services:
       - ./data:/workspace/data:ro
       - ${EDUMIND_MEDIA_CACHE_HOST_PATH:-./data/videos/cache}:/workspace/data/videos/cache:ro
     environment:
-      EDUMIND_KNOWLEDGE_GRAPH_PATH: /workspace/data/knowledge_graph.yaml
+      EDUMIND_KNOWLEDGE_GRAPH_VERSION: ${EDUMIND_KNOWLEDGE_GRAPH_VERSION:-mvp-0.2.0}
       EDUMIND_ANIMATION_DISPATCH: ${EDUMIND_ANIMATION_DISPATCH:-pg_poll}
       EDUMIND_PRODUCT_MODE: ${EDUMIND_PRODUCT_MODE:-catalog_only}
       EDUMIND_DATABASE_URL: postgresql+asyncpg://edumind:${EDUMIND_POSTGRES_PASSWORD:-edumind_dev_password}@postgres:5432/edumind_dev

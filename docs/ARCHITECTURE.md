@@ -98,3 +98,9 @@ T028的开发接口、API-only准备操作、原session/holder取消、无凭据
 2026-10-09用户已批准ADR-0012 A–D，见[批准登记](ADR/0012-graph-approval-20261009.json)。上述待批准段落保留提案时上下文；当前选型为Accepted，扩展结构及Repository/路径UI仍按T031–T033逐项实施与验证。
 
 T031已发布独立`data/knowledge/phase-1.1.0.json`及来源sidecar/摘要manifest，schema2保留原节点字段，30节点/69关系；严格绑定规范JSON来源摘要与节点映射，自动参考核验明确标reference_checked，不冒用人工课程签核。原10节点seed/目录包和默认图不变；版本选择、catalog依赖分离及公开故障映射在T032继续实现。加载与验证见[知识结构说明](../data/knowledge/README.md)。
+
+### T032 扩展图版本Repository
+
+按Accepted ADR-0012，`knowledge_graph_versions.py`注册历史mvp-0.2.0和phase-1.1.0；默认旧版，显式`EDUMIND_KNOWLEDGE_GRAPH_VERSION`与重启选择/回滚。注册表固定原seed及扩展manifest摘要，manifest绑定图/来源字节；已校验字节直接解析成不可变对象，按版本缓存，旧对象不因配置选择变化而改写。配置每次解析，未知/冲突版本不得返回缓存旧图。无Neo4j、新依赖或PG迁移；当前/前置/后继/相似查询及30节点实际微基准见T032测试与local-materials证据（仅进程内，不代表HTTP/数据库性能）。
+
+公共图API保留路由/ID/字段，schema_version如实为1或2；全局KnowledgeGraphValidationError映射503 GRAPH_UNAVAILABLE/no-store，不暴露异常和路径。目录校验/列表/入课使用固定历史Repository，继续签核全节点/version匹配；扩展配置不改变已审核资源和用户PG掌握度，也不打开模型/动画动态门禁。路径兼容与新增节点缺课程UI由T033接续交付。

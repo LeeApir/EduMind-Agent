@@ -13,3 +13,9 @@ schema1保持原`manual_fact_checked`历史状态；schema2使用`reference_chec
 教材基于批准清单中的GNU C、作者维护的Open Data Structures C++0.1G和OpenDSA官方材料，只记录章节/链接与自己的元数据描述，没有复制课件。C++教材不能直接作为C代码提交。新增快排/归并的上下文明确先补递归/分治；树遍历包含显式栈和层序队列；图搜索限定访问标记、连通分量与无权BFS性质；平衡搜索树只承诺红黑树概念。
 
 验证：`cd backend && .venv/bin/python -m pytest -q tests/test_expanded_knowledge_structure.py`，及原图/API/catalog包/path规则回归、改动Ruff/mypy。测试覆盖真实本地文件、缺失/非法JSON/符号链接来源、摘要/版本/课程资格伪造和关系错误；没有模型、网络获取、数据库或课程发布。
+
+T032：`EDUMIND_KNOWLEDGE_GRAPH_VERSION`默认`mvp-0.2.0`；显式设置`phase-1.1.0`后重启API使用30节点图，恢复旧值并重启可回滚。Compose透传同名变量。Repository按已批准版本和真实文件字节摘要加载（扩展manifest自身摘要固定在代码注册表），解析同一批已核验字节，避免校验后重读；进程内缓存不可变对象，不热加载磁盘编辑。旧版本对象仍可独立读取，已有PG路径快照不重写。
+
+旧`EDUMIND_KNOWLEDGE_GRAPH_PATH`兼容原seed部署定位，但内容必须符合历史签核摘要；自定义路径与扩展版本同时设置属于冲突，默认seed挂载路径除外。未知版本、缺失/损坏/符号链接发布文件或冲突配置均拒绝，HTTP统一503 `GRAPH_UNAVAILABLE`及`no-store`，不暴露文件路径，不伪造空路径。正常未知节点仍404 `GRAPH_NODE_NOT_FOUND`。`similar_for`只读取显式SIMILAR_TO关系。
+
+目录包校验、目录列表和目录入课固定使用`catalog_knowledge_graph_repository()`的历史10节点图，忽略公共图版本配置，仍核验全节点集合和原graph_version，不能把扩展节点当作已审核课程。用户掌握度/作答证据仍存PG，无schema迁移。动画资格现有历史图与ADR0011配置绑定保持；新图不自动获得动画资格。T033继续完成路径/UI的版本与可学课程区分。

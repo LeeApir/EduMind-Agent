@@ -27,6 +27,7 @@ from app.api.quiz import router as quiz_router
 from app.core.auth import AuthFailure
 from app.core.database import database_lifespan
 from app.core.product_mode import catalog_only, require_dynamic_mode
+from app.services.knowledge_graph import KnowledgeGraphValidationError
 
 app = FastAPI(title="EduMind Agent API", version="0.1.0", lifespan=database_lifespan)
 app.include_router(auth_router)
@@ -49,6 +50,22 @@ app.include_router(provider_model_catalog_router)
 app.include_router(provider_probe_router)
 app.include_router(paths_router)
 app.include_router(quiz_router)
+
+
+@app.exception_handler(KnowledgeGraphValidationError)
+async def graph_failure_handler(
+    _request: Request, _error: KnowledgeGraphValidationError
+) -> JSONResponse:
+    """Fail closed for every graph consumer, without exposing source/configuration paths."""
+    return JSONResponse(
+        status_code=503,
+        content={
+            "code": "GRAPH_UNAVAILABLE",
+            "message": "Knowledge graph unavailable.",
+            "retryable": False,
+        },
+        headers={"Cache-Control": "no-store"},
+    )
 
 
 @app.exception_handler(AuthFailure)

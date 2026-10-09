@@ -3311,6 +3311,7 @@
         "description": "公共种子图谱不包含任何用户掌握度、画像或学习记录；节点和关系均按稳定 ID 排序。",
         "operationId": "getKnowledgeGraph",
         "responses": {
+          "503": {"description": "配置图版本缺失、损坏或未批准；不回退、不返回空路径。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},
           "200": {"description": "已校验的版本化图谱。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/KnowledgeGraph"}}}}
         }
       }
@@ -3322,6 +3323,7 @@
         "operationId": "getKnowledgeNode",
         "parameters": [{"$ref": "#/components/parameters/NodeId"}],
         "responses": {
+          "503": {"description": "配置图版本缺失、损坏或未批准；不回退、不返回空路径。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},
           "200": {"description": "节点及其稳定排序的入/出关系。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/KnowledgeNodeDetail"}}}},
           "404": {"$ref": "#/components/responses/GraphNodeNotFound"}
         }
@@ -4610,7 +4612,7 @@
       "KnowledgeNodeId": {"type": "string", "pattern": "^[a-z][a-z0-9-]{1,63}$"},
       "KnowledgeNode": {"type": "object", "additionalProperties": false, "required": ["id", "name", "chapter", "difficulty", "description", "prerequisites", "learning_objectives", "common_misconceptions", "ai_context", "mastery_rule_key"], "properties": {"id": {"$ref": "#/components/schemas/KnowledgeNodeId"}, "name": {"type": "string"}, "chapter": {"type": "string"}, "difficulty": {"type": "integer", "minimum": 1, "maximum": 5}, "description": {"type": "string"}, "prerequisites": {"type": "array", "items": {"$ref": "#/components/schemas/KnowledgeNodeId"}}, "learning_objectives": {"type": "array", "minItems": 1, "items": {"type": "string"}}, "common_misconceptions": {"type": "array", "items": {"type": "string"}}, "ai_context": {"type": "string"}, "mastery_rule_key": {"type": "string"}}},
       "KnowledgeRelation": {"type": "object", "additionalProperties": false, "required": ["from", "to", "type"], "properties": {"from": {"$ref": "#/components/schemas/KnowledgeNodeId"}, "to": {"$ref": "#/components/schemas/KnowledgeNodeId"}, "type": {"type": "string", "enum": ["DEPENDS_ON", "SIMILAR_TO", "EXTENDS"]}}},
-      "KnowledgeGraph": {"type": "object", "additionalProperties": false, "required": ["schema_version", "graph_version", "nodes", "relations"], "properties": {"schema_version": {"type": "integer", "minimum": 1}, "graph_version": {"type": "string"}, "nodes": {"type": "array", "items": {"$ref": "#/components/schemas/KnowledgeNode"}}, "relations": {"type": "array", "items": {"$ref": "#/components/schemas/KnowledgeRelation"}}}},
+      "KnowledgeGraph": {"type": "object", "additionalProperties": false, "required": ["schema_version", "graph_version", "nodes", "relations"], "properties": {"schema_version": {"type": "integer", "enum": [1, 2]}, "graph_version": {"type": "string"}, "nodes": {"type": "array", "items": {"$ref": "#/components/schemas/KnowledgeNode"}}, "relations": {"type": "array", "items": {"$ref": "#/components/schemas/KnowledgeRelation"}}}},
       "KnowledgeNodeDetail": {"type": "object", "additionalProperties": false, "required": ["graph_version", "node", "incoming_relations", "outgoing_relations"], "properties": {"graph_version": {"type": "string"}, "node": {"$ref": "#/components/schemas/KnowledgeNode"}, "incoming_relations": {"type": "array", "items": {"$ref": "#/components/schemas/KnowledgeRelation"}}, "outgoing_relations": {"type": "array", "items": {"$ref": "#/components/schemas/KnowledgeRelation"}}}},
       "QuizAnswer": {"type": "object", "additionalProperties": false, "required": ["question_id", "answer"], "properties": {"question_id": {"type": "string", "minLength": 1, "maxLength": 128}, "answer": {"type": "string", "maxLength": 500, "description": "v1 固定短答案；允许空串表示未答，服务端只做版本化精确匹配。"}}},
       "QuizSubmissionRequest": {"type": "object", "additionalProperties": false, "required": ["resource_id", "resource_version", "answers"], "properties": {"resource_id": {"$ref": "#/components/schemas/Identifier"}, "resource_version": {"type": "integer", "minimum": 1}, "answers": {"type": "array", "minItems": 1, "maxItems": 10, "items": {"$ref": "#/components/schemas/QuizAnswer"}}}},

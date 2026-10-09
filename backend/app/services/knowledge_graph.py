@@ -8,7 +8,6 @@ import re
 from dataclasses import dataclass, field
 from datetime import date
 from enum import StrEnum
-from functools import lru_cache
 from graphlib import CycleError, TopologicalSorter
 from os import getenv
 from pathlib import Path
@@ -181,6 +180,17 @@ class KnowledgeGraphRepository:
         ]
         return tuple(self._nodes_by_id[successor] for successor in sorted(successors))
 
+    def similar_for(self, node_id: str) -> tuple[KnowledgeNode, ...]:
+        """Return explicit outgoing comparison neighbors in stable ID order."""
+        ids = sorted(
+            {
+                r.to_node_id
+                for r in self.outgoing_relations(node_id)
+                if r.relation_type is RelationType.SIMILAR_TO
+            }
+        )
+        return tuple(self._nodes_by_id[node] for node in ids)
+
 
 def default_knowledge_graph_path() -> Path:
     """Return the MVP seed path, overridable via env for containerized runs."""
@@ -188,10 +198,11 @@ def default_knowledge_graph_path() -> Path:
     return Path(override) if override else _DEFAULT_GRAPH_PATH
 
 
-@lru_cache(maxsize=1)
 def default_knowledge_graph_repository() -> KnowledgeGraphRepository:
-    """Load the immutable application graph once per process."""
-    return KnowledgeGraphRepository.from_file(default_knowledge_graph_path())
+    """Return the explicitly configured immutable approved graph release."""
+    from app.services.knowledge_graph_versions import configured_graph_repository
+
+    return configured_graph_repository()
 
 
 def _mapping(value: object, field: str) -> Mapping[str, object]:
