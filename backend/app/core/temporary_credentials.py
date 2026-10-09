@@ -233,6 +233,32 @@ class TemporaryCredentialRegistry(MemoryOnly):
                 with suppress(asyncio.CancelledError):
                     await entry.observer
 
+    def retire_operation(
+        self,
+        owner_id: UUID,
+        session_hash: str,
+        operation_id: UUID,
+        *,
+        purpose: str = "generation",
+    ) -> None:
+        """Erase only this owner's original session operation and its pending handles."""
+        self._assert_loop()
+        current = asyncio.current_task()
+        for handle, entry in list(self._entries.items()):
+            binding = entry.binding
+            if (
+                binding.owner_id,
+                binding.session_hash,
+                binding.operation_id,
+                binding.purpose,
+            ) == (
+                owner_id,
+                session_hash,
+                operation_id,
+                purpose,
+            ):
+                self._retire(handle, entry, cancel=entry.consumer is not current)
+
     def revoke(self, connection_id: UUID) -> None:
         """Synchronous notification after a same-process connection mutation commits."""
         self._assert_loop()

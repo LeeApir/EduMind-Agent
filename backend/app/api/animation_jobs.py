@@ -41,18 +41,32 @@ class AnimationRequest(BaseModel):
 
 def animation_job_payload(job: AnimationJob) -> dict[str, object]:
     payload: dict[str, object] = {
-        "id": str(job.id), "status": job.status,
+        "id": str(job.id),
+        "status": job.status,
         "learning_unit_id": str(job.learning_unit_id),
-        "template_id": job.template_id, "attempt": job.attempt,
-        "progress": job.progress, "last_event_id": job.last_event_id,
+        "template_id": job.template_id,
+        "attempt": job.attempt,
+        "progress": job.progress,
+        "last_event_id": job.last_event_id,
     }
     if job.media_id is not None:
         payload["media_id"] = str(job.media_id)
+    if job.render_kind == "dsl" or job.generation_id is not None:
+        payload["render_kind"] = job.render_kind
+        if job.candidate_id is not None:
+            payload["candidate_id"] = str(job.candidate_id)
+        if job.generation_id is not None:
+            payload["generation_id"] = str(job.generation_id)
+        if job.fallback_of is not None:
+            payload["fallback_of"] = str(job.fallback_of)
+        if job.fallback_reason_code is not None:
+            payload["fallback_reason_code"] = job.fallback_reason_code
     if job.retry_of is not None:
         payload["retry_of"] = str(job.retry_of)
     if job.error_code is not None:
         payload["error"] = {
-            "code": job.error_code, "message": "Animation is unavailable.",
+            "code": job.error_code,
+            "message": "Animation is unavailable.",
             "retryable": job.status == "failed",
         }
     return payload
@@ -68,20 +82,25 @@ def _conflict(code: str) -> AuthFailure:
 
 @router.post("/api/learning-units/{unit_id}/animations")
 async def request_animation(
-    unit_id: UUID, payload: AnimationRequest, response: Response,
+    unit_id: UUID,
+    payload: AnimationRequest,
+    response: Response,
     current: AuthenticatedSession = Depends(require_authenticated_session),
     idempotency_key: str = Header(min_length=16, max_length=128, alias="Idempotency-Key"),
     sessions: async_sessionmaker[AsyncSession] = Depends(database_session_factory),
 ) -> dict[str, object]:
     async with sessions() as db:
-        existing = await db.scalar(select(AnimationJob).where(
-            AnimationJob.user_id == current.user.id,
-            AnimationJob.action_kind == "request",
-            AnimationJob.idempotency_key == idempotency_key,
-        ))
+        existing = await db.scalar(
+            select(AnimationJob).where(
+                AnimationJob.user_id == current.user.id,
+                AnimationJob.action_kind == "request",
+                AnimationJob.idempotency_key == idempotency_key,
+            )
+        )
         if existing is not None:
             digest = animation_request_digest(
-                learning_unit_id=unit_id, scene_id=existing.scene_id,
+                learning_unit_id=unit_id,
+                scene_id=existing.scene_id,
                 scene_version=payload.scene_version,
                 template_id=payload.template_id,
                 template_version=payload.template_version,
@@ -95,26 +114,36 @@ async def request_animation(
                 raise _not_found() from None
             response.headers["Cache-Control"] = "no-store"
             return animation_job_payload(existing)
-        target = await db.scalar(select(LearningScene).join(
-            LearningUnit, LearningUnit.id == LearningScene.learning_unit_id,
-        ).where(
-            LearningUnit.id == unit_id,
-            LearningUnit.user_id == current.user.id,
-            LearningUnit.knowledge_point_id == payload.template_id,
-            LearningUnit.status == "ready",
-            LearningScene.scene_key == "intro",
-            LearningScene.version == payload.scene_version,
-            LearningScene.generation_status == "complete",
-            LearningScene.review_status == "passed",
-        ))
+        target = await db.scalar(
+            select(LearningScene)
+            .join(
+                LearningUnit,
+                LearningUnit.id == LearningScene.learning_unit_id,
+            )
+            .where(
+                LearningUnit.id == unit_id,
+                LearningUnit.user_id == current.user.id,
+                LearningUnit.knowledge_point_id == payload.template_id,
+                LearningUnit.status == "ready",
+                LearningScene.scene_key == "intro",
+                LearningScene.version == payload.scene_version,
+                LearningScene.generation_status == "complete",
+                LearningScene.review_status == "passed",
+            )
+        )
         if target is None:
             raise _not_found()
         try:
             reservation = await reserve_animation_job(
-                db, owner_id=current.user.id, learning_unit_id=unit_id,
-                scene_id=target.id, scene_version=payload.scene_version,
-                template_id=payload.template_id, template_version=payload.template_version,
-                parameters=payload.parameters, idempotency_key=idempotency_key,
+                db,
+                owner_id=current.user.id,
+                learning_unit_id=unit_id,
+                scene_id=target.id,
+                scene_version=payload.scene_version,
+                template_id=payload.template_id,
+                template_version=payload.template_version,
+                parameters=payload.parameters,
+                idempotency_key=idempotency_key,
                 cache=AnimationCache(),
             )
         except AnimationIdempotencyConflict:
@@ -132,7 +161,8 @@ async def request_animation(
 
 @router.get("/api/animation-jobs/{job_id}")
 async def get_animation_job(
-    job_id: UUID, response: Response,
+    job_id: UUID,
+    response: Response,
     current: AuthenticatedSession = Depends(require_authenticated_session),
     sessions: async_sessionmaker[AsyncSession] = Depends(database_session_factory),
 ) -> dict[str, object]:
@@ -148,7 +178,8 @@ async def get_animation_job(
 
 @router.post("/api/animation-jobs/{job_id}/cancel")
 async def cancel_animation(
-    job_id: UUID, response: Response,
+    job_id: UUID,
+    response: Response,
     current: AuthenticatedSession = Depends(require_authenticated_session),
     idempotency_key: str = Header(min_length=16, max_length=128, alias="Idempotency-Key"),
     sessions: async_sessionmaker[AsyncSession] = Depends(database_session_factory),
@@ -156,7 +187,9 @@ async def cancel_animation(
     async with sessions() as db:
         try:
             job = await cancel_animation_job(
-                db, owner_id=current.user.id, job_id=job_id,
+                db,
+                owner_id=current.user.id,
+                job_id=job_id,
                 idempotency_key=idempotency_key,
             )
         except AnimationTargetUnavailable:
@@ -171,7 +204,8 @@ async def cancel_animation(
 
 @router.post("/api/animation-jobs/{job_id}/retry")
 async def retry_animation(
-    job_id: UUID, response: Response,
+    job_id: UUID,
+    response: Response,
     current: AuthenticatedSession = Depends(require_authenticated_session),
     idempotency_key: str = Header(min_length=16, max_length=128, alias="Idempotency-Key"),
     sessions: async_sessionmaker[AsyncSession] = Depends(database_session_factory),
@@ -179,7 +213,9 @@ async def retry_animation(
     async with sessions() as db:
         try:
             job, created = await retry_animation_job(
-                db, owner_id=current.user.id, job_id=job_id,
+                db,
+                owner_id=current.user.id,
+                job_id=job_id,
                 idempotency_key=idempotency_key,
             )
         except AnimationTargetUnavailable:

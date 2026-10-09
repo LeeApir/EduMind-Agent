@@ -1435,7 +1435,7 @@
       "id": "PHASE-1-T028",
       "phase": "Phase 1",
       "title": "提供DSL动画Job与版本化缓存访问",
-      "status": "todo",
+      "status": "done",
       "priority": "P1",
       "depends_on": [
         "PHASE-1-T021",
@@ -1448,7 +1448,14 @@
         "backend/app/models/",
         "backend/alembic/",
         "backend/tests/",
-        "docs/api/openapi.yaml"
+        "docs/api/openapi.yaml",
+        "backend/app/core/temporary_credentials.py",
+        "backend/app/main.py",
+        "backend/app/workers/dsl_render.py",
+        "docs/PRD.md",
+        "docs/ARCHITECTURE.md",
+        "docs/DEPLOYMENT.md",
+        "docs/agents/animation-dsl-jobs-v1.md"
       ],
       "prd_source": "PRD §3.3、§7动画API",
       "acceptance_criteria": [
@@ -1460,9 +1467,30 @@
         "cd backend && .venv/bin/python -m pytest -q tests/test_dsl_animation_jobs.py",
         "对本任务改动运行Ruff和mypy；涉及持久化时在隔离PostgreSQL核验迁移及并发。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "backend/.venv/bin/python /private/tmp/edumind-t028-final2.py (isolated PG groups edumind_catalog_phase1_t025_t028_f2_dsl and edumind_catalog_phase1_t028_f2_old; alembic upgrade head, pytest -q 20 animation/DSL/queue/Provider mock test files; EDUMIND_DOCKER_TESTS=1; dedicated temporary Redis ACL on loopback15580, cleaned)",
+          "result": "passed: DSL 382 + legacy 73 = 455 tests, no skips; actual Linux Docker MP4 decode/SRT/isolation/cleanup, actual Redis/Celery ACL publish/failure recovery, real PG constraints/withdrawal/owner/publication, source-qualified cache, POST SSE/default budget denial/original active disconnect/observer/ASGI cancellation. Initial final-v1 failure retained: historical test DB-name safety prefix and preclaim hash timing corrected in tests; legacy full-table cleanup isolated rather than weakening new history FKs. No real Provider calls or drawing-quality claims.",
+          "evidence": "local-materials/phase-1-t028/checks/final-v2-dsl.txt; final-v2-legacy.txt; run_final_checks.py"
+        },
+        {
+          "command": "backend/.venv/bin/python /private/tmp/edumind-t028-races.py; backend/.venv/bin/python /private/tmp/edumind-t028-migrations.py",
+          "result": "passed: additional 9 actual-PG selected concurrency tests, 7 explicitly deselected already covered by full suite; holder cancellation/handoff contenders prove both lock orders and zero-Job/retained-Job outcomes; concurrent repeat fallback returns one distinct child; temporary operation cleanup preserves unrelated model_refresh purpose. Preparation 3 passed, 5 explicitly deselected; final0024/0025 empty up/down/up and retained preparation downgrade refusal. Docker daemon became unavailable before setup; restored existing OrbStack/test containers, then both validations passed, no production restart/deployment.",
+          "evidence": "local-materials/phase-1-t028/checks/races-v1.txt; prep-v7.txt; run_race_checks.py; run_migration_checks.py"
+        },
+        {
+          "command": "backend/.venv/bin/python /private/tmp/edumind-t028-media-final.py (isolated PG; cd backend && .venv/bin/python -m pytest -q tests/test_dsl_animation_jobs.py; actual Docker)",
+          "result": "passed: all 8 T028 Job tests, no skips; final symlink-root error converted to fixed MEDIA_UNAVAILABLE with actual private MP4/SRT provenance, HTTP range/download source headers, corruption/withdrawal/history/GC preservation and both cancellation/handoff lock contenders.",
+          "evidence": "local-materials/phase-1-t028/checks/media-final-v1.txt; run_media_checks.py"
+        },
+        {
+          "command": "Ruff check/format --check all34 changed Python files; cd backend && .venv/bin/mypy 25 changed app sources; check_provider_contract.py; check_catalog_workflow.py; verify_phase1_dynamic_approval.py; Animation Draft202012 schema validation; git diff --check",
+          "result": "passed: lint/format/mypy; OpenAPI564refs/63uniqueoperations/85validatedexamples/15implementedroutes; dependency/archive/ADR0011 historical approval integrity preserved; self diff reviewed, no secrets/media/ignored evidence staged. catalog_only and default DSL budget deny remain; Provider0; T033 remains historical blocked; T029 not claimed. Local commit only, no push/merge/deployment.",
+          "evidence": "local-materials/phase-1-t028/checks/static-final.txt; docs/agents/animation-dsl-jobs-v1.md"
+        }
+      ],
+      "started_at": "2026-10-08T16:47:38",
+      "completed_at": "2026-10-09T12:31:18",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T028"
     },

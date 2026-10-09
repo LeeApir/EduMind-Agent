@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import json
 import os
 import re
 from collections.abc import AsyncIterator, Callable
@@ -74,22 +75,33 @@ async def _chunks(file: VerifiedMediaFile, *, start: int, end: int) -> AsyncIter
 
 
 async def _read_media(
-    media_id: UUID, *, extension: str, download: bool, range_header: str | None,
-    current: AuthenticatedSession, sessions: async_sessionmaker[AsyncSession],
+    media_id: UUID,
+    *,
+    extension: str,
+    download: bool,
+    range_header: str | None,
+    current: AuthenticatedSession,
+    sessions: async_sessionmaker[AsyncSession],
 ) -> StreamingResponse | JSONResponse:
     async with sessions() as db:
         media = await owned_reviewed_media(
-            db, owner_id=current.user.id, media_id=media_id,
+            db,
+            owner_id=current.user.id,
+            media_id=media_id,
         )
         if media is None:
             raise AuthFailure(404, "NOT_FOUND", "Animation media not found.")
     try:
         file = await asyncio.to_thread(
-            open_verified_media, media, extension=extension, cache=AnimationCache(),
+            open_verified_media,
+            media,
+            extension=extension,
+            cache=AnimationCache(),
         )
     except MediaUnavailable:
         raise AuthFailure(
-            503, "MEDIA_UNAVAILABLE",
+            503,
+            "MEDIA_UNAVAILABLE",
             "Animation media is unavailable. Request a new animation job to restore it.",
         ) from None
     bounds = _range(range_header, file.size) if extension == "mp4" else (0, file.size - 1)
@@ -98,7 +110,8 @@ async def _read_media(
         return JSONResponse(
             status_code=416,
             content={
-                "code": "RANGE_NOT_SATISFIABLE", "message": "Requested range is unavailable.",
+                "code": "RANGE_NOT_SATISFIABLE",
+                "message": "Requested range is unavailable.",
                 "retryable": False,
             },
             headers={"Content-Range": f"bytes */{file.size}", "Cache-Control": "private, no-store"},
@@ -113,16 +126,26 @@ async def _read_media(
         ),
         "Content-Length": str(end - start + 1),
         "X-Animation-Media-ID": str(media.id),
-        "X-Animation-Template-ID": media.template_id,
-        "X-Animation-Template-Version": media.template_version,
         "X-Animation-Subtitle-Version": media.subtitle_version,
         "X-Animation-Review-Version": media.review_rule_version,
         "X-Animation-Content-SHA256": (
             media.mp4_sha256 if extension == "mp4" else media.srt_sha256
         ),
-        "X-Animation-Generated-By": "reviewed-manim-template",
+        "X-Animation-Generated-By": (
+            "reviewed-manim-dsl" if media.render_kind == "dsl" else "reviewed-manim-template"
+        ),
         "X-Animation-Published-At": media.published_at.astimezone(timezone.utc).isoformat(),
     }
+    if media.render_kind == "template":
+        if media.template_id is None or media.template_version is None:
+            file.close()
+            raise AuthFailure(404, "NOT_FOUND", "Animation media not found.")
+        headers["X-Animation-Template-ID"] = media.template_id
+        headers["X-Animation-Template-Version"] = media.template_version
+    else:
+        headers["X-Animation-Source-Versions"] = json.dumps(
+            media.source_versions, sort_keys=True, ensure_ascii=True
+        )
     if extension == "mp4":
         headers["Accept-Ranges"] = "bytes"
         if partial:
@@ -138,24 +161,34 @@ async def _read_media(
 
 @router.get("/api/animation-media/{media_id}/mp4", response_model=None)
 async def animation_mp4(
-    media_id: UUID, download: bool = False,
+    media_id: UUID,
+    download: bool = False,
     range_header: str | None = Header(default=None, alias="Range"),
     current: AuthenticatedSession = Depends(require_authenticated_session),
     sessions: async_sessionmaker[AsyncSession] = Depends(database_session_factory),
 ) -> StreamingResponse | JSONResponse:
     return await _read_media(
-        media_id, extension="mp4", download=download, range_header=range_header,
-        current=current, sessions=sessions,
+        media_id,
+        extension="mp4",
+        download=download,
+        range_header=range_header,
+        current=current,
+        sessions=sessions,
     )
 
 
 @router.get("/api/animation-media/{media_id}/srt", response_model=None)
 async def animation_srt(
-    media_id: UUID, download: bool = False,
+    media_id: UUID,
+    download: bool = False,
     current: AuthenticatedSession = Depends(require_authenticated_session),
     sessions: async_sessionmaker[AsyncSession] = Depends(database_session_factory),
 ) -> StreamingResponse | JSONResponse:
     return await _read_media(
-        media_id, extension="srt", download=download, range_header=None,
-        current=current, sessions=sessions,
+        media_id,
+        extension="srt",
+        download=download,
+        range_header=None,
+        current=current,
+        sessions=sessions,
     )

@@ -61,6 +61,33 @@ def policy_manifest() -> dict[str, object]:
         "review_gateway": hashlib.sha256(
             (Path(__file__).parent / "animation_dsl_review_gateway.py").read_bytes()
         ).hexdigest(),
+        "dsl_media_cache": hashlib.sha256(
+            (Path(__file__).parent / "animation_dsl_media_cache.py").read_bytes()
+        ).hexdigest(),
+        "dsl_publication": hashlib.sha256(
+            (Path(__file__).parent / "animation_dsl_publication.py").read_bytes()
+        ).hexdigest(),
+        "preparation": hashlib.sha256(
+            (Path(__file__).parent / "animation_preparation.py").read_bytes()
+        ).hexdigest(),
+        "handoff": hashlib.sha256(
+            (Path(__file__).parent / "animation_dsl_handoff.py").read_bytes()
+        ).hexdigest(),
+        "selected_flow": hashlib.sha256(
+            (Path(__file__).parent / "animation_dsl_flow.py").read_bytes()
+        ).hexdigest(),
+        "render_failure": hashlib.sha256(
+            (Path(__file__).parent / "animation_dsl_failure.py").read_bytes()
+        ).hexdigest(),
+        "private_gc": hashlib.sha256(
+            (Path(__file__).parent / "animation_dsl_gc.py").read_bytes()
+        ).hexdigest(),
+        "preparation_api": hashlib.sha256(
+            (Path(__file__).parents[1] / "api/animation_generation.py").read_bytes()
+        ).hexdigest(),
+        "job_qualification": hashlib.sha256(
+            (Path(__file__).parent / "animation_job_qualification.py").read_bytes()
+        ).hexdigest(),
         "dsl_renderer": hashlib.sha256(
             (Path(__file__).parent / "animation_dsl_renderer.py").read_bytes()
         ).hexdigest(),

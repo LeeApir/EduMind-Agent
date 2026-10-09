@@ -6,7 +6,7 @@
 
 后端依赖使用 `backend/uv.lock`，前端使用 `web/pnpm-lock.yaml`。安装和Compose启动见[README](../README.md)。私有 `.env` 只配置本地数据库密码；目录版显式设置 `EDUMIND_PRODUCT_MODE=catalog_only` 并将三项 `EDUMIND_PROVIDER_*` 连接凭据置空。缺少或无效产品模式也关闭动态能力；`dynamic` 只保留给另行授权的历史开发回归，不用于目录交付。
 
-Compose的API启动先执行 `alembic upgrade head`；目录版退出时迁移链到 `0017_catalog_immutability`；Phase 1 开发链现增量到 `0022_animation_attempts`（目标部署仍需另行核验）。API、Web、PostgreSQL只绑定 `127.0.0.1` 的8000、5173、15432，可用配置覆盖端口。数据目录和媒体只读挂给API；学生无上传课程或在线发布接口。健康检查只表示服务活着，不表示已登记课程。
+Compose的API启动先执行 `alembic upgrade head`；目录版退出时迁移链到 `0017_catalog_immutability`；Phase 1 开发链现增量到 `0025_animation_dsl_media`（目标部署仍需另行核验）。API、Web、PostgreSQL只绑定 `127.0.0.1` 的8000、5173、15432，可用配置覆盖端口。数据目录和媒体只读挂给API；学生无上传课程或在线发布接口。健康检查只表示服务活着，不表示已登记课程。
 
 ## 人工签核和受信登记
 
@@ -65,3 +65,7 @@ Worker 先在 PostgreSQL 校验当前 owner、目标/场景版本、独立审核
 性能证据适用于本机单并发、固定浏览器/镜像和冻结工作树；“冷首屏”是新owner/浏览器/单元，API/DB进程仍热。不能据此承诺公网、高并发或全进程冷启动性能。详细门槛、原始结果及失败记录见[退出报告](acceptance/mvp-0.3-catalog-exit-20261003.md)。
 
 T034验收工作树中仍保留未提交的旧T033代码和证据；它们未纳入T034提交。当时的hash核验只证明冻结工作树一致。之后已对交付提交 `c7831d1` 建立干净checkout，锁定依赖新安装、生产Web构建、目录离线回归、新隔离库迁移及构建产物浏览器冒烟通过，见[已提交版本验证](acceptance/mvp-0.3-clean-checkout-20261003.md)。旧退出脚本依赖原 `.env` 和历史实验，不能直接在该checkout通过，原失败及冻结文件保留。此次不重跑媒体渲染/性能矩阵、不构建新部署镜像；未来部署前仍需固定实际发布源码、迁移/依赖/镜像及签核配置，补目标环境验证，不得自动启用动态能力、重开Provider测试或启动Phase 1。
+
+## T028 DSL Job开发实现
+
+[DSL Job v1](agents/animation-dsl-jobs-v1.md)新增API准备/SSE和owner私有Job/media来源；默认catalog_only拒绝动态路由，服务端DSL模型预算默认拒绝。临时凭据仅API内存，Worker无Provider权限，显式pg_poll/celery切换仍用旧运维函数名route_queued_template_jobs并兼容DSL资格。私有DSL缓存部署目录必须持久保存且只由API/Worker维护；显式GC以同namespace/key锁及非锁定PG引用检查保留正式文件，旧孤儿最短24h。0024/0025有保留新来源时拒绝降级；生产迁移/清理/部署未执行。T028验收为隔离PG、Redis、实际Linux容器和mock模型，不能替代真实模型画面/开放验收。

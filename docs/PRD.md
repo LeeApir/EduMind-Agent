@@ -363,9 +363,11 @@ queued → planning → generating → reviewing → ready
 
 该流水线与 OpenMAIC **不相同**：OpenMAIC 的视频能力主要调用生成式视频 Provider 获得媒体片段，并支持把课堂时间线渲染/导出为视频；EduMind 使用动画 DSL、模板编译器与 Manim 确定性渲染数据结构和算法过程，重点是步骤准确、可复现、可审查。两者共享分阶段、异步 Job、场景复用和导出思想，但不共享视频底层实现。
 
-P0 不开放任意主题的 LLM 动画生成，只提供链表插入、链表删除和指针移动等 2-3 个预渲染/参数化模板。P1 完整生成仅开放 `create_node`、`connect`、`disconnect`、`move_pointer`、`highlight`、`compare`、`swap`、`visit` 和 `show_complexity` 等动画动作。模型不得直接提交任意 Python；DSL 校验或渲染失败时自动降级到已验证模板。
+P0 不开放任意主题的 LLM 动画生成，只提供链表插入、链表删除和指针移动等 2-3 个预渲染/参数化模板。P1 完整生成仅开放 `create_node`、`connect`、`disconnect`、`move_pointer`、`highlight`、`compare`、`swap`、`visit` 和 `show_complexity` 等动画动作。模型不得直接提交任意 Python；按已批准[ADR-0010](ADR/0010-constrained-animation-dsl.md)，失败降级须原请求明确允许、目标与参数存在合法模板且原会话授权仍有效，最终渲染失败创建独立模板Job，不覆盖原DSL失败终态或循环降级。
 
 缓存优先级固定为“预渲染资源 → 参数化模板 → P1 完整 DSL 生成”。缓存键包含知识点、模板版本、参数和语言；同一输入必须复用已审核资源。
+
+P1的已审核DSL文本及媒体按owner隔离；复用还须匹配目标/参考/图谱、当前模型来源与Prompt/采样、审核/编译/runtime版本，凭据版本不进入内容键。撤回阻止新Job、发布及读取，历史成功终态保留。API模型准备操作与无凭据渲染Job分开持久化：原session/holder、最多2个活跃操作、≤180秒绝对deadline与有界独立审核；只有原POST断线取消准备，观察连接不接管。详情见[DSL Job v1](agents/animation-dsl-jobs-v1.md)。这些开发实现不代表动态入口或真实Provider预算已开放。
 
 #### 验收标准
 
@@ -1093,6 +1095,16 @@ services:
 | POST | `/api/jobs/{job_id}/retry` | 从可恢复阶段幂等重试失败任务 |
 
 MVP 0.1 的正式资源读取以 `/api/resource/{id}` 为规范路径；已发布 OpenAPI 中的 `/api/resources/{id}` 暂作兼容别名，使用相同的身份和审核过滤。
+
+Phase 1 T028的动画实际接口保留旧 `POST /api/learning-units/{id}/animations` 模板JSON回执，新增以下开发契约，受catalog_only及独立模型预算门禁保护：
+
+| 方法 | 路径 | 用途 |
+|---|---|---|
+| POST | `/api/learning-units/{unit_id}/animations/generate` | owner/原session/CSRF/幂等绑定的POST SSE准备流程；body只含scene/version、固定goal和有界整数参数 |
+| GET | `/api/animation-preparations/{operation_id}` | 安全快照/原Job引用，不接管持有者或后台重放模型 |
+| POST | `/api/animation-preparations/{operation_id}/cancel` | 原session/CSRF/幂等取消准备；handoff后使用既有Job cancel |
+
+渲染继续使用 `/api/animation-jobs/{job_id}` 查询/取消/重试及GET EventSource，媒体使用既有owner绑定MP4/SRT接口。Job/media增量保存互斥template/dsl来源、owner/candidate/目标复合约束和固定fallback来源；DSL不使用假模板身份。精确字段、头部和事件见[OpenAPI](api/openapi.yaml)，保留数据迁移回退拒绝见ADR-0010。
 
 ### 7.4 知识图谱与路径 API
 

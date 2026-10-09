@@ -154,15 +154,17 @@ async def seed(sessions, *, bad_hash=False):
             request_digest=digest({"candidate": str(cid), "scene": str(ids[2])}),
             parameters_digest=digest(parameters),
             parameters=parameters,
-            template_id="animation-dsl",
-            template_version=compiled.compiler_version,
+            template_id=None,
+            template_version=None,
+            render_kind="dsl",
+            candidate_id=cid,
             review_rule_version=REVIEW_VERSION,
             source_sha256="f" * 64 if bad_hash else compiled.source_sha256,
             image_digest=IMAGE.split("@", 1)[1],
             font_digest=FONT_DIGEST,
             renderer_config_sha256=renderer.renderer_identity(),
             subtitle_version="animation-dsl-subtitles-v1",
-            cache_key=dsl_cache_key(compiled, outcome.binding_sha256),
+            cache_key=dsl_cache_key(compiled, outcome.binding_sha256, ids[0]),
             status="queued",
             progress=0,
         )
@@ -186,7 +188,11 @@ def test_pg_unqualified_dsl_never_starts_container(
         engine = create_database_engine(URL)
         sessions = async_sessionmaker(engine, expire_on_commit=False)
         try:
-            lease, cid = await seed(sessions, bad_hash=failure == "hash")
+            lease, cid = await seed(sessions)
+            if failure == "hash":
+                async with sessions() as db, db.begin():
+                    job = await db.get(AnimationJob, lease.job_id)
+                    job.source_sha256 = "f" * 64
             if failure == "withdrawn":
                 async with sessions() as db, db.begin():
                     await revoke_candidate(db, GRAPH, owner=lease.owner_id, candidate_id=cid)
@@ -195,6 +201,33 @@ def test_pg_unqualified_dsl_never_starts_container(
             async with sessions() as db:
                 job = await db.get(AnimationJob, lease.job_id)
                 assert job.status == "failed" and job.media_id is None and job.lease_token is None
+        finally:
+            await engine.dispose()
+
+    asyncio.run(exercise())
+    assert not calls
+
+
+@pytest.mark.skipif(not URL, reason="dedicated PostgreSQL required")
+def test_pg_queued_invalid_identity_rejected_before_new_claim(monkeypatch, dynamic_test_mode):
+    calls = []
+    monkeypatch.setattr(renderer, "_docker", lambda *a, **k: calls.append(a))
+
+    async def exercise():
+        engine = create_database_engine(URL)
+        sessions = async_sessionmaker(engine, expire_on_commit=False)
+        try:
+            lease, _ = await seed(sessions)
+            async with sessions() as db, db.begin():
+                job = await db.get(AnimationJob, lease.job_id)
+                job.status = "queued"
+                job.lease_token = job.lease_expires_at = None
+                job.source_sha256 = "f" * 64
+            assert await claim_animation_job(sessions) is None
+            async with sessions() as db:
+                job = await db.get(AnimationJob, lease.job_id)
+                assert job.status == "failed" and job.error_code == "ANIMATION_TARGET_UNAVAILABLE"
+                assert job.attempt == 1 and job.media_id is None
         finally:
             await engine.dispose()
 

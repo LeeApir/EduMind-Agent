@@ -34,8 +34,10 @@ class ReviewedDSLCandidateCache:
         graph: KnowledgeGraphRepository,
         *,
         owner: UUID,
+        expected_sources: tuple[ModelSource, ModelSource] | None = None,
     ):
         self.factory, self.graph, self.owner = factory, graph, owner
+        self.expected_sources = expected_sources
 
     async def lookup(self, intent: VideoIntent, reference: DSLReference) -> DSLReviewOutcome | None:
         payload = intent.payload()
@@ -72,6 +74,15 @@ class ReviewedDSLCandidateCache:
                         data["sampling_sha256"],
                     )
                     source = ModelSource(**record.evidence["review_source"])
+                    if self.expected_sources is not None and (generation.source, source) != (
+                        self.expected_sources
+                    ):
+                        continue
+                    if self.expected_sources is not None:
+                        from app.agents.animation_dsl_generation import SAMPLING
+
+                        if generation.sampling_sha256 != digest(SAMPLING):
+                            continue
                     bound = binding(compiled, reference, generation, canonical(payload))
                     reviewed = digest(
                         {

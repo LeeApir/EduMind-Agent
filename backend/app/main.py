@@ -5,6 +5,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
 from app.api.animation_events import router as animation_events_router
+from app.api.animation_generation import router as animation_generation_router
 from app.api.animation_jobs import router as animation_jobs_router
 from app.api.animation_media import router as animation_media_router
 from app.api.auth import router as auth_router
@@ -33,6 +34,7 @@ app.include_router(catalog_router)
 app.include_router(classroom_router)
 app.include_router(debate_router, dependencies=[Depends(require_dynamic_mode)])
 app.include_router(animation_jobs_router)
+app.include_router(animation_generation_router)
 app.include_router(animation_media_router)
 app.include_router(animation_events_router)
 app.include_router(knowledge_graph_router)

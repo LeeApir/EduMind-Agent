@@ -729,11 +729,37 @@ def test_pg_migration_downgrade_refuses_existing_review_data():
     from urllib.parse import urlsplit
 
     assert re.fullmatch(r"/edumind_catalog_phase1_t025_[a-z0-9_]+", urlsplit(URL).path)
+    # Exercise the historical 0023 refusal in its own 0023 database. Newer migrations
+    # have their own retained-data gates and must not mask the candidate-specific check.
+    sys.path.insert(0, str(ROOT / "scripts"))
+    from run_catalog_db_tests import test_environment
+
+    env = test_environment("edumind_catalog_phase1_t025_drain_" + uuid4().hex[:8])
     env = {
-        k: v
-        for k, v in os.environ.items()
-        if not k.startswith(("EDUMIND_PROVIDER", "EDUMIND_CREDENTIAL"))
+        k: v for k, v in env.items() if not k.startswith(("EDUMIND_PROVIDER", "EDUMIND_CREDENTIAL"))
     }
+    subprocess.run(
+        [sys.executable, "-m", "alembic", "upgrade", "0023_animation_dsl_reviews"],
+        cwd=ROOT / "backend",
+        env=env,
+        capture_output=True,
+        check=True,
+        timeout=20,
+    )
+    isolated_url = env["EDUMIND_TEST_DATABASE_URL"]
+
+    async def seed_baseline():
+        engine = create_database_engine(isolated_url)
+        sessions = async_sessionmaker(engine, expire_on_commit=False)
+        try:
+            async with sessions() as db, db.begin():
+                await admit_current_policy(db)
+            ids = await target(sessions)
+            await save(sessions, ids, await reviewed(sessions, ids))
+        finally:
+            await engine.dispose()
+
+    asyncio.run(seed_baseline())
     response = subprocess.run(
         [sys.executable, "-m", "alembic", "downgrade", "0022_animation_attempts"],
         cwd=ROOT / "backend",
@@ -745,7 +771,7 @@ def test_pg_migration_downgrade_refuses_existing_review_data():
     assert response.returncode != 0 and "DSL_CANDIDATES_REQUIRE_DRAIN" in response.stderr
 
     async def exercise():
-        engine = create_database_engine(URL)
+        engine = create_database_engine(isolated_url)
         try:
             async with engine.connect() as db:
                 assert (

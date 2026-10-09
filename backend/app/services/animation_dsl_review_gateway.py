@@ -1,6 +1,8 @@
 """Bind independent DSL review to a server-selected, authorized Provider route."""
 
 import hashlib
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 import httpx
@@ -16,6 +18,7 @@ from app.services.provider_connections import ProviderConnectionStore
 from app.services.provider_gateway import (
     ProviderError,
     ProviderErrorCode,
+    ProviderGateway,
     StructuredRequest,
     TaskProfile,
 )
@@ -40,9 +43,13 @@ class SelectedDSLReviewGateway:
         *,
         registry: TemporaryCredentialRegistry | None = None,
         transport: httpx.AsyncBaseTransport | None = None,
+        shared_gateway: ProviderGateway | None = None,
+        target_log: list[ApprovedTarget] | None = None,
     ) -> None:
         self.store, self.dispatch, self.authorize = store, dispatch, authorize
         self.registry, self.transport = registry, transport
+        self.shared_gateway = shared_gateway
+        self.target_log = target_log if target_log is not None else []
 
     async def review_structured(self, request: StructuredRequest) -> ReviewCall:
         if request.prompt.task_profile is not TaskProfile.REVIEW:
@@ -63,18 +70,14 @@ class SelectedDSLReviewGateway:
             raise ProviderError(ProviderErrorCode.CAPABILITY_UNAVAILABLE)
         adapter_file = Path(__file__).parent / _ADAPTERS[provider_type]
         adapter_hash = hashlib.sha256(adapter_file.read_bytes()).hexdigest()
-        targets: list[ApprovedTarget] = []
-        async with build_connection_provider_gateway(
-            self.store,
-            self.dispatch,
-            self.authorize,
-            registry=self.registry,
-            transport=self.transport,
-            target_observer=targets.append,
-        ) as gateway:
+        targets = self.target_log if self.shared_gateway is not None else []
+        offset = len(targets)
+        async with self._gateway(targets) as gateway:
             result = await gateway.generate_structured(request, retry_safe=False)
+        observed = targets[offset:]
         if (
-            len(targets) != 1
+            len(observed) != 1
+            or result.model_id != self.dispatch.route.model_id
             or hashlib.sha256(adapter_file.read_bytes()).hexdigest() != adapter_hash
         ):
             raise ProviderError(ProviderErrorCode.INVALID_OUTPUT)
@@ -87,7 +90,7 @@ class SelectedDSLReviewGateway:
                 target_sha256=digest(
                     {
                         "provider_type": provider_type,
-                        "target": targets[0].url,
+                        "target": observed[0].url,
                         "selected_model": self.dispatch.route.model_id,
                     }
                 ),
@@ -95,3 +98,19 @@ class SelectedDSLReviewGateway:
         except ValueError:
             raise ProviderError(ProviderErrorCode.INVALID_OUTPUT) from None
         return ReviewCall(result, source)
+
+    @asynccontextmanager
+    async def _gateway(self, targets: list[ApprovedTarget]) -> AsyncIterator[ProviderGateway]:
+        # One API operation task can own a single temporary lease across bounded corrections/review.
+        if self.shared_gateway is not None:
+            yield self.shared_gateway
+        else:
+            async with build_connection_provider_gateway(
+                self.store,
+                self.dispatch,
+                self.authorize,
+                registry=self.registry,
+                transport=self.transport,
+                target_observer=targets.append,
+            ) as gateway:
+                yield gateway

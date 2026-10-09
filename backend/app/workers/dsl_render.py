@@ -11,6 +11,7 @@ from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.agents.animation_dsl_review import REVIEW_VERSION, digest
+from app.models.animation import AnimationJob
 from app.models.animation_dsl import DSLReviewRecord
 from app.services.animation_cache import FONT_DIGEST
 from app.services.animation_dsl_candidates import DSLCandidateUnavailable, qualified_candidate
@@ -43,9 +44,10 @@ class DSLRenderResult:
     error_code: str | None = None
 
 
-def dsl_cache_key(compiled: CompiledDSL, binding_sha256: str) -> str:
+def dsl_cache_key(compiled: CompiledDSL, binding_sha256: str, owner_id: UUID) -> str:
     return digest(
         {
+            "owner_namespace": digest({"private_dsl_owner_v1": str(owner_id)}),
             "compiler_identity": compiled.identity_sha256,
             "binding": binding_sha256,
             "renderer": renderer_identity(),
@@ -65,44 +67,58 @@ async def qualify_dsl_job(
     # No host lock/container call is made while this transaction holds the Job row.
     async with sessions() as db:
         job = await _locked_current_job(db, lease)
-        if (
-            job is None
-            or job.template_id != "animation-dsl"
-            or job.parameters != {"candidate_id": str(candidate_id)}
-        ):
+        if job is None:
             raise DSLCandidateUnavailable()
-        candidate = await qualified_candidate(
-            db, graph, owner=lease.owner_id, candidate_id=candidate_id
-        )
-        if (candidate.learning_unit_id, candidate.scene_id, candidate.scene_version) != (
-            job.learning_unit_id,
-            job.scene_id,
-            job.scene_version,
-        ):
-            raise DSLCandidateUnavailable()
-        record = await db.get(DSLReviewRecord, candidate.review_id)
-        if record is None:
-            raise DSLCandidateUnavailable()
-        compiled = await asyncio.to_thread(
-            compile_animation_dsl,
-            candidate.canonical_dsl,
-            knowledge_point_id=job_knowledge_point(candidate.canonical_dsl),
-        )
-        key = dsl_cache_key(compiled, record.binding_sha256)
-        if (
-            record.evidence.get("identity") != compiled.identity_sha256
-            or record.evidence.get("compiled_source") != compiled.source_sha256
-            or job.cache_key != key
-            or job.source_sha256 != compiled.source_sha256
-            or job.template_version != compiled.compiler_version
-            or job.review_rule_version != REVIEW_VERSION
-            or job.image_digest != IMAGE.split("@", 1)[1]
-            or job.font_digest != FONT_DIGEST
-            or job.renderer_config_sha256 != renderer_identity()
-            or job.subtitle_version != "animation-dsl-subtitles-v1"
-        ):
-            raise DSLCandidateUnavailable()
-        return DSLRenderQualification(candidate_id, compiled, record.binding_sha256, key)
+        return await qualification_in_transaction(db, graph, job, candidate_id)
+
+
+async def qualification_in_transaction(
+    db: AsyncSession,
+    graph: KnowledgeGraphRepository,
+    job: AnimationJob,
+    candidate_id: UUID,
+    *,
+    lock: bool = False,
+) -> DSLRenderQualification:
+    if (
+        job.render_kind != "dsl"
+        or job.candidate_id != candidate_id
+        or job.template_id is not None
+        or job.template_version is not None
+        or job.parameters != {"candidate_id": str(candidate_id)}
+    ):
+        raise DSLCandidateUnavailable()
+    candidate = await qualified_candidate(
+        db, graph, owner=job.user_id, candidate_id=candidate_id, lock=lock
+    )
+    if (candidate.learning_unit_id, candidate.scene_id, candidate.scene_version) != (
+        job.learning_unit_id,
+        job.scene_id,
+        job.scene_version,
+    ):
+        raise DSLCandidateUnavailable()
+    record = await db.get(DSLReviewRecord, candidate.review_id)
+    if record is None:
+        raise DSLCandidateUnavailable()
+    compiled = await asyncio.to_thread(
+        compile_animation_dsl,
+        candidate.canonical_dsl,
+        knowledge_point_id=job_knowledge_point(candidate.canonical_dsl),
+    )
+    key = dsl_cache_key(compiled, record.binding_sha256, job.user_id)
+    if (
+        record.evidence.get("identity") != compiled.identity_sha256
+        or record.evidence.get("compiled_source") != compiled.source_sha256
+        or job.cache_key != key
+        or job.source_sha256 != compiled.source_sha256
+        or job.review_rule_version != REVIEW_VERSION
+        or job.image_digest != IMAGE.split("@", 1)[1]
+        or job.font_digest != FONT_DIGEST
+        or job.renderer_config_sha256 != renderer_identity()
+        or job.subtitle_version != "animation-dsl-subtitles-v1"
+    ):
+        raise DSLCandidateUnavailable()
+    return DSLRenderQualification(candidate_id, compiled, record.binding_sha256, key)
 
 
 def job_knowledge_point(raw: str) -> str:
@@ -122,6 +138,7 @@ async def render_dsl_job(
     *,
     work_root: Path | None = None,
     complete: Callable[[DSLRenderResult], Awaitable[bool]] | None = None,
+    failure: Callable[[str], Awaitable[bool]] | None = None,
 ) -> DSLRenderResult:
     controller = RenderHost(sessions, lease.token, asyncio.get_running_loop())
     stop = asyncio.Event()
@@ -148,12 +165,15 @@ async def render_dsl_job(
         if refreshed != qualification:
             raise DSLCandidateUnavailable()
         result = DSLRenderResult(media, qualification)
-        # Final binding/current-qualification CAS is supplied by T028, while heartbeat remains alive.
+        # T028 publication callback checks binding/current qualification with heartbeat alive.
         if complete is not None and not await complete(result):
             raise DSLCandidateUnavailable()
         return result  # Rendering success alone does not mark Job succeeded or grant media access.
     except asyncio.CancelledError:
-        await fail_animation_job(sessions, lease, code="DSL_RENDER_INTERRUPTED")
+        if failure is None:
+            await fail_animation_job(sessions, lease, code="DSL_RENDER_INTERRUPTED")
+        else:
+            await failure("DSL_RENDER_INTERRUPTED")
         await asyncio.to_thread(controller.stop)
         # Cancelling an asyncio waiter does not stop its thread. Reap any late local output.
         if render_task is not None:
@@ -178,7 +198,10 @@ async def render_dsl_job(
             "DSL_RENDER_RESOURCE_LIMIT",
         }:
             code = "DSL_RENDER_UNAVAILABLE"
-        await fail_animation_job(sessions, lease, code=code)
+        if failure is None:
+            await fail_animation_job(sessions, lease, code=code)
+        else:
+            await failure(code)
         return DSLRenderResult(error_code=code)
     finally:
         stop.set()

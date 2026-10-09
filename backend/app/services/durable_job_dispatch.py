@@ -305,7 +305,7 @@ async def route_queued_template_jobs(
     """Explicit operator migration/rollback only; never rewrite active leases or terminal jobs."""
     if backend not in ("pg_poll", "celery") or not 1 <= len(job_ids) <= 100:
         raise ValueError("INVALID_DISPATCH_MIGRATION")
-    from app.services.catalog_animation_access import animation_target_approved
+    from app.services.animation_job_qualification import animation_job_approved
 
     async with sessions() as db:
         jobs = (
@@ -324,18 +324,12 @@ async def route_queued_template_jobs(
         for job in jobs:
             if job.dispatch_backend == backend:
                 continue
-            if job.template_id not in ("linked-list-insertion", "linked-list-deletion"):
-                raise ValueError("RENDERER_UNAVAILABLE")
-            if not await animation_target_approved(
-                db,
-                owner_id=job.user_id,
-                unit_id=job.learning_unit_id,
-                scene_id=job.scene_id,
-                scene_version=job.scene_version,
-                template_id=job.template_id,
-                template_version=job.template_version,
-                lock_release=True,
+            if job.render_kind == "template" and job.template_id not in (
+                "linked-list-insertion",
+                "linked-list-deletion",
             ):
+                raise ValueError("RENDERER_UNAVAILABLE")
+            if not await animation_job_approved(db, job, lock=True):
                 raise ValueError("ANIMATION_TARGET_UNAVAILABLE")
             rows = (
                 await db.scalars(

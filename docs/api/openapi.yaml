@@ -36,6 +36,246 @@
     }
   ],
   "paths": {
+    "/api/learning-units/{unit_id}/animations/generate": {
+      "post": {
+        "tags": [
+          "Animation"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "x-implementation-task": "PHASE-1-T028",
+        "x-runtime-status": "implemented",
+        "operationId": "generateAnimation",
+        "summary": "按需生成已审核动画并交付渲染Job",
+        "parameters": [
+          {
+            "name": "unit_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/CsrfToken"
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "name": "X-Animation-Operation-ID",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "UUIDv4非秘密相关ID；预上传temporary handle绑定相同operation/purpose=generation。服务端holder token另行随机生成，不回传。"
+          },
+          {
+            "name": "X-Animation-Quality-Handle",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 32,
+              "maxLength": 200
+            },
+            "description": ""
+          },
+          {
+            "name": "X-Animation-Review-Handle",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 32,
+              "maxLength": 200
+            },
+            "description": ""
+          },
+          {
+            "name": "X-Animation-Allow-Template-Fallback",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "description": "同目标/参数合法模板降级授权；缺省拒绝。不得延长原session expiry。"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnimationGenerateRequest"
+              },
+              "example": {
+                "scene_id": "00000000-0000-4000-8000-000000000001",
+                "scene_version": 1,
+                "goal_kind": "compare",
+                "parameters": {
+                  "values": [
+                    1,
+                    2
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "POST fetch+ReadableStream SSE，agent_start/stage_changed/done；事件数据定义见AnimationPreparationEvent。done不保证渲染成功，handed_off后使用持久Job GET EventSource。",
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/CsrfFailed"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/IdempotencyConflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "429": {
+            "description": "ANIMATION_PREPARATION_LIMIT：最多2个owner活跃准备操作。",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "description": "开发实现受catalog_only门禁（409 FEATURE_UNAVAILABLE）及独立DSL调用预算默认拒绝。相同owner/原session/key/body只观察或重放，不重领handle/启动第二生成；原POST断线取消holder，观察连接断线不取消。绝对deadline<=180s及原session expiry；无Provider/handle/DSL/Python/owner/URL进入body或PG准备记录。"
+      }
+    },
+    "/api/animation-preparations/{operation_id}": {
+      "get": {
+        "tags": [
+          "Animation"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "x-implementation-task": "PHASE-1-T028",
+        "x-runtime-status": "implemented",
+        "operationId": "getAnimationPreparation",
+        "summary": "读取准备快照",
+        "parameters": [
+          {
+            "name": "operation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "owner与不可变原session绑定；private,no-store。handoff后返回Job引用，使用既有Job cancel。到期可CAS固定失败，无持有者接管/后台模型重放。",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnimationPreparation"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      }
+    },
+    "/api/animation-preparations/{operation_id}/cancel": {
+      "post": {
+        "tags": [
+          "Animation"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "x-implementation-task": "PHASE-1-T028",
+        "x-runtime-status": "implemented",
+        "operationId": "cancelAnimationPreparation",
+        "summary": "取消准备操作",
+        "parameters": [
+          {
+            "name": "operation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/CsrfToken"
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "owner与不可变原session绑定；private,no-store。handoff后返回Job引用，使用既有Job cancel。到期可CAS固定失败，无持有者接管/后台模型重放。",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnimationPreparation"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/CsrfFailed"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/IdempotencyConflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      }
+    },
+
 
   "/api/providers/catalog": {
     "get": {
@@ -3215,8 +3455,8 @@
     "/api/animation-jobs/{jobId}/cancel": {"post": {"tags": ["Animation"],"summary": "取消未完成Job","operationId": "cancelAnimationJob","security": [{"sessionCookie": []}],"parameters": [{"$ref": "#/components/parameters/AnimationJobId"},{"$ref": "#/components/parameters/CsrfToken"},{"$ref": "#/components/parameters/IdempotencyKey"}],"responses": {"200": {"description": "成功。","content": {"application/json": {"schema": {"$ref": "#/components/schemas/AnimationJob"}}}},"401": {"$ref": "#/components/responses/Unauthorized"},"403": {"$ref": "#/components/responses/CsrfFailed"},"404": {"$ref": "#/components/responses/NotFound"},"409": {"description": "IDEMPOTENCY_CONFLICT 或 当前Job终态不允许该操作；code=JOB_STATE_CONFLICT。","content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},"422": {"$ref": "#/components/responses/ValidationError"}},"description": "已成功终态不能取消；取消幂等键按owner唯一持久保存，取消与发布由同一Job行锁确定顺序。Worker检测到取消后终止当前尝试容器。"}},
     "/api/animation-jobs/{jobId}/retry": {"post": {"tags": ["Animation"],"summary": "显式重试失败或已取消Job","operationId": "retryAnimationJob","security": [{"sessionCookie": []}],"parameters": [{"$ref": "#/components/parameters/AnimationJobId"},{"$ref": "#/components/parameters/CsrfToken"},{"$ref": "#/components/parameters/IdempotencyKey"}],"responses": {"202": {"description": "成功。","content": {"application/json": {"schema": {"$ref": "#/components/schemas/AnimationJob"}}}},"401": {"$ref": "#/components/responses/Unauthorized"},"403": {"$ref": "#/components/responses/CsrfFailed"},"404": {"$ref": "#/components/responses/NotFound"},"409": {"description": "IDEMPOTENCY_CONFLICT 或 当前Job终态不允许该操作；code=JOB_STATE_CONFLICT。","content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},"422": {"$ref": "#/components/responses/ValidationError"}},"description": "创建新Job并保存retry_of；原终态不可修改。"}},
     "/api/animation-jobs/{jobId}/events": {"get": {"tags": ["Animation"],"summary": "持久Job事件流","operationId": "subscribeAnimationJob","security": [{"sessionCookie": []}],"parameters": [{"$ref": "#/components/parameters/AnimationJobId"},{"$ref": "#/components/parameters/LastEventId"},{"$ref": "#/components/parameters/AnimationEventAfter"}],"responses": {"200": {"description": "GET EventSource text/event-stream；事件ID为Job内单调整数。","content": {"text/event-stream": {"schema": {"type": "string"}}}},"401": {"$ref": "#/components/responses/Unauthorized"},"404": {"$ref": "#/components/responses/NotFound"},"409": {"$ref": "#/components/responses/EventCursorInvalid"},"410": {"$ref": "#/components/responses/EventCursorExpired"},"503": {"description": "本进程SSE连接容量已满；code=STREAM_CAPACITY。","content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}}},"description": "无游标从头；Last-Event-ID只回放更大ID。终态且游标已消费则立即关闭。410后GET快照取last_event_id再订阅；心跳无持久ID。每进程最多32连接，轮询间隔1.5秒，单连接最多5分钟后由EventSource按游标重连；首次连接可用after查询参数，重连时Last-Event-ID头优先。"}},
-    "/api/animation-media/{mediaId}/mp4": {"get": {"tags": ["Animation"],"summary": "读取或下载已审核MP4","operationId": "downloadAnimationMP4","security": [{"sessionCookie": []}],"parameters": [{"$ref": "#/components/parameters/MediaId"},{"$ref": "#/components/parameters/DownloadMedia"}],"responses": {"200": {"description": "仅owner已绑定且已审核的媒体；固定Content-Type、nosniff、private缓存、安全文件名与来源/版本响应头；默认inline、显式下载attachment。MP4支持Range。","content": {"video/mp4": {"schema": {"type": "string","format": "binary"}}},"headers": {"Content-Disposition": {"description": "默认inline供播放/字幕；download=true用attachment；均使用服务端安全文件名。","schema": {"type": "string"}},"X-Content-Type-Options": {"schema": {"type": "string","const": "nosniff"}},"Cache-Control": {"schema": {"type": "string","const": "private, no-store"}},"X-Animation-Media-ID": {"schema": {"$ref": "#/components/schemas/Identifier"}},"X-Animation-Template-ID": {"schema": {"type": "string"}},"X-Animation-Template-Version": {"schema": {"type": "string"}},"X-Animation-Subtitle-Version": {"schema": {"type": "string"}},"X-Animation-Review-Version": {"schema": {"type": "string"}},"X-Animation-Content-SHA256": {"description": "完整文件的内容摘要；206 Range仍指完整资源。","schema": {"type": "string","pattern": "^[0-9a-f]{64}$"}},"X-Animation-Generated-By": {"schema": {"type": "string","const": "reviewed-manim-template"}},"X-Animation-Published-At": {"schema": {"type": "string","format": "date-time"}}}},"206": {"description": "经授权的MP4部分内容。","content": {"video/mp4": {"schema": {"type": "string","format": "binary"}}},"headers": {"Content-Disposition": {"description": "默认inline供播放/字幕；download=true用attachment；均使用服务端安全文件名。","schema": {"type": "string"}},"X-Content-Type-Options": {"schema": {"type": "string","const": "nosniff"}},"Cache-Control": {"schema": {"type": "string","const": "private, no-store"}},"X-Animation-Media-ID": {"schema": {"$ref": "#/components/schemas/Identifier"}},"X-Animation-Template-ID": {"schema": {"type": "string"}},"X-Animation-Template-Version": {"schema": {"type": "string"}},"X-Animation-Subtitle-Version": {"schema": {"type": "string"}},"X-Animation-Review-Version": {"schema": {"type": "string"}},"X-Animation-Content-SHA256": {"description": "完整文件的内容摘要；206 Range仍指完整资源。","schema": {"type": "string","pattern": "^[0-9a-f]{64}$"}},"X-Animation-Generated-By": {"schema": {"type": "string","const": "reviewed-manim-template"}},"X-Animation-Published-At": {"schema": {"type": "string","format": "date-time"}}}},"401": {"$ref": "#/components/responses/Unauthorized"},"404": {"$ref": "#/components/responses/NotFound"},"409": {"$ref": "#/components/responses/MediaNotReady"},"416": {"description": "无效或越界单段Range；code=RANGE_NOT_SATISFIABLE，返回Content-Range: bytes */size。","content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},"503": {"$ref": "#/components/responses/MediaUnavailable"}}}},
-    "/api/animation-media/{mediaId}/srt": {"get": {"tags": ["Animation"],"summary": "读取或下载已审核SRT","operationId": "downloadAnimationSRT","security": [{"sessionCookie": []}],"parameters": [{"$ref": "#/components/parameters/MediaId"},{"$ref": "#/components/parameters/DownloadMedia"}],"responses": {"200": {"description": "仅owner已绑定且已审核的媒体；固定Content-Type、nosniff、private缓存、安全文件名与来源/版本响应头；默认inline、显式下载attachment。SRT使用UTF-8。","content": {"application/x-subrip": {"schema": {"type": "string","format": "binary"}}},"headers": {"Content-Disposition": {"description": "默认inline供播放/字幕；download=true用attachment；均使用服务端安全文件名。","schema": {"type": "string"}},"X-Content-Type-Options": {"schema": {"type": "string","const": "nosniff"}},"Cache-Control": {"schema": {"type": "string","const": "private, no-store"}},"X-Animation-Media-ID": {"schema": {"$ref": "#/components/schemas/Identifier"}},"X-Animation-Template-ID": {"schema": {"type": "string"}},"X-Animation-Template-Version": {"schema": {"type": "string"}},"X-Animation-Subtitle-Version": {"schema": {"type": "string"}},"X-Animation-Review-Version": {"schema": {"type": "string"}},"X-Animation-Content-SHA256": {"description": "完整文件的内容摘要；206 Range仍指完整资源。","schema": {"type": "string","pattern": "^[0-9a-f]{64}$"}},"X-Animation-Generated-By": {"schema": {"type": "string","const": "reviewed-manim-template"}},"X-Animation-Published-At": {"schema": {"type": "string","format": "date-time"}}}},"401": {"$ref": "#/components/responses/Unauthorized"},"404": {"$ref": "#/components/responses/NotFound"},"409": {"$ref": "#/components/responses/MediaNotReady"},"503": {"$ref": "#/components/responses/MediaUnavailable"}}}},
+    "/api/animation-media/{mediaId}/mp4": {"get": {"tags": ["Animation"],"summary": "读取或下载已审核MP4","operationId": "downloadAnimationMP4","security": [{"sessionCookie": []}],"parameters": [{"$ref": "#/components/parameters/MediaId"},{"$ref": "#/components/parameters/DownloadMedia"}],"responses": {"200": {"description": "仅owner已绑定且已审核的媒体；固定Content-Type、nosniff、private缓存、安全文件名与来源/版本响应头；默认inline、显式下载attachment。MP4支持Range。","content": {"video/mp4": {"schema": {"type": "string","format": "binary"}}},"headers": {"Content-Disposition": {"description": "默认inline供播放/字幕；download=true用attachment；均使用服务端安全文件名。","schema": {"type": "string"}},"X-Content-Type-Options": {"schema": {"type": "string","const": "nosniff"}},"Cache-Control": {"schema": {"type": "string","const": "private, no-store"}},"X-Animation-Media-ID": {"schema": {"$ref": "#/components/schemas/Identifier"}},"X-Animation-Template-ID": {"schema": {"type": "string"}},"X-Animation-Template-Version": {"schema": {"type": "string"}},"X-Animation-Subtitle-Version": {"schema": {"type": "string"}},"X-Animation-Review-Version": {"schema": {"type": "string"}},"X-Animation-Content-SHA256": {"description": "完整文件的内容摘要；206 Range仍指完整资源。","schema": {"type": "string","pattern": "^[0-9a-f]{64}$"}},"X-Animation-Generated-By": {"schema": {"type": "string","enum": ["reviewed-manim-template","reviewed-manim-dsl"]}},"X-Animation-Published-At": {"schema": {"type": "string","format": "date-time"}},"X-Animation-Source-Versions": {"schema": {"type": "string"},"description": "仅DSL：受限ASCII JSON模型、Prompt、binding、graph、schema/compiler/rules版本；无完整URL/Key/handle。DSL省略模板ID/version响应头。"}}},"206": {"description": "经授权的MP4部分内容。","content": {"video/mp4": {"schema": {"type": "string","format": "binary"}}},"headers": {"Content-Disposition": {"description": "默认inline供播放/字幕；download=true用attachment；均使用服务端安全文件名。","schema": {"type": "string"}},"X-Content-Type-Options": {"schema": {"type": "string","const": "nosniff"}},"Cache-Control": {"schema": {"type": "string","const": "private, no-store"}},"X-Animation-Media-ID": {"schema": {"$ref": "#/components/schemas/Identifier"}},"X-Animation-Template-ID": {"schema": {"type": "string"}},"X-Animation-Template-Version": {"schema": {"type": "string"}},"X-Animation-Subtitle-Version": {"schema": {"type": "string"}},"X-Animation-Review-Version": {"schema": {"type": "string"}},"X-Animation-Content-SHA256": {"description": "完整文件的内容摘要；206 Range仍指完整资源。","schema": {"type": "string","pattern": "^[0-9a-f]{64}$"}},"X-Animation-Generated-By": {"schema": {"type": "string","enum": ["reviewed-manim-template","reviewed-manim-dsl"]}},"X-Animation-Published-At": {"schema": {"type": "string","format": "date-time"}},"X-Animation-Source-Versions": {"schema": {"type": "string"},"description": "仅DSL：受限ASCII JSON模型、Prompt、binding、graph、schema/compiler/rules版本；无完整URL/Key/handle。DSL省略模板ID/version响应头。"}}},"401": {"$ref": "#/components/responses/Unauthorized"},"404": {"$ref": "#/components/responses/NotFound"},"409": {"$ref": "#/components/responses/MediaNotReady"},"416": {"description": "无效或越界单段Range；code=RANGE_NOT_SATISFIABLE，返回Content-Range: bytes */size。","content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},"503": {"$ref": "#/components/responses/MediaUnavailable"}}}},
+    "/api/animation-media/{mediaId}/srt": {"get": {"tags": ["Animation"],"summary": "读取或下载已审核SRT","operationId": "downloadAnimationSRT","security": [{"sessionCookie": []}],"parameters": [{"$ref": "#/components/parameters/MediaId"},{"$ref": "#/components/parameters/DownloadMedia"}],"responses": {"200": {"description": "仅owner已绑定且已审核的媒体；固定Content-Type、nosniff、private缓存、安全文件名与来源/版本响应头；默认inline、显式下载attachment。SRT使用UTF-8。","content": {"application/x-subrip": {"schema": {"type": "string","format": "binary"}}},"headers": {"Content-Disposition": {"description": "默认inline供播放/字幕；download=true用attachment；均使用服务端安全文件名。","schema": {"type": "string"}},"X-Content-Type-Options": {"schema": {"type": "string","const": "nosniff"}},"Cache-Control": {"schema": {"type": "string","const": "private, no-store"}},"X-Animation-Media-ID": {"schema": {"$ref": "#/components/schemas/Identifier"}},"X-Animation-Template-ID": {"schema": {"type": "string"}},"X-Animation-Template-Version": {"schema": {"type": "string"}},"X-Animation-Subtitle-Version": {"schema": {"type": "string"}},"X-Animation-Review-Version": {"schema": {"type": "string"}},"X-Animation-Content-SHA256": {"description": "完整文件的内容摘要；206 Range仍指完整资源。","schema": {"type": "string","pattern": "^[0-9a-f]{64}$"}},"X-Animation-Generated-By": {"schema": {"type": "string","enum": ["reviewed-manim-template","reviewed-manim-dsl"]}},"X-Animation-Published-At": {"schema": {"type": "string","format": "date-time"}},"X-Animation-Source-Versions": {"schema": {"type": "string"},"description": "仅DSL：受限ASCII JSON模型、Prompt、binding、graph、schema/compiler/rules版本；无完整URL/Key/handle。DSL省略模板ID/version响应头。"}}},"401": {"$ref": "#/components/responses/Unauthorized"},"404": {"$ref": "#/components/responses/NotFound"},"409": {"$ref": "#/components/responses/MediaNotReady"},"503": {"$ref": "#/components/responses/MediaUnavailable"}}}},
     "/api/learning-units/{learningUnitId}/classroom": {"get": {"tags": ["Classroom"],"summary": "读取课堂快照","operationId": "getClassroom","security": [{"sessionCookie": []}],"parameters": [{"$ref": "#/components/parameters/LearningUnitId"}],"responses": {"200": {"description": "成功。","content": {"application/json": {"schema": {"$ref": "#/components/schemas/ClassroomSnapshot"}}}},"401": {"$ref": "#/components/responses/Unauthorized"},"404": {"$ref": "#/components/responses/NotFound"}}},"post": {"tags": ["Classroom"],"summary": "为已发布学习单元建立默认课堂","operationId": "createClassroom","security": [{"sessionCookie": []}],"parameters": [{"$ref": "#/components/parameters/LearningUnitId"},{"$ref": "#/components/parameters/CsrfToken"},{"$ref": "#/components/parameters/IdempotencyKey"}],"description": "默认focus/仅导师、revision=1；同owner+单元最多一个当前课堂。已存在且同键同摘要回放原快照；仅已审核且published_at非空的intro资源可创建课堂；不启动Provider。","responses": {"201": {"description": "新建默认课堂。","content": {"application/json": {"schema": {"$ref": "#/components/schemas/ClassroomSnapshot"}}}},"200": {"description": "幂等回放已建课堂。","content": {"application/json": {"schema": {"$ref": "#/components/schemas/ClassroomSnapshot"}}}},"401": {"$ref": "#/components/responses/Unauthorized"},"403": {"$ref": "#/components/responses/CsrfFailed"},"404": {"$ref": "#/components/responses/NotFound"},"409": {"description": "IDEMPOTENCY_CONFLICT；迁移前操作无可恢复原回执时为IDEMPOTENCY_RESULT_UNAVAILABLE。","content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},"422": {"$ref": "#/components/responses/ValidationError"}}}},
     "/api/learning-units/{learningUnitId}/classroom/messages": {"get": {"tags": ["Classroom"],"summary": "读取已提交课堂消息","operationId": "getClassroomMessages","security": [{"sessionCookie": []}],"parameters": [{"$ref": "#/components/parameters/LearningUnitId"},{"$ref": "#/components/parameters/AfterMessageCursor"}],"responses": {"200": {"description": "成功。","content": {"application/json": {"schema": {"$ref": "#/components/schemas/ClassroomMessagePage"}}}},"401": {"$ref": "#/components/responses/Unauthorized"},"404": {"$ref": "#/components/responses/NotFound"},"409": {"$ref": "#/components/responses/MessageCursorInvalid"},"410": {"$ref": "#/components/responses/MessageCursorExpired"}},"description": "after只过滤已提交消息，不回放临时token；410后GET课堂快照取得message_cursor。"},"post": {"tags": ["Classroom"],"summary": "课堂发言流","operationId": "streamClassroomSpeech","security": [{"sessionCookie": []}],"parameters": [{"$ref": "#/components/parameters/LearningUnitId"},{"$ref": "#/components/parameters/CsrfToken"},{"$ref": "#/components/parameters/IdempotencyKey"},{"$ref": "#/components/parameters/IfMatchClassroomRevision"}],"responses": {"200": {"description": "POST fetch+ReadableStream；临时token不持久回放，只有审核通过的ready事件指向正式资源。","content": {"text/event-stream": {"schema": {"type": "string"}}}},"401": {"$ref": "#/components/responses/Unauthorized"},"403": {"$ref": "#/components/responses/CsrfFailed"},"404": {"$ref": "#/components/responses/NotFound"},"409": {"description": "IDEMPOTENCY_CONFLICT 或 课堂revision不匹配；code=CLASSROOM_VERSION_CONFLICT。","content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},"422": {"$ref": "#/components/responses/ValidationError"},"503": {"$ref": "#/components/responses/ReviewUnavailable"}},"requestBody": {"required": true,"content": {"application/json": {"schema": {"$ref": "#/components/schemas/ClassroomSpeech"}}}},"description": "事件携带revision、scene_version、generation_id；低风险临时token可见，审核拒绝/不可用发content_retracted并禁止持久发布。 响应头发送前审核不可用可返回HTTP 503；流开始后只能发送content_retracted、error(code=REVIEW_UNAVAILABLE)、done(status=failed)，不能修改HTTP状态。SSE首个agent_start含operation_id，可用GET /api/classroom-operations/{operationId}读取持久操作状态；临时token不重放。"}},
     "/api/learning-units/{learningUnitId}/classroom/mode": {"patch": {"tags": ["Classroom"],"summary": "切换专注/互动和角色启用","operationId": "setClassroomMode","security": [{"sessionCookie": []}],"parameters": [{"$ref": "#/components/parameters/LearningUnitId"},{"$ref": "#/components/parameters/CsrfToken"},{"$ref": "#/components/parameters/IdempotencyKey"},{"$ref": "#/components/parameters/IfMatchClassroomRevision"}],"responses": {"200": {"description": "成功。","content": {"application/json": {"schema": {"$ref": "#/components/schemas/ClassroomSnapshot"}}}},"401": {"$ref": "#/components/responses/Unauthorized"},"403": {"$ref": "#/components/responses/CsrfFailed"},"404": {"$ref": "#/components/responses/NotFound"},"409": {"description": "IDEMPOTENCY_CONFLICT 或 课堂revision不匹配；code=CLASSROOM_VERSION_CONFLICT；迁移前操作无可恢复原回执时为IDEMPOTENCY_RESULT_UNAVAILABLE。","content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},"422": {"$ref": "#/components/responses/ValidationError"}},"requestBody": {"required": true,"content": {"application/json": {"schema": {"$ref": "#/components/schemas/ModeChange"}}}},"description": "幂等命中先于If-Match检查，并返回该命令提交时保存的原快照；关闭角色先提交新revision和generation_id，迟到输出不能发布到当前会话。"}},
@@ -3281,6 +3521,322 @@
       "ReviewUnavailable": {"description": "审核不可用；code=REVIEW_UNAVAILABLE，禁止正式发布。","content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}}
     },
     "schemas": {
+      "AnimationGenerateRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "scene_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "scene_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "goal_kind": {
+            "type": "string",
+            "enum": [
+              "compare",
+              "swap",
+              "traverse",
+              "insert",
+              "delete",
+              "trace_insert",
+              "trace_delete"
+            ]
+          },
+          "parameters": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "values": {
+                "type": "array",
+                "maxItems": 8,
+                "items": {
+                  "type": "integer",
+                  "minimum": -999,
+                  "maximum": 999
+                }
+              },
+              "index": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 7
+              },
+              "value": {
+                "type": "integer",
+                "minimum": -999,
+                "maximum": 999
+              }
+            },
+            "required": [
+              "values"
+            ]
+          }
+        },
+        "required": [
+          "scene_id",
+          "scene_version",
+          "goal_kind",
+          "parameters"
+        ],
+        "description": "受信知识点映射：array compare/swap/traverse，链表概念compare/traverse，链表遍历traverse，链表插入insert/trace_insert，删除delete/trace_delete。严格整数（bool不可替代）；compare/swap至少2项；insert<=7项且0<=index<=len，delete非空且index<len。trace仅详细轨迹表现，不新增DSL动作。",
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "goal_kind": {
+                  "enum": [
+                    "compare",
+                    "swap"
+                  ]
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "parameters": {
+                  "required": [
+                    "values"
+                  ],
+                  "properties": {
+                    "values": {
+                      "minItems": 2,
+                      "maxItems": 8
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "index"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "value"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "goal_kind": {
+                  "enum": [
+                    "traverse"
+                  ]
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "parameters": {
+                  "required": [
+                    "values"
+                  ],
+                  "properties": {
+                    "values": {
+                      "minItems": 0,
+                      "maxItems": 8
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "index"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "value"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "goal_kind": {
+                  "enum": [
+                    "insert",
+                    "trace_insert"
+                  ]
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "parameters": {
+                  "required": [
+                    "values",
+                    "index",
+                    "value"
+                  ],
+                  "properties": {
+                    "values": {
+                      "minItems": 0,
+                      "maxItems": 7
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "goal_kind": {
+                  "enum": [
+                    "delete",
+                    "trace_delete"
+                  ]
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "parameters": {
+                  "required": [
+                    "values",
+                    "index"
+                  ],
+                  "properties": {
+                    "values": {
+                      "minItems": 1,
+                      "maxItems": 8
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "value"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "AnimationPreparation": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "stage": {
+            "type": "string",
+            "enum": [
+              "reserved",
+              "generating",
+              "reviewing",
+              "compiled",
+              "handed_off",
+              "failed",
+              "cancelled"
+            ]
+          },
+          "deadline": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "job_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "error_code": {
+            "type": "string",
+            "pattern": "^[A-Z0-9_]{1,64}$"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "reviewed_cache",
+              "parameterized_template",
+              "generated_dsl",
+              "reviewed_dsl_cache",
+              "template_fallback",
+              "unavailable"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "stage",
+          "deadline"
+        ]
+      },
+      "AnimationPreparationEvent": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "event": {
+                "enum": [
+                  "agent_start",
+                  "done"
+                ]
+              },
+              "data": {
+                "$ref": "#/components/schemas/AnimationPreparation"
+              }
+            },
+            "required": [
+              "event",
+              "data"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "event": {
+                "const": "stage_changed"
+              },
+              "data": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "$ref": "#/components/schemas/Identifier"
+                  },
+                  "stage": {
+                    "type": "string",
+                    "enum": [
+                      "generating",
+                      "reviewing",
+                      "compiled"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "stage"
+                ]
+              }
+            },
+            "required": [
+              "event",
+              "data"
+            ]
+          }
+        ],
+        "description": "SSE文本event/data封装。准备事件不持久化token日志、不承诺游标回放；原session失效的终止done可只含id/stage=failed/error_code。持久渲染Job事件另走GET EventSource。"
+      },
+
 
   "ProviderType": {
     "type": "string",
@@ -4143,7 +4699,7 @@
         ],
         "description": "索引与当前values长度的关系由服务端固定模板注册表进一步校验；owner学习单元知识点必须与template_id相同。"
       },
-      "AnimationJob": {"type": "object","additionalProperties": false,"properties": {"id": {"$ref": "#/components/schemas/Identifier"},"status": {"type": "string","enum": ["queued","running","succeeded","failed","cancelled"]},"learning_unit_id": {"$ref": "#/components/schemas/Identifier"},"template_id": {"type": "string"},"attempt": {"type": "integer","minimum": 0},"progress": {"type": "number","minimum": 0,"maximum": 1},"last_event_id": {"type": "integer","minimum": 0},"media_id": {"$ref": "#/components/schemas/Identifier"},"retry_of": {"$ref": "#/components/schemas/Identifier"},"error": {"$ref": "#/components/schemas/Error"}},"required": ["id","status","learning_unit_id","template_id","attempt","progress","last_event_id"]},
+      "AnimationJob": {"type": "object","additionalProperties": false,"properties": {"id": {"$ref": "#/components/schemas/Identifier"},"status": {"type": "string","enum": ["queued","running","succeeded","failed","cancelled"]},"learning_unit_id": {"$ref": "#/components/schemas/Identifier"},"template_id": {"type": ["string","null"]},"attempt": {"type": "integer","minimum": 0},"progress": {"type": "number","minimum": 0,"maximum": 1},"last_event_id": {"type": "integer","minimum": 0},"media_id": {"$ref": "#/components/schemas/Identifier"},"retry_of": {"$ref": "#/components/schemas/Identifier"},"error": {"$ref": "#/components/schemas/Error"},"render_kind": {"type": "string","enum": ["template","dsl"]},"candidate_id": {"$ref": "#/components/schemas/Identifier"},"generation_id": {"$ref": "#/components/schemas/Identifier"},"fallback_of": {"$ref": "#/components/schemas/Identifier"},"fallback_reason_code": {"type": "string","pattern": "^[A-Z0-9_]{1,64}$"}},"required": ["id","status","learning_unit_id","template_id","attempt","progress","last_event_id"],"description": "保留旧模板响应。新增准备来源Job包含render_kind/generation_id；DSL template_id=null且candidate_id准确。最终失败仍保留原Job，failed事件可带唯一fallback_job_id/fallback_source=template_fallback；新模板queued事件带fallback_of/source/reason_code=DSL_RENDER_FAILED；模板失败无循环。"},
       "ClassroomSnapshot": {"type":"object","additionalProperties":false,"properties":{"learning_unit_id":{"$ref":"#/components/schemas/Identifier"},"revision":{"type":"integer","minimum":1},"message_cursor":{"type":"integer","minimum":0},"scene_key":{"type":"string"},"scene_version":{"type":"integer","minimum":1},"scene_progress":{"type":"integer","minimum":0},"mode":{"type":"string","enum":["focus","interactive"]},"enabled_roles":{"type":"array","items":{"type":"string","enum":["beginner","advanced"]},"uniqueItems":true},"generation_id":{"$ref":"#/components/schemas/Identifier"},"paused":{"type":"boolean"},"detour":{"type":"object","additionalProperties":false,"properties":{"scene_key":{"type":"string"},"scene_version":{"type":"integer","minimum":1},"scene_progress":{"type":"integer","minimum":0},"kind":{"type":"string","enum":["prerequisite","debate"]},"target_node_id":{"$ref":"#/components/schemas/KnowledgeNodeId"},"path_version_id":{"$ref":"#/components/schemas/Identifier"},"mode":{"type":"string","enum":["focus","interactive"]},"enabled_roles":{"type":"array","items":{"type":"string","enum":["beginner","advanced"]}},"paused":{"type":"boolean"},"result_id":{"$ref":"#/components/schemas/Identifier"}},"required":["scene_key","scene_version","scene_progress"]},"version_changed":{"type":"boolean"}},"required":["learning_unit_id","revision","message_cursor","scene_key","scene_version","scene_progress","mode","enabled_roles","paused"]},
       "ClassroomMessage": {"type": "object","additionalProperties": false,"properties": {"id": {"$ref": "#/components/schemas/Identifier"},"cursor": {"type": "integer","minimum": 1},"role": {"type": "string","enum": ["student","tutor","beginner","advanced","system","performance","engineering","academic","moderator"]},"scene_key": {"type": "string"},"scene_version": {"type": "integer","minimum": 1},"text": {"type": "string"},"resource_id": {"$ref": "#/components/schemas/Identifier"}},"required": ["id","cursor","role","scene_key","scene_version"]},
       "ClassroomMessagePage": {"type": "object","additionalProperties": false,"properties": {"messages": {"type": "array","items": {"$ref": "#/components/schemas/ClassroomMessage"}},"last_message_cursor": {"type": "integer","minimum": 0}},"required": ["messages","last_message_cursor"]},
@@ -4217,9 +4773,9 @@
       "PHASE-1-T028",
       "PHASE-1-T029"
     ],
-    "runtime_changed": false,
-    "existing_public_contract_changed": false,
-    "planned_public_changes": "T028: owner/CSRF/idempotent POST fetch SSE animation generation + GET preparation snapshot/cancel; render_kind and safe source/fallback metadata; no uploaded DSL/Python. Final public schema validated in T028.",
+    "runtime_changed": true,
+    "existing_public_contract_changed": true,
+    "public_changes": "T028 development implementation: owner/original-session/CSRF/idempotent POST SSE + GET preparation/cancel; explicit render_kind and fallback metadata. catalog_only gate and default-denied DSL budget remain. No uploaded DSL/Python.",
     "queue_boundary": "Only reviewed credential-free rendering; API model preparation never brokered",
     "dsl_version": "animation-dsl/1",
     "dsl_cache_scope": "owner-private; existing reviewed template cache unchanged",

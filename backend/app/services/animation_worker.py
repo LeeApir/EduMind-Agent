@@ -16,10 +16,10 @@ from app.models.animation import AnimationJob
 from app.services.animation_attempts import record_attempt, request_cleanup
 from app.services.animation_cache import AnimationCache, CachedAnimation
 from app.services.animation_host import RenderHost
+from app.services.animation_job_qualification import animation_job_approved
 from app.services.animation_jobs import append_animation_event
 from app.services.animation_publication import bind_media, reviewed_media_row
 from app.services.animation_renderer import RenderError
-from app.services.catalog_animation_access import animation_target_approved
 from app.services.durable_job_dispatch import DispatchMessage, enqueue_animation_job
 
 LEASE_SECONDS = 30
@@ -34,7 +34,7 @@ class JobLease:
     owner_id: UUID
     attempt: int
     token: UUID
-    template_id: str
+    template_id: str | None
     parameters: dict[str, object]
     dispatch_backend: str = "pg_poll"
     dispatch_epoch: int = 1
@@ -68,16 +68,7 @@ async def claim_animation_job(
         if job is None:
             await db.rollback()
             return None
-        if not await animation_target_approved(
-            db,
-            owner_id=job.user_id,
-            unit_id=job.learning_unit_id,
-            scene_id=job.scene_id,
-            scene_version=job.scene_version,
-            template_id=job.template_id,
-            template_version=job.template_version,
-            lock_release=True,
-        ):
+        if not await animation_job_approved(db, job, lock=True):
             job.status, job.error_code = "failed", "ANIMATION_TARGET_UNAVAILABLE"
             await append_animation_event(
                 db,
@@ -236,6 +227,11 @@ async def reclaim_expired_animation_jobs(
             )
         ).all()
         for job in jobs:
+            if job.render_kind == "dsl":
+                from app.services.animation_dsl_failure import settle_dsl_failure
+
+                await settle_dsl_failure(db, job, code="RENDER_INTERRUPTED")
+                continue
             await request_cleanup(db, job)
             job.lease_token = None
             job.lease_expires_at = None
@@ -275,16 +271,7 @@ async def publish_animation_job(
         if job is None:
             await db.rollback()
             return False
-        if not await animation_target_approved(
-            db,
-            owner_id=job.user_id,
-            unit_id=job.learning_unit_id,
-            scene_id=job.scene_id,
-            scene_version=job.scene_version,
-            template_id=job.template_id,
-            template_version=job.template_version,
-            lock_release=True,
-        ):
+        if job.render_kind != "template" or not await animation_job_approved(db, job, lock=True):
             await db.rollback()
             await fail_animation_job(sessions, lease, code="ANIMATION_TARGET_UNAVAILABLE")
             return False
@@ -378,6 +365,37 @@ async def run_one_animation_job(
     lease = lease or await claim_animation_job(sessions)
     if lease is None:
         return None
+    if lease.template_id is None:
+        from app.services.animation_dsl_publication import publish_dsl_job
+        from app.services.animation_job_qualification import current_animation_graph
+        from app.workers.dsl_render import DSLRenderResult, render_dsl_job
+
+        graph = current_animation_graph()
+        async with sessions() as db:
+            job = await _locked_current_job(db, lease)
+            candidate_id = job.candidate_id if job is not None else None
+        if candidate_id is None:
+            await fail_animation_job(sessions, lease, code="DSL_RENDER_UNAVAILABLE")
+            return lease.job_id
+
+        async def complete(result: "DSLRenderResult") -> bool:
+            return await publish_dsl_job(sessions, graph, lease, result)
+
+        async def failure(code: str) -> bool:
+            from app.services.animation_dsl_failure import settle_dsl_failure
+
+            async with sessions() as db:
+                current = await _locked_current_job(db, lease)
+                if current is None:
+                    return False
+                await settle_dsl_failure(db, current, code=code)
+                await db.commit()
+                return True
+
+        await render_dsl_job(
+            sessions, graph, lease, candidate_id, complete=complete, failure=failure
+        )
+        return lease.job_id
     controller = RenderHost(sessions, lease.token, asyncio.get_running_loop())
     trusted_cache = cache or AnimationCache()
     stop = asyncio.Event()

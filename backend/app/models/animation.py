@@ -29,18 +29,42 @@ class AnimationMedia(Base):
     __tablename__ = "animation_media"
     __table_args__ = (
         UniqueConstraint("cache_key", name="uq_animation_media_cache_key"),
+        UniqueConstraint("id", "user_id", "candidate_id", name="uq_animation_media_dsl_owner"),
+        ForeignKeyConstraint(
+            ["user_id", "candidate_id"],
+            ["animation_dsl_candidates.user_id", "animation_dsl_candidates.id"],
+        ),
+        CheckConstraint(
+            "(render_kind='template' AND template_id IS NOT NULL AND template_version IS NOT NULL "
+            "AND user_id IS NULL AND candidate_id IS NULL) OR "
+            "(render_kind='dsl' AND template_id IS NULL AND template_version IS NULL "
+            "AND user_id IS NOT NULL AND candidate_id IS NOT NULL)",
+            name="ck_animation_media_render_kind",
+        ),
         CheckConstraint("review_status = 'passed'", name="ck_animation_media_review_passed"),
         CheckConstraint("duration_seconds BETWEEN 30 AND 90", name="ck_animation_media_duration"),
-        CheckConstraint("mp4_size > 0 AND mp4_size <= 67108864",
-                        name="ck_animation_media_mp4_size"),
-        CheckConstraint("srt_size > 0 AND srt_size <= 67108864",
-                        name="ck_animation_media_srt_size"),
+        CheckConstraint(
+            "mp4_size > 0 AND mp4_size <= 67108864", name="ck_animation_media_mp4_size"
+        ),
+        CheckConstraint(
+            "srt_size > 0 AND srt_size <= 67108864", name="ck_animation_media_srt_size"
+        ),
     )
 
     id: Mapped[UUID] = mapped_column(PostgreSQLUUID(as_uuid=True), primary_key=True, default=uuid4)
+    render_kind: Mapped[str] = mapped_column(
+        String(16), default="template", server_default="template", nullable=False
+    )
+    user_id: Mapped[UUID | None] = mapped_column(
+        PostgreSQLUUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE")
+    )
+    candidate_id: Mapped[UUID | None] = mapped_column(PostgreSQLUUID(as_uuid=True))
+    source_versions: Mapped[dict[str, object]] = mapped_column(
+        JSONB, default=dict, server_default="{}", nullable=False
+    )
     cache_key: Mapped[str] = mapped_column(String(64), nullable=False)
-    template_id: Mapped[str] = mapped_column(String(64), nullable=False)
-    template_version: Mapped[str] = mapped_column(String(40), nullable=False)
+    template_id: Mapped[str | None] = mapped_column(String(64))
+    template_version: Mapped[str | None] = mapped_column(String(40))
     review_rule_version: Mapped[str] = mapped_column(String(64), nullable=False)
     source_sha256: Mapped[str] = mapped_column(String(64), nullable=False)
     image_digest: Mapped[str] = mapped_column(String(71), nullable=False)
@@ -61,18 +85,25 @@ class AnimationJob(Base):
 
     __tablename__ = "animation_jobs"
     __table_args__ = (
-        UniqueConstraint("user_id", "action_kind", "idempotency_key",
-                         name="uq_animation_job_owner_action_key"),
-        UniqueConstraint("user_id", "cancel_idempotency_key",
-                         name="uq_animation_job_owner_cancel_key"),
+        UniqueConstraint(
+            "user_id", "action_kind", "idempotency_key", name="uq_animation_job_owner_action_key"
+        ),
+        UniqueConstraint(
+            "user_id", "cancel_idempotency_key", name="uq_animation_job_owner_cancel_key"
+        ),
         UniqueConstraint("user_id", "id", name="uq_animation_job_owner_id"),
         UniqueConstraint("user_id", "id", "media_id", name="uq_animation_job_owner_id_media"),
         UniqueConstraint(
-            "user_id", "learning_unit_id", "scene_id", "scene_version", "id",
+            "user_id",
+            "learning_unit_id",
+            "scene_id",
+            "scene_version",
+            "id",
             name="uq_animation_job_owner_target_id",
         ),
         ForeignKeyConstraint(
-            ["user_id", "learning_unit_id"], ["learning_units.user_id", "learning_units.id"],
+            ["user_id", "learning_unit_id"],
+            ["learning_units.user_id", "learning_units.id"],
             name="fk_animation_job_unit_owner",
         ),
         ForeignKeyConstraint(
@@ -81,24 +112,75 @@ class AnimationJob(Base):
             name="fk_animation_job_scene_version",
         ),
         ForeignKeyConstraint(
-            ["user_id", "retry_of"], ["animation_jobs.user_id", "animation_jobs.id"],
+            ["user_id", "retry_of"],
+            ["animation_jobs.user_id", "animation_jobs.id"],
             name="fk_animation_job_retry_owner",
         ),
-        CheckConstraint("dispatch_backend IN ('pg_poll','celery')",
-                        name="ck_animation_job_dispatch_backend"),
+        ForeignKeyConstraint(
+            ["user_id", "learning_unit_id", "scene_id", "scene_version", "candidate_id"],
+            [
+                "animation_dsl_candidates.user_id",
+                "animation_dsl_candidates.learning_unit_id",
+                "animation_dsl_candidates.scene_id",
+                "animation_dsl_candidates.scene_version",
+                "animation_dsl_candidates.id",
+            ],
+            name="fk_animation_job_dsl_target",
+        ),
+        ForeignKeyConstraint(
+            ["media_id", "user_id", "candidate_id"],
+            ["animation_media.id", "animation_media.user_id", "animation_media.candidate_id"],
+            name="fk_animation_job_dsl_media",
+        ),
+        ForeignKeyConstraint(
+            ["user_id", "learning_unit_id", "scene_id", "scene_version", "generation_id"],
+            [
+                "animation_preparations.user_id",
+                "animation_preparations.learning_unit_id",
+                "animation_preparations.scene_id",
+                "animation_preparations.scene_version",
+                "animation_preparations.id",
+            ],
+            name="fk_animation_job_generation_target",
+        ),
+        ForeignKeyConstraint(
+            ["user_id", "fallback_of"],
+            ["animation_jobs.user_id", "animation_jobs.id"],
+            name="fk_animation_job_fallback_owner",
+        ),
+        UniqueConstraint("fallback_of", "render_kind", name="uq_animation_job_fallback_kind"),
+        CheckConstraint(
+            "(render_kind='template' AND template_id IS NOT NULL AND template_version IS NOT NULL "
+            "AND candidate_id IS NULL) OR (render_kind='dsl' AND template_id IS NULL "
+            "AND template_version IS NULL AND candidate_id IS NOT NULL)",
+            name="ck_animation_job_render_kind",
+        ),
+        CheckConstraint(
+            "fallback_of IS NULL OR (render_kind='template' AND generation_id IS NOT NULL "
+            "AND fallback_reason_code='DSL_RENDER_FAILED' AND retry_of IS NULL)",
+            name="ck_animation_job_fallback",
+        ),
+        CheckConstraint(
+            "dispatch_backend IN ('pg_poll','celery')", name="ck_animation_job_dispatch_backend"
+        ),
         CheckConstraint("dispatch_epoch >= 1", name="ck_animation_job_dispatch_epoch"),
-        CheckConstraint("status IN ('queued','running','succeeded','failed','cancelled')",
-                        name="ck_animation_job_status"),
+        CheckConstraint(
+            "status IN ('queued','running','succeeded','failed','cancelled')",
+            name="ck_animation_job_status",
+        ),
         CheckConstraint("action_kind IN ('request','retry')", name="ck_animation_job_action"),
         CheckConstraint("attempt BETWEEN 0 AND 2", name="ck_animation_job_attempt"),
         CheckConstraint("progress BETWEEN 0 AND 1", name="ck_animation_job_progress"),
         CheckConstraint("last_event_id >= 0", name="ck_animation_job_event_watermark"),
         CheckConstraint("scene_version >= 1", name="ck_animation_job_scene_version"),
-        CheckConstraint("status != 'running' OR (lease_token IS NOT NULL AND "
-                        "lease_expires_at IS NOT NULL AND attempt >= 1)",
-                        name="ck_animation_job_running_lease"),
-        CheckConstraint("status != 'succeeded' OR media_id IS NOT NULL",
-                        name="ck_animation_job_succeeded_media"),
+        CheckConstraint(
+            "status != 'running' OR (lease_token IS NOT NULL AND "
+            "lease_expires_at IS NOT NULL AND attempt >= 1)",
+            name="ck_animation_job_running_lease",
+        ),
+        CheckConstraint(
+            "status != 'succeeded' OR media_id IS NOT NULL", name="ck_animation_job_succeeded_media"
+        ),
     )
 
     id: Mapped[UUID] = mapped_column(PostgreSQLUUID(as_uuid=True), primary_key=True, default=uuid4)
@@ -113,20 +195,33 @@ class AnimationJob(Base):
     request_digest: Mapped[str] = mapped_column(String(64), nullable=False)
     parameters_digest: Mapped[str] = mapped_column(String(64), nullable=False)
     parameters: Mapped[dict[str, object]] = mapped_column(JSONB, nullable=False)
-    template_id: Mapped[str] = mapped_column(String(64), nullable=False)
-    template_version: Mapped[str] = mapped_column(String(40), nullable=False)
+    template_id: Mapped[str | None] = mapped_column(String(64))
+    template_version: Mapped[str | None] = mapped_column(String(40))
     review_rule_version: Mapped[str] = mapped_column(String(64), nullable=False)
     source_sha256: Mapped[str] = mapped_column(String(64), nullable=False)
     image_digest: Mapped[str] = mapped_column(String(71), nullable=False)
     font_digest: Mapped[str] = mapped_column(String(64), nullable=False)
     renderer_config_sha256: Mapped[str] = mapped_column(String(64), nullable=False)
     subtitle_version: Mapped[str] = mapped_column(String(40), nullable=False)
+    render_kind: Mapped[str] = mapped_column(
+        String(16), default="template", server_default="template", nullable=False
+    )
+    candidate_id: Mapped[UUID | None] = mapped_column(PostgreSQLUUID(as_uuid=True))
+    generation_id: Mapped[UUID | None] = mapped_column(PostgreSQLUUID(as_uuid=True))
+    fallback_of: Mapped[UUID | None] = mapped_column(PostgreSQLUUID(as_uuid=True))
+    fallback_reason_code: Mapped[str | None] = mapped_column(String(64))
     cache_key: Mapped[str] = mapped_column(String(64), nullable=False)
     dispatch_backend: Mapped[str] = mapped_column(
-        String(16), default="pg_poll", server_default="pg_poll", nullable=False,
+        String(16),
+        default="pg_poll",
+        server_default="pg_poll",
+        nullable=False,
     )
     dispatch_epoch: Mapped[int] = mapped_column(
-        Integer, default=1, server_default="1", nullable=False,
+        Integer,
+        default=1,
+        server_default="1",
+        nullable=False,
     )
     status: Mapped[str] = mapped_column(String(16), nullable=False, default="queued")
     attempt: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
@@ -151,13 +246,16 @@ class AnimationJobEvent(Base):
     __tablename__ = "animation_job_events"
     __table_args__ = (
         ForeignKeyConstraint(
-            ["user_id", "job_id"], ["animation_jobs.user_id", "animation_jobs.id"],
-            name="fk_animation_job_event_owner", ondelete="CASCADE",
+            ["user_id", "job_id"],
+            ["animation_jobs.user_id", "animation_jobs.id"],
+            name="fk_animation_job_event_owner",
+            ondelete="CASCADE",
         ),
         CheckConstraint("event_id >= 1", name="ck_animation_job_event_id_positive"),
         CheckConstraint(
             "event_type IN ('queued','running','progress','succeeded','failed','cancelled',"
-            "'recovered')", name="ck_animation_job_event_type",
+            "'recovered')",
+            name="ck_animation_job_event_type",
         ),
     )
 
@@ -177,9 +275,15 @@ class AnimationResourceBinding(Base):
         UniqueConstraint("user_id", "job_id", name="uq_animation_binding_owner_job"),
         ForeignKeyConstraint(
             ["user_id", "learning_unit_id", "scene_id", "scene_version", "job_id"],
-            ["animation_jobs.user_id", "animation_jobs.learning_unit_id",
-             "animation_jobs.scene_id", "animation_jobs.scene_version", "animation_jobs.id"],
-            name="fk_animation_binding_job_target_owner", ondelete="CASCADE",
+            [
+                "animation_jobs.user_id",
+                "animation_jobs.learning_unit_id",
+                "animation_jobs.scene_id",
+                "animation_jobs.scene_version",
+                "animation_jobs.id",
+            ],
+            name="fk_animation_binding_job_target_owner",
+            ondelete="CASCADE",
         ),
         ForeignKeyConstraint(
             ["user_id", "job_id", "media_id"],
@@ -253,14 +357,20 @@ class AnimationJobAttempt(Base):
         UniqueConstraint("job_id", "attempt", name="uq_animation_attempt_number"),
         CheckConstraint("attempt BETWEEN 1 AND 2", name="ck_animation_attempt_number"),
         CheckConstraint("dispatch_epoch > 0", name="ck_animation_attempt_epoch"),
-        CheckConstraint("dispatch_backend IN ('pg_poll','celery')",
-                        name="ck_animation_attempt_backend"),
-        CheckConstraint("launch_state IN ('prepared','starting','started',"
-                        "'cleanup_requested','absent')", name="ck_animation_attempt_state"),
+        CheckConstraint(
+            "dispatch_backend IN ('pg_poll','celery')", name="ck_animation_attempt_backend"
+        ),
+        CheckConstraint(
+            "launch_state IN ('prepared','starting','started','cleanup_requested','absent')",
+            name="ck_animation_attempt_state",
+        ),
     )
     token: Mapped[UUID] = mapped_column(PostgreSQLUUID(as_uuid=True), primary_key=True)
-    job_id: Mapped[UUID] = mapped_column(PostgreSQLUUID(as_uuid=True),
-        ForeignKey("animation_jobs.id", ondelete="CASCADE"), nullable=False)
+    job_id: Mapped[UUID] = mapped_column(
+        PostgreSQLUUID(as_uuid=True),
+        ForeignKey("animation_jobs.id", ondelete="CASCADE"),
+        nullable=False,
+    )
     attempt: Mapped[int] = mapped_column(Integer, nullable=False)
     dispatch_backend: Mapped[str] = mapped_column(String(16), nullable=False)
     dispatch_epoch: Mapped[int] = mapped_column(Integer, nullable=False)
@@ -268,3 +378,8 @@ class AnimationJobAttempt(Base):
     started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     cleanup_requested_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     cleanup_done_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+# Register composite FK targets without runtime service imports.
+from app.models import animation_dsl as _dsl_models  # noqa: E402, F401
+from app.models import animation_generation as _preparation_models  # noqa: E402, F401
