@@ -1498,7 +1498,7 @@
       "id": "PHASE-1-T029",
       "phase": "Phase 1",
       "title": "展示DSL动画进度及降级结果",
-      "status": "todo",
+      "status": "done",
       "priority": "P1",
       "depends_on": [
         "PHASE-1-T028"
@@ -1517,9 +1517,30 @@
         "cd web && pnpm test --run tests/dsl-animation.spec.ts",
         "cd web && pnpm typecheck && pnpm build；对本任务改动运行ESLint。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "cd web && pnpm test --run tests/dsl-animation.spec.ts",
+          "result": "passed: 17 tests; POST SSE/target correlation/strict DSL identity, stage/progress/player/export, both cancel outcomes, GET-only restoration, fallback replay/provenance/template retry, version/withdrawal/late snapshot isolation. Mock interfaces only, Provider0.",
+          "evidence": "local-materials/phase-1-t029/checks/dsl-tests.log"
+        },
+        {
+          "command": "cd web && pnpm test --run && pnpm typecheck && pnpm build && pnpm exec eslint src/components/AnimationPanel.vue src/App.vue src/api/animationGeneration.ts src/api/animationJobs.ts tests/dsl-animation.spec.ts --max-warnings 0",
+          "result": "passed: 25 files/181 tests; typecheck/build; changed ESLint zero errors/warnings. Existing template/media/download and catalog tests retained.",
+          "evidence": "local-materials/phase-1-t029/checks/vitest.log; typecheck.log; build.log; eslint.log"
+        },
+        {
+          "command": "backend/.venv/bin/python /Users/apir/.agents/skills/webapp-testing/scripts/with_server.py --server 'cd web && pnpm dev --host 127.0.0.1 --port 4189 --strictPort' --port 4189 -- backend/.venv/bin/python web/tests/e2e/dsl_animation_flow.py",
+          "result": "passed: actual headless Chromium against local Vite with mock HTTP/SSE; fallback/source/reason, refresh no new POST, version isolation, catalog template and preparation cancel. Screenshots inspected. Initial fixture interception of /src/api corrected to /api; runtime render harness, no weakened assertions. Automatic permission review timeout retried successfully.",
+          "evidence": "local-materials/phase-1-t029/checks/browser.log; local-materials/phase-1-t029/browser/{initial,fallback,catalog}.png; requests.json"
+        },
+        {
+          "command": "backend/.venv/bin/ruff check web/tests/e2e/dsl_animation_flow.py; backend/.venv/bin/ruff format --check web/tests/e2e/dsl_animation_flow.py; python3 scripts/check_catalog_workflow.py; python3 scripts/verify_legacy_archives.py; git diff --check",
+          "result": "passed: Python lint/format, active dependencies/legacy archives; self diff inspected. No real Provider, production configuration/DB/deployment/push/merge; catalog_only/default budget deny and archived T033 unchanged. T030 not claimed.",
+          "evidence": "local-materials/phase-1-t029/checks/static.log; docs/agents/animation-dsl-jobs-v1.md"
+        }
+      ],
+      "started_at": "2026-10-09T12:51:12",
+      "completed_at": "2026-10-09T13:08:28",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T029"
     },

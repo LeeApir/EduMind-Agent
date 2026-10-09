@@ -31,3 +31,13 @@ PG准备操作绑定owner、目标、规范意图、摘要、不可变原session
 生成失败仅当原请求头 `X-Animation-Allow-Template-Fallback=true` 且目标/参数有合法模板时降级，准备快照和Job保留明确来源及固定原因。会话/目标失效无回退。DSL渲染异常或worker失联按PG租约最多两次领取；最终失败仍保存原DSL Job。一项原请求授权仅在不可变原session还有效、目标仍合格且合法模板适用时创建独立template Job，唯一(original_job_id,render_kind)。原failed事件可带fallback_job_id/fallback_source，新queued事件带fallback_of/source/reason_code；模板失败不循环。更晚的新guest/session/Key不能延长旧授权。正式DSL可用率仍将原槽记失败，模板体验可用单列。
 
 验证入口：`test_dsl_animation_jobs.py`（真实PG/真实Docker媒体、外键、撤回/发布和迁移），`test_dsl_animation_api.py`（真实PG、mock出口、SSE/幂等/断线/预算/契约），`test_dsl_selected_flow.py`（persistent/temporary、同/不同审核模型、一次lease与独立修正），`test_dsl_animation_failure.py`（两次领取、唯一回退、原session/撤回门禁、队列切换），`test_dsl_animation_gc.py`（真实PG、24h、协调锁）。旧模板/Job/媒体/事件/outbox/容器测试共同回归。Mock/字节夹具不作为教学质量或真实Provider成绩；T028真实Provider调用数为0。
+
+## T029 Web 交互
+
+动态应用中的按需动画面板提供“制作详细动画”，当前可信节点映射固定三项整数示例：数组/链表概念及遍历使用traverse，插入/删除使用详细轨迹目标。默认不允许失败降级；复选框明确允许同目标审核模板。目录应用只保留旧模板入口，不请求generate，也不改变服务端catalog_only、模型预算或独立验收门禁。此UI使用已配置的服务端模型路线；没有收集、保存或重放临时Key/handle，缺凭据时按固定失败处理，不自动换模型。
+
+准备POST显示生成/审核/编译阶段，handoff后复用原Job EventSource、取消/重试、播放器、字幕与MP4/SRT下载。原POST在离开组件或切换scene/version时中止；刷新/断线只GET准备或Job状态，不重放生成。准备取消若输给handoff，则继续使用Job cancel。刷新保存的仅非秘密请求身份、目标版本和Job/来源；同owner新会话能否读取由服务端原会话约束裁定。
+
+渲染最终失败的fallback引用只在最后事件，因此恢复failed DSL Job时回读最后事件，并确认替代Job属于同单元、原准备操作及原Job后才切换。独立模板重试使用旧回执，不冒充新DSL生成。明确显示已审核模板、生成动画、生成缓存或失败后模板替代及中文原因/固定代码。scene/version或动态模式变化使旧事件失效；媒体错误、下载确认不可用及恢复GET拒绝均移除播放器。浏览器重新联网或窗口重新聚焦时复核Job；动画失败不禁用讲解/代码/练习。
+
+验证：`cd web && pnpm test --run tests/dsl-animation.spec.ts`；全量Vitest/typecheck/build/改动ESLint。`web/tests/e2e/dsl_animation_flow.py`在本地Vite+Chromium以模拟HTTP/SSE检查来源、刷新无新POST、版本隔离、目录入口和准备取消；不替代真实模型、实际Manim画面或动态开放验收。浏览器证据保存在忽略目录`local-materials/phase-1-t029/browser/`。

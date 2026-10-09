@@ -500,6 +500,7 @@ function stringValue(value: unknown): string {
       />
       <AnimationPanel
         v-if="resources.length && learningUnitId && animationSceneVersion >= 1"
+        :dynamic-enabled="true"
         :unit-id="learningUnitId"
         :node-id="animationNodeId"
         :scene-version="animationSceneVersion"
