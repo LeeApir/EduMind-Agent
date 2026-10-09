@@ -96,3 +96,5 @@ T028的开发接口、API-only准备操作、原session/holder取消、无凭据
 [ADR-0012](ADR/0012-expanded-knowledge-graph.md)拟冻结30节点/69有向关系及来源，保留默认10节点图与目录包，独立发布扩展版本。结构查询微基准支持复用不可变YAML Repository+PostgreSQL用户状态，未据此引入Neo4j。扩展元数据不授予课程资格；无正式课程须在路径/UI明确不可学习。schema/version兼容、catalog图固定与扩展查询配置隔离、503图故障和恢复边界仅为Proposed，未实施/未批准；具体清单及测量见[报告](acceptance/phase-1-graph-plan-v1.md)。
 
 2026-10-09用户已批准ADR-0012 A–D，见[批准登记](ADR/0012-graph-approval-20261009.json)。上述待批准段落保留提案时上下文；当前选型为Accepted，扩展结构及Repository/路径UI仍按T031–T033逐项实施与验证。
+
+T031已发布独立`data/knowledge/phase-1.1.0.json`及来源sidecar/摘要manifest，schema2保留原节点字段，30节点/69关系；严格绑定规范JSON来源摘要与节点映射，自动参考核验明确标reference_checked，不冒用人工课程签核。原10节点seed/目录包和默认图不变；版本选择、catalog依赖分离及公开故障映射在T032继续实现。加载与验证见[知识结构说明](../data/knowledge/README.md)。

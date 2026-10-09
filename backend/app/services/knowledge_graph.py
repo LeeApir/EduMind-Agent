@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from datetime import date
 from enum import StrEnum
 from functools import lru_cache
 from graphlib import CycleError, TopologicalSorter
@@ -12,8 +14,10 @@ from os import getenv
 from pathlib import Path
 from types import MappingProxyType
 from typing import Mapping, cast
+from urllib.parse import urlsplit
 
 GRAPH_SCHEMA_VERSION = 1
+_SUPPORTED_SCHEMA_VERSIONS = (1, 2)
 _NODE_ID_PATTERN = re.compile(r"^[a-z][a-z0-9-]{1,63}$")
 _DEFAULT_GRAPH_PATH = Path(__file__).resolve().parents[3] / "data" / "knowledge_graph.yaml"
 
@@ -63,6 +67,10 @@ class KnowledgeGraphRepository:
     graph_version: str
     _nodes_by_id: Mapping[str, KnowledgeNode]
     _relations: tuple[KnowledgeRelation, ...]
+    _reference_ids: Mapping[str, tuple[str, ...]] = field(
+        default_factory=lambda: MappingProxyType({})
+    )
+    reference_digest: str | None = None
 
     @classmethod
     def from_file(cls, source: Path) -> KnowledgeGraphRepository:
@@ -71,34 +79,65 @@ class KnowledgeGraphRepository:
             payload = json.loads(source.read_text(encoding="utf-8"))
         except (OSError, UnicodeDecodeError, json.JSONDecodeError) as error:
             raise KnowledgeGraphValidationError("Knowledge graph source is invalid.") from error
-        return cls.from_payload(payload)
+        reference_payload: object = None
+        if isinstance(payload, dict) and payload.get("schema_version") == 2:
+            descriptor = _reference_descriptor(payload)
+            name = str(descriptor["file"])
+            sidecar = source.parent / name
+            if sidecar.is_symlink() or sidecar.resolve().parent != source.parent.resolve():
+                raise KnowledgeGraphValidationError("Reference file must be a local sibling.")
+            try:
+                reference_payload = json.loads(sidecar.read_text(encoding="utf-8"))
+            except (OSError, UnicodeDecodeError, json.JSONDecodeError) as error:
+                raise KnowledgeGraphValidationError(
+                    "Knowledge references are unavailable."
+                ) from error
+        return cls.from_payload(payload, reference_payload=reference_payload)
 
     @classmethod
-    def from_payload(cls, payload: object) -> KnowledgeGraphRepository:
+    def from_payload(
+        cls, payload: object, *, reference_payload: object = None
+    ) -> KnowledgeGraphRepository:
         """Validate a decoded seed document and build an immutable repository."""
         root = _mapping(payload, "graph")
         _require_keys(
             root,
             required={"schema_version", "graph_version", "nodes", "relations"},
-            optional={"review", "relationship_direction"},
+            optional={"review", "relationship_direction", "references"},
             field="graph",
         )
         schema_version = _integer(root["schema_version"], "schema_version")
-        if schema_version != GRAPH_SCHEMA_VERSION:
+        if schema_version not in _SUPPORTED_SCHEMA_VERSIONS:
             raise KnowledgeGraphValidationError("Unsupported graph schema version.")
         graph_version = _nonempty_string(root["graph_version"], "graph_version")
-        _validate_metadata(root)
+        _validate_metadata(root, schema_version)
         nodes = _nodes(root["nodes"])
         nodes_by_id = {node.id: node for node in nodes}
         relations = _relations(root["relations"], nodes_by_id)
         _validate_prerequisites(nodes_by_id, relations)
         _validate_dependency_dag(nodes_by_id, relations)
+        reference_ids: Mapping[str, tuple[str, ...]] = MappingProxyType({})
+        reference_digest = None
+        if schema_version == 2:
+            reference_ids = _validate_references(root, reference_payload, nodes_by_id)
+            reference_digest = str(_reference_descriptor(root)["sha256"])
+            _validate_expanded_relations(nodes_by_id, relations)
+            if any(not n.common_misconceptions for n in nodes):
+                raise KnowledgeGraphValidationError("Expanded nodes need misconceptions.")
+        elif "references" in root or reference_payload is not None:
+            raise KnowledgeGraphValidationError("References require graph schema v2.")
         return cls(
             schema_version=schema_version,
             graph_version=graph_version,
             _nodes_by_id=MappingProxyType(nodes_by_id),
             _relations=tuple(sorted(relations, key=_relation_sort_key)),
+            _reference_ids=reference_ids,
+            reference_digest=reference_digest,
         )
+
+    def reference_ids_for(self, node_id: str) -> tuple[str, ...]:
+        """Return source IDs without conferring course eligibility."""
+        return self._reference_ids.get(node_id, ())
 
     def all_nodes(self) -> tuple[KnowledgeNode, ...]:
         """Return nodes in stable ID order."""
@@ -189,7 +228,7 @@ def _string_list(value: object, field: str, *, require_item: bool = False) -> tu
     return tuple(sorted(items))
 
 
-def _validate_metadata(root: Mapping[str, object]) -> None:
+def _validate_metadata(root: Mapping[str, object], schema_version: int) -> None:
     review = _mapping(root.get("review"), "review")
     _require_keys(
         review,
@@ -199,8 +238,16 @@ def _validate_metadata(root: Mapping[str, object]) -> None:
     )
     _nonempty_string(review["source"], "review.source")
     _nonempty_string(review["fact_checked_at"], "review.fact_checked_at")
-    if review["status"] != "manual_fact_checked":
-        raise KnowledgeGraphValidationError("review.status must be manual_fact_checked.")
+    expected_status = "manual_fact_checked" if schema_version == 1 else "reference_checked"
+    if review["status"] != expected_status:
+        raise KnowledgeGraphValidationError("Review status does not match graph schema.")
+    if schema_version == 2:
+        _date_string(review["fact_checked_at"])
+        if root.get("relationship_direction") != (
+            "from 指向 to；DEPENDS_ON 表示 from 以 to 为前置，EXTENDS 表示 from 是 to 的进阶，"
+            "SIMILAR_TO 表示两节点需要对比讲解。"
+        ):
+            raise KnowledgeGraphValidationError("Expanded graph relation direction changed.")
     _nonempty_string(root.get("relationship_direction"), "relationship_direction")
 
 
@@ -318,3 +365,123 @@ def _validate_dependency_dag(
 
 def _relation_sort_key(relation: KnowledgeRelation) -> tuple[str, str, str]:
     return (relation.from_node_id, relation.to_node_id, relation.relation_type.value)
+
+
+def _date_string(value: object) -> None:
+    try:
+        date.fromisoformat(_nonempty_string(value, "checked_at"))
+    except ValueError as error:
+        raise KnowledgeGraphValidationError("Reference check date is invalid.") from error
+
+
+def _reference_descriptor(root: Mapping[str, object]) -> Mapping[str, object]:
+    descriptor = _mapping(root.get("references"), "references")
+    _require_keys(descriptor, required={"file", "sha256"}, optional=set(), field="references")
+    name = _nonempty_string(descriptor["file"], "references.file")
+    digest = _nonempty_string(descriptor["sha256"], "references.sha256")
+    if re.fullmatch(r"[a-z0-9][a-z0-9.-]{0,100}\.sources\.json", name) is None:
+        raise KnowledgeGraphValidationError("Reference filename is invalid.")
+    if re.fullmatch(r"[0-9a-f]{64}", digest) is None:
+        raise KnowledgeGraphValidationError("Reference digest is invalid.")
+    return descriptor
+
+
+def _reference_url(value: object) -> None:
+    url = _nonempty_string(value, "reference.url")
+    try:
+        parsed = urlsplit(url)
+    except ValueError as error:
+        raise KnowledgeGraphValidationError("Reference URL is invalid.") from error
+    if (
+        len(url) > 1000
+        or parsed.scheme != "https"
+        or not parsed.netloc
+        or parsed.username
+        or parsed.password
+        or any(ord(c) < 32 for c in url)
+    ):
+        raise KnowledgeGraphValidationError("Reference URL must be public HTTPS metadata.")
+
+
+def _validate_references(
+    root: Mapping[str, object], payload: object, nodes: Mapping[str, KnowledgeNode]
+) -> Mapping[str, tuple[str, ...]]:
+    descriptor = _reference_descriptor(root)
+    references = _mapping(payload, "reference sidecar")
+    _require_keys(
+        references,
+        required={
+            "schema_version",
+            "graph_version",
+            "checked_at",
+            "sources",
+            "node_references",
+            "qualification",
+        },
+        optional=set(),
+        field="reference sidecar",
+    )
+    if _integer(references["schema_version"], "references.schema_version") != 1:
+        raise KnowledgeGraphValidationError("Unsupported reference schema.")
+    if references["graph_version"] != root["graph_version"]:
+        raise KnowledgeGraphValidationError("Reference graph version mismatch.")
+    _date_string(references["checked_at"])
+    if references["checked_at"] != _mapping(root["review"], "review")["fact_checked_at"]:
+        raise KnowledgeGraphValidationError("Reference check date mismatch.")
+    if references["qualification"] != (
+        "metadata_only; actual course qualification belongs to "
+        "signed catalog or reviewed owner resources"
+    ):
+        raise KnowledgeGraphValidationError("Reference metadata cannot grant course qualification.")
+    sources = _mapping(references["sources"], "sources")
+    for source_id, raw in sources.items():
+        if _NODE_ID_PATTERN.fullmatch(source_id) is None:
+            raise KnowledgeGraphValidationError("Reference ID is invalid.")
+        source = _mapping(raw, "source")
+        _require_keys(
+            source,
+            required={"title", "url", "sections", "verification"},
+            optional={"supporting_urls"},
+            field="source",
+        )
+        for key in ("title", "sections", "verification"):
+            _nonempty_string(source[key], key)
+        _reference_url(source["url"])
+        for url in _string_list(source.get("supporting_urls", []), "supporting_urls"):
+            _reference_url(url)
+    bindings = _mapping(references["node_references"], "node_references")
+    if set(bindings) != set(nodes):
+        raise KnowledgeGraphValidationError("References must cover the exact graph node set.")
+    ids = {
+        node_id: _string_list(value, "node_references", require_item=True)
+        for node_id, value in bindings.items()
+    }
+    if any(not set(value) <= sources.keys() for value in ids.values()):
+        raise KnowledgeGraphValidationError("Unknown source ID.")
+    canonical = json.dumps(
+        references, ensure_ascii=False, sort_keys=True, separators=(",", ":"), allow_nan=False
+    ).encode("utf-8")
+    if hashlib.sha256(canonical).hexdigest() != descriptor["sha256"]:
+        raise KnowledgeGraphValidationError("Reference digest mismatch.")
+    return MappingProxyType(ids)
+
+
+def _validate_expanded_relations(
+    nodes: Mapping[str, KnowledgeNode], relations: tuple[KnowledgeRelation, ...]
+) -> None:
+    edges = {(r.from_node_id, r.to_node_id, r.relation_type) for r in relations}
+    for a, b, kind in edges:
+        if kind is RelationType.SIMILAR_TO and (b, a, kind) not in edges:
+            raise KnowledgeGraphValidationError("Similarity requires an explicit reverse relation.")
+        if kind is RelationType.EXTENDS:
+            pending = list(nodes[a].prerequisites)
+            seen: set[str] = set()
+            while pending:
+                current = pending.pop()
+                if current not in seen:
+                    seen.add(current)
+                    pending.extend(nodes[current].prerequisites)
+            if b not in seen:
+                raise KnowledgeGraphValidationError(
+                    "Extension must point toward prerequisite ancestry."
+                )

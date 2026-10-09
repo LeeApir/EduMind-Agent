@@ -1594,7 +1594,7 @@
       "id": "PHASE-1-T031",
       "phase": "Phase 1",
       "title": "发布版本化扩展知识结构",
-      "status": "todo",
+      "status": "done",
       "priority": "P1",
       "depends_on": [
         "PHASE-1-T030"
@@ -1616,9 +1616,20 @@
         "cd backend && .venv/bin/python -m pytest -q tests/test_expanded_knowledge_structure.py",
         "对本任务改动运行Ruff和mypy；涉及持久化时在隔离PostgreSQL核验迁移及并发。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "cd backend && .venv/bin/python -m pytest -q tests/test_expanded_knowledge_structure.py tests/test_knowledge_graph.py tests/test_knowledge_graph_api.py tests/test_catalog_package.py tests/test_path_rules.py",
+          "result": "passed: 58 tests (27 expansion); no skips. Exact approved30 nodes/69 edges, unchanged legacy metadata/seed, v1 default, source canonical digest/version/date/mappings, invalid graph/DAG/relationship direction/qualification, missing/corrupt/symlink/unsafe reference paths fail closed; catalog/API/path rules preserved. Existing Starlette deprecation warning only.",
+          "evidence": "local-materials/phase-1-t031/checks/tests.log"
+        },
+        {
+          "command": "cd backend && .venv/bin/ruff check app/services/knowledge_graph.py tests/test_expanded_knowledge_structure.py && .venv/bin/ruff format --check app/services/knowledge_graph.py tests/test_expanded_knowledge_structure.py && .venv/bin/mypy app/services/knowledge_graph.py; release manifest/approved plan/legacy seed SHA256; check_catalog_workflow.py; verify_legacy_archives.py; git diff --check",
+          "result": "passed: lint/format/mypy, independent release and ADR0012 bindings, unchanged original seed, governance/history/diff self review. No migration/DB access/Provider/generated resources/mastery or default graph selection; T032 handles config/catalog isolation and public faults.",
+          "evidence": "local-materials/phase-1-t031/checks/ruff.log; mypy.log; data/knowledge/phase-1.1.0.manifest.json; data/knowledge/README.md"
+        }
+      ],
+      "started_at": "2026-10-09T14:07:57",
+      "completed_at": "2026-10-09T14:14:45",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T031"
     },
