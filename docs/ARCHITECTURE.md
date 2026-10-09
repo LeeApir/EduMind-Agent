@@ -104,3 +104,9 @@ T031已发布独立`data/knowledge/phase-1.1.0.json`及来源sidecar/摘要manif
 按Accepted ADR-0012，`knowledge_graph_versions.py`注册历史mvp-0.2.0和phase-1.1.0；默认旧版，显式`EDUMIND_KNOWLEDGE_GRAPH_VERSION`与重启选择/回滚。注册表固定原seed及扩展manifest摘要，manifest绑定图/来源字节；已校验字节直接解析成不可变对象，按版本缓存，旧对象不因配置选择变化而改写。配置每次解析，未知/冲突版本不得返回缓存旧图。无Neo4j、新依赖或PG迁移；当前/前置/后继/相似查询及30节点实际微基准见T032测试与local-materials证据（仅进程内，不代表HTTP/数据库性能）。
 
 公共图API保留路由/ID/字段，schema_version如实为1或2；全局KnowledgeGraphValidationError映射503 GRAPH_UNAVAILABLE/no-store，不暴露异常和路径。目录校验/列表/入课使用固定历史Repository，继续签核全节点/version匹配；扩展配置不改变已审核资源和用户PG掌握度，也不打开模型/动画动态门禁。路径兼容与新增节点缺课程UI由T033接续交付。
+
+### T033 路径快照与当前课程资格
+
+规划继续使用PG掌握度投影：无证据节点保留unseen与算法默认score0，新增快照`mastery_known`用于明确未知，不新增证据/重评分。历史快照不回填字段，不重写；当前查询与命令重放按原graph_version独立读取已批准Repository，选择变化仅标记stale，显式replan追加新版本，旧幂等键仍返回原版本。
+
+路径响应新增可选`learning_availability`（旧契约字段保留），作为当前读取投影而非路径历史内容：实际验证approved catalog完整签核/摘要/节点；非catalog_only时可复用owner内ready单元及passed已发布场景资源，要求节点匹配并具备讲解/代码/练习三类。来源标签、graph metadata_only或一个passed资源都不构成完整课程资格。撤回即时影响该投影，不改路径版本；目录损坏明确503 LEARNING_AVAILABILITY_UNAVAILABLE，不把校验失败伪装成“无课程”。元数据缺正式课程返回unavailable/no_reviewed_course，UI接续T034。无新增迁移、Provider或动态开放。

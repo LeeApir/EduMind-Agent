@@ -107,6 +107,7 @@ async def plan_or_replan_path(
         {
             "node_id": step.node_id,
             "score": step.score,
+            "mastery_known": step.node_id in mastery,
             "status": step.status,
             "cost": step.cost,
             "recommended_resource": step.recommended_resource,

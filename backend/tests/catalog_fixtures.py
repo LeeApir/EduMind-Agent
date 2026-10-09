@@ -2,11 +2,11 @@
 
 from app.services.animation_templates import load_template
 from app.services.catalog_package import CatalogPackage, content_digest, validate_package
-from app.services.knowledge_graph import default_knowledge_graph_repository
+from app.services.knowledge_graph_versions import catalog_knowledge_graph_repository
 
 
 def package_fixture() -> CatalogPackage:
-    graph = default_knowledge_graph_repository()
+    graph = catalog_knowledge_graph_repository()
     nodes = {node.id: {
         "explanation": {"markdown": "Synthetic fixture for " + node.name},
         "code": {"language": "C", "source": "int main(void) { return 0; }",

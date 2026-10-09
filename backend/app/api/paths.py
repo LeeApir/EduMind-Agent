@@ -10,9 +10,12 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from app.api.knowledge_graph import knowledge_graph_repository
 from app.core.auth import AuthenticatedSession, AuthFailure, require_authenticated_session
 from app.core.database import database_session_factory
-from app.models.learning_state import NodeMasteryCurrent, NodeMasteryRevision
-from app.services.knowledge_graph import KnowledgeGraphRepository
+from app.models.learning_state import LearningPathVersion, NodeMasteryCurrent, NodeMasteryRevision
+from app.services.catalog_package import CatalogError
+from app.services.knowledge_graph import KnowledgeGraphRepository, KnowledgeGraphValidationError
+from app.services.knowledge_graph_versions import graph_repository_for_version
 from app.services.learning_operations import IdempotencyConflict
+from app.services.path_availability import path_learning_availability
 from app.services.path_commands import (
     PathNotFound,
     PathVersionConflict,
@@ -89,7 +92,31 @@ async def get_current_path(
             or version.graph_version != graph.graph_version
             or version.planner_rule_version != PATH_RULE_VERSION
         )
-        return path_payload(version, is_stale=stale)
+        return await _public_path(db, version, stale=stale)
+
+
+async def _public_path(
+    db: AsyncSession, version: LearningPathVersion, *, stale: bool
+) -> dict[str, object]:
+    # Restore the original approved graph independently of the configured current version.
+    historical = graph_repository_for_version(version.graph_version, None)
+    payload = path_payload(version, is_stale=stale)
+    node_ids: list[str] = []
+    for item in version.nodes:
+        if not isinstance(item, dict) or not isinstance(item.get("node_id"), str):
+            raise KnowledgeGraphValidationError("Stored path nodes are invalid.")
+        node_ids.append(item["node_id"])
+    if any(historical.get_node(node) is None for node in [version.target_node_id, *node_ids]):
+        raise KnowledgeGraphValidationError("Stored path references invalid graph nodes.")
+    try:
+        payload["learning_availability"] = await path_learning_availability(
+            db, owner_id=version.user_id, node_ids=node_ids
+        )
+    except CatalogError:
+        raise AuthFailure(
+            503, "LEARNING_AVAILABILITY_UNAVAILABLE", "Course availability cannot be verified."
+        ) from None
+    return payload
 
 
 async def _command(
@@ -136,7 +163,7 @@ async def _command(
             or result.graph_version != graph.graph_version
             or result.planner_rule_version != PATH_RULE_VERSION
         )
-        return path_payload(result, is_stale=stale)
+        return await _public_path(db, result, stale=stale)
 
 
 @router.post("/api/path/plan", status_code=201)

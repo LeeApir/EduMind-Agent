@@ -1690,7 +1690,7 @@
       "id": "PHASE-1-T033",
       "phase": "Phase 1",
       "title": "推荐扩展节点并保持路径版本兼容",
-      "status": "todo",
+      "status": "done",
       "priority": "P1",
       "depends_on": [
         "PHASE-1-T032"
@@ -1698,7 +1698,9 @@
       "scope": [
         "backend/app/services/",
         "backend/app/api/",
-        "backend/tests/"
+        "backend/tests/",
+        "docs/api/openapi.yaml",
+        "docs/ARCHITECTURE.md"
       ],
       "prd_source": "PRD §3.4、ADR-0003",
       "acceptance_criteria": [
@@ -1710,9 +1712,25 @@
         "cd backend && .venv/bin/python -m pytest -q tests/test_expanded_learning_paths.py",
         "对本任务改动运行Ruff和mypy；涉及持久化时在隔离PostgreSQL核验迁移及并发。"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "backend/.venv/bin/python scripts/run_provider_storage_tests.py edumind_catalog_phase1_t033_v6 tests/test_expanded_learning_paths.py tests/test_path_versions.py tests/test_paths_api.py tests/test_path_rules.py tests/test_catalog_publication.py",
+          "result": "passed: 20 tests, no skips, actual isolated PG migration roundtrip; historical replay/rollback/concurrency, owner isolation, mastery evidence/response unchanged, no inferred new evidence, current signed catalog/withdrawal, DB immutability and injected integrity failure 503, complete matching reviewed owner resources; Provider 0",
+          "evidence": "local-materials/phase-1-t033/checks/pg-v6.log"
+        },
+        {
+          "command": "test_expanded_ordinary_path_request_p95: 30 target plans and 30 current reads via TestClient + actual PG + signed TEST_ONLY catalog",
+          "result": "passed: nearest-rank P95 plan 64.5503ms/read 48.6803ms <=200ms; complete denominators; local environment only",
+          "evidence": "local-materials/phase-1-t033/latency.json"
+        },
+        {
+          "command": "offline graph/catalog/path regression; changed Ruff/format/mypy3; provider contract/workflow/legacy archives/diff self-review",
+          "result": "passed: offline76, 571 refs/63 operations/85 examples. Initial PG v1 failed two test assumptions (node spelling and public-graph fixture); fixture bound to catalog baseline. Added-resource v3 test tried mutating immutable publication, corrected by appending resource version; DB safety preserved. v2/v4/v5 passed and final v6 all20 passed. No new migration/schema, no Provider calls.",
+          "evidence": "local-materials/phase-1-t033/checks/; backend/tests/test_expanded_learning_paths.py"
+        }
+      ],
+      "started_at": "2026-10-09T14:22:05",
+      "completed_at": "2026-10-09T14:30:18",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T033"
     },
