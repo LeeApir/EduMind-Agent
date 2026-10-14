@@ -27,3 +27,11 @@ T039保持blocked，T040/T041未开始。后续先离线增强有界、无正文
 [真实诊断结果](results/diagnostic-r02.json)：HTTP200，1.108264秒，生产解析通过，模型ID `qwen3.8-max-0902`，usage输入17/输出2，共19 tokens；正常JSON、无error、1个choice。因此**当前配置可以调用**。精确OK匹配false、编码gzip，实际复现了两处测试观测缺陷：r01把本地内容检查的ValueError统一归为TEMPORARILY_UNAVAILABLE；r01按原始压缩wire字节读JSON导致usage丢失。离线使用OK.示例复现前者、gzip合成响应复现后者，36项回归/Ruff通过；诊断已通过，但不把其结果改写为r01通过，不推断第一轮未保留的具体正文/唯一根因。
 
 累计真实2次，持久保守预留CNY0.02172，首轮usage仍unknown；本次19 tokens按冻结原价估算CNY0.000276，并非真实账单。两轮结束均已撤销连接/核对无持久Key。T039仍未完成结构化/工具/流式及其他适配器验收，未启动T040/T041。现有总4次预算只余2次而剩余主模型探测3项，不静默超额补跑。
+
+## 修复及继续执行 r03
+
+用户要求修复后继续T039，修复版源码2308846，专用PG132通过/零跳过、mypy166/Ruff通过；官方兼容API明确支持`stream_options.include_usage=true`，按显式内部能力绑定启用，默认wire不变。新入口 `run_phase1_provider_checks_v2.py`：本地探测校验/程序错误/Provider错误分别记录，gzip与SSE usage在HTTP解码后提取，原schema/模型身份/协议正常终止断言保留；词面OK只记录诊断，不拿它替代接入判断，旧r01失败不改分。
+
+实际结构化probe1次：HTTP200/1.053809s，严格json_schema及ok=true通过，21输入+5输出；实际流式probe1次：HTTP200/1.106806s，模型一致/SSE正常结束及DONE通过、末尾usage17输入+2输出。本轮49 tokens，含此前诊断已知64 tokens，首轮用量仍未知。新冻结附件SHA与三个SQLite台账核对一致，累计4/4请求，保守预留CNY0.046488（非实际账单），连接均撤销/Key无持久记录；[本轮摘要](results/progress-r03.json)。
+
+当前主模型只余工具格式探测，原4次上限已满，不能默默发送第5次。[额外1次具体方案](tool-followup-proposal.json) 请求将累计上限改为5次、费用仍人民币1元；固定公开emit_probe(ok=true)，64总输出/预留74、10秒、0重试/回退、禁止执行工具、不含T040/T041及其他厂商。批准前不发出，不清零旧台账。其他原生适配器继续如实未配置/未授权/未验收，不宣称整个T039已完成。

@@ -1,0 +1,29 @@
+{
+  "task_id": "PHASE-1-T039",
+  "state": "BLOCKED_REQUEST_LIMIT_REACHED",
+  "fix_source_commit": "2308846",
+  "checks_offline": "checks-offline.json",
+  "frozen_file_hashes_match": true,
+  "aggregate_actual_requests": 4,
+  "approved_request_limit": 4,
+  "aggregate_reserved_cost_cny": 0.046488,
+  "actual_bill_cny": null,
+  "usage_note": "r01 remains unknown; diagnostic+structured+stream known input55/output9=64, not the total across all4 calls.",
+  "primary_model_results": {
+    "text": "real diagnostic production parser passed; original r01 failed preserved",
+    "structured": "passed strict json_schema and exact boolean payload",
+    "stream": "passed production SSE parser, normal termination/DONE, model binding and actual final usage 17+2",
+    "tool": "not_run_budget_exhausted"
+  },
+  "other_adapters": {
+    "ollama": "not_configured_not_authorized_not_run",
+    "anthropic": "not_configured_not_authorized_not_run",
+    "gemini": "not_configured_not_authorized_not_run",
+    "spark": "not_configured_not_authorized_not_run"
+  },
+  "gate_changes": "Local probe failures are INVALID_OUTPUT/probe_validation, unexpected local bugs SAFETY_FAILURE/local_unexpected, Provider codes retained. gzip/SSE usage parsed after HTTP decoding. Protocol/schema/model checks unchanged; literal OK diagnostic does not classify availability.",
+  "source_history": "r01 code at5014173; diagnostic r02 at16f46ec; r03 at2308846. Historical freezes are checked against those versions, not rewritten after current source changes.",
+  "fallbacks": 0,
+  "tool_executions": 0,
+  "t040_t041_started": false
+}

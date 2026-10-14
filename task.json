@@ -2152,7 +2152,7 @@
       "id": "PHASE-1-T039",
       "phase": "Phase 1",
       "title": "验证真实Provider连接与选择路由",
-      "status": "in_progress",
+      "status": "blocked",
       "priority": "P1",
       "depends_on": [
         "PHASE-1-T008",
@@ -2188,11 +2188,12 @@
         "用户提供9个阿里云模型额度显示及主/付费兜底偏好，已记录model-selection-20261014.json；仅核对本机主模型/端点元数据一致，未使用Key/联网，能力及额度计费未验证；主模型建议上限4次但实际授权仍0",
         "用户“先进行T39”批准主模型4次/CNY1，独立authorization-20261014.json，不扩T040/T041；有界兼容wire修复与专用PG122测试通过0跳过、mypy166/Ruff通过；已冻结run-r01，真实请求待执行。",
         "真实r01：源码5014173，出站1次/HTTP200/1.381369s，文本探测失败TEMPORARILY_UNAVAILABLE，用量未知；预留保守费用CNY0.01086非实际账单，首败永久halt，结构化/工具/流式未发送；0重试/0回退，临时Key未持久且连接已撤销，冻结SHA/SQLite台账与脱敏摘要核对通过，results/r01.json。",
-        "用户“排查是无法调用吗”后，原总4次/CNY1内单独分配1次/CNY0.03诊断。冻结16f46ec；相同正文SHA真实HTTP200/1.108264s/模型一致/生产解析通过，输入17输出2，精确OK=false/gzip；证明当前可调用并复现测试检查/观测缺陷，首轮唯一根因不可追溯。离线36通过/Ruff通过；原冻结SHA、两轮台账总2次/预留CNY0.02172、撤销/无持久Key审计，results/diagnostic-r02.json；原r01/台账不修改，无额外重试/回退。"
+        "用户“排查是无法调用吗”后，原总4次/CNY1内单独分配1次/CNY0.03诊断。冻结16f46ec；相同正文SHA真实HTTP200/1.108264s/模型一致/生产解析通过，输入17输出2，精确OK=false/gzip；证明当前可调用并复现测试检查/观测缺陷，首轮唯一根因不可追溯。离线36通过/Ruff通过；原冻结SHA、两轮台账总2次/预留CNY0.02172、撤销/无持久Key审计，results/diagnostic-r02.json；原r01/台账不修改，无额外重试/回退。",
+        "修复源码2308846：专用PG132通过零跳过/mypy166/Ruff；实际严格json_schema HTTP200/1.053809s/21+5tokens；流式HTTP200/1.106806s/17+2tokens、模型及SSE正常终止/DONE通过，gzip和末尾usage正确读取。累计4/4次/保守预留CNY0.046488；三SQLite台账和新冻结SHA审计、撤销/无持久Key通过，results/progress-r03.json；旧r01不改写、T040/T041未启动。"
       ],
       "started_at": "2026-10-14T15:58:34",
       "completed_at": null,
-      "blocker": null,
+      "blocker": "修复已完成并经专用PG132/mypy/Ruff及真实结构化/流式验证通过；累计4/4请求、保守预留CNY0.046488。当前主模型仅余工具格式1次，需明确批准将累计请求上限改为5、原CNY1不变，具体tool-followup-proposal.json；其他原生适配器无配置/授权仍未验收，不冒称整体done。",
       "commit_lookup": "Task-Completed: PHASE-1-T039"
     },
     {

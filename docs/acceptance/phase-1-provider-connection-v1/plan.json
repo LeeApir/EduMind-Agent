@@ -1,7 +1,7 @@
 {
   "version": "phase1-real-connection-v3",
   "task_id": "PHASE-1-T039",
-  "state": "STOPPED_FIRST_FAILURE",
+  "state": "BLOCKED_REQUEST_LIMIT_REACHED",
   "base_commit": "cbf52bcc1a6ac8da8bc34f13eb3de831b462bdb6",
   "current_authorization": {
     "requests": 4,
@@ -33,7 +33,7 @@
         "currency": "CNY",
         "amount": 1
       },
-      "remote_validation": "diagnostic_connection_parser_passed; r01 remains failed; structured/tool/stream not_run"
+      "remote_validation": "text diagnostic + strict structured + streamed response passed; original r01 failure preserved; tool pending budget"
     }
   ],
   "available_adapter_types": [
@@ -87,7 +87,7 @@
     "cross_provider_fallback": false,
     "send_learner_data": false
   },
-  "execution_gate": "Original r01 remains permanently stopped. User requested bounded diagnosis: independent r02 sent once inside original aggregate limits and passed production parsing. No further calls: 2/4 spent, 3 primary capability probes remain, native adapters not configured/authorized, T040/T041 not started.",
+  "execution_gate": "Original aggregate 4-request limit fully consumed. No further calls until user agrees to one extra same-model public tool-format probe (aggregate5/CNY1). Preserve all historical ledgers; no retry/fallback/T040/T041.",
   "selection_record": "model-selection-20261014.json",
   "paid_last_resort": {
     "model_id": "deepseek-flash",
@@ -98,5 +98,7 @@
   "frozen_run": "run-r01.json",
   "result": "results/r01.json",
   "diagnostic_result": "results/diagnostic-r02.json",
-  "aggregate_actual_requests": 2
+  "aggregate_actual_requests": 4,
+  "latest_result": "results/progress-r03.json",
+  "pending_budget_proposal": "tool-followup-proposal.json"
 }
