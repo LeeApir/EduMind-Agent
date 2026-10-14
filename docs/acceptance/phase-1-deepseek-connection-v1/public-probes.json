@@ -1,0 +1,100 @@
+{
+  "text": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Reply only with OK."
+      }
+    ],
+    "stream": false,
+    "reasoning": {
+      "effort": "none"
+    },
+    "max_output_tokens": 128,
+    "temperature": 0,
+    "model": "deepseek-flash"
+  },
+  "structured": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Return JSON {\"ok\":true}."
+      }
+    ],
+    "stream": false,
+    "reasoning": {
+      "effort": "none"
+    },
+    "max_output_tokens": 128,
+    "temperature": 0,
+    "model": "deepseek-flash",
+    "text": {
+      "format": {
+        "type": "json_schema",
+        "name": "edumind_result",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "ok": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "ok"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "tool": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Call emit_probe with ok=true. Do not write prose."
+      }
+    ],
+    "stream": false,
+    "reasoning": {
+      "effort": "none"
+    },
+    "max_output_tokens": 128,
+    "temperature": 0,
+    "model": "deepseek-flash",
+    "tools": [
+      {
+        "type": "function",
+        "name": "emit_probe",
+        "description": "Return the fixed probe flag.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "ok": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "ok"
+          ],
+          "additionalProperties": false
+        }
+      }
+    ],
+    "tool_choice": "auto"
+  },
+  "stream": {
+    "input": [
+      {
+        "role": "user",
+        "content": "Reply only with OK."
+      }
+    ],
+    "stream": true,
+    "reasoning": {
+      "effort": "none"
+    },
+    "max_output_tokens": 128,
+    "temperature": 0,
+    "model": "deepseek-flash"
+  }
+}
