@@ -2221,7 +2221,7 @@
       "id": "PHASE-1-T040",
       "phase": "Phase 1",
       "title": "完成新配置动态资源质量验收",
-      "status": "todo",
+      "status": "blocked",
       "priority": "P0",
       "depends_on": [
         "PHASE-1-T035",
@@ -2243,11 +2243,12 @@
       ],
       "verification_results": [
         "用户指定先切换DeepSeek做后续完整测试；本机.env恢复已有DeepSeek Key/https://api.deepseek.com/deepseek-flash，传输改为工厂实际支持的responses_json_schema，Qwen配置留作inactive回退资料。实际环境离线解析及DeepSeekResponsesAdapter选择通过，config/Responses59测试通过；0DNS/模型调用。T039原Qwen完成证据不转授，新DeepSeek实际路径需另存接入复验证据并冻结有界预算后才能启动T040；本次不领取质量任务。",
-        "用户要求“用deepseek跑一遍”后完成独立接入复验：源码909ddb6、4/4公开请求HTTP200/模型一致，当前Responses路径文本/严格JSON/auto工具格式/流式response.completed与usage均通过。实际359输入45输出共404tokens，106离线测试/Ruff、冻结SHA/台账核验通过，独立证据phase-1-deepseek-connection-v1/results/r01.json；仅证明此系统模型传输，不转授P1 Chat或质量/性能，不开动态，不开始T040/T041正式验收。"
+        "用户要求“用deepseek跑一遍”后完成独立接入复验：源码909ddb6、4/4公开请求HTTP200/模型一致，当前Responses路径文本/严格JSON/auto工具格式/流式response.completed与usage均通过。实际359输入45输出共404tokens，106离线测试/Ruff、冻结SHA/台账核验通过，独立证据phase-1-deepseek-connection-v1/results/r01.json；仅证明此系统模型传输，不转授P1 Chat或质量/性能，不开动态，不开始T040/T041正式验收。",
+        "2026-10-14 T040准备检查点：prepare_t040_diagnostics.py从当前ReviewAgent._review离线捕获历史5/5/1/2组共13正文，绑定原payload/请求/source哈希，4096总输出/非思考/temperature0/单次60秒/零重试回退；各组费用上限0.25/0.25/0.05/0.11元，未授权/未发送。38离线测试、Ruff、proposal哈希核对、历史批准/动态冻结/236归档文件校验、工作流/diff通过；先前两历史校验器因后续运行源码和已授权ADR追加而失败，已修复为原批准提交与当前冻结样本分别核对，不改原附件/标签/失败。具体证据phase-1-t040-deepseek-v1。"
       ],
-      "started_at": null,
+      "started_at": "2026-10-14T19:38:26",
       "completed_at": null,
-      "blocker": null,
+      "blocker": "四组DeepSeek历史诊断具体预算待批准：5/5/1/2请求，分别CNY0.25/0.25/0.05/0.11，合计13次/CNY0.66；ADR-0011 D要求各组独立授权。已准备当前生产审核请求及来源hash，真实调用0；正式质量与DSL预算另行冻结，不能转用接入额度。",
       "commit_lookup": "Task-Completed: PHASE-1-T040"
     },
     {

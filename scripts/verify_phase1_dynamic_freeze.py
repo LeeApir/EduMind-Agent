@@ -5,6 +5,7 @@ import subprocess
 from pathlib import Path
 
 from acceptance_support.phase1_budget import canonical, sha
+from verify_phase1_dynamic_approval import main as verify_approval
 
 ROOT = Path(__file__).resolve().parents[1]
 BASE = ROOT / "docs/acceptance/phase-1-dynamic-v1"
@@ -19,11 +20,15 @@ def archived(commit, path):
 
 
 def main():
+    verify_approval()
+    approval = json.loads((ROOT / "docs/ADR/0011-dynamic-approval-20261008.json").read_text())
     manifest = read("manifest.json")
     assert manifest["status"] == "PROPOSED_NO_CALLS"
     assert manifest["authorized_requests"] == manifest["authorized_cost_micro"] == 0
     for path, digest in manifest["files"].items():
-        assert sha((ROOT / path).read_bytes()) == digest, f"freeze changed: {path}"
+        # This proposal records historical sources, not the later execution freeze.
+        # verify_approval above separately checks current immutable samples and ADR addendum.
+        assert sha(archived(approval["approved_proposal_commit"], path)) == digest, path
     history = read("history.json")
     raw = archived(history["archive_commit"], history["source_path"])
     assert sha(raw) == history["source_sha256"]
@@ -75,7 +80,7 @@ def main():
     )
     print(
         "PASS: proposal hashes, 8 historical cases, 9 failed slots, 50 new review cases, "
-        "100 new generation slots; Provider calls=0; approval pending"
+        "100 new generation slots; Provider calls=0; execution budget remains separate"
     )
 
 

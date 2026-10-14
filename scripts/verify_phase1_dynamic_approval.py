@@ -9,6 +9,18 @@ from acceptance_support.phase1_budget import sha
 ROOT = Path(__file__).resolve().parents[1]
 RECORD = ROOT / "docs/ADR/0011-dynamic-approval-20261008.json"
 MANIFEST = "docs/acceptance/phase-1-dynamic-v1/manifest.json"
+ADR = "docs/ADR/0011-independent-dynamic-acceptance.md"
+DEFERRAL_COMMIT = "61ffdcc"
+DEFERRAL_RECORD = "docs/acceptance/phase-1-provider-connection-v1/target-deferral-20261014.json"
+
+
+def verify_current_attachment(path, original, current, deferred_adr=None):
+    """Only the separately authorized target addendum may extend the approved ADR."""
+    if path == ADR and deferred_adr is not None:
+        assert deferred_adr.startswith(original + b"\n"), path
+        assert current == deferred_adr, path
+    else:
+        assert current == original, path
 
 
 def main():
@@ -42,7 +54,22 @@ def main():
         if path.startswith("docs/acceptance/phase-1-dynamic-v1/") or path.startswith(
             "docs/ADR/0011-"
         ):
-            assert sha((ROOT / path).read_bytes()) == digest, path
+            deferred = None
+            if path == ADR:
+                deferred = subprocess.check_output(
+                    ["git", "show", f"{DEFERRAL_COMMIT}:{ADR}"], cwd=ROOT
+                )
+                deferral_raw = subprocess.check_output(
+                    ["git", "show", f"{DEFERRAL_COMMIT}:{DEFERRAL_RECORD}"], cwd=ROOT
+                )
+                assert (ROOT / DEFERRAL_RECORD).read_bytes() == deferral_raw
+                deferral = json.loads(deferral_raw)
+                assert deferral["deferred_real_targets"] == [
+                    "ollama", "anthropic", "gemini", "spark"
+                ]
+                assert deferral["additional_provider_requests_authorized"] == 0
+                assert deferral["t040_t041_execution_authorized"] is False
+            verify_current_attachment(path, archived(path), (ROOT / path).read_bytes(), deferred)
     assert (
         sha((ROOT / MANIFEST).read_bytes())
         == record["approved_proposal_manifest_sha256"]
