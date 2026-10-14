@@ -1,0 +1,42 @@
+{
+  "tool": {
+    "model": "qwen3.8-max-0902",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Call emit_probe with ok=true. Do not write prose."
+      }
+    ],
+    "max_completion_tokens": 64,
+    "enable_thinking": false,
+    "stream": false,
+    "temperature": 0,
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "emit_probe",
+          "description": "Return the fixed probe flag.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "ok": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "ok"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    ],
+    "tool_choice": {
+      "type": "function",
+      "function": {
+        "name": "emit_probe"
+      }
+    }
+  }
+}
