@@ -221,3 +221,41 @@ def test_full_sender_reserves_before_key_and_production_http_parser(
     with pytest.raises(GateFailure, match="BUDGET_EXHAUSTED|RUN_HALTED"):
         asyncio.run(runner.run_one("error_detection"))
     assert audits[0].sent == 1
+
+
+@pytest.mark.parametrize("reason", ["max_output_tokens", "content_filter"])
+def test_incomplete_metadata_keeps_only_documented_enums_and_item_counts(reason):
+    raw = {
+        "status": "incomplete",
+        "incomplete_details": {"reason": reason, "message": "PRIVATE_ERROR"},
+        "error": {"message": "PRIVATE_ERROR"},
+        "output": [
+            {"type": "reasoning", "content": "PRIVATE_REASONING"},
+            {"type": "message", "content": "PRIVATE_PARTIAL"},
+            {"type": "reasoning", "content": "PRIVATE_REASONING"},
+            {"type": "PRIVATE_TYPE"},
+        ],
+    }
+    assert runner.completion_metadata(json.dumps(raw).encode()) == {
+        "status": "incomplete",
+        "incomplete_reason": reason,
+        "output_item_counts": {"reasoning": 2, "message": 1},
+    }
+    assert runner.retain_generated_response(json.dumps(raw).encode()) is None
+
+
+@pytest.mark.parametrize(
+    "raw",
+    [
+        b"PRIVATE",
+        b"[]",
+        b"null",
+        b'{"status":[],"incomplete_details":{"reason":{}},"output":[{"type":[]}]}',
+    ],
+)
+def test_untrusted_completion_metadata_never_leaks_arbitrary_values(raw):
+    assert runner.completion_metadata(raw) == {
+        "status": None,
+        "incomplete_reason": None,
+        "output_item_counts": {},
+    }

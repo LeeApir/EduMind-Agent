@@ -27,13 +27,14 @@ def settings_guard():
 
 
 @pytest.mark.parametrize("structured", [False, True])
-def test_explicit_high_uses_same_adapter_and_total_output_bound(structured, monkeypatch):
+@pytest.mark.parametrize("effort", ["high", "low"])
+def test_explicit_effort_uses_same_adapter_and_total_output_bound(structured, effort, monkeypatch):
     observed = []
 
     def send(request):
         body = json.loads(request.content)
         observed.append(body)
-        assert body["reasoning"] == {"effort": "high"}
+        assert body["reasoning"] == {"effort": effort}
         assert body["max_output_tokens"] == 8192
         assert request.headers["Host"] == "api.deepseek.test"
         assert request.extensions["sni_hostname"] == "api.deepseek.test"
@@ -63,7 +64,7 @@ def test_explicit_high_uses_same_adapter_and_total_output_bound(structured, monk
         )
 
     monkeypatch.setenv("EDUMIND_PROVIDER_STRUCTURED_TRANSPORT", "responses_json_schema")
-    adapter = configured_provider_adapter(*settings_guard(), reasoning_effort="high")
+    adapter = configured_provider_adapter(*settings_guard(), reasoning_effort=effort)
     assert isinstance(adapter, DeepSeekResponsesAdapter)
     adapter._transport = httpx.MockTransport(send)
     prompt = TextRequest((ChatMessage("user", "Synthetic check"),), max_output_tokens=8192)

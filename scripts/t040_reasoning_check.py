@@ -21,13 +21,16 @@ CASE_IDS = ("linked-list-concept:explanation:1", "correct-list-concept")
 
 def select_round(round_id):
     global BASE, RAW, ROUND, GROUP, CASE_IDS
-    if round_id not in {"r03", "r06"}:
+    if round_id not in {"r03", "r06", "r07"}:
         raise GateFailure("INVALID_FREEZE")
     ROUND = round_id
-    if round_id == "r06":
+    if round_id in {"r06", "r07"}:
         BASE = ROOT / "docs/acceptance/phase-1-t040-review-scope-check"
         RAW = ROOT / "local-materials/phase-1-t040-review-scope-check"
         GROUP = "review_scope"
+        if round_id == "r07":
+            BASE = ROOT / "docs/acceptance/phase-1-t040-review-scope-low"
+            RAW = ROOT / "local-materials/phase-1-t040-review-scope-low"
         CASE_IDS = ("queue:explanation:1", "correct-list-concept")
     else:
         BASE = ROOT / "docs/acceptance/phase-1-t040-reasoning-check"
@@ -42,7 +45,7 @@ async def proposed():
     bodies, rows = {}, []
     for index, case in enumerate(selected, 1):
         body = await preparation.capture_case(case)
-        body["reasoning"] = {"effort": "high"}
+        body["reasoning"] = {"effort": "low" if ROUND == "r07" else "high"}
         body["max_output_tokens"] = 8192
         slot = f"{GROUP}:{index:02}"
         bodies[slot] = body
@@ -71,7 +74,7 @@ async def proposed():
         "base_url": "https://api.deepseek.com",
         "transport": "responses_json_schema",
         "adapter": "DeepSeekResponsesAdapter",
-        "reasoning_effort": "high",
+        "reasoning_effort": "low" if ROUND == "r07" else "high",
         "review_instruction_version": REVIEW_INSTRUCTION_VERSION,
         "temperature": 0,
         "temperature_effect": "Ignored by provider in thinking mode.",
@@ -116,7 +119,7 @@ async def proposed():
         "human_factual_signoff_inferred": False,
         "old_budget_transferred": False,
     }
-    if ROUND == "r06":
+    if ROUND in {"r06", "r07"}:
         plan.update(
             version="t040-review-findings-scope-proposal-v1",
             scope="Findings-only review calibration. Does not replace any full diagnostic group.",
@@ -130,6 +133,14 @@ async def proposed():
             },
             reporting_policy="Record each axis separately; never relabel a correct detection as a miss because another axis failed.",
             scope_failure_gate="A false finding/counterexample or findings-only scope violation stops calibration as ADMISSION_FAILED, without changing detection/classification labels.",
+        )
+    if ROUND == "r07":
+        plan.update(
+            version="t040-review-findings-low-proposal-v1",
+            previous_failed_result="docs/acceptance/phase-1-t040-review-scope-check/results/review-scope-r06.json",
+            comparison_limits="Only reasoning effort changes from r06 high to low; two samples cannot establish reliability or unique causation.",
+            hypothesis="Lower reasoning effort may finish within the unchanged total output cap; this does not guarantee completion or defect detection.",
+            diagnostic_metadata="Persist only allowlisted status/incomplete reason/output item type counts; no vendor error text or reasoning text.",
         )
     return bodies, plan
 
@@ -159,7 +170,7 @@ def write_proposal():
         ROOT / "docs/acceptance/phase-1-deepseek-connection-v1/results/r01.json",
         ROOT / "docs/acceptance/phase-1-t040-deepseek-v2/results/diagnostic-r02.json",
     ]
-    if ROUND == "r06":
+    if ROUND in {"r06", "r07"}:
         paths += [
             ROOT / "backend/tests/test_review_scope.py",
             ROOT / plan["previous_failed_result"],
@@ -194,7 +205,7 @@ def check_proposal():
             or sha(path.read_bytes()) != digest
         ):
             raise GateFailure("FREEZE_CHANGED")
-    print("PASS: high-reasoning two-case strategy proposal/source hashes; real calls=0")
+    print("PASS: two-case strategy proposal/source hashes; real calls=0")
 
 
 def configure_execution():
@@ -205,7 +216,7 @@ def configure_execution():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--round", choices=("r03", "r06"), default="r03")
+    parser.add_argument("--round", choices=("r03", "r06", "r07"), default="r03")
     group = parser.add_mutually_exclusive_group(required=True)
     for name in ("write-proposal", "check-proposal", "freeze", "run-one"):
         group.add_argument("--" + name, action="store_true")

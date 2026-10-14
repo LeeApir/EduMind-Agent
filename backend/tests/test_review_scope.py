@@ -117,3 +117,29 @@ def test_r06_uses_queue_error_plus_approved_correct_control_and_separate_axes(mo
         assert plan["evaluation_axes"]["repair_quality"].startswith("NOT_RUN")
         assert "never relabel a correct detection" in plan["reporting_policy"]
         assert all(b["reasoning"] == {"effort": "high"} for b in bodies.values())
+
+
+def test_r07_changes_only_effort_with_new_budget_and_same_frozen_axes(monkeypatch):
+    with monkeypatch.context() as context:
+        for name in ("BASE", "RAW", "ROUND", "GROUP", "CASE_IDS"):
+            context.setattr(scope, name, getattr(scope, name))
+        scope.select_round("r07")
+        bodies, plan = asyncio.run(scope.proposed())
+        prior_base = scope.ROOT / "docs/acceptance/phase-1-t040-review-scope-check"
+        prior = json.loads((prior_base / "requests.json").read_text())
+        prior_plan = json.loads((prior_base / "proposal.json").read_text())
+        for slot, body in bodies.items():
+            original = prior[slot]
+            assert body["reasoning"] == {"effort": "low"}
+            assert {k: v for k, v in body.items() if k != "reasoning"} == {
+                k: v for k, v in original.items() if k != "reasoning"
+            }
+        assert scope.BASE != prior_base
+        assert str(scope.RAW).endswith("review-scope-low")
+        assert plan["evaluation_axes"] == prior_plan["evaluation_axes"]
+        assert plan["requested_total_calls"] == 2
+        assert plan["requested_total_cost_micro_cny"] == 180000
+        assert plan["provider_requests_authorized"] == 0
+        assert not plan["old_budget_transferred"]
+        assert not plan["formal_quality_authorized"]
+        assert plan["previous_failed_result"].endswith("review-scope-r06.json")

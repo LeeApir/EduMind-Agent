@@ -333,6 +333,7 @@ async def run_one(group):
         "error_category": category,
         "quality_failure": quality_failure,
         "response": fields,
+        "completion_metadata": completion_metadata(decoded),
         "review": review,
         "duration_seconds": round(time.monotonic() - started, 6),
         "human_confirmed": False,
@@ -354,6 +355,40 @@ async def run_one(group):
             }
         )
     )
+
+
+def completion_metadata(decoded):
+    """Allowlisted protocol metadata only; never persist arbitrary vendor text."""
+    try:
+        raw = json.loads(decoded)
+    except (ValueError, UnicodeError):
+        return {"status": None, "incomplete_reason": None, "output_item_counts": {}}
+    if not isinstance(raw, dict):
+        return {"status": None, "incomplete_reason": None, "output_item_counts": {}}
+    status = raw.get("status")
+    details = raw.get("incomplete_details")
+    reason = details.get("reason") if isinstance(details, dict) else None
+    counts = {}
+    output = raw.get("output")
+    if isinstance(output, list):
+        for item in output:
+            kind = item.get("type") if isinstance(item, dict) else None
+            if isinstance(kind, str) and kind in {
+                "message",
+                "reasoning",
+                "function_call",
+            }:
+                counts[kind] = counts.get(kind, 0) + 1
+    return {
+        "status": status
+        if isinstance(status, str)
+        and status in {"in_progress", "completed", "incomplete", "failed"}
+        else None,
+        "incomplete_reason": reason
+        if isinstance(reason, str) and reason in {"max_output_tokens", "content_filter"}
+        else None,
+        "output_item_counts": counts,
+    }
 
 
 def retain_generated_response(decoded):
