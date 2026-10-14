@@ -2221,7 +2221,7 @@
       "id": "PHASE-1-T040",
       "phase": "Phase 1",
       "title": "完成新配置动态资源质量验收",
-      "status": "in_progress",
+      "status": "blocked",
       "priority": "P0",
       "depends_on": [
         "PHASE-1-T035",
@@ -2253,11 +2253,12 @@
         "2026-10-14 用户继续后实施审核Prompt v3修复候选，通用检查分配/可失败调用的失败路径、调用者覆盖和原内存所有权、清理与注释；保留正确临时返回值/所有权契约对照，无按案例ID预定拒绝。94离线通过、Ruff、mypy166源文件通过、历史批准/样本冻结/工作流通过；原r01 SQLite只读核验仍1次且CONCRETE_DEFECT_MISSED。独立v2/r02提案绑定原历史payload/新系统指令/执行源码，无真实调用，13次费用上限0.69待批；不能把离线Mock pass当模型语义修复通过。",
         "用户同意ec1bc2d的r02四组13次/CNY0.69后，冻结2fc9e6a执行首例：实际HTTP200/0.819711秒/输入2716输出22共2738tokens，当前v3指令仍pass/issues=[]，触发CONCRETE_DEFECT_MISSED停止；12槽未发。此前94离线/Ruff/mypy166通过；四当前源码冻结哈希、实际请求/SQLite/保留回答review核验通过，原r01源码按2f989da及只读SQLite再次核对。Prompt修复无实测改善证据；独立结果phase-1-t040-deepseek-v2/results/diagnostic-r02.json。",
         "继续排查确认实际请求哈希与冻结正文匹配、适配器固定reasoning=none，保留响应reasoning_tokens均0；不能唯一归因漏检。官方Responses及人民币定价核对后增加服务端显式推理参数（默认none不变，Beta拒绝忽略非none），准备same-model high两例小检查，保留v3 Prompt/候选/schema，8192总输出/120秒/2次/CNY0.17待批准。128离线通过、Ruff/mypy166、历史批准/样本冻结/任务/提案哈希通过；旧两SQLite只读仍各1次且停止。尚无真实推理策略结果，证据phase-1-t040-reasoning-check。",
-        "用户批准2次/CNY0.17后按575402d真实high策略小检查：错例revise，具体指出head覆盖丢链/泄漏，code_safety/major，8.346243秒/2741输入1368总输出(推理1123)；正确例pass，2.321424秒/1320输入229总输出(推理206)。2HTTP200/schema/完成/模型/usage有效，合计5658tokens，其中推理1329；预留CNY0.169712，实际账单未知。原128离线通过、当前冻结源码/请求/SQLite两条/保留最终回答一致核验通过，不存推理正文；实际人工签核未推定，未晋级。另准备同配置完整r04 13次/CNY1.12提案，新计划回归1项/Ruff/来源SHA通过，真实未发。"
+        "用户批准2次/CNY0.17后按575402d真实high策略小检查：错例revise，具体指出head覆盖丢链/泄漏，code_safety/major，8.346243秒/2741输入1368总输出(推理1123)；正确例pass，2.321424秒/1320输入229总输出(推理206)。2HTTP200/schema/完成/模型/usage有效，合计5658tokens，其中推理1329；预留CNY0.169712，实际账单未知。原128离线通过、当前冻结源码/请求/SQLite两条/保留最终回答一致核验通过，不存推理正文；实际人工签核未推定，未晋级。另准备同配置完整r04 13次/CNY1.12提案，新计划回归1项/Ruff/来源SHA通过，真实未发。",
+        "用户ok确认r03两例事实并批准四组13次/CNY1.12，按31ed911冻结high/8192/120秒执行第一组：3HTTP200/模型/schema/完成/用量均有效；第1例具体检出head覆盖泄漏/code_safety，第2例具体检出循环队列rear-front及front==rear空满矛盾/fact，第3例第i走i步未注明0起点却pass，按已批准标签漏检停止。实际7309输入+13183总输出=20492tokens（其中推理12865），预留CNY0.261834，10槽未发；四当前冻结来源SHA、请求/SQLite/保留最终回答核验通过，无新人工签核/跨配置拼分。证据phase-1-t040-deepseek-high-v1/results/error-detection-r04.json。"
       ],
       "started_at": "2026-10-14T19:38:26",
       "completed_at": null,
-      "blocker": null,
+      "blocker": "获批完整high诊断r04第一组已发3例：前两例assistant核对具体检出正确，但第3例未限定编号起点的第i元素走i步偏差被pass，触发CONCRETE_DEFECT_MISSED停止；总3/13次、20492tokens/推理12865、预留CNY0.261834，余10未发。需改善索引约定/边界事实审核后另冻新轮次，原标签/失败不改；分类/正确对照/长审核组和正式质量/DSL/T041未启动。",
       "commit_lookup": "Task-Completed: PHASE-1-T040"
     },
     {

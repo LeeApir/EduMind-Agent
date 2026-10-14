@@ -1,6 +1,9 @@
 # T040 high 完整历史诊断 r04 提案
 
-状态：已准备，真实调用 0，预算待批准。前置参考是
+当前状态：用户确认两例策略结果并批准四组预算，按 `31ed911` 冻结执行。
+第一组前两例具体检出正确，第三例漏检索引约定/步数问题而停止；实际 3 次、20492 Token，余 10 槽未发。
+T040 仍为 blocked，未进入下一组。见 [实际结果](results/error-detection-r04.json) 与
+[核对说明](results/error-detection-r04.md)。以下保留提案时范围与预算。前置参考是
 [high 两例结果](../phase-1-t040-reasoning-check/results/strategy-r03.md)，
 不能以其代替本轮四组或最终质量分数；用户人工确认未推定。
 
