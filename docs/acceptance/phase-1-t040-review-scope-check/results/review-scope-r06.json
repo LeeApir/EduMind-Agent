@@ -1,0 +1,108 @@
+{
+  "version": "t040-review-scope-r06-result-v1",
+  "recorded_at": "2026-10-14T23:24:27",
+  "state": "BLOCKED_INVALID_OUTPUT",
+  "execution_source_commit": "93ac1f0",
+  "model_id": "deepseek-flash",
+  "review_instruction_version": "resource-review-instructions-v5",
+  "reasoning_effort": "high",
+  "max_total_output_tokens": 8192,
+  "approved_requests": 2,
+  "approved_cost_micro_cny": 180000,
+  "real_requests": 1,
+  "observations": [
+    {
+      "duration_seconds": 48.469505,
+      "error_category": "provider_protocol",
+      "error_code": "INVALID_OUTPUT",
+      "freeze": "4fef29f0961a90f376314738a92006139c8aa88a063669b7cf1eae67112dcedd",
+      "http_status": 200,
+      "human_confirmed": false,
+      "mock": false,
+      "outbound_sends": 1,
+      "protocol_passed": false,
+      "quality_failure": null,
+      "real_cloud": true,
+      "request_sha256": "9ae83eb594111bd084f6c74216ca3e79c75f0f327c2b152c33b1878177629558",
+      "response": {
+        "arguments_schema_valid": false,
+        "completed": false,
+        "function_count": 0,
+        "function_name_matches": false,
+        "input_tokens": 2784,
+        "model_matches": true,
+        "output_tokens": 8192,
+        "reasoning_tokens": 8192
+      },
+      "response_sha256": "fc1034b405fc1c5b787cb09d9ba6cab9835178227a8395173cf682ca69d638c0",
+      "review": null,
+      "slot": "review_scope:01",
+      "wire_response_sha256": "655920127adf529be0c2488c106421f32b7dacae41d19ac1774f87c5ddc1e4f5"
+    }
+  ],
+  "unattempted_slots": [
+    "review_scope:02"
+  ],
+  "budget_snapshot": {
+    "manifest_sha256": "4fef29f0961a90f376314738a92006139c8aa88a063669b7cf1eae67112dcedd",
+    "halted": "INVALID_OUTPUT",
+    "attempts": [
+      [
+        1,
+        "review_scope:01",
+        "review",
+        "35791b9d0eaf59f0b675a095767c5e584b4dbd81ac882dbad974735350eb8488",
+        "9ae83eb594111bd084f6c74216ca3e79c75f0f327c2b152c33b1878177629558",
+        90642,
+        "failed",
+        2784,
+        8192,
+        "INVALID_OUTPUT"
+      ]
+    ],
+    "unattempted_slots": [
+      "review_scope:02"
+    ]
+  },
+  "input_tokens": 2784,
+  "output_tokens": 8192,
+  "reasoning_tokens": 8192,
+  "known_total_tokens": 10976,
+  "reserved_cost_micro_cny": 90642,
+  "known_token_peak_list_reference_micro_cny": 71104,
+  "actual_bill": "unknown",
+  "evaluation_axes": {
+    "completion_schema": "FAILED_INVALID_OUTPUT",
+    "detection": "NOT_ASSESSABLE_NO_REVIEW",
+    "classification": "NOT_ASSESSABLE_NO_REVIEW",
+    "review_scope_and_factual_quality": "NOT_ASSESSABLE_NO_REVIEW",
+    "correct_control": "NOT_RUN",
+    "repair_quality": "NOT_RUN"
+  },
+  "interpretation": "HTTP 200 and identity matched, but completion false and no parsed review. Reported output count equals reasoning count and frozen total output limit. This is consistent with exhaustion of the output allowance; exact vendor incomplete reason and reasoning behavior were not retained and are not asserted. No finding or correction-quality score can be derived.",
+  "evidence_limits": {
+    "private_observation_sha256": "59daab4509f2c8cc75053d800bb8c22ffb4a5418805ba3b131c731665a4d0111",
+    "completed_visible_response_file_present": false,
+    "raw_response_retained": false,
+    "reasoning_text_retained": false,
+    "response_hash_reconstructible_from_retained_files": false
+  },
+  "checks": {
+    "source_hash_file_checks": 186,
+    "source_files_unchanged": true,
+    "request_matches_frozen_slot": true,
+    "sqlite_attempts": 1,
+    "halted_before_second_call": true,
+    "prior_offline_tests": 137,
+    "new_mock_or_model_tests": 0
+  },
+  "human_fact_confirmation": false,
+  "retries": 0,
+  "fallbacks": 0,
+  "correction_calls": 0,
+  "formal_quality_started": false,
+  "dsl_quality_started": false,
+  "t041_started": false,
+  "production_mode": "catalog_only",
+  "production_default_effort": "none"
+}

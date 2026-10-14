@@ -2221,7 +2221,7 @@
       "id": "PHASE-1-T040",
       "phase": "Phase 1",
       "title": "完成新配置动态资源质量验收",
-      "status": "in_progress",
+      "status": "blocked",
       "priority": "P0",
       "depends_on": [
         "PHASE-1-T035",
@@ -2257,11 +2257,12 @@
         "用户ok确认r03两例事实并批准四组13次/CNY1.12，按31ed911冻结high/8192/120秒执行第一组：3HTTP200/模型/schema/完成/用量均有效；第1例具体检出head覆盖泄漏/code_safety，第2例具体检出循环队列rear-front及front==rear空满矛盾/fact，第3例第i走i步未注明0起点却pass，按已批准标签漏检停止。实际7309输入+13183总输出=20492tokens（其中推理12865），预留CNY0.261834，10槽未发；四当前冻结来源SHA、请求/SQLite/保留最终回答核验通过，无新人工签核/跨配置拼分。证据phase-1-t040-deepseek-high-v1/results/error-detection-r04.json。",
         "用户yes后实施审核Prompt v4索引/边界修复候选：约定缺失且会改变定量真值不得默认0基放行；明确零基/一基/哨兵/访问节点与链接数对照保留。133离线测试通过、Ruff/mypy166、历史批准/冻结样本/任务与新提案hash通过；旧r04只读台账仍3条/CONCRETE_DEFECT_MISSED。相关Prompt版本测试更新为当前完整生产system+原不变user/schema，并非删弱断言。复用轮次组合准备r05 13次/CNY1.16独立方案，无真实调用；不注入案例ID标准答案，不使用正式新例调参，无T040完成证据。",
         "用户yes批准13次/CNY1.16后按d774804冻结r05：两HTTP200/模型/schema/完成/用量正常；例1具体检出head覆盖泄漏/code_safety，例2具体检出队列计数空满矛盾/fact，但另建议无空槽循环队列使用取模差计数，满8时算成0。独立整数状态核对72个可达状态，8个满队列状态均反例；不执行候选C代码。原目标仍计具体检出/分类正确，不伪记漏检；单独审核建议事实错误导致ADMISSION_FAILED停止。实际5605输入+7540输出=13145tokens/推理7174，余11未发，当前源码/请求/SQLite/保留回答核对通过，证据phase-1-t040-deepseek-high-v2/results/error-detection-r05.json。",
-        "用户继续后实现审核findings-only Prompt v5及独立修正v2，允许引用原候选定位/反例，禁止夹带替换代码/通用修复公式；修正要求独立核实意见、保持原容量/表示/状态，完整重审且最多两轮。补ResourceSchemaError捕获，无效修正安全拒绝。137离线/Ruff/mypy166、历史批准/冻结样本/任务与新提案SHA通过；旧r05只读两条/ADMISSION_FAILED。r06两例小检查2次/CNY0.18方案已固定不同评估维度，正确检出不因其他失败改记漏检，修正质量NOT_RUN；真实未发，证据phase-1-t040-review-scope-check。"
+        "用户继续后实现审核findings-only Prompt v5及独立修正v2，允许引用原候选定位/反例，禁止夹带替换代码/通用修复公式；修正要求独立核实意见、保持原容量/表示/状态，完整重审且最多两轮。补ResourceSchemaError捕获，无效修正安全拒绝。137离线/Ruff/mypy166、历史批准/冻结样本/任务与新提案SHA通过；旧r05只读两条/ADMISSION_FAILED。r06两例小检查2次/CNY0.18方案已固定不同评估维度，正确检出不因其他失败改记漏检，修正质量NOT_RUN；真实未发，证据phase-1-t040-review-scope-check。",
+        "用户yes批准r06两次/CNY0.18，执行源码93ac1f0首条实际HTTP200/模型匹配/48.469505秒，但completed=false/review=null，2784输入+8192总输出=10976tokens，其中推理8192；INVALID_OUTPUT自动停止，正确对照未发。保守预留CNY0.090642，标价参考0.071104非账单；当前冻结来源SHA/请求/SQLite一条核验通过，原137离线证据。检出/分类/职责事实质量不可评估，修正NOT_RUN，不冒称漏检或通过；不留原始响应/推理正文，具体供应商未完成原因未知。证据phase-1-t040-review-scope-check/results/review-scope-r06.json。"
       ],
       "started_at": "2026-10-14T19:38:26",
       "completed_at": null,
-      "blocker": null,
+      "blocker": "r06 首条 HTTP200/模型匹配但未完成且无审核结论，INVALID_OUTPUT 停止；8192输出全部计为推理，第二条未运行。需明确新的有界推理/输出方案并独立冻结批准，不恢复旧轮次。",
       "commit_lookup": "Task-Completed: PHASE-1-T040"
     },
     {
