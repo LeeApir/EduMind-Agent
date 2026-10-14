@@ -1,6 +1,9 @@
 # T040 DeepSeek 历史诊断准备
 
-状态：已领取 T040，尚未发送真实请求。本文是具体预算提案，不是质量通过证据或执行授权。
+当前状态：四组预算已获用户批准，执行冻结为 `2f989da`；首例真实审核漏检后已停止。
+实际 1 次请求、2531 Token，其余 12 槽未发送，T040 为 blocked。
+具体输入位置、实际回答、用量与证据 hash 见 [本轮结果](results/diagnostic-r01.json) 和
+[失败说明](results/diagnostic-r01.md)。下文保留准备时的预算和范围说明，不是质量通过证据。
 
 沿用用户已选择并完成独立接入复验的 `deepseek-flash` / DeepSeek Responses 系统模型路径。
 审核请求由当前生产 `ReviewAgent._review` 离线捕获，候选和上下文逐项匹配原历史 payload hash；
