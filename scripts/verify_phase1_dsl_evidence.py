@@ -24,7 +24,7 @@ def main():
     assert safety_path.parent.parent == BASE.resolve()
     safety = json.loads(safety_path.read_text())
     assert safety["passed"] and safety["counts"] == {
-        "tests": 288,
+        "tests": 295,
         "failures": 0,
         "errors": 0,
         "skipped": 0,
@@ -90,8 +90,12 @@ def main():
         for key in ("mp4", "srt", "vtt", "dsl_file"):
             name = case["dsl"] if key == "dsl_file" else case[key]
             assert digest(review.parent / name) == case[key + "_sha256"]
+        assert (
+            case["dimensions"] == {"width": 1280, "height": 720} and case["fps"] == 15
+        )
         assert len(case["frames"]) == 11
         for frame in case["frames"]:
+            assert abs(frame["presented_seconds"] - frame["seconds"]) <= 1 / 15 + 1e-6
             assert digest(review.parent / frame["image"]) == frame["sha256"]
     result = {
         "task_id": "PHASE-1-T037",
@@ -111,6 +115,8 @@ def main():
         "review_page_sha256": digest(review.parent / "index.html"),
         "unique_actual_dsl_media": 20,
         "step_frames": 220,
+        "resolution": [1280, 720],
+        "fps": 15,
         "hardware": plan["hardware"],
         "evidence_sha256": {
             "matrix_result": digest(run / "matrix-result.json"),

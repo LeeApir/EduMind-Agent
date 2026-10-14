@@ -1985,7 +1985,10 @@
         "backend/app/workers/dsl_render.py",
         "backend/docker/dsl/",
         "docs/ARCHITECTURE.md",
-        "docs/agents/animation-dsl-v1/README.md"
+        "docs/agents/animation-dsl-v1/README.md",
+        "backend/app/services/animation_dsl_compiler_policy.json",
+        "backend/app/services/animation_dsl_static.py",
+        "docs/DEPLOYMENT.md"
       ],
       "prd_source": "PRD §3.3、§8.2、§9.4",
       "acceptance_criteria": [
@@ -2061,11 +2064,36 @@
           "command": "backend/.venv/bin/python scripts/check_catalog_workflow.py; git diff --check; Ruff check/format --check on12 modified Python files; native Chromium review-page check",
           "result": "passed workflow/dependencies/diff/source checks and review HTTP200,20 videos/220frames/20 tracks,actual first video playback",
           "evidence": "docs/acceptance/phase-1-dsl-v1/README.md"
+        },
+        {
+          "command": "EDUMIND_CATALOG_TEST_PG_CONTAINER=edumind-phase1-t037-pg backend/.venv/bin/python scripts/run_phase1_dsl_safety.py --run-id r07",
+          "result": "295 passed/0 failures/errors/skipped,720p15 compiler/static/real decode + prior safety coverage; Provider0",
+          "evidence": "docs/acceptance/phase-1-dsl-v1/results/safety-r07.json"
+        },
+        {
+          "command": "EDUMIND_CATALOG_TEST_PG_CONTAINER=edumind-phase1-t037-pg backend/.venv/bin/python scripts/run_phase1_dsl_matrix.py --run-id r06",
+          "result": "automatic300/300 passed,720p15 DSL; coldP95 upper bound5.560s,DSL/template cache0.478/0.240s; Provider0,humanpending",
+          "evidence": "docs/acceptance/phase-1-dsl-v1/results/matrix-r06.json"
+        },
+        {
+          "command": "backend/.venv/bin/python scripts/build_phase1_dsl_review.py local-materials/phase-1-t037/matrix-r06",
+          "result": "20 actual720p15 videos/220 presented-timestamp-bound native frames; no control overlay; proportional player and full-size step images; external subtitle default off",
+          "evidence": "docs/acceptance/phase-1-dsl-v1/results/visual-spot-check-r06.json"
+        },
+        {
+          "command": "backend/.venv/bin/python scripts/verify_phase1_dsl_evidence.py local-materials/phase-1-t037/matrix-r06 local-materials/phase-1-t037/safety-r07",
+          "result": "all automatic hashes/source freezes/295 tests/300 slots/20 media/220 frame timestamps passed; full_task_complete=false,humanpending",
+          "evidence": "docs/acceptance/phase-1-dsl-v1/results/automatic-evidence-r06.json"
+        },
+        {
+          "command": "native Chromium smoke http://127.0.0.1:8177/ -> /720p-r06/",
+          "result": "HTTP200,no-store,new manifest/media bytes verified,1280x720 video playback,20videos/220frames,16:9 size<=native,subtitle default disabled",
+          "evidence": "docs/acceptance/phase-1-dsl-v1/results/review-page-smoke-r06.json"
         }
       ],
       "started_at": "2026-10-09T17:12:40",
       "completed_at": null,
-      "blocker": "Automated safety288 and matrix300 passed; human actual-media review required by acceptance criterion2 is pending for20 videos/220 frames, manifest0669d0ce5a4c2dd78225bc351d09470243a4db92fd75889d1d1a33123cbb92f0; no Task-Completed until specific review confirmation.",
+      "blocker": "720p15 presentation fix safety295/matrix300 passed; new20 actual videos/220 frames await human consistency review per criterion2; manifest 63d54ed13e023cfdbb5cc9b4992908bd46e14036713b13a4c37717f41fb6faa1; old480p approval not inferred.",
       "commit_lookup": "Task-Completed: PHASE-1-T037"
     },
     {

@@ -144,7 +144,17 @@ def _wrap(text: str) -> str:
 
 
 class Builder:
-    def __init__(self) -> None:
+    def __init__(self, validated: ValidatedDSL) -> None:
+        cells = {(n.column, n.row) for f in validated.frames for n in f.nodes} or {(0, 0)}
+        columns, rows = zip(*cells)
+        self.column_center = (min(columns) + max(columns)) / 2
+        self.row_center = (min(rows) + max(rows)) / 2
+        self.column_spacing = min(
+            POLICY["layout"]["max_column_spacing"],
+            POLICY["layout"]["max_grid_width"] / max(1, max(columns) - min(columns)),
+        )
+        self.pointer_count = len(validated.candidate["pointers"])
+        self.left = (min(columns) - self.column_center) * self.column_spacing
         self.body: list[ast.stmt] = []
         self.counter = 0
 
@@ -154,7 +164,7 @@ class Builder:
         self.body.append(ast.Assign([ast.Name(variable, ast.Store())], expression))
         return _name(variable)
 
-    def text(self, text: str, x: float, y: float, size: int = 16, style: str = "reset") -> ast.Name:
+    def text(self, text: str, x: float, y: float, size: int = 22, style: str = "reset") -> ast.Name:
         expression = _call(
             "Text",
             ast.Constant(_wrap(text)),
@@ -173,8 +183,10 @@ class Builder:
                 "Arrow",
                 _point(*start),
                 _point(*end),
-                buff=0.05,
-                stroke_width=2,
+                buff=POLICY["layout"]["arrow_buff"],
+                stroke_width=POLICY["layout"]["stroke_width"],
+                tip_length=POLICY["layout"]["arrow_tip_length"],
+                max_tip_length_to_length_ratio=POLICY["layout"]["arrow_tip_ratio"],
                 color=POLICY["colors"][style],
             )
         )
@@ -188,58 +200,68 @@ class Builder:
         x, y = self.cell(node)
         box = _call(
             "RoundedRectangle",
-            width=1.15,
-            height=0.65,
+            width=POLICY["layout"]["node_width"],
+            height=POLICY["layout"]["node_height"],
             corner_radius=0.1,
             color=POLICY["colors"][node.style],
-            stroke_width=2,
+            stroke_width=POLICY["layout"]["stroke_width"],
             fill_opacity=0.3 if node.visited else 0.08,
         )
         border = self.assign(_call(ast.Attribute(box, "move_to", ast.Load()), _point(x, y)))
-        value = self.text(str(node.value), x, y, 22, node.style)
+        value = self.text(
+            str(node.value), x, y - 0.1, POLICY["layout"]["node_value_size"], node.style
+        )
         objects = [
             border,
             value,
-            self.text(node.id, x, y + 0.55, 12, node.style),
+            self.text(
+                "\n".join(node.id[i : i + 8] for i in range(0, len(node.id), 8)),
+                x,
+                y + 0.35,
+                POLICY["layout"]["long_node_label_size" if len(node.id) > 8 else "node_label_size"],
+                node.style,
+            ),
         ]
         if node.visited:
-            objects.append(self.text("已访问", x, y - 0.55, 12, "success"))
+            objects.append(
+                self.text("已访问", x, y - 0.49, POLICY["layout"]["marker_size"], "success")
+            )
         return self.group(*objects), value, border
 
-    @staticmethod
-    def cell(node: NodeState) -> tuple[float, float]:
+    def cell(self, node: NodeState) -> tuple[float, float]:
         return (
-            float(POLICY["column_start"] + POLICY["column_spacing"] * node.column),
-            float(POLICY["row_start"] - POLICY["row_spacing"] * node.row),
+            round((node.column - self.column_center) * self.column_spacing, 6),
+            round((self.row_center - node.row) * POLICY["row_spacing"], 6),
         )
 
     def edge(self, edge: EdgeState, nodes: dict[str, NodeState]) -> ast.Name:
         sx, sy = self.cell(nodes[edge.source])
         if edge.target is None:
             return self.group(
-                self.arrow((sx + 0.6, sy), (sx + 0.9, sy), edge.style),
-                self.text("NULL", sx + 1.15, sy, 12, edge.style),
+                self.arrow((sx + 0.7, sy), (sx + 1.0, sy), edge.style),
+                self.text("NULL", sx + 1.35, sy, 20, edge.style),
             )
         tx, ty = self.cell(nodes[edge.target])
-        if sx != tx:
-            sign = 1 if tx > sx else -1
-            start, end = (sx + 0.6 * sign, sy), (tx - 0.6 * sign, ty)
-        else:
-            sign = 1 if ty > sy else -1
-            start, end = (sx, sy + 0.4 * sign), (tx, ty - 0.4 * sign)
+        dx, dy = tx - sx, ty - sy
+        t = min(0.65 / abs(dx) if dx else float("inf"), 0.675 / abs(dy) if dy else float("inf"))
+        start, end = (sx + t * dx, sy + t * dy), (tx - t * dx, ty - t * dy)
         return self.group(self.arrow(start, end, edge.style))
 
     def pointer(self, pointer: PointerState, offset: int, nodes: dict[str, NodeState]) -> ast.Name:
-        x = -4.8 + 3.2 * offset
-        label = self.text(pointer.label, x, 2.85, 14, pointer.style)
+        x = self.left - 0.45 if self.pointer_count == 1 else -4.8 + 3.2 * offset
         if pointer.target is None:
             return self.group(
-                label,
-                self.arrow((x, 2.6), (x, 2.3), pointer.style),
-                self.text("NULL", x, 2.1, 12, pointer.style),
+                self.text(
+                    f"{pointer.label} → NULL",
+                    x,
+                    2.55,
+                    POLICY["layout"]["pointer_size"],
+                    pointer.style,
+                )
             )
+        label = self.text(pointer.label, x, 2.55, POLICY["layout"]["pointer_size"], pointer.style)
         tx, ty = self.cell(nodes[pointer.target])
-        return self.group(label, self.arrow((x, 2.6), (tx, ty + 0.4), pointer.style))
+        return self.group(label, self.arrow((x, 2.28), (tx - 0.45, ty + 0.725), pointer.style))
 
 
 def _subtitle(validated: ValidatedDSL) -> str:
@@ -274,8 +296,8 @@ def compile_animation_dsl(raw: bytes | str, *, knowledge_point_id: str) -> Compi
     validated = validate_animation_dsl(raw, knowledge_point_id=knowledge_point_id)
     candidate = validated.candidate
     actions = cast(list[dict[str, object]], candidate["actions"])
-    builder = Builder()
-    title = builder.text(cast(str, candidate["title"]), 0, 3.5, 22)
+    builder = Builder(validated)
+    title = builder.text(cast(str, candidate["title"]), 0, 3.5, POLICY["layout"]["title_size"])
     builder.scene("add", title)
     node_objects: dict[str, ast.Name] = {}
     values: dict[str, ast.Name] = {}
@@ -296,7 +318,7 @@ def compile_animation_dsl(raw: bytes | str, *, knowledge_point_id: str) -> Compi
         if comparison_object is not None:
             builder.scene("remove", comparison_object)
             comparison_object = None
-        previous_caption = builder.text(frame.caption, 0, -3.15)
+        previous_caption = builder.text(frame.caption, 0, -3.35, POLICY["layout"]["caption_size"])
         builder.scene("add", previous_caption)
         animations: list[ast.expr] = []
         nodes = {n.id: n for n in frame.nodes}
@@ -318,13 +340,16 @@ def compile_animation_dsl(raw: bytes | str, *, knowledge_point_id: str) -> Compi
             c = frame.comparison
             operator = {"lt": "<", "eq": "=", "gt": ">"}[c.result]
             comparison_object = builder.text(
-                f"{nodes[c.left].value} {operator} {nodes[c.right].value}", 0, -2.5, 24
+                f"{nodes[c.left].value} {operator} {nodes[c.right].value}", 0, -2.45, 28
             )
             animations.append(_call("FadeIn", comparison_object))
         elif op == "show_complexity":
             assert frame.complexity is not None
             obj = builder.text(
-                f"Time: {frame.complexity[0]}  Space: {frame.complexity[1]}", 0, 3.0, 14
+                f"Time: {frame.complexity[0]}  Space: {frame.complexity[1]}",
+                0,
+                2.95,
+                POLICY["layout"]["complexity_size"],
             )
             if complexity_object is None:
                 complexity_object = obj
@@ -335,13 +360,16 @@ def compile_animation_dsl(raw: bytes | str, *, knowledge_point_id: str) -> Compi
             for ident in (cast(str, action["left"]), cast(str, action["right"])):
                 node = nodes[ident]
                 x, y = builder.cell(node)
-                new = builder.text(str(node.value), x, y, 22, node.style)
+                new = builder.text(str(node.value), x, y - 0.1, 28, node.style)
                 animations.append(_call("Transform", values[ident], new))
         elif op == "visit":
             ident = cast(str, action["node"])
             x, y = builder.cell(nodes[ident])
             if ident not in visited:
-                builder.scene("add", builder.text("已访问", x, y - 0.55, 12, "success"))
+                builder.scene(
+                    "add",
+                    builder.text("已访问", x, y - 0.49, POLICY["layout"]["marker_size"], "success"),
+                )
                 visited.add(ident)
             receiver = ast.Attribute(borders[ident], "animate", ast.Load())
             animations.append(_call(ast.Attribute(receiver, "set_fill", ast.Load()), opacity=0.3))

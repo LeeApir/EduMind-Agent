@@ -47,7 +47,10 @@ def main() -> None:
         rendered = subprocess.run(
             [
                 "manim",
-                "-ql",
+                "--resolution",
+                "1280,720",
+                "--fps",
+                "15",
                 "--disable_caching",
                 "--media_dir",
                 str(OUTPUT),
@@ -62,7 +65,7 @@ def main() -> None:
         raise ValueError("DSL_RENDER_TIMEOUT") from None
     if rendered.returncode:
         raise ValueError("DSL_RENDER_FAILED")
-    original = OUTPUT / "videos/DSLScene/480p15/DSLScene.mp4"
+    original = OUTPUT / "videos/DSLScene/720p15/DSLScene.mp4"
     video = OUTPUT / "DSLScene.mp4"
     if original.is_symlink() or not original.is_file() or original.stat().st_nlink != 1:
         raise ValueError("DSL_MEDIA_INVALID")

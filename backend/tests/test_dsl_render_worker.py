@@ -104,6 +104,40 @@ def test_real_dsl_media_source_identity_and_literal_code(compiled, tmp_path):
         assert result.srt_sha256 == compiled.subtitles_sha256
         assert not (result.attempt_dir / "input").exists()
         assert result.mp4_path.stat().st_size > 0
+        # Independently inspect the copied MP4, not renderer metadata or .ready.
+        decoded = subprocess.run(
+            [
+                "docker",
+                "run",
+                "--rm",
+                "-i",
+                "--network",
+                "none",
+                "--read-only",
+                "--user",
+                "10001:10001",
+                "--cpus",
+                "1",
+                "--memory",
+                "512m",
+                "--pids-limit",
+                "32",
+                "--cap-drop",
+                "ALL",
+                "--security-opt",
+                "no-new-privileges",
+                IMAGE,
+                "python",
+                "-c",
+                "import sys,io,av; m=av.open(io.BytesIO(sys.stdin.buffer.read()));"
+                "s=m.streams.video[0];print(s.width,s.height,s.average_rate)",
+            ],
+            input=result.mp4_path.read_bytes(),
+            capture_output=True,
+            timeout=15,
+            check=True,
+        )
+        assert decoded.stdout.strip() == b"1280 720 15"
     finally:
         result.cleanup()
     # Unknown Manim code is never accepted from a caller's patched CompiledDSL dataclass.

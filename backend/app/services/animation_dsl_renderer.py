@@ -248,8 +248,8 @@ def render_compiled_dsl(
             or not math.isfinite(duration)
             or not 30 <= duration <= 90
             or abs(duration - fresh.validated.duration_ms / 1000) > 1 / 15 + 1e-6
-            or media.get("height") != 480
-            or media.get("width") != 854
+            or media.get("height") != 720
+            or media.get("width") != 1280
             or media.get("fps") != 15
         ):
             raise RenderError("DSL_MEDIA_INVALID")

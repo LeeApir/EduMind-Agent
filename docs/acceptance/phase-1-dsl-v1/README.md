@@ -1,3 +1,15 @@
+# T037 当前检查点：720p / 15fps
+
+用户要求的画质与比例修复已完成自动验证，T037整体仍等待新版实际媒体的人工核对。最新证据以[720p修订说明](presentation-720p.md)与results/automatic-evidence-r06.json为准；下方旧480p检查点仅用于历史追溯。
+
+- 安全r07：295项通过，零失败/错误/跳过；真实Docker、专用PG，无Provider请求。
+- 矩阵r06：100DSL/100模板/100缓存全部通过；冷DSL P95保守上界5.560秒，DSL/模板缓存0.478/0.240秒，缓存逐槽≤2秒。
+- 20个真实720p视频及220帧已核验摘要和呈现时间戳。标识/数值/访问状态放入节点卡片，指针/箭头/字体比例与居中布局已修订；旧身份不能转授。
+- 最新人工清单SHA256：`63d54ed13e023cfdbb5cc9b4992908bd46e14036713b13a4c37717f41fb6faa1`。预览 http://127.0.0.1:8177/720p-r06/ 。核对页原比例显示、原图可打开，外置字幕默认关闭；新的URL和no-store避免旧缓存。
+- 本轮修改不代表人工已批准，不创建Task-Completed。用户核对当前这份新清单并确认后再恢复完成提交。默认catalog_only，无push/merge/公开部署。
+
+<details><summary>此前480p检查点（历史，不作为新版验收）</summary>
+
 # T037 DSL安全与动作验收
 
 当前任务未完成：实际媒体仍须用户人工核对，不能以AI检查替代。真实Provider请求0；默认catalog_only持续，未开放动态入口、push、merge或部署。
@@ -46,3 +58,5 @@ T037未完成，状态blocked。真实Provider请求0，动态能力仍未开放
 最新自动验收：matrix-r05三组各100/100；DSL冷P95保守上界5.063秒，DSL缓存0.403秒/模板缓存0.224秒，缓存逐槽≤2秒。全部计数/真实MP4/SRT/VTT/DSL/220帧摘要经verify_phase1_dsl_evidence校验；human pending、full_task_complete=false。
 
 人工材料：`local-materials/phase-1-t037/matrix-r05/human-review/index.html`；仅回环预览 http://127.0.0.1:8177/ ，清单SHA256 `0669d0ce5a4c2dd78225bc351d09470243a4db92fd75889d1d1a33123cbb92f0`。用户按task.json T037第二条逐个核对20视频/步骤后确认；此确认仅为这些实际测试媒体的一致性，不开放动态/真实Provider预算。签核前保存blocked检查点；回复确认后核对相同摘要，记录实际用户批准，再恢复任务完成提交。
+
+</details>

@@ -20,11 +20,11 @@ def main() -> None:
         if len(media.streams) != 1 or len(media.streams.video) != 1 or media.duration is None:
             raise ValueError("DSL_MEDIA_INVALID")
         stream = media.streams.video[0]
-        if stream.height != 480 or stream.width != 854 or stream.average_rate != 15:
+        if stream.height != 720 or stream.width != 1280 or stream.average_rate != 15:
             raise ValueError("DSL_MEDIA_INVALID")
         count = 0
         for frame in media.decode(stream):
-            if frame.height != 480 or frame.width != 854:
+            if frame.height != 720 or frame.width != 1280:
                 raise ValueError("DSL_MEDIA_INVALID")
             count += 1
             if count > 1351:
@@ -42,8 +42,8 @@ def main() -> None:
                 "mp4_sha256": hashlib.sha256(data).hexdigest(),
                 "duration_seconds": duration,
                 "frames": count,
-                "height": 480,
-                "width": 854,
+                "height": 720,
+                "width": 1280,
                 "fps": 15,
             },
             sort_keys=True,

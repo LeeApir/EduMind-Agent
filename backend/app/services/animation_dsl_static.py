@@ -95,7 +95,7 @@ class Checker:
             string(node.args[0])
             kw = self.keywords(node, {"font", "font_size", "color"})
             string(kw["font"], choices=(POLICY["font"],))
-            require(number(kw["font_size"], 12, 24) in POLICY["font_sizes"])
+            require(number(kw["font_size"], 18, 28) in POLICY["font_sizes"])
             string(kw["color"], choices=colors)
             return "text"
         if name == "RoundedRectangle":
@@ -103,10 +103,10 @@ class Checker:
             kw = self.keywords(
                 node, {"width", "height", "corner_radius", "color", "stroke_width", "fill_opacity"}
             )
-            require(number(kw["width"], 1.15, 1.15) == 1.15)
-            require(number(kw["height"], 0.65, 0.65) == 0.65)
+            require(number(kw["width"], 1.3, 1.3) == 1.3)
+            require(number(kw["height"], 1.35, 1.35) == 1.35)
             number(kw["corner_radius"], 0.1, 0.1)
-            number(kw["stroke_width"], 2, 2)
+            number(kw["stroke_width"], 3, 3)
             require(number(kw["fill_opacity"], 0.08, 0.3) in (0.08, 0.3))
             string(kw["color"], choices=colors)
             return "box"
@@ -115,9 +115,14 @@ class Checker:
             for point in node.args:
                 coordinate(point)
             require(ast.dump(node.args[0]) != ast.dump(node.args[1]))
-            kw = self.keywords(node, {"buff", "stroke_width", "color"})
-            number(kw["buff"], 0.05, 0.05)
-            number(kw["stroke_width"], 2, 2)
+            kw = self.keywords(
+                node,
+                {"buff", "stroke_width", "color", "tip_length", "max_tip_length_to_length_ratio"},
+            )
+            number(kw["buff"], 0.04, 0.04)
+            number(kw["tip_length"], 0.14, 0.14)
+            number(kw["max_tip_length_to_length_ratio"], 0.3, 0.3)
+            number(kw["stroke_width"], 3, 3)
             string(kw["color"], choices=colors)
             return "arrow"
         require(name == "VGroup" and not node.keywords and 1 <= len(node.args) <= 4)

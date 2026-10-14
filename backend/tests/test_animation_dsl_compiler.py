@@ -235,7 +235,7 @@ def test_forbidden_nodes_receivers_methods_and_args_fail_closed(result, statemen
         ("font_size=22", "font_size=True"),
         ("font='Noto Sans CJK SC'", "font='/tmp/font.ttf'"),
         ("color='#FFFFFF'", "color='arbitrary'"),
-        ("width=1.15", "width=999"),
+        ("width=1.3", "width=999"),
         ("fill_opacity=0.08", "fill_opacity=0.99"),
         ("move_to([0, 3.5, 0])", "move_to([0, 99, 0])"),
         ("run_time=1.0", "run_time=1.1"),
@@ -360,3 +360,90 @@ def test_malformed_checker_protocol_never_reports_success_or_raw_error(
 def test_loaded_checker_digest_drift_requires_reload(result, monkeypatch):
     monkeypatch.setattr(compiler, "STATIC_SHA256", "0" * 64)
     reject_source(result.source, "DSL_COMPILE_UNAVAILABLE")
+
+
+def test_centered_layout_typography_and_bounded_arrow_geometry(result):
+    tree = ast.parse(result.source)
+    texts = {}
+    arrows = []
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call):
+            continue
+        if isinstance(node.func, ast.Attribute) and node.func.attr == "move_to":
+            inner = node.func.value
+            if (
+                isinstance(inner, ast.Call)
+                and isinstance(inner.func, ast.Name)
+                and inner.func.id == "Text"
+            ):
+                texts.setdefault(inner.args[0].value, []).append(
+                    (
+                        ast.literal_eval(node.args[0]),
+                        {k.arg: ast.literal_eval(k.value) for k in inner.keywords},
+                    )
+                )
+        if isinstance(node.func, ast.Name) and node.func.id == "Arrow":
+            arrows.append({k.arg: ast.literal_eval(k.value) for k in node.keywords})
+    x0, style0 = texts["n0"][0]
+    x1, style1 = texts["n1"][0]
+    assert x0[0] < 0 < x1[0] and x0[0] == -x1[0]
+    assert x0[1] == x1[1]
+    assert style0["font_size"] == style1["font_size"] >= 20
+    assert texts["p"][0][1]["font_size"] >= style0["font_size"]
+    assert arrows and all(0 < a["tip_length"] <= 0.15 and a["stroke_width"] == 3 for a in arrows)
+    assert compiler.POLICY["pixel_width"] == 1280
+    assert compiler.POLICY["pixel_height"] == 720 and compiler.POLICY["frame_rate"] == 15
+
+
+@pytest.mark.parametrize(
+    "old,new",
+    [
+        ("tip_length=0.14", "tip_length=10"),
+        ("max_tip_length_to_length_ratio=0.3", "max_tip_length_to_length_ratio=1"),
+        ("height=1.35", "height=99"),
+        ("stroke_width=3", "stroke_width=0"),
+    ],
+)
+def test_presentation_parameters_remain_exactly_whitelisted(result, old, new):
+    assert old in result.source
+    reject_source(result.source.replace(old, new, 1))
+
+
+def test_legal_complexity_only_scene_has_stable_empty_grid():
+    data = copy.deepcopy(BASE)
+    data["pointers"] = []
+    data["actions"] = [
+        {
+            "op": "show_complexity",
+            "time": "O(1)",
+            "space": "O(1)",
+            "duration_ms": 2000,
+            "hold_ms": 3000,
+            "caption": "固定规模常数复杂度",
+        }
+        for _ in range(6)
+    ]
+    result = compile_candidate(data)
+    assert result.validated.duration_ms == 30000
+    assert not any(f.nodes for f in result.validated.frames)
+
+
+def test_card_value_position_does_not_jump_during_swap(result):
+    values = []
+    for node in ast.walk(ast.parse(result.source)):
+        if (
+            isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Attribute)
+            and node.func.attr == "move_to"
+        ):
+            text = node.func.value
+            if (
+                isinstance(text, ast.Call)
+                and isinstance(text.func, ast.Name)
+                and text.func.id == "Text"
+            ):
+                if text.args[0].value in {"3", "1"}:
+                    values.append(ast.literal_eval(node.args[0]))
+    assert len(values) == 4
+    assert all(point[1] == -0.1 for point in values)
+    assert sorted(point[0] for point in values) == [-2.25, -2.25, 2.25, 2.25]
