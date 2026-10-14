@@ -2152,7 +2152,7 @@
       "id": "PHASE-1-T039",
       "phase": "Phase 1",
       "title": "验证真实Provider连接与选择路由",
-      "status": "blocked",
+      "status": "in_progress",
       "priority": "P1",
       "depends_on": [
         "PHASE-1-T008",
@@ -2170,7 +2170,8 @@
         "backend/app/services/provider_connection_dispatch.py",
         "backend/app/services/openai_compatible.py",
         "backend/tests/test_provider_connection_gateway.py",
-        "backend/tests/test_phase1_connection_runner.py"
+        "backend/tests/test_phase1_connection_runner.py",
+        "backend/tests/test_phase1_connection_diagnostics.py"
       ],
       "prd_source": "PRD §3.8验收标准、§9.1",
       "acceptance_criteria": [
@@ -2190,7 +2191,7 @@
       ],
       "started_at": "2026-10-14T15:58:34",
       "completed_at": null,
-      "blocker": "已按4次/CNY1批准冻结并执行真实主模型1次：HTTP200但探测TEMPORARILY_UNAVAILABLE，usage/实际账单未知；按首败停止不可重试，剩余3项未发送。冻结脚本只保存泛化错误/响应SHA，无法回溯唯一根因。需离线补充安全诊断并单独冻结后续轮次；其他原生适配器无本轮配置/授权，整体未通过。",
+      "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T039"
     },
     {
