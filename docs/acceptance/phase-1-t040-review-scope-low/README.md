@@ -1,6 +1,7 @@
 # T040 low 推理审核职责小检查 r07
 
-状态：可执行提案与离线回归完成，真实请求 0；2 次 / CNY 0.18 独立预算待批准。
+状态：用户已批准 2 次 / CNY 0.18；首条只检出原两项缺陷中的计数错误，已停止，第二条未发。
+结果见 [review-scope-r07.json](results/review-scope-r07.json)，执行源码 `3c5936c`。
 
 r06 首条 HTTP 200、模型匹配，但未完成且没有可解析审核；8192 总输出全部计为推理。
 现有证据符合输出预算耗尽，未保存供应商具体未完成原因，不能唯一确定内部原因。
@@ -51,3 +52,12 @@ Mock 只证明工程流程，不证明模型质量。r06 的 186 个冻结来源
 - [Responses 参数](https://api-docs.deepseek.com/api/create-response/)：支持 low/high，输出上限含推理，未完成原因枚举。
 - [人民币价格](https://api-docs.deepseek.com/zh-cn/quick_start/pricing/)：峰值输入未命中 2 元/M、输出 8 元/M。
 - [ADR-0011 D](../../ADR/0011-independent-dynamic-acceptance.md)：配置变化须形成新轮次独立批准。
+
+实际首条 HTTP 200/completed、schema/模型/用量有效，28.677132 秒；输入 2784、
+总输出 5036（推理 4862 包含其中），合计 7820 Token。
+原计数错误具体检出，fact 分类正确，所给反例有效且未夹带修复方案；
+但没有指出 front==rear 也可能是满队列，未达到事前固定的“两项均检出”条件。
+独立语义评估将台账停止为 CONCRETE_DEFECT_MISSED，原自动行 quality_failure=null 不修改。
+不能把已检出的计数问题改记漏检，也不能以 revise 代替两项检出。
+保守预留 CNY 0.090640，峰值标价参考 CNY 0.045856，真实账单未知。
+正确对照/修正均未运行，不代表完整诊断或正式验收通过，也不由单样本断言 low 的因果效果。
