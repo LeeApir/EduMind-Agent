@@ -1,0 +1,66 @@
+{
+  "version": "phase1-real-connection-draft-v1",
+  "task_id": "PHASE-1-T039",
+  "state": "BLOCKED_MISSING_TARGET_AND_BUDGET",
+  "base_commit": "cbf52bcc1a6ac8da8bc34f13eb3de831b462bdb6",
+  "current_authorization": {
+    "requests": 0,
+    "cost_micro": 0,
+    "dynamic_opening": false,
+    "source": "docs/ADR/0011-dynamic-approval-20261008.json",
+    "source_sha256": "3d90135badde22e0a2e352b226ffc6c8cb1e8a12ff3232dfddcd5c68cfbda253"
+  },
+  "targets": [],
+  "available_adapter_types": [
+    "openai-compatible",
+    "ollama",
+    "anthropic",
+    "gemini",
+    "spark"
+  ],
+  "required_target_fields": [
+    "provider_type",
+    "endpoint",
+    "model_id_and_revision",
+    "credential_reference_only",
+    "local_or_cloud",
+    "allowed_data_categories",
+    "capability_snapshot",
+    "requests_hard_limit",
+    "pricing_and_currency",
+    "conservative_cost_hard_limit",
+    "user_authorization_evidence"
+  ],
+  "proposed_flow_per_selected_target": [
+    {
+      "step": "connection_probe",
+      "calls": 1,
+      "data": "fixed public probe only"
+    },
+    {
+      "step": "streaming_probe",
+      "calls": 1,
+      "data": "fixed public probe only"
+    },
+    {
+      "step": "declared_structured_capability",
+      "calls_at_most": 1,
+      "condition": "only if explicitly declared supported; otherwise record unknown/not tested"
+    },
+    {
+      "step": "declared_tool_capability",
+      "calls_at_most": 1,
+      "condition": "only if explicitly declared supported; tool execution prohibited"
+    }
+  ],
+  "proposed_constraints": {
+    "concurrency": 1,
+    "retries": 0,
+    "model_list_refresh": false,
+    "max_output_tokens": 64,
+    "request_timeout_seconds": 10,
+    "cross_provider_fallback": false,
+    "send_learner_data": false
+  },
+  "execution_gate": "Draft is not executable or approved. After target/budget input, freeze actual route/config/source/locks/prompt/request order and conservative pricing bound before any attempt. Failed/timeout attempts count. Historical2033/2500 not available. Connection approval never grants T040/T041."
+}
