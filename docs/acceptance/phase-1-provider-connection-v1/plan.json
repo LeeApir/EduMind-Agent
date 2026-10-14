@@ -1,7 +1,7 @@
 {
   "version": "phase1-real-connection-v3",
   "task_id": "PHASE-1-T039",
-  "state": "FROZEN_RUN_READY",
+  "state": "STOPPED_FIRST_FAILURE",
   "base_commit": "cbf52bcc1a6ac8da8bc34f13eb3de831b462bdb6",
   "current_authorization": {
     "requests": 4,
@@ -33,7 +33,7 @@
         "currency": "CNY",
         "amount": 1
       },
-      "remote_validation": "pending"
+      "remote_validation": "failed_after_http_200"
     }
   ],
   "available_adapter_types": [
@@ -87,7 +87,7 @@
     "cross_provider_fallback": false,
     "send_learner_data": false
   },
-  "execution_gate": "User authorized the concrete primary-only 4-request / CNY1 proposal via 先进行T39. Execute run-r01.json once, no retries/fallback/model listing/learner data/T040/T041. Stop on first failure or missing usage; stream is last.",
+  "execution_gate": "Stopped after first real attempt. Budget ledger halted permanently; three other slots unattempted. Do not retry, replace/reset ledger, fallback or enter T040/T041.",
   "selection_record": "model-selection-20261014.json",
   "paid_last_resort": {
     "model_id": "deepseek-flash",
@@ -95,5 +95,6 @@
     "budget": "not supplied",
     "enabled": false
   },
-  "frozen_run": "run-r01.json"
+  "frozen_run": "run-r01.json",
+  "result": "results/r01.json"
 }

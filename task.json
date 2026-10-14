@@ -2152,7 +2152,7 @@
       "id": "PHASE-1-T039",
       "phase": "Phase 1",
       "title": "验证真实Provider连接与选择路由",
-      "status": "in_progress",
+      "status": "blocked",
       "priority": "P1",
       "depends_on": [
         "PHASE-1-T008",
@@ -2185,11 +2185,12 @@
         "verify_phase1_dynamic_approval.py通过：A-D及标签已批准，真实请求/费用0、动态开放false；读取授权不读取实际Key，不联网、不探测目标",
         "已完成T038本地提交cbf52bc及干净状态核对；本任务只保存待补齐的接入方案与人工阻塞，未完成真实验证",
         "用户提供9个阿里云模型额度显示及主/付费兜底偏好，已记录model-selection-20261014.json；仅核对本机主模型/端点元数据一致，未使用Key/联网，能力及额度计费未验证；主模型建议上限4次但实际授权仍0",
-        "用户“先进行T39”批准主模型4次/CNY1，独立authorization-20261014.json，不扩T040/T041；有界兼容wire修复与专用PG122测试通过0跳过、mypy166/Ruff通过；已冻结run-r01，真实请求待执行。"
+        "用户“先进行T39”批准主模型4次/CNY1，独立authorization-20261014.json，不扩T040/T041；有界兼容wire修复与专用PG122测试通过0跳过、mypy166/Ruff通过；已冻结run-r01，真实请求待执行。",
+        "真实r01：源码5014173，出站1次/HTTP200/1.381369s，文本探测失败TEMPORARILY_UNAVAILABLE，用量未知；预留保守费用CNY0.01086非实际账单，首败永久halt，结构化/工具/流式未发送；0重试/0回退，临时Key未持久且连接已撤销，冻结SHA/SQLite台账与脱敏摘要核对通过，results/r01.json。"
       ],
       "started_at": "2026-10-14T15:58:34",
       "completed_at": null,
-      "blocker": null,
+      "blocker": "已按4次/CNY1批准冻结并执行真实主模型1次：HTTP200但探测TEMPORARILY_UNAVAILABLE，usage/实际账单未知；按首败停止不可重试，剩余3项未发送。冻结脚本只保存泛化错误/响应SHA，无法回溯唯一根因。需离线补充安全诊断并单独冻结后续轮次；其他原生适配器无本轮配置/授权，整体未通过。",
       "commit_lookup": "Task-Completed: PHASE-1-T039"
     },
     {

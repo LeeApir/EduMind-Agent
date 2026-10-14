@@ -1,0 +1,83 @@
+{
+  "task_id": "PHASE-1-T039",
+  "state": "BLOCKED",
+  "run": "r01",
+  "source_commit": "5014173",
+  "executed_at": "2026-10-14T16:45:36",
+  "manifest_sha256": "b68eead5b328cc6555413b5bdab8e58d70ea1b83132f0f27a56770d2b700609e",
+  "primary_only": true,
+  "real_cloud": true,
+  "mock": false,
+  "actual_outbound_requests": 1,
+  "approved_request_limit": 4,
+  "approved_cost_limit_cny": 1,
+  "reserved_conservative_cost_cny": 0.01086,
+  "actual_bill_cny": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "outcome": "HTTP200 received, but text probe failed with normalized TEMPORARILY_UNAVAILABLE; exact cause not captured. Do not infer authentication/model/capability success.",
+  "failure_diagnostic_limit": "The frozen runner retained only normalized failure/status/body hash. Neither response content/headers nor exception details were persisted; parsing/validation/transport fault cannot be distinguished retrospectively.",
+  "observations": [
+    {
+      "slot": "text",
+      "attempt": 1,
+      "passed": false,
+      "error_code": "TEMPORARILY_UNAVAILABLE",
+      "http_status": 200,
+      "outbound_sends": 1,
+      "model": null,
+      "duration_seconds": 1.381369,
+      "target_observations": [
+        "73f9b6f70eaf2f154f4f49c553849b4599296b15edcc3af5291d5d278a95ec20"
+      ],
+      "request_sha256": "781520c637d97cc2cb8cda4a00f84d5c5d86f0a9d633ca1f264a8b3f24c92537",
+      "response_sha256": "8bb6c6239f7f2a90ec0060b524bed0e5e6bdc837491e791346305529fb113cee",
+      "input_tokens": null,
+      "output_tokens": null,
+      "tool_executions": 0,
+      "fallbacks": 0
+    }
+  ],
+  "budget": {
+    "manifest_sha256": "b68eead5b328cc6555413b5bdab8e58d70ea1b83132f0f27a56770d2b700609e",
+    "halted": "TEMPORARILY_UNAVAILABLE",
+    "attempts": [
+      [
+        1,
+        "text",
+        "probe",
+        "01dc88839865af2024aedeb78452883a7e710bfa33d392e97f24b7a5431f6fff",
+        "781520c637d97cc2cb8cda4a00f84d5c5d86f0a9d633ca1f264a8b3f24c92537",
+        10860,
+        "failed",
+        null,
+        null,
+        "TEMPORARILY_UNAVAILABLE"
+      ]
+    ],
+    "unattempted_slots": [
+      "structured",
+      "tool",
+      "stream"
+    ]
+  },
+  "persistent_secret_absent": true,
+  "connection_revoked": true,
+  "other_adapter_results": {
+    "ollama": "not_authorized_not_run",
+    "anthropic": "not_authorized_not_run",
+    "gemini": "not_authorized_not_run",
+    "spark": "not_authorized_not_run"
+  },
+  "fallbacks": 0,
+  "retries": 0,
+  "tool_executions": 0,
+  "dynamic_opening": false,
+  "t040_t041_started": false,
+  "audit": {
+    "frozen_file_hashes_match": true,
+    "sqlite_attempts_match_export": true,
+    "result_sha256": "5cfbd2bc5511f084d59a6228eeda2290d02ca7daa6a066d7e4aab6f9bd2fb1ef"
+  },
+  "next_action": "Keep stopped r01 immutable. Prepare content-free error/encoding diagnostics offline before proposing a separately frozen bounded diagnostic run; do not replay or reset this ledger."
+}
