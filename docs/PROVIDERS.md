@@ -254,3 +254,9 @@ handle为32随机字节的URL-safe编码，只在所属进程/loop有效。绑�
 T039修复版探测入口为 `scripts/run_phase1_provider_checks_v2.py`，r01/r02脚本和结果保留为历史证据。接入验收依据正常协议终止、非空有效响应、实际模型身份及严格schema；词面OK匹配单列诊断，不把不匹配冒称服务故障，不改写旧失败。新增服务端内部 `include_stream_usage: bool = False`，显式启用才发送 `stream_options.include_usage=true`；非流式/默认请求不变，无公共API/数据库字段。兼容能力声明及使用量须绑定具体配置，遵从目标声明，未知usage仍unknown。解码后的有界响应被观测后再解析，gzip/SSE用量不会直接从压缩wire读取；本地校验失败归probe_validation/INVALID_OUTPUT，本地意外错误归local_unexpected/SAFETY_FAILURE，Provider错误保留类型，敏感异常消息不记录。
 
 T039实际工具诊断结果：当前Qwen端点强制指定函数时返回合法工具/参数但finish_reason=stop；探测原本要求完整tool_calls终止而失败。修复只将完整工具选择探测改为显式auto，全部10项严格检查实测通过，未全局放宽finish_reason或结构化校验，未修改文本适配器拒绝tool_calls的保护。具体证据及适用路径见 `docs/acceptance/phase-1-provider-connection-v1/results/final.json`。仅此P1连接文本/json_schema/流式/auto工具格式可声明通过，P0默认Responses传输及强制函数模式不转授成绩，其他4类真实接入延期。
+
+### 当前本机选择更新：DeepSeek（2026-10-14）
+
+用户指定先切换到自有DeepSeek作后续完整测试；当前本机私有.env选择 `https://api.deepseek.com` / `deepseek-flash` / `responses_json_schema`，沿用原DeepSeek私有Key，Aliyun三项改为注释保留，不启用回退。原responses_json_object不是当前server factory支持项，已同步修正为Responses schema传输；官方接口声明见[DeepSeek Responses API](https://api-docs.deepseek.com/api/create-response/)。只离线核对配置/工厂选择和59项Mock测试，未请求DNS/模型，也未重启只提供目录基线的本地服务。
+
+本选择不意味着DeepSeek已通过本轮接入或质量验收。已完成的T039仍只证明其Qwen目标，后续需对DeepSeek实际消费路径独立核对文本/结构化/流式及所需工具；如果P1使用Chat Completions，不得把P0 Responses成绩冒充其通过。保持生成/审核模型组合独立冻结、真实请求与费用硬上限；当前没有启动T040/T041或付费探测。详见[非密钥配置记录](acceptance/phase-1-provider-selection/deepseek-20261014.json)。

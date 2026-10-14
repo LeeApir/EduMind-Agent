@@ -86,7 +86,15 @@
       "note": "历史额度不自动转为Phase 1授权；新真实调用单独冻结批准。"
     },
     "planning_note": "优先按§9.1核心路线图细化。其他章节的P1扩展标签与阶段冲突由T001列明；新增范围需先调整PRD/任务，不静默加入。",
-    "acceptance_plan": "docs/acceptance/phase-1-acceptance-plan.md"
+    "acceptance_plan": "docs/acceptance/phase-1-acceptance-plan.md",
+    "current_provider_selection": {
+      "model_id": "deepseek-flash",
+      "provider": "deepseek",
+      "record": "docs/acceptance/phase-1-provider-selection/deepseek-20261014.json",
+      "real_validation": "not_run",
+      "prior_qwen_t039_result": "preserved, not transferable",
+      "automatic_fallback": false
+    }
   },
   "deferred_improvements": [
     {
@@ -2232,7 +2240,9 @@
       "verification": [
         "按批准的冻结计划执行有界真实质量验收与人工核对；没有真实预算或门禁不通过时不运行。"
       ],
-      "verification_results": [],
+      "verification_results": [
+        "用户指定先切换DeepSeek做后续完整测试；本机.env恢复已有DeepSeek Key/https://api.deepseek.com/deepseek-flash，传输改为工厂实际支持的responses_json_schema，Qwen配置留作inactive回退资料。实际环境离线解析及DeepSeekResponsesAdapter选择通过，config/Responses59测试通过；0DNS/模型调用。T039原Qwen完成证据不转授，新DeepSeek实际路径需另存接入复验证据并冻结有界预算后才能启动T040；本次不领取质量任务。"
+      ],
       "started_at": null,
       "completed_at": null,
       "blocker": null,
