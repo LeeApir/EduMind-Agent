@@ -2221,7 +2221,7 @@
       "id": "PHASE-1-T040",
       "phase": "Phase 1",
       "title": "完成新配置动态资源质量验收",
-      "status": "in_progress",
+      "status": "blocked",
       "priority": "P0",
       "depends_on": [
         "PHASE-1-T035",
@@ -2248,11 +2248,12 @@
         "用户要求“用deepseek跑一遍”后完成独立接入复验：源码909ddb6、4/4公开请求HTTP200/模型一致，当前Responses路径文本/严格JSON/auto工具格式/流式response.completed与usage均通过。实际359输入45输出共404tokens，106离线测试/Ruff、冻结SHA/台账核验通过，独立证据phase-1-deepseek-connection-v1/results/r01.json；仅证明此系统模型传输，不转授P1 Chat或质量/性能，不开动态，不开始T040/T041正式验收。",
         "2026-10-14 T040准备检查点：prepare_t040_diagnostics.py从当前ReviewAgent._review离线捕获历史5/5/1/2组共13正文，绑定原payload/请求/source哈希，4096总输出/非思考/temperature0/单次60秒/零重试回退；各组费用上限0.25/0.25/0.05/0.11元，未授权/未发送。38离线测试、Ruff、proposal哈希核对、历史批准/动态冻结/236归档文件校验、工作流/diff通过；先前两历史校验器因后续运行源码和已授权ADR追加而失败，已修复为原批准提交与当前冻结样本分别核对，不改原附件/标签/失败。具体证据phase-1-t040-deepseek-v1。",
         "2026-10-14 用户批准13次/CNY0.66后，冻结2f989da执行首组首例：实际HTTP200/0.934046s/2509输入22输出，模型/schema/completed/usage均通过，审核却pass/issues=[]；已知push_front malloc失败返回NULL被main直接赋给非空head导致原链丢失，触发CONCRETE_DEFECT_MISSED，持久台账停止且后12槽未发。51离线通过/Ruff、四执行清单源码哈希/请求哈希/SQLite与保留响应-审核一致核对通过，正式质量/DSL/T041未启动，证据phase-1-t040-deepseek-v1/results/diagnostic-r01.json。",
-        "2026-10-14 用户继续后实施审核Prompt v3修复候选，通用检查分配/可失败调用的失败路径、调用者覆盖和原内存所有权、清理与注释；保留正确临时返回值/所有权契约对照，无按案例ID预定拒绝。94离线通过、Ruff、mypy166源文件通过、历史批准/样本冻结/工作流通过；原r01 SQLite只读核验仍1次且CONCRETE_DEFECT_MISSED。独立v2/r02提案绑定原历史payload/新系统指令/执行源码，无真实调用，13次费用上限0.69待批；不能把离线Mock pass当模型语义修复通过。"
+        "2026-10-14 用户继续后实施审核Prompt v3修复候选，通用检查分配/可失败调用的失败路径、调用者覆盖和原内存所有权、清理与注释；保留正确临时返回值/所有权契约对照，无按案例ID预定拒绝。94离线通过、Ruff、mypy166源文件通过、历史批准/样本冻结/工作流通过；原r01 SQLite只读核验仍1次且CONCRETE_DEFECT_MISSED。独立v2/r02提案绑定原历史payload/新系统指令/执行源码，无真实调用，13次费用上限0.69待批；不能把离线Mock pass当模型语义修复通过。",
+        "用户同意ec1bc2d的r02四组13次/CNY0.69后，冻结2fc9e6a执行首例：实际HTTP200/0.819711秒/输入2716输出22共2738tokens，当前v3指令仍pass/issues=[]，触发CONCRETE_DEFECT_MISSED停止；12槽未发。此前94离线/Ruff/mypy166通过；四当前源码冻结哈希、实际请求/SQLite/保留回答review核验通过，原r01源码按2f989da及只读SQLite再次核对。Prompt修复无实测改善证据；独立结果phase-1-t040-deepseek-v2/results/diagnostic-r02.json。"
       ],
       "started_at": "2026-10-14T19:38:26",
       "completed_at": null,
-      "blocker": null,
+      "blocker": "r02审核Prompt v3真实复验首例仍pass，漏检同一已批准malloc失败丢失链表/内存泄漏缺陷；本次修复未奏效。HTTP200/schema/完成/用量有效，1/13请求、2738tokens、保守预留CNY0.056960，其余12未发，台账CONCRETE_DEFECT_MISSED停止。r01失败保留不拼分，需先决定新的审核/推理策略和独立验证方案，不能重放或继续正式质量/DSL/T041。",
       "commit_lookup": "Task-Completed: PHASE-1-T040"
     },
     {
