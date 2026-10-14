@@ -794,3 +794,56 @@ def test_pg_actual_httpx_body_trace_releases_lock_before_response(monkeypatch):
             await server.wait_closed()
 
     asyncio.run(run())
+
+
+@pytest.mark.parametrize("mode", ["text", "structured", "stream"])
+def test_explicit_total_output_limit_and_disabled_thinking_reach_every_wire_mode(mode):
+    async def run():
+        req = request_for()
+        req = replace(
+            req,
+            capabilities=replace(
+                req.capabilities,
+                output_token_parameter="max_completion_tokens",
+                thinking_enabled=False,
+            ),
+        )
+        stream = Chunks(
+            [(frame({"content": "ok"}) + frame(finish="stop") + "data: [DONE]\n\n").encode()]
+        )
+        harness = Harness(
+            lambda r: httpx.Response(200, stream=stream)
+            if mode == "stream"
+            else httpx.Response(200, json=result('{"answer":3}' if mode == "structured" else "ok")),
+            req,
+        )
+        adapter = OpenAICompatibleAdapter(harness)
+        prompt = TextRequest(PROMPT.messages, max_output_tokens=64)
+        if mode == "structured":
+            assert (await adapter.generate_structured(StructuredRequest(prompt, SCHEMA))).value == {
+                "answer": 3
+            }
+        elif mode == "stream":
+            assert "".join([d.text async for d in adapter.stream_text(prompt)]) == "ok"
+        else:
+            assert (await adapter.generate_text(prompt)).text == "ok"
+        assert len(harness.calls) == 1
+        body = harness.calls[0]
+        assert body["max_completion_tokens"] == 64
+        assert body["enable_thinking"] is False
+        assert "max_tokens" not in body
+
+    asyncio.run(run())
+
+
+@pytest.mark.parametrize(
+    "fields",
+    [
+        {"output_token_parameter": "arbitrary"},
+        {"thinking_enabled": 0},
+        {"thinking_enabled": "false"},
+    ],
+)
+def test_bound_wire_options_reject_invalid_values(fields):
+    with pytest.raises(CredentialFailure):
+        replace(request_for().capabilities, **fields)

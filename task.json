@@ -2152,7 +2152,7 @@
       "id": "PHASE-1-T039",
       "phase": "Phase 1",
       "title": "验证真实Provider连接与选择路由",
-      "status": "blocked",
+      "status": "in_progress",
       "priority": "P1",
       "depends_on": [
         "PHASE-1-T008",
@@ -2166,7 +2166,11 @@
       "scope": [
         "scripts/",
         "docs/acceptance/",
-        "docs/PROVIDERS.md"
+        "docs/PROVIDERS.md",
+        "backend/app/services/provider_connection_dispatch.py",
+        "backend/app/services/openai_compatible.py",
+        "backend/tests/test_provider_connection_gateway.py",
+        "backend/tests/test_phase1_connection_runner.py"
       ],
       "prd_source": "PRD §3.8验收标准、§9.1",
       "acceptance_criteria": [
@@ -2180,11 +2184,12 @@
       "verification_results": [
         "verify_phase1_dynamic_approval.py通过：A-D及标签已批准，真实请求/费用0、动态开放false；读取授权不读取实际Key，不联网、不探测目标",
         "已完成T038本地提交cbf52bc及干净状态核对；本任务只保存待补齐的接入方案与人工阻塞，未完成真实验证",
-        "用户提供9个阿里云模型额度显示及主/付费兜底偏好，已记录model-selection-20261014.json；仅核对本机主模型/端点元数据一致，未使用Key/联网，能力及额度计费未验证；主模型建议上限4次但实际授权仍0"
+        "用户提供9个阿里云模型额度显示及主/付费兜底偏好，已记录model-selection-20261014.json；仅核对本机主模型/端点元数据一致，未使用Key/联网，能力及额度计费未验证；主模型建议上限4次但实际授权仍0",
+        "用户“先进行T39”批准主模型4次/CNY1，独立authorization-20261014.json，不扩T040/T041；有界兼容wire修复与专用PG122测试通过0跳过、mypy166/Ruff通过；已冻结run-r01，真实请求待执行。"
       ],
       "started_at": "2026-10-14T15:58:34",
       "completed_at": null,
-      "blocker": "用户已指定阿里云qwen3.8-max-0902为当前主模型（本机配置元数据一致），自有付费deepseek-flash仅在所列阿里云模型全部不可用时兜底。仍缺本轮请求/费用硬上限和可执行价格/能力冻结；剩余额度显示不自动授权调用。",
+      "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T039"
     },
     {

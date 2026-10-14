@@ -56,12 +56,15 @@ class OpenAICompatibleAdapter:
     def _body(self, request: TextRequest) -> dict[str, object]:
         self._operation._check()
         messages, tokens, temperature = message_parameters(request)
+        capabilities = self._operation.request.capabilities
         body: dict[str, object] = {
             "model": self._operation.request.route.model_id,
             "messages": messages,
-            "max_tokens": tokens,
+            capabilities.output_token_parameter: tokens,
             "stream": False,
         }
+        if capabilities.thinking_enabled is not None:
+            body["enable_thinking"] = capabilities.thinking_enabled
         if temperature is not None:
             body["temperature"] = temperature
         bounded_json(body)

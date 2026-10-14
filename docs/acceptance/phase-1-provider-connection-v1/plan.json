@@ -1,14 +1,15 @@
 {
-  "version": "phase1-real-connection-draft-v2",
+  "version": "phase1-real-connection-v3",
   "task_id": "PHASE-1-T039",
-  "state": "BLOCKED_MISSING_BUDGET",
+  "state": "FROZEN_RUN_READY",
   "base_commit": "cbf52bcc1a6ac8da8bc34f13eb3de831b462bdb6",
   "current_authorization": {
-    "requests": 0,
-    "cost_micro": 0,
+    "requests": 4,
+    "cost_micro": 1000000,
+    "currency": "CNY",
     "dynamic_opening": false,
-    "source": "docs/ADR/0011-dynamic-approval-20261008.json",
-    "source_sha256": "3d90135badde22e0a2e352b226ffc6c8cb1e8a12ff3232dfddcd5c68cfbda253"
+    "source": "docs/acceptance/phase-1-provider-connection-v1/authorization-20261014.json",
+    "source_sha256": "0e39e170d66fe1cca2bf456cdbde47fbf2f96bc2874a366952d414958bb269b6"
   },
   "targets": [
     {
@@ -21,12 +22,18 @@
       "allowed_data_categories": [
         "probe"
       ],
-      "capabilities": "unknown",
+      "capabilities": "Official declarations; actual probe pending",
       "proposed_requests_hard_limit": 4,
-      "requests_authorized": 0,
-      "pricing_and_currency": null,
-      "cost_hard_limit": null,
-      "remote_validation": "not_run"
+      "requests_authorized": 4,
+      "pricing_and_currency": {
+        "input_cny_per_million": 12,
+        "output_cny_per_million": 36
+      },
+      "cost_hard_limit": {
+        "currency": "CNY",
+        "amount": 1
+      },
+      "remote_validation": "pending"
     }
   ],
   "available_adapter_types": [
@@ -80,12 +87,13 @@
     "cross_provider_fallback": false,
     "send_learner_data": false
   },
-  "execution_gate": "Primary selection and conditional paid fallback preference received. This does not define a request/cost hard limit. Complete concrete budget/pricing/capability/route freeze before real calls. Failed/timeout attempts count. No automatic nine-model scan or paid fallback; T040/T041 remain separately authorized.",
+  "execution_gate": "User authorized the concrete primary-only 4-request / CNY1 proposal via 先进行T39. Execute run-r01.json once, no retries/fallback/model listing/learner data/T040/T041. Stop on first failure or missing usage; stream is last.",
   "selection_record": "model-selection-20261014.json",
   "paid_last_resort": {
     "model_id": "deepseek-flash",
     "condition": "all listed Aliyun models unusable",
     "budget": "not supplied",
     "enabled": false
-  }
+  },
+  "frozen_run": "run-r01.json"
 }

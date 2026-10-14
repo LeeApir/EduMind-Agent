@@ -81,15 +81,24 @@ class ModelCapabilities:
     structured_transport: str = "json_schema"
     tool_calling: bool | None = None
     vision: bool | None = None
+    output_token_parameter: str = "max_tokens"
+    thinking_enabled: bool | None = None
 
     def __post_init__(self) -> None:
         if (
             not 1 <= len(self.version) <= 100
             or self.structured_transport
             not in {"json_schema", "json_object", "text_json", "tool_schema"}
+            or self.output_token_parameter not in {"max_tokens", "max_completion_tokens"}
             or any(
                 v is not None and type(v) is not bool
-                for v in (self.streaming, self.structured_output, self.tool_calling, self.vision)
+                for v in (
+                    self.streaming,
+                    self.structured_output,
+                    self.tool_calling,
+                    self.vision,
+                    self.thinking_enabled,
+                )
             )
         ):
             raise CredentialFailure("VALIDATION_ERROR")

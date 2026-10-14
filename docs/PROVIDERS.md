@@ -244,3 +244,9 @@ handle为32随机字节的URL-safe编码，只在所属进程/loop有效。绑�
 本地访问必须管理员设置`EDUMIND_PROVIDER_DEPLOYMENT=local`及精确IP:port白名单；回环IPv4/IPv6可以显式允许，危险特殊地址仍不能放行。域名全部A/AAAA须在白名单，混合公网/本地答案拒绝HTTP。本地判定不能由客户端标记扩大。每次实际尝试重新校验DNS，传给HTTP库的是固定IP URL，Host及TLS SNI保留原域名与端口，`trust_env=False`、`follow_redirects=False`；所有3xx（含同源）停止，无自动第二请求。
 
 运行`cd backend && .venv/bin/python -m pytest -q tests/test_provider_target_policy.py tests/test_provider_target.py tests/test_provider_retry.py tests/test_provider_stream.py tests/test_deepseek_responses.py tests/test_deepseek_beta_tools.py`验证受控DNS、HTTPX Mock及实际构造的请求，不创建真实网络连接。后续T007/T008/原生适配器必须继续遵守同一目标策略与固定IP传输，不把保存连接时的DNS检查当成永久发送许可。
+
+### T039 有界兼容探测
+
+服务端内部 `ModelCapabilities.output_token_parameter` 只能显式选择 `max_tokens`（默认）或 `max_completion_tokens`；`thinking_enabled` 仅接受 bool/None，None不发送该字段。兼容适配器普通、结构化、流式共享此配置，不按模型名称猜测能力，不提供任意extra_body透传，不新增公共API/数据库字段。对默认开启思考的服务，冻结声明应选择覆盖思考与回答的总输出上限；不能把仅限制回答的max_tokens当作总费用上限。默认既有请求保持原样。
+
+本轮主模型以64总输出加官方最多10 token偏差保留74输出预算，并显式关闭思考；定价/授权/冻结与实际结果见 `docs/acceptance/phase-1-provider-connection-v1/`。工具探测只验证远端函数调用格式，经同一ConnectionOperation权限/SSRF/预算/临时凭据通路，不执行工具，不宣称新增业务Tools接口。
