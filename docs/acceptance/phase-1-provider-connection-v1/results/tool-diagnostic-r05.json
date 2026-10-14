@@ -1,0 +1,85 @@
+{
+  "version": "tool-diagnostic-r05",
+  "slot": "tool",
+  "real_cloud": true,
+  "mock": false,
+  "http_status": 200,
+  "outbound_sends": 1,
+  "parser_passed": false,
+  "error_code": "INVALID_OUTPUT",
+  "diagnostic": {
+    "exception_class": "ProbeFailure",
+    "category": "probe_validation",
+    "stage": "dispatch_and_production_parser",
+    "trace": [
+      {
+        "file": "scripts/acceptance_support/tool_probe_attempt.py",
+        "line": 156
+      }
+    ],
+    "output_failure_reason": null
+  },
+  "tool_checks": {
+    "model_identity": true,
+    "single_choice": true,
+    "choice_index": true,
+    "tool_finish_reason": false,
+    "assistant_role": true,
+    "no_refusal": true,
+    "single_tool": true,
+    "function_type": true,
+    "function_name": true,
+    "arguments_schema": true
+  },
+  "tool_fields": {
+    "finish_reason": "stop",
+    "argument_wire_type": "str",
+    "argument_json_type": "dict",
+    "ok_type": "bool",
+    "ok_boolean": true,
+    "argument_keys_exact": true
+  },
+  "model": null,
+  "matches_original_exact_OK": null,
+  "response": {
+    "decoded_bytes": 514,
+    "content_encoding": "gzip",
+    "json_object": true,
+    "has_error": false,
+    "choices_count": 1,
+    "input_tokens": 293,
+    "output_tokens": 19
+  },
+  "response_wire_sha256": "6c4c85ab4ac7ab09c01f19be127eb06c658eaae46605a7f8e7801381884ba21e",
+  "response_decoded_sha256": "77a94557a2c1d5e48540ccf656ef330998e38bc4a1009d7aaeebebcd0de9b8aa",
+  "duration_seconds": 1.594418,
+  "budget": {
+    "manifest_sha256": "75ee6f6d38d7213cf40e8882c01fb23fbed61e62c6a24bd36ef02bfb7cab1df8",
+    "halted": "INVALID_OUTPUT",
+    "attempts": [
+      [
+        1,
+        "tool",
+        "probe",
+        "d591947d1f671e7b284b9895362698efaf934101902d1c20a13aa3b27941d2e8",
+        "0bce87e574ea248a8d0c43f31ed6667f527924bef799248140507fcb41945a91",
+        14724,
+        "failed",
+        293,
+        19,
+        "INVALID_OUTPUT"
+      ]
+    ],
+    "unattempted_slots": []
+  },
+  "aggregate_attempts_including_r01": 6,
+  "aggregate_reserved_cost_micro": 75936,
+  "persistent_secret_absent": true,
+  "connection_revoked": true,
+  "retries": 0,
+  "fallbacks": 0,
+  "tool_executions": 0,
+  "t040_t041_started": false,
+  "source_commit": "95b02b7",
+  "raw_result_sha256": "0993a4f2f64a6008a57f83ea2009fd8d0c409de90975df8896a0be76e66ff058"
+}

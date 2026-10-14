@@ -152,9 +152,25 @@ def test_tool_metadata_disambiguates_types_without_retaining_values(
     assert "PRIVATE_CANARY" not in json.dumps(meta)
 
 
-def test_new_diagnostic_prior_guard_and_round_bounds():
-    from run_phase1_tool_diagnostics import names, prior_check
+def test_new_diagnostic_prior_guard_and_round_bounds(tmp_path, monkeypatch):
+    import run_phase1_tool_diagnostics as diagnostics
 
-    assert prior_check(5) == (5, 61212)
+    monkeypatch.setattr(diagnostics, "ROOT", tmp_path)
+    parent = tmp_path / "local-materials/phase-1-t039"
+    records = [
+        ("r01", [10860], "TEMPORARILY_UNAVAILABLE"),
+        ("diagnostic-r02", [10860], None),
+        ("checks-r03", [13440, 11328], None),
+        ("tool-r04", [14724], "INVALID_OUTPUT"),
+    ]
+    for name, costs, halted in records:
+        directory = parent / name
+        directory.mkdir(parents=True)
+        with sqlite3.connect(directory / "budget.sqlite") as db:
+            db.execute("CREATE TABLE attempts(cost_micro INTEGER)")
+            db.executemany("INSERT INTO attempts VALUES(?)", [(c,) for c in costs])
+            db.execute("CREATE TABLE run(id INTEGER,halted TEXT)")
+            db.execute("INSERT INTO run VALUES(1,?)", (halted,))
+    assert diagnostics.prior_check(5) == (5, 61212)
     with pytest.raises(ValueError, match="ROUND_NOT_APPROVED"):
-        names(8)
+        diagnostics.names(8)
