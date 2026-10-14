@@ -8,6 +8,7 @@ from pathlib import Path
 import httpx
 import pytest
 
+from app.agents.review_agent import _REVIEW_INSTRUCTIONS, review_contract_instructions
 from app.core.config import ProviderSettings
 from app.core.provider_factory import configured_provider_adapter
 from app.core.provider_target import ProviderTargetGuard, TargetPolicy
@@ -135,7 +136,10 @@ def test_two_case_strategy_does_not_reuse_old_approval_or_claim_diagnostic_pass(
         ("reasoning_check:02", "correct_control:01"),
     ):
         body = bodies[slot]
-        assert body["input"] == previous[prior]["input"]
+        assert body["input"] == [
+            {"role": "system", "content": _REVIEW_INSTRUCTIONS + review_contract_instructions()},
+            previous[prior]["input"][1],
+        ]
         assert body["text"] == previous[prior]["text"]
         assert body["reasoning"] == {"effort": "high"}
         assert body["max_output_tokens"] == 8192

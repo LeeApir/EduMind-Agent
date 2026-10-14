@@ -49,7 +49,7 @@ do not demand that each short resource cover every listed objective or misconcep
 If reference context is absent, do not pretend to have checked graph or learner fit.
 Return only the requested JSON review. Do not pass a resource with any unresolved issue."""
 
-REVIEW_INSTRUCTION_VERSION = "resource-review-instructions-v3"
+REVIEW_INSTRUCTION_VERSION = "resource-review-instructions-v4"
 
 
 def review_contract_instructions() -> str:
@@ -90,6 +90,20 @@ def review_contract_instructions() -> str:
         "reject merely because a call can fail or because it returns NULL. Base any "
         "rejection on a reachable path in the supplied code and its stated preconditions, "
         "not on a missing printout or speculative code outside the resource.\n"
+        "Notation/boundary audit: independently check quantitative claims in prose as "
+        "well as code. Distinguish ordinal positions from zero-based indices, visited "
+        "nodes from traversed links, and a data head from a dummy/sentinel head. Check "
+        "the stated initial position, the first element, a singleton and relevant end "
+        "positions against the claimed operation count or formula. Do not infer that "
+        "a natural-language position is zero-based merely because the code language is C. "
+        "If the origin or counting convention is unstated and common conventions change "
+        "the truth of a quantitative claim, do not silently choose the convention that "
+        "makes it true. Report the missing convention or boundary mismatch as a concrete "
+        "fact issue, locating the claim and giving a brief boundary counterexample. "
+        "An explicit convention or one unambiguously established by surrounding code "
+        "or text is valid evidence; do not demand redundant declarations or reject a "
+        "correct zero-based, one-based or sentinel-based formulation. Report the actual "
+        "consequence without inventing memory-safety impact from a notation issue alone.\n"
         "Required output schema:\n" + json.dumps(review_output_schema(), ensure_ascii=False)
         + "\nSerialization examples:\n" + json.dumps(examples, ensure_ascii=False)
     )

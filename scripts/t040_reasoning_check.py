@@ -9,6 +9,7 @@ from pathlib import Path
 import prepare_t040_diagnostics as preparation
 import run_t040_diagnostics as execution
 from acceptance_support.phase1_budget import GateFailure, canonical, sha
+from app.agents.review_agent import REVIEW_INSTRUCTION_VERSION
 
 ROOT = preparation.ROOT
 BASE = ROOT / "docs/acceptance/phase-1-t040-reasoning-check"
@@ -54,7 +55,7 @@ async def proposed():
         "transport": "responses_json_schema",
         "adapter": "DeepSeekResponsesAdapter",
         "reasoning_effort": "high",
-        "review_instruction_version": "resource-review-instructions-v3",
+        "review_instruction_version": REVIEW_INSTRUCTION_VERSION,
         "temperature": 0,
         "temperature_effect": "Ignored by provider in thinking mode.",
         "max_output_tokens_including_reasoning": 8192,
