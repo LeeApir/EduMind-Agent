@@ -182,6 +182,8 @@ class OpenAICompatibleAdapter:
             raise ProviderError(ProviderErrorCode.CAPABILITY_UNAVAILABLE)
         body = self._body(request)
         body["stream"] = True
+        if self._operation.request.capabilities.include_stream_usage:
+            body["stream_options"] = {"include_usage": True}
         async with self._operation.send(body, stream=True) as response:
             _check_status(response)
             saw_text = False

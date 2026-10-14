@@ -65,3 +65,73 @@ def test_frozen_wire_observer_cannot_parse_gzip_usage():
     with pytest.raises(Exception):
         audit.usage()
     asyncio.run(audit.aclose())
+
+
+@pytest.mark.parametrize(
+    "wire,expected",
+    [
+        (
+            b'data: {"model":"test","choices":[]}\r\n\r\n'
+            b'data: {"usage":{"prompt_tokens":3,"completion_tokens":2},"choices":[]}\r\n\r\n'
+            b"data: [DONE]\r\n\r\n",
+            (3, 2),
+        ),
+        (b'data: {"choices":[]}\n\ndata: [DONE]\n\n', (None, None)),
+        (b'data: {"usage":{"prompt_tokens":true,"completion_tokens":2}}\n\n', (None, 2)),
+    ],
+)
+def test_stream_usage_is_read_from_decoded_complete_sse_frames(wire, expected):
+    recorder = RecordingOperation(None)
+    recorder.payload.extend(wire)
+    summary = recorder.summary(streaming=True)
+    assert (summary["input_tokens"], summary["output_tokens"]) == expected
+
+
+def test_local_probe_failures_and_bugs_are_not_vendor_outages():
+    from acceptance_support.connection_diagnostics import ProbeFailure, classify_failure
+
+    from app.services.provider_gateway import ProviderError, ProviderErrorCode
+
+    assert classify_failure(ProbeFailure("fixed_schema")) == ("INVALID_OUTPUT", "probe_validation")
+    assert classify_failure(ValueError("private diagnostic message")) == (
+        "SAFETY_FAILURE",
+        "local_unexpected",
+    )
+    assert classify_failure(ProviderError(ProviderErrorCode.TIMEOUT)) == (
+        "TIMEOUT",
+        "provider_protocol",
+    )
+
+
+def test_compressed_stream_passes_production_parser_and_preserves_usage():
+    from dataclasses import replace
+
+    from test_provider_connection_gateway import frame, request_for
+
+    async def run():
+        req = request_for()
+        req = replace(req, capabilities=replace(req.capabilities, include_stream_usage=True))
+        usage = (
+            'data: {"model":"selected-model","choices":[],"usage":'
+            + '{"prompt_tokens":5,"completion_tokens":3}}\n\n'
+        )
+        wire = gzip.compress(
+            (frame({"content": "OK."}) + frame(finish="stop") + usage + "data: [DONE]\n\n").encode()
+        )
+        harness = Harness(
+            lambda request: httpx.Response(
+                200, headers={"content-encoding": "gzip"}, stream=Bytes(wire)
+            ),
+            req,
+        )
+        recorder = RecordingOperation(harness)
+        text = "".join(
+            [delta.text async for delta in OpenAICompatibleAdapter(recorder).stream_text(PROMPT)]
+        )
+        assert text == "OK."
+        summary = recorder.summary(streaming=True)
+        assert (summary["input_tokens"], summary["output_tokens"]) == (5, 3)
+        assert summary["content_encoding"] == "gzip"
+        assert harness.calls[0]["stream_options"] == {"include_usage": True}
+
+    asyncio.run(run())

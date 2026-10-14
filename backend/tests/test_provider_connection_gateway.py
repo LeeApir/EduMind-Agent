@@ -847,3 +847,30 @@ def test_explicit_total_output_limit_and_disabled_thinking_reach_every_wire_mode
 def test_bound_wire_options_reject_invalid_values(fields):
     with pytest.raises(CredentialFailure):
         replace(request_for().capabilities, **fields)
+
+
+def test_explicit_stream_usage_request_and_final_usage_frame():
+    async def run():
+        req = request_for()
+        req = replace(req, capabilities=replace(req.capabilities, include_stream_usage=True))
+        usage = (
+            'data: {"model":"selected-model","choices":[],'
+            '"usage":{"prompt_tokens":4,"completion_tokens":2}}\n\n'
+        )
+        stream = Chunks(
+            [
+                (
+                    frame({"content": "ok"}) + frame(finish="stop") + usage + "data: [DONE]\n\n"
+                ).encode()
+            ]
+        )
+        harness = Harness(lambda r: httpx.Response(200, stream=stream), req)
+        assert (
+            "".join([d.text async for d in OpenAICompatibleAdapter(harness).stream_text(PROMPT)])
+            == "ok"
+        )
+        assert harness.calls[0]["stream_options"] == {"include_usage": True}
+        with pytest.raises(CredentialFailure):
+            replace(req.capabilities, include_stream_usage=1)
+
+    asyncio.run(run())

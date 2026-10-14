@@ -250,3 +250,5 @@ handle为32随机字节的URL-safe编码，只在所属进程/loop有效。绑�
 服务端内部 `ModelCapabilities.output_token_parameter` 只能显式选择 `max_tokens`（默认）或 `max_completion_tokens`；`thinking_enabled` 仅接受 bool/None，None不发送该字段。兼容适配器普通、结构化、流式共享此配置，不按模型名称猜测能力，不提供任意extra_body透传，不新增公共API/数据库字段。对默认开启思考的服务，冻结声明应选择覆盖思考与回答的总输出上限；不能把仅限制回答的max_tokens当作总费用上限。默认既有请求保持原样。
 
 本轮主模型以64总输出加官方最多10 token偏差保留74输出预算，并显式关闭思考；定价/授权/冻结与实际结果见 `docs/acceptance/phase-1-provider-connection-v1/`。工具探测只验证远端函数调用格式，经同一ConnectionOperation权限/SSRF/预算/临时凭据通路，不执行工具，不宣称新增业务Tools接口。
+
+T039修复版探测入口为 `scripts/run_phase1_provider_checks_v2.py`，r01/r02脚本和结果保留为历史证据。接入验收依据正常协议终止、非空有效响应、实际模型身份及严格schema；词面OK匹配单列诊断，不把不匹配冒称服务故障，不改写旧失败。新增服务端内部 `include_stream_usage: bool = False`，显式启用才发送 `stream_options.include_usage=true`；非流式/默认请求不变，无公共API/数据库字段。兼容能力声明及使用量须绑定具体配置，遵从目标声明，未知usage仍unknown。解码后的有界响应被观测后再解析，gzip/SSE用量不会直接从压缩wire读取；本地校验失败归probe_validation/INVALID_OUTPUT，本地意外错误归local_unexpected/SAFETY_FAILURE，Provider错误保留类型，敏感异常消息不记录。
