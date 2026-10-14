@@ -1,7 +1,7 @@
 {
-  "version": "phase1-real-connection-draft-v1",
+  "version": "phase1-real-connection-draft-v2",
   "task_id": "PHASE-1-T039",
-  "state": "BLOCKED_MISSING_TARGET_AND_BUDGET",
+  "state": "BLOCKED_MISSING_BUDGET",
   "base_commit": "cbf52bcc1a6ac8da8bc34f13eb3de831b462bdb6",
   "current_authorization": {
     "requests": 0,
@@ -10,7 +10,25 @@
     "source": "docs/ADR/0011-dynamic-approval-20261008.json",
     "source_sha256": "3d90135badde22e0a2e352b226ffc6c8cb1e8a12ff3232dfddcd5c68cfbda253"
   },
-  "targets": [],
+  "targets": [
+    {
+      "provider_type": "openai-compatible",
+      "provider": "aliyun",
+      "model_id": "qwen3.8-max-0902",
+      "endpoint_reference": ".env:EDUMIND_PROVIDER_BASE_URL",
+      "credential_reference": ".env:EDUMIND_PROVIDER_API_KEY",
+      "local_or_cloud": "cloud",
+      "allowed_data_categories": [
+        "probe"
+      ],
+      "capabilities": "unknown",
+      "proposed_requests_hard_limit": 4,
+      "requests_authorized": 0,
+      "pricing_and_currency": null,
+      "cost_hard_limit": null,
+      "remote_validation": "not_run"
+    }
+  ],
   "available_adapter_types": [
     "openai-compatible",
     "ollama",
@@ -62,5 +80,12 @@
     "cross_provider_fallback": false,
     "send_learner_data": false
   },
-  "execution_gate": "Draft is not executable or approved. After target/budget input, freeze actual route/config/source/locks/prompt/request order and conservative pricing bound before any attempt. Failed/timeout attempts count. Historical2033/2500 not available. Connection approval never grants T040/T041."
+  "execution_gate": "Primary selection and conditional paid fallback preference received. This does not define a request/cost hard limit. Complete concrete budget/pricing/capability/route freeze before real calls. Failed/timeout attempts count. No automatic nine-model scan or paid fallback; T040/T041 remain separately authorized.",
+  "selection_record": "model-selection-20261014.json",
+  "paid_last_resort": {
+    "model_id": "deepseek-flash",
+    "condition": "all listed Aliyun models unusable",
+    "budget": "not supplied",
+    "enabled": false
+  }
 }
