@@ -1,0 +1,64 @@
+{
+  "version": "t040-high-diagnostics-approval-v1",
+  "approved": true,
+  "approved_at": "2026-10-14T22:41:01",
+  "approver": "Lee",
+  "user_response": "ok",
+  "authorization_evidence": "本聊天展示bf03d71完整high诊断四组5/5/1/2次、费用0.43/0.43/0.08/0.18合计13次/CNY1.12后，用户回复ok。",
+  "proposal_commit": "bf03d71",
+  "proposal_sha256": "5f90260330809ed97d9fd9bc7d97a9970419f9de782218d0ba627a69e40b3ef5",
+  "groups": {
+    "error_detection": {
+      "requests": 5,
+      "cost_micro": 430000
+    },
+    "classification": {
+      "requests": 5,
+      "cost_micro": 430000
+    },
+    "correct_control": {
+      "requests": 1,
+      "cost_micro": 80000
+    },
+    "long_review": {
+      "requests": 2,
+      "cost_micro": 180000
+    }
+  },
+  "strategy_fact_confirmation": {
+    "reviewer": "Lee",
+    "user_response": "ok",
+    "confirmed_at": "2026-10-14T22:41:01",
+    "confirmation_evidence": "本聊天明确请用户核对已展示的两例实际结果并确认、同时请求完整四组预算后，用户回复ok；本记录只确认r03两例，不预确认r04未来回答。",
+    "result_sha256": "186d00d79cfee6b8775f4851402464d62b5307cce9b01fc712f0d5f14eb4ca3d",
+    "observations": [
+      {
+        "slot": "reasoning_check:01",
+        "request_sha256": "89a973686fa20b0d737ea7e1cf2e4f27222cdcac7fe5aa66cb12dade246d4c29",
+        "response_sha256": "50419ad1a63b805709b7ad0e89ea5d82fad72647d319398fd7c38c813a507912",
+        "review_sha256": "e46c35b70ee236a0bd399b835539f038d598dcf7b236c004530f243301b932f7",
+        "verdict": "revise",
+        "issues": [
+          {
+            "area": "code_safety",
+            "message": "In main, each insertion is written as `head = push_front(head, ...)`, which discards the only live pointer to the existing chain whenever the call fails. push_front documents and implements a failure contract (malloc returning NULL yields NULL with 原链表不变), so on a reachable path — e.g. malloc fails on the call that inserts 2 — the assignment overwrites the pointer to the node holding 1 with NULL: that node (and any earlier nodes) becomes unreachable and is never released by the subsequent free_list(head), i.e. a memory leak. The comment '分配失败，原链表不变' is accurate only for the function body, not for the caller, which does lose ownership. Use a temporary, e.g. `struct Node *n = push_front(head, 2); if (n == NULL) { /* keep head, report error */ } else head = n;`, so that a failed allocation neither leaks nor silently empties the list.",
+            "severity": "major"
+          }
+        ]
+      },
+      {
+        "slot": "reasoning_check:02",
+        "request_sha256": "bbf2242580570cd0f00613c4e70fb69776060a095d24e0a870f3a3e937f04b4c",
+        "response_sha256": "d6ce003bf1d1dfdd4f6fd2c7de4215f03e8a98544d11666cf440800f97d772f0",
+        "review_sha256": "5ac410b1ef4d05bd230d76295cbc2b8a551601fd460f17235d1219a29e981ceb",
+        "verdict": "pass",
+        "issues": []
+      }
+    ]
+  },
+  "formal_quality_authorized": false,
+  "dsl_authorized": false,
+  "t041_authorized": false,
+  "production_opening_authorized": false,
+  "r04_future_human_signoff_granted": false
+}
