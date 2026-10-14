@@ -2230,7 +2230,9 @@
       "scope": [
         "scripts/",
         "backend/tests/",
-        "docs/acceptance/"
+        "docs/acceptance/",
+        "backend/app/agents/review_agent.py",
+        "docs/PROVIDERS.md"
       ],
       "prd_source": "PRD §3.3、§8.2、§10.2",
       "acceptance_criteria": [
@@ -2245,11 +2247,12 @@
         "用户指定先切换DeepSeek做后续完整测试；本机.env恢复已有DeepSeek Key/https://api.deepseek.com/deepseek-flash，传输改为工厂实际支持的responses_json_schema，Qwen配置留作inactive回退资料。实际环境离线解析及DeepSeekResponsesAdapter选择通过，config/Responses59测试通过；0DNS/模型调用。T039原Qwen完成证据不转授，新DeepSeek实际路径需另存接入复验证据并冻结有界预算后才能启动T040；本次不领取质量任务。",
         "用户要求“用deepseek跑一遍”后完成独立接入复验：源码909ddb6、4/4公开请求HTTP200/模型一致，当前Responses路径文本/严格JSON/auto工具格式/流式response.completed与usage均通过。实际359输入45输出共404tokens，106离线测试/Ruff、冻结SHA/台账核验通过，独立证据phase-1-deepseek-connection-v1/results/r01.json；仅证明此系统模型传输，不转授P1 Chat或质量/性能，不开动态，不开始T040/T041正式验收。",
         "2026-10-14 T040准备检查点：prepare_t040_diagnostics.py从当前ReviewAgent._review离线捕获历史5/5/1/2组共13正文，绑定原payload/请求/source哈希，4096总输出/非思考/temperature0/单次60秒/零重试回退；各组费用上限0.25/0.25/0.05/0.11元，未授权/未发送。38离线测试、Ruff、proposal哈希核对、历史批准/动态冻结/236归档文件校验、工作流/diff通过；先前两历史校验器因后续运行源码和已授权ADR追加而失败，已修复为原批准提交与当前冻结样本分别核对，不改原附件/标签/失败。具体证据phase-1-t040-deepseek-v1。",
-        "2026-10-14 用户批准13次/CNY0.66后，冻结2f989da执行首组首例：实际HTTP200/0.934046s/2509输入22输出，模型/schema/completed/usage均通过，审核却pass/issues=[]；已知push_front malloc失败返回NULL被main直接赋给非空head导致原链丢失，触发CONCRETE_DEFECT_MISSED，持久台账停止且后12槽未发。51离线通过/Ruff、四执行清单源码哈希/请求哈希/SQLite与保留响应-审核一致核对通过，正式质量/DSL/T041未启动，证据phase-1-t040-deepseek-v1/results/diagnostic-r01.json。"
+        "2026-10-14 用户批准13次/CNY0.66后，冻结2f989da执行首组首例：实际HTTP200/0.934046s/2509输入22输出，模型/schema/completed/usage均通过，审核却pass/issues=[]；已知push_front malloc失败返回NULL被main直接赋给非空head导致原链丢失，触发CONCRETE_DEFECT_MISSED，持久台账停止且后12槽未发。51离线通过/Ruff、四执行清单源码哈希/请求哈希/SQLite与保留响应-审核一致核对通过，正式质量/DSL/T041未启动，证据phase-1-t040-deepseek-v1/results/diagnostic-r01.json。",
+        "2026-10-14 用户继续后实施审核Prompt v3修复候选，通用检查分配/可失败调用的失败路径、调用者覆盖和原内存所有权、清理与注释；保留正确临时返回值/所有权契约对照，无按案例ID预定拒绝。94离线通过、Ruff、mypy166源文件通过、历史批准/样本冻结/工作流通过；原r01 SQLite只读核验仍1次且CONCRETE_DEFECT_MISSED。独立v2/r02提案绑定原历史payload/新系统指令/执行源码，无真实调用，13次费用上限0.69待批；不能把离线Mock pass当模型语义修复通过。"
       ],
       "started_at": "2026-10-14T19:38:26",
       "completed_at": null,
-      "blocker": "诊断r01首例真实HTTP200/有效schema但verdict=pass，漏检已批准历史malloc失败丢失链表头/内存泄漏缺陷，CONCRETE_DEFECT_MISSED持久停止；1/13请求、2531tokens、保守预留CNY0.054626，其余12未发，未进入正式质量/DSL/T041。需先修复审核策略，再冻结批准的新诊断轮次；原失败/台账不得清空或拼分。",
+      "blocker": "r01已知缺陷漏检及停止台账保留。已完成生产审核指令v3失败路径/调用者状态/内存所有权修复候选，94离线测试/Ruff/mypy166通过；尚无真实修复通过证据。新配置r02独立13次四组费用上限CNY0.26/0.26/0.05/0.12合计0.69待批准，新增真实0，不转用旧剩余额度；正式质量/DSL/T041未运行。",
       "commit_lookup": "Task-Completed: PHASE-1-T040"
     },
     {

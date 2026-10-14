@@ -49,7 +49,7 @@ do not demand that each short resource cover every listed objective or misconcep
 If reference context is absent, do not pretend to have checked graph or learner fit.
 Return only the requested JSON review. Do not pass a resource with any unresolved issue."""
 
-REVIEW_INSTRUCTION_VERSION = "resource-review-instructions-v2"
+REVIEW_INSTRUCTION_VERSION = "resource-review-instructions-v3"
 
 
 def review_contract_instructions() -> str:
@@ -75,6 +75,21 @@ def review_contract_instructions() -> str:
         "for learner-level mismatch; misconception for relevant misconception coverage. "
         "Do not invent a safety issue in a correct resource. Describe the actual defect "
         "and choose severity from its impact, not from the resource type.\n"
+        "Code-path audit: inspect code embedded in explanations and exercises as carefully "
+        "as standalone code. Check failure paths as well as the demonstrated successful "
+        "execution. For allocation or other fallible calls, check each returned value "
+        "together with its caller: what changes when the call fails after earlier calls "
+        "succeeded? Track the last reachable pointer to each owned allocation, including "
+        "replacement of a live pointer by a failure result and subsequent cleanup. "
+        "A NULL check inside a helper does not by itself prove the caller preserves its "
+        "existing state or can still release owned memory. Check comments against the "
+        "actual assignments and return values. Classify concrete lost ownership and "
+        "memory leaks as code_safety. In a reported issue, identify the failure condition, "
+        "the responsible operation and its observable consequence. A checked temporary "
+        "result or a documented contract that preserves ownership can be correct; do not "
+        "reject merely because a call can fail or because it returns NULL. Base any "
+        "rejection on a reachable path in the supplied code and its stated preconditions, "
+        "not on a missing printout or speculative code outside the resource.\n"
         "Required output schema:\n" + json.dumps(review_output_schema(), ensure_ascii=False)
         + "\nSerialization examples:\n" + json.dumps(examples, ensure_ascii=False)
     )

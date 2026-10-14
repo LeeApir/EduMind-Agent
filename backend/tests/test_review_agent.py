@@ -65,7 +65,7 @@ def test_passed_review_approves_candidate() -> None:
         assert REVIEW_INSTRUCTION_VERSION in instruction
         assert json.dumps(review_output_schema(), ensure_ascii=False) in instruction
         assert "examples demonstrate serialization only" in instruction
-        assert "resource-review-instructions-v2" in instruction
+        assert "resource-review-instructions-v3" in instruction
         assert "including NULL dereference, use-after-free" in instruction
         assert (
             "even when the unsafe claim appears only in explanation or exercise text" in instruction

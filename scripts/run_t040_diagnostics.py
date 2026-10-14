@@ -28,6 +28,7 @@ from app.core.provider_target import ProviderTargetGuard, TargetPolicy
 from app.services.provider_gateway import ChatMessage, StructuredRequest, TextRequest
 
 RAW = ROOT / "local-materials/phase-1-t040-deepseek-v1"
+ROUND = "r01"
 
 
 def read(path):
@@ -85,7 +86,7 @@ def freeze():
         },
     }
     for group in plan["groups"]:
-        path = BASE / f"run-{group['id']}-r01.json"
+        path = BASE / f"run-{group['id']}-{ROUND}.json"
         if path.exists():
             raise GateFailure("FREEZE_CHANGED")
         target = dict(next(iter(old["targets"].values())))
@@ -100,7 +101,7 @@ def freeze():
         )
         manifest = {
             "version": "phase1-run-v1",
-            "run_id": f"t040-{group['id']}-r01",
+            "run_id": f"t040-{group['id']}-{ROUND}",
             "state": "FROZEN_RUN_READY",
             "phase": "diagnostic",
             "files": files,
@@ -136,7 +137,7 @@ def freeze():
 
 def budget(group):
     plan, _ = approval_record()
-    manifest = read(BASE / f"run-{group}-r01.json")
+    manifest = read(BASE / f"run-{group}-{ROUND}.json")
     expected = next(g for g in plan["groups"] if g["id"] == group)
     return FrozenBudget(
         manifest,
@@ -158,7 +159,7 @@ def require_prior_group(group):
     for previous in GROUPS[: GROUPS.index(group)]:
         gate = budget(previous)
         snapshot = gate.snapshot()
-        path = BASE / f"human-{previous}-r01.json"
+        path = BASE / f"human-{previous}-{ROUND}.json"
         if snapshot["halted"] or snapshot["unattempted_slots"] or not path.exists():
             raise GateFailure("PREREQUISITE_MISSING")
         signoff = read(path)
