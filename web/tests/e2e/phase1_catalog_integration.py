@@ -115,7 +115,17 @@ def main():
     try:
         server = start_api()
         web = subprocess.Popen(
-            ["pnpm", "dev", "--host", "127.0.0.1", "--port", "4238", "--strictPort"],
+            [
+                "pnpm",
+                "exec",
+                "vite",
+                "preview",
+                "--host",
+                "127.0.0.1",
+                "--port",
+                "4238",
+                "--strictPort",
+            ],
             cwd=ROOT / "web",
             env={**os.environ, "EDUMIND_API_PROXY_TARGET": API},
             stdout=logs[1],
@@ -205,6 +215,15 @@ def main():
             context = browser.new_context(viewport={"width": 1280, "height": 900})
             context.route("**/*", route)
             page = context.new_page()
+            report["main_frame_navigations"] = []
+            page.on(
+                "framenavigated",
+                lambda frame: (
+                    report["main_frame_navigations"].append(frame.url)
+                    if frame == page.main_frame
+                    else None
+                ),
+            )
             page.goto(BASE, wait_until="networkidle")
             graph = catalog.api(page, "/api/graph?version=phase-1.1.0")
             assert graph["status"] == 200 and len(graph["body"]["nodes"]) == 30
@@ -212,6 +231,7 @@ def main():
             with ThreadPoolExecutor(max_workers=1) as pool:
                 for template in ("linked-list-insertion", "linked-list-deletion"):
                     unit = catalog.enroll(page, release_id, template)
+                    navigation_count = len(report["main_frame_navigations"])
                     row = catalog.measure_animation(
                         page,
                         {"id": "integration-" + template, "template_id": template},
@@ -220,9 +240,15 @@ def main():
                         pool=pool,
                     )
                     row["unit_id"] = unit
+                    row["navigation_count"] = (
+                        len(report["main_frame_navigations"]) - navigation_count
+                    )
                     report["binding_probes"].append(row)
                     persist()
                     assert row["ok"], row
+                    assert row["navigation_count"] == 1, (
+                        "Unexpected page reload during rendering"
+                    )
 
                 def restart(checks, rows):
                     nonlocal server

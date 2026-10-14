@@ -19,3 +19,7 @@ T038 同时执行阶段计划的定量接口：目录首屏 20 槽；扩展路�
 首轮 r01（7c1001d）1758项后端中8失败/0错误/0跳过，另strict mypy/旧Mock浏览器/新增恢复检查失败，见 prior-r01.json。修复：统一应用ORM注册；ORIGINAL_SEND在fixture改写前导入；旧浏览器明确 dynamic runtime，模型设置补齐图谱/掌握度契约；恢复检查允许持久化练习页。所有原断言保留。旧导出夹具的伪MP4触发真实解码失败，改用固定禁网只读Manim镜像内PyAV生成内存黑帧，不作为教学动画质量证据；镜像无ffmpeg CLI的首个诊断失败亦保留本机日志。三组后端诊断共45项通过；核心Mock/连接路由图谱Mock及真实十节点目录+进程恢复诊断均通过，诊断不替代下一固定提交完整验收。
 
 本地clone的 .git/info/exclude 仅登记 backend/.venv 与 web/node_modules 缓存链接；首次未登记时 clean gate 拒绝（未执行测试），未修改源码忽略规则。20条浏览器路径加载从实际 path/current fetch 开始计入网络，到节点DOM就绪+两帧；模块启动另外包含在首屏计时中。
+
+r02（4e599a8）后端1758/1758、前端189/189、全部类型/lint/build/Mock浏览器通过；实际100模板与100 SSE均通过、无出站、源码干净，但目录整体失败，见 prior-r02.json/prior-r02-catalog.json。20首屏及路径画面门槛通过；第二动画的计时变量在等待播放时变为undefined，Worker任务已完成。本轮没有采集导航/控制台细节，不能断言重载的唯一根因。依赖目录链接指向共享node_modules，开发优化缓存/HMR是待排查可能性；新轮改用同次构建产物的 vite preview（已核对固定Vite6.1.0源码proxy继承配置），隔离开发热重载，并断言动画过程只发生一次有意导航，完整失败轮次保留。不是把旧r02计时补成通过。
+
+额外逐项比较20已签核样本：4e599a8编译出的Scene源码及SRT SHA均与15e52f1签核材料一致，见 compiled-byte-comparison.json；仅证明输出字节不变，旧性能与候选源码身份不转授。
