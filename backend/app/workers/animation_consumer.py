@@ -33,12 +33,15 @@ async def consume(payload: object) -> None:
         await engine.dispose()
 
 
-@shared_task(name=TASK_NAME, ignore_result=True)
 def render_animation(payload: object) -> None:
     try:
         asyncio.run(consume(payload))
     except Exception:
         logging.getLogger(__name__).warning("ANIMATION_CONSUMER_INTERRUPTED")
+
+
+# Explicit registration preserves the typed callable boundary with untyped Celery.
+render_animation = shared_task(name=TASK_NAME, ignore_result=True)(render_animation)
 
 
 def build_consumer() -> Celery:
@@ -51,7 +54,6 @@ def build_consumer() -> Celery:
     return app
 
 
-@signals.worker_process_init.connect(weak=False)
 def initialize_consumer_process(**kwargs: object) -> None:
     # macOS spawn starts with an empty fast-trace cache. Initialize the fixed
     # app in every child, including replacement children after WorkerLost.
@@ -60,6 +62,9 @@ def initialize_consumer_process(**kwargs: object) -> None:
         for name in tuple(current_app.tasks):
             if name != TASK_NAME:
                 current_app.tasks.pop(name)
+
+
+signals.worker_process_init.connect(initialize_consumer_process, weak=False)
 
 
 def main() -> None:

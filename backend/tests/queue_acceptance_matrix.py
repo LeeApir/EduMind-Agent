@@ -31,7 +31,12 @@ from app.services.catalog_publication import publish_catalog  # noqa: E402
 from tests.run_mvp03_animation_quality import correct_links  # noqa: E402
 
 BASE = "https://127.0.0.1:8166"
-PLAN = ROOT / "docs/acceptance/phase-1-queue-v1/matrix-protocol.json"
+PLAN = Path(
+    os.environ.get(
+        "EDUMIND_QUEUE_MATRIX_PROTOCOL",
+        str(ROOT / "docs/acceptance/phase-1-queue-v1/matrix-protocol.json"),
+    )
+)
 OUTPUT = Path(os.environ["EDUMIND_QUEUE_MATRIX_OUTPUT"])
 CACHE = OUTPUT / "media-cache"
 report = {

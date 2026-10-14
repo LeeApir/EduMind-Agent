@@ -2,6 +2,7 @@
 
 import json
 import os
+import subprocess
 from pathlib import Path
 from urllib.parse import urlsplit
 
@@ -9,12 +10,26 @@ from playwright.sync_api import expect, sync_playwright
 
 BASE = os.getenv("EDUMIND_E2E_BASE_URL", "http://127.0.0.1:4173")
 UNIT = "unit-export-0001"
-MP4 = b"\x00\x00\x00\x18ftypisom reviewed MP4 bytes"
 SRT = "1\n00:00:00,000 --> 00:00:01,000\n链表插入\n".encode()
 NOTES = "# 学习笔记\n\n当前已审核讲解 v2\n".encode()
 
 
 def run() -> None:
+    # A valid synthetic clip prevents the browser's decode-error path from
+    # invalidating the export UI. It is not a reviewed teaching animation.
+    mp4 = subprocess.run(
+        ["docker", "run", "--rm", "--pull=never", "--network=none", "--read-only",
+         "--cpus=1", "--memory=256m", "--pids-limit=64", "--entrypoint=python",
+         "manimcommunity/manim@sha256:89ab433ce59134a4dcf351deb2511e067ab354393c0bb7d1859f3e8f0b2406a3",
+         "-c", "import av,io,sys; import numpy as np; "
+         "out=io.BytesIO(); c=av.open(out,mode='w',format='mp4'); "
+         "s=c.add_stream('libx264',rate=1); s.width=32; s.height=32; "
+         "s.pix_fmt='yuv420p'; s.codec_context.thread_count=1; "
+         "f=av.VideoFrame.from_ndarray(np.zeros((32,32,3),dtype=np.uint8),format='rgb24'); "
+         "[c.mux(p) for p in s.encode(f)]; [c.mux(p) for p in s.encode()]; "
+         "c.close(); sys.stdout.buffer.write(out.getvalue())"],
+        capture_output=True, check=True, timeout=30,
+    ).stdout
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch(headless=True)
         try:
@@ -42,6 +57,8 @@ def run() -> None:
                     return route.continue_()
                 path = request_path.removeprefix("/api/")
                 requests.append((request.method, path))
+                if path == "runtime":
+                    return route.fulfill(json={"mode": "dynamic"})
                 if path == "auth/session":
                     return route.fulfill(json={"csrf_token": "csrf"})
                 if path == f"learning-units/{UNIT}":
@@ -73,7 +90,7 @@ def run() -> None:
                     })
                 if path.startswith("animation-media/media-current/"):
                     extension = "mp4" if "/mp4" in path else "srt"
-                    body = MP4 if extension == "mp4" else SRT
+                    body = mp4 if extension == "mp4" else SRT
                     return route.fulfill(body=body, headers={
                         "Content-Type": (
                             "video/mp4" if extension == "mp4" else "application/x-subrip"
@@ -90,7 +107,7 @@ def run() -> None:
             expect(page.get_by_test_id("download-mp4")).to_be_visible()
             for test_id, expected_name, expected_bytes in (
                 ("download-notes", f"learning-notes-{UNIT}.md", NOTES),
-                ("download-mp4", "animation-media-current.mp4", MP4),
+                ("download-mp4", "animation-media-current.mp4", mp4),
                 ("download-srt", "animation-media-current.srt", SRT),
             ):
                 page.get_by_test_id(test_id).focus()

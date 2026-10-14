@@ -37,6 +37,10 @@ def main() -> None:
             value = {"user": {"id": "owner"}, "csrf_token": "csrf"}
         elif path == "/api/catalog":
             value = {"status": "not_ready", "releases": []}
+        elif path == "/api/graph":
+            value = json.loads((Path(__file__).resolve().parents[3] / "data/knowledge_graph.yaml").read_text())
+        elif path == "/api/mastery":
+            value = {"graph_version": "mvp-0.2.0", "items": []}
         elif path == "/api/providers/connections":
             value = {"items": connections}
         elif path.endswith("/models"):

@@ -39,6 +39,10 @@ def main() -> None:
             result = {"user": {"id": "owner"}, "csrf_token": "csrf"}
         elif path == "/api/catalog":
             result = {"status": "not_ready", "releases": []}
+        elif path == "/api/graph":
+            result = json.loads((Path(__file__).resolve().parents[3] / "data/knowledge_graph.yaml").read_text())
+        elif path == "/api/mastery":
+            result = {"graph_version": "mvp-0.2.0", "items": []}
         elif path.endswith("/models"):
             result = {"connection_id": cid, "config_version": items[0]["config_version"],
                       "models": [{"id": "mock-model", "capabilities": caps}], "refreshed_at": "2026-10-04T00:00:00Z"}

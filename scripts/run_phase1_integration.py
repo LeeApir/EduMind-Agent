@@ -232,6 +232,42 @@ def main():
         [sys.executable, "web/tests/e2e/phase1_catalog_integration.py"],
         environment=child_env,
     )
+    # T038 independently repeats the frozen 100 physical SSE disconnects.
+    matrix_output = output / "queue-matrix"
+    matrix_output.mkdir()
+    matrix_env = isolated_environment(f"edumind_catalog_phase1_t038_{args.run_id}_sse")
+    matrix_env.update(
+        EDUMIND_PRODUCT_MODE="catalog_only",
+        EDUMIND_ANIMATION_BROKER_URL=(
+            "redis://publisher:synthetic_queue_test_only_password@127.0.0.1:15579/0"
+        ),
+        EDUMIND_QUEUE_MATRIX_OUTPUT=str(matrix_output),
+        EDUMIND_QUEUE_MATRIX_PROTOCOL=str(PLAN.with_name("sse-protocol.json")),
+    )
+    assert (
+        run(
+            "sse-migration",
+            [sys.executable, "-m", "alembic", "upgrade", "head"],
+            cwd=ROOT / "backend",
+            environment=matrix_env,
+        )
+        == 0
+    )
+    run(
+        "sse-template-matrix",
+        [sys.executable, "-m", "tests.queue_acceptance_matrix"],
+        cwd=ROOT / "backend",
+        environment=matrix_env,
+        timeout=2400,
+    )
+    matrix = json.loads((matrix_output / "matrix-result.json").read_text())
+    report["sse_counts"] = {
+        "total": len(matrix["sse_slots"]),
+        "ok": sum(row["ok"] for row in matrix["sse_slots"]),
+    }
+    report["sse_matrix_passed"] = matrix.get("matrix_passed", False)
+    paths = ROOT / "local-materials/phase-1-t033/latency.json"
+    report["path_metrics"] = json.loads(paths.read_text())
     report["backend_counts"] = {
         key: sum(item["counts"][key] for item in report["backend"])
         for key in ("tests", "failures", "errors", "skipped")
@@ -248,6 +284,9 @@ def main():
         )
         and report["clean_after"]
         and report["external_attempts"] == 0
+        and report["sse_matrix_passed"]
+        and report["sse_counts"]["total"] == 100
+        and report["sse_counts"]["ok"] >= 99
     )
     save()
     print(

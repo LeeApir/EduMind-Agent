@@ -8,6 +8,7 @@ from dataclasses import replace
 from pathlib import Path
 
 import pytest
+from test_provider_connection_test_api import ORIGINAL_SEND
 from test_provider_connections_api import setup_api  # noqa: F401 -- real PG fixture
 
 from app.agents.animation_dsl_generation import AnimationDSLGenerator, GenerationCall
@@ -394,7 +395,7 @@ def test_pg_selected_pipeline_mock_transport_and_candidate_qualification(
 
     import httpx
     from test_model_preferences import internal
-    from test_provider_connection_test_api import ORIGINAL_SEND, create, output
+    from test_provider_connection_test_api import create, output
     from test_provider_connections_api import guest
 
     from app.core.credential_crypto import CredentialFailure
