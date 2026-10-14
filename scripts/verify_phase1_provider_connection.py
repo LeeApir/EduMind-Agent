@@ -88,6 +88,18 @@ def verify():
     assert sum(row[5] for row in attempts) == 61212
     assert attempts[0][6] == "failed" and attempts[-1][9] == "INVALID_OUTPUT"
     assert all(row[6] == "complete" for row in attempts[1:-1])
+    deferral_path = BASE / "target-deferral-20261014.json"
+    deferred = []
+    if deferral_path.exists():
+        record = json.loads(deferral_path.read_text())
+        assert record["deferred_real_targets"] == [
+            "ollama",
+            "anthropic",
+            "gemini",
+            "spark",
+        ]
+        assert record["tool_failure_waived"] is False
+        deferred = record["deferred_real_targets"]
     return {
         "source_snapshots_verified": 4,
         "source_file_hashes_verified": source_files,
@@ -108,13 +120,16 @@ def verify():
             "tool": "failed_strict_format",
         },
         "overall_T039_passed": False,
-        "remaining": [
+        "remaining": ["tool response format"]
+        if deferred
+        else [
             "tool response format",
             "Ollama real connection",
             "Anthropic real connection",
             "Gemini real connection",
             "Spark real connection",
         ],
+        "deferred_real_targets": deferred,
         "historical_failures_preserved": True,
         "provider_calls_by_this_audit": 0,
     }

@@ -72,7 +72,8 @@
       "账户系统/跨设备账号合并",
       "真并行辩论、RAG、学习报告和更多课程（沿用§9.1后续阶段）",
       "TTS/ASR、Embedding消费场景、额外多模态产品入口（保留能力规划，非本阶段必交付）",
-      "任意Python执行、iOS、PPTX/离线HTML、模板市场"
+      "任意Python执行、iOS、PPTX/离线HTML、模板市场",
+      "2026-10-14用户明确暂缓Ollama/Anthropic/Gemini/星火真实接入；本轮T039只验收已批准Qwen兼容目标，阶段交接须列明四类未验收，后续恢复另行批准配置和预算。"
     ],
     "conditional": {
       "Neo4j": "由PHASE-1-T030的查询场景/测量和批准选型决定；未必要时使用现有Repository，不以引入数据库为完成目标。",
@@ -94,6 +95,13 @@
       "last_observed_p95_ms": 2632.575,
       "blocks_stage_exit": false,
       "next_step": "后续另行授权非计费诊断及必要的时序方案；不作为本阶段必做任务，不自动启动付费复测。"
+    },
+    {
+      "title": "Ollama/Anthropic/Gemini/星火真实接入验收",
+      "source": "docs/acceptance/phase-1-provider-connection-v1/target-deferral-20261014.json",
+      "status": "deferred_by_user",
+      "blocks_current_t039": false,
+      "next_step": "用户恢复后另行冻结各真实连接、能力及请求/费用上限；保留实现/Mock，不宣称真实通过。"
     }
   ],
   "archive_transition": {
@@ -2176,7 +2184,7 @@
       ],
       "prd_source": "PRD §3.8验收标准、§9.1",
       "acceptance_criteria": [
-        "在另行批准的目标、凭据和有界预算内验证本地/兼容/已列原生适配器的实际连接、流式与声明能力。",
+        "在另行批准的目标、凭据和有界预算内验证当前qwen3.8-max-0902兼容连接的实际连接、流式与声明能力；按2026-10-14用户明确要求，Ollama/Anthropic/Gemini/星火真实接入暂缓并记录未验收，不作为当前T039必测目标。",
         "证据区分Mock、真实本地和真实云端，每个实际Provider配置独立记录；无账号/能力不得伪称通过。",
         "实际路由与用户设置一致，无静默回退，缺用量记未知；真实授权缺失时blocked。"
       ],
@@ -2191,11 +2199,12 @@
         "真实r01：源码5014173，出站1次/HTTP200/1.381369s，文本探测失败TEMPORARILY_UNAVAILABLE，用量未知；预留保守费用CNY0.01086非实际账单，首败永久halt，结构化/工具/流式未发送；0重试/0回退，临时Key未持久且连接已撤销，冻结SHA/SQLite台账与脱敏摘要核对通过，results/r01.json。",
         "用户“排查是无法调用吗”后，原总4次/CNY1内单独分配1次/CNY0.03诊断。冻结16f46ec；相同正文SHA真实HTTP200/1.108264s/模型一致/生产解析通过，输入17输出2，精确OK=false/gzip；证明当前可调用并复现测试检查/观测缺陷，首轮唯一根因不可追溯。离线36通过/Ruff通过；原冻结SHA、两轮台账总2次/预留CNY0.02172、撤销/无持久Key审计，results/diagnostic-r02.json；原r01/台账不修改，无额外重试/回退。",
         "修复源码2308846：专用PG132通过零跳过/mypy166/Ruff；实际严格json_schema HTTP200/1.053809s/21+5tokens；流式HTTP200/1.106806s/17+2tokens、模型及SSE正常终止/DONE通过，gzip和末尾usage正确读取。累计4/4次/保守预留CNY0.046488；三SQLite台账和新冻结SHA审计、撤销/无持久Key通过，results/progress-r03.json；旧r01不改写、T040/T041未启动。",
-        "工具源码fa9f467单次HTTP200/1.309903s/gzip/严格格式INVALID_OUTPUT，usage293+19，执行工具0，撤销/无持久Key通过；未知具体字段如实保留。新增安全字段级诊断，离线55通过/Ruff；旧冻结因新源码变化FREEZE_CHANGED拒绝重放。verify_phase1_provider_connection.py审计4源码快照720文件SHA、4SQLite台账，累计5/5、保守预留CNY0.061212，已知376tokens+首轮unknown，原失败不改。原计划本地/原生缺条件不可自动跳过，待批准拆分未应用，T040/T041未启动。"
+        "工具源码fa9f467单次HTTP200/1.309903s/gzip/严格格式INVALID_OUTPUT，usage293+19，执行工具0，撤销/无持久Key通过；未知具体字段如实保留。新增安全字段级诊断，离线55通过/Ruff；旧冻结因新源码变化FREEZE_CHANGED拒绝重放。verify_phase1_provider_connection.py审计4源码快照720文件SHA、4SQLite台账，累计5/5、保守预留CNY0.061212，已知376tokens+首轮unknown，原失败不改。原计划本地/原生缺条件不可自动跳过，待批准拆分未应用，T040/T041未启动。",
+        "用户明确“Ollama、Anthropic、Gemini、星火的真实接入暂时不做”，已同步PRD/阶段验收计划/ADR0011当前范围与target-deferral-20261014.json；四类状态为延期/未验收，不冒称通过且不创建T043–T047。只移除此范围阻塞；工具失败、原失败和5次预算不改变，本次新增真实请求0。"
       ],
       "started_at": "2026-10-14T15:58:34",
       "completed_at": null,
-      "blocker": "已执行批准额外工具探测（累计5/5次/CNY1）：HTTP200/293输入19输出，但严格工具响应格式INVALID_OUTPUT，未定位具体字段，不重试或改为通过。原验收计划明确本地/三类原生真实证据缺条件须blocked，其他目标无配置/预算；单凭Qwen三项通过不能整体done。需补齐真实条件与新诊断预算，或明确批准t039-split-proposal.json将未完范围拆至T043–T047且保留Phase1退出依赖。",
+      "blocker": "当前主模型工具格式探测HTTP200但严格schema校验INVALID_OUTPUT；该轮缺少字段级记录，唯一不匹配项尚未定位。累计5/5真实请求已用满，工具失败未获豁免且没有新增诊断预算。其余四类真实接入已按用户要求暂缓，不再阻塞T039；未批准整体拆分或T040/T041。",
       "commit_lookup": "Task-Completed: PHASE-1-T039"
     },
     {
@@ -2287,7 +2296,7 @@
       "prd_source": "PRD §0.1、§9.1",
       "acceptance_criteria": [
         "核对本阶段所有任务完成提交与退出证据，更多Provider/DSL通过统一边界接入，长任务真实可恢复。",
-        "交付说明区分目录基线与获批准动态能力，列明模型适用配置、图谱后端选择及已知限制；归档T033原状态不改。",
+        "交付说明区分目录基线与获批准动态能力，列明模型适用配置、图谱后端选择及已知限制；归档T033原状态不改。 按2026-10-14用户范围调整明确Ollama/Anthropic/Gemini/星火真实验收延期，不能宣称全厂商真实通过。",
         "报告实际调用与预算，不宣称部署、用户试用或Phase 2已完成；阶段结束保存交接并停止，下一次归档另行授权。"
       ],
       "verification": [
