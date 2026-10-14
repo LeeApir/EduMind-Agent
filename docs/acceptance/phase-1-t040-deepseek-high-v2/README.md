@@ -1,6 +1,10 @@
 # T040 索引约定修复诊断 r05 提案
 
-状态：Prompt v4 修复候选与离线回归完成，新增真实调用 0，新轮次预算待批准。
+当前状态：用户批准预算后按 `d774804` 执行两例。原目标缺陷均具体检出且分类正确，
+但第二例审核回答另含不适用于满队列的修正公式，单独质量评估触发 ADMISSION_FAILED 停止。
+实际 2 次、13145 Token，余 11 槽未发；索引第三例尚未复验，T040 为 blocked。
+见 [结果](results/error-detection-r05.json) 和 [算术反例说明](results/error-detection-r05.md)。
+以下保留准备时的修复和预算说明。
 原 [r04 漏检及未运行槽](../phase-1-t040-deepseek-high-v1/results/error-detection-r04.md) 保留，
 不重新解释标签或将旧成绩填入本轮。
 

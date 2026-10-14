@@ -1,0 +1,217 @@
+{
+  "version": "t040-high-v4-error-detection-r05-result-v1",
+  "recorded_at": "2026-10-14T23:03:39",
+  "state": "BLOCKED_INCORRECT_REPAIR_SUGGESTION",
+  "execution_source_commit": "d774804",
+  "model_id": "deepseek-flash",
+  "review_instruction_version": "resource-review-instructions-v4",
+  "reasoning_effort": "high",
+  "approved_requests": 13,
+  "approved_cost_micro_cny": 1160000,
+  "real_requests": 2,
+  "observations": [
+    {
+      "duration_seconds": 16.44074,
+      "error_category": null,
+      "error_code": null,
+      "freeze": "faa50d22ca102e4107589c0ff7164842b967eeee29559813ceef47bfe628efb8",
+      "http_status": 200,
+      "human_confirmed": false,
+      "mock": false,
+      "outbound_sends": 1,
+      "protocol_passed": true,
+      "quality_failure": null,
+      "real_cloud": true,
+      "request_sha256": "a9b2373047863763728ade10bb310b5020056bb8953df9acc5908fc19cb1d120",
+      "response": {
+        "arguments_schema_valid": false,
+        "completed": true,
+        "function_count": 0,
+        "function_name_matches": false,
+        "input_tokens": 2940,
+        "model_matches": true,
+        "output_tokens": 2621,
+        "reasoning_tokens": 2513
+      },
+      "response_sha256": "c3255e3c700e67f524ec41eb3e357405cb0d8d1dec2a40d6178084c1a3491e22",
+      "review": {
+        "issues": [
+          {
+            "area": "code_safety",
+            "message": "In main, `head = push_front(head, value)` overwrites the only pointer to the existing list when `malloc` fails on the second or third insertion. `push_front` returns NULL without freeing the old list, so the previous nodes become unreachable and `free_list(NULL)` cannot release them; this is a memory leak on the allocation-failure path.",
+            "severity": "major"
+          }
+        ],
+        "review_version": "resource-review-v3",
+        "verdict": "revise"
+      },
+      "slot": "error_detection:01",
+      "wire_response_sha256": "0a53cc792d181af3deb11ef51a1bad9bdec94d4361dad1d13c9dfae9af2b01a9"
+    },
+    {
+      "duration_seconds": 27.209489,
+      "error_category": null,
+      "error_code": null,
+      "freeze": "faa50d22ca102e4107589c0ff7164842b967eeee29559813ceef47bfe628efb8",
+      "http_status": 200,
+      "human_confirmed": false,
+      "mock": false,
+      "outbound_sends": 1,
+      "protocol_passed": true,
+      "quality_failure": null,
+      "real_cloud": true,
+      "request_sha256": "7bd8631ebf054a3ae5df95abf624f428ca958fc8c2ed8165dbe240f15883b8eb",
+      "response": {
+        "arguments_schema_valid": false,
+        "completed": true,
+        "function_count": 0,
+        "function_name_matches": false,
+        "input_tokens": 2665,
+        "model_matches": true,
+        "output_tokens": 4919,
+        "reasoning_tokens": 4661
+      },
+      "response_sha256": "7f8866f5af1fac0abeeba7339c912a48de567b81cc1508e1ffb1b0125abb973f",
+      "review": {
+        "issues": [
+          {
+            "area": "fact",
+            "message": "「关键公式」一节给出的计数与判空公式与本文后面的循环队列实现不一致：`size = rear - front` 仅在未发生回绕（非循环数组队列）时成立，而代码用 `% CAPACITY` 使下标回绕并另设 `size` 计数器。反例：CAPACITY=8，连续 enqueue 8 次再 dequeue 1 次后 front=1、rear=0，实际 size=7，但公式给出 0-1=-1。同样地，「空队列条件：front == rear」在循环队列中并不充分（队满时也有 front == rear，队列满时按该条件会被误判为空），代码实际用的是 `size == 0`。应在公式处明确这些结论仅适用于非循环队列，或补上 `size = (rear - front + CAPACITY) % CAPACITY` 与 `size == 0`/`size == CAPACITY` 的循环队列判空判满条件。",
+            "severity": "major"
+          }
+        ],
+        "review_version": "resource-review-v3",
+        "verdict": "revise"
+      },
+      "slot": "error_detection:02",
+      "wire_response_sha256": "bbc4c40e65a0e30ecb1fff8ab19cb8006eb8b328b62fbd777d58a93a2668a2c1"
+    }
+  ],
+  "unattempted_slots": [
+    "error_detection:03",
+    "error_detection:04",
+    "error_detection:05",
+    "classification:01",
+    "classification:02",
+    "classification:03",
+    "classification:04",
+    "classification:05",
+    "correct_control:01",
+    "long_review:01",
+    "long_review:02"
+  ],
+  "input_tokens": 5605,
+  "output_tokens": 7540,
+  "reasoning_tokens": 7174,
+  "known_total_tokens": 13145,
+  "reserved_cost_micro_cny": 181182,
+  "known_token_peak_list_reference_micro_cny": 71530,
+  "actual_bill": "unknown",
+  "retries": 0,
+  "fallbacks": 0,
+  "correction_calls": 0,
+  "unknown_total_usage_attempts": 0,
+  "retained_visible_evidence": [
+    {
+      "slot": "error_detection:01",
+      "path": "local-materials/phase-1-t040-deepseek-high-v2/error_detection/error_detection-01-response.json",
+      "sha256": "51324aa1d148b0a0a24ad08a0ab4ca6710667af440452a3192b55c3e618f7fac",
+      "review_sha256": "873396db3e8e7439385a9bd83fb962bf1af4d28793e27e10ab9b011540bf0fdd"
+    },
+    {
+      "slot": "error_detection:02",
+      "path": "local-materials/phase-1-t040-deepseek-high-v2/error_detection/error_detection-02-response.json",
+      "sha256": "35b92549f62f5458dcde8adb3333f320ead82bcf9875f1d5d509413c11acd923",
+      "review_sha256": "e5d4764aced1453f39f140b41bef066fb245bad3856361075be06503afae300f"
+    }
+  ],
+  "assistant_semantic_assessment": {
+    "first_known_defect_concretely_detected": true,
+    "first_expected_area": "code_safety",
+    "second_known_defect_concretely_detected": true,
+    "second_expected_area": "fact",
+    "not_a_missed_detection_or_wrong_classification": true,
+    "additional_response_error": "The suggested modulo-count formula maps a full, all-slots-used queue to 0 and conflicts with the code and size==CAPACITY full test.",
+    "budget_halt": "ADMISSION_FAILED",
+    "halt_assessment_separate_from_automatic_observation": true,
+    "why_within_quality_scope": "Frozen proposal stops on quality failure; the independent review result contains a concretely false repair suggestion consumed as correction guidance. No new recall label or threshold was substituted.",
+    "human_fact_confirmation": false
+  },
+  "formula_witness": {
+    "capacity": 8,
+    "source_semantics": "Historical queue code stores an independent size, uses all CAPACITY slots, and checks full with size==CAPACITY.",
+    "suggested_formula": "(rear-front+CAPACITY)%CAPACITY",
+    "reachable_states_checked": 72,
+    "mismatches": [
+      {
+        "front": 0,
+        "rear": 0,
+        "actual_size": 8,
+        "suggested_size": 0
+      },
+      {
+        "front": 1,
+        "rear": 1,
+        "actual_size": 8,
+        "suggested_size": 0
+      },
+      {
+        "front": 2,
+        "rear": 2,
+        "actual_size": 8,
+        "suggested_size": 0
+      },
+      {
+        "front": 3,
+        "rear": 3,
+        "actual_size": 8,
+        "suggested_size": 0
+      },
+      {
+        "front": 4,
+        "rear": 4,
+        "actual_size": 8,
+        "suggested_size": 0
+      },
+      {
+        "front": 5,
+        "rear": 5,
+        "actual_size": 8,
+        "suggested_size": 0
+      },
+      {
+        "front": 6,
+        "rear": 6,
+        "actual_size": 8,
+        "suggested_size": 0
+      },
+      {
+        "front": 7,
+        "rear": 7,
+        "actual_size": 8,
+        "suggested_size": 0
+      }
+    ],
+    "minimal_reachable_counterexample": "Starting at front=rear=0,size=0, enqueue eight items. Then front=rear=0,size=8, but the suggested formula yields 0.",
+    "empty_and_full_same_indices": true,
+    "candidate_c_code_executed": false,
+    "witness_computation": "Integer arithmetic over reachable circular-queue states; no eval/exec or untrusted code."
+  },
+  "index_case_retested": false,
+  "formal_quality_score": null,
+  "formal_quality_started": false,
+  "dsl_quality_started": false,
+  "t041_started": false,
+  "production_mode": "catalog_only",
+  "production_default_effort": "none",
+  "checks": {
+    "source_hash_file_checks": 772,
+    "all_four_source_manifests_unchanged": true,
+    "requests_match_frozen_slots": true,
+    "retained_answers_match_reviews": true,
+    "reasoning_text_retained": false,
+    "sqlite_attempts": 2,
+    "halted_before_third_call": true,
+    "prior_offline_tests": 133
+  }
+}
