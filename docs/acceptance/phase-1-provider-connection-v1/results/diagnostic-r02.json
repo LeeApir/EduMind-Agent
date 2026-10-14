@@ -1,0 +1,66 @@
+{
+  "version": "t039-diagnostic-r02",
+  "real_cloud": true,
+  "mock": false,
+  "http_status": 200,
+  "outbound_sends": 1,
+  "parser_passed": true,
+  "error_code": null,
+  "diagnostic": {},
+  "model": "qwen3.8-max-0902",
+  "matches_original_exact_OK": false,
+  "response": {
+    "decoded_bytes": 369,
+    "content_encoding": "gzip",
+    "json_object": true,
+    "has_error": false,
+    "choices_count": 1,
+    "input_tokens": 17,
+    "output_tokens": 2
+  },
+  "response_wire_sha256": "0706ab1a7b8b6f31070526b7bcacad72f74eaf8066e9b0dfcacaaec177959527",
+  "response_decoded_sha256": "3c8719cac315288094b1cc0e89c0f0ca64692e0e769cdd7bb7f201497b270302",
+  "duration_seconds": 1.108264,
+  "budget": {
+    "manifest_sha256": "614b673d04105a8ad6a558b76134f99808f67c8391795ae5f189d97a2cebd65e",
+    "halted": null,
+    "attempts": [
+      [
+        1,
+        "text_diagnostic",
+        "probe",
+        "01dc88839865af2024aedeb78452883a7e710bfa33d392e97f24b7a5431f6fff",
+        "781520c637d97cc2cb8cda4a00f84d5c5d86f0a9d633ca1f264a8b3f24c92537",
+        10860,
+        "complete",
+        17,
+        2,
+        null
+      ]
+    ],
+    "unattempted_slots": []
+  },
+  "aggregate_attempts_including_r01": 2,
+  "aggregate_reserved_cost_micro": 21720,
+  "persistent_secret_absent": true,
+  "connection_revoked": true,
+  "retries": 0,
+  "fallbacks": 0,
+  "t040_t041_started": false,
+  "source_commit": "16f46ec",
+  "audit": {
+    "all_frozen_file_hashes_match": true,
+    "raw_result_sha256": "cd35a5048d4de314cfdfb4d8264de72c8610792e74ce9b545375c771425bef3b",
+    "offline_checks": "pytest diagnostics/runner/dynamic_gate: 36 passed; Ruff passed; no production code modified"
+  },
+  "conclusions": {
+    "current_model_callable": true,
+    "production_compatible_parser_passed": true,
+    "original_exact_text_check_would_fail_this_successful_response": true,
+    "old_wire_usage_reader_cannot_parse_this_gzip_response": true,
+    "original_r01_unique_root_cause_proven": false,
+    "historical_limit": "r01 retains only normalized error/body hash; diagnosis reproduces two observer/checker defects with identical outbound body but cannot recover historical response."
+  },
+  "known_diagnostic_list_price_cny": 0.000276,
+  "billing_note": "Known 19 tokens at frozen list price, not a provider bill. r01 usage remains unknown; aggregate reserved cost CNY0.02172 is not actual billing."
+}

@@ -33,7 +33,7 @@
         "currency": "CNY",
         "amount": 1
       },
-      "remote_validation": "failed_after_http_200"
+      "remote_validation": "diagnostic_connection_parser_passed; r01 remains failed; structured/tool/stream not_run"
     }
   ],
   "available_adapter_types": [
@@ -87,7 +87,7 @@
     "cross_provider_fallback": false,
     "send_learner_data": false
   },
-  "execution_gate": "Stopped after first real attempt. Budget ledger halted permanently; three other slots unattempted. Do not retry, replace/reset ledger, fallback or enter T040/T041.",
+  "execution_gate": "Original r01 remains permanently stopped. User requested bounded diagnosis: independent r02 sent once inside original aggregate limits and passed production parsing. No further calls: 2/4 spent, 3 primary capability probes remain, native adapters not configured/authorized, T040/T041 not started.",
   "selection_record": "model-selection-20261014.json",
   "paid_last_resort": {
     "model_id": "deepseek-flash",
@@ -96,5 +96,7 @@
     "enabled": false
   },
   "frozen_run": "run-r01.json",
-  "result": "results/r01.json"
+  "result": "results/r01.json",
+  "diagnostic_result": "results/diagnostic-r02.json",
+  "aggregate_actual_requests": 2
 }
