@@ -8,8 +8,12 @@ import subprocess
 import sys
 import time
 from pathlib import Path
+from typing import TYPE_CHECKING
 
-from font_check import check_font
+if TYPE_CHECKING:
+    from app.dsl_runtime.font_check import check_font
+else:
+    from font_check import check_font
 
 INPUT = Path("/input")
 OUTPUT = Path("/output")

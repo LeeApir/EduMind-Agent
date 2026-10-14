@@ -153,7 +153,7 @@ class Builder:
             POLICY["layout"]["max_column_spacing"],
             POLICY["layout"]["max_grid_width"] / max(1, max(columns) - min(columns)),
         )
-        self.pointer_count = len(validated.candidate["pointers"])
+        self.pointer_count = len(cast(list[dict[str, str]], validated.candidate["pointers"]))
         self.left = (min(columns) - self.column_center) * self.column_spacing
         self.body: list[ast.stmt] = []
         self.counter = 0

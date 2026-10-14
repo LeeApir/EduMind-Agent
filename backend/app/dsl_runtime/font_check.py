@@ -4,6 +4,7 @@ import ast
 import hashlib
 import subprocess
 from pathlib import Path
+from typing import cast
 
 FONT = Path("/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc")
 DIGEST = "b76b0433203017ca80401b2ee0dd69350349871c4b19d504c34dbdd80541690a"
@@ -44,7 +45,7 @@ def check_font(source: bytes) -> None:
             and isinstance(node.func, ast.Name)
             and node.func.id == "Text"
         ):
-            text = node.args[0].value
+            text = cast(ast.Constant, node.args[0]).value
             for char in text:
                 if not char.isspace() and not any(lo <= ord(char) <= hi for lo, hi in ranges):
                     raise ValueError("DSL_RENDER_UNAVAILABLE")

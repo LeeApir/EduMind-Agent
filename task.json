@@ -2105,7 +2105,7 @@
       "id": "PHASE-1-T038",
       "phase": "Phase 1",
       "title": "验证无模型目录基线及跨模块集成",
-      "status": "todo",
+      "status": "in_progress",
       "priority": "P1",
       "depends_on": [
         "PHASE-1-T014",
@@ -2121,7 +2121,10 @@
         "backend/tests/",
         "web/tests/e2e/",
         "scripts/",
-        "docs/acceptance/"
+        "docs/acceptance/",
+        "backend/app/services/animation_dsl_compiler.py",
+        "backend/app/dsl_runtime/container_runner.py",
+        "backend/app/dsl_runtime/font_check.py"
       ],
       "prd_source": "PRD §0、§9.1",
       "acceptance_criteria": [
@@ -2130,10 +2133,10 @@
         "核心单测、类型检查、构建及隔离E2E通过；未启用真实服务或跳过项单独记录。"
       ],
       "verification": [
-        "在固定提交运行相关后端/前端测试、类型检查和构建，建立零出站隔离E2E并保存证据。"
+        "backend/.venv/bin/python scripts/run_phase1_integration.py --run-id r01（在固定检查点的干净本地clone执行；失败轮次保留，修复后另建新轮次）"
       ],
       "verification_results": [],
-      "started_at": null,
+      "started_at": "2026-10-14T14:52:56",
       "completed_at": null,
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T038"
