@@ -1,5 +1,7 @@
 # T038 跨模块集成验收
 
+r03 已完成，固定源码 `1f46d5b8fac1ecb932380ff8fce0144dfb4987af` 的干净副本全组通过，原始证据审计通过。汇总见 [complete.json](results/complete.json)，原始命令/分组见 [integration-r03.json](results/integration-r03.json)，目录与恢复见 [catalog-r03.json](results/catalog-r03.json)，SSE/模板见 [sse-template-r03.json](results/sse-template-r03.json)。
+
 本轮仅本地隔离验证，真实 Provider 授权为 0。协议见 protocol.json，运行入口为 `backend/.venv/bin/python scripts/run_phase1_integration.py --run-id r01`。须在无 .env 的干净固定提交 clone 执行；复用已安装的锁定依赖，并逐项核对直接依赖版本与锁文件摘要。所有命令和实际结果保留在 ignored local-materials/phase-1-t038 下，完成后提交脱敏汇总。
 
 后端逐文件新建独立测试库，防止撤销 DSL 政策影响后续文件；模型路径使用 MockTransport/合成 fixture。目录端到端使用原人工签核课程包、实际 PostgreSQL/Worker/Docker/Chromium；两个模板从空目录真实渲染，全部十节点学习/计分/重复提交/笔记/演示，最后重启 API 进程检查持久化并实际撤回版本。扩展图谱查询 30 节点与目录十节点并存。连接设置、原生选择、路由和扩展路径另以浏览器 Mock 契约验证。
@@ -23,3 +25,15 @@ T038 同时执行阶段计划的定量接口：目录首屏 20 槽；扩展路�
 r02（4e599a8）后端1758/1758、前端189/189、全部类型/lint/build/Mock浏览器通过；实际100模板与100 SSE均通过、无出站、源码干净，但目录整体失败，见 prior-r02.json/prior-r02-catalog.json。20首屏及路径画面门槛通过；第二动画的计时变量在等待播放时变为undefined，Worker任务已完成。本轮没有采集导航/控制台细节，不能断言重载的唯一根因。依赖目录链接指向共享node_modules，开发优化缓存/HMR是待排查可能性；新轮改用同次构建产物的 vite preview（已核对固定Vite6.1.0源码proxy继承配置），隔离开发热重载，并断言动画过程只发生一次有意导航，完整失败轮次保留。不是把旧r02计时补成通过。
 
 额外逐项比较20已签核样本：4e599a8编译出的Scene源码及SRT SHA均与15e52f1签核材料一致，见 compiled-byte-comparison.json；仅证明输出字节不变，旧性能与候选源码身份不转授。
+
+## 最终结果与交接
+
+后端118文件1758通过、0失败/错误/跳过；前端26文件189通过；严格mypy166源、Ruff、TypeScript、ESLint、生产构建及两组Mock浏览器全部通过。Python缓存离线冻结同步核对59包无变更，pnpm安装锁与仓库锁字节一致。
+
+真实人工签核目录10节点/30资源/30题、2模板MP4/SRT导出、身份/CSRF/目录动态关闭、实际不同PID恢复与撤回全部通过。固定20首屏HTTP累计保守P95=0.123391s、DOM可读P95=0.923257s；20路径画面从fetch开始到两帧呈现最大108.600ms≤500。实际PG/TestClient的100路径操作P95/P99各组均≤200ms（分层原始时序在结果内）。
+
+模板100/100，20独立未命中P95=9.283898s≤90；SSE100/100，Job50/课堂50，含重启/终态/过期游标快照重订阅。课堂Mock且仅提交后断线，全部真实Provider0/非回环出站0。完整r03无意外导航，两个动画探针各只有1次预期打开导航。
+
+证据审计拒绝真实失败r01，并对r03的源码/协议/196+冻结路径、118XML计数、固定分母/门槛、签核/恢复/撤回及出站记录通过。r01/r02失败保留；旧DSL人工/性能仍绑定原提交，20编译源码/SRT一致证明另列，不补旧轮成绩。生成媒体、私钥及原始日志不提交，complete.json只保存可复查摘要。
+
+无本任务遗留，不push/merge/发布、不开放动态能力。下一项T039需按ADR-0011另行指定真实目标/模型与请求、费用预算；已有“全部批准”仅批准设计/标签、实际预算仍0。

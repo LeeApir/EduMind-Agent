@@ -2105,7 +2105,7 @@
       "id": "PHASE-1-T038",
       "phase": "Phase 1",
       "title": "验证无模型目录基线及跨模块集成",
-      "status": "in_progress",
+      "status": "done",
       "priority": "P1",
       "depends_on": [
         "PHASE-1-T014",
@@ -2134,11 +2134,17 @@
         "核心单测、类型检查、构建及隔离E2E通过；未启用真实服务或跳过项单独记录。"
       ],
       "verification": [
-        "backend/.venv/bin/python scripts/run_phase1_integration.py --run-id r01（在固定检查点的干净本地clone执行；失败轮次保留，修复后另建新轮次）"
+        "固定1f46d5b干净clone：backend/.venv/bin/python scripts/run_phase1_integration.py --run-id r03",
+        "backend/.venv/bin/python scripts/verify_phase1_integration.py --run-dir local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03"
       ],
-      "verification_results": [],
+      "verification_results": [
+        "r03后端1758/1758、前端189/189，零失败/错误/跳过；strict mypy166源、Ruff/TS/ESLint/build、Mock浏览器通过",
+        "真实签核10节点目录/2渲染导出/不同PID恢复/撤回通过；20首屏/20路径呈现、100路径操作/100模板/100SSE全部达到原门槛",
+        "Provider0/非回环出站0；59Python包离线冻结同步与pnpm安装锁一致；历史signed-cache文件未运行单列，不充通过",
+        "证据审计/源码协议与118XML核对通过；results/complete.json，保留r01/r02失败及20签核样本编译字节一致证明"
+      ],
       "started_at": "2026-10-14T14:52:56",
-      "completed_at": null,
+      "completed_at": "2026-10-14T15:56:48",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T038"
     },
