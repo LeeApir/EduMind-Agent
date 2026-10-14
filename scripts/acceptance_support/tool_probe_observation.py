@@ -54,3 +54,35 @@ def tool_shape(raw, *, models):
         except Exception:
             pass
     return flags
+
+
+def tool_metadata(raw):
+    """Only fixed enums/types/counts and the expected boolean, no arbitrary strings."""
+    meta = {
+        "finish_reason": None,
+        "argument_wire_type": None,
+        "argument_json_type": None,
+        "ok_type": None,
+        "ok_boolean": None,
+        "argument_keys_exact": None,
+    }
+    try:
+        choice = raw["choices"][0]
+        finish = choice.get("finish_reason")
+        meta["finish_reason"] = (
+            finish
+            if finish in {"stop", "tool_calls", "length", "content_filter", "function_call", None}
+            else "other"
+        )
+        arguments = choice["message"]["tool_calls"][0]["function"]["arguments"]
+        meta["argument_wire_type"] = type(arguments).__name__
+        value = strict_json(arguments) if isinstance(arguments, str) else arguments
+        meta["argument_json_type"] = type(value).__name__
+        if isinstance(value, dict):
+            meta["argument_keys_exact"] = set(value) == {"ok"}
+            ok = value.get("ok")
+            meta["ok_type"] = type(ok).__name__
+            meta["ok_boolean"] = ok if type(ok) is bool else None
+    except Exception:
+        pass
+    return meta

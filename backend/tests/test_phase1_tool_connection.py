@@ -124,3 +124,37 @@ def test_safe_shape_diagnostics_accept_only_exact_arguments():
     from acceptance_support.tool_probe_observation import tool_shape
 
     assert all(tool_shape(valid_response(), models={runner.MODEL}).values())
+
+
+@pytest.mark.parametrize(
+    "arguments,wire_type,json_type,ok_type,ok_boolean",
+    [
+        ('{"ok":true}', "str", "dict", "bool", True),
+        ('{"ok":1}', "str", "dict", "int", None),
+        ('{"ok":"PRIVATE_CANARY"}', "str", "dict", "str", None),
+        ({"ok": True}, "dict", "dict", "bool", True),
+    ],
+)
+def test_tool_metadata_disambiguates_types_without_retaining_values(
+    arguments, wire_type, json_type, ok_type, ok_boolean
+):
+    from acceptance_support.tool_probe_observation import tool_metadata
+
+    raw = valid_response()
+    raw["choices"][0]["message"]["tool_calls"][0]["function"]["arguments"] = arguments
+    meta = tool_metadata(raw)
+    assert (
+        meta["argument_wire_type"],
+        meta["argument_json_type"],
+        meta["ok_type"],
+        meta["ok_boolean"],
+    ) == (wire_type, json_type, ok_type, ok_boolean)
+    assert "PRIVATE_CANARY" not in json.dumps(meta)
+
+
+def test_new_diagnostic_prior_guard_and_round_bounds():
+    from run_phase1_tool_diagnostics import names, prior_check
+
+    assert prior_check(5) == (5, 61212)
+    with pytest.raises(ValueError, match="ROUND_NOT_APPROVED"):
+        names(8)
