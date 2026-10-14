@@ -89,3 +89,38 @@ def test_prior_budget_checks_all_three_ledgers_and_rejects_extra_calls(tmp_path,
         db.execute("INSERT INTO attempts VALUES(0)")
     with pytest.raises(ValueError, match="PRIOR_BUDGET_CHANGED"):
         runner.prior_usage()
+
+
+@pytest.mark.parametrize(
+    "defect,expected_failed",
+    [
+        ("name", "function_name"),
+        ("argument", "arguments_schema"),
+        ("finish", "tool_finish_reason"),
+        ("model", "model_identity"),
+    ],
+)
+def test_safe_shape_diagnostics_identify_failure_without_content(defect, expected_failed):
+    from acceptance_support.tool_probe_observation import tool_shape
+
+    raw = valid_response()
+    canary = "PRIVATE_CANARY_DO_NOT_PERSIST"
+    raw["choices"][0]["message"]["content"] = canary
+    if defect == "name":
+        raw["choices"][0]["message"]["tool_calls"][0]["function"]["name"] = canary
+    elif defect == "argument":
+        raw["choices"][0]["message"]["tool_calls"][0]["function"]["arguments"] = '{"ok":1}'
+    elif defect == "finish":
+        raw["choices"][0]["finish_reason"] = "stop"
+    else:
+        raw["model"] = canary
+    flags = tool_shape(raw, models={runner.MODEL})
+    assert [key for key, passed in flags.items() if not passed] == [expected_failed]
+    assert canary not in json.dumps(flags)
+    assert all(type(value) is bool for value in flags.values())
+
+
+def test_safe_shape_diagnostics_accept_only_exact_arguments():
+    from acceptance_support.tool_probe_observation import tool_shape
+
+    assert all(tool_shape(valid_response(), models={runner.MODEL}).values())

@@ -2152,7 +2152,7 @@
       "id": "PHASE-1-T039",
       "phase": "Phase 1",
       "title": "验证真实Provider连接与选择路由",
-      "status": "in_progress",
+      "status": "blocked",
       "priority": "P1",
       "depends_on": [
         "PHASE-1-T008",
@@ -2190,11 +2190,12 @@
         "用户“先进行T39”批准主模型4次/CNY1，独立authorization-20261014.json，不扩T040/T041；有界兼容wire修复与专用PG122测试通过0跳过、mypy166/Ruff通过；已冻结run-r01，真实请求待执行。",
         "真实r01：源码5014173，出站1次/HTTP200/1.381369s，文本探测失败TEMPORARILY_UNAVAILABLE，用量未知；预留保守费用CNY0.01086非实际账单，首败永久halt，结构化/工具/流式未发送；0重试/0回退，临时Key未持久且连接已撤销，冻结SHA/SQLite台账与脱敏摘要核对通过，results/r01.json。",
         "用户“排查是无法调用吗”后，原总4次/CNY1内单独分配1次/CNY0.03诊断。冻结16f46ec；相同正文SHA真实HTTP200/1.108264s/模型一致/生产解析通过，输入17输出2，精确OK=false/gzip；证明当前可调用并复现测试检查/观测缺陷，首轮唯一根因不可追溯。离线36通过/Ruff通过；原冻结SHA、两轮台账总2次/预留CNY0.02172、撤销/无持久Key审计，results/diagnostic-r02.json；原r01/台账不修改，无额外重试/回退。",
-        "修复源码2308846：专用PG132通过零跳过/mypy166/Ruff；实际严格json_schema HTTP200/1.053809s/21+5tokens；流式HTTP200/1.106806s/17+2tokens、模型及SSE正常终止/DONE通过，gzip和末尾usage正确读取。累计4/4次/保守预留CNY0.046488；三SQLite台账和新冻结SHA审计、撤销/无持久Key通过，results/progress-r03.json；旧r01不改写、T040/T041未启动。"
+        "修复源码2308846：专用PG132通过零跳过/mypy166/Ruff；实际严格json_schema HTTP200/1.053809s/21+5tokens；流式HTTP200/1.106806s/17+2tokens、模型及SSE正常终止/DONE通过，gzip和末尾usage正确读取。累计4/4次/保守预留CNY0.046488；三SQLite台账和新冻结SHA审计、撤销/无持久Key通过，results/progress-r03.json；旧r01不改写、T040/T041未启动。",
+        "工具源码fa9f467单次HTTP200/1.309903s/gzip/严格格式INVALID_OUTPUT，usage293+19，执行工具0，撤销/无持久Key通过；未知具体字段如实保留。新增安全字段级诊断，离线55通过/Ruff；旧冻结因新源码变化FREEZE_CHANGED拒绝重放。verify_phase1_provider_connection.py审计4源码快照720文件SHA、4SQLite台账，累计5/5、保守预留CNY0.061212，已知376tokens+首轮unknown，原失败不改。原计划本地/原生缺条件不可自动跳过，待批准拆分未应用，T040/T041未启动。"
       ],
       "started_at": "2026-10-14T15:58:34",
       "completed_at": null,
-      "blocker": null,
+      "blocker": "已执行批准额外工具探测（累计5/5次/CNY1）：HTTP200/293输入19输出，但严格工具响应格式INVALID_OUTPUT，未定位具体字段，不重试或改为通过。原验收计划明确本地/三类原生真实证据缺条件须blocked，其他目标无配置/预算；单凭Qwen三项通过不能整体done。需补齐真实条件与新诊断预算，或明确批准t039-split-proposal.json将未完范围拆至T043–T047且保留Phase1退出依赖。",
       "commit_lookup": "Task-Completed: PHASE-1-T039"
     },
     {

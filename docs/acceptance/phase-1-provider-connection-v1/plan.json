@@ -1,15 +1,15 @@
 {
   "version": "phase1-real-connection-v3",
   "task_id": "PHASE-1-T039",
-  "state": "BLOCKED_REQUEST_LIMIT_REACHED",
+  "state": "BLOCKED_TOOL_FORMAT_AND_OTHER_TARGETS",
   "base_commit": "cbf52bcc1a6ac8da8bc34f13eb3de831b462bdb6",
   "current_authorization": {
-    "requests": 4,
+    "requests": 5,
     "cost_micro": 1000000,
     "currency": "CNY",
     "dynamic_opening": false,
-    "source": "docs/acceptance/phase-1-provider-connection-v1/authorization-20261014.json",
-    "source_sha256": "0e39e170d66fe1cca2bf456cdbde47fbf2f96bc2874a366952d414958bb269b6"
+    "source": "docs/acceptance/phase-1-provider-connection-v1/tool-authorization.json",
+    "source_sha256": "fbb05b9f09f4ad85c826315001da53f85dafc280940c86fbf8ebed10724dddb3"
   },
   "targets": [
     {
@@ -24,7 +24,7 @@
       ],
       "capabilities": "Official declarations; actual probe pending",
       "proposed_requests_hard_limit": 4,
-      "requests_authorized": 4,
+      "requests_authorized": 5,
       "pricing_and_currency": {
         "input_cny_per_million": 12,
         "output_cny_per_million": 36
@@ -33,7 +33,7 @@
         "currency": "CNY",
         "amount": 1
       },
-      "remote_validation": "text diagnostic + strict structured + streamed response passed; original r01 failure preserved; tool pending budget"
+      "remote_validation": "text diagnostic/strict structured/stream passed; strict tool format failed INVALID_OUTPUT"
     }
   ],
   "available_adapter_types": [
@@ -87,7 +87,7 @@
     "cross_provider_fallback": false,
     "send_learner_data": false
   },
-  "execution_gate": "Original aggregate 4-request limit fully consumed. No further calls until user agrees to one extra same-model public tool-format probe (aggregate5/CNY1). Preserve all historical ledgers; no retry/fallback/T040/T041.",
+  "execution_gate": "Aggregate5 request limit consumed. Tool r04 failed strict output validation, stopped and never retried. Original phase1 acceptance plan requires real local/native evidence; no implicit scope waiver. Pending t039-split-proposal.json requires explicit user decision, not applied.",
   "selection_record": "model-selection-20261014.json",
   "paid_last_resort": {
     "model_id": "deepseek-flash",
@@ -98,7 +98,8 @@
   "frozen_run": "run-r01.json",
   "result": "results/r01.json",
   "diagnostic_result": "results/diagnostic-r02.json",
-  "aggregate_actual_requests": 4,
-  "latest_result": "results/progress-r03.json",
-  "pending_budget_proposal": "tool-followup-proposal.json"
+  "aggregate_actual_requests": 5,
+  "latest_result": "results/audit-final.json",
+  "pending_budget_proposal": "tool-followup-proposal.json",
+  "pending_scope_proposal": "t039-split-proposal.json"
 }

@@ -50,6 +50,7 @@ from acceptance_support.connection_diagnostics import (
     classify_failure,
 )
 from run_phase1_provider_connection import _check_status, strict_json, verify_tool
+from acceptance_support.tool_probe_observation import tool_shape
 
 RAW = ROOT / "local-materials/phase-1-t039/tool-r04"
 FREEZE = BASE / "tool-r04.json"
@@ -243,6 +244,7 @@ async def run(slot):
     recorder = None
     error = None
     diagnostic = {}
+    tool_checks = {}
     stage = "credential"
     model = None
     exact_ok = None
@@ -301,6 +303,9 @@ async def run(slot):
                     async for _ in response.aiter_bytes():
                         operation._check()
                     raw = strict_json(bytes(recorder.payload))
+                    tool_checks = tool_shape(
+                        raw, models={MODEL, "qwen3.8-max-2026-09-02"}
+                    )
                     verify_tool_response(raw)
                     model = raw["model"]
                     stage = "model_identity"
@@ -353,6 +358,7 @@ async def run(slot):
             "parser_passed": error is None,
             "error_code": error,
             "diagnostic": diagnostic,
+            "tool_checks": tool_checks,
             "model": model,
             "matches_original_exact_OK": exact_ok,
             "response": summary,

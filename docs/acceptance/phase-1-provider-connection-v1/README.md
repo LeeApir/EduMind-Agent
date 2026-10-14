@@ -35,3 +35,13 @@ T039保持blocked，T040/T041未开始。后续先离线增强有界、无正文
 实际结构化probe1次：HTTP200/1.053809s，严格json_schema及ok=true通过，21输入+5输出；实际流式probe1次：HTTP200/1.106806s，模型一致/SSE正常结束及DONE通过、末尾usage17输入+2输出。本轮49 tokens，含此前诊断已知64 tokens，首轮用量仍未知。新冻结附件SHA与三个SQLite台账核对一致，累计4/4请求，保守预留CNY0.046488（非实际账单），连接均撤销/Key无持久记录；[本轮摘要](results/progress-r03.json)。
 
 当前主模型只余工具格式探测，原4次上限已满，不能默默发送第5次。[额外1次具体方案](tool-followup-proposal.json) 请求将累计上限改为5次、费用仍人民币1元；固定公开emit_probe(ok=true)，64总输出/预留74、10秒、0重试/回退、禁止执行工具、不含T040/T041及其他厂商。批准前不发出，不清零旧台账。其他原生适配器继续如实未配置/未授权/未验收，不宣称整个T039已完成。
+
+## 额外工具探测 r04 与整体验收阻塞
+
+用户“继续，直到完成T39”批准已提出的累计5次/总CNY1工具格式方案；独立tool-authorization记录，不修改原预算或台账。冻结源码fa9f467，第5次实际HTTP200/1.309903s，gzip解码正常、JSON对象无error/1choice，用量293输入+19输出；严格工具响应校验失败INVALID_OUTPUT/probe_validation（非网络不可用），工具执行0。该轮仅保留泛化tool_response_schema，未保存具体失败字段/原始正文，不能回溯唯一差异或声称远端不支持工具。后续诊断代码已补字段级布尔tool_checks及5项防泄漏/定位测试（总离线55通过）；没有继续发送真实请求。历史r04冻结与失败不改分，新源码不能复用旧冻结，实际验证FREEZE_CHANGED拒绝重放，未读Key/发送。
+
+[只读审计](results/audit-final.json) 通过：4组源码快照720个文件SHA、全部冻结请求SHA/目标与4个SQLite台账核对一致，真实5/5次、保守预留CNY0.061212；已知348输入+28输出共376 tokens，首轮usage仍unknown，实际账单未知。每轮连接均已撤销/Key无持久记录；text诊断/严格JSON/流式通过，工具失败，不使用mock冒充；复核命令 `python3 scripts/verify_phase1_provider_connection.py`（0外部调用）。
+
+**整体T039仍blocked**：已批准 `phase-1-acceptance-plan.md` §1明确“可选不表示账本可自动跳过”，§3要求本地/兼容/三类原生真实结果，缺账号/能力/授权按任务blocked。之前将任务表述为“只剩1次工具”只覆盖当前主模型，对整体范围不完整，此处纠正。Ollama/Anthropic/Gemini/星火无本轮实际配置/预算，不能靠Qwen成绩或“直到完成”口令自动省略。
+
+准备[待批准拆分方案](t039-split-proposal.json)：T039只完成当前已实测通过的主模型文本/JSON/流式；工具及本地/三类原生分别列T043–T047，并继续加入T042阶段退出依赖，阶段整体验收标准不减少。**尚未应用**，active task仍原42项、T039 blocked，不创建虚假的Task-Completed。用户也可保留原范围，补齐其他连接引用与独立预算并重新冻结工具诊断；Key仅本机安全配置，不发聊天。T040/T041均未启动。
