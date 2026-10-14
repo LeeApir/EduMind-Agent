@@ -2232,7 +2232,9 @@
         "backend/tests/",
         "docs/acceptance/",
         "backend/app/agents/review_agent.py",
-        "docs/PROVIDERS.md"
+        "docs/PROVIDERS.md",
+        "backend/app/services/deepseek_responses.py",
+        "backend/app/core/provider_factory.py"
       ],
       "prd_source": "PRD §3.3、§8.2、§10.2",
       "acceptance_criteria": [
@@ -2249,11 +2251,12 @@
         "2026-10-14 T040准备检查点：prepare_t040_diagnostics.py从当前ReviewAgent._review离线捕获历史5/5/1/2组共13正文，绑定原payload/请求/source哈希，4096总输出/非思考/temperature0/单次60秒/零重试回退；各组费用上限0.25/0.25/0.05/0.11元，未授权/未发送。38离线测试、Ruff、proposal哈希核对、历史批准/动态冻结/236归档文件校验、工作流/diff通过；先前两历史校验器因后续运行源码和已授权ADR追加而失败，已修复为原批准提交与当前冻结样本分别核对，不改原附件/标签/失败。具体证据phase-1-t040-deepseek-v1。",
         "2026-10-14 用户批准13次/CNY0.66后，冻结2f989da执行首组首例：实际HTTP200/0.934046s/2509输入22输出，模型/schema/completed/usage均通过，审核却pass/issues=[]；已知push_front malloc失败返回NULL被main直接赋给非空head导致原链丢失，触发CONCRETE_DEFECT_MISSED，持久台账停止且后12槽未发。51离线通过/Ruff、四执行清单源码哈希/请求哈希/SQLite与保留响应-审核一致核对通过，正式质量/DSL/T041未启动，证据phase-1-t040-deepseek-v1/results/diagnostic-r01.json。",
         "2026-10-14 用户继续后实施审核Prompt v3修复候选，通用检查分配/可失败调用的失败路径、调用者覆盖和原内存所有权、清理与注释；保留正确临时返回值/所有权契约对照，无按案例ID预定拒绝。94离线通过、Ruff、mypy166源文件通过、历史批准/样本冻结/工作流通过；原r01 SQLite只读核验仍1次且CONCRETE_DEFECT_MISSED。独立v2/r02提案绑定原历史payload/新系统指令/执行源码，无真实调用，13次费用上限0.69待批；不能把离线Mock pass当模型语义修复通过。",
-        "用户同意ec1bc2d的r02四组13次/CNY0.69后，冻结2fc9e6a执行首例：实际HTTP200/0.819711秒/输入2716输出22共2738tokens，当前v3指令仍pass/issues=[]，触发CONCRETE_DEFECT_MISSED停止；12槽未发。此前94离线/Ruff/mypy166通过；四当前源码冻结哈希、实际请求/SQLite/保留回答review核验通过，原r01源码按2f989da及只读SQLite再次核对。Prompt修复无实测改善证据；独立结果phase-1-t040-deepseek-v2/results/diagnostic-r02.json。"
+        "用户同意ec1bc2d的r02四组13次/CNY0.69后，冻结2fc9e6a执行首例：实际HTTP200/0.819711秒/输入2716输出22共2738tokens，当前v3指令仍pass/issues=[]，触发CONCRETE_DEFECT_MISSED停止；12槽未发。此前94离线/Ruff/mypy166通过；四当前源码冻结哈希、实际请求/SQLite/保留回答review核验通过，原r01源码按2f989da及只读SQLite再次核对。Prompt修复无实测改善证据；独立结果phase-1-t040-deepseek-v2/results/diagnostic-r02.json。",
+        "继续排查确认实际请求哈希与冻结正文匹配、适配器固定reasoning=none，保留响应reasoning_tokens均0；不能唯一归因漏检。官方Responses及人民币定价核对后增加服务端显式推理参数（默认none不变，Beta拒绝忽略非none），准备same-model high两例小检查，保留v3 Prompt/候选/schema，8192总输出/120秒/2次/CNY0.17待批准。128离线通过、Ruff/mypy166、历史批准/样本冻结/任务/提案哈希通过；旧两SQLite只读仍各1次且停止。尚无真实推理策略结果，证据phase-1-t040-reasoning-check。"
       ],
       "started_at": "2026-10-14T19:38:26",
       "completed_at": null,
-      "blocker": "r02审核Prompt v3真实复验首例仍pass，漏检同一已批准malloc失败丢失链表/内存泄漏缺陷；本次修复未奏效。HTTP200/schema/完成/用量有效，1/13请求、2738tokens、保守预留CNY0.056960，其余12未发，台账CONCRETE_DEFECT_MISSED停止。r01失败保留不拼分，需先决定新的审核/推理策略和独立验证方案，不能重放或继续正式质量/DSL/T041。",
+      "blocker": "r01/r02两次非思考审核漏检保留。已准备同模型high推理策略小检查：原错误例+已批准正确对照2次、8192总输出/单次120秒、CNY0.17上限，独立预算待批准，新增真实0；不是完整四组诊断或正式质量通过。适配器只增加显式推理参数，生产默认仍none。",
       "commit_lookup": "Task-Completed: PHASE-1-T040"
     },
     {

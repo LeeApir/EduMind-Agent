@@ -211,6 +211,13 @@ Provider失败只携带固定输出类别与验证过的非负整数token用量�
 此为修复候选，离线流程回归不证明模型已能检出；新 Prompt 须通过独立冻结/预算的真实历史诊断，
 旧失败仍保留，正式质量与动态开放不自动授权。
 
+2026-10-14 两次非思考审核均漏检后，Responses 适配器支持由服务端组合层显式传入
+`reasoning_effort=none/low/high/max`，默认仍为 `none`；无新增前端参数或自动回退。
+无效档位在 DNS/发送前拒绝，Beta transport 不会静默忽略非 none 的请求。
+文本、结构化和流式请求使用同一配置；`max_output_tokens` 仍约束推理与可见输出总量。
+当前只准备同模型 high 策略的两例独立诊断，尚无实测通过或生产切换。
+验收证据只保留最终回答及推理 Token 数，不持久化 reasoning 文本；细分用量缺失不推测为 0。
+
 画像提取指令 `profile-instructions-v2` 在消息中重申原schema的精确根字段及证据记录字段；
 行为更新指令 `profile-behavior-instructions-v2` 要求唯一根字段 `updates`，证据不足时
 仅返回 `{"updates": {}}`。原schema、允许字段、服务端证据归属和失败降级策略不变。

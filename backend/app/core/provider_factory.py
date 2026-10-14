@@ -55,13 +55,17 @@ def build_default_provider_gateway() -> ProviderGateway:
 def configured_provider_adapter(
     settings: ProviderSettings,
     guard: ProviderTargetGuard,
+    *,
+    reasoning_effort: str = "none",
 ) -> ProviderAdapter:
     from app.services.deepseek_responses import DeepSeekResponsesAdapter
 
     mode = getenv("EDUMIND_PROVIDER_STRUCTURED_TRANSPORT", "responses_json_schema")
     if mode == "responses_json_schema":
-        return DeepSeekResponsesAdapter(settings, guard)
+        return DeepSeekResponsesAdapter(settings, guard, reasoning_effort=reasoning_effort)
     if mode == "beta_tools":
+        if reasoning_effort != "none":
+            raise ProviderError(ProviderErrorCode.CAPABILITY_UNAVAILABLE)
         from app.services.deepseek_beta_tools import DeepSeekBetaToolsAdapter
 
         return DeepSeekBetaToolsAdapter(settings, guard)

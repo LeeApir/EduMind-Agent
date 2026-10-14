@@ -143,17 +143,19 @@ def _wire_target(target: ApprovedTarget) -> tuple[str, str]:
     return endpoint, host_header
 
 
-def _request_body(request: TextRequest) -> dict[str, object]:
+def _request_body(
+    request: TextRequest, *, reasoning_effort: str = "none"
+) -> dict[str, object]:
+    if reasoning_effort not in {"none", "low", "high", "max"}:
+        raise ProviderError(ProviderErrorCode.CONFIGURATION_MISSING)
     body: dict[str, object] = {
         "input": [
             {"role": message.role, "content": message.content}
             for message in request.messages
         ],
         "stream": False,
-        # DeepSeek enables thinking by default. P0 requires a fast first screen
-        # and bounded formal-resource calls, so its sole configured model is used
-        # in non-thinking mode unless a later product phase adds a distinct policy.
-        "reasoning": {"effort": "none"},
+        # Server composition must explicitly opt in; existing P0 defaults stay non-thinking.
+        "reasoning": {"effort": reasoning_effort},
         "max_output_tokens": (
             request.max_output_tokens
             if request.max_output_tokens is not None
@@ -321,10 +323,14 @@ class DeepSeekResponsesAdapter:
         guard: ProviderTargetGuard,
         *,
         transport: httpx.AsyncBaseTransport | None = None,
+        reasoning_effort: str = "none",
     ) -> None:
+        if reasoning_effort not in {"none", "low", "high", "max"}:
+            raise ProviderError(ProviderErrorCode.CONFIGURATION_MISSING)
         self._settings = settings
         self._guard = guard
         self._transport = transport
+        self._reasoning_effort = reasoning_effort
 
     def _target(self) -> tuple[ApprovedTarget, str, dict[str, str]]:
         try:
@@ -378,7 +384,7 @@ class DeepSeekResponsesAdapter:
         return _result(payload)
 
     async def generate_text(self, request: TextRequest) -> TextResult:
-        return await self._response(_request_body(request))
+        return await self._response(_request_body(request, reasoning_effort=self._reasoning_effort))
 
     async def generate_structured(self, request: StructuredRequest) -> StructuredResult:
         try:
@@ -392,7 +398,7 @@ class DeepSeekResponsesAdapter:
                 ProviderErrorCode.INVALID_OUTPUT,
                 output_failure_reason=OutputFailureReason.REQUEST_SCHEMA_INVALID,
             ) from None
-        body = _request_body(request.prompt)
+        body = _request_body(request.prompt, reasoning_effort=self._reasoning_effort)
         if request.prompt.temperature is None:
             body["temperature"] = 0.0
         body["text"] = {
@@ -441,7 +447,7 @@ class DeepSeekResponsesAdapter:
 
     async def stream_text(self, request: TextRequest) -> AsyncIterator[TextDelta]:
         target, url, headers = self._target()
-        body = _request_body(request)
+        body = _request_body(request, reasoning_effort=self._reasoning_effort)
         body["model"] = self._settings.model
         body["stream"] = True
         headers["Accept"] = "text/event-stream"

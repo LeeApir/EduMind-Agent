@@ -92,7 +92,22 @@ def freeze():
         target = dict(next(iter(old["targets"].values())))
         target.update(
             max_wire_bytes=max(r["request_bytes"] for r in group["slots"]),
-            max_total_output_tokens=4096,
+            max_total_output_tokens=plan["max_output_tokens_including_reasoning"],
+            adapter_sha256=sha(
+                (ROOT / "backend/app/services/deepseek_responses.py").read_bytes()
+            ),
+            capability_sha256=sha(
+                canonical(
+                    {
+                        "model": MODEL,
+                        "transport": plan["transport"],
+                        "reasoning_effort": plan["reasoning_effort"],
+                        "max_output_tokens": plan[
+                            "max_output_tokens_including_reasoning"
+                        ],
+                    }
+                )
+            ),
         )
         target_id = sha(
             canonical(
@@ -120,7 +135,7 @@ def freeze():
             "bounds": {
                 "requests": group["requests"],
                 "cost_micro": group["cost_cap_micro_cny"],
-                "timeout_seconds": 60,
+                "timeout_seconds": group["timeout_seconds_per_request"],
                 "max_active_attempts": 1,
                 "corrections_per_resource": 2,
             },
@@ -230,7 +245,7 @@ async def run_one(group):
     decoded = b""
     started = time.monotonic()
     try:
-        async with asyncio.timeout(60):
+        async with asyncio.timeout(gate.manifest["bounds"]["timeout_seconds"]):
             settings = ProviderSettings(
                 "https://api.deepseek.com",
                 configured("EDUMIND_PROVIDER_API_KEY"),
@@ -241,7 +256,9 @@ async def run_one(group):
                 {"EDUMIND_PROVIDER_STRUCTURED_TRANSPORT": "responses_json_schema"},
             ):
                 adapter = configured_provider_adapter(
-                    settings, ProviderTargetGuard(settings.base_url, TargetPolicy())
+                    settings,
+                    ProviderTargetGuard(settings.base_url, TargetPolicy()),
+                    reasoning_effort=body["reasoning"]["effort"],
                 )
             adapter._transport = audit
             answer = await adapter.generate_structured(
@@ -250,7 +267,7 @@ async def run_one(group):
                         tuple(
                             ChatMessage(m["role"], m["content"]) for m in body["input"]
                         ),
-                        max_output_tokens=4096,
+                        max_output_tokens=body["max_output_tokens"],
                         temperature=0,
                     ),
                     body["text"]["format"]["schema"],
@@ -271,12 +288,15 @@ async def run_one(group):
             cases = read(ROOT / "docs/acceptance/phase-1-dynamic-v1/history.json")[
                 "cases"
             ]
-            expected_area = next(
-                c["expected_area"]
-                for c in cases
-                if c["id"] == planned_slot["historical_case_id"]
+            expected_case = next(
+                c for c in cases if c["id"] == planned_slot["historical_case_id"]
             )
-            quality_failure = coarse_quality_failure(group, review, expected_area)
+            quality_group = (
+                "classification" if group == "classification" else expected_case["kind"]
+            )
+            quality_failure = coarse_quality_failure(
+                quality_group, review, expected_case["expected_area"]
+            )
     except Exception as exc:
         error, category = classify_failure(exc)
     try:
@@ -284,6 +304,7 @@ async def run_one(group):
         decoded = audit.decoded()
     except Exception:
         fields = observe(None)
+    fields["reasoning_tokens"] = reasoning_count(decoded, fields["output_tokens"])
     # Private raw evidence includes text for human checking, never request headers or credentials.
     # Reflected secrets are discarded entirely rather than copied into evidence or exceptions.
     secret = configured("EDUMIND_PROVIDER_API_KEY").encode()
@@ -347,7 +368,35 @@ def retain_generated_response(decoded):
         or raw.get("error")
     ):
         return None
-    return {key: raw.get(key) for key in ("status", "model", "usage", "output")}
+    retained = {key: raw.get(key) for key in ("status", "model", "usage")}
+    output = raw.get("output")
+    retained["output"] = (
+        [
+            item
+            for item in output
+            if isinstance(item, dict) and item.get("type") == "message"
+        ]
+        if isinstance(output, list)
+        else []
+    )
+    return retained
+
+
+def reasoning_count(decoded, output_tokens):
+    """Numeric provider usage only; absent details remain unknown, never fabricated zero."""
+    try:
+        value = json.loads(decoded)["usage"]["output_tokens_details"][
+            "reasoning_tokens"
+        ]
+    except (ValueError, UnicodeError, KeyError, TypeError):
+        return None
+    if (
+        type(value) is int
+        and type(output_tokens) is int
+        and 0 <= value <= output_tokens
+    ):
+        return value
+    return None
 
 
 if __name__ == "__main__":
