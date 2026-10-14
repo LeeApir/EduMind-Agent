@@ -44,7 +44,7 @@ def test_failure_path_guidance_reaches_each_resource_without_predetermined_rejec
     # not that a model can find the defect or that this minimal snippet is complete C.
     assert outcome.approved and outcome.review_model_id == "offline-only"
     instruction = gateway.request.prompt.messages[0].content
-    assert REVIEW_INSTRUCTION_VERSION == "resource-review-instructions-v4"
+    assert REVIEW_INSTRUCTION_VERSION == "resource-review-instructions-v5"
     assert "each returned value together with its caller" in instruction
     assert "last reachable pointer" in instruction
     assert "checked temporary result" in instruction

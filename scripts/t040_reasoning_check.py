@@ -14,20 +14,37 @@ from app.agents.review_agent import REVIEW_INSTRUCTION_VERSION
 ROOT = preparation.ROOT
 BASE = ROOT / "docs/acceptance/phase-1-t040-reasoning-check"
 RAW = ROOT / "local-materials/phase-1-t040-reasoning-check"
+ROUND = "r03"
+GROUP = "reasoning_check"
+CASE_IDS = ("linked-list-concept:explanation:1", "correct-list-concept")
+
+
+def select_round(round_id):
+    global BASE, RAW, ROUND, GROUP, CASE_IDS
+    if round_id not in {"r03", "r06"}:
+        raise GateFailure("INVALID_FREEZE")
+    ROUND = round_id
+    if round_id == "r06":
+        BASE = ROOT / "docs/acceptance/phase-1-t040-review-scope-check"
+        RAW = ROOT / "local-materials/phase-1-t040-review-scope-check"
+        GROUP = "review_scope"
+        CASE_IDS = ("queue:explanation:1", "correct-list-concept")
+    else:
+        BASE = ROOT / "docs/acceptance/phase-1-t040-reasoning-check"
+        RAW = ROOT / "local-materials/phase-1-t040-reasoning-check"
+        GROUP = "reasoning_check"
+        CASE_IDS = ("linked-list-concept:explanation:1", "correct-list-concept")
 
 
 async def proposed():
     history = json.loads(preparation.HISTORY.read_text())["cases"]
-    selected = [
-        next(c for c in history if c["id"] == key)
-        for key in ("linked-list-concept:explanation:1", "correct-list-concept")
-    ]
+    selected = [next(c for c in history if c["id"] == key) for key in CASE_IDS]
     bodies, rows = {}, []
     for index, case in enumerate(selected, 1):
         body = await preparation.capture_case(case)
         body["reasoning"] = {"effort": "high"}
         body["max_output_tokens"] = 8192
-        slot = f"reasoning_check:{index:02}"
+        slot = f"{GROUP}:{index:02}"
         bodies[slot] = body
         rows.append(
             {
@@ -44,7 +61,7 @@ async def proposed():
     reservation = sum(r["reservation_micro_cny"] for r in rows)
     plan = {
         "version": "t040-reasoning-strategy-proposal-v1",
-        "round": "r03",
+        "round": ROUND,
         "state": "PENDING_BUDGET_APPROVAL",
         "real_requests_sent": 0,
         "provider_requests_authorized": 0,
@@ -61,7 +78,7 @@ async def proposed():
         "max_output_tokens_including_reasoning": 8192,
         "groups": [
             {
-                "id": "reasoning_check",
+                "id": GROUP,
                 "state": "PENDING_BUDGET_APPROVAL",
                 "requests": 2,
                 "cost_cap_micro_cny": ((reservation + 9999) // 10000) * 10000,
@@ -99,6 +116,21 @@ async def proposed():
         "human_factual_signoff_inferred": False,
         "old_budget_transferred": False,
     }
+    if ROUND == "r06":
+        plan.update(
+            version="t040-review-findings-scope-proposal-v1",
+            scope="Findings-only review calibration. Does not replace any full diagnostic group.",
+            previous_failed_result="docs/acceptance/phase-1-t040-deepseek-high-v2/results/error-detection-r05.json",
+            evaluation_axes={
+                "detection": "Concrete identification of the original queue count/full-empty defects.",
+                "classification": "fact on the known error; correct control must pass with no issues.",
+                "review_scope": "Findings, conditions and factual counterexamples only; no proposed replacement code/formulas/patch steps.",
+                "repair_quality": "NOT_RUN: no correction requests in this two-case check.",
+                "schema_completion": "Existing strict JSON/completed/model/usage/budget gates unchanged.",
+            },
+            reporting_policy="Record each axis separately; never relabel a correct detection as a miss because another axis failed.",
+            scope_failure_gate="A false finding/counterexample or findings-only scope violation stops calibration as ADMISSION_FAILED, without changing detection/classification labels.",
+        )
     return bodies, plan
 
 
@@ -127,6 +159,11 @@ def write_proposal():
         ROOT / "docs/acceptance/phase-1-deepseek-connection-v1/results/r01.json",
         ROOT / "docs/acceptance/phase-1-t040-deepseek-v2/results/diagnostic-r02.json",
     ]
+    if ROUND == "r06":
+        paths += [
+            ROOT / "backend/tests/test_review_scope.py",
+            ROOT / plan["previous_failed_result"],
+        ]
     plan["files"] = {str(p.relative_to(ROOT)): sha(p.read_bytes()) for p in paths}
     (BASE / "proposal.json").write_text(
         json.dumps(plan, ensure_ascii=False, indent=2) + "\n"
@@ -161,27 +198,27 @@ def check_proposal():
 
 
 def configure_execution():
-    execution.BASE, execution.RAW, execution.ROUND = BASE, RAW, "r03"
-    execution.GROUPS = ("reasoning_check",)
+    execution.BASE, execution.RAW, execution.ROUND = BASE, RAW, ROUND
+    execution.GROUPS = (GROUP,)
     execution.check_proposal = check_proposal
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--round", choices=("r03", "r06"), default="r03")
     group = parser.add_mutually_exclusive_group(required=True)
     for name in ("write-proposal", "check-proposal", "freeze", "run-one"):
         group.add_argument("--" + name, action="store_true")
     args = parser.parse_args()
     try:
+        select_round(args.round)
         if args.write_proposal:
             write_proposal()
         elif args.check_proposal:
             check_proposal()
         else:
             configure_execution()
-            execution.freeze() if args.freeze else asyncio.run(
-                execution.run_one("reasoning_check")
-            )
+            execution.freeze() if args.freeze else asyncio.run(execution.run_one(GROUP))
     except Exception as exc:
         print(
             "Stopped: "

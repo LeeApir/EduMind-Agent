@@ -218,6 +218,13 @@ Provider失败只携带固定输出类别与验证过的非负整数token用量�
 原 schema-v3、安全/上下文规则及验收阈值保持；原历史/正式标签不重写。
 离线组装和对照回归通过不等于模型已修复，仍需新 Prompt 的独立真实诊断与预算。
 
+2026-10-14 审核指令升级为 `resource-review-instructions-v5`：issue 只报告当前问题、位置、
+触发条件及具体反例/后果；允许引用原候选定位，不输出替换代码、通用修复公式或补丁步骤。
+修正步骤使用 `resource-correction-instructions-v2`，独立核实问题，不能盲信 issue 中夹带的建议，
+保留原表示方式/容量/状态不变量，完整有效候选再次审核，仍最多两轮。
+修正结果的资源 schema 无效时安全拒绝，不再由未捕获 ResourceSchemaError 中断流程。
+检出、分类、审核职责范围、修正质量分别记录；未执行修正不记为修正质量通过，不追加运行后临时指标。
+
 2026-10-14 两次非思考审核均漏检后，Responses 适配器支持由服务端组合层显式传入
 `reasoning_effort=none/low/high/max`，默认仍为 `none`；无新增前端参数或自动回退。
 无效档位在 DNS/发送前拒绝，Beta transport 不会静默忽略非 none 的请求。

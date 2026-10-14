@@ -43,7 +43,7 @@ def test_explicit_correct_conventions_are_forwarded_without_local_false_rejectio
     prompt = gateway.request.prompt
     assert json.loads(prompt.messages[1].content)["content"]["markdown"] == text
     instructions = prompt.messages[0].content
-    assert REVIEW_INSTRUCTION_VERSION == "resource-review-instructions-v4"
+    assert REVIEW_INSTRUCTION_VERSION == "resource-review-instructions-v5"
     assert "visited nodes from traversed links" in instructions
     assert "dummy/sentinel head" in instructions
     assert "do not silently choose the convention" in instructions
