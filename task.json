@@ -91,9 +91,10 @@
       "model_id": "deepseek-flash",
       "provider": "deepseek",
       "record": "docs/acceptance/phase-1-provider-selection/deepseek-20261014.json",
-      "real_validation": "not_run",
+      "real_validation": "Responses selected-system path recheck passed",
       "prior_qwen_t039_result": "preserved, not transferable",
-      "automatic_fallback": false
+      "automatic_fallback": false,
+      "real_validation_record": "docs/acceptance/phase-1-provider-selection/deepseek-connection-20261014.json"
     }
   },
   "deferred_improvements": [
@@ -2241,7 +2242,8 @@
         "按批准的冻结计划执行有界真实质量验收与人工核对；没有真实预算或门禁不通过时不运行。"
       ],
       "verification_results": [
-        "用户指定先切换DeepSeek做后续完整测试；本机.env恢复已有DeepSeek Key/https://api.deepseek.com/deepseek-flash，传输改为工厂实际支持的responses_json_schema，Qwen配置留作inactive回退资料。实际环境离线解析及DeepSeekResponsesAdapter选择通过，config/Responses59测试通过；0DNS/模型调用。T039原Qwen完成证据不转授，新DeepSeek实际路径需另存接入复验证据并冻结有界预算后才能启动T040；本次不领取质量任务。"
+        "用户指定先切换DeepSeek做后续完整测试；本机.env恢复已有DeepSeek Key/https://api.deepseek.com/deepseek-flash，传输改为工厂实际支持的responses_json_schema，Qwen配置留作inactive回退资料。实际环境离线解析及DeepSeekResponsesAdapter选择通过，config/Responses59测试通过；0DNS/模型调用。T039原Qwen完成证据不转授，新DeepSeek实际路径需另存接入复验证据并冻结有界预算后才能启动T040；本次不领取质量任务。",
+        "用户要求“用deepseek跑一遍”后完成独立接入复验：源码909ddb6、4/4公开请求HTTP200/模型一致，当前Responses路径文本/严格JSON/auto工具格式/流式response.completed与usage均通过。实际359输入45输出共404tokens，106离线测试/Ruff、冻结SHA/台账核验通过，独立证据phase-1-deepseek-connection-v1/results/r01.json；仅证明此系统模型传输，不转授P1 Chat或质量/性能，不开动态，不开始T040/T041正式验收。"
       ],
       "started_at": null,
       "completed_at": null,
