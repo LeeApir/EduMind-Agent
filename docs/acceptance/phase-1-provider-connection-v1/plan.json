@@ -1,15 +1,15 @@
 {
   "version": "phase1-real-connection-v3",
   "task_id": "PHASE-1-T039",
-  "state": "BLOCKED_PRIMARY_TOOL_FORMAT",
+  "state": "VERIFIED",
   "base_commit": "cbf52bcc1a6ac8da8bc34f13eb3de831b462bdb6",
   "current_authorization": {
-    "requests": 5,
+    "requests": 8,
     "cost_micro": 1000000,
     "currency": "CNY",
     "dynamic_opening": false,
-    "source": "docs/acceptance/phase-1-provider-connection-v1/tool-authorization.json",
-    "source_sha256": "fbb05b9f09f4ad85c826315001da53f85dafc280940c86fbf8ebed10724dddb3"
+    "source": "docs/acceptance/phase-1-provider-connection-v1/tool-diagnostics-approval.json",
+    "source_sha256": "252dbc853379b0b21d18051e35983af23d030c468ac424d60ef3b0bbdee50fd9"
   },
   "targets": [
     {
@@ -24,7 +24,7 @@
       ],
       "capabilities": "Official declarations; actual probe pending",
       "proposed_requests_hard_limit": 4,
-      "requests_authorized": 5,
+      "requests_authorized": 8,
       "pricing_and_currency": {
         "input_cny_per_million": 12,
         "output_cny_per_million": 36
@@ -33,7 +33,7 @@
         "currency": "CNY",
         "amount": 1
       },
-      "remote_validation": "text diagnostic/strict structured/stream passed; strict tool format failed INVALID_OUTPUT"
+      "remote_validation": "passed scoped text/json_schema/stream and strict auto tool selection; failed forced-mode attempts preserved"
     }
   ],
   "available_adapter_types": [
@@ -87,7 +87,7 @@
     "cross_provider_fallback": false,
     "send_learner_data": false
   },
-  "execution_gate": "Four other real adapter integrations explicitly deferred by user; current T039 requires only approved primary. Tool format remains failed and aggregate5 request cap is spent. No new call or scope split/tool waiver approved.",
+  "execution_gate": "Scoped current-primary T039 verification complete. Seven of8 approved attempts used. No eighth call after success. Other adapters deferred explicitly; T040/T041 not authorized by this result.",
   "selection_record": "model-selection-20261014.json",
   "paid_last_resort": {
     "model_id": "deepseek-flash",
@@ -98,8 +98,9 @@
   "frozen_run": "run-r01.json",
   "result": "results/r01.json",
   "diagnostic_result": "results/diagnostic-r02.json",
-  "aggregate_actual_requests": 5,
-  "latest_result": "results/audit-final.json",
+  "aggregate_actual_requests": 7,
+  "latest_result": "results/final.json",
   "pending_budget_proposal": "tool-followup-proposal.json",
-  "target_deferral": "target-deferral-20261014.json"
+  "target_deferral": "target-deferral-20261014.json",
+  "completion_commit_lookup": "Task-Completed: PHASE-1-T039"
 }

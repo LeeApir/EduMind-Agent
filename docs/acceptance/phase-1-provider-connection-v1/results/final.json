@@ -1,0 +1,66 @@
+{
+  "task_id": "PHASE-1-T039",
+  "state": "VERIFIED",
+  "completion_requires": "Local Task-Completed commit; report does not claim its own commit hash",
+  "scope_record": "target-deferral-20261014.json",
+  "target": {
+    "provider_type": "openai-compatible",
+    "model_id": "qwen3.8-max-0902",
+    "endpoint_sha256": "fcc2d7cebcf9dc92386775dffe92e465f713a1ab8e88883fe5960bdc697289c0",
+    "model_revision": "official snapshot alias qwen3.8-max-0902; backend build revision unknown"
+  },
+  "verified": {
+    "text": "diagnostic-r02, production compatible adapter, valid nonempty response and selected model identity",
+    "structured": "checks-r03, json_schema strict boolean payload and normal finish",
+    "stream": "checks-r03, normal termination/DONE and final actual usage",
+    "tool": "tool-diagnostic-r06, auto selection, all10 strict checks, tool executions0"
+  },
+  "primary_transport": "P1 selected ConnectionOperation; OpenAICompatibleAdapter for text/JSON/stream; literal fixed tool probe through same guard, no business Tools API",
+  "wire_controls": {
+    "output_token_parameter": "max_completion_tokens",
+    "limit": 64,
+    "reserved_total_output": 74,
+    "enable_thinking": false,
+    "structured_transport": "json_schema",
+    "stream_options_include_usage": true,
+    "verified_tool_choice": "auto"
+  },
+  "limits": [
+    "Named forced-tool mode returned stop with a valid tool payload under r05; not globally normalized and not declared compatible with the strict full-tool termination contract.",
+    "r01/r04 original failure fields cannot be reconstructed; failures/unknown usage remain preserved.",
+    "Ollama/Anthropic/Gemini/Spark real access deferred by user, not passed.",
+    "Only this selected P1 connection is verified; P0 server-default Responses/beta transport is not verified and must not be substituted in T040.",
+    "No teaching quality, cloud cancellation performance, P95 or dynamic opening is claimed by these public connection probes."
+  ],
+  "root_cause_evidence": {
+    "r05": "finish_reason stop; other9 checks pass",
+    "fix": "Freeze full automatic tool-selection probe with tool_choice auto, keep exact model/tool/schema/finish assertions unchanged",
+    "r06": "finish_reason tool_calls; all10 checks pass",
+    "official_mode_reference": "https://help.aliyun.com/zh/model-studio/qwen-function-calling",
+    "caveat": "Observed endpoint difference; official docs distinguish selection modes but do not promise stop for forced calls."
+  },
+  "approval": "tool-diagnostics-approval.json",
+  "audit": "results/audit-final.json",
+  "offline_checks": "results/final-checks.json",
+  "total_real_attempts": 7,
+  "approved_limit": 8,
+  "unused_requests": 1,
+  "reserved_cost_cny": 0.090108,
+  "actual_bill_cny": null,
+  "known_tokens": {
+    "input": 927,
+    "output": 73,
+    "attempts_with_unknown_usage": 1
+  },
+  "stop_after_success": true,
+  "no_new_round_after_success": "prior_check(7) rejects after successful r06; tested with synthetic ledgers",
+  "t040_t041_started": false,
+  "fallbacks": 0,
+  "tool_executions": 0,
+  "deferred_real_targets": [
+    "ollama",
+    "anthropic",
+    "gemini",
+    "spark"
+  ]
+}

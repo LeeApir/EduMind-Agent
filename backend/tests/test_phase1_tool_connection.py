@@ -172,5 +172,18 @@ def test_new_diagnostic_prior_guard_and_round_bounds(tmp_path, monkeypatch):
             db.execute("CREATE TABLE run(id INTEGER,halted TEXT)")
             db.execute("INSERT INTO run VALUES(1,?)", (halted,))
     assert diagnostics.prior_check(5) == (5, 61212)
+    for name, state, cost, halted in [
+        ("tool-diagnostic-r05", "failed", 14724, "INVALID_OUTPUT"),
+        ("tool-diagnostic-r06", "complete", 14172, None),
+    ]:
+        directory = parent / name
+        directory.mkdir(parents=True)
+        with sqlite3.connect(directory / "budget.sqlite") as db:
+            db.execute("CREATE TABLE attempts(state TEXT,cost_micro INTEGER)")
+            db.execute("INSERT INTO attempts VALUES(?,?)", (state, cost))
+            db.execute("CREATE TABLE run(id INTEGER,halted TEXT)")
+            db.execute("INSERT INTO run VALUES(1,?)", (halted,))
+    with pytest.raises(ValueError, match="PREVIOUS_ROUND_NOT_FAILED"):
+        diagnostics.prior_check(7)
     with pytest.raises(ValueError, match="ROUND_NOT_APPROVED"):
         diagnostics.names(8)

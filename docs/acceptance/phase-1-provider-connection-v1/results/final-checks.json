@@ -1,0 +1,22 @@
+{
+  "dedicated_pg": {
+    "tests": 151,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "commands": [
+    "EDUMIND_CATALOG_TEST_PG_CONTAINER=edumind-phase1-t037-pg isolated_environment(edumind_catalog_phase1_t039_r01) + pytest provider_connection_gateway/provider_connection_test_api/phase1_connection_runner/phase1_connection_diagnostics/phase1_dynamic_gate/phase1_tool_connection",
+    "cd backend && .venv/bin/mypy app",
+    "ruff check changed Python files",
+    "python3 scripts/check_catalog_workflow.py",
+    "python3 scripts/verify_phase1_provider_connection.py",
+    "git diff --check"
+  ],
+  "mypy": "166 sources passed",
+  "ruff": "passed",
+  "post_run_guard_delta": "Tool tests19 pass after adding successful-round rejection guard; no dependence on local ignored ledgers",
+  "source_evidence": "local-materials/phase-1-t039/final/offline.xml",
+  "xml_sha256": "ac10efbafb9030ac141dccc34169460d26a845915091dd9bf4b4a90d570f0575",
+  "provider_calls_by_offline_checks": 0
+}

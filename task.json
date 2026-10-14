@@ -2160,7 +2160,7 @@
       "id": "PHASE-1-T039",
       "phase": "Phase 1",
       "title": "验证真实Provider连接与选择路由",
-      "status": "in_progress",
+      "status": "done",
       "priority": "P1",
       "depends_on": [
         "PHASE-1-T008",
@@ -2200,10 +2200,11 @@
         "用户“排查是无法调用吗”后，原总4次/CNY1内单独分配1次/CNY0.03诊断。冻结16f46ec；相同正文SHA真实HTTP200/1.108264s/模型一致/生产解析通过，输入17输出2，精确OK=false/gzip；证明当前可调用并复现测试检查/观测缺陷，首轮唯一根因不可追溯。离线36通过/Ruff通过；原冻结SHA、两轮台账总2次/预留CNY0.02172、撤销/无持久Key审计，results/diagnostic-r02.json；原r01/台账不修改，无额外重试/回退。",
         "修复源码2308846：专用PG132通过零跳过/mypy166/Ruff；实际严格json_schema HTTP200/1.053809s/21+5tokens；流式HTTP200/1.106806s/17+2tokens、模型及SSE正常终止/DONE通过，gzip和末尾usage正确读取。累计4/4次/保守预留CNY0.046488；三SQLite台账和新冻结SHA审计、撤销/无持久Key通过，results/progress-r03.json；旧r01不改写、T040/T041未启动。",
         "工具源码fa9f467单次HTTP200/1.309903s/gzip/严格格式INVALID_OUTPUT，usage293+19，执行工具0，撤销/无持久Key通过；未知具体字段如实保留。新增安全字段级诊断，离线55通过/Ruff；旧冻结因新源码变化FREEZE_CHANGED拒绝重放。verify_phase1_provider_connection.py审计4源码快照720文件SHA、4SQLite台账，累计5/5、保守预留CNY0.061212，已知376tokens+首轮unknown，原失败不改。原计划本地/原生缺条件不可自动跳过，待批准拆分未应用，T040/T041未启动。",
-        "用户明确“Ollama、Anthropic、Gemini、星火的真实接入暂时不做”，已同步PRD/阶段验收计划/ADR0011当前范围与target-deferral-20261014.json；四类状态为延期/未验收，不冒称通过且不创建T043–T047。只移除此范围阻塞；工具失败、原失败和5次预算不改变，本次新增真实请求0。"
+        "用户明确“Ollama、Anthropic、Gemini、星火的真实接入暂时不做”，已同步PRD/阶段验收计划/ADR0011当前范围与target-deferral-20261014.json；四类状态为延期/未验收，不冒称通过且不创建T043–T047。只移除此范围阻塞；工具失败、原失败和5次预算不改变，本次新增真实请求0。",
+        "用户批准新增≤3/累计8/CNY1；仅用2次：r05唯一失败finish_reason=stop其余9项通过；改显式auto完整工具选择、严格断言不变，r06全部10项通过/HTTP200/1.484112s/286+26。当前授权P1主模型文本/JSON/流式/auto工具均通过，4类真实延期已明确。最终专用PG151零失败/跳过、mypy166/Ruff/工具组19增量回归，6源码快照1106文件SHA及6SQLite台账审计，真实7/8/保守CNY0.090108/已知1000tokens+首轮unknown；停止不用第8次，成功后继续被guard拒绝。所有连接撤销/Key无持久；results/final.json记录限制，T040/T041未启动，完成以Task-Completed提交核对为准。"
       ],
       "started_at": "2026-10-14T15:58:34",
-      "completed_at": null,
+      "completed_at": "2026-10-14T18:42:24",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T039"
     },

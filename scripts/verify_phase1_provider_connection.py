@@ -32,6 +32,18 @@ def verify():
             ["checks-r03-structured.json", "checks-r03-stream.json"],
         ),
         ("tool-r04.json", "fa9f467", "tool-r04", ["tool-r04.json"]),
+        (
+            "tool-diagnostic-r05.json",
+            "95b02b7",
+            "tool-diagnostic-r05",
+            ["tool-diagnostic-r05.json"],
+        ),
+        (
+            "tool-diagnostic-r06.json",
+            "8989d27",
+            "tool-diagnostic-r06",
+            ["tool-diagnostic-r06.json"],
+        ),
     ]
     attempts = []
     source_files = 0
@@ -84,10 +96,47 @@ def verify():
             assert sum(d["outbound_sends"] for d in docs) == len(rows)
             assert all(d["fallbacks"] == d["retries"] == 0 for d in docs)
         attempts.extend(rows)
-    assert len(attempts) == 5
-    assert sum(row[5] for row in attempts) == 61212
-    assert attempts[0][6] == "failed" and attempts[-1][9] == "INVALID_OUTPUT"
-    assert all(row[6] == "complete" for row in attempts[1:-1])
+    assert len(attempts) == 7
+    assert sum(row[5] for row in attempts) == 90108
+    assert [row[6] for row in attempts] == [
+        "failed",
+        "complete",
+        "complete",
+        "complete",
+        "failed",
+        "failed",
+        "complete",
+    ]
+    assert attempts[0][7] is None and attempts[0][8] is None
+    assert all(row[9] == "INVALID_OUTPUT" for row in attempts[4:6])
+    positive = json.loads((BASE / "results/tool-diagnostic-r06.json").read_text())
+    checks = {
+        "model_identity",
+        "single_choice",
+        "choice_index",
+        "tool_finish_reason",
+        "assistant_role",
+        "no_refusal",
+        "single_tool",
+        "function_type",
+        "function_name",
+        "arguments_schema",
+    }
+    assert set(positive["tool_checks"]) == checks and all(
+        positive["tool_checks"].values()
+    )
+    assert (
+        positive["tool_fields"]["finish_reason"] == "tool_calls"
+        and positive["tool_fields"]["ok_boolean"] is True
+    )
+    assert positive["model"] == "qwen3.8-max-0902" and positive["tool_executions"] == 0
+    final_body = json.loads((BASE / "tool-diagnostic-r06-body.json").read_text())
+    assert final_body["tool_choice"] == "auto"
+    approval = json.loads((BASE / "tool-diagnostics-approval.json").read_text())
+    assert (
+        approval["aggregate_request_limit"] == 8
+        and approval["aggregate_cost_micro"] == 1000000
+    )
     deferral_path = BASE / "target-deferral-20261014.json"
     deferred = []
     if deferral_path.exists():
@@ -101,11 +150,11 @@ def verify():
         assert record["tool_failure_waived"] is False
         deferred = record["deferred_real_targets"]
     return {
-        "source_snapshots_verified": 4,
+        "source_snapshots_verified": len(matrix),
         "source_file_hashes_verified": source_files,
-        "real_attempts": 5,
-        "approved_limit": 5,
-        "reserved_cost_cny": 0.061212,
+        "real_attempts": len(attempts),
+        "approved_limit": 8,
+        "reserved_cost_cny": 0.090108,
         "known_input_tokens": sum(row[7] or 0 for row in attempts),
         "known_output_tokens": sum(row[8] or 0 for row in attempts),
         "attempts_with_unknown_usage": sum(
@@ -117,10 +166,10 @@ def verify():
             "text": "passed_diagnostic",
             "structured": "passed",
             "stream": "passed",
-            "tool": "failed_strict_format",
+            "tool": "passed_auto_selection_strict_format",
         },
-        "overall_T039_passed": False,
-        "remaining": ["tool response format"]
+        "overall_T039_passed": bool(deferred),
+        "remaining": []
         if deferred
         else [
             "tool response format",
@@ -130,6 +179,8 @@ def verify():
             "Spark real connection",
         ],
         "deferred_real_targets": deferred,
+        "tool_mode_limit": "auto verified; forced-mode stop mismatch preserved, not globally normalized",
+        "unused_authorized_requests": 1,
         "historical_failures_preserved": True,
         "provider_calls_by_this_audit": 0,
     }

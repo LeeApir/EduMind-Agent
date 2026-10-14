@@ -51,3 +51,11 @@ T039保持blocked，T040/T041未开始。后续先离线增强有界、无正文
 用户最新指示“Ollama、Anthropic、Gemini、星火的真实接入暂时不做”，已按[独立范围记录](target-deferral-20261014.json)同步PRD/阶段验收/ADR和活动任务。四类从当前T039必测范围移出，保留deferred/not verified，不再作为本任务阻塞；已实现代码/Mock成绩不改，不新增T043–T047，原拆分提案未整体批准。阶段交接明确这些真实验证限制。
 
 T039现在只剩当前Qwen工具格式问题：HTTP200/可解码JSON不是工具协议通过的充分条件，strict finish/model/tool name/arguments等任一项不满足都会拒绝。r04诊断没有保留具体失败字段，是探测诊断设计不足；不能据此断言模型不支持工具或服务不可调用，字段级安全记录已补但尚未重测。此次范围调整不豁免工具失败、不增加原5次/CNY1预算，当前无新增真实请求，T040/T041未启动。
+
+## T039当前范围验收完成（工具auto模式）
+
+用户批准最多新增3次、累计8次/CNY1后，仅执行2次：r05诊断（95b02b7）HTTP200/1.594418s，唯一失败项finish_reason=stop，其余9项模型/工具/schema/布尔均通过，usage293+19；r06（8989d27）只将公开请求tool_choice改为auto，保持全部严格断言，HTTP200/1.484112s、finish_reason=tool_calls/10项全部通过，usage286+26。按[官方说明](https://help.aliyun.com/zh/model-studio/qwen-function-calling)区分自动选择与强制指定函数参数生成；stop差异来自实际观测，不冒充官方保证。没有放宽normal finish/schema断言、修改旧失败或新增业务工具执行功能。
+
+最终当前已批准主模型文本/严格JSON/流式/auto工具格式均通过；合计真实7/8次，停止不用第8次，成功后继续下一轮也被prior guard拒绝。保守预留费用CNY0.090108，非实际账单；已知927输入/73输出，首轮usage仍unknown。[最终证据](results/final.json)、[审计](results/audit-final.json)核对6源码快照/1106项文件SHA/请求与6SQLite台账；[最终回归](results/final-checks.json)专用PG151通过零失败/跳过，mypy166/Ruff/治理通过，最后新增成功后拒绝重试的19项工具组复验通过。所有实际连接结束均撤销且没有持久Key。
+
+**适用限制**：只验证此P1 selected ConnectionOperation/兼容适配器，未验证P0服务端默认Responses/beta传输；T040必须另行冻结同一真实路径，不能仅换.env模型名转授成绩。工具只证明auto模式，强制指定函数模式的stop差异仍保留限制；文本/结构化适配器拒绝工具响应的保护保持不变。云端取消性能/教学质量/P95/动态发布不由本轮探测证明。其他4类真实接入按用户要求暂缓，状态未验收，不阻塞当前T039，不创建T043–T047。T040/T041不启动。完成以本地Task-Completed提交为准。
