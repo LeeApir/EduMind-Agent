@@ -1969,7 +1969,7 @@
       "id": "PHASE-1-T037",
       "phase": "Phase 1",
       "title": "验证DSL容器安全与动作正确性",
-      "status": "blocked",
+      "status": "done",
       "priority": "P1",
       "depends_on": [
         "PHASE-1-T028",
@@ -2089,11 +2089,16 @@
           "command": "native Chromium smoke http://127.0.0.1:8177/ -> /720p-r06/",
           "result": "HTTP200,no-store,new manifest/media bytes verified,1280x720 video playback,20videos/220frames,16:9 size<=native,subtitle default disabled",
           "evidence": "docs/acceptance/phase-1-dsl-v1/results/review-page-smoke-r06.json"
+        },
+        {
+          "command": "backend/.venv/bin/python scripts/verify_phase1_dsl_signoff.py",
+          "result": "passed: new720p human confirmation bound to exact manifest;20 actual videos/220 frames/all hashes/tested source15e52f1 verified;295 safety+300 matrix,Provider0",
+          "evidence": "docs/acceptance/phase-1-dsl-v1/results/complete-evidence.json"
         }
       ],
       "started_at": "2026-10-09T17:12:40",
-      "completed_at": null,
-      "blocker": "720p15 presentation fix safety295/matrix300 passed; new20 actual videos/220 frames await human consistency review per criterion2; manifest 63d54ed13e023cfdbb5cc9b4992908bd46e14036713b13a4c37717f41fb6faa1; old480p approval not inferred.",
+      "completed_at": "2026-10-14T14:49:52",
+      "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T037"
     },
     {

@@ -1,12 +1,12 @@
 # T037 当前检查点：720p / 15fps
 
-用户要求的画质与比例修复已完成自动验证，T037整体仍等待新版实际媒体的人工核对。最新证据以[720p修订说明](presentation-720p.md)与results/automatic-evidence-r06.json为准；下方旧480p检查点仅用于历史追溯。
+用户已回复“核对确认完成”，T037当前720p版本的人工一致性核对已批准。独立记录见human-review-20261014.json，完整证据见results/complete-evidence.json。原始pending快照保留原样。最新证据以[720p修订说明](presentation-720p.md)与results/automatic-evidence-r06.json为准；下方旧480p检查点仅用于历史追溯。
 
 - 安全r07：295项通过，零失败/错误/跳过；真实Docker、专用PG，无Provider请求。
 - 矩阵r06：100DSL/100模板/100缓存全部通过；冷DSL P95保守上界5.560秒，DSL/模板缓存0.478/0.240秒，缓存逐槽≤2秒。
 - 20个真实720p视频及220帧已核验摘要和呈现时间戳。标识/数值/访问状态放入节点卡片，指针/箭头/字体比例与居中布局已修订；旧身份不能转授。
 - 最新人工清单SHA256：`63d54ed13e023cfdbb5cc9b4992908bd46e14036713b13a4c37717f41fb6faa1`。预览 http://127.0.0.1:8177/720p-r06/ 。核对页原比例显示、原图可打开，外置字幕默认关闭；新的URL和no-store避免旧缓存。
-- 本轮修改不代表人工已批准，不创建Task-Completed。用户核对当前这份新清单并确认后再恢复完成提交。默认catalog_only，无push/merge/公开部署。
+- 新版清单已获用户人工确认；本次完成提交包含Task-Completed标记，原480p不获追溯签核。默认catalog_only，无push/merge/公开部署。
 
 <details><summary>此前480p检查点（历史，不作为新版验收）</summary>
 
