@@ -34,3 +34,12 @@ highlights and ask_exercise references. Server-created UTF-8 anchors identify or
 fields. Action validation recomputes the exact trusted template and bound resource
 digests, rejecting cross-scene IDs, extra speech/HTML and stale content. No Provider
 calls. Action/dependency regressions: 10 passed; Ruff and mypy172 passed.
+
+T048: evidence-resource-review-v4 and Alembic 0027 add four-result evidence review,
+separate local routing and append-only records bound to owner/unit/plan/operation.
+Server anchor catalogs and mandatory checks are validated; schema/invalid anchor/hard
+code/objective-format failures cannot be waived. Complete candidates are corrected and
+re-reviewed at most twice. Missing reference context goes to human. Audit hashes use
+actual transport bodies; legacy calls remain compatible. Synthetic review, mock HTTP,
+old ReviewAgent and actual PG regressions: 73 passed, zero skips, om48b. Migration
+empty roundtrip passed. Ruff and application mypy175 passed. Provider requests: 0.

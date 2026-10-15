@@ -16,7 +16,16 @@ from app.services.provider_gateway import ProviderError, ProviderErrorCode
 def workspace():
     binding = deepcopy(EXAMPLES["plan_record"]["binding"])
     binding["plan_digest"] = digest("plan", "learning-plan-v1", plan=PLAN)
-    return PlannedScenes(PLAN, binding)
+    return PlannedScenes(
+        PLAN,
+        binding,
+        reference_context={
+            "source": "synthetic-test-only",
+            "facts": ["Stack uses LIFO."],
+            "learner_evidence": {},
+            "scope": "partial reference, not proof of code safety",
+        },
+    )
 
 
 def fill(w):

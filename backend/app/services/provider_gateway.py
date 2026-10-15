@@ -85,11 +85,21 @@ class OutputTextCounts:
 
 
 @dataclass(frozen=True, slots=True)
+class TransportAudit:
+    """Content-free exact body digests; excludes authorization headers and raw reasoning."""
+
+    request_digest: str
+    response_digest: str
+    config_digest: str
+
+
+@dataclass(frozen=True, slots=True)
 class TextResult:
     text: str
     model_id: str
     usage: TokenUsage | None = None
     output_text_counts: OutputTextCounts | None = None
+    transport_audit: TransportAudit | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -98,6 +108,7 @@ class StructuredResult:
     model_id: str
     usage: TokenUsage | None = None
     output_text_counts: OutputTextCounts | None = None
+    transport_audit: TransportAudit | None = None
 
 
 @dataclass(frozen=True, slots=True)

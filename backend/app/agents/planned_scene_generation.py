@@ -48,13 +48,18 @@ class SceneCandidate:
 
 
 class PlannedScenes:
-    def __init__(self, plan: object, binding: object) -> None:
+    def __init__(self, plan: object, binding: object, *, reference_context: object = None) -> None:
+        self.reference_context = deepcopy(reference_context)
         self.plan = validate_contract(plan, "plan")
         self.binding = validate_contract(binding, "binding")
         if self.binding["plan_digest"] != digest("plan", "learning-plan-v1", plan=self.plan):
             raise LearningContractError
         self._candidates: dict[str, SceneCandidate] = {}
+        self._history: list[SceneCandidate] = []
         self._dispositions: dict[str, str] = {}
+
+    def history(self) -> tuple[SceneCandidate, ...]:
+        return tuple(deepcopy(self._history))
 
     def candidates(self) -> tuple[SceneCandidate, ...]:
         return tuple(deepcopy(self._candidates[r]) for r in ROLES if r in self._candidates)
@@ -97,6 +102,7 @@ class PlannedScenes:
             self._candidates.pop(r, None)
             self._dispositions.pop(r, None)
         self._candidates[role] = candidate
+        self._history.append(deepcopy(candidate))
         if (
             sum(len(canonical(c.envelope["content"])) for c in self._candidates.values())
             > 48 * 1024

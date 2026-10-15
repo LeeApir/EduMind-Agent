@@ -2575,7 +2575,7 @@
       "id": "PHASE-1-T048",
       "phase": "Phase 1",
       "title": "返回带证据和人工路由的资源审核结果",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1-T046"
@@ -2599,9 +2599,11 @@
         "python3 scripts/check_catalog_workflow.py",
         "git diff --check"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "完成独立v4证据审核/本地路由、服务锚点/必检项、硬拒绝与两轮完整修正重审，原结果与local_routing分存；0027审核记录只追加且owner/plan/operation绑定，历史候选保留；DeepSeek补可选TransportAudit准确wire摘要而非重序列化冒充 | 专用PG om48b迁移往返及73测试零跳过（含原ReviewAgent、mockHTTP精确摘要），Ruff/app mypy175/工作流/diff及自查通过；文档prompts/evidence-resource-review-v4.md及shared-learning.md，真实Provider0 | Mock不证明语义改善，其他适配器缺审计能力在新链安全拒绝、旧行为保留；T040门禁未解除 | 独立提交后领取T049一致性检查"
+      ],
+      "started_at": "2026-10-15T19:06:05",
+      "completed_at": "2026-10-15T19:10:38",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T048",
       "execution_gate": "ADR-0015 A–D与更新manifest已获用户明确批准，仅按依赖串行实施和零Provider测试；真实调用/费用/生产开放另批。",
