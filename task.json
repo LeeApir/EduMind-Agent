@@ -2651,7 +2651,7 @@
       "id": "PHASE-1-T050",
       "phase": "Phase 1",
       "title": "持久化人工复核案件与不可变结论",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1-T049"
@@ -2674,9 +2674,11 @@
         "python3 scripts/check_catalog_workflow.py",
         "git diff --check"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "完成0028完整人工案件/只追加决定、唯一当前案、准确摘要/理由/身份来源、幂等冲突和owner/unit锁；当前reject不可准入；取消/新计划/政策变化失效且操作终态明确 | PG om50迁移往返及最终16测试零跳过，真实并发重复审批/审批取消通过；初测试漏导入修复保留断言；Ruff/app mypy180/工作流/diff及自查通过，真实Provider0；证据shared-learning.md | 仅受信服务，不提供学生审核API；此处合成决定不是真实课程签核，也尚不发布 | 完成本地提交后领取T051受信维护CLI"
+      ],
+      "started_at": "2026-10-15T19:14:03",
+      "completed_at": "2026-10-15T19:16:47",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T050",
       "execution_gate": "ADR-0015 A–D与更新manifest已获用户明确批准，仅按依赖串行实施和零Provider测试；真实调用/费用/生产开放另批。",

@@ -7,6 +7,7 @@ from test_learning_plan_persistence import PLAN, REFS
 from app.models.auth import User
 from app.models.learning import LearningOperation, LearningUnit
 from app.services.learning_plans import save_plan
+from app.services.learning_policy import POLICY
 
 
 async def plan_fixture(db):
@@ -36,7 +37,7 @@ async def plan_fixture(db):
         references=REFS,
         node_ids={"stack"},
         policy_version="hybrid-review-v1",
-        policy={},
+        policy=POLICY,
     )
     return user, unit, operation, plan
 

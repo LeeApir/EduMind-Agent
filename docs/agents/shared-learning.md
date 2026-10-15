@@ -50,3 +50,14 @@ modified material fails. Independent unit review receives full plan, all resourc
 actions and reference context; consistency cannot revise or start a global generation
 loop. Current reject stops; uncertainty in any component retains needs_human. Binding,
 action and consistency regressions: 17 passed; Ruff/mypy177 passed; Provider 0.
+
+T050: Alembic 0028 stores immutable complete case payloads and append-only decisions.
+One pending/approved case per owner/unit; local owner and unit locks serialize decisions,
+cancellation and future publication. Only needs_human is eligible; current reject cannot
+be overridden. Decisions bind the exact case digest, reviewer identity source, reason and
+idempotency key. Replay returns the original decision, changed payload conflicts.
+Cancellation/new plan/changed active policy invalidate the old case; canceled stays
+canceled, other unfinished operations fail REVIEW_CASE_INVALIDATED. No publication
+occurs in the decision service. Actual PG om50: migration empty roundtrip and 16 tests
+passed, including concurrent replay and approval/cancellation. One test import omission
+was corrected without changing its assertions. Ruff and application mypy180 passed.
