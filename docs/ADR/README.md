@@ -2,6 +2,10 @@
 
 本索引汇总已有批准记录，不新增批准。产品范围以 [PRD](../PRD.md) 为准；现行接口见 [OpenAPI](../api/openapi.yaml)，实现与限制摘要见 [架构说明](../ARCHITECTURE.md)。
 
+## 当前新提案：OM式生成与混合审核
+
+2026-10-15用户选择参照OM重构生成、保留自动审核，并将无法可靠判断的内容交人工。[ADR-0015](0015-shared-plan-and-hybrid-review.md) A–D及[准确附件](../acceptance/phase-1-om-redesign/proposal-manifest.json)为Proposed：共享计划/三个场景/受约束动作，语义审核及人工路由，计划与案件持久化/维护CLI/原子发布/API状态，以及分层验收和仅新链路的诊断补充。T043只交付设计，T044–T054待具体批准后实施；方向选择不是本文A–D的批准，真实预算0、catalog_only保持，T040旧路线及历史失败不恢复。
+
 | ADR | 当前状态 | 已确定内容 | 仍待决定 |
 | --- | --- | --- | --- |
 | [0001：匿名身份与持久化](0001-anonymous-identity-and-persistence-boundary.md) | 部分批准 | HttpOnly Cookie + CSRF；P0 同源及既定会话边界 | 匿名数据留存/删除、P0 以外会话策略、账户合并、跨站点部署 |

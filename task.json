@@ -95,6 +95,27 @@
       "prior_qwen_t039_result": "preserved, not transferable",
       "automatic_fallback": false,
       "real_validation_record": "docs/acceptance/phase-1-provider-selection/deepseek-connection-20261014.json"
+    },
+    "om_redesign": {
+      "direction_authorization": "2026-10-15用户要求参照OM重构并重做验收，选择方案①并补充“还是应该保留部分无法自动审核需要交给人工”。",
+      "proposal_task": "PHASE-1-T043",
+      "implementation_tasks": [
+        "PHASE-1-T044",
+        "PHASE-1-T045",
+        "PHASE-1-T046",
+        "PHASE-1-T047",
+        "PHASE-1-T048",
+        "PHASE-1-T049",
+        "PHASE-1-T050",
+        "PHASE-1-T051",
+        "PHASE-1-T052",
+        "PHASE-1-T053",
+        "PHASE-1-T054"
+      ],
+      "decision_status": "direction_selected_detailed_adr_pending",
+      "provider_requests_authorized": 0,
+      "production_mode": "catalog_only",
+      "historical_failures": "T033与T040旧诊断原判定保持；新链不得作为旧路线第三轮或旧额度恢复。"
     }
   },
   "deferred_improvements": [
@@ -2225,7 +2246,8 @@
       "priority": "P0",
       "depends_on": [
         "PHASE-1-T035",
-        "PHASE-1-T039"
+        "PHASE-1-T039",
+        "PHASE-1-T054"
       ],
       "scope": [
         "scripts/",
@@ -2276,7 +2298,8 @@
         "2026-10-15 用户yes批准9217215准确r10根/4次/CNY8.551250与共享两轮8次退出；保存独立批准并当日官方规格/none/价格复核。仅focus-01发出1次：completed/HUMAN_REVIEW_REQUIRED，5405输入+599输出=6004tokens、reasoning0，预留CNY2.152262，峰值用量参考0.015602非账单。返回fact/major/revise并以CAPACITY8满队列差值0及出队后差值-1命中主缺陷；附带front==rear空满冲突和递增/取模差异，另把未用头文件归为code_safety欠依据，建议不计干净通过待实际人工核对。value_hash ce4ba7468bb112915217fc3a4a4cbb942c1c5b8e7d1a7dbfbd6c0a8f225fce2e，assessment为空/后3条未发/未自动重试。215冻结来源、账本一条及r09 202/r08 186来源和原停止只读核对通过；无源码改动，273离线证据沿用9217215，未重跑业务测试。证据phase-1-t040-focus-r10/results/r10-focus-01.json；none/catalog_only保持。",
         "2026-10-15 用户“继续进行第二条，直到再次出现问题”：保存显式续测例外，仅以受信本地事务在首条receipt记录该例外摘要，原误报/semantic_quality_accepted=false保留；未调用assess(passed=true)、未改冻结源码/预算/期限/标签。focus-02实际1次完成，5384输入+667输出=6051tokens、推理0；主fact/major/revise正确给出满队列front==rear反例；附带重复冗余头文件code_safety误报，新增缺少入队满检查说明指责与现有代码和enqueue满时false说明不符。按委托观察保存Codex停止判定（非Lee人工事实签核）并持久ADMISSION_FAILED；本轮总2次/10789输入/1266输出/12055tokens，预留CNY4.304320、峰值参考CNY0.031706非账单，focus-03/04未发。215冻结来源、两receipt/实际wire/value/例外与停止证据摘要/私有权限、r09 202/r08 186来源和原停止核验，工作流/diff通过；源码未改/273离线证据沿用9217215、未重跑业务测试。证据phase-1-t040-focus-r10/results/r10-focus-02.json；T040 blocked/none/catalog_only保持，不授权第二轮或原余量重用。",
         "2026-10-15 用户“测试最后一轮”后，仅离线准备最后r11：新编栈FIFO错误、malloc检查前空指针写入错误及正确栈/二分查找对照；完整样本与本地标签分离，未用正式样本调参/未冒称人工签核或统计独立。补齐主/附带发现统一实际证据/四类定义/前提与非缺陷规则，不隐藏other_findings；新独立CLI/FinalFocusGate复用原raw sender及固定counter，round2核对r10根/终止与累计8上限，不改原215源码或旧状态。19新增+273相关=292离线通过/Ruff，正确C对照cc编译并验证729条栈序列/280次查找；旧准备器/工作流/历史批准/冻结核验通过，畸形wire异常映射修复后原断言通过，无标签/断言弱化。r11准确根89bf93924db5da5850bdfbe2bdba8dcb63fb1f09f1347750202203f6f7faaf3e绑定228来源，none/2048/60秒/零重试修正/4请求保守CNY8.516778；新准确预算和新样本范围未批，真实Provider0/仅stat真实env，未批准CLI NOT_AUTHORIZED且无r11 ledger/round2登记。r10 215来源/2次ADMISSION_FAILED、r09 202/1次及r08 186/1次停止只读不变；app未改未重跑生产mypy/scripts未严格mypy。失败即停止当前路线、不追加第三轮；小诊断通过不等于正式质量/跨课程保证。证据phase-1-t040-focus-r11/validation.json，T040 blocked/none/catalog_only保持。",
-        "2026-10-15 用户“是”批准7a1467a准确r11根89bf93924db5da5850bdfbe2bdba8dcb63fb1f09f1347750202203f6f7faaf3e、四样本范围/最多4次/CNY8.516778/最后一轮首败停止，保存新批准/范围确认及当日官方规格/峰值价/none复核。仅final-01实际1次：协议/schema完成，1519输入+195输出=1714tokens、推理0；预留CNY2.125910，峰值用量参考0.004598非账单。模型reject/severe给出正确LIFO/FIFO冲突与push10/push20/pop20反例，具体缺陷命中；area=misconception未满足事前fact分类，独立质量粗判ADMISSION_FAILED，不误记漏检/截断/API失败。余final-02/03/04未发，code_safety缺陷/正确对照与跨课程质量未测。当前策略已用2轮/累计3请求，虽未到8次上限仍按最后轮退出，route-retired.json明确停止当前自动生成审核路线，不追加第三轮/微调/自动换模型。228冻结来源、批准/实际wire/value/私有ledger1条与持久RUN_HALTED、两round登记及r10 215/2、r09 202/1、r08 186/1原停止只读核验；源码未改/292离线沿用7a1467a，未重跑业务测试。证据phase-1-t040-focus-r11/results/r11.json及route-retired.json；T040 blocked/none/catalog_only保持，无完成标记。"
+        "2026-10-15 用户“是”批准7a1467a准确r11根89bf93924db5da5850bdfbe2bdba8dcb63fb1f09f1347750202203f6f7faaf3e、四样本范围/最多4次/CNY8.516778/最后一轮首败停止，保存新批准/范围确认及当日官方规格/峰值价/none复核。仅final-01实际1次：协议/schema完成，1519输入+195输出=1714tokens、推理0；预留CNY2.125910，峰值用量参考0.004598非账单。模型reject/severe给出正确LIFO/FIFO冲突与push10/push20/pop20反例，具体缺陷命中；area=misconception未满足事前fact分类，独立质量粗判ADMISSION_FAILED，不误记漏检/截断/API失败。余final-02/03/04未发，code_safety缺陷/正确对照与跨课程质量未测。当前策略已用2轮/累计3请求，虽未到8次上限仍按最后轮退出，route-retired.json明确停止当前自动生成审核路线，不追加第三轮/微调/自动换模型。228冻结来源、批准/实际wire/value/私有ledger1条与持久RUN_HALTED、两round登记及r10 215/2、r09 202/1、r08 186/1原停止只读核验；源码未改/292离线沿用7a1467a，未重跑业务测试。证据phase-1-t040-focus-r11/results/r11.json及route-retired.json；T040 blocked/none/catalog_only保持，无完成标记。",
+        "2026-10-15用户要求参照OM重构生成并重验，选择保留自动审核且不确定部分交人工。新增T043–T054独立重构链；旧路线/r11仍retired且本任务blocked，不恢复旧轮次/余额/标签；具体ADR及真实预算待批。"
       ],
       "started_at": "2026-10-14T19:38:26",
       "completed_at": null,
@@ -2353,6 +2376,445 @@
       "completed_at": null,
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T042"
+    },
+    {
+      "id": "PHASE-1-T043",
+      "phase": "Phase 1",
+      "title": "设计OM式课程生成与混合审核重构方案",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1-T038",
+        "PHASE-1-T039"
+      ],
+      "scope": [
+        "docs/ADR/0015-shared-plan-and-hybrid-review.md",
+        "docs/acceptance/phase-1-om-redesign/",
+        "docs/reference/openmaic/generation-review-20261015.md",
+        "docs/PRD.md",
+        "docs/ARCHITECTURE.md",
+        "docs/ADR/README.md",
+        "AGENTS.md",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD §0.2重构方向（具体设计待批准）；ADR-0015 Proposed",
+      "acceptance_criteria": [
+        "交付共享教学计划、逐场景内容和受约束授课动作的完整设计，明确OM源码依据及本项目适配边界。",
+        "定义自动审核、人工复核、硬拒绝与原子发布的状态、权限、不可变摘要和过期规则；具体ADR条款仍待批准。",
+        "交付新验收分层、调用上界、人工占比及旧失败保留规则，禁止用人工通过充当自动审核通过。",
+        "细化当前Phase 1实现依赖及验证入口，完成文档读者检查、治理和历史批准完整性核对；不调用真实Provider。"
+      ],
+      "verification": [
+        "python3 -m json.tool task.json >/dev/null",
+        "python3 scripts/check_catalog_workflow.py",
+        "python3 scripts/verify_legacy_archives.py",
+        "python3 scripts/verify_phase1_dynamic_approval.py",
+        "git diff --check"
+      ],
+      "verification_results": [
+        "已交付Proposed ADR-0015 A–D、源码固定提交ecb940c依据、新分层验收/20或22次硬上限及T044–T054明确待建立的验证接口；方向选择不视为具体设计批准。",
+        "4文档SHA/本地引用/围栏/12任务契约/54任务依赖与状态/调用算术检查通过；check_catalog_workflow、verify_legacy_archives（236原文件/64实验/169证据）、verify_phase1_dynamic_approval、JSON与diff检查通过。",
+        "无聊天上下文子代理读者检查及一次复查；修复严重reject人工处理歧义与失效操作终态，并同步图与任务；不是人工课程签核或运行代码评审。",
+        "证据docs/acceptance/phase-1-om-redesign/validation.json；真实Provider0、运行代码/迁移/OpenAPI未修改，未跑业务测试；A–D待批/T044–T054未领取/T040 blocked/catalog_only保持，完成以Task-Completed提交为准。"
+      ],
+      "started_at": "2026-10-15T15:30:51",
+      "completed_at": "2026-10-15T15:44:48",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T043"
+    },
+    {
+      "id": "PHASE-1-T044",
+      "phase": "Phase 1",
+      "title": "持久化共享教学计划快照",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1-T043"
+      ],
+      "scope": [
+        "backend/app/models/",
+        "backend/alembic/",
+        "backend/tests/",
+        "docs/api/openapi.yaml"
+      ],
+      "prd_source": "PRD §0.2重构方向（具体设计待批准）；ADR-0015 Proposed",
+      "acceptance_criteria": [
+        "仅在ADR-0015 A–D获准后实施；计划版本、owner/图谱/画像/目标摘要及三个场景定义持久化且不可原地改写。",
+        "候选和场景能绑定同一计划及约定摘要，跨owner或失配引用被数据库和服务拒绝。",
+        "Alembic升级与旧目录/旧学习单元兼容通过，降级在存在新数据时安全拒绝。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/pytest -q tests/test_learning_plan_persistence.py",
+        "cd backend && .venv/bin/ruff check app tests && .venv/bin/mypy app",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T044",
+      "execution_gate": "ADR-0015 A–D及绑定附件获具体批准后才能领取实施；方向选择不预签持久化、API、人工权限或新验收细则。",
+      "verification_note": "上述新文件/CLI为待建立的验收接口，当前未运行且不声称已存在；本任务完成前必须建立并实际执行。数据库任务须真实PG零跳过，Mock不替代；按变更风险追加已有核心路径回归。"
+    },
+    {
+      "id": "PHASE-1-T045",
+      "phase": "Phase 1",
+      "title": "生成受约束的共享教学计划",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1-T044"
+      ],
+      "scope": [
+        "backend/app/agents/",
+        "backend/tests/",
+        "docs/agents/prompts/"
+      ],
+      "prd_source": "PRD §0.2重构方向（具体设计待批准）；ADR-0015 Proposed",
+      "acceptance_criteria": [
+        "从同一节点、目标和有据画像生成三个场景计划，统一术语、索引/状态约定及共享示例。",
+        "严格schema、稳定本地场景ID和版本化参考检查，未知来源/缺约定/超限不进入内容生成。",
+        "计划不是事实证据或课程签核；单次生成失败不伪造计划或自动重试，Mock验证Provider失败与取消。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/pytest -q tests/test_shared_learning_plan.py",
+        "cd backend && .venv/bin/ruff check app tests && .venv/bin/mypy app",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T045",
+      "execution_gate": "ADR-0015 A–D及绑定附件获具体批准后才能领取实施；方向选择不预签持久化、API、人工权限或新验收细则。",
+      "verification_note": "上述新文件/CLI为待建立的验收接口，当前未运行且不声称已存在；本任务完成前必须建立并实际执行。数据库任务须真实PG零跳过，Mock不替代；按变更风险追加已有核心路径回归。"
+    },
+    {
+      "id": "PHASE-1-T046",
+      "phase": "Phase 1",
+      "title": "按共享计划生成三个场景内容",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1-T045"
+      ],
+      "scope": [
+        "backend/app/agents/learning_unit_generator.py",
+        "backend/app/agents/learning_resource_prompt.py",
+        "backend/tests/"
+      ],
+      "prd_source": "PRD §0.2重构方向（具体设计待批准）；ADR-0015 Proposed",
+      "acceptance_criteria": [
+        "讲解、代码、练习分别接收同一计划、共享示例和场景目标，代码与练习还接收前序候选摘要及完整相关内容。",
+        "任何修正产生新候选摘要，后续绑定失效；禁止把计划中的预期输出冒充已执行验证。",
+        "维持现有资源schema和display_only，单场景失败不虚构替代资源；所有实际尝试纳入预算。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/pytest -q tests/test_planned_scene_generation.py",
+        "cd backend && .venv/bin/ruff check app tests && .venv/bin/mypy app",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T046",
+      "execution_gate": "ADR-0015 A–D及绑定附件获具体批准后才能领取实施；方向选择不预签持久化、API、人工权限或新验收细则。",
+      "verification_note": "上述新文件/CLI为待建立的验收接口，当前未运行且不声称已存在；本任务完成前必须建立并实际执行。数据库任务须真实PG零跳过，Mock不替代；按变更风险追加已有核心路径回归。"
+    },
+    {
+      "id": "PHASE-1-T047",
+      "phase": "Phase 1",
+      "title": "组装引用场景内容的授课动作",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1-T046"
+      ],
+      "scope": [
+        "backend/app/services/",
+        "backend/tests/",
+        "docs/agents/"
+      ],
+      "prd_source": "PRD §0.2重构方向（具体设计待批准）；ADR-0015 Proposed",
+      "acceptance_criteria": [
+        "以本地受信模板生成讲解/高亮/练习动作，目标仅能引用本场景已绑定内容片段和题号。",
+        "不生成任意HTML/JS、角色发言或新事实；动作规则版本和摘要参与单元审核绑定。",
+        "无效引用/跨场景引用和内容变更使动作失效，重复组装保持确定性，无新增Provider调用。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/pytest -q tests/test_teaching_action_assembly.py",
+        "cd backend && .venv/bin/ruff check app tests && .venv/bin/mypy app",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T047",
+      "execution_gate": "ADR-0015 A–D及绑定附件获具体批准后才能领取实施；方向选择不预签持久化、API、人工权限或新验收细则。",
+      "verification_note": "上述新文件/CLI为待建立的验收接口，当前未运行且不声称已存在；本任务完成前必须建立并实际执行。数据库任务须真实PG零跳过，Mock不替代；按变更风险追加已有核心路径回归。"
+    },
+    {
+      "id": "PHASE-1-T048",
+      "phase": "Phase 1",
+      "title": "返回带证据和人工路由的资源审核结果",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1-T046"
+      ],
+      "scope": [
+        "backend/app/agents/review_agent.py",
+        "backend/app/agents/review_schema.py",
+        "backend/tests/",
+        "docs/agents/prompts/"
+      ],
+      "prd_source": "PRD §0.2重构方向（具体设计待批准）；ADR-0015 Proposed",
+      "acceptance_criteria": [
+        "新版本审核显式返回pass/revise/reject/needs_human及证据锚点、条件/反例、覆盖和未知项，旧协议不静默混用。",
+        "本地硬拒绝不能人工豁免；可解析但证据不足/覆盖未知/修正耗尽进入人工，协议/预算/凭据失败保持失败。",
+        "审核器按影响定位问题，类别与检出分开计分；最多两轮修正、完整重审且禁止自动模型回退。",
+        "用离线合成结果覆盖误报、空证据、越界引用、多个问题和正确对照，明确Mock不证明语义改善。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/pytest -q tests/test_hybrid_resource_review.py",
+        "cd backend && .venv/bin/ruff check app tests && .venv/bin/mypy app",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T048",
+      "execution_gate": "ADR-0015 A–D及绑定附件获具体批准后才能领取实施；方向选择不预签持久化、API、人工权限或新验收细则。",
+      "verification_note": "上述新文件/CLI为待建立的验收接口，当前未运行且不声称已存在；本任务完成前必须建立并实际执行。数据库任务须真实PG零跳过，Mock不替代；按变更风险追加已有核心路径回归。"
+    },
+    {
+      "id": "PHASE-1-T049",
+      "phase": "Phase 1",
+      "title": "检查整单元跨场景一致性",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1-T047",
+        "PHASE-1-T048"
+      ],
+      "scope": [
+        "backend/app/agents/",
+        "backend/app/services/",
+        "backend/tests/",
+        "docs/agents/prompts/"
+      ],
+      "prd_source": "PRD §0.2重构方向（具体设计待批准）；ADR-0015 Proposed",
+      "acceptance_criteria": [
+        "一次独立审核接收完整计划、三资源和动作，检查术语、约定、示例轨迹和答案的一致性。",
+        "输出绑定整单元摘要；任何候选/动作/计划变化使结果失效，局部pass不能替代整单元检查。",
+        "有据具体严重缺陷reject；其余未决跨场景冲突或覆盖未知转人工，不自动无限重生成；schema/预算/调用故障安全失败。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/pytest -q tests/test_unit_consistency_review.py",
+        "cd backend && .venv/bin/ruff check app tests && .venv/bin/mypy app",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T049",
+      "execution_gate": "ADR-0015 A–D及绑定附件获具体批准后才能领取实施；方向选择不预签持久化、API、人工权限或新验收细则。",
+      "verification_note": "上述新文件/CLI为待建立的验收接口，当前未运行且不声称已存在；本任务完成前必须建立并实际执行。数据库任务须真实PG零跳过，Mock不替代；按变更风险追加已有核心路径回归。"
+    },
+    {
+      "id": "PHASE-1-T050",
+      "phase": "Phase 1",
+      "title": "持久化人工复核案件与不可变结论",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1-T049"
+      ],
+      "scope": [
+        "backend/app/models/",
+        "backend/app/services/",
+        "backend/alembic/",
+        "backend/tests/"
+      ],
+      "prd_source": "PRD §0.2重构方向（具体设计待批准）；ADR-0015 Proposed",
+      "acceptance_criteria": [
+        "案件绑定owner、操作、完整单元/候选/计划/政策摘要，结论只追加并保留自动审核原结果。",
+        "案件pending不发布；仅needs_human案件可approve/reject，当前有据严重reject不能人工放行；内容变更须新版本，失效案使未取消操作failed/REVIEW_CASE_INVALIDATED。",
+        "事务幂等、取消与复核互斥、跨owner隔离及迁移约束在真实测试数据库验证。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/pytest -q tests/test_learning_review_cases.py",
+        "cd backend && .venv/bin/ruff check app tests && .venv/bin/mypy app",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T050",
+      "execution_gate": "ADR-0015 A–D及绑定附件获具体批准后才能领取实施；方向选择不预签持久化、API、人工权限或新验收细则。",
+      "verification_note": "上述新文件/CLI为待建立的验收接口，当前未运行且不声称已存在；本任务完成前必须建立并实际执行。数据库任务须真实PG零跳过，Mock不替代；按变更风险追加已有核心路径回归。"
+    },
+    {
+      "id": "PHASE-1-T051",
+      "phase": "Phase 1",
+      "title": "提供受信本地人工复核命令",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1-T050"
+      ],
+      "scope": [
+        "scripts/",
+        "backend/app/services/",
+        "backend/tests/",
+        "docs/"
+      ],
+      "prd_source": "PRD §0.2重构方向（具体设计待批准）；ADR-0015 Proposed",
+      "acceptance_criteria": [
+        "仅维护端CLI支持list/show/decide，复核人从受信配置验证，真实决定绑定准确摘要和理由。",
+        "学生HTTP/模型不能写审核结论；CLI不调用Provider、不执行代码，审批文件不能仅凭passed=true发布。",
+        "明确无人工值守SLA，重复/过期/跨owner/取消后决定失败，命令默认不导出敏感正文。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/pytest -q tests/test_learning_review_cli.py",
+        "backend/.venv/bin/python scripts/review_learning_cases.py --help",
+        "cd backend && .venv/bin/ruff check app tests && .venv/bin/mypy app",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T051",
+      "execution_gate": "ADR-0015 A–D及绑定附件获具体批准后才能领取实施；方向选择不预签持久化、API、人工权限或新验收细则。",
+      "verification_note": "上述新文件/CLI为待建立的验收接口，当前未运行且不声称已存在；本任务完成前必须建立并实际执行。数据库任务须真实PG零跳过，Mock不替代；按变更风险追加已有核心路径回归。"
+    },
+    {
+      "id": "PHASE-1-T052",
+      "phase": "Phase 1",
+      "title": "按自动或人工证据原子发布完整单元",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1-T051"
+      ],
+      "scope": [
+        "backend/app/services/learning_finalization.py",
+        "backend/app/services/resource_publication.py",
+        "backend/app/models/",
+        "backend/tests/"
+      ],
+      "prd_source": "PRD §0.2重构方向（具体设计待批准）；ADR-0015 Proposed",
+      "acceptance_criteria": [
+        "所有必需场景及整单元检查满足资格后才一次事务发布，记录auto/human_assisted来源，保留原自动审核结果。",
+        "人工批准只替代准确案件的语义资格，不豁免本地硬检查/owner/计划版本/撤回/预算/DSL沙箱。",
+        "待人工和部分通过不可被读取、评分、导出或动画复用；取消/重解释产生新版本，旧批准不继承。",
+        "不改变旧目录人工签核和原已发布版本，真实数据库并发/崩溃边界与关键读取回归通过。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/pytest -q tests/test_hybrid_learning_publication.py",
+        "cd backend && .venv/bin/ruff check app tests && .venv/bin/mypy app",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T052",
+      "execution_gate": "ADR-0015 A–D及绑定附件获具体批准后才能领取实施；方向选择不预签持久化、API、人工权限或新验收细则。",
+      "verification_note": "上述新文件/CLI为待建立的验收接口，当前未运行且不声称已存在；本任务完成前必须建立并实际执行。数据库任务须真实PG零跳过，Mock不替代；按变更风险追加已有核心路径回归。"
+    },
+    {
+      "id": "PHASE-1-T053",
+      "phase": "Phase 1",
+      "title": "展示生成阶段和待人工复核状态",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1-T052"
+      ],
+      "scope": [
+        "backend/app/api/",
+        "backend/app/services/learning_operations.py",
+        "docs/api/openapi.yaml",
+        "web/src/",
+        "web/tests/",
+        "backend/tests/"
+      ],
+      "prd_source": "PRD §0.2重构方向（具体设计待批准）；ADR-0015 Proposed",
+      "acceptance_criteria": [
+        "沿现有owner查询和POST SSE暴露阶段及awaiting_human/rejected，不新增学生审核接口或未审正文读取。",
+        "待人工结束当前流且不保持无限连接，刷新只查持久状态；人工处理后只显示真实已发布或被拒状态。",
+        "前端明确待人工且无完成时间承诺，自动/人工来源可辨；不把待审内容显示成正式课程。",
+        "OpenAPI、类型、关键浏览器旅程、SSE断线/取消和目录零调用回归通过。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/pytest -q tests/test_hybrid_learning_operations.py",
+        "pnpm --dir web test --run tests/hybrid-review-flow.spec.ts",
+        "pnpm --dir web lint && pnpm --dir web typecheck && pnpm --dir web build",
+        "backend/.venv/bin/python web/tests/e2e/hybrid_review_flow.py",
+        "cd backend && .venv/bin/ruff check app tests && .venv/bin/mypy app",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T053",
+      "execution_gate": "ADR-0015 A–D及绑定附件获具体批准后才能领取实施；方向选择不预签持久化、API、人工权限或新验收细则。",
+      "verification_note": "上述新文件/CLI为待建立的验收接口，当前未运行且不声称已存在；本任务完成前必须建立并实际执行。数据库任务须真实PG零跳过，Mock不替代；按变更风险追加已有核心路径回归。"
+    },
+    {
+      "id": "PHASE-1-T054",
+      "phase": "Phase 1",
+      "title": "冻结重构后的分层质量验收方案",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1-T053"
+      ],
+      "scope": [
+        "scripts/",
+        "backend/tests/",
+        "docs/acceptance/"
+      ],
+      "prd_source": "PRD §0.2重构方向（具体设计待批准）；ADR-0015 Proposed",
+      "acceptance_criteria": [
+        "离线构建新冻结组合、完整分母和预算方案，自动质量、混合发布及人工依赖分别报告。",
+        "继承原首次schema≥98%、自动正式成功≥95%、严重错误召回≥90%等阈值，待人工/人工通过不得补自动分子。",
+        "分别报告具体检出、分类、误报、正确对照、覆盖/不确定、人工比例及长输出；旧T033/r01-r11保持原判定。",
+        "真实预算为0直至准确新方案另批，未批准CLI应拒绝；离线通过不解除T040/T041或生产门禁。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/pytest -q tests/test_om_redesign_acceptance_preparation.py",
+        "backend/.venv/bin/python scripts/prepare_om_redesign_acceptance.py --check",
+        "cd backend && .venv/bin/ruff check app tests && .venv/bin/mypy app",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T054",
+      "execution_gate": "ADR-0015 A–D及绑定附件获具体批准后才能领取实施；方向选择不预签持久化、API、人工权限或新验收细则。",
+      "verification_note": "上述新文件/CLI为待建立的验收接口，当前未运行且不声称已存在；本任务完成前必须建立并实际执行。数据库任务须真实PG零跳过，Mock不替代；按变更风险追加已有核心路径回归。"
     }
   ]
 }

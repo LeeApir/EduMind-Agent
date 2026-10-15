@@ -1,0 +1,340 @@
+{
+  "version": "om-redesign-proposal-v1",
+  "status": "PROPOSED_NO_RUNTIME_OR_PROVIDER_AUTHORIZATION",
+  "base_commit": "e21d34099daeb48626913bdbef7c10e95fd72456",
+  "upstream_commit": "ecb940c136cc5b4ea56dc81b2505e64eff1dea29",
+  "decisions": [
+    "A",
+    "B",
+    "C",
+    "D"
+  ],
+  "documents": [
+    {
+      "path": "docs/ADR/0015-shared-plan-and-hybrid-review.md",
+      "sha256": "4259f715c6fcd50d40806b04907b30a8b318c2efabc76b3839c86fe553ab3503"
+    },
+    {
+      "path": "docs/acceptance/phase-1-om-redesign/acceptance-plan.md",
+      "sha256": "487c10258fdf336c5978b4516a63e51d57d16473986b416030903c6714ae86f6"
+    },
+    {
+      "path": "docs/reference/openmaic/generation-review-20261015.md",
+      "sha256": "289fbda80fb9c8d516b90fd4aff699fda1f2b80d806d486be99f1ba0623ff655"
+    },
+    {
+      "path": "docs/acceptance/phase-1-om-redesign/reader-check.md",
+      "sha256": "b3507f300198532c5ccba306156954bd9b70324b8422543a68dfbc8773214557"
+    }
+  ],
+  "task_contracts": [
+    {
+      "id": "PHASE-1-T043",
+      "title": "设计OM式课程生成与混合审核重构方案",
+      "depends_on": [
+        "PHASE-1-T038",
+        "PHASE-1-T039"
+      ],
+      "scope": [
+        "docs/ADR/0015-shared-plan-and-hybrid-review.md",
+        "docs/acceptance/phase-1-om-redesign/",
+        "docs/reference/openmaic/generation-review-20261015.md",
+        "docs/PRD.md",
+        "docs/ARCHITECTURE.md",
+        "docs/ADR/README.md",
+        "AGENTS.md",
+        "task.json",
+        "process.txt"
+      ],
+      "acceptance_criteria": [
+        "交付共享教学计划、逐场景内容和受约束授课动作的完整设计，明确OM源码依据及本项目适配边界。",
+        "定义自动审核、人工复核、硬拒绝与原子发布的状态、权限、不可变摘要和过期规则；具体ADR条款仍待批准。",
+        "交付新验收分层、调用上界、人工占比及旧失败保留规则，禁止用人工通过充当自动审核通过。",
+        "细化当前Phase 1实现依赖及验证入口，完成文档读者检查、治理和历史批准完整性核对；不调用真实Provider。"
+      ],
+      "verification": [
+        "python3 -m json.tool task.json >/dev/null",
+        "python3 scripts/check_catalog_workflow.py",
+        "python3 scripts/verify_legacy_archives.py",
+        "python3 scripts/verify_phase1_dynamic_approval.py",
+        "git diff --check"
+      ]
+    },
+    {
+      "id": "PHASE-1-T044",
+      "title": "持久化共享教学计划快照",
+      "depends_on": [
+        "PHASE-1-T043"
+      ],
+      "scope": [
+        "backend/app/models/",
+        "backend/alembic/",
+        "backend/tests/",
+        "docs/api/openapi.yaml"
+      ],
+      "acceptance_criteria": [
+        "仅在ADR-0015 A–D获准后实施；计划版本、owner/图谱/画像/目标摘要及三个场景定义持久化且不可原地改写。",
+        "候选和场景能绑定同一计划及约定摘要，跨owner或失配引用被数据库和服务拒绝。",
+        "Alembic升级与旧目录/旧学习单元兼容通过，降级在存在新数据时安全拒绝。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/pytest -q tests/test_learning_plan_persistence.py",
+        "cd backend && .venv/bin/ruff check app tests && .venv/bin/mypy app",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ]
+    },
+    {
+      "id": "PHASE-1-T045",
+      "title": "生成受约束的共享教学计划",
+      "depends_on": [
+        "PHASE-1-T044"
+      ],
+      "scope": [
+        "backend/app/agents/",
+        "backend/tests/",
+        "docs/agents/prompts/"
+      ],
+      "acceptance_criteria": [
+        "从同一节点、目标和有据画像生成三个场景计划，统一术语、索引/状态约定及共享示例。",
+        "严格schema、稳定本地场景ID和版本化参考检查，未知来源/缺约定/超限不进入内容生成。",
+        "计划不是事实证据或课程签核；单次生成失败不伪造计划或自动重试，Mock验证Provider失败与取消。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/pytest -q tests/test_shared_learning_plan.py",
+        "cd backend && .venv/bin/ruff check app tests && .venv/bin/mypy app",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ]
+    },
+    {
+      "id": "PHASE-1-T046",
+      "title": "按共享计划生成三个场景内容",
+      "depends_on": [
+        "PHASE-1-T045"
+      ],
+      "scope": [
+        "backend/app/agents/learning_unit_generator.py",
+        "backend/app/agents/learning_resource_prompt.py",
+        "backend/tests/"
+      ],
+      "acceptance_criteria": [
+        "讲解、代码、练习分别接收同一计划、共享示例和场景目标，代码与练习还接收前序候选摘要及完整相关内容。",
+        "任何修正产生新候选摘要，后续绑定失效；禁止把计划中的预期输出冒充已执行验证。",
+        "维持现有资源schema和display_only，单场景失败不虚构替代资源；所有实际尝试纳入预算。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/pytest -q tests/test_planned_scene_generation.py",
+        "cd backend && .venv/bin/ruff check app tests && .venv/bin/mypy app",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ]
+    },
+    {
+      "id": "PHASE-1-T047",
+      "title": "组装引用场景内容的授课动作",
+      "depends_on": [
+        "PHASE-1-T046"
+      ],
+      "scope": [
+        "backend/app/services/",
+        "backend/tests/",
+        "docs/agents/"
+      ],
+      "acceptance_criteria": [
+        "以本地受信模板生成讲解/高亮/练习动作，目标仅能引用本场景已绑定内容片段和题号。",
+        "不生成任意HTML/JS、角色发言或新事实；动作规则版本和摘要参与单元审核绑定。",
+        "无效引用/跨场景引用和内容变更使动作失效，重复组装保持确定性，无新增Provider调用。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/pytest -q tests/test_teaching_action_assembly.py",
+        "cd backend && .venv/bin/ruff check app tests && .venv/bin/mypy app",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ]
+    },
+    {
+      "id": "PHASE-1-T048",
+      "title": "返回带证据和人工路由的资源审核结果",
+      "depends_on": [
+        "PHASE-1-T046"
+      ],
+      "scope": [
+        "backend/app/agents/review_agent.py",
+        "backend/app/agents/review_schema.py",
+        "backend/tests/",
+        "docs/agents/prompts/"
+      ],
+      "acceptance_criteria": [
+        "新版本审核显式返回pass/revise/reject/needs_human及证据锚点、条件/反例、覆盖和未知项，旧协议不静默混用。",
+        "本地硬拒绝不能人工豁免；可解析但证据不足/覆盖未知/修正耗尽进入人工，协议/预算/凭据失败保持失败。",
+        "审核器按影响定位问题，类别与检出分开计分；最多两轮修正、完整重审且禁止自动模型回退。",
+        "用离线合成结果覆盖误报、空证据、越界引用、多个问题和正确对照，明确Mock不证明语义改善。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/pytest -q tests/test_hybrid_resource_review.py",
+        "cd backend && .venv/bin/ruff check app tests && .venv/bin/mypy app",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ]
+    },
+    {
+      "id": "PHASE-1-T049",
+      "title": "检查整单元跨场景一致性",
+      "depends_on": [
+        "PHASE-1-T047",
+        "PHASE-1-T048"
+      ],
+      "scope": [
+        "backend/app/agents/",
+        "backend/app/services/",
+        "backend/tests/",
+        "docs/agents/prompts/"
+      ],
+      "acceptance_criteria": [
+        "一次独立审核接收完整计划、三资源和动作，检查术语、约定、示例轨迹和答案的一致性。",
+        "输出绑定整单元摘要；任何候选/动作/计划变化使结果失效，局部pass不能替代整单元检查。",
+        "有据具体严重缺陷reject；其余未决跨场景冲突或覆盖未知转人工，不自动无限重生成；schema/预算/调用故障安全失败。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/pytest -q tests/test_unit_consistency_review.py",
+        "cd backend && .venv/bin/ruff check app tests && .venv/bin/mypy app",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ]
+    },
+    {
+      "id": "PHASE-1-T050",
+      "title": "持久化人工复核案件与不可变结论",
+      "depends_on": [
+        "PHASE-1-T049"
+      ],
+      "scope": [
+        "backend/app/models/",
+        "backend/app/services/",
+        "backend/alembic/",
+        "backend/tests/"
+      ],
+      "acceptance_criteria": [
+        "案件绑定owner、操作、完整单元/候选/计划/政策摘要，结论只追加并保留自动审核原结果。",
+        "案件pending不发布；仅needs_human案件可approve/reject，当前有据严重reject不能人工放行；内容变更须新版本，失效案使未取消操作failed/REVIEW_CASE_INVALIDATED。",
+        "事务幂等、取消与复核互斥、跨owner隔离及迁移约束在真实测试数据库验证。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/pytest -q tests/test_learning_review_cases.py",
+        "cd backend && .venv/bin/ruff check app tests && .venv/bin/mypy app",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ]
+    },
+    {
+      "id": "PHASE-1-T051",
+      "title": "提供受信本地人工复核命令",
+      "depends_on": [
+        "PHASE-1-T050"
+      ],
+      "scope": [
+        "scripts/",
+        "backend/app/services/",
+        "backend/tests/",
+        "docs/"
+      ],
+      "acceptance_criteria": [
+        "仅维护端CLI支持list/show/decide，复核人从受信配置验证，真实决定绑定准确摘要和理由。",
+        "学生HTTP/模型不能写审核结论；CLI不调用Provider、不执行代码，审批文件不能仅凭passed=true发布。",
+        "明确无人工值守SLA，重复/过期/跨owner/取消后决定失败，命令默认不导出敏感正文。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/pytest -q tests/test_learning_review_cli.py",
+        "backend/.venv/bin/python scripts/review_learning_cases.py --help",
+        "cd backend && .venv/bin/ruff check app tests && .venv/bin/mypy app",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ]
+    },
+    {
+      "id": "PHASE-1-T052",
+      "title": "按自动或人工证据原子发布完整单元",
+      "depends_on": [
+        "PHASE-1-T051"
+      ],
+      "scope": [
+        "backend/app/services/learning_finalization.py",
+        "backend/app/services/resource_publication.py",
+        "backend/app/models/",
+        "backend/tests/"
+      ],
+      "acceptance_criteria": [
+        "所有必需场景及整单元检查满足资格后才一次事务发布，记录auto/human_assisted来源，保留原自动审核结果。",
+        "人工批准只替代准确案件的语义资格，不豁免本地硬检查/owner/计划版本/撤回/预算/DSL沙箱。",
+        "待人工和部分通过不可被读取、评分、导出或动画复用；取消/重解释产生新版本，旧批准不继承。",
+        "不改变旧目录人工签核和原已发布版本，真实数据库并发/崩溃边界与关键读取回归通过。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/pytest -q tests/test_hybrid_learning_publication.py",
+        "cd backend && .venv/bin/ruff check app tests && .venv/bin/mypy app",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ]
+    },
+    {
+      "id": "PHASE-1-T053",
+      "title": "展示生成阶段和待人工复核状态",
+      "depends_on": [
+        "PHASE-1-T052"
+      ],
+      "scope": [
+        "backend/app/api/",
+        "backend/app/services/learning_operations.py",
+        "docs/api/openapi.yaml",
+        "web/src/",
+        "web/tests/",
+        "backend/tests/"
+      ],
+      "acceptance_criteria": [
+        "沿现有owner查询和POST SSE暴露阶段及awaiting_human/rejected，不新增学生审核接口或未审正文读取。",
+        "待人工结束当前流且不保持无限连接，刷新只查持久状态；人工处理后只显示真实已发布或被拒状态。",
+        "前端明确待人工且无完成时间承诺，自动/人工来源可辨；不把待审内容显示成正式课程。",
+        "OpenAPI、类型、关键浏览器旅程、SSE断线/取消和目录零调用回归通过。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/pytest -q tests/test_hybrid_learning_operations.py",
+        "pnpm --dir web test --run tests/hybrid-review-flow.spec.ts",
+        "pnpm --dir web lint && pnpm --dir web typecheck && pnpm --dir web build",
+        "backend/.venv/bin/python web/tests/e2e/hybrid_review_flow.py",
+        "cd backend && .venv/bin/ruff check app tests && .venv/bin/mypy app",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ]
+    },
+    {
+      "id": "PHASE-1-T054",
+      "title": "冻结重构后的分层质量验收方案",
+      "depends_on": [
+        "PHASE-1-T053"
+      ],
+      "scope": [
+        "scripts/",
+        "backend/tests/",
+        "docs/acceptance/"
+      ],
+      "acceptance_criteria": [
+        "离线构建新冻结组合、完整分母和预算方案，自动质量、混合发布及人工依赖分别报告。",
+        "继承原首次schema≥98%、自动正式成功≥95%、严重错误召回≥90%等阈值，待人工/人工通过不得补自动分子。",
+        "分别报告具体检出、分类、误报、正确对照、覆盖/不确定、人工比例及长输出；旧T033/r01-r11保持原判定。",
+        "真实预算为0直至准确新方案另批，未批准CLI应拒绝；离线通过不解除T040/T041或生产门禁。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/pytest -q tests/test_om_redesign_acceptance_preparation.py",
+        "backend/.venv/bin/python scripts/prepare_om_redesign_acceptance.py --check",
+        "cd backend && .venv/bin/ruff check app tests && .venv/bin/mypy app",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ]
+    }
+  ],
+  "provider_requests_authorized": 0,
+  "fee_authorized": 0,
+  "production_mode": "catalog_only",
+  "historical_route_status": "retired_unchanged"
+}
