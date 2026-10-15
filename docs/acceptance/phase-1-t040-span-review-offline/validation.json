@@ -1,0 +1,75 @@
+{
+  "version": "span-redesign-offline-validation-v1",
+  "recorded_at": "2026-10-15T13:56:09",
+  "baseline_commit": "13aaea7",
+  "authorization": "User 好: redesign task decomposition offline and prepare manually checkable focus list; no new real API approval",
+  "provider_requests": 0,
+  "provider_cost": 0,
+  "real_key_read": false,
+  "new_tests": 39,
+  "related_prototype_tests": 61,
+  "combined_tests": 100,
+  "combined_result": "passed",
+  "ruff": "passed",
+  "old_339_suite": "NOT_RERUN: dff3a06 evidence retained, frozen production/transport sources unchanged",
+  "app_mypy": "NOT_RERUN: no app change; scripts not strictly type-checked",
+  "worksheet_human_approved": false,
+  "source_sha256": {
+    "docs/acceptance/phase-1-dynamic-v1/history.json": "305e8be1689cbf24c1db8052b4bb8b5f74781fa73db52fd25f1c07b10ce683da",
+    "scripts/acceptance_support/span_review_offline.py": "e51f955dae4e8c8baf8eba9841942b61c2b974901e11e0396e9f667b52a8d649",
+    "scripts/prepare_t040_span_review.py": "ced53bf834566a0c684dc8eb2a62c4208482fc19cf40a6fb386828d7ab2eb9fb",
+    "scripts/acceptance_support/claim_review_prototype.py": "fc45c8185eb0ce75926b12a37675a7c751f013f41b0473a02274da5cfad00a6c",
+    "backend/uv.lock": "f891dba550dab343335b714bb3cbbe7e498ed18afa001f5123c7e7dccefc5efe",
+    "backend/tests/test_span_review_offline.py": "7c7f7d85d40ff108bf279ad5a7a4a7fad853c509946cb1e671f3bfc582173354"
+  },
+  "draft_sha256": {
+    "worksheet.json": "13df81a376795cba4e23f2b3b8875af66b6846c71809fff320d22a4626bc5cfd",
+    "exit-policy-proposal.json": "1af71efe39fa309fdcc1166fdcb001f36bf7593d8c3e9ff9a0427005200b553e",
+    "selection-previews.json": "01a62fa286347bdcee06956d53f9120af8c73197379fc792ac5e3bbefb41c8b4",
+    "historical-size-screen.json": "3caa07c1d6ce510f58a69f0949cd5f56d9ee2d7499c876dba993747d76e761f6",
+    "focus-previews.json": "24496509636e62c15167895e5b01ab21e311b052ce61a1d30c147d37a43a5ff4",
+    "expectations-not-for-model.json": "c971bd5507e95d50a09bff5aa9e3046cb3e9593d0b1cf6756a6114589c1ec0f1"
+  },
+  "preview_canonical_bytes": {
+    "selection": [
+      17166,
+      4130
+    ],
+    "focus": [
+      17880,
+      17778,
+      4729,
+      4730
+    ],
+    "is_api_wire_or_token_measure": false
+  },
+  "historical_samples_screened": 8,
+  "semantic_claim_counts": "NOT_MEASURED",
+  "r09_sources_checked": 202,
+  "r09_attempts": 1,
+  "r09_halted": "INVALID_OUTPUT",
+  "r08_sources_checked": 186,
+  "r08_attempts": 1,
+  "r08_halted": "CONCRETE_DEFECT_MISSED",
+  "formal_samples_accessed": false,
+  "semantic_quality_verified": false,
+  "live_strategy_counter_implemented": false,
+  "production_registered": false,
+  "production_mode": "catalog_only",
+  "t040_complete": false,
+  "commands": [
+    "backend/.venv/bin/pytest -q backend/tests/test_span_review_offline.py backend/tests/test_claim_review_prototype.py --tb=short",
+    "backend/.venv/bin/ruff check scripts/acceptance_support/span_review_offline.py scripts/prepare_t040_span_review.py backend/tests/test_span_review_offline.py",
+    "backend/.venv/bin/python scripts/prepare_t040_span_review.py",
+    "backend/.venv/bin/python scripts/prepare_t040_span_review.py --check",
+    "backend/.venv/bin/python scripts/check_catalog_workflow.py",
+    "backend/.venv/bin/python scripts/prepare_t040_derived_run.py --check"
+  ],
+  "limits": [
+    "Deterministic spans are locators, not independent semantic assertions.",
+    "ID mapping and synthetic results do not establish coverage, fact accuracy or lower reasoning costs.",
+    "Four assistant-drafted focus statements remain unsigned; not complete resource inventories.",
+    "K16 remains unchanged and unverified for full resources; input tables have overhead.",
+    "Two-round/eight-attempt exit proposal has no real budget or live ledger."
+  ]
+}
