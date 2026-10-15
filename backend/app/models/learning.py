@@ -8,6 +8,7 @@ from sqlalchemy import (
     DateTime,
     Float,
     ForeignKey,
+    ForeignKeyConstraint,
     Integer,
     String,
     Text,
@@ -107,7 +108,8 @@ class LearningUnit(Base):
         PostgreSQLUUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
     catalog_release_id: Mapped[UUID | None] = mapped_column(
-        PostgreSQLUUID(as_uuid=True), ForeignKey("catalog_releases.id"))
+        PostgreSQLUUID(as_uuid=True), ForeignKey("catalog_releases.id")
+    )
     knowledge_point_id: Mapped[str | None] = mapped_column(String(64))
     title: Mapped[str | None] = mapped_column(String(200))
     learning_objectives: Mapped[dict[str, object] | None] = mapped_column(JSONB)
@@ -128,6 +130,7 @@ class LearningOperation(Base):
     __tablename__ = "learning_operations"
     __table_args__ = (
         UniqueConstraint("user_id", "idempotency_key", name="uq_learning_operations_user_key"),
+        UniqueConstraint("user_id", "learning_unit_id", "id", name="uq_operation_target"),
         CheckConstraint("attempt >= 1", name="ck_learning_operations_attempt_positive"),
     )
 
@@ -165,6 +168,11 @@ class LearningScene(Base):
         UniqueConstraint(
             "learning_unit_id", "id", "version", name="uq_learning_scenes_unit_id_version"
         ),
+        UniqueConstraint("learning_unit_id", "id", "plan_id", name="uq_scene_plan"),
+        ForeignKeyConstraint(
+            ["learning_unit_id", "plan_id"],
+            ["learning_plan_versions.learning_unit_id", "learning_plan_versions.id"],
+        ),
         CheckConstraint("version >= 1", name="ck_learning_scenes_version_positive"),
     )
 
@@ -174,6 +182,8 @@ class LearningScene(Base):
         ForeignKey("learning_units.id", ondelete="CASCADE"),
         nullable=False,
     )
+    plan_id: Mapped[UUID | None] = mapped_column(PostgreSQLUUID(as_uuid=True))
+    dependency_digest: Mapped[str | None] = mapped_column(String(64))
     scene_key: Mapped[str] = mapped_column(String(64), nullable=False)
     scene_order: Mapped[int] = mapped_column(Integer, nullable=False)
     scene_type: Mapped[str] = mapped_column(String(30), nullable=False)
@@ -191,6 +201,18 @@ class GeneratedResource(Base):
     __table_args__ = (
         UniqueConstraint(
             "scene_id", "resource_type", "version", name="uq_generated_resources_scene_type_version"
+        ),
+        ForeignKeyConstraint(
+            ["user_id", "learning_unit_id", "plan_id"],
+            [
+                "learning_plan_versions.user_id",
+                "learning_plan_versions.learning_unit_id",
+                "learning_plan_versions.id",
+            ],
+        ),
+        ForeignKeyConstraint(
+            ["learning_unit_id", "scene_id", "plan_id"],
+            ["learning_scenes.learning_unit_id", "learning_scenes.id", "learning_scenes.plan_id"],
         ),
         CheckConstraint("version >= 1", name="ck_generated_resources_version_positive"),
         CheckConstraint(
@@ -223,10 +245,15 @@ class GeneratedResource(Base):
         ForeignKey("learning_scenes.id", ondelete="CASCADE"),
         nullable=False,
     )
-    origin_type: Mapped[str] = mapped_column(String(16), default="generated",
-                                           server_default="generated", nullable=False)
+    plan_id: Mapped[UUID | None] = mapped_column(PostgreSQLUUID(as_uuid=True))
+    content_digest: Mapped[str | None] = mapped_column(String(64))
+    dependency_digest: Mapped[str | None] = mapped_column(String(64))
+    origin_type: Mapped[str] = mapped_column(
+        String(16), default="generated", server_default="generated", nullable=False
+    )
     catalog_release_id: Mapped[UUID | None] = mapped_column(
-        PostgreSQLUUID(as_uuid=True), ForeignKey("catalog_releases.id"))
+        PostgreSQLUUID(as_uuid=True), ForeignKey("catalog_releases.id")
+    )
     catalog_content_digest: Mapped[str | None] = mapped_column(String(64))
     knowledge_point_id: Mapped[str | None] = mapped_column(String(64))
     resource_type: Mapped[str] = mapped_column(String(20), nullable=False)
