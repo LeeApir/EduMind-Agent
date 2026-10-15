@@ -52,3 +52,5 @@
 2026-10-09：[ADR-0012：30节点知识结构、存储与课程资格](0012-expanded-knowledge-graph.md)为T030的Proposed方案，待批准A–D及准确附件。推荐复用YAML/PostgreSQL；默认10节点seed/签核目录保持，独立扩展图；元数据不等于课程资格。未完成T030、未开放动态或授权真实模型。
 
 2026-10-09：用户明确回复“批准”，[ADR-0012批准登记](0012-graph-approval-20261009.json)将A–D与准确manifest附件批准为Accepted。原提案/报告/manifest保留Proposed历史字节，当前状态以本登记为准；按T031–T033实施，真实Provider授权0、动态入口未开放。
+
+2026-10-15：[ADR-0013：逐条声明审核与确定性汇总](0013-claim-level-resource-review.md)为T040连续漏项后的Proposed设计稿，仅设计授权；声明提取/独立覆盖/逐条及整体检查/本地汇总均未实施，真实请求0。内部原型实施、动态子请求冻结规则补充与真实预算需分别决定；不改变ADR-0011、原失败/验收标签或catalog_only。
