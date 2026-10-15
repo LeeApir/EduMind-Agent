@@ -125,3 +125,12 @@ Initial E2E interception wrongly matched /src/api modules, corrected to site /ap
 A classroom HTTP mock needed its separate gateway dependency; corrected without real
 credentials or lowered assertions. Ruff/mypy188/JSON/manifest/workflow/diff passed.
 All model calls were synthetic; real Provider requests and authorized new fees are 0.
+
+T054: offline preparation is in docs/acceptance/phase-1-om-implementation. It binds the
+new runtime/source closure, fixed 100/20/20/10 denominators and 50 concrete new audit
+units with separately proposed (not human-approved) labels. At least 20 route scenarios
+exercise actual local gates. Human pass does not increase any automatic numerator;
+missed, failed and unrun slots are not replaced. The conservative 2360-request envelope
+has no verified monetary ceiling and grants zero requests/fees. The preparer rejects
+--run before any credential/transport access. Actual new T040 materials/labels, exact
+model/wires, verified token/price proof and paid approval still need their own freeze.

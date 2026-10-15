@@ -1,0 +1,119 @@
+{
+  "version": "om-implementation-offline-validation-v1",
+  "frozen_root_sha256": "f749afec0d0148eecb18d477ce805f3c8a73eafe79467270edd68f58463f55e1",
+  "frozen_source_count": 493,
+  "checks": [
+    {
+      "command": "backend/.venv/bin/python scripts/prepare_om_redesign_acceptance.py --check",
+      "chunk_id": "18f3ef",
+      "wall_time_seconds": 0.113056459,
+      "exit_code": 0,
+      "original_token_count": 69,
+      "output": "{\"status\": \"OFFLINE_PREPARATION_NOT_EXECUTABLE\", \"root_sha256\": \"f749afec0d0148eecb18d477ce805f3c8a73eafe79467270edd68f58463f55e1\", \"sources\": 493, \"targets\": 100, \"severe\": 20, \"correct\": 20, \"long\": 10, \"offline_scenarios\": 20, \"provider_requests\": 0, \"fees_authorized\": 0}\n"
+    },
+    {
+      "command": "backend/.venv/bin/ruff check backend/app backend/tests scripts/acceptance_support/om_preparation.py scripts/acceptance_support/om_benchmarks.py scripts/prepare_om_redesign_acceptance.py",
+      "chunk_id": "02a09a",
+      "wall_time_seconds": 0.000008458,
+      "exit_code": 0,
+      "original_token_count": 5,
+      "output": "All checks passed!\n"
+    },
+    {
+      "command": "backend/.venv/bin/mypy backend/app --config-file backend/pyproject.toml",
+      "chunk_id": "3d75f6",
+      "wall_time_seconds": 7.166057,
+      "exit_code": 0,
+      "original_token_count": 12,
+      "output": "Success: no issues found in 188 source files\n"
+    },
+    {
+      "command": "python3 scripts/check_catalog_workflow.py",
+      "chunk_id": "536fc2",
+      "wall_time_seconds": 0.000008958,
+      "exit_code": 0,
+      "original_token_count": 18,
+      "output": "Active Phase 1 dependencies valid; catalog ledger valid; T033 blocked\n"
+    },
+    {
+      "command": "python3 scripts/verify_legacy_archives.py",
+      "chunk_id": "86931f",
+      "wall_time_seconds": 1.4599755,
+      "exit_code": 0,
+      "original_token_count": 42,
+      "output": "{\"passed\": true, \"source\": \"git_archives\", \"original_files_verified\": 236, \"experiment_files\": 64, \"evidence_files\": 169, \"provider_requests\": 0, \"t033\": \"blocked\"}\n"
+    },
+    {
+      "command": "python3 scripts/verify_phase1_dynamic_approval.py",
+      "chunk_id": "2bc4f1",
+      "wall_time_seconds": 0.2911265,
+      "exit_code": 0,
+      "original_token_count": 31,
+      "output": "PASS: ADR-0011 A-D and labels approved; exact historical manifest verified; Provider requests/cost=0; dynamic opening=false\n"
+    },
+    {
+      "command": "git diff --check",
+      "chunk_id": "3da889",
+      "wall_time_seconds": 0.000008209,
+      "exit_code": 0,
+      "original_token_count": 0,
+      "output": ""
+    }
+  ],
+  "integration": {
+    "command": "EDUMIND_CATALOG_TEST_PG_CONTAINER=edumind-phase1-t037-pg backend/.venv/bin/python scripts/run_shared_learning_tests.py --database edumind_catalog_phase1_om54 --dynamic-mock-mode tests/test_learning_plan_persistence.py tests/test_shared_learning_plan.py tests/test_planned_scene_generation.py tests/test_teaching_action_assembly.py tests/test_hybrid_resource_review.py tests/test_unit_consistency_review.py tests/test_learning_review_cases.py tests/test_learning_review_cli.py tests/test_hybrid_learning_publication.py tests/test_hybrid_learning_operations.py tests/test_om_redesign_acceptance_preparation.py tests/test_learning_closed_loop.py tests/test_quiz_api.py tests/test_markdown_notes_api.py tests/test_paths_api.py tests/test_catalog_mode.py tests/test_catalog_sessions.py tests/test_review_agent.py tests/test_provider_gateway.py tests/test_deepseek_responses.py",
+    "chunk_id": "66195d",
+    "wall_time_seconds": 0.000018542,
+    "exit_code": 0,
+    "original_token_count": 219,
+    "output": "........................................................................ [ 40%]\n........................................................................ [ 81%]\n................................                                         [100%]\n=============================== warnings summary ===============================\n.venv/lib/python3.11/site-packages/starlette/testclient.py:37\n  /Users/apir/Code/EduMind_Agent/backend/.venv/lib/python3.11/site-packages/starlette/testclient.py:37: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.\n    _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n176 passed, 1 warning in 9.18s\nDedicated OM test run completed; no server configuration or .env loaded.\n",
+    "passed": 176,
+    "skipped": 0
+  },
+  "preparation_tests": {
+    "command": "cd backend && .venv/bin/pytest -q tests/test_om_redesign_acceptance_preparation.py",
+    "passed": 24,
+    "route_matrix_cases": 20,
+    "unsafe_candidate_code_executed": false
+  },
+  "web": {
+    "full_tests_passed": 194,
+    "final_related_tests_passed": 23,
+    "lint_exit_code": 0,
+    "existing_ProfileCard_formatting_warnings": 35,
+    "typecheck": "passed",
+    "build": "passed",
+    "chromium_mock_journey": "passed; page reload without generation POST; exact publication version; human source; 375px no overflow",
+    "screenshots": "local-materials/phase-1-t053/browser (ignored, visually inspected)",
+    "evidence_scope": "real Chromium with mock HTTP; not real Provider/production-load acceptance"
+  },
+  "historical": {
+    "legacy_original_files_verified": 236,
+    "experiment_files": 64,
+    "evidence_files": 169,
+    "old_dynamic_approval_verified": true,
+    "retired_r11_unchanged": true
+  },
+  "initial_repairs": [
+    "Ruff formatting/import errors and one schema test's missing expected_type argument fixed without lowering assertions",
+    "Post-T044 migration guard regression now verifies the earliest populated protected migration; original no-loss assertion retained",
+    "Legacy dynamic tests run in dedicated mock dynamic process, not the catalog-only server",
+    "Browser mock intercept narrowed from all /api/ substrings to the site's /api/ prefix so it does not intercept /src/api/ modules"
+  ],
+  "formal_denominators": {
+    "generation": 100,
+    "severe": 20,
+    "correct": 20,
+    "long": 10
+  },
+  "formal_slots_run": 0,
+  "provider_requests": 0,
+  "human_course_signoffs": 0,
+  "fee_authorized_micro_cny": 0,
+  "cost_ceiling_micro_cny": null,
+  "benchmark_ground_truth": "all 50 assistant proposals require independent human review",
+  "T040": "blocked",
+  "production_mode": "catalog_only",
+  "real_model_quality": "NOT_TESTED",
+  "deployment": "NOT_PERFORMED"
+}
