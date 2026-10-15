@@ -1,0 +1,46 @@
+{
+  "version": "claim-review-offline-validation-v1",
+  "recorded_at": "2026-10-15T12:21:09",
+  "design_source_commit": "681dca1",
+  "authorization": "User continued the proposed zero-Provider prototype only; no dynamic derivation/real budget authorization.",
+  "synthetic_only": true,
+  "provider_requests": 0,
+  "prototype_tests": 61,
+  "existing_related_tests": 148,
+  "combined_tests": 209,
+  "combined_result": "passed",
+  "ruff": "passed",
+  "production_mypy_source_files": 166,
+  "production_mypy_result": "passed",
+  "prototype_strict_type_check": "NOT_RUN: prototype scripts outside app mypy scope",
+  "history_input_size_screen": "8 of 8 within byte/field limits; claim counts NOT_MEASURED",
+  "source_sha256": {
+    "scripts/acceptance_support/claim_review_prototype.py": "fc45c8185eb0ce75926b12a37675a7c751f013f41b0473a02274da5cfad00a6c",
+    "scripts/measure_t040_claim_inputs.py": "22e0eeb2a8d94ddbf44f3d822259d37f00801a29477eeadb3f9ccb6d2eaf9401",
+    "backend/tests/test_claim_review_prototype.py": "1d29e64eadb89ec71a0e3187dd193e6f0cfdaf7765f3cd00c5ec505c5e00036d"
+  },
+  "r08_frozen_source_files_checked": 186,
+  "r08_ledger_attempts": 1,
+  "r08_ledger_halted": "CONCRETE_DEFECT_MISSED",
+  "prototype_production_registered": false,
+  "live_budget_or_wire_sender_implemented": false,
+  "formal_benchmark_accessed": false,
+  "model_quality_verified": false,
+  "formal_t040_complete": false,
+  "production_mode": "catalog_only",
+  "known_limits": [
+    "Synthetic verdicts cannot prove extraction recall, semantic alignment or factual correctness.",
+    "Prototype JSON/reference checks do not replace formal resource schema, AST or publishing gates.",
+    "No real pricing/tokenization/egress/authorization path; canned counters are not real spend approval.",
+    "K=16 still needs semantic inventory measurement."
+  ],
+  "commands": [
+    "backend/.venv/bin/pytest -q backend/tests/test_claim_review_prototype.py backend/tests/test_review_scope.py backend/tests/test_review_indexing.py backend/tests/test_review_agent.py backend/tests/test_review_failure_paths.py backend/tests/test_deepseek_reasoning.py backend/tests/test_t040_high_plan.py backend/tests/test_t040_diagnostic_runner.py backend/tests/test_t040_diagnostic_preparation.py backend/tests/test_deepseek_responses.py backend/tests/test_phase1_dynamic_gate.py backend/tests/test_acceptance_budget.py",
+    "backend/.venv/bin/ruff check scripts/acceptance_support/claim_review_prototype.py scripts/measure_t040_claim_inputs.py backend/tests/test_claim_review_prototype.py",
+    "backend/.venv/bin/python scripts/measure_t040_claim_inputs.py",
+    "cd backend then .venv/bin/mypy app",
+    "backend/.venv/bin/python scripts/verify_phase1_dynamic_approval.py",
+    "backend/.venv/bin/python scripts/verify_phase1_dynamic_freeze.py",
+    "backend/.venv/bin/python scripts/check_catalog_workflow.py"
+  ]
+}
