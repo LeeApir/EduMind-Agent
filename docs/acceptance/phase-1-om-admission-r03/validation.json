@@ -1,0 +1,70 @@
+{
+  "version": "fixed-check-id-zero-call-validation-v1",
+  "status": "ENGINEERING_REPAIR_VERIFIED_REAL_QUALITY_NOT_RUN",
+  "checks": [
+    {
+      "command": "EDUMIND_CATALOG_TEST_PG_CONTAINER=edumind-phase1-t037-pg backend/.venv/bin/python scripts/run_shared_learning_tests.py --database edumind_catalog_phase1_om_ids03 --dynamic-mock-mode tests/test_learning_plan_persistence.py tests/test_shared_learning_plan.py tests/test_planned_scene_generation.py tests/test_teaching_action_assembly.py tests/test_hybrid_resource_review.py tests/test_hybrid_review_scope.py tests/test_hybrid_review_check_ids.py tests/test_unit_consistency_review.py tests/test_learning_review_cases.py tests/test_learning_review_cli.py tests/test_hybrid_learning_publication.py tests/test_hybrid_learning_operations.py tests/test_om_redesign_acceptance_preparation.py tests/test_learning_closed_loop.py tests/test_quiz_api.py tests/test_markdown_notes_api.py tests/test_paths_api.py tests/test_catalog_mode.py tests/test_catalog_sessions.py tests/test_review_agent.py tests/test_provider_gateway.py tests/test_deepseek_responses.py",
+      "result": "200 passed, zero skips, 9.52s; dedicated real PG with synthetic Gateway/mock HTTP; no actual .env loaded"
+    },
+    {
+      "command": "backend/.venv/bin/pytest -q scripts/tests/test_om_admission.py scripts/tests/test_om_admission_r02.py scripts/tests/test_om_admission_r03.py backend/tests/test_acceptance_budget.py backend/tests/test_deepseek_responses.py backend/tests/test_provider_target.py backend/tests/test_provider_target_policy.py backend/tests/test_t040_diagnostic_preparation.py backend/tests/test_t040_diagnostic_runner.py --tb=short",
+      "result": "194 passed in 1.23s, zero skips; test sets overlap, not combined semantic denominator"
+    },
+    {
+      "command": "backend/.venv/bin/pytest -q backend/tests/test_hybrid_review_check_ids.py --tb=short",
+      "result": "13 passed in 0.06s; includes final exact schema-mismatch/enum assertions for adapter"
+    },
+    {
+      "command": "backend/.venv/bin/mypy backend/app --config-file backend/pyproject.toml",
+      "result": "188 files, no issues"
+    },
+    {
+      "command": "backend/.venv/bin/ruff check backend/app backend/tests scripts/prepare_om_admission_r03.py scripts/run_om_admission_r03.py scripts/tests/test_om_admission_r02.py scripts/tests/test_om_admission_r03.py --fix",
+      "result": "All checks passed; one later test import sorting fixed without behavior change"
+    },
+    {
+      "command": "backend/.venv/bin/python scripts/prepare_om_admission_r03.py --check",
+      "result": "root 81d18bc3c0c166bb33c3ee200543d074930a1166011ec0111313cbec7ccd3238; 4 requests;8706640 micro CNY; authorized0"
+    },
+    {
+      "command": "backend/.venv/bin/python scripts/run_om_admission_r03.py --run-one",
+      "result": "exit2 STOPPED_OR_NOT_AUTHORIZED before Key/DNS/new real ledger"
+    },
+    {
+      "command": "backend/.venv/bin/python docs/acceptance/phase-1-om-redesign/check_contract.py",
+      "result": "12 documents/12 task contracts manifest unchanged"
+    },
+    {
+      "command": "python3 scripts/verify_legacy_archives.py",
+      "result": "236 originals,64 experiments,169 evidence files verified"
+    },
+    {
+      "command": "git diff --check",
+      "result": "passed"
+    }
+  ],
+  "regressions": [
+    "Actual r02 prose result rejected by new outbound schema; historical local route remains needs_human/COVERAGE_INCOMPLETE.",
+    "Duplicate/translated/cross-scope IDs and invented anchors rejected.",
+    "Partial checked coverage with genuine unchecked/unresolved remains representable and routes to human.",
+    "Actual adapter revalidates enum when mock vendor ignores schema; new runner cannot retry failed send or skip exact human continuation."
+  ],
+  "historical_integrity": {
+    "r01_r02_documents_compared_to_3d989ea": 24,
+    "byte_identical": true,
+    "r01_requests": 2,
+    "r01_halt": "SAFETY_FAILURE",
+    "r02_requests": 1,
+    "r02_halt": "INVALID_OUTPUT",
+    "old_r02_current_source_load": "FREEZE_CHANGED before Key/ledger"
+  },
+  "credential_access": "preparation stat metadata only; no real Key bytes read/hashed",
+  "new_provider_requests": 0,
+  "fees_authorized_micro_cny": 0,
+  "r03_real_ledger_exists": false,
+  "labels": "Calibration proposals pending independent human review, not formal holdout.",
+  "T040": "blocked",
+  "production_mode": "catalog_only",
+  "T041_T042": "not_started",
+  "deployment": "not_performed"
+}

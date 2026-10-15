@@ -2259,7 +2259,8 @@
         "backend/app/core/provider_factory.py",
         "docs/ADR/",
         "backend/app/services/learning_policy.py",
-        "docs/agents/review-scope-v4.1.md"
+        "docs/agents/review-scope-v4.1.md",
+        "docs/agents/review-check-ids-v4.2.md"
       ],
       "prd_source": "PRD §3.3、§8.2、§10.2",
       "acceptance_criteria": [
@@ -2307,11 +2308,12 @@
         "2026-10-15用户继续确认首槽实际计划，登记准确plan-human后仅correct-unit实际1次。接口/Schema/模型与实际wire完成，11491输入+650输出=12141tokens；unit/revise被本地route_review拒绝，原结果离线重放REVIEW_PROTOCOL_INVALID。共享Schema允许revise而Prompt未明确unit禁用，本地契约表达不一致；样本只讲求和/边界，图谱含复杂度/插入删除目标，对照自动pass标签存在范围歧义，不能把全部意见算误报；difficulty缺学习者证据等分类另待核对。通用异常器将本地异常记SAFETY_FAILURE，独立账本原样持久停止，不代表Key泄漏。累计2请求/13098输入+1468输出=14566tokens，预留4.301416元/峰值用量参考0.037940元非账单；余2未发、不重试。源码冻结/收据摘要/0600/账本两行与准确人工来源核对，185离线沿用46cf3e9，未改业务代码。证据phase-1-om-admission-r01/results/correct-unit-02.json；T040 blocked/catalog_only。",
         "2026-10-15用户同意继续零调用修复：Prompt版本v4.1与scope投影Schema明确unit禁止revise，保留resource两次修正及本地硬门禁；server review_contract覆盖候选同名字段；澄清用户/单元目标与图谱其他目标，不让计划缩目标逃避用户目标；Prompt/scope加入政策摘要使旧待审按原规则失效。新r02正确对照补完整轨迹教学/对应题，新增同目标遗漏反例，真实安全/事实对照保留；标签待独立复核，不是正式holdout。PG scope02共187 passed零跳过，诊断相关190 passed、Ruff/mypy188、原ADR manifest/236归档通过；原r01全部13文件对f67245e字节一致，原账本两次与SAFETY_FAILURE halt未改；旧准备器/加载器对新源码拒绝，旧测试读取冻结请求并断言拒绝重基线。新r02独立CLI/root/账本/错误映射与4实际wire冻结，新预算8.701900元/8192输出tokens，未批准实跑退出2，无Key读取/新真实账本/DNS。证据phase-1-om-admission-r02/validation.json；本次真实Provider0，不标T040完成，不启动T041。",
         "2026-10-15助手误把之前继续当作新r02明确批准并登记run-approval；自动审批在创建执行进程前拒绝，指出可信对话没有对r02四次/8.701900元/标签的明确批准。未重试或绕过，误登记内容保存approval-correction.json并删除运行批准文件以恢复拒绝状态；r02模型请求/新费用均0，无r02真实账本。先前本轮RESUME中的用户已批准表述由本纠正覆盖，不作为有效授权。等待用户新明确决定，T040 blocked。",
-        "2026-10-15用户在37443c9纠正后的新r02四次/8.701900元/标签明确询问下实际批准，另建有效记录，撤销误登记历史保留。r02首槽correct-unit实际1次完成：unit/pass、无findings/unchecked/unresolved，12416输入+151输出=12567tokens；实际wire/模型/Schema通过。checked返回自然语言而非五个固定必检ID，原结果离线重放needs_human/COVERAGE_INCOMPLETE，正确对照未自动pass触发CONTROL_NOT_AUTO_PASS，新账本INVALID_OUTPUT halt；不属于模型指出事实错误，不能事后把描述映射成ID改分。输出Schema仍允许checked普通字符串而本地精确ID比较的契约缺口待零调用处理。预留2.183058元/高峰未命中用量参考0.026040元非账单，余3未发、不重试；r01原2次/halt保持。源码/收据/0600与账本一条核验，187PG/190离线沿用f4078b4，业务代码未变。证据phase-1-om-admission-r02/results/correct-unit-01.json；T040 blocked/catalog_only。"
+        "2026-10-15用户在37443c9纠正后的新r02四次/8.701900元/标签明确询问下实际批准，另建有效记录，撤销误登记历史保留。r02首槽correct-unit实际1次完成：unit/pass、无findings/unchecked/unresolved，12416输入+151输出=12567tokens；实际wire/模型/Schema通过。checked返回自然语言而非五个固定必检ID，原结果离线重放needs_human/COVERAGE_INCOMPLETE，正确对照未自动pass触发CONTROL_NOT_AUTO_PASS，新账本INVALID_OUTPUT halt；不属于模型指出事实错误，不能事后把描述映射成ID改分。输出Schema仍允许checked普通字符串而本地精确ID比较的契约缺口待零调用处理。预留2.183058元/高峰未命中用量参考0.026040元非账单，余3未发、不重试；r01原2次/halt保持。源码/收据/0600与账本一条核验，187PG/190离线沿用f4078b4，业务代码未变。证据phase-1-om-admission-r02/results/correct-unit-01.json；T040 blocked/catalog_only。",
+        "2026-10-15用户批准继续零调用修复checked ID契约：Prompt v4.2/请求Schema将checked限定scope五ID enum+unique，允许真实部分覆盖/未知，不强制全查；finding.anchors按真实目录enum收窄，原本地范围/覆盖/锚点/安全门禁不放松，规则版本进入政策摘要。用r02原真实prose回归：新Schema拒绝，原结果仍needs_human/COVERAGE_INCOMPLETE，不事后解释成ID改分。真实PG ids03共200 passed零跳过、相关离线194、最终ID回归13/Ruff/mypy188/批准manifest/236归档通过。旧r01/r02共24文件对3d989ea逐字节核验、原账本2/1次和halt未改，旧r02对新源码拒绝。独立新r03同配对家族4请求/528来源冻结，上限8.706640元/8192输出tokens；未批准CLI退出2，Key/DNS/新账本0，真实Provider0。证据phase-1-om-admission-r03/validation.json；新费用/预期待独立批准，正式T040不通过/catalog_only。"
       ],
       "started_at": "2026-10-14T19:38:26",
       "completed_at": null,
-      "blocker": "r02首槽模型unit/pass且无问题，但checked未使用五个固定必检ID，本地needs_human/COVERAGE_INCOMPLETE不满足正确对照自动pass，原账本INVALID_OUTPUT halt，余3不得发。需先零调用统一检查项ID可见契约和本地规则；真实再跑须新冻结批准，正式T040/T041仍未解锁。",
+      "blocker": "checked/anchor ID零调用修复和200PG/194相关回归已过；新r03四请求准确上限8.706640元及校准预期尚未获新明确预算批准，实际调用授权0。原r01/r02 halt保留，正式八类/独立真值/派生执行器/费用门禁未解除。",
       "commit_lookup": "Task-Completed: PHASE-1-T040"
     },
     {

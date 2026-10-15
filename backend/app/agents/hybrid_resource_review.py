@@ -21,7 +21,7 @@ from app.services.learning_contract import (
 from app.services.provider_gateway import ChatMessage, StructuredRequest, TaskProfile, TextRequest
 from app.services.teaching_actions import anchor_catalog
 
-REVIEW_V4_PROMPT = "evidence-resource-review-v4.1"
+REVIEW_V4_PROMPT = "evidence-resource-review-v4.2"
 RESOURCE_CHECKS = {"facts", "code_safety", "learner_fit", "objectives", "reference_scope"}
 UNIT_CHECKS = {
     "terminology",
@@ -58,10 +58,15 @@ A proposed trace is not independent evidence; independently reason through actua
 premises when possible. A reference not certifying this exact example does not by itself
 make a directly checkable calculation unknown. Genuine unverifiable claims remain unresolved.
 An omitted objective is not a fact contradiction without a concrete false statement.
-Do not label an assessment-coverage concern difficulty without explicit learner evidence."""
+Do not label an assessment-coverage concern difficulty without explicit learner evidence.
+coverage.checked contains exact IDs copied from mandatory_checks, never prose descriptions,
+translations or invented IDs, and no duplicates. List only checks actually performed.
+Describe checks that could not be completed in unchecked/unresolved; do not claim they were
+completed just to fill the checklist. pass requires all mandatory IDs and no uncertainty.
+Finding anchors must be actual supplied anchor_catalog IDs; never invent or translate them."""
 
 
-def review_output_schema(scope: str) -> dict[str, Any]:
+def review_output_schema(scope: str, *, anchor_ids: list[str] | None = None) -> dict[str, Any]:
     """Project the approved cross-field scope rule into the model-visible schema."""
     if scope not in ("resource", "unit"):
         raise LearningContractError("REVIEW_PROTOCOL_INVALID")
@@ -69,7 +74,17 @@ def review_output_schema(scope: str) -> dict[str, Any]:
     schema["properties"]["scope"] = {"const": scope}
     if scope == "unit":
         schema["properties"]["verdict"]["enum"] = ["pass", "reject", "needs_human"]
+    checks = sorted(UNIT_CHECKS if scope == "unit" else RESOURCE_CHECKS)
+    checked = schema["properties"]["coverage"]["properties"]["checked"]
+    checked.update(items={"type": "string", "enum": checks}, uniqueItems=True, maxItems=len(checks))
     schema["$defs"] = deepcopy(SCHEMA["$defs"])
+    if anchor_ids is not None:
+        if not anchor_ids or len(set(anchor_ids)) != len(anchor_ids):
+            raise LearningContractError("REVIEW_ANCHOR_INVALID")
+        schema["$defs"]["finding"]["properties"]["anchors"]["items"] = {
+            "type": "string",
+            "enum": list(anchor_ids),
+        }
     return schema
 
 
@@ -136,10 +151,12 @@ async def review_once(
     candidates: tuple[SceneCandidate, ...],
     scope: str = "resource",
 ) -> dict[str, Any]:
-    schema = review_output_schema(scope)
+    if scope not in ("resource", "unit"):
+        raise LearningContractError("REVIEW_PROTOCOL_INVALID")
     for c in candidates:
         hard_checks(c)
     catalog = anchor_catalog(candidates)
+    schema = review_output_schema(scope, anchor_ids=[a["anchor_id"] for a in catalog])
     checks = RESOURCE_CHECKS if scope == "resource" else UNIT_CHECKS
     data = {
         **deepcopy(payload),

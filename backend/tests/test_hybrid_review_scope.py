@@ -23,6 +23,8 @@ from app.services.learning_contract import SCHEMA, LearningContractError
 def test_outbound_schema_matches_scope_and_preserves_resource_corrections(scope, verdict):
     before = deepcopy(SCHEMA)
     value = answer(verdict, scope)
+    if scope == "unit":
+        value["coverage"]["checked"] = sorted(UNIT_CHECKS)
     schema = review_output_schema(scope)
     Draft202012Validator.check_schema(schema)
     validator = Draft202012Validator(schema)
@@ -65,7 +67,7 @@ def test_real_request_cannot_accept_a_candidate_supplied_scope_override():
         assert "revise" not in request.json_schema["properties"]["verdict"]["enum"]
         assert data["plan"] == w.plan
         assert data["reference_context"] == w.reference_context
-        assert result["prompt_version"] == "evidence-resource-review-v4.1"
+        assert result["prompt_version"] == "evidence-resource-review-v4.2"
         assert result["local_routing"]["verdict"] == "pass"
 
     asyncio.run(check())
