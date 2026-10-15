@@ -64,3 +64,5 @@
 2026-10-15 后续：完成[派生发送组合离线验证](../acceptance/phase-1-t040-derived-calibration-draft/README.md)，311项离线通过，补齐模型可复制的块/身份摘要；两例最多38次草案仍DRAFT_NOT_EXECUTABLE，Token/费用证明、真实审批/当前凭据同意和事实签核组合待补，真实Provider0，未新增架构或付费批准。
 
 2026-10-15 后续：[r09两例运行准备](../acceptance/phase-1-t040-derived-calibration-r09/README.md)完成：供应商整窗契约界、单步审批/凭据文件版本及逐例人工事实门禁，339项离线通过。准确根最多38次/CNY120.149000尚待真实预算批准；非预计消费、非账户硬限额，无模型调用，不改变ADR批准或T040状态。
+
+2026-10-15 实际结果：用户yes批准dff3a06 r09准确根/38次/CNY120.149000后，仅首条声明提取请求实际发送；3932输入/8192总输出（推理8192）、无合格清单，INVALID_OUTPUT停止，余37未发。见[r09结果](../acceptance/phase-1-t040-derived-calibration-r09/results/r09.json)。不误记事实漏检或质量通过、不恢复旧失败；T040仍blocked，none/catalog_only保持。

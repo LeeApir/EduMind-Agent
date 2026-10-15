@@ -1,0 +1,80 @@
+{
+  "version": "derived-calibration-r09-result-v1",
+  "recorded_at": "2026-10-15T13:31:41",
+  "executed_source_commit": "dff3a06",
+  "root_sha256": "9fafc55d9034be4f6958004a921a2ec8bcf0972bb379d95a84b0bd7e6cab8db4",
+  "approval_sha256": "f10bc0c49b966453d79ab8e3a722ec15a7c558e2db3f375456fb2349baac2d65",
+  "run_id": "t040-derived-calibration-r09",
+  "state": "HALTED_INVALID_OUTPUT",
+  "real_cloud": true,
+  "mock": false,
+  "attempts_sent": 1,
+  "potential_request_cap": 38,
+  "remaining_slots_not_sent": 37,
+  "resources": {
+    "queue-error": "FAILED_INVENTORY_OUTPUT",
+    "correct-control": "NOT_RUN"
+  },
+  "request": {
+    "slot": "queue-error.r0.inventory.0",
+    "stage": "inventory",
+    "model": "deepseek-flash",
+    "reasoning_effort": "low",
+    "max_output_tokens_including_reasoning": 8192,
+    "wire_sha256": "af7b1b70d8960eab671f60dc1bda45bc1327ac8a8f6ca04c2c7109aa8d235a8e",
+    "wire_bytes": 12914,
+    "parent_attempts": []
+  },
+  "observation": {
+    "error_code": "INVALID_OUTPUT",
+    "http_status": null,
+    "response_status": null,
+    "observed_model_id": null,
+    "input_tokens": 3932,
+    "output_tokens": 8192,
+    "reasoning_tokens": 8192,
+    "total_tokens": 12124,
+    "output_limit_reached": true,
+    "response_sha256": "0ffafb650855735cda652f1ca34e44105fc7220608581534745937af1b348249",
+    "retained_normalized_result_sha256": null,
+    "reasoning_or_raw_response_retained": false
+  },
+  "interpretation": "Reported output reached 8192 and all 8192 were reasoning; no valid retained inventory. This supports output budget spent on reasoning, but precise upstream completion/failure cause and status were not retained. Not a concrete-defect miss or quality pass.",
+  "cost": {
+    "currency": "CNY",
+    "group_authorized_cap_micro": 120149000,
+    "attempt_reserved_micro": 2188516,
+    "peak_list_price_usage_reference_micro": 73400,
+    "actual_bill": null,
+    "unused_reservations_not_transferred": true
+  },
+  "timing": {
+    "reservation_to_last_gate_seconds_derived": 30.801921,
+    "duration_is_derived_not_instrumented_http_latency": true
+  },
+  "verification": {
+    "frozen_source_files_checked": 202,
+    "wire_matches_frozen_body": true,
+    "sqlite_attempt_count": 1,
+    "ledger_mode_private": true,
+    "r08_sources_checked": 186,
+    "r08_attempt_count_unchanged": 1,
+    "r08_halted_unchanged": "CONCRETE_DEFECT_MISSED",
+    "prior_offline_tests": 339,
+    "prior_offline_source_commit": "dff3a06",
+    "business_tests_rerun": false,
+    "business_code_changed": false,
+    "runtime_housekeeping": "Added root runtime lock to .gitignore; lock retained locally, not deleted or committed; frozen execution sources unchanged."
+  },
+  "human_fact_confirmed": false,
+  "claim_extraction_complete": false,
+  "semantic_quality_evaluated": false,
+  "correction_run": false,
+  "formal_quality_run": false,
+  "dsl_run": false,
+  "t041_run": false,
+  "production_mode": "catalog_only",
+  "production_reasoning_default": "none",
+  "t040_complete": false,
+  "stop_policy": "Do not retry, resume halted run, shift remaining quota, or advance correct control. New strategy and independent run approval required."
+}
