@@ -50,7 +50,7 @@ do not demand that each short resource cover every listed objective or misconcep
 If reference context is absent, do not pretend to have checked graph or learner fit.
 Return only the requested JSON review. Do not pass a resource with any unresolved issue."""
 
-REVIEW_INSTRUCTION_VERSION = "resource-review-instructions-v5"
+REVIEW_INSTRUCTION_VERSION = "resource-review-instructions-v6"
 CORRECTION_INSTRUCTION_VERSION = "resource-correction-instructions-v2"
 
 
@@ -106,6 +106,18 @@ def review_contract_instructions() -> str:
         "or text is valid evidence; do not demand redundant declarations or reject a "
         "correct zero-based, one-based or sentinel-based formulation. Report the actual "
         "consequence without inventing memory-safety impact from a notation issue alone.\n"
+        "Claim-coverage audit: check every explicit quantitative claim, formula, state "
+        "predicate and operation rule in the candidate against its stated representation "
+        "and embedded implementation. Check each claim independently on applicable "
+        "normal, boundary and failure states. Finding one error is not a reason to stop "
+        "checking the remaining claims or to assume related claims are correct. "
+        "Before returning, check that every distinct concrete defect found is reported; "
+        "do not truncate the findings to a single representative error. Distinct false "
+        "claims need their own located conditions or counterexamples, even when they "
+        "share a cause. Avoid duplicate descriptions of the same defect. This is an "
+        "audit of claims actually made, not a requirement to add missing course topics "
+        "or to invent a fixed number of issues. Keep the coverage check internal and "
+        "return only the existing review schema; a correct resource still passes.\n"
         "Findings-only scope: each issue describes an existing defect, its location, "
         "triggering condition and a brief concrete counterexample or consequence. "
         "You may quote candidate code or formulas to locate an error and use numeric "

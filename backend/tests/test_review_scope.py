@@ -124,7 +124,8 @@ def test_r07_changes_only_effort_with_new_budget_and_same_frozen_axes(monkeypatc
         for name in ("BASE", "RAW", "ROUND", "GROUP", "CASE_IDS"):
             context.setattr(scope, name, getattr(scope, name))
         scope.select_round("r07")
-        bodies, plan = asyncio.run(scope.proposed())
+        bodies = json.loads((scope.BASE / "requests.json").read_text())
+        plan = json.loads((scope.BASE / "proposal.json").read_text())
         prior_base = scope.ROOT / "docs/acceptance/phase-1-t040-review-scope-check"
         prior = json.loads((prior_base / "requests.json").read_text())
         prior_plan = json.loads((prior_base / "proposal.json").read_text())
@@ -143,3 +144,70 @@ def test_r07_changes_only_effort_with_new_budget_and_same_frozen_axes(monkeypatc
         assert not plan["old_budget_transferred"]
         assert not plan["formal_quality_authorized"]
         assert plan["previous_failed_result"].endswith("review-scope-r06.json")
+
+
+def test_multiple_independent_findings_reach_correction_then_full_re_review():
+    issues = [
+        {
+            "area": "fact",
+            "severity": "major",
+            "message": "The stated operation count fails on the first item.",
+        },
+        {
+            "area": "fact",
+            "severity": "major",
+            "message": "A distinct claimed predicate fails at the final item.",
+        },
+    ]
+    corrected = {
+        "resource_type": "explanation",
+        "prompt_version": "learning-resources-v1",
+        "content": {"markdown": "A corrected resource covering both independent claims."},
+    }
+    gateway = Gateway(
+        [verdict("revise", issues), StructuredResult(corrected, "correction"), verdict("pass")]
+    )
+    outcome = asyncio.run(ReviewAgent(gateway).review(candidate()))
+    assert outcome.approved and outcome.correction_attempts == 1
+    assert len(gateway.requests) == 3
+    correction_input = gateway.requests[1].prompt.messages[1].content
+    assert json.loads(correction_input.split("Correct only these review issues: ", 1)[1]) == issues
+    assert (
+        json.loads(gateway.requests[2].prompt.messages[1].content)["content"]
+        == corrected["content"]
+    )
+    system = gateway.requests[0].prompt.messages[0].content
+    assert "Finding one error is not a reason to stop" in system
+    assert "do not truncate the findings to a single representative error" in system
+    assert "not a requirement to add missing course topics" in system
+    assert "invent a fixed number of issues" in system
+    assert "Findings-only scope" in system
+    # Synthetic findings test the pipeline, never model recall or factual quality.
+
+
+def test_r08_uses_current_production_prompt_with_frozen_candidate_and_scoring(monkeypatch):
+    with monkeypatch.context() as context:
+        for name in ("BASE", "RAW", "ROUND", "GROUP", "CASE_IDS"):
+            context.setattr(scope, name, getattr(scope, name))
+        scope.select_round("r08")
+        bodies, plan = asyncio.run(scope.proposed())
+        baseline = scope.ROOT / "docs/acceptance/phase-1-t040-review-scope-low"
+        prior = json.loads((baseline / "requests.json").read_text())
+        prior_plan = json.loads((baseline / "proposal.json").read_text())
+        for slot, body in bodies.items():
+            old = prior[slot]
+            assert body["input"][0]["content"] != old["input"][0]["content"]
+            assert "resource-review-instructions-v6" in body["input"][0]["content"]
+            assert body["input"][1:] == old["input"][1:]
+            assert {k: v for k, v in body.items() if k != "input"} == {
+                k: v for k, v in old.items() if k != "input"
+            }
+        assert scope.BASE != baseline
+        assert str(scope.RAW).endswith("review-coverage-check")
+        assert plan["evaluation_axes"] == prior_plan["evaluation_axes"]
+        assert plan["review_instruction_version"] == "resource-review-instructions-v6"
+        assert plan["reasoning_effort"] == "low"
+        assert plan["requested_total_calls"] == 2
+        assert plan["provider_requests_authorized"] == 0
+        assert not plan["old_budget_transferred"] and not plan["formal_quality_authorized"]
+        assert plan["previous_failed_result"].endswith("review-scope-r07.json")

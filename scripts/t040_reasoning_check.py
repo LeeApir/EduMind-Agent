@@ -21,16 +21,19 @@ CASE_IDS = ("linked-list-concept:explanation:1", "correct-list-concept")
 
 def select_round(round_id):
     global BASE, RAW, ROUND, GROUP, CASE_IDS
-    if round_id not in {"r03", "r06", "r07"}:
+    if round_id not in {"r03", "r06", "r07", "r08"}:
         raise GateFailure("INVALID_FREEZE")
     ROUND = round_id
-    if round_id in {"r06", "r07"}:
+    if round_id in {"r06", "r07", "r08"}:
         BASE = ROOT / "docs/acceptance/phase-1-t040-review-scope-check"
         RAW = ROOT / "local-materials/phase-1-t040-review-scope-check"
         GROUP = "review_scope"
         if round_id == "r07":
             BASE = ROOT / "docs/acceptance/phase-1-t040-review-scope-low"
             RAW = ROOT / "local-materials/phase-1-t040-review-scope-low"
+        if round_id == "r08":
+            BASE = ROOT / "docs/acceptance/phase-1-t040-review-coverage-check"
+            RAW = ROOT / "local-materials/phase-1-t040-review-coverage-check"
         CASE_IDS = ("queue:explanation:1", "correct-list-concept")
     else:
         BASE = ROOT / "docs/acceptance/phase-1-t040-reasoning-check"
@@ -45,7 +48,7 @@ async def proposed():
     bodies, rows = {}, []
     for index, case in enumerate(selected, 1):
         body = await preparation.capture_case(case)
-        body["reasoning"] = {"effort": "low" if ROUND == "r07" else "high"}
+        body["reasoning"] = {"effort": "low" if ROUND in {"r07", "r08"} else "high"}
         body["max_output_tokens"] = 8192
         slot = f"{GROUP}:{index:02}"
         bodies[slot] = body
@@ -74,7 +77,7 @@ async def proposed():
         "base_url": "https://api.deepseek.com",
         "transport": "responses_json_schema",
         "adapter": "DeepSeekResponsesAdapter",
-        "reasoning_effort": "low" if ROUND == "r07" else "high",
+        "reasoning_effort": "low" if ROUND in {"r07", "r08"} else "high",
         "review_instruction_version": REVIEW_INSTRUCTION_VERSION,
         "temperature": 0,
         "temperature_effect": "Ignored by provider in thinking mode.",
@@ -119,7 +122,7 @@ async def proposed():
         "human_factual_signoff_inferred": False,
         "old_budget_transferred": False,
     }
-    if ROUND in {"r06", "r07"}:
+    if ROUND in {"r06", "r07", "r08"}:
         plan.update(
             version="t040-review-findings-scope-proposal-v1",
             scope="Findings-only review calibration. Does not replace any full diagnostic group.",
@@ -141,6 +144,13 @@ async def proposed():
             comparison_limits="Only reasoning effort changes from r06 high to low; two samples cannot establish reliability or unique causation.",
             hypothesis="Lower reasoning effort may finish within the unchanged total output cap; this does not guarantee completion or defect detection.",
             diagnostic_metadata="Persist only allowlisted status/incomplete reason/output item type counts; no vendor error text or reasoning text.",
+        )
+    if ROUND == "r08":
+        plan.update(
+            version="t040-review-claim-coverage-proposal-v1",
+            previous_failed_result="docs/acceptance/phase-1-t040-review-scope-low/results/review-scope-r07.json",
+            comparison_limits="Only the review system instruction changes from frozen r07 v5 to v6; low, candidate, schema, output cap and deadline stay fixed. Two cases do not establish reliability or causality.",
+            hypothesis="Explicitly continuing through independent claims may improve coverage; no model-quality result is inferred from offline prompt checks.",
         )
     return bodies, plan
 
@@ -170,7 +180,7 @@ def write_proposal():
         ROOT / "docs/acceptance/phase-1-deepseek-connection-v1/results/r01.json",
         ROOT / "docs/acceptance/phase-1-t040-deepseek-v2/results/diagnostic-r02.json",
     ]
-    if ROUND in {"r06", "r07"}:
+    if ROUND in {"r06", "r07", "r08"}:
         paths += [
             ROOT / "backend/tests/test_review_scope.py",
             ROOT / plan["previous_failed_result"],
@@ -216,7 +226,7 @@ def configure_execution():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--round", choices=("r03", "r06", "r07"), default="r03")
+    parser.add_argument("--round", choices=("r03", "r06", "r07", "r08"), default="r03")
     group = parser.add_mutually_exclusive_group(required=True)
     for name in ("write-proposal", "check-proposal", "freeze", "run-one"):
         group.add_argument("--" + name, action="store_true")
