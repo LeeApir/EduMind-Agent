@@ -1,5 +1,6 @@
 """Evidence-bound v4 review; model conclusions never become publication flags."""
 
+from collections.abc import Awaitable, Callable
 from copy import deepcopy
 from datetime import datetime, timezone
 from typing import Any
@@ -158,11 +159,18 @@ async def review_once(
 
 
 async def review_resource(
-    gateway: StructuredResourceGateway, window: CallWindow, workspace: PlannedScenes, role: str
+    gateway: StructuredResourceGateway,
+    window: CallWindow,
+    workspace: PlannedScenes,
+    role: str,
+    on_candidate: Callable[[PlannedScenes], Awaitable[None]] | None = None,
+    on_review: Callable[[dict[str, Any]], Awaitable[None]] | None = None,
 ) -> tuple[dict[str, Any], ...]:
     history = []
     for correction in range(3):
         candidate = next(c for c in workspace.candidates() if c.role == role)
+        if on_candidate is not None:
+            await on_candidate(workspace)
         record = await review_once(
             gateway,
             window,
@@ -179,6 +187,8 @@ async def review_resource(
         route = record["local_routing"]["verdict"]
         if route != "revise":
             workspace.disposition(role, candidate.id, route)
+            if on_review is not None:
+                await on_review(record)
             return tuple(history)
         if correction == 2:
             record["local_routing"] = {
@@ -187,7 +197,11 @@ async def review_resource(
                 "policy_version": "hybrid-review-v1",
             }
             workspace.disposition(role, candidate.id, "needs_human")
+            if on_review is not None:
+                await on_review(record)
             return tuple(history)
+        if on_review is not None:
+            await on_review(record)
         context = workspace.context(
             role, {"findings": record["result"]["findings"], "candidate": candidate.payload()}
         )

@@ -104,6 +104,12 @@ async def run(args):
                 reason=args.reason,
                 idempotency_key=args.idempotency_key,
             )
+            if decision.verdict == "approve":
+                from app.services.hybrid_learning_publication import (
+                    publish_approved_case,
+                )
+
+                await publish_approved_case(db, owner_id=case.user_id, case_id=case.id)
             await db.commit()
             return {
                 "case_id": str(case.id),

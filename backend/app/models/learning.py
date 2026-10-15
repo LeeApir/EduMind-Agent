@@ -107,6 +107,7 @@ class LearningUnit(Base):
     user_id: Mapped[UUID] = mapped_column(
         PostgreSQLUUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
+    current_publication_id: Mapped[UUID | None] = mapped_column(PostgreSQLUUID(as_uuid=True))
     catalog_release_id: Mapped[UUID | None] = mapped_column(
         PostgreSQLUUID(as_uuid=True), ForeignKey("catalog_releases.id")
     )
@@ -152,6 +153,9 @@ class LearningOperation(Base):
     )
     published_scene_version: Mapped[int | None] = mapped_column(Integer)
     error: Mapped[dict[str, object] | None] = mapped_column(JSONB)
+    publication_expectation: Mapped[dict[str, object] | None] = mapped_column(JSONB)
+    generation_call_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    generation_deadline: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     canceled_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)

@@ -51,6 +51,14 @@ async def invalidate_case(db: AsyncSession, case: LearningReviewCase) -> None:
             "message": "Review case expired.",
             "retryable": False,
         }
+    if op and op.publication_expectation:
+        from app.models.classroom import ClassroomOperation
+
+        parent = await db.get(
+            ClassroomOperation, UUID(str(op.publication_expectation["classroom_operation_id"]))
+        )
+        if parent and parent.status in ("accepted", "running", "awaiting_human"):
+            parent.status = "cancelled" if op.status == "canceled" else "failed"
 
 
 async def case_current(db: AsyncSession, case: LearningReviewCase) -> bool:
@@ -76,6 +84,8 @@ async def case_current(db: AsyncSession, case: LearningReviewCase) -> bool:
         or latest != plan.version
         or payload["material"]["binding"]["policy_digest"] != plan.policy_digest
     ):
+        return False
+    if not await operation_context_current(db, op):
         return False
     restore_material(payload["material"])
     return True
@@ -243,3 +253,33 @@ async def cancel_review_operation(db: AsyncSession, *, owner_id: UUID, operation
         await invalidate_case(db, case)
     await db.flush()
     return True
+
+
+async def operation_context_current(db: AsyncSession, op: LearningOperation) -> bool:
+    if op.publication_expectation is None:
+        return True
+    from app.models.classroom import ClassroomOperation, ClassroomSession
+
+    expected = op.publication_expectation
+    session = await db.scalar(
+        select(ClassroomSession)
+        .where(
+            ClassroomSession.user_id == op.user_id,
+            ClassroomSession.learning_unit_id == op.learning_unit_id,
+        )
+        .execution_options(populate_existing=True)
+    )
+    classroom_op = await db.get(
+        ClassroomOperation, UUID(str(expected["classroom_operation_id"])), populate_existing=True
+    )
+    if (
+        not session
+        or not classroom_op
+        or classroom_op.status not in ("accepted", "running", "awaiting_human")
+    ):
+        return False
+    return (
+        session.revision == expected["revision"]
+        and str(session.generation_id) == expected["generation_id"]
+        and session.publication_version == expected["publication_version"]
+    )

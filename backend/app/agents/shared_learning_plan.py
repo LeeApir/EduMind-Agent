@@ -2,6 +2,7 @@
 
 import asyncio
 import time
+from collections.abc import Awaitable, Callable
 from copy import deepcopy
 from dataclasses import dataclass, field
 from typing import Any
@@ -32,12 +33,15 @@ class CallWindow:
     deadline: float = field(default_factory=lambda: time.monotonic() + 180)
     limit: int = 20
     used: int = 0
+    reserve: Callable[[], Awaitable[None]] | None = None
 
     async def send(self, gateway: StructuredResourceGateway, request: StructuredRequest) -> Any:
         remaining = self.deadline - time.monotonic()
         if self.limit not in (20, 22) or self.used >= self.limit or remaining <= 0:
             raise LearningContractError("GENERATION_LIMIT_EXCEEDED")
         # A failed/canceled request consumes a slot. No retry_safe or fallback opt-in.
+        if self.reserve is not None:
+            await self.reserve()
         self.used += 1
         async with asyncio.timeout(min(60, remaining)):
             return await gateway.generate_structured(request, retry_safe=False)
@@ -49,6 +53,7 @@ class PlanInputs:
     references: dict[str, Any]
     node_ids: frozenset[str]
     learner_evidence: dict[str, Any]
+    reference_context: object = None
 
     def snapshot(self) -> dict[str, Any]:
         value = deepcopy(

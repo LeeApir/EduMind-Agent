@@ -18,6 +18,15 @@ async def animation_target_approved(
     unit = await visible_unit(db, owner_id, unit_id)
     if unit is None:
         return False
+    if unit.catalog_release_id is None and unit.current_publication_id is not None:
+        from app.services.hybrid_learning_publication import current_publication
+        publication = await current_publication(db, owner_id=owner_id, unit_id=unit_id)
+        if publication is None:
+            return False
+        scenes = publication.material["scenes"]
+        assert isinstance(scenes, list)
+        return any(isinstance(s, dict) and s["scene_id"] == str(scene_id)
+                   and s["scene_version"] == scene_version for s in scenes)
     if unit.catalog_release_id is None:
         return True  # Keep the original dynamic publication rules in explicit dynamic mode.
     release = await db.get(CatalogRelease, unit.catalog_release_id,

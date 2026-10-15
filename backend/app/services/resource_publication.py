@@ -66,7 +66,7 @@ async def record_reviewed_resource(
     scene = await _owned_scene(
         db, owner_id=owner_id, learning_unit_id=learning_unit_id, scene_id=scene_id
     )
-    if scene is None:
+    if scene is None or scene.plan_id is not None:
         raise ResourcePublicationError
 
     latest_version = await db.scalar(

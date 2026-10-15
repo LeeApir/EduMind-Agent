@@ -2726,7 +2726,7 @@
       "id": "PHASE-1-T052",
       "phase": "Phase 1",
       "title": "按自动或人工证据原子发布完整单元",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1-T051"
@@ -2753,9 +2753,11 @@
         "python3 scripts/check_catalog_workflow.py",
         "git diff --check"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "完成0029完整发布/撤回快照、current指针/课堂publication_version与持久调用计数截止；私有候选和审核逐步持久化，模型等待无DB事务；自动/准确人工案件一次事务发布，审批失败回滚；新旧intro/三场景取材/重解释全链复审/换示例重建/旧版保留及CAS拒绝，旧单场景发布器拒绝planned | PG om52b迁移往返、最终50新旧回归零跳过（含审批发布取消竞争/无长事务/撤回/历史读取），Ruff/app mypy185/工作流/批准manifest/diff及自查通过；修复完整重放绑定与保留失败审计；真实Provider0 | 服务已具备完整发布和重解释，API/SSE及UI接线由T053；真实费用轮次未授权，T040仍blocked | 独立完成提交后领取T053接口与界面，不push/merge"
+      ],
+      "started_at": "2026-10-15T19:20:11",
+      "completed_at": "2026-10-15T19:33:46",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T052",
       "execution_gate": "ADR-0015 A–D与更新manifest已获用户明确批准，仅按依赖串行实施和零Provider测试；真实调用/费用/生产开放另批。",

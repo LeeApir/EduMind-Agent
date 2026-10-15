@@ -61,3 +61,32 @@ canceled, other unfinished operations fail REVIEW_CASE_INVALIDATED. No publicati
 occurs in the decision service. Actual PG om50: migration empty roundtrip and 16 tests
 passed, including concurrent replay and approval/cancellation. One test import omission
 was corrected without changing its assertions. Ruff and application mypy180 passed.
+
+T052: Alembic 0029 adds immutable publication/withdrawal snapshots, a current-publication
+pointer, classroom publication_version and durable call counts/deadlines. The complete
+pipeline commits private candidates and automatic audits between model stages, outside
+network waits. A shared 20-call/180-second window reserves a durable slot before each
+request; failure never refunds it and replay never restarts generation. Optional initial
+profile/preview calls are not part of this service. Real acceptance still needs its own
+approved monetary envelope and a budgeted gateway; no live run is authorized here.
+
+Automatic qualification or an exact eligible human decision atomically publishes all
+three resources/scenes, records approval_source, advances the pointer and classroom CAS,
+and completes the operation. CLI approval shares this transaction. Public resource,
+quiz/export/path and template qualification use complete publication provenance; private
+candidates remain inaccessible. Legacy intro publication and curated signatures remain.
+
+Planned reexplanation takes associated code/language from one snapshot: simpler/deeper
+reuse the plan but bind new resource IDs and re-review all three; another_example must
+change the example and rebuild the plan/resources. New operations invalidate old pending
+cases. Waiting/failure keeps the old complete snapshot; historical resources retain their
+own IDs. Classroom revision/generation changes reject late publication. Planned calls
+are prepared as services here; T053 wires their API/SSE paths and UI.
+
+Validation: isolated om52b migration empty roundtrip; final 50 PG tests passed, zero
+skips, including legacy speech/control/reexplanation, populated downgrade refusal,
+rollback, cancellation/publication race, exact resource reads and withdrawal. Initial
+legacy tests used catalog_only and correctly returned 404; rerun in the isolated dynamic
+mock-test process passed, without changing server configuration or assertions. The old
+stage-pinned migration test now checks the first populated protective migration and
+unchanged head, as newer protected tables precede 0026. Ruff/mypy185 passed; Provider 0.

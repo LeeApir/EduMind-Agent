@@ -60,6 +60,7 @@ class ClassroomSession(Base):
         PostgreSQLUUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
     learning_unit_id: Mapped[UUID] = mapped_column(PostgreSQLUUID(as_uuid=True), nullable=False)
+    publication_version: Mapped[int | None] = mapped_column(Integer)
     scene_key: Mapped[str] = mapped_column(String(64), nullable=False)
     scene_version: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
     scene_progress: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
@@ -101,7 +102,7 @@ class ClassroomOperation(Base):
         ),
         CheckConstraint(
             "status IN ('accepted', 'running', 'published', 'failed', 'cancelled', "
-            "'superseded')",
+            "'superseded', 'awaiting_human', 'rejected')",
             name="ck_classroom_operations_status",
         ),
         CheckConstraint(

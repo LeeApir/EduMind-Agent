@@ -71,6 +71,10 @@ async def _has_resource(
             )
             .limit(1)
         ) is not None
+    if scene.plan_id is not None:
+        from app.services.owned_learning import published_scenes
+        pairs = await published_scenes(db, owner_id, unit_id)
+        return any(r.resource_type == resource_type for _, r in pairs)
     return await db.scalar(
         select(GeneratedResource.id).where(
             GeneratedResource.user_id == owner_id,
@@ -87,6 +91,8 @@ async def _next_scene(
     db: AsyncSession, *, owner_id: UUID, unit_id: UUID,
     current: LearningScene,
 ) -> LearningScene | None:
+    if current.plan_id is not None:
+        return None
     return cast(LearningScene | None, await db.scalar(
         select(LearningScene)
         .where(

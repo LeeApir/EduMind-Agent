@@ -162,6 +162,18 @@ def test_plan_persistence_and_database_guards() -> None:
                 assert loaded and loaded.plan_json == PLAN
                 old = await db.get(LearningScene, sid)
                 assert old and old.plan_id is None and old.scene_key == "intro"
+            async with factory() as db:
+                before_revision = await db.scalar(text("SELECT version_num FROM alembic_version"))
+                expected_guard = "planned data prevents downgrade"
+                for table, message in [
+                    ("learning_publications", "publication data prevents downgrade"),
+                    ("learning_review_cases", "review cases prevent downgrade"),
+                    ("learning_review_records", "review data prevents downgrade"),
+                ]:
+                    exists = await db.scalar(text("SELECT to_regclass(:name)"), {"name": table})
+                    if exists and await db.scalar(text(f"SELECT count(*) FROM {table}")):
+                        expected_guard = message
+                        break
             result = subprocess.run(
                 [sys.executable, "-m", "alembic", "downgrade", "0025_animation_dsl_media"],
                 cwd=ROOT / "backend",
@@ -169,10 +181,11 @@ def test_plan_persistence_and_database_guards() -> None:
                 text=True,
             )
             assert result.returncode != 0
-            assert "planned data prevents downgrade" in result.stderr
+            assert expected_guard in result.stderr
             async with factory() as db:
-                assert await db.scalar(text("SELECT version_num FROM alembic_version")) == (
-                    "0026_learning_plans"
+                assert (
+                    await db.scalar(text("SELECT version_num FROM alembic_version"))
+                    == before_revision
                 )
         finally:
             await engine.dispose()

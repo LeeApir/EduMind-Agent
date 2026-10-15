@@ -30,7 +30,8 @@ resources, actions, reference context and four automatic reviews on the trusted 
 Exports are explicit 0600 new files, never overwritten. The CLI never runs model/code,
 reads Provider keys or grants approval from a supplied passed=true file. A changed,
 canceled, expired or cross-owner case fails; same exact decision key replays its receipt.
-This step records the decision; T052 integrates the atomic publication transaction.
+T052 now records approval and publishes the complete unit in the same short locked transaction.
+If publication qualification fails, the new approval is rolled back; reject remains a terminal decision.
 
 Validation: CLI --help, Ruff, app mypy181; 9 actual PG/identity/export/case tests passed
 in isolated om50, no skips. Only synthetic lifecycle records were created; Provider 0.
