@@ -4,7 +4,7 @@
 
 ## 当前新提案：OM式生成与混合审核
 
-2026-10-15用户选择参照OM重构生成、保留自动审核，并将无法可靠判断的内容交人工。[ADR-0015](0015-shared-plan-and-hybrid-review.md) A–D及[准确附件](../acceptance/phase-1-om-redesign/proposal-manifest.json)为Proposed：共享计划/三个场景/受约束动作，语义审核及人工路由，计划与案件持久化/维护CLI/原子发布/API状态，以及分层验收和仅新链路的诊断补充。T043只交付设计，T044–T054待具体批准后实施；方向选择不是本文A–D的批准，真实预算0、catalog_only保持，T040旧路线及历史失败不恢复。
+2026-10-15用户选择参照OM重构生成、保留自动审核，并将无法可靠判断的内容交人工。[ADR-0015](0015-shared-plan-and-hybrid-review.md) A–D及[准确附件](../acceptance/phase-1-om-redesign/proposal-manifest.json)已按本次用户要求补齐契约/兼容并获A–D批准：共享计划/三个场景/受约束动作，语义审核及人工路由，计划与案件持久化/维护CLI/原子发布/API状态，以及分层验收和仅新链路的诊断补充。T043只交付设计，T044–T054按依赖零调用实施；准确批准见[登记](0015-approval-20261015.json)，真实预算0、catalog_only保持，T040旧路线及历史失败不恢复。
 
 | ADR | 当前状态 | 已确定内容 | 仍待决定 |
 | --- | --- | --- | --- |

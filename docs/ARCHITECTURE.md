@@ -25,11 +25,11 @@ T024的`animation_dsl_compiler`仅通过AST构造固定Manim `DSLScene.construct
 T025通过`animation_dsl_review`和服务端`SelectedDSLReviewGateway`将完整DSL/可信轨迹/≤8KiB版本化参考交给T012实际review档位，单次60秒、不隐式回退；生成Python不发送或执行。严格审核输出与动作索引/安全文字检查失败返回`DSL_REVIEW_UNAVAILABLE`，与事实reject分开。`0023_animation_dsl_reviews`建立owner/单元/场景版本复合外键、pass绑定与内容摘要插入复核、不可变候选/审核/政策，以及追加撤回记录；失败仅存固定类别/索引/摘要，不存未审核文字。已有审核数据的迁移降级拒绝，正常owner学习数据删除可级联。当前政策须受信维护代码显式登记，读/存不自动复活；资格检查刷新当前课程/场景/参考/图谱及政策，锁顺序遵守ADR-0010。详见[运行审核材料](../data/animation_dsl/review-v1/README.md)。T026生成/修正、T027实际渲染和T028 Job/媒体发布仍待交付，尚无新HTTP或媒体，也未开放动态入口。
 
 
-## OM式生成与混合审核重构（2026-10-15，待实施/待具体批准）
+## OM式生成与混合审核重构（2026-10-15，设计已批准/待实施）
 
 用户已选择共享教学计划→逐场景内容→受约束授课动作的OM式分工，同时保留独立自动语义审核，不确定内容交人工。完整提案为[ADR-0015](ADR/0015-shared-plan-and-hybrid-review.md)，与[验收方案](acceptance/phase-1-om-redesign/acceptance-plan.md)共同约束后续T044–T054；本段不是运行实现说明。
 
-拟增加不可变计划、显式needs_human、整单元一致性检查、owner隔离人工案件/只追加决定，以及受信维护CLI。人工不能覆盖本地硬门禁，不构造伪模型pass；三场景和最终审核证据原子发布。默认catalog_only不变，旧资源不升级资格；没有远程人工后台、任意代码执行或新增Provider授权。API/SSE待批准后随T053同步OpenAPI，不能用本文推断现有接口已经支持新状态。
+拟增加不可变计划、显式needs_human、整单元一致性检查、owner隔离人工案件/只追加决定，以及受信维护CLI。人工不能覆盖本地硬门禁，不构造伪模型pass；三场景和最终审核证据原子发布。默认catalog_only不变，旧资源不升级资格；没有远程人工后台、任意代码执行或新增Provider授权。最小数据Schema、完整发布快照及legacy intro/planned explanation兼容已在ADR附件冻结；A–D批准登记见ADR/0015-approval-20261015.json。API/SSE随T053同步OpenAPI，不能用本文推断现有接口已经支持新状态。
 
 ## 身份与学习状态（ADR-0001 部分批准）
 

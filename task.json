@@ -2416,7 +2416,8 @@
         "已交付Proposed ADR-0015 A–D、源码固定提交ecb940c依据、新分层验收/20或22次硬上限及T044–T054明确待建立的验证接口；方向选择不视为具体设计批准。",
         "4文档SHA/本地引用/围栏/12任务契约/54任务依赖与状态/调用算术检查通过；check_catalog_workflow、verify_legacy_archives（236原文件/64实验/169证据）、verify_phase1_dynamic_approval、JSON与diff检查通过。",
         "无聊天上下文子代理读者检查及一次复查；修复严重reject人工处理歧义与失效操作终态，并同步图与任务；不是人工课程签核或运行代码评审。",
-        "证据docs/acceptance/phase-1-om-redesign/validation.json；真实Provider0、运行代码/迁移/OpenAPI未修改，未跑业务测试；A–D待批/T044–T054未领取/T040 blocked/catalog_only保持，完成以Task-Completed提交为准。"
+        "证据docs/acceptance/phase-1-om-redesign/validation.json；真实Provider0、运行代码/迁移/OpenAPI未修改，未跑业务测试；A–D待批/T044–T054未领取/T040 blocked/catalog_only保持，完成以Task-Completed提交为准。",
+        "2026-10-15治理补充：用户明确批准补齐最小数据Schema、版本/摘要绑定和legacy/planned兼容后的ADR-0015 A–D；旧结果为T043原交付时记录，当前批准以docs/ADR/0015-approval-20261015.json为准；T044–T054仍todo，未实施/真实Provider0。"
       ],
       "started_at": "2026-10-15T15:30:51",
       "completed_at": "2026-10-15T15:44:48",
@@ -2436,13 +2437,15 @@
         "backend/app/models/",
         "backend/alembic/",
         "backend/tests/",
-        "docs/api/openapi.yaml"
+        "docs/api/openapi.yaml",
+        "docs/acceptance/phase-1-om-redesign/",
+        "backend/app/services/"
       ],
-      "prd_source": "PRD §0.2重构方向（具体设计待批准）；ADR-0015 Proposed",
+      "prd_source": "PRD §0.2；ADR-0015 Accepted及批准登记0015-approval-20261015.json",
       "acceptance_criteria": [
-        "仅在ADR-0015 A–D获准后实施；计划版本、owner/图谱/画像/目标摘要及三个场景定义持久化且不可原地改写。",
-        "候选和场景能绑定同一计划及约定摘要，跨owner或失配引用被数据库和服务拒绝。",
-        "Alembic升级与旧目录/旧学习单元兼容通过，降级在存在新数据时安全拒绝。"
+        "按ADR-0015最小契约及Draft 2020-12 Schema建立计划/场景/资源绑定与同义本地校验，缺约定、额外字段、错误角色/顺序/目标引用、超限均拒绝。",
+        "计划ID/版本、JSON、输入/参考/政策摘要不可原地改写；服务端计算规范摘要，资源与场景同owner/unit/plan复合约束及依赖快照在真实PG拒绝失配。",
+        "Alembic升级保留legacy intro及null计划绑定，不回填新资格；旧目录/会话可读；存在新数据时降级安全拒绝。"
       ],
       "verification": [
         "cd backend && .venv/bin/pytest -q tests/test_learning_plan_persistence.py",
@@ -2455,7 +2458,7 @@
       "completed_at": null,
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T044",
-      "execution_gate": "ADR-0015 A–D及绑定附件获具体批准后才能领取实施；方向选择不预签持久化、API、人工权限或新验收细则。",
+      "execution_gate": "ADR-0015 A–D与更新manifest已获用户明确批准，仅按依赖串行实施和零Provider测试；真实调用/费用/生产开放另批。",
       "verification_note": "上述新文件/CLI为待建立的验收接口，当前未运行且不声称已存在；本任务完成前必须建立并实际执行。数据库任务须真实PG零跳过，Mock不替代；按变更风险追加已有核心路径回归。"
     },
     {
@@ -2472,10 +2475,10 @@
         "backend/tests/",
         "docs/agents/prompts/"
       ],
-      "prd_source": "PRD §0.2重构方向（具体设计待批准）；ADR-0015 Proposed",
+      "prd_source": "PRD §0.2；ADR-0015 Accepted及批准登记0015-approval-20261015.json",
       "acceptance_criteria": [
         "从同一节点、目标和有据画像生成三个场景计划，统一术语、索引/状态约定及共享示例。",
-        "严格schema、稳定本地场景ID和版本化参考检查，未知来源/缺约定/超限不进入内容生成。",
+        "复用冻结plan_generation/plan schema及服务端合并规则/本地跨字段规则，服务分配三场景key/ID/version，未知来源/缺约定/超限不进入内容生成，计划预期轨迹不充当验证证据。",
         "计划不是事实证据或课程签核；单次生成失败不伪造计划或自动重试，Mock验证Provider失败与取消。"
       ],
       "verification": [
@@ -2489,7 +2492,7 @@
       "completed_at": null,
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T045",
-      "execution_gate": "ADR-0015 A–D及绑定附件获具体批准后才能领取实施；方向选择不预签持久化、API、人工权限或新验收细则。",
+      "execution_gate": "ADR-0015 A–D与更新manifest已获用户明确批准，仅按依赖串行实施和零Provider测试；真实调用/费用/生产开放另批。",
       "verification_note": "上述新文件/CLI为待建立的验收接口，当前未运行且不声称已存在；本任务完成前必须建立并实际执行。数据库任务须真实PG零跳过，Mock不替代；按变更风险追加已有核心路径回归。"
     },
     {
@@ -2506,7 +2509,7 @@
         "backend/app/agents/learning_resource_prompt.py",
         "backend/tests/"
       ],
-      "prd_source": "PRD §0.2重构方向（具体设计待批准）；ADR-0015 Proposed",
+      "prd_source": "PRD §0.2；ADR-0015 Accepted及批准登记0015-approval-20261015.json",
       "acceptance_criteria": [
         "讲解、代码、练习分别接收同一计划、共享示例和场景目标，代码与练习还接收前序候选摘要及完整相关内容。",
         "任何修正产生新候选摘要，后续绑定失效；禁止把计划中的预期输出冒充已执行验证。",
@@ -2523,7 +2526,7 @@
       "completed_at": null,
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T046",
-      "execution_gate": "ADR-0015 A–D及绑定附件获具体批准后才能领取实施；方向选择不预签持久化、API、人工权限或新验收细则。",
+      "execution_gate": "ADR-0015 A–D与更新manifest已获用户明确批准，仅按依赖串行实施和零Provider测试；真实调用/费用/生产开放另批。",
       "verification_note": "上述新文件/CLI为待建立的验收接口，当前未运行且不声称已存在；本任务完成前必须建立并实际执行。数据库任务须真实PG零跳过，Mock不替代；按变更风险追加已有核心路径回归。"
     },
     {
@@ -2540,7 +2543,7 @@
         "backend/tests/",
         "docs/agents/"
       ],
-      "prd_source": "PRD §0.2重构方向（具体设计待批准）；ADR-0015 Proposed",
+      "prd_source": "PRD §0.2；ADR-0015 Accepted及批准登记0015-approval-20261015.json",
       "acceptance_criteria": [
         "以本地受信模板生成讲解/高亮/练习动作，目标仅能引用本场景已绑定内容片段和题号。",
         "不生成任意HTML/JS、角色发言或新事实；动作规则版本和摘要参与单元审核绑定。",
@@ -2557,7 +2560,7 @@
       "completed_at": null,
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T047",
-      "execution_gate": "ADR-0015 A–D及绑定附件获具体批准后才能领取实施；方向选择不预签持久化、API、人工权限或新验收细则。",
+      "execution_gate": "ADR-0015 A–D与更新manifest已获用户明确批准，仅按依赖串行实施和零Provider测试；真实调用/费用/生产开放另批。",
       "verification_note": "上述新文件/CLI为待建立的验收接口，当前未运行且不声称已存在；本任务完成前必须建立并实际执行。数据库任务须真实PG零跳过，Mock不替代；按变更风险追加已有核心路径回归。"
     },
     {
@@ -2575,9 +2578,9 @@
         "backend/tests/",
         "docs/agents/prompts/"
       ],
-      "prd_source": "PRD §0.2重构方向（具体设计待批准）；ADR-0015 Proposed",
+      "prd_source": "PRD §0.2；ADR-0015 Accepted及批准登记0015-approval-20261015.json",
       "acceptance_criteria": [
-        "新版本审核显式返回pass/revise/reject/needs_human及证据锚点、条件/反例、覆盖和未知项，旧协议不静默混用。",
+        "严格实现冻结resource-review-v4/review_record结构与服务端绑定；证据JSON Pointer/UTF-8半开锚点、scope必检项、目标摘要及四结论附加规则可验证，旧协议不静默混用。",
         "本地硬拒绝不能人工豁免；可解析但证据不足/覆盖未知/修正耗尽进入人工，协议/预算/凭据失败保持失败。",
         "审核器按影响定位问题，类别与检出分开计分；最多两轮修正、完整重审且禁止自动模型回退。",
         "用离线合成结果覆盖误报、空证据、越界引用、多个问题和正确对照，明确Mock不证明语义改善。"
@@ -2593,7 +2596,7 @@
       "completed_at": null,
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T048",
-      "execution_gate": "ADR-0015 A–D及绑定附件获具体批准后才能领取实施；方向选择不预签持久化、API、人工权限或新验收细则。",
+      "execution_gate": "ADR-0015 A–D与更新manifest已获用户明确批准，仅按依赖串行实施和零Provider测试；真实调用/费用/生产开放另批。",
       "verification_note": "上述新文件/CLI为待建立的验收接口，当前未运行且不声称已存在；本任务完成前必须建立并实际执行。数据库任务须真实PG零跳过，Mock不替代；按变更风险追加已有核心路径回归。"
     },
     {
@@ -2612,10 +2615,10 @@
         "backend/tests/",
         "docs/agents/prompts/"
       ],
-      "prd_source": "PRD §0.2重构方向（具体设计待批准）；ADR-0015 Proposed",
+      "prd_source": "PRD §0.2；ADR-0015 Accepted及批准登记0015-approval-20261015.json",
       "acceptance_criteria": [
         "一次独立审核接收完整计划、三资源和动作，检查术语、约定、示例轨迹和答案的一致性。",
-        "输出绑定整单元摘要；任何候选/动作/计划变化使结果失效，局部pass不能替代整单元检查。",
+        "输出绑定冻结unit_digest及scope=unit必检项；一致性不接受revise，任何候选/动作/计划变化失效，局部pass不能替代整单元检查。",
         "有据具体严重缺陷reject；其余未决跨场景冲突或覆盖未知转人工，不自动无限重生成；schema/预算/调用故障安全失败。"
       ],
       "verification": [
@@ -2629,7 +2632,7 @@
       "completed_at": null,
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T049",
-      "execution_gate": "ADR-0015 A–D及绑定附件获具体批准后才能领取实施；方向选择不预签持久化、API、人工权限或新验收细则。",
+      "execution_gate": "ADR-0015 A–D与更新manifest已获用户明确批准，仅按依赖串行实施和零Provider测试；真实调用/费用/生产开放另批。",
       "verification_note": "上述新文件/CLI为待建立的验收接口，当前未运行且不声称已存在；本任务完成前必须建立并实际执行。数据库任务须真实PG零跳过，Mock不替代；按变更风险追加已有核心路径回归。"
     },
     {
@@ -2647,7 +2650,7 @@
         "backend/alembic/",
         "backend/tests/"
       ],
-      "prd_source": "PRD §0.2重构方向（具体设计待批准）；ADR-0015 Proposed",
+      "prd_source": "PRD §0.2；ADR-0015 Accepted及批准登记0015-approval-20261015.json",
       "acceptance_criteria": [
         "案件绑定owner、操作、完整单元/候选/计划/政策摘要，结论只追加并保留自动审核原结果。",
         "案件pending不发布；仅needs_human案件可approve/reject，当前有据严重reject不能人工放行；内容变更须新版本，失效案使未取消操作failed/REVIEW_CASE_INVALIDATED。",
@@ -2664,7 +2667,7 @@
       "completed_at": null,
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T050",
-      "execution_gate": "ADR-0015 A–D及绑定附件获具体批准后才能领取实施；方向选择不预签持久化、API、人工权限或新验收细则。",
+      "execution_gate": "ADR-0015 A–D与更新manifest已获用户明确批准，仅按依赖串行实施和零Provider测试；真实调用/费用/生产开放另批。",
       "verification_note": "上述新文件/CLI为待建立的验收接口，当前未运行且不声称已存在；本任务完成前必须建立并实际执行。数据库任务须真实PG零跳过，Mock不替代；按变更风险追加已有核心路径回归。"
     },
     {
@@ -2682,7 +2685,7 @@
         "backend/tests/",
         "docs/"
       ],
-      "prd_source": "PRD §0.2重构方向（具体设计待批准）；ADR-0015 Proposed",
+      "prd_source": "PRD §0.2；ADR-0015 Accepted及批准登记0015-approval-20261015.json",
       "acceptance_criteria": [
         "仅维护端CLI支持list/show/decide，复核人从受信配置验证，真实决定绑定准确摘要和理由。",
         "学生HTTP/模型不能写审核结论；CLI不调用Provider、不执行代码，审批文件不能仅凭passed=true发布。",
@@ -2700,7 +2703,7 @@
       "completed_at": null,
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T051",
-      "execution_gate": "ADR-0015 A–D及绑定附件获具体批准后才能领取实施；方向选择不预签持久化、API、人工权限或新验收细则。",
+      "execution_gate": "ADR-0015 A–D与更新manifest已获用户明确批准，仅按依赖串行实施和零Provider测试；真实调用/费用/生产开放另批。",
       "verification_note": "上述新文件/CLI为待建立的验收接口，当前未运行且不声称已存在；本任务完成前必须建立并实际执行。数据库任务须真实PG零跳过，Mock不替代；按变更风险追加已有核心路径回归。"
     },
     {
@@ -2716,14 +2719,17 @@
         "backend/app/services/learning_finalization.py",
         "backend/app/services/resource_publication.py",
         "backend/app/models/",
-        "backend/tests/"
+        "backend/tests/",
+        "backend/app/services/classroom.py",
+        "backend/app/services/scene_reexplanation.py"
       ],
-      "prd_source": "PRD §0.2重构方向（具体设计待批准）；ADR-0015 Proposed",
+      "prd_source": "PRD §0.2；ADR-0015 Accepted及批准登记0015-approval-20261015.json",
       "acceptance_criteria": [
-        "所有必需场景及整单元检查满足资格后才一次事务发布，记录auto/human_assisted来源，保留原自动审核结果。",
-        "人工批准只替代准确案件的语义资格，不豁免本地硬检查/owner/计划版本/撤回/预算/DSL沙箱。",
-        "待人工和部分通过不可被读取、评分、导出或动画复用；取消/重解释产生新版本，旧批准不继承。",
-        "不改变旧目录人工签核和原已发布版本，真实数据库并发/崩溃边界与关键读取回归通过。"
+        "按冻结publication快照与全部审核证据一次事务发布，记录auto/human_assisted，保留原结果；current_publication_id与课堂锚点/revision原子切换，失败不暴露部分内容。",
+        "人工仅替代准确案件语义资格；硬门禁/owner/计划/撤回/预算/DSL不可豁免；待审/部分通过不可读取、计分、导出、动画复用。",
+        "legacy intro布局/签核/旧收据保持；planned默认explanation、intro请求别名、响应真实key；重解释按同一发布快照取关联code和语言，缺失不默认Python，code/exercise重解释409。",
+        "simpler/deeper保留计划但重绑候选并三资源复审/重组动作/一致性；another_example新计划重建三资源；旧案件/批准不继承，待审/失败/取消保留旧完整发布和历史证据，所有新调用计入原上限。",
+        "真实PG验证复合外键、CAS/取消/审批/发布竞争、崩溃回滚及旧版本只读；新讲解不得和旧代码/题目按max(version)混合；课堂旧revision冲突409。"
       ],
       "verification": [
         "cd backend && .venv/bin/pytest -q tests/test_hybrid_learning_publication.py",
@@ -2736,7 +2742,7 @@
       "completed_at": null,
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T052",
-      "execution_gate": "ADR-0015 A–D及绑定附件获具体批准后才能领取实施；方向选择不预签持久化、API、人工权限或新验收细则。",
+      "execution_gate": "ADR-0015 A–D与更新manifest已获用户明确批准，仅按依赖串行实施和零Provider测试；真实调用/费用/生产开放另批。",
       "verification_note": "上述新文件/CLI为待建立的验收接口，当前未运行且不声称已存在；本任务完成前必须建立并实际执行。数据库任务须真实PG零跳过，Mock不替代；按变更风险追加已有核心路径回归。"
     },
     {
@@ -2756,12 +2762,13 @@
         "web/tests/",
         "backend/tests/"
       ],
-      "prd_source": "PRD §0.2重构方向（具体设计待批准）；ADR-0015 Proposed",
+      "prd_source": "PRD §0.2；ADR-0015 Accepted及批准登记0015-approval-20261015.json",
       "acceptance_criteria": [
         "沿现有owner查询和POST SSE暴露阶段及awaiting_human/rejected，不新增学生审核接口或未审正文读取。",
         "待人工结束当前流且不保持无限连接，刷新只查持久状态；人工处理后只显示真实已发布或被拒状态。",
         "前端明确待人工且无完成时间承诺，自动/人工来源可辨；不把待审内容显示成正式课程。",
-        "OpenAPI、类型、关键浏览器旅程、SSE断线/取消和目录零调用回归通过。"
+        "OpenAPI、类型、关键浏览器旅程、SSE断线/取消和目录零调用回归通过。",
+        "UI/OpenAPI/SSE同步真实scene_key和可选publication_version及GET版本查询（不可读404、不回退），三个场景同快照顺序展示；重解释不支持场景409、待人工无scene_ready、整单元发布后按准确版本重读；旧intro客户端/旧会话兼容。"
       ],
       "verification": [
         "cd backend && .venv/bin/pytest -q tests/test_hybrid_learning_operations.py",
@@ -2777,7 +2784,7 @@
       "completed_at": null,
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T053",
-      "execution_gate": "ADR-0015 A–D及绑定附件获具体批准后才能领取实施；方向选择不预签持久化、API、人工权限或新验收细则。",
+      "execution_gate": "ADR-0015 A–D与更新manifest已获用户明确批准，仅按依赖串行实施和零Provider测试；真实调用/费用/生产开放另批。",
       "verification_note": "上述新文件/CLI为待建立的验收接口，当前未运行且不声称已存在；本任务完成前必须建立并实际执行。数据库任务须真实PG零跳过，Mock不替代；按变更风险追加已有核心路径回归。"
     },
     {
@@ -2794,12 +2801,13 @@
         "backend/tests/",
         "docs/acceptance/"
       ],
-      "prd_source": "PRD §0.2重构方向（具体设计待批准）；ADR-0015 Proposed",
+      "prd_source": "PRD §0.2；ADR-0015 Accepted及批准登记0015-approval-20261015.json",
       "acceptance_criteria": [
         "离线构建新冻结组合、完整分母和预算方案，自动质量、混合发布及人工依赖分别报告。",
         "继承原首次schema≥98%、自动正式成功≥95%、严重错误召回≥90%等阈值，待人工/人工通过不得补自动分子。",
         "分别报告具体检出、分类、误报、正确对照、覆盖/不确定、人工比例及长输出；旧T033/r01-r11保持原判定。",
-        "真实预算为0直至准确新方案另批，未批准CLI应拒绝；离线通过不解除T040/T041或生产门禁。"
+        "真实预算为0直至准确新方案另批，未批准CLI应拒绝；离线通过不解除T040/T041或生产门禁。",
+        "冻结计划/审核Schema与兼容附件，离线覆盖legacy/planned入口、跨场景取材、换示例失效/复审、同发布快照读取及旧版保留；不以只测新单元替代旧目录/课堂回归。"
       ],
       "verification": [
         "cd backend && .venv/bin/pytest -q tests/test_om_redesign_acceptance_preparation.py",
@@ -2813,7 +2821,7 @@
       "completed_at": null,
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T054",
-      "execution_gate": "ADR-0015 A–D及绑定附件获具体批准后才能领取实施；方向选择不预签持久化、API、人工权限或新验收细则。",
+      "execution_gate": "ADR-0015 A–D与更新manifest已获用户明确批准，仅按依赖串行实施和零Provider测试；真实调用/费用/生产开放另批。",
       "verification_note": "上述新文件/CLI为待建立的验收接口，当前未运行且不声称已存在；本任务完成前必须建立并实际执行。数据库任务须真实PG零跳过，Mock不替代；按变更风险追加已有核心路径回归。"
     }
   ]
