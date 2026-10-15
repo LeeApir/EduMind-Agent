@@ -2688,7 +2688,7 @@
       "id": "PHASE-1-T051",
       "phase": "Phase 1",
       "title": "提供受信本地人工复核命令",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1-T050"
@@ -2712,9 +2712,11 @@
         "python3 scripts/check_catalog_workflow.py",
         "git diff --check"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "完成受信本地review_learning_cases.py list/show/decide；OS euid+私有配置allowlist，不接受自报reviewer，默认摘要/显式全文与0600新文件导出，幂等决定及安全错误 | CLI --help、PG om50共9测试零跳过、Ruff/app mypy181/工作流/diff及自查通过；仅合成拒绝/决定回放不是实际课程签核；证据docs/agents/human-review-cli.md，Provider0 | 无值守SLA，不新增学生HTTP审核能力；审批发布原子组合由T052接入 | 完成本地提交后领取T052混合原子发布与旧课堂兼容"
+      ],
+      "started_at": "2026-10-15T19:17:51",
+      "completed_at": "2026-10-15T19:18:51",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T051",
       "execution_gate": "ADR-0015 A–D与更新manifest已获用户明确批准，仅按依赖串行实施和零Provider测试；真实调用/费用/生产开放另批。",
