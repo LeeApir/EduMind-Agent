@@ -1,0 +1,174 @@
+{
+  "version": "om-admission-real-plan-01-v1",
+  "source_commit": "46cf3e9",
+  "proposal_sha256": "28e25a016c1689c8b27ae52284edb91244fec85b4f24c19297673377a2b17057",
+  "approval_sha256": "b5a4f18165949f466ab9bddd91effa3b17ce8758dab797cf675c07653e0a4214",
+  "receipt_sha256": "5ed4793d41d1060b534a82e64476e000538e142cc3bc1f5cf0b57a5c2d68e3f5",
+  "slot": "plan",
+  "real_cloud": true,
+  "mock": false,
+  "requests_sent": 1,
+  "requests_remaining_not_sent": [
+    "correct-unit",
+    "reachable-safety",
+    "fact-contradiction"
+  ],
+  "protocol_schema_and_server_binding": "passed",
+  "automatic_semantic_acceptance": false,
+  "human_confirmed": false,
+  "local_gate_state": "HUMAN_CHECK_REQUIRED",
+  "T040": "blocked",
+  "formal_quality_passed": false,
+  "input_tokens": 1607,
+  "output_tokens_including_reasoning": 818,
+  "total_tokens": 2425,
+  "reasoning_tokens_breakdown": "not retained by receipt; reasoning.effort=none frozen",
+  "cost_reserved_micro_cny": 2124020,
+  "peak_usage_cost_reference_micro_cny": 9758,
+  "actual_invoice_cost": null,
+  "cost_note": "Peak uncached usage reference only; no asserted actual bill or zero cache discount.",
+  "private_receipt_path": "local-materials/phase-1-om-admission-r01/plan.json",
+  "private_permissions": "0600 receipt, 0600 ledger",
+  "request_sha256": "fba0ad8e167b0e3321549166327b699d82fa2d52e8efeb5d356c27c0b470f7a7",
+  "response_sha256": "381af5a2efaf169cbef47f772e112d7299dd4cf3c98b10192a33a3dad5551553",
+  "plan_generation_result": {
+    "conventions": {
+      "capacity": 3,
+      "index_base": 0,
+      "not_applicable_reasons": [],
+      "state_representation": "用a[0]=2、a[1]=5、a[2]=9表示数组状态；用i表示当前下标，用sum表示当前累加结果。初始状态为i未开始、sum=0。"
+    },
+    "objectives": [
+      {
+        "id": "obj-index",
+        "text": "用下标0至2定位数组{2,5,9}中的每个元素，并说明下标与元素的一一对应关系。"
+      },
+      {
+        "id": "obj-loop",
+        "text": "用C的for循环按顺序访问数组元素，并说明循环变量i从0递增到2时循环体执行三次。"
+      },
+      {
+        "id": "obj-accumulate",
+        "text": "用累加变量sum追踪求和过程，说明每次迭代后sum的值如何变化。"
+      },
+      {
+        "id": "obj-return",
+        "text": "说明求和循环结束后返回值为16，并解释16是2+5+9的结果。"
+      }
+    ],
+    "prerequisite_node_ids": [
+      "c-pointer"
+    ],
+    "reference_ids": [
+      "graph-node:phase-1.1.0:array"
+    ],
+    "scenes": [
+      {
+        "depends_on": [],
+        "objective_ids": [
+          "obj-index",
+          "obj-loop",
+          "obj-accumulate",
+          "obj-return"
+        ],
+        "role": "explanation",
+        "scene_key": "explanation"
+      },
+      {
+        "depends_on": [
+          "explanation"
+        ],
+        "objective_ids": [
+          "obj-loop",
+          "obj-accumulate",
+          "obj-return"
+        ],
+        "role": "code",
+        "scene_key": "code"
+      },
+      {
+        "depends_on": [
+          "explanation",
+          "code"
+        ],
+        "objective_ids": [
+          "obj-index",
+          "obj-loop",
+          "obj-accumulate",
+          "obj-return"
+        ],
+        "role": "exercise",
+        "scene_key": "exercise"
+      }
+    ],
+    "shared_example": {
+      "initial_state": "sum = 0；循环变量i尚未开始，下一次将取i = 0。",
+      "input_description": "数组a，长度为3，元素依次为a[0]=2、a[1]=5、a[2]=9；求和函数从下标0开始遍历到下标2。",
+      "steps": [
+        {
+          "expected_output": null,
+          "expected_state": "i = 0；sum = 0 + 2 = 2。",
+          "operation": "i = 0，读取a[0]，执行sum = sum + a[0]。"
+        },
+        {
+          "expected_output": null,
+          "expected_state": "i = 1；sum = 2 + 5 = 7。",
+          "operation": "i = 1，读取a[1]，执行sum = sum + a[1]。"
+        },
+        {
+          "expected_output": null,
+          "expected_state": "i = 2；sum = 7 + 9 = 16。",
+          "operation": "i = 2，读取a[2]，执行sum = sum + a[2]。"
+        },
+        {
+          "expected_output": "16",
+          "expected_state": "循环结束；sum = 16。",
+          "operation": "i = 3，不满足i < 3，循环结束，返回sum。"
+        }
+      ]
+    },
+    "terminology": [
+      {
+        "meaning": "一段连续存储的同类型元素序列；本课例子为int a[3] = {2, 5, 9}。",
+        "term": "数组"
+      },
+      {
+        "meaning": "数组中元素的位置编号；本课采用从0开始的下标，因此三个元素的下标依次为0、1、2。",
+        "term": "下标"
+      },
+      {
+        "meaning": "数组中的一个具体值；本课例子中的元素依次是2、5、9。",
+        "term": "元素"
+      },
+      {
+        "meaning": "数组中元素的个数；本课例子的长度为3。",
+        "term": "长度"
+      },
+      {
+        "meaning": "控制循环次数的变量；本课用i表示，取值依次为0、1、2。",
+        "term": "循环变量"
+      },
+      {
+        "meaning": "保存当前求和结果的变量；本课用sum表示，初始为0。",
+        "term": "累加变量"
+      },
+      {
+        "meaning": "循环体的一次执行；本课共执行三次迭代。",
+        "term": "迭代"
+      },
+      {
+        "meaning": "函数执行结束后交给调用方的结果；本课求和函数返回16。",
+        "term": "返回值"
+      }
+    ]
+  },
+  "assistant_observations_not_human_signoff": [
+    "All three scene keys/order/dependencies and objective references are structurally valid; selected reference is supplied array graph node.",
+    "Trace additions 0+2=2, 2+5=7, 7+9=16 and i=3 termination are internally consistent.",
+    "Model listed c-pointer as prerequisite, although array graph node has no prerequisites. Schema permits selecting supplied node IDs; necessity is a pedagogical human decision, not verified by structural validation.",
+    "This only tests plan generation, not scene generation/resource audit/long output/full publication/whole-course quality."
+  ],
+  "next": "Independent human checks exact plan receipt before correct-unit. No human continue record written.",
+  "production_mode": "catalog_only",
+  "dynamic_opening": false
+}
