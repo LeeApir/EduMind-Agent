@@ -1,0 +1,102 @@
+{
+  "version": "fixed-focus-r10-observation-v1",
+  "execution_source_commit": "9217215",
+  "root_sha256": "e8388f55fe970be398d44bf4543d85f3dd03004e6c4fb6e44b98e44b1ef8923a",
+  "state": "HUMAN_REVIEW_REQUIRED",
+  "provider_requests": 1,
+  "remaining_unrun_slots": [
+    "focus-02",
+    "focus-03",
+    "focus-04"
+  ],
+  "reasoning_effort_requested": "none",
+  "input_tokens": 5405,
+  "output_tokens": 599,
+  "reasoning_tokens_included": 0,
+  "total_tokens": 6004,
+  "reserved_micro_cny": 2152262,
+  "peak_usage_reference_micro_cny": 15602,
+  "actual_bill": null,
+  "response_sha256": "56189f053a106c1e3101246d93c1750f50bdfceb6d6f8c7bfc4edd7144a5034d",
+  "value_hash": "ce4ba7468bb112915217fc3a4a4cbb942c1c5b8e7d1a7dbfbd6c0a8f225fce2e",
+  "model_and_completed_status_verified_by_frozen_finish": true,
+  "http_status_not_retained": true,
+  "request_count_basis": "Private SQLite readonly attempts query and successful one-step sender result",
+  "actual_response": {
+    "findings": [
+      {
+        "area": "fact",
+        "message": "聚焦声明称“在 rear 指向下一个空位的约定下，元素个数满足 size = rear - front”，但同一资源在 s0034 与 s0041–s0071 中明确采用循环队列（`% CAPACITY`）实现，并单独维护 `size` 字段。在循环队列中 rear 会回绕到 0，因此 `rear - front` 不再等于元素个数：例如 CAPACITY=8，先 enqueue 8 个元素使 front=0、rear=0、size=8，此时 `rear - front = 0` 而实际元素个数为 8；再 dequeue 一个后 front=1、rear=0、size=7，`rear - front = -1`。该公式仅在非回绕的线性数组约定下成立，与本文代码的循环约定冲突，会误导读者。",
+        "severity": "major"
+      }
+    ],
+    "other_findings": [
+      {
+        "finding": {
+          "area": "fact",
+          "message": "s0028 给出空队列条件 `front == rear`，但代码（s0056–s0061）用 `size == 0` 判断空、`size == CAPACITY` 判断满。在循环队列中 `front == rear` 同时对应空和满两种状态，无法单独作为空队列条件；该公式与代码约定不一致。",
+          "severity": "minor"
+        },
+        "span_ids": [
+          "s0028",
+          "s0056",
+          "s0057",
+          "s0060",
+          "s0061"
+        ]
+      },
+      {
+        "finding": {
+          "area": "fact",
+          "message": "s0029/s0030 描述入队/出队为 `rear++`、`front++`，但代码（s0070、s0081）使用 `(rear + 1) % CAPACITY` 与 `(front + 1) % CAPACITY` 回绕。在数组末尾处 `rear++`/`front++` 会越界，与循环队列实现不符。",
+          "severity": "minor"
+        },
+        "span_ids": [
+          "s0029",
+          "s0030",
+          "s0070",
+          "s0081"
+        ]
+      },
+      {
+        "finding": {
+          "area": "code_safety",
+          "message": "代码包含 `#include <stdio.h>` 与 `#include <stdlib.h>`，但示例中未使用任何 stdio 或 stdlib 功能，属于冗余包含；虽不影响正确性，但与“仅展示”的最小示意意图不符。",
+          "severity": "minor"
+        },
+        "span_ids": [
+          "s0037",
+          "s0038"
+        ]
+      }
+    ],
+    "request_id": "7e466e9de71b86b4e9ece6743336471c06347bb0020498abec7ce597737c0b4b",
+    "uncertain": false,
+    "verdict": "revise",
+    "version": "span-focus-review-v1"
+  },
+  "local_fact_observation": {
+    "primary_counterexample_supported": true,
+    "full_queue": {
+      "front": 0,
+      "rear": 0,
+      "size": 8,
+      "rear_minus_front": 0
+    },
+    "after_one_dequeue": {
+      "front": 1,
+      "rear": 0,
+      "size": 7,
+      "rear_minus_front": -1
+    },
+    "additional_front_equals_rear_ambiguity_supported": true,
+    "unused_headers_observation": "Headers are unused, but their presence alone does not establish a code safety defect; code_safety categorization is unsupported.",
+    "suggested_disposition": "Do not count as a clean reviewer pass due to additional safety classification false positive; await actual human decision."
+  },
+  "human_fact_confirmation": null,
+  "semantic_quality_accepted": false,
+  "full_resource_coverage_verified": false,
+  "t040_complete": false,
+  "next_call_sent": false,
+  "production_mode": "catalog_only"
+}

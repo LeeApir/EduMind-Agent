@@ -42,3 +42,11 @@ backend/.venv/bin/python scripts/run_t040_focus.py report
 ```
 
 r09仍1次INVALID_OUTPUT停止、剩余37槽未运行；r08仍1次CONCRETE_DEFECT_MISSED停止。没有恢复或挪用旧余额。生产none/catalog_only保持，本次非T040完成提交，不push/merge。
+
+## 2026-10-15 获批后的首条实际结果
+
+用户yes批准9217215准确根/4次/CNY8.551250及退出规则，另存[运行批准](run-approval.json)和[当日规格核对](terms-verification.json)；以上“待批准/文件不存在”保留准备时历史，实际以新增登记为准。只发送focus-01一次，返回完成，当前停HUMAN_REVIEW_REQUIRED，后3条未发、没有人工assessment。
+
+[完整结果与待核对观察](results/r10-focus-01.json)：5405输入+599输出=6004Token，推理0；预留CNY2.152262，峰值用量参考CNY0.015602，均不当作实际账单。主结论fact/major/revise指出循环队列回绕使rear-front失效，CAPACITY8满队列的差值0、出队后的差值-1均与原代码一致。附带发现空满判定/增量与取模的冲突，并把未使用stdio/stdlib头文件列成code_safety；未用头文件本身不能证明代码安全缺陷，该分类欠依据。建议不计干净审核通过，等待实际用户核对后才能保存本条事实结论或终止本轮；没有用原范围确认或费用批准代签。
+
+215冻结来源、请求/响应摘要、私有账本1条及assessment为空核验通过；r09/r08原来源和停止状态不变。源码未改，273离线证据沿用9217215，不重跑业务测试；只读报告/准备器/活动任务/diff核对通过。T040仍blocked，none/catalog_only保持，本次非完成提交。
