@@ -62,3 +62,5 @@
 2026-10-15 后续：用户“yes”批准ADR-0014 A–D及准确manifest，状态以[批准登记](0014-derived-budget-approval-20261015.json)为Accepted，原Proposed提案保留历史字节。[独立预算机制](../acceptance/phase-1-t040-derived-budget-kernel/README.md)完成零调用实现与269项离线验证；未接入真实HTTP/出站鉴权，真实请求及费用授权仍0，T040质量门禁继续blocked。
 
 2026-10-15 后续：完成[派生发送组合离线验证](../acceptance/phase-1-t040-derived-calibration-draft/README.md)，311项离线通过，补齐模型可复制的块/身份摘要；两例最多38次草案仍DRAFT_NOT_EXECUTABLE，Token/费用证明、真实审批/当前凭据同意和事实签核组合待补，真实Provider0，未新增架构或付费批准。
+
+2026-10-15 后续：[r09两例运行准备](../acceptance/phase-1-t040-derived-calibration-r09/README.md)完成：供应商整窗契约界、单步审批/凭据文件版本及逐例人工事实门禁，339项离线通过。准确根最多38次/CNY120.149000尚待真实预算批准；非预计消费、非账户硬限额，无模型调用，不改变ADR批准或T040状态。

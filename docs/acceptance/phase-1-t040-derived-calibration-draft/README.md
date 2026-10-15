@@ -32,3 +32,5 @@ backend/.venv/bin/python scripts/prepare_t040_derived_calibration.py --check
 仍须补齐：实际输入Token及服务端格式上界证明；据此计算最坏费用和固定期限；受信真实运行审批解析、当前服务端凭据版本/同意lease提供方；独立事实评估与人工组门禁的组合。发送模块不读env/Key、无CLI或生产注册，Approval和lease是受信调用方输入，不会从任意approved=true JSON产生人类授权。模拟lease不证明实际凭据可用、同意未撤回或权限正确。
 
 目前不申请付费额度，不能通过填一个approved=true或绕过缺失证明启动。随后将形成准确根清单/源码/目标/费用与事实核对入口，再单独呈交真实调用方案；旧r01–r08不恢复、不拼分，不进入正式质量/DSL/T041。
+
+2026-10-15 后续：本目录保留6b8ba27不可执行草案，未改写其历史结果。新的[r09确切运行方案](../phase-1-t040-derived-calibration-r09/README.md)使用供应商整窗契约上界并接好单步审批/凭据及人工事实门禁；最多38次/CNY120.149000的保守预留等待单独批准，真实调用仍0。
