@@ -2613,7 +2613,7 @@
       "id": "PHASE-1-T049",
       "phase": "Phase 1",
       "title": "检查整单元跨场景一致性",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1-T047",
@@ -2637,9 +2637,11 @@
         "python3 scripts/check_catalog_workflow.py",
         "git diff --check"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "完成完整unit_material及原文/版本/依赖/动作摘要绑定，一次scope=unit独立一致性检查，资源reject优先、未知转人工、revise协议拒绝且无全局重生循环 | 一致性/动作17测试、Ruff/app mypy177/工作流/diff及自查通过；证据docs/agents/shared-learning.md；真实Provider0 | 局部pass不授予发布，语义改善未真实验证 | 本地完成提交后领取T050人工案件持久化"
+      ],
+      "started_at": "2026-10-15T19:11:46",
+      "completed_at": "2026-10-15T19:12:30",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T049",
       "execution_gate": "ADR-0015 A–D与更新manifest已获用户明确批准，仅按依赖串行实施和零Provider测试；真实调用/费用/生产开放另批。",

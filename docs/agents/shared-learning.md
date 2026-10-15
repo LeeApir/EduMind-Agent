@@ -43,3 +43,10 @@ re-reviewed at most twice. Missing reference context goes to human. Audit hashes
 actual transport bodies; legacy calls remain compatible. Synthetic review, mock HTTP,
 old ReviewAgent and actual PG regressions: 73 passed, zero skips, om48b. Migration
 empty roundtrip passed. Ruff and application mypy175 passed. Provider requests: 0.
+
+T049: `unit_material` binds one plan, exact scene/resource versions, dependencies and
+trusted actions to learning-publication-v1 unit_digest before review. Restoring a
+modified material fails. Independent unit review receives full plan, all resources,
+actions and reference context; consistency cannot revise or start a global generation
+loop. Current reject stops; uncertainty in any component retains needs_human. Binding,
+action and consistency regressions: 17 passed; Ruff/mypy177 passed; Provider 0.
