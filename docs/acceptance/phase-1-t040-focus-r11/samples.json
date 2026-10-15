@@ -1,0 +1,68 @@
+{
+  "version": "final-focus-diagnostic-samples-v1",
+  "authored_by": "assistant",
+  "human_scope_confirmed": false,
+  "scope": "Four new hand-authored diagnostic fixtures, not formal held-out samples or statistically independent observations",
+  "items": [
+    {
+      "probe_id": "final-01",
+      "title": "栈操作顺序错误",
+      "claim_text": "栈按先进先出的顺序删除元素。",
+      "markdown": "# 顺序栈\n栈按先进先出的顺序删除元素。\n令栈初始为空，依次 push(10)、push(20)、pop()，此时 pop 返回20。\n约定push在栈顶加入，pop删除最近一次加入且尚未删除的栈顶元素。\n",
+      "expected": "fact",
+      "criterion": "聚焦先进先出断言与LIFO操作约定冲突；给出push10/push20/pop20的有效反例，不只笼统说措辞有误。",
+      "resource_type": "explanation",
+      "reference_context": {
+        "context_version": "final-diagnostic-context-v1",
+        "course": "data-structures",
+        "language": "C",
+        "scope": "Evaluate only stated teaching claims and supplied code under explicit preconditions; no hidden caller or additional product requirements."
+      }
+    },
+    {
+      "probe_id": "final-02",
+      "title": "分配失败后空指针写入",
+      "claim_text": "下面的 make_node 在 malloc 失败时会安全返回 NULL，不会解引用空指针。",
+      "markdown": "# 创建单链表节点\n下面的 make_node 在 malloc 失败时会安全返回 NULL，不会解引用空指针。\n前提：标准C环境，malloc允许返回NULL。本函数不接收已有节点，不涉及调用者覆盖旧链表。\n```c\n#include <stdlib.h>\ntypedef struct Node {\n    int value;\n    struct Node *next;\n} Node;\nNode *make_node(int value) {\n    Node *node = malloc(sizeof *node);\n    node->value = value;\n    if (node == NULL) {\n        return NULL;\n    }\n    node->next = NULL;\n    return node;\n}\n```\n分配成功时，返回节点的next为NULL，调用者负责最终free。\n",
+      "expected": "code_safety",
+      "criterion": "必须指出malloc返回NULL时node->value写在检查之前，发生空指针解引用；分类code_safety。不能凭未展示调用者虚构泄漏。",
+      "resource_type": "explanation",
+      "reference_context": {
+        "context_version": "final-diagnostic-context-v1",
+        "course": "data-structures",
+        "language": "C",
+        "scope": "Evaluate only stated teaching claims and supplied code under explicit preconditions; no hidden caller or additional product requirements."
+      }
+    },
+    {
+      "probe_id": "final-03",
+      "title": "正确栈操作与无害头文件对照",
+      "claim_text": "非空栈的 pop 删除最近一次加入且尚未删除的元素，即后进先出。",
+      "markdown": "# 栈的顺序\n非空栈的 pop 删除最近一次加入且尚未删除的元素，即后进先出。\n从空栈依次push(10)、push(20)，两次pop依次返回20、10。\n下面仅展示容量4的整数栈；调用者须传入有效Stack指针，pop的out须指向可写int。\n```c\n#include <stdbool.h>\n#include <stdio.h>\n#include <stdlib.h>\ntypedef struct { int data[4]; int size; } Stack;\nvoid init(Stack *s) { s->size = 0; }\nbool push(Stack *s, int value) {\n    if (s->size == 4) return false;\n    s->data[s->size++] = value;\n    return true;\n}\nbool pop(Stack *s, int *out) {\n    if (s->size == 0) return false;\n    *out = s->data[--s->size];\n    return true;\n}\n```\n使用前先init，仅经push/pop改变状态；push满时与pop空时返回false且不访问数组元素。\n",
+      "expected": "pass",
+      "criterion": "后进先出及代码正确；冗余头文件与未写打印语句不是错误，不可对有效指针前提另造缺陷。",
+      "resource_type": "explanation",
+      "reference_context": {
+        "context_version": "final-diagnostic-context-v1",
+        "course": "data-structures",
+        "language": "C",
+        "scope": "Evaluate only stated teaching claims and supplied code under explicit preconditions; no hidden caller or additional product requirements."
+      }
+    },
+    {
+      "probe_id": "final-04",
+      "title": "正确折半查找与边界对照",
+      "claim_text": "在给定前提下，binary_search 找到目标时返回其下标，找不到时返回 -1。",
+      "markdown": "# 有序数组查找\n在给定前提下，binary_search 找到目标时返回其下标，找不到时返回 -1。\n前提：a指向至少n个有效int，元素非降序；0 <= n <= INT_MAX；n=0时a可为NULL。函数不分配、不释放，也不修改数组。\n```c\n#include <limits.h>\nint binary_search(const int *a, int n, int target) {\n    int lo = 0;\n    int hi = n - 1;\n    while (lo <= hi) {\n        int mid = lo + (hi - lo) / 2;\n        if (a[mid] == target) return mid;\n        if (a[mid] < target) lo = mid + 1;\n        else hi = mid - 1;\n    }\n    return -1;\n}\n```\n每次未命中会缩小搜索区间。n=0时hi=-1，不进入循环；重复值只承诺返回其中某个匹配位置，不承诺首个。\n",
+      "expected": "pass",
+      "criterion": "空数组/单元素/重复值约定有效，边界和中点算术在前提内成立；不虚构需要首个匹配或NULL检测的要求。",
+      "resource_type": "explanation",
+      "reference_context": {
+        "context_version": "final-diagnostic-context-v1",
+        "course": "data-structures",
+        "language": "C",
+        "scope": "Evaluate only stated teaching claims and supplied code under explicit preconditions; no hidden caller or additional product requirements."
+      }
+    }
+  ]
+}
