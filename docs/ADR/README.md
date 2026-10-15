@@ -56,3 +56,5 @@
 2026-10-15：[ADR-0013：逐条声明审核与确定性汇总](0013-claim-level-resource-review.md)为T040连续漏项后的Proposed设计稿，仅设计授权；声明提取/独立覆盖/逐条及整体检查/本地汇总均未实施，真实请求0。内部原型实施、动态子请求冻结规则补充与真实预算需分别决定；不改变ADR-0011、原失败/验收标签或catalog_only。
 
 2026-10-15 后续：用户“继续”授权并完成[零调用原型](../acceptance/phase-1-t040-claim-review-prototype/README.md)，只在scripts实验层使用合成tape；不代表ADR-0013真实派生/生产接入条款Accepted。61原型+148相关回归通过，真实Provider0，动态预算补充与质量门禁仍待决定。
+
+2026-10-15：[ADR-0014：T040有界子请求冻结与预算](0014-bounded-derived-review-requests.md)为Proposed补充，A–D待批准；[准确提案清单](../acceptance/phase-1-t040-derived-budget-proposal/manifest.json)只绑定规则/基线供设计审阅。批准仅授予独立机制实现与零Provider测试；不授权247次理论调用、任何金额、正式质量/DSL/T041或生产开放，旧v1与旧台账不改。
