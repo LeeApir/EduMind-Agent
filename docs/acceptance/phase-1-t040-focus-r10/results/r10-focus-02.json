@@ -1,0 +1,111 @@
+{
+  "version": "fixed-focus-r10-observation-v1",
+  "execution_source_commit": "9217215",
+  "governance_baseline_commit": "2553d69",
+  "root_sha256": "e8388f55fe970be398d44bf4543d85f3dd03004e6c4fb6e44b98e44b1ef8923a",
+  "state": "HALTED_ADMISSION_FAILED",
+  "provider_requests_this_observation": 1,
+  "total_round_requests": 2,
+  "remaining_unrun_slots": [
+    "focus-03",
+    "focus-04"
+  ],
+  "input_tokens": 5384,
+  "output_tokens": 667,
+  "reasoning_tokens_included": 0,
+  "total_tokens": 6051,
+  "reserved_micro_cny": 2152058,
+  "peak_usage_reference_micro_cny": 16104,
+  "round_totals": {
+    "input_tokens": 10789,
+    "output_tokens": 1266,
+    "total_tokens": 12055,
+    "reserved_micro_cny": 4304320,
+    "peak_usage_reference_micro_cny": 31706
+  },
+  "actual_bill": null,
+  "response_sha256": "0e89162130eea9999aaa4950668eabd7bb83323a26f632254438cef633eaebb7",
+  "value_hash": "08eb52e98e3dfcb52af84e7ee3752693bb534c5d5da8807db2565f3a4fa9db17",
+  "model_and_completed_status_verified_by_frozen_finish": true,
+  "http_status_not_retained": true,
+  "actual_response": {
+    "findings": [
+      {
+        "area": "fact",
+        "message": "聚焦断言“front == rear 是空队列条件”与同一资源中代码的约定不一致。代码（s0044–s0047、s0050–s0053、s0060–s0062、s0069–s0071、s0080–s0082）使用 size 字段判定空/满，并让 front 与 rear 对 CAPACITY 取模循环推进；在这种循环队列约定下，front == rear 同时对应空队列和满队列（size == 0 与 size == CAPACITY），因此它不是充分条件。反例：CAPACITY=8 时连续 enqueue 8 个元素后 size==8、front==rear==0，此时队列为满而非空。s0027 的 size = rear - front 也只在非循环、rear 不取模的约定下成立，与代码的取模实现冲突。该断言仅在“rear 不取模、front 不推进回绕”的朴素数组约定下才成立，而资源并未声明这一约定。",
+        "severity": "major"
+      }
+    ],
+    "other_findings": [
+      {
+        "finding": {
+          "area": "fact",
+          "message": "“关键公式”一节（s0027–s0030）采用非循环数组约定：size = rear - front、front == rear 判空、rear++/front++ 不取模。但紧随其后的 C 代码（s0070、s0081）对下标取模形成循环队列，并用 size 判空/判满。两套约定在同一资源内并存且未加区分，读者按公式推导循环队列状态会得到错误结论（例如满队列时 rear - front 为 0 而非 CAPACITY）。",
+          "severity": "major"
+        },
+        "span_ids": [
+          "s0027",
+          "s0028",
+          "s0029",
+          "s0030"
+        ]
+      },
+      {
+        "finding": {
+          "area": "code_safety",
+          "message": "代码块包含 #include <stdio.h> 与 #include <stdlib.h>，但示例中未使用任何 stdio 或 stdlib 设施（无 printf、malloc 等），属于冗余包含；虽不影响正确性，但与“仅展示”的示意代码简洁性目标不符。",
+          "severity": "minor"
+        },
+        "span_ids": [
+          "s0037",
+          "s0038"
+        ]
+      },
+      {
+        "finding": {
+          "area": "code_safety",
+          "message": "说明称 dequeue 和 queue_peek 都先检查 queue_is_empty 以避免访问 data[front]，但未提及 enqueue 的满队列检查（s0066）同样关键：若省略该检查，size==CAPACITY 时写入 data[rear] 会覆盖仍有效的队头元素并破坏 FIFO 语义。说明对失败路径的覆盖不完整。",
+          "severity": "minor"
+        },
+        "span_ids": [
+          "s0099"
+        ]
+      }
+    ],
+    "request_id": "c7883075af9487668299febf3b9e3c95597c339815a9522b311f2a2514d4d85d",
+    "uncertain": false,
+    "verdict": "revise",
+    "version": "span-focus-review-v1"
+  },
+  "fact_observation": {
+    "version": "fixed-focus-delegated-stop-assessment-v1",
+    "root_sha256": "e8388f55fe970be398d44bf4543d85f3dd03004e6c4fb6e44b98e44b1ef8923a",
+    "number": 2,
+    "value_hash": "08eb52e98e3dfcb52af84e7ee3752693bb534c5d5da8807db2565f3a4fa9db17",
+    "assessed_by": "Codex",
+    "delegated_by": "Lee",
+    "delegation_user_text": "继续进行第二条，直到再次出现问题",
+    "source_message_id": "current-thread:user-continue-second-until-next-problem-after-2553d69-first-observation",
+    "semantic_quality_accepted": false,
+    "continuation_authorized": false,
+    "disposition": "STOP_ON_NEW_REVIEWER_PROBLEM",
+    "observations": [
+      "Primary finding correctly identifies front==rear as insufficient for emptiness in the size-tracked full-capacity circular implementation.",
+      "Unused stdio/stdlib includes again classified code_safety without a safety defect.",
+      "New additional code_safety finding criticizes missing discussion of enqueue-full check despite present check and the explicit enqueue-full-return-false explanation; hypothetical removal of an existing check is not an existing safety defect."
+    ],
+    "source_evidence": [
+      "if (queue_is_full(q)) { return false; }",
+      "返回值与注释描述同一约定：enqueue 满时返回 false，dequeue/queue_peek 空时返回 false。"
+    ],
+    "human_semantic_signoff": null
+  },
+  "first_observation_continuation_exception": "../continuation-exception-focus-01.json",
+  "first_observation_quality_failure_preserved": true,
+  "human_semantic_signoff": null,
+  "semantic_quality_accepted": false,
+  "full_resource_coverage_verified": false,
+  "production_mode": "catalog_only",
+  "t040_complete": false,
+  "no_additional_run_authorized": true
+}
