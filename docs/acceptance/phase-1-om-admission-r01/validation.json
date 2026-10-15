@@ -1,0 +1,56 @@
+{
+  "status": "ZERO_CALL_PREPARATION_VERIFIED_NOT_REAL_ACCEPTANCE",
+  "checks": [
+    {
+      "command": "backend/.venv/bin/pytest -q scripts/tests/test_om_admission.py backend/tests/test_acceptance_budget.py backend/tests/test_deepseek_responses.py backend/tests/test_provider_target.py backend/tests/test_provider_target_policy.py backend/tests/test_t040_diagnostic_preparation.py backend/tests/test_t040_diagnostic_runner.py --tb=short",
+      "result": "185 passed in 0.71s; no skips; 24 new admission cases included"
+    },
+    {
+      "command": "backend/.venv/bin/ruff check scripts/acceptance_support/om_diagnostic.py scripts/prepare_om_admission.py scripts/run_om_admission.py scripts/tests/test_om_admission.py",
+      "result": "All checks passed"
+    },
+    {
+      "command": "backend/.venv/bin/python scripts/prepare_om_admission.py --check",
+      "result": "passed; 4 frozen wire requests; 8629186 micro CNY; no authorization"
+    },
+    {
+      "command": "backend/.venv/bin/python scripts/run_om_admission.py --run-one",
+      "exit_code": 2,
+      "result": "STOPPED_OR_NOT_AUTHORIZED; no .env/key read, DNS or real ledger"
+    },
+    {
+      "command": "backend/.venv/bin/python docs/acceptance/phase-1-om-redesign/check_contract.py",
+      "result": "12 documents /12 task contracts approved manifest unchanged"
+    },
+    {
+      "command": "python3 scripts/check_catalog_workflow.py",
+      "result": "dependencies and catalog valid; T033 blocked"
+    },
+    {
+      "command": "python3 scripts/verify_legacy_archives.py",
+      "result": "236 originals /64 experiments /169 evidence files verified"
+    },
+    {
+      "command": "backend/.venv/bin/python scripts/prepare_om_redesign_acceptance.py --check",
+      "result": "T054 root f749afec0d0148eecb18d477ce805f3c8a73eafe79467270edd68f58463f55e1 unchanged"
+    },
+    {
+      "command": "git diff --check",
+      "result": "passed"
+    }
+  ],
+  "initial_repairs": [
+    "Synthetic HTTP message fixture needed completed status; kept production parser strict.",
+    "Used existing kernel ADMISSION_FAILED halt code and corrected receipt tuple state index; no assertion weakened.",
+    "Rebuild used project virtualenv because system Python lacks httpx; no dependency installation or network needed."
+  ],
+  "provider_requests": 0,
+  "fees_authorized_micro_cny": 0,
+  "credential_access_in_preparation": "metadata-only; Key bytes not read or hashed",
+  "real_model_quality": "NOT_TESTED",
+  "unsafe_C_execution": false,
+  "production_mode": "catalog_only",
+  "T040": "blocked",
+  "T041_T042": "not_started",
+  "limits": "4 requests are separate admission probes, not full eight-category diagnosis; formal scopes/ground truth/derived runner and fees still gated."
+}
