@@ -28,3 +28,9 @@ Changing a candidate discards all dependent candidates and dispositions. A code
 language mismatch fails. This workspace alone grants no publication qualification.
 Scene generation uses the operation's shared call/deadline window, 4096 total output
 per generation, no retry/fallback. New and legacy generator regressions: 13 passed.
+
+T047: teaching-actions-v1 deterministically assembles show_resource, code key-step
+highlights and ask_exercise references. Server-created UTF-8 anchors identify original
+fields. Action validation recomputes the exact trusted template and bound resource
+digests, rejecting cross-scene IDs, extra speech/HTML and stale content. No Provider
+calls. Action/dependency regressions: 10 passed; Ruff and mypy172 passed.
