@@ -456,7 +456,7 @@ class DerivedBudget:
         parents = []
         if correction is not None:
             parents.append(correction)
-        payload = {"candidate": snap.data, "identity": snap.identity}
+        payload = {"candidate": snap.data, "identity": snap.identity, "blocks": snap.blocks}
         if stage != "inventory":
             parents.append(ir)
             payload["inventory"] = self._value(ir) if stage == "coverage" else inv
@@ -464,6 +464,11 @@ class DerivedBudget:
             parents.append(cr)
         if stage == "claim":
             payload["focus"] = inv["claims"][ordinal - 1]
+            payload["review_identity"] = claims.binding(
+                snap, inv, inv["claims"][ordinal - 1]["claim_id"]
+            )
+        if stage == "overall":
+            payload["review_identity"] = claims.binding(snap, inv, "__overall__")
         if stage in ("overall", "correction"):
             for n in range(1, len(inv["claims"]) + 1):
                 parents.append(self._row(db, case["id"], r, "claim", n))
@@ -732,7 +737,16 @@ class DerivedBudget:
                 )
                 self._halt(db, code)
 
-    def abort(self, number, *, error_code, response_sha256=None):
+    def abort(
+        self,
+        number,
+        *,
+        error_code,
+        response_sha256=None,
+        input_tokens=None,
+        output_tokens=None,
+        reasoning_tokens=None,
+    ):
         """Trusted transport-failure hook; never accepts vendor exception/error text."""
         with self._db() as db:
             self._gate(db)
@@ -747,9 +761,21 @@ class DerivedBudget:
             require(
                 row is not None and row["state"] in ("reserved", "intent"), "INVALID_FINISH_STATE"
             )
+
+            def observed(value):
+                return value if type(value) is int and 0 <= value <= 2**63 - 1 else None
+
+            i, o, reasoning = (
+                observed(input_tokens),
+                observed(output_tokens),
+                observed(reasoning_tokens),
+            )
+            if reasoning is not None and (o is None or reasoning > o):
+                reasoning = None
             db.execute(
-                "UPDATE children SET state='failed',response_hash=? WHERE number=?",
-                (response_sha256, number),
+                "UPDATE children SET state='failed',response_hash=?,input_tokens=?,"
+                "output_tokens=?,reasoning_tokens=? WHERE number=?",
+                (response_sha256, i, o, reasoning, number),
             )
             self._halt(db, error_code)
 

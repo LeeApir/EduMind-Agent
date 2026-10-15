@@ -60,3 +60,5 @@
 2026-10-15：[ADR-0014：T040有界子请求冻结与预算](0014-bounded-derived-review-requests.md)为Proposed补充，A–D待批准；[准确提案清单](../acceptance/phase-1-t040-derived-budget-proposal/manifest.json)只绑定规则/基线供设计审阅。批准仅授予独立机制实现与零Provider测试；不授权247次理论调用、任何金额、正式质量/DSL/T041或生产开放，旧v1与旧台账不改。
 
 2026-10-15 后续：用户“yes”批准ADR-0014 A–D及准确manifest，状态以[批准登记](0014-derived-budget-approval-20261015.json)为Accepted，原Proposed提案保留历史字节。[独立预算机制](../acceptance/phase-1-t040-derived-budget-kernel/README.md)完成零调用实现与269项离线验证；未接入真实HTTP/出站鉴权，真实请求及费用授权仍0，T040质量门禁继续blocked。
+
+2026-10-15 后续：完成[派生发送组合离线验证](../acceptance/phase-1-t040-derived-calibration-draft/README.md)，311项离线通过，补齐模型可复制的块/身份摘要；两例最多38次草案仍DRAFT_NOT_EXECUTABLE，Token/费用证明、真实审批/当前凭据同意和事实签核组合待补，真实Provider0，未新增架构或付费批准。
