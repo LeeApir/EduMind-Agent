@@ -1220,3 +1220,9 @@ r08 v6 low首例只检出计数错误/fact，反例有效且无修复方案，�
 四请求初筛首槽plan实际1次完成，保存完整计划/准确收据和人工核对包；共享轨迹0/2/7/16、i=3终止一致，额外c-pointer先修需人工判断 | 协议/schema/绑定通过，实际1607+818=2425tokens；独立账本1条complete/未halt，预留2.124020元/峰值用量参考0.009758元非账单；源码冻结与摘要/0600核对通过，185离线沿用46cf3e9 | 此为真实首槽检查点不是T040完成或人工签核，无plan-human.json，余3未发 | 保存本地提交后按批准的逐次门禁等待用户核对，完整证据phase-1-om-admission-r01/results/plan-01.json
 [2026-10-15T20:48:01] [PHASE-1-T040] BLOCKED | executor=Lee
 首槽返回HUMAN_CHECK_REQUIRED且未写人工继续收据 | 第2槽发送前检查会要求准确第1槽收据人工确认，不以预算批准冒充结果通过 | 需用户核对实际计划，尤其额外C指针先修；正式T040其余门禁保留 | 用户确认具体计划后才可登记准确plan-human并执行correct-unit一次，不扩大预算/轮次
+[2026-10-15T20:49:43] [PHASE-1-T040] RESUME | executor=Lee | branch=codex/phase-1-continued
+用户在d897d2a完整计划/额外C指针先修核对问题后回复继续，登记准确plan收据5ed4793d41d1060b534a82e64476e000538e142cc3bc1f5cf0b57a5c2d68e3f5的人工continue | 原准确根/4次/8.629186元/同日官方条款与load门禁保持，不改冻结输入和实际结果 | 仅解除correct-unit前人工继续门禁，完整T040仍blocked，余量不扩展 | 执行第2槽正确整单元审核一次并停止核对
+[2026-10-15T20:52:23] [PHASE-1-T040] VERIFIED | executor=Lee
+首槽实际计划经用户继续后执行第2槽一次并保存完整失败证据；识别共享unit Schema/Prompt允许revise与本地禁用不一致及对照目标范围歧义，不把全结果误算模型幻觉 | 实际11491+650tokens；原结果离线复现REVIEW_PROTOCOL_INVALID；源码/收据/0600及账本两条核验，累计2请求14566tokens、预留4.301416元/峰值参考0.037940元非账单 | 通用兜底记SAFETY_FAILURE并halt，非密钥泄漏证据，余2未发，T040不完成 | 保存correct-unit-02.json及review.md，持久停止当前冻结轮次，不修改源码/原结果/标签/旧账本
+[2026-10-15T20:52:23] [PHASE-1-T040] BLOCKED | executor=Lee
+正确对照未过本地unit/revise协议门禁；原halt不清除 | 接口成功、结构有效，实际原因与用量已记录，不报TEMPORARILY_UNAVAILABLE或网络失败 | 需先零调用统一unit可见协议与本地规则、澄清图谱目标和单元目标及人工预期；正式门禁未解除 | 停止真实请求并提交检查点，不沿用余量自动重开；后续新组合/真实预算另批

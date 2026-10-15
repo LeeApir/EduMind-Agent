@@ -1,0 +1,123 @@
+{
+  "version": "om-admission-correct-unit-02-failure-v1",
+  "source_commit": "46cf3e9",
+  "predecessor_evidence_commit": "d897d2a",
+  "proposal_sha256": "28e25a016c1689c8b27ae52284edb91244fec85b4f24c19297673377a2b17057",
+  "approval_sha256": "b5a4f18165949f466ab9bddd91effa3b17ce8758dab797cf675c07653e0a4214",
+  "receipt_sha256": "7e8cecd8bcb699572b26573f577d88143e3d4bc359b475fb7e0fd74e4a9680a7",
+  "prior_plan_human_continue_sha256": "a61bfa13df0554a9414dd07f7e09f2d53dcf2fffb8f9a41027d10dfc23a33541",
+  "real_cloud": true,
+  "mock": false,
+  "slot": "correct-unit",
+  "requests_sent_this_step": 1,
+  "cumulative_requests": 2,
+  "provider_structured_response": "completed and schema valid; model/actual request binding matched",
+  "local_protocol": "REVIEW_PROTOCOL_INVALID (exact offline replay, zero additional requests)",
+  "ledger_error": "SAFETY_FAILURE",
+  "ledger_halted": "SAFETY_FAILURE",
+  "ledger_error_interpretation": "Generic classify_failure maps unrecognized LearningContractError to SAFETY_FAILURE/local_unexpected. Not evidence of a credential leak, network outage or memory-safety issue in the control. Preserve original ledger; do not relabel it silently.",
+  "root_causes_and_observations_not_human_signoff": [
+    {
+      "kind": "protocol_contract_mismatch",
+      "finding": "Local route_review rejects unit/revise; shared review schema still permits revise and runtime INSTRUCTION does not explicitly forbid it for unit. Model chose a schema-permitted answer rejected by local cross-field rule. No repair or retry authorized for this frozen run."
+    },
+    {
+      "kind": "control_scope_ambiguity",
+      "finding": "Model points out absent array access-complexity and insertion/deletion objectives. Fixture deliberately only covers summation/bounds while carrying a graph node with broader objectives. The proposed automatic-pass label is not established as fair for whole-unit review; do not count this entire rejection as proven model hallucination."
+    },
+    {
+      "kind": "classification_and_evidence",
+      "finding": "Model labels objective omission fact, absent correction of node misconceptions misconception, and trace-coverage gap difficulty. Runtime instruction requires explicit learner evidence for difficulty; response acknowledges no learner evidence. Classification and unsupported assumptions need independent adjudication."
+    },
+    {
+      "kind": "routing_not_correctness",
+      "finding": "Even a protocol-compatible needs_human answer would not satisfy the frozen correct-control auto-pass gate. Structural completeness alone does not prove acceptable content."
+    }
+  ],
+  "input_tokens": 11491,
+  "output_tokens_including_reasoning": 650,
+  "total_tokens": 12141,
+  "cost_reserved_micro_cny": 2177396,
+  "peak_usage_cost_reference_micro_cny": 28182,
+  "cumulative_input_tokens": 13098,
+  "cumulative_output_tokens": 1468,
+  "cumulative_total_tokens": 14566,
+  "cumulative_cost_reserved_micro_cny": 4301416,
+  "cumulative_peak_usage_reference_micro_cny": 37940,
+  "actual_invoice_cost": null,
+  "cost_note": "Reference uses approved peak/uncached price; not bill. Failed slot consumes reservation without refund.",
+  "requests_not_sent": [
+    "reachable-safety",
+    "fact-contradiction"
+  ],
+  "request_sha256": "7e956106e4872cca65cff7946333299fad39dba901e057310f3581911356d89b",
+  "response_sha256": "07d59805b9fb6ff24b26e9d6624f429fc96aa07aae58a3530193045478a54616",
+  "review_result": {
+    "coverage": {
+      "checked": [
+        "action_references",
+        "answer_consistency",
+        "conventions",
+        "example_trace",
+        "terminology",
+        "explanation_content",
+        "code_content",
+        "exercise_content",
+        "plan_objective_alignment",
+        "node_learning_objectives",
+        "node_common_misconceptions",
+        "anchor_catalog_consistency"
+      ],
+      "unchecked": [
+        "Independent verification of the proposed trace against the graph source (reference_context explicitly marks the trace as not independently verified)",
+        "Learner evidence (learner_evidence is empty, so no empirical difficulty or misconception data is available)"
+      ]
+    },
+    "findings": [
+      {
+        "anchors": [
+          "a1"
+        ],
+        "category": "fact",
+        "condition_or_counterexample": "Explanation resource states 数组a={2,5,9}，合法下标0至2。sum()返回16；函数不打印。 The plan's stated goal and objective are to trace the C summation loop and explain index bounds 0–2 and return value 16, but the node's explicit learning objectives are 说出下标访问的时间复杂度 and 说明连续存储对插入和删除的影响. The explanation contains no statement about index-access time complexity and no statement about the effect of contiguous storage on insertion/deletion.",
+        "impact": "The explanation scene does not cover the node's declared learning objectives; a learner completing this unit receives no instruction on the required complexity or insertion/deletion consequences, so the unit cannot satisfy its mastery target.",
+        "severity": "major"
+      },
+      {
+        "anchors": [
+          "a1",
+          "a9",
+          "a13",
+          "a17"
+        ],
+        "category": "misconception",
+        "condition_or_counterexample": "The node lists common_misconceptions including 数组插入总是 O(1) and 数组每次访问都要从头遍历. The explanation and all three exercise items only address index bounds, arithmetic 2+5+9=16, and whether a return value is printed. No item or explanation confronts either listed misconception.",
+        "impact": "Learners holding the documented misconceptions receive no corrective feedback; the exercises can be answered correctly while the misconceptions remain intact, undermining the unit's misconception-remediation purpose.",
+        "severity": "major"
+      },
+      {
+        "anchors": [
+          "a9",
+          "a13",
+          "a17"
+        ],
+        "category": "difficulty",
+        "condition_or_counterexample": "All three exercise items are true/false with single-character answers (T/F) and the node difficulty is 1. The plan objective is 追踪数组求和的边界和结果, but no item requires tracing the loop, producing the intermediate totals 2,7,16, or reasoning about the boundary condition i<3.",
+        "impact": "The assessment does not exercise the stated tracing objective; a learner can pass by recalling the arithmetic fact 2+5+9=16 and the general rule that return values are not printed, without demonstrating the intended trace skill.",
+        "severity": "minor"
+      }
+    ],
+    "schema_version": "resource-review-v4",
+    "scope": "unit",
+    "unresolved": [
+      "The reference_context scope states 'Partial graph; proposed trace is not independently verified evidence', so alignment of the unit with the full graph beyond the array node cannot be confirmed.",
+      "No learner evidence is supplied; difficulty and misconception findings rest on resource content versus declared node metadata only."
+    ],
+    "verdict": "revise"
+  },
+  "human_confirmed": false,
+  "T040": "blocked",
+  "formal_quality_passed": false,
+  "production_mode": "catalog_only",
+  "next": "Stop current frozen admission run. Review response, clarify unit verdict contract and control objective scope offline before any separately frozen/reapproved real round."
+}
