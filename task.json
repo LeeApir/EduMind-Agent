@@ -2221,7 +2221,7 @@
       "id": "PHASE-1-T040",
       "phase": "Phase 1",
       "title": "完成新配置动态资源质量验收",
-      "status": "in_progress",
+      "status": "blocked",
       "priority": "P0",
       "depends_on": [
         "PHASE-1-T035",
@@ -2261,11 +2261,12 @@
         "用户yes批准r06两次/CNY0.18，执行源码93ac1f0首条实际HTTP200/模型匹配/48.469505秒，但completed=false/review=null，2784输入+8192总输出=10976tokens，其中推理8192；INVALID_OUTPUT自动停止，正确对照未发。保守预留CNY0.090642，标价参考0.071104非账单；当前冻结来源SHA/请求/SQLite一条核验通过，原137离线证据。检出/分类/职责事实质量不可评估，修正NOT_RUN，不冒称漏检或通过；不留原始响应/推理正文，具体供应商未完成原因未知。证据phase-1-t040-review-scope-check/results/review-scope-r06.json。",
         "用户继续后准备r07：只将high改low，其余同模型/Promptv5/历史两例/schema/8192/120秒不变，独立2次/CNY0.18提案未批准、真实0；新增只留枚举状态/未完成原因/输出类型计数，无任意错误或推理正文，不回填r06未知原因。146离线/Ruff/mypy166/任务/批准/冻结校验通过；r06按93ac1f0核对186来源文件，只读SQLite仍1条/INVALID_OUTPUT。低推理可能降低检出，尚无语义通过证据，不转授完整诊断/正式质量/DSL/T041，证据phase-1-t040-review-scope-low。",
         "用户yes批准r07两次/CNY0.18，执行源码3c5936c首条HTTP200/completed/schema/模型/usage有效，28.677132秒/2784输入+5036输出=7820tokens（推理4862包含），预留CNY0.090640/峰值标价参考0.045856非账单。计数rear-front回绕错误具体检出且fact正确，front6/rear2/size4反例可达，无替换公式/补丁；但未指出front==rear满队列误判空，不满足事前两项均检出，独立语义评估halt CONCRETE_DEFECT_MISSED，原自动quality_failure=null不改。第二例/修正未运行，186冻结来源/请求/SQLite1条/保留最终回答核对通过，原146离线证据。不以一例断言low因果效果或全部漏检/正式通过；证据phase-1-t040-review-scope-low/results/review-scope-r07.json。",
-        "用户继续后核对代码/schema支持多issue，r07原回答确实只有一条，无程序截断证据；审核Prompt v6增加通用逐断言覆盖、找到一处继续核对其余、不只报告代表性一条，并保持正确对照/无固定数量/findings-only及独立修正完整重审。148离线/Ruff/mypy166、批准/历史冻结/任务校验通过；新增多问题完整传修正/全候选复审和r08仅system变化测试。旧r07对比测试直接核对冻结r07/r06正文，继续断言仅effort不同，旧文件不改；r07按3c5936c核验186来源/只读SQLite仍1次且停止。r08两例low/8192/120秒/CNY0.18新提案已准备，真实0，未证明模型质量或放宽标签。"
+        "用户继续后核对代码/schema支持多issue，r07原回答确实只有一条，无程序截断证据；审核Prompt v6增加通用逐断言覆盖、找到一处继续核对其余、不只报告代表性一条，并保持正确对照/无固定数量/findings-only及独立修正完整重审。148离线/Ruff/mypy166、批准/历史冻结/任务校验通过；新增多问题完整传修正/全候选复审和r08仅system变化测试。旧r07对比测试直接核对冻结r07/r06正文，继续断言仅effort不同，旧文件不改；r07按3c5936c核验186来源/只读SQLite仍1次且停止。r08两例low/8192/120秒/CNY0.18新提案已准备，真实0，未证明模型质量或放宽标签。",
+        "用户yes批准r08两次/CNY0.18，执行源码f8faff5首例HTTP200/completed/schema/模型/用量有效，15.189834秒/2944输入+1966输出=4910tokens（推理1770包含），预留CNY0.092476/峰值标价参考0.021616非账单。rear-front计数错误具体检出且fact正确，enqueue8/dequeue1得到front1/rear0/size7的反例有效，回答无修复方案；仍未指出front==rear空满混淆，不满足冻结两项检出要求，独立语义评估halt CONCRETE_DEFECT_MISSED，原自动quality_failure=null不改。第二条/修正未发，186来源/实际请求/SQLite1条/保留最终回答核验通过；原148离线证据。r07/r08同漏项，无v6改善证据；停止付费，须先决定审核策略，不自动追加微调或下一轮。证据phase-1-t040-review-coverage-check/results/review-coverage-r08.json。"
       ],
       "started_at": "2026-10-14T19:38:26",
       "completed_at": null,
-      "blocker": null,
+      "blocker": "r08 v6 low首条仍只检出计数错误，漏front==rear空满条件；CONCRETE_DEFECT_MISSED停止，第二条未发。r07/r08连续同漏项，须先人工决定后续审核策略，不再盲目微调Prompt重跑。",
       "commit_lookup": "Task-Completed: PHASE-1-T040"
     },
     {
