@@ -22,9 +22,14 @@ class OperationReservation:
     created: bool
 
 
-def request_digest(*, goal: str, preferred_language: str) -> str:
+def request_digest(
+    *, goal: str, preferred_language: str, generation_protocol: str | None = None
+) -> str:
+    payload = {"goal": goal.strip(), "preferred_language": preferred_language}
+    if generation_protocol is not None:
+        payload["generation_protocol"] = generation_protocol
     value = json.dumps(
-        {"goal": goal.strip(), "preferred_language": preferred_language},
+        payload,
         ensure_ascii=False,
         sort_keys=True,
         separators=(",", ":"),
@@ -39,9 +44,12 @@ async def reserve_operation(
     idempotency_key: str,
     goal: str,
     preferred_language: str,
+    generation_protocol: str | None = None,
 ) -> OperationReservation:
     """Create one operation or return the same owner-bound, same-payload record."""
-    digest = request_digest(goal=goal, preferred_language=preferred_language)
+    digest = request_digest(
+        goal=goal, preferred_language=preferred_language, generation_protocol=generation_protocol
+    )
     existing = await db.scalar(
         select(LearningOperation).where(
             LearningOperation.user_id == owner_id,
@@ -105,6 +113,15 @@ def operation_payload(operation: LearningOperation) -> dict[str, object]:
         "id": str(operation.id),
         "status": operation.status,
         "attempt": operation.attempt,
+        "phase": operation.phase,
+        "publication_version": (operation.review_summary or {}).get("publication_version"),
+        "review_summary": {
+            k: v
+            for k, v in operation.review_summary.items()
+            if k in {"state", "approval_source", "reason_code", "updated_at"}
+        }
+        if operation.review_summary
+        else None,
         "learning_unit_id": str(operation.learning_unit_id) if operation.learning_unit_id else None,
         "published_scene_version": operation.published_scene_version,
         "error": operation.error,

@@ -3198,24 +3198,72 @@
       }
     },
     "/api/learning-sessions": {
-      "post": {
-        "tags": ["Learning"],
-        "summary": "创建学习会话，流式返回临时首段并审核发布正式资源",
-        "description": "先将目标映射到已审核图谱节点；不可靠映射返回澄清而不默认节点。可靠目标按路径当前推荐节点生成内容，学习单元保存节点与路径快照。首段 token 是待审核的临时内容；只有 scene_ready 指向的版本可作为正式资源读取。相同 owner、Idempotency-Key 和请求摘要必须返回同一操作或同一澄清结果。重复 POST 只回放持久化状态，不调用 Provider；失败操作不自动创建新 attempt。只有用户明确重新生成或提交新目标才使用新幂等键。",
-        "operationId": "startLearningSession",
-        "security": [{"sessionCookie": []}],
-        "parameters": [{"$ref": "#/components/parameters/IdempotencyKey"}, {"$ref": "#/components/parameters/CsrfToken"}],
-        "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/StartLearningRequest"}}}},
-        "responses": {
-          "200": {"$ref": "#/components/responses/LearningEventStream"},
-          "401": {"$ref": "#/components/responses/Unauthorized"},
-          "403": {"$ref": "#/components/responses/CsrfFailed"},
-          "409": {"$ref": "#/components/responses/IdempotencyConflict"},
-          "422": {"description": "请求无效或目标需要澄清。", "content": {"application/json": {"schema": {"oneOf": [{"$ref": "#/components/schemas/Error"}, {"$ref": "#/components/schemas/GoalClarification"}]}}}},
-          "429": {"$ref": "#/components/responses/RateLimited"}
+  "post": {
+    "tags": [
+      "Learning"
+    ],
+    "summary": "创建学习会话，流式返回临时首段并审核发布正式资源",
+    "description": "先将目标映射到已审核图谱节点；不可靠映射返回澄清而不默认节点。可靠目标按路径当前推荐节点生成内容，学习单元保存节点与路径快照。首段 token 是待审核的临时内容；只有 scene_ready 指向的版本可作为正式资源读取。相同 owner、Idempotency-Key 和请求摘要必须返回同一操作或同一澄清结果。重复 POST 只回放持久化状态，不调用 Provider；失败操作不自动创建新 attempt。只有用户明确重新生成或提交新目标才使用新幂等键。 generation_protocol=shared-plan-v1选择计划/三场景/混合审核新链；不自动回退。首版新链只使用已存在的有据画像（缺失保持未知），不新增画像推断/临时讲解请求，实际阶段由SSE及操作GET读取。每次最多20个含可选目标映射的请求与180秒总窗；无隐式重试。",
+    "operationId": "startLearningSession",
+    "security": [
+      {
+        "sessionCookie": []
+      }
+    ],
+    "parameters": [
+      {
+        "$ref": "#/components/parameters/IdempotencyKey"
+      },
+      {
+        "$ref": "#/components/parameters/CsrfToken"
+      }
+    ],
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/StartLearningRequest"
+          }
         }
       }
     },
+    "responses": {
+      "200": {
+        "$ref": "#/components/responses/LearningEventStream"
+      },
+      "401": {
+        "$ref": "#/components/responses/Unauthorized"
+      },
+      "403": {
+        "$ref": "#/components/responses/CsrfFailed"
+      },
+      "409": {
+        "$ref": "#/components/responses/IdempotencyConflict"
+      },
+      "422": {
+        "description": "请求无效或目标需要澄清。",
+        "content": {
+          "application/json": {
+            "schema": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/Error"
+                },
+                {
+                  "$ref": "#/components/schemas/GoalClarification"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "429": {
+        "$ref": "#/components/responses/RateLimited"
+      }
+    }
+  }
+},
     "/api/learning-operations/{operationId}": {
       "get": {
         "tags": ["Learning"],
@@ -3261,20 +3309,53 @@
       }
     },
     "/api/learning-units/{learningUnitId}": {
-      "get": {
-        "tags": ["Learning"],
-        "summary": "读取学生可见的学习单元",
-        "description": "只返回所有者拥有且已审核发布的场景与资源版本；同一scene_key保留旧版只读，并以is_current标明最新正式版本；不得泄露临时候选。",
-        "operationId": "getLearningUnit",
-        "security": [{"sessionCookie": []}],
-        "parameters": [{"$ref": "#/components/parameters/LearningUnitId"}],
-        "responses": {
-          "200": {"description": "学习单元。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/LearningUnit"}}}},
-          "401": {"$ref": "#/components/responses/Unauthorized"},
-          "404": {"$ref": "#/components/responses/NotFound"}
-        }
+  "get": {
+    "tags": [
+      "Learning"
+    ],
+    "summary": "读取学生可见的学习单元",
+    "description": "只返回所有者拥有且已审核发布的场景与资源版本；同一scene_key保留旧版只读，并以is_current标明最新正式版本；不得泄露临时候选。",
+    "operationId": "getLearningUnit",
+    "security": [
+      {
+        "sessionCookie": []
       }
-    },
+    ],
+    "parameters": [
+      {
+        "$ref": "#/components/parameters/LearningUnitId"
+      },
+      {
+        "name": "publication_version",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "description": "省略取current完整快照，指定只读准确已发布未撤回版本；不可读404，不回退其他版本。旧无计划单元指定此参数404。"
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "学习单元。",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/LearningUnit"
+            }
+          }
+        }
+      },
+      "401": {
+        "$ref": "#/components/responses/Unauthorized"
+      },
+      "404": {
+        "$ref": "#/components/responses/NotFound"
+      }
+    }
+  }
+},
     "/api/resource/{resourceId}": {
       "get": {
         "tags": ["Resources"],
@@ -3468,7 +3549,85 @@
     "/api/learning-units/{learningUnitId}/classroom/messages": {"get": {"tags": ["Classroom"],"summary": "读取已提交课堂消息","operationId": "getClassroomMessages","security": [{"sessionCookie": []}],"parameters": [{"$ref": "#/components/parameters/LearningUnitId"},{"$ref": "#/components/parameters/AfterMessageCursor"}],"responses": {"200": {"description": "成功。","content": {"application/json": {"schema": {"$ref": "#/components/schemas/ClassroomMessagePage"}}}},"401": {"$ref": "#/components/responses/Unauthorized"},"404": {"$ref": "#/components/responses/NotFound"},"409": {"$ref": "#/components/responses/MessageCursorInvalid"},"410": {"$ref": "#/components/responses/MessageCursorExpired"}},"description": "after只过滤已提交消息，不回放临时token；410后GET课堂快照取得message_cursor。"},"post": {"tags": ["Classroom"],"summary": "课堂发言流","operationId": "streamClassroomSpeech","security": [{"sessionCookie": []}],"parameters": [{"$ref": "#/components/parameters/LearningUnitId"},{"$ref": "#/components/parameters/CsrfToken"},{"$ref": "#/components/parameters/IdempotencyKey"},{"$ref": "#/components/parameters/IfMatchClassroomRevision"}],"responses": {"200": {"description": "POST fetch+ReadableStream；临时token不持久回放，只有审核通过的ready事件指向正式资源。","content": {"text/event-stream": {"schema": {"type": "string"}}}},"401": {"$ref": "#/components/responses/Unauthorized"},"403": {"$ref": "#/components/responses/CsrfFailed"},"404": {"$ref": "#/components/responses/NotFound"},"409": {"description": "IDEMPOTENCY_CONFLICT 或 课堂revision不匹配；code=CLASSROOM_VERSION_CONFLICT。","content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},"422": {"$ref": "#/components/responses/ValidationError"},"503": {"$ref": "#/components/responses/ReviewUnavailable"}},"requestBody": {"required": true,"content": {"application/json": {"schema": {"$ref": "#/components/schemas/ClassroomSpeech"}}}},"description": "事件携带revision、scene_version、generation_id；低风险临时token可见，审核拒绝/不可用发content_retracted并禁止持久发布。 响应头发送前审核不可用可返回HTTP 503；流开始后只能发送content_retracted、error(code=REVIEW_UNAVAILABLE)、done(status=failed)，不能修改HTTP状态。SSE首个agent_start含operation_id，可用GET /api/classroom-operations/{operationId}读取持久操作状态；临时token不重放。"}},
     "/api/learning-units/{learningUnitId}/classroom/mode": {"patch": {"tags": ["Classroom"],"summary": "切换专注/互动和角色启用","operationId": "setClassroomMode","security": [{"sessionCookie": []}],"parameters": [{"$ref": "#/components/parameters/LearningUnitId"},{"$ref": "#/components/parameters/CsrfToken"},{"$ref": "#/components/parameters/IdempotencyKey"},{"$ref": "#/components/parameters/IfMatchClassroomRevision"}],"responses": {"200": {"description": "成功。","content": {"application/json": {"schema": {"$ref": "#/components/schemas/ClassroomSnapshot"}}}},"401": {"$ref": "#/components/responses/Unauthorized"},"403": {"$ref": "#/components/responses/CsrfFailed"},"404": {"$ref": "#/components/responses/NotFound"},"409": {"description": "IDEMPOTENCY_CONFLICT 或 课堂revision不匹配；code=CLASSROOM_VERSION_CONFLICT；迁移前操作无可恢复原回执时为IDEMPOTENCY_RESULT_UNAVAILABLE。","content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},"422": {"$ref": "#/components/responses/ValidationError"}},"requestBody": {"required": true,"content": {"application/json": {"schema": {"$ref": "#/components/schemas/ModeChange"}}}},"description": "幂等命中先于If-Match检查，并返回该命令提交时保存的原快照；关闭角色先提交新revision和generation_id，迟到输出不能发布到当前会话。"}},
     "/api/learning-units/{learningUnitId}/classroom/controls": {"post":{"tags":["Classroom"],"summary":"学习控制","operationId":"controlClassroom","security":[{"sessionCookie":[]}],"parameters":[{"$ref":"#/components/parameters/LearningUnitId"},{"$ref":"#/components/parameters/CsrfToken"},{"$ref":"#/components/parameters/IdempotencyKey"},{"$ref":"#/components/parameters/IfMatchClassroomRevision"}],"responses":{"200":{"description":"成功。","content":{"application/json":{"schema":{"$ref":"#/components/schemas/ClassroomSnapshot"}}}},"401":{"$ref":"#/components/responses/Unauthorized"},"403":{"$ref":"#/components/responses/CsrfFailed"},"404":{"$ref":"#/components/responses/NotFound"},"409":{"description":"IDEMPOTENCY_CONFLICT、IDEMPOTENCY_RESULT_UNAVAILABLE、CLASSROOM_VERSION_CONFLICT或CLASSROOM_CONTROL_CONFLICT。","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Error"}}}},"422":{"$ref":"#/components/responses/ValidationError"}},"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/LearningControl"}}}},"description":"暂停/继续、跳过、补前置和资源选择按owner、revision与幂等键提交；重复请求回放原快照。跳过记录显式反馈但不增加掌握分；资源选择需当前正式资源并记录行为事件；补前置需当前路径推荐的直接前置节点并保存返回点。动画选择不创建Job。"}},
-    "/api/learning-units/{learningUnitId}/classroom/scenes/{sceneKey}/reexplanations": {"post": {"tags": ["Classroom"],"summary": "重解释当前场景","operationId": "reexplainScene","security": [{"sessionCookie": []}],"parameters": [{"$ref": "#/components/parameters/LearningUnitId"},{"$ref": "#/components/parameters/SceneKey"},{"$ref": "#/components/parameters/CsrfToken"},{"$ref": "#/components/parameters/IdempotencyKey"},{"$ref": "#/components/parameters/IfMatchClassroomRevision"}],"responses": {"200": {"description": "POST fetch+ReadableStream；临时token不持久回放，只有审核通过的ready事件指向正式资源。","content": {"text/event-stream": {"schema": {"type": "string"}}}},"401": {"$ref": "#/components/responses/Unauthorized"},"403": {"$ref": "#/components/responses/CsrfFailed"},"404": {"$ref": "#/components/responses/NotFound"},"409": {"description": "IDEMPOTENCY_CONFLICT 或 场景基版本过期；code=SCENE_VERSION_CONFLICT。","content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},"422": {"$ref": "#/components/responses/ValidationError"},"503": {"$ref": "#/components/responses/ReviewUnavailable"}},"requestBody": {"required": true,"content": {"application/json": {"schema": {"$ref": "#/components/schemas/ReexplanationRequest"}}}},"description": "证据仅表示提出需求；候选经schema/Review后用base_scene_version CAS发布。失败/断线保留旧正式版本。 响应头发送前审核不可用可返回HTTP 503；流开始后只能发送content_retracted、error(code=REVIEW_UNAVAILABLE)、done(status=failed)，不能修改HTTP状态。SSE首个agent_start含operation_id，可用GET /api/classroom-operations/{operationId}读取持久操作状态；临时token不重放。"}},
+    "/api/learning-units/{learningUnitId}/classroom/scenes/{sceneKey}/reexplanations": {
+  "post": {
+    "tags": [
+      "Classroom"
+    ],
+    "summary": "重解释当前场景",
+    "operationId": "reexplainScene",
+    "security": [
+      {
+        "sessionCookie": []
+      }
+    ],
+    "parameters": [
+      {
+        "$ref": "#/components/parameters/LearningUnitId"
+      },
+      {
+        "$ref": "#/components/parameters/SceneKey"
+      },
+      {
+        "$ref": "#/components/parameters/CsrfToken"
+      },
+      {
+        "$ref": "#/components/parameters/IdempotencyKey"
+      },
+      {
+        "$ref": "#/components/parameters/IfMatchClassroomRevision"
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "POST fetch+ReadableStream；临时token不持久回放，只有审核通过的ready事件指向正式资源。",
+        "content": {
+          "text/event-stream": {
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "401": {
+        "$ref": "#/components/responses/Unauthorized"
+      },
+      "403": {
+        "$ref": "#/components/responses/CsrfFailed"
+      },
+      "404": {
+        "$ref": "#/components/responses/NotFound"
+      },
+      "409": {
+        "description": "IDEMPOTENCY_CONFLICT 或 场景基版本过期；code=SCENE_VERSION_CONFLICT。",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "422": {
+        "$ref": "#/components/responses/ValidationError"
+      },
+      "503": {
+        "$ref": "#/components/responses/ReviewUnavailable"
+      }
+    },
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/ReexplanationRequest"
+          }
+        }
+      }
+    },
+    "description": "证据仅表示提出需求；候选经schema/Review后用base_scene_version CAS发布。失败/断线保留旧正式版本。 响应头发送前审核不可用可返回HTTP 503；流开始后只能发送content_retracted、error(code=REVIEW_UNAVAILABLE)、done(status=failed)，不能修改HTTP状态。SSE首个agent_start含operation_id，可用GET /api/classroom-operations/{operationId}读取持久操作状态；临时token不重放。 新planned单元仅支持explanation及intro请求别名，响应真实key；code/exercise返回409 REEXPLANATION_SCENE_UNSUPPORTED。关联代码来自同publication快照。待人工无scene_ready，最终通过才发布完整三场景。"
+  }
+},
     "/api/learning-units/{learningUnitId}/classroom/debate": {"post": {"tags": ["Classroom"],"summary": "启动数组vs链表结构化演示","operationId": "startStructuredDebate","security": [{"sessionCookie": []}],"parameters": [{"$ref": "#/components/parameters/LearningUnitId"},{"$ref": "#/components/parameters/CsrfToken"},{"$ref": "#/components/parameters/IdempotencyKey"},{"$ref": "#/components/parameters/IfMatchClassroomRevision"}],"responses": {"401": {"$ref": "#/components/responses/Unauthorized"},"403": {"$ref": "#/components/responses/CsrfFailed"},"404": {"$ref": "#/components/responses/NotFound"},"409": {"description": "IDEMPOTENCY_CONFLICT 或 课堂revision不匹配；code=CLASSROOM_VERSION_CONFLICT。","content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},"422": {"$ref": "#/components/responses/ValidationError"},"503": {"$ref": "#/components/responses/ReviewUnavailable"},"200": {"description": "POST fetch+ReadableStream；结构化候选为临时数据，review_pass后debate_ready携带已发布结果ID；失败仅error/done。","content": {"text/event-stream": {"schema": {"type": "string"}}}}},"requestBody": {"required": true,"content": {"application/json": {"schema": {"$ref": "#/components/schemas/DebateRequest"}}}},"description": "一次结构化流式生成，三个视角及主持人总结整体审核；不并行生成。保存原课堂返回点。 流开始后Review不可用以error/done传达，不改HTTP状态；agent_start含operation_id，状态由GET课堂操作查询。"}},
     "/api/learning-units/{learningUnitId}/classroom/debate/{resultId}": {"get": {"tags": ["Classroom"],"summary": "读取已审核演示结果","operationId": "getStructuredDebate","security": [{"sessionCookie": []}],"parameters": [{"$ref": "#/components/parameters/LearningUnitId"},{"$ref": "#/components/parameters/DebateResultId"}],"responses": {"200": {"description": "成功。","content": {"application/json": {"schema": {"$ref": "#/components/schemas/DebateResult"}}}},"401": {"$ref": "#/components/responses/Unauthorized"},"404": {"$ref": "#/components/responses/NotFound"}}}},
     "/api/learning-units/{learningUnitId}/classroom/debate/{resultId}/exit": {"post": {"tags": ["Classroom"],"summary": "退出演示并恢复课堂","operationId": "exitStructuredDebate","security": [{"sessionCookie": []}],"parameters": [{"$ref": "#/components/parameters/LearningUnitId"},{"$ref": "#/components/parameters/DebateResultId"},{"$ref": "#/components/parameters/CsrfToken"},{"$ref": "#/components/parameters/IdempotencyKey"},{"$ref": "#/components/parameters/IfMatchClassroomRevision"}],"responses": {"200": {"description": "成功。","content": {"application/json": {"schema": {"$ref": "#/components/schemas/ClassroomSnapshot"}}}},"401": {"$ref": "#/components/responses/Unauthorized"},"403": {"$ref": "#/components/responses/CsrfFailed"},"404": {"$ref": "#/components/responses/NotFound"},"409": {"description": "IDEMPOTENCY_CONFLICT 或 课堂revision不匹配；code=CLASSROOM_VERSION_CONFLICT。","content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},"422": {"$ref": "#/components/responses/ValidationError"}},"description": "恢复scene_progress/模式/角色，message_cursor不回拨；若场景已更新则提示当前已审核版本。"}},
@@ -4604,10 +4763,232 @@
       "User": {"type": "object", "required": ["id", "is_guest"], "properties": {"id": {"$ref": "#/components/schemas/Identifier"}, "is_guest": {"type": "boolean"}}},
       "StudentProfile": {"type": "object", "required": ["id", "version", "updated_at"], "properties": {"id": {"$ref": "#/components/schemas/Identifier"}, "version": {"type": "integer", "minimum": 1}, "initial_query": {"type": ["string", "null"]}, "professional_background": {"type": ["object", "null"]}, "knowledge_base": {"type": ["object", "null"]}, "cognitive_style": {"type": ["object", "null"]}, "learning_goals": {"type": ["object", "null"]}, "error_preferences": {"type": ["array", "null"]}, "engineering_preference": {"type": ["object", "null"]}, "extended_dimensions": {"type": ["object", "null"]}, "evidence": {"type": ["object", "null"]}, "updated_at": {"type": "string", "format": "date-time"}}},
       "RegisterRequest": {"type": "object", "additionalProperties": false, "required": ["email", "password"], "properties": {"email": {"type": "string", "format": "email"}, "password": {"type": "string", "minLength": 12, "writeOnly": true}}},
-      "StartLearningRequest": {"type": "object", "additionalProperties": false, "required": ["goal"], "properties": {"goal": {"type": "string", "minLength": 1, "maxLength": 2000, "description": "学生的一句话学习目标或困难。"}, "preferred_language": {"type": "string", "enum": ["c"], "default": "c"}}},
-      "LearningOperation": {"type": "object", "required": ["id", "status", "attempt", "created_at"], "properties": {"id": {"$ref": "#/components/schemas/Identifier"}, "status": {"type": "string", "enum": ["accepted", "preparing", "streaming_temporary", "temporary_complete", "reviewing", "regenerating", "published", "failed", "canceled"]}, "attempt": {"type": "integer", "minimum": 1, "maximum": 3}, "learning_unit_id": {"type": ["string", "null"]}, "published_scene_version": {"type": ["integer", "null"], "minimum": 1}, "error": {"oneOf": [{"$ref": "#/components/schemas/Error"}, {"$ref": "#/components/schemas/GoalClarification"}, {"type": "null"}]}, "created_at": {"type": "string", "format": "date-time"}, "updated_at": {"type": "string", "format": "date-time"}}},
+      "StartLearningRequest": {
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "goal"
+  ],
+  "properties": {
+    "goal": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000,
+      "description": "学生的一句话学习目标或困难。"
+    },
+    "preferred_language": {
+      "type": "string",
+      "enum": [
+        "c"
+      ],
+      "default": "c"
+    },
+    "generation_protocol": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "shared-plan-v1",
+        null
+      ],
+      "description": "新Web显式选择新链；省略保留历史客户端契约，不作新链失败回退。该标识参与幂等摘要。"
+    }
+  }
+},
+      "LearningOperation": {
+  "type": "object",
+  "required": [
+    "id",
+    "status",
+    "attempt",
+    "created_at"
+  ],
+  "properties": {
+    "id": {
+      "$ref": "#/components/schemas/Identifier"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "accepted",
+        "preparing",
+        "streaming_temporary",
+        "temporary_complete",
+        "reviewing",
+        "regenerating",
+        "published",
+        "failed",
+        "canceled",
+        "running",
+        "awaiting_human",
+        "rejected",
+        "completed"
+      ]
+    },
+    "attempt": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 3
+    },
+    "learning_unit_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "published_scene_version": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1
+    },
+    "error": {
+      "oneOf": [
+        {
+          "$ref": "#/components/schemas/Error"
+        },
+        {
+          "$ref": "#/components/schemas/GoalClarification"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "phase": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "planning",
+        "generating",
+        "reviewing",
+        "consistency_check",
+        "awaiting_human",
+        "publishing",
+        null
+      ]
+    },
+    "publication_version": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1
+    },
+    "review_summary": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "state": {
+          "enum": [
+            "pending",
+            "approved",
+            "rejected",
+            "invalidated"
+          ]
+        },
+        "approval_source": {
+          "enum": [
+            "auto",
+            "human_assisted",
+            null
+          ]
+        },
+        "reason_code": {
+          "type": "string"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  }
+},
       "GoalClarification": {"type": "object", "additionalProperties": false, "required": ["code", "message", "retryable", "candidate_nodes"], "properties": {"code": {"const": "GOAL_CLARIFICATION_REQUIRED"}, "message": {"type": "string"}, "retryable": {"const": false}, "candidate_nodes": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["id", "name"], "properties": {"id": {"$ref": "#/components/schemas/KnowledgeNodeId"}, "name": {"type": "string"}}}}}},
-      "LearningUnit": {"type": "object", "required": ["id", "status", "scenes", "knowledge_node_id", "path_target_node_id", "path_version"], "properties": {"id": {"$ref": "#/components/schemas/Identifier"}, "status": {"const": "ready"}, "scenes": {"type": "array", "items": {"$ref": "#/components/schemas/PublishedScene"}}, "knowledge_node_id": {"type": ["string", "null"]}, "path_target_node_id": {"type": ["string", "null"]}, "path_version": {"type": ["integer", "null"], "minimum": 1}, "origin_type": {"type": "string", "enum": ["generated", "curated"]}, "catalog_release_id": {"type": ["string", "null"], "format": "uuid"}}},
+      "LearningUnit": {
+  "type": "object",
+  "required": [
+    "id",
+    "status",
+    "scenes",
+    "knowledge_node_id",
+    "path_target_node_id",
+    "path_version"
+  ],
+  "properties": {
+    "id": {
+      "$ref": "#/components/schemas/Identifier"
+    },
+    "status": {
+      "const": "ready"
+    },
+    "scenes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/components/schemas/PublishedScene"
+      }
+    },
+    "knowledge_node_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "path_target_node_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "path_version": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1
+    },
+    "origin_type": {
+      "type": "string",
+      "enum": [
+        "generated",
+        "curated"
+      ]
+    },
+    "catalog_release_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid"
+    },
+    "publication_version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "approval_source": {
+      "enum": [
+        "auto",
+        "human_assisted"
+      ]
+    }
+  }
+},
       "PublishedScene": {"type": "object", "required": ["id", "scene_key", "version", "is_current", "resources", "review_status"], "properties": {"id": {"$ref": "#/components/schemas/Identifier"}, "scene_key": {"type": "string"}, "version": {"type": "integer", "minimum": 1}, "is_current": {"type": "boolean"}, "review_status": {"const": "passed"}, "resources": {"type": "array", "items": {"$ref": "#/components/schemas/PublishedResource"}}}},
       "PublishedResource": {"type": "object", "required": ["id", "type", "version", "content", "review_status"], "properties": {"id": {"$ref": "#/components/schemas/Identifier"}, "type": {"type": "string", "enum": ["explanation", "code", "exercise"]}, "version": {"type": "integer", "minimum": 1}, "content": {"type": "object", "description": "按资源类型定义的已清洗内容；练习 items 只包含 id/question，答案键保留在服务端，评分解释由提交回执返回。"}, "review_status": {"const": "passed"}}},
       "ProfileCorrectionRequest": {"type": "object", "additionalProperties": false, "minProperties": 1, "properties": {"professional_background": {"type": "object"}, "learning_goals": {"type": "object"}, "error_preferences": {"type": "array"}, "engineering_preference": {"type": "object"}, "cognitive_style": {"type": "object", "additionalProperties": false, "required": ["preference_persona"], "properties": {"preference_persona": {"type": "string", "enum": ["performance", "engineering", "academic"]}}}}},
@@ -4707,7 +5088,134 @@
         "description": "索引与当前values长度的关系由服务端固定模板注册表进一步校验；owner学习单元知识点必须与template_id相同。"
       },
       "AnimationJob": {"type": "object","additionalProperties": false,"properties": {"id": {"$ref": "#/components/schemas/Identifier"},"status": {"type": "string","enum": ["queued","running","succeeded","failed","cancelled"]},"learning_unit_id": {"$ref": "#/components/schemas/Identifier"},"template_id": {"type": ["string","null"]},"attempt": {"type": "integer","minimum": 0},"progress": {"type": "number","minimum": 0,"maximum": 1},"last_event_id": {"type": "integer","minimum": 0},"media_id": {"$ref": "#/components/schemas/Identifier"},"retry_of": {"$ref": "#/components/schemas/Identifier"},"error": {"$ref": "#/components/schemas/Error"},"render_kind": {"type": "string","enum": ["template","dsl"]},"candidate_id": {"$ref": "#/components/schemas/Identifier"},"generation_id": {"$ref": "#/components/schemas/Identifier"},"fallback_of": {"$ref": "#/components/schemas/Identifier"},"fallback_reason_code": {"type": "string","pattern": "^[A-Z0-9_]{1,64}$"}},"required": ["id","status","learning_unit_id","template_id","attempt","progress","last_event_id"],"description": "保留旧模板响应。新增准备来源Job包含render_kind/generation_id；DSL template_id=null且candidate_id准确。最终失败仍保留原Job，failed事件可带唯一fallback_job_id/fallback_source=template_fallback；新模板queued事件带fallback_of/source/reason_code=DSL_RENDER_FAILED；模板失败无循环。"},
-      "ClassroomSnapshot": {"type":"object","additionalProperties":false,"properties":{"learning_unit_id":{"$ref":"#/components/schemas/Identifier"},"revision":{"type":"integer","minimum":1},"message_cursor":{"type":"integer","minimum":0},"scene_key":{"type":"string"},"scene_version":{"type":"integer","minimum":1},"scene_progress":{"type":"integer","minimum":0},"mode":{"type":"string","enum":["focus","interactive"]},"enabled_roles":{"type":"array","items":{"type":"string","enum":["beginner","advanced"]},"uniqueItems":true},"generation_id":{"$ref":"#/components/schemas/Identifier"},"paused":{"type":"boolean"},"detour":{"type":"object","additionalProperties":false,"properties":{"scene_key":{"type":"string"},"scene_version":{"type":"integer","minimum":1},"scene_progress":{"type":"integer","minimum":0},"kind":{"type":"string","enum":["prerequisite","debate"]},"target_node_id":{"$ref":"#/components/schemas/KnowledgeNodeId"},"path_version_id":{"$ref":"#/components/schemas/Identifier"},"mode":{"type":"string","enum":["focus","interactive"]},"enabled_roles":{"type":"array","items":{"type":"string","enum":["beginner","advanced"]}},"paused":{"type":"boolean"},"result_id":{"$ref":"#/components/schemas/Identifier"}},"required":["scene_key","scene_version","scene_progress"]},"version_changed":{"type":"boolean"}},"required":["learning_unit_id","revision","message_cursor","scene_key","scene_version","scene_progress","mode","enabled_roles","paused"]},
+      "ClassroomSnapshot": {
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "learning_unit_id": {
+      "$ref": "#/components/schemas/Identifier"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "message_cursor": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "scene_key": {
+      "type": "string"
+    },
+    "scene_version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "scene_progress": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "mode": {
+      "type": "string",
+      "enum": [
+        "focus",
+        "interactive"
+      ]
+    },
+    "enabled_roles": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "beginner",
+          "advanced"
+        ]
+      },
+      "uniqueItems": true
+    },
+    "generation_id": {
+      "$ref": "#/components/schemas/Identifier"
+    },
+    "paused": {
+      "type": "boolean"
+    },
+    "detour": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "scene_key": {
+          "type": "string"
+        },
+        "scene_version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "scene_progress": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "prerequisite",
+            "debate"
+          ]
+        },
+        "target_node_id": {
+          "$ref": "#/components/schemas/KnowledgeNodeId"
+        },
+        "path_version_id": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "focus",
+            "interactive"
+          ]
+        },
+        "enabled_roles": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "beginner",
+              "advanced"
+            ]
+          }
+        },
+        "paused": {
+          "type": "boolean"
+        },
+        "result_id": {
+          "$ref": "#/components/schemas/Identifier"
+        }
+      },
+      "required": [
+        "scene_key",
+        "scene_version",
+        "scene_progress"
+      ]
+    },
+    "version_changed": {
+      "type": "boolean"
+    },
+    "publication_version": {
+      "type": "integer",
+      "minimum": 1
+    }
+  },
+  "required": [
+    "learning_unit_id",
+    "revision",
+    "message_cursor",
+    "scene_key",
+    "scene_version",
+    "scene_progress",
+    "mode",
+    "enabled_roles",
+    "paused"
+  ]
+},
       "ClassroomMessage": {"type": "object","additionalProperties": false,"properties": {"id": {"$ref": "#/components/schemas/Identifier"},"cursor": {"type": "integer","minimum": 1},"role": {"type": "string","enum": ["student","tutor","beginner","advanced","system","performance","engineering","academic","moderator"]},"scene_key": {"type": "string"},"scene_version": {"type": "integer","minimum": 1},"text": {"type": "string"},"resource_id": {"$ref": "#/components/schemas/Identifier"}},"required": ["id","cursor","role","scene_key","scene_version"]},
       "ClassroomMessagePage": {"type": "object","additionalProperties": false,"properties": {"messages": {"type": "array","items": {"$ref": "#/components/schemas/ClassroomMessage"}},"last_message_cursor": {"type": "integer","minimum": 0}},"required": ["messages","last_message_cursor"]},
       "ModeChange": {"type": "object","additionalProperties": false,"properties": {"mode": {"type": "string","enum": ["focus","interactive"]},"enabled_roles": {"type": "array","items": {"type": "string","enum": ["beginner","advanced"]},"uniqueItems": true}},"required": ["mode","enabled_roles"]},
@@ -4718,24 +5226,223 @@
       "DebateResult": {"type":"object","additionalProperties":false,"properties":{"id":{"$ref":"#/components/schemas/Identifier"},"scene_key":{"type":"string"},"scene_version":{"type":"integer","minimum":1},"status":{"const":"published"},"perspectives":{"type":"object","additionalProperties":false,"properties":{"performance":{"type":"string"},"engineering":{"type":"string"},"academic":{"type":"string"}},"required":["performance","engineering","academic"]},"moderator_summary":{"type":"string"},"question":{"type":"string","minLength":1},"question_conditions":{"type":"object","additionalProperties":false,"required":["stated","unknown"],"properties":{"stated":{"type":"array","items":{"type":"string","minLength":1}},"unknown":{"type":"array","items":{"type":"string","minLength":1}}}},"graph_basis":{"type":"object","additionalProperties":false,"required":["graph_version","nodes","relation"],"properties":{"graph_version":{"type":"string"},"nodes":{"type":"array","minItems":2,"maxItems":2,"items":{"type":"object","additionalProperties":false,"required":["id","name","description","ai_context","learning_objectives"],"properties":{"id":{"type":"string","enum":["array","single-linked-list"]},"name":{"type":"string"},"description":{"type":"string"},"ai_context":{"type":"string"},"learning_objectives":{"type":"array","items":{"type":"string"}}}}},"relation":{"type":"object","additionalProperties":false,"required":["type","node_ids"],"properties":{"type":{"const":"SIMILAR_TO"},"node_ids":{"type":"array","minItems":2,"maxItems":2,"items":{"type":"string","enum":["array","single-linked-list"]}}}}}},"moderator":{"type":"object","additionalProperties":false,"required":["objective_conclusion","tradeoffs","learner_advice"],"properties":{"objective_conclusion":{"type":"string","minLength":1},"tradeoffs":{"type":"string","minLength":1},"learner_advice":{"type":"string","minLength":1}}},"candidate_schema_version":{"type":"string","minLength":1},"candidate_prompt_version":{"type":"string","minLength":1},"generation_model_id":{"type":"string","minLength":1},"review_version":{"type":"string","minLength":1},"review_model_id":{"type":"string","minLength":1},"correction_attempts":{"type":"integer","minimum":0}},"required":["id","scene_key","scene_version","status","question","question_conditions","graph_basis","perspectives","moderator","moderator_summary","candidate_schema_version","candidate_prompt_version","generation_model_id","review_version","review_model_id","correction_attempts"]},
       "PerspectiveFeedback": {"type": "object","additionalProperties": false,"properties": {"perspective": {"type": "string","enum": ["performance","engineering","academic"]},"feedback": {"type": "string","const": "helpful"}},"required": ["perspective","feedback"]},
       "PreferenceReceipt": {"type": "object","additionalProperties": false,"properties": {"evidence_id": {"$ref": "#/components/schemas/Identifier"},"profile_version": {"type": ["integer", "null"],"minimum": 1},"update_status": {"type": "string","enum": ["updated","pending","unchanged","failed"]}},"required": ["evidence_id","profile_version","update_status"]},
-      "ClassroomOperation": {"type": "object","additionalProperties": false,"required": ["id","status","learning_unit_id","kind","base_revision"],"properties": {"id": {"$ref": "#/components/schemas/Identifier"},"status": {"type": "string","enum": ["accepted","running","published","failed","cancelled","superseded"]},"learning_unit_id": {"$ref": "#/components/schemas/Identifier"},"kind": {"type": "string","enum": ["speech","reexplanation","debate"]},"base_revision": {"type": "integer","minimum": 1},"generation_id": {"$ref": "#/components/schemas/Identifier"},"result_id": {"$ref": "#/components/schemas/Identifier"},"error": {"$ref": "#/components/schemas/Error"}}},
+      "ClassroomOperation": {
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "status",
+    "learning_unit_id",
+    "kind",
+    "base_revision"
+  ],
+  "properties": {
+    "id": {
+      "$ref": "#/components/schemas/Identifier"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "accepted",
+        "running",
+        "published",
+        "failed",
+        "cancelled",
+        "superseded",
+        "awaiting_human",
+        "rejected"
+      ]
+    },
+    "learning_unit_id": {
+      "$ref": "#/components/schemas/Identifier"
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "speech",
+        "reexplanation",
+        "debate"
+      ]
+    },
+    "base_revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "generation_id": {
+      "$ref": "#/components/schemas/Identifier"
+    },
+    "result_id": {
+      "$ref": "#/components/schemas/Identifier"
+    },
+    "error": {
+      "$ref": "#/components/schemas/Error"
+    },
+    "learning_operation_id": {
+      "$ref": "#/components/schemas/Identifier"
+    },
+    "publication_version": {
+      "type": "integer",
+      "minimum": 1
+    }
+  }
+},
       "AnimationInsertRequest": {"type": "object","additionalProperties": false,"required": ["template_id","template_version","scene_version","parameters"],"properties": {"template_id": {"const": "linked-list-insertion"},"template_version": {"type": "string","pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$","maxLength": 40},"scene_version": {"type": "integer","minimum": 1},"parameters": {"type": "object","additionalProperties": false,"required": ["values","index","value"],"properties": {"values": {"type": "array","minItems": 0,"maxItems": 7,"items": {"type": "integer","minimum": -99,"maximum": 99}},"index": {"type": "integer","minimum": 0,"maximum": 7},"value": {"type": "integer","minimum": -99,"maximum": 99}}}}},
       "AnimationDeleteRequest": {"type": "object","additionalProperties": false,"required": ["template_id","template_version","scene_version","parameters"],"properties": {"template_id": {"const": "linked-list-deletion"},"template_version": {"type": "string","pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$","maxLength": 40},"scene_version": {"type": "integer","minimum": 1},"parameters": {"type": "object","additionalProperties": false,"required": ["values","index"],"properties": {"values": {"type": "array","minItems": 1,"maxItems": 8,"items": {"type": "integer","minimum": -99,"maximum": 99}},"index": {"type": "integer","minimum": 0,"maximum": 7}}}}}
     }
   },
   "x-sse-events": {
-    "agent_start": {"data": {"operation_id": "string", "stage": "preparing"}},
-    "token": {"description": "临时首段文本，绝不是正式资源。", "data": {"operation_id": "string", "temporary": true, "delta": "string"}},
-    "stage_changed": {"data": {"operation_id": "string", "stage": "reviewing|regenerating"}},
-    "review_pass": {"data": {"operation_id": "string", "attempt": "integer"}},
-    "review_reject": {"data": {"operation_id": "string", "attempt": "integer", "retry": "boolean"}},
-    "scene_ready": {"description": "唯一允许客户端读取为正式资源的信号。", "data": {"operation_id": "string", "learning_unit_id": "string", "scene_id": "string", "version": "integer", "resource_ids": ["string"]}},
-    "error": {"data": {"code": "string", "message": "string", "retryable": "boolean", "operation_id": "string"}},
-    "done": {"data": {"operation_id": "string", "status": "temporary_complete|published|failed|canceled"}}
+  "agent_start": {
+    "data": {
+      "operation_id": "string",
+      "stage": "preparing"
+    }
   },
+  "token": {
+    "description": "临时首段文本，绝不是正式资源。",
+    "data": {
+      "operation_id": "string",
+      "temporary": true,
+      "delta": "string"
+    }
+  },
+  "stage_changed": {
+    "data": {
+      "operation_id": "string",
+      "stage": "planning|generating|reviewing|consistency_check|awaiting_human|publishing|regenerating"
+    }
+  },
+  "review_pass": {
+    "data": {
+      "operation_id": "string",
+      "attempt": "integer"
+    }
+  },
+  "review_reject": {
+    "data": {
+      "operation_id": "string",
+      "attempt": "integer",
+      "retry": "boolean"
+    }
+  },
+  "scene_ready": {
+    "description": "唯一允许客户端读取为正式资源的信号。",
+    "data": {
+      "operation_id": "string",
+      "learning_unit_id": "string",
+      "scene_id": "string",
+      "version": "integer",
+      "resource_ids": [
+        "string"
+      ],
+      "scene_key": "intro|explanation",
+      "publication_version": "integer (planned only)"
+    }
+  },
+  "error": {
+    "data": {
+      "code": "string",
+      "message": "string",
+      "retryable": "boolean",
+      "operation_id": "string"
+    }
+  },
+  "done": {
+    "data": {
+      "operation_id": "string",
+      "status": "temporary_complete|published|failed|canceled|awaiting_human|rejected|completed"
+    }
+  },
+  "review_required": {
+    "description": "仅固定原因码，流随后done/awaiting_human；不是发布，不含未审正文。",
+    "data": {
+      "operation_id": "string",
+      "reason_code": "SEMANTIC_REVIEW_REQUIRED"
+    }
+  }
+},
   "x-mvp-0.3-contract-status": "T004设计契约；新增端点由T012–T028逐项实现，OpenAPI版本不等于已上线。",
   "x-animation-job-events": {"queued": {"data": {"job_id": "string","status": "queued","progress": "number"}},"running": {"data": {"job_id": "string","status": "running","attempt": "integer","progress": "number"}},"progress": {"data": {"job_id": "string","stage": "validating|rendering|publishing","progress": "number"}},"succeeded": {"data": {"job_id": "string","status": "succeeded","media_id": "string"}},"failed": {"data": {"job_id": "string","status": "failed","code": "string"}},"cancelled": {"data": {"job_id": "string","status": "cancelled"}},"recovered": {"data": {"job_id": "string","status": "queued|failed","attempt": "integer"}}},
-  "x-classroom-stream-events": {"token": {"description": "临时，非正式消息","data": {"revision": "integer","scene_version": "integer","generation_id": "string","temporary": true,"delta": "string","role": "tutor|beginner|advanced"}},"content_retracted": {"description": "审核拒绝、不可用、发布失败或版本冲突时清除本generation临时内容","data": {"revision": "integer","generation_id": "string","code": "REVIEW_REJECTED|REVIEW_UNAVAILABLE|SCENE_PUBLICATION_FAILED|SCENE_VERSION_CONFLICT"}},"message_ready": {"description": "审核/规则通过且已提交的消息","data": {"revision": "integer","message_cursor": "integer","message_id": "string"}},"scene_ready": {"description": "新场景正式版本已发布","data": {"revision": "integer","scene_key": "string","scene_version": "integer","resource_ids": ["string"]}},"error": {"data": {"code": "string","retryable": "boolean"}},"done": {"data": {"status": "published|failed|cancelled"}},"agent_start": {"data": {"operation_id": "string","revision": "integer","scene_version": "integer","generation_id": "string"}},"debate_ready": {"description": "三个视角与主持人总结整体审核发布","data": {"operation_id": "string","result_id": "string","revision": "integer"}},"review_pass": {"data": {"operation_id": "string","kind": "speech|reexplanation|debate"}}},
+  "x-classroom-stream-events": {
+  "token": {
+    "description": "临时，非正式消息",
+    "data": {
+      "revision": "integer",
+      "scene_version": "integer",
+      "generation_id": "string",
+      "temporary": true,
+      "delta": "string",
+      "role": "tutor|beginner|advanced"
+    }
+  },
+  "content_retracted": {
+    "description": "审核拒绝、不可用、发布失败或版本冲突时清除本generation临时内容",
+    "data": {
+      "revision": "integer",
+      "generation_id": "string",
+      "code": "REVIEW_REJECTED|REVIEW_UNAVAILABLE|SCENE_PUBLICATION_FAILED|SCENE_VERSION_CONFLICT"
+    }
+  },
+  "message_ready": {
+    "description": "审核/规则通过且已提交的消息",
+    "data": {
+      "revision": "integer",
+      "message_cursor": "integer",
+      "message_id": "string"
+    }
+  },
+  "scene_ready": {
+    "description": "新场景正式版本已发布",
+    "data": {
+      "revision": "integer",
+      "scene_key": "string",
+      "scene_version": "integer",
+      "resource_ids": [
+        "string"
+      ],
+      "publication_version": "integer (planned only)"
+    }
+  },
+  "error": {
+    "data": {
+      "code": "string",
+      "retryable": "boolean"
+    }
+  },
+  "done": {
+    "data": {
+      "status": "published|failed|cancelled|awaiting_human|rejected"
+    }
+  },
+  "agent_start": {
+    "data": {
+      "operation_id": "string",
+      "revision": "integer",
+      "scene_version": "integer",
+      "generation_id": "string"
+    }
+  },
+  "debate_ready": {
+    "description": "三个视角与主持人总结整体审核发布",
+    "data": {
+      "operation_id": "string",
+      "result_id": "string",
+      "revision": "integer"
+    }
+  },
+  "review_pass": {
+    "data": {
+      "operation_id": "string",
+      "kind": "speech|reexplanation|debate"
+    }
+  },
+  "review_required": {
+    "data": {
+      "operation_id": "string",
+      "learning_operation_id": "string",
+      "reason_code": "SEMANTIC_REVIEW_REQUIRED"
+    }
+  }
+},
   "x-queue-migration": {
     "task_id": "PHASE-1-T018",
     "status": "approved",

@@ -16,6 +16,7 @@ export type ClassroomMessageRole =
 export type ClassroomSpeechEventType =
   | "agent_start"
   | "token"
+  | "review_required"
   | "review_pass"
   | "stage_changed"
   | "debate_ready"
@@ -33,6 +34,7 @@ export interface ClassroomSpeechEvent {
 export interface ClassroomDetour {
   scene_key: string;
   scene_version: number;
+  publication_version?: number;
   scene_progress: number;
   kind?: "prerequisite" | "debate";
   target_node_id?: string;
@@ -44,6 +46,7 @@ export interface ClassroomDetour {
 }
 
 export interface ClassroomSnapshot {
+  publication_version?: number;
   learning_unit_id: string;
   revision: number;
   message_cursor: number;
@@ -109,6 +112,8 @@ export interface ClassroomMessagePage {
 }
 
 export type ClassroomOperationStatus =
+  | "awaiting_human"
+  | "rejected"
   | "accepted"
   | "running"
   | "published"
@@ -122,6 +127,8 @@ export interface ClassroomOperation {
   learning_unit_id: string;
   kind: "speech" | "reexplanation" | "debate";
   base_revision: number;
+  learning_operation_id?: string;
+  publication_version?: number;
   generation_id?: string;
   result_id?: string;
   error?: { code: string; message: string; retryable: boolean };

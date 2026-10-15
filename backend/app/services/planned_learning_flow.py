@@ -1,6 +1,8 @@
 """Shared-plan operation pipeline; all network stages run outside DB transactions."""
 
+import asyncio
 import time
+from collections.abc import Awaitable, Callable
 from copy import deepcopy
 from datetime import timedelta
 from typing import Any
@@ -38,6 +40,7 @@ async def run_planned_operation(
     reuse_plan: LearningPlanVersion | None = None,
     reuse_content: dict[str, Any] | None = None,
     adjustment: object = None,
+    on_phase: Callable[[str], Awaitable[None]] | None = None,
 ) -> dict[str, Any]:
     inputs = deepcopy(inputs)
     await lock_learning_owner(db, owner_id)
@@ -55,7 +58,7 @@ async def run_planned_operation(
             title=str(inputs.metadata["goal"])[:200],
             knowledge_point_id=inputs.metadata["node_id"],
             learning_objectives={"goal": inputs.metadata["goal"]},
-            outline={"pipeline": "shared-plan-v1"},
+            outline={"pipeline": "shared-plan-v1", "path_snapshot": inputs.path_snapshot},
         )
         db.add(unit)
         await db.flush()
@@ -73,7 +76,7 @@ async def run_planned_operation(
     ).all():
         await invalidate_case(db, prior_case)
     op.status = "running"
-    op.generation_deadline = utc_now() + timedelta(seconds=180)
+    op.generation_deadline = op.generation_deadline or utc_now() + timedelta(seconds=180)
     unit_id = unit.id
     deadline = op.generation_deadline
     await db.commit()
@@ -98,7 +101,19 @@ async def run_planned_operation(
     window = CallWindow(
         deadline=time.monotonic() + max(0, (deadline - utc_now()).total_seconds()), reserve=reserve
     )
+
+    async def phase(value: str) -> None:
+        await db.execute(
+            update(LearningOperation)
+            .where(LearningOperation.id == operation_id, LearningOperation.status == "running")
+            .values(phase=value)
+        )
+        await db.commit()
+        if on_phase is not None:
+            await on_phase(value)
+
     try:
+        await phase("planning")
         if reuse_plan is None:
             plan_inputs = inputs
             if adjustment is not None:
@@ -150,10 +165,12 @@ async def run_planned_operation(
             await db.commit()
 
         for role in ROLES:
+            await phase("generating")
             if reuse_content and role in reuse_content:
                 workspace.stage(role, reuse_content[role])
             else:
                 await workspace.generate(gateway, window, role, adjustment)
+            await phase("reviewing")
             history = await review_resource(
                 gateway,
                 window,
@@ -169,6 +186,7 @@ async def run_planned_operation(
                 raise LearningContractError("CURRENT_CANDIDATE_REJECTED")
         actions = assemble_actions(workspace.candidates())
         material = unit_material(workspace, scenes, actions)
+        await phase("consistency_check")
         result = await review_unit(gateway, window, material, records)
         if result["review"] is None:
             raise LearningContractError("CURRENT_CANDIDATE_REJECTED")
@@ -186,6 +204,7 @@ async def run_planned_operation(
                 "case_id": str(case.id),
                 "learning_unit_id": str(unit_id),
             }
+        await phase("publishing")
         publication = await publish_complete_unit(db, material, final_ids)
         await db.commit()
         return {
@@ -200,6 +219,11 @@ async def run_planned_operation(
         await lock_learning_owner(db, owner_id)
         current = await db.get(LearningOperation, operation_id, populate_existing=True)
         if current and current.status not in ("canceled", "completed"):
+            if isinstance(error, asyncio.CancelledError):
+                current.status = "canceled"
+                current.canceled_at = utc_now()
+                await db.commit()
+                raise
             current.status = (
                 "rejected"
                 if isinstance(error, LearningContractError)

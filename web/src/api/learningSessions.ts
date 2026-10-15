@@ -2,6 +2,7 @@ export type LearningEventType =
   | "agent_start"
   | "token"
   | "stage_changed"
+  | "review_required"
   | "review_pass"
   | "review_reject"
   | "scene_ready"
@@ -15,6 +16,7 @@ export interface LearningEvent {
 
 export interface StartLearningSessionOptions {
   goal: string;
+  signal?: AbortSignal;
   csrfToken: string;
   idempotencyKey?: string;
   onEvent: (event: LearningEvent) => void;
@@ -56,6 +58,7 @@ export class LearningRequestError extends Error {
 
 export async function startLearningSession({
   goal,
+  signal,
   csrfToken,
   idempotencyKey = crypto.randomUUID(),
   onEvent,
@@ -63,6 +66,7 @@ export async function startLearningSession({
 }: StartLearningSessionOptions): Promise<void> {
   const stream = await requestLearningStream({
     goal,
+    signal,
     csrfToken,
     idempotencyKey,
     fetchImpl,
@@ -93,11 +97,13 @@ export async function startLearningSession({
 
 async function requestLearningStream({
   goal,
+  signal,
   csrfToken,
   idempotencyKey,
   fetchImpl,
 }: {
   goal: string;
+  signal?: AbortSignal;
   csrfToken: string;
   idempotencyKey: string;
   fetchImpl: FetchLike;
@@ -105,6 +111,7 @@ async function requestLearningStream({
   let response: Response;
   try {
     response = await fetchImpl("/api/learning-sessions", {
+      signal,
       method: "POST",
       credentials: "same-origin",
       headers: {
@@ -113,7 +120,7 @@ async function requestLearningStream({
         "X-CSRF-Token": csrfToken,
         "Idempotency-Key": idempotencyKey,
       },
-      body: JSON.stringify({ goal, preferred_language: "c" }),
+      body: JSON.stringify({ goal, preferred_language: "c", generation_protocol: "shared-plan-v1" }),
     });
   } catch {
     throw new LearningRequestError({

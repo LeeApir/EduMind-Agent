@@ -346,6 +346,14 @@ async def publish_complete_unit(
         "publication_version": publication.version,
     }
     op.status = "completed"
+    op.phase = "publishing"
+    op.review_summary = {
+        "state": "approved",
+        "approval_source": publication.approval_source,
+        "reason_code": "REVIEW_APPROVED",
+        "publication_version": publication.version,
+        "updated_at": utc_now().isoformat(),
+    }
     op.scene_id = UUID(material["scenes"][0]["scene_id"])
     op.published_scene_version = material["scenes"][0]["scene_version"]
     op.updated_at = utc_now()

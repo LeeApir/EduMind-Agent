@@ -2,9 +2,10 @@
 
 import json
 from collections.abc import AsyncIterator
+from typing import Literal
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Header, Request
+from fastapi import APIRouter, Depends, Header, Request, Response
 from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
@@ -33,6 +34,7 @@ class StartLearningRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
     goal: str = Field(min_length=1, max_length=2000)
     preferred_language: str = "c"
+    generation_protocol: Literal["shared-plan-v1"] | None = None
 
 
 def provider_gateway() -> ProviderGateway:
@@ -182,6 +184,7 @@ async def start_learning_session(
                 idempotency_key=idempotency_key,
                 goal=payload.goal,
                 preferred_language=payload.preferred_language,
+                generation_protocol=payload.generation_protocol,
             )
         except IdempotencyConflict:
             from app.core.auth import AuthFailure
@@ -195,6 +198,22 @@ async def start_learning_session(
                 )
             return StreamingResponse(
                 _replay_operation_events(reservation.operation),
+                media_type="text/event-stream",
+                headers={"Cache-Control": "no-store", "X-Accel-Buffering": "no"},
+            )
+        if payload.generation_protocol == "shared-plan-v1":
+            from app.api.hybrid_learning import hybrid_events
+
+            return StreamingResponse(
+                hybrid_events(
+                    operation_id=reservation.operation.id,
+                    owner_id=current.user.id,
+                    goal=payload.goal,
+                    language=payload.preferred_language,
+                    gateway=gateway,
+                    graph=graph,
+                    sessions=session_factory,
+                ),
                 media_type="text/event-stream",
                 headers={"Cache-Control": "no-store", "X-Accel-Buffering": "no"},
             )
@@ -252,9 +271,11 @@ async def _replay_operation_events(operation: object) -> AsyncIterator[str]:
 @router.get("/api/learning-operations/{operation_id}")
 async def get_learning_operation(
     operation_id: UUID,
+    response: Response,
     current: AuthenticatedSession = Depends(require_authenticated_session),
     session_factory: async_sessionmaker[AsyncSession] = Depends(database_session_factory),
 ) -> dict[str, object]:
+    response.headers["Cache-Control"] = "no-store"
     async with session_factory() as db:
         operation = await owned_operation(db, owner_id=current.user.id, operation_id=operation_id)
         if operation is None:

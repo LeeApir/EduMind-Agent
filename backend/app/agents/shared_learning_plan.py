@@ -54,6 +54,7 @@ class PlanInputs:
     node_ids: frozenset[str]
     learner_evidence: dict[str, Any]
     reference_context: object = None
+    path_snapshot: object = None
 
     def snapshot(self) -> dict[str, Any]:
         value = deepcopy(

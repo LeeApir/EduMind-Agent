@@ -46,6 +46,12 @@ async def invalidate_case(db: AsyncSession, case: LearningReviewCase) -> None:
     op = await db.get(LearningOperation, case.operation_id)
     if op and op.status not in ("canceled", "completed"):
         op.status = "failed"
+        op.review_summary = {
+            "state": "invalidated",
+            "approval_source": None,
+            "reason_code": "REVIEW_CASE_INVALIDATED",
+            "updated_at": utc_now().isoformat(),
+        }
         op.error = {
             "code": "REVIEW_CASE_INVALIDATED",
             "message": "Review case expired.",
@@ -153,6 +159,13 @@ async def create_review_case(
     if op is None or op.status not in ("accepted", "running"):
         raise LearningContractError("OPERATION_NOT_ACTIVE")
     op.status = "awaiting_human"
+    op.phase = "awaiting_human"
+    op.review_summary = {
+        "state": "pending",
+        "approval_source": None,
+        "reason_code": "SEMANTIC_REVIEW_REQUIRED",
+        "updated_at": utc_now().isoformat(),
+    }
     db.add(case)
     await db.flush()
     return case
@@ -221,6 +234,12 @@ async def decide_case(
         op = await db.get(LearningOperation, case.operation_id)
         assert op
         op.status = "rejected"
+        op.review_summary = {
+            "state": "rejected",
+            "approval_source": None,
+            "reason_code": "HUMAN_REJECTED",
+            "updated_at": utc_now().isoformat(),
+        }
     db.add(row)
     await db.flush()
     return row

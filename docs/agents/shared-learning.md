@@ -90,3 +90,38 @@ legacy tests used catalog_only and correctly returned 404; rerun in the isolated
 mock-test process passed, without changing server configuration or assertions. The old
 stage-pinned migration test now checks the first populated protective migration and
 unchanged head, as newer protected tables precede 0026. Ruff/mypy185 passed; Provider 0.
+
+T053: New Web requests explicitly select generation_protocol=shared-plan-v1; it is
+included in the owner idempotency digest. Omitted markers retain the old HTTP client
+contract for compatibility; new-chain failures never invoke it as fallback. The new
+chain uses existing evidence (or an explicit-goal-only unknown profile), preserves the
+path loop, and does not request an extra inferred profile/temporary text. A possible
+goal-mapping call consumes the same durable 20-slot quota and 180-second deadline.
+Legacy numeric profile confidence is preserved as JSON text in the otherwise integer/
+string-only source envelope, so no unknown learner dimensions are guessed.
+
+Alembic 0030 persists phase and safe review_summary; operation GET is no-store. SSE
+review_required then done/awaiting_human ends the connection without scene_ready. New
+planned reexplanations use the complete pipeline, same snapshot code, intro alias and
+409 for unsupported code/exercise scenes. Exact publication_version GET returns only
+that approved snapshot or 404; historical snapshots are marked non-current. Unreviewed
+answers, findings, maintainer identity and case bodies are not public.
+
+The Web keeps the old formal course while waiting and displays the human source after
+publication. Waiting operation IDs survive refresh. Recovery uses GET only, at most
+60 reads at 5-second intervals, only while the document is visible; navigation/changed
+operation stops timers and ignores late responses. New stream requests carry AbortSignal;
+server disconnect cancels the durable operation. Human waiting is not timed as a model
+connection and no human processing ETA is promised.
+
+Validation: 0030 empty migration roundtrip and 29 actual PG/HTTP tests passed in isolated
+om53final, zero skips (new/legacy initial stream, reexplanation, owner/CSRF, waiting,
+protocol-key conflict, exact read and disconnect). Web full 194 tests passed; latest
+recovery/polling subset 23 passed after final changes. Typecheck/build passed. Lint exits
+0 with 35 existing ProfileCard formatting warnings; no new-file lint errors. Chromium
+full-App mock journey passed, including refresh without POST, human source, exact version
+and 375px no overflow; screenshots inspected under local-materials/phase-1-t053/browser.
+Initial E2E interception wrongly matched /src/api modules, corrected to site /api paths.
+A classroom HTTP mock needed its separate gateway dependency; corrected without real
+credentials or lowered assertions. Ruff/mypy188/JSON/manifest/workflow/diff passed.
+All model calls were synthetic; real Provider requests and authorized new fees are 0.

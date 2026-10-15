@@ -153,6 +153,8 @@ class LearningOperation(Base):
     )
     published_scene_version: Mapped[int | None] = mapped_column(Integer)
     error: Mapped[dict[str, object] | None] = mapped_column(JSONB)
+    phase: Mapped[str | None] = mapped_column(String(32))
+    review_summary: Mapped[dict[str, object] | None] = mapped_column(JSONB)
     publication_expectation: Mapped[dict[str, object] | None] = mapped_column(JSONB)
     generation_call_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     generation_deadline: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))

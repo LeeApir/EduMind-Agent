@@ -300,6 +300,11 @@ def classroom_operation_payload(operation: ClassroomOperation) -> dict[str, obje
         "kind": operation.kind,
         "base_revision": operation.base_revision,
     }
+    snapshot = operation.result_snapshot or {}
+    if isinstance(snapshot.get("learning_operation_id"), str):
+        payload["learning_operation_id"] = snapshot["learning_operation_id"]
+    if isinstance(snapshot.get("publication_version"), int):
+        payload["publication_version"] = snapshot["publication_version"]
     if operation.generation_id is not None:
         payload["generation_id"] = str(operation.generation_id)
     if operation.result_id is not None:
