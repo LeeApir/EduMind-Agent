@@ -68,3 +68,5 @@
 2026-10-15 实际结果：用户yes批准dff3a06 r09准确根/38次/CNY120.149000后，仅首条声明提取请求实际发送；3932输入/8192总输出（推理8192）、无合格清单，INVALID_OUTPUT停止，余37未发。见[r09结果](../acceptance/phase-1-t040-derived-calibration-r09/results/r09.json)。不误记事实漏检或质量通过、不恢复旧失败；T040仍blocked，none/catalog_only保持。
 
 2026-10-15 后续：用户好接受停止付费盲重试，完成[程序定位/ID选择离线原型与局部审核对照准备](../acceptance/phase-1-t040-span-review-offline/README.md)。新resource-line-spans-v1只用于隔离实验，不替换原已冻结分块或根；100项相关离线通过。四条助手清单待人工范围确认，最多两轮/8次退出规则仅提案，无真实预算/调用，不代表T040或整篇覆盖通过，旧r09停止保持。
+
+2026-10-15 后续：用户确认四条声明忠实原文的范围，独立保存[范围登记](../acceptance/phase-1-t040-span-review-offline/scope-confirmation.json)。[r10固定焦点方案](../acceptance/phase-1-t040-focus-r10/README.md)准备完成：4静态请求/none/2048输出/60秒、保守CNY8.551250、共享最多两轮8次及逐条实际人工事实门禁；新增35+相关238=273离线通过。准确运行预算与退出方案待批准，范围确认不转授调用或预签模型判断；不改变原ADR附件、T040 blocked及目录模式。
