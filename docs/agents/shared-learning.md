@@ -20,3 +20,11 @@ EDUMIND_CATALOG_TEST_PG_CONTAINER=edumind-phase1-t037-pg backend/.venv/bin/pytho
 Upgrade/empty downgrade/upgrade passed; 11 tests passed with zero skips, including
 actual Alembic refusal to downgrade populated plans and unchanged legacy reads.
 Provider requests: 0. Ruff and application mypy (169 modules) passed.
+
+T046: `PlannedScenes` keeps private candidates with server UUID, content/dependency
+digests and complete upstream snapshots. A predecessor must be reviewed as pass or
+needs_human before dependent generation; reject/revise block the dependent stage.
+Changing a candidate discards all dependent candidates and dispositions. A code
+language mismatch fails. This workspace alone grants no publication qualification.
+Scene generation uses the operation's shared call/deadline window, 4096 total output
+per generation, no retry/fallback. New and legacy generator regressions: 13 passed.

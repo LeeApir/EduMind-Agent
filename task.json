@@ -2503,7 +2503,7 @@
       "id": "PHASE-1-T046",
       "phase": "Phase 1",
       "title": "按共享计划生成三个场景内容",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1-T045"
@@ -2525,9 +2525,11 @@
         "python3 scripts/check_catalog_workflow.py",
         "git diff --check"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "完成PlannedScenes共享计划三场景生成、完整上游内容/摘要、稳定候选ID与修改后失效传播；前序pass/needs_human才可继续，代码语言和48KiB上限校验 | 三场景/计划/旧生成器13测试通过，Ruff/app mypy171/工作流/diff及自查通过，真实Provider0；证据docs/agents/shared-learning.md | 私有候选尚不具备发布资格，语义质量未测 | 独立完成提交后领取T047确定性动作"
+      ],
+      "started_at": "2026-10-15T19:03:15",
+      "completed_at": "2026-10-15T19:03:51",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T046",
       "execution_gate": "ADR-0015 A–D与更新manifest已获用户明确批准，仅按依赖串行实施和零Provider测试；真实调用/费用/生产开放另批。",
