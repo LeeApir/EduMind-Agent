@@ -72,3 +72,5 @@
 2026-10-15 后续：用户确认四条声明忠实原文的范围，独立保存[范围登记](../acceptance/phase-1-t040-span-review-offline/scope-confirmation.json)。[r10固定焦点方案](../acceptance/phase-1-t040-focus-r10/README.md)准备完成：4静态请求/none/2048输出/60秒、保守CNY8.551250、共享最多两轮8次及逐条实际人工事实门禁；新增35+相关238=273离线通过。准确运行预算与退出方案待批准，范围确认不转授调用或预签模型判断；不改变原ADR附件、T040 blocked及目录模式。
 
 2026-10-15 最后一轮准备：r10两条主缺陷检出但附带分类误报，用户要求只再测最后一轮。独立[r11方案](../acceptance/phase-1-t040-focus-r11/README.md)补齐通用分类/实际证据契约及新2错误2正确诊断，19新增+273相关=292离线通过；准确4次/CNY8.516778与新样本范围待批准。复用原两轮8次策略登记，失败后停止当前自动生成/审核路线、不追加第三轮；四条通过也不替代正式T040或跨课程验收。旧源码/评分/停止账本不变，当前真实Provider0，none/catalog_only保持。
+
+2026-10-15 最后一轮实际结束：用户批准7a1467a r11准确范围/最多4次/CNY8.516778后，仅final-01实际1次；具体FIFO/LIFO错误正确检出，但返回misconception未满足冻结fact类别，ADMISSION_FAILED停止，余3未发。见[结果](../acceptance/phase-1-t040-focus-r11/results/r11.json)和[最终退出](../acceptance/phase-1-t040-focus-r11/route-retired.json)：当前路线停止，不追加第三轮/微调重试，2轮累计3次而非8次耗尽；T040 blocked/none/catalog_only保持，旧结果和ADR批准不改，不代表正式质量或跨课程能力通过。

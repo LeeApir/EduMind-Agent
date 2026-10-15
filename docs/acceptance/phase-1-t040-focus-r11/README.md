@@ -47,3 +47,15 @@ backend/.venv/bin/python scripts/run_t040_final_focus.py check
 backend/.venv/bin/python scripts/run_t040_final_focus.py step
 backend/.venv/bin/python scripts/run_t040_final_focus.py report
 ```
+
+## 最后一轮实际结束（2026-10-15）
+
+用户“是”批准7a1467a准确根、四样本范围、最多4次/CNY8.516778及最后轮首败退出；新增[实际批准](run-approval.json)、[范围确认](scope-confirmation.json)、[当日规格复核](terms-verification.json)。以上未批准/范围待确认描述保留准备时历史；当前以新增记录为准，确认不预签未来模型事实。
+
+[真实结果](results/r11.json)：只发送final-01一次。模型完整返回reject/severe，准确指出栈的FIFO/LIFO冲突，并以push(10)、push(20)、pop返回20给出有效反例；但area为misconception，未满足事前冻结的fact类别，质量门禁ADMISSION_FAILED停止。具体错误检出正确，不改记为漏检，也不称API失败、截断或无效JSON。原样保留响应和标签，不在看到结果后改分类标准。
+
+实际1519输入+195输出=1714Token，显式推理0；预留CNY2.125910、峰值用量参考CNY0.004598，实际账单未知。final-02和两条正确对照均未发，不能对其代码安全检出、误报率或跨课程质量作结论。协议收据state=complete/error_code=null与诊断run.halted=ADMISSION_FAILED分别保留。
+
+按用户约定新增[最终退出记录](route-retired.json)：当前策略已用两轮、实际累计3请求；虽然未到8次总上限，仍因最后轮失败停止当前自动生成＋审核调试路线，不转授剩余容量、不追加第三轮、同路线Prompt微调重测或自动切模型。T040仍blocked、目录版保留；这不是项目完成或正式T040/DSL/T041通过。
+
+228来源/准确批准/实际wire/响应与value摘要/私有账本1条/两轮登记已核对，重新打开FinalFocusGate明确返回RUN_HALTED；r10 215来源与2次停止、r09 202来源与1次停止、r08 186来源与1次停止未变。源码未改，292项离线证据沿用7a1467a，未重跑业务测试；准备器/活动任务/历史批准/diff核对通过。当前只保存结果、退出状态和本地非完成提交，不push/merge。

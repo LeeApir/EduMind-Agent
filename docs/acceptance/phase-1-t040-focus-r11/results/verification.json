@@ -1,0 +1,58 @@
+{
+  "version": "final-focus-r11-real-verification-v1",
+  "root_sha256": "89bf93924db5da5850bdfbe2bdba8dcb63fb1f09f1347750202203f6f7faaf3e",
+  "execution_source_commit": "7a1467a",
+  "commands": [
+    "backend/.venv/bin/python scripts/prepare_t040_final_focus.py --check",
+    "backend/.venv/bin/python scripts/run_t040_final_focus.py check",
+    "backend/.venv/bin/python scripts/run_t040_final_focus.py step (exit1 ADMISSION_FAILED after one actual request)",
+    "backend/.venv/bin/python scripts/run_t040_final_focus.py report",
+    "Readonly frozen-source and SQLite checks; explicit reopen rejects RUN_HALTED",
+    "backend/.venv/bin/python scripts/check_catalog_workflow.py",
+    "backend/.venv/bin/python scripts/verify_phase1_dynamic_approval.py",
+    "git diff --check"
+  ],
+  "real_provider_calls": 1,
+  "real_rounds_total": 2,
+  "strategy_real_requests_total": 3,
+  "unrun_slots": [
+    "final-02",
+    "final-03",
+    "final-04"
+  ],
+  "run_halted": "ADMISSION_FAILED",
+  "attempt_state": "complete",
+  "attempt_error_code": null,
+  "main_defect_detected": true,
+  "category_gate_passed": false,
+  "category_expected": "fact",
+  "category_observed": "misconception",
+  "prior_runs_unchanged": {
+    "r10": {
+      "sources": 215,
+      "attempts": 2,
+      "halted": "ADMISSION_FAILED"
+    },
+    "r09": {
+      "sources": 202,
+      "attempts": 1,
+      "halted": "INVALID_OUTPUT"
+    },
+    "r08": {
+      "sources": 186,
+      "attempts": 1,
+      "halted": "CONCRETE_DEFECT_MISSED"
+    }
+  },
+  "sources_checked": 228,
+  "private_ledger_mode_checked": true,
+  "third_round_authorized": false,
+  "route_stopped": true,
+  "prior_offline_tests": 292,
+  "business_tests_rerun": false,
+  "source_code_changed": false,
+  "http_status_not_retained": true,
+  "actual_bill": null,
+  "production_mode": "catalog_only",
+  "t040_complete": false
+}
