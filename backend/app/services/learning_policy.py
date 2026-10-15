@@ -5,6 +5,8 @@ from app.services.learning_contract import digest
 POLICY_VERSION = "hybrid-review-v1"
 POLICY = {
     "resource_review": "resource-review-v4",
+    "resource_review_prompt": "evidence-resource-review-v4.1",
+    "review_scope": "goal-bound-review-scope-v1",
     "plan": "learning-plan-v1",
     "actions": "teaching-actions-v1",
     "max_corrections": 2,

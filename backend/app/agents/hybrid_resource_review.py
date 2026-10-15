@@ -21,7 +21,7 @@ from app.services.learning_contract import (
 from app.services.provider_gateway import ChatMessage, StructuredRequest, TaskProfile, TextRequest
 from app.services.teaching_actions import anchor_catalog
 
-REVIEW_V4_PROMPT = "evidence-resource-review-v4"
+REVIEW_V4_PROMPT = "evidence-resource-review-v4.1"
 RESOURCE_CHECKS = {"facts", "code_safety", "learner_fit", "objectives", "reference_scope"}
 UNIT_CHECKS = {
     "terminology",
@@ -42,6 +42,35 @@ explicit learner evidence; misconception requires conflict with an explicit teac
 Use needs_human for uncertainty, insufficient premises, evidence or coverage. Never claim
 unverified source support or confidence as proof. pass requires all mandatory checks, no
 findings, unchecked areas or unresolved items. Do not invent an issue to fill a category."""
+INSTRUCTION += """
+The server review_contract fixes this request's scope and allowed verdicts. For scope=unit,
+return only pass, reject or needs_human; NEVER revise. Resource scope may return revise.
+Assess coverage against the server-bound learning goal and the selected plan/scene objectives.
+Also check that the plan actually addresses that goal; a narrower plan cannot excuse missing
+parts of the requested goal. A graph node's other objectives and misconception examples are
+reference context, not a requirement to cover the entire node in every single learning unit.
+If the unit explicitly promises full-node coverage, assess that promise too. Concrete false
+claims and reachable unsafe operations remain defects anywhere in the supplied material.
+Do not infer learner difficulties or misconceptions from node difficulty, question format,
+or missing profile data. With no learner evidence, check for invented personalization and
+report uncertainty only when the actual judgment depends on missing learner facts.
+A proposed trace is not independent evidence; independently reason through actual code and
+premises when possible. A reference not certifying this exact example does not by itself
+make a directly checkable calculation unknown. Genuine unverifiable claims remain unresolved.
+An omitted objective is not a fact contradiction without a concrete false statement.
+Do not label an assessment-coverage concern difficulty without explicit learner evidence."""
+
+
+def review_output_schema(scope: str) -> dict[str, Any]:
+    """Project the approved cross-field scope rule into the model-visible schema."""
+    if scope not in ("resource", "unit"):
+        raise LearningContractError("REVIEW_PROTOCOL_INVALID")
+    schema: dict[str, Any] = deepcopy(SCHEMA["$defs"]["review_result"])
+    schema["properties"]["scope"] = {"const": scope}
+    if scope == "unit":
+        schema["properties"]["verdict"]["enum"] = ["pass", "reject", "needs_human"]
+    schema["$defs"] = deepcopy(SCHEMA["$defs"])
+    return schema
 
 
 def hard_checks(candidate: SceneCandidate) -> None:
@@ -107,11 +136,26 @@ async def review_once(
     candidates: tuple[SceneCandidate, ...],
     scope: str = "resource",
 ) -> dict[str, Any]:
+    schema = review_output_schema(scope)
     for c in candidates:
         hard_checks(c)
     catalog = anchor_catalog(candidates)
     checks = RESOURCE_CHECKS if scope == "resource" else UNIT_CHECKS
-    data = {**deepcopy(payload), "anchor_catalog": catalog, "mandatory_checks": sorted(checks)}
+    data = {
+        **deepcopy(payload),
+        "anchor_catalog": catalog,
+        "mandatory_checks": sorted(checks),
+        # Constructed after caller data, so a candidate cannot override the trusted rule.
+        "review_contract": {
+            "version": "goal-bound-review-scope-v1",
+            "scope": scope,
+            "allowed_verdicts": schema["properties"]["verdict"]["enum"],
+            "coverage_target": "server-bound goal and selected plan/scene objectives",
+            "graph_role": "partial reference, not automatic full-node certification",
+            "plan_is_evidence": False,
+            "missing_learner_evidence_is_known_difficulty": False,
+        },
+    }
     encoded = canonical(data)
     if len(encoded) > 64 * 1024:
         raise LearningContractError("REVIEW_INPUT_LIMIT_EXCEEDED")
@@ -124,12 +168,8 @@ async def review_once(
             task_profile=TaskProfile.QUALITY,
             max_output_tokens=2048,
         ),
-        json_schema=deepcopy(SCHEMA["$defs"]["review_result"]),
+        json_schema=schema,
     )
-    # review_result references finding; include definitions for provider schema resolvers.
-    schema = deepcopy(dict(request.json_schema))
-    schema["$defs"] = deepcopy(SCHEMA["$defs"])
-    request = StructuredRequest(request.prompt, schema)
     result = await window.send(gateway, request)
     audit = result.transport_audit
     if audit is None:

@@ -2257,7 +2257,9 @@
         "docs/PROVIDERS.md",
         "backend/app/services/deepseek_responses.py",
         "backend/app/core/provider_factory.py",
-        "docs/ADR/"
+        "docs/ADR/",
+        "backend/app/services/learning_policy.py",
+        "docs/agents/review-scope-v4.1.md"
       ],
       "prd_source": "PRD §3.3、§8.2、§10.2",
       "acceptance_criteria": [
@@ -2302,11 +2304,12 @@
         "2026-10-15用户要求参照OM重构生成并重验，选择保留自动审核且不确定部分交人工。新增T043–T054独立重构链；旧路线/r11仍retired且本任务blocked，不恢复旧轮次/余额/标签；具体ADR及真实预算待批。",
         "2026-10-15新链零调用初筛准备：4个独立固定请求（计划/正确整单元/可达安全/事实矛盾），准确wire及当前官方人民币高峰/整窗成本证明已冻结；上限8.629186元/8192输出tokens，无重试回退，未获准确费用及预期标签批准时执行器在Key/DNS/账本之前拒绝；185离线回归通过、493文件T054根及历史证据不变，证据docs/acceptance/phase-1-om-admission-r01/validation.json。此为准备检查点，不是T040完成：八类诊断、100/20/20/10独立人工范围/真值、可信依赖执行器和正式费用待新冻结批准；2360次整窗保守信封5645.271040元不是预计消费。真实Provider0/费用授权0，catalog_only，T041/T042未启动。",
         "2026-10-15用户批准46cf3e9准确四请求初筛/8.629186元及预期标签，登记新根28e25a016c1689c8b27ae52284edb91244fec85b4f24c19297673377a2b17057；仅plan实际1次完成，结构/引用/服务端绑定通过，1607输入+818输出=2425tokens；预留2.124020元，高峰未命中用量参考0.009758元非账单。共享轨迹2/7/16与i=3结束一致；额外先修c-pointer与原array无先修需人工判断。停HUMAN_CHECK_REQUIRED，没有代填plan-human.json；余3槽未发，模型/费用及完整T040未晋级，catalog_only。证据phase-1-om-admission-r01/results/plan-01.json与plan-01-review.md；源冻结及账本1条complete核对通过，原185离线测试沿用46cf3e9，业务源码未改。",
-        "2026-10-15用户继续确认首槽实际计划，登记准确plan-human后仅correct-unit实际1次。接口/Schema/模型与实际wire完成，11491输入+650输出=12141tokens；unit/revise被本地route_review拒绝，原结果离线重放REVIEW_PROTOCOL_INVALID。共享Schema允许revise而Prompt未明确unit禁用，本地契约表达不一致；样本只讲求和/边界，图谱含复杂度/插入删除目标，对照自动pass标签存在范围歧义，不能把全部意见算误报；difficulty缺学习者证据等分类另待核对。通用异常器将本地异常记SAFETY_FAILURE，独立账本原样持久停止，不代表Key泄漏。累计2请求/13098输入+1468输出=14566tokens，预留4.301416元/峰值用量参考0.037940元非账单；余2未发、不重试。源码冻结/收据摘要/0600/账本两行与准确人工来源核对，185离线沿用46cf3e9，未改业务代码。证据phase-1-om-admission-r01/results/correct-unit-02.json；T040 blocked/catalog_only。"
+        "2026-10-15用户继续确认首槽实际计划，登记准确plan-human后仅correct-unit实际1次。接口/Schema/模型与实际wire完成，11491输入+650输出=12141tokens；unit/revise被本地route_review拒绝，原结果离线重放REVIEW_PROTOCOL_INVALID。共享Schema允许revise而Prompt未明确unit禁用，本地契约表达不一致；样本只讲求和/边界，图谱含复杂度/插入删除目标，对照自动pass标签存在范围歧义，不能把全部意见算误报；difficulty缺学习者证据等分类另待核对。通用异常器将本地异常记SAFETY_FAILURE，独立账本原样持久停止，不代表Key泄漏。累计2请求/13098输入+1468输出=14566tokens，预留4.301416元/峰值用量参考0.037940元非账单；余2未发、不重试。源码冻结/收据摘要/0600/账本两行与准确人工来源核对，185离线沿用46cf3e9，未改业务代码。证据phase-1-om-admission-r01/results/correct-unit-02.json；T040 blocked/catalog_only。",
+        "2026-10-15用户同意继续零调用修复：Prompt版本v4.1与scope投影Schema明确unit禁止revise，保留resource两次修正及本地硬门禁；server review_contract覆盖候选同名字段；澄清用户/单元目标与图谱其他目标，不让计划缩目标逃避用户目标；Prompt/scope加入政策摘要使旧待审按原规则失效。新r02正确对照补完整轨迹教学/对应题，新增同目标遗漏反例，真实安全/事实对照保留；标签待独立复核，不是正式holdout。PG scope02共187 passed零跳过，诊断相关190 passed、Ruff/mypy188、原ADR manifest/236归档通过；原r01全部13文件对f67245e字节一致，原账本两次与SAFETY_FAILURE halt未改；旧准备器/加载器对新源码拒绝，旧测试读取冻结请求并断言拒绝重基线。新r02独立CLI/root/账本/错误映射与4实际wire冻结，新预算8.701900元/8192输出tokens，未批准实跑退出2，无Key读取/新真实账本/DNS。证据phase-1-om-admission-r02/validation.json；本次真实Provider0，不标T040完成，不启动T041。"
       ],
       "started_at": "2026-10-14T19:38:26",
       "completed_at": null,
-      "blocker": "新初筛r01第2槽unit/revise触发REVIEW_PROTOCOL_INVALID并持久halt（通用映射SAFETY_FAILURE）；共享Schema/Prompt与本地规则不一致，正确对照目标范围/自动pass标签需复核，不能自动重试剩余2槽。先零调用澄清并修正契约/样本，真实重跑须新冻批准；正式T040/T041门禁保留。",
+      "blocker": "r01原两请求/halt保留；零调用scope修复及回归已通过，新r02四请求/8.701900元与具体预期标签尚待独立批准确认，真实调用授权0。完整八类诊断、正式真值/执行器/预算仍待门禁，T040不完成，catalog_only。",
       "commit_lookup": "Task-Completed: PHASE-1-T040"
     },
     {

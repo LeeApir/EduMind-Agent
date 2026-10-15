@@ -29,11 +29,23 @@ from app.core.config import ProviderSettings  # noqa: E402
 
 @pytest.fixture(scope="module")
 def prepared():
-    return prepare.build()
+    # r01 is stopped and immutable; exercise its actual frozen inputs, not new runtime prompts.
+    base = ROOT / BASE
+    return {
+        k: json.loads((base / k).read_text())
+        for k in (
+            "proposal.json",
+            "cases.json",
+            "proposed-labels.json",
+            "token-cost-proof.json",
+        )
+    }
 
 
 def test_preparation_is_reproducible_and_has_separate_new_examples(prepared):
-    assert prepared == prepare.build()
+    # Current runtime changed after r01. The old preparer must fail closed, not rebaseline it.
+    with pytest.raises(ValueError, match="IMPLEMENTATION_BASELINE_CHANGED"):
+        prepare.build()
     p = prepared["proposal.json"]
     assert p["requests"] == 4 and p["requests_authorized"] == 0
     assert p["fees_authorized"] == 0
