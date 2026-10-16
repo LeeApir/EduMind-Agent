@@ -18,6 +18,10 @@ from acceptance_support.om_diagnostic import MODEL, stable
 
 BASE = "docs/acceptance/phase-1-review-config-r02"
 PRIVATE = "local-materials/phase-1-review-config-r02"
+REQUESTS = 14
+SLOT_IDS = None
+RUN_ID = "review-config-r02"
+REVIEW_DOCUMENT_MODULE = "prepare_review_config_comparison"
 from acceptance_support.phase1_budget import (
     Approval,
     FrozenBudget,
@@ -88,7 +92,7 @@ def load(root=ROOT):
         and a["version"] == "om-admission-human-approval-v1"
         and a["proposal_sha256"] == stable(p)
         and type(a["requests"]) is int
-        and a["requests"] == p["requests"] == 14
+        and a["requests"] == p["requests"] == REQUESTS
         and type(a["cost_micro_cny"]) is int
         and a["cost_micro_cny"] == p["cost_micro_cny"]
         and a["labels_sha256"] == p["labels_sha256"]
@@ -131,9 +135,10 @@ def load(root=ROOT):
     )
     require(
         tuple(data) == tuple(s["id"] for s in p["slots"])
-        and len(data) == 14
+        and len(data) == REQUESTS
+        and (SLOT_IDS is None or tuple(data) == SLOT_IDS)
         and (root / BASE / "human-review.md").read_text()
-        == __import__("prepare_review_config_comparison").review_document(data)
+        == __import__(REVIEW_DOCUMENT_MODULE).review_document(data)
         and read(root / BASE / "token-cost-proof.json")["checked_on"]
         == time.strftime("%Y-%m-%d"),
         "FREEZE_CHANGED",
@@ -172,12 +177,14 @@ def manifest(p, root):
             )
         },
     }
-    files[str(Path(BASE) / "labels-human.json")] = sha(
-        (root / BASE / "labels-human.json").read_bytes()
-    )
+    # An unapproved structural preview can omit this absent record. Actual step()
+    # always passes load(), which requires it before manifest or any ledger access.
+    label_path = root / BASE / "labels-human.json"
+    if label_path.is_file():
+        files[str(Path(BASE) / "labels-human.json")] = sha(label_path.read_bytes())
     return {
         "version": "phase1-run-v1",
-        "run_id": "review-config-r02",
+        "run_id": RUN_ID,
         "state": "FROZEN_RUN_READY",
         "phase": "diagnostic",
         "files": files,
@@ -194,7 +201,7 @@ def manifest(p, root):
             for s in p["slots"]
         ],
         "bounds": {
-            "requests": 14,
+            "requests": REQUESTS,
             "cost_micro": p["cost_micro_cny"],
             "max_active_attempts": 1,
             "timeout_seconds": 60,
@@ -337,7 +344,7 @@ async def step(root=ROOT, *, transport=None, resolver=None):
             private / "budget.sqlite",
             root=root,
             approval=Approval(
-                stable(m), "diagnostic", 14, p["cost_micro_cny"], stable(a), True
+                stable(m), "diagnostic", REQUESTS, p["cost_micro_cny"], stable(a), True
             ),
         )
         registration = private / "enrollment.json"

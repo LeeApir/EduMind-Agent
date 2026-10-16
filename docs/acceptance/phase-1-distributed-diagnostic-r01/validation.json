@@ -1,0 +1,108 @@
+{
+  "version": "distributed-single-freeze-validation-v1",
+  "baseline": "433ccf5",
+  "proposal_sha256": "ca6e41a624172ed6fc14b022ea72a862118977061c7a816a2a98aaea784c1012",
+  "provider_requests": 0,
+  "requests_authorized": 0,
+  "fees_authorized": 0,
+  "requests_max": 1,
+  "cost_micro_cny": 2198030,
+  "output_token_cap_including_reasoning": 2048,
+  "wire_bytes": 42247,
+  "wire_sha256": "4bdf42a82166858698e18ff88e922b0876653b94b2cec02e0afa65735c3e0ea3",
+  "case_byte_data_equal": true,
+  "regenerated_input_or_request": false,
+  "source_files_verified": 598,
+  "unapproved_structural_preview": {
+    "kernel_files": 602,
+    "requests": 1,
+    "slots": 1,
+    "attempts_per_slot": 1,
+    "allowed_stages": [
+      "probe"
+    ],
+    "approval": null,
+    "snapshot_or_reserve_called": false,
+    "new_private_directory_exists": false
+  },
+  "checks": [
+    {
+      "command": "backend/.venv/bin/python -m pytest -q scripts/tests/test_distributed_diagnostic.py scripts/tests/test_failure_observation.py scripts/tests/test_review_config_comparison.py scripts/tests/test_review_taxonomy_replay.py scripts/tests/test_coverage_v44.py scripts/tests/test_coverage_admission.py scripts/tests/test_coverage_review.py scripts/tests/test_om_admission.py scripts/tests/test_om_admission_r02.py scripts/tests/test_om_admission_r03.py backend/tests/test_acceptance_budget.py backend/tests/test_derived_diagnostic_budget.py backend/tests/test_real_browser_budget.py",
+      "result": "203 passed;15 new single-slot/exact wire/gates/success exhausted/failure diagnostic no retry tests"
+    },
+    {
+      "command": "backend/.venv/bin/ruff check scripts/run_review_config_observed.py scripts/run_distributed_diagnostic.py scripts/prepare_distributed_diagnostic.py scripts/tests/test_distributed_diagnostic.py",
+      "result": "passed"
+    },
+    {
+      "command": "backend/.venv/bin/python scripts/run_distributed_diagnostic.py --run-one",
+      "exit_code": 2,
+      "result": "STOPPED_OR_NOT_AUTHORIZED before key/DNS/new ledger"
+    },
+    {
+      "command": "backend/.venv/bin/python docs/acceptance/phase-1-om-redesign/check_contract.py",
+      "result": "12 original documents/12 task contracts valid"
+    },
+    {
+      "command": "python3 scripts/verify_legacy_archives.py",
+      "result": "236 original files verified"
+    },
+    {
+      "command": "python3 scripts/check_catalog_workflow.py",
+      "result": "valid"
+    }
+  ],
+  "historical_integrity": {
+    "against": "433ccf5",
+    "evidence_files_equal": 91,
+    "ledgers": [
+      {
+        "run": "phase-1-om-admission-r01",
+        "attempts": 2,
+        "halted": "SAFETY_FAILURE"
+      },
+      {
+        "run": "phase-1-om-admission-r02",
+        "attempts": 1,
+        "halted": "INVALID_OUTPUT"
+      },
+      {
+        "run": "phase-1-om-admission-r03",
+        "attempts": 2,
+        "halted": "INVALID_OUTPUT"
+      },
+      {
+        "run": "phase-1-coverage-r04-real",
+        "attempts": 1,
+        "halted": "INVALID_OUTPUT"
+      },
+      {
+        "run": "phase-1-coverage-r05-real",
+        "attempts": 3,
+        "halted": "INVALID_OUTPUT"
+      },
+      {
+        "run": "phase-1-review-config-r01",
+        "attempts": 3,
+        "halted": "INVALID_OUTPUT"
+      }
+    ],
+    "old_third_usage": [
+      null,
+      null
+    ],
+    "old_third_cause": "UNKNOWN_NOT_RECOVERED"
+  },
+  "production_default_prompt_schema_changed": false,
+  "old_frozen_runner_changed": false,
+  "new_approval_records_created": false,
+  "limits": [
+    "One authored case is not formal acceptance or holdout",
+    "Mock/structural preview is not real semantic or compatibility success",
+    "Original low2048 may still fail; no automatic cap increase",
+    "Fresh execution-day terms and independent exact approval still required",
+    "No PG/mypy rerun; business code unchanged"
+  ],
+  "T040": "blocked",
+  "production_mode": "catalog_only"
+}
