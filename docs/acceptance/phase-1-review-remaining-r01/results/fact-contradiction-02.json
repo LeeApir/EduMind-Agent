@@ -1,0 +1,97 @@
+{
+  "version": "review-remaining-actual-02-v1",
+  "source_commit": "695b31f",
+  "previous_checkpoint": "d0038cd",
+  "proposal_sha256": "7b7d495f9fd7d64ad0db40e5b03cc55c01ce804de61f82a99348691186b90d8f",
+  "approval_sha256": "8b879eec5b928466309cbb65dc281d53ce6feab45d02b1061b4e9c7cf1fa0ce2",
+  "receipt_sha256": "81cd06b659096534d4b8945719fc801ed5ffcc290a7171458fd3b59fad3e9ec7",
+  "slot": "fact-contradiction:candidate",
+  "real_cloud": true,
+  "mock": false,
+  "cli_exit_code": 0,
+  "requests_sent_this_step": 1,
+  "attempts_authorized": 5,
+  "attempts_used": 2,
+  "remaining_attempts": 3,
+  "unattempted_slots": [
+    "reachable-safety:candidate",
+    "gap-and-safety:candidate",
+    "trace-complete:candidate"
+  ],
+  "first_result_human_confirmation_sha256": "5e42232a630575535391fac426e24b1910617b2fa00cb313db8c0235118e5e89",
+  "request_sha256": "0aee3d1068a17a0045c872e850d053d50da7fd5c308628470eb9168f9f5ae3af",
+  "response_sha256": "aef7ad23fdc4a87f72f8a9fb2065dff04d17724b8badf3bcaef6dc7f5376b53e",
+  "material_sha256": "8bede9d8eb0c83a47c748a66af6eeaab4db474653c51e51d9de875c7e4717bd6",
+  "completeness": {
+    "actual_request_digest_matches": true,
+    "provider_response_completed": true,
+    "response_model_matches": true,
+    "single_assistant_message_and_text_block": true,
+    "structured_json_schema_valid": true,
+    "usage_known_and_within_frozen_bound": true
+  },
+  "structured_review": {
+    "coverage": {
+      "checked": [
+        "action_references",
+        "answer_consistency",
+        "conventions",
+        "example_trace",
+        "terminology"
+      ],
+      "unchecked": []
+    },
+    "findings": [
+      {
+        "anchors": [
+          "a1",
+          "a15"
+        ],
+        "category": "fact",
+        "condition_or_counterexample": "Explanation markdown states: 累加到 total=16 之后紧接着写 “sum()返回18，不直接打印。” The array {2,5,9} sums to 2+5+9=16, and the code (`return total;`), the code's key_steps, the exercise q3 stem/explanation (返回16), and the authoritative goal/plan (返回值16) all use 16; the explanation's 18 contradicts its own preceding sentence (total=16) and every other supplied resource.",
+        "impact": "The unit's central answer — the function's return value — is stated incorrectly in the student-visible explanation, directly contradicting the goal's required value 16 and the exercise feedback (q3), so learners reading the explanation before the quiz are taught the wrong result.",
+        "severity": "severe"
+      }
+    ],
+    "schema_version": "resource-review-v4",
+    "scope": "unit",
+    "unresolved": [],
+    "verdict": "reject"
+  },
+  "assistant_semantic_assessment": {
+    "core_detection_satisfied": true,
+    "overall": "CORE_MET_WITH_SECONDARY_ANCHOR_LIMITATION_PENDING_HUMAN",
+    "basis": "Explanation directly says sum returns18 despite total16; actual loop sums2+5+9=16 and returns total. Severe fact and reject are concretely supported by a1.",
+    "all_cited_locations_precise": false,
+    "secondary_anchor_limitation": {
+      "anchor_id": "a15",
+      "actual_pointer": "/items/2/answer",
+      "actual_text": "F",
+      "note": "Valid catalog ID but only a truth-value answer; not direct evidence of returned16. q3 question mentions16 elsewhere; do not treat a15 as a precise numeric location. Main a1 itself contains18-vs16 contradiction."
+    },
+    "additional_false_finding_detected": false,
+    "scope": "Core contradiction detected; no claim of perfect anchor precision or formal T040 acceptance."
+  },
+  "input_tokens": 14136,
+  "output_tokens_including_reasoning": 1474,
+  "total_tokens": 15610,
+  "output_limit_including_reasoning": 8192,
+  "reasoning_visible_split": "UNKNOWN_NOT_RETAINED",
+  "slot_reserved_micro_cny": 2247338,
+  "peak_uncached_usage_reference_micro_cny": 40064,
+  "actual_invoice_cost": null,
+  "cumulative_known_tokens": 32148,
+  "cumulative_peak_uncached_reference_micro_cny": 87324,
+  "cumulative_reserved_micro_cny": 4495294,
+  "remaining_reservation_budget_micro_cny": 6740266,
+  "cost_note": "Peak uncached reference is not invoice; reservation not charge. Existing five-call authorization retained.",
+  "human_confirmed": false,
+  "first_result_human_confirmed": true,
+  "run_halt": null,
+  "pause_reason": "Per-result human gate; explicitly review secondary-anchor limitation before any continuation. No second-result continue file.",
+  "next_slot": "reachable-safety:candidate",
+  "T040": "blocked",
+  "formal_quality_passed": false,
+  "production_mode": "catalog_only",
+  "second_cli_this_turn_or_retry": false
+}
