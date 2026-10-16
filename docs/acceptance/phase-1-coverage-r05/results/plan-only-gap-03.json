@@ -1,0 +1,94 @@
+{
+  "version": "coverage-r05-plan-only-gap-03-v1",
+  "source_commit": "9b35479",
+  "proposal_sha256": "fdbb5c6563289f5f61ded5cf473fd8d3ba5dba204fd3045e2fc18eb9d8e145e2",
+  "approval_sha256": "049b5dc5e236edd22365e1248fb6375a635c67429854b4b02ffeb885d319c8ff",
+  "receipt_sha256": "22c194ea762b0b3c4ec61335590331c3423186b5129708ab45b2bef1a71ed5e0",
+  "slot": "plan-only-gap",
+  "real_cloud": true,
+  "mock": false,
+  "real_requests_this_step": 1,
+  "r05_requests_sent": 3,
+  "requests_not_sent": [
+    "assessment-gap"
+  ],
+  "protocol_schema_wire_model_binding": "passed",
+  "model_verdict": "needs_human",
+  "local_routing": {
+    "verdict": "needs_human",
+    "reason_codes": [
+      "SEMANTIC_UNRESOLVED"
+    ],
+    "policy_version": "hybrid-review-v1"
+  },
+  "admission_gate": "PURE_COVERAGE_FINDING_INVALID",
+  "review_result": {
+    "coverage": {
+      "checked": [
+        "action_references",
+        "answer_consistency",
+        "conventions",
+        "example_trace",
+        "terminology"
+      ],
+      "unchecked": []
+    },
+    "findings": [
+      {
+        "anchors": [
+          "a1"
+        ],
+        "category": "fact",
+        "condition_or_counterexample": "Explanation resource states \"sum()返回16，不直接打印。\" The code resource defines `int sum(void)` with no parameters and no caller; the explanation's phrasing implies a callable function whose return value is observed, but no call site exists in the supplied material. This is a presentation gap rather than a false arithmetic claim.",
+        "impact": "Learners see a return value asserted without any visible invocation, which may weaken the connection between the function body and the claimed return of 16; however the arithmetic and return statement are correct, so this is minor.",
+        "severity": "minor"
+      }
+    ],
+    "schema_version": "resource-review-v4",
+    "scope": "unit",
+    "unresolved": [
+      "Student-visible goal coverage for the TRACE/EXPLAIN-PROCESS objective: the authoritative request asks to trace the summation loop and explain indices 0–2 and the return value 16. The explanation resource only states the array, capacity, indices, and that sum() returns 16 without printing; it does not show the step-by-step total=2,7,16 progression or the i=3 termination condition. The code resource contains the loop but no student-visible trace of key state changes or exit condition. The exercise items ask only whether indices 0,1,2 are valid, whether 2+5+9=16, and whether a return value is necessarily printed; none require tracing total across iterations or explaining the i=3 boundary. The plan's shared_example and key_steps contain the trace, but these are internal plan/reference fields, not delivered teaching evidence. Therefore the unit does not visibly deliver the requested process trace or boundary explanation.",
+      "No verified animation evidence is supplied; no explicit animation promise is present, so absent animation is not treated as a defect.",
+      "The code resource is marked display_only and has no call site; whether learners are expected to infer the caller context is not specified in the supplied material."
+    ],
+    "verdict": "needs_human"
+  },
+  "input_tokens": 13588,
+  "output_tokens_including_reasoning": 455,
+  "total_tokens": 14043,
+  "cost_reserved_micro_cny": 2196416,
+  "peak_uncached_usage_reference_micro_cny": 30816,
+  "cumulative_input_tokens": 42028,
+  "cumulative_output_tokens": 577,
+  "cumulative_total_tokens": 42605,
+  "cumulative_reserved_micro_cny": 6592848,
+  "cumulative_peak_usage_reference_micro_cny": 88672,
+  "actual_invoice_cost": null,
+  "cost_note": "Approved peak uncached usage reference only; cache/period invoice unknown; reservation is not charge.",
+  "request_sha256": "7246430641f52a31ff21183859a900e8b06c2c9c56d58ffd5ab31c98dda12be7",
+  "response_sha256": "90e24b44ae2cf16d3463b5c8988f965e45adb412763c815b1a7714a620adf0b8",
+  "material_unit_digest": "8eec1ba97cdee9ecbc8bdf343335664d348c98d0bea6ae27f4b7f1e994edc31f",
+  "material_sha256": "c19deec758d9756b548b797f9af13dcff587143d523c1a25be76d9dd96e74ab3",
+  "frozen_material_location": "cases.json:plan-only-gap.material",
+  "bound_original_goal": "用C追踪数组{2,5,9}的求和循环，解释下标0至2和返回值16。",
+  "coverage_gap_specificity": "assistant-observed specific state/exit and question-carrier gap, pending human result review",
+  "assistant_observations_not_human_signoff": [
+    "The result specifically identifies absent total2/7/16 progression, i3 exit teaching and exercise questions not requiring trace knowledge. These match the actual frozen visible fields; do not describe this as a missed coverage gap.",
+    "The model returns the expected needs_human route, with all five IDs. Pure-coverage admission nevertheless fails because findings contains a minor fact about an absent call site. The model itself states this is presentation rather than a false arithmetic claim and acknowledges correct arithmetic/return.",
+    "No complete executable program or call-site demonstration was promised. Under adopted coverage/fact criteria, a missing demonstration is not itself a factual contradiction. The frozen rule prohibits fabricating fact findings for a pure coverage gap.",
+    "The text places an unsolicited absent-animation statement in unresolved while saying no animation promise/defect exists. It also refers imprecisely to plan key_steps: actual code.key_steps is only a generic traversal/return sentence; explicit state trace is internal shared_example.steps. These are auxiliary concerns for human review, not the recorded admission error.",
+    "Protocol/API/wire binding succeeded. The persisted INVALID_OUTPUT denotes local admission failure, not inability to call the provider, a transport/schema failure or serious factual-error recall miss."
+  ],
+  "prior_two_actual_controls_human_confirmed": true,
+  "human_confirmed": false,
+  "ledger": {
+    "attempts": 3,
+    "complete": 2,
+    "failed": 1,
+    "halted": "INVALID_OUTPUT"
+  },
+  "T040": "blocked",
+  "formal_quality_passed": false,
+  "production_mode": "catalog_only",
+  "next": "Review actual omission diagnosis and extra fact finding. Run remains stopped; do not send assessment-gap, retry, change prompt/labels or clear halt."
+}

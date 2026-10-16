@@ -1,9 +1,10 @@
 # v4.4 / r05：同样本覆盖诊断运行包
 
 本轮独立于已停止的r04。2026-10-16用户已批准四次/8.791654元及原四判据绑定；
-首条完整正例已获用户实际确认；第2条分散覆盖真实一次，模型/local均pass。
-本轮累计2次、两个正例自动通过，停在第2条实际结果人工核对门禁，余2反例未发。
-见[第2条完整材料与意见](results/trace-distributed-02-review.md)。
+前两个正例均已获用户实际确认。第3条过程支持缺失已具体指出缺口并needs_human，
+但额外给出minor/fact调用示例缺失，未过纯覆盖不足不虚构事实错误的冻结判据。
+本轮累计3次，账本INVALID_OUTPUT持久停止，第4条未发。
+见[第3条完整材料与意见](results/plan-only-gap-03-review.md)。
 当前源码基线4d66a7d（v4.4）；新执行器、准备器、测试和依赖一起冻结，共581来源文件。
 运行根：`fdbb5c6563289f5f61ded5cf473fd8d3ba5dba204fd3045e2fc18eb9d8e145e2`。
 完整可读内容及原始目标见 [human-review.md](human-review.md)，精确输入/请求在 [cases.json](cases.json)。
@@ -59,7 +60,7 @@ reasoning=none、temperature=0、每次max_output_tokens=2048、60秒，无重�
 执行：`backend/.venv/bin/python scripts/run_coverage_v44.py --run-one`。
 新run-approval及精确案例绑定已按用户明确批准登记；首条后仍须绑定准确收据的人工继续。
 准备阶段仅读取.env文件元数据，不读取密钥；发送前由安全执行器校验冻结元数据并读取服务端配置。
-新私有账本位于local-materials/phase-1-coverage-r05-real，目前两条complete、无halt。
+新私有账本位于local-materials/phase-1-coverage-r05-real，目前两条complete、一条failed，INVALID_OUTPUT持久halt。
 
 批准后先发完整正例一次，保存完整实际结果；准确收据的人工确认后才发下一条。
 任一协议/目标/用量/路由错误持久停止，不重试、不清halt、不退款复用预留。
