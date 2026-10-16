@@ -153,6 +153,7 @@ async def run_planned_operation(
             plan.plan_json,
             plan_binding(plan, operation_id),
             reference_context=inputs.reference_context,
+            input_snapshot=plan.input_snapshot,
         )
         records = []
 
@@ -187,7 +188,9 @@ async def run_planned_operation(
         actions = assemble_actions(workspace.candidates())
         material = unit_material(workspace, scenes, actions)
         await phase("consistency_check")
-        result = await review_unit(gateway, window, material, records)
+        result = await review_unit(
+            gateway, window, material, records, input_snapshot=plan.input_snapshot
+        )
         if result["review"] is None:
             raise LearningContractError("CURRENT_CANDIDATE_REJECTED")
         consistency = await save_review(db, result["review"])

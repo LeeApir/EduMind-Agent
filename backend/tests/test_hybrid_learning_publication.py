@@ -1,6 +1,7 @@
 """Actual PG atomic publication and blocked read boundaries with synthetic model data."""
 
 import asyncio
+import json
 import os
 from copy import deepcopy
 from uuid import UUID, uuid4
@@ -16,6 +17,7 @@ from app.agents.hybrid_resource_review import UNIT_CHECKS
 from app.core.database import create_database_engine
 from app.models.auth import User
 from app.models.learning import GeneratedResource, LearningOperation, LearningUnit
+from app.models.learning_plan import LearningPlanVersion
 from app.models.learning_publication import LearningPublication
 from app.services.hybrid_learning_publication import (
     current_publication,
@@ -84,6 +86,19 @@ def test_full_automatic_flow_is_atomic_and_budget_is_persistent(monkeypatch):
                     db, owner_id=uid, operation_id=oid, inputs=flow_inputs(), gateway=g
                 )
                 assert result["status"] == "completed" and len(g.requests) == 8
+                for index in (2, 4, 6, 7):
+                    sent = json.loads(g.requests[index].prompt.messages[1].content)
+                    assert (
+                        sent["authoritative_teaching_goal"]["user_request"]
+                        == inputs().metadata["goal"]
+                    )
+                    assert sent["authoritative_teaching_goal"]["status"] == "bound_original_request"
+                    assert "facts" not in sent["reference_context"]
+                plan = await db.get(
+                    LearningPlanVersion, UUID(result["material"]["binding"]["plan_id"])
+                )
+                assert plan.input_snapshot["reference_context"] == flow_inputs().reference_context
+                assert result["material"]["reference_context"] == flow_inputs().reference_context
                 op = await db.get(LearningOperation, oid)
                 unit = await db.get(LearningUnit, op.learning_unit_id)
                 assert op.generation_call_count == 8 and op.status == "completed"

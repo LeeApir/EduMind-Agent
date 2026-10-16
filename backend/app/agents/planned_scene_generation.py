@@ -48,8 +48,16 @@ class SceneCandidate:
 
 
 class PlannedScenes:
-    def __init__(self, plan: object, binding: object, *, reference_context: object = None) -> None:
+    def __init__(
+        self,
+        plan: object,
+        binding: object,
+        *,
+        reference_context: object = None,
+        input_snapshot: dict[str, Any] | None = None,
+    ) -> None:
         self.reference_context = deepcopy(reference_context)
+        self.input_snapshot = deepcopy(input_snapshot)
         self.plan = validate_contract(plan, "plan")
         self.binding = validate_contract(binding, "binding")
         if self.binding["plan_digest"] != digest("plan", "learning-plan-v1", plan=self.plan):

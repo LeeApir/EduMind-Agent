@@ -37,6 +37,8 @@ async def review_unit(
     window: CallWindow,
     material: dict[str, Any],
     resource_records: list[dict[str, Any]],
+    *,
+    input_snapshot: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     workspace, checked = restore_material(material)
     prior = resource_review_priority(checked, resource_records)
@@ -50,6 +52,7 @@ async def review_unit(
         payload={"unit": checked, "reference_context": workspace.reference_context},
         candidates=workspace.candidates(),
         scope="unit",
+        input_snapshot=input_snapshot,
     )
     verdict = record["local_routing"]["verdict"]
     state = (

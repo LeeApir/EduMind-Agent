@@ -19,11 +19,12 @@ import prepare_om_admission_r02 as prepare  # noqa: E402
 from acceptance_support.om_admission_r02 import BASE, PRIVATE, SLOTS  # noqa: E402
 from acceptance_support.om_diagnostic import stable, valid_review  # noqa: E402
 from acceptance_support.phase1_budget import GateFailure  # noqa: E402
+from run_om_admission_r02 import runtime  # noqa: E402
+from test_om_admission import fake_transport  # noqa: E402
+
 from app.core.config import ProviderSettings  # noqa: E402
 from app.services.learning_contract import LearningContractError  # noqa: E402
 from app.services.unit_material import restore_material  # noqa: E402
-from run_om_admission_r02 import runtime  # noqa: E402
-from test_om_admission import fake_transport  # noqa: E402
 
 
 @pytest.fixture(scope="module")
@@ -42,7 +43,8 @@ def prepared():
 
 def test_repair_freeze_is_reproducible_and_keeps_old_results(prepared):
     # r02 is now stopped. Current schema repair may never silently rebaseline its inputs.
-    assert prepare.build() != prepared
+    with pytest.raises(ValueError, match="UNEXPECTED_IMPLEMENTATION_CHANGE"):
+        prepare.build()
     p = prepared["proposal.json"]
     assert set(p["implementation_changes"]) == prepare.ALLOWED_CHANGES
     assert p["requests_authorized"] == p["fees_authorized"] == 0
@@ -144,7 +146,9 @@ def test_new_runtime_runs_each_slot_only_after_exact_synthetic_human_continue(
                         else "fact",
                         "severity": "major",
                         "anchors": [data[slot]["anchors"][0]["anchor_id"]],
-                        "condition_or_counterexample": "Synthetic routing condition, not semantic proof.",
+                        "condition_or_counterexample": (
+                            "Synthetic routing condition, not semantic proof."
+                        ),
                         "impact": "Synthetic impact, not human-approved evidence.",
                     }
                 ],

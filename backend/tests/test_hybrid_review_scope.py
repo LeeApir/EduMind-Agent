@@ -51,6 +51,7 @@ def test_real_request_cannot_accept_a_candidate_supplied_scope_override():
             gateway,
             CallWindow(),
             binding=w.binding,
+            input_snapshot=w.input_snapshot,
             target_digest=c.content_digest,
             payload={
                 "plan": w.plan,
@@ -66,8 +67,9 @@ def test_real_request_cannot_accept_a_candidate_supplied_scope_override():
         assert "revise" not in data["review_contract"]["allowed_verdicts"]
         assert "revise" not in request.json_schema["properties"]["verdict"]["enum"]
         assert data["plan"] == w.plan
-        assert data["reference_context"] == w.reference_context
-        assert result["prompt_version"] == "evidence-resource-review-v4.3"
+        assert data["reference_context"]["source"] == w.reference_context["source"]
+        assert "facts" not in data["reference_context"]
+        assert result["prompt_version"] == "evidence-resource-review-v4.4"
         assert result["local_routing"]["verdict"] == "pass"
 
     asyncio.run(check())
@@ -82,6 +84,7 @@ def test_unit_revise_is_still_rejected_if_a_provider_ignores_outbound_schema():
                 ReviewGateway([answer("revise", "unit")]),
                 CallWindow(),
                 binding=w.binding,
+                input_snapshot=w.input_snapshot,
                 target_digest=c.content_digest,
                 payload={"reference_context": w.reference_context},
                 candidates=(c,),
@@ -102,6 +105,7 @@ def test_genuine_unknowns_and_concrete_rejects_keep_existing_routes():
                 ReviewGateway([a]),
                 CallWindow(),
                 binding=w.binding,
+                input_snapshot=w.input_snapshot,
                 target_digest=c.content_digest,
                 payload={"reference_context": w.reference_context},
                 candidates=(c,),

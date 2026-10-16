@@ -11,6 +11,8 @@ from app.services.learning_policy import POLICY
 
 
 async def plan_fixture(db):
+    from test_planned_scene_generation import workspace
+
     user = User(is_guest=True)
     db.add(user)
     await db.flush()
@@ -33,7 +35,7 @@ async def plan_fixture(db):
         unit_id=unit.id,
         operation_id=operation.id,
         plan=PLAN,
-        input_snapshot={},
+        input_snapshot=workspace().input_snapshot,
         references=REFS,
         node_ids={"stack"},
         policy_version="hybrid-review-v1",

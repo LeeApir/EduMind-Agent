@@ -17,7 +17,14 @@ from app.services.unit_material import restore_material  # noqa: E402
 
 @pytest.fixture(scope="module")
 def frozen():
-    return build()
+    names = (
+        "proposal.json",
+        "cases.json",
+        "offline-implementation-control.json",
+        "reassessment.json",
+        "proposed-labels.json",
+    )
+    return {name: json.loads((ROOT / BASE / name).read_text()) for name in names}
 
 
 def content(case, role):
@@ -29,6 +36,8 @@ def content(case, role):
 
 
 def test_freeze_binds_exact_material_without_authorizing_any_execution(frozen):
+    # Stopped calibration is historical; current policy may not silently rebaseline it.
+    assert build() != frozen
     for name, value in frozen.items():
         assert json.loads((ROOT / BASE / name).read_text()) == value
     proposal = frozen["proposal.json"]

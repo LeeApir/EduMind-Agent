@@ -1,0 +1,527 @@
+{
+  "evidence_type": "SYNTHETIC_OFFLINE_PROJECTION_NOT_LIVE_OR_EXECUTABLE_FREEZE",
+  "provider_requests": 0,
+  "goal_available": true,
+  "projection": {
+    "unit": {
+      "binding": {
+        "owner_id": "63da834c-4ffb-5db4-b2fa-1970b13e8e4a",
+        "unit_id": "ca0e6f59-4cca-5038-9e5c-23f7bb2b46fe",
+        "operation_id": "18b47b7c-1c7e-5d3b-97fd-68e2c7138740",
+        "plan_id": "3cd91d96-0d0a-5abd-88db-5dfdf33f7cc7",
+        "plan_version": 1,
+        "plan_digest": "6e001c28456d4841817de40632d24d87c231159d61bf15f53d4c9ae57d07d8f1",
+        "input_digest": "5aa4798f2210d2ee98501be9bdb785580ed650b54ad785a66c558a70cbbe2d00",
+        "references_digest": "73c808e61d8d171633df56ec547afd4c0172facc4598782432d22880d9c8841c",
+        "policy_version": "hybrid-review-v1",
+        "policy_digest": "0ae5cb21ae5713f8f25491c3e09596a2519e1f8f45a656bd05dd4ecaed51320e"
+      },
+      "plan": {
+        "objectives": [
+          {
+            "id": "sum",
+            "text": "逐步追踪total=2、7、16及i=3时不再访问数组的边界"
+          }
+        ],
+        "terminology": [
+          {
+            "term": "i",
+            "meaning": "从0开始的数组下标"
+          }
+        ],
+        "conventions": {
+          "index_base": 0,
+          "capacity": 3,
+          "state_representation": "a={2,5,9}; total表示已处理元素之和",
+          "not_applicable_reasons": []
+        },
+        "shared_example": {
+          "input_description": "a={2,5,9}",
+          "initial_state": "total=0",
+          "steps": [
+            {
+              "operation": "i=0,1,2累加a[i]",
+              "expected_state": "total依次2,7,16",
+              "expected_output": null
+            },
+            {
+              "operation": "i=3检查i<3",
+              "expected_state": "条件为假，退出且不访问a[3]",
+              "expected_output": "16"
+            }
+          ]
+        },
+        "prerequisite_node_ids": [],
+        "scenes": [
+          {
+            "role": "explanation",
+            "scene_key": "explanation",
+            "objective_ids": [
+              "sum"
+            ],
+            "depends_on": []
+          },
+          {
+            "role": "code",
+            "scene_key": "code",
+            "objective_ids": [
+              "sum"
+            ],
+            "depends_on": [
+              "explanation"
+            ]
+          },
+          {
+            "role": "exercise",
+            "scene_key": "exercise",
+            "objective_ids": [
+              "sum"
+            ],
+            "depends_on": [
+              "explanation",
+              "code"
+            ]
+          }
+        ],
+        "node_id": "array",
+        "graph_version": "phase-1.1.0",
+        "graph_digest": "2caffdbb1f523de8acbb412d2a4a231a49f7ce08da86ba45811f2f41b60c021a",
+        "profile_version": null,
+        "profile_evidence_digest": "8838fdd11ee58e08fd54a21272313e784012370b7cf0a2cde8b823ed8806d85d",
+        "goal": "用C追踪数组{2,5,9}的求和循环，解释下标0至2和返回值16。",
+        "code_language": "C",
+        "schema_version": "learning-plan-v1",
+        "references": [
+          {
+            "reference_id": "graph-node:phase-1.1.0:array",
+            "version": "phase-1.1.0",
+            "digest": "f83fd12e754fcda4124aa62b8a29203d97a897605d23dc4e37877393dcb0015d"
+          }
+        ]
+      },
+      "candidates": [
+        {
+          "resource_id": "9257c1b7-efea-4ee6-a37f-9898d34c7d80",
+          "role": "explanation",
+          "envelope": {
+            "resource_type": "explanation",
+            "prompt_version": "learning-resources-v1",
+            "content": {
+              "markdown": "a={2,5,9}，容量3，下标0、1、2。total初始为0。i=0读取a[0]=2后total=2；i=1读取a[1]=5后total=7；i=2读取a[2]=9后total=16。i增至3，i<3为假，停止循环，不访问a[3]，循环体恰执行3次。sum()返回16，不直接打印。"
+            }
+          },
+          "content_digest": "b06705b2ef6a4d09590bae655dd3d91369808240bbb1164cd1751d0a0cb45fa1",
+          "dependency_digest": "aa2c3d0c1d5b294919c2150a307a2d72c3db9c496fd746f560903c703224aba6",
+          "upstream": []
+        },
+        {
+          "resource_id": "0a4a96bb-adc3-4ab1-afea-a50a6f7dd2d9",
+          "role": "code",
+          "envelope": {
+            "resource_type": "code",
+            "prompt_version": "learning-resources-v1",
+            "content": {
+              "language": "C",
+              "source": "#include <stddef.h>\nint sum(void){int a[3]={2,5,9};int total=0;for(int i=0;i<3;i++)total+=a[i];return total;}",
+              "expected_output": "不打印；由调用方取得返回值。",
+              "key_steps": [
+                "total从0开始依次变为2、7、16。",
+                "i=3时i<3为假，停止且不访问a[3]。"
+              ],
+              "display_only": true
+            }
+          },
+          "content_digest": "281f23f8b481c1d8d5db61966fbc30d2b8ddb5bede539a5ad968e65c4f453b60",
+          "dependency_digest": "6df4620d02e314fc32020893f14e3e602adebc5c71f6695168daad3c80ea3d7e",
+          "upstream": [
+            {
+              "resource_id": "9257c1b7-efea-4ee6-a37f-9898d34c7d80",
+              "content_digest": "b06705b2ef6a4d09590bae655dd3d91369808240bbb1164cd1751d0a0cb45fa1",
+              "dependency_digest": "aa2c3d0c1d5b294919c2150a307a2d72c3db9c496fd746f560903c703224aba6"
+            }
+          ]
+        },
+        {
+          "resource_id": "2764aab5-416d-4897-baae-f3d5fcafe436",
+          "role": "exercise",
+          "envelope": {
+            "resource_type": "exercise",
+            "prompt_version": "learning-resources-v1",
+            "content": {
+              "items": [
+                {
+                  "id": "q1",
+                  "question": "[判断题] i=1这次循环结束后total=7。仅填 T 或 F（T=正确，F=错误）",
+                  "answer": "T",
+                  "explanation": "先加入a[0]=2，再加入a[1]=5，得到7。"
+                },
+                {
+                  "id": "q2",
+                  "question": "[判断题] i=3时停止，循环体共执行3次。仅填 T 或 F（T=正确，F=错误）",
+                  "answer": "T",
+                  "explanation": "i只在0、1、2进入循环体；i=3不满足i<3。"
+                },
+                {
+                  "id": "q3",
+                  "question": "[判断题] sum返回16表示它直接打印16。仅填 T 或 F（T=正确，F=错误）",
+                  "answer": "F",
+                  "explanation": "返回值交给调用方，本函数没有打印语句。"
+                }
+              ]
+            }
+          },
+          "content_digest": "7eaf610d07dab1bbf97bb61cfe62e30b920cdc9fa3dc7833b2ce17e50a627a35",
+          "dependency_digest": "004899e9c0ed7a9c52d03e2c2bea66e7706823745804cb664210863fb92d2b3d",
+          "upstream": [
+            {
+              "resource_id": "9257c1b7-efea-4ee6-a37f-9898d34c7d80",
+              "content_digest": "b06705b2ef6a4d09590bae655dd3d91369808240bbb1164cd1751d0a0cb45fa1",
+              "dependency_digest": "aa2c3d0c1d5b294919c2150a307a2d72c3db9c496fd746f560903c703224aba6"
+            },
+            {
+              "resource_id": "0a4a96bb-adc3-4ab1-afea-a50a6f7dd2d9",
+              "content_digest": "281f23f8b481c1d8d5db61966fbc30d2b8ddb5bede539a5ad968e65c4f453b60",
+              "dependency_digest": "6df4620d02e314fc32020893f14e3e602adebc5c71f6695168daad3c80ea3d7e"
+            }
+          ]
+        }
+      ],
+      "scenes": [
+        {
+          "role": "explanation",
+          "scene_key": "explanation",
+          "scene_id": "ee30047c-2ecb-5bba-a585-54bdd8a818f0",
+          "scene_version": 1,
+          "resource_id": "9257c1b7-efea-4ee6-a37f-9898d34c7d80",
+          "resource_digest": "b06705b2ef6a4d09590bae655dd3d91369808240bbb1164cd1751d0a0cb45fa1",
+          "dependency_digest": "aa2c3d0c1d5b294919c2150a307a2d72c3db9c496fd746f560903c703224aba6"
+        },
+        {
+          "role": "code",
+          "scene_key": "code",
+          "scene_id": "36e954a4-849f-5344-833f-ac3bbe150e1a",
+          "scene_version": 1,
+          "resource_id": "0a4a96bb-adc3-4ab1-afea-a50a6f7dd2d9",
+          "resource_digest": "281f23f8b481c1d8d5db61966fbc30d2b8ddb5bede539a5ad968e65c4f453b60",
+          "dependency_digest": "6df4620d02e314fc32020893f14e3e602adebc5c71f6695168daad3c80ea3d7e"
+        },
+        {
+          "role": "exercise",
+          "scene_key": "exercise",
+          "scene_id": "685999ae-812a-5eaf-b491-89dea473d9e0",
+          "scene_version": 1,
+          "resource_id": "2764aab5-416d-4897-baae-f3d5fcafe436",
+          "resource_digest": "7eaf610d07dab1bbf97bb61cfe62e30b920cdc9fa3dc7833b2ce17e50a627a35",
+          "dependency_digest": "004899e9c0ed7a9c52d03e2c2bea66e7706823745804cb664210863fb92d2b3d"
+        }
+      ],
+      "actions": {
+        "version": "teaching-actions-v1",
+        "actions": [
+          {
+            "kind": "show_resource",
+            "scene_key": "explanation",
+            "resource_id": "9257c1b7-efea-4ee6-a37f-9898d34c7d80",
+            "resource_digest": "b06705b2ef6a4d09590bae655dd3d91369808240bbb1164cd1751d0a0cb45fa1"
+          },
+          {
+            "kind": "show_resource",
+            "scene_key": "code",
+            "resource_id": "0a4a96bb-adc3-4ab1-afea-a50a6f7dd2d9",
+            "resource_digest": "281f23f8b481c1d8d5db61966fbc30d2b8ddb5bede539a5ad968e65c4f453b60"
+          },
+          {
+            "kind": "highlight",
+            "scene_key": "code",
+            "resource_id": "0a4a96bb-adc3-4ab1-afea-a50a6f7dd2d9",
+            "resource_digest": "281f23f8b481c1d8d5db61966fbc30d2b8ddb5bede539a5ad968e65c4f453b60",
+            "anchor_id": "a3"
+          },
+          {
+            "kind": "highlight",
+            "scene_key": "code",
+            "resource_id": "0a4a96bb-adc3-4ab1-afea-a50a6f7dd2d9",
+            "resource_digest": "281f23f8b481c1d8d5db61966fbc30d2b8ddb5bede539a5ad968e65c4f453b60",
+            "anchor_id": "a4"
+          },
+          {
+            "kind": "show_resource",
+            "scene_key": "exercise",
+            "resource_id": "2764aab5-416d-4897-baae-f3d5fcafe436",
+            "resource_digest": "7eaf610d07dab1bbf97bb61cfe62e30b920cdc9fa3dc7833b2ce17e50a627a35"
+          },
+          {
+            "kind": "ask_exercise",
+            "scene_key": "exercise",
+            "resource_id": "2764aab5-416d-4897-baae-f3d5fcafe436",
+            "resource_digest": "7eaf610d07dab1bbf97bb61cfe62e30b920cdc9fa3dc7833b2ce17e50a627a35",
+            "exercise_id": "q1"
+          },
+          {
+            "kind": "ask_exercise",
+            "scene_key": "exercise",
+            "resource_id": "2764aab5-416d-4897-baae-f3d5fcafe436",
+            "resource_digest": "7eaf610d07dab1bbf97bb61cfe62e30b920cdc9fa3dc7833b2ce17e50a627a35",
+            "exercise_id": "q2"
+          },
+          {
+            "kind": "ask_exercise",
+            "scene_key": "exercise",
+            "resource_id": "2764aab5-416d-4897-baae-f3d5fcafe436",
+            "resource_digest": "7eaf610d07dab1bbf97bb61cfe62e30b920cdc9fa3dc7833b2ce17e50a627a35",
+            "exercise_id": "q3"
+          }
+        ],
+        "anchor_catalog": [
+          {
+            "anchor_id": "a1",
+            "resource_id": "9257c1b7-efea-4ee6-a37f-9898d34c7d80",
+            "resource_digest": "b06705b2ef6a4d09590bae655dd3d91369808240bbb1164cd1751d0a0cb45fa1",
+            "json_pointer": "/markdown",
+            "start_utf8": 0,
+            "end_utf8": 256
+          },
+          {
+            "anchor_id": "a2",
+            "resource_id": "0a4a96bb-adc3-4ab1-afea-a50a6f7dd2d9",
+            "resource_digest": "281f23f8b481c1d8d5db61966fbc30d2b8ddb5bede539a5ad968e65c4f453b60",
+            "json_pointer": "/expected_output",
+            "start_utf8": 0,
+            "end_utf8": 42
+          },
+          {
+            "anchor_id": "a3",
+            "resource_id": "0a4a96bb-adc3-4ab1-afea-a50a6f7dd2d9",
+            "resource_digest": "281f23f8b481c1d8d5db61966fbc30d2b8ddb5bede539a5ad968e65c4f453b60",
+            "json_pointer": "/key_steps/0",
+            "start_utf8": 0,
+            "end_utf8": 40
+          },
+          {
+            "anchor_id": "a4",
+            "resource_id": "0a4a96bb-adc3-4ab1-afea-a50a6f7dd2d9",
+            "resource_digest": "281f23f8b481c1d8d5db61966fbc30d2b8ddb5bede539a5ad968e65c4f453b60",
+            "json_pointer": "/key_steps/1",
+            "start_utf8": 0,
+            "end_utf8": 43
+          },
+          {
+            "anchor_id": "a5",
+            "resource_id": "0a4a96bb-adc3-4ab1-afea-a50a6f7dd2d9",
+            "resource_digest": "281f23f8b481c1d8d5db61966fbc30d2b8ddb5bede539a5ad968e65c4f453b60",
+            "json_pointer": "/language",
+            "start_utf8": 0,
+            "end_utf8": 1
+          },
+          {
+            "anchor_id": "a6",
+            "resource_id": "0a4a96bb-adc3-4ab1-afea-a50a6f7dd2d9",
+            "resource_digest": "281f23f8b481c1d8d5db61966fbc30d2b8ddb5bede539a5ad968e65c4f453b60",
+            "json_pointer": "/source",
+            "start_utf8": 0,
+            "end_utf8": 109
+          },
+          {
+            "anchor_id": "a7",
+            "resource_id": "2764aab5-416d-4897-baae-f3d5fcafe436",
+            "resource_digest": "7eaf610d07dab1bbf97bb61cfe62e30b920cdc9fa3dc7833b2ce17e50a627a35",
+            "json_pointer": "/items/0/answer",
+            "start_utf8": 0,
+            "end_utf8": 1
+          },
+          {
+            "anchor_id": "a8",
+            "resource_id": "2764aab5-416d-4897-baae-f3d5fcafe436",
+            "resource_digest": "7eaf610d07dab1bbf97bb61cfe62e30b920cdc9fa3dc7833b2ce17e50a627a35",
+            "json_pointer": "/items/0/explanation",
+            "start_utf8": 0,
+            "end_utf8": 46
+          },
+          {
+            "anchor_id": "a9",
+            "resource_id": "2764aab5-416d-4897-baae-f3d5fcafe436",
+            "resource_digest": "7eaf610d07dab1bbf97bb61cfe62e30b920cdc9fa3dc7833b2ce17e50a627a35",
+            "json_pointer": "/items/0/id",
+            "start_utf8": 0,
+            "end_utf8": 2
+          },
+          {
+            "anchor_id": "a10",
+            "resource_id": "2764aab5-416d-4897-baae-f3d5fcafe436",
+            "resource_digest": "7eaf610d07dab1bbf97bb61cfe62e30b920cdc9fa3dc7833b2ce17e50a627a35",
+            "json_pointer": "/items/0/question",
+            "start_utf8": 0,
+            "end_utf8": 85
+          },
+          {
+            "anchor_id": "a11",
+            "resource_id": "2764aab5-416d-4897-baae-f3d5fcafe436",
+            "resource_digest": "7eaf610d07dab1bbf97bb61cfe62e30b920cdc9fa3dc7833b2ce17e50a627a35",
+            "json_pointer": "/items/1/answer",
+            "start_utf8": 0,
+            "end_utf8": 1
+          },
+          {
+            "anchor_id": "a12",
+            "resource_id": "2764aab5-416d-4897-baae-f3d5fcafe436",
+            "resource_digest": "7eaf610d07dab1bbf97bb61cfe62e30b920cdc9fa3dc7833b2ce17e50a627a35",
+            "json_pointer": "/items/1/explanation",
+            "start_utf8": 0,
+            "end_utf8": 52
+          },
+          {
+            "anchor_id": "a13",
+            "resource_id": "2764aab5-416d-4897-baae-f3d5fcafe436",
+            "resource_digest": "7eaf610d07dab1bbf97bb61cfe62e30b920cdc9fa3dc7833b2ce17e50a627a35",
+            "json_pointer": "/items/1/id",
+            "start_utf8": 0,
+            "end_utf8": 2
+          },
+          {
+            "anchor_id": "a14",
+            "resource_id": "2764aab5-416d-4897-baae-f3d5fcafe436",
+            "resource_digest": "7eaf610d07dab1bbf97bb61cfe62e30b920cdc9fa3dc7833b2ce17e50a627a35",
+            "json_pointer": "/items/1/question",
+            "start_utf8": 0,
+            "end_utf8": 91
+          },
+          {
+            "anchor_id": "a15",
+            "resource_id": "2764aab5-416d-4897-baae-f3d5fcafe436",
+            "resource_digest": "7eaf610d07dab1bbf97bb61cfe62e30b920cdc9fa3dc7833b2ce17e50a627a35",
+            "json_pointer": "/items/2/answer",
+            "start_utf8": 0,
+            "end_utf8": 1
+          },
+          {
+            "anchor_id": "a16",
+            "resource_id": "2764aab5-416d-4897-baae-f3d5fcafe436",
+            "resource_digest": "7eaf610d07dab1bbf97bb61cfe62e30b920cdc9fa3dc7833b2ce17e50a627a35",
+            "json_pointer": "/items/2/explanation",
+            "start_utf8": 0,
+            "end_utf8": 57
+          },
+          {
+            "anchor_id": "a17",
+            "resource_id": "2764aab5-416d-4897-baae-f3d5fcafe436",
+            "resource_digest": "7eaf610d07dab1bbf97bb61cfe62e30b920cdc9fa3dc7833b2ce17e50a627a35",
+            "json_pointer": "/items/2/id",
+            "start_utf8": 0,
+            "end_utf8": 2
+          },
+          {
+            "anchor_id": "a18",
+            "resource_id": "2764aab5-416d-4897-baae-f3d5fcafe436",
+            "resource_digest": "7eaf610d07dab1bbf97bb61cfe62e30b920cdc9fa3dc7833b2ce17e50a627a35",
+            "json_pointer": "/items/2/question",
+            "start_utf8": 0,
+            "end_utf8": 88
+          }
+        ],
+        "digest": "190b85d727184ff99b0439930ea0c837a836146dae99a26eceee1b44b79c4093"
+      },
+      "reference_context": {
+        "source": {
+          "reference_id": "graph-node:phase-1.1.0:array",
+          "version": "phase-1.1.0",
+          "digest": "f83fd12e754fcda4124aa62b8a29203d97a897605d23dc4e37877393dcb0015d"
+        },
+        "node": {
+          "id": "array",
+          "name": "数组",
+          "description": "使用连续存储空间、通过下标访问元素的线性结构。"
+        },
+        "learner_evidence": {},
+        "explicitly_requested_objective_references": [],
+        "scope": "Selected background for correctness, not additional teaching requirements or proof.",
+        "complete_node_objective_catalog_supplied": false
+      },
+      "unit_digest": "48a708e2a775a76dd6ccf6bb885eaf8f681fb69309c39311e4f5bb0126a3cad1"
+    },
+    "reference_context": {
+      "source": {
+        "reference_id": "graph-node:phase-1.1.0:array",
+        "version": "phase-1.1.0",
+        "digest": "f83fd12e754fcda4124aa62b8a29203d97a897605d23dc4e37877393dcb0015d"
+      },
+      "node": {
+        "id": "array",
+        "name": "数组",
+        "description": "使用连续存储空间、通过下标访问元素的线性结构。"
+      },
+      "learner_evidence": {},
+      "explicitly_requested_objective_references": [],
+      "scope": "Selected background for correctness, not additional teaching requirements or proof.",
+      "complete_node_objective_catalog_supplied": false
+    },
+    "authoritative_teaching_goal": {
+      "version": "authoritative-review-input-v1",
+      "status": "bound_original_request",
+      "source": "LearningPlanVersion.input_snapshot.metadata.goal",
+      "input_digest": "5aa4798f2210d2ee98501be9bdb785580ed650b54ad785a66c558a70cbbe2d00",
+      "user_request": "用C追踪数组{2,5,9}的求和循环，解释下标0至2和返回值16。",
+      "plan_commitments": {
+        "goal": "用C追踪数组{2,5,9}的求和循环，解释下标0至2和返回值16。",
+        "objectives": [
+          {
+            "id": "sum",
+            "text": "逐步追踪total=2、7、16及i=3时不再访问数组的边界"
+          }
+        ],
+        "scenes": [
+          {
+            "role": "explanation",
+            "scene_key": "explanation",
+            "objective_ids": [
+              "sum"
+            ],
+            "depends_on": []
+          },
+          {
+            "role": "code",
+            "scene_key": "code",
+            "objective_ids": [
+              "sum"
+            ],
+            "depends_on": [
+              "explanation"
+            ]
+          },
+          {
+            "role": "exercise",
+            "scene_key": "exercise",
+            "objective_ids": [
+              "sum"
+            ],
+            "depends_on": [
+              "explanation",
+              "code"
+            ]
+          }
+        ]
+      },
+      "background_is_not_a_commitment": true,
+      "full_node_rule": "If user or unit explicitly promises full-node coverage, check that promise. A narrower plan cannot replace it. If this view cannot substantiate complete coverage, state the gap/uncertainty; never silently pass it."
+    },
+    "media_requirements": {
+      "rule": "Missing animation is relevant only if this unit explicitly promises animation.",
+      "commitment_sources": [
+        "bound user_request",
+        "plan commitments",
+        "actual student-facing promises"
+      ],
+      "background_suggestions_are_commitments": false,
+      "unsolicited_animation_absence_is_unresolved": false,
+      "verified_animation_evidence_supplied": false,
+      "assessment": "Read explicit promises in the supplied content. No automatic NL classification or assertion of media delivery is made by this projection."
+    },
+    "review_input_audit": {
+      "version": "authoritative-review-input-v1",
+      "original_reference_digest": "1f15d5902600d56a945464771b25035fe76968b3c3400718e6d5216cce903927",
+      "original_material_digest": "c170595648896c5f41e4600f68ff60897b060554b555a8b66afe8ccb1d7b5f82",
+      "projection_is_publication_material": false,
+      "full_reference_retained_server_side": true,
+      "all_actual_content_requires_fact_and_safety_review": true
+    }
+  }
+}

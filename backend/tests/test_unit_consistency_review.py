@@ -20,6 +20,7 @@ async def resource_records(w):
             ReviewGateway([answer()]),
             CallWindow(),
             binding=w.binding,
+            input_snapshot=w.input_snapshot,
             target_digest=c.content_digest,
             payload={"candidate": c.payload(), "reference_context": w.reference_context},
             candidates=(c,),
@@ -58,7 +59,7 @@ def test_consistency_result_is_independent_and_no_correction(verdict, expected):
         a["coverage"]["checked"] = sorted(UNIT_CHECKS)
         gateway = ReviewGateway([a])
         window = CallWindow()
-        result = await review_unit(gateway, window, m, records)
+        result = await review_unit(gateway, window, m, records, input_snapshot=w.input_snapshot)
         assert result["state"] == expected and window.used == 1
         assert result["review"]["target_digest"] == m["unit_digest"]
 
@@ -71,11 +72,13 @@ def test_existing_reject_has_priority_and_stale_review_fails_without_call():
         records = await resource_records(w)
         g = ReviewGateway([])
         records[0]["local_routing"]["verdict"] = "reject"
-        assert (await review_unit(g, CallWindow(), m, records))["state"] == "rejected"
+        assert (await review_unit(g, CallWindow(), m, records, input_snapshot=w.input_snapshot))[
+            "state"
+        ] == "rejected"
         assert not g.requests
         records[0]["target_digest"] = "f" * 64
         with pytest.raises(LearningContractError):
-            await review_unit(g, CallWindow(), m, records)
+            await review_unit(g, CallWindow(), m, records, input_snapshot=w.input_snapshot)
 
     asyncio.run(exercise())
 
@@ -87,11 +90,15 @@ def test_unit_revise_is_protocol_failure_and_uncertainty_stays_human():
         a = answer("revise", "unit")
         a["coverage"]["checked"] = sorted(UNIT_CHECKS)
         with pytest.raises(LearningContractError):
-            await review_unit(ReviewGateway([a]), CallWindow(), m, records)
+            await review_unit(
+                ReviewGateway([a]), CallWindow(), m, records, input_snapshot=w.input_snapshot
+            )
         records[0]["local_routing"]["verdict"] = "needs_human"
         a = answer("pass", "unit")
         a["coverage"]["checked"] = sorted(UNIT_CHECKS)
-        outcome = await review_unit(ReviewGateway([a]), CallWindow(), m, records)
+        outcome = await review_unit(
+            ReviewGateway([a]), CallWindow(), m, records, input_snapshot=w.input_snapshot
+        )
         assert outcome["state"] == "needs_human"
 
     asyncio.run(exercise())

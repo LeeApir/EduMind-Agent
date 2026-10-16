@@ -40,7 +40,8 @@ def prepared():
 
 def test_freeze_has_exact_scope_check_ids_and_actual_anchor_ids(prepared):
     # Stopped r03 inputs are historical: current policy must not silently rebaseline them.
-    assert prepare.build() != prepared
+    with pytest.raises(ValueError, match="UNEXPECTED_IMPLEMENTATION_CHANGE"):
+        prepare.build()
     p = prepared["proposal.json"]
     assert p["requests_authorized"] == p["fees_authorized"] == 0
     assert set(p["implementation_changes"]) == prepare.ALLOWED_CHANGES

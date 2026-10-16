@@ -59,6 +59,7 @@ def test_review_replaces_caller_supplied_delivery_flags_and_routes_pure_gap_to_h
             gateway,
             CallWindow(),
             binding=w.binding,
+            input_snapshot=w.input_snapshot,
             target_digest=material["unit_digest"],
             payload={
                 "unit": material,
@@ -89,6 +90,7 @@ def test_resource_can_request_supplement_without_a_fabricated_fact_category():
             ReviewGateway([value]),
             CallWindow(),
             binding=w.binding,
+            input_snapshot=w.input_snapshot,
             target_digest=c.content_digest,
             payload={
                 "plan": material["plan"],

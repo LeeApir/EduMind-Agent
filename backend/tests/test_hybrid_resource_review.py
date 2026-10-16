@@ -211,6 +211,10 @@ def test_review_records_are_bound_and_append_only():
 def test_missing_reference_context_is_not_automatic_pass():
     w = candidate_workspace()
     w.reference_context = None
+    w.input_snapshot["reference_context"] = None
+    from app.services.learning_contract import digest
+
+    w.binding["input_digest"] = digest("input", "learning-input-v1", snapshot=w.input_snapshot)
     records = asyncio.run(
         review_resource(ReviewGateway([answer()]), CallWindow(), w, "explanation")
     )

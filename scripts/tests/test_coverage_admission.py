@@ -26,10 +26,19 @@ from app.services.learning_contract import LearningContractError  # noqa: E402
 
 @pytest.fixture(scope="module")
 def prepared():
-    return build()
+    names = (
+        "proposal.json",
+        "cases.json",
+        "proposed-labels.json",
+        "token-cost-proof.json",
+    )
+    return {name: json.loads((ROOT / BASE / name).read_text()) for name in names}
 
 
 def test_execution_freeze_preserves_all_four_exact_prior_wires(prepared):
+    # The actual r04 run is stopped. The old preparer must now fail on changed sources.
+    with pytest.raises(ValueError, match="IMPLEMENTATION_BASELINE_CHANGED"):
+        build()
     prior = json.loads((ROOT / PLAN / "proposal.json").read_text())
     assert stable(prior) == PLAN_SHA
     assert prepared["cases.json"] == json.loads(
@@ -54,6 +63,9 @@ def execution(tmp_path, monkeypatch, prepared):
     values = deepcopy(prepared)
     p, data = values["proposal.json"], values["cases.json"]
     p["execution_root"] = str(tmp_path.resolve())
+    p["expiry_local"] = "2099-01-01T00:00:00+08:00"
+    values["token-cost-proof.json"]["checked_on"] = runner.time.strftime("%Y-%m-%d")
+    p["proof_sha256"] = stable(values["token-cost-proof.json"])
     names = (
         "backend/app/services/deepseek_responses.py",
         "docs/ADR/0015-approval-20261015.json",
