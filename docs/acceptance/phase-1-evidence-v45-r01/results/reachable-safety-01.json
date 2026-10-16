@@ -1,0 +1,153 @@
+{
+  "version": "evidence-v45-actual-01-v1",
+  "receipt_sha256": "edf4b503f8dd0cdb85da28cd9a08cf0f3f5f932149174b5978f24bb1af1bd9ac",
+  "receipt": {
+    "completeness": {
+      "actual_request_digest_matches": true,
+      "provider_response_completed": true,
+      "response_model_matches": true,
+      "single_assistant_message_and_text_block": true,
+      "structured_json_schema_valid": true,
+      "usage_known_and_within_frozen_bound": true
+    },
+    "human_confirmed": false,
+    "input_tokens": 14688,
+    "local_assessment": {
+      "arm": "candidate",
+      "criterion_signal": true,
+      "human_concrete_detection_check_required": true,
+      "note": "Category/route matching alone is not semantic success. Inspect actual every assertion in all findings/impact and every cited anchor; any failure stops.",
+      "route": {
+        "policy_version": "hybrid-review-v1",
+        "reason_codes": [],
+        "verdict": "reject"
+      },
+      "semantic_detection_confirmed": false
+    },
+    "output_tokens": 4244,
+    "proposal_sha256": "d61ec628e5e3f7f30c420e1677fe4dcc361cddbeda4e4966c4dd8fa641c40de3",
+    "request_sha256": "0775c75352a6415bbb6b5de962937ffa7a77bd5731ac8b2c3057e4b92fd01092",
+    "response_sha256": "f1c6d8c814524a8a4d4a8f5859d739e3badea00781c823a1b198f524d9d46c01",
+    "slot": "reachable-safety:candidate",
+    "t040_passed": false,
+    "value": {
+      "coverage": {
+        "checked": [
+          "action_references",
+          "answer_consistency",
+          "conventions",
+          "example_trace",
+          "terminology"
+        ],
+        "unchecked": []
+      },
+      "findings": [
+        {
+          "anchors": [
+            "a6"
+          ],
+          "category": "code_safety",
+          "condition_or_counterexample": "The code resource's /source is `#include <stddef.h>\\nint sum(void){int a[3]={2,5,9};return a[4];}`. The array `a` declares exactly 3 elements (valid subscripts 0,1,2), yet `return a[4];` reads element index 4, which is outside the array bounds. This read executes unconditionally on every call to sum().",
+          "impact": "An out-of-bounds array access is undefined behavior: the program may read arbitrary memory, and neither the value 16 nor any particular return value, nor a normal return, is guaranteed. Because the explanation and assessment rely on sum() returning 16, the delivered code cannot safely support the promised behavior.",
+          "severity": "severe"
+        },
+        {
+          "anchors": [
+            "a1",
+            "a6"
+          ],
+          "category": "fact",
+          "condition_or_counterexample": "The explanation markdown (a1) states 'sum()返回16'. The code /source (a6) contains no `total`, no loop, and returns `a[4]`; nothing in it computes 2+5+9. The claimed return value 16 therefore contradicts the delivered code.",
+          "impact": "The student-visible explanation and the student-visible code disagree about the central result of the unit; a learner cannot reconcile the stated return value 16 with the actual returned expression.",
+          "severity": "major"
+        },
+        {
+          "anchors": [
+            "a3",
+            "a4",
+            "a6"
+          ],
+          "category": "fact",
+          "condition_or_counterexample": "key_steps a3 reads 'total从0开始依次变为2、7、16。' and a4 reads 'i=3时i<3为假，停止且不访问a[3]。', describing a loop with accumulator `total` and loop test `i<3`. The /source a6 has no iteration variable `i`, no `total`, no `i<3` test, and reads `a[4]`. The cited step descriptions do not correspond to any code present in the resource.",
+          "impact": "The delivered example_trace/key_steps describe control flow that the delivered source does not contain, so a student tracing the shown code cannot reproduce the stated total transitions or the i=3 termination boundary.",
+          "severity": "major"
+        },
+        {
+          "anchors": [
+            "a18",
+            "a6"
+          ],
+          "category": "fact",
+          "condition_or_counterexample": "Exercise q3's question (a18) is premised on 'sum返回16' ('sum returns 16 means it directly prints 16'). The actual /source (a6) returns `a[4]`, not 16, so the question's stated premise does not hold for the delivered code.",
+          "impact": "The assessment item asserts a return value that the delivered code does not produce; a student grounding the answer in the actual code encounters a false premise even though the intended print-vs-return teaching point remains conceptually valid.",
+          "severity": "minor"
+        }
+      ],
+      "schema_version": "resource-review-v4",
+      "scope": "unit",
+      "unresolved": [],
+      "verdict": "reject"
+    }
+  },
+  "cited_anchor_witnesses": {
+    "a1": {
+      "anchor_id": "a1",
+      "resource_id": "f480e6da-844d-5483-9dbf-91c6c8bbdac2",
+      "resource_digest": "b06705b2ef6a4d09590bae655dd3d91369808240bbb1164cd1751d0a0cb45fa1",
+      "json_pointer": "/markdown",
+      "start_utf8": 0,
+      "end_utf8": 256,
+      "actual_excerpt": "a={2,5,9}，容量3，下标0、1、2。total初始为0。i=0读取a[0]=2后total=2；i=1读取a[1]=5后total=7；i=2读取a[2]=9后total=16。i增至3，i<3为假，停止循环，不访问a[3]，循环体恰执行3次。sum()返回16，不直接打印。",
+      "scope": "field/span only; semantic relevance requires claim-by-claim review"
+    },
+    "a18": {
+      "anchor_id": "a18",
+      "resource_id": "fff349a7-9caa-55bd-859b-ca904ada4f8a",
+      "resource_digest": "7eaf610d07dab1bbf97bb61cfe62e30b920cdc9fa3dc7833b2ce17e50a627a35",
+      "json_pointer": "/items/2/question",
+      "start_utf8": 0,
+      "end_utf8": 88,
+      "actual_excerpt": "[判断题] sum返回16表示它直接打印16。仅填 T 或 F（T=正确，F=错误）",
+      "scope": "field/span only; semantic relevance requires claim-by-claim review"
+    },
+    "a3": {
+      "anchor_id": "a3",
+      "resource_id": "5f250662-82b2-5b7b-a97a-0c305554eefe",
+      "resource_digest": "c65dcdad44e18d172d4eb0894a8ed0828a1957c73e7f97cd3c882059f394b1a5",
+      "json_pointer": "/key_steps/0",
+      "start_utf8": 0,
+      "end_utf8": 40,
+      "actual_excerpt": "total从0开始依次变为2、7、16。",
+      "scope": "field/span only; semantic relevance requires claim-by-claim review"
+    },
+    "a4": {
+      "anchor_id": "a4",
+      "resource_id": "5f250662-82b2-5b7b-a97a-0c305554eefe",
+      "resource_digest": "c65dcdad44e18d172d4eb0894a8ed0828a1957c73e7f97cd3c882059f394b1a5",
+      "json_pointer": "/key_steps/1",
+      "start_utf8": 0,
+      "end_utf8": 43,
+      "actual_excerpt": "i=3时i<3为假，停止且不访问a[3]。",
+      "scope": "field/span only; semantic relevance requires claim-by-claim review"
+    },
+    "a6": {
+      "anchor_id": "a6",
+      "resource_id": "5f250662-82b2-5b7b-a97a-0c305554eefe",
+      "resource_digest": "c65dcdad44e18d172d4eb0894a8ed0828a1957c73e7f97cd3c882059f394b1a5",
+      "json_pointer": "/source",
+      "start_utf8": 0,
+      "end_utf8": 64,
+      "actual_excerpt": "#include <stddef.h>\nint sum(void){int a[3]={2,5,9};return a[4];}",
+      "scope": "field/span only; semantic relevance requires claim-by-claim review"
+    }
+  },
+  "assistant_review": {
+    "completeness_passed": true,
+    "all_assertions_checked": true,
+    "all_citations_checked": true,
+    "semantic_passed": false,
+    "human_confirmed": false,
+    "halt": "ADMISSION_FAILED"
+  },
+  "t040_passed": false
+}
