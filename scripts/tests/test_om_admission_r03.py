@@ -17,19 +17,30 @@ sys.path[:0] = [
 import prepare_om_admission_r03 as prepare  # noqa: E402
 from acceptance_support.om_diagnostic import stable, valid_review  # noqa: E402
 from acceptance_support.phase1_budget import GateFailure  # noqa: E402
-from app.agents.hybrid_resource_review import RESOURCE_CHECKS, UNIT_CHECKS  # noqa: E402
-from app.core.config import ProviderSettings  # noqa: E402
 from run_om_admission_r03 import BASE, PRIVATE, runtime  # noqa: E402
 from test_om_admission import fake_transport  # noqa: E402
+
+from app.agents.hybrid_resource_review import RESOURCE_CHECKS, UNIT_CHECKS  # noqa: E402
+from app.core.config import ProviderSettings  # noqa: E402
 
 
 @pytest.fixture(scope="module")
 def prepared():
-    return prepare.build()
+    base = ROOT / BASE
+    return {
+        name: json.loads((base / name).read_text())
+        for name in (
+            "proposal.json",
+            "cases.json",
+            "proposed-labels.json",
+            "token-cost-proof.json",
+        )
+    }
 
 
 def test_freeze_has_exact_scope_check_ids_and_actual_anchor_ids(prepared):
-    assert prepare.build() == prepared
+    # Stopped r03 inputs are historical: current policy must not silently rebaseline them.
+    assert prepare.build() != prepared
     p = prepared["proposal.json"]
     assert p["requests_authorized"] == p["fees_authorized"] == 0
     assert set(p["implementation_changes"]) == prepare.ALLOWED_CHANGES

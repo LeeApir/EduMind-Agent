@@ -10,6 +10,7 @@ from app.agents.learning_resource_schema import LearningResourceType, resource_o
 from app.agents.learning_unit_generator import StructuredResourceGateway
 from app.agents.objective_exercises import objective_exercise_issues
 from app.agents.planned_scene_generation import PlannedScenes, SceneCandidate
+from app.agents.review_delivery import COVERAGE_STANDARD_VERSION, delivery_manifest
 from app.agents.review_schema import severe_code_issues
 from app.agents.shared_learning_plan import CallWindow
 from app.services.learning_contract import (
@@ -21,7 +22,7 @@ from app.services.learning_contract import (
 from app.services.provider_gateway import ChatMessage, StructuredRequest, TaskProfile, TextRequest
 from app.services.teaching_actions import anchor_catalog
 
-REVIEW_V4_PROMPT = "evidence-resource-review-v4.2"
+REVIEW_V4_PROMPT = "evidence-resource-review-v4.3"
 RESOURCE_CHECKS = {"facts", "code_safety", "learner_fit", "objectives", "reference_scope"}
 UNIT_CHECKS = {
     "terminology",
@@ -64,6 +65,33 @@ translations or invented IDs, and no duplicates. List only checks actually perfo
 Describe checks that could not be completed in unchecked/unresolved; do not claim they were
 completed just to fill the checklist. pass requires all mandatory IDs and no uncertainty.
 Finding anchors must be actual supplied anchor_catalog IDs; never invent or translate them."""
+INSTRUCTION += """
+Apply the student-visible goal coverage standard, separately from factual correctness:
+IMPLEMENTATION goals can be met by correct code plus necessary input/output explanations.
+TRACE/EXPLAIN-PROCESS goals need explicit key state changes AND termination/exit conditions
+in student-visible content, not just a correct loop from which a reader could derive them.
+ASSESS-PROCESS goals need questions whose answers require the relevant process knowledge;
+asking only the final arithmetic value does not establish process mastery. An explanation
+after answering can teach a process without making the question itself test that process.
+Respect delivery timing: post-answer explanations cannot satisfy an explicit promise to
+teach that process before the quiz. Do not invent that sequencing promise if absent.
+Aggregate support across explanation, code comments, key_steps, exercise explanations and
+actual verified student-visible animation evidence; never demand repetition in every scene.
+Internal plan traces, reference descriptions, show/highlight commands, planned animations
+and inferred reasoning are NOT delivered teaching evidence. student_delivery indexes actual
+candidate fields; it is not a declaration of coverage or proof that content is already public.
+If a candidate is unindexed and its actual student-facing content cannot be located, report
+that uncertainty; do not substitute the plan or reference text for missing delivery evidence.
+For UNIT scope, independently assess delivered goal coverage as well as the five consistency
+checks. Prior resource passes do not establish aggregate teaching coverage. For RESOURCE scope,
+assess its explicit promises and supplementation needs; do not infer missing sibling support
+when siblings were not supplied. If partial coverage needs supplementation, state the exact
+missing support and student-visible locations in unresolved and return needs_human for unit.
+Do not invent a fact, difficulty or misconception finding for a pure teaching-support gap.
+The current finding taxonomy has no coverage category: use needs_human/unresolved for a pure
+resource coverage gap too, rather than a fabricated category to trigger resource revise.
+Concrete false claims or reachable unsafe operations remain separately reportable and a
+well-supported serious reject is not downgraded merely because a coverage gap also exists."""
 
 
 def review_output_schema(scope: str, *, anchor_ids: list[str] | None = None) -> dict[str, Any]:
@@ -162,6 +190,7 @@ async def review_once(
         **deepcopy(payload),
         "anchor_catalog": catalog,
         "mandatory_checks": sorted(checks),
+        "student_delivery": delivery_manifest(payload, candidates),
         # Constructed after caller data, so a candidate cannot override the trusted rule.
         "review_contract": {
             "version": "goal-bound-review-scope-v1",
@@ -171,6 +200,12 @@ async def review_once(
             "graph_role": "partial reference, not automatic full-node certification",
             "plan_is_evidence": False,
             "missing_learner_evidence_is_known_difficulty": False,
+            "coverage_standard": COVERAGE_STANDARD_VERSION,
+            "unit_responsibilities": [
+                "cross-resource consistency",
+                "student-visible goal coverage",
+                "questions use the assigned process knowledge",
+            ],
         },
     }
     encoded = canonical(data)

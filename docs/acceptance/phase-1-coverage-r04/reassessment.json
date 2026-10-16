@@ -1,0 +1,353 @@
+{
+  "version": "coverage-standard-reassessment-v1",
+  "standard": "ADR-0016",
+  "review_method": "read frozen student-facing bodies without using model verdicts as evidence; fixed code arithmetic checked independently",
+  "independent_human_review_of_all_rows": false,
+  "provider_requests": 0,
+  "rows": [
+    {
+      "id": "correct-unit",
+      "material_sha256": "7384435151e9c7de6a1ab86e2327777e5e909854e4cf6bf358b8b4860583e92c",
+      "unit_digest": "98261203a5821f842235830d15a94d9a351e85a89af5fbaf140f07a515a986d9",
+      "source_evidence": [
+        {
+          "resource_id": "c9c04158-3949-5182-867e-87e8117680dc",
+          "resource_digest": "b06705b2ef6a4d09590bae655dd3d91369808240bbb1164cd1751d0a0cb45fa1",
+          "role": "explanation",
+          "actual_content": {
+            "markdown": "a={2,5,9}，容量3，下标0、1、2。total初始为0。i=0读取a[0]=2后total=2；i=1读取a[1]=5后total=7；i=2读取a[2]=9后total=16。i增至3，i<3为假，停止循环，不访问a[3]，循环体恰执行3次。sum()返回16，不直接打印。"
+          }
+        },
+        {
+          "resource_id": "336f3921-014a-53f1-a19d-370f0963e63a",
+          "resource_digest": "281f23f8b481c1d8d5db61966fbc30d2b8ddb5bede539a5ad968e65c4f453b60",
+          "role": "code",
+          "actual_content": {
+            "language": "C",
+            "source": "#include <stddef.h>\nint sum(void){int a[3]={2,5,9};int total=0;for(int i=0;i<3;i++)total+=a[i];return total;}",
+            "expected_output": "不打印；由调用方取得返回值。",
+            "key_steps": [
+              "total从0开始依次变为2、7、16。",
+              "i=3时i<3为假，停止且不访问a[3]。"
+            ],
+            "display_only": true
+          }
+        },
+        {
+          "resource_id": "537cbe60-4e97-5403-868e-5c0703b9b83e",
+          "resource_digest": "7eaf610d07dab1bbf97bb61cfe62e30b920cdc9fa3dc7833b2ce17e50a627a35",
+          "role": "exercise",
+          "actual_content": {
+            "items": [
+              {
+                "id": "q1",
+                "question": "[判断题] i=1这次循环结束后total=7。仅填 T 或 F（T=正确，F=错误）",
+                "answer": "T",
+                "explanation": "先加入a[0]=2，再加入a[1]=5，得到7。"
+              },
+              {
+                "id": "q2",
+                "question": "[判断题] i=3时停止，循环体共执行3次。仅填 T 或 F（T=正确，F=错误）",
+                "answer": "T",
+                "explanation": "i只在0、1、2进入循环体；i=3不满足i<3。"
+              },
+              {
+                "id": "q3",
+                "question": "[判断题] sum返回16表示它直接打印16。仅填 T 或 F（T=正确，F=错误）",
+                "answer": "F",
+                "explanation": "返回值交给调用方，本函数没有打印语句。"
+              }
+            ]
+          }
+        }
+      ],
+      "reference_check": {
+        "source_matched_closed_fixture": true,
+        "trace": [
+          {
+            "i": 0,
+            "total": 2
+          },
+          {
+            "i": 1,
+            "total": 7
+          },
+          {
+            "i": 2,
+            "total": 16
+          }
+        ],
+        "exit": {
+          "i": 3,
+          "condition": "i<3 is false"
+        },
+        "return": 16,
+        "method": "trusted Python model of this exact fixed loop, not C execution"
+      },
+      "accompanying_inconsistencies": [],
+      "implementation": "correct fixed loop",
+      "process_support": "explicit state sequence and loop exit in explanation; inspect any actual defects separately",
+      "process_assessment": "q1 asks intermediate total, q2 loop exit/iteration count",
+      "expected_primary_semantics": "pass",
+      "teaching_gap_is_severe_fact_error": false,
+      "adjudication_authority": "ASSISTANT_RUBRIC_RECHECK_AND_CLOSED_REFERENCE_CHECK_NOT_NEW_HUMAN_SIGNOFF",
+      "internal_plan_counted_as_teaching": false
+    },
+    {
+      "id": "missing-unit-objective",
+      "material_sha256": "4b6126537698d2268971065bf9650197b71ba8b159f52cfedcbaded8b2079227",
+      "unit_digest": "384fc710a8f5ea69e8182696d78efa7fdfe84b62791a58c024b1e01433b4dedf",
+      "source_evidence": [
+        {
+          "resource_id": "76bd91dc-993a-5a71-839b-1f711c4e42a7",
+          "resource_digest": "2d21823e29bd9139d109a5436b13ef37487914c57636405a88be2e1b53d7d942",
+          "role": "explanation",
+          "actual_content": {
+            "markdown": "a={2,5,9}，容量3，下标0、1、2。sum()返回16，不直接打印。"
+          }
+        },
+        {
+          "resource_id": "a62916ad-3541-561b-883e-387c68d175d3",
+          "resource_digest": "371024bcb52809cfa8ed99cde3780ef8c1e364d5c84e98628169873ca5007e59",
+          "role": "code",
+          "actual_content": {
+            "language": "C",
+            "source": "#include <stddef.h>\nint sum(void){int a[3]={2,5,9};int total=0;for(int i=0;i<3;i++)total+=a[i];return total;}",
+            "expected_output": "不打印；由调用方取得返回值。",
+            "key_steps": [
+              "遍历并求和后返回结果。"
+            ],
+            "display_only": true
+          }
+        },
+        {
+          "resource_id": "1b112a34-af0f-5c40-826a-33bc2d3b63d0",
+          "resource_digest": "5ced6e9273f4e12291d42caabc894e7926912dc7a550609e76fce6ee9cd22b85",
+          "role": "exercise",
+          "actual_content": {
+            "items": [
+              {
+                "id": "q1",
+                "question": "[判断题] 长度为3的数组合法下标为0、1、2。仅填 T 或 F（T=正确，F=错误）",
+                "answer": "T",
+                "explanation": "从0开始，最后下标为长度减1。"
+              },
+              {
+                "id": "q2",
+                "question": "[判断题] 2+5+9=16。仅填 T 或 F（T=正确，F=错误）",
+                "answer": "T",
+                "explanation": "2+5=7，7+9=16。"
+              },
+              {
+                "id": "q3",
+                "question": "[判断题] 返回值必然直接打印到屏幕。仅填 T 或 F（T=正确，F=错误）",
+                "answer": "F",
+                "explanation": "返回值传给调用方；本例没有打印语句。"
+              }
+            ]
+          }
+        }
+      ],
+      "reference_check": {
+        "source_matched_closed_fixture": true,
+        "trace": [
+          {
+            "i": 0,
+            "total": 2
+          },
+          {
+            "i": 1,
+            "total": 7
+          },
+          {
+            "i": 2,
+            "total": 16
+          }
+        ],
+        "exit": {
+          "i": 3,
+          "condition": "i<3 is false"
+        },
+        "return": 16,
+        "method": "trusted Python model of this exact fixed loop, not C execution"
+      },
+      "accompanying_inconsistencies": [],
+      "implementation": "correct fixed loop",
+      "process_support": "partial: no explicit state sequence or loop exit in student-facing fields",
+      "process_assessment": "not established by final arithmetic/index-bound/non-printing questions",
+      "expected_primary_semantics": "needs_human",
+      "teaching_gap_is_severe_fact_error": false,
+      "adjudication_authority": "CURRENT_USER_EXPLICIT_PARTIAL_COVERAGE_DECISION",
+      "internal_plan_counted_as_teaching": false
+    },
+    {
+      "id": "reachable-safety",
+      "material_sha256": "b7c9a9fac8b1d0669967e5c52d7db1dcf88d53afac51ef6cd1048142206b2051",
+      "unit_digest": "a2fbff66448922a77a32da93e1ef307fbec7f0455b11c9e531f82a3c68d7d0d9",
+      "source_evidence": [
+        {
+          "resource_id": "91fe8567-c361-5324-a3e2-a66ff7fad945",
+          "resource_digest": "b06705b2ef6a4d09590bae655dd3d91369808240bbb1164cd1751d0a0cb45fa1",
+          "role": "explanation",
+          "actual_content": {
+            "markdown": "a={2,5,9}，容量3，下标0、1、2。total初始为0。i=0读取a[0]=2后total=2；i=1读取a[1]=5后total=7；i=2读取a[2]=9后total=16。i增至3，i<3为假，停止循环，不访问a[3]，循环体恰执行3次。sum()返回16，不直接打印。"
+          }
+        },
+        {
+          "resource_id": "853faf67-ae97-58d1-9ee9-7643aaf7fc15",
+          "resource_digest": "c65dcdad44e18d172d4eb0894a8ed0828a1957c73e7f97cd3c882059f394b1a5",
+          "role": "code",
+          "actual_content": {
+            "language": "C",
+            "source": "#include <stddef.h>\nint sum(void){int a[3]={2,5,9};return a[4];}",
+            "expected_output": "不打印；由调用方取得返回值。",
+            "key_steps": [
+              "total从0开始依次变为2、7、16。",
+              "i=3时i<3为假，停止且不访问a[3]。"
+            ],
+            "display_only": true
+          }
+        },
+        {
+          "resource_id": "d1fc508f-d7f0-5cd0-a299-13dbed928519",
+          "resource_digest": "7eaf610d07dab1bbf97bb61cfe62e30b920cdc9fa3dc7833b2ce17e50a627a35",
+          "role": "exercise",
+          "actual_content": {
+            "items": [
+              {
+                "id": "q1",
+                "question": "[判断题] i=1这次循环结束后total=7。仅填 T 或 F（T=正确，F=错误）",
+                "answer": "T",
+                "explanation": "先加入a[0]=2，再加入a[1]=5，得到7。"
+              },
+              {
+                "id": "q2",
+                "question": "[判断题] i=3时停止，循环体共执行3次。仅填 T 或 F（T=正确，F=错误）",
+                "answer": "T",
+                "explanation": "i只在0、1、2进入循环体；i=3不满足i<3。"
+              },
+              {
+                "id": "q3",
+                "question": "[判断题] sum返回16表示它直接打印16。仅填 T 或 F（T=正确，F=错误）",
+                "answer": "F",
+                "explanation": "返回值交给调用方，本函数没有打印语句。"
+              }
+            ]
+          }
+        }
+      ],
+      "reference_check": {
+        "source_matched_closed_fixture": true,
+        "reachable_unsafe_access": "a[4]",
+        "array_length": 3,
+        "valid_indices": [
+          0,
+          1,
+          2
+        ],
+        "return": null,
+        "method": "exact fixture inspection; no undefined C behavior executed"
+      },
+      "accompanying_inconsistencies": [
+        "Code directly returns a[4] and has no i/total/loop, while explanation, key_steps and process questions describe a summation loop."
+      ],
+      "implementation": "unsafe reachable access",
+      "process_support": "explicit state sequence and loop exit in explanation; inspect any actual defects separately",
+      "process_assessment": "q1 asks intermediate total, q2 loop exit/iteration count",
+      "expected_primary_semantics": "code_safety reachable defect",
+      "teaching_gap_is_severe_fact_error": false,
+      "adjudication_authority": "ASSISTANT_RUBRIC_RECHECK_AND_CLOSED_REFERENCE_CHECK_NOT_NEW_HUMAN_SIGNOFF",
+      "internal_plan_counted_as_teaching": false
+    },
+    {
+      "id": "fact-contradiction",
+      "material_sha256": "ea8563549386ff04c10b7f9c014540be76504e81fabebc5fc83b2d5e727bc6b9",
+      "unit_digest": "e25c374cda8d437ae271d35cc04df60af54016474b100efacf7f32c4cf06fb31",
+      "source_evidence": [
+        {
+          "resource_id": "024dfb34-65fa-5229-b728-4818f6ebd225",
+          "resource_digest": "aabfa9dbf8c9eb7914528cb1f94c7154432e47415d5e6e139b775fd513830450",
+          "role": "explanation",
+          "actual_content": {
+            "markdown": "a={2,5,9}，容量3，下标0、1、2。total初始为0。i=0读取a[0]=2后total=2；i=1读取a[1]=5后total=7；i=2读取a[2]=9后total=16。i增至3，i<3为假，停止循环，不访问a[3]，循环体恰执行3次。sum()返回18，不直接打印。"
+          }
+        },
+        {
+          "resource_id": "72c06360-3f24-5802-9b3f-1379814304b0",
+          "resource_digest": "281f23f8b481c1d8d5db61966fbc30d2b8ddb5bede539a5ad968e65c4f453b60",
+          "role": "code",
+          "actual_content": {
+            "language": "C",
+            "source": "#include <stddef.h>\nint sum(void){int a[3]={2,5,9};int total=0;for(int i=0;i<3;i++)total+=a[i];return total;}",
+            "expected_output": "不打印；由调用方取得返回值。",
+            "key_steps": [
+              "total从0开始依次变为2、7、16。",
+              "i=3时i<3为假，停止且不访问a[3]。"
+            ],
+            "display_only": true
+          }
+        },
+        {
+          "resource_id": "9c967319-9939-57eb-9dc4-171136ecc74a",
+          "resource_digest": "7eaf610d07dab1bbf97bb61cfe62e30b920cdc9fa3dc7833b2ce17e50a627a35",
+          "role": "exercise",
+          "actual_content": {
+            "items": [
+              {
+                "id": "q1",
+                "question": "[判断题] i=1这次循环结束后total=7。仅填 T 或 F（T=正确，F=错误）",
+                "answer": "T",
+                "explanation": "先加入a[0]=2，再加入a[1]=5，得到7。"
+              },
+              {
+                "id": "q2",
+                "question": "[判断题] i=3时停止，循环体共执行3次。仅填 T 或 F（T=正确，F=错误）",
+                "answer": "T",
+                "explanation": "i只在0、1、2进入循环体；i=3不满足i<3。"
+              },
+              {
+                "id": "q3",
+                "question": "[判断题] sum返回16表示它直接打印16。仅填 T 或 F（T=正确，F=错误）",
+                "answer": "F",
+                "explanation": "返回值交给调用方，本函数没有打印语句。"
+              }
+            ]
+          }
+        }
+      ],
+      "reference_check": {
+        "source_matched_closed_fixture": true,
+        "trace": [
+          {
+            "i": 0,
+            "total": 2
+          },
+          {
+            "i": 1,
+            "total": 7
+          },
+          {
+            "i": 2,
+            "total": 16
+          }
+        ],
+        "exit": {
+          "i": 3,
+          "condition": "i<3 is false"
+        },
+        "return": 16,
+        "method": "trusted Python model of this exact fixed loop, not C execution"
+      },
+      "accompanying_inconsistencies": [],
+      "implementation": "correct fixed loop",
+      "process_support": "explicit state sequence and loop exit in explanation; inspect any actual defects separately",
+      "process_assessment": "q1 asks intermediate total, q2 loop exit/iteration count",
+      "expected_primary_semantics": "fact: stated18 vs actual16",
+      "teaching_gap_is_severe_fact_error": false,
+      "adjudication_authority": "ASSISTANT_RUBRIC_RECHECK_AND_CLOSED_REFERENCE_CHECK_NOT_NEW_HUMAN_SIGNOFF",
+      "internal_plan_counted_as_teaching": false
+    }
+  ],
+  "formal_50_labels": "not requalified; still need independent scope/coverage review before formal acceptance",
+  "old_results_labels_halts": "unchanged; reassessment is a new separate artifact"
+}
