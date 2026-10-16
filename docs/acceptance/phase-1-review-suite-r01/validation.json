@@ -1,0 +1,120 @@
+{
+  "version": "ordered-review-suite-freeze-validation-v1",
+  "baseline": "324edb8",
+  "proposal_sha256": "d932bb269cd4a9aaa6038d2c50cc6f4b9fa395516784d08bb46f9862921958f3",
+  "provider_requests": 0,
+  "requests_authorized": 0,
+  "fees_authorized": 0,
+  "new_approval_labels_ledger_exist": false,
+  "requests_max": 7,
+  "cost_micro_cny": 15728308,
+  "output_limit_including_reasoning": 8192,
+  "source_files_verified": 596,
+  "source_cases": "all seven original low-arm material/anchors/snapshot/case fields identical except wire",
+  "wire_change_only": "max_output_tokens2048->8192; reverse serialized wire byte-identical for each case",
+  "order": [
+    "plan-only-gap:candidate",
+    "assessment-gap:candidate",
+    "fact-contradiction:candidate",
+    "reachable-safety:candidate",
+    "gap-and-safety:candidate",
+    "trace-complete:candidate",
+    "trace-distributed:candidate"
+  ],
+  "structural_budget_preview": {
+    "files": 600,
+    "requests": 7,
+    "approval": null,
+    "reserve_or_snapshot_called": false
+  },
+  "human_gate": "prior exact proposal+receipt digest bound continue from Lee required; no pre-signing results",
+  "semantic_gate": "structural signal then concrete evidence review; stop on any mismatch even if category/route matches",
+  "private_ledger_preview_written": false,
+  "historical_evidence_files_byte_equal": 117,
+  "historical_ledgers": [
+    {
+      "run": "phase-1-om-admission-r01",
+      "attempts": 2,
+      "halted": "SAFETY_FAILURE"
+    },
+    {
+      "run": "phase-1-om-admission-r02",
+      "attempts": 1,
+      "halted": "INVALID_OUTPUT"
+    },
+    {
+      "run": "phase-1-om-admission-r03",
+      "attempts": 2,
+      "halted": "INVALID_OUTPUT"
+    },
+    {
+      "run": "phase-1-coverage-r04-real",
+      "attempts": 1,
+      "halted": "INVALID_OUTPUT"
+    },
+    {
+      "run": "phase-1-coverage-r05-real",
+      "attempts": 3,
+      "halted": "INVALID_OUTPUT"
+    },
+    {
+      "run": "phase-1-review-config-r01",
+      "attempts": 3,
+      "halted": "INVALID_OUTPUT"
+    },
+    {
+      "run": "phase-1-distributed-diagnostic-r01",
+      "attempts": 1,
+      "halted": "INVALID_OUTPUT"
+    },
+    {
+      "run": "phase-1-distributed-budget-r01",
+      "attempts": 1,
+      "halted": null
+    }
+  ],
+  "checks": [
+    {
+      "command": "backend/.venv/bin/python -m pytest -q scripts/tests/test_review_suite.py scripts/tests/test_distributed_budget.py scripts/tests/test_distributed_diagnostic.py scripts/tests/test_failure_observation.py scripts/tests/test_review_config_comparison.py scripts/tests/test_review_taxonomy_replay.py scripts/tests/test_coverage_v44.py scripts/tests/test_coverage_admission.py scripts/tests/test_coverage_review.py scripts/tests/test_om_admission.py scripts/tests/test_om_admission_r02.py scripts/tests/test_om_admission_r03.py backend/tests/test_acceptance_budget.py backend/tests/test_derived_diagnostic_budget.py backend/tests/test_real_browser_budget.py",
+      "result": "241 passed;14 new offline tests; 7 mocked steps not cloud calls"
+    },
+    {
+      "command": "backend/.venv/bin/ruff check scripts/run_review_suite.py scripts/prepare_review_suite.py scripts/tests/test_review_suite.py",
+      "result": "passed"
+    },
+    {
+      "command": "backend/.venv/bin/python scripts/prepare_review_suite.py --write",
+      "result": "reproducible"
+    },
+    {
+      "command": "backend/.venv/bin/python scripts/run_review_suite.py --run-one",
+      "exit_code": 2,
+      "result": "unapproved before Key/DNS/new private directory"
+    },
+    {
+      "command": "python3 scripts/check_catalog_workflow.py",
+      "result": "passed"
+    },
+    {
+      "command": "python3 scripts/verify_legacy_archives.py",
+      "result": "236 original files verified"
+    },
+    {
+      "command": "backend/.venv/bin/python docs/acceptance/phase-1-om-redesign/check_contract.py",
+      "result": "12 documents /12 task contracts valid"
+    },
+    {
+      "command": "git diff --check",
+      "result": "passed"
+    }
+  ],
+  "protocol_terms_rechecked_on": "2026-10-16",
+  "terms_sources": [
+    "https://api-docs.deepseek.com/zh-cn/quick_start/pricing/",
+    "https://api-docs.deepseek.com/api/create-response/"
+  ],
+  "terms_access": "official CNY pricing direct read; Responses direct timeout then official indexed body; low/JSON Schema/total cap corroborated",
+  "pg_mypy": "not rerun; production code unchanged",
+  "T040": "blocked",
+  "production_mode": "catalog_only"
+}

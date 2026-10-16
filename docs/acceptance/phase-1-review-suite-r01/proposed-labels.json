@@ -1,0 +1,62 @@
+{
+  "status": "PROPOSED_NOT_HUMAN_SIGNED",
+  "rows": [
+    {
+      "id": "plan-only-gap:candidate",
+      "kind": "pure_gap",
+      "expected_route": "needs_human",
+      "material_sha256": "c19deec758d9756b548b797f9af13dcff587143d523c1a25be76d9dd96e74ab3",
+      "specific_evidence": "needs_human; concretely identify missing student-visible loop states and exit support (internal plan does not count); no findings, including invented callsite fact.",
+      "human_specific_evidence_required": true
+    },
+    {
+      "id": "assessment-gap:candidate",
+      "kind": "pure_gap",
+      "expected_route": "needs_human",
+      "material_sha256": "530af5709da6a592e94bd3f5128892b76a66337a74a84d0a914f1cd1075d92e3",
+      "specific_evidence": "needs_human; teaching states/exit exist, but questions test arithmetic/index/return rather than execution process; concrete measurement gap, no findings.",
+      "human_specific_evidence_required": true
+    },
+    {
+      "id": "fact-contradiction:candidate",
+      "kind": "fact",
+      "expected_route": "reject",
+      "material_sha256": "8bede9d8eb0c83a47c748a66af6eeaab4db474653c51e51d9de875c7e4717bd6",
+      "specific_evidence": "reject; major/severe fact anchored to claim sum returns18 versus actual16; not merely a generic label.",
+      "human_specific_evidence_required": true
+    },
+    {
+      "id": "reachable-safety:candidate",
+      "kind": "safety",
+      "expected_route": "reject",
+      "material_sha256": "ece85986089f110d40824542ab06b0c1b877a9d7dee81e0f866da595bb280dd3",
+      "specific_evidence": "reject; major/severe code_safety anchored to reachable return a[4] with a[3] length, legal indices0..2; do not execute unsafe code.",
+      "human_specific_evidence_required": true
+    },
+    {
+      "id": "gap-and-safety:candidate",
+      "kind": "mixed",
+      "expected_route": "reject",
+      "material_sha256": "967b1960d24d8fd78ad6217ebafb7a04c4bedd881791983390ac394371804720",
+      "specific_evidence": "reject retaining major/severe code_safety for a[4] despite real teaching/measurement gaps; acknowledge gaps in semantic review without downgrading severe issue.",
+      "human_specific_evidence_required": true
+    },
+    {
+      "id": "trace-complete:candidate",
+      "kind": "positive",
+      "expected_route": "pass",
+      "material_sha256": "e422c5a587b691edb34e26de69d40562e601276b0b91ebd069db8e231c3a0701",
+      "specific_evidence": "pass, five checks covered and no findings/unchecked/unresolved; no invented callsite or animation requirements.",
+      "human_specific_evidence_required": true
+    },
+    {
+      "id": "trace-distributed:candidate",
+      "kind": "positive",
+      "expected_route": "pass",
+      "material_sha256": "87bcc0bc29edb86451809aedc204f15d4defa5813190a5aeb6961d08075f2d04",
+      "specific_evidence": "pass, five checks covered and no findings/unchecked/unresolved; student-visible code key_steps and process questions satisfy distributed coverage.",
+      "human_specific_evidence_required": true
+    }
+  ],
+  "basis": "Original seven authored materials and criteria unchanged; low arm only, output limit8192. Not independent holdouts."
+}
