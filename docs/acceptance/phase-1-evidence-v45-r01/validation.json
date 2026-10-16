@@ -1,0 +1,133 @@
+{
+  "version": "evidence-v45-four-case-freeze-validation-v1",
+  "implementation_baseline": "fdce381",
+  "proposal_sha256": "d61ec628e5e3f7f30c420e1677fe4dcc361cddbeda4e4966c4dd8fa641c40de3",
+  "provider_requests": 0,
+  "requests_max": 4,
+  "cost_micro_cny": 9010508,
+  "source_files_verified": 621,
+  "historical_evidence_files_equal": 174,
+  "historical_ledgers": [
+    {
+      "run": "phase-1-om-admission-r01",
+      "attempts": 2,
+      "halted": "SAFETY_FAILURE"
+    },
+    {
+      "run": "phase-1-om-admission-r02",
+      "attempts": 1,
+      "halted": "INVALID_OUTPUT"
+    },
+    {
+      "run": "phase-1-om-admission-r03",
+      "attempts": 2,
+      "halted": "INVALID_OUTPUT"
+    },
+    {
+      "run": "phase-1-coverage-r04-real",
+      "attempts": 1,
+      "halted": "INVALID_OUTPUT"
+    },
+    {
+      "run": "phase-1-coverage-r05-real",
+      "attempts": 3,
+      "halted": "INVALID_OUTPUT"
+    },
+    {
+      "run": "phase-1-review-config-r01",
+      "attempts": 3,
+      "halted": "INVALID_OUTPUT"
+    },
+    {
+      "run": "phase-1-distributed-diagnostic-r01",
+      "attempts": 1,
+      "halted": "INVALID_OUTPUT"
+    },
+    {
+      "run": "phase-1-distributed-budget-r01",
+      "attempts": 1,
+      "halted": null
+    },
+    {
+      "run": "phase-1-review-suite-r01",
+      "attempts": 1,
+      "halted": "INVALID_OUTPUT"
+    },
+    {
+      "run": "phase-1-plan-gap-location-r01",
+      "attempts": 1,
+      "halted": null
+    },
+    {
+      "run": "phase-1-review-remaining-r01",
+      "attempts": 3,
+      "halted": "ADMISSION_FAILED"
+    }
+  ],
+  "new_budget_approval_labels_or_private_ledger": false,
+  "same_student_envelopes_digests_goals_plans_output_schema": true,
+  "changed_only": "v4.5 prompt/policy plus required identity/dependency rebinding and independent executor budget gate",
+  "config": "deepseek-flash/low/8192/60s/temperature0",
+  "order": [
+    "reachable-safety:candidate",
+    "fact-contradiction:candidate",
+    "gap-and-safety:candidate",
+    "trace-complete:candidate"
+  ],
+  "human_gate": "all three flags completeness/assertions/citations true, issues empty and exact receipt/proposal plus real user confirmation; not a general semantic verifier",
+  "stop": "any failed part persists halt; no core finding or primary citation waives other errors; no retry or old2-slot reuse",
+  "budget_preview": {
+    "files": 625,
+    "approval": null,
+    "snapshot_or_reserve_called": false
+  },
+  "checks": [
+    {
+      "command": "backend/.venv/bin/python scripts/prepare_evidence_v45.py --write",
+      "result": "frozen and reproducible"
+    },
+    {
+      "command": "backend/.venv/bin/python -m pytest -q scripts/tests/test_evidence_v45.py backend/tests/test_acceptance_budget.py backend/tests/test_derived_diagnostic_budget.py backend/tests/test_real_browser_budget.py",
+      "result": "81 passed;12 new executor tests; mocked4-slot sending not real Provider"
+    },
+    {
+      "command": "backend/.venv/bin/python -m pytest -q scripts/tests/test_evidence_v45.py",
+      "result": "12 passed again after README exact-budget rendering; no runtime change"
+    },
+    {
+      "command": "backend/.venv/bin/ruff check scripts/prepare_evidence_v45.py scripts/run_evidence_v45.py scripts/tests/test_evidence_v45.py",
+      "result": "passed"
+    },
+    {
+      "command": "backend/.venv/bin/python scripts/run_evidence_v45.py --run-one",
+      "exit_code": 2,
+      "result": "unapproved before Key/DNS/private directory"
+    },
+    {
+      "command": "python3 scripts/check_catalog_workflow.py",
+      "result": "passed"
+    },
+    {
+      "command": "python3 scripts/verify_legacy_archives.py",
+      "result": "236 original files verified"
+    },
+    {
+      "command": "backend/.venv/bin/python docs/acceptance/phase-1-om-redesign/check_contract.py",
+      "result": "12 documents/12 task contracts valid"
+    },
+    {
+      "command": "git diff --check",
+      "result": "passed"
+    }
+  ],
+  "implementation_validation": "../phase-1-review-evidence-v45/validation.json: real PG128/0skipped,mypy191",
+  "terms_checked_on": "2026-10-16",
+  "official_sources": [
+    "https://api-docs.deepseek.com/zh-cn/quick_start/pricing/",
+    "https://api-docs.deepseek.com/api/create-response/"
+  ],
+  "terms_access": "fresh official indexed CNY pricing/Responses text: 1M/384K, peak uncached2/8,low,json_schema,total cap; real terms recheck execution day",
+  "formal_t040_gate": "Only after all4 actual results fully checked and signed, then admission review; no formal acceptance calls or new budget here",
+  "T040": "blocked",
+  "production_mode": "catalog_only"
+}
