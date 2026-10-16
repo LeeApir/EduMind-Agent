@@ -1,0 +1,46 @@
+{
+  "status": "PROPOSED_NOT_HUMAN_SIGNED",
+  "rows": [
+    {
+      "id": "assessment-gap:candidate",
+      "kind": "pure_gap",
+      "expected_route": "needs_human",
+      "material_sha256": "530af5709da6a592e94bd3f5128892b76a66337a74a84d0a914f1cd1075d92e3",
+      "specific_evidence": "needs_human; explicitly distinguish already taught states/exit from missing process assessment; no findings or invented facts.",
+      "human_specific_evidence_required": true
+    },
+    {
+      "id": "fact-contradiction:candidate",
+      "kind": "fact",
+      "expected_route": "reject",
+      "material_sha256": "8bede9d8eb0c83a47c748a66af6eeaab4db474653c51e51d9de875c7e4717bd6",
+      "specific_evidence": "reject; major/severe fact concretely identifies explanation return18 versus actual loop sum16.",
+      "human_specific_evidence_required": true
+    },
+    {
+      "id": "reachable-safety:candidate",
+      "kind": "safety",
+      "expected_route": "reject",
+      "material_sha256": "ece85986089f110d40824542ab06b0c1b877a9d7dee81e0f866da595bb280dd3",
+      "specific_evidence": "reject; major/severe code_safety concretely identifies reachable return a[4] from length3 array (legal0..2).",
+      "human_specific_evidence_required": true
+    },
+    {
+      "id": "gap-and-safety:candidate",
+      "kind": "mixed",
+      "expected_route": "reject",
+      "material_sha256": "967b1960d24d8fd78ad6217ebafb7a04c4bedd881791983390ac394371804720",
+      "specific_evidence": "reject; retain major/severe a[4] code_safety even with real teaching/measurement gap, never downgrade all to human.",
+      "human_specific_evidence_required": true
+    },
+    {
+      "id": "trace-complete:candidate",
+      "kind": "positive",
+      "expected_route": "pass",
+      "material_sha256": "e422c5a587b691edb34e26de69d40562e601276b0b91ebd069db8e231c3a0701",
+      "specific_evidence": "pass with five required checks and no findings/unchecked/unresolved or attached false positives.",
+      "human_specific_evidence_required": true
+    }
+  ],
+  "basis": "Same five authored materials and criteria. No plan-gap/distributed rerun; historical positive references not new result signoff."
+}
