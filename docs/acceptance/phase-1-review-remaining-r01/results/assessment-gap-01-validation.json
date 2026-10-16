@@ -1,0 +1,142 @@
+{
+  "version": "review-remaining-actual-validation-01-v1",
+  "source_commit": "695b31f",
+  "source_files_verified": 607,
+  "old_evidence_files_byte_equal": 147,
+  "five_case_frozen_files_byte_equal": 8,
+  "private_files_mode": "0600",
+  "historical_ledgers": [
+    {
+      "run": "phase-1-om-admission-r01",
+      "attempts": 2,
+      "halted": "SAFETY_FAILURE",
+      "states": {
+        "complete": 1,
+        "failed": 1
+      }
+    },
+    {
+      "run": "phase-1-om-admission-r02",
+      "attempts": 1,
+      "halted": "INVALID_OUTPUT",
+      "states": {
+        "failed": 1
+      }
+    },
+    {
+      "run": "phase-1-om-admission-r03",
+      "attempts": 2,
+      "halted": "INVALID_OUTPUT",
+      "states": {
+        "complete": 1,
+        "failed": 1
+      }
+    },
+    {
+      "run": "phase-1-coverage-r04-real",
+      "attempts": 1,
+      "halted": "INVALID_OUTPUT",
+      "states": {
+        "failed": 1
+      }
+    },
+    {
+      "run": "phase-1-coverage-r05-real",
+      "attempts": 3,
+      "halted": "INVALID_OUTPUT",
+      "states": {
+        "complete": 2,
+        "failed": 1
+      }
+    },
+    {
+      "run": "phase-1-review-config-r01",
+      "attempts": 3,
+      "halted": "INVALID_OUTPUT",
+      "states": {
+        "complete": 2,
+        "failed": 1
+      }
+    },
+    {
+      "run": "phase-1-distributed-diagnostic-r01",
+      "attempts": 1,
+      "halted": "INVALID_OUTPUT",
+      "states": {
+        "failed": 1
+      }
+    },
+    {
+      "run": "phase-1-distributed-budget-r01",
+      "attempts": 1,
+      "halted": null,
+      "states": {
+        "complete": 1
+      }
+    },
+    {
+      "run": "phase-1-review-suite-r01",
+      "attempts": 1,
+      "halted": "INVALID_OUTPUT",
+      "states": {
+        "failed": 1
+      }
+    },
+    {
+      "run": "phase-1-plan-gap-location-r01",
+      "attempts": 1,
+      "halted": null,
+      "states": {
+        "complete": 1
+      }
+    },
+    {
+      "run": "phase-1-review-remaining-r01",
+      "attempts": 1,
+      "halted": null,
+      "states": {
+        "complete": 1
+      },
+      "usage": [
+        14174,
+        2364,
+        2247956,
+        8192
+      ]
+    }
+  ],
+  "ledger_usage_matches_receipt": true,
+  "completeness_all_passed": true,
+  "assistant_concrete_semantic_check": "already taught, not assessed; matches original criterion",
+  "actual_human_signoff": false,
+  "next_slot_not_sent": true,
+  "later_four_not_sent": true,
+  "human_continue_record_absent": true,
+  "offline_tests": "273 passed baseline695b31f; not rerun this turn, code unchanged",
+  "terms_checked_on": "2026-10-16",
+  "official_sources": [
+    "https://api-docs.deepseek.com/zh-cn/quick_start/pricing/",
+    "https://api-docs.deepseek.com/api/create-response/"
+  ],
+  "terms_access": "Fresh official indexed pricing/Responses text checked, unchanged2/8 peak uncached,low,Schema,total cap",
+  "T040": "blocked",
+  "production_mode": "catalog_only",
+  "post_run_checks": [
+    {
+      "command": "python3 scripts/check_catalog_workflow.py",
+      "result": "passed"
+    },
+    {
+      "command": "python3 scripts/verify_legacy_archives.py",
+      "result": "236 original files verified"
+    },
+    {
+      "command": "backend/.venv/bin/python docs/acceptance/phase-1-om-redesign/check_contract.py",
+      "result": "12 documents /12 task contracts valid"
+    },
+    {
+      "command": "git diff --check",
+      "result": "passed"
+    }
+  ]
+}

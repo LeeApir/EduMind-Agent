@@ -1,0 +1,76 @@
+{
+  "version": "review-remaining-actual-01-v1",
+  "source_commit": "695b31f",
+  "proposal_sha256": "7b7d495f9fd7d64ad0db40e5b03cc55c01ce804de61f82a99348691186b90d8f",
+  "approval_sha256": "8b879eec5b928466309cbb65dc281d53ce6feab45d02b1061b4e9c7cf1fa0ce2",
+  "receipt_sha256": "e2313fcfa32c02929b76d9f5e14b7273a05f4769df6546164f65e9d15157f44d",
+  "slot": "assessment-gap:candidate",
+  "real_cloud": true,
+  "mock": false,
+  "cli_exit_code": 0,
+  "requests_sent_this_step": 1,
+  "attempts_authorized": 5,
+  "attempts_used": 1,
+  "remaining_attempts": 4,
+  "unattempted_slots": [
+    "fact-contradiction:candidate",
+    "reachable-safety:candidate",
+    "gap-and-safety:candidate",
+    "trace-complete:candidate"
+  ],
+  "budget_authorized_micro_cny": 11235560,
+  "first_slot_reserved_micro_cny": 2247956,
+  "remaining_reservation_budget_micro_cny": 8987604,
+  "input_tokens": 14174,
+  "output_tokens_including_reasoning": 2364,
+  "total_tokens": 16538,
+  "output_limit_including_reasoning": 8192,
+  "reasoning_visible_split": "UNKNOWN_NOT_RETAINED",
+  "peak_uncached_usage_reference_micro_cny": 47260,
+  "actual_invoice_cost": null,
+  "cost_note": "Peak uncached usage reference not invoice; reservation not charge. Existing authorized remainder retained, no new fee approval requested.",
+  "request_sha256": "bbadd5aabb2ca38f96c54dbecf202c97ccf7025d285bb5188dda81c029e88559",
+  "response_sha256": "b2dce0098f721b13547cda3b92011d51a362b376fd4e60e62ed0020bbbe6fd50",
+  "material_sha256": "530af5709da6a592e94bd3f5128892b76a66337a74a84d0a914f1cd1075d92e3",
+  "completeness": {
+    "actual_request_digest_matches": true,
+    "provider_response_completed": true,
+    "response_model_matches": true,
+    "single_assistant_message_and_text_block": true,
+    "structured_json_schema_valid": true,
+    "usage_known_and_within_frozen_bound": true
+  },
+  "structured_review": {
+    "coverage": {
+      "checked": [
+        "action_references",
+        "answer_consistency",
+        "conventions",
+        "example_trace",
+        "terminology"
+      ],
+      "unchecked": []
+    },
+    "findings": [],
+    "schema_version": "resource-review-v4",
+    "scope": "unit",
+    "unresolved": [
+      "Assessment-coverage gap against the bound goal (检验学生是否掌握循环过程) and objective 'sum' ('用题目检验中间状态和退出条件知识'). The three exercise items do not test the loop's intermediate states or its exit condition: q1 only asks whether a length-3 array's legal indices are 0/1/2, q2 only asks the final arithmetic value 2+5+9=16 (per the assess-process rule, asking only the final value does not establish process mastery), and q3 only asks whether a return value is necessarily printed. No student-visible question requires the student to state total=2 after i=0, total=7 after i=1, or that i reaches 3, i<3 is false, the loop stops, and a[3] is not accessed. The explanation resource (markdown) does deliver those key state changes and the termination condition, so the gap is limited to the exercise/assessment resource (questions q1/q2/q3 in resource e807ccd6-e8ac-55ea-a104-974e24e19a73); supplementation would be an added question probing the intermediate totals and the exit/no-out-of-bounds behavior. No fact, code_safety, difficulty or misconception finding is asserted here because the underlying explanation, code and answers are otherwise correct."
+    ],
+    "verdict": "needs_human"
+  },
+  "assistant_semantic_assessment": {
+    "criterion_satisfied": true,
+    "basis": "Bound original request explicitly asks to test process knowledge. Explanation and key_steps deliver states/exit, while q1 indices, q2 arithmetic, q3 return-vs-print do not assess loop process. Review explicitly distinguishes delivered teaching from assessment gap and points to exact exercise resource e807ccd6-e8ac-55ea-a104-974e24e19a73; no findings or invented facts.",
+    "scope": "Only first authored control, not remaining facts/safety/mixed/positive outcomes or formal acceptance."
+  },
+  "human_confirmed": false,
+  "run_halt": null,
+  "pause_reason": "Frozen per-result real human receipt-bound confirmation required before next slot. No continue file written.",
+  "second_cli_or_retry": false,
+  "next_slot": "fact-contradiction:candidate",
+  "T040": "blocked",
+  "formal_quality_passed": false,
+  "production_mode": "catalog_only",
+  "old_runs": "unchanged and stopped"
+}
