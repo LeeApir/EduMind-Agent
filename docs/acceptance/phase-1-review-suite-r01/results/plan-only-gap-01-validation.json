@@ -1,0 +1,127 @@
+{
+  "version": "ordered-review-suite-actual-validation-01-v1",
+  "source_commit": "5206e17",
+  "source_files_verified": 596,
+  "old_evidence_files_byte_equal": 117,
+  "suite_frozen_files_byte_equal": 8,
+  "private_files_mode": "0600",
+  "ledgers": [
+    {
+      "run": "phase-1-om-admission-r01",
+      "attempts": 2,
+      "halted": "SAFETY_FAILURE",
+      "states": {
+        "complete": 1,
+        "failed": 1
+      }
+    },
+    {
+      "run": "phase-1-om-admission-r02",
+      "attempts": 1,
+      "halted": "INVALID_OUTPUT",
+      "states": {
+        "failed": 1
+      }
+    },
+    {
+      "run": "phase-1-om-admission-r03",
+      "attempts": 2,
+      "halted": "INVALID_OUTPUT",
+      "states": {
+        "complete": 1,
+        "failed": 1
+      }
+    },
+    {
+      "run": "phase-1-coverage-r04-real",
+      "attempts": 1,
+      "halted": "INVALID_OUTPUT",
+      "states": {
+        "failed": 1
+      }
+    },
+    {
+      "run": "phase-1-coverage-r05-real",
+      "attempts": 3,
+      "halted": "INVALID_OUTPUT",
+      "states": {
+        "complete": 2,
+        "failed": 1
+      }
+    },
+    {
+      "run": "phase-1-review-config-r01",
+      "attempts": 3,
+      "halted": "INVALID_OUTPUT",
+      "states": {
+        "complete": 2,
+        "failed": 1
+      }
+    },
+    {
+      "run": "phase-1-distributed-diagnostic-r01",
+      "attempts": 1,
+      "halted": "INVALID_OUTPUT",
+      "states": {
+        "failed": 1
+      }
+    },
+    {
+      "run": "phase-1-distributed-budget-r01",
+      "attempts": 1,
+      "halted": null,
+      "states": {
+        "complete": 1
+      }
+    },
+    {
+      "run": "phase-1-review-suite-r01",
+      "attempts": 1,
+      "halted": "INVALID_OUTPUT",
+      "states": {
+        "failed": 1
+      },
+      "usage": [
+        13613,
+        4363,
+        2245566,
+        8192,
+        "INVALID_OUTPUT"
+      ]
+    }
+  ],
+  "ledger_usage_matches_safe_observation": true,
+  "new_requests": 1,
+  "new_slot_failed": true,
+  "run_persistently_halted": true,
+  "remaining_six_not_sent": true,
+  "second_cli_or_retry": false,
+  "no_parsed_review_available": true,
+  "semantic_success_or_failure_not_inferred": true,
+  "offline_tests": "241 passed baseline5206e17, not rerun this turn; source code unchanged",
+  "T040": "blocked",
+  "production_mode": "catalog_only",
+  "terms_verified_on": "2026-10-16",
+  "official_sources": [
+    "https://api-docs.deepseek.com/zh-cn/quick_start/pricing/",
+    "https://api-docs.deepseek.com/api/create-response/"
+  ],
+  "post_run_checks": [
+    {
+      "command": "python3 scripts/check_catalog_workflow.py",
+      "result": "passed"
+    },
+    {
+      "command": "python3 scripts/verify_legacy_archives.py",
+      "result": "236 original files verified"
+    },
+    {
+      "command": "backend/.venv/bin/python docs/acceptance/phase-1-om-redesign/check_contract.py",
+      "result": "12 documents/12 task contracts valid"
+    },
+    {
+      "command": "git diff --check",
+      "result": "passed"
+    }
+  ]
+}
