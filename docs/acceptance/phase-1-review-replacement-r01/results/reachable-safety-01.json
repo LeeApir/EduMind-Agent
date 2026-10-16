@@ -1,0 +1,252 @@
+{
+  "version": "review-replacement-actual-01-v1",
+  "receipt_sha256": "1a297234b542e41281e5213541e33093dc187c9da711a458112f4f6303792b92",
+  "receipt": {
+    "completeness": {
+      "actual_request_digest_matches": true,
+      "provider_response_completed": true,
+      "response_model_matches": true,
+      "single_assistant_message_and_text_block": true,
+      "structured_json_schema_valid": true,
+      "usage_known_and_within_frozen_bound": true
+    },
+    "human_confirmed": false,
+    "input_tokens": 14688,
+    "local_assessment": {
+      "arm": "candidate",
+      "criterion_signal": true,
+      "human_concrete_detection_check_required": true,
+      "note": "Category/route matching alone is not semantic success. Inspect actual every assertion in all findings/impact and every cited anchor; any failure stops.",
+      "route": {
+        "policy_version": "hybrid-review-v1",
+        "reason_codes": [
+          "SEMANTIC_UNRESOLVED"
+        ],
+        "verdict": "reject"
+      },
+      "semantic_detection_confirmed": false
+    },
+    "output_tokens": 7346,
+    "proposal_sha256": "0d13cf5d908f289ad13000cb9c3d78eec34282b46d20a8d15db5b18e2bb45a1a",
+    "request_sha256": "670bf119484e9cc9f490385e5dff57abc565712194eb6bc5d78cbbed80b04bae",
+    "response_sha256": "6c1580af11a490957d271dbaf792df009b09229426e99f83ba2f01c7c5a0ad16",
+    "slot": "reachable-safety:candidate",
+    "t040_passed": false,
+    "value": {
+      "coverage": {
+        "checked": [
+          "action_references",
+          "answer_consistency",
+          "conventions",
+          "example_trace",
+          "terminology"
+        ],
+        "unchecked": []
+      },
+      "findings": [
+        {
+          "anchors": [
+            "a6"
+          ],
+          "category": "code_safety",
+          "condition_or_counterexample": "The code resource's /source is `#include <stddef.h>\nint sum(void){int a[3]={2,5,9};return a[4];}`. The array `a` has valid indices 0, 1 and 2 only, so evaluating `a[4]` performs an out-of-bounds read whenever `sum` is called; there is no bounds check or other guard between function entry and that access.",
+          "impact": "This is a reachable undefined-behavior operation in the student-visible code. No particular return value, including the promised 16, is guaranteed.",
+          "severity": "severe"
+        },
+        {
+          "anchors": [
+            "a6",
+            "a1",
+            "a3",
+            "a4"
+          ],
+          "category": "fact",
+          "condition_or_counterexample": "The explanation at /markdown says total goes 0->2->7->16 while reading a[0], a[1], a[2], then i=3 stops and sum() returns 16; /key_steps/0 says total changes 2, 7, 16; /key_steps/1 says i=3 stops because i<3 is false and does not access a[3]. The supplied /source instead has no `total`, no `i`, no loop, and returns `a[4]`.",
+          "impact": "The student-visible code scene contradicts the promised trace and return value, so the lesson's code does not implement the summation it asks students to follow.",
+          "severity": "major"
+        },
+        {
+          "anchors": [
+            "a6",
+            "a10",
+            "a14",
+            "a18"
+          ],
+          "category": "fact",
+          "condition_or_counterexample": "Exercise questions ask students to judge `i=1` loop-end total=7 (/items/0/question), `i=3` stop with 3 body executions (/items/1/question), and `sum` returning 16 (/items/2/question). The supplied code (/source) contains no `i`, no `total`, no loop, and returns `a[4]`, which is out of bounds.",
+          "impact": "The exercise items cannot be verified against the supplied code; students are asked about a program that is not present in the code scene, and the answer key describes a different program.",
+          "severity": "major"
+        }
+      ],
+      "schema_version": "resource-review-v4",
+      "scope": "unit",
+      "unresolved": [
+        "Student-visible goal coverage gap: the code scene (/source) does not contain the requested C summing loop, `total` progression, `i` boundary, or return 16. Those trace/return claims appear in /markdown and key_steps but are contradicted by the executable resource. The missing support is a corrected code resource that actually computes and returns 16 while showing indices 0-2."
+      ],
+      "verdict": "reject"
+    }
+  },
+  "cited_anchor_witnesses": {
+    "a1": {
+      "anchor_id": "a1",
+      "resource_id": "f480e6da-844d-5483-9dbf-91c6c8bbdac2",
+      "resource_digest": "b06705b2ef6a4d09590bae655dd3d91369808240bbb1164cd1751d0a0cb45fa1",
+      "json_pointer": "/markdown",
+      "start_utf8": 0,
+      "end_utf8": 256,
+      "actual_excerpt": "a={2,5,9}，容量3，下标0、1、2。total初始为0。i=0读取a[0]=2后total=2；i=1读取a[1]=5后total=7；i=2读取a[2]=9后total=16。i增至3，i<3为假，停止循环，不访问a[3]，循环体恰执行3次。sum()返回16，不直接打印。",
+      "scope": "field/span only; semantic relevance requires claim-by-claim review"
+    },
+    "a10": {
+      "anchor_id": "a10",
+      "resource_id": "fff349a7-9caa-55bd-859b-ca904ada4f8a",
+      "resource_digest": "7eaf610d07dab1bbf97bb61cfe62e30b920cdc9fa3dc7833b2ce17e50a627a35",
+      "json_pointer": "/items/0/question",
+      "start_utf8": 0,
+      "end_utf8": 85,
+      "actual_excerpt": "[判断题] i=1这次循环结束后total=7。仅填 T 或 F（T=正确，F=错误）",
+      "scope": "field/span only; semantic relevance requires claim-by-claim review"
+    },
+    "a14": {
+      "anchor_id": "a14",
+      "resource_id": "fff349a7-9caa-55bd-859b-ca904ada4f8a",
+      "resource_digest": "7eaf610d07dab1bbf97bb61cfe62e30b920cdc9fa3dc7833b2ce17e50a627a35",
+      "json_pointer": "/items/1/question",
+      "start_utf8": 0,
+      "end_utf8": 91,
+      "actual_excerpt": "[判断题] i=3时停止，循环体共执行3次。仅填 T 或 F（T=正确，F=错误）",
+      "scope": "field/span only; semantic relevance requires claim-by-claim review"
+    },
+    "a18": {
+      "anchor_id": "a18",
+      "resource_id": "fff349a7-9caa-55bd-859b-ca904ada4f8a",
+      "resource_digest": "7eaf610d07dab1bbf97bb61cfe62e30b920cdc9fa3dc7833b2ce17e50a627a35",
+      "json_pointer": "/items/2/question",
+      "start_utf8": 0,
+      "end_utf8": 88,
+      "actual_excerpt": "[判断题] sum返回16表示它直接打印16。仅填 T 或 F（T=正确，F=错误）",
+      "scope": "field/span only; semantic relevance requires claim-by-claim review"
+    },
+    "a3": {
+      "anchor_id": "a3",
+      "resource_id": "5f250662-82b2-5b7b-a97a-0c305554eefe",
+      "resource_digest": "c65dcdad44e18d172d4eb0894a8ed0828a1957c73e7f97cd3c882059f394b1a5",
+      "json_pointer": "/key_steps/0",
+      "start_utf8": 0,
+      "end_utf8": 40,
+      "actual_excerpt": "total从0开始依次变为2、7、16。",
+      "scope": "field/span only; semantic relevance requires claim-by-claim review"
+    },
+    "a4": {
+      "anchor_id": "a4",
+      "resource_id": "5f250662-82b2-5b7b-a97a-0c305554eefe",
+      "resource_digest": "c65dcdad44e18d172d4eb0894a8ed0828a1957c73e7f97cd3c882059f394b1a5",
+      "json_pointer": "/key_steps/1",
+      "start_utf8": 0,
+      "end_utf8": 43,
+      "actual_excerpt": "i=3时i<3为假，停止且不访问a[3]。",
+      "scope": "field/span only; semantic relevance requires claim-by-claim review"
+    },
+    "a6": {
+      "anchor_id": "a6",
+      "resource_id": "5f250662-82b2-5b7b-a97a-0c305554eefe",
+      "resource_digest": "c65dcdad44e18d172d4eb0894a8ed0828a1957c73e7f97cd3c882059f394b1a5",
+      "json_pointer": "/source",
+      "start_utf8": 0,
+      "end_utf8": 64,
+      "actual_excerpt": "#include <stddef.h>\nint sum(void){int a[3]={2,5,9};return a[4];}",
+      "scope": "field/span only; semantic relevance requires claim-by-claim review"
+    }
+  },
+  "auditor_context_not_model_citations": {
+    "a7": {
+      "anchor_id": "a7",
+      "resource_id": "fff349a7-9caa-55bd-859b-ca904ada4f8a",
+      "resource_digest": "7eaf610d07dab1bbf97bb61cfe62e30b920cdc9fa3dc7833b2ce17e50a627a35",
+      "json_pointer": "/items/0/answer",
+      "start_utf8": 0,
+      "end_utf8": 1,
+      "actual_excerpt": "T",
+      "scope": "field/span only; semantic relevance requires claim-by-claim review"
+    },
+    "a8": {
+      "anchor_id": "a8",
+      "resource_id": "fff349a7-9caa-55bd-859b-ca904ada4f8a",
+      "resource_digest": "7eaf610d07dab1bbf97bb61cfe62e30b920cdc9fa3dc7833b2ce17e50a627a35",
+      "json_pointer": "/items/0/explanation",
+      "start_utf8": 0,
+      "end_utf8": 46,
+      "actual_excerpt": "先加入a[0]=2，再加入a[1]=5，得到7。",
+      "scope": "field/span only; semantic relevance requires claim-by-claim review"
+    },
+    "a11": {
+      "anchor_id": "a11",
+      "resource_id": "fff349a7-9caa-55bd-859b-ca904ada4f8a",
+      "resource_digest": "7eaf610d07dab1bbf97bb61cfe62e30b920cdc9fa3dc7833b2ce17e50a627a35",
+      "json_pointer": "/items/1/answer",
+      "start_utf8": 0,
+      "end_utf8": 1,
+      "actual_excerpt": "T",
+      "scope": "field/span only; semantic relevance requires claim-by-claim review"
+    },
+    "a12": {
+      "anchor_id": "a12",
+      "resource_id": "fff349a7-9caa-55bd-859b-ca904ada4f8a",
+      "resource_digest": "7eaf610d07dab1bbf97bb61cfe62e30b920cdc9fa3dc7833b2ce17e50a627a35",
+      "json_pointer": "/items/1/explanation",
+      "start_utf8": 0,
+      "end_utf8": 52,
+      "actual_excerpt": "i只在0、1、2进入循环体；i=3不满足i<3。",
+      "scope": "field/span only; semantic relevance requires claim-by-claim review"
+    },
+    "a15": {
+      "anchor_id": "a15",
+      "resource_id": "fff349a7-9caa-55bd-859b-ca904ada4f8a",
+      "resource_digest": "7eaf610d07dab1bbf97bb61cfe62e30b920cdc9fa3dc7833b2ce17e50a627a35",
+      "json_pointer": "/items/2/answer",
+      "start_utf8": 0,
+      "end_utf8": 1,
+      "actual_excerpt": "F",
+      "scope": "field/span only; semantic relevance requires claim-by-claim review"
+    },
+    "a16": {
+      "anchor_id": "a16",
+      "resource_id": "fff349a7-9caa-55bd-859b-ca904ada4f8a",
+      "resource_digest": "7eaf610d07dab1bbf97bb61cfe62e30b920cdc9fa3dc7833b2ce17e50a627a35",
+      "json_pointer": "/items/2/explanation",
+      "start_utf8": 0,
+      "end_utf8": 57,
+      "actual_excerpt": "返回值交给调用方，本函数没有打印语句。",
+      "scope": "field/span only; semantic relevance requires claim-by-claim review"
+    }
+  },
+  "assistant_review": {
+    "completeness_passed": true,
+    "all_assertions_checked": true,
+    "all_citations_checked": true,
+    "semantic_passed": false,
+    "candidate_decision": "eliminated",
+    "human_confirmed": false,
+    "issues": [
+      {
+        "actual": "the answer key describes a different program",
+        "cited_fields": [
+          "/source",
+          "/items/0/question",
+          "/items/1/question",
+          "/items/2/question"
+        ],
+        "field": "impact",
+        "finding": 3,
+        "issue": "Cited questions do not contain the answer key. The argument about what the answer key says requires the actual answer/explanation fields; neighboring values cannot be borrowed."
+      },
+      {
+        "actual": "judge ... sum returning 16",
+        "field": "condition_or_counterexample",
+        "finding": 3,
+        "issue": "q3 judges the implication from return16 to printing16, not the standalone proposition returns16. Preserve the actual compound judgment rather than substituting its premise."
+      }
+    ]
+  },
+  "t040_passed": false
+}
