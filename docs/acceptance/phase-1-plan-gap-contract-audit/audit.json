@@ -1,0 +1,122 @@
+{
+  "version": "plan-gap-wire-contract-audit-v1",
+  "provider_requests": 0,
+  "prior_proposal_sha256": "d932bb269cd4a9aaa6038d2c50cc6f4b9fa395516784d08bb46f9862921958f3",
+  "wire_sha256": "5cfdfa15cc68e61959d10e5ef60d2a6e8bd53e0f17e24bc4872e8df3fa46798b",
+  "wire_bytes": 41439,
+  "prompt_sha256": "5f3094cc33fd0b1be2276deb7ae6e35923bcb7c479a328497a98ce64079253a3",
+  "schema_sha256": "f07d17b713eebb1f5e1aac99004334ed35505cd90b06d6c68831df13c868ce42",
+  "clear_contract_conflict_found": false,
+  "actual_request_output_examples": {
+    "count": 0,
+    "note": "No assistant/few-shot review output examples in actual wire; student samples and plan traces are input data, not review output examples."
+  },
+  "offline_only_examples": {
+    "pass": {
+      "schema_version": "resource-review-v4",
+      "scope": "unit",
+      "verdict": "pass",
+      "findings": [],
+      "coverage": {
+        "checked": [
+          "action_references",
+          "answer_consistency",
+          "conventions",
+          "example_trace",
+          "terminology"
+        ],
+        "unchecked": []
+      },
+      "unresolved": []
+    },
+    "needs_human": {
+      "schema_version": "resource-review-v4",
+      "scope": "unit",
+      "verdict": "needs_human",
+      "findings": [],
+      "coverage": {
+        "checked": [
+          "action_references",
+          "answer_consistency",
+          "conventions",
+          "example_trace",
+          "terminology"
+        ],
+        "unchecked": []
+      },
+      "unresolved": [
+        "缺少学生可见循环状态和退出边界的明确教学支持。"
+      ]
+    }
+  },
+  "offline_examples_sent_to_provider": false,
+  "original_resource_example": "valid at resource scope; different mandatory check IDs, not sent as unit example",
+  "negative_schema_checks": {
+    "unresolved_object": [
+      {
+        "keyword": "type",
+        "path": [
+          "unresolved",
+          0
+        ]
+      }
+    ],
+    "unresolved_string": [
+      {
+        "keyword": "type",
+        "path": [
+          "unresolved"
+        ]
+      }
+    ],
+    "extra_top_explanation": [
+      {
+        "keyword": "additionalProperties",
+        "path": []
+      }
+    ],
+    "extra_coverage_field": [
+      {
+        "keyword": "additionalProperties",
+        "path": [
+          "coverage"
+        ]
+      }
+    ]
+  },
+  "provider_configuration": {
+    "endpoint": "https://api.deepseek.com/responses",
+    "format_type": "json_schema",
+    "format_keys": [
+      "type",
+      "name",
+      "schema"
+    ],
+    "strict_present": false,
+    "strict_in_provider_response_format_reference": "not documented in inspected DeepSeek Responses text.format reference; tool strict is a separate beta interface, not assumed required here",
+    "local_validation": "unchanged Draft202012Validator.validate, extra fields rejected",
+    "reasoning": {
+      "effort": "low"
+    },
+    "output_limit": 8192,
+    "temperature": "0.0",
+    "timeout_seconds": 60
+  },
+  "prompt_review": {
+    "unit_allowed_verdicts_match": true,
+    "pure_gap_unresolved_matches_schema": true,
+    "unresolved_item_type_not_repeated_in_prose": "schema explicitly requires string items; prose does not prescribe objects",
+    "findings_only_phrase": "read in context as findings/no repairs, not a requirement to omit mandatory protocol metadata; wording is imprecise but no explicit incompatible field/type example found",
+    "extra_top_level_explanation_requested": false
+  },
+  "limitations": [
+    "No vendor internal constraint enforcement or strict guarantee inferred from docs.",
+    "Old additionalProperties field is still unknown; no inference about unresolved or any named field.",
+    "No prompt/schema/strict flag changes based on this audit."
+  ],
+  "official_sources": [
+    "https://api-docs.deepseek.com/api/create-response/",
+    "https://api-docs.deepseek.com/guides/responses_api/"
+  ],
+  "official_terms_checked_on": "2026-10-16"
+}
