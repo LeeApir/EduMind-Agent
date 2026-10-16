@@ -1,0 +1,78 @@
+{
+  "checked_on": "2026-10-16T13:49:09",
+  "provider_requests": 0,
+  "new_requests_authorized": 0,
+  "new_fees_authorized": 0,
+  "proposal_sha256": "fdbb5c6563289f5f61ded5cf473fd8d3ba5dba204fd3045e2fc18eb9d8e145e2",
+  "checks": [
+    {
+      "command": "backend/.venv/bin/python -m pytest -q scripts/tests/test_coverage_v44.py scripts/tests/test_coverage_admission.py scripts/tests/test_coverage_review.py scripts/tests/test_om_admission.py scripts/tests/test_om_admission_r02.py scripts/tests/test_om_admission_r03.py backend/tests/test_acceptance_budget.py backend/tests/test_derived_diagnostic_budget.py backend/tests/test_real_browser_budget.py",
+      "result": "144 passed, includes19 actual r05 composition/mock HTTP regressions"
+    },
+    {
+      "command": "backend/.venv/bin/ruff check --config scripts/acceptance_support/ruff.toml scripts/acceptance_support/coverage_v44.py scripts/prepare_coverage_v44.py scripts/run_coverage_v44.py scripts/tests/test_coverage_v44.py",
+      "result": "passed"
+    },
+    {
+      "command": "backend/.venv/bin/python scripts/prepare_coverage_v44.py",
+      "result": "exact root reproduced;581 source files, four actual wires"
+    },
+    {
+      "command": "backend/.venv/bin/python scripts/run_coverage_v44.py --run-one",
+      "exit_code": 2,
+      "result": "STOPPED_OR_NOT_AUTHORIZED before key/DNS/new real ledger; new private directory absent"
+    },
+    {
+      "command": "FrozenBudget unapproved structural preview against actual source/artifact closure, approval=None, no snapshot/reserve",
+      "result": "585 files/four slots/8791654 micro CNY validated; no file/ledger writes or authorization"
+    },
+    {
+      "command": "backend/.venv/bin/python docs/acceptance/phase-1-om-redesign/check_contract.py",
+      "result": "12 original documents /12 task contracts and schema checks valid"
+    },
+    {
+      "command": "python3 scripts/verify_legacy_archives.py",
+      "result": "236 original files verified"
+    },
+    {
+      "command": "python3 scripts/check_catalog_workflow.py",
+      "result": "valid"
+    },
+    {
+      "command": "r04 runtime.load read only",
+      "result": "FREEZE_CHANGED; current source cannot resume stopped r04"
+    }
+  ],
+  "content_integrity": {
+    "resource_envelopes_equal_to_r04": 12,
+    "resource_content_digests_equal": 12,
+    "full_plans_equal": 4,
+    "original_goal_texts_equal": 4,
+    "original_input_digest_checks": 4,
+    "source_of_goal": "r04 frozen input_snapshot.goal, not reconstructed from plan",
+    "identity_dependency_policy_changes": "New r05 identity/bound metadata wrapper/policy; body text/code/questions/answers/explanations untouched"
+  },
+  "historical_integrity": {
+    "against_commit": "4d66a7d",
+    "old_r01_r02_r03_r04_files_equal": 57,
+    "attempt_counts": [
+      2,
+      1,
+      2,
+      1
+    ],
+    "halts": [
+      "SAFETY_FAILURE",
+      "INVALID_OUTPUT",
+      "INVALID_OUTPUT",
+      "INVALID_OUTPUT"
+    ]
+  },
+  "not_rerun": "Production code unchanged;219 PG/190-file mypy baseline remains4d66a7d, not counted as current runs.",
+  "limits": [
+    "Authored calibration controls, not new holdout or formal labels",
+    "Matching needs_human without concrete correct location/gap requires human adjudication, never auto counts detection",
+    "No run-approval or labels-human record minted; no new private ledger",
+    "Separate fact/safety/other diagnosis only after all4 actual results pass and are confirmed; formal quality after that under separate admission and budgets"
+  ]
+}
