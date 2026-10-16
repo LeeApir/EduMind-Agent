@@ -1,0 +1,49 @@
+{
+  "version": "r04-real-checkpoint-v1",
+  "proposal_sha256": "91c9d5f818d1f675f22691f9e318aec89fc6f0828bb070f245c86cc1b07ea1db",
+  "receipt_sha256": "b4116b0b046fcb40c13e6183d626ab95698b27a6796397a7026b97b194887cc8",
+  "provider_requests": 1,
+  "untouched_slots": [
+    "trace-distributed",
+    "plan-only-gap",
+    "assessment-gap"
+  ],
+  "checks": [
+    "exact approval/labels/source/material/load verified",
+    "actual receipt and frozen wire binding match",
+    "original model result offline assess reproduces COVERAGE_ROUTE_MISMATCH",
+    "private files 0600; one failed attempt; INVALID_OUTPUT persistent halt",
+    "44 old frozen r01/r02/r03/r04 files byte-equal to 5cabe2d",
+    "both original r04 and admission preparers reproduce unchanged roots",
+    "catalog workflow and git diff --check pass"
+  ],
+  "old_ledgers": [
+    {
+      "run": "r01",
+      "attempts": 2,
+      "halted": "SAFETY_FAILURE"
+    },
+    {
+      "run": "r02",
+      "attempts": 1,
+      "halted": "INVALID_OUTPUT"
+    },
+    {
+      "run": "r03",
+      "attempts": 2,
+      "halted": "INVALID_OUTPUT"
+    }
+  ],
+  "terms_recheck": {
+    "checked_on": "2026-10-16",
+    "CNY_pricing": "official Chinese page directly read unchanged",
+    "responses_output_contract": "same-day direct evidence from preparation retained; current direct opens timed out, official search corroborated total output incl reasoning",
+    "links": [
+      "https://api-docs.deepseek.com/zh-cn/quick_start/pricing/",
+      "https://api-docs.deepseek.com/api/create-response/"
+    ]
+  },
+  "testing": "No implementation change. Existing125 offline/204 priorPG not rerun or represented as new runs.",
+  "human_actual_result_confirmed": false,
+  "t040_passed": false
+}
