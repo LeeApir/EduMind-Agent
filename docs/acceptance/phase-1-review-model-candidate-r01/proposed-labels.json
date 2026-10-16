@@ -1,0 +1,114 @@
+{
+  "status": "PROPOSED_NOT_INDEPENDENTLY_HUMAN_SIGNED",
+  "rows": [
+    {
+      "id": "reachable-safety:candidate",
+      "phase": "screen",
+      "kind": "safety",
+      "criterion": "reject; concrete major/severe reachable code_safety; no deterministic UB outcome; all assertions/citations supported",
+      "concrete_witness": "长度3仅合法0..2，却无条件return a[4]；不能保证返回16不等于必非16；所有附带引用准确。",
+      "material_sha256": "9863bb68c355eea9dd1c269a5be29e06d734b530cce3b279500edf18f06a4c90",
+      "authored_after_v45_freeze": false
+    },
+    {
+      "id": "fact-contradiction:candidate",
+      "phase": "screen",
+      "kind": "fact",
+      "criterion": "reject; concrete major/severe definite fact contradiction; every assertion/citation supported",
+      "concrete_witness": "定义良好的求和代码实际16，讲解声明18；答案F不支持数值16，必须引用实际代码/声明。",
+      "material_sha256": "a18523040fc2de2da6458e0fbbe8f0e22ca26915da6614866d1927166078775b",
+      "authored_after_v45_freeze": false
+    },
+    {
+      "id": "gap-and-safety:candidate",
+      "phase": "screen",
+      "kind": "mixed",
+      "criterion": "reject; concrete major/severe reachable code_safety retained; teaching gaps accurately separated; no unsupported factual conclusions",
+      "concrete_witness": "长度3访问a[4]仍严重拒绝；学生可见过程支持不足另外说明，不能整体降待人工。",
+      "material_sha256": "4aebcd62660a65ff26435d1574dbebdd84f6c7bf4252499fde62751720fbf8ae",
+      "authored_after_v45_freeze": false
+    },
+    {
+      "id": "trace-complete:candidate",
+      "phase": "screen",
+      "kind": "positive",
+      "criterion": "pass; all checks; empty findings/unchecked/unresolved; no false positives",
+      "concrete_witness": "完整正确求和材料：状态2/7/16、i=3退出、过程练习；应pass且无附带误报。",
+      "material_sha256": "3376bc1ea1b286867b9cfb1e27c54389c4cbb1f34798d15fafb82357fec2bcd9",
+      "authored_after_v45_freeze": false
+    },
+    {
+      "id": "generalization-search-positive",
+      "phase": "generalization",
+      "kind": "positive",
+      "criterion": "pass; all checks; empty findings/unchecked/unresolved; no false positives",
+      "concrete_witness": "线性查找命中i=2返回2；未命中i=4条件假且不读取a[4]，返回-1；过程考查齐全。",
+      "material_sha256": "cd9b1ad8a780175ecc6f3e84836cad03744d0c608940a8b5a7e8f21789c87568",
+      "authored_after_v45_freeze": true
+    },
+    {
+      "id": "generalization-search-fact",
+      "phase": "generalization",
+      "kind": "fact",
+      "criterion": "reject; concrete major/severe definite fact contradiction; every assertion/citation supported",
+      "concrete_witness": "find(9)讲解声称返回3，定义良好的代码实际返回2。",
+      "material_sha256": "977c620dfcf897274297593bdf5ad9b153f2611c292e85e2e85879b4662c25ad",
+      "authored_after_v45_freeze": true
+    },
+    {
+      "id": "generalization-search-safety",
+      "phase": "generalization",
+      "kind": "safety",
+      "criterion": "reject; concrete major/severe reachable code_safety; no deterministic UB outcome; all assertions/citations supported",
+      "concrete_witness": "find(8)在i=4时仍满足i<=4，读a[4]越界（合法0..3）。不能由UB推导固定值、必非某值或必崩溃。",
+      "material_sha256": "a18facc6b2a11f806bce9862f14cbb4f0205c0628eceaa6cb5727b6a0f531070",
+      "authored_after_v45_freeze": true
+    },
+    {
+      "id": "generalization-search-mixed",
+      "phase": "generalization",
+      "kind": "mixed",
+      "criterion": "reject; concrete major/severe reachable code_safety retained; teaching gaps accurately separated; no unsupported factual conclusions",
+      "concrete_witness": "find(8)在i=4时仍满足i<=4，读a[4]越界（合法0..3）。另未显式交付状态/边界轨迹，练习只问概念/容量/结果，未考查指定过程；严重拒绝保留，缺口具体列出。不能由UB推导固定值、必非某值或必崩溃。",
+      "material_sha256": "642d13cf66063c557d7cfe8278038370707f54184a30633033004714cbe43b4f",
+      "authored_after_v45_freeze": true
+    },
+    {
+      "id": "generalization-stack-positive",
+      "phase": "generalization",
+      "kind": "positive",
+      "criterion": "pass; all checks; empty findings/unchecked/unresolved; no false positives",
+      "concrete_witness": "top2写a[2]再增3；先减top至2，再读a[2]得9；过程考查齐全。",
+      "material_sha256": "aab107f0a71224a643c41afe08799905b9f46b198f38388aa09f4506a9c0e160",
+      "authored_after_v45_freeze": true
+    },
+    {
+      "id": "generalization-stack-fact",
+      "phase": "generalization",
+      "kind": "fact",
+      "criterion": "reject; concrete major/severe definite fact contradiction; every assertion/citation supported",
+      "concrete_witness": "讲解声称出栈返回6，定义良好的demo实际返回9。",
+      "material_sha256": "c48967478497d0d1526e7439c22a81274d93605fa719fa3f44139b1eba8fb967",
+      "authored_after_v45_freeze": true
+    },
+    {
+      "id": "generalization-stack-safety",
+      "phase": "generalization",
+      "kind": "safety",
+      "criterion": "reject; concrete major/severe reachable code_safety; no deterministic UB outcome; all assertions/citations supported",
+      "concrete_witness": "容量3而top初值3，a[top++]=9首次即写a[3]越界（合法0..2）。不能由UB推导固定值、必非某值或必崩溃。",
+      "material_sha256": "22782911947e5e2b6df5203ed943ec8d1f35674c4dacfc8acb6e036c5fad46e7",
+      "authored_after_v45_freeze": true
+    },
+    {
+      "id": "generalization-stack-mixed",
+      "phase": "generalization",
+      "kind": "mixed",
+      "criterion": "reject; concrete major/severe reachable code_safety retained; teaching gaps accurately separated; no unsupported factual conclusions",
+      "concrete_witness": "容量3而top初值3，a[top++]=9首次即写a[3]越界（合法0..2）。另未显式交付状态/边界轨迹，练习只问概念/容量/结果，未考查指定过程；严重拒绝保留，缺口具体列出。不能由UB推导固定值、必非某值或必崩溃。",
+      "material_sha256": "1a0e7e76d0a42c986d2103ee2ed79266e248cb3ec4e40146254fa57b101651b3",
+      "authored_after_v45_freeze": true
+    }
+  ],
+  "caution": "Prospectively authored after fixed v4.5; not an independent blind benchmark or statistical guarantee."
+}

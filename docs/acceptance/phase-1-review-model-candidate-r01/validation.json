@@ -1,0 +1,146 @@
+{
+  "version": "different-model-zero-call-plan-validation-v1",
+  "baseline": "dd96f42",
+  "proposal_sha256": "7907116b32fe2b086d467e1287fcfb66ef1ed91704950906991b27107fa52ed8",
+  "real_provider_calls": 0,
+  "real_requests_authorized": 0,
+  "fees_authorized": 0,
+  "candidate": "qwen3.8-max-0902",
+  "candidate_count_max": 1,
+  "generation_model": "deepseek-flash unchanged",
+  "fixed": "v4.5 messages/material/Schema/policy; existing4 cases exact; new8 authored after frozen contract",
+  "source_files_verified": 632,
+  "previous_source_files_unchanged": 634,
+  "historical_evidence_files_equal": 202,
+  "historical_ledgers_unchanged": [
+    {
+      "run": "phase-1-om-admission-r01",
+      "attempts": 2,
+      "halted": "SAFETY_FAILURE"
+    },
+    {
+      "run": "phase-1-om-admission-r02",
+      "attempts": 1,
+      "halted": "INVALID_OUTPUT"
+    },
+    {
+      "run": "phase-1-om-admission-r03",
+      "attempts": 2,
+      "halted": "INVALID_OUTPUT"
+    },
+    {
+      "run": "phase-1-coverage-r04-real",
+      "attempts": 1,
+      "halted": "INVALID_OUTPUT"
+    },
+    {
+      "run": "phase-1-coverage-r05-real",
+      "attempts": 3,
+      "halted": "INVALID_OUTPUT"
+    },
+    {
+      "run": "phase-1-review-config-r01",
+      "attempts": 3,
+      "halted": "INVALID_OUTPUT"
+    },
+    {
+      "run": "phase-1-distributed-diagnostic-r01",
+      "attempts": 1,
+      "halted": "INVALID_OUTPUT"
+    },
+    {
+      "run": "phase-1-distributed-budget-r01",
+      "attempts": 1,
+      "halted": null
+    },
+    {
+      "run": "phase-1-review-suite-r01",
+      "attempts": 1,
+      "halted": "INVALID_OUTPUT"
+    },
+    {
+      "run": "phase-1-plan-gap-location-r01",
+      "attempts": 1,
+      "halted": null
+    },
+    {
+      "run": "phase-1-review-remaining-r01",
+      "attempts": 3,
+      "halted": "ADMISSION_FAILED"
+    },
+    {
+      "run": "phase-1-evidence-v45-r01",
+      "attempts": 1,
+      "halted": "ADMISSION_FAILED"
+    },
+    {
+      "run": "phase-1-review-replacement-r01",
+      "attempts": 1,
+      "halted": "ADMISSION_FAILED"
+    }
+  ],
+  "env_content_read": false,
+  "env_metadata_unchanged": true,
+  "new_private_directory_or_approval_or_ledger": false,
+  "requests_max": 12,
+  "phase_calls": {
+    "screen": 4,
+    "generalization": 8
+  },
+  "stage_reserve_micro_cny": {
+    "screen": 53672808,
+    "generalization": 107398452
+  },
+  "exact_all_slot_reserve_micro_cny": 161071260,
+  "absolute_wire_limit_reserve_micro_cny": 163975392,
+  "global_ceiling_micro_cny": 164000000,
+  "request_output_limit": 8192,
+  "reserved_total_output": 8202,
+  "timeout_seconds": 60,
+  "offline_review_entry_captures": 12,
+  "offline_generation_entry_capture": 1,
+  "real_connection_operation_verified": false,
+  "credential_balance_or_live_complex_schema_verified": false,
+  "audit_bridge": "Mock proof uses observed request/response bytes; real bridge/connection and8202 budget enforcement implementation required before any real run",
+  "generalization": "prospectively frozen8 examples across linear search/array stack, no v4.5 changes; authored labels NOT independently human signed",
+  "candidate_or_stage_failure": "eliminate fixed sole candidate, no second model/retry/tuning; remaining slots stopped",
+  "checks": [
+    {
+      "command": "backend/.venv/bin/python scripts/prepare_review_model_candidate.py --write",
+      "result": "frozen and reproducible,0 Provider calls"
+    },
+    {
+      "command": "backend/.venv/bin/python -m pytest -q scripts/tests/test_review_model_candidate.py",
+      "result": "10 passed; includes actual correct C controls compiled/run; unsafe never executed"
+    },
+    {
+      "command": "backend/.venv/bin/ruff check scripts/prepare_review_model_candidate.py scripts/tests/test_review_model_candidate.py",
+      "result": "passed"
+    },
+    {
+      "command": "python3 scripts/check_catalog_workflow.py",
+      "result": "passed"
+    },
+    {
+      "command": "python3 scripts/verify_legacy_archives.py",
+      "result": "236 original files verified"
+    },
+    {
+      "command": "backend/.venv/bin/python docs/acceptance/phase-1-om-redesign/check_contract.py",
+      "result": "12 documents/12 task contracts valid"
+    },
+    {
+      "command": "git diff --check",
+      "result": "passed"
+    }
+  ],
+  "official_terms_checked_on": "2026-10-17",
+  "official_sources": [
+    "https://help.aliyun.com/en/model-studio/qwen3-8-max",
+    "https://help.aliyun.com/zh/model-studio/qwen-api-via-openai-chat-completions",
+    "https://help.aliyun.com/zh/model-studio/qwen-structured-output"
+  ],
+  "T040": "blocked",
+  "production_mode": "catalog_only",
+  "next": "proposal review, then separately authorized zero-call real-executor preparation and source/budget freeze; real calls require separate approval"
+}
