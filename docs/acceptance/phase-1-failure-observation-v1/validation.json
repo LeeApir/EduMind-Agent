@@ -1,0 +1,88 @@
+{
+  "version": "safe-failure-observation-validation-v1",
+  "baseline": "19b775d",
+  "provider_requests": 0,
+  "new_real_run_prepared": false,
+  "new_budget_authorized": false,
+  "new_private_directory_exists": false,
+  "checks": [
+    {
+      "command": "backend/.venv/bin/python -m pytest -q scripts/tests/test_failure_observation.py scripts/tests/test_review_config_comparison.py scripts/tests/test_review_taxonomy_replay.py scripts/tests/test_coverage_v44.py scripts/tests/test_coverage_admission.py scripts/tests/test_coverage_review.py scripts/tests/test_om_admission.py scripts/tests/test_om_admission_r02.py scripts/tests/test_om_admission_r03.py backend/tests/test_acceptance_budget.py backend/tests/test_derived_diagnostic_budget.py backend/tests/test_real_browser_budget.py",
+      "result": "188 passed;21 new real adapter mock-stream/metadata/privacy/halt tests"
+    },
+    {
+      "command": "backend/.venv/bin/ruff check scripts/acceptance_support/failure_observation.py scripts/run_review_config_observed.py scripts/tests/test_failure_observation.py",
+      "result": "passed"
+    },
+    {
+      "command": "backend/.venv/bin/python scripts/run_review_config_observed.py --run-one",
+      "exit_code": 2,
+      "result": "STOPPED_OR_NOT_AUTHORIZED, missing new package/approval before key/DNS/new directory"
+    },
+    {
+      "command": "backend/.venv/bin/python docs/acceptance/phase-1-om-redesign/check_contract.py",
+      "result": "12 documents/12 task contracts valid"
+    },
+    {
+      "command": "python3 scripts/verify_legacy_archives.py",
+      "result": "236 original files verified"
+    },
+    {
+      "command": "python3 scripts/check_catalog_workflow.py",
+      "result": "valid"
+    }
+  ],
+  "historical_integrity": {
+    "against": "19b775d",
+    "unchanged_evidence_files": 91,
+    "r01_original_source_closure_equal": 587,
+    "ledgers": [
+      {
+        "run": "phase-1-om-admission-r01",
+        "attempts": 2,
+        "halted": "SAFETY_FAILURE"
+      },
+      {
+        "run": "phase-1-om-admission-r02",
+        "attempts": 1,
+        "halted": "INVALID_OUTPUT"
+      },
+      {
+        "run": "phase-1-om-admission-r03",
+        "attempts": 2,
+        "halted": "INVALID_OUTPUT"
+      },
+      {
+        "run": "phase-1-coverage-r04-real",
+        "attempts": 1,
+        "halted": "INVALID_OUTPUT"
+      },
+      {
+        "run": "phase-1-coverage-r05-real",
+        "attempts": 3,
+        "halted": "INVALID_OUTPUT"
+      },
+      {
+        "run": "phase-1-review-config-r01",
+        "attempts": 3,
+        "halted": "INVALID_OUTPUT"
+      }
+    ],
+    "r01_third_usage": [
+      null,
+      null
+    ],
+    "r01_third_cause": "UNKNOWN_NOT_RECOVERED"
+  },
+  "production_code_prompt_schema_defaults_changed": false,
+  "frozen_runner_changed": false,
+  "new_executor": "scripts/run_review_config_observed.py; future r02 namespace only, not a prepared run",
+  "limits": [
+    "Mock metadata recovery is not evidence of historical third cause",
+    "Diagnostic writes may still fail if storage unavailable; halt/reserved-state blocks retry",
+    "No new wire/budget/labels/real-run approval created",
+    "No PG/mypy rerun because production code unchanged"
+  ],
+  "T040": "blocked",
+  "production_mode": "catalog_only"
+}
