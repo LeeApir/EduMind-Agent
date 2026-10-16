@@ -1,0 +1,125 @@
+{
+  "version": "coverage-r05-trace-complete-01-v1",
+  "source_commit": "b4db9ea",
+  "proposal_sha256": "fdbb5c6563289f5f61ded5cf473fd8d3ba5dba204fd3045e2fc18eb9d8e145e2",
+  "approval_sha256": "049b5dc5e236edd22365e1248fb6375a635c67429854b4b02ffeb885d319c8ff",
+  "labels_human_sha256": "6504dcf46192827a9e971bb99a99c737464352c44b6128ac640f2ceb114a70d6",
+  "receipt_sha256": "4757950f10e3d085d1ccc345c88480f0627cc249a47caf440a7f91a1faff3076",
+  "slot": "trace-complete",
+  "real_cloud": true,
+  "mock": false,
+  "r05_requests_sent": 1,
+  "requests_not_sent": [
+    "trace-distributed",
+    "plan-only-gap",
+    "assessment-gap"
+  ],
+  "protocol_schema_wire_model_binding": "passed",
+  "model_verdict": "pass",
+  "local_routing": {
+    "policy_version": "hybrid-review-v1",
+    "reason_codes": [],
+    "verdict": "pass"
+  },
+  "review_result": {
+    "coverage": {
+      "checked": [
+        "action_references",
+        "answer_consistency",
+        "conventions",
+        "example_trace",
+        "terminology"
+      ],
+      "unchecked": []
+    },
+    "findings": [],
+    "schema_version": "resource-review-v4",
+    "scope": "unit",
+    "unresolved": [],
+    "verdict": "pass"
+  },
+  "input_tokens": 14247,
+  "output_tokens_including_reasoning": 61,
+  "total_tokens": 14308,
+  "cost_reserved_micro_cny": 2198400,
+  "peak_uncached_usage_reference_micro_cny": 28982,
+  "actual_invoice_cost": null,
+  "cost_note": "Peak uncached reference only, not actual cache/period invoice; reservation is not charge.",
+  "request_sha256": "b7809c3ffa9bace20ca2b26e1eb8675a75ccf107cee4090258df84bed7f67203",
+  "response_sha256": "7973ed251ee66d2b8f498d7712234f90275541976560ffc44eaf908e0e46351d",
+  "material_unit_digest": "9f8c3237f53d5b83f776eed076d42c110e7dcef6c43d091d980ed6ca4238ca66",
+  "material_sha256": "e422c5a587b691edb34e26de69d40562e601276b0b91ebd069db8e231c3a0701",
+  "frozen_material_location": "cases.json:trace-complete.material",
+  "bound_original_goal": "用C追踪数组{2,5,9}的求和循环，解释下标0至2和返回值16。",
+  "original_goal_snapshot": {
+    "goal": "用C追踪数组{2,5,9}的求和循环，解释下标0至2和返回值16。",
+    "node_id": "array",
+    "code_language": "C",
+    "reference_context": {
+      "source": {
+        "reference_id": "graph-node:phase-1.1.0:array",
+        "version": "phase-1.1.0",
+        "digest": "f83fd12e754fcda4124aa62b8a29203d97a897605d23dc4e37877393dcb0015d"
+      },
+      "node": {
+        "id": "array",
+        "name": "数组",
+        "chapter": "线性表",
+        "difficulty": 1,
+        "description": "使用连续存储空间、通过下标访问元素的线性结构。",
+        "prerequisites": [],
+        "learning_objectives": [
+          "说出下标访问的时间复杂度",
+          "说明连续存储对插入和删除的影响"
+        ],
+        "common_misconceptions": [
+          "数组每次访问都要从头遍历",
+          "数组插入总是 O(1)"
+        ],
+        "ai_context": "使用连续格子和下标精灵的图示，对比中间插入时的元素搬移。",
+        "mastery_rule_key": "linear-structure-v1"
+      },
+      "learner_evidence": {},
+      "scope": "Partial graph; proposed trace is not independently verified evidence."
+    }
+  },
+  "closed_fixture_reference_check": {
+    "source_matched_closed_fixture": true,
+    "trace": [
+      {
+        "i": 0,
+        "total": 2
+      },
+      {
+        "i": 1,
+        "total": 7
+      },
+      {
+        "i": 2,
+        "total": 16
+      }
+    ],
+    "exit": {
+      "i": 3,
+      "condition": "i<3 is false"
+    },
+    "return": 16,
+    "method": "trusted Python model of this exact fixed loop, not C execution"
+  },
+  "student_content_unchanged_from_r04": true,
+  "assistant_observations_not_human_signoff": [
+    "Actual complete control gives total2/7/16, i3 termination and process questions. This meets the stated local goal under the adopted rubric.",
+    "Five exact check IDs, no findings/unchecked/unresolved; no unsupported full-node or absent-animation concern returned. The r04 over-referral did not recur in this one response.",
+    "Only one authored control is tested. Distributed support and two actual omission controls remain NOT_RUN; no claim of full v4.4 efficacy or serious-error recall."
+  ],
+  "human_confirmed": false,
+  "ledger": {
+    "attempts": 1,
+    "state": "complete",
+    "halted": null
+  },
+  "T040": "blocked",
+  "formal_quality_passed": false,
+  "production_mode": "catalog_only",
+  "next": "Independent review of this exact control and pass before second trace-distributed. No continuation record minted."
+}
