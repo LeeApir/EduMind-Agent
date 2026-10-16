@@ -1254,3 +1254,9 @@ r02正确对照未过自动门禁并持久停止 | 输出Schema普通字符串�
 r03首槽correct-unit实际1次，模型/local均pass，五ID齐全无发现/未知，保存完整实际对照和审核供人工 | 协议/Schema/wire/模型通过，12620+61=12681tokens，账本1条complete无halt，预留2.184292元/峰值参考0.025728元非账单；源码/收据/0600核验，200PG/194离线沿用e44eb0c | 单例校准不等于正式通过；未人工签核、无correct-unit-human、余3未发，catalog_only | 提交证据后等待准确首槽人工核对，材料phase-1-om-admission-r03/results/correct-unit-01-review.md
 [2026-10-16T10:06:59] [PHASE-1-T040] BLOCKED | executor=Lee
 自动首槽通过，停HUMAN_CHECK_REQUIRED，T040仍不完成 | 完整材料/实际审核与用量已保存，未擅自代填人工意见 | 需用户对本次正确对照及pass独立确认，预算批准不代替结果核对；正式门禁保留 | 确认后才可登记准确收据并执行第2槽目标遗漏一次，不新增预算或自动晋级
+[2026-10-16T10:08:59] [PHASE-1-T040] RESUME | executor=Lee | branch=codex/phase-1-continued
+用户在7ff0cec正确对照完整材料/审核与继续第2项询问后回复yes，保存准确首槽收据aed03b9ae11070c49b11a941992abd4ad13499754b1904f89bea1eab98f924e7的人工continue | 原r03准确根/4次/8.706640元及同日条款/load核验保持，未扩大预算 | 仅解除第2项目标遗漏前的人工核对门禁，完整T040仍blocked | 仅执行missing-unit-objective一次并停下保存实际结果
+[2026-10-16T10:11:02] [PHASE-1-T040] VERIFIED | executor=Lee
+r03第2项目标遗漏实际一次，模型pass/五ID正确但未满足负例冻结预期；保留失败，识别样本教学覆盖仍需人工裁定而非直接认定严重漏检 | 实际12136+61tokens；原结果离线门禁CONCRETE_DEFECT_MISSED、两行账本INVALID_OUTPUT halt，累计2次24878tokens/预留4.366600元/峰值参考0.050488元非账单，源码/收据/0600核验 | 代码与计划仍含可推导轨迹，原标签是否充分待独立评判；余2未发，200PG/194离线沿用e44eb0c | 保存missing-objective-02.json及完整review.md并提交检查点，不改结果/标签/Prompt、不重试
+[2026-10-16T10:11:02] [PHASE-1-T040] BLOCKED | executor=Lee
+r03冻结负例门禁失败并持久停止 | 协议正常，未指出预期覆盖缺口，不再用格式问题解释 | 需用户独立裁定实际反例及单元目标覆盖标准，再决定是否修改审核策略；完整T040仍未过 | 停止真实请求，剩余安全/事实两槽未发，不扩额/不清halt/不开放dynamic
