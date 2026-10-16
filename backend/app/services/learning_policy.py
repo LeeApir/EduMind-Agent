@@ -1,11 +1,12 @@
 """Versioned local publication policy; changing its semantics invalidates pending cases."""
 
+from app.agents.review_evidence import REVIEW_PROMPT_VERSION
 from app.services.learning_contract import digest
 
 POLICY_VERSION = "hybrid-review-v1"
 POLICY = {
     "resource_review": "resource-review-v4",
-    "resource_review_prompt": "evidence-resource-review-v4.4",
+    "resource_review_prompt": REVIEW_PROMPT_VERSION,
     "review_input": "authoritative-review-input-v1",
     "objective_coverage": "student-visible-goal-coverage-v1",
     "review_coverage": "fixed-check-ids-v1",

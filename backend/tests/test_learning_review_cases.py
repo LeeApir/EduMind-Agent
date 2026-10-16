@@ -249,3 +249,54 @@ def test_cancel_racing_approval_cannot_leave_publishable_case():
             await e.dispose()
 
     asyncio.run(exercise())
+
+
+def test_real_v44_pending_case_invalidates_after_v45_policy_switch(monkeypatch):
+    """Use actual prior prompt/policy, then current digest; never issue a model call."""
+    import json
+    from pathlib import Path
+
+    from app.services.learning_policy import POLICY, active_policy_digest
+
+    async def exercise():
+        e = create_database_engine(URL)
+        f = async_sessionmaker(e, expire_on_commit=False)
+        old = json.loads(
+            (
+                Path(__file__).resolve().parents[2]
+                / "docs/acceptance/phase-1-review-remaining-r01/cases.json"
+            ).read_text()
+        )["assessment-gap:candidate"]
+        old_instruction = json.loads(bytes.fromhex(old["wire_hex"]))["input"][0]["content"]
+        try:
+            async with f() as db:
+                with monkeypatch.context() as patch:
+                    patch.setitem(POLICY, "resource_review_prompt", "evidence-resource-review-v4.4")
+                    patch.setattr(
+                        "app.agents.hybrid_resource_review.REVIEW_V4_PROMPT",
+                        "evidence-resource-review-v4.4",
+                    )
+                    patch.setattr("app.agents.hybrid_resource_review.INSTRUCTION", old_instruction)
+                    user, unit, op, plan, case = await case_fixture(db)
+                    old_digest = plan.policy_digest
+                    await db.commit()
+                    args = decision_args(case)
+                assert old_digest != active_policy_digest()
+                with pytest.raises(LearningContractError, match="REVIEW_CASE_INVALIDATED"):
+                    await decide_case(db, **args)
+                await db.refresh(case)
+                await db.refresh(op)
+                assert case.state == "invalidated" and op.status == "failed"
+                assert (
+                    await db.scalar(
+                        select(func.count())
+                        .select_from(LearningReviewDecision)
+                        .where(LearningReviewDecision.case_id == case.id)
+                    )
+                    == 0
+                )
+                assert case.payload["material"]["binding"]["policy_digest"] == old_digest
+        finally:
+            await e.dispose()
+
+    asyncio.run(exercise())

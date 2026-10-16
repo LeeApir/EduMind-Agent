@@ -11,6 +11,7 @@ from app.agents.learning_unit_generator import StructuredResourceGateway
 from app.agents.objective_exercises import objective_exercise_issues
 from app.agents.planned_scene_generation import PlannedScenes, SceneCandidate
 from app.agents.review_delivery import COVERAGE_STANDARD_VERSION, delivery_manifest
+from app.agents.review_evidence import EVIDENCE_INSTRUCTION, REVIEW_PROMPT_VERSION
 from app.agents.review_input import REVIEW_INPUT_VERSION, review_input
 from app.agents.review_schema import severe_code_issues
 from app.agents.shared_learning_plan import CallWindow
@@ -23,7 +24,7 @@ from app.services.learning_contract import (
 from app.services.provider_gateway import ChatMessage, StructuredRequest, TaskProfile, TextRequest
 from app.services.teaching_actions import anchor_catalog
 
-REVIEW_V4_PROMPT = "evidence-resource-review-v4.4"
+REVIEW_V4_PROMPT = REVIEW_PROMPT_VERSION
 RESOURCE_CHECKS = {"facts", "code_safety", "learner_fit", "objectives", "reference_scope"}
 UNIT_CHECKS = {
     "terminology",
@@ -109,6 +110,8 @@ media. Only evaluate absent animation when explicit user/plan/student-facing pro
 it. Actual false media-delivery claims remain factual issues. Missing authoritative input
 cannot be repaired by treating plan.goal as the original request; retain uncertainty.
 """
+
+INSTRUCTION += "\n" + EVIDENCE_INSTRUCTION
 
 
 def review_output_schema(scope: str, *, anchor_ids: list[str] | None = None) -> dict[str, Any]:
