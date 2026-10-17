@@ -1,0 +1,95 @@
+{
+  "version": "legacy-review-retrospective-v1",
+  "scope": "Pre-ADR-0015 T040 r01-r11, closed historical route; no scores/balances transferred",
+  "real_requests": 16,
+  "rounds": [
+    {
+      "round": "r01",
+      "evidence": "docs/acceptance/phase-1-t040-deepseek-v1/results/diagnostic-r01.json",
+      "evidence_sha256": "aba6d22f30866a3ac289563058a6af2bad2bdc27001bf5916c02776f6fbab273",
+      "real_requests": 1,
+      "configuration": "none / instructions-v2 / 4096",
+      "observed_result": "完整1；head覆盖导致泄漏漏检并pass；无可宣称的引用/覆盖结果"
+    },
+    {
+      "round": "r02",
+      "evidence": "docs/acceptance/phase-1-t040-deepseek-v2/results/diagnostic-r02.json",
+      "evidence_sha256": "3807f39677ba513d767460187ea03eb6e6a1940a3e48a82f7dd2f3366534d4ff",
+      "real_requests": 1,
+      "configuration": "none / instructions-v3 / 4096",
+      "observed_result": "同例完整1仍漏检；不是API失败"
+    },
+    {
+      "round": "r03",
+      "evidence": "docs/acceptance/phase-1-t040-reasoning-check/results/strategy-r03.json",
+      "evidence_sha256": "186d00d79cfee6b8775f4851402464d62b5307cce9b01fc712f0d5f14eb4ca3d",
+      "real_requests": 2,
+      "configuration": "high / instructions-v3 / 8192",
+      "observed_result": "严重链表失败路径检出1，正确对照pass1；单组小样本"
+    },
+    {
+      "round": "r04",
+      "evidence": "docs/acceptance/phase-1-t040-deepseek-high-v1/results/error-detection-r04.json",
+      "evidence_sha256": "4f82cd2057d55f8774411e087b2816b9bce20e2b705cfbedcd6f0f16d98b4bf4",
+      "real_requests": 3,
+      "configuration": "high / instructions-v3 / 8192",
+      "observed_result": "前2目标具体检出；第3编号约定/索引偏差漏检；是否语义严重依原标签，不能夸成3例全漏"
+    },
+    {
+      "round": "r05",
+      "evidence": "docs/acceptance/phase-1-t040-deepseek-high-v2/results/error-detection-r05.json",
+      "evidence_sha256": "b63586f39aef47fe90cce0eddbb8381a7d0fb22621b50a2226e31f4bd275196e",
+      "real_requests": 2,
+      "configuration": "high / instructions-v4 / 8192",
+      "observed_result": "2目标检出正确，附带循环队列模差修复建议错误；不得算目标漏检"
+    },
+    {
+      "round": "r06",
+      "evidence": "docs/acceptance/phase-1-t040-review-scope-check/results/review-scope-r06.json",
+      "evidence_sha256": "4f95598fb3794a1102ef50fcd1eb047a2e177c8298e75dfed77a14abf5765fc2",
+      "real_requests": 1,
+      "configuration": "high / instructions-v5 / 8192",
+      "observed_result": "输出8192全为推理，无有效完整审核；精确上游失败原因未知"
+    },
+    {
+      "round": "r07",
+      "evidence": "docs/acceptance/phase-1-t040-review-scope-low/results/review-scope-r07.json",
+      "evidence_sha256": "a3eef75793a8f433efe9070292d5639f4e10e544b938bf1064cca0c408608902",
+      "real_requests": 1,
+      "configuration": "low / instructions-v5 / 8192",
+      "observed_result": "有完整审核；检出计数，漏空满条件；分类fact正确，无补丁误报"
+    },
+    {
+      "round": "r08",
+      "evidence": "docs/acceptance/phase-1-t040-review-coverage-check/results/review-coverage-r08.json",
+      "evidence_sha256": "231fd693def53bc620114e36a17477630e6efd6b742ca07c9abd94f05d2e51c4",
+      "real_requests": 1,
+      "configuration": "low / instructions-v6 / 8192",
+      "observed_result": "仍部分检出；不能将同一例两轮当泛化统计"
+    },
+    {
+      "round": "r09",
+      "evidence": "docs/acceptance/phase-1-t040-derived-calibration-r09/results/r09.json",
+      "evidence_sha256": "53e912cc64292c83b7ff9d2a191337ba1116e16b531a6b7afefd21a8f88845cb",
+      "real_requests": 1,
+      "configuration": "low / 有界派生声明清单 / 8192",
+      "observed_result": "输出8192全推理，无有效清单；不算语义漏检，精确原因未保留"
+    },
+    {
+      "round": "r10",
+      "evidence": "docs/acceptance/phase-1-t040-focus-r10/results/r10-focus-02.json",
+      "evidence_sha256": "b3c8971f0611fdbf574d727877856b7733aea2c845e118de519e0d924202e167",
+      "real_requests": 2,
+      "configuration": "none / 固定焦点 / 2048",
+      "observed_result": "主计数、空满问题各检出；附带将无害头文件当code_safety；首例人工允许带局限继续，不抹质量失败"
+    },
+    {
+      "round": "r11",
+      "evidence": "docs/acceptance/phase-1-t040-focus-r11/results/r11.json",
+      "evidence_sha256": "d88d9b58a0bdb39a76c720dbdbf74d30fb2f82ff10b7dd98b727b3a270d36c01",
+      "real_requests": 1,
+      "configuration": "none / span-focus-review-v1输出，契约v2 / 2048",
+      "observed_result": "具体检出FIFO/LIFO严重矛盾并reject；fact→misconception分类失败，不是漏检；无附带项；整篇覆盖未验证"
+    }
+  ]
+}
