@@ -32,6 +32,7 @@ from app.services.provider_protocol import (
     strict_json,
     validated_model,
 )
+from app.services.qwen_schema import QWEN_SCHEMA_PROFILE, qwen_wire_schema
 
 
 def _usage(raw: object) -> TokenUsage | None:
@@ -134,12 +135,20 @@ class OpenAICompatibleAdapter:
         if mode not in {"json_schema", "json_object", "text_json"}:
             raise ProviderError(ProviderErrorCode.CAPABILITY_UNAVAILABLE)
         if mode == "json_schema":
+            try:
+                wire_schema = (
+                    qwen_wire_schema(schema)
+                    if self._operation.request.capabilities.schema_profile == QWEN_SCHEMA_PROFILE
+                    else schema
+                )
+            except (ValueError, TypeError, RecursionError):
+                raise ProviderError(ProviderErrorCode.CAPABILITY_UNAVAILABLE) from None
             body["response_format"] = {
                 "type": "json_schema",
                 "json_schema": {
                     "name": "edumind_result",
                     "strict": True,
-                    "schema": schema,
+                    "schema": wire_schema,
                 },
             }
         else:

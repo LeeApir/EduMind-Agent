@@ -148,6 +148,8 @@ class AuditedGateway:
             "policy_digest": active_policy_digest(),
             "prompt_version": REVIEW_V4_PROMPT,
         }
+        if self.recorder.request.capabilities.schema_profile != "full-v1":
+            config["schema_profile"] = self.recorder.request.capabilities.schema_profile
         return replace(
             result,
             transport_audit=TransportAudit(
@@ -232,7 +234,17 @@ class AttemptFailure(Exception):
 
 
 async def perform(
-    case, wire, *, endpoint, key, database_url, authorize, transport=None, resolver=None
+    case,
+    wire,
+    *,
+    endpoint,
+    key,
+    database_url,
+    authorize,
+    transport=None,
+    resolver=None,
+    schema_profile="full-v1",
+    audit_factory=None,
 ):
     """Caller must have durably reserved before calling. Connection authority is real."""
     # app.main registers all ORM relationships, never starts an app or reads a Provider key.
@@ -281,7 +293,7 @@ async def perform(
         version = int(view["config_version"])
         # Normalized target is used by the real ConnectionOperation, and by exact-wire validation.
         normalized = str(view["base_url"])
-        audit = ExactTransport(wire, normalized, transport)
+        audit = (audit_factory or ExactTransport)(wire, normalized, transport)
         op_id = uuid4()
         handle = await registry.register(
             TemporaryBinding(uid, session_hash, cid, version, op_id, "connection_test", MODEL),
@@ -299,6 +311,7 @@ async def perform(
             structured_transport="json_schema",
             output_token_parameter="max_completion_tokens",
             thinking_enabled=False,
+            schema_profile=schema_profile,
         )
         request = DispatchRequest(
             owner,
@@ -397,6 +410,8 @@ async def perform(
                     )
     if failure is not None:
         failure["cleanup"] = cleanup
+        if audit is not None and hasattr(audit, "error_diagnosis"):
+            failure["provider_error"] = audit.error_diagnosis
         raise AttemptFailure(failure) from None
     result["cleanup"] = cleanup
     return result

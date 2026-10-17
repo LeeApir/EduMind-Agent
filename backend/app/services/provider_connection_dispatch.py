@@ -84,6 +84,7 @@ class ModelCapabilities:
     output_token_parameter: str = "max_tokens"
     thinking_enabled: bool | None = None
     include_stream_usage: bool = False
+    schema_profile: str = "full-v1"
 
     def __post_init__(self) -> None:
         if (
@@ -91,6 +92,7 @@ class ModelCapabilities:
             or self.structured_transport
             not in {"json_schema", "json_object", "text_json", "tool_schema"}
             or self.output_token_parameter not in {"max_tokens", "max_completion_tokens"}
+            or self.schema_profile not in {"full-v1", "qwen-strict-20261017-v1"}
             or type(self.include_stream_usage) is not bool
             or any(
                 v is not None and type(v) is not bool
