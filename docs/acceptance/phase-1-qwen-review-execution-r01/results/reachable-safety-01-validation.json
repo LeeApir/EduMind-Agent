@@ -1,0 +1,63 @@
+{
+  "version": "qwen-real-failure-validation-01-v1",
+  "baseline": "deac242",
+  "proposal_sha256": "d7561f3d18c17ce93973a739d893a7ce4c1a077174f3c3618405375ff0925438",
+  "actual_command": "backend/.venv/bin/python /tmp/edumind_qwen_first_once.py -> scripts/run_qwen_review.py --run-one (dedicated test DB env supplied without printing credentials)",
+  "exit_code": 2,
+  "status": "CANDIDATE_ELIMINATED_TECHNICAL_FAILURE",
+  "provider_calls": 1,
+  "http_status": 400,
+  "normalized_error": "CAPABILITY_UNAVAILABLE",
+  "usage_known": false,
+  "actual_fee_known": false,
+  "attempt_reserved_micro_cny": 13420260,
+  "remaining_reservation_not_reusable_micro_cny": 147651000,
+  "snapshot": {
+    "manifest_sha256": "f18895d4eecadcdc1ff6899a93cec6a40f3f3eb21ddf97d6e3813fc4b879fb5a",
+    "halted": "CAPABILITY_UNAVAILABLE",
+    "attempts": [
+      [
+        1,
+        "reachable-safety:candidate",
+        "probe",
+        "f8c155fadaa9bce315f8ddceeb0d87dc05fc620daa7029088a6be0974d70f395",
+        "0c503bda442a2f8e37a1b7815532b0c8fbe8129ac77f58c2260abf052ce3a736",
+        13420260,
+        "failed",
+        null,
+        null,
+        "CAPABILITY_UNAVAILABLE"
+      ]
+    ],
+    "unattempted_slots": [
+      "fact-contradiction:candidate",
+      "gap-and-safety:candidate",
+      "trace-complete:candidate",
+      "generalization-search-positive",
+      "generalization-search-fact",
+      "generalization-search-safety",
+      "generalization-search-mixed",
+      "generalization-stack-positive",
+      "generalization-stack-fact",
+      "generalization-stack-safety",
+      "generalization-stack-mixed"
+    ]
+  },
+  "source_files_verified": 648,
+  "prior_acceptance_files_equal": 498,
+  "historical_ledgers_usage_and_halt_unchanged": 13,
+  "env_metadata_unchanged": true,
+  "private_files_mode": "0600",
+  "result_human_signed": false,
+  "semantic_and_citation_checks": "NOT_ASSESSABLE_NO_COMPLETE_REVIEW",
+  "checks": {
+    "workflow": "passed",
+    "legacy_archives": "236 verified",
+    "adr_contract": "12 documents/12 tasks valid",
+    "source_freeze": "648 verified via load",
+    "prior150mock_tests": "not rerun; unchanged baseline deac242"
+  },
+  "T040": "blocked",
+  "production_mode": "catalog_only",
+  "next": "Stop; no retry or new candidate. Root cause unknown beyond HTTP400. Any followup must first be zero-call evidence plan."
+}
