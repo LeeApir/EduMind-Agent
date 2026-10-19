@@ -116,6 +116,40 @@
       "provider_requests_authorized": 0,
       "production_mode": "catalog_only",
       "historical_failures": "T033与T040旧诊断原判定保持；新链不得作为旧路线第三轮或旧额度恢复。"
+    },
+    "review_binding_offline_planning": {
+      "source": "用户2026-10-19：保留审核分工建议、修复目标/路径/课程绑定、沉淀离线验收；所有步骤拆任务，不开发。",
+      "plan": "docs/acceptance/phase-1-review-binding-offline-plan.md",
+      "task_ids": [
+        "PHASE-1-T056",
+        "PHASE-1-T057",
+        "PHASE-1-T058",
+        "PHASE-1-T059",
+        "PHASE-1-T060",
+        "PHASE-1-T061",
+        "PHASE-1-T062",
+        "PHASE-1-T063",
+        "PHASE-1-T064",
+        "PHASE-1-T065",
+        "PHASE-1-T066",
+        "PHASE-1-T067",
+        "PHASE-1-T068",
+        "PHASE-1-T069",
+        "PHASE-1-T070"
+      ],
+      "authorization": "仅更新规划、PRD范围、活动账本和治理交接；新增任务不领取，不实施业务、迁移、API、测试运行器或付费验证。",
+      "adopted_principles": [
+        "资源审核按自身职责，整单元核完整需求与跨场景一致性；未知学情本身不阻止发布，具体依赖未知时保留未决。",
+        "所有实际事实/安全主张继续审核；硬门禁和严重reject优先；不增加自动全课重生。"
+      ],
+      "pending_design_decisions": [
+        "T056具体审核请求/结果/必检项与政策换版契约。",
+        "T060目标/推荐当前/实际教学节点的选择规则、API和持久化兼容。",
+        "T065固定C样本准入、隔离方案/资源限额与离线结果契约。"
+      ],
+      "future_execution": "后续用户明确授权开发后再按依赖串行领取；具体重大设计须批准，原更早持续授权不覆盖本次不开发指令。",
+      "new_provider_budget": 0,
+      "dynamic_gate": "T040仍blocked，新增T070前置；T041/T042继承门禁；不恢复任何旧停止运行、余额、标签或原审核结果。"
     }
   },
   "deferred_improvements": [
@@ -2247,7 +2281,8 @@
       "depends_on": [
         "PHASE-1-T035",
         "PHASE-1-T039",
-        "PHASE-1-T054"
+        "PHASE-1-T054",
+        "PHASE-1-T070"
       ],
       "scope": [
         "scripts/",
@@ -2941,6 +2976,560 @@
       "verification_results": [
         "零Provider完成goal-node-v2背景/主目标/配套范围与并列保守澄清，统一原因候选和持久错误，失败清理phase/deadline，前端不被恢复覆盖。原失败15文件对照c6374fa不变，相同原文新运行c9a4ac19解析linked-list-insertion且gateway尝试0，非课程全链路复测。独立PG54测试0跳过，前端195，Ruff6文件/mypy192/build/变更ESLint/OpenAPI/流程/236归档/ADR12文档12契约通过；保留首轮17环境失败及1前端回归并说明修正，未削弱断言。证据docs/acceptance/phase-1-goal-scope-r01。T040仍blocked/catalog_only；不包含未跟踪OM材料。"
       ]
+    },
+    {
+      "id": "PHASE-1-T056",
+      "phase": "Phase 1",
+      "title": "冻结分层审核职责与未知学情契约",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1-T054",
+        "PHASE-1-T055"
+      ],
+      "scope": [
+        "docs/ADR/",
+        "docs/agents/",
+        "docs/acceptance/",
+        "docs/PRD.md"
+      ],
+      "prd_source": "PRD §0.3；用户2026-10-19采纳审核分工并要求三部分仅拆任务；docs/acceptance/phase-1-review-binding-offline-plan.md",
+      "acceptance_criteria": [
+        "依据ADR-0015/0016形成可审查补充设计，明确讲解/代码/练习的自身职责与整单元完整需求覆盖；全量实际事实/安全陈述不因职责分工豁免。",
+        "区分原始需求、计划分工、跨场景待核验事项与真正未决；计划不得缩小原始需求，资源自身缺承诺仍须报告，不因看不到兄弟资源推断整课缺失。",
+        "冻结未知学情规则：不凭缺少画像阻止发布，不推断掌握度或困难；无依据个性化陈述需修正，具体结论依赖未知/冲突事实时才留未决。",
+        "明确必检ID/结果Schema是否变化、learner_fit与objectives的实际含义、政策版本和旧案失效，保留严重reject优先/硬门禁/四次审核/调用上限与原质量阈值。",
+        "形成正反例及批准入口；具体审核协议改变获用户批准后才可实施T057–T059，不把本次原则采纳冒充字段级设计批准。"
+      ],
+      "verification": [
+        "核对设计条款与ADR-0015、ADR-0016、PRD及正反例逐项对应，记录实际决定与批准范围。",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T056",
+      "execution_gate": "本次仅规划，未授权开发。后续获明确实施授权且依赖完成后领取；涉及审核契约/API/持久化/执行安全边界时须先取得对应具体设计批准；真实Provider与动态开放不在本批授权内。",
+      "verification_note": "验证命令是将来任务完成时必须实际执行的接口；新文件/CLI尚待建立，不代表本次已存在或通过。测试须禁止真实Provider；数据库验收用隔离真实PostgreSQL且不得以跳过冒充通过；编译/执行遵守T065已批准隔离方案。"
+    },
+    {
+      "id": "PHASE-1-T057",
+      "phase": "Phase 1",
+      "title": "让资源审核按场景职责判定覆盖",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1-T056"
+      ],
+      "scope": [
+        "backend/app/agents/hybrid_resource_review.py",
+        "backend/app/agents/review_input.py",
+        "backend/app/agents/review_delivery.py",
+        "backend/app/services/learning_policy.py",
+        "backend/tests/",
+        "docs/agents/"
+      ],
+      "prd_source": "PRD §0.3；用户2026-10-19采纳审核分工并要求三部分仅拆任务；docs/acceptance/phase-1-review-binding-offline-plan.md",
+      "acceptance_criteria": [
+        "按T056批准契约发送服务端绑定的资源角色/自身目标和整课待核验责任，完整用户原文及计划承诺保持，候选不能覆盖职责或审核规则。",
+        "资源objectives检查自身承诺，不因完整程序/练习分配给兄弟场景而制造覆盖未决；自身承诺真实缺失或所需前提未知仍报告。",
+        "讲解/练习内真实代码及安全主张完整检查，保留事实、失败路径、证据锚点和无修复建议规则；不通过裁掉内容/误标已检查来取得pass。",
+        "配对回归覆盖分工合理、自身缺失、计划漏分配用户要求、跨载体支持及片段安全缺陷；政策换版依批准规则处理新旧案，历史记录不改。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/pytest -q tests/test_resource_review_responsibilities.py tests/test_review_input.py tests/test_hybrid_resource_review.py",
+        "cd backend && .venv/bin/ruff check app tests && .venv/bin/mypy app",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T057",
+      "execution_gate": "本次仅规划，未授权开发。后续获明确实施授权且依赖完成后领取；涉及审核契约/API/持久化/执行安全边界时须先取得对应具体设计批准；真实Provider与动态开放不在本批授权内。",
+      "verification_note": "验证命令是将来任务完成时必须实际执行的接口；新文件/CLI尚待建立，不代表本次已存在或通过。测试须禁止真实Provider；数据库验收用隔离真实PostgreSQL且不得以跳过冒充通过；编译/执行遵守T065已批准隔离方案。"
+    },
+    {
+      "id": "PHASE-1-T058",
+      "phase": "Phase 1",
+      "title": "按学情证据检查个性化陈述而不误拦截未知",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1-T057"
+      ],
+      "scope": [
+        "backend/app/agents/",
+        "backend/app/services/shared_plan_inputs.py",
+        "backend/app/services/learning_policy.py",
+        "backend/tests/",
+        "docs/agents/"
+      ],
+      "prd_source": "PRD §0.3；用户2026-10-19采纳审核分工并要求三部分仅拆任务；docs/acceptance/phase-1-review-binding-offline-plan.md",
+      "acceptance_criteria": [
+        "按T056契约检查有据背景/约束与个性化陈述；未知字段和用户自述学习经历不升格为已掌握、特定困难或偏好。",
+        "无错题/画像、明确初学背景、课程清楚说明先修条件不能单独触发待人工；不是省略learner_fit或填造证据，而是按明确范围检查无编造和约束一致。",
+        "无证据的你经常混淆等实际陈述须修正；确实依赖缺失/冲突学情的具体判断保留未决及影响，已知明确约束不得忽略。",
+        "正反例覆盖无画像、用户自述、编造掌握/困难、证据冲突和真正不可判断；脚本化审核通过不计真实模型质量。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/pytest -q tests/test_learner_evidence_review.py tests/test_shared_learning_plan.py tests/test_review_input.py",
+        "cd backend && .venv/bin/ruff check app tests && .venv/bin/mypy app",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T058",
+      "execution_gate": "本次仅规划，未授权开发。后续获明确实施授权且依赖完成后领取；涉及审核契约/API/持久化/执行安全边界时须先取得对应具体设计批准；真实Provider与动态开放不在本批授权内。",
+      "verification_note": "验证命令是将来任务完成时必须实际执行的接口；新文件/CLI尚待建立，不代表本次已存在或通过。测试须禁止真实Provider；数据库验收用隔离真实PostgreSQL且不得以跳过冒充通过；编译/执行遵守T065已批准隔离方案。"
+    },
+    {
+      "id": "PHASE-1-T059",
+      "phase": "Phase 1",
+      "title": "整单元独立核验需求覆盖与跨场景发布资格",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1-T058"
+      ],
+      "scope": [
+        "backend/app/agents/unit_consistency_review.py",
+        "backend/app/agents/hybrid_resource_review.py",
+        "backend/app/services/hybrid_learning_publication.py",
+        "backend/app/services/learning_contract.schema.json",
+        "backend/tests/",
+        "docs/agents/"
+      ],
+      "prd_source": "PRD §0.3；用户2026-10-19采纳审核分工并要求三部分仅拆任务；docs/acceptance/phase-1-review-binding-offline-plan.md",
+      "acceptance_criteria": [
+        "按T056批准契约将原始需求/计划承诺的学生可见覆盖作为明确必检，完整三资源及动作在同一冻结单元上核验；资源pass和内部计划轨迹不能替代覆盖证据。",
+        "保留实现/过程教学/过程测量区分，聚合讲解/注释/关键步骤/解析且尊重明确时序；题目只问最终值、解析才教过程等缺口不得误放行。",
+        "跨场景检查接口/术语/表示/轨迹/答案/动作，free_list置空归属错误和接口混用须有可定位证据；纯覆盖缺口不伪造事实或安全类别。",
+        "全部资源自身职责通过与整单元通过才有自动资格；资源真实未决/严重reject不得被整课pass覆盖，硬门禁/取消/版本绑定和零全课重生循环保持。",
+        "真实隔离PG回归验证新政策新案、旧版/旧案件不可改写及原子发布；无Provider测试不解除动态门禁。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/pytest -q tests/test_unit_review_responsibilities.py tests/test_unit_consistency_review.py tests/test_hybrid_learning_publication.py",
+        "cd backend && .venv/bin/ruff check app tests && .venv/bin/mypy app",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T059",
+      "execution_gate": "本次仅规划，未授权开发。后续获明确实施授权且依赖完成后领取；涉及审核契约/API/持久化/执行安全边界时须先取得对应具体设计批准；真实Provider与动态开放不在本批授权内。",
+      "verification_note": "验证命令是将来任务完成时必须实际执行的接口；新文件/CLI尚待建立，不代表本次已存在或通过。测试须禁止真实Provider；数据库验收用隔离真实PostgreSQL且不得以跳过冒充通过；编译/执行遵守T065已批准隔离方案。"
+    },
+    {
+      "id": "PHASE-1-T060",
+      "phase": "Phase 1",
+      "title": "冻结目标与路径及实际教学节点绑定契约",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1-T059"
+      ],
+      "scope": [
+        "docs/ADR/",
+        "docs/api/",
+        "docs/PRD.md",
+        "docs/acceptance/"
+      ],
+      "prd_source": "PRD §0.3；用户2026-10-19采纳审核分工并要求三部分仅拆任务；docs/acceptance/phase-1-review-binding-offline-plan.md",
+      "acceptance_criteria": [
+        "区分用户目标节点、路径推荐当前节点、本次实际教学节点，依据现有PRD决定直接学目标/先学前置的选择与告知规则；不直接全局用target替换current。",
+        "明确背景学习经历不是已掌握；实际讲前置则目标/内容/元数据如实解释，实际讲目标则禁止标成前置，歧义继续澄清。",
+        "冻结输入快照→计划→三资源→发布→作答/掌握度→路径的节点来源和一致性检查，包含重解释/换目标/路径重排/历史版本及catalog兼容。",
+        "明确所需API字段、持久化/迁移和错误语义；旧错误测试数据不原地洗白，潜在历史错绑处置需具体规则，不静默改写掌握度。",
+        "产出可批准设计及正反例，具体API/数据/教学策略获用户批准后才实施T061–T064。"
+      ],
+      "verification": [
+        "逐项核对目标选择矩阵、节点传递矩阵、API/迁移影响与历史兼容，记录具体批准。",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T060",
+      "execution_gate": "本次仅规划，未授权开发。后续获明确实施授权且依赖完成后领取；涉及审核契约/API/持久化/执行安全边界时须先取得对应具体设计批准；真实Provider与动态开放不在本批授权内。",
+      "verification_note": "验证命令是将来任务完成时必须实际执行的接口；新文件/CLI尚待建立，不代表本次已存在或通过。测试须禁止真实Provider；数据库验收用隔离真实PostgreSQL且不得以跳过冒充通过；编译/执行遵守T065已批准隔离方案。"
+    },
+    {
+      "id": "PHASE-1-T061",
+      "phase": "Phase 1",
+      "title": "按实际教学节点生成同主题计划与内容",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1-T060"
+      ],
+      "scope": [
+        "backend/app/api/hybrid_learning.py",
+        "backend/app/services/shared_plan_inputs.py",
+        "backend/app/services/planned_learning_flow.py",
+        "backend/app/agents/",
+        "backend/tests/",
+        "docs/agents/"
+      ],
+      "prd_source": "PRD §0.3；用户2026-10-19采纳审核分工并要求三部分仅拆任务；docs/acceptance/phase-1-review-binding-offline-plan.md",
+      "acceptance_criteria": [
+        "按T060批准规则从解析结果和路径快照确定实际教学节点及相应本次教学目标，原始用户请求单独保留并绑定，禁止静默改写原文缩小覆盖。",
+        "实际教学节点对应的参考、前置关系、计划及生成上下文一致，不能以c-pointer元数据生成头插法正文；先学前置须按批准规则处理尚未交付的原目标。",
+        "同输入头插法、明确前置学习、目标等于当前、空当前节点、未知/无课程节点、并列歧义均回归；不能硬编码本样本或臆造已掌握。",
+        "使用禁止真实Provider的Gateway/固定输出验证输入链与安全失败，真实模型主题一致性留给新质量验收。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/pytest -q tests/test_teaching_node_selection.py tests/test_goal_node_resolver.py tests/test_shared_learning_plan.py tests/test_hybrid_learning_operations.py",
+        "cd backend && .venv/bin/ruff check app tests && .venv/bin/mypy app",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T061",
+      "execution_gate": "本次仅规划，未授权开发。后续获明确实施授权且依赖完成后领取；涉及审核契约/API/持久化/执行安全边界时须先取得对应具体设计批准；真实Provider与动态开放不在本批授权内。",
+      "verification_note": "验证命令是将来任务完成时必须实际执行的接口；新文件/CLI尚待建立，不代表本次已存在或通过。测试须禁止真实Provider；数据库验收用隔离真实PostgreSQL且不得以跳过冒充通过；编译/执行遵守T065已批准隔离方案。"
+    },
+    {
+      "id": "PHASE-1-T062",
+      "phase": "Phase 1",
+      "title": "在持久化与发布边界拒绝教学节点错绑",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1-T061"
+      ],
+      "scope": [
+        "backend/app/models/",
+        "backend/app/services/learning_plans.py",
+        "backend/app/services/planned_learning_flow.py",
+        "backend/app/services/hybrid_learning_publication.py",
+        "backend/app/services/unit_material.py",
+        "backend/alembic/",
+        "backend/tests/"
+      ],
+      "prd_source": "PRD §0.3；用户2026-10-19采纳审核分工并要求三部分仅拆任务；docs/acceptance/phase-1-review-binding-offline-plan.md",
+      "acceptance_criteria": [
+        "按批准契约约束操作输入、单元、计划、三资源与发布快照的实际教学节点、图谱版本和owner绑定一致；写入和发布均拒绝篡改/混配。",
+        "若T060决定需新字段/约束，提供Alembic迁移及真实PG往返；若无需迁移，明确说明并验证现有约束与服务检查，不能自行扩展持久化模型。",
+        "错绑、旧计划复用、换目标和重解释不会拼接跨节点/跨版本资源；失败保持旧完整发布，不开放部分新内容。",
+        "保留legacy/catalog资格与历史原件，历史错误绑定不静默改名或重算证据；新不变量不追认旧待审已通过。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/pytest -q tests/test_teaching_node_publication_binding.py tests/test_learning_plan_persistence.py tests/test_hybrid_learning_publication.py",
+        "在隔离PostgreSQL按T060批准迁移方案验证升级/降级及并发发布；无需迁移则记录依据。",
+        "cd backend && .venv/bin/ruff check app tests && .venv/bin/mypy app",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T062",
+      "execution_gate": "本次仅规划，未授权开发。后续获明确实施授权且依赖完成后领取；涉及审核契约/API/持久化/执行安全边界时须先取得对应具体设计批准；真实Provider与动态开放不在本批授权内。",
+      "verification_note": "验证命令是将来任务完成时必须实际执行的接口；新文件/CLI尚待建立，不代表本次已存在或通过。测试须禁止真实Provider；数据库验收用隔离真实PostgreSQL且不得以跳过冒充通过；编译/执行遵守T065已批准隔离方案。"
+    },
+    {
+      "id": "PHASE-1-T063",
+      "phase": "Phase 1",
+      "title": "按准确发布节点归属作答和掌握度证据",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1-T062"
+      ],
+      "scope": [
+        "backend/app/services/",
+        "backend/app/api/",
+        "backend/tests/",
+        "docs/mastery-rules-v1.md",
+        "docs/path-rules-v2.md"
+      ],
+      "prd_source": "PRD §0.3；用户2026-10-19采纳审核分工并要求三部分仅拆任务；docs/acceptance/phase-1-review-binding-offline-plan.md",
+      "acceptance_criteria": [
+        "作答/评分/掌握度依据owner可读的准确课程发布版本与题目绑定确定节点，不以最新路径current或用户目标覆盖已有发布归属。",
+        "先学前置只更新实际前置证据，直接学目标只更新实际目标；路径推荐使用真实证据，不把生成或看过课程当作掌握。",
+        "真实PG覆盖路径重排、换目标、历史版本、重解释、跨owner拒绝与重复作答去重；旧目录计分规则/已发布证据保持。",
+        "元数据错绑/不可读/撤回/待审内容不得形成新掌握度，不自动迁移或重算本次旧候选与历史学习记录。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/pytest -q tests/test_teaching_node_mastery_binding.py tests/test_mastery_updates.py tests/test_path_versions.py tests/test_expanded_learning_paths.py",
+        "cd backend && .venv/bin/ruff check app tests && .venv/bin/mypy app",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T063",
+      "execution_gate": "本次仅规划，未授权开发。后续获明确实施授权且依赖完成后领取；涉及审核契约/API/持久化/执行安全边界时须先取得对应具体设计批准；真实Provider与动态开放不在本批授权内。",
+      "verification_note": "验证命令是将来任务完成时必须实际执行的接口；新文件/CLI尚待建立，不代表本次已存在或通过。测试须禁止真实Provider；数据库验收用隔离真实PostgreSQL且不得以跳过冒充通过；编译/执行遵守T065已批准隔离方案。"
+    },
+    {
+      "id": "PHASE-1-T064",
+      "phase": "Phase 1",
+      "title": "一致展示目标和推荐节点与实际课程主题",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1-T063"
+      ],
+      "scope": [
+        "backend/app/api/",
+        "docs/api/openapi.yaml",
+        "web/src/",
+        "web/tests/",
+        "backend/tests/"
+      ],
+      "prd_source": "PRD §0.3；用户2026-10-19采纳审核分工并要求三部分仅拆任务；docs/acceptance/phase-1-review-binding-offline-plan.md",
+      "acceptance_criteria": [
+        "按T060已批准契约使REST/SSE/页面分别表达用户目标、路径推荐及实际教学主题，不把头插法正文标作指针课，先学前置时按规则明确理由。",
+        "刷新/重连/重解释读取同一准确发布快照；旧HTTP客户端/intro别名/catalog学习与待人工不显示未审正文的行为保持。",
+        "必要API字段与类型/OpenAPI一起交付，未知/缺失字段不靠前端猜节点；仅修复信息一致性，不新增课堂角色或图谱编辑功能。",
+        "零Provider后端集成、前端与浏览器回归验证直接学目标/先学前置/路径变化/旧发布读取及待人工，记录实际截图与结果。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/pytest -q tests/test_teaching_node_operations.py tests/test_hybrid_learning_operations.py",
+        "pnpm --dir web test --run tests/teaching-node-binding.spec.ts tests/hybrid-review-flow.spec.ts tests/paths.spec.ts",
+        "pnpm --dir web lint && pnpm --dir web typecheck && pnpm --dir web build",
+        "backend/.venv/bin/python web/tests/e2e/teaching_node_binding.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T064",
+      "execution_gate": "本次仅规划，未授权开发。后续获明确实施授权且依赖完成后领取；涉及审核契约/API/持久化/执行安全边界时须先取得对应具体设计批准；真实Provider与动态开放不在本批授权内。",
+      "verification_note": "验证命令是将来任务完成时必须实际执行的接口；新文件/CLI尚待建立，不代表本次已存在或通过。测试须禁止真实Provider；数据库验收用隔离真实PostgreSQL且不得以跳过冒充通过；编译/执行遵守T065已批准隔离方案。"
+    },
+    {
+      "id": "PHASE-1-T065",
+      "phase": "Phase 1",
+      "title": "冻结固定C样本离线验收的隔离与结果契约",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1-T064"
+      ],
+      "scope": [
+        "docs/ADR/",
+        "docs/acceptance/",
+        "docs/PRD.md"
+      ],
+      "prd_source": "PRD §0.3；用户2026-10-19采纳审核分工并要求三部分仅拆任务；docs/acceptance/phase-1-review-binding-offline-plan.md",
+      "acceptance_criteria": [
+        "限定本地维护者审阅并明确登记的固定C样本/驱动，绑定原件摘要、提取过程、接口检查规格及独立预期；不实现任意模型代码自动执行或学生线上运行。",
+        "冻结编译与执行的隔离、禁网、非特权、最小文件挂载、CPU/内存/进程/时间/输出上限、无凭据及清理规则；具体技术方案先批准，环境不可用不降级宿主直接执行。",
+        "冻结结果协议：样本/原件/驱动/规格/工具链/命令/参数/退出码/超时/stdout/stderr/分配释放证据及通过、失败、未运行/不支持的明确区分。",
+        "严格与普通编译、原程序与独立函数驱动、数值与格式、Sanitizer与显式跟踪分别报告；模型expected_output/计划轨迹不是真值，检查范围不得外推。",
+        "形成独立安全/数据契约批准入口后才实施T066–T069；离线结果不写模型pass、不代人工签核、不赋予正式发布资格。"
+      ],
+      "verification": [
+        "核对隔离威胁边界、固定样本准入、结果协议和环境失败行为，记录具体设计批准。",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T065",
+      "execution_gate": "本次仅规划，未授权开发。后续获明确实施授权且依赖完成后领取；涉及审核契约/API/持久化/执行安全边界时须先取得对应具体设计批准；真实Provider与动态开放不在本批授权内。",
+      "verification_note": "验证命令是将来任务完成时必须实际执行的接口；新文件/CLI尚待建立，不代表本次已存在或通过。测试须禁止真实Provider；数据库验收用隔离真实PostgreSQL且不得以跳过冒充通过；编译/执行遵守T065已批准隔离方案。"
+    },
+    {
+      "id": "PHASE-1-T066",
+      "phase": "Phase 1",
+      "title": "建立封存课程到固定离线样本的可追溯登记",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1-T065"
+      ],
+      "scope": [
+        "scripts/",
+        "scripts/tests/",
+        "docs/acceptance/"
+      ],
+      "prd_source": "PRD §0.3；用户2026-10-19采纳审核分工并要求三部分仅拆任务；docs/acceptance/phase-1-review-binding-offline-plan.md",
+      "acceptance_criteria": [
+        "按T065批准契约为EduMind r02和OM原件创建派生样本登记，绑定原输入/课程/source摘要、提取映射、驱动/检查规格版本及维护者审阅准入。",
+        "不修改reference证据；提取不自动补typedef、改签名或补末尾换行；原程序与独立函数驱动分开登记。",
+        "登记机制拒绝未审阅/未列入名单/摘要变更/越界路径/符号链接逃逸，不扫描并执行新生成内容；准入不是语义人工签核。",
+        "原始生成输出与独立预期/检查规格分开，标签仍按实际签核状态保存；来源变化需新登记，不覆盖原样本或旧成绩。"
+      ],
+      "verification": [
+        "backend/.venv/bin/python -m pytest -q scripts/tests/test_offline_c_fixture_manifest.py",
+        "backend/.venv/bin/python scripts/check_offline_c_fixtures.py --check",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T066",
+      "execution_gate": "本次仅规划，未授权开发。后续获明确实施授权且依赖完成后领取；涉及审核契约/API/持久化/执行安全边界时须先取得对应具体设计批准；真实Provider与动态开放不在本批授权内。",
+      "verification_note": "验证命令是将来任务完成时必须实际执行的接口；新文件/CLI尚待建立，不代表本次已存在或通过。测试须禁止真实Provider；数据库验收用隔离真实PostgreSQL且不得以跳过冒充通过；编译/执行遵守T065已批准隔离方案。"
+    },
+    {
+      "id": "PHASE-1-T067",
+      "phase": "Phase 1",
+      "title": "受限编译与运行固定C样本并核验输出",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1-T066"
+      ],
+      "scope": [
+        "scripts/",
+        "scripts/tests/",
+        "docs/acceptance/"
+      ],
+      "prd_source": "PRD §0.3；用户2026-10-19采纳审核分工并要求三部分仅拆任务；docs/acceptance/phase-1-review-binding-offline-plan.md",
+      "acceptance_criteria": [
+        "实现T065批准隔离方案的固定样本编译/运行入口，编译器及程序都受限；默认只处理批准清单，禁网/限额/输出限制与不传凭据可验证。",
+        "原字节严格编译和普通编译分别留证，编译失败不运行原程序，不静默修复或更换为驱动冒充通过。",
+        "正常运行对比独立登记的输出规格，精确字节与允许规范化的比较规则显式分列；模型expected_output仅作为待核对主张。",
+        "覆盖正常、编译失败、非零退出、超时、输出超限和隔离不可用；不可用记未运行并失败退出，不回退无隔离执行。",
+        "实际隔离运行保存工具链版本和证据；复现OM编译失败与EduMind严格失败/普通编译运行结果，不以Mock证明隔离或C程序通过。"
+      ],
+      "verification": [
+        "backend/.venv/bin/python -m pytest -q scripts/tests/test_offline_c_runner.py",
+        "backend/.venv/bin/python scripts/run_offline_c_checks.py --manifest docs/acceptance/offline-c-fixtures/manifest.json --suite compile-output --output /tmp/edumind-offline-c-compile-output",
+        "核对实际报告与独立预期一致；已知失败作为被检出缺陷保留，不记作原程序通过。",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T067",
+      "execution_gate": "本次仅规划，未授权开发。后续获明确实施授权且依赖完成后领取；涉及审核契约/API/持久化/执行安全边界时须先取得对应具体设计批准；真实Provider与动态开放不在本批授权内。",
+      "verification_note": "验证命令是将来任务完成时必须实际执行的接口；新文件/CLI尚待建立，不代表本次已存在或通过。测试须禁止真实Provider；数据库验收用隔离真实PostgreSQL且不得以跳过冒充通过；编译/执行遵守T065已批准隔离方案。"
+    },
+    {
+      "id": "PHASE-1-T068",
+      "phase": "Phase 1",
+      "title": "验证固定头插法的失败路径和内存所有权",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1-T067"
+      ],
+      "scope": [
+        "scripts/",
+        "scripts/tests/",
+        "docs/acceptance/"
+      ],
+      "prd_source": "PRD §0.3；用户2026-10-19采纳审核分工并要求三部分仅拆任务；docs/acceptance/phase-1-review-binding-offline-plan.md",
+      "acceptance_criteria": [
+        "对可编译且已登记的原main/函数驱动分别覆盖正常及malloc第1/2/3次失败，每个场景独立进程并遵守隔离/限额；OM原main保持编译失败，运行项记未运行及原因，不为凑场景数修改原件或用驱动替代。",
+        "逐次检查head返回/调用者接收、链的可达性和值序、成功分配与释放次数、重复释放及最终存活分配，不能只用进程退出或无Sanitizer报告判通过。",
+        "ASan/UBSan与显式分配跟踪分别记实际是否运行；未运行LeakSanitizer不声称已测；发生UB不推断必然崩溃或固定数值。",
+        "OM函数驱动与原main分别留证，不能让适配驱动掩盖接口不一致；EduMind失败返回旧head的正确路径保留，静默跳过插入的输出按实际情况报告。",
+        "派生反例覆盖丢链/错误赋值/NULL访问/重复释放，验证检查器能失败；仅说明本固定样本和故障位置，不声称证明任意代码安全。"
+      ],
+      "verification": [
+        "backend/.venv/bin/python -m pytest -q scripts/tests/test_offline_head_insertion_checks.py",
+        "backend/.venv/bin/python scripts/run_offline_c_checks.py --manifest docs/acceptance/offline-c-fixtures/manifest.json --suite ownership --output /tmp/edumind-offline-c-ownership",
+        "核对隔离真实执行中可编译样本的main/接口各正常及三次失败（共8场景）、派生负例及逐项跟踪；OM原main编译失败后运行项须未运行，函数驱动独立报告，不以Mock或改原件代实际检查。",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T068",
+      "execution_gate": "本次仅规划，未授权开发。后续获明确实施授权且依赖完成后领取；涉及审核契约/API/持久化/执行安全边界时须先取得对应具体设计批准；真实Provider与动态开放不在本批授权内。",
+      "verification_note": "验证命令是将来任务完成时必须实际执行的接口；新文件/CLI尚待建立，不代表本次已存在或通过。测试须禁止真实Provider；数据库验收用隔离真实PostgreSQL且不得以跳过冒充通过；编译/执行遵守T065已批准隔离方案。"
+    },
+    {
+      "id": "PHASE-1-T069",
+      "phase": "Phase 1",
+      "title": "统一离线检查证据并保持审核与发布边界",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1-T068"
+      ],
+      "scope": [
+        "scripts/",
+        "scripts/tests/",
+        "docs/acceptance/",
+        "docs/agents/"
+      ],
+      "prd_source": "PRD §0.3；用户2026-10-19采纳审核分工并要求三部分仅拆任务；docs/acceptance/phase-1-review-binding-offline-plan.md",
+      "acceptance_criteria": [
+        "为编译/输出/失败路径报告提供统一聚合入口，保存样本/工具链/检查规格/原件/驱动摘要、准确命令、结果及证据路径，拒绝缺失/篡改/跨样本混配。",
+        "检查器执行成功、样本检查通过、检出预期缺陷分别表达；失败/未运行/不支持保留，环境不可用或缺工具不计通过。",
+        "保留OM/EduMind原始失败及派生驱动边界；独立预期与模型主张分开，不补写历史审核pass或人工决定，不修改原件以获得通过。",
+        "工具只输出离线维护证据，不读Provider凭据/调用模型/写生产审核或发布数据库；集成方式明确为将来审核参考，不自动授予课程发布资格。",
+        "交付可复现离线操作文档和报告示例，故意篡改/缺证据的报告必须被校验器拒绝。"
+      ],
+      "verification": [
+        "backend/.venv/bin/python -m pytest -q scripts/tests/test_offline_c_evidence.py",
+        "backend/.venv/bin/python scripts/run_offline_c_checks.py --manifest docs/acceptance/offline-c-fixtures/manifest.json --suite all --output /tmp/edumind-offline-c-report",
+        "backend/.venv/bin/python scripts/check_offline_c_report.py --report /tmp/edumind-offline-c-report/report.json",
+        "按新文档完整执行两样本离线流程并检查原件摘要未变，报告中真实缺陷保持失败。",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T069",
+      "execution_gate": "本次仅规划，未授权开发。后续获明确实施授权且依赖完成后领取；涉及审核契约/API/持久化/执行安全边界时须先取得对应具体设计批准；真实Provider与动态开放不在本批授权内。",
+      "verification_note": "验证命令是将来任务完成时必须实际执行的接口；新文件/CLI尚待建立，不代表本次已存在或通过。测试须禁止真实Provider；数据库验收用隔离真实PostgreSQL且不得以跳过冒充通过；编译/执行遵守T065已批准隔离方案。"
+    },
+    {
+      "id": "PHASE-1-T070",
+      "phase": "Phase 1",
+      "title": "交付审核与节点绑定及离线检查的集成验收准备",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1-T069"
+      ],
+      "scope": [
+        "docs/acceptance/",
+        "backend/tests/",
+        "web/tests/",
+        "scripts/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD §0.3；用户2026-10-19采纳审核分工并要求三部分仅拆任务；docs/acceptance/phase-1-review-binding-offline-plan.md",
+      "acceptance_criteria": [
+        "零Provider验证新审核职责/未知学情/整单元覆盖与目标-教学节点-发布-作答-路径闭环，包含严重缺陷优先、目录/旧课堂/重解释/SSE取消恢复回归。",
+        "按批准隔离方案实际执行固定C样本验收并汇总证据，分别报告契约Mock、真实PG、浏览器和实际C检查；漏检/未运行/严格编译失败不混入通过项。",
+        "绑定新源码/政策/数据契约/正反例及独立标签状态，建立新的真实模型验证准备清单；旧冻结组合、停止账本、原候选和历史签核只读不刷新。",
+        "明确真实模型是否遵守职责、误拦截率/严重错误召回/性能仍待T040/T041；保留98%/95%/90%原阈值、人工不补自动分子，本任务不创建真实预算或调用。",
+        "交接遗留问题、实际验证命令/证据、待批准事项和T040准入所缺条件；T040原阻塞与catalog_only保持，不自动恢复旧余额或进入Phase 2/3。"
+      ],
+      "verification": [
+        "backend/.venv/bin/python scripts/check_review_binding_preparation.py --check",
+        "运行已建立的T057–T069相关零Provider测试及隔离真实PG/浏览器/C样本检查，保存实际命令与结果。",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T070",
+      "execution_gate": "本次仅规划，未授权开发。后续获明确实施授权且依赖完成后领取；涉及审核契约/API/持久化/执行安全边界时须先取得对应具体设计批准；真实Provider与动态开放不在本批授权内。",
+      "verification_note": "验证命令是将来任务完成时必须实际执行的接口；新文件/CLI尚待建立，不代表本次已存在或通过。测试须禁止真实Provider；数据库验收用隔离真实PostgreSQL且不得以跳过冒充通过；编译/执行遵守T065已批准隔离方案。"
     }
   ]
 }
