@@ -1,0 +1,2011 @@
+{
+  "version": "fixed-c-report-v1",
+  "run_id": "809c12a9a2f74b97b1b415146596e6ec",
+  "suite": "compile-output",
+  "provider_calls": 0,
+  "cases": [
+    {
+      "version": "fixed-c-offline-v1",
+      "run_id": "809c12a9a2f74b97b1b415146596e6ec",
+      "case_id": "strict",
+      "source_id": "edumind-r02-original",
+      "bindings": {
+        "package": "59020455441fb55d1231c1f6ef0ff75403ce633895d6c600c38119cd0f6a106b",
+        "source": "48f63b2689c128b89cc399fa9aab9fff377804d26ae42f5d7a1253879a2ba394",
+        "extraction": "ee4f6dac497e654191d311c6cea706536fcfe1a59ba9fd5e8857802f07533ea5",
+        "driver": null,
+        "spec": "f2f260a288bf483f25fab9c6dcdc9fa54d3f9eb1d34428b2109d95e3c01c8e5f",
+        "review_registry": "30bd79d824ca50eb7c4759cc8c6ed9d7406ecf2c3c9cf25ca880a841b7aa7a94",
+        "toolchain": "3a627ac9040b85a92a62c777fe2be5d221a3968480facfc72057392ef98b0f5f",
+        "controller": "86376274926ff21823452f2b4a1d2f2a49564542a3b3627f69781f99ebdc9bfa",
+        "baseline_commit": "a4990f53d4da00bc6fff346e1963e892ac9c0534"
+      },
+      "toolchain": {
+        "version": "fixed-c-toolchain-lock-v2",
+        "base": "manimcommunity/manim@sha256:89ab433ce59134a4dcf351deb2511e067ab354393c0bb7d1859f3e8f0b2406a3",
+        "image_id": "sha256:038613d332c25e0024cb00d03e9081f32fe355b62a77d94af87719b14337c917",
+        "platform": "linux/arm64",
+        "snapshot": "20260601T000000Z",
+        "approval": "docs/ADR/0019-toolchain-amendment-approval-20261019.json",
+        "approval_manifest_sha256": "366ab2dced7a7945ac9d47e56fff99a8f5fc0f8324728a4629249228cec034f5",
+        "controller": "scripts/offline_c_runtime/controller.py",
+        "controller_sha256": "86376274926ff21823452f2b4a1d2f2a49564542a3b3627f69781f99ebdc9bfa",
+        "dockerfile_sha256": "0b2a66a54447937413a94db3e19c8e3fd4773a727c67e237b08649ba735a1eca",
+        "packages_sha256": "3834746dcc855415ee7823d9e91025ccfdef18d5da5678961b7873fb0de27c40",
+        "metadata_sha256": "5388cdb904cdb6b1cd736151d6011cc050323e5608488c2cb37f23b5df5ad3ea",
+        "python": "3.14.7 (main, Aug  5 2026, 16:34:40) [GCC 14.2.0]",
+        "clang": "Debian clang version 19.1.7 (3+b1)\nTarget: aarch64-unknown-linux-gnu\nThread model: posix\nInstalledDir: /usr/lib/llvm-19/bin\n",
+        "linker": "GNU ld (GNU Binutils for Debian) 2.44\nCopyright (C) 2025 Free Software Foundation, Inc.\nThis program is free software; you may redistribute it under the terms of\nthe GNU General Public License version 3 or (at your option) a later version.\nThis program has absolutely no warranty.\n",
+        "runtime_versions": {
+          "libc6": "2.41-12+deb13u3",
+          "clang-19": "1:19.1.7-3+b1",
+          "libclang-rt-19-dev": "1:19.1.7-3+b1",
+          "binutils": "2.44-3"
+        },
+        "build_command": [
+          "docker",
+          "build",
+          "--network=none",
+          "--pull=false",
+          "--tag",
+          "edumind-fixed-c:t066-r02",
+          "/tmp/edumind-t066-toolchain-r02/build"
+        ],
+        "input_artifacts": {
+          "deb_count": 32,
+          "source_bytes": 0,
+          "credentials": 0
+        },
+        "signed_metadata": [
+          {
+            "filename": "snapshot.debian.org_archive_debian_20260601T000000Z_dists_trixie_InRelease",
+            "sha256": "71f2c66148e9e10b4a0c100985b28734704f61efca350519b09bb3a0aad4c771",
+            "bytes": 140415
+          },
+          {
+            "filename": "snapshot.debian.org_archive_debian_20260601T000000Z_dists_trixie_main_binary-arm64_Packages.lz4",
+            "sha256": "ba2a8f1fa69a6a21c8779e8060abd70093864c20f6180522e564e300238a9f6b",
+            "bytes": 20639789
+          }
+        ],
+        "sample_compilations": 0,
+        "sample_executions": 0,
+        "provider_calls": 0,
+        "qualification": "Actual identity/limits/readonly/network/timeout/output/cleanup probes passed; no C executed at lock time",
+        "preparation_note": "T067 adds only trusted fixed isolation probes; actual preflight passed; T066 lock remains unchanged.",
+        "packages_lock": "docs/acceptance/offline-c-toolchain-r02/packages.json"
+      },
+      "isolation": {
+        "effective": {
+          "NetworkMode": "none",
+          "IpcMode": "none",
+          "ReadonlyRootfs": true,
+          "Memory": 536870912,
+          "MemorySwap": 536870912,
+          "NanoCpus": 1000000000,
+          "PidsLimit": 64
+        },
+        "user": "10001:10001",
+        "cap_drop": [
+          "ALL"
+        ],
+        "security_opt": [
+          "no-new-privileges:true"
+        ],
+        "tmpfs": {
+          "/tmp": "rw,noexec,nosuid,nodev,size=16777216,uid=10001,gid=10001,mode=0700",
+          "/work": "rw,exec,nosuid,nodev,size=134217728,uid=10001,gid=10001,mode=0700"
+        },
+        "mounts": [
+          {
+            "Type": "bind",
+            "Destination": "/bundle",
+            "RW": false
+          }
+        ],
+        "inspect_sha256": "6c8f6bc964dd87812868a8641fc9a6b35079868ba99b2624c1e3ed7173c18980",
+        "oom": false,
+        "preflight_sha256": "cfec7fdc24d6f48232ec1af04bd53b134af77e8281df047feb2ba479e941b5e5",
+        "cleanup": "removed",
+        "container_argv": [
+          "docker",
+          "run",
+          "--name",
+          "edumind-fixed-c-e3d6f632ea094d8d9878a5725f650fb0",
+          "--pull=never",
+          "--network=none",
+          "--ipc=none",
+          "--user=10001:10001",
+          "--cap-drop=ALL",
+          "--security-opt=no-new-privileges:true",
+          "--read-only",
+          "--cpus=1",
+          "--memory=512m",
+          "--memory-swap=512m",
+          "--pids-limit=64",
+          "--ulimit=core=0:0",
+          "--ulimit=nofile=128:128",
+          "--ulimit=fsize=16777216:16777216",
+          "--tmpfs=/work:rw,exec,nosuid,nodev,size=134217728,uid=10001,gid=10001,mode=0700",
+          "--tmpfs=/tmp:rw,noexec,nosuid,nodev,size=16777216,uid=10001,gid=10001,mode=0700",
+          "--log-driver=none",
+          "--entrypoint=/usr/bin/env",
+          "--mount",
+          "type=bind,source=/var/folders/22/4lqw_x794jn65xl_95lkblkr0000gn/T/edumind-fixed-c-f6pg0nq6/bundle,target=/bundle,readonly",
+          "sha256:038613d332c25e0024cb00d03e9081f32fe355b62a77d94af87719b14337c917",
+          "-i",
+          "PATH=/usr/bin:/bin",
+          "HOME=/tmp",
+          "TMPDIR=/tmp",
+          "LANG=C",
+          "LC_ALL=C",
+          "ASAN_OPTIONS=detect_leaks=0:abort_on_error=1:symbolize=0",
+          "UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=0",
+          "/usr/local/bin/python3",
+          "-I",
+          "/opt/fixed-c/controller.py",
+          "edumind-r02-original",
+          "strict"
+        ]
+      },
+      "kind": "strict_compile",
+      "fault_at": null,
+      "commands": [
+        {
+          "argv": [
+            "/usr/bin/clang-19",
+            "-std=c11",
+            "-Wall",
+            "-Wextra",
+            "-Wpedantic",
+            "-Wnewline-eof",
+            "-Werror",
+            "/bundle/edumind/candidate.c",
+            "-o",
+            "/work/program"
+          ],
+          "cwd": "/work",
+          "env": {
+            "PATH": "/usr/bin:/bin",
+            "HOME": "/tmp",
+            "TMPDIR": "/tmp",
+            "LANG": "C",
+            "LC_ALL": "C",
+            "ASAN_OPTIONS": "detect_leaks=0:abort_on_error=1:symbolize=0",
+            "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=0"
+          },
+          "started_at": "2026-10-19T10:43:10.984252+00:00",
+          "ended_at": "2026-10-19T10:43:11.063922+00:00",
+          "duration_ms": 79,
+          "exit_code": 1,
+          "signal": null,
+          "timeout": false,
+          "output_limit": false,
+          "oom": false,
+          "stdout": {
+            "base64": "",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stderr": {
+            "base64": "L2J1bmRsZS9lZHVtaW5kL2NhbmRpZGF0ZS5jOjU5OjI6IGVycm9yOiBubyBuZXdsaW5lIGF0IGVuZCBvZiBmaWxlIFstV2Vycm9yLC1XbmV3bGluZS1lb2ZdCiAgIDU5IHwgfQogICAgICB8ICBeCjEgZXJyb3IgZ2VuZXJhdGVkLgo=",
+            "bytes": 131,
+            "sha256": "22b7029775e7d3785df843a60df8e67ca27fabacc7afc6df715d0db175de1eb5"
+          }
+        }
+      ],
+      "status": "fail",
+      "reason": "compile_error",
+      "observations": {
+        "numeric_sequence": null,
+        "format_exact": null,
+        "attempts": null,
+        "allocated": null,
+        "released": null,
+        "live": null,
+        "per_insert_states": null,
+        "free_call_sequence": null,
+        "caller_head_reset": null,
+        "asan": "not_run",
+        "ubsan": "not_run",
+        "lsan": "not_run"
+      },
+      "expected_observation_matched": true,
+      "scope_limitations": [
+        "fixed original 1/2/3 main only",
+        "ordinary and strict results separate",
+        "LSan not run",
+        "model output not oracle",
+        "not a model review/pass or human signoff"
+      ]
+    },
+    {
+      "version": "fixed-c-offline-v1",
+      "run_id": "809c12a9a2f74b97b1b415146596e6ec",
+      "case_id": "ordinary",
+      "source_id": "edumind-r02-original",
+      "bindings": {
+        "package": "59020455441fb55d1231c1f6ef0ff75403ce633895d6c600c38119cd0f6a106b",
+        "source": "48f63b2689c128b89cc399fa9aab9fff377804d26ae42f5d7a1253879a2ba394",
+        "extraction": "ee4f6dac497e654191d311c6cea706536fcfe1a59ba9fd5e8857802f07533ea5",
+        "driver": null,
+        "spec": "f2f260a288bf483f25fab9c6dcdc9fa54d3f9eb1d34428b2109d95e3c01c8e5f",
+        "review_registry": "30bd79d824ca50eb7c4759cc8c6ed9d7406ecf2c3c9cf25ca880a841b7aa7a94",
+        "toolchain": "3a627ac9040b85a92a62c777fe2be5d221a3968480facfc72057392ef98b0f5f",
+        "controller": "86376274926ff21823452f2b4a1d2f2a49564542a3b3627f69781f99ebdc9bfa",
+        "baseline_commit": "a4990f53d4da00bc6fff346e1963e892ac9c0534"
+      },
+      "toolchain": {
+        "version": "fixed-c-toolchain-lock-v2",
+        "base": "manimcommunity/manim@sha256:89ab433ce59134a4dcf351deb2511e067ab354393c0bb7d1859f3e8f0b2406a3",
+        "image_id": "sha256:038613d332c25e0024cb00d03e9081f32fe355b62a77d94af87719b14337c917",
+        "platform": "linux/arm64",
+        "snapshot": "20260601T000000Z",
+        "approval": "docs/ADR/0019-toolchain-amendment-approval-20261019.json",
+        "approval_manifest_sha256": "366ab2dced7a7945ac9d47e56fff99a8f5fc0f8324728a4629249228cec034f5",
+        "controller": "scripts/offline_c_runtime/controller.py",
+        "controller_sha256": "86376274926ff21823452f2b4a1d2f2a49564542a3b3627f69781f99ebdc9bfa",
+        "dockerfile_sha256": "0b2a66a54447937413a94db3e19c8e3fd4773a727c67e237b08649ba735a1eca",
+        "packages_sha256": "3834746dcc855415ee7823d9e91025ccfdef18d5da5678961b7873fb0de27c40",
+        "metadata_sha256": "5388cdb904cdb6b1cd736151d6011cc050323e5608488c2cb37f23b5df5ad3ea",
+        "python": "3.14.7 (main, Aug  5 2026, 16:34:40) [GCC 14.2.0]",
+        "clang": "Debian clang version 19.1.7 (3+b1)\nTarget: aarch64-unknown-linux-gnu\nThread model: posix\nInstalledDir: /usr/lib/llvm-19/bin\n",
+        "linker": "GNU ld (GNU Binutils for Debian) 2.44\nCopyright (C) 2025 Free Software Foundation, Inc.\nThis program is free software; you may redistribute it under the terms of\nthe GNU General Public License version 3 or (at your option) a later version.\nThis program has absolutely no warranty.\n",
+        "runtime_versions": {
+          "libc6": "2.41-12+deb13u3",
+          "clang-19": "1:19.1.7-3+b1",
+          "libclang-rt-19-dev": "1:19.1.7-3+b1",
+          "binutils": "2.44-3"
+        },
+        "build_command": [
+          "docker",
+          "build",
+          "--network=none",
+          "--pull=false",
+          "--tag",
+          "edumind-fixed-c:t066-r02",
+          "/tmp/edumind-t066-toolchain-r02/build"
+        ],
+        "input_artifacts": {
+          "deb_count": 32,
+          "source_bytes": 0,
+          "credentials": 0
+        },
+        "signed_metadata": [
+          {
+            "filename": "snapshot.debian.org_archive_debian_20260601T000000Z_dists_trixie_InRelease",
+            "sha256": "71f2c66148e9e10b4a0c100985b28734704f61efca350519b09bb3a0aad4c771",
+            "bytes": 140415
+          },
+          {
+            "filename": "snapshot.debian.org_archive_debian_20260601T000000Z_dists_trixie_main_binary-arm64_Packages.lz4",
+            "sha256": "ba2a8f1fa69a6a21c8779e8060abd70093864c20f6180522e564e300238a9f6b",
+            "bytes": 20639789
+          }
+        ],
+        "sample_compilations": 0,
+        "sample_executions": 0,
+        "provider_calls": 0,
+        "qualification": "Actual identity/limits/readonly/network/timeout/output/cleanup probes passed; no C executed at lock time",
+        "preparation_note": "T067 adds only trusted fixed isolation probes; actual preflight passed; T066 lock remains unchanged.",
+        "packages_lock": "docs/acceptance/offline-c-toolchain-r02/packages.json"
+      },
+      "isolation": {
+        "effective": {
+          "NetworkMode": "none",
+          "IpcMode": "none",
+          "ReadonlyRootfs": true,
+          "Memory": 536870912,
+          "MemorySwap": 536870912,
+          "NanoCpus": 1000000000,
+          "PidsLimit": 64
+        },
+        "user": "10001:10001",
+        "cap_drop": [
+          "ALL"
+        ],
+        "security_opt": [
+          "no-new-privileges:true"
+        ],
+        "tmpfs": {
+          "/tmp": "rw,noexec,nosuid,nodev,size=16777216,uid=10001,gid=10001,mode=0700",
+          "/work": "rw,exec,nosuid,nodev,size=134217728,uid=10001,gid=10001,mode=0700"
+        },
+        "mounts": [
+          {
+            "Type": "bind",
+            "Destination": "/bundle",
+            "RW": false
+          }
+        ],
+        "inspect_sha256": "47062c23bb45dcf72f6c974a75bd2aecd860c37815a9232f9b7f823751a0724a",
+        "oom": false,
+        "preflight_sha256": "cfec7fdc24d6f48232ec1af04bd53b134af77e8281df047feb2ba479e941b5e5",
+        "cleanup": "removed",
+        "container_argv": [
+          "docker",
+          "run",
+          "--name",
+          "edumind-fixed-c-cf4cd6c0fefa41759dfb93539cee60da",
+          "--pull=never",
+          "--network=none",
+          "--ipc=none",
+          "--user=10001:10001",
+          "--cap-drop=ALL",
+          "--security-opt=no-new-privileges:true",
+          "--read-only",
+          "--cpus=1",
+          "--memory=512m",
+          "--memory-swap=512m",
+          "--pids-limit=64",
+          "--ulimit=core=0:0",
+          "--ulimit=nofile=128:128",
+          "--ulimit=fsize=16777216:16777216",
+          "--tmpfs=/work:rw,exec,nosuid,nodev,size=134217728,uid=10001,gid=10001,mode=0700",
+          "--tmpfs=/tmp:rw,noexec,nosuid,nodev,size=16777216,uid=10001,gid=10001,mode=0700",
+          "--log-driver=none",
+          "--entrypoint=/usr/bin/env",
+          "--mount",
+          "type=bind,source=/var/folders/22/4lqw_x794jn65xl_95lkblkr0000gn/T/edumind-fixed-c-f6pg0nq6/bundle,target=/bundle,readonly",
+          "sha256:038613d332c25e0024cb00d03e9081f32fe355b62a77d94af87719b14337c917",
+          "-i",
+          "PATH=/usr/bin:/bin",
+          "HOME=/tmp",
+          "TMPDIR=/tmp",
+          "LANG=C",
+          "LC_ALL=C",
+          "ASAN_OPTIONS=detect_leaks=0:abort_on_error=1:symbolize=0",
+          "UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=0",
+          "/usr/local/bin/python3",
+          "-I",
+          "/opt/fixed-c/controller.py",
+          "edumind-r02-original",
+          "ordinary"
+        ]
+      },
+      "kind": "ordinary_compile",
+      "fault_at": null,
+      "commands": [
+        {
+          "argv": [
+            "/usr/bin/clang-19",
+            "-std=c11",
+            "-Wall",
+            "-Wextra",
+            "-Wpedantic",
+            "-Wnewline-eof",
+            "/bundle/edumind/candidate.c",
+            "-o",
+            "/work/program"
+          ],
+          "cwd": "/work",
+          "env": {
+            "PATH": "/usr/bin:/bin",
+            "HOME": "/tmp",
+            "TMPDIR": "/tmp",
+            "LANG": "C",
+            "LC_ALL": "C",
+            "ASAN_OPTIONS": "detect_leaks=0:abort_on_error=1:symbolize=0",
+            "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=0"
+          },
+          "started_at": "2026-10-19T10:43:11.383963+00:00",
+          "ended_at": "2026-10-19T10:43:11.420681+00:00",
+          "duration_ms": 36,
+          "exit_code": 0,
+          "signal": null,
+          "timeout": false,
+          "output_limit": false,
+          "oom": false,
+          "stdout": {
+            "base64": "",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stderr": {
+            "base64": "L2J1bmRsZS9lZHVtaW5kL2NhbmRpZGF0ZS5jOjU5OjI6IHdhcm5pbmc6IG5vIG5ld2xpbmUgYXQgZW5kIG9mIGZpbGUgWy1XbmV3bGluZS1lb2ZdCiAgIDU5IHwgfQogICAgICB8ICBeCjEgd2FybmluZyBnZW5lcmF0ZWQuCg==",
+            "bytes": 127,
+            "sha256": "e867022ff2e13b8a9fcba3c06f7f4495a6b1e55375a3403c4b399eb98f7d9624"
+          }
+        }
+      ],
+      "status": "pass",
+      "reason": "success",
+      "observations": {
+        "numeric_sequence": null,
+        "format_exact": null,
+        "attempts": null,
+        "allocated": null,
+        "released": null,
+        "live": null,
+        "per_insert_states": null,
+        "free_call_sequence": null,
+        "caller_head_reset": null,
+        "asan": "not_run",
+        "ubsan": "not_run",
+        "lsan": "not_run"
+      },
+      "expected_observation_matched": true,
+      "scope_limitations": [
+        "fixed original 1/2/3 main only",
+        "ordinary and strict results separate",
+        "LSan not run",
+        "model output not oracle",
+        "not a model review/pass or human signoff"
+      ]
+    },
+    {
+      "version": "fixed-c-offline-v1",
+      "run_id": "809c12a9a2f74b97b1b415146596e6ec",
+      "case_id": "normal",
+      "source_id": "edumind-r02-original",
+      "bindings": {
+        "package": "59020455441fb55d1231c1f6ef0ff75403ce633895d6c600c38119cd0f6a106b",
+        "source": "48f63b2689c128b89cc399fa9aab9fff377804d26ae42f5d7a1253879a2ba394",
+        "extraction": "ee4f6dac497e654191d311c6cea706536fcfe1a59ba9fd5e8857802f07533ea5",
+        "driver": null,
+        "spec": "f2f260a288bf483f25fab9c6dcdc9fa54d3f9eb1d34428b2109d95e3c01c8e5f",
+        "review_registry": "30bd79d824ca50eb7c4759cc8c6ed9d7406ecf2c3c9cf25ca880a841b7aa7a94",
+        "toolchain": "3a627ac9040b85a92a62c777fe2be5d221a3968480facfc72057392ef98b0f5f",
+        "controller": "86376274926ff21823452f2b4a1d2f2a49564542a3b3627f69781f99ebdc9bfa",
+        "baseline_commit": "a4990f53d4da00bc6fff346e1963e892ac9c0534"
+      },
+      "toolchain": {
+        "version": "fixed-c-toolchain-lock-v2",
+        "base": "manimcommunity/manim@sha256:89ab433ce59134a4dcf351deb2511e067ab354393c0bb7d1859f3e8f0b2406a3",
+        "image_id": "sha256:038613d332c25e0024cb00d03e9081f32fe355b62a77d94af87719b14337c917",
+        "platform": "linux/arm64",
+        "snapshot": "20260601T000000Z",
+        "approval": "docs/ADR/0019-toolchain-amendment-approval-20261019.json",
+        "approval_manifest_sha256": "366ab2dced7a7945ac9d47e56fff99a8f5fc0f8324728a4629249228cec034f5",
+        "controller": "scripts/offline_c_runtime/controller.py",
+        "controller_sha256": "86376274926ff21823452f2b4a1d2f2a49564542a3b3627f69781f99ebdc9bfa",
+        "dockerfile_sha256": "0b2a66a54447937413a94db3e19c8e3fd4773a727c67e237b08649ba735a1eca",
+        "packages_sha256": "3834746dcc855415ee7823d9e91025ccfdef18d5da5678961b7873fb0de27c40",
+        "metadata_sha256": "5388cdb904cdb6b1cd736151d6011cc050323e5608488c2cb37f23b5df5ad3ea",
+        "python": "3.14.7 (main, Aug  5 2026, 16:34:40) [GCC 14.2.0]",
+        "clang": "Debian clang version 19.1.7 (3+b1)\nTarget: aarch64-unknown-linux-gnu\nThread model: posix\nInstalledDir: /usr/lib/llvm-19/bin\n",
+        "linker": "GNU ld (GNU Binutils for Debian) 2.44\nCopyright (C) 2025 Free Software Foundation, Inc.\nThis program is free software; you may redistribute it under the terms of\nthe GNU General Public License version 3 or (at your option) a later version.\nThis program has absolutely no warranty.\n",
+        "runtime_versions": {
+          "libc6": "2.41-12+deb13u3",
+          "clang-19": "1:19.1.7-3+b1",
+          "libclang-rt-19-dev": "1:19.1.7-3+b1",
+          "binutils": "2.44-3"
+        },
+        "build_command": [
+          "docker",
+          "build",
+          "--network=none",
+          "--pull=false",
+          "--tag",
+          "edumind-fixed-c:t066-r02",
+          "/tmp/edumind-t066-toolchain-r02/build"
+        ],
+        "input_artifacts": {
+          "deb_count": 32,
+          "source_bytes": 0,
+          "credentials": 0
+        },
+        "signed_metadata": [
+          {
+            "filename": "snapshot.debian.org_archive_debian_20260601T000000Z_dists_trixie_InRelease",
+            "sha256": "71f2c66148e9e10b4a0c100985b28734704f61efca350519b09bb3a0aad4c771",
+            "bytes": 140415
+          },
+          {
+            "filename": "snapshot.debian.org_archive_debian_20260601T000000Z_dists_trixie_main_binary-arm64_Packages.lz4",
+            "sha256": "ba2a8f1fa69a6a21c8779e8060abd70093864c20f6180522e564e300238a9f6b",
+            "bytes": 20639789
+          }
+        ],
+        "sample_compilations": 0,
+        "sample_executions": 0,
+        "provider_calls": 0,
+        "qualification": "Actual identity/limits/readonly/network/timeout/output/cleanup probes passed; no C executed at lock time",
+        "preparation_note": "T067 adds only trusted fixed isolation probes; actual preflight passed; T066 lock remains unchanged.",
+        "packages_lock": "docs/acceptance/offline-c-toolchain-r02/packages.json"
+      },
+      "isolation": {
+        "effective": {
+          "NetworkMode": "none",
+          "IpcMode": "none",
+          "ReadonlyRootfs": true,
+          "Memory": 536870912,
+          "MemorySwap": 536870912,
+          "NanoCpus": 1000000000,
+          "PidsLimit": 64
+        },
+        "user": "10001:10001",
+        "cap_drop": [
+          "ALL"
+        ],
+        "security_opt": [
+          "no-new-privileges:true"
+        ],
+        "tmpfs": {
+          "/tmp": "rw,noexec,nosuid,nodev,size=16777216,uid=10001,gid=10001,mode=0700",
+          "/work": "rw,exec,nosuid,nodev,size=134217728,uid=10001,gid=10001,mode=0700"
+        },
+        "mounts": [
+          {
+            "Type": "bind",
+            "Destination": "/bundle",
+            "RW": false
+          }
+        ],
+        "inspect_sha256": "61e254770bc74721e4c46d85a48a3a77e1d0b50d920ac50bafd697603fafabbb",
+        "oom": false,
+        "preflight_sha256": "cfec7fdc24d6f48232ec1af04bd53b134af77e8281df047feb2ba479e941b5e5",
+        "cleanup": "removed",
+        "container_argv": [
+          "docker",
+          "run",
+          "--name",
+          "edumind-fixed-c-8ce1904848e84daea1190e8445f6303b",
+          "--pull=never",
+          "--network=none",
+          "--ipc=none",
+          "--user=10001:10001",
+          "--cap-drop=ALL",
+          "--security-opt=no-new-privileges:true",
+          "--read-only",
+          "--cpus=1",
+          "--memory=512m",
+          "--memory-swap=512m",
+          "--pids-limit=64",
+          "--ulimit=core=0:0",
+          "--ulimit=nofile=128:128",
+          "--ulimit=fsize=16777216:16777216",
+          "--tmpfs=/work:rw,exec,nosuid,nodev,size=134217728,uid=10001,gid=10001,mode=0700",
+          "--tmpfs=/tmp:rw,noexec,nosuid,nodev,size=16777216,uid=10001,gid=10001,mode=0700",
+          "--log-driver=none",
+          "--entrypoint=/usr/bin/env",
+          "--mount",
+          "type=bind,source=/var/folders/22/4lqw_x794jn65xl_95lkblkr0000gn/T/edumind-fixed-c-f6pg0nq6/bundle,target=/bundle,readonly",
+          "sha256:038613d332c25e0024cb00d03e9081f32fe355b62a77d94af87719b14337c917",
+          "-i",
+          "PATH=/usr/bin:/bin",
+          "HOME=/tmp",
+          "TMPDIR=/tmp",
+          "LANG=C",
+          "LC_ALL=C",
+          "ASAN_OPTIONS=detect_leaks=0:abort_on_error=1:symbolize=0",
+          "UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=0",
+          "/usr/local/bin/python3",
+          "-I",
+          "/opt/fixed-c/controller.py",
+          "edumind-r02-original",
+          "normal"
+        ]
+      },
+      "kind": "original_main",
+      "fault_at": null,
+      "commands": [
+        {
+          "argv": [
+            "/usr/bin/clang-19",
+            "-std=c11",
+            "-Wall",
+            "-Wextra",
+            "-Wpedantic",
+            "-Wnewline-eof",
+            "/bundle/edumind/candidate.c",
+            "-o",
+            "/work/program"
+          ],
+          "cwd": "/work",
+          "env": {
+            "PATH": "/usr/bin:/bin",
+            "HOME": "/tmp",
+            "TMPDIR": "/tmp",
+            "LANG": "C",
+            "LC_ALL": "C",
+            "ASAN_OPTIONS": "detect_leaks=0:abort_on_error=1:symbolize=0",
+            "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=0"
+          },
+          "started_at": "2026-10-19T10:43:11.689352+00:00",
+          "ended_at": "2026-10-19T10:43:11.719185+00:00",
+          "duration_ms": 29,
+          "exit_code": 0,
+          "signal": null,
+          "timeout": false,
+          "output_limit": false,
+          "oom": false,
+          "stdout": {
+            "base64": "",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stderr": {
+            "base64": "L2J1bmRsZS9lZHVtaW5kL2NhbmRpZGF0ZS5jOjU5OjI6IHdhcm5pbmc6IG5vIG5ld2xpbmUgYXQgZW5kIG9mIGZpbGUgWy1XbmV3bGluZS1lb2ZdCiAgIDU5IHwgfQogICAgICB8ICBeCjEgd2FybmluZyBnZW5lcmF0ZWQuCg==",
+            "bytes": 127,
+            "sha256": "e867022ff2e13b8a9fcba3c06f7f4495a6b1e55375a3403c4b399eb98f7d9624"
+          }
+        },
+        {
+          "argv": [
+            "/work/program"
+          ],
+          "cwd": "/work",
+          "env": {
+            "PATH": "/usr/bin:/bin",
+            "HOME": "/tmp",
+            "TMPDIR": "/tmp",
+            "LANG": "C",
+            "LC_ALL": "C",
+            "ASAN_OPTIONS": "detect_leaks=0:abort_on_error=1:symbolize=0",
+            "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=0"
+          },
+          "started_at": "2026-10-19T10:43:11.719241+00:00",
+          "ended_at": "2026-10-19T10:43:11.723416+00:00",
+          "duration_ms": 4,
+          "exit_code": 0,
+          "signal": null,
+          "timeout": false,
+          "output_limit": false,
+          "oom": false,
+          "stdout": {
+            "base64": "MyAyIDEgCg==",
+            "bytes": 7,
+            "sha256": "16b3499450b7437bf19ddc009f735924ca60f7080ae18b1960e51eeae762990d"
+          },
+          "stderr": {
+            "base64": "",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        }
+      ],
+      "status": "pass",
+      "reason": "success",
+      "observations": {
+        "numeric_sequence": [
+          3,
+          2,
+          1
+        ],
+        "format_exact": {
+          "independent": true,
+          "model_claim": false
+        },
+        "attempts": null,
+        "allocated": null,
+        "released": null,
+        "live": null,
+        "per_insert_states": null,
+        "free_call_sequence": null,
+        "caller_head_reset": null,
+        "asan": "not_run",
+        "ubsan": "not_run",
+        "lsan": "not_run"
+      },
+      "expected_observation_matched": true,
+      "scope_limitations": [
+        "fixed original 1/2/3 main only",
+        "ordinary and strict results separate",
+        "LSan not run",
+        "model output not oracle",
+        "not a model review/pass or human signoff"
+      ]
+    },
+    {
+      "version": "fixed-c-offline-v1",
+      "run_id": "809c12a9a2f74b97b1b415146596e6ec",
+      "case_id": "sanitized-normal",
+      "source_id": "edumind-r02-original",
+      "bindings": {
+        "package": "59020455441fb55d1231c1f6ef0ff75403ce633895d6c600c38119cd0f6a106b",
+        "source": "48f63b2689c128b89cc399fa9aab9fff377804d26ae42f5d7a1253879a2ba394",
+        "extraction": "ee4f6dac497e654191d311c6cea706536fcfe1a59ba9fd5e8857802f07533ea5",
+        "driver": null,
+        "spec": "f2f260a288bf483f25fab9c6dcdc9fa54d3f9eb1d34428b2109d95e3c01c8e5f",
+        "review_registry": "30bd79d824ca50eb7c4759cc8c6ed9d7406ecf2c3c9cf25ca880a841b7aa7a94",
+        "toolchain": "3a627ac9040b85a92a62c777fe2be5d221a3968480facfc72057392ef98b0f5f",
+        "controller": "86376274926ff21823452f2b4a1d2f2a49564542a3b3627f69781f99ebdc9bfa",
+        "baseline_commit": "a4990f53d4da00bc6fff346e1963e892ac9c0534"
+      },
+      "toolchain": {
+        "version": "fixed-c-toolchain-lock-v2",
+        "base": "manimcommunity/manim@sha256:89ab433ce59134a4dcf351deb2511e067ab354393c0bb7d1859f3e8f0b2406a3",
+        "image_id": "sha256:038613d332c25e0024cb00d03e9081f32fe355b62a77d94af87719b14337c917",
+        "platform": "linux/arm64",
+        "snapshot": "20260601T000000Z",
+        "approval": "docs/ADR/0019-toolchain-amendment-approval-20261019.json",
+        "approval_manifest_sha256": "366ab2dced7a7945ac9d47e56fff99a8f5fc0f8324728a4629249228cec034f5",
+        "controller": "scripts/offline_c_runtime/controller.py",
+        "controller_sha256": "86376274926ff21823452f2b4a1d2f2a49564542a3b3627f69781f99ebdc9bfa",
+        "dockerfile_sha256": "0b2a66a54447937413a94db3e19c8e3fd4773a727c67e237b08649ba735a1eca",
+        "packages_sha256": "3834746dcc855415ee7823d9e91025ccfdef18d5da5678961b7873fb0de27c40",
+        "metadata_sha256": "5388cdb904cdb6b1cd736151d6011cc050323e5608488c2cb37f23b5df5ad3ea",
+        "python": "3.14.7 (main, Aug  5 2026, 16:34:40) [GCC 14.2.0]",
+        "clang": "Debian clang version 19.1.7 (3+b1)\nTarget: aarch64-unknown-linux-gnu\nThread model: posix\nInstalledDir: /usr/lib/llvm-19/bin\n",
+        "linker": "GNU ld (GNU Binutils for Debian) 2.44\nCopyright (C) 2025 Free Software Foundation, Inc.\nThis program is free software; you may redistribute it under the terms of\nthe GNU General Public License version 3 or (at your option) a later version.\nThis program has absolutely no warranty.\n",
+        "runtime_versions": {
+          "libc6": "2.41-12+deb13u3",
+          "clang-19": "1:19.1.7-3+b1",
+          "libclang-rt-19-dev": "1:19.1.7-3+b1",
+          "binutils": "2.44-3"
+        },
+        "build_command": [
+          "docker",
+          "build",
+          "--network=none",
+          "--pull=false",
+          "--tag",
+          "edumind-fixed-c:t066-r02",
+          "/tmp/edumind-t066-toolchain-r02/build"
+        ],
+        "input_artifacts": {
+          "deb_count": 32,
+          "source_bytes": 0,
+          "credentials": 0
+        },
+        "signed_metadata": [
+          {
+            "filename": "snapshot.debian.org_archive_debian_20260601T000000Z_dists_trixie_InRelease",
+            "sha256": "71f2c66148e9e10b4a0c100985b28734704f61efca350519b09bb3a0aad4c771",
+            "bytes": 140415
+          },
+          {
+            "filename": "snapshot.debian.org_archive_debian_20260601T000000Z_dists_trixie_main_binary-arm64_Packages.lz4",
+            "sha256": "ba2a8f1fa69a6a21c8779e8060abd70093864c20f6180522e564e300238a9f6b",
+            "bytes": 20639789
+          }
+        ],
+        "sample_compilations": 0,
+        "sample_executions": 0,
+        "provider_calls": 0,
+        "qualification": "Actual identity/limits/readonly/network/timeout/output/cleanup probes passed; no C executed at lock time",
+        "preparation_note": "T067 adds only trusted fixed isolation probes; actual preflight passed; T066 lock remains unchanged.",
+        "packages_lock": "docs/acceptance/offline-c-toolchain-r02/packages.json"
+      },
+      "isolation": {
+        "effective": {
+          "NetworkMode": "none",
+          "IpcMode": "none",
+          "ReadonlyRootfs": true,
+          "Memory": 536870912,
+          "MemorySwap": 536870912,
+          "NanoCpus": 1000000000,
+          "PidsLimit": 64
+        },
+        "user": "10001:10001",
+        "cap_drop": [
+          "ALL"
+        ],
+        "security_opt": [
+          "no-new-privileges:true"
+        ],
+        "tmpfs": {
+          "/tmp": "rw,noexec,nosuid,nodev,size=16777216,uid=10001,gid=10001,mode=0700",
+          "/work": "rw,exec,nosuid,nodev,size=134217728,uid=10001,gid=10001,mode=0700"
+        },
+        "mounts": [
+          {
+            "Type": "bind",
+            "Destination": "/bundle",
+            "RW": false
+          }
+        ],
+        "inspect_sha256": "1c1993f9055d44f3ab32f394b32c7d28333f5f88b82b4205e0533cffa4d38de0",
+        "oom": false,
+        "preflight_sha256": "cfec7fdc24d6f48232ec1af04bd53b134af77e8281df047feb2ba479e941b5e5",
+        "cleanup": "removed",
+        "container_argv": [
+          "docker",
+          "run",
+          "--name",
+          "edumind-fixed-c-35ff213e73fe465ca340f2f92f5a3832",
+          "--pull=never",
+          "--network=none",
+          "--ipc=none",
+          "--user=10001:10001",
+          "--cap-drop=ALL",
+          "--security-opt=no-new-privileges:true",
+          "--read-only",
+          "--cpus=1",
+          "--memory=512m",
+          "--memory-swap=512m",
+          "--pids-limit=64",
+          "--ulimit=core=0:0",
+          "--ulimit=nofile=128:128",
+          "--ulimit=fsize=16777216:16777216",
+          "--tmpfs=/work:rw,exec,nosuid,nodev,size=134217728,uid=10001,gid=10001,mode=0700",
+          "--tmpfs=/tmp:rw,noexec,nosuid,nodev,size=16777216,uid=10001,gid=10001,mode=0700",
+          "--log-driver=none",
+          "--entrypoint=/usr/bin/env",
+          "--mount",
+          "type=bind,source=/var/folders/22/4lqw_x794jn65xl_95lkblkr0000gn/T/edumind-fixed-c-f6pg0nq6/bundle,target=/bundle,readonly",
+          "sha256:038613d332c25e0024cb00d03e9081f32fe355b62a77d94af87719b14337c917",
+          "-i",
+          "PATH=/usr/bin:/bin",
+          "HOME=/tmp",
+          "TMPDIR=/tmp",
+          "LANG=C",
+          "LC_ALL=C",
+          "ASAN_OPTIONS=detect_leaks=0:abort_on_error=1:symbolize=0",
+          "UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=0",
+          "/usr/local/bin/python3",
+          "-I",
+          "/opt/fixed-c/controller.py",
+          "edumind-r02-original",
+          "sanitized-normal"
+        ]
+      },
+      "kind": "original_main",
+      "fault_at": null,
+      "commands": [
+        {
+          "argv": [
+            "/usr/bin/clang-19",
+            "-std=c11",
+            "-Wall",
+            "-Wextra",
+            "-Wpedantic",
+            "-Wnewline-eof",
+            "-O0",
+            "-g",
+            "-fno-omit-frame-pointer",
+            "-fsanitize=address,undefined",
+            "-fno-sanitize-recover=all",
+            "/bundle/edumind/candidate.c",
+            "-o",
+            "/work/program"
+          ],
+          "cwd": "/work",
+          "env": {
+            "PATH": "/usr/bin:/bin",
+            "HOME": "/tmp",
+            "TMPDIR": "/tmp",
+            "LANG": "C",
+            "LC_ALL": "C",
+            "ASAN_OPTIONS": "detect_leaks=0:abort_on_error=1:symbolize=0",
+            "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=0"
+          },
+          "started_at": "2026-10-19T10:43:12.005572+00:00",
+          "ended_at": "2026-10-19T10:43:12.069280+00:00",
+          "duration_ms": 63,
+          "exit_code": 0,
+          "signal": null,
+          "timeout": false,
+          "output_limit": false,
+          "oom": false,
+          "stdout": {
+            "base64": "",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stderr": {
+            "base64": "L2J1bmRsZS9lZHVtaW5kL2NhbmRpZGF0ZS5jOjU5OjI6IHdhcm5pbmc6IG5vIG5ld2xpbmUgYXQgZW5kIG9mIGZpbGUgWy1XbmV3bGluZS1lb2ZdCiAgIDU5IHwgfQogICAgICB8ICBeCjEgd2FybmluZyBnZW5lcmF0ZWQuCg==",
+            "bytes": 127,
+            "sha256": "e867022ff2e13b8a9fcba3c06f7f4495a6b1e55375a3403c4b399eb98f7d9624"
+          }
+        },
+        {
+          "argv": [
+            "/work/program"
+          ],
+          "cwd": "/work",
+          "env": {
+            "PATH": "/usr/bin:/bin",
+            "HOME": "/tmp",
+            "TMPDIR": "/tmp",
+            "LANG": "C",
+            "LC_ALL": "C",
+            "ASAN_OPTIONS": "detect_leaks=0:abort_on_error=1:symbolize=0",
+            "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=0"
+          },
+          "started_at": "2026-10-19T10:43:12.069328+00:00",
+          "ended_at": "2026-10-19T10:43:12.074477+00:00",
+          "duration_ms": 5,
+          "exit_code": 0,
+          "signal": null,
+          "timeout": false,
+          "output_limit": false,
+          "oom": false,
+          "stdout": {
+            "base64": "MyAyIDEgCg==",
+            "bytes": 7,
+            "sha256": "16b3499450b7437bf19ddc009f735924ca60f7080ae18b1960e51eeae762990d"
+          },
+          "stderr": {
+            "base64": "",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        }
+      ],
+      "status": "pass",
+      "reason": "success",
+      "observations": {
+        "numeric_sequence": [
+          3,
+          2,
+          1
+        ],
+        "format_exact": {
+          "independent": true,
+          "model_claim": false
+        },
+        "attempts": null,
+        "allocated": null,
+        "released": null,
+        "live": null,
+        "per_insert_states": null,
+        "free_call_sequence": null,
+        "caller_head_reset": null,
+        "asan": "ran; see exact exit/stderr, no report on this path",
+        "ubsan": "ran; see exact exit/stderr, no report on this path",
+        "lsan": "not_run"
+      },
+      "expected_observation_matched": true,
+      "scope_limitations": [
+        "fixed original 1/2/3 main only",
+        "ordinary and strict results separate",
+        "LSan not run",
+        "model output not oracle",
+        "not a model review/pass or human signoff"
+      ]
+    },
+    {
+      "version": "fixed-c-offline-v1",
+      "run_id": "809c12a9a2f74b97b1b415146596e6ec",
+      "case_id": "strict",
+      "source_id": "om-original",
+      "bindings": {
+        "package": "59020455441fb55d1231c1f6ef0ff75403ce633895d6c600c38119cd0f6a106b",
+        "source": "d7d6aa24f1fa5a7f03ed7075b8283bd34c4a1916acc7a5778d912a086673fe78",
+        "extraction": "ee4f6dac497e654191d311c6cea706536fcfe1a59ba9fd5e8857802f07533ea5",
+        "driver": null,
+        "spec": "f2f260a288bf483f25fab9c6dcdc9fa54d3f9eb1d34428b2109d95e3c01c8e5f",
+        "review_registry": "30bd79d824ca50eb7c4759cc8c6ed9d7406ecf2c3c9cf25ca880a841b7aa7a94",
+        "toolchain": "3a627ac9040b85a92a62c777fe2be5d221a3968480facfc72057392ef98b0f5f",
+        "controller": "86376274926ff21823452f2b4a1d2f2a49564542a3b3627f69781f99ebdc9bfa",
+        "baseline_commit": "a4990f53d4da00bc6fff346e1963e892ac9c0534"
+      },
+      "toolchain": {
+        "version": "fixed-c-toolchain-lock-v2",
+        "base": "manimcommunity/manim@sha256:89ab433ce59134a4dcf351deb2511e067ab354393c0bb7d1859f3e8f0b2406a3",
+        "image_id": "sha256:038613d332c25e0024cb00d03e9081f32fe355b62a77d94af87719b14337c917",
+        "platform": "linux/arm64",
+        "snapshot": "20260601T000000Z",
+        "approval": "docs/ADR/0019-toolchain-amendment-approval-20261019.json",
+        "approval_manifest_sha256": "366ab2dced7a7945ac9d47e56fff99a8f5fc0f8324728a4629249228cec034f5",
+        "controller": "scripts/offline_c_runtime/controller.py",
+        "controller_sha256": "86376274926ff21823452f2b4a1d2f2a49564542a3b3627f69781f99ebdc9bfa",
+        "dockerfile_sha256": "0b2a66a54447937413a94db3e19c8e3fd4773a727c67e237b08649ba735a1eca",
+        "packages_sha256": "3834746dcc855415ee7823d9e91025ccfdef18d5da5678961b7873fb0de27c40",
+        "metadata_sha256": "5388cdb904cdb6b1cd736151d6011cc050323e5608488c2cb37f23b5df5ad3ea",
+        "python": "3.14.7 (main, Aug  5 2026, 16:34:40) [GCC 14.2.0]",
+        "clang": "Debian clang version 19.1.7 (3+b1)\nTarget: aarch64-unknown-linux-gnu\nThread model: posix\nInstalledDir: /usr/lib/llvm-19/bin\n",
+        "linker": "GNU ld (GNU Binutils for Debian) 2.44\nCopyright (C) 2025 Free Software Foundation, Inc.\nThis program is free software; you may redistribute it under the terms of\nthe GNU General Public License version 3 or (at your option) a later version.\nThis program has absolutely no warranty.\n",
+        "runtime_versions": {
+          "libc6": "2.41-12+deb13u3",
+          "clang-19": "1:19.1.7-3+b1",
+          "libclang-rt-19-dev": "1:19.1.7-3+b1",
+          "binutils": "2.44-3"
+        },
+        "build_command": [
+          "docker",
+          "build",
+          "--network=none",
+          "--pull=false",
+          "--tag",
+          "edumind-fixed-c:t066-r02",
+          "/tmp/edumind-t066-toolchain-r02/build"
+        ],
+        "input_artifacts": {
+          "deb_count": 32,
+          "source_bytes": 0,
+          "credentials": 0
+        },
+        "signed_metadata": [
+          {
+            "filename": "snapshot.debian.org_archive_debian_20260601T000000Z_dists_trixie_InRelease",
+            "sha256": "71f2c66148e9e10b4a0c100985b28734704f61efca350519b09bb3a0aad4c771",
+            "bytes": 140415
+          },
+          {
+            "filename": "snapshot.debian.org_archive_debian_20260601T000000Z_dists_trixie_main_binary-arm64_Packages.lz4",
+            "sha256": "ba2a8f1fa69a6a21c8779e8060abd70093864c20f6180522e564e300238a9f6b",
+            "bytes": 20639789
+          }
+        ],
+        "sample_compilations": 0,
+        "sample_executions": 0,
+        "provider_calls": 0,
+        "qualification": "Actual identity/limits/readonly/network/timeout/output/cleanup probes passed; no C executed at lock time",
+        "preparation_note": "T067 adds only trusted fixed isolation probes; actual preflight passed; T066 lock remains unchanged.",
+        "packages_lock": "docs/acceptance/offline-c-toolchain-r02/packages.json"
+      },
+      "isolation": {
+        "effective": {
+          "NetworkMode": "none",
+          "IpcMode": "none",
+          "ReadonlyRootfs": true,
+          "Memory": 536870912,
+          "MemorySwap": 536870912,
+          "NanoCpus": 1000000000,
+          "PidsLimit": 64
+        },
+        "user": "10001:10001",
+        "cap_drop": [
+          "ALL"
+        ],
+        "security_opt": [
+          "no-new-privileges:true"
+        ],
+        "tmpfs": {
+          "/tmp": "rw,noexec,nosuid,nodev,size=16777216,uid=10001,gid=10001,mode=0700",
+          "/work": "rw,exec,nosuid,nodev,size=134217728,uid=10001,gid=10001,mode=0700"
+        },
+        "mounts": [
+          {
+            "Type": "bind",
+            "Destination": "/bundle",
+            "RW": false
+          }
+        ],
+        "inspect_sha256": "56b7ce6c9040b0a0457a94920b295c7643c8eee5678977b0a0290e423ac30504",
+        "oom": false,
+        "preflight_sha256": "cfec7fdc24d6f48232ec1af04bd53b134af77e8281df047feb2ba479e941b5e5",
+        "cleanup": "removed",
+        "container_argv": [
+          "docker",
+          "run",
+          "--name",
+          "edumind-fixed-c-b018cb6f4b6441fb8bcaa8db6fc16738",
+          "--pull=never",
+          "--network=none",
+          "--ipc=none",
+          "--user=10001:10001",
+          "--cap-drop=ALL",
+          "--security-opt=no-new-privileges:true",
+          "--read-only",
+          "--cpus=1",
+          "--memory=512m",
+          "--memory-swap=512m",
+          "--pids-limit=64",
+          "--ulimit=core=0:0",
+          "--ulimit=nofile=128:128",
+          "--ulimit=fsize=16777216:16777216",
+          "--tmpfs=/work:rw,exec,nosuid,nodev,size=134217728,uid=10001,gid=10001,mode=0700",
+          "--tmpfs=/tmp:rw,noexec,nosuid,nodev,size=16777216,uid=10001,gid=10001,mode=0700",
+          "--log-driver=none",
+          "--entrypoint=/usr/bin/env",
+          "--mount",
+          "type=bind,source=/var/folders/22/4lqw_x794jn65xl_95lkblkr0000gn/T/edumind-fixed-c-f6pg0nq6/bundle,target=/bundle,readonly",
+          "sha256:038613d332c25e0024cb00d03e9081f32fe355b62a77d94af87719b14337c917",
+          "-i",
+          "PATH=/usr/bin:/bin",
+          "HOME=/tmp",
+          "TMPDIR=/tmp",
+          "LANG=C",
+          "LC_ALL=C",
+          "ASAN_OPTIONS=detect_leaks=0:abort_on_error=1:symbolize=0",
+          "UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=0",
+          "/usr/local/bin/python3",
+          "-I",
+          "/opt/fixed-c/controller.py",
+          "om-original",
+          "strict"
+        ]
+      },
+      "kind": "strict_compile",
+      "fault_at": null,
+      "commands": [
+        {
+          "argv": [
+            "/usr/bin/clang-19",
+            "-std=c11",
+            "-Wall",
+            "-Wextra",
+            "-Wpedantic",
+            "-Wnewline-eof",
+            "-Werror",
+            "/bundle/om/original-program.c",
+            "-o",
+            "/work/program"
+          ],
+          "cwd": "/work",
+          "env": {
+            "PATH": "/usr/bin:/bin",
+            "HOME": "/tmp",
+            "TMPDIR": "/tmp",
+            "LANG": "C",
+            "LC_ALL": "C",
+            "ASAN_OPTIONS": "detect_leaks=0:abort_on_error=1:symbolize=0",
+            "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=0"
+          },
+          "started_at": "2026-10-19T10:43:12.357779+00:00",
+          "ended_at": "2026-10-19T10:43:12.377286+00:00",
+          "duration_ms": 19,
+          "exit_code": 1,
+          "signal": null,
+          "timeout": false,
+          "output_limit": false,
+          "oom": false,
+          "stdout": {
+            "base64": "",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stderr": {
+            "base64": "L2J1bmRsZS9vbS9vcmlnaW5hbC1wcm9ncmFtLmM6MTg6MTY6IGVycm9yOiBtdXN0IHVzZSAnc3RydWN0JyB0YWcgdG8gcmVmZXIgdG8gdHlwZSAnTm9kZScKICAgMTggfCB2b2lkIHByaW50TGlzdChOb2RlICpoZWFkKSB7CiAgICAgIHwgICAgICAgICAgICAgICAgXgogICAgICB8ICAgICAgICAgICAgICAgIHN0cnVjdCAKL2J1bmRsZS9vbS9vcmlnaW5hbC1wcm9ncmFtLmM6MTk6MzogZXJyb3I6IG11c3QgdXNlICdzdHJ1Y3QnIHRhZyB0byByZWZlciB0byB0eXBlICdOb2RlJwogICAxOSB8ICAgTm9kZSAqcCA9IGhlYWQ7CiAgICAgIHwgICBeCiAgICAgIHwgICBzdHJ1Y3QgCi9idW5kbGUvb20vb3JpZ2luYWwtcHJvZ3JhbS5jOjI3OjE1OiBlcnJvcjogbXVzdCB1c2UgJ3N0cnVjdCcgdGFnIHRvIHJlZmVyIHRvIHR5cGUgJ05vZGUnCiAgIDI3IHwgdm9pZCBmcmVlTGlzdChOb2RlICoqaGVhZCkgewogICAgICB8ICAgICAgICAgICAgICAgXgogICAgICB8ICAgICAgICAgICAgICAgc3RydWN0IAovYnVuZGxlL29tL29yaWdpbmFsLXByb2dyYW0uYzoyODozOiBlcnJvcjogbXVzdCB1c2UgJ3N0cnVjdCcgdGFnIHRvIHJlZmVyIHRvIHR5cGUgJ05vZGUnCiAgIDI4IHwgICBOb2RlICpwID0gKmhlYWQsICpuZXh0OwogICAgICB8ICAgXgogICAgICB8ICAgc3RydWN0IAovYnVuZGxlL29tL29yaWdpbmFsLXByb2dyYW0uYzozODozOiBlcnJvcjogbXVzdCB1c2UgJ3N0cnVjdCcgdGFnIHRvIHJlZmVyIHRvIHR5cGUgJ05vZGUnCiAgIDM4IHwgICBOb2RlICpoZWFkID0gTlVMTDsKICAgICAgfCAgIF4KICAgICAgfCAgIHN0cnVjdCAKL2J1bmRsZS9vbS9vcmlnaW5hbC1wcm9ncmFtLmM6Mzk6MjE6IGVycm9yOiBpbmNvbXBhdGlibGUgcG9pbnRlciB0eXBlcyBwYXNzaW5nICdOb2RlIConIHRvIHBhcmFtZXRlciBvZiB0eXBlICdzdHJ1Y3QgTm9kZSAqKic7IHRha2UgdGhlIGFkZHJlc3Mgd2l0aCAmIFstV2Vycm9yLC1XaW5jb21wYXRpYmxlLXBvaW50ZXItdHlwZXNdCiAgIDM5IHwgICBoZWFkID0gaW5zZXJ0SGVhZChoZWFkLCAxKTsKICAgICAgfCAgICAgICAgICAgICAgICAgICAgIF5+fn4KICAgICAgfCAgICAgICAgICAgICAgICAgICAgICYKL2J1bmRsZS9vbS9vcmlnaW5hbC1wcm9ncmFtLmM6MTI6MzE6IG5vdGU6IHBhc3NpbmcgYXJndW1lbnQgdG8gcGFyYW1ldGVyICdoZWFkJyBoZXJlCiAgIDEyIHwgdm9pZCBpbnNlcnRIZWFkKHN0cnVjdCBOb2RlICoqaGVhZCwgaW50IHZhbHVlKSB7IC8qIOKRoiDlpLTmj5IgKi8KICAgICAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCi9idW5kbGUvb20vb3JpZ2luYWwtcHJvZ3JhbS5jOjM5Ojg6IGVycm9yOiBhc3NpZ25pbmcgdG8gJ05vZGUgKicgZnJvbSBpbmNvbXBhdGlibGUgdHlwZSAndm9pZCcKICAgMzkgfCAgIGhlYWQgPSBpbnNlcnRIZWFkKGhlYWQsIDEpOwogICAgICB8ICAgICAgICBeIH5+fn5+fn5+fn5+fn5+fn5+fn4KL2J1bmRsZS9vbS9vcmlnaW5hbC1wcm9ncmFtLmM6NDA6MjE6IGVycm9yOiBpbmNvbXBhdGlibGUgcG9pbnRlciB0eXBlcyBwYXNzaW5nICdOb2RlIConIHRvIHBhcmFtZXRlciBvZiB0eXBlICdzdHJ1Y3QgTm9kZSAqKic7IHRha2UgdGhlIGFkZHJlc3Mgd2l0aCAmIFstV2Vycm9yLC1XaW5jb21wYXRpYmxlLXBvaW50ZXItdHlwZXNdCiAgIDQwIHwgICBoZWFkID0gaW5zZXJ0SGVhZChoZWFkLCAyKTsKICAgICAgfCAgICAgICAgICAgICAgICAgICAgIF5+fn4KICAgICAgfCAgICAgICAgICAgICAgICAgICAgICYKL2J1bmRsZS9vbS9vcmlnaW5hbC1wcm9ncmFtLmM6MTI6MzE6IG5vdGU6IHBhc3NpbmcgYXJndW1lbnQgdG8gcGFyYW1ldGVyICdoZWFkJyBoZXJlCiAgIDEyIHwgdm9pZCBpbnNlcnRIZWFkKHN0cnVjdCBOb2RlICoqaGVhZCwgaW50IHZhbHVlKSB7IC8qIOKRoiDlpLTmj5IgKi8KICAgICAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCi9idW5kbGUvb20vb3JpZ2luYWwtcHJvZ3JhbS5jOjQwOjg6IGVycm9yOiBhc3NpZ25pbmcgdG8gJ05vZGUgKicgZnJvbSBpbmNvbXBhdGlibGUgdHlwZSAndm9pZCcKICAgNDAgfCAgIGhlYWQgPSBpbnNlcnRIZWFkKGhlYWQsIDIpOwogICAgICB8ICAgICAgICBeIH5+fn5+fn5+fn5+fn5+fn5+fn4KL2J1bmRsZS9vbS9vcmlnaW5hbC1wcm9ncmFtLmM6NDE6MjE6IGVycm9yOiBpbmNvbXBhdGlibGUgcG9pbnRlciB0eXBlcyBwYXNzaW5nICdOb2RlIConIHRvIHBhcmFtZXRlciBvZiB0eXBlICdzdHJ1Y3QgTm9kZSAqKic7IHRha2UgdGhlIGFkZHJlc3Mgd2l0aCAmIFstV2Vycm9yLC1XaW5jb21wYXRpYmxlLXBvaW50ZXItdHlwZXNdCiAgIDQxIHwgICBoZWFkID0gaW5zZXJ0SGVhZChoZWFkLCAzKTsKICAgICAgfCAgICAgICAgICAgICAgICAgICAgIF5+fn4KICAgICAgfCAgICAgICAgICAgICAgICAgICAgICYKL2J1bmRsZS9vbS9vcmlnaW5hbC1wcm9ncmFtLmM6MTI6MzE6IG5vdGU6IHBhc3NpbmcgYXJndW1lbnQgdG8gcGFyYW1ldGVyICdoZWFkJyBoZXJlCiAgIDEyIHwgdm9pZCBpbnNlcnRIZWFkKHN0cnVjdCBOb2RlICoqaGVhZCwgaW50IHZhbHVlKSB7IC8qIOKRoiDlpLTmj5IgKi8KICAgICAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCi9idW5kbGUvb20vb3JpZ2luYWwtcHJvZ3JhbS5jOjQxOjg6IGVycm9yOiBhc3NpZ25pbmcgdG8gJ05vZGUgKicgZnJvbSBpbmNvbXBhdGlibGUgdHlwZSAndm9pZCcKICAgNDEgfCAgIGhlYWQgPSBpbnNlcnRIZWFkKGhlYWQsIDMpOwogICAgICB8ICAgICAgICBeIH5+fn5+fn5+fn5+fn5+fn5+fn4KMTEgZXJyb3JzIGdlbmVyYXRlZC4K",
+            "bytes": 2811,
+            "sha256": "9269a0e31c43f8ca49c825def42be4c69fe9ac86a8490db4a9654b954175ccbf"
+          }
+        }
+      ],
+      "status": "fail",
+      "reason": "compile_error",
+      "observations": {
+        "numeric_sequence": null,
+        "format_exact": null,
+        "attempts": null,
+        "allocated": null,
+        "released": null,
+        "live": null,
+        "per_insert_states": null,
+        "free_call_sequence": null,
+        "caller_head_reset": null,
+        "asan": "not_run",
+        "ubsan": "not_run",
+        "lsan": "not_run"
+      },
+      "expected_observation_matched": true,
+      "scope_limitations": [
+        "fixed original 1/2/3 main only",
+        "ordinary and strict results separate",
+        "LSan not run",
+        "model output not oracle",
+        "not a model review/pass or human signoff"
+      ]
+    },
+    {
+      "version": "fixed-c-offline-v1",
+      "run_id": "809c12a9a2f74b97b1b415146596e6ec",
+      "case_id": "ordinary",
+      "source_id": "om-original",
+      "bindings": {
+        "package": "59020455441fb55d1231c1f6ef0ff75403ce633895d6c600c38119cd0f6a106b",
+        "source": "d7d6aa24f1fa5a7f03ed7075b8283bd34c4a1916acc7a5778d912a086673fe78",
+        "extraction": "ee4f6dac497e654191d311c6cea706536fcfe1a59ba9fd5e8857802f07533ea5",
+        "driver": null,
+        "spec": "f2f260a288bf483f25fab9c6dcdc9fa54d3f9eb1d34428b2109d95e3c01c8e5f",
+        "review_registry": "30bd79d824ca50eb7c4759cc8c6ed9d7406ecf2c3c9cf25ca880a841b7aa7a94",
+        "toolchain": "3a627ac9040b85a92a62c777fe2be5d221a3968480facfc72057392ef98b0f5f",
+        "controller": "86376274926ff21823452f2b4a1d2f2a49564542a3b3627f69781f99ebdc9bfa",
+        "baseline_commit": "a4990f53d4da00bc6fff346e1963e892ac9c0534"
+      },
+      "toolchain": {
+        "version": "fixed-c-toolchain-lock-v2",
+        "base": "manimcommunity/manim@sha256:89ab433ce59134a4dcf351deb2511e067ab354393c0bb7d1859f3e8f0b2406a3",
+        "image_id": "sha256:038613d332c25e0024cb00d03e9081f32fe355b62a77d94af87719b14337c917",
+        "platform": "linux/arm64",
+        "snapshot": "20260601T000000Z",
+        "approval": "docs/ADR/0019-toolchain-amendment-approval-20261019.json",
+        "approval_manifest_sha256": "366ab2dced7a7945ac9d47e56fff99a8f5fc0f8324728a4629249228cec034f5",
+        "controller": "scripts/offline_c_runtime/controller.py",
+        "controller_sha256": "86376274926ff21823452f2b4a1d2f2a49564542a3b3627f69781f99ebdc9bfa",
+        "dockerfile_sha256": "0b2a66a54447937413a94db3e19c8e3fd4773a727c67e237b08649ba735a1eca",
+        "packages_sha256": "3834746dcc855415ee7823d9e91025ccfdef18d5da5678961b7873fb0de27c40",
+        "metadata_sha256": "5388cdb904cdb6b1cd736151d6011cc050323e5608488c2cb37f23b5df5ad3ea",
+        "python": "3.14.7 (main, Aug  5 2026, 16:34:40) [GCC 14.2.0]",
+        "clang": "Debian clang version 19.1.7 (3+b1)\nTarget: aarch64-unknown-linux-gnu\nThread model: posix\nInstalledDir: /usr/lib/llvm-19/bin\n",
+        "linker": "GNU ld (GNU Binutils for Debian) 2.44\nCopyright (C) 2025 Free Software Foundation, Inc.\nThis program is free software; you may redistribute it under the terms of\nthe GNU General Public License version 3 or (at your option) a later version.\nThis program has absolutely no warranty.\n",
+        "runtime_versions": {
+          "libc6": "2.41-12+deb13u3",
+          "clang-19": "1:19.1.7-3+b1",
+          "libclang-rt-19-dev": "1:19.1.7-3+b1",
+          "binutils": "2.44-3"
+        },
+        "build_command": [
+          "docker",
+          "build",
+          "--network=none",
+          "--pull=false",
+          "--tag",
+          "edumind-fixed-c:t066-r02",
+          "/tmp/edumind-t066-toolchain-r02/build"
+        ],
+        "input_artifacts": {
+          "deb_count": 32,
+          "source_bytes": 0,
+          "credentials": 0
+        },
+        "signed_metadata": [
+          {
+            "filename": "snapshot.debian.org_archive_debian_20260601T000000Z_dists_trixie_InRelease",
+            "sha256": "71f2c66148e9e10b4a0c100985b28734704f61efca350519b09bb3a0aad4c771",
+            "bytes": 140415
+          },
+          {
+            "filename": "snapshot.debian.org_archive_debian_20260601T000000Z_dists_trixie_main_binary-arm64_Packages.lz4",
+            "sha256": "ba2a8f1fa69a6a21c8779e8060abd70093864c20f6180522e564e300238a9f6b",
+            "bytes": 20639789
+          }
+        ],
+        "sample_compilations": 0,
+        "sample_executions": 0,
+        "provider_calls": 0,
+        "qualification": "Actual identity/limits/readonly/network/timeout/output/cleanup probes passed; no C executed at lock time",
+        "preparation_note": "T067 adds only trusted fixed isolation probes; actual preflight passed; T066 lock remains unchanged.",
+        "packages_lock": "docs/acceptance/offline-c-toolchain-r02/packages.json"
+      },
+      "isolation": {
+        "effective": {
+          "NetworkMode": "none",
+          "IpcMode": "none",
+          "ReadonlyRootfs": true,
+          "Memory": 536870912,
+          "MemorySwap": 536870912,
+          "NanoCpus": 1000000000,
+          "PidsLimit": 64
+        },
+        "user": "10001:10001",
+        "cap_drop": [
+          "ALL"
+        ],
+        "security_opt": [
+          "no-new-privileges:true"
+        ],
+        "tmpfs": {
+          "/tmp": "rw,noexec,nosuid,nodev,size=16777216,uid=10001,gid=10001,mode=0700",
+          "/work": "rw,exec,nosuid,nodev,size=134217728,uid=10001,gid=10001,mode=0700"
+        },
+        "mounts": [
+          {
+            "Type": "bind",
+            "Destination": "/bundle",
+            "RW": false
+          }
+        ],
+        "inspect_sha256": "329e8873adc9f06f3bae632fc19ff8df565917951644256036801dd2365e60ed",
+        "oom": false,
+        "preflight_sha256": "cfec7fdc24d6f48232ec1af04bd53b134af77e8281df047feb2ba479e941b5e5",
+        "cleanup": "removed",
+        "container_argv": [
+          "docker",
+          "run",
+          "--name",
+          "edumind-fixed-c-0b728ad5018040bd88927da0f70aa85a",
+          "--pull=never",
+          "--network=none",
+          "--ipc=none",
+          "--user=10001:10001",
+          "--cap-drop=ALL",
+          "--security-opt=no-new-privileges:true",
+          "--read-only",
+          "--cpus=1",
+          "--memory=512m",
+          "--memory-swap=512m",
+          "--pids-limit=64",
+          "--ulimit=core=0:0",
+          "--ulimit=nofile=128:128",
+          "--ulimit=fsize=16777216:16777216",
+          "--tmpfs=/work:rw,exec,nosuid,nodev,size=134217728,uid=10001,gid=10001,mode=0700",
+          "--tmpfs=/tmp:rw,noexec,nosuid,nodev,size=16777216,uid=10001,gid=10001,mode=0700",
+          "--log-driver=none",
+          "--entrypoint=/usr/bin/env",
+          "--mount",
+          "type=bind,source=/var/folders/22/4lqw_x794jn65xl_95lkblkr0000gn/T/edumind-fixed-c-f6pg0nq6/bundle,target=/bundle,readonly",
+          "sha256:038613d332c25e0024cb00d03e9081f32fe355b62a77d94af87719b14337c917",
+          "-i",
+          "PATH=/usr/bin:/bin",
+          "HOME=/tmp",
+          "TMPDIR=/tmp",
+          "LANG=C",
+          "LC_ALL=C",
+          "ASAN_OPTIONS=detect_leaks=0:abort_on_error=1:symbolize=0",
+          "UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=0",
+          "/usr/local/bin/python3",
+          "-I",
+          "/opt/fixed-c/controller.py",
+          "om-original",
+          "ordinary"
+        ]
+      },
+      "kind": "ordinary_compile",
+      "fault_at": null,
+      "commands": [
+        {
+          "argv": [
+            "/usr/bin/clang-19",
+            "-std=c11",
+            "-Wall",
+            "-Wextra",
+            "-Wpedantic",
+            "-Wnewline-eof",
+            "/bundle/om/original-program.c",
+            "-o",
+            "/work/program"
+          ],
+          "cwd": "/work",
+          "env": {
+            "PATH": "/usr/bin:/bin",
+            "HOME": "/tmp",
+            "TMPDIR": "/tmp",
+            "LANG": "C",
+            "LC_ALL": "C",
+            "ASAN_OPTIONS": "detect_leaks=0:abort_on_error=1:symbolize=0",
+            "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=0"
+          },
+          "started_at": "2026-10-19T10:43:12.650132+00:00",
+          "ended_at": "2026-10-19T10:43:12.670219+00:00",
+          "duration_ms": 20,
+          "exit_code": 1,
+          "signal": null,
+          "timeout": false,
+          "output_limit": false,
+          "oom": false,
+          "stdout": {
+            "base64": "",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stderr": {
+            "base64": "L2J1bmRsZS9vbS9vcmlnaW5hbC1wcm9ncmFtLmM6MTg6MTY6IGVycm9yOiBtdXN0IHVzZSAnc3RydWN0JyB0YWcgdG8gcmVmZXIgdG8gdHlwZSAnTm9kZScKICAgMTggfCB2b2lkIHByaW50TGlzdChOb2RlICpoZWFkKSB7CiAgICAgIHwgICAgICAgICAgICAgICAgXgogICAgICB8ICAgICAgICAgICAgICAgIHN0cnVjdCAKL2J1bmRsZS9vbS9vcmlnaW5hbC1wcm9ncmFtLmM6MTk6MzogZXJyb3I6IG11c3QgdXNlICdzdHJ1Y3QnIHRhZyB0byByZWZlciB0byB0eXBlICdOb2RlJwogICAxOSB8ICAgTm9kZSAqcCA9IGhlYWQ7CiAgICAgIHwgICBeCiAgICAgIHwgICBzdHJ1Y3QgCi9idW5kbGUvb20vb3JpZ2luYWwtcHJvZ3JhbS5jOjI3OjE1OiBlcnJvcjogbXVzdCB1c2UgJ3N0cnVjdCcgdGFnIHRvIHJlZmVyIHRvIHR5cGUgJ05vZGUnCiAgIDI3IHwgdm9pZCBmcmVlTGlzdChOb2RlICoqaGVhZCkgewogICAgICB8ICAgICAgICAgICAgICAgXgogICAgICB8ICAgICAgICAgICAgICAgc3RydWN0IAovYnVuZGxlL29tL29yaWdpbmFsLXByb2dyYW0uYzoyODozOiBlcnJvcjogbXVzdCB1c2UgJ3N0cnVjdCcgdGFnIHRvIHJlZmVyIHRvIHR5cGUgJ05vZGUnCiAgIDI4IHwgICBOb2RlICpwID0gKmhlYWQsICpuZXh0OwogICAgICB8ICAgXgogICAgICB8ICAgc3RydWN0IAovYnVuZGxlL29tL29yaWdpbmFsLXByb2dyYW0uYzozODozOiBlcnJvcjogbXVzdCB1c2UgJ3N0cnVjdCcgdGFnIHRvIHJlZmVyIHRvIHR5cGUgJ05vZGUnCiAgIDM4IHwgICBOb2RlICpoZWFkID0gTlVMTDsKICAgICAgfCAgIF4KICAgICAgfCAgIHN0cnVjdCAKL2J1bmRsZS9vbS9vcmlnaW5hbC1wcm9ncmFtLmM6Mzk6MjE6IHdhcm5pbmc6IGluY29tcGF0aWJsZSBwb2ludGVyIHR5cGVzIHBhc3NpbmcgJ05vZGUgKicgdG8gcGFyYW1ldGVyIG9mIHR5cGUgJ3N0cnVjdCBOb2RlICoqJzsgdGFrZSB0aGUgYWRkcmVzcyB3aXRoICYgWy1XaW5jb21wYXRpYmxlLXBvaW50ZXItdHlwZXNdCiAgIDM5IHwgICBoZWFkID0gaW5zZXJ0SGVhZChoZWFkLCAxKTsKICAgICAgfCAgICAgICAgICAgICAgICAgICAgIF5+fn4KICAgICAgfCAgICAgICAgICAgICAgICAgICAgICYKL2J1bmRsZS9vbS9vcmlnaW5hbC1wcm9ncmFtLmM6MTI6MzE6IG5vdGU6IHBhc3NpbmcgYXJndW1lbnQgdG8gcGFyYW1ldGVyICdoZWFkJyBoZXJlCiAgIDEyIHwgdm9pZCBpbnNlcnRIZWFkKHN0cnVjdCBOb2RlICoqaGVhZCwgaW50IHZhbHVlKSB7IC8qIOKRoiDlpLTmj5IgKi8KICAgICAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCi9idW5kbGUvb20vb3JpZ2luYWwtcHJvZ3JhbS5jOjM5Ojg6IGVycm9yOiBhc3NpZ25pbmcgdG8gJ05vZGUgKicgZnJvbSBpbmNvbXBhdGlibGUgdHlwZSAndm9pZCcKICAgMzkgfCAgIGhlYWQgPSBpbnNlcnRIZWFkKGhlYWQsIDEpOwogICAgICB8ICAgICAgICBeIH5+fn5+fn5+fn5+fn5+fn5+fn4KL2J1bmRsZS9vbS9vcmlnaW5hbC1wcm9ncmFtLmM6NDA6MjE6IHdhcm5pbmc6IGluY29tcGF0aWJsZSBwb2ludGVyIHR5cGVzIHBhc3NpbmcgJ05vZGUgKicgdG8gcGFyYW1ldGVyIG9mIHR5cGUgJ3N0cnVjdCBOb2RlICoqJzsgdGFrZSB0aGUgYWRkcmVzcyB3aXRoICYgWy1XaW5jb21wYXRpYmxlLXBvaW50ZXItdHlwZXNdCiAgIDQwIHwgICBoZWFkID0gaW5zZXJ0SGVhZChoZWFkLCAyKTsKICAgICAgfCAgICAgICAgICAgICAgICAgICAgIF5+fn4KICAgICAgfCAgICAgICAgICAgICAgICAgICAgICYKL2J1bmRsZS9vbS9vcmlnaW5hbC1wcm9ncmFtLmM6MTI6MzE6IG5vdGU6IHBhc3NpbmcgYXJndW1lbnQgdG8gcGFyYW1ldGVyICdoZWFkJyBoZXJlCiAgIDEyIHwgdm9pZCBpbnNlcnRIZWFkKHN0cnVjdCBOb2RlICoqaGVhZCwgaW50IHZhbHVlKSB7IC8qIOKRoiDlpLTmj5IgKi8KICAgICAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCi9idW5kbGUvb20vb3JpZ2luYWwtcHJvZ3JhbS5jOjQwOjg6IGVycm9yOiBhc3NpZ25pbmcgdG8gJ05vZGUgKicgZnJvbSBpbmNvbXBhdGlibGUgdHlwZSAndm9pZCcKICAgNDAgfCAgIGhlYWQgPSBpbnNlcnRIZWFkKGhlYWQsIDIpOwogICAgICB8ICAgICAgICBeIH5+fn5+fn5+fn5+fn5+fn5+fn4KL2J1bmRsZS9vbS9vcmlnaW5hbC1wcm9ncmFtLmM6NDE6MjE6IHdhcm5pbmc6IGluY29tcGF0aWJsZSBwb2ludGVyIHR5cGVzIHBhc3NpbmcgJ05vZGUgKicgdG8gcGFyYW1ldGVyIG9mIHR5cGUgJ3N0cnVjdCBOb2RlICoqJzsgdGFrZSB0aGUgYWRkcmVzcyB3aXRoICYgWy1XaW5jb21wYXRpYmxlLXBvaW50ZXItdHlwZXNdCiAgIDQxIHwgICBoZWFkID0gaW5zZXJ0SGVhZChoZWFkLCAzKTsKICAgICAgfCAgICAgICAgICAgICAgICAgICAgIF5+fn4KICAgICAgfCAgICAgICAgICAgICAgICAgICAgICYKL2J1bmRsZS9vbS9vcmlnaW5hbC1wcm9ncmFtLmM6MTI6MzE6IG5vdGU6IHBhc3NpbmcgYXJndW1lbnQgdG8gcGFyYW1ldGVyICdoZWFkJyBoZXJlCiAgIDEyIHwgdm9pZCBpbnNlcnRIZWFkKHN0cnVjdCBOb2RlICoqaGVhZCwgaW50IHZhbHVlKSB7IC8qIOKRoiDlpLTmj5IgKi8KICAgICAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCi9idW5kbGUvb20vb3JpZ2luYWwtcHJvZ3JhbS5jOjQxOjg6IGVycm9yOiBhc3NpZ25pbmcgdG8gJ05vZGUgKicgZnJvbSBpbmNvbXBhdGlibGUgdHlwZSAndm9pZCcKICAgNDEgfCAgIGhlYWQgPSBpbnNlcnRIZWFkKGhlYWQsIDMpOwogICAgICB8ICAgICAgICBeIH5+fn5+fn5+fn5+fn5+fn5+fn4KMyB3YXJuaW5ncyBhbmQgOCBlcnJvcnMgZ2VuZXJhdGVkLgo=",
+            "bytes": 2807,
+            "sha256": "d07ae8d1df7a4e75bcb48aaf7c4090feaafa95b6dd6b94b4350a15b3d9df612a"
+          }
+        }
+      ],
+      "status": "fail",
+      "reason": "compile_error",
+      "observations": {
+        "numeric_sequence": null,
+        "format_exact": null,
+        "attempts": null,
+        "allocated": null,
+        "released": null,
+        "live": null,
+        "per_insert_states": null,
+        "free_call_sequence": null,
+        "caller_head_reset": null,
+        "asan": "not_run",
+        "ubsan": "not_run",
+        "lsan": "not_run"
+      },
+      "expected_observation_matched": true,
+      "scope_limitations": [
+        "fixed original 1/2/3 main only",
+        "ordinary and strict results separate",
+        "LSan not run",
+        "model output not oracle",
+        "not a model review/pass or human signoff"
+      ]
+    },
+    {
+      "version": "fixed-c-offline-v1",
+      "run_id": "809c12a9a2f74b97b1b415146596e6ec",
+      "case_id": "normal",
+      "source_id": "om-original",
+      "bindings": {
+        "package": "59020455441fb55d1231c1f6ef0ff75403ce633895d6c600c38119cd0f6a106b",
+        "source": "d7d6aa24f1fa5a7f03ed7075b8283bd34c4a1916acc7a5778d912a086673fe78",
+        "extraction": "ee4f6dac497e654191d311c6cea706536fcfe1a59ba9fd5e8857802f07533ea5",
+        "driver": null,
+        "spec": "f2f260a288bf483f25fab9c6dcdc9fa54d3f9eb1d34428b2109d95e3c01c8e5f",
+        "review_registry": "30bd79d824ca50eb7c4759cc8c6ed9d7406ecf2c3c9cf25ca880a841b7aa7a94",
+        "toolchain": "3a627ac9040b85a92a62c777fe2be5d221a3968480facfc72057392ef98b0f5f",
+        "controller": "86376274926ff21823452f2b4a1d2f2a49564542a3b3627f69781f99ebdc9bfa",
+        "baseline_commit": "a4990f53d4da00bc6fff346e1963e892ac9c0534"
+      },
+      "toolchain": {
+        "version": "fixed-c-toolchain-lock-v2",
+        "base": "manimcommunity/manim@sha256:89ab433ce59134a4dcf351deb2511e067ab354393c0bb7d1859f3e8f0b2406a3",
+        "image_id": "sha256:038613d332c25e0024cb00d03e9081f32fe355b62a77d94af87719b14337c917",
+        "platform": "linux/arm64",
+        "snapshot": "20260601T000000Z",
+        "approval": "docs/ADR/0019-toolchain-amendment-approval-20261019.json",
+        "approval_manifest_sha256": "366ab2dced7a7945ac9d47e56fff99a8f5fc0f8324728a4629249228cec034f5",
+        "controller": "scripts/offline_c_runtime/controller.py",
+        "controller_sha256": "86376274926ff21823452f2b4a1d2f2a49564542a3b3627f69781f99ebdc9bfa",
+        "dockerfile_sha256": "0b2a66a54447937413a94db3e19c8e3fd4773a727c67e237b08649ba735a1eca",
+        "packages_sha256": "3834746dcc855415ee7823d9e91025ccfdef18d5da5678961b7873fb0de27c40",
+        "metadata_sha256": "5388cdb904cdb6b1cd736151d6011cc050323e5608488c2cb37f23b5df5ad3ea",
+        "python": "3.14.7 (main, Aug  5 2026, 16:34:40) [GCC 14.2.0]",
+        "clang": "Debian clang version 19.1.7 (3+b1)\nTarget: aarch64-unknown-linux-gnu\nThread model: posix\nInstalledDir: /usr/lib/llvm-19/bin\n",
+        "linker": "GNU ld (GNU Binutils for Debian) 2.44\nCopyright (C) 2025 Free Software Foundation, Inc.\nThis program is free software; you may redistribute it under the terms of\nthe GNU General Public License version 3 or (at your option) a later version.\nThis program has absolutely no warranty.\n",
+        "runtime_versions": {
+          "libc6": "2.41-12+deb13u3",
+          "clang-19": "1:19.1.7-3+b1",
+          "libclang-rt-19-dev": "1:19.1.7-3+b1",
+          "binutils": "2.44-3"
+        },
+        "build_command": [
+          "docker",
+          "build",
+          "--network=none",
+          "--pull=false",
+          "--tag",
+          "edumind-fixed-c:t066-r02",
+          "/tmp/edumind-t066-toolchain-r02/build"
+        ],
+        "input_artifacts": {
+          "deb_count": 32,
+          "source_bytes": 0,
+          "credentials": 0
+        },
+        "signed_metadata": [
+          {
+            "filename": "snapshot.debian.org_archive_debian_20260601T000000Z_dists_trixie_InRelease",
+            "sha256": "71f2c66148e9e10b4a0c100985b28734704f61efca350519b09bb3a0aad4c771",
+            "bytes": 140415
+          },
+          {
+            "filename": "snapshot.debian.org_archive_debian_20260601T000000Z_dists_trixie_main_binary-arm64_Packages.lz4",
+            "sha256": "ba2a8f1fa69a6a21c8779e8060abd70093864c20f6180522e564e300238a9f6b",
+            "bytes": 20639789
+          }
+        ],
+        "sample_compilations": 0,
+        "sample_executions": 0,
+        "provider_calls": 0,
+        "qualification": "Actual identity/limits/readonly/network/timeout/output/cleanup probes passed; no C executed at lock time",
+        "preparation_note": "T067 adds only trusted fixed isolation probes; actual preflight passed; T066 lock remains unchanged.",
+        "packages_lock": "docs/acceptance/offline-c-toolchain-r02/packages.json"
+      },
+      "isolation": {
+        "effective": {
+          "NetworkMode": "none",
+          "IpcMode": "none",
+          "ReadonlyRootfs": true,
+          "Memory": 536870912,
+          "MemorySwap": 536870912,
+          "NanoCpus": 1000000000,
+          "PidsLimit": 64
+        },
+        "user": "10001:10001",
+        "cap_drop": [
+          "ALL"
+        ],
+        "security_opt": [
+          "no-new-privileges:true"
+        ],
+        "tmpfs": {
+          "/tmp": "rw,noexec,nosuid,nodev,size=16777216,uid=10001,gid=10001,mode=0700",
+          "/work": "rw,exec,nosuid,nodev,size=134217728,uid=10001,gid=10001,mode=0700"
+        },
+        "mounts": [
+          {
+            "Type": "bind",
+            "Destination": "/bundle",
+            "RW": false
+          }
+        ],
+        "inspect_sha256": "75a2999b7dd408cfa2a8a136b65ba979c16f3b95f7d03c9c379aa4e02394ee48",
+        "oom": false,
+        "preflight_sha256": "cfec7fdc24d6f48232ec1af04bd53b134af77e8281df047feb2ba479e941b5e5",
+        "cleanup": "removed",
+        "container_argv": [
+          "docker",
+          "run",
+          "--name",
+          "edumind-fixed-c-7e46c058b196442f9e10804bb358c329",
+          "--pull=never",
+          "--network=none",
+          "--ipc=none",
+          "--user=10001:10001",
+          "--cap-drop=ALL",
+          "--security-opt=no-new-privileges:true",
+          "--read-only",
+          "--cpus=1",
+          "--memory=512m",
+          "--memory-swap=512m",
+          "--pids-limit=64",
+          "--ulimit=core=0:0",
+          "--ulimit=nofile=128:128",
+          "--ulimit=fsize=16777216:16777216",
+          "--tmpfs=/work:rw,exec,nosuid,nodev,size=134217728,uid=10001,gid=10001,mode=0700",
+          "--tmpfs=/tmp:rw,noexec,nosuid,nodev,size=16777216,uid=10001,gid=10001,mode=0700",
+          "--log-driver=none",
+          "--entrypoint=/usr/bin/env",
+          "--mount",
+          "type=bind,source=/var/folders/22/4lqw_x794jn65xl_95lkblkr0000gn/T/edumind-fixed-c-f6pg0nq6/bundle,target=/bundle,readonly",
+          "sha256:038613d332c25e0024cb00d03e9081f32fe355b62a77d94af87719b14337c917",
+          "-i",
+          "PATH=/usr/bin:/bin",
+          "HOME=/tmp",
+          "TMPDIR=/tmp",
+          "LANG=C",
+          "LC_ALL=C",
+          "ASAN_OPTIONS=detect_leaks=0:abort_on_error=1:symbolize=0",
+          "UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=0",
+          "/usr/local/bin/python3",
+          "-I",
+          "/opt/fixed-c/controller.py",
+          "om-original",
+          "normal"
+        ]
+      },
+      "kind": "original_main",
+      "fault_at": null,
+      "commands": [
+        {
+          "argv": [
+            "/usr/bin/clang-19",
+            "-std=c11",
+            "-Wall",
+            "-Wextra",
+            "-Wpedantic",
+            "-Wnewline-eof",
+            "/bundle/om/original-program.c",
+            "-o",
+            "/work/program"
+          ],
+          "cwd": "/work",
+          "env": {
+            "PATH": "/usr/bin:/bin",
+            "HOME": "/tmp",
+            "TMPDIR": "/tmp",
+            "LANG": "C",
+            "LC_ALL": "C",
+            "ASAN_OPTIONS": "detect_leaks=0:abort_on_error=1:symbolize=0",
+            "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=0"
+          },
+          "started_at": "2026-10-19T10:43:12.961010+00:00",
+          "ended_at": "2026-10-19T10:43:12.982016+00:00",
+          "duration_ms": 21,
+          "exit_code": 1,
+          "signal": null,
+          "timeout": false,
+          "output_limit": false,
+          "oom": false,
+          "stdout": {
+            "base64": "",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stderr": {
+            "base64": "L2J1bmRsZS9vbS9vcmlnaW5hbC1wcm9ncmFtLmM6MTg6MTY6IGVycm9yOiBtdXN0IHVzZSAnc3RydWN0JyB0YWcgdG8gcmVmZXIgdG8gdHlwZSAnTm9kZScKICAgMTggfCB2b2lkIHByaW50TGlzdChOb2RlICpoZWFkKSB7CiAgICAgIHwgICAgICAgICAgICAgICAgXgogICAgICB8ICAgICAgICAgICAgICAgIHN0cnVjdCAKL2J1bmRsZS9vbS9vcmlnaW5hbC1wcm9ncmFtLmM6MTk6MzogZXJyb3I6IG11c3QgdXNlICdzdHJ1Y3QnIHRhZyB0byByZWZlciB0byB0eXBlICdOb2RlJwogICAxOSB8ICAgTm9kZSAqcCA9IGhlYWQ7CiAgICAgIHwgICBeCiAgICAgIHwgICBzdHJ1Y3QgCi9idW5kbGUvb20vb3JpZ2luYWwtcHJvZ3JhbS5jOjI3OjE1OiBlcnJvcjogbXVzdCB1c2UgJ3N0cnVjdCcgdGFnIHRvIHJlZmVyIHRvIHR5cGUgJ05vZGUnCiAgIDI3IHwgdm9pZCBmcmVlTGlzdChOb2RlICoqaGVhZCkgewogICAgICB8ICAgICAgICAgICAgICAgXgogICAgICB8ICAgICAgICAgICAgICAgc3RydWN0IAovYnVuZGxlL29tL29yaWdpbmFsLXByb2dyYW0uYzoyODozOiBlcnJvcjogbXVzdCB1c2UgJ3N0cnVjdCcgdGFnIHRvIHJlZmVyIHRvIHR5cGUgJ05vZGUnCiAgIDI4IHwgICBOb2RlICpwID0gKmhlYWQsICpuZXh0OwogICAgICB8ICAgXgogICAgICB8ICAgc3RydWN0IAovYnVuZGxlL29tL29yaWdpbmFsLXByb2dyYW0uYzozODozOiBlcnJvcjogbXVzdCB1c2UgJ3N0cnVjdCcgdGFnIHRvIHJlZmVyIHRvIHR5cGUgJ05vZGUnCiAgIDM4IHwgICBOb2RlICpoZWFkID0gTlVMTDsKICAgICAgfCAgIF4KICAgICAgfCAgIHN0cnVjdCAKL2J1bmRsZS9vbS9vcmlnaW5hbC1wcm9ncmFtLmM6Mzk6MjE6IHdhcm5pbmc6IGluY29tcGF0aWJsZSBwb2ludGVyIHR5cGVzIHBhc3NpbmcgJ05vZGUgKicgdG8gcGFyYW1ldGVyIG9mIHR5cGUgJ3N0cnVjdCBOb2RlICoqJzsgdGFrZSB0aGUgYWRkcmVzcyB3aXRoICYgWy1XaW5jb21wYXRpYmxlLXBvaW50ZXItdHlwZXNdCiAgIDM5IHwgICBoZWFkID0gaW5zZXJ0SGVhZChoZWFkLCAxKTsKICAgICAgfCAgICAgICAgICAgICAgICAgICAgIF5+fn4KICAgICAgfCAgICAgICAgICAgICAgICAgICAgICYKL2J1bmRsZS9vbS9vcmlnaW5hbC1wcm9ncmFtLmM6MTI6MzE6IG5vdGU6IHBhc3NpbmcgYXJndW1lbnQgdG8gcGFyYW1ldGVyICdoZWFkJyBoZXJlCiAgIDEyIHwgdm9pZCBpbnNlcnRIZWFkKHN0cnVjdCBOb2RlICoqaGVhZCwgaW50IHZhbHVlKSB7IC8qIOKRoiDlpLTmj5IgKi8KICAgICAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCi9idW5kbGUvb20vb3JpZ2luYWwtcHJvZ3JhbS5jOjM5Ojg6IGVycm9yOiBhc3NpZ25pbmcgdG8gJ05vZGUgKicgZnJvbSBpbmNvbXBhdGlibGUgdHlwZSAndm9pZCcKICAgMzkgfCAgIGhlYWQgPSBpbnNlcnRIZWFkKGhlYWQsIDEpOwogICAgICB8ICAgICAgICBeIH5+fn5+fn5+fn5+fn5+fn5+fn4KL2J1bmRsZS9vbS9vcmlnaW5hbC1wcm9ncmFtLmM6NDA6MjE6IHdhcm5pbmc6IGluY29tcGF0aWJsZSBwb2ludGVyIHR5cGVzIHBhc3NpbmcgJ05vZGUgKicgdG8gcGFyYW1ldGVyIG9mIHR5cGUgJ3N0cnVjdCBOb2RlICoqJzsgdGFrZSB0aGUgYWRkcmVzcyB3aXRoICYgWy1XaW5jb21wYXRpYmxlLXBvaW50ZXItdHlwZXNdCiAgIDQwIHwgICBoZWFkID0gaW5zZXJ0SGVhZChoZWFkLCAyKTsKICAgICAgfCAgICAgICAgICAgICAgICAgICAgIF5+fn4KICAgICAgfCAgICAgICAgICAgICAgICAgICAgICYKL2J1bmRsZS9vbS9vcmlnaW5hbC1wcm9ncmFtLmM6MTI6MzE6IG5vdGU6IHBhc3NpbmcgYXJndW1lbnQgdG8gcGFyYW1ldGVyICdoZWFkJyBoZXJlCiAgIDEyIHwgdm9pZCBpbnNlcnRIZWFkKHN0cnVjdCBOb2RlICoqaGVhZCwgaW50IHZhbHVlKSB7IC8qIOKRoiDlpLTmj5IgKi8KICAgICAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCi9idW5kbGUvb20vb3JpZ2luYWwtcHJvZ3JhbS5jOjQwOjg6IGVycm9yOiBhc3NpZ25pbmcgdG8gJ05vZGUgKicgZnJvbSBpbmNvbXBhdGlibGUgdHlwZSAndm9pZCcKICAgNDAgfCAgIGhlYWQgPSBpbnNlcnRIZWFkKGhlYWQsIDIpOwogICAgICB8ICAgICAgICBeIH5+fn5+fn5+fn5+fn5+fn5+fn4KL2J1bmRsZS9vbS9vcmlnaW5hbC1wcm9ncmFtLmM6NDE6MjE6IHdhcm5pbmc6IGluY29tcGF0aWJsZSBwb2ludGVyIHR5cGVzIHBhc3NpbmcgJ05vZGUgKicgdG8gcGFyYW1ldGVyIG9mIHR5cGUgJ3N0cnVjdCBOb2RlICoqJzsgdGFrZSB0aGUgYWRkcmVzcyB3aXRoICYgWy1XaW5jb21wYXRpYmxlLXBvaW50ZXItdHlwZXNdCiAgIDQxIHwgICBoZWFkID0gaW5zZXJ0SGVhZChoZWFkLCAzKTsKICAgICAgfCAgICAgICAgICAgICAgICAgICAgIF5+fn4KICAgICAgfCAgICAgICAgICAgICAgICAgICAgICYKL2J1bmRsZS9vbS9vcmlnaW5hbC1wcm9ncmFtLmM6MTI6MzE6IG5vdGU6IHBhc3NpbmcgYXJndW1lbnQgdG8gcGFyYW1ldGVyICdoZWFkJyBoZXJlCiAgIDEyIHwgdm9pZCBpbnNlcnRIZWFkKHN0cnVjdCBOb2RlICoqaGVhZCwgaW50IHZhbHVlKSB7IC8qIOKRoiDlpLTmj5IgKi8KICAgICAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCi9idW5kbGUvb20vb3JpZ2luYWwtcHJvZ3JhbS5jOjQxOjg6IGVycm9yOiBhc3NpZ25pbmcgdG8gJ05vZGUgKicgZnJvbSBpbmNvbXBhdGlibGUgdHlwZSAndm9pZCcKICAgNDEgfCAgIGhlYWQgPSBpbnNlcnRIZWFkKGhlYWQsIDMpOwogICAgICB8ICAgICAgICBeIH5+fn5+fn5+fn5+fn5+fn5+fn4KMyB3YXJuaW5ncyBhbmQgOCBlcnJvcnMgZ2VuZXJhdGVkLgo=",
+            "bytes": 2807,
+            "sha256": "d07ae8d1df7a4e75bcb48aaf7c4090feaafa95b6dd6b94b4350a15b3d9df612a"
+          }
+        }
+      ],
+      "status": "not_run",
+      "reason": "compile_failed",
+      "observations": {
+        "numeric_sequence": null,
+        "format_exact": null,
+        "attempts": null,
+        "allocated": null,
+        "released": null,
+        "live": null,
+        "per_insert_states": null,
+        "free_call_sequence": null,
+        "caller_head_reset": null,
+        "asan": "not_run",
+        "ubsan": "not_run",
+        "lsan": "not_run"
+      },
+      "expected_observation_matched": true,
+      "scope_limitations": [
+        "fixed original 1/2/3 main only",
+        "ordinary and strict results separate",
+        "LSan not run",
+        "model output not oracle",
+        "not a model review/pass or human signoff"
+      ]
+    },
+    {
+      "version": "fixed-c-offline-v1",
+      "run_id": "809c12a9a2f74b97b1b415146596e6ec",
+      "case_id": "sanitized-normal",
+      "source_id": "om-original",
+      "bindings": {
+        "package": "59020455441fb55d1231c1f6ef0ff75403ce633895d6c600c38119cd0f6a106b",
+        "source": "d7d6aa24f1fa5a7f03ed7075b8283bd34c4a1916acc7a5778d912a086673fe78",
+        "extraction": "ee4f6dac497e654191d311c6cea706536fcfe1a59ba9fd5e8857802f07533ea5",
+        "driver": null,
+        "spec": "f2f260a288bf483f25fab9c6dcdc9fa54d3f9eb1d34428b2109d95e3c01c8e5f",
+        "review_registry": "30bd79d824ca50eb7c4759cc8c6ed9d7406ecf2c3c9cf25ca880a841b7aa7a94",
+        "toolchain": "3a627ac9040b85a92a62c777fe2be5d221a3968480facfc72057392ef98b0f5f",
+        "controller": "86376274926ff21823452f2b4a1d2f2a49564542a3b3627f69781f99ebdc9bfa",
+        "baseline_commit": "a4990f53d4da00bc6fff346e1963e892ac9c0534"
+      },
+      "toolchain": {
+        "version": "fixed-c-toolchain-lock-v2",
+        "base": "manimcommunity/manim@sha256:89ab433ce59134a4dcf351deb2511e067ab354393c0bb7d1859f3e8f0b2406a3",
+        "image_id": "sha256:038613d332c25e0024cb00d03e9081f32fe355b62a77d94af87719b14337c917",
+        "platform": "linux/arm64",
+        "snapshot": "20260601T000000Z",
+        "approval": "docs/ADR/0019-toolchain-amendment-approval-20261019.json",
+        "approval_manifest_sha256": "366ab2dced7a7945ac9d47e56fff99a8f5fc0f8324728a4629249228cec034f5",
+        "controller": "scripts/offline_c_runtime/controller.py",
+        "controller_sha256": "86376274926ff21823452f2b4a1d2f2a49564542a3b3627f69781f99ebdc9bfa",
+        "dockerfile_sha256": "0b2a66a54447937413a94db3e19c8e3fd4773a727c67e237b08649ba735a1eca",
+        "packages_sha256": "3834746dcc855415ee7823d9e91025ccfdef18d5da5678961b7873fb0de27c40",
+        "metadata_sha256": "5388cdb904cdb6b1cd736151d6011cc050323e5608488c2cb37f23b5df5ad3ea",
+        "python": "3.14.7 (main, Aug  5 2026, 16:34:40) [GCC 14.2.0]",
+        "clang": "Debian clang version 19.1.7 (3+b1)\nTarget: aarch64-unknown-linux-gnu\nThread model: posix\nInstalledDir: /usr/lib/llvm-19/bin\n",
+        "linker": "GNU ld (GNU Binutils for Debian) 2.44\nCopyright (C) 2025 Free Software Foundation, Inc.\nThis program is free software; you may redistribute it under the terms of\nthe GNU General Public License version 3 or (at your option) a later version.\nThis program has absolutely no warranty.\n",
+        "runtime_versions": {
+          "libc6": "2.41-12+deb13u3",
+          "clang-19": "1:19.1.7-3+b1",
+          "libclang-rt-19-dev": "1:19.1.7-3+b1",
+          "binutils": "2.44-3"
+        },
+        "build_command": [
+          "docker",
+          "build",
+          "--network=none",
+          "--pull=false",
+          "--tag",
+          "edumind-fixed-c:t066-r02",
+          "/tmp/edumind-t066-toolchain-r02/build"
+        ],
+        "input_artifacts": {
+          "deb_count": 32,
+          "source_bytes": 0,
+          "credentials": 0
+        },
+        "signed_metadata": [
+          {
+            "filename": "snapshot.debian.org_archive_debian_20260601T000000Z_dists_trixie_InRelease",
+            "sha256": "71f2c66148e9e10b4a0c100985b28734704f61efca350519b09bb3a0aad4c771",
+            "bytes": 140415
+          },
+          {
+            "filename": "snapshot.debian.org_archive_debian_20260601T000000Z_dists_trixie_main_binary-arm64_Packages.lz4",
+            "sha256": "ba2a8f1fa69a6a21c8779e8060abd70093864c20f6180522e564e300238a9f6b",
+            "bytes": 20639789
+          }
+        ],
+        "sample_compilations": 0,
+        "sample_executions": 0,
+        "provider_calls": 0,
+        "qualification": "Actual identity/limits/readonly/network/timeout/output/cleanup probes passed; no C executed at lock time",
+        "preparation_note": "T067 adds only trusted fixed isolation probes; actual preflight passed; T066 lock remains unchanged.",
+        "packages_lock": "docs/acceptance/offline-c-toolchain-r02/packages.json"
+      },
+      "isolation": {
+        "effective": {
+          "NetworkMode": "none",
+          "IpcMode": "none",
+          "ReadonlyRootfs": true,
+          "Memory": 536870912,
+          "MemorySwap": 536870912,
+          "NanoCpus": 1000000000,
+          "PidsLimit": 64
+        },
+        "user": "10001:10001",
+        "cap_drop": [
+          "ALL"
+        ],
+        "security_opt": [
+          "no-new-privileges:true"
+        ],
+        "tmpfs": {
+          "/tmp": "rw,noexec,nosuid,nodev,size=16777216,uid=10001,gid=10001,mode=0700",
+          "/work": "rw,exec,nosuid,nodev,size=134217728,uid=10001,gid=10001,mode=0700"
+        },
+        "mounts": [
+          {
+            "Type": "bind",
+            "Destination": "/bundle",
+            "RW": false
+          }
+        ],
+        "inspect_sha256": "533262c3248e350208cb040704abc38d4fa2b8ce74b0a321701e3ab0dc7c6101",
+        "oom": false,
+        "preflight_sha256": "cfec7fdc24d6f48232ec1af04bd53b134af77e8281df047feb2ba479e941b5e5",
+        "cleanup": "removed",
+        "container_argv": [
+          "docker",
+          "run",
+          "--name",
+          "edumind-fixed-c-c3eba24c62384b4db0950b6780d0dc42",
+          "--pull=never",
+          "--network=none",
+          "--ipc=none",
+          "--user=10001:10001",
+          "--cap-drop=ALL",
+          "--security-opt=no-new-privileges:true",
+          "--read-only",
+          "--cpus=1",
+          "--memory=512m",
+          "--memory-swap=512m",
+          "--pids-limit=64",
+          "--ulimit=core=0:0",
+          "--ulimit=nofile=128:128",
+          "--ulimit=fsize=16777216:16777216",
+          "--tmpfs=/work:rw,exec,nosuid,nodev,size=134217728,uid=10001,gid=10001,mode=0700",
+          "--tmpfs=/tmp:rw,noexec,nosuid,nodev,size=16777216,uid=10001,gid=10001,mode=0700",
+          "--log-driver=none",
+          "--entrypoint=/usr/bin/env",
+          "--mount",
+          "type=bind,source=/var/folders/22/4lqw_x794jn65xl_95lkblkr0000gn/T/edumind-fixed-c-f6pg0nq6/bundle,target=/bundle,readonly",
+          "sha256:038613d332c25e0024cb00d03e9081f32fe355b62a77d94af87719b14337c917",
+          "-i",
+          "PATH=/usr/bin:/bin",
+          "HOME=/tmp",
+          "TMPDIR=/tmp",
+          "LANG=C",
+          "LC_ALL=C",
+          "ASAN_OPTIONS=detect_leaks=0:abort_on_error=1:symbolize=0",
+          "UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=0",
+          "/usr/local/bin/python3",
+          "-I",
+          "/opt/fixed-c/controller.py",
+          "om-original",
+          "sanitized-normal"
+        ]
+      },
+      "kind": "original_main",
+      "fault_at": null,
+      "commands": [
+        {
+          "argv": [
+            "/usr/bin/clang-19",
+            "-std=c11",
+            "-Wall",
+            "-Wextra",
+            "-Wpedantic",
+            "-Wnewline-eof",
+            "-O0",
+            "-g",
+            "-fno-omit-frame-pointer",
+            "-fsanitize=address,undefined",
+            "-fno-sanitize-recover=all",
+            "/bundle/om/original-program.c",
+            "-o",
+            "/work/program"
+          ],
+          "cwd": "/work",
+          "env": {
+            "PATH": "/usr/bin:/bin",
+            "HOME": "/tmp",
+            "TMPDIR": "/tmp",
+            "LANG": "C",
+            "LC_ALL": "C",
+            "ASAN_OPTIONS": "detect_leaks=0:abort_on_error=1:symbolize=0",
+            "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=0"
+          },
+          "started_at": "2026-10-19T10:43:13.269512+00:00",
+          "ended_at": "2026-10-19T10:43:13.291048+00:00",
+          "duration_ms": 21,
+          "exit_code": 1,
+          "signal": null,
+          "timeout": false,
+          "output_limit": false,
+          "oom": false,
+          "stdout": {
+            "base64": "",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stderr": {
+            "base64": "L2J1bmRsZS9vbS9vcmlnaW5hbC1wcm9ncmFtLmM6MTg6MTY6IGVycm9yOiBtdXN0IHVzZSAnc3RydWN0JyB0YWcgdG8gcmVmZXIgdG8gdHlwZSAnTm9kZScKICAgMTggfCB2b2lkIHByaW50TGlzdChOb2RlICpoZWFkKSB7CiAgICAgIHwgICAgICAgICAgICAgICAgXgogICAgICB8ICAgICAgICAgICAgICAgIHN0cnVjdCAKL2J1bmRsZS9vbS9vcmlnaW5hbC1wcm9ncmFtLmM6MTk6MzogZXJyb3I6IG11c3QgdXNlICdzdHJ1Y3QnIHRhZyB0byByZWZlciB0byB0eXBlICdOb2RlJwogICAxOSB8ICAgTm9kZSAqcCA9IGhlYWQ7CiAgICAgIHwgICBeCiAgICAgIHwgICBzdHJ1Y3QgCi9idW5kbGUvb20vb3JpZ2luYWwtcHJvZ3JhbS5jOjI3OjE1OiBlcnJvcjogbXVzdCB1c2UgJ3N0cnVjdCcgdGFnIHRvIHJlZmVyIHRvIHR5cGUgJ05vZGUnCiAgIDI3IHwgdm9pZCBmcmVlTGlzdChOb2RlICoqaGVhZCkgewogICAgICB8ICAgICAgICAgICAgICAgXgogICAgICB8ICAgICAgICAgICAgICAgc3RydWN0IAovYnVuZGxlL29tL29yaWdpbmFsLXByb2dyYW0uYzoyODozOiBlcnJvcjogbXVzdCB1c2UgJ3N0cnVjdCcgdGFnIHRvIHJlZmVyIHRvIHR5cGUgJ05vZGUnCiAgIDI4IHwgICBOb2RlICpwID0gKmhlYWQsICpuZXh0OwogICAgICB8ICAgXgogICAgICB8ICAgc3RydWN0IAovYnVuZGxlL29tL29yaWdpbmFsLXByb2dyYW0uYzozODozOiBlcnJvcjogbXVzdCB1c2UgJ3N0cnVjdCcgdGFnIHRvIHJlZmVyIHRvIHR5cGUgJ05vZGUnCiAgIDM4IHwgICBOb2RlICpoZWFkID0gTlVMTDsKICAgICAgfCAgIF4KICAgICAgfCAgIHN0cnVjdCAKL2J1bmRsZS9vbS9vcmlnaW5hbC1wcm9ncmFtLmM6Mzk6MjE6IHdhcm5pbmc6IGluY29tcGF0aWJsZSBwb2ludGVyIHR5cGVzIHBhc3NpbmcgJ05vZGUgKicgdG8gcGFyYW1ldGVyIG9mIHR5cGUgJ3N0cnVjdCBOb2RlICoqJzsgdGFrZSB0aGUgYWRkcmVzcyB3aXRoICYgWy1XaW5jb21wYXRpYmxlLXBvaW50ZXItdHlwZXNdCiAgIDM5IHwgICBoZWFkID0gaW5zZXJ0SGVhZChoZWFkLCAxKTsKICAgICAgfCAgICAgICAgICAgICAgICAgICAgIF5+fn4KICAgICAgfCAgICAgICAgICAgICAgICAgICAgICYKL2J1bmRsZS9vbS9vcmlnaW5hbC1wcm9ncmFtLmM6MTI6MzE6IG5vdGU6IHBhc3NpbmcgYXJndW1lbnQgdG8gcGFyYW1ldGVyICdoZWFkJyBoZXJlCiAgIDEyIHwgdm9pZCBpbnNlcnRIZWFkKHN0cnVjdCBOb2RlICoqaGVhZCwgaW50IHZhbHVlKSB7IC8qIOKRoiDlpLTmj5IgKi8KICAgICAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCi9idW5kbGUvb20vb3JpZ2luYWwtcHJvZ3JhbS5jOjM5Ojg6IGVycm9yOiBhc3NpZ25pbmcgdG8gJ05vZGUgKicgZnJvbSBpbmNvbXBhdGlibGUgdHlwZSAndm9pZCcKICAgMzkgfCAgIGhlYWQgPSBpbnNlcnRIZWFkKGhlYWQsIDEpOwogICAgICB8ICAgICAgICBeIH5+fn5+fn5+fn5+fn5+fn5+fn4KL2J1bmRsZS9vbS9vcmlnaW5hbC1wcm9ncmFtLmM6NDA6MjE6IHdhcm5pbmc6IGluY29tcGF0aWJsZSBwb2ludGVyIHR5cGVzIHBhc3NpbmcgJ05vZGUgKicgdG8gcGFyYW1ldGVyIG9mIHR5cGUgJ3N0cnVjdCBOb2RlICoqJzsgdGFrZSB0aGUgYWRkcmVzcyB3aXRoICYgWy1XaW5jb21wYXRpYmxlLXBvaW50ZXItdHlwZXNdCiAgIDQwIHwgICBoZWFkID0gaW5zZXJ0SGVhZChoZWFkLCAyKTsKICAgICAgfCAgICAgICAgICAgICAgICAgICAgIF5+fn4KICAgICAgfCAgICAgICAgICAgICAgICAgICAgICYKL2J1bmRsZS9vbS9vcmlnaW5hbC1wcm9ncmFtLmM6MTI6MzE6IG5vdGU6IHBhc3NpbmcgYXJndW1lbnQgdG8gcGFyYW1ldGVyICdoZWFkJyBoZXJlCiAgIDEyIHwgdm9pZCBpbnNlcnRIZWFkKHN0cnVjdCBOb2RlICoqaGVhZCwgaW50IHZhbHVlKSB7IC8qIOKRoiDlpLTmj5IgKi8KICAgICAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCi9idW5kbGUvb20vb3JpZ2luYWwtcHJvZ3JhbS5jOjQwOjg6IGVycm9yOiBhc3NpZ25pbmcgdG8gJ05vZGUgKicgZnJvbSBpbmNvbXBhdGlibGUgdHlwZSAndm9pZCcKICAgNDAgfCAgIGhlYWQgPSBpbnNlcnRIZWFkKGhlYWQsIDIpOwogICAgICB8ICAgICAgICBeIH5+fn5+fn5+fn5+fn5+fn5+fn4KL2J1bmRsZS9vbS9vcmlnaW5hbC1wcm9ncmFtLmM6NDE6MjE6IHdhcm5pbmc6IGluY29tcGF0aWJsZSBwb2ludGVyIHR5cGVzIHBhc3NpbmcgJ05vZGUgKicgdG8gcGFyYW1ldGVyIG9mIHR5cGUgJ3N0cnVjdCBOb2RlICoqJzsgdGFrZSB0aGUgYWRkcmVzcyB3aXRoICYgWy1XaW5jb21wYXRpYmxlLXBvaW50ZXItdHlwZXNdCiAgIDQxIHwgICBoZWFkID0gaW5zZXJ0SGVhZChoZWFkLCAzKTsKICAgICAgfCAgICAgICAgICAgICAgICAgICAgIF5+fn4KICAgICAgfCAgICAgICAgICAgICAgICAgICAgICYKL2J1bmRsZS9vbS9vcmlnaW5hbC1wcm9ncmFtLmM6MTI6MzE6IG5vdGU6IHBhc3NpbmcgYXJndW1lbnQgdG8gcGFyYW1ldGVyICdoZWFkJyBoZXJlCiAgIDEyIHwgdm9pZCBpbnNlcnRIZWFkKHN0cnVjdCBOb2RlICoqaGVhZCwgaW50IHZhbHVlKSB7IC8qIOKRoiDlpLTmj5IgKi8KICAgICAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCi9idW5kbGUvb20vb3JpZ2luYWwtcHJvZ3JhbS5jOjQxOjg6IGVycm9yOiBhc3NpZ25pbmcgdG8gJ05vZGUgKicgZnJvbSBpbmNvbXBhdGlibGUgdHlwZSAndm9pZCcKICAgNDEgfCAgIGhlYWQgPSBpbnNlcnRIZWFkKGhlYWQsIDMpOwogICAgICB8ICAgICAgICBeIH5+fn5+fn5+fn5+fn5+fn5+fn4KMyB3YXJuaW5ncyBhbmQgOCBlcnJvcnMgZ2VuZXJhdGVkLgo=",
+            "bytes": 2807,
+            "sha256": "d07ae8d1df7a4e75bcb48aaf7c4090feaafa95b6dd6b94b4350a15b3d9df612a"
+          }
+        }
+      ],
+      "status": "not_run",
+      "reason": "compile_failed",
+      "observations": {
+        "numeric_sequence": null,
+        "format_exact": null,
+        "attempts": null,
+        "allocated": null,
+        "released": null,
+        "live": null,
+        "per_insert_states": null,
+        "free_call_sequence": null,
+        "caller_head_reset": null,
+        "asan": "not_run",
+        "ubsan": "not_run",
+        "lsan": "not_run"
+      },
+      "expected_observation_matched": true,
+      "scope_limitations": [
+        "fixed original 1/2/3 main only",
+        "ordinary and strict results separate",
+        "LSan not run",
+        "model output not oracle",
+        "not a model review/pass or human signoff"
+      ]
+    }
+  ],
+  "preflight": {
+    "probe": {
+      "uid": 10001,
+      "gid": 10001,
+      "status": {
+        "CapEff": "0000000000000000",
+        "NoNewPrivs": "1",
+        "Seccomp": "2"
+      },
+      "write_denied": {
+        "/root-write-probe": true,
+        "/bundle/write-probe": true
+      },
+      "cgroup": {
+        "memory.max": "536870912",
+        "memory.swap.max": "0",
+        "pids.max": "64",
+        "cpu.max": "100000 100000"
+      },
+      "routes": "Iface\tDestination\tGateway \tFlags\tRefCnt\tUse\tMetric\tMask\t\tMTU\tWindow\tIRTT                                                       \n",
+      "mounts": "overlay / overlay ro,relatime,lowerdir=/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/2078/fs:/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/2039/fs:/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/2028/fs:/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/2027/fs:/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/330/fs:/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/329/fs:/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/328/fs:/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/327/fs:/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/326/fs:/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/325/fs:/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/324/fs:/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/323/fs:/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/322/fs:/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/321/fs:/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/320/fs,upperdir=/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/2079/fs,workdir=/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/2079/work 0 0\nproc /proc proc rw,nosuid,nodev,noexec,relatime 0 0\ntmpfs /dev tmpfs rw,nosuid,size=65536k,mode=755 0 0\ndevpts /dev/pts devpts rw,nosuid,noexec,relatime,gid=5,mode=620,ptmxmode=666 0 0\nsysfs /sys sysfs ro,nosuid,nodev,noexec,relatime 0 0\ncgroup /sys/fs/cgroup cgroup2 ro,nosuid,nodev,noexec,relatime,nsdelegate 0 0\nmqueue /dev/mqueue mqueue rw,nosuid,nodev,noexec,relatime 0 0\nmac /bundle virtiofs ro,relatime 0 0\ntmpfs /tmp tmpfs rw,nosuid,nodev,noexec,relatime,size=16384k,mode=700,uid=10001,gid=10001 0 0\ntmpfs /work tmpfs rw,nosuid,nodev,relatime,size=131072k,mode=700,uid=10001,gid=10001 0 0\n/dev/vdb1 /etc/hostname btrfs ro,noatime,nodatasum,nodatacow,ssd,discard,space_cache=v2,subvolid=256,subvol=/docker 0 0\n/dev/vdb1 /etc/hosts btrfs ro,noatime,nodatasum,nodatacow,ssd,discard,space_cache=v2,subvolid=256,subvol=/docker 0 0\n/dev/vdb1 /etc/resolv.conf btrfs ro,noatime,nodatasum,nodatacow,ssd,discard,space_cache=v2,subvolid=256,subvol=/docker 0 0\nproc /proc/bus proc ro,nosuid,nodev,noexec,relatime 0 0\nproc /proc/fs proc ro,nosuid,nodev,noexec,relatime 0 0\nproc /proc/irq proc ro,nosuid,nodev,noexec,relatime 0 0\nproc /proc/sys proc ro,nosuid,nodev,noexec,relatime 0 0\nproc /proc/sysrq-trigger proc ro,nosuid,nodev,noexec,relatime 0 0\ntmpfs /proc/asound tmpfs ro,relatime,size=4k,nr_inodes=1 0 0\ntmpfs /proc/interrupts tmpfs rw,nosuid,size=65536k,mode=755 0 0\ntmpfs /proc/keys tmpfs rw,nosuid,size=65536k,mode=755 0 0\ntmpfs /proc/timer_list tmpfs rw,nosuid,size=65536k,mode=755 0 0\ntmpfs /sys/firmware tmpfs ro,relatime,size=4k,nr_inodes=1 0 0\n",
+      "tmpfs_bytes": {
+        "/work": 134217728,
+        "/tmp": 16777216
+      },
+      "rlimits": {
+        "nofile": [
+          128,
+          128
+        ],
+        "core": [
+          0,
+          0
+        ],
+        "fsize": [
+          16777216,
+          16777216
+        ]
+      },
+      "controller_sha256": "86376274926ff21823452f2b4a1d2f2a49564542a3b3627f69781f99ebdc9bfa"
+    },
+    "isolation": {
+      "effective": {
+        "NetworkMode": "none",
+        "IpcMode": "none",
+        "ReadonlyRootfs": true,
+        "Memory": 536870912,
+        "MemorySwap": 536870912,
+        "NanoCpus": 1000000000,
+        "PidsLimit": 64
+      },
+      "user": "10001:10001",
+      "cap_drop": [
+        "ALL"
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "tmpfs": {
+        "/tmp": "rw,noexec,nosuid,nodev,size=16777216,uid=10001,gid=10001,mode=0700",
+        "/work": "rw,exec,nosuid,nodev,size=134217728,uid=10001,gid=10001,mode=0700"
+      },
+      "mounts": [
+        {
+          "Type": "bind",
+          "Destination": "/bundle",
+          "RW": false
+        }
+      ],
+      "inspect_sha256": "47fc675adaeacdf3ca78aa52aac4d8674637772c603f566b11b775048fcad15e",
+      "oom": false
+    },
+    "host_timeout": {
+      "reason": "timeout",
+      "argv": [
+        "docker",
+        "run",
+        "--name",
+        "edumind-fixed-c-703493ce48894e828567da553dfb40eb",
+        "--pull=never",
+        "--network=none",
+        "--ipc=none",
+        "--user=10001:10001",
+        "--cap-drop=ALL",
+        "--security-opt=no-new-privileges:true",
+        "--read-only",
+        "--cpus=1",
+        "--memory=512m",
+        "--memory-swap=512m",
+        "--pids-limit=64",
+        "--ulimit=core=0:0",
+        "--ulimit=nofile=128:128",
+        "--ulimit=fsize=16777216:16777216",
+        "--tmpfs=/work:rw,exec,nosuid,nodev,size=134217728,uid=10001,gid=10001,mode=0700",
+        "--tmpfs=/tmp:rw,noexec,nosuid,nodev,size=16777216,uid=10001,gid=10001,mode=0700",
+        "--log-driver=none",
+        "--entrypoint=/usr/bin/env",
+        "--mount",
+        "type=bind,source=/var/folders/22/4lqw_x794jn65xl_95lkblkr0000gn/T/edumind-fixed-c-f6pg0nq6/bundle,target=/bundle,readonly",
+        "sha256:038613d332c25e0024cb00d03e9081f32fe355b62a77d94af87719b14337c917",
+        "-i",
+        "PATH=/usr/bin:/bin",
+        "HOME=/tmp",
+        "TMPDIR=/tmp",
+        "LANG=C",
+        "LC_ALL=C",
+        "ASAN_OPTIONS=detect_leaks=0:abort_on_error=1:symbolize=0",
+        "UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=0",
+        "/usr/local/bin/python3",
+        "-I",
+        "/opt/fixed-c/controller.py",
+        "probe-loop"
+      ]
+    },
+    "host_output": {
+      "reason": "output_limit",
+      "bytes": 1048576,
+      "argv": [
+        "docker",
+        "run",
+        "--name",
+        "edumind-fixed-c-b07850ce89fe476aa350b7bba540af5d",
+        "--pull=never",
+        "--network=none",
+        "--ipc=none",
+        "--user=10001:10001",
+        "--cap-drop=ALL",
+        "--security-opt=no-new-privileges:true",
+        "--read-only",
+        "--cpus=1",
+        "--memory=512m",
+        "--memory-swap=512m",
+        "--pids-limit=64",
+        "--ulimit=core=0:0",
+        "--ulimit=nofile=128:128",
+        "--ulimit=fsize=16777216:16777216",
+        "--tmpfs=/work:rw,exec,nosuid,nodev,size=134217728,uid=10001,gid=10001,mode=0700",
+        "--tmpfs=/tmp:rw,noexec,nosuid,nodev,size=16777216,uid=10001,gid=10001,mode=0700",
+        "--log-driver=none",
+        "--entrypoint=/usr/bin/env",
+        "--mount",
+        "type=bind,source=/var/folders/22/4lqw_x794jn65xl_95lkblkr0000gn/T/edumind-fixed-c-f6pg0nq6/bundle,target=/bundle,readonly",
+        "sha256:038613d332c25e0024cb00d03e9081f32fe355b62a77d94af87719b14337c917",
+        "-i",
+        "PATH=/usr/bin:/bin",
+        "HOME=/tmp",
+        "TMPDIR=/tmp",
+        "LANG=C",
+        "LC_ALL=C",
+        "ASAN_OPTIONS=detect_leaks=0:abort_on_error=1:symbolize=0",
+        "UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=0",
+        "/usr/local/bin/python3",
+        "-I",
+        "/opt/fixed-c/controller.py",
+        "probe-output"
+      ]
+    },
+    "child_output": {
+      "argv": [
+        "/usr/local/bin/python3",
+        "-I",
+        "-c",
+        "import os; os.write(1, b'x'*131072)"
+      ],
+      "cwd": "/work",
+      "env": {
+        "PATH": "/usr/bin:/bin",
+        "HOME": "/tmp",
+        "TMPDIR": "/tmp",
+        "LANG": "C",
+        "LC_ALL": "C",
+        "ASAN_OPTIONS": "detect_leaks=0:abort_on_error=1:symbolize=0",
+        "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=0"
+      },
+      "started_at": "2026-10-19T10:43:10.682778+00:00",
+      "ended_at": "2026-10-19T10:43:10.692948+00:00",
+      "duration_ms": 10,
+      "exit_code": 0,
+      "signal": null,
+      "timeout": false,
+      "output_limit": true,
+      "oom": false,
+      "stdout": {
+        "base64": "eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eA==",
+        "bytes": 65536,
+        "sha256": "1f8745f0d2d1387ec1af2211a3cf417b2e9e885e853472649c1d979d0e9370e3"
+      },
+      "stderr": {
+        "base64": "",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    "cleanup": "all containers removed"
+  },
+  "stopped": null,
+  "execution_counts_are_confirmed_minimum": false,
+  "compilations": 8,
+  "sample_processes": 2
+}

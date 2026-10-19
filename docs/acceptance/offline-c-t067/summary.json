@@ -1,0 +1,27 @@
+{
+  "task": "PHASE-1-T067",
+  "mock_unit_tests": 20,
+  "fixture_regressions": 16,
+  "actual_final_compile_cases": 8,
+  "actual_final_compilations": 8,
+  "actual_final_program_processes": 2,
+  "actual_suites": 2,
+  "cumulative_actual_compilations": 16,
+  "cumulative_actual_program_processes": 4,
+  "provider_calls": 0,
+  "all_predeclared_observations_matched": true,
+  "original_programs_passed": false,
+  "known_failures": [
+    "EduMind missing final newline strict compilation failure",
+    "OM Node alias/interface compilation errors; normal and sanitized main not run"
+  ],
+  "independent_expected_vs_model_claim": "EduMind raw stdout matches independently registered bytes, differs from model claim terminal whitespace; both retained",
+  "sanitizers": "ASan/UBSan actually used for one normal path per suite; LSan disabled/not_run",
+  "preflight": "effective identity/caps/seccomp/no-new-privileges, read-only root/bundle, no egress, cgroup/rlimits/tmpfs, owned-container timeout/output/cleanup actual passes",
+  "retained_development_failure": "preflight-attempt-01 host killpg permission denied after Docker killed container; corrected to wait/kill owned CLI only, no container boundary relaxed",
+  "limitations": [
+    "fixed 1/2/3 normal original main only",
+    "ownership/fault paths not yet run",
+    "does not prove model accuracy or publication qualification"
+  ]
+}

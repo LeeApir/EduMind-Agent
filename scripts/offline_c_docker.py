@@ -12,7 +12,7 @@ def container_argv(image: str, name: str, bundle: Path | None, args: list[str]) 
         raise ValueError("exact image digest required")
     if not re.fullmatch(r"edumind-fixed-c-[0-9a-f]{32}", name):
         raise ValueError("private run name required")
-    valid = args == ["metadata"] or (len(args) == 2 and args[0] in {
+    valid = args in [["metadata"], ["probe"], ["probe-loop"], ["probe-output"], ["probe-child-output"]] or (len(args) == 2 and args[0] in {
         "edumind-r02-original", "om-original"} and args[1] in {
         "strict", "ordinary", "normal", "sanitized-normal"})
     if not valid:

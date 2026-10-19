@@ -6,6 +6,7 @@ import hashlib
 import json
 import os
 import selectors
+import resource
 import signal
 import subprocess
 import sys
@@ -77,7 +78,43 @@ def metadata():
             "platform": sys.platform, "machine": os.uname().machine, "commands": commands}
 
 
+def probe():
+    status = dict(line.split(":", 1) for line in Path("/proc/self/status").read_text().splitlines() if ":" in line)
+    denied = {}
+    for name in ["/root-write-probe", "/bundle/write-probe"]:
+        try:
+            Path(name).write_text("forbidden")
+            denied[name] = False
+        except PermissionError:
+            denied[name] = True
+        except OSError as exc:
+            denied[name] = exc.errno == 30
+    cgroup = {name: Path("/sys/fs/cgroup", name).read_text().strip()
+              for name in ["memory.max", "memory.swap.max", "pids.max", "cpu.max"]}
+    return {"uid": os.getuid(), "gid": os.getgid(),
+            "status": {k: status[k].strip() for k in ["CapEff", "NoNewPrivs", "Seccomp"]},
+            "write_denied": denied, "cgroup": cgroup,
+            "routes": Path("/proc/net/route").read_text(),
+            "mounts": Path("/proc/mounts").read_text(),
+            "tmpfs_bytes": {name: os.statvfs(name).f_blocks * os.statvfs(name).f_frsize for name in ["/work", "/tmp"]},
+            "rlimits": {name: resource.getrlimit(value) for name, value in [
+                ("nofile", resource.RLIMIT_NOFILE), ("core", resource.RLIMIT_CORE), ("fsize", resource.RLIMIT_FSIZE)]},
+            "controller_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest()}
+
+
 def main():
+    if sys.argv[1:] == ["probe"]:
+        print(json.dumps(probe()))
+        return
+    if sys.argv[1:] == ["probe-loop"]:
+        while True:
+            pass
+    if sys.argv[1:] == ["probe-output"]:
+        while True:
+            os.write(1, b"x" * 8192)
+    if sys.argv[1:] == ["probe-child-output"]:
+        print(json.dumps(capture([sys.executable, "-I", "-c", "import os; os.write(1, b'x'*131072)"], 5)))
+        return
     if sys.argv[1:] == ["metadata"]:
         print(json.dumps(metadata()))
         return
