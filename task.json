@@ -3099,7 +3099,7 @@
       "id": "PHASE-1-T059",
       "phase": "Phase 1",
       "title": "整单元独立核验需求覆盖与跨场景发布资格",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1-T058"
@@ -3126,9 +3126,11 @@
         "python3 scripts/check_catalog_workflow.py",
         "git diff --check"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "完成v4.8整单元独立objectives第六必检与完整原文/三候选/动作职责，原五项/结果Schema不变；资源真实未决和严重reject不被unit pass清除，旧五checked不静默补齐 | 最终隔离PG+Mock132通过0跳过，Ruff全app/tests、mypy194、workflow/diff/236归档通过；旧待审/已批未发拒跨新政策，旧发布准确快照可读，追加记录/取消/原子发布/HTTP/CLI验证；原ADR0015现树PRD哈希失败保留，恢复45cfc96原件跑原检查12文档12契约通过且现12任务契约未变 | Provider0，脚本化语义非真实质量，人类签核未授予，r02错绑及T040阻塞保持 | 证据phase-1-layered-review-implementation/t059.json与README；独立提交后领取T060具体节点设计，不直接改数据"
+      ],
+      "started_at": "2026-10-19T15:10:06",
+      "completed_at": "2026-10-19T15:16:36",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T059",
       "execution_gate": "2026-10-19用户已明确授权在新分支开发T056–T070，按依赖串行执行；审核契约/API/持久化/执行安全边界仍须对应T056/T060/T065具体设计明确批准后实施，未批准项不得推定。真实Provider与动态开放不在本批授权内。",

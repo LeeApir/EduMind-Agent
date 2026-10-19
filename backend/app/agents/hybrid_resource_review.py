@@ -17,6 +17,7 @@ from app.agents.review_input import REVIEW_INPUT_VERSION, review_input
 from app.agents.review_responsibilities import (
     RESPONSIBILITY_INSTRUCTION,
     REVIEW_SCOPE_VERSION,
+    UNIT_OBJECTIVE_INSTRUCTION,
     review_responsibilities,
 )
 from app.agents.review_schema import severe_code_issues
@@ -33,6 +34,7 @@ from app.services.teaching_actions import anchor_catalog
 REVIEW_V4_PROMPT = REVIEW_PROMPT_VERSION
 RESOURCE_CHECKS = {"facts", "code_safety", "learner_fit", "objectives", "reference_scope"}
 UNIT_CHECKS = {
+    "objectives",
     "terminology",
     "conventions",
     "example_trace",
@@ -117,7 +119,13 @@ it. Actual false media-delivery claims remain factual issues. Missing authoritat
 cannot be repaired by treating plan.goal as the original request; retain uncertainty.
 """
 
-INSTRUCTION += "\n" + EVIDENCE_INSTRUCTION + RESPONSIBILITY_INSTRUCTION + LEARNER_INSTRUCTION
+INSTRUCTION += (
+    "\n"
+    + EVIDENCE_INSTRUCTION
+    + RESPONSIBILITY_INSTRUCTION
+    + LEARNER_INSTRUCTION
+    + UNIT_OBJECTIVE_INSTRUCTION
+)
 
 
 def review_output_schema(scope: str, *, anchor_ids: list[str] | None = None) -> dict[str, Any]:

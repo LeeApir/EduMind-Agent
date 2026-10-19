@@ -15,7 +15,7 @@ from app.services.learning_contract import (
 from app.services.unit_material import restore_material
 
 RESPONSIBILITY_VERSION = "review-responsibilities-v1"
-REVIEW_SCOPE_VERSION = "role-learner-review-scope-v4"
+REVIEW_SCOPE_VERSION = "layered-review-scope-v5"
 ROLE_RESPONSIBILITIES = {
     "explanation": [
         "Concepts, terminology, process states and boundaries actually stated here.",
@@ -127,3 +127,24 @@ def review_responsibilities(
         "sibling_content_supplied": scope == "unit",
         "assignment_is_delivery_evidence": False,
     }
+
+
+UNIT_OBJECTIVE_INSTRUCTION = """
+For UNIT scope the six mandatory checks include objectives as an independent duty in addition
+to terminology, conventions, example_trace, answer_consistency and action_references.
+Check complete ORIGINAL requirements and all explicit plan/content promises against all three
+final candidates, never just resource verdicts. Separately assess implementation delivery,
+explicit process-state transitions and exit boundaries, and whether questions require using
+process knowledge. Correct code alone does not teach a trace; explanations only in feedback
+do not prove the question assessed it. Aggregate actual explanation, comments, key_steps and
+feedback support with their visibility timing. Respect explicitly requested pre-quiz teaching,
+but never invent that ordering when absent. Internal plan traces and action references are
+not delivered teaching. Identify concrete missing support in unresolved without inventing a
+fact/safety category. In mixed cases report both the serious defect and the independent gap;
+reject retains priority, it does not excuse leaving gaps unreported.
+Check actual interfaces and who performs each update across scenes: a local pointer variable
+and a caller's variable are not the same storage. A caller's separate cleanup assignment does
+not make a claim that the callee performed it true. Report the precise false attribution
+with actual anchors, without inventing a reachable memory error when none is demonstrated.
+Every auxiliary assertion/citation must still satisfy the evidence-strength rules.
+"""

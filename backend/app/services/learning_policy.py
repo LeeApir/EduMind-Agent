@@ -12,7 +12,7 @@ POLICY = {
     "resource_review_prompt": REVIEW_PROMPT_VERSION,
     "review_input": REVIEW_INPUT_VERSION,
     "objective_coverage": "student-visible-goal-coverage-v1",
-    "review_coverage": "fixed-check-ids-v1",
+    "review_coverage": "fixed-check-ids-v2",
     "review_scope": REVIEW_SCOPE_VERSION,
     "review_responsibilities": RESPONSIBILITY_VERSION,
     "learner_review": LEARNER_REVIEW_VERSION,

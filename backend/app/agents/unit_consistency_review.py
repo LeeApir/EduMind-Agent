@@ -2,7 +2,7 @@
 
 from typing import Any
 
-from app.agents.hybrid_resource_review import review_once
+from app.agents.hybrid_resource_review import review_once, route_review
 from app.agents.learning_unit_generator import StructuredResourceGateway
 from app.agents.shared_learning_plan import CallWindow
 from app.services.learning_contract import LearningContractError, canonical, validate_contract
@@ -22,7 +22,14 @@ def resource_review_priority(material: dict[str, Any], records: list[dict[str, A
             or any(a["resource_id"] != candidate["resource_id"] for a in record["anchor_catalog"])
         ):
             raise LearningContractError("RESOURCE_REVIEW_STALE")
-        states.append(record["local_routing"]["verdict"])
+        local = record["local_routing"]["verdict"]
+        # A stored pass must not hide raw unresolved items or missing checks.
+        # Never weaken a stricter stored disposition (e.g. correction exhaustion).
+        if local == "pass":
+            local = route_review(
+                record["result"], scope="resource", catalog=record["anchor_catalog"]
+            )["verdict"]
+        states.append(local)
     if "failed" in states:
         raise LearningContractError("RESOURCE_REVIEW_FAILED")
     if "reject" in states:
