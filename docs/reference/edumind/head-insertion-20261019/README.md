@@ -10,7 +10,7 @@
 - 用户对“独立实例、单节课、保留自动审核、5元/22次上限”提案回复“无上限”。本轮据此不设费用上限，仍只提交一次；保留产品自身调用/超时限制，观察层最多22次，不恢复任何旧余额。未因此授权修改生产模式或自动质量验收。
 - 原 EduMind API/Web 未运行。新建独立数据库 `edumind_head_insertion_20261019`，使用 Alembic 完整迁移至 `0030_learning_phases`；API 为回环8029，Web为回环5199，独立匿名会话。未复用 OM 服务、代理、数据目录或数据库。
 - 源码基线 `0f21463c1dad1244d07f306bdd4ed591bd618b13`，原功能分支 `codex/phase-1-continued`。启动器只在本次进程设置 dynamic；没有写入 `.env`，没有修改业务源码、正式门禁、task.json、旧账本或旧签核。原有未跟踪 OM 目录未纳入本次提交。
-- [serve_test.py](serve_test.py) 使用原应用及 Provider 工厂，独立实例增加只读观测：捕获学习请求/响应，以及适配器出网请求体和响应（不保存凭据头）；没有代理或改写模型请求。**本次没有真实模型请求，观测层的真实转发能力未被验证。**
+- `serve_test.py`（临时启动脚本，现已清理） 使用原应用及 Provider 工厂，独立实例增加只读观测：捕获学习请求/响应，以及适配器出网请求体和响应（不保存凭据头）；没有代理或改写模型请求。**本次没有真实模型请求，观测层的真实转发能力未被验证。**
 
 ## 模型、思考模式、输出上限与路由
 
@@ -43,7 +43,7 @@
 
 `backend/app/agents/goal_node_resolver.py:73` 在候选数大于1时直接返回 `ambiguous_aliases`；`backend/app/api/hybrid_learning.py:74` 随后抛出 `GOAL_CLARIFICATION_REQUIRED`，尚未执行共享计划生成。规则没有区分本次输入的“已经掌握的前置知识”和“要生成的教学主题”。
 
-[inspect_test.py](inspect_test.py) 使用原解析器、实际默认10节点图谱和禁止任何模型调用的 Gateway 复现相同结果，见 [resolver-reproduction.json](resolver-reproduction.json)。这是离线定位，不是第二次课程提交。没有测试其他图谱配置，也没有绕过解析器测试生成后半段。
+`inspect_test.py`（临时查询脚本，现已清理） 使用原解析器、实际默认10节点图谱和禁止任何模型调用的 Gateway 复现相同结果，见 [resolver-reproduction.json](resolver-reproduction.json)。这是离线定位，不是第二次课程提交。没有测试其他图谱配置，也没有绕过解析器测试生成后半段。
 
 数据库操作 `62345851-701d-4a37-89f1-89490fe3a0fc` 为 `failed`，phase仍为 `planning`，`generation_call_count=0`；课程、计划、场景、资源、审核记录、人工待审、发布、画像均为0。详见 [database-evidence.json](database-evidence.json)；[provider-calls.json](provider-calls.json) 为空。由这两份证据交叉核实：真实 Provider 请求0，模型费用0，不是“usage缺失而假定0”。
 
@@ -63,6 +63,8 @@
 本样本记录为“端到端未交付：目标识别拒绝”；模型回答质量为“未测”。单个样本不支持总体成功率，更不能与旧的不同输入合并计分。已有 OM 材料含首次环境中断及独立恢复记录，本轮未重新运行或评审 OM；没有宣称两边均完成，也没有给出产品优劣排名。
 
 ## 实际检查与交接
+
+以下命令记录测试时的实际操作。测试完成后已按用户要求删除三个临时脚本及其字节码缓存；历史脚本可通过本地提交 `5ca6504` 恢复，下面的脚本命令不再是当前可执行入口。原始输入、SSE、数据库快照、截图及验证结果保留；`artifact-manifest.json` 现仅列出保留文件。
 
 1. `backend/.venv/bin/python -m py_compile docs/reference/edumind/head-insertion-20261019/serve_test.py`：通过。
 2. `backend/.venv/bin/python docs/reference/edumind/head-insertion-20261019/serve_test.py`：首次受沙箱本地网络限制，未创建数据库/调用模型；获工具权限后成功创建新数据库、完成30版迁移并启动原应用。首次前端启动同样受沙箱限制；随后在 `web/` 启动 Vite6.1.0成功。
