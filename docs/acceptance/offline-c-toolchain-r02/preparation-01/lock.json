@@ -1,0 +1,53 @@
+{
+  "version": "fixed-c-toolchain-lock-v1",
+  "base": "manimcommunity/manim@sha256:89ab433ce59134a4dcf351deb2511e067ab354393c0bb7d1859f3e8f0b2406a3",
+  "image_id": "sha256:a71274f1a45f0e6569502f650dd79cabd8e7bedf2a2f0798b0f55ccb2e31bc7b",
+  "platform": "linux/arm64",
+  "snapshot": "20260601T000000Z",
+  "approval": "docs/ADR/0019-toolchain-amendment-approval-20261019.json",
+  "approval_manifest_sha256": "366ab2dced7a7945ac9d47e56fff99a8f5fc0f8324728a4629249228cec034f5",
+  "controller": "scripts/offline_c_runtime/controller.py",
+  "controller_sha256": "83d2a2baf4c5d3374c99c826593c2c39372ea6f9b7cde57c18d5de83c40b27e8",
+  "dockerfile_sha256": "0b2a66a54447937413a94db3e19c8e3fd4773a727c67e237b08649ba735a1eca",
+  "packages_sha256": "3834746dcc855415ee7823d9e91025ccfdef18d5da5678961b7873fb0de27c40",
+  "metadata_sha256": "0733ff1a91261f951cfc72f14f4fad8e4e03eff66cb4f25ac54b83321f44248a",
+  "python": "3.14.7 (main, Aug  5 2026, 16:34:40) [GCC 14.2.0]",
+  "clang": "Debian clang version 19.1.7 (3+b1)\nTarget: aarch64-unknown-linux-gnu\nThread model: posix\nInstalledDir: /usr/lib/llvm-19/bin\n",
+  "linker": "GNU ld (GNU Binutils for Debian) 2.44\nCopyright (C) 2025 Free Software Foundation, Inc.\nThis program is free software; you may redistribute it under the terms of\nthe GNU General Public License version 3 or (at your option) a later version.\nThis program has absolutely no warranty.\n",
+  "runtime_versions": {
+    "libc6": "2.41-12+deb13u3",
+    "clang-19": "1:19.1.7-3+b1",
+    "libclang-rt-19-dev": "1:19.1.7-3+b1",
+    "binutils": "2.44-3"
+  },
+  "build_command": [
+    "docker",
+    "build",
+    "--network=none",
+    "--pull=false",
+    "--tag",
+    "edumind-fixed-c:t066-r02",
+    "/tmp/edumind-t066-toolchain-r02/build"
+  ],
+  "input_artifacts": {
+    "deb_count": 32,
+    "source_bytes": 0,
+    "credentials": 0
+  },
+  "signed_metadata": [
+    {
+      "filename": "snapshot.debian.org_archive_debian_20260601T000000Z_dists_trixie_InRelease",
+      "sha256": "71f2c66148e9e10b4a0c100985b28734704f61efca350519b09bb3a0aad4c771",
+      "bytes": 140415
+    },
+    {
+      "filename": "snapshot.debian.org_archive_debian_20260601T000000Z_dists_trixie_main_binary-arm64_Packages.lz4",
+      "sha256": "ba2a8f1fa69a6a21c8779e8060abd70093864c20f6180522e564e300238a9f6b",
+      "bytes": 20639789
+    }
+  ],
+  "sample_compilations": 0,
+  "sample_executions": 0,
+  "provider_calls": 0,
+  "qualification": "toolchain prepared and metadata observed; isolation probes and C cases still NOT_RUN"
+}
