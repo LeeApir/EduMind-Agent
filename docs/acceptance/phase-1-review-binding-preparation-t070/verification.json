@@ -1,0 +1,71 @@
+{
+  "version": "review-binding-integration-evidence-v1",
+  "real_provider_calls": 0,
+  "backend": {
+    "database": "edumind_t070_20261019_a",
+    "migration": "0031 head upgraded in new isolated DB",
+    "files": 30,
+    "passed": 226,
+    "skipped": 0,
+    "kind": "actual PostgreSQL plus scripted gateway/HTTP; not real model quality",
+    "command": "EDUMIND_PRODUCT_MODE=dynamic EDUMIND_TEST_DATABASE_URL=<isolated local test URL> .venv/bin/pytest -q <backend-test-files.txt entries>",
+    "warning": "one existing Starlette/AnyIO deprecation"
+  },
+  "frontend": {
+    "passed": 200,
+    "files": 28,
+    "typecheck": "passed",
+    "build": "passed",
+    "lint_errors": 0,
+    "existing_lint_warnings": 35,
+    "kind": "Vitest DOM/API mocks"
+  },
+  "browser": {
+    "engine": "headless Chromium",
+    "api_kind": "route mocks",
+    "journeys": [
+      "direct target/prerequisite selection, exact GET refresh, pending body hidden",
+      "pending stream/reload GET-only/human-approved exact snapshot read"
+    ],
+    "mobile": "375px; no horizontal overflow; screenshots visually inspected",
+    "evidence_directory": "local-materials/phase-1-t070/browser",
+    "limitations": "sparse fixtures may display auxiliary graph/profile error/empty states; browser does not replace actual PG scoring/path/API tests",
+    "command": "python3 /Users/apir/.agents/skills/webapp-testing/scripts/with_server.py --server 'pnpm --dir web dev --host 127.0.0.1 --port 4194' --port 4194 -- backend/.venv/bin/python web/tests/e2e/review_binding_integration.py"
+  },
+  "offline_c": {
+    "cases": 27,
+    "compilations": 27,
+    "program_processes": 17,
+    "checks_pass": 12,
+    "checks_fail": 9,
+    "not_run": 6,
+    "predeclared_observations_matched": true,
+    "kind": "actual isolated container/Clang/ASan+UBSan plus explicit tracker; LSan not_run",
+    "command": "backend/.venv/bin/python scripts/run_offline_c_checks.py --manifest docs/acceptance/offline-c-fixtures/manifest.json --suite all --output /tmp/edumind-t070-offline-c"
+  },
+  "offline_tests": 55,
+  "backend_static": {
+    "ruff": "all app/tests passed",
+    "mypy_sources": 196
+  },
+  "publication_qualified": false,
+  "T040": "blocked",
+  "default_mode": "catalog_only",
+  "legacy_checks": {
+    "original_archive_files_verified": 236,
+    "reference_collection_diff_from_9b2c195": "unchanged",
+    "adr0015_current_tree": "known failure at PRD hash due to later explicitly authorized revisions; retained, not passed",
+    "adr0015_original_45cfc96": "original checker restored with original12docs/12task contracts passed; current same12task contracts unchanged",
+    "approved_0017_0018_0019_and_r02": "exact frozen attachments verified; original files not refreshed"
+  },
+  "retained_development_issues": [
+    "first preparation unit import harness omitted scripts sys.path:1 failed/5 passed; fixed test entry setup, actual standalone CLI was already passing"
+  ],
+  "script_regressions": {
+    "total": 61,
+    "offline_c": 55,
+    "preparation_boundaries": 6,
+    "result": "passed",
+    "kind": "unit/Mock plus file/evidence checks, distinct from actual C"
+  }
+}

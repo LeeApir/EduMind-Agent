@@ -1,0 +1,33 @@
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 0001_initial, Initialize the Alembic revision chain.
+INFO  [alembic.runtime.migration] Running upgrade 0001_initial -> 0002_auth_sessions, Create users and server-side authentication sessions.
+INFO  [alembic.runtime.migration] Running upgrade 0002_auth_sessions -> 0003_learning_snapshots, Persist versioned profiles, learning scenes, and reviewed resources.
+INFO  [alembic.runtime.migration] Running upgrade 0003_learning_snapshots -> 0004_learning_operations, Persist idempotent and recoverable learning operations.
+INFO  [alembic.runtime.migration] Running upgrade 0004_learning_operations -> 0005_profile_events, Persist idempotent, owner-scoped profile behavior summaries.
+INFO  [alembic.runtime.migration] Running upgrade 0005_profile_events -> 0006_profile_correction, Track idempotency for manual profile corrections.
+INFO  [alembic.runtime.migration] Running upgrade 0006_profile_correction -> 0007_profile_provenance, Persist profile event schema and snapshot lineage.
+INFO  [alembic.runtime.migration] Running upgrade 0007_profile_provenance -> 0008_learning_state, Create owner-scoped learning evidence, mastery, and path state.
+INFO  [alembic.runtime.migration] Running upgrade 0008_learning_state -> 0009_path_commands, Persist owner-scoped path command idempotency receipts.
+INFO  [alembic.runtime.migration] Running upgrade 0009_path_commands -> 0010_animation_jobs, Persist reviewed animation jobs, local event cursors and owner media bindings.
+INFO  [alembic.runtime.migration] Running upgrade 0010_animation_jobs -> 0011_animation_cancel_key, Remember the owner-scoped cancellation key on its immutable job receipt.
+INFO  [alembic.runtime.migration] Running upgrade 0011_animation_cancel_key -> 0012_classroom_sessions, Create classroom sessions, append-only messages, and per-role contexts.
+INFO  [alembic.runtime.migration] Running upgrade 0012_classroom_sessions -> 0013_classroom_operations, Create owner-scoped classroom operation idempotency records.
+INFO  [alembic.runtime.migration] Running upgrade 0013_classroom_operations -> 0014_classroom_receipts, Keep immutable classroom command receipts for idempotent replay.
+INFO  [alembic.runtime.migration] Running upgrade 0014_classroom_receipts -> 0015_debate_results, Store only reviewed, immutable multi-perspective results.
+INFO  [alembic.runtime.migration] Running upgrade 0015_debate_results -> 0016_catalog_releases, Add explicit curated provenance without rewriting generated approval history.
+INFO  [alembic.runtime.migration] Running upgrade 0016_catalog_releases -> 0017_catalog_immutability, Keep catalog provenance immutable; withdrawal never permits reapproval.
+INFO  [alembic.runtime.migration] Running upgrade 0017_catalog_immutability -> 0018_provider_connections, Session bounded encrypted Provider connections (ADR-0008).
+INFO  [alembic.runtime.migration] Running upgrade 0018_provider_connections -> 0019_provider_model_snapshots, Version-bound sanitized model cache; no credentials or raw upstream metadata.
+INFO  [alembic.runtime.migration] Running upgrade 0019_provider_model_snapshots -> 0020_model_preferences, Owner-scoped four task profiles with explicit versioned routes and fallback consent.
+INFO  [alembic.runtime.migration] Running upgrade 0020_model_preferences -> 0021_animation_dispatch, Compatible pg_poll/celery routing and transactional animation outbox (ADR-0009).
+INFO  [alembic.runtime.migration] Running upgrade 0021_animation_dispatch -> 0022_animation_attempts, Persistent render attempts and cleanup tokens (accepted ADR-0009).
+INFO  [alembic.runtime.migration] Running upgrade 0022_animation_attempts -> 0023_animation_dsl_reviews, Immutable DSL review/candidate ledger and explicit policy admission (ADR-0010).
+INFO  [alembic.runtime.migration] Running upgrade 0023_animation_dsl_reviews -> 0024_animation_preparations, API preparation receipts with immutable session/deadline identity (ADR-0010).
+INFO  [alembic.runtime.migration] Running upgrade 0024_animation_preparations -> 0025_animation_dsl_media, Explicit private DSL media/job provenance; preserve every legacy template row.
+INFO  [alembic.runtime.migration] Running upgrade 0025_animation_dsl_media -> 0026_learning_plans, Immutable shared plans and nullable legacy-compatible candidate bindings.
+INFO  [alembic.runtime.migration] Running upgrade 0026_learning_plans -> 0027_learning_reviews, Append-only hybrid review records; no publication privileges.
+INFO  [alembic.runtime.migration] Running upgrade 0027_learning_reviews -> 0028_learning_review_cases, Immutable human-review cases and decisions, with one active case per unit.
+INFO  [alembic.runtime.migration] Running upgrade 0028_learning_review_cases -> 0029_learning_publications, Atomic planned unit publication snapshots and withdrawal facts.
+INFO  [alembic.runtime.migration] Running upgrade 0029_learning_publications -> 0030_learning_phases, Durable generation phase and public review summary, without private content.
+INFO  [alembic.runtime.migration] Running upgrade 0030_learning_phases -> 0031_teaching_context, Freeze explicit teaching selection without inferring any historical node.

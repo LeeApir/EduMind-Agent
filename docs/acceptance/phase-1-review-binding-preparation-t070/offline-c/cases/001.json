@@ -1,0 +1,214 @@
+{
+  "version": "fixed-c-offline-v1",
+  "run_id": "af6340103253403c9dbec8325086f08d",
+  "case_id": "ordinary",
+  "source_id": "edumind-r02-original",
+  "bindings": {
+    "package": "16e0903eb8053cc8a31fb9a4ebb7afb3c0c017ab032a08c60f12b20812d008eb",
+    "source": "48f63b2689c128b89cc399fa9aab9fff377804d26ae42f5d7a1253879a2ba394",
+    "extraction": "ee4f6dac497e654191d311c6cea706536fcfe1a59ba9fd5e8857802f07533ea5",
+    "driver": null,
+    "spec": "f2f260a288bf483f25fab9c6dcdc9fa54d3f9eb1d34428b2109d95e3c01c8e5f",
+    "review_registry": "3a2afaefd5250abe0904016bfe8ac9933fc0dcb21529453825715190d7435c16",
+    "toolchain": "829c6503b37438d6972fc91fb51e620ba07cfa11c0467af33b56e53153d572b1",
+    "controller": "23106d0dd01229c77012beafaeee0a2488a2a3e52963f09534a9a2ff607919db",
+    "baseline_commit": "77b2da73fadf72a4ee1e45d152ab5b4e30845226"
+  },
+  "toolchain": {
+    "version": "fixed-c-toolchain-lock-v3",
+    "base": "manimcommunity/manim@sha256:89ab433ce59134a4dcf351deb2511e067ab354393c0bb7d1859f3e8f0b2406a3",
+    "image_id": "sha256:39fda22d66f57168e9e81ed3327ad59e61b948b0fc2ea0c3b14446d95f58a16f",
+    "platform": "linux/arm64",
+    "snapshot": "20260601T000000Z",
+    "approval": "docs/ADR/0019-toolchain-amendment-approval-20261019.json",
+    "approval_manifest_sha256": "366ab2dced7a7945ac9d47e56fff99a8f5fc0f8324728a4629249228cec034f5",
+    "controller": "scripts/offline_c_runtime/controller.py",
+    "controller_sha256": "23106d0dd01229c77012beafaeee0a2488a2a3e52963f09534a9a2ff607919db",
+    "dockerfile_sha256": "0b2a66a54447937413a94db3e19c8e3fd4773a727c67e237b08649ba735a1eca",
+    "packages_sha256": "3834746dcc855415ee7823d9e91025ccfdef18d5da5678961b7873fb0de27c40",
+    "metadata_sha256": "b26bc5f97b536eda534372443ac04b9ba2307af712623f43fa3dcfe62f249df9",
+    "python": "3.14.7 (main, Aug  5 2026, 16:34:40) [GCC 14.2.0]",
+    "clang": "Debian clang version 19.1.7 (3+b1)\nTarget: aarch64-unknown-linux-gnu\nThread model: posix\nInstalledDir: /usr/lib/llvm-19/bin\n",
+    "linker": "GNU ld (GNU Binutils for Debian) 2.44\nCopyright (C) 2025 Free Software Foundation, Inc.\nThis program is free software; you may redistribute it under the terms of\nthe GNU General Public License version 3 or (at your option) a later version.\nThis program has absolutely no warranty.\n",
+    "runtime_versions": {
+      "libc6": "2.41-12+deb13u3",
+      "clang-19": "1:19.1.7-3+b1",
+      "libclang-rt-19-dev": "1:19.1.7-3+b1",
+      "binutils": "2.44-3"
+    },
+    "build_command": [
+      "docker",
+      "build",
+      "--network=none",
+      "--pull=false",
+      "--tag",
+      "edumind-fixed-c:t066-r02",
+      "/tmp/edumind-t066-toolchain-r02/build"
+    ],
+    "input_artifacts": {
+      "deb_count": 32,
+      "source_bytes": 0,
+      "credentials": 0
+    },
+    "signed_metadata": [
+      {
+        "filename": "snapshot.debian.org_archive_debian_20260601T000000Z_dists_trixie_InRelease",
+        "sha256": "71f2c66148e9e10b4a0c100985b28734704f61efca350519b09bb3a0aad4c771",
+        "bytes": 140415
+      },
+      {
+        "filename": "snapshot.debian.org_archive_debian_20260601T000000Z_dists_trixie_main_binary-arm64_Packages.lz4",
+        "sha256": "ba2a8f1fa69a6a21c8779e8060abd70093864c20f6180522e564e300238a9f6b",
+        "bytes": 20639789
+      }
+    ],
+    "sample_compilations": 0,
+    "sample_executions": 0,
+    "provider_calls": 0,
+    "qualification": "Actual identity/limits/readonly/network/timeout/output/cleanup probes passed; no C executed at lock time",
+    "preparation_note": "T068 adds only fixed ownership case dispatch; package/base/isolation unchanged; actual preflight passed.",
+    "packages_lock": "docs/acceptance/offline-c-toolchain-r02/packages.json"
+  },
+  "isolation": {
+    "effective": {
+      "NetworkMode": "none",
+      "IpcMode": "none",
+      "ReadonlyRootfs": true,
+      "Memory": 536870912,
+      "MemorySwap": 536870912,
+      "NanoCpus": 1000000000,
+      "PidsLimit": 64
+    },
+    "user": "10001:10001",
+    "cap_drop": [
+      "ALL"
+    ],
+    "security_opt": [
+      "no-new-privileges:true"
+    ],
+    "tmpfs": {
+      "/tmp": "rw,noexec,nosuid,nodev,size=16777216,uid=10001,gid=10001,mode=0700",
+      "/work": "rw,exec,nosuid,nodev,size=134217728,uid=10001,gid=10001,mode=0700"
+    },
+    "mounts": [
+      {
+        "Type": "bind",
+        "Destination": "/bundle",
+        "RW": false
+      }
+    ],
+    "inspect_sha256": "19e339d086fa7f84d22a7ec308ba8c4e9d880aef290826b80bf2ba641e9a5ae3",
+    "oom": false,
+    "preflight_sha256": "4f8c5b115b3c89da1bce8ec903a59696989ee97d781166736a9c5295863c5733",
+    "cleanup": "removed",
+    "container_argv": [
+      "docker",
+      "run",
+      "--name",
+      "edumind-fixed-c-9d5c0cbfe9c244d39dd06341d4bfb955",
+      "--pull=never",
+      "--network=none",
+      "--ipc=none",
+      "--user=10001:10001",
+      "--cap-drop=ALL",
+      "--security-opt=no-new-privileges:true",
+      "--read-only",
+      "--cpus=1",
+      "--memory=512m",
+      "--memory-swap=512m",
+      "--pids-limit=64",
+      "--ulimit=core=0:0",
+      "--ulimit=nofile=128:128",
+      "--ulimit=fsize=16777216:16777216",
+      "--tmpfs=/work:rw,exec,nosuid,nodev,size=134217728,uid=10001,gid=10001,mode=0700",
+      "--tmpfs=/tmp:rw,noexec,nosuid,nodev,size=16777216,uid=10001,gid=10001,mode=0700",
+      "--log-driver=none",
+      "--entrypoint=/usr/bin/env",
+      "--mount",
+      "type=bind,source=/var/folders/22/4lqw_x794jn65xl_95lkblkr0000gn/T/edumind-fixed-c-qcxknxo_/bundle,target=/bundle,readonly",
+      "sha256:39fda22d66f57168e9e81ed3327ad59e61b948b0fc2ea0c3b14446d95f58a16f",
+      "-i",
+      "PATH=/usr/bin:/bin",
+      "HOME=/tmp",
+      "TMPDIR=/tmp",
+      "LANG=C",
+      "LC_ALL=C",
+      "ASAN_OPTIONS=detect_leaks=0:abort_on_error=1:symbolize=0",
+      "UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=0",
+      "/usr/local/bin/python3",
+      "-I",
+      "/opt/fixed-c/controller.py",
+      "edumind-r02-original",
+      "ordinary"
+    ]
+  },
+  "kind": "ordinary_compile",
+  "fault_at": null,
+  "commands": [
+    {
+      "argv": [
+        "/usr/bin/clang-19",
+        "-std=c11",
+        "-Wall",
+        "-Wextra",
+        "-Wpedantic",
+        "-Wnewline-eof",
+        "/bundle/edumind/candidate.c",
+        "-o",
+        "/work/program"
+      ],
+      "cwd": "/work",
+      "env": {
+        "PATH": "/usr/bin:/bin",
+        "HOME": "/tmp",
+        "TMPDIR": "/tmp",
+        "LANG": "C",
+        "LC_ALL": "C",
+        "ASAN_OPTIONS": "detect_leaks=0:abort_on_error=1:symbolize=0",
+        "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=0"
+      },
+      "started_at": "2026-10-19T12:04:31.477309+00:00",
+      "ended_at": "2026-10-19T12:04:31.509917+00:00",
+      "duration_ms": 32,
+      "exit_code": 0,
+      "signal": null,
+      "timeout": false,
+      "output_limit": false,
+      "oom": false,
+      "stdout": {
+        "base64": "",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "base64": "L2J1bmRsZS9lZHVtaW5kL2NhbmRpZGF0ZS5jOjU5OjI6IHdhcm5pbmc6IG5vIG5ld2xpbmUgYXQgZW5kIG9mIGZpbGUgWy1XbmV3bGluZS1lb2ZdCiAgIDU5IHwgfQogICAgICB8ICBeCjEgd2FybmluZyBnZW5lcmF0ZWQuCg==",
+        "bytes": 127,
+        "sha256": "e867022ff2e13b8a9fcba3c06f7f4495a6b1e55375a3403c4b399eb98f7d9624"
+      }
+    }
+  ],
+  "status": "pass",
+  "reason": "success",
+  "observations": {
+    "numeric_sequence": null,
+    "format_exact": null,
+    "attempts": null,
+    "allocated": null,
+    "released": null,
+    "live": null,
+    "per_insert_states": null,
+    "free_call_sequence": null,
+    "caller_head_reset": null,
+    "asan": "not_run",
+    "ubsan": "not_run",
+    "lsan": "not_run"
+  },
+  "expected_observation_matched": true,
+  "scope_limitations": [
+    "fixed 1/2/3 case only; original main and independent driver separate",
+    "ordinary and strict results separate",
+    "LSan not run",
+    "model output not oracle",
+    "not a model review/pass or human signoff"
+  ]
+}
