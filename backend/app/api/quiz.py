@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from app.agents.profile_agent import StructuredProfileGateway
 from app.core.auth import AuthenticatedSession, AuthFailure, require_authenticated_session
 from app.core.database import database_session_factory
+from app.services.learning_contract import LearningContractError
 from app.services.learning_operations import IdempotencyConflict
 from app.services.profile_behavior_updates import (
     learning_evidence_summary,
@@ -90,6 +91,10 @@ async def submit_quiz(
             )
         except QuizResourceNotFound:
             raise AuthFailure(404, "NOT_FOUND", "Resource not found.") from None
+        except LearningContractError as error:
+            raise AuthFailure(
+                409, error.code, "课程教学节点绑定不可用于本次评分，已有记录保持。"
+            ) from None
         except QuizScoringError:
             raise AuthFailure(
                 422, "QUIZ_SUBMISSION_INVALID", "Quiz submission is invalid."
