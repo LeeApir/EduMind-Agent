@@ -55,6 +55,7 @@ class PlanInputs:
     learner_evidence: dict[str, Any]
     reference_context: object = None
     path_snapshot: object = None
+    teaching_context: dict[str, Any] | None = None
 
     def snapshot(self) -> dict[str, Any]:
         value = deepcopy(
@@ -65,6 +66,9 @@ class PlanInputs:
                 "node_ids": sorted(self.node_ids),
             }
         )
+        if self.teaching_context is not None:
+            from app.services.teaching_binding import check_teaching_plan
+            value["teaching_context"] = check_teaching_plan(self.teaching_context, self.metadata)
         canonical(value)
         return value
 

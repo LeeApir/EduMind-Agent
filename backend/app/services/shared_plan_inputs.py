@@ -21,6 +21,7 @@ async def shared_plan_inputs(
     goal: str,
     language: str,
     graph: KnowledgeGraphRepository,
+    teaching_context: dict[str, Any] | None = None,
 ) -> PlanInputs:
     node = graph.get_node(node_id)
     code_language = {"c": "C", "C": "C", "python": "Python", "Python": "Python"}.get(language)
@@ -74,4 +75,5 @@ async def shared_plan_inputs(
         node_ids=frozenset(n.id for n in graph.all_nodes()),
         learner_evidence=evidence,
         reference_context=context,
+        teaching_context=teaching_context,
     )

@@ -6,7 +6,7 @@ from typing import Any
 from app.agents.learner_review import learner_review_context
 from app.services.learning_contract import LearningContractError, canonical, digest
 
-REVIEW_INPUT_VERSION = "authoritative-review-input-v3"
+REVIEW_INPUT_VERSION = "authoritative-review-input-v4"
 
 
 def review_input(
@@ -23,6 +23,12 @@ def review_input(
     learner = learner_review_context(snapshot)
     metadata = snapshot.get("metadata", {})
     goal = metadata.get("goal") if isinstance(metadata, dict) else None
+    teaching = snapshot.get("teaching_context")
+    if teaching is not None:
+        from app.services.teaching_binding import check_teaching_plan
+
+        teaching = check_teaching_plan(teaching, metadata)
+        goal = teaching["original_request"]
     available = available and isinstance(goal, str) and bool(goal.strip())
     original_reference = payload.get("reference_context")
     if "reference_context" in snapshot and canonical(snapshot["reference_context"]) != canonical(
@@ -66,12 +72,16 @@ def review_input(
     # Close the duplicate nested route too. Keep all student content/actions/plan promises.
     if isinstance(unit, dict):
         unit["reference_context"] = deepcopy(view)
+    if teaching is not None:
+        data["current_segment_scope"] = deepcopy(teaching)
     data["reference_context"] = view
     data["learner_review_context"] = learner
     data["authoritative_teaching_goal"] = {
         "version": REVIEW_INPUT_VERSION,
         "status": "bound_original_request" if available else "unavailable",
-        "source": "LearningPlanVersion.input_snapshot.metadata.goal",
+        "source": "LearningPlanVersion.input_snapshot.teaching_context.original_request"
+        if teaching is not None
+        else "LearningPlanVersion.input_snapshot.metadata.goal",
         "input_digest": binding["input_digest"],
         "user_request": goal if available else None,
         "plan_commitments": {

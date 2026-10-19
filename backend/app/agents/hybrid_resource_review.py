@@ -17,6 +17,7 @@ from app.agents.review_input import REVIEW_INPUT_VERSION, review_input
 from app.agents.review_responsibilities import (
     RESPONSIBILITY_INSTRUCTION,
     REVIEW_SCOPE_VERSION,
+    TEACHING_SCOPE_INSTRUCTION,
     UNIT_OBJECTIVE_INSTRUCTION,
     review_responsibilities,
 )
@@ -125,6 +126,7 @@ INSTRUCTION += (
     + RESPONSIBILITY_INSTRUCTION
     + LEARNER_INSTRUCTION
     + UNIT_OBJECTIVE_INSTRUCTION
+    + TEACHING_SCOPE_INSTRUCTION
 )
 
 

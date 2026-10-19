@@ -1,6 +1,6 @@
 """Versioned evidence-strength and citation rules shared by prompt and policy."""
 
-REVIEW_PROMPT_VERSION = "evidence-resource-review-v4.8"
+REVIEW_PROMPT_VERSION = "evidence-resource-review-v4.9"
 
 EVIDENCE_INSTRUCTION = """\
 Bound every conclusion to the strength and scope of its evidence. Separate a demonstrated

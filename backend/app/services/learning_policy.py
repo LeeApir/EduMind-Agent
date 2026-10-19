@@ -5,6 +5,7 @@ from app.agents.review_evidence import REVIEW_PROMPT_VERSION
 from app.agents.review_input import REVIEW_INPUT_VERSION
 from app.agents.review_responsibilities import RESPONSIBILITY_VERSION, REVIEW_SCOPE_VERSION
 from app.services.learning_contract import digest
+from app.services.teaching_binding import TEACHING_BINDING_VERSION
 
 POLICY_VERSION = "hybrid-review-v1"
 POLICY = {
@@ -16,6 +17,7 @@ POLICY = {
     "review_scope": REVIEW_SCOPE_VERSION,
     "review_responsibilities": RESPONSIBILITY_VERSION,
     "learner_review": LEARNER_REVIEW_VERSION,
+    "teaching_scope": TEACHING_BINDING_VERSION,
     "plan": "learning-plan-v1",
     "actions": "teaching-actions-v1",
     "max_corrections": 2,

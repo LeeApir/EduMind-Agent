@@ -27,6 +27,7 @@ async def hybrid_events(
     gateway: ProviderGateway,
     graph: KnowledgeGraphRepository,
     sessions: async_sessionmaker[AsyncSession],
+    teaching_mode: str = "target",
 ) -> AsyncIterator[str]:
     from app.api.learning_sessions import _event
 
@@ -116,15 +117,26 @@ async def hybrid_events(
                     graph=graph,
                     trigger_reason="initial_plan",
                 )
+                from app.services.teaching_binding import select_teaching_context
+
+                teaching = select_teaching_context(
+                    owner_id=owner_id,
+                    target_node_id=resolution.node.id,
+                    original_request=goal,
+                    mode=teaching_mode,
+                    graph=graph,
+                    path=path,
+                )
                 path_snapshot = path_payload(path, is_stale=False)
                 await db.commit()
                 inputs = await shared_plan_inputs(
                     db,
                     owner_id=owner_id,
-                    node_id=path.current_node_id or resolution.node.id,
-                    goal=goal,
+                    node_id=teaching["teaching_node_id"],
+                    goal=teaching["segment_goal"],
                     language=language,
                     graph=graph,
+                    teaching_context=teaching,
                 )
                 inputs = replace(inputs, path_snapshot=path_snapshot)
                 await db.commit()

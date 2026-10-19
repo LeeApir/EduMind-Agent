@@ -15,7 +15,7 @@ from app.services.learning_contract import (
 from app.services.unit_material import restore_material
 
 RESPONSIBILITY_VERSION = "review-responsibilities-v1"
-REVIEW_SCOPE_VERSION = "layered-review-scope-v5"
+REVIEW_SCOPE_VERSION = "teaching-bound-review-scope-v6"
 ROLE_RESPONSIBILITIES = {
     "explanation": [
         "Concepts, terminology, process states and boundaries actually stated here.",
@@ -147,4 +147,17 @@ and a caller's variable are not the same storage. A caller's separate cleanup as
 not make a claim that the callee performed it true. Report the precise false attribution
 with actual anchors, without inventing a reachable memory error when none is demonstrated.
 Every auxiliary assertion/citation must still satisfy the evidence-strength rules.
+"""
+
+
+TEACHING_SCOPE_INSTRUCTION = """
+current_segment_scope, when supplied, is trusted server-bound user selection, not a plan's
+permission to narrow the original request. For target_lesson, check the complete original
+request. For prerequisite_segment the user explicitly selected the recommended prerequisite:
+check the actual selected node and segment_goal; keep the complete original request and its
+constraints visible, but never claim the final target lesson has been delivered or mastered.
+Do not demand the deferred target implementation in a clearly authorized prerequisite lesson.
+Do not erase conflicting or unclear user constraints: state the concrete conflict/unknown.
+Plans and candidates cannot mint or override a selection, teaching node or segment scope.
+Topic identity requires actual content review; equal node IDs alone do not prove correct topic.
 """

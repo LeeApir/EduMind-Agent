@@ -3179,7 +3179,7 @@
       "id": "PHASE-1-T061",
       "phase": "Phase 1",
       "title": "按实际教学节点生成同主题计划与内容",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1-T060"
@@ -3204,9 +3204,11 @@
         "cd backend && .venv/bin/ruff check app tests && .venv/bin/mypy app",
         "git diff --check"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "完成target/recommended内部选择、冻结path身份和本节范围/原文双层输入，实际hybrid不再直接用path.current取代目标；v4.9/inputv4/scopev6及政策teaching_scope绑定，后台角色/摘要规则保留 | 定向45、独立PG+Mock83通过0跳过，Ruff全app/tests/mypy195/workflow/diff通过；2例Mock构造错误修正并保留记录 | Provider0；T062列/发布绑定与T064公开模式尚未实施，不声称端到端完成，原r02不改 | 证据teaching-binding-implementation/t061.json，独立提交后领取T062"
+      ],
+      "started_at": "2026-10-19T15:25:32",
+      "completed_at": "2026-10-19T15:29:38",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T061",
       "execution_gate": "2026-10-19用户已明确授权在新分支开发T056–T070，按依赖串行执行；审核契约/API/持久化/执行安全边界仍须对应T056/T060/T065具体设计明确批准后实施，未批准项不得推定。真实Provider与动态开放不在本批授权内。",

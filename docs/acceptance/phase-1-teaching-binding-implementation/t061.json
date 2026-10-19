@@ -1,0 +1,45 @@
+{
+  "task": "PHASE-1-T061",
+  "provider_calls": 0,
+  "targeted_tests": 45,
+  "pg_mock_tests": 83,
+  "skipped": 0,
+  "ruff": "all app/tests passed",
+  "mypy": "195 sources passed",
+  "workflow": "passed",
+  "diff": "passed",
+  "policy": {
+    "resource_review": "resource-review-v4",
+    "resource_review_prompt": "evidence-resource-review-v4.9",
+    "review_input": "authoritative-review-input-v4",
+    "objective_coverage": "student-visible-goal-coverage-v1",
+    "review_coverage": "fixed-check-ids-v2",
+    "review_scope": "teaching-bound-review-scope-v6",
+    "review_responsibilities": "review-responsibilities-v1",
+    "learner_review": "learner-evidence-review-v1",
+    "teaching_scope": "teaching-node-binding-v1",
+    "plan": "learning-plan-v1",
+    "actions": "teaching-actions-v1",
+    "max_corrections": 2,
+    "max_formal_calls": 20,
+    "max_with_temporary_calls": 22,
+    "model_deadline_seconds": 180,
+    "human_requires_complete_unit": true,
+    "hard_gate_override": false
+  },
+  "policy_digest": "5d6625caef31a1ed7c452c7295557480f253914be3e13d482284738d17b0a7ac",
+  "implemented": [
+    "explicit target vs recommended selection",
+    "frozen path identity not mutable path pointer",
+    "PlanInputs teaching_context and bound original/segment goals",
+    "actual hybrid entry selects teaching node instead of path current",
+    "v4.9/inputv4/scopev6 Prompt and exact request capture"
+  ],
+  "not_yet_implemented": [
+    "T062 immutable operation column and publication v2 binding",
+    "T063 exact quiz mastery node",
+    "T064 public mode and display"
+  ],
+  "initial_test_failure": "2 cases used list instead of object for local mock Gateway; corrected fixture constructor, original assertions preserved",
+  "semantic_accuracy": "not measured; Mock only"
+}

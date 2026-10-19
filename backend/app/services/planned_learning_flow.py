@@ -123,6 +123,7 @@ async def run_planned_operation(
                     inputs.node_ids,
                     {**inputs.learner_evidence, "explicit_adjustment": adjustment},
                     inputs.reference_context,
+                    teaching_context=inputs.teaching_context,
                 )
             plan_value = await generate_shared_plan(gateway, plan_inputs, window)
             if (
