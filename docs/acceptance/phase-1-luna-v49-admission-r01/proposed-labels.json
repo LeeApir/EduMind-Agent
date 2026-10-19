@@ -1,0 +1,154 @@
+{
+  "labels": [
+    {
+      "id": "screen-complete",
+      "phase": "screen",
+      "material_sha256": "3c09bb7db5a8a8c32fd962d2830082c994ccbcdc14200ed00aa79e19b0aaef1a",
+      "expected_local_verdict": "pass",
+      "required_claims": [
+        "所有必检ID齐全，findings/unchecked/unresolved均为空；无附带误报。"
+      ],
+      "all_claims_and_all_anchors_must_be_supported": true,
+      "independent_human_status": "pending",
+      "model_result": null
+    },
+    {
+      "id": "screen-distributed",
+      "phase": "screen",
+      "material_sha256": "c11931be3e017d216ab1fc34f2fc0228cfb36403e6fdb04bbaa77c50a1e9da6d",
+      "expected_local_verdict": "pass",
+      "required_claims": [
+        "所有必检ID齐全，findings/unchecked/unresolved均为空；无附带误报。"
+      ],
+      "all_claims_and_all_anchors_must_be_supported": true,
+      "independent_human_status": "pending",
+      "model_result": null
+    },
+    {
+      "id": "screen-teaching-gap",
+      "phase": "screen",
+      "material_sha256": "ef1ddc40e0ac04190e9c1762b6c4f687f8fa18dfc3db9086de8eaab76d3b159c",
+      "expected_local_verdict": "needs_human",
+      "required_claims": [
+        "具体说明学生可见关键状态/退出教学不足，以及题目未考查过程；内部计划不算交付。"
+      ],
+      "all_claims_and_all_anchors_must_be_supported": true,
+      "independent_human_status": "pending",
+      "model_result": null
+    },
+    {
+      "id": "screen-assessment-gap",
+      "phase": "screen",
+      "material_sha256": "d515cbf6ee9025123351878c79de147224e6e737a8ecea68bccc93f0fa497a0e",
+      "expected_local_verdict": "needs_human",
+      "required_claims": [
+        "已教状态与退出边界，准确指出仅测最终值/长度而未测过程；不得声称未教。"
+      ],
+      "all_claims_and_all_anchors_must_be_supported": true,
+      "independent_human_status": "pending",
+      "model_result": null
+    },
+    {
+      "id": "screen-fact",
+      "phase": "screen",
+      "material_sha256": "e603d3956207ab1ffa0af8a46e8b25925c2353aa56a6c94ed4a0edebd3cfbf19",
+      "expected_local_verdict": "reject",
+      "required_claims": [
+        "指出返回值声明与实际程序矛盾，引用声明和程序；不得编造其他缺陷。"
+      ],
+      "all_claims_and_all_anchors_must_be_supported": true,
+      "independent_human_status": "pending",
+      "model_result": null
+    },
+    {
+      "id": "screen-safety",
+      "phase": "screen",
+      "material_sha256": "7b92d201b94fb87000013b7ef6ad844e501dea1d7d219945234422f380b2d016",
+      "expected_local_verdict": "reject",
+      "required_claims": [
+        "指出实际可达越界及精确长度/索引；不得从未定义行为推出必然不等于某个数值。"
+      ],
+      "all_claims_and_all_anchors_must_be_supported": true,
+      "independent_human_status": "pending",
+      "model_result": null
+    },
+    {
+      "id": "screen-mixed",
+      "phase": "screen",
+      "material_sha256": "59169c21cab172ef712bf9b916a382b601100ea2fedee3b5442ca8ffc4a82b47",
+      "expected_local_verdict": "reject",
+      "required_claims": [
+        "指出实际可达越界及精确长度/索引；不得从未定义行为推出必然不等于某个数值。",
+        "程序未实现原始目标承诺的求和循环；这是实际交付缺口，须具体说明，不能误记为附带误报。",
+        "具体说明学生可见关键状态/退出教学不足，以及题目未考查过程；内部计划不算交付。"
+      ],
+      "all_claims_and_all_anchors_must_be_supported": true,
+      "independent_human_status": "pending",
+      "model_result": null
+    },
+    {
+      "id": "screen-full-node-promise",
+      "phase": "screen",
+      "material_sha256": "11b86d4dfaa756b9bcbc6cf0aab905334acbacc84fd9de2645261256236bb8b3",
+      "expected_local_verdict": "needs_human",
+      "required_claims": [
+        "指出显式完整基本操作承诺中的插入/删除没有交付，不能只按局部求和目标放行；不将缺教学编造为fact。"
+      ],
+      "all_claims_and_all_anchors_must_be_supported": true,
+      "independent_human_status": "pending",
+      "model_result": null
+    },
+    {
+      "id": "holdout-stack-complete",
+      "phase": "holdout",
+      "material_sha256": "70cb349988027c6bbea643d0a076bba0d4e48d8967bea627038dbf92a3a9fd92",
+      "expected_local_verdict": "pass",
+      "required_claims": [
+        "所有必检ID齐全，findings/unchecked/unresolved均为空；无附带误报。"
+      ],
+      "all_claims_and_all_anchors_must_be_supported": true,
+      "independent_human_status": "pending",
+      "model_result": null
+    },
+    {
+      "id": "holdout-stack-fact",
+      "phase": "holdout",
+      "material_sha256": "e80369f5a79b5f51861eed3bc7db3da0adc6b3f5f4900ecd475afc671f098186",
+      "expected_local_verdict": "reject",
+      "required_claims": [
+        "指出返回值声明与实际程序矛盾，引用声明和程序；不得编造其他缺陷。"
+      ],
+      "all_claims_and_all_anchors_must_be_supported": true,
+      "independent_human_status": "pending",
+      "model_result": null
+    },
+    {
+      "id": "holdout-stack-safety",
+      "phase": "holdout",
+      "material_sha256": "f7859e40d0b2804bd384eb40df318f64353e24f141ace602e9b229f13092d813",
+      "expected_local_verdict": "reject",
+      "required_claims": [
+        "指出实际可达越界及精确长度/索引；不得从未定义行为推出必然不等于某个数值。",
+        "本例未递减top，也未完成所承诺的出栈/返回值教学；该真实目标缺口须保留具体说明，不计附带误报。"
+      ],
+      "all_claims_and_all_anchors_must_be_supported": true,
+      "independent_human_status": "pending",
+      "model_result": null
+    },
+    {
+      "id": "holdout-prerequisite",
+      "phase": "holdout",
+      "material_sha256": "af0eb0a3ea3e41f0e380646b875e19bc2a2ce52f406a86a1f942ceca2f4e4cf2",
+      "expected_local_verdict": "pass",
+      "required_claims": [
+        "所有必检ID齐全，findings/unchecked/unresolved均为空；无附带误报。"
+      ],
+      "all_claims_and_all_anchors_must_be_supported": true,
+      "independent_human_status": "pending",
+      "model_result": null
+    }
+  ],
+  "authorship": "Codex draft; not independent signoff",
+  "holdout_definition": "newly authored after v4.9 freeze, disjoint from earlier fixes; visible to preparer, not statistically blind to preparer",
+  "real_calls": 0
+}
