@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 from typing import Any
 from uuid import uuid4
 
+from app.agents.learner_review import LEARNER_INSTRUCTION
 from app.agents.learning_resource_schema import LearningResourceType, resource_output_schema
 from app.agents.learning_unit_generator import StructuredResourceGateway
 from app.agents.objective_exercises import objective_exercise_issues
@@ -116,7 +117,7 @@ it. Actual false media-delivery claims remain factual issues. Missing authoritat
 cannot be repaired by treating plan.goal as the original request; retain uncertainty.
 """
 
-INSTRUCTION += "\n" + EVIDENCE_INSTRUCTION + RESPONSIBILITY_INSTRUCTION
+INSTRUCTION += "\n" + EVIDENCE_INSTRUCTION + RESPONSIBILITY_INSTRUCTION + LEARNER_INSTRUCTION
 
 
 def review_output_schema(scope: str, *, anchor_ids: list[str] | None = None) -> dict[str, Any]:

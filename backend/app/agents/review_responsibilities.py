@@ -15,7 +15,7 @@ from app.services.learning_contract import (
 from app.services.unit_material import restore_material
 
 RESPONSIBILITY_VERSION = "review-responsibilities-v1"
-REVIEW_SCOPE_VERSION = "role-bound-review-scope-v3"
+REVIEW_SCOPE_VERSION = "role-learner-review-scope-v4"
 ROLE_RESPONSIBILITIES = {
     "explanation": [
         "Concepts, terminology, process states and boundaries actually stated here.",

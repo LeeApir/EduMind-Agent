@@ -1,5 +1,6 @@
 """Versioned local publication policy; changing its semantics invalidates pending cases."""
 
+from app.agents.learner_review import LEARNER_REVIEW_VERSION
 from app.agents.review_evidence import REVIEW_PROMPT_VERSION
 from app.agents.review_input import REVIEW_INPUT_VERSION
 from app.agents.review_responsibilities import RESPONSIBILITY_VERSION, REVIEW_SCOPE_VERSION
@@ -14,6 +15,7 @@ POLICY = {
     "review_coverage": "fixed-check-ids-v1",
     "review_scope": REVIEW_SCOPE_VERSION,
     "review_responsibilities": RESPONSIBILITY_VERSION,
+    "learner_review": LEARNER_REVIEW_VERSION,
     "plan": "learning-plan-v1",
     "actions": "teaching-actions-v1",
     "max_corrections": 2,

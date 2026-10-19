@@ -3,9 +3,10 @@
 from copy import deepcopy
 from typing import Any
 
+from app.agents.learner_review import learner_review_context
 from app.services.learning_contract import LearningContractError, canonical, digest
 
-REVIEW_INPUT_VERSION = "authoritative-review-input-v2"
+REVIEW_INPUT_VERSION = "authoritative-review-input-v3"
 
 
 def review_input(
@@ -19,6 +20,7 @@ def review_input(
     ):
         raise LearningContractError("REVIEW_INPUT_BINDING_MISMATCH")
     snapshot = input_snapshot or {}
+    learner = learner_review_context(snapshot)
     metadata = snapshot.get("metadata", {})
     goal = metadata.get("goal") if isinstance(metadata, dict) else None
     available = available and isinstance(goal, str) and bool(goal.strip())
@@ -47,7 +49,9 @@ def review_input(
         "source": source,
         "node": {k: deepcopy(node[k]) for k in ("id", "name", "description") if k in node},
         "learner_evidence": deepcopy(
-            snapshot.get("learner_evidence", reference.get("learner_evidence", {}))
+            learner["evidence"].get(
+                "input_snapshot", learner["evidence"].get("reference_context", {})
+            )
         ),
         "explicitly_requested_objective_references": [
             item
@@ -63,6 +67,7 @@ def review_input(
     if isinstance(unit, dict):
         unit["reference_context"] = deepcopy(view)
     data["reference_context"] = view
+    data["learner_review_context"] = learner
     data["authoritative_teaching_goal"] = {
         "version": REVIEW_INPUT_VERSION,
         "status": "bound_original_request" if available else "unavailable",

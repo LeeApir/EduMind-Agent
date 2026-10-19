@@ -69,7 +69,7 @@ def test_real_request_cannot_accept_a_candidate_supplied_scope_override():
         assert data["unit"]["plan"] == w.plan
         assert data["reference_context"]["source"] == w.reference_context["source"]
         assert "facts" not in data["reference_context"]
-        assert result["prompt_version"] == "evidence-resource-review-v4.6"
+        assert result["prompt_version"] == "evidence-resource-review-v4.7"
         assert result["local_routing"]["verdict"] == "pass"
 
     asyncio.run(check())
