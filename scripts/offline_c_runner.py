@@ -14,8 +14,8 @@ from pathlib import Path
 from offline_c_docker import container_argv
 from offline_c_fixtures import FIXTURES, ROOT, AdmissionError, check_manifest, safe_file, sha
 
-LOCK_PATH = ROOT / "docs/acceptance/offline-c-toolchain-t067/lock.json"
-LOCK_SHA256 = "3a627ac9040b85a92a62c777fe2be5d221a3968480facfc72057392ef98b0f5f"
+LOCK_PATH = ROOT / "docs/acceptance/offline-c-toolchain-t068/lock.json"
+LOCK_SHA256 = "829c6503b37438d6972fc91fb51e620ba07cfa11c0467af33b56e53153d572b1"
 HOST_ENV = {"PATH": os.environ["PATH"], "HOME": str(Path.home())}
 
 
@@ -124,12 +124,22 @@ def execute_container(lock, bundle, args, *, timeout=40):
             raise AdmissionError(f"container cleanup failed: {name}")
 
 
-def prepare_bundle(destination):
+def prepare_bundle(destination, *, ownership=False):
     check_manifest()
     manifest = json.loads((ROOT / FIXTURES / "manifest.json").read_bytes())
-    destination.mkdir(mode=0o755)
+    if ownership:
+        from offline_c_ownership import DIRECTORY, MANIFEST_SHA256, check_ownership
+        extension = check_ownership()
+        manifest["_ownership_digest"] = MANIFEST_SHA256
+        manifest["_ownership_review"] = extension["review_registry_sha256"]
+        manifest["artifacts"] = {**manifest["artifacts"], **extension["artifacts"]}
+    destination.mkdir(mode=0o755, exist_ok=True)
+    destination.chmod(0o755)
     for relative, evidence in manifest["artifacts"].items():
-        raw = safe_file(ROOT, str(FIXTURES / relative)).read_bytes()
+        source_root = FIXTURES
+        if ownership and relative in extension["artifacts"]:
+            source_root = DIRECTORY
+        raw = safe_file(ROOT, str(source_root / relative)).read_bytes()
         if sha(raw) != evidence["sha256"]:
             raise AdmissionError("bundle source changed")
         target = destination / relative
@@ -215,7 +225,13 @@ def case_result(lock, bundle, source, case, manifest, preflight_digest, *, timeo
     observations = {k: None for k in ["numeric_sequence", "format_exact", "attempts", "allocated", "released", "live", "per_insert_states", "free_call_sequence", "caller_head_reset"]}
     observations.update({"asan": "not_run", "ubsan": "not_run", "lsan": "not_run"})
     expected = False
-    if source == "om-original":
+    ownership_case = case.startswith(("program-", "contract-", "negative-"))
+    if ownership_case:
+        from offline_c_ownership_results import observe
+        observations, expected = observe(source, case, value, commands, bundle)
+        if not expected and value["status"] == "pass":
+            value["status"], value["reason"] = "fail", "assertion_failed"
+    elif source == "om-original":
         expected = (value["reason"] in {"compile_failed", "compile_error"} and "Node" in stderr)
     elif case == "strict":
         expected = value["reason"] == "compile_error" and "no newline at end of file" in stderr
@@ -233,7 +249,7 @@ def case_result(lock, bundle, source, case, manifest, preflight_digest, *, timeo
         expected = value["status"] == "pass" and numeric == independent["numeric_sequence"] and observations["format_exact"]["independent"]
         if not expected and value["status"] == "pass":
             value["status"], value["reason"] = "fail", "numeric_mismatch" if numeric != independent["numeric_sequence"] else "format_mismatch"
-    source_relative = manifest["sources"][source]["program"]
+    source_relative = "edumind/" + case + ".c" if case.startswith("negative-") else manifest["sources"][source]["program"]
     bindings = {"package": sha((ROOT / FIXTURES / "manifest.json").read_bytes()),
                 "source": manifest["artifacts"][source_relative]["sha256"],
                 "extraction": manifest["artifacts"]["spec/extraction.json"]["sha256"],
@@ -241,30 +257,39 @@ def case_result(lock, bundle, source, case, manifest, preflight_digest, *, timeo
                 "review_registry": manifest["review_registry_sha256"], "toolchain": LOCK_SHA256,
                 "controller": lock["controller_sha256"],
                 "baseline_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()}
+    if manifest.get("_ownership_digest"):
+        bindings["package"] = sha(json.dumps({"base": bindings["package"], "ownership": manifest["_ownership_digest"]}, sort_keys=True).encode())
+        bindings["review_registry"] = sha(json.dumps({"base": bindings["review_registry"], "ownership": manifest["_ownership_review"]}, sort_keys=True).encode())
+    if ownership_case and len(commands) == 2:
+        driver = ("edumind" if source == "edumind-r02-original" else "om") + "/ownership-driver.c"
+        bindings["driver"] = manifest["artifacts"][driver]["sha256"]
     return {"version": "fixed-c-offline-v1", "run_id": None, "case_id": case, "source_id": source,
             "bindings": bindings, "toolchain": lock,
             "isolation": {**result["isolation"], "preflight_sha256": preflight_digest, "cleanup": "removed", "container_argv": result["argv"]},
-            "kind": "strict_compile" if case == "strict" else "ordinary_compile" if case == "ordinary" else "original_main",
-            "fault_at": None, **value, "observations": observations,
+            "kind": "controlled_negative" if case.startswith("negative-") else "wrapped_main" if case.startswith("program-") else "function_contract" if case.startswith("contract-") else "strict_compile" if case == "strict" else "ordinary_compile" if case == "ordinary" else "original_main",
+            "fault_at": int(case.rsplit("-", 1)[1]) if case.startswith(("program-", "contract-")) else 0 if case.startswith("negative-") else None, **value, "observations": observations,
             "expected_observation_matched": expected,
-            "scope_limitations": ["fixed original 1/2/3 main only", "ordinary and strict results separate", "LSan not run", "model output not oracle", "not a model review/pass or human signoff"]}
+            "scope_limitations": ["fixed 1/2/3 case only; original main and independent driver separate", "ordinary and strict results separate", "LSan not run", "model output not oracle", "not a model review/pass or human signoff"]}
 
 
-def run_compile_suite(manifest_path, output):
+def run_compile_suite(manifest_path, output, *, suite="compile-output"):
     # The output must be fresh so past failure evidence is never overwritten.
     if output.exists() and any(output.iterdir()):
         raise AdmissionError("output evidence directory must be fresh")
     output.mkdir(parents=True, exist_ok=True)
     check_manifest(manifest_path)
     schedule = [(s, c) for s in ["edumind-r02-original", "om-original"] for c in ["strict", "ordinary", "normal", "sanitized-normal"]]
-    report = {"version": "fixed-c-report-v1", "run_id": uuid.uuid4().hex, "suite": "compile-output",
+    if suite == "ownership":
+        schedule = [(s, f"{mode}-{n}") for s in ["edumind-r02-original", "om-original"] for mode in ["program", "contract"] for n in range(4)]
+        schedule += [("edumind-r02-original", "negative-" + n) for n in ["drop-link", "double-free", "ignored-return"]]
+    report = {"version": "fixed-c-report-v1", "run_id": uuid.uuid4().hex, "suite": suite,
               "provider_calls": 0, "cases": [], "preflight": None, "stopped": None}
     started = time.monotonic()
     try:
         lock = verify_toolchain()
         with tempfile.TemporaryDirectory(prefix="edumind-fixed-c-") as private:
             bundle = Path(private) / "bundle"
-            manifest = prepare_bundle(bundle)
+            manifest = prepare_bundle(bundle, ownership=suite == "ownership")
             report["preflight"] = preflight(lock, bundle)
             preflight_digest = sha(json.dumps(report["preflight"], sort_keys=True).encode())
             for source, case in schedule:

@@ -1,0 +1,33 @@
+{
+  "task": "PHASE-1-T068",
+  "provider_calls": 0,
+  "actual_compilations": 19,
+  "actual_program_processes": 15,
+  "cases": 19,
+  "edumind_main_and_contract": {
+    "scenarios": 8,
+    "result": "pass; failure preserves old head; tracked actual allocations all freed once; actual per-step states and stdout verified"
+  },
+  "om_original_main": {
+    "scenarios": 4,
+    "result": "not_run due to original compilation failure"
+  },
+  "om_contract": {
+    "normal": "pass; Node** caller reset and empty release verified",
+    "malloc_failures": "three fail with actual NULL diagnostics; no fabricated UB output or final release summary"
+  },
+  "controlled_negatives": {
+    "count": 3,
+    "result": "all fail actual runtime checks; known expected defects retained"
+  },
+  "unit_regressions": 42,
+  "scope": [
+    "original main traces use allocation-root snapshots, not unobserved local head values",
+    "independent drivers directly check caller head/return/next after each step",
+    "main local reset not observable after function returns; explicitly null in observations",
+    "ASan/UBSan actual instrumented paths separate from explicit allocation tracking",
+    "LeakSanitizer not_run, no universal memory-safety claim"
+  ],
+  "retained_preparation_failure": "first extension bundle was copied twice and hit its own0444 permissions before C; fixed merge-then-copy-once and added regression",
+  "fixture_originals": "unchanged"
+}

@@ -1,0 +1,37 @@
+{
+  "version": "fixed-ownership-review-v1",
+  "status": "reviewed",
+  "reviewer": "Lee",
+  "reviewed_at": "2026-10-19T18:47:26+08:00",
+  "scope": "technical fixed-domain harness admission, not course signoff",
+  "review_basis": [
+    "original C remains included unchanged; OM alias only in independent driver",
+    "caller-head return/Node** checks and full chain values/counts after every contract insert",
+    "original main allocation-root snapshots explicitly distinguished from directly observable caller head",
+    "per-slot allocations/releases, empty release, all-live flags and cumulative event trace",
+    "three derivations exactly implement approved drop-link/double-free/ignored-return negatives",
+    "NULL failure in original OM functions remains unrepaired; unknown final counters not synthesized"
+  ],
+  "artifacts": {
+    "edumind/negative-double-free.c": {
+      "bytes": 1501,
+      "sha256": "0d3f1c02a0d53ebef8e39b6b0252d5c1341f344374e4cea0fbcaf37d900a26e0"
+    },
+    "edumind/negative-drop-link.c": {
+      "bytes": 1492,
+      "sha256": "8a0d14a8c9e7ae83c6154b8e58d99e580417c651d8737f4f77c187f34f0a84df"
+    },
+    "edumind/negative-ignored-return.c": {
+      "bytes": 1471,
+      "sha256": "fb22704e6790bbcb6080c9c27296534b190e4bba60277ed13c7cd58db49bd302"
+    },
+    "edumind/ownership-driver.c": {
+      "bytes": 3989,
+      "sha256": "a74eccf316ad32fa191c256652eb585fb88c212dd7b614d8657a5a57e0154ca9"
+    },
+    "om/ownership-driver.c": {
+      "bytes": 4029,
+      "sha256": "1e56ae1decebb68e5713cab89ca127866d9c14b8c7e85088fc2c0dddcf8102ac"
+    }
+  }
+}

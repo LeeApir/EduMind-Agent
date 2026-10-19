@@ -1614,3 +1614,7 @@ ADR0019 A-D及准确附件获批，固定样本/独立真值/禁网非特权容�
 实现固定C受限运行入口/实际隔离探针/严格普通及输出分列 | T066完成提交a4990f5已核对，最终工具链锁建立 | 只运行已登记固定样本，Provider0；先探针后C，失败无宿主回退 | 扩充可信探针controller新锁，完成host限流/inspect/清理与回归
 [2026-10-19T18:44:22] [PHASE-1-T067] VERIFIED | executor=Lee
 完成固定C host监督器与可信隔离探针v2锁、严格/普通/正常/Sanitizer原main分列及有界证据；异常/未运行不伪造成pass | 20监督器Mock+16准入回归通过；实际最终8编译2程序运行均符合预期，复核两suite累计16编译4运行；实际隔离/超时/输出/清理通过，Ruff/workflow/原冻结/diff通过 | 原严格/OM编译失败保留；LSan和所有权故障尚未运行；首宿主killpg错误已安全修复并留证，Provider0 | 证据offline-c-t067及toolchain-t067；独立完成提交后T068所有权矩阵
+[2026-10-19T18:46:29] [PHASE-1-T068] START | executor=Lee | branch=codex/phase-1-t056-t070
+按批准固定域实现main/函数正常及malloc1/2/3失败和受控反例 | T067完成提交c72b3a7已核对，实际隔离可用 | 原程序不改，OM main编译失败不替换，LSan不声称已跑，Provider0 | 新建独立审阅驱动与三负例准入扩展，逐状态/分配释放实证后运行
+[2026-10-19T19:51:00] [PHASE-1-T068] VERIFIED | executor=Lee
+完成独立审阅所有权驱动/三最小反例扩展准入、实际每步状态与slot分配释放证据，原main/函数和不可观测值分开 | 42Mock/准入回归通过；实际19编译15程序进程19案例均符合预登记：EduMind8场景pass，OM4main未运行/函数正常pass三NULL失败，三反例fail；隔离新v3锁/探针/Ruff/workflow/原冻结/diff通过 | 初私有包重复写0444失败在C前留证并修正加回归；LSan未跑，UB终止不推断最终计数，main局部head重置null；Provider0 | offline-c-t068/ownership-fixtures/toolchain-t068留完整证据，独立提交后T069统一证据校验

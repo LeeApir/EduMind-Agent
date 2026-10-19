@@ -15,6 +15,9 @@ def container_argv(image: str, name: str, bundle: Path | None, args: list[str]) 
     valid = args in [["metadata"], ["probe"], ["probe-loop"], ["probe-output"], ["probe-child-output"]] or (len(args) == 2 and args[0] in {
         "edumind-r02-original", "om-original"} and args[1] in {
         "strict", "ordinary", "normal", "sanitized-normal"})
+    if len(args) == 2 and args[0] in {"edumind-r02-original", "om-original"}:
+        valid = valid or args[1] in {f"{mode}-{n}" for mode in ["program", "contract"] for n in range(4)}
+        valid = valid or (args[0] == "edumind-r02-original" and args[1] in {"negative-drop-link", "negative-double-free", "negative-ignored-return"})
     if not valid:
         raise ValueError("unregistered command")
     argv = ["docker", "run", "--name", name, "--pull=never", "--network=none", "--ipc=none",

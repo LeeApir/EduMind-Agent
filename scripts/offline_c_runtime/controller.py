@@ -121,12 +121,22 @@ def main():
     if len(sys.argv) != 3 or sys.argv[1] not in SOURCES:
         raise ValueError("unregistered source or command")
     source_id, case = sys.argv[1:]
-    if case not in {"strict", "ordinary", "normal", "sanitized-normal"}:
+    ownership = case in {f"{mode}-{n}" for mode in ["program", "contract"] for n in range(4)}
+    negative = case in {"negative-drop-link", "negative-double-free", "negative-ignored-return"}
+    if case not in {"strict", "ordinary", "normal", "sanitized-normal"} and not ownership and not negative:
         raise ValueError("unregistered case")
     source = "/bundle/" + SOURCES[source_id]
+    if ownership and (source_id == "edumind-r02-original" or case.startswith("contract-")):
+        source = "/bundle/" + ("edumind" if source_id == "edumind-r02-original" else "om") + "/ownership-driver.c"
+    if negative:
+        if source_id != "edumind-r02-original":
+            raise ValueError("unregistered controlled negative")
+        source = "/bundle/edumind/ownership-driver.c"
     flags = FLAGS + (["-Werror"] if case == "strict" else [])
-    if case == "sanitized-normal":
+    if case == "sanitized-normal" or ownership or negative:
         flags += SANITIZERS
+    if negative:
+        flags += [f'-DSOURCE_C="{case}.c"']
     command = capture(["/usr/bin/clang-19", *flags, source, "-o", "/work/program"], 30)
     commands = [command]
     reason = "success"
@@ -137,8 +147,13 @@ def main():
         status, reason = "fail", "output_limit"
     elif command["exit_code"] != 0:
         status, reason = "fail", "compile_error"
-    elif case in {"normal", "sanitized-normal"}:
-        run = capture(["/work/program"], 5)
+    elif case in {"normal", "sanitized-normal"} or ownership or negative:
+        args = ["/work/program"]
+        if ownership:
+            args += ["program" if case.startswith("program-") else "contract", case.rsplit("-", 1)[1]]
+        if negative:
+            args += ["program", "0"]
+        run = capture(args, 5)
         commands.append(run)
         if run["timeout"]:
             status, reason = "fail", "timeout"
@@ -146,7 +161,7 @@ def main():
             status, reason = "fail", "output_limit"
         elif run["exit_code"] != 0:
             status, reason = "fail", "runtime_error"
-    if len(commands) == 1 and reason == "compile_error" and case in {"normal", "sanitized-normal"}:
+    if len(commands) == 1 and reason == "compile_error" and (case in {"normal", "sanitized-normal"} or ownership):
         status, reason = "not_run", "compile_failed"
     print(json.dumps({"commands": commands, "status": status, "reason": reason}))
 

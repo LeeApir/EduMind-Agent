@@ -3451,7 +3451,7 @@
       "id": "PHASE-1-T068",
       "phase": "Phase 1",
       "title": "验证固定头插法的失败路径和内存所有权",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1-T067"
@@ -3475,9 +3475,11 @@
         "核对隔离真实执行中可编译样本的main/接口各正常及三次失败（共8场景）、派生负例及逐项跟踪；OM原main编译失败后运行项须未运行，函数驱动独立报告，不以Mock或改原件代实际检查。",
         "git diff --check"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "完成独立审阅所有权驱动/三最小反例扩展准入、实际每步状态与slot分配释放证据，原main/函数和不可观测值分开 | 42Mock/准入回归通过；实际19编译15程序进程19案例均符合预登记：EduMind8场景pass，OM4main未运行/函数正常pass三NULL失败，三反例fail；隔离新v3锁/探针/Ruff/workflow/原冻结/diff通过 | 初私有包重复写0444失败在C前留证并修正加回归；LSan未跑，UB终止不推断最终计数，main局部head重置null；Provider0 | offline-c-t068/ownership-fixtures/toolchain-t068留完整证据，独立提交后T069统一证据校验"
+      ],
+      "started_at": "2026-10-19T18:46:29",
+      "completed_at": "2026-10-19T19:51:00",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T068",
       "execution_gate": "2026-10-19用户已明确授权在新分支开发T056–T070，按依赖串行执行；审核契约/API/持久化/执行安全边界仍须对应T056/T060/T065具体设计明确批准后实施，未批准项不得推定。真实Provider与动态开放不在本批授权内。",
