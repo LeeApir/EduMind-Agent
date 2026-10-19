@@ -8,7 +8,7 @@ from offline_c_runner import run_compile_suite
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--manifest", type=Path, required=True)
-    parser.add_argument("--suite", choices=["compile-output", "ownership"], required=True)
+    parser.add_argument("--suite", choices=["compile-output", "ownership", "all"], required=True)
     parser.add_argument("--output", type=Path, required=True)
     options = parser.parse_args()
     try:

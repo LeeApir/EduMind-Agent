@@ -160,6 +160,23 @@ def preflight(lock, bundle):
     if result["exit_code"] != 0 or result["reason"]:
         raise AdmissionError("isolation probe failed")
     probe = json.loads(result["stdout"])
+    check_probe(probe, lock)
+    loop = execute_container(lock, bundle, ["probe-loop"], timeout=2)
+    flood = execute_container(lock, bundle, ["probe-output"])
+    child = execute_container(lock, bundle, ["probe-child-output"])
+    assert loop["reason"] == "timeout"
+    assert flood["reason"] == "output_limit" and len(flood["stdout"]) == 1048576
+    child_result = json.loads(child["stdout"])
+    assert child_result["output_limit"] and child_result["stdout"]["bytes"] == 65536
+    return {"probe": probe, "isolation": result["isolation"],
+            "host_timeout": {"reason": loop["reason"], "argv": loop["argv"]},
+            "host_output": {"reason": flood["reason"], "bytes": len(flood["stdout"]), "argv": flood["argv"]},
+            "child_output": child_result, "cleanup": "all containers removed"}
+
+
+def check_probe(probe, lock):
+    if not __debug__:
+        raise AdmissionError("optimized host mode is unsupported")
     assert probe["controller_sha256"] == lock["controller_sha256"]
     assert (probe["uid"], probe["gid"]) == (10001, 10001)
     assert probe["status"] == {"CapEff": "0000000000000000", "NoNewPrivs": "1", "Seccomp": "2"}
@@ -175,21 +192,21 @@ def preflight(lock, bundle):
     for mount, required in [("/work", {"nosuid", "nodev"}), ("/tmp", {"nosuid", "nodev", "noexec"})]:
         options = next(line.split()[3] for line in probe["mounts"].splitlines() if line.split()[1] == mount)
         assert required <= set(options.split(','))
-    loop = execute_container(lock, bundle, ["probe-loop"], timeout=2)
-    flood = execute_container(lock, bundle, ["probe-output"])
-    child = execute_container(lock, bundle, ["probe-child-output"])
-    assert loop["reason"] == "timeout"
-    assert flood["reason"] == "output_limit" and len(flood["stdout"]) == 1048576
-    child_result = json.loads(child["stdout"])
-    assert child_result["output_limit"] and child_result["stdout"]["bytes"] == 65536
-    return {"probe": probe, "isolation": result["isolation"],
-            "host_timeout": {"reason": loop["reason"], "argv": loop["argv"]},
-            "host_output": {"reason": flood["reason"], "bytes": len(flood["stdout"]), "argv": flood["argv"]},
-            "child_output": child_result, "cleanup": "all containers removed"}
 
 
 def validate_commands(commands):
+    from datetime import datetime
+    fields = {"argv", "cwd", "env", "started_at", "ended_at", "duration_ms", "exit_code", "signal", "timeout", "output_limit", "oom", "stdout", "stderr"}
     for c in commands:
+        if set(c) != fields:
+            raise AdmissionError("command fields mismatch")
+        code, sig = c["exit_code"], c["signal"]
+        if (code is None) == (sig is None) or (code is not None and (type(code) is not int or not 0 <= code <= 255)) or (sig is not None and (type(sig) is not int or not 1 <= sig <= 64)):
+            raise AdmissionError("invalid exit/signal evidence")
+        if any(type(c[k]) is not bool for k in ["timeout", "output_limit", "oom"]) or type(c["duration_ms"]) is not int or c["duration_ms"] < 0:
+            raise AdmissionError("invalid stage flags/duration")
+        if datetime.fromisoformat(c["ended_at"]) < datetime.fromisoformat(c["started_at"]):
+            raise AdmissionError("invalid stage timestamps")
         for stream in ["stdout", "stderr"]:
             b = c[stream]
             raw = base64.b64decode(b["base64"], validate=True)
@@ -201,6 +218,10 @@ def validate_commands(commands):
 
 def case_result(lock, bundle, source, case, manifest, preflight_digest, *, timeout=40):
     result = execute_container(lock, bundle, [source, case], timeout=timeout)
+    return interpret_case(lock, bundle, source, case, manifest, preflight_digest, result)
+
+
+def interpret_case(lock, bundle, source, case, manifest, preflight_digest, result):
     aborted = result["reason"] or result["exit_code"] != 0 or result["isolation"]["oom"]
     if aborted:
         value = {"commands": [], "status": "fail", "reason": "oom" if result["isolation"]["oom"] else result["reason"] or "protocol_error"}
@@ -279,17 +300,21 @@ def run_compile_suite(manifest_path, output, *, suite="compile-output"):
     output.mkdir(parents=True, exist_ok=True)
     check_manifest(manifest_path)
     schedule = [(s, c) for s in ["edumind-r02-original", "om-original"] for c in ["strict", "ordinary", "normal", "sanitized-normal"]]
+    ownership_schedule = [(s, f"{mode}-{n}") for s in ["edumind-r02-original", "om-original"] for mode in ["program", "contract"] for n in range(4)]
+    ownership_schedule += [("edumind-r02-original", "negative-" + n) for n in ["drop-link", "double-free", "ignored-return"]]
     if suite == "ownership":
-        schedule = [(s, f"{mode}-{n}") for s in ["edumind-r02-original", "om-original"] for mode in ["program", "contract"] for n in range(4)]
-        schedule += [("edumind-r02-original", "negative-" + n) for n in ["drop-link", "double-free", "ignored-return"]]
-    report = {"version": "fixed-c-report-v1", "run_id": uuid.uuid4().hex, "suite": suite,
+        schedule = ownership_schedule
+    elif suite == "all":
+        schedule += ownership_schedule
+    from offline_c_evidence import source_snapshot
+    report = {"execution_baseline_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(), "execution_sources": source_snapshot(), "version": "fixed-c-report-v1", "run_id": uuid.uuid4().hex, "suite": suite,
               "provider_calls": 0, "cases": [], "preflight": None, "stopped": None}
     started = time.monotonic()
     try:
         lock = verify_toolchain()
         with tempfile.TemporaryDirectory(prefix="edumind-fixed-c-") as private:
             bundle = Path(private) / "bundle"
-            manifest = prepare_bundle(bundle, ownership=suite == "ownership")
+            manifest = prepare_bundle(bundle, ownership=suite in {"ownership", "all"})
             report["preflight"] = preflight(lock, bundle)
             preflight_digest = sha(json.dumps(report["preflight"], sort_keys=True).encode())
             for source, case in schedule:
@@ -317,5 +342,6 @@ def run_compile_suite(manifest_path, output, *, suite="compile-output"):
     report["execution_counts_are_confirmed_minimum"] = any(c.get("isolation", {}).get("controller_failure") for c in report["cases"])
     report["compilations"] = sum(len([c for c in case.get("commands", []) if c["argv"][0] == "/usr/bin/clang-19"]) for case in report["cases"])
     report["sample_processes"] = sum(len([c for c in case.get("commands", []) if c["argv"][0] == "/work/program"]) for case in report["cases"])
-    (output / "report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2)+"\n")
+    from offline_c_evidence import seal_report
+    seal_report(report, output)
     return report

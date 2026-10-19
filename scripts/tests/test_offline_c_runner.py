@@ -65,6 +65,7 @@ def test_extra_or_writable_mount_is_rejected():
 def test_good_inspect_and_bounded_output_binding():
     assert checked_inspect(inspect_fixture(), IMAGE)["effective"]["PidsLimit"] == 64
     command = {"stdout": controller.encoded(b"3 2 1 \n"), "stderr": controller.encoded(b""), "cwd": "/work", "env": controller.ENV}
+    command.update(argv=["synthetic"], started_at="2026-10-19T00:00:00+00:00", ended_at="2026-10-19T00:00:00+00:00", duration_ms=0, exit_code=0, signal=None, timeout=False, output_limit=False, oom=False)
     validate_commands([command])
     bad = copy.deepcopy(command)
     bad["stdout"]["base64"] = base64.b64encode(b"other").decode()
