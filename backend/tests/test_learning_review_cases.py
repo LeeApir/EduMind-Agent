@@ -54,7 +54,11 @@ async def case_fixture(db, *, unit_verdict="needs_human"):
             binding=w.binding,
             input_snapshot=w.input_snapshot,
             target_digest=c.content_digest,
-            payload={"reference_context": w.reference_context},
+            payload={
+                "plan": w.plan,
+                "candidate": c.payload(),
+                "reference_context": w.reference_context,
+            },
             candidates=(c,),
         )
         records.append(await save_review(db, r))
@@ -67,7 +71,7 @@ async def case_fixture(db, *, unit_verdict="needs_human"):
         binding=w.binding,
         input_snapshot=w.input_snapshot,
         target_digest=material["unit_digest"],
-        payload={"reference_context": w.reference_context},
+        payload={"unit": material, "reference_context": w.reference_context},
         candidates=w.candidates(),
         scope="unit",
     )

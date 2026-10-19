@@ -5,7 +5,7 @@ from typing import Any
 
 from app.services.learning_contract import LearningContractError, canonical, digest
 
-REVIEW_INPUT_VERSION = "authoritative-review-input-v1"
+REVIEW_INPUT_VERSION = "authoritative-review-input-v2"
 
 
 def review_input(

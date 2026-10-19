@@ -185,6 +185,7 @@ def test_review_records_are_bound_and_append_only():
                 user, unit, op, plan = await plan_fixture(db)
                 w = candidate_workspace()
                 w.binding = plan_binding(plan, op.id)
+                w.stage("explanation", w.candidates()[0].envelope)
                 records = await review_resource(
                     ReviewGateway([answer()]), CallWindow(), w, "explanation"
                 )
@@ -215,6 +216,7 @@ def test_missing_reference_context_is_not_automatic_pass():
     from app.services.learning_contract import digest
 
     w.binding["input_digest"] = digest("input", "learning-input-v1", snapshot=w.input_snapshot)
+    w.stage("explanation", w.candidates()[0].envelope)
     records = asyncio.run(
         review_resource(ReviewGateway([answer()]), CallWindow(), w, "explanation")
     )

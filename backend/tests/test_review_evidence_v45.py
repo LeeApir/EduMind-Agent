@@ -31,12 +31,13 @@ def test_general_rule_shared_version_and_original_prompt_prefix():
         (ROOT / "docs/acceptance/phase-1-review-remaining-r01/cases.json").read_text()
     )["reachable-safety:candidate"]
     body = json.loads(bytes.fromhex(old["wire_hex"]))
-    assert INSTRUCTION == body["input"][0]["content"] + "\n" + EVIDENCE_INSTRUCTION
+    assert INSTRUCTION.startswith(body["input"][0]["content"] + "\n" + EVIDENCE_INSTRUCTION)
+    assert INSTRUCTION == (ROOT / f"docs/agents/prompts/{REVIEW_PROMPT_VERSION}.txt").read_text()
     assert (
         REVIEW_V4_PROMPT
         == REVIEW_PROMPT_VERSION
         == POLICY["resource_review_prompt"]
-        == "evidence-resource-review-v4.5"
+        == "evidence-resource-review-v4.6"
     )
     assert (
         EVIDENCE_INSTRUCTION
@@ -62,14 +63,20 @@ def test_outbound_request_uses_new_rules_without_new_fields(scope):
             CallWindow(),
             binding=w.binding,
             input_snapshot=w.input_snapshot,
-            target_digest=m["unit_digest"],
-            payload={"unit": m, "reference_context": w.reference_context},
-            candidates=w.candidates(),
+            target_digest=m["unit_digest"] if scope == "unit" else w.candidates()[0].content_digest,
+            payload={"unit": m, "reference_context": w.reference_context}
+            if scope == "unit"
+            else {
+                "plan": w.plan,
+                "candidate": w.candidates()[0].payload(),
+                "reference_context": w.reference_context,
+            },
+            candidates=w.candidates() if scope == "unit" else (w.candidates()[0],),
             scope=scope,
         )
         request = g.requests[0]
         assert request.prompt.messages[0].content == INSTRUCTION
-        assert record["prompt_version"] == "evidence-resource-review-v4.5"
+        assert record["prompt_version"] == "evidence-resource-review-v4.6"
         assert request.json_schema == review_output_schema(
             scope, anchor_ids=[a["anchor_id"] for a in record["anchor_catalog"]]
         )

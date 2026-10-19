@@ -7,7 +7,8 @@ from copy import deepcopy
 import pytest
 from jsonschema import Draft202012Validator
 from jsonschema.exceptions import ValidationError
-from test_hybrid_resource_review import ReviewGateway, answer, candidate_workspace
+from om_fixtures import material_fixture
+from test_hybrid_resource_review import ReviewGateway, answer
 
 from app.agents.hybrid_resource_review import (
     UNIT_CHECKS,
@@ -42,8 +43,7 @@ def test_outbound_schema_matches_scope_and_preserves_resource_corrections(scope,
 
 def test_real_request_cannot_accept_a_candidate_supplied_scope_override():
     async def check():
-        w = candidate_workspace()
-        c = w.candidates()[0]
+        w, material = material_fixture()
         a = answer("pass", "unit")
         a["coverage"]["checked"] = sorted(UNIT_CHECKS)
         gateway = ReviewGateway([a])
@@ -52,13 +52,13 @@ def test_real_request_cannot_accept_a_candidate_supplied_scope_override():
             CallWindow(),
             binding=w.binding,
             input_snapshot=w.input_snapshot,
-            target_digest=c.content_digest,
+            target_digest=material["unit_digest"],
             payload={
-                "plan": w.plan,
+                "unit": material,
                 "reference_context": w.reference_context,
                 "review_contract": {"scope": "resource", "allowed_verdicts": ["revise"]},
             },
-            candidates=(c,),
+            candidates=w.candidates(),
             scope="unit",
         )
         request = gateway.requests[0]
@@ -66,10 +66,10 @@ def test_real_request_cannot_accept_a_candidate_supplied_scope_override():
         assert data["review_contract"]["scope"] == "unit"
         assert "revise" not in data["review_contract"]["allowed_verdicts"]
         assert "revise" not in request.json_schema["properties"]["verdict"]["enum"]
-        assert data["plan"] == w.plan
+        assert data["unit"]["plan"] == w.plan
         assert data["reference_context"]["source"] == w.reference_context["source"]
         assert "facts" not in data["reference_context"]
-        assert result["prompt_version"] == "evidence-resource-review-v4.5"
+        assert result["prompt_version"] == "evidence-resource-review-v4.6"
         assert result["local_routing"]["verdict"] == "pass"
 
     asyncio.run(check())
@@ -77,17 +77,16 @@ def test_real_request_cannot_accept_a_candidate_supplied_scope_override():
 
 def test_unit_revise_is_still_rejected_if_a_provider_ignores_outbound_schema():
     async def check():
-        w = candidate_workspace()
-        c = w.candidates()[0]
+        w, material = material_fixture()
         with pytest.raises(LearningContractError, match="REVIEW_PROTOCOL_INVALID"):
             await review_once(
                 ReviewGateway([answer("revise", "unit")]),
                 CallWindow(),
                 binding=w.binding,
                 input_snapshot=w.input_snapshot,
-                target_digest=c.content_digest,
-                payload={"reference_context": w.reference_context},
-                candidates=(c,),
+                target_digest=material["unit_digest"],
+                payload={"unit": material, "reference_context": w.reference_context},
+                candidates=w.candidates(),
                 scope="unit",
             )
 
@@ -97,8 +96,7 @@ def test_unit_revise_is_still_rejected_if_a_provider_ignores_outbound_schema():
 def test_genuine_unknowns_and_concrete_rejects_keep_existing_routes():
     async def check():
         for verdict in ("needs_human", "reject"):
-            w = candidate_workspace()
-            c = w.candidates()[0]
+            w, material = material_fixture()
             a = answer(verdict, "unit")
             a["coverage"]["checked"] = sorted(UNIT_CHECKS)
             r = await review_once(
@@ -106,9 +104,9 @@ def test_genuine_unknowns_and_concrete_rejects_keep_existing_routes():
                 CallWindow(),
                 binding=w.binding,
                 input_snapshot=w.input_snapshot,
-                target_digest=c.content_digest,
-                payload={"reference_context": w.reference_context},
-                candidates=(c,),
+                target_digest=material["unit_digest"],
+                payload={"unit": material, "reference_context": w.reference_context},
+                candidates=w.candidates(),
                 scope="unit",
             )
             assert r["result"] == a

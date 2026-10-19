@@ -22,7 +22,11 @@ async def resource_records(w):
             binding=w.binding,
             input_snapshot=w.input_snapshot,
             target_digest=c.content_digest,
-            payload={"candidate": c.payload(), "reference_context": w.reference_context},
+            payload={
+                "plan": w.plan,
+                "candidate": c.payload(),
+                "reference_context": w.reference_context,
+            },
             candidates=(c,),
         )
         for c in w.candidates()

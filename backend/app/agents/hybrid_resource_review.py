@@ -13,6 +13,11 @@ from app.agents.planned_scene_generation import PlannedScenes, SceneCandidate
 from app.agents.review_delivery import COVERAGE_STANDARD_VERSION, delivery_manifest
 from app.agents.review_evidence import EVIDENCE_INSTRUCTION, REVIEW_PROMPT_VERSION
 from app.agents.review_input import REVIEW_INPUT_VERSION, review_input
+from app.agents.review_responsibilities import (
+    RESPONSIBILITY_INSTRUCTION,
+    REVIEW_SCOPE_VERSION,
+    review_responsibilities,
+)
 from app.agents.review_schema import severe_code_issues
 from app.agents.shared_learning_plan import CallWindow
 from app.services.learning_contract import (
@@ -111,7 +116,7 @@ it. Actual false media-delivery claims remain factual issues. Missing authoritat
 cannot be repaired by treating plan.goal as the original request; retain uncertainty.
 """
 
-INSTRUCTION += "\n" + EVIDENCE_INSTRUCTION
+INSTRUCTION += "\n" + EVIDENCE_INSTRUCTION + RESPONSIBILITY_INSTRUCTION
 
 
 def review_output_schema(scope: str, *, anchor_ids: list[str] | None = None) -> dict[str, Any]:
@@ -202,6 +207,9 @@ async def review_once(
 ) -> dict[str, Any]:
     if scope not in ("resource", "unit"):
         raise LearningContractError("REVIEW_PROTOCOL_INVALID")
+    responsibilities = review_responsibilities(
+        payload, binding, candidates, scope=scope, target_digest=target_digest
+    )
     for c in candidates:
         hard_checks(c)
     catalog = anchor_catalog(candidates)
@@ -210,12 +218,13 @@ async def review_once(
     projected, goal_available = review_input(payload, binding, input_snapshot)
     data = {
         **projected,
+        "review_responsibilities": responsibilities,
         "anchor_catalog": catalog,
         "mandatory_checks": sorted(checks),
         "student_delivery": delivery_manifest(payload, candidates),
         # Constructed after caller data, so a candidate cannot override the trusted rule.
         "review_contract": {
-            "version": "goal-bound-review-scope-v2",
+            "version": REVIEW_SCOPE_VERSION,
             "input_version": REVIEW_INPUT_VERSION,
             "scope": scope,
             "allowed_verdicts": schema["properties"]["verdict"]["enum"],
