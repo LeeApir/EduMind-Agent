@@ -1,0 +1,170 @@
+{
+  "version": "head-insertion-independent-spec-v1",
+  "design_sha256": "21d3c72ffc830824734ad34fc39b2b3543bd489006eec7a6c7a2d19d1cc40aa9",
+  "independent_expectations": {
+    "edumind": {
+      "strict_compile": "fail: missing final newline; do not repair",
+      "ordinary_compile": "pass with retained newline warning",
+      "original_main": {
+        "numeric_sequence": [
+          3,
+          2,
+          1
+        ],
+        "stdout_base64": "MyAyIDEgCg==",
+        "format_vs_model_claim": "not exact; preserve space and newline"
+      },
+      "fault_sequences": {
+        "0": [
+          3,
+          2,
+          1
+        ],
+        "1": [
+          3,
+          2
+        ],
+        "2": [
+          3,
+          1
+        ],
+        "3": [
+          2,
+          1
+        ]
+      },
+      "attempts": 3,
+      "allocated": {
+        "0": 3,
+        "1": 2,
+        "2": 2,
+        "3": 2
+      },
+      "freed": "each actual allocation once; all successful paths live=0",
+      "free_interface": "free_list(Node*) does not reset caller; main resets head itself"
+    },
+    "om": {
+      "strict_compile": "fail: missing Node alias and incompatible insertHead calls",
+      "ordinary_compile": "fail; actual diagnostics recorded, do not require exact Apple error count",
+      "original_main": "not_run: compile_failed",
+      "function_driver": "original Node** interface plus explicitly test-only alias; not original main",
+      "normal": {
+        "numeric_sequence": [
+          3,
+          2,
+          1
+        ],
+        "stdout_base64": "MyAtPiAyIC0+IDEgLT4gTlVMTAo=",
+        "attempts": 3,
+        "allocated": 3,
+        "released": 3,
+        "live": 0,
+        "caller_head_reset": true
+      },
+      "fault": "fail: reachable NULL dereference at injected malloc failure; report actual sanitizer/exit evidence, no definite UB output",
+      "prior_live_before_fault": {
+        "1": 0,
+        "2": 1,
+        "3": 2
+      }
+    }
+  },
+  "matrix": [
+    {
+      "id": "original-strict",
+      "sources": [
+        "edumind-r02-original",
+        "om-original"
+      ],
+      "kind": "strict_compile",
+      "sanitizers": false
+    },
+    {
+      "id": "original-ordinary",
+      "sources": [
+        "edumind-r02-original",
+        "om-original"
+      ],
+      "kind": "ordinary_compile",
+      "sanitizers": false
+    },
+    {
+      "id": "original-main-normal",
+      "sources": [
+        "edumind-r02-original",
+        "om-original"
+      ],
+      "kind": "original_main",
+      "sanitizers": false,
+      "requires": "that source ordinary compilation succeeded"
+    },
+    {
+      "id": "original-main-sanitized",
+      "sources": [
+        "edumind-r02-original",
+        "om-original"
+      ],
+      "kind": "original_main",
+      "sanitizers": true,
+      "requires": "that source sanitizer compilation succeeded"
+    },
+    {
+      "id": "wrapped-main-faults",
+      "sources": [
+        "edumind-r02-original",
+        "om-original"
+      ],
+      "kind": "wrapped_main",
+      "fault_at": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "sanitizers": true,
+      "requires": "original main is compilable; OM remains not_run, no main substitution"
+    },
+    {
+      "id": "function-contract-faults",
+      "sources": [
+        "edumind-r02-original",
+        "om-original"
+      ],
+      "kind": "function_contract",
+      "fault_at": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "sanitizers": true,
+      "requires": "reviewed fixed interface driver; separate from original main"
+    }
+  ],
+  "controlled_negatives": [
+    {
+      "id": "negative-drop-link",
+      "base": "edumind-r02-original",
+      "change": "derived copy only: new_node->next = NULL instead of head",
+      "expected": "fail full chain state/count assertion on second successful insert"
+    },
+    {
+      "id": "negative-double-free",
+      "base": "edumind-r02-original",
+      "change": "derived copy only: duplicate free(p) in free_list",
+      "expected": "fail tracker or ASan double-free; may stop before final counts"
+    },
+    {
+      "id": "negative-ignored-return",
+      "base": "edumind-r02-original",
+      "change": "derived copy only: remove caller head assignment for inserts in main",
+      "expected": "fail actual wrapped-main output/ownership or live-allocation checks; a correct function driver cannot mask bad main"
+    }
+  ],
+  "scope_limitations": [
+    "empty list, values1/2/3 only",
+    "no model expected output used as oracle",
+    "original main and function drivers are separate",
+    "tracker is not LeakSanitizer"
+  ]
+}

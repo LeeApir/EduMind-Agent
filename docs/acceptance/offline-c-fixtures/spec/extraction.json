@@ -1,0 +1,41 @@
+{
+  "version": "fixed-c-extraction-v1",
+  "edumind": {
+    "source": "docs/reference/head-insertion-tests-20261019/edumind-r02/complete-review-case.json",
+    "field": "material.candidates[role=code].envelope.content.source",
+    "conversion": "UTF8 encoding only; no final newline added",
+    "artifact": "edumind/candidate.c"
+  },
+  "om": {
+    "source": "docs/reference/head-insertion-tests-20261019/openmaic/original-manifest.json",
+    "blocks": [
+      {
+        "scene_index": 3,
+        "element_id": "text_PC4lH1c-",
+        "artifact": "om/head-functions.c"
+      },
+      {
+        "scene_index": 4,
+        "element_id": "text_xl2jWB1X",
+        "artifact": "om/print-function.c"
+      },
+      {
+        "scene_index": 4,
+        "element_id": "text_lQ4hkvgP",
+        "artifact": "om/free-function.c"
+      },
+      {
+        "scene_index": 4,
+        "element_id": "text_H9ykoDg9",
+        "artifact": "om/main-function.c"
+      }
+    ],
+    "conversion": "replace </p> by LF, strip HTML tags, HTML-unescape, NBSP to space, UTF8; join four blocks with one LF; no C repair",
+    "artifact": "om/original-program.c"
+  },
+  "drivers": {
+    "edumind/checks/fault-injection.c": "byte-for-byte archived driver; includes ../candidate.c",
+    "om/function-harness.c": "byte-for-byte archived driver; test-only typedef and Node** calls, not repaired main"
+  },
+  "source_signoff": "No course publication or semantic human signoff granted"
+}
