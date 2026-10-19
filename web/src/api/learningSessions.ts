@@ -1,4 +1,7 @@
+import type { TeachingMode } from "./teachingContext";
+
 export type LearningEventType =
+  | "teaching_selected"
   | "agent_start"
   | "token"
   | "stage_changed"
@@ -16,6 +19,7 @@ export interface LearningEvent {
 
 export interface StartLearningSessionOptions {
   goal: string;
+  teachingMode?: TeachingMode;
   signal?: AbortSignal;
   csrfToken: string;
   idempotencyKey?: string;
@@ -68,6 +72,7 @@ export class LearningRequestError extends Error {
 
 export async function startLearningSession({
   goal,
+  teachingMode = "target",
   signal,
   csrfToken,
   idempotencyKey = crypto.randomUUID(),
@@ -76,6 +81,7 @@ export async function startLearningSession({
 }: StartLearningSessionOptions): Promise<void> {
   const stream = await requestLearningStream({
     goal,
+    teachingMode,
     signal,
     csrfToken,
     idempotencyKey,
@@ -107,12 +113,14 @@ export async function startLearningSession({
 
 async function requestLearningStream({
   goal,
+  teachingMode,
   signal,
   csrfToken,
   idempotencyKey,
   fetchImpl,
 }: {
   goal: string;
+  teachingMode: TeachingMode;
   signal?: AbortSignal;
   csrfToken: string;
   idempotencyKey: string;
@@ -130,7 +138,7 @@ async function requestLearningStream({
         "X-CSRF-Token": csrfToken,
         "Idempotency-Key": idempotencyKey,
       },
-      body: JSON.stringify({ goal, preferred_language: "c", generation_protocol: "shared-plan-v1" }),
+      body: JSON.stringify({ goal, preferred_language: "c", generation_protocol: "shared-plan-v1", teaching_mode: teachingMode }),
     });
   } catch {
     throw new LearningRequestError({

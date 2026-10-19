@@ -1,5 +1,8 @@
+import type { TeachingBindingStatus, TeachingContext } from "./teachingContext";
 /** Bounded GET-only review recovery. Never restarts generation or posts a decision. */
 export interface HybridOperation {
+  teaching_context?: TeachingContext | null;
+  binding_status?: TeachingBindingStatus;
   id: string;
   status: string;
   phase?: string | null;

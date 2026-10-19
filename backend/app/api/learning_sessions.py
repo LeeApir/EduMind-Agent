@@ -35,6 +35,7 @@ class StartLearningRequest(BaseModel):
     goal: str = Field(min_length=1, max_length=2000)
     preferred_language: str = "c"
     generation_protocol: Literal["shared-plan-v1"] | None = None
+    teaching_mode: Literal["target", "recommended"] | None = None
 
 
 def provider_gateway() -> ProviderGateway:
@@ -176,6 +177,10 @@ async def start_learning_session(
     graph: KnowledgeGraphRepository = Depends(knowledge_graph_repository),
 ) -> StreamingResponse | JSONResponse:
     """Persist only the profile, then stream explicitly temporary first learning content."""
+    if payload.generation_protocol is None and payload.teaching_mode == "recommended":
+        from app.core.auth import AuthFailure
+
+        raise AuthFailure(422, "TEACHING_SELECTION_UNAVAILABLE", "旧协议不支持推荐前置模式。")
     async with session_factory() as db:
         try:
             reservation = await reserve_operation(
@@ -185,6 +190,7 @@ async def start_learning_session(
                 goal=payload.goal,
                 preferred_language=payload.preferred_language,
                 generation_protocol=payload.generation_protocol,
+                teaching_mode=payload.teaching_mode,
             )
         except IdempotencyConflict:
             from app.core.auth import AuthFailure
@@ -213,6 +219,7 @@ async def start_learning_session(
                     gateway=gateway,
                     graph=graph,
                     sessions=session_factory,
+                    teaching_mode=payload.teaching_mode or "target",
                 ),
                 media_type="text/event-stream",
                 headers={"Cache-Control": "no-store", "X-Accel-Buffering": "no"},

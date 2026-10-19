@@ -209,3 +209,9 @@ async def verify_persisted_teaching(
             or graph.get_node(context["teaching_node_id"]) is None
         ):
             raise LearningContractError("TEACHING_BINDING_MISMATCH")
+
+
+def public_teaching_context(value: object) -> dict[str, Any] | None:
+    if value is None:
+        return None
+    return validate_teaching_context(value)

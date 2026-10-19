@@ -3203,7 +3203,7 @@
       "Learning"
     ],
     "summary": "创建学习会话，流式返回临时首段并审核发布正式资源",
-    "description": "先将目标映射到已审核图谱节点；不可靠映射返回澄清而不默认节点。可靠目标按路径当前推荐节点生成内容，学习单元保存节点与路径快照。首段 token 是待审核的临时内容；只有 scene_ready 指向的版本可作为正式资源读取。相同 owner、Idempotency-Key 和请求摘要必须返回同一操作或同一澄清结果。重复 POST 只回放持久化状态，不调用 Provider；失败操作不自动创建新 attempt。只有用户明确重新生成或提交新目标才使用新幂等键。 generation_protocol=shared-plan-v1选择计划/三场景/混合审核新链；不自动回退。首版新链只使用已存在的有据画像（缺失保持未知），不新增画像推断/临时讲解请求，实际阶段由SSE及操作GET读取。每次最多20个含可选目标映射的请求与180秒总窗；无隐式重试。",
+    "description": "先将目标映射到已审核图谱节点；不可靠映射返回澄清而不默认节点。旧协议保留原路径行为；shared-plan-v1 默认直接学习目标，显式 teaching_mode=recommended 才选择冻结路径推荐节点，并发送 teaching_selected 告知三种节点与分段范围，学习单元保存节点与路径快照。首段 token 是待审核的临时内容；只有 scene_ready 指向的版本可作为正式资源读取。相同 owner、Idempotency-Key 和请求摘要必须返回同一操作或同一澄清结果。重复 POST 只回放持久化状态，不调用 Provider；失败操作不自动创建新 attempt。只有用户明确重新生成或提交新目标才使用新幂等键。 generation_protocol=shared-plan-v1选择计划/三场景/混合审核新链；不自动回退。首版新链只使用已存在的有据画像（缺失保持未知），不新增画像推断/临时讲解请求，实际阶段由SSE及操作GET读取。每次最多20个含可选目标映射的请求与180秒总窗；无隐式重试。",
     "operationId": "startLearningSession",
     "security": [
       {
@@ -4763,6 +4763,87 @@
       "User": {"type": "object", "required": ["id", "is_guest"], "properties": {"id": {"$ref": "#/components/schemas/Identifier"}, "is_guest": {"type": "boolean"}}},
       "StudentProfile": {"type": "object", "required": ["id", "version", "updated_at"], "properties": {"id": {"$ref": "#/components/schemas/Identifier"}, "version": {"type": "integer", "minimum": 1}, "initial_query": {"type": ["string", "null"]}, "professional_background": {"type": ["object", "null"]}, "knowledge_base": {"type": ["object", "null"]}, "cognitive_style": {"type": ["object", "null"]}, "learning_goals": {"type": ["object", "null"]}, "error_preferences": {"type": ["array", "null"]}, "engineering_preference": {"type": ["object", "null"]}, "extended_dimensions": {"type": ["object", "null"]}, "evidence": {"type": ["object", "null"]}, "updated_at": {"type": "string", "format": "date-time"}}},
       "RegisterRequest": {"type": "object", "additionalProperties": false, "required": ["email", "password"], "properties": {"email": {"type": "string", "format": "email"}, "password": {"type": "string", "minLength": 12, "writeOnly": true}}},
+      "TeachingContext": {
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "teaching_mode",
+    "target_node_id",
+    "recommended_node_id",
+    "teaching_node_id",
+    "selection_reason",
+    "original_request",
+    "segment_goal",
+    "segment_scope",
+    "path_version_id",
+    "path_version",
+    "graph_version",
+    "graph_digest"
+  ],
+  "properties": {
+    "version": {
+      "const": "teaching-node-binding-v1"
+    },
+    "teaching_mode": {
+      "enum": [
+        "target",
+        "recommended"
+      ]
+    },
+    "target_node_id": {
+      "type": "string"
+    },
+    "recommended_node_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "teaching_node_id": {
+      "type": "string"
+    },
+    "selection_reason": {
+      "enum": [
+        "direct_target",
+        "recommended_target",
+        "recommended_prerequisite"
+      ]
+    },
+    "original_request": {
+      "type": "string"
+    },
+    "segment_goal": {
+      "type": "string"
+    },
+    "segment_scope": {
+      "enum": [
+        "target_lesson",
+        "prerequisite_segment"
+      ]
+    },
+    "path_version_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "path_version": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1
+    },
+    "graph_version": {
+      "type": "string"
+    },
+    "graph_digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+},
       "StartLearningRequest": {
   "type": "object",
   "additionalProperties": false,
@@ -4793,6 +4874,18 @@
         null
       ],
       "description": "新Web显式选择新链；省略保留历史客户端契约，不作新链失败回退。该标识参与幂等摘要。"
+    },
+    "teaching_mode": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "target",
+        "recommended",
+        null
+      ],
+      "description": "shared-plan-v1: omitted/null means target. recommended explicitly selects frozen path.current. Legacy recommended is 422. Mode changes under the same new key are 409; old shared keys only replay when mode is omitted/null."
     }
   }
 },
@@ -4917,6 +5010,28 @@
           "format": "date-time"
         }
       }
+    },
+    "teaching_context": {
+      "anyOf": [
+        {
+          "$ref": "#/components/schemas/TeachingContext"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "binding_status": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "bound",
+        "legacy_unverified",
+        null
+      ],
+      "description": "Bound to frozen operation/publication context; old planned content is legacy_unverified; unplanned unit may be null."
     }
   }
 },
@@ -4986,6 +5101,28 @@
         "auto",
         "human_assisted"
       ]
+    },
+    "teaching_context": {
+      "anyOf": [
+        {
+          "$ref": "#/components/schemas/TeachingContext"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "binding_status": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "bound",
+        "legacy_unverified",
+        null
+      ],
+      "description": "Bound to frozen operation/publication context; old planned content is legacy_unverified; unplanned unit may be null."
     }
   }
 },
@@ -5357,6 +5494,16 @@
     "data": {
       "operation_id": "string",
       "reason_code": "SEMANTIC_REVIEW_REQUIRED"
+    }
+  },
+  "teaching_selected": {
+    "description": "Queued before the first plan/model request; frozen target, recommendation and actual teaching scope. Does not authorize publication.",
+    "data": {
+      "operation_id": "uuid",
+      "teaching_context": {
+        "$ref": "#/components/schemas/TeachingContext"
+      },
+      "binding_status": "bound"
     }
   }
 },

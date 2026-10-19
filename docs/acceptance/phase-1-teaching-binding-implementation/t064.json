@@ -1,0 +1,42 @@
+{
+  "task": "PHASE-1-T064",
+  "provider_calls": 0,
+  "database": "edumind_t057_t070_20261019",
+  "isolated_pg_tests": 33,
+  "skipped": 0,
+  "frontend": {
+    "full_suite_before_final_retry_test": 199,
+    "final_targeted_suite": 15,
+    "lint": "0 errors, 35 pre-existing ProfileCard warnings",
+    "typecheck": "passed",
+    "build": "passed"
+  },
+  "browser": {
+    "engine": "headless Chromium",
+    "api": "route mocks; not actual Provider/PG",
+    "command": "python3 /Users/apir/.agents/skills/webapp-testing/scripts/with_server.py --server 'pnpm --dir web dev --host 127.0.0.1 --port 4194' --port 4194 -- backend/.venv/bin/python web/tests/e2e/teaching_node_binding.py",
+    "screenshots": [
+      "local-materials/phase-1-t064/browser/target.png",
+      "local-materials/phase-1-t064/browser/recommended-mobile.png",
+      "local-materials/phase-1-t064/browser/pending.png"
+    ],
+    "result": "direct and prerequisite mode, frozen scope, exact publication query, reload GET-only, pending without unpublished body, no page errors; mobile screenshot inspected"
+  },
+  "checks": [
+    "new default target and explicit recommended, teaching_selected before scene_ready",
+    "GET operation and exact publication expose the same bound context",
+    "later current path changes do not rewrite original published context",
+    "new mode change same key conflicts, old shared key omitted mode read-only replay",
+    "legacy recommended rejected without Provider",
+    "retry retains original submitted mode/key; reload does not regenerate",
+    "restored publication version retained in sessionStorage; frozen original scope does not follow latest path",
+    "pending request preserves and separately labels any previously published body"
+  ],
+  "backend_static": "Ruff app/tests and mypy196 passed",
+  "workflow": "passed",
+  "retained_failures": [
+    "initial new tests had configured fixture removed by unused-import auto-fix: 5 errors, 6 passed; fixed explicit fixture import/usefixtures, then 11 passed and final binding suite33 passed",
+    "initial lint formatting warnings in new Vue markup fixed; old ProfileCard35 warnings preserved"
+  ],
+  "semantic_quality": "not measured; scripted model replies and browser mocks are not quality acceptance"
+}

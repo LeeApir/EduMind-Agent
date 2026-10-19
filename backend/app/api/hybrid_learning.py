@@ -127,6 +127,18 @@ async def hybrid_events(
                     graph=graph,
                     path=path,
                 )
+                op.teaching_context = teaching
+                await db.commit()
+                await queue.put(
+                    (
+                        "teaching_selected",
+                        {
+                            "operation_id": str(operation_id),
+                            "teaching_context": teaching,
+                            "binding_status": "bound",
+                        },
+                    )
+                )
                 path_snapshot = path_payload(path, is_stale=False)
                 await db.commit()
                 inputs = await shared_plan_inputs(

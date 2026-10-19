@@ -3297,7 +3297,7 @@
       "id": "PHASE-1-T064",
       "phase": "Phase 1",
       "title": "一致展示目标和推荐节点与实际课程主题",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1-T063"
@@ -3323,9 +3323,11 @@
         "backend/.venv/bin/python web/tests/e2e/teaching_node_binding.py",
         "git diff --check"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "完成模式API/版本化幂等、先行teaching_selected和GET准确发布上下文、目标/建议/实际节点展示；刷新读保存发布版本，重试保留原模式/键，待人工保留且标明旧发布 | PG+Mock绑定组合33通过0跳过，前端全量199+最终定向15，Chromium模式/刷新仅GET/待人工/移动端通过；Ruff/mypy196/typecheck/build/workflow/diff通过，35既有ProfileCard lint警告保留 | Provider0；首轮测试夹具导入错误保留，不计真实主题质量；旧r02/catalog_only/T040不改 | 证据teaching-binding-implementation/t064.json；独立提交后领取T065具体固定C隔离设计，不跨审批门禁"
+      ],
+      "started_at": "2026-10-19T17:57:35",
+      "completed_at": "2026-10-19T18:09:56",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T064",
       "execution_gate": "2026-10-19用户已明确授权在新分支开发T056–T070，按依赖串行执行；审核契约/API/持久化/执行安全边界仍须对应T056/T060/T065具体设计明确批准后实施，未批准项不得推定。真实Provider与动态开放不在本批授权内。",

@@ -4,6 +4,8 @@ import { NButton, NInput, NTag } from "naive-ui";
 
 import { LearningRequestError, errorFromPayload, startLearningSession, type GoalCandidate, type LearningEvent } from "./api/learningSessions";
 import { readHybridOperation, watchHybridOperation } from "./api/hybridReview";
+import TeachingNodeSummary from "./components/TeachingNodeSummary.vue";
+import type { TeachingBindingStatus, TeachingContext, TeachingMode } from "./api/teachingContext";
 import { ensureProfileSession } from "./api/profile";
 import LearningProgressPanel, {
   type PublishedResource,
@@ -28,6 +30,8 @@ interface Resource extends PublishedResource {
 }
 
 interface LearningUnitPayload {
+  teaching_context?: TeachingContext | null;
+  binding_status?: TeachingBindingStatus;
   publication_version?: number;
   approval_source?: string;
   scenes: Array<{
@@ -52,6 +56,11 @@ interface SceneVersion {
 const props = defineProps<{ startLearningRequest?: StartLearningRequest }>();
 const goal = ref("");
 const submittedGoal = ref("");
+const teachingMode = ref<TeachingMode>("target");
+const submittedTeachingMode = ref<TeachingMode>("target");
+const teachingContext = ref<TeachingContext | null>(null);
+const publishedTeachingContext = ref<TeachingContext | null>(null);
+const bindingStatus = ref<TeachingBindingStatus>(null);
 const requestState = ref<"idle" | "loading" | "error">("idle");
 const requestError = ref("");
 const temporaryText = ref("");
@@ -109,6 +118,7 @@ function selectScene(sceneId: string): void {
 async function startLearning(): Promise<void> {
   if (!canSubmit.value) return;
   submittedGoal.value = goal.value.trim();
+  submittedTeachingMode.value = teachingMode.value;
   resetAttempt();
   await submitLearningRequest();
 }
@@ -134,11 +144,14 @@ async function retryLearning(): Promise<void> {
 
 async function regenerateLearning(): Promise<void> {
   if (!submittedGoal.value || requestState.value === "loading") return;
+  submittedTeachingMode.value = teachingMode.value;
   resetAttempt();
   await submitLearningRequest();
 }
 
 function resetAttempt(): void {
+  teachingContext.value = null;
+  bindingStatus.value = null;
   generationController?.abort();
   stopReviewWatch?.();
   readyPublicationVersion = undefined;
@@ -179,6 +192,7 @@ async function submitLearningRequest(): Promise<void> {
     await startLearningSession({
       signal: generationController.signal,
       goal: requestGoal,
+      teachingMode: submittedTeachingMode.value,
       csrfToken: csrf,
       idempotencyKey: requestKey,
       onEvent: (event) => {
@@ -234,6 +248,10 @@ function applyLearningEvent(event: LearningEvent): string {
     }
   }
   if (event.type === "stage_changed" || event.type === "agent_start") generationPhase.value = stringValue(event.data.phase || event.data.stage);
+  if (event.type === "teaching_selected") {
+    teachingContext.value = event.data.teaching_context as TeachingContext;
+    bindingStatus.value = "bound";
+  }
   if (event.type === "review_required") {
     reviewState.value = "awaiting_human";
     temporaryText.value = "";
@@ -265,6 +283,8 @@ async function recoverPublishedOperation(generation: number): Promise<void> {
   if (!recoveringOperationId) throw new Error("缺少操作标识，请恢复原请求。");
   const payload = await readHybridOperation(recoveringOperationId);
   if (generation !== learningGeneration) return;
+  teachingContext.value = payload.teaching_context ?? null;
+  bindingStatus.value = payload.binding_status ?? null;
   const unitId = stringValue(payload.learning_unit_id);
   if (payload.id !== recoveringOperationId) throw new Error("原请求状态无效，请再次重试恢复。");
   if ((payload.status === "published" || payload.status === "completed") && unitId) {
@@ -343,6 +363,9 @@ async function loadPublishedUnit(
   const selected = publishedScene ?? loaded.find((scene) => scene.id === priorSelection) ?? current;
   learningUnitId.value = unitId;
   generationPhase.value = "";
+  teachingContext.value = payload.teaching_context ?? null;
+  bindingStatus.value = payload.binding_status ?? null;
+  publishedTeachingContext.value = payload.teaching_context ?? null;
   publicationVersion.value = payload.publication_version;
   approvalSource.value = payload.approval_source ?? "";
   scenes.value = loaded;
@@ -351,7 +374,11 @@ async function loadPublishedUnit(
   animationNodeId.value = typeof payload.knowledge_node_id === "string" ? payload.knowledge_node_id : "";
   pathTargetNodeId.value = typeof payload.path_target_node_id === "string" ? payload.path_target_node_id : "";
   reviewState.value = "published";
-  try { sessionStorage.setItem("edumind:last-learning-unit", unitId); } catch { /* Storage is optional; server state remains authoritative. */ }
+  try {
+    sessionStorage.setItem("edumind:last-learning-unit", unitId);
+    if (payload.publication_version) sessionStorage.setItem(`edumind:publication:${unitId}`, String(payload.publication_version));
+    else sessionStorage.removeItem(`edumind:publication:${unitId}`);
+  } catch { /* Storage is optional; server state remains authoritative. */ }
 }
 
 async function handleScenePublished(startedSelectionId: string, sceneKey: string, sceneVersion: number, publishedVersion?: number): Promise<void> {
@@ -397,7 +424,8 @@ async function restoreRecentUnit(): Promise<void> {
   restoreUnitError.value = "";
   try {
     await ensureSession();
-    await loadPublishedUnit(unitId, token);
+    const savedVersion = Number(sessionStorage.getItem(`edumind:publication:${unitId}`));
+    await loadPublishedUnit(unitId, token, undefined, Number.isSafeInteger(savedVersion) && savedVersion > 0 ? savedVersion : undefined);
   } catch {
     if (token === learningGeneration) restoreUnitError.value = "上次学习资源暂时无法读取。可以重试读取或开始新目标。";
   } finally {
@@ -471,6 +499,19 @@ function stringValue(value: unknown): string {
           :autosize="{ minRows: 3, maxRows: 5 }"
           :input-props="{ id: 'learning-goal' }"
         />
+        <label for="teaching-mode">本节安排</label>
+        <select
+          id="teaching-mode"
+          v-model="teachingMode"
+          :disabled="requestState === 'loading'"
+        >
+          <option value="target">
+            直接学习目标
+          </option>
+          <option value="recommended">
+            先按路径建议补前置
+          </option>
+        </select>
         <div class="form-footer">
           <span>不需要先填写画像</span>
           <NButton
@@ -483,6 +524,10 @@ function stringValue(value: unknown): string {
         </div>
       </form>
     </section>
+    <TeachingNodeSummary
+      :context="teachingContext"
+      :binding-status="bindingStatus"
+    />
     <section
       class="cue-strip"
       aria-label="可直接使用的学习方式"
@@ -567,6 +612,12 @@ function stringValue(value: unknown): string {
       @profile-changed="profileRefreshToken += 1"
     />
     <div v-show="!debateActive">
+      <aside
+        v-if="resources.length && publishedTeachingContext && publishedTeachingContext !== teachingContext"
+        data-testid="previous-teaching-scope"
+      >
+        <p>下方仍为此前已发布课程：{{ publishedTeachingContext.segment_goal }}。本次请求发布前保留该版本。</p>
+      </aside>
       <PublishedLearningWorkspace
         v-if="resources.length"
         :key="selectedSceneId"

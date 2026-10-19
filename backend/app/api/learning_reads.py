@@ -106,6 +106,13 @@ async def get_learning_unit(
         resources = scenes[scene_key]["resources"]
         assert isinstance(resources, list)
         resources.append(resource_payload(resource))
+    from app.services.teaching_binding import public_teaching_context
+
+    context = (
+        public_teaching_context(publication.material.get("teaching_context"))
+        if publication
+        else None
+    )
     path_snapshot = (unit.outline or {}).get("path_snapshot")
     return {
         **(
@@ -119,13 +126,21 @@ async def get_learning_unit(
         "id": str(unit.id),
         "status": unit.status,
         "scenes": list(scenes.values()),
-        "knowledge_node_id": unit.knowledge_point_id,
+        "knowledge_node_id": context["teaching_node_id"] if context else unit.knowledge_point_id,
+        "teaching_context": context,
+        "binding_status": "bound" if context else "legacy_unverified" if publication else None,
         "origin_type": "curated" if unit.catalog_release_id else "generated",
         "catalog_release_id": str(unit.catalog_release_id) if unit.catalog_release_id else None,
-        "path_target_node_id": path_snapshot.get("target_node_id")
+        "path_target_node_id": context["target_node_id"]
+        if context
+        else path_snapshot.get("target_node_id")
         if isinstance(path_snapshot, dict)
         else None,
-        "path_version": path_snapshot.get("version") if isinstance(path_snapshot, dict) else None,
+        "path_version": context["path_version"]
+        if context
+        else path_snapshot.get("version")
+        if isinstance(path_snapshot, dict)
+        else None,
     }
 
 
