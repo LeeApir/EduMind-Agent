@@ -78,3 +78,7 @@
 2026-10-15 最后一轮准备：r10两条主缺陷检出但附带分类误报，用户要求只再测最后一轮。独立[r11方案](../acceptance/phase-1-t040-focus-r11/README.md)补齐通用分类/实际证据契约及新2错误2正确诊断，19新增+273相关=292离线通过；准确4次/CNY8.516778与新样本范围待批准。复用原两轮8次策略登记，失败后停止当前自动生成/审核路线、不追加第三轮；四条通过也不替代正式T040或跨课程验收。旧源码/评分/停止账本不变，当前真实Provider0，none/catalog_only保持。
 
 2026-10-15 最后一轮实际结束：用户批准7a1467a r11准确范围/最多4次/CNY8.516778后，仅final-01实际1次；具体FIFO/LIFO错误正确检出，但返回misconception未满足冻结fact类别，ADMISSION_FAILED停止，余3未发。见[结果](../acceptance/phase-1-t040-focus-r11/results/r11.json)和[最终退出](../acceptance/phase-1-t040-focus-r11/route-retired.json)：当前路线停止，不追加第三轮/微调重试，2轮累计3次而非8次耗尽；T040 blocked/none/catalog_only保持，旧结果和ADR批准不改，不代表正式质量或跨课程能力通过。
+
+2026-10-19：[ADR-0018](0018-teaching-node-binding.md)已按[准确批准](0018-approval-20261019.json)实施T060–T064：目标/推荐/教学分离及准确发布绑定/评分/API恢复。原Proposed附件保留批准时字节，当前状态以批准记录和根账本为准。T064完成提交8a9b38f；全部零Provider，不代表真实主题质量通过。
+
+2026-10-19：[ADR-0019：固定C样本离线验收](0019-fixed-c-offline-verification.md)为T065具体Proposed方案，A–D及[manifest](../acceptance/phase-1-fixed-c-design-r01/manifest.json)待批准；固定两份封存原件/审阅驱动、独立工具链锁、禁网非特权容器与限额、编译/输出/故障/追踪分列。工具链环境尚未就绪；样本编译/运行0，Provider0。T066–T069不得先行，无宿主直接执行降级或正式发布授权。

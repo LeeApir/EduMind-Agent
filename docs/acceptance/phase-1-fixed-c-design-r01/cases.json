@@ -1,0 +1,253 @@
+{
+  "version": "fixed-c-design-cases-v1",
+  "status": "proposed_not_executable",
+  "sources": {
+    "docs/reference/head-insertion-tests-20261019/edumind-r02/candidate.c": {
+      "bytes": 1492,
+      "sha256": "48f63b2689c128b89cc399fa9aab9fff377804d26ae42f5d7a1253879a2ba394"
+    },
+    "docs/reference/head-insertion-tests-20261019/edumind-r02/complete-review-case.json": {
+      "bytes": 28555,
+      "sha256": "0fdd597a3619503e4475bb4b514f51418dd6bababe15d38c3e5cac0b22114183"
+    },
+    "docs/reference/head-insertion-tests-20261019/edumind-r02/checks/fault-injection.c": {
+      "bytes": 2786,
+      "sha256": "781fa2b6572914653a3c5b4a1e0087278ec1133f094ba7d5c370c75e62260263"
+    },
+    "docs/reference/head-insertion-tests-20261019/openmaic/original-course.maic.zip": {
+      "bytes": 401704,
+      "sha256": "fd34ca2ca08f73f1455e727cca822afafac75431b51796f6bece8ae57f11b808"
+    },
+    "docs/reference/head-insertion-tests-20261019/openmaic/original-manifest.json": {
+      "bytes": 401580,
+      "sha256": "acaafae0770e54daad297eb32cd2d69c4afc59f2663d8baeacad1fe6555ca73a"
+    },
+    "docs/reference/head-insertion-tests-20261019/openmaic/independent-review/original-program.c": {
+      "bytes": 965,
+      "sha256": "d7d6aa24f1fa5a7f03ed7075b8283bd34c4a1916acc7a5778d912a086673fe78"
+    },
+    "docs/reference/head-insertion-tests-20261019/openmaic/independent-review/extraction-map.json": {
+      "bytes": 1257,
+      "sha256": "e3c7d5e5ce58aa462c6a88e0a765e4bf3fac7d96ddcdd09e33694721592efea6"
+    },
+    "docs/reference/head-insertion-tests-20261019/openmaic/independent-review/function-harness.c": {
+      "bytes": 2181,
+      "sha256": "e2b5b02f9684dcea370cab5ad6f6a38f327c07fc46fad5ee7eb28f6595214b3f"
+    },
+    "docs/reference/head-insertion-tests-20261019/openmaic/independent-review/head-functions.c": {
+      "bytes": 493,
+      "sha256": "d2d175f7920fd8bba6723fa1a6d961c11c20b676bc1a12b4106f0fb367cb6641"
+    },
+    "docs/reference/head-insertion-tests-20261019/openmaic/independent-review/print-function.c": {
+      "bytes": 143,
+      "sha256": "52913e0b7b994344bb2596aa01c16e435c67ab6cf2f74c7545903f4bf40875c0"
+    },
+    "docs/reference/head-insertion-tests-20261019/openmaic/independent-review/free-function.c": {
+      "bytes": 146,
+      "sha256": "0a7e44c372f6ef5415ef2e11d15a8b5faff861206fa40153e421b1ced4186cd1"
+    }
+  },
+  "approved_source_ids": [
+    "edumind-r02-original",
+    "om-original"
+  ],
+  "scope": {
+    "values": [
+      1,
+      2,
+      3
+    ],
+    "start": "empty list",
+    "fail_at": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "per_scenario": "fresh process and fresh container; no retry"
+  },
+  "independent_expectations": {
+    "edumind": {
+      "strict_compile": "fail: missing final newline; do not repair",
+      "ordinary_compile": "pass with retained newline warning",
+      "original_main": {
+        "numeric_sequence": [
+          3,
+          2,
+          1
+        ],
+        "stdout_base64": "MyAyIDEgCg==",
+        "format_vs_model_claim": "not exact; preserve space and newline"
+      },
+      "fault_sequences": {
+        "0": [
+          3,
+          2,
+          1
+        ],
+        "1": [
+          3,
+          2
+        ],
+        "2": [
+          3,
+          1
+        ],
+        "3": [
+          2,
+          1
+        ]
+      },
+      "attempts": 3,
+      "allocated": {
+        "0": 3,
+        "1": 2,
+        "2": 2,
+        "3": 2
+      },
+      "freed": "each actual allocation once; all successful paths live=0",
+      "free_interface": "free_list(Node*) does not reset caller; main resets head itself"
+    },
+    "om": {
+      "strict_compile": "fail: missing Node alias and incompatible insertHead calls",
+      "ordinary_compile": "fail; actual diagnostics recorded, do not require exact Apple error count",
+      "original_main": "not_run: compile_failed",
+      "function_driver": "original Node** interface plus explicitly test-only alias; not original main",
+      "normal": {
+        "numeric_sequence": [
+          3,
+          2,
+          1
+        ],
+        "stdout_base64": "MyAtPiAyIC0+IDEgLT4gTlVMTAo=",
+        "attempts": 3,
+        "allocated": 3,
+        "released": 3,
+        "live": 0,
+        "caller_head_reset": true
+      },
+      "fault": "fail: reachable NULL dereference at injected malloc failure; report actual sanitizer/exit evidence, no definite UB output",
+      "prior_live_before_fault": {
+        "1": 0,
+        "2": 1,
+        "3": 2
+      }
+    }
+  },
+  "matrix": [
+    {
+      "id": "original-strict",
+      "sources": [
+        "edumind-r02-original",
+        "om-original"
+      ],
+      "kind": "strict_compile",
+      "sanitizers": false
+    },
+    {
+      "id": "original-ordinary",
+      "sources": [
+        "edumind-r02-original",
+        "om-original"
+      ],
+      "kind": "ordinary_compile",
+      "sanitizers": false
+    },
+    {
+      "id": "original-main-normal",
+      "sources": [
+        "edumind-r02-original",
+        "om-original"
+      ],
+      "kind": "original_main",
+      "sanitizers": false,
+      "requires": "that source ordinary compilation succeeded"
+    },
+    {
+      "id": "original-main-sanitized",
+      "sources": [
+        "edumind-r02-original",
+        "om-original"
+      ],
+      "kind": "original_main",
+      "sanitizers": true,
+      "requires": "that source sanitizer compilation succeeded"
+    },
+    {
+      "id": "wrapped-main-faults",
+      "sources": [
+        "edumind-r02-original",
+        "om-original"
+      ],
+      "kind": "wrapped_main",
+      "fault_at": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "sanitizers": true,
+      "requires": "original main is compilable; OM remains not_run, no main substitution"
+    },
+    {
+      "id": "function-contract-faults",
+      "sources": [
+        "edumind-r02-original",
+        "om-original"
+      ],
+      "kind": "function_contract",
+      "fault_at": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "sanitizers": true,
+      "requires": "reviewed fixed interface driver; separate from original main"
+    }
+  ],
+  "controlled_negatives": [
+    {
+      "id": "negative-drop-link",
+      "base": "edumind-r02-original",
+      "change": "derived copy only: new_node->next = NULL instead of head",
+      "expected": "fail full chain state/count assertion on second successful insert"
+    },
+    {
+      "id": "negative-double-free",
+      "base": "edumind-r02-original",
+      "change": "derived copy only: duplicate free(p) in free_list",
+      "expected": "fail tracker or ASan double-free; may stop before final counts"
+    },
+    {
+      "id": "negative-ignored-return",
+      "base": "edumind-r02-original",
+      "change": "derived copy only: remove caller head assignment for inserts in main",
+      "expected": "fail actual wrapped-main output/ownership or live-allocation checks; a correct function driver cannot mask bad main"
+    }
+  ],
+  "environment_probes": [
+    "identity/caps/no-new-privileges",
+    "network namespace no egress route",
+    "readonly bundle/root",
+    "effective memory/cpu/pids/tmpfs bounds",
+    "output overflow killed",
+    "infinite loop timed out"
+  ],
+  "budgets": {
+    "provider_calls": 0,
+    "tokens": 0,
+    "provider_cost_cny": 0,
+    "max_compilations_per_run": 64,
+    "max_sample_processes_per_run": 40,
+    "max_run_wall_seconds": 1200,
+    "automatic_retries": 0
+  },
+  "not_yet_done": [
+    "driver extraction/review/registry",
+    "final image and dependency lock",
+    "isolation probes",
+    "all compilation and sample execution"
+  ],
+  "result_contract": "execution-contract.md"
+}
