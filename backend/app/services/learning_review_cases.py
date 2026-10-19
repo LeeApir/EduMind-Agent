@@ -94,6 +94,14 @@ async def case_current(db: AsyncSession, case: LearningReviewCase) -> bool:
     if not await operation_context_current(db, op):
         return False
     restore_material(payload["material"])
+    from app.services.teaching_binding import verify_persisted_teaching
+
+    try:
+        await verify_persisted_teaching(
+            db, plan_id=plan.id, operation_id=op.id, material=payload["material"], check_graph=True
+        )
+    except LearningContractError:
+        return False
     return True
 
 
@@ -108,6 +116,11 @@ async def create_review_case(
         select(LearningUnit)
         .where(LearningUnit.id == UUID(b["unit_id"]), LearningUnit.user_id == owner_id)
         .with_for_update()
+    )
+    from app.services.teaching_binding import verify_persisted_teaching
+
+    await verify_persisted_teaching(
+        db, plan_id=UUID(b["plan_id"]), operation_id=UUID(b["operation_id"]), material=value
     )
     rows = [await db.get(LearningReviewRecord, id) for id in review_ids]
     if len(rows) != 4 or any(

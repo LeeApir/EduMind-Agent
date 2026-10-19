@@ -56,22 +56,33 @@ def unit_material(
         "actions": action_value,
         "reference_context": deepcopy(workspace.reference_context),
     }
+    context = workspace.teaching_context
+    if context is not None:
+        frozen["teaching_context"] = deepcopy(context)
     if len(canonical(frozen)) > 64 * 1024:
         raise LearningContractError("UNIT_INPUT_LIMIT_EXCEEDED")
     frozen["unit_digest"] = digest(
         "unit",
-        "learning-publication-v1",
+        "learning-publication-v2" if context is not None else "learning-publication-v1",
         binding=workspace.binding,
         scenes=scenes,
         actions_version=action_value["version"],
         actions_digest=action_value["digest"],
+        **({"teaching_context": context} if context is not None else {}),
     )
     return frozen
 
 
 def restore_material(value: dict[str, Any]) -> tuple[PlannedScenes, dict[str, Any]]:
+    if "teaching_context" in value:
+        from app.services.teaching_binding import validate_teaching_context
+
+        validate_teaching_context(value["teaching_context"])
     workspace = PlannedScenes(
-        value["plan"], value["binding"], reference_context=value["reference_context"]
+        value["plan"],
+        value["binding"],
+        reference_context=value["reference_context"],
+        teaching_context=value.get("teaching_context"),
     )
     # Restore server-issued immutable candidates; stage() would allocate new identities.
     for item in value["candidates"]:

@@ -84,6 +84,11 @@ async def stage_candidates(db: AsyncSession, workspace: Any) -> list[dict[str, A
     owner_id = UUID(b["owner_id"])
     unit_id = UUID(b["unit_id"])
     await lock_learning_owner(db, owner_id)
+    from app.services.teaching_binding import verify_persisted_teaching
+
+    await verify_persisted_teaching(
+        db, plan_id=UUID(b["plan_id"]), operation_id=UUID(b["operation_id"])
+    )
     final_ids = {c.id for c in workspace.candidates()}
     scenes = []
     for c in workspace.history():
@@ -172,6 +177,11 @@ async def publication_checks(
     )
     if latest != plan.version:
         raise LearningContractError("PUBLICATION_PLAN_STALE")
+    from app.services.teaching_binding import verify_persisted_teaching
+
+    await verify_persisted_teaching(
+        db, plan_id=plan.id, operation_id=UUID(b["operation_id"]), material=value, check_graph=True
+    )
     snapshot_context = plan.input_snapshot.get("reference_context")
     if snapshot_context is not None and canonical(snapshot_context) != canonical(
         workspace.reference_context
@@ -183,6 +193,10 @@ async def publication_checks(
         scene = await db.get(LearningScene, UUID(s["scene_id"]))
         if (
             not resource
+            or (
+                workspace.teaching_context is not None
+                and resource.knowledge_point_id != workspace.plan["node_id"]
+            )
             or not scene
             or resource.user_id != plan.user_id
             or resource.learning_unit_id != plan.learning_unit_id

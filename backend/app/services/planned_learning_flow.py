@@ -51,6 +51,18 @@ async def run_planned_operation(
     )
     if op is None or op.status != "accepted":
         raise LearningContractError("OPERATION_NOT_FRESH")
+    if inputs.teaching_context is not None:
+        from app.services.teaching_binding import check_teaching_plan
+
+        teaching = check_teaching_plan(inputs.teaching_context, inputs.metadata)
+        if op.goal != teaching["original_request"] or (
+            op.teaching_context is not None
+            and canonical(op.teaching_context) != canonical(teaching)
+        ):
+            raise LearningContractError("TEACHING_BINDING_MISMATCH")
+        op.teaching_context = teaching
+    elif op.teaching_context is not None:
+        raise LearningContractError("TEACHING_BINDING_MISMATCH")
     unit = await db.get(LearningUnit, op.learning_unit_id) if op.learning_unit_id else None
     if unit is None:
         unit = LearningUnit(
@@ -58,11 +70,22 @@ async def run_planned_operation(
             title=str(inputs.metadata["goal"])[:200],
             knowledge_point_id=inputs.metadata["node_id"],
             learning_objectives={"goal": inputs.metadata["goal"]},
-            outline={"pipeline": "shared-plan-v1", "path_snapshot": inputs.path_snapshot},
+            outline={
+                "pipeline": "shared-plan-v1",
+                "path_snapshot": inputs.path_snapshot,
+                **(
+                    {"teaching_context": inputs.teaching_context} if inputs.teaching_context else {}
+                ),
+            },
         )
         db.add(unit)
         await db.flush()
         op.learning_unit_id = unit.id
+    if (
+        inputs.teaching_context is not None
+        and unit.knowledge_point_id != inputs.metadata["node_id"]
+    ):
+        raise LearningContractError("TEACHING_BINDING_MISMATCH")
     if unit.user_id != owner_id or unit.status == "withdrawn":
         raise LearningContractError("UNIT_NOT_AVAILABLE")
     for prior_case in (

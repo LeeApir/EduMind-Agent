@@ -118,13 +118,19 @@ async def run_planned_reexplanation(
         frozenset(raw["node_ids"]),
         raw["learner_evidence"],
         raw["reference_context"],
+        teaching_context=raw.get("teaching_context"),
     )
     op = LearningOperation(
         user_id=owner_id,
         learning_unit_id=classroom_op.learning_unit_id,
         idempotency_key="planned-reexplanation:" + str(classroom_op.id),
         request_digest=classroom_op.request_digest,
-        goal=str(plan.plan_json["goal"]),
+        goal=str(
+            raw["teaching_context"]["original_request"]
+            if raw.get("teaching_context")
+            else plan.plan_json["goal"]
+        ),
+        teaching_context=raw.get("teaching_context"),
         preferred_language=values["code_language"],
     )
     op.publication_expectation = {

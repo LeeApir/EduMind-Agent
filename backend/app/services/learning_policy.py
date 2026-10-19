@@ -18,6 +18,7 @@ POLICY = {
     "review_responsibilities": RESPONSIBILITY_VERSION,
     "learner_review": LEARNER_REVIEW_VERSION,
     "teaching_scope": TEACHING_BINDING_VERSION,
+    "teaching_binding": TEACHING_BINDING_VERSION,
     "plan": "learning-plan-v1",
     "actions": "teaching-actions-v1",
     "max_corrections": 2,

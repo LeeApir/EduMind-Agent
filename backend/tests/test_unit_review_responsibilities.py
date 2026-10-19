@@ -164,6 +164,8 @@ def prior_policy(monkeypatch):
 
     from app.services.learning_policy import POLICY
 
+    monkeypatch.delitem(POLICY, "teaching_scope", raising=False)
+    monkeypatch.delitem(POLICY, "teaching_binding", raising=False)
     old_checks = UNIT_CHECKS - {"objectives"}
     monkeypatch.setattr("app.agents.hybrid_resource_review.UNIT_CHECKS", old_checks)
     monkeypatch.setattr("test_learning_review_cases.UNIT_CHECKS", old_checks)

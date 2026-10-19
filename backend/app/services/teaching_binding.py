@@ -5,6 +5,8 @@ from dataclasses import asdict
 from typing import Any
 from uuid import UUID
 
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.models.learning_state import LearningPathVersion
 from app.services.knowledge_graph import KnowledgeGraphRepository
 from app.services.learning_contract import LearningContractError, canonical, digest
@@ -143,8 +145,10 @@ def select_teaching_context(
     )
 
 
-def check_teaching_plan(context: object, metadata: dict[str, Any]) -> dict[str, Any]:
+def check_teaching_plan(context: object, metadata: object) -> dict[str, Any]:
     c = validate_teaching_context(context)
+    if not isinstance(metadata, dict):
+        raise LearningContractError("TEACHING_BINDING_MISMATCH")
     if any(
         metadata.get(k) != c[v]
         for k, v in (
@@ -156,3 +160,52 @@ def check_teaching_plan(context: object, metadata: dict[str, Any]) -> dict[str, 
     ):
         raise LearningContractError("TEACHING_BINDING_MISMATCH")
     return c
+
+
+async def verify_persisted_teaching(
+    db: AsyncSession,
+    *,
+    plan_id: UUID,
+    operation_id: UUID,
+    material: dict[str, Any] | None = None,
+    check_graph: bool = False,
+) -> None:
+    from app.models.learning import LearningOperation, LearningUnit
+    from app.models.learning_plan import LearningPlanVersion
+
+    plan = await db.get(LearningPlanVersion, plan_id, populate_existing=True)
+    op = await db.get(LearningOperation, operation_id, populate_existing=True)
+    if (
+        not plan
+        or not op
+        or plan.user_id != op.user_id
+        or plan.learning_unit_id != op.learning_unit_id
+    ):
+        raise LearningContractError("TEACHING_BINDING_MISMATCH")
+    c = plan.input_snapshot.get("teaching_context")
+    if canonical(c) != canonical(op.teaching_context):
+        raise LearningContractError("TEACHING_BINDING_MISMATCH")
+    if material is not None and canonical(material.get("teaching_context")) != canonical(c):
+        raise LearningContractError("TEACHING_BINDING_MISMATCH")
+    if c is None:
+        return  # Legacy reads remain possible; new mastery eligibility is separate.
+    context = check_teaching_plan(c, plan.plan_json)
+    check_teaching_plan(c, plan.input_snapshot.get("metadata", {}))
+    unit = await db.get(LearningUnit, plan.learning_unit_id, populate_existing=True)
+    if (
+        not unit
+        or unit.user_id != op.user_id
+        or unit.knowledge_point_id != context["teaching_node_id"]
+        or op.goal != context["original_request"]
+    ):
+        raise LearningContractError("TEACHING_BINDING_MISMATCH")
+    if check_graph:
+        from app.services.knowledge_graph import default_knowledge_graph_repository
+
+        graph = default_knowledge_graph_repository()
+        if (
+            graph.graph_version != context["graph_version"]
+            or graph_digest(graph) != context["graph_digest"]
+            or graph.get_node(context["teaching_node_id"]) is None
+        ):
+            raise LearningContractError("TEACHING_BINDING_MISMATCH")

@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.learning import LearningOperation, LearningUnit
 from app.models.learning_plan import LearningPlanVersion
-from app.services.learning_contract import LearningContractError, digest, validate_plan
+from app.services.learning_contract import LearningContractError, canonical, digest, validate_plan
 from app.services.learning_owner_lock import lock_learning_owner
 
 
@@ -37,6 +37,19 @@ async def save_plan(
         or operation.learning_unit_id != unit_id
     ):
         raise LearningContractError
+    context = input_snapshot.get("teaching_context")
+    if canonical(context) != canonical(operation.teaching_context):
+        raise LearningContractError("TEACHING_BINDING_MISMATCH")
+    if context is not None:
+        from app.services.teaching_binding import check_teaching_plan
+
+        c = check_teaching_plan(context, value)
+        check_teaching_plan(context, input_snapshot.get("metadata", {}))
+        if (
+            unit.knowledge_point_id != c["teaching_node_id"]
+            or operation.goal != c["original_request"]
+        ):
+            raise LearningContractError("TEACHING_BINDING_MISMATCH")
     version = await db.scalar(
         select(func.max(LearningPlanVersion.version)).where(
             LearningPlanVersion.learning_unit_id == unit_id

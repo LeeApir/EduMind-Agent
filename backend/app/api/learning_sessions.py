@@ -208,7 +208,7 @@ async def start_learning_session(
                 hybrid_events(
                     operation_id=reservation.operation.id,
                     owner_id=current.user.id,
-                    goal=payload.goal,
+                    goal=reservation.operation.goal,
                     language=payload.preferred_language,
                     gateway=gateway,
                     graph=graph,

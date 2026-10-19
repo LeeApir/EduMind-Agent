@@ -174,9 +174,23 @@ def test_plan_persistence_and_database_guards() -> None:
                     if exists and await db.scalar(text(f"SELECT count(*) FROM {table}")):
                         expected_guard = message
                         break
+                has_context = await db.scalar(
+                    text(
+                        "SELECT EXISTS (SELECT 1 FROM information_schema.columns "
+                        "WHERE table_name='learning_operations' AND column_name='teaching_context')"
+                    )
+                )
+                if has_context and await db.scalar(
+                    text(
+                        "SELECT count(*) FROM learning_operations "
+                        "WHERE teaching_context IS NOT NULL"
+                    )
+                ):
+                    expected_guard = "teaching data prevents downgrade"
             result = subprocess.run(
                 [sys.executable, "-m", "alembic", "downgrade", "0025_animation_dsl_media"],
                 cwd=ROOT / "backend",
+                env={**os.environ, "EDUMIND_DATABASE_URL": URL},
                 capture_output=True,
                 text=True,
             )

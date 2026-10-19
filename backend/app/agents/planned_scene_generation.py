@@ -55,10 +55,22 @@ class PlannedScenes:
         *,
         reference_context: object = None,
         input_snapshot: dict[str, Any] | None = None,
+        teaching_context: dict[str, Any] | None = None,
     ) -> None:
         self.reference_context = deepcopy(reference_context)
         self.input_snapshot = deepcopy(input_snapshot)
+        self.teaching_context = deepcopy(
+            teaching_context
+            if teaching_context is not None
+            else input_snapshot.get("teaching_context")
+            if input_snapshot
+            else None
+        )
         self.plan = validate_contract(plan, "plan")
+        if self.teaching_context is not None:
+            from app.services.teaching_binding import check_teaching_plan
+
+            check_teaching_plan(self.teaching_context, self.plan)
         self.binding = validate_contract(binding, "binding")
         if self.binding["plan_digest"] != digest("plan", "learning-plan-v1", plan=self.plan):
             raise LearningContractError

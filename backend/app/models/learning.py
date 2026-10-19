@@ -153,6 +153,7 @@ class LearningOperation(Base):
     )
     published_scene_version: Mapped[int | None] = mapped_column(Integer)
     error: Mapped[dict[str, object] | None] = mapped_column(JSONB)
+    teaching_context: Mapped[dict[str, object] | None] = mapped_column(JSONB(none_as_null=True))
     phase: Mapped[str | None] = mapped_column(String(32))
     review_summary: Mapped[dict[str, object] | None] = mapped_column(JSONB)
     publication_expectation: Mapped[dict[str, object] | None] = mapped_column(JSONB)
