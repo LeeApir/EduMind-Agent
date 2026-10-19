@@ -1,0 +1,768 @@
+{
+  "version": "luna-schema-zero-call-audit-v1",
+  "parent_manifest_sha256": "2cb7190424d4b6d47e9d77be4b02f2548bf913b39fc046c793c73d51be73d130",
+  "original_wire_sha256": "fce847194f8b37be935a8581a0227ebd4c65579de12f656a8c993a694ec0e67e",
+  "original_full_schema_sha256": "76a1c726afdda86cf81acc9e2e6928b556f4dcb39b0027201448ddc35be0d0ce",
+  "provider_failure": {
+    "code": "invalid_json_schema",
+    "content_encoding": "identity",
+    "decoded_bytes": 281,
+    "fields": {
+      "code": "str",
+      "message": "str",
+      "param": "str",
+      "type": "str"
+    },
+    "media_type": "application/json",
+    "parse": "JSON_ERROR_OBJECT",
+    "raw_bytes": 281,
+    "raw_complete": true,
+    "raw_sha256": "c9e495ee5eee3ebfea652ad1eb9bf74c9f740d2de5d30ca10ceecefad49a96b5",
+    "technical_message_tokens": [
+      "Invalid",
+      "schema",
+      "for",
+      "response_format",
+      "[redacted]",
+      ":",
+      "In",
+      "context",
+      "=",
+      "(",
+      "properties",
+      ",",
+      "[redacted]",
+      ",",
+      "[redacted]",
+      ",",
+      "0",
+      ",",
+      "properties",
+      ",",
+      "[redacted]",
+      ")",
+      ",",
+      "schema",
+      "must",
+      "have",
+      "a",
+      "type",
+      "[redacted]",
+      "."
+    ],
+    "unknown_field_count": 0
+  },
+  "causality": "Exact first-rejected field cannot be uniquely reconstructed from redacted error; audit proves multiple concrete untyped enum/const nodes. $ref/anyOf are not all invalid.",
+  "original_untyped_nodes": [
+    {
+      "path": [
+        "properties",
+        "schema_version"
+      ],
+      "keywords": [
+        "const"
+      ],
+      "classification": "implicit scalar type via const/enum"
+    },
+    {
+      "path": [
+        "properties",
+        "scope"
+      ],
+      "keywords": [
+        "const"
+      ],
+      "classification": "implicit scalar type via const/enum"
+    },
+    {
+      "path": [
+        "properties",
+        "verdict"
+      ],
+      "keywords": [
+        "enum"
+      ],
+      "classification": "implicit scalar type via const/enum"
+    },
+    {
+      "path": [
+        "properties",
+        "findings",
+        "items"
+      ],
+      "keywords": [
+        "$ref"
+      ],
+      "classification": "reference node; no standalone type required by ordinary JSON Schema"
+    },
+    {
+      "path": [
+        "$defs",
+        "plan",
+        "properties",
+        "schema_version"
+      ],
+      "keywords": [
+        "const"
+      ],
+      "classification": "implicit scalar type via const/enum"
+    },
+    {
+      "path": [
+        "$defs",
+        "plan",
+        "properties",
+        "profile_version"
+      ],
+      "keywords": [
+        "anyOf"
+      ],
+      "classification": "union schema; no standalone type required by ordinary JSON Schema"
+    },
+    {
+      "path": [
+        "$defs",
+        "plan",
+        "properties",
+        "code_language"
+      ],
+      "keywords": [
+        "enum"
+      ],
+      "classification": "implicit scalar type via const/enum"
+    },
+    {
+      "path": [
+        "$defs",
+        "plan",
+        "properties",
+        "conventions",
+        "properties",
+        "index_base"
+      ],
+      "keywords": [
+        "anyOf"
+      ],
+      "classification": "union schema; no standalone type required by ordinary JSON Schema"
+    },
+    {
+      "path": [
+        "$defs",
+        "plan",
+        "properties",
+        "conventions",
+        "properties",
+        "index_base",
+        "anyOf",
+        0
+      ],
+      "keywords": [
+        "enum"
+      ],
+      "classification": "implicit scalar type via const/enum"
+    },
+    {
+      "path": [
+        "$defs",
+        "plan",
+        "properties",
+        "conventions",
+        "properties",
+        "capacity"
+      ],
+      "keywords": [
+        "anyOf"
+      ],
+      "classification": "union schema; no standalone type required by ordinary JSON Schema"
+    },
+    {
+      "path": [
+        "$defs",
+        "plan",
+        "properties",
+        "shared_example",
+        "properties",
+        "steps",
+        "items",
+        "properties",
+        "expected_output"
+      ],
+      "keywords": [
+        "anyOf"
+      ],
+      "classification": "union schema; no standalone type required by ordinary JSON Schema"
+    },
+    {
+      "path": [
+        "$defs",
+        "plan",
+        "properties",
+        "scenes",
+        "prefixItems",
+        0,
+        "properties",
+        "role"
+      ],
+      "keywords": [
+        "const"
+      ],
+      "classification": "implicit scalar type via const/enum"
+    },
+    {
+      "path": [
+        "$defs",
+        "plan",
+        "properties",
+        "scenes",
+        "prefixItems",
+        0,
+        "properties",
+        "scene_key"
+      ],
+      "keywords": [
+        "const"
+      ],
+      "classification": "implicit scalar type via const/enum"
+    },
+    {
+      "path": [
+        "$defs",
+        "plan",
+        "properties",
+        "scenes",
+        "prefixItems",
+        0,
+        "properties",
+        "depends_on"
+      ],
+      "keywords": [
+        "const"
+      ],
+      "classification": "implicit scalar type via const/enum"
+    },
+    {
+      "path": [
+        "$defs",
+        "plan",
+        "properties",
+        "scenes",
+        "prefixItems",
+        1,
+        "properties",
+        "role"
+      ],
+      "keywords": [
+        "const"
+      ],
+      "classification": "implicit scalar type via const/enum"
+    },
+    {
+      "path": [
+        "$defs",
+        "plan",
+        "properties",
+        "scenes",
+        "prefixItems",
+        1,
+        "properties",
+        "scene_key"
+      ],
+      "keywords": [
+        "const"
+      ],
+      "classification": "implicit scalar type via const/enum"
+    },
+    {
+      "path": [
+        "$defs",
+        "plan",
+        "properties",
+        "scenes",
+        "prefixItems",
+        1,
+        "properties",
+        "depends_on"
+      ],
+      "keywords": [
+        "const"
+      ],
+      "classification": "implicit scalar type via const/enum"
+    },
+    {
+      "path": [
+        "$defs",
+        "plan",
+        "properties",
+        "scenes",
+        "prefixItems",
+        2,
+        "properties",
+        "role"
+      ],
+      "keywords": [
+        "const"
+      ],
+      "classification": "implicit scalar type via const/enum"
+    },
+    {
+      "path": [
+        "$defs",
+        "plan",
+        "properties",
+        "scenes",
+        "prefixItems",
+        2,
+        "properties",
+        "scene_key"
+      ],
+      "keywords": [
+        "const"
+      ],
+      "classification": "implicit scalar type via const/enum"
+    },
+    {
+      "path": [
+        "$defs",
+        "plan",
+        "properties",
+        "scenes",
+        "prefixItems",
+        2,
+        "properties",
+        "depends_on"
+      ],
+      "keywords": [
+        "const"
+      ],
+      "classification": "implicit scalar type via const/enum"
+    },
+    {
+      "path": [
+        "$defs",
+        "plan_record",
+        "properties",
+        "binding"
+      ],
+      "keywords": [
+        "$ref"
+      ],
+      "classification": "reference node; no standalone type required by ordinary JSON Schema"
+    },
+    {
+      "path": [
+        "$defs",
+        "plan_record",
+        "properties",
+        "plan"
+      ],
+      "keywords": [
+        "$ref"
+      ],
+      "classification": "reference node; no standalone type required by ordinary JSON Schema"
+    },
+    {
+      "path": [
+        "$defs",
+        "scene_binding",
+        "properties",
+        "role"
+      ],
+      "keywords": [
+        "enum"
+      ],
+      "classification": "implicit scalar type via const/enum"
+    },
+    {
+      "path": [
+        "$defs",
+        "scene_binding",
+        "properties",
+        "scene_key"
+      ],
+      "keywords": [
+        "enum"
+      ],
+      "classification": "implicit scalar type via const/enum"
+    },
+    {
+      "path": [
+        "$defs",
+        "finding",
+        "properties",
+        "category"
+      ],
+      "keywords": [
+        "enum"
+      ],
+      "classification": "implicit scalar type via const/enum"
+    },
+    {
+      "path": [
+        "$defs",
+        "finding",
+        "properties",
+        "severity"
+      ],
+      "keywords": [
+        "enum"
+      ],
+      "classification": "implicit scalar type via const/enum"
+    },
+    {
+      "path": [
+        "$defs",
+        "review_result",
+        "properties",
+        "schema_version"
+      ],
+      "keywords": [
+        "const"
+      ],
+      "classification": "implicit scalar type via const/enum"
+    },
+    {
+      "path": [
+        "$defs",
+        "review_result",
+        "properties",
+        "scope"
+      ],
+      "keywords": [
+        "enum"
+      ],
+      "classification": "implicit scalar type via const/enum"
+    },
+    {
+      "path": [
+        "$defs",
+        "review_result",
+        "properties",
+        "verdict"
+      ],
+      "keywords": [
+        "enum"
+      ],
+      "classification": "implicit scalar type via const/enum"
+    },
+    {
+      "path": [
+        "$defs",
+        "review_result",
+        "properties",
+        "findings",
+        "items"
+      ],
+      "keywords": [
+        "$ref"
+      ],
+      "classification": "reference node; no standalone type required by ordinary JSON Schema"
+    },
+    {
+      "path": [
+        "$defs",
+        "review_record",
+        "properties",
+        "binding"
+      ],
+      "keywords": [
+        "$ref"
+      ],
+      "classification": "reference node; no standalone type required by ordinary JSON Schema"
+    },
+    {
+      "path": [
+        "$defs",
+        "review_record",
+        "properties",
+        "result"
+      ],
+      "keywords": [
+        "$ref"
+      ],
+      "classification": "reference node; no standalone type required by ordinary JSON Schema"
+    },
+    {
+      "path": [
+        "$defs",
+        "review_record",
+        "properties",
+        "anchor_catalog",
+        "items"
+      ],
+      "keywords": [
+        "$ref"
+      ],
+      "classification": "reference node; no standalone type required by ordinary JSON Schema"
+    },
+    {
+      "path": [
+        "$defs",
+        "review_record",
+        "properties",
+        "local_routing",
+        "properties",
+        "verdict"
+      ],
+      "keywords": [
+        "enum"
+      ],
+      "classification": "implicit scalar type via const/enum"
+    },
+    {
+      "path": [
+        "$defs",
+        "plan_generation",
+        "properties",
+        "conventions",
+        "properties",
+        "index_base"
+      ],
+      "keywords": [
+        "anyOf"
+      ],
+      "classification": "union schema; no standalone type required by ordinary JSON Schema"
+    },
+    {
+      "path": [
+        "$defs",
+        "plan_generation",
+        "properties",
+        "conventions",
+        "properties",
+        "index_base",
+        "anyOf",
+        0
+      ],
+      "keywords": [
+        "enum"
+      ],
+      "classification": "implicit scalar type via const/enum"
+    },
+    {
+      "path": [
+        "$defs",
+        "plan_generation",
+        "properties",
+        "conventions",
+        "properties",
+        "capacity"
+      ],
+      "keywords": [
+        "anyOf"
+      ],
+      "classification": "union schema; no standalone type required by ordinary JSON Schema"
+    },
+    {
+      "path": [
+        "$defs",
+        "plan_generation",
+        "properties",
+        "shared_example",
+        "properties",
+        "steps",
+        "items",
+        "properties",
+        "expected_output"
+      ],
+      "keywords": [
+        "anyOf"
+      ],
+      "classification": "union schema; no standalone type required by ordinary JSON Schema"
+    },
+    {
+      "path": [
+        "$defs",
+        "plan_generation",
+        "properties",
+        "scenes",
+        "prefixItems",
+        0,
+        "properties",
+        "role"
+      ],
+      "keywords": [
+        "const"
+      ],
+      "classification": "implicit scalar type via const/enum"
+    },
+    {
+      "path": [
+        "$defs",
+        "plan_generation",
+        "properties",
+        "scenes",
+        "prefixItems",
+        0,
+        "properties",
+        "scene_key"
+      ],
+      "keywords": [
+        "const"
+      ],
+      "classification": "implicit scalar type via const/enum"
+    },
+    {
+      "path": [
+        "$defs",
+        "plan_generation",
+        "properties",
+        "scenes",
+        "prefixItems",
+        0,
+        "properties",
+        "depends_on"
+      ],
+      "keywords": [
+        "const"
+      ],
+      "classification": "implicit scalar type via const/enum"
+    },
+    {
+      "path": [
+        "$defs",
+        "plan_generation",
+        "properties",
+        "scenes",
+        "prefixItems",
+        1,
+        "properties",
+        "role"
+      ],
+      "keywords": [
+        "const"
+      ],
+      "classification": "implicit scalar type via const/enum"
+    },
+    {
+      "path": [
+        "$defs",
+        "plan_generation",
+        "properties",
+        "scenes",
+        "prefixItems",
+        1,
+        "properties",
+        "scene_key"
+      ],
+      "keywords": [
+        "const"
+      ],
+      "classification": "implicit scalar type via const/enum"
+    },
+    {
+      "path": [
+        "$defs",
+        "plan_generation",
+        "properties",
+        "scenes",
+        "prefixItems",
+        1,
+        "properties",
+        "depends_on"
+      ],
+      "keywords": [
+        "const"
+      ],
+      "classification": "implicit scalar type via const/enum"
+    },
+    {
+      "path": [
+        "$defs",
+        "plan_generation",
+        "properties",
+        "scenes",
+        "prefixItems",
+        2,
+        "properties",
+        "role"
+      ],
+      "keywords": [
+        "const"
+      ],
+      "classification": "implicit scalar type via const/enum"
+    },
+    {
+      "path": [
+        "$defs",
+        "plan_generation",
+        "properties",
+        "scenes",
+        "prefixItems",
+        2,
+        "properties",
+        "scene_key"
+      ],
+      "keywords": [
+        "const"
+      ],
+      "classification": "implicit scalar type via const/enum"
+    },
+    {
+      "path": [
+        "$defs",
+        "plan_generation",
+        "properties",
+        "scenes",
+        "prefixItems",
+        2,
+        "properties",
+        "depends_on"
+      ],
+      "keywords": [
+        "const"
+      ],
+      "classification": "implicit scalar type via const/enum"
+    }
+  ],
+  "projection": {
+    "profile": "luna-review-explicit-string-types-reachable-defs-v1",
+    "added_string_type_paths": [
+      [
+        "properties",
+        "schema_version"
+      ],
+      [
+        "properties",
+        "scope"
+      ],
+      [
+        "properties",
+        "verdict"
+      ],
+      [
+        "$defs",
+        "finding",
+        "properties",
+        "category"
+      ],
+      [
+        "$defs",
+        "finding",
+        "properties",
+        "severity"
+      ]
+    ],
+    "retained_definitions": [
+      "finding"
+    ],
+    "pruned_definitions": [
+      "anchor",
+      "binding",
+      "plan",
+      "plan_generation",
+      "plan_record",
+      "review_record",
+      "review_result",
+      "scene_binding"
+    ],
+    "removed_reachable_constraints": [],
+    "strict_parameter_changed": false
+  },
+  "remaining_untyped_scalar_enum_nodes": [],
+  "all_other_request_fields_unchanged": true,
+  "original_business_schema_kept_for_local_validation": true,
+  "production_app_source_changes": false,
+  "official_reference": "https://developers.openai.com/api/docs/guides/structured-outputs",
+  "provider_documentation_limit": "OpenAI official schema subset is reference only, not proof of third-party support; uniqueItems retained pending evidence, strict mode unchanged.",
+  "real_calls": 0
+}
