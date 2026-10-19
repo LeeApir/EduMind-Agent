@@ -3337,7 +3337,7 @@
       "id": "PHASE-1-T065",
       "phase": "Phase 1",
       "title": "冻结固定C样本离线验收的隔离与结果契约",
-      "status": "blocked",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1-T064"
@@ -3361,11 +3361,12 @@
         "git diff --check"
       ],
       "verification_results": [
-        "Design-only checker:6 document hashes/11 originals/6 task contracts/6 matrices/3 negatives/6 probes passed; workflow/diff/236 archive originals and ADR0017/18 attachments verified. Provider0, C compilation0/execution0; exact design pending approval, not completion."
+        "Design-only checker:6 document hashes/11 originals/6 task contracts/6 matrices/3 negatives/6 probes passed; workflow/diff/236 archive originals and ADR0017/18 attachments verified. Provider0, C compilation0/execution0; exact design pending approval, not completion.",
+        "ADR0019 A-D及准确附件获批，固定样本/独立真值/禁网非特权容器/限额/结果契约冻结 | 6附件11原件6任务契约检查、workflow/diff通过，批准登记独立保存 | 工具链/驱动审阅/隔离探针尚待T066–T067，Provider0；不授予发布或T040通过 | 独立提交后串行T066"
       ],
       "started_at": "2026-10-19T18:10:26",
-      "completed_at": null,
-      "blocker": "ADR-0019 A-D及准确manifest尚待具体安全/数据批准；按本任务验收5及规划§3，不实施T066–T069或编译执行。工具链目前缺Clang，批准后先准备锁和探针，不降级宿主。",
+      "completed_at": "2026-10-19T18:18:15",
+      "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T065",
       "execution_gate": "2026-10-19用户已明确授权在新分支开发T056–T070，按依赖串行执行；审核契约/API/持久化/执行安全边界仍须对应T056/T060/T065具体设计明确批准后实施，未批准项不得推定。真实Provider与动态开放不在本批授权内。",
       "verification_note": "验证命令是将来任务完成时必须实际执行的接口；新文件/CLI尚待建立，不代表本次已存在或通过。测试须禁止真实Provider；数据库验收用隔离真实PostgreSQL且不得以跳过冒充通过；编译/执行遵守T065已批准隔离方案。"
