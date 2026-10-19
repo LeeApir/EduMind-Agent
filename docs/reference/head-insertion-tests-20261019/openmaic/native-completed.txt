@@ -1,0 +1,221 @@
+- button "OpenMAIC":
+  - img "OpenMAIC"
+- button:
+- generic: "1"
+- generic: 从结构体与指针到链表
+- generic: 加载中 ...
+- generic: "2"
+- generic: 头插法的三步执行过程
+- generic: 加载中 ...
+- generic: "3"
+- generic: 指针变化可视化：单步看头插
+- generic: Interactive
+- generic: "4"
+- generic: 完整程序（上）：节点结构与头插函数
+- paragraph:
+  - strong: 完整程序（上）：节点结构与头插函数
+- paragraph: "#include <stdio.h>"
+- paragraph: "#include <stdlib.h>"
+- paragraph: "struct Node { int data; struct Node *next; }; /* ① 结构 */"
+- paragraph
+- paragraph: "struct Node* createNode(int value) { /* ② 建节点 */"
+- paragraph: struct Node *n = malloc(sizeof(struct Node));
+- paragraph: if (n == NULL) return NULL;
+- paragraph: n->data = value; n->next = NULL;
+- paragraph: return n;
+- paragraph: "}"
+- paragraph
+- paragraph: "void insertHead(struct Node **head, int value) { /* ③ 头插 */"
+- paragraph: struct Node *n = createNode(value);
+- paragraph: n->next = *head; /* ① 先接上 */
+- paragraph: "*head = n; /* ② 再改 head */"
+- paragraph: "}"
+- paragraph:
+  - strong: ① 节点结构 Node
+- paragraph: data 存数据，next 指向下一节点
+- paragraph: next = NULL 表示表尾
+- paragraph:
+  - strong: ② createNode(int value)
+- paragraph: malloc 申请内存 → 赋 data
+- paragraph: next 置 NULL，并检查 NULL
+- paragraph:
+  - strong: ③ insertHead(**head, value)
+- paragraph: n->next = *head; *head = n;
+- paragraph: 二级指针改的是 main 的 head
+- generic: "5"
+- generic: 完整程序（下）：遍历、释放与 main
+- paragraph:
+  - strong: 完整程序（下）：遍历、释放与 main
+- paragraph: "void printList(Node *head) {"
+- paragraph: Node *p = head;
+- paragraph: "while (p != NULL) {"
+- paragraph: printf("%d -> ", p->data);
+- paragraph: p = p->next;
+- paragraph: "}"
+- paragraph: printf("NULL\n");
+- paragraph: "}"
+- paragraph: "void freeList(Node **head) {"
+- paragraph: Node *p = *head, *next;
+- paragraph: "while (p != NULL) {"
+- paragraph: next = p->next;
+- paragraph: free(p);
+- paragraph: p = next;
+- paragraph: "}"
+- paragraph: "*head = NULL;"
+- paragraph: "}"
+- paragraph: "int main(void) {"
+- paragraph: Node *head = NULL;
+- paragraph: head = insertHead(head, 1);
+- paragraph: head = insertHead(head, 2);
+- paragraph: head = insertHead(head, 3);
+- paragraph: printList(head);
+- paragraph: freeList(&head);
+- paragraph: return 0;
+- paragraph: "}"
+- paragraph:
+  - strong: 预期输出：
+  - text: 3 -> 2 -> 1 -> NULL
+- paragraph: 提示：malloc 与 free 必须成对出现，用完即释放
+- generic: "6"
+- generic: 逐步追踪指针变化与预期输出
+- paragraph:
+  - strong: 逐步追踪指针变化与预期输出
+- paragraph:
+  - strong: ① 初始
+- paragraph:
+  - strong: head
+- paragraph:
+  - strong: "NULL"
+- paragraph:
+  - strong: ② 插入 1 后
+- paragraph:
+  - strong: head
+- paragraph:
+  - strong: 1|NULL
+- paragraph:
+  - strong: ③ 插入 2 后
+- paragraph:
+  - strong: head
+- paragraph:
+  - strong: 2|·
+- paragraph:
+  - strong: 1|NULL
+- paragraph:
+  - strong: ④ 插入 3 后
+- paragraph:
+  - strong: head
+- paragraph:
+  - strong: 3|·
+- paragraph:
+  - strong: 2|·
+- paragraph:
+  - strong: 1|NULL
+- paragraph:
+  - strong: 预期输出
+- paragraph:
+  - strong: 3 → 2 → 1 → NULL
+- paragraph:
+  - strong: 为什么顺序相反
+- paragraph: 每次都在表头插入 → 后进先出（LIFO）：最后插入的最先被访问。
+- paragraph:
+  - strong: 常见错误
+- paragraph: × 忘记 head = newNode
+- paragraph: × 先改 head 再接 next
+- paragraph: × free 后仍访问 next
+- paragraph: × 忘记把 head 置回 NULL
+- generic: "7"
+- generic: 三道练习：检验你真的懂了吗
+- generic: "8"
+- generic: 总结与延伸：头插法 vs 尾插法
+- paragraph:
+  - strong: 总结与延伸：头插法 vs 尾插法
+- paragraph:
+  - strong: ① 建节点
+- paragraph:
+  - strong: ② 接 next
+- paragraph:
+  - strong: ③ 移 head
+- paragraph:
+  - strong: 头插法（head insertion）
+- paragraph: • 插入 O(1)，实现简单
+- paragraph: • 结果：逆序链表
+- paragraph: • 适合：频繁表头插入
+- paragraph:
+  - strong: 尾插法（tail insertion）
+- paragraph: • 需维护尾指针 tail
+- paragraph: • 结果：与插入顺序一致
+- paragraph: • 适合：需保持顺序的场合
+- paragraph: 课后练习：把本课代码改成尾插法，比较两者的输出差异
+- generic: "9"
+- generic: 课程完成
+- banner:
+  - button "返回首页":
+  - generic: 当前场景
+  - heading "完整程序（下）：遍历、释放与 main" [level=1]
+  - button "CN"
+  - button "主题":
+  - button "设置":
+  - button "导出 PPTX":
+- paragraph:
+  - strong: 完整程序（下）：遍历、释放与 main
+- paragraph: "void printList(Node *head) {"
+- paragraph: Node *p = head;
+- paragraph: "while (p != NULL) {"
+- paragraph: printf("%d -> ", p->data);
+- paragraph: p = p->next;
+- paragraph: "}"
+- paragraph: printf("NULL\n");
+- paragraph: "}"
+- paragraph: "void freeList(Node **head) {"
+- paragraph: Node *p = *head, *next;
+- paragraph: "while (p != NULL) {"
+- paragraph: next = p->next;
+- paragraph: free(p);
+- paragraph: p = next;
+- paragraph: "}"
+- paragraph: "*head = NULL;"
+- paragraph: "}"
+- paragraph: "int main(void) {"
+- paragraph: Node *head = NULL;
+- paragraph: head = insertHead(head, 1);
+- paragraph: head = insertHead(head, 2);
+- paragraph: head = insertHead(head, 3);
+- paragraph: printList(head);
+- paragraph: freeList(&head);
+- paragraph: return 0;
+- paragraph: "}"
+- paragraph:
+  - strong: 预期输出：
+  - text: 3 -> 2 -> 1 -> NULL
+- paragraph: 提示：malloc 与 free 必须成对出现，用完即释放
+- generic: "05"
+- button "Toggle sidebar":
+- generic: 5/9
+- button "Mute" [disabled]:
+- generic: "100"
+- slider: "1"
+- button "Playback speed": 1x
+- button "Previous scene":
+- button "Play":
+- button "Next scene":
+- button "Auto-play":
+- button "打开白板":
+- button "全屏":
+- button "Toggle chat":
+- img "张老师"
+- generic: 张老师
+- generic "张老师":
+  - img "张老师"
+- generic: 张老师
+- paragraph: 上一页我们把节点结构、createNode 和 insertHead 都写好了，这一页把剩下的遍历、释放和 main 补齐，让这份代码真正能编译、能跑起来。
+- button:
+- img "小林助教"
+- img "小明"
+- img "小研"
+- button:
+- button:
+- button:
+- img "你"
+- region "Notifications alt+T"
+- button "Open Next.js Dev Tools":
+- alert

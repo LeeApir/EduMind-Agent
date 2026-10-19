@@ -1,0 +1,96 @@
+{
+  "recorded_at": "2026-10-19T09:55:26.947892+08:00",
+  "original_program_compile_exit_code": 1,
+  "original_program_run": false,
+  "fixture_warning": "Provides missing Node alias and a driver with correct Node ** calls for isolated function testing ONLY; does not repair or validate course main. Extracted bodies unmodified.",
+  "compile_command": [
+    "clang",
+    "-std=c11",
+    "-Wall",
+    "-Wextra",
+    "-Wpedantic",
+    "-Werror",
+    "-g",
+    "-O1",
+    "-fsanitize=address,undefined",
+    "-fno-omit-frame-pointer",
+    "/Users/apir/Code/EduMind_Agent/docs/reference/openmaic/head-insertion-20261019/independent-review/function-harness.c",
+    "-o",
+    "/private/tmp/om-head-insertion-check-2f5mqaka/function-harness"
+  ],
+  "compile_exit_code": 0,
+  "cases": [
+    {
+      "fail_at": 0,
+      "command": [
+        "/private/tmp/om-head-insertion-check-2f5mqaka/function-harness",
+        "0"
+      ],
+      "exit_code": 0,
+      "stdout": "3 -> 2 -> 1 -> NULL\n",
+      "allocation_trace": [
+        "TRACK calls=3 allocated=3 released=3 live=0"
+      ],
+      "null_pointer_diagnostic": false,
+      "normal_case_pass": true,
+      "logs": [
+        "function-case-0.stdout",
+        "function-case-0.stderr"
+      ]
+    },
+    {
+      "fail_at": 1,
+      "command": [
+        "/private/tmp/om-head-insertion-check-2f5mqaka/function-harness",
+        "1"
+      ],
+      "exit_code": -6,
+      "stdout": "",
+      "allocation_trace": [
+        "INJECT malloc_failure_at=1 prior_live=0"
+      ],
+      "null_pointer_diagnostic": true,
+      "normal_case_pass": false,
+      "logs": [
+        "function-case-1.stdout",
+        "function-case-1.stderr"
+      ]
+    },
+    {
+      "fail_at": 2,
+      "command": [
+        "/private/tmp/om-head-insertion-check-2f5mqaka/function-harness",
+        "2"
+      ],
+      "exit_code": -6,
+      "stdout": "",
+      "allocation_trace": [
+        "INJECT malloc_failure_at=2 prior_live=1"
+      ],
+      "null_pointer_diagnostic": true,
+      "normal_case_pass": false,
+      "logs": [
+        "function-case-2.stdout",
+        "function-case-2.stderr"
+      ]
+    },
+    {
+      "fail_at": 3,
+      "command": [
+        "/private/tmp/om-head-insertion-check-2f5mqaka/function-harness",
+        "3"
+      ],
+      "exit_code": -6,
+      "stdout": "",
+      "allocation_trace": [
+        "INJECT malloc_failure_at=3 prior_live=2"
+      ],
+      "null_pointer_diagnostic": true,
+      "normal_case_pass": false,
+      "logs": [
+        "function-case-3.stdout",
+        "function-case-3.stderr"
+      ]
+    }
+  ]
+}
