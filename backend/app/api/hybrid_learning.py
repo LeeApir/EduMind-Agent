@@ -8,7 +8,7 @@ from uuid import UUID
 from sqlalchemy import update
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from app.agents.goal_node_resolver import resolve_goal_node
+from app.agents.goal_node_resolver import clarification_payload, resolve_goal_node
 from app.models.learning import LearningOperation, utc_now
 from app.services.knowledge_graph import KnowledgeGraphRepository
 from app.services.learning_contract import LearningContractError
@@ -38,6 +38,7 @@ async def hybrid_events(
         )
 
     async def work() -> None:
+        failure_detail: dict[str, object] | None = None
         try:
             async with sessions() as db:
                 op = await owned_operation(db, owner_id=owner_id, operation_id=operation_id)
@@ -73,6 +74,7 @@ async def hybrid_events(
 
                 resolution = await resolve_goal_node(goal, graph=graph, gateway=MappingGateway())
                 if resolution.node is None:
+                    failure_detail = clarification_payload(resolution, graph)
                     raise LearningContractError("GOAL_CLARIFICATION_REQUIRED")
                 # Preserve the existing path loop without an extra profile model request.
                 from dataclasses import replace
@@ -165,30 +167,23 @@ async def hybrid_events(
                     ("done", {"operation_id": str(operation_id), "status": result["status"]})
                 )
         except Exception as error:
+            detail = failure_detail or {
+                "code": error.code
+                if isinstance(error, LearningContractError)
+                else "GENERATION_FAILED",
+                "retryable": False,
+            }
             async with sessions() as db:
                 op = await owned_operation(db, owner_id=owner_id, operation_id=operation_id)
                 if op and op.status not in ("completed", "canceled", "rejected", "failed"):
                     op.status = "failed"
-                    op.error = {
-                        "code": error.code
-                        if isinstance(error, LearningContractError)
-                        else "GENERATION_FAILED",
-                        "retryable": False,
-                    }
-                    await db.commit()
+                    op.error = detail
+                if op and op.status in ("canceled", "rejected", "failed"):
+                    op.phase = None
+                    op.generation_deadline = None
+                await db.commit()
                 status = op.status if op else "failed"
-            await queue.put(
-                (
-                    "error",
-                    {
-                        "operation_id": str(operation_id),
-                        "code": error.code
-                        if isinstance(error, LearningContractError)
-                        else "GENERATION_FAILED",
-                        "retryable": False,
-                    },
-                )
-            )
+            await queue.put(("error", {"operation_id": str(operation_id), **detail}))
             await queue.put(("done", {"operation_id": str(operation_id), "status": status}))
 
     task = asyncio.create_task(work())

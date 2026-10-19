@@ -2,7 +2,7 @@
 import { computed, onMounted, onBeforeUnmount, ref } from "vue";
 import { NButton, NInput, NTag } from "naive-ui";
 
-import { LearningRequestError, startLearningSession, type LearningEvent } from "./api/learningSessions";
+import { LearningRequestError, errorFromPayload, startLearningSession, type GoalCandidate, type LearningEvent } from "./api/learningSessions";
 import { readHybridOperation, watchHybridOperation } from "./api/hybridReview";
 import { ensureProfileSession } from "./api/profile";
 import LearningProgressPanel, {
@@ -71,6 +71,8 @@ const pathRefreshToken = ref(0);
 const restoringUnit = ref(false);
 const restoreUnitError = ref("");
 const generationPhase = ref("");
+const goalCandidates = ref<GoalCandidate[]>([]);
+const clarificationReason = ref("");
 const approvalSource = ref("");
 const publicationVersion = ref<number | undefined>();
 let readyPublicationVersion: number | undefined;
@@ -141,6 +143,8 @@ function resetAttempt(): void {
   stopReviewWatch?.();
   readyPublicationVersion = undefined;
   generationPhase.value = "";
+  goalCandidates.value = [];
+  clarificationReason.value = "";
   learningGeneration += 1;
   restoringUnit.value = false;
   restoreUnitError.value = "";
@@ -196,7 +200,8 @@ async function submitLearningRequest(): Promise<void> {
     if (generation !== learningGeneration) return;
     if (error instanceof LearningRequestError && error.operationId) operationId.value = error.operationId;
     let recoveryError: unknown;
-    if (operationId.value && !recoveryAttempted) {
+    if (operationId.value && !recoveryAttempted
+      && !(error instanceof LearningRequestError && !error.retryable)) {
       try {
         await recoverPublishedOperation(generation);
         if (generation === learningGeneration) requestState.value = "idle";
@@ -210,6 +215,12 @@ async function submitLearningRequest(): Promise<void> {
     requestError.value = failure instanceof Error && failure.message
       ? failure.message
       : "暂时无法开始学习，请检查网络后重试。";
+    generationPhase.value = "";
+    if (failure instanceof LearningRequestError && !failure.retryable) temporaryText.value = "";
+    if (failure instanceof LearningRequestError && failure.code === "GOAL_CLARIFICATION_REQUIRED") {
+      goalCandidates.value = failure.candidates;
+      clarificationReason.value = failure.reason ?? "unknown";
+    }
     requestState.value = "error";
   }
 }
@@ -273,6 +284,7 @@ async function recoverPublishedOperation(generation: number): Promise<void> {
         if ((state.status === "completed" || state.status === "published") && state.learning_unit_id) {
           await loadPublishedUnit(state.learning_unit_id, generation, undefined, state.publication_version ?? undefined);
         } else if (["failed", "canceled", "rejected"].includes(state.status)) {
+          generationPhase.value = "";
           reviewState.value = "rejected";
           requestError.value = "本次课程未发布，已有课程仍可学习。";
         }
@@ -281,6 +293,14 @@ async function recoverPublishedOperation(generation: number): Promise<void> {
     return;
   }
   if (payload.status === "failed" || payload.status === "canceled" || payload.status === "rejected") {
+    generationPhase.value = "";
+    temporaryText.value = "";
+    if (payload.error?.code === "GOAL_CLARIFICATION_REQUIRED") {
+      const failure = errorFromPayload(payload.error);
+      goalCandidates.value = failure.candidates;
+      clarificationReason.value = failure.reason ?? "unknown";
+      throw failure;
+    }
     throw new Error("原请求已失败或取消。恢复不会再次生成；需要新内容请明确选择“重新生成”。");
   }
   throw new Error("原请求尚未发布，请等待后重试恢复；不会重复生成。");
@@ -500,6 +520,20 @@ function stringValue(value: unknown): string {
       aria-live="assertive"
     >
       {{ requestError }}
+      <div
+        v-if="clarificationReason"
+        data-testid="goal-clarification"
+      >
+        <p>请选择本次主要目标，或编辑原文说明主次后重新提交。</p>
+        <ul>
+          <li
+            v-for="candidate in goalCandidates"
+            :key="candidate.id"
+          >
+            {{ candidate.name }}
+          </li>
+        </ul>
+      </div>
       <NButton
         size="small"
         @click="retryLearning"

@@ -232,3 +232,36 @@ def test_planned_reexplanation_http_wait_keeps_old_course_and_rejects_code_scene
     assert "event: scene_ready" not in pending.text and len(g2.requests) == 5
     old = client.get(base + "?publication_version=1")
     assert old.status_code == 200 and old.json()["publication_version"] == 1
+
+
+@pytest.mark.parametrize("protocol", ["shared-plan-v1", "legacy-v1"])
+def test_goal_clarification_has_choices_persists_reason_and_clears_phase(configured, protocol):
+    class ForbiddenGateway:
+        async def generate_structured(self, *args, **kwargs):
+            pytest.fail("explicit ambiguity must not call a Provider")
+
+    app.dependency_overrides[provider_gateway] = lambda: ForbiddenGateway()
+    client, csrf = guest()
+    body = {"goal": "学习数组和队列", "preferred_language": "c"}
+    if protocol == "shared-plan-v1":
+        body["generation_protocol"] = protocol
+    response = client.post("/api/learning-sessions", headers=headers(csrf, str(uuid4())), json=body)
+    if protocol == "shared-plan-v1":
+        assert response.status_code == 200
+        frames = [
+            json.loads(part.split("data: ")[1])
+            for part in response.text.split("\n\n")
+            if part.startswith("event: error")
+        ]
+        detail = frames[0]
+        state = client.get("/api/learning-operations/" + detail["operation_id"]).json()
+        assert state["status"] == "failed"
+        assert state["phase"] is None
+        assert state["error"]["reason"] == "ambiguous_aliases"
+    else:
+        assert response.status_code == 422
+        detail = response.json()
+    assert detail["code"] == "GOAL_CLARIFICATION_REQUIRED"
+    assert detail["reason"] == "ambiguous_aliases"
+    assert {node["id"] for node in detail["candidate_nodes"]} == {"array", "queue"}
+    assert "并列" in detail["message"]

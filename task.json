@@ -2906,6 +2906,41 @@
       "commit_lookup": "Task-Completed: PHASE-1-T054",
       "execution_gate": "ADR-0015 A–D与更新manifest已获用户明确批准，仅按依赖串行实施和零Provider测试；真实调用/费用/生产开放另批。",
       "verification_note": "上述新文件/CLI为待建立的验收接口，当前未运行且不声称已存在；本任务完成前必须建立并实际执行。数据库任务须真实PG零跳过，Mock不替代；按变更风险追加已有核心路径回归。"
+    },
+    {
+      "id": "PHASE-1-T055",
+      "phase": "Phase 1",
+      "title": "修复背景与目标区分及澄清失败状态",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1-T053"
+      ],
+      "scope": [
+        "backend/app/agents/goal_node_resolver.py",
+        "backend/app/api/",
+        "backend/tests/",
+        "web/src/",
+        "web/tests/",
+        "docs/acceptance/"
+      ],
+      "prd_source": "PRD §3.1；用户2026-10-19零调用修复指令",
+      "acceptance_criteria": [
+        "区分明确背景、主要目标和配套要求，真正并列或不确定目标继续澄清，不按关键词长度全局选目标。",
+        "共享与旧入口保留原因及候选，失败清除准备状态，页面展示具体澄清而非被恢复错误覆盖。",
+        "原失败证据不变，相同原文在新零调用记录复测；不调用Provider或宣称课程质量通过。"
+      ],
+      "verification": [
+        "backend/.venv/bin/pytest backend/tests/test_goal_node_resolver.py",
+        "pnpm --dir web test --run tests/App.spec.ts tests/hybrid-review-flow.spec.ts",
+        "pnpm --dir web build"
+      ],
+      "started_at": "2026-10-19T10:15:20",
+      "completed_at": "2026-10-19T10:22:31",
+      "commit_lookup": "Task-Completed: PHASE-1-T055",
+      "verification_results": [
+        "零Provider完成goal-node-v2背景/主目标/配套范围与并列保守澄清，统一原因候选和持久错误，失败清理phase/deadline，前端不被恢复覆盖。原失败15文件对照c6374fa不变，相同原文新运行c9a4ac19解析linked-list-insertion且gateway尝试0，非课程全链路复测。独立PG54测试0跳过，前端195，Ruff6文件/mypy192/build/变更ESLint/OpenAPI/流程/236归档/ADR12文档12契约通过；保留首轮17环境失败及1前端回归并说明修正，未削弱断言。证据docs/acceptance/phase-1-goal-scope-r01。T040仍blocked/catalog_only；不包含未跟踪OM材料。"
+      ]
     }
   ]
 }

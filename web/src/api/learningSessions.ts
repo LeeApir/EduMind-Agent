@@ -25,7 +25,11 @@ export interface StartLearningSessionOptions {
 
 type FetchLike = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
 
+export interface GoalCandidate { id: string; name: string; }
+
 interface ApiErrorPayload {
+  reason?: string;
+  candidate_nodes?: GoalCandidate[];
   code?: string;
   message?: string;
   retryable?: boolean;
@@ -36,23 +40,29 @@ export class LearningRequestError extends Error {
   readonly code: string;
   readonly retryable: boolean;
   readonly operationId?: string;
+  readonly reason?: string;
+  readonly candidates: GoalCandidate[];
 
   constructor({
     message,
     code = "CONNECTION_FAILED",
     retryable = true,
-    operationId,
+    operationId, reason, candidates = [],
   }: {
     message: string;
     code?: string;
     retryable?: boolean;
     operationId?: string;
+    reason?: string;
+    candidates?: GoalCandidate[];
   }) {
     super(message);
     this.name = "LearningRequestError";
     this.code = code;
     this.retryable = retryable;
     this.operationId = operationId;
+    this.reason = reason;
+    this.candidates = candidates;
   }
 }
 
@@ -151,7 +161,7 @@ async function readErrorPayload(response: Response): Promise<ApiErrorPayload> {
   }
 }
 
-function errorFromPayload(payload: Record<string, unknown> | ApiErrorPayload, status?: number): LearningRequestError {
+export function errorFromPayload(payload: Record<string, unknown> | ApiErrorPayload, status?: number): LearningRequestError {
   const message = typeof payload.message === "string"
     ? payload.message
     : "学习请求暂时无法完成，请重试。";
@@ -160,7 +170,12 @@ function errorFromPayload(payload: Record<string, unknown> | ApiErrorPayload, st
     ? payload.retryable
     : status === undefined || status >= 500 || status === 429;
   const operationId = typeof payload.operation_id === "string" ? payload.operation_id : undefined;
-  return new LearningRequestError({ message, code, retryable, operationId });
+  const candidates = Array.isArray(payload.candidate_nodes) ? payload.candidate_nodes.filter(
+    (node): node is GoalCandidate => typeof node === "object" && node !== null
+      && typeof node.id === "string" && typeof node.name === "string",
+  ) : [];
+  const reason = typeof payload.reason === "string" ? payload.reason : undefined;
+  return new LearningRequestError({ message, code, retryable, operationId, reason, candidates });
 }
 
 export async function* parseSseStream(stream: ReadableStream<Uint8Array>): AsyncGenerator<LearningEvent> {

@@ -4920,7 +4920,7 @@
     }
   }
 },
-      "GoalClarification": {"type": "object", "additionalProperties": false, "required": ["code", "message", "retryable", "candidate_nodes"], "properties": {"code": {"const": "GOAL_CLARIFICATION_REQUIRED"}, "message": {"type": "string"}, "retryable": {"const": false}, "candidate_nodes": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["id", "name"], "properties": {"id": {"$ref": "#/components/schemas/KnowledgeNodeId"}, "name": {"type": "string"}}}}}},
+      "GoalClarification": {"type": "object", "additionalProperties": false, "required": ["code", "message", "retryable", "candidate_nodes"], "properties": {"reason": {"type": "string", "description": "Stable clarification reason; shared-plan SSE error and persisted operation error carry the same reason, message and candidate_nodes. Terminal failures clear the active phase."}, "code": {"const": "GOAL_CLARIFICATION_REQUIRED"}, "message": {"type": "string"}, "retryable": {"const": false}, "candidate_nodes": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["id", "name"], "properties": {"id": {"$ref": "#/components/schemas/KnowledgeNodeId"}, "name": {"type": "string"}}}}}},
       "LearningUnit": {
   "type": "object",
   "required": [

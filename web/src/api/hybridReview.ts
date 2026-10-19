@@ -3,6 +3,7 @@ export interface HybridOperation {
   id: string;
   status: string;
   phase?: string | null;
+  error?: Record<string, unknown> | null;
   learning_unit_id?: string | null;
   publication_version?: number | null;
   review_summary?: {

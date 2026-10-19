@@ -1,0 +1,63 @@
+{
+  "provider_calls": 0,
+  "real_course_generation": "NOT_RUN",
+  "original_failure_preserved": true,
+  "test_database": "edumind_t055_20261019",
+  "checks": [
+    {
+      "command": "EDUMIND_PRODUCT_MODE=dynamic EDUMIND_TEST_DATABASE_URL=<isolated test database> .venv/bin/pytest tests/test_goal_node_resolver.py tests/test_goal_clarification_events.py tests/test_hybrid_learning_operations.py tests/test_learning_sessions.py -q",
+      "result": "backend cwd; 54 passed, no skips; actual PG/Mock Provider"
+    },
+    {
+      "command": "pnpm --dir web test --run",
+      "result": "27 files / 195 passed"
+    },
+    {
+      "command": "pnpm --dir web build",
+      "result": "passed"
+    },
+    {
+      "command": "pnpm --dir web exec eslint src/App.vue src/api/learningSessions.ts src/api/hybridReview.ts tests/App.spec.ts",
+      "result": "passed; no warnings"
+    },
+    {
+      "command": "backend/.venv/bin/ruff check <six changed Python files>",
+      "result": "passed"
+    },
+    {
+      "command": "backend/.venv/bin/mypy backend/app",
+      "result": "192 source files passed"
+    },
+    {
+      "command": "python3 scripts/check_catalog_workflow.py",
+      "result": "passed"
+    },
+    {
+      "command": "python3 scripts/verify_legacy_archives.py",
+      "result": "236 originals passed"
+    },
+    {
+      "command": "backend/.venv/bin/python docs/acceptance/phase-1-om-redesign/check_contract.py",
+      "result": "12 docs / 12 contracts passed"
+    }
+  ],
+  "retained_test_failures": [
+    {
+      "run": "initial combined backend",
+      "passed": 34,
+      "failed": 17,
+      "cause": "test process lacked dynamic mode; existing catalog_only feature gate",
+      "resolution": "explicit test-process dynamic env only; final54pass"
+    },
+    {
+      "run": "initial full frontend",
+      "passed": 194,
+      "failed": 1,
+      "cause": "clearing temporary text on recoverable connection interruption broke existing whitespace preservation",
+      "resolution": "retain provisional text on recoverable interruption; final195pass"
+    }
+  ],
+  "production_env_changed": false,
+  "t040_resumed": false,
+  "human_course_signoff": false
+}

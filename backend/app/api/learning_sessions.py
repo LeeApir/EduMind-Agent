@@ -10,7 +10,7 @@ from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from app.agents.goal_node_resolver import resolve_goal_node
+from app.agents.goal_node_resolver import clarification_payload, resolve_goal_node
 from app.api.knowledge_graph import knowledge_graph_repository
 from app.core.auth import AuthenticatedSession, require_authenticated_session
 from app.core.database import database_session_factory
@@ -219,15 +219,7 @@ async def start_learning_session(
             )
         resolution = await resolve_goal_node(payload.goal, graph=graph, gateway=gateway)
         if resolution.node is None:
-            clarification: dict[str, object] = {
-                "code": "GOAL_CLARIFICATION_REQUIRED",
-                "message": "请明确一个知识点，例如“C 指针”“单链表”或“链表插入”。",
-                "retryable": False,
-                "candidate_nodes": [
-                    {"id": node.id, "name": node.name}
-                    for node in (resolution.candidates or graph.all_nodes())
-                ],
-            }
+            clarification = clarification_payload(resolution, graph)
             await update_operation(db, reservation.operation, status="failed", error=clarification)
             return JSONResponse(
                 status_code=422, content=clarification, headers={"Cache-Control": "no-store"}
