@@ -1,11 +1,11 @@
 {
   "manifest_sha256": "b9ca8591bce97edca60bf7d17c132f51a8ff8504e4f7a23240e93f707ec9e613",
   "candidate": "Luna/high/v4.9 final only",
-  "actual_requests_this_run": 5,
+  "actual_requests_this_run": 6,
   "requests_max": 12,
   "state": "WAITING_HUMAN_REVIEW",
   "persistent_halt": false,
-  "current_stage": "B/four calibration model outputs match expected,last actual human check pending",
+  "current_stage": "C/fact-safety-mixed",
   "cases": {
     "compat-schema": {
       "verdict": "pass",
@@ -35,21 +35,27 @@
       "verdict": "needs_human",
       "expected": "needs_human",
       "receipt_sha256": "f5c72624152fefa69009917b4f43b702c06ab7c43ac9bb8c700cc2032e54eb44",
+      "actual_human_confirmation": "confirmed via assessments/cal-04.json"
+    },
+    "screen-fact": {
+      "verdict": "reject",
+      "expected": "reject",
+      "receipt_sha256": "447e5bee40895d2f0baa7209978241cde73883eb03e7cd5f2d1a0b105368433a",
       "actual_human_confirmation": "pending"
     }
   },
+  "stageB": "all four frozen calibration results match and actual human confirmations recorded;not formal independent test evidence",
   "technical_integrity_all": "HTTP200/exactmodel/highrequest/fullbusinessSchema/6checks/completeRaw/usage/exactwire passed",
-  "input_tokens_provider_reported": 79980,
-  "output_tokens_provider_reported": 2182,
-  "total_tokens_provider_reported": 82162,
-  "model_call_duration_ms_total": 40026,
+  "input_tokens_provider_reported": 96000,
+  "output_tokens_provider_reported": 2646,
+  "total_tokens_provider_reported": 98646,
+  "model_call_duration_ms_total": 53973,
   "requested_reasoning": "high",
   "provider_effective_reasoning": "not independently established",
   "separate_reasoning_tokens": null,
   "actual_cost": null,
   "effective_wall_deadline": "2026-10-21T09:44:16.144212+08:00",
   "not_sent": [
-    "screen-fact",
     "screen-safety",
     "screen-mixed",
     "holdout-stack-complete",
@@ -57,8 +63,8 @@
     "holdout-stack-safety",
     "holdout-prerequisite"
   ],
-  "latest_semantic_review": "already taught process,but final-arithmetic-only questions accurately flagged assessment gap,no fact/safety or missing-teaching false claim",
-  "citation_quality": "no finding citations in these cases;not general anchor ability proof",
-  "formal_T040_quality": "not run;calibration not independent test set;severe/unused cases not yet tested",
-  "tests": "source unchanged;106 evidence retained from9288782,not rerun;actual wire/fullSchema/receipts/484source/oldstops/workflow/diff checked"
+  "latest_semantic_review": "fact/major reject matches exact17versus15 contradiction;one finding,no extras;both a1/fullmarkdown and a6/fullsource support every assertion",
+  "citation_quality": "fact case2cited anchors checked;earlier no citations,not universal capability claim",
+  "formal_T040_quality": "not run;safety/mixed and unused materials not yet tested",
+  "tests": "source unchanged;106 evidence retained from9288782,not rerun;actual fullSchema/wire/receipts/citation pointers/digests/484source/oldstops/workflow/diff checked"
 }
