@@ -3888,6 +3888,74 @@
       "completed_at": "2026-10-20T21:12:07",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T076"
+    },
+    {
+      "id": "PHASE-1-T077",
+      "phase": "Phase 1",
+      "title": "封存独立留出验收输入及数据分区",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1-T076"
+      ],
+      "scope": [
+        "scripts/",
+        "backend/tests/",
+        "docs/acceptance/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD §0.2/§3.3；ADR0015；用户要求独立留出与修复/人工机制缺口核查",
+      "acceptance_criteria": [
+        "A01/A02、G01–04及四类12样本明确为开发回归，不计泛化。",
+        "新主题/新目标留出集在后续调参前冻结，独立标签由Lee实际核对，未签核不进入正式分母；说明作者暴露和盲测局限。",
+        "校验新输入/预标签摘要、来源不重复、开发入口不加载留出数据；冻结一次使用和污染后转回归规则，零Provider。"
+      ],
+      "verification": [
+        "执行留出材料一致性/隔离检查或零调用纠错生命周期回归",
+        "运行Ruff/workflow/git diff --check",
+        "保存真实命令结果与源码证据，未签核保持pending"
+      ],
+      "verification_results": [
+        "封存8个H新原始目标/PlanInputs/参考预标签，支持节点内的新边界查询/删除/判环/反转，与A/G/12校准共20开发输入字面无重复；按用户“我本人核对”仅登记Lee，所有独立签核pending/模型结论null。明确8只是独立用途生成输入候选，不是作者盲测、统计总体或已签核固定审核集；后续实际输出须Lee先标注再看审核答案，暴露用于修复即转spent/development。分区守卫5个占位回归通过，实际hash/dedup check/Ruff/workflow/diff通过，Provider0/新C0；未改变图谱/Prompt/Schema。初未支持节点选择与未冻结准备目录冲突保留于validation，不扩大产品范围。holdout-reserve-r01附逐项核对表，下一T078审计计划修复和人工闭环。"
+      ],
+      "started_at": "2026-10-20T21:18:32",
+      "completed_at": "2026-10-20T21:24:43",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T077"
+    },
+    {
+      "id": "PHASE-1-T078",
+      "phase": "Phase 1",
+      "title": "审计计划纠错及人工闭环并明确修复边界",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1-T077"
+      ],
+      "scope": [
+        "scripts/",
+        "backend/tests/",
+        "docs/acceptance/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD §0.2/§3.3；ADR0015；用户要求独立留出与修复/人工机制缺口核查",
+      "acceptance_criteria": [
+        "对照源码/既有真实失败核对资源修正、计划版本、整单元待人工、维护CLI及再生成的实际边界，不把阻断发布等同于解决错误。",
+        "列明当前可有限自动修复、必须人工/澄清、硬拒绝不可豁免及尚缺实现；提出需批准的变化，不先改生产实现。",
+        "使用有意义的零调用回归及隔离PG既有生命周期检查验证机制，记录证据和限制，不签核真实待审课程。"
+      ],
+      "verification": [
+        "执行留出材料一致性/隔离检查或零调用纠错生命周期回归",
+        "运行Ruff/workflow/git diff --check",
+        "保存真实命令结果与源码证据，未签核保持pending"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T078"
     }
   ]
 }

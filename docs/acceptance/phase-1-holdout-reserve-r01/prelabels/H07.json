@@ -1,0 +1,50 @@
+{
+  "id": "H07",
+  "status": "pending_independent_human_check",
+  "assigned_reviewer": "Lee",
+  "assignment_source_user_message": "我本人核对",
+  "human_signoff": null,
+  "reference_calculation": {
+    "kind": "iterative_reverse",
+    "expected": {
+      "after_round": [
+        {
+          "prev": "A",
+          "cur": "B",
+          "edge": "A.next=NULL"
+        },
+        {
+          "prev": "B",
+          "cur": "C",
+          "edge": "B.next=A"
+        },
+        {
+          "prev": "C",
+          "cur": null,
+          "edge": "C.next=B"
+        }
+      ],
+      "new_head": "C",
+      "final_identity": [
+        "C",
+        "B",
+        "A"
+      ],
+      "final_values": [
+        2,
+        5,
+        2
+      ]
+    }
+  },
+  "common_checks": [
+    "原文与模型计划来源分开，不新增用户要求",
+    "算法实现/状态/退出与指定过程一致；不假定计划轨迹已被证明",
+    "三题按各自原文考查过程，不只验证最终结果；题型不预设",
+    "无明确动画要求，不因缺动画误拒",
+    "对新生成内容先独立标注实际正确/事实错误/安全错误/教学不足/证据不足；不预填model应pass"
+  ],
+  "expected_model_verdict": null,
+  "semantic_author": "GPT-authored prelabel; requires Lee actual independent check, not signed truth",
+  "reference_method": "manual static identity/link walkthrough; no C compilation or execution"
+}

@@ -1,0 +1,53 @@
+{
+  "development": [
+    {
+      "root": "docs/acceptance/phase-1-generation-mini-r01",
+      "ids": [
+        "A01",
+        "A02",
+        "A03",
+        "A04"
+      ],
+      "reason": "Repeated diagnostics, including A01/A02 repair exposure; all reserved old slots remain stopped."
+    },
+    {
+      "root": "docs/acceptance/phase-1-defect-regression-r01",
+      "ids": "all12",
+      "reason": "Authored calibration after known failures; no generalization denominator."
+    },
+    {
+      "root": "docs/acceptance/phase-1-separated-diagnostics-r01",
+      "ids": [
+        "G01",
+        "G02",
+        "G03",
+        "G04"
+      ],
+      "reason": "Reuses A inputs, development generation diagnostics only."
+    }
+  ],
+  "reserved": {
+    "root": "docs/acceptance/phase-1-holdout-reserve-r01",
+    "ids": [
+      "H01",
+      "H02",
+      "H03",
+      "H04",
+      "H05",
+      "H06",
+      "H07",
+      "H08"
+    ],
+    "purpose": "future held-out generation + subsequent independent content labeling before evaluating reviewer on those fixed outputs",
+    "human_reviewer": "Lee",
+    "human_status": "pending"
+  },
+  "rules": [
+    "Never use H inputs/outputs/prelabels in Prompt edits, few-shot, repair feedback, model selection or development early stopping.",
+    "Freeze candidate generation/review model/Prompt/Schema/config and actual executor before first H inference.",
+    "Before execution Lee checks prelabels; after generation independently label actual student content before reviewer outputs are inspected. Intended reference traces do not pre-label generated courses as correct.",
+    "After exposing H result to implementation/prompt repair, mark that sample spent/development with append-only exposure evidence; do not reuse it as unseen proof.",
+    "All attempts/stops/unknowns remain in held-out denominator; no replacement of hard cases to improve scores.",
+    "No algorithm, example or library choice can certify statistical independence; authored by repair agent, so no blind-author or representative population claim."
+  ]
+}
