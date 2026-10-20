@@ -3820,6 +3820,72 @@
       "completed_at": "2026-10-20T20:05:53",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T074"
+    },
+    {
+      "id": "PHASE-1-T075",
+      "phase": "Phase 1",
+      "title": "扩充四类缺陷固定回归及完整审核请求",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1-T074"
+      ],
+      "scope": [
+        "scripts/",
+        "docs/acceptance/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD §0.2/§3.3；用户要求扩充缺陷类型并分开评估生成与审核",
+      "acceptance_criteria": [
+        "指针作用域、计划内部矛盾、原始要求与计划来源混淆、目标与练习覆盖四类各含正确/错误/信息不足，交付完整材料、独立预标签与证据检查表。",
+        "保持当前生产Prompt/Schema/模型，实际适配器零网络捕获审核wire，不把Mock输出当模型成绩；保留旧失败。",
+        "离线验证全12材料契约、摘要绑定、原始要求与计划分列、标签不泄漏到审核请求及真实出站配置。"
+      ],
+      "verification": [
+        "运行新增固定材料/路由或隔离评估回归",
+        "运行Ruff、workflow及git diff --check",
+        "保存零调用证据和交接文档"
+      ],
+      "verification_results": [
+        "四类各正/错/未知12完整材料、独立预标签/证据边界、当前v4.10真实review_once和Luna high/8192实际Mock wire完成。17测试通过0跳过，原文/计划分列、标签不泄漏、分散完整表判断题正例/同讲解代码仅算术负例、缺前提和篡改输入前置拒绝核对；Ruff/check/workflow/diff通过，0Provider/未读Key。首不足样本题型格式拒绝及初测试误判IP固定12fail、格式/系统Python问题均在validation保留并修复，生产契约未改。phase-1-defect-regression-r01交接，标签非真人真值/盲测，不证明模型质量；下一T076独立两路评估。"
+      ],
+      "started_at": "2026-10-20T20:51:46",
+      "completed_at": "2026-10-20T20:57:09",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T075"
+    },
+    {
+      "id": "PHASE-1-T076",
+      "phase": "Phase 1",
+      "title": "拆分固定材料审核波动与独立生成诊断",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1-T075"
+      ],
+      "scope": [
+        "scripts/",
+        "docs/acceptance/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD §0.2/§3.3；用户要求扩充缺陷类型并分开评估生成与审核",
+      "acceptance_criteria": [
+        "审核仅复用固定材料，按重复编号记录语义/附带断言/引用，不依赖重新生成。",
+        "生成诊断独立走计划加三内容生成、不调用审核、不修正、不持久化或发布；分别记录计划/正文质量。",
+        "交付独立入口、结果记录与有界待批诊断提案，零调用回归证明两路隔离，真实执行不沿用已停止预算。"
+      ],
+      "verification": [
+        "运行新增固定材料/路由或隔离评估回归",
+        "运行Ruff、workflow及git diff --check",
+        "保存零调用证据和交接文档"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T076"
     }
   ]
 }
