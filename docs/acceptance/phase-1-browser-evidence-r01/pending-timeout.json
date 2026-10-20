@@ -1,0 +1,61 @@
+{
+  "case": "pending",
+  "source": {
+    "course_state": "awaiting_human",
+    "database": "edumind_catalog_five_hour_r01",
+    "learning_unit_id": "693b89a3-d3dd-4573-928b-a385eea7e7cc",
+    "operation_id": "2c73abe2-026e-4564-95bf-fe1a0a2cf345",
+    "owner_id": "26ada7ef-84f7-548c-bba7-aad77280ad06",
+    "source": "actual previous live generation; no regeneration",
+    "version": 1
+  },
+  "status": "fail",
+  "failure": "TimeoutError: Timeout 15000ms exceeded.\n=========================== logs ===========================\n\"load\" event fired\n============================================================",
+  "observations": {},
+  "page_errors": [],
+  "network": [
+    {
+      "path": "/api/__acceptance/bootstrap",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/runtime",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/auth/session",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/learning-operations/2c73abe2-026e-4564-95bf-fe1a0a2cf345",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/learning-operations/2c73abe2-026e-4564-95bf-fe1a0a2cf345",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/profile/me",
+      "status": 404,
+      "method": "GET"
+    },
+    {
+      "path": "/api/learning-operations/2c73abe2-026e-4564-95bf-fe1a0a2cf345",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/learning-operations/2c73abe2-026e-4564-95bf-fe1a0a2cf345",
+      "status": 200,
+      "method": "GET"
+    }
+  ],
+  "real_provider_calls": 0,
+  "ui_source": "pnpm build output + actual read-only backend, no mocked HTTP replies",
+  "screenshot_sha256": "804a10fcaa69979ef9e716b58cd652eb9992f96136af458a0715db960c01b478"
+}

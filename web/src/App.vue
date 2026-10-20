@@ -321,6 +321,11 @@ async function recoverPublishedOperation(generation: number): Promise<void> {
       clarificationReason.value = failure.reason ?? "unknown";
       throw failure;
     }
+    if (payload.status === "rejected") {
+      reviewState.value = "rejected";
+      requestError.value = "本次课程未发布，已有课程仍可学习。";
+      return;
+    }
     throw new Error("原请求已失败或取消。恢复不会再次生成；需要新内容请明确选择“重新生成”。");
   }
   throw new Error("原请求尚未发布，请等待后重试恢复；不会重复生成。");

@@ -2297,7 +2297,8 @@
         "PHASE-1-T039",
         "PHASE-1-T054",
         "PHASE-1-T070",
-        "PHASE-1-T072"
+        "PHASE-1-T072",
+        "PHASE-1-T074"
       ],
       "scope": [
         "scripts/",
@@ -3746,6 +3747,75 @@
       "completed_at": "2026-10-20T17:22:35",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T072"
+    },
+    {
+      "id": "PHASE-1-T073",
+      "phase": "Phase 1",
+      "title": "补齐既有隔离结果浏览器显示与读取证据",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1-T072"
+      ],
+      "scope": [
+        "scripts/",
+        "docs/acceptance/",
+        "task.json",
+        "process.txt",
+        "web/src/App.vue",
+        "web/tests/App.spec.ts"
+      ],
+      "prd_source": "PRD §0.2/0.3；ADR0016/0017/0020；用户先浏览器证据后小规模生成验收冻结",
+      "acceptance_criteria": [
+        "复用A01待审/A02拒绝和现有隔离正式发布，不调用模型或重新生成课程。",
+        "真实浏览器核对状态、正文隔离、精确版本及错误版本读取；保留截图、DOM、请求状态和实际来源。",
+        "清理浏览器服务与测试会话，旧原件/台账不变，正式夹具不当模型成绩。"
+      ],
+      "verification": [
+        "执行对应浏览器/只读证据或冻结一致性检查",
+        "保存实际结果/失败与源码摘要",
+        "git diff --check"
+      ],
+      "verification_results": [
+        "真实浏览器先发现A02 rejected恢复响应被onMounted catch吞掉，仅显示初始占位；保留rejected-r01截图/DOM/API。用户要求显示核对内补齐该分支和测试，不改数据库拒绝状态或生成链路。",
+        "复用原A01待审/A02拒绝和既有脚本PG自动发布夹具，真实Chromium+构建Vue+真实API：待审/拒绝无正式内容且正文404，正式精确v1正文200/3场景、错误版本404、匿名401，所有生成写403，截图DOM网络/API/来源保留并目视。真实发现拒绝恢复异常被吞导致空占位，补分支及回归，原记录复验通过。前端14通过/构建类型lint及三脚本Ruff通过；networkidle原超时/修复前截图保留，改具体UI/API就绪；首helper遗留2认证已限定清理，直接SIGINT管理器正常清理，双库auth0、课程/发布数量不增、监听关闭、旧3ledger哈希保持。Provider0，正式夹具不算模型成绩，旁路403/legacy绑定提示不隐藏；phase-1-browser-evidence-r01交接，下一T074只冻结小生成包。"
+      ],
+      "started_at": "2026-10-20T17:27:18",
+      "completed_at": "2026-10-20T17:38:03",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T073"
+    },
+    {
+      "id": "PHASE-1-T074",
+      "phase": "Phase 1",
+      "title": "冻结以完整生成链路为主的小规模验收包",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1-T073"
+      ],
+      "scope": [
+        "scripts/",
+        "docs/acceptance/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD §0.2/0.3；ADR0016/0017/0020；用户先浏览器证据后小规模生成验收冻结",
+      "acceptance_criteria": [
+        "浏览器证据完成后冻结当前源码/政策/模型/目标及真实调用预算，不恢复旧运行。",
+        "逐项列明U/R可引用证据及其跨版本局限，不重跑全部筛选或把旧成绩充新分母。",
+        "冻结完整生成优先顺序、成功/人工/附带错误计分及首败停止；新包仅准备，真实执行待准确授权。"
+      ],
+      "verification": [
+        "执行对应浏览器/只读证据或冻结一致性检查",
+        "保存实际结果/失败与源码摘要",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T074"
     }
   ]
 }

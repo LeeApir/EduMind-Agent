@@ -199,3 +199,27 @@ it("shows clarification choices and clears preparation without replacing them wi
   wrapper.unmount();
   sessionStorage.clear(); vi.unstubAllGlobals();
 });
+
+
+it("restores a rejected operation as rejected without reading drafts or generating", async () => {
+  sessionStorage.clear();
+  sessionStorage.setItem("edumind:last-learning-operation", "rejected-operation-001");
+  const fetchImpl = vi.fn(async (input: RequestInfo | URL) => {
+    const url = String(input);
+    if (url === "/api/auth/session") return Response.json({ csrf_token: "csrf" });
+    if (url === "/api/learning-operations/rejected-operation-001") return Response.json({
+      id: "rejected-operation-001", status: "rejected", learning_unit_id: "draft-unit-001",
+    });
+    return Response.json({}, { status: 404 });
+  });
+  vi.stubGlobal("fetch", fetchImpl);
+  const wrapper = mount(App, { global: { stubs } });
+  await flushPromises();
+  expect(wrapper.get('[data-testid="review-rejected-state"]').text()).toContain("未通过审核");
+  expect(wrapper.find('[data-testid="published-state"]').exists()).toBe(false);
+  expect(wrapper.find('[data-testid="explanation-tab"]').exists()).toBe(false);
+  expect(fetchImpl.mock.calls.some(([url]) => String(url).startsWith("/api/learning-units/"))).toBe(false);
+  expect(fetchImpl.mock.calls.some(([url]) => String(url) === "/api/learning-sessions")).toBe(false);
+  wrapper.unmount();
+  sessionStorage.clear(); vi.unstubAllGlobals();
+});

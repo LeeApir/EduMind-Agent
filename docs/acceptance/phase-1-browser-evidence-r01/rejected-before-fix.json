@@ -1,0 +1,47 @@
+{
+  "case": "rejected",
+  "source": {
+    "course_state": "rejected",
+    "database": "edumind_catalog_five_hour_r01",
+    "learning_unit_id": "e27752c7-e085-4e69-95bf-cc7efe297d5d",
+    "operation_id": "bb8ca64f-38c5-4b64-b30a-fb7fa2b70968",
+    "owner_id": "d6b1f046-baac-5c03-8cfd-2b63008e6351",
+    "source": "actual previous live generation; no regeneration",
+    "version": 1
+  },
+  "status": "fail",
+  "failure": "TimeoutError: Locator.wait_for: Timeout 10000ms exceeded.\nCall log:\n  - waiting for get_by_test_id(\"review-rejected-state\") to be visible\n",
+  "observations": {},
+  "page_errors": [],
+  "network": [
+    {
+      "path": "/api/__acceptance/bootstrap",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/runtime",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/auth/session",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/learning-operations/bb8ca64f-38c5-4b64-b30a-fb7fa2b70968",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/profile/me",
+      "status": 404,
+      "method": "GET"
+    }
+  ],
+  "real_provider_calls": 0,
+  "networkidle_warning": "networkidle not reached; explicit final URL/UI/API gates used",
+  "ui_source": "pnpm build output + actual read-only backend, no mocked HTTP replies",
+  "screenshot_sha256": "fdc2d2bce65117f76c17418d547d55d12216ef72d8e96d431a03173531e8c7e3"
+}
