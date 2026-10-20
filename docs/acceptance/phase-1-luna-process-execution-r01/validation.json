@@ -1,0 +1,53 @@
+{
+  "scope": "zero Provider preparation after user confirmed exact four materials and labels",
+  "real_provider_requests": 0,
+  "authorized_requests": 0,
+  "material_label_confirmation": "labels-human.json binds original2373e15 unchanged materials; not result signoff",
+  "commands": [
+    {
+      "command": "backend/.venv/bin/pytest -q scripts/tests/test_luna_process_execution.py scripts/tests/test_luna_process_calibration.py scripts/tests/test_luna_schema_validation.py scripts/tests/test_luna_admission.py",
+      "result": "84 passed, no skipped;27 new execution tests and57 prior regressions"
+    },
+    {
+      "command": "backend/.venv/bin/ruff check scripts/run_luna_process_calibration.py scripts/prepare_luna_process_execution.py scripts/freeze_luna_process_execution.py scripts/tests/test_luna_process_execution.py",
+      "result": "passed"
+    },
+    {
+      "command": "backend/.venv/bin/python scripts/prepare_luna_process_execution.py",
+      "result": "four actual execution-path Mock captures reproduce, all match confirmed preview bytes and same successful model/reasoning/system instruction/projected schema"
+    },
+    {
+      "command": "python3 scripts/check_catalog_workflow.py",
+      "result": "passed"
+    },
+    {
+      "command": "git diff --check",
+      "result": "passed"
+    }
+  ],
+  "coverage": [
+    "exact new request authority/count/expiry/labels",
+    "per-result human gate and final fourth-result gate",
+    "persistent first failure/incorrect verdict/unsupported extra finding/missing usage/incomplete capture/missing mandatory check stop",
+    "crash/uncertain reservation/concurrent entry cannot replay",
+    "second send authorization denied",
+    "outputcap/bool/negative usage denied",
+    "root/source/env tampering denied",
+    "per-call timeout shrinks near expiry to reserve transport closure"
+  ],
+  "preparation_failures_retained": [
+    "first actual-path Mock used pre-consumed json response and raw-complete audit failed; changed ONLY Mock reply to unread ByteStream to exercise full response capture; no audit assertion weakened",
+    "first Ruff found6 E701 in new test single-line if clauses; formatted new files only",
+    "one apply_patch anchor did not match reformatted test definition; no file changed, reapplied against actual lines"
+  ],
+  "source_changes": "new scripts/docs only; no production code/policy/prompt/schema/model/env modifications",
+  "limits": [
+    "Mock scripted pass is NOT semantic quality",
+    "real token counts/third-party bills unknown",
+    "material confirmation does not pre-sign model results",
+    "four calibration cases are NOT independent/formal benchmark",
+    "freeze and unauthorized CLI post-checks are separately recorded in results/preflight.json"
+  ],
+  "T040": "blocked; no formal score",
+  "production_mode": "catalog_only unchanged"
+}
