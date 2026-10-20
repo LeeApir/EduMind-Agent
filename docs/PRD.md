@@ -24,6 +24,8 @@
 
 ### 0.1 当前开发阶段：Phase 1 功能开发（2026-10-03）
 
+2026-10-20 用户批准[ADR-0021](ADR/0021-plan-check-and-bounded-repair.md)计划检查与受限纠错方案A，按T081–T085实施；早期计划问题终止交人工，默认空验证器不自动重建，完整单元人工发布规则不变。H留出封存、真实请求未授权、T040仍blocked；具体实施状态以活动任务账本为准。
+
 用户选择继续Phase 1功能开发。MVP 0.3最终账本原样保存在[阶段归档](tasks/mvp-0.3.json)，45项done、T033仍blocked；根目录[task.json](../task.json)保存42项Phase 1活动任务（切换时全部todo）。归档与规划已完成；用户进一步授权开始PHASE-1-T001，范围与验证规则见[Phase 1验收计划](acceptance/phase-1-acceptance-plan.md)。后续执行以活动账本和明确授权为准，不代表这些功能、架构决定或真实验证已完成。
 
 本阶段以§9.1产品化基础为范围：兼容Provider与Ollama、持久及临时BYOK、四档模型选择与显式回退、§3.8所列Anthropic/Gemini/星火可选原生适配器；Redis/Celery可靠投递与持久Job恢复；受约束动画DSL、审核、确定性编译与隔离Worker；约30节点版本化知识结构及兼容路径查询。Neo4j只在查询复杂度与测量证据表明必要、选型获批准后引入。
