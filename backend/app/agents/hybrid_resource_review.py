@@ -267,7 +267,7 @@ async def review_once(
                 ChatMessage(role="user", content=encoded.decode()),
             ),
             task_profile=TaskProfile.QUALITY,
-            max_output_tokens=2048,
+            max_output_tokens=8192,
         ),
         json_schema=schema,
         stage="unit_review" if scope == "unit" else "resource_review",
@@ -339,10 +339,14 @@ async def review_resource(
             if on_review is not None:
                 await on_review(record)
             return tuple(history)
-        if correction == 2:
+        if correction == 2 or not await window.permit_correction(role):
             record["local_routing"] = {
                 "verdict": "needs_human",
-                "reason_codes": ["CORRECTIONS_EXHAUSTED"],
+                "reason_codes": [
+                    "CORRECTIONS_EXHAUSTED"
+                    if correction == 2
+                    else "SHARED_CORRECTION_BUDGET_EXHAUSTED"
+                ],
                 "policy_version": "hybrid-review-v1",
             }
             workspace.disposition(role, candidate.id, "needs_human")

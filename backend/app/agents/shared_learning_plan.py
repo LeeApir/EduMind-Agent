@@ -6,6 +6,7 @@ from collections.abc import Awaitable, Callable
 from copy import deepcopy
 from dataclasses import dataclass, field
 from typing import Any
+from uuid import UUID
 
 from app.agents.learning_unit_generator import StructuredResourceGateway
 from app.services.learning_contract import (
@@ -34,15 +35,39 @@ class CallWindow:
     limit: int = 20
     used: int = 0
     reserve: Callable[[], Awaitable[None]] | None = None
+    reserve_request: Callable[[StructuredRequest, UUID | None], Awaitable[None]] | None = None
+    reserve_pair: Callable[[str], Awaitable[UUID | None]] | None = None
+    correction_permit: UUID | None = None
+    permit_steps: int = 0
+
+    async def permit_correction(self, role: str) -> bool:
+        if self.correction_permit is not None:
+            raise LearningContractError("CORRECTION_PERMIT_INVALID")
+        if self.reserve_pair is None:
+            return True  # Standalone development callers still have their own outer quota.
+        permit = await self.reserve_pair(role)
+        if permit is None:
+            return False
+        self.correction_permit, self.permit_steps = permit, 2
+        return True
 
     async def send(self, gateway: StructuredResourceGateway, request: StructuredRequest) -> Any:
         remaining = self.deadline - time.monotonic()
         if self.limit not in (20, 22) or self.used >= self.limit or remaining <= 0:
             raise LearningContractError("GENERATION_LIMIT_EXCEEDED")
         # A failed/canceled request consumes a slot. No retry_safe or fallback opt-in.
-        if self.reserve is not None:
+        if self.reserve_request is not None:
+            await self.reserve_request(request, self.correction_permit)
+        elif self.reserve is not None:
             await self.reserve()
+        if self.correction_permit is not None:
+            self.permit_steps -= 1
+            if self.permit_steps == 0:
+                self.correction_permit = None
         self.used += 1
+        remaining = self.deadline - time.monotonic()
+        if remaining <= 0:
+            raise LearningContractError("GENERATION_LIMIT_EXCEEDED")
         async with asyncio.timeout(min(60, remaining)):
             return await gateway.generate_structured(request, retry_safe=False)
 

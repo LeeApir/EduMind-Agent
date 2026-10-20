@@ -133,6 +133,11 @@ class LearningOperation(Base):
         UniqueConstraint("user_id", "idempotency_key", name="uq_learning_operations_user_key"),
         UniqueConstraint("user_id", "learning_unit_id", "id", name="uq_operation_target"),
         CheckConstraint("attempt >= 1", name="ck_learning_operations_attempt_positive"),
+        CheckConstraint(
+            "generation_mapping_count BETWEEN 0 AND 1 AND generation_rebuild_count BETWEEN 0 AND 1 "
+            "AND generation_tail_remaining BETWEEN 0 AND 9",
+            name="learning_budget_counters",
+        ),
     )
 
     id: Mapped[UUID] = mapped_column(PostgreSQLUUID(as_uuid=True), primary_key=True, default=uuid4)
@@ -158,6 +163,10 @@ class LearningOperation(Base):
     review_summary: Mapped[dict[str, object] | None] = mapped_column(JSONB)
     publication_expectation: Mapped[dict[str, object] | None] = mapped_column(JSONB)
     generation_call_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    generation_budget_version: Mapped[str | None] = mapped_column(String(32))
+    generation_mapping_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    generation_rebuild_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    generation_tail_remaining: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     generation_deadline: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     canceled_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)

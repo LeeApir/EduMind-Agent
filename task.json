@@ -4108,7 +4108,7 @@
       "id": "PHASE-1-T083",
       "phase": "Phase 1",
       "title": "共享持久预算与时限",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1-T081",
@@ -4133,9 +4133,11 @@
         "PG并发/中断/超时/尾部保留集成测试",
         "Ruff/类型检查/workflow/git diff --check；真实Provider0"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "0033持久预算版本/映射/重建/tail计数、修正许可与发送预约，操作行锁原子预约20次并保护剩余基线；许可不计请求，修正/复审分别消费1许可槽和1实际预约，DB禁止许可退款/删除及attempt改删，旧非零无版本拒绝重开。可选映射512/所有审核8192纳入政策；统一180秒初始化一次/单次60及剩余时间，提交后重新检查截止，终止不清空原截止。108分配/22组合符合上限5或4对，每资源2对；独立PG179通过0跳过/1旧依赖警告，另第20槽并发1测试及19次完整耗尽仍完成unit_review进入pending1测试通过；6源码mypy/Ruff/workflow/diff及空库迁移回退再升级/非空拒绝通过。Provider0/H封存/四旧ledger保持/T040 blocked，无新真实预算；phase-1-shared-budget-r01交接，下一T084受验证器门控一次新计划。"
+      ],
+      "started_at": "2026-10-20T23:01:00",
+      "completed_at": "2026-10-20T23:09:39",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T083",
       "execution_gate": "用户批准方案A、20次180秒共享预算及PC-01–05串行实施；默认空验证器，无真实调用/H调优/T040解除授权。"

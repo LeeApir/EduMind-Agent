@@ -4,7 +4,6 @@ import asyncio
 import time
 from collections.abc import Awaitable, Callable
 from copy import deepcopy
-from datetime import timedelta
 from typing import Any
 from uuid import UUID
 
@@ -21,6 +20,7 @@ from app.models.learning import LearningOperation, LearningUnit, utc_now
 from app.models.learning_plan import LearningPlanVersion
 from app.models.learning_review_case import LearningReviewCase
 from app.services.hybrid_learning_publication import publish_complete_unit, stage_candidates
+from app.services.learning_budget import initialize_budget, reserve_attempt, reserve_correction
 from app.services.learning_contract import ROLES, LearningContractError, canonical
 from app.services.learning_owner_lock import lock_learning_owner
 from app.services.learning_plans import save_plan
@@ -103,31 +103,34 @@ async def run_planned_operation(
         )
     ).all():
         await invalidate_case(db, prior_case)
+    initialize_budget(op)
+    if op.generation_tail_remaining != 0:
+        raise LearningContractError("GENERATION_BUDGET_ALREADY_STARTED")
+    op.generation_tail_remaining = (9 if reuse_plan is None else 8) - sum(
+        1 for role in ROLES if reuse_content and role in reuse_content
+    )
     op.status = "running"
-    op.generation_deadline = op.generation_deadline or utc_now() + timedelta(seconds=180)
     unit_id = unit.id
     deadline = op.generation_deadline
+    assert deadline is not None  # Established by initialized/locked budget.
     await db.commit()
 
-    async def reserve() -> None:
-        count = await db.scalar(
-            update(LearningOperation)
-            .where(
-                LearningOperation.id == operation_id,
-                LearningOperation.user_id == owner_id,
-                LearningOperation.status == "running",
-                LearningOperation.generation_call_count < 20,
-                LearningOperation.generation_deadline > utc_now(),
-            )
-            .values(generation_call_count=LearningOperation.generation_call_count + 1)
-            .returning(LearningOperation.generation_call_count)
+    async def reserve(request: Any, permit_id: UUID | None) -> None:
+        await reserve_attempt(
+            db,
+            owner_id=owner_id,
+            operation_id=operation_id,
+            stage=request.stage,
+            permit_id=permit_id,
         )
-        await db.commit()
-        if count is None:
-            raise LearningContractError("GENERATION_LIMIT_EXCEEDED")
+
+    async def pair(role: str) -> UUID | None:
+        return await reserve_correction(db, owner_id=owner_id, operation_id=operation_id, role=role)
 
     window = CallWindow(
-        deadline=time.monotonic() + max(0, (deadline - utc_now()).total_seconds()), reserve=reserve
+        deadline=time.monotonic() + max(0, (deadline - utc_now()).total_seconds()),
+        reserve_request=reserve,
+        reserve_pair=pair,
     )
 
     async def phase(value: str) -> None:

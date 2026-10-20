@@ -1,0 +1,33 @@
+{
+  "checks": [
+    {
+      "database": "edumind_catalog_shared_budget_1792508760",
+      "command": "alembic downgrade 0032_plan_check_evidence",
+      "expected_success": false,
+      "actual_exit": 1,
+      "result": "matched expectation; data retained"
+    },
+    {
+      "database": "edumind_catalog_budget_migrate_1792508815",
+      "command": "alembic upgrade head",
+      "expected_success": true,
+      "actual_exit": 0,
+      "result": "passed"
+    },
+    {
+      "database": "edumind_catalog_budget_migrate_1792508815",
+      "command": "alembic downgrade 0032_plan_check_evidence",
+      "expected_success": true,
+      "actual_exit": 0,
+      "result": "passed"
+    },
+    {
+      "database": "edumind_catalog_budget_migrate_1792508815",
+      "command": "alembic upgrade head",
+      "expected_success": true,
+      "actual_exit": 0,
+      "result": "passed"
+    }
+  ],
+  "provider_calls": 0
+}

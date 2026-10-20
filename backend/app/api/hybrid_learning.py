@@ -2,15 +2,14 @@
 
 import asyncio
 from collections.abc import AsyncIterator
-from datetime import timedelta
 from uuid import UUID
 
-from sqlalchemy import update
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.agents.goal_node_resolver import clarification_payload, resolve_goal_node
-from app.models.learning import LearningOperation, utc_now
+from app.models.learning import utc_now
 from app.services.knowledge_graph import KnowledgeGraphRepository
+from app.services.learning_budget import initialize_budget, reserve_attempt
 from app.services.learning_contract import LearningContractError
 from app.services.learning_operations import owned_operation
 from app.services.planned_learning_flow import run_planned_operation
@@ -46,7 +45,7 @@ async def hybrid_events(
                 if op is None or op.status != "accepted":
                     raise LearningContractError("OPERATION_NOT_FRESH")
                 op.phase = "planning"
-                op.generation_deadline = utc_now() + timedelta(seconds=180)
+                initialize_budget(op)
                 await db.commit()
 
                 # An optional goal-mapping request consumes the same durable operation quota.
@@ -54,23 +53,10 @@ async def hybrid_events(
                     async def generate_structured(
                         self, request: StructuredRequest, *, retry_safe: bool = False
                     ) -> StructuredResult:
-                        count = await db.scalar(
-                            update(LearningOperation)
-                            .where(
-                                LearningOperation.id == operation_id,
-                                LearningOperation.status == "accepted",
-                                LearningOperation.generation_call_count < 20,
-                                LearningOperation.generation_deadline > utc_now(),
-                            )
-                            .values(
-                                generation_call_count=LearningOperation.generation_call_count + 1
-                            )
-                            .returning(LearningOperation.generation_call_count)
+                        remaining = await reserve_attempt(
+                            db, owner_id=owner_id, operation_id=operation_id, stage="goal_mapping"
                         )
-                        await db.commit()
-                        if count is None:
-                            raise LearningContractError("GENERATION_LIMIT_EXCEEDED")
-                        async with asyncio.timeout(60):
+                        async with asyncio.timeout(remaining):
                             return await gateway.generate_structured(request, retry_safe=False)
 
                 resolution = await resolve_goal_node(goal, graph=graph, gateway=MappingGateway())
@@ -209,7 +195,6 @@ async def hybrid_events(
                     }
                 if op and op.status in ("canceled", "rejected", "failed"):
                     op.phase = None
-                    op.generation_deadline = None
                 await db.commit()
                 status = op.status if op else "failed"
             await queue.put(("error", {"operation_id": str(operation_id), **detail}))

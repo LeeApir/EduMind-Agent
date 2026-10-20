@@ -172,6 +172,7 @@ async def resolve_goal_node(
                 ),
             ),
             task_profile=TaskProfile.FAST,
+            max_output_tokens=512,
         ),
         stage="goal_mapping",
         json_schema={
