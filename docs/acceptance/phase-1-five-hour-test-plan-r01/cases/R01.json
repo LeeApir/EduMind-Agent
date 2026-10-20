@@ -1,0 +1,525 @@
+{
+  "id": "R01",
+  "scope": "resource",
+  "selected_role": "explanation",
+  "material": {
+    "binding": {
+      "owner_id": "ebc210fd-78e8-53f0-8c34-f05d7ed4a143",
+      "unit_id": "a01f22f4-e4b8-563e-b805-921e01aae659",
+      "operation_id": "abf795de-5f56-57b3-ae03-73d9d63e3014",
+      "plan_id": "c2d80ef7-7328-5011-869d-f51a39d5f48c",
+      "plan_version": 1,
+      "plan_digest": "088d740f941ef1ae1e8ea6313a0910c9bfa96a6a8d5c176fdb1eb1055b095307",
+      "input_digest": "7c88d61f05acad5c49e7bd0496df8cfc9f5620701f922ed6f926af874d1b80f4",
+      "references_digest": "1335b93c5c57bca280ff7d4076dbd2c6cd8c0bc14bf154738dada80dc5e6281e",
+      "policy_version": "hybrid-review-v1",
+      "policy_digest": "747ec507e0f011d8a82e74d3823964fc2f860ab23693f71e695273ebf696fdad"
+    },
+    "plan": {
+      "objectives": [
+        {
+          "id": "concept",
+          "text": "说明长度3数组的合法下标0、1、2"
+        },
+        {
+          "id": "implementation",
+          "text": "代码场景提供安全求和实现"
+        },
+        {
+          "id": "assessment",
+          "text": "练习场景检查下标与求和知识"
+        }
+      ],
+      "terminology": [
+        {
+          "term": "返回值",
+          "meaning": "函数交给调用方的值，不等于打印"
+        }
+      ],
+      "conventions": {
+        "index_base": 0,
+        "capacity": 3,
+        "state_representation": "s为已处理元素和，i为下一个处理下标",
+        "not_applicable_reasons": []
+      },
+      "shared_example": {
+        "input_description": "a={4,6,9}",
+        "initial_state": "s=0,i=0",
+        "steps": [
+          {
+            "operation": "求和循环",
+            "expected_state": "s=4,10,19；i=3条件失败退出",
+            "expected_output": "无打印，返回19"
+          }
+        ]
+      },
+      "prerequisite_node_ids": [],
+      "scenes": [
+        {
+          "role": "explanation",
+          "scene_key": "explanation",
+          "objective_ids": [
+            "concept"
+          ],
+          "depends_on": []
+        },
+        {
+          "role": "code",
+          "scene_key": "code",
+          "objective_ids": [
+            "implementation"
+          ],
+          "depends_on": [
+            "explanation"
+          ]
+        },
+        {
+          "role": "exercise",
+          "scene_key": "exercise",
+          "objective_ids": [
+            "assessment"
+          ],
+          "depends_on": [
+            "explanation",
+            "code"
+          ]
+        }
+      ],
+      "node_id": "array",
+      "graph_version": "mvp-0.2.0",
+      "graph_digest": "3639db6aedc9699348e63b5e7e1bdaaea3189592b19540c64e8f175aceb9ef59",
+      "profile_version": null,
+      "profile_evidence_digest": "8838fdd11ee58e08fd54a21272313e784012370b7cf0a2cde8b823ed8806d85d",
+      "goal": "讲解场景仅解释数组长度与下标；代码场景给出求和实现，练习场景提供题目。",
+      "code_language": "C",
+      "schema_version": "learning-plan-v1",
+      "references": [
+        {
+          "reference_id": "graph-node:mvp-0.2.0:array",
+          "version": "mvp-0.2.0",
+          "digest": "f83fd12e754fcda4124aa62b8a29203d97a897605d23dc4e37877393dcb0015d"
+        }
+      ]
+    },
+    "candidates": [
+      {
+        "resource_id": "0cb958a5-3952-55f7-9f3e-0482f506183b",
+        "role": "explanation",
+        "envelope": {
+          "resource_type": "explanation",
+          "prompt_version": "learning-resources-v1",
+          "content": {
+            "markdown": "C数组a[3]包含3个同类型元素，合法下标为0、1、2。后续代码场景给出求和实现，练习场景提供题目；本讲解只说明长度和下标。"
+          }
+        },
+        "content_digest": "3485a8c28be48b2370e7fe2ad45a95aea033bcd3e2cb2265cb24e65ccac62abb",
+        "dependency_digest": "587a01ce1d0dd8dac1310bfb3ce63e9413cf0cb8fef90f75e52c504488df85a5",
+        "upstream": []
+      },
+      {
+        "resource_id": "a91a7d3c-7447-586a-88f0-fe64ecdf4e88",
+        "role": "code",
+        "envelope": {
+          "resource_type": "code",
+          "prompt_version": "learning-resources-v1",
+          "content": {
+            "language": "C",
+            "source": "int sum_sample(void) {\n    int a[3] = {4, 6, 9};\n    int s = 0;\n    for (int i = 0; i < 3; ++i) s += a[i];\n    return s;\n}",
+            "expected_output": "函数返回19，没有标准输出。",
+            "key_steps": [
+              "初始s=0；i=0轮后s=4，i=1轮后s=10，i=2轮后s=19；随后i=3，3<3为假，退出，不访问a[3]，返回19，无打印。"
+            ],
+            "display_only": true
+          }
+        },
+        "content_digest": "3dc160a6f4c2288872ca672661dfad8f8da3f93f429f70090b4bdfebe4bf542e",
+        "dependency_digest": "166d95d2a38c3bd8817dde23485d13b20f8a96c947f0e043d3a5f21780b27e75",
+        "upstream": [
+          {
+            "resource_id": "0cb958a5-3952-55f7-9f3e-0482f506183b",
+            "content_digest": "3485a8c28be48b2370e7fe2ad45a95aea033bcd3e2cb2265cb24e65ccac62abb",
+            "dependency_digest": "587a01ce1d0dd8dac1310bfb3ce63e9413cf0cb8fef90f75e52c504488df85a5"
+          }
+        ]
+      },
+      {
+        "resource_id": "2c1a2c03-25b2-539a-845a-e9b8f12a6f87",
+        "role": "exercise",
+        "envelope": {
+          "resource_type": "exercise",
+          "prompt_version": "learning-resources-v1",
+          "content": {
+            "items": [
+              {
+                "id": "q1",
+                "question": "[判断题] 请从s=0逐轮推演：i=1轮结束后s=10 仅填 T 或 F（T=正确，F=错误）。",
+                "answer": "T",
+                "explanation": "先加4得4，再加6得10。"
+              },
+              {
+                "id": "q2",
+                "question": "[判断题] 请推演首次条件失败：i=3时退出，不执行访问a[3]的循环体 仅填 T 或 F（T=正确，F=错误）。",
+                "answer": "T",
+                "explanation": "i=2轮后s=19，i递增为3，3<3为假，因此退出。"
+              },
+              {
+                "id": "q3",
+                "question": "[判断题] 函数会自行把19打印到屏幕 仅填 T 或 F（T=正确，F=错误）。",
+                "answer": "F",
+                "explanation": "函数只有return，没有打印语句。"
+              }
+            ]
+          }
+        },
+        "content_digest": "1153a4cdb3c88eaccb0043223b122aa72cf5d59d342c262fab37cda548c009c9",
+        "dependency_digest": "9ba1b8a2060f543a71ff8b60bf2e77ebd4eabf36a122847e8134c3b341983b4b",
+        "upstream": [
+          {
+            "resource_id": "0cb958a5-3952-55f7-9f3e-0482f506183b",
+            "content_digest": "3485a8c28be48b2370e7fe2ad45a95aea033bcd3e2cb2265cb24e65ccac62abb",
+            "dependency_digest": "587a01ce1d0dd8dac1310bfb3ce63e9413cf0cb8fef90f75e52c504488df85a5"
+          },
+          {
+            "resource_id": "a91a7d3c-7447-586a-88f0-fe64ecdf4e88",
+            "content_digest": "3dc160a6f4c2288872ca672661dfad8f8da3f93f429f70090b4bdfebe4bf542e",
+            "dependency_digest": "166d95d2a38c3bd8817dde23485d13b20f8a96c947f0e043d3a5f21780b27e75"
+          }
+        ]
+      }
+    ],
+    "scenes": [
+      {
+        "role": "explanation",
+        "scene_key": "explanation",
+        "scene_id": "d89291ab-52cc-512b-bcf5-e9c891e1e11f",
+        "scene_version": 1,
+        "resource_id": "0cb958a5-3952-55f7-9f3e-0482f506183b",
+        "resource_digest": "3485a8c28be48b2370e7fe2ad45a95aea033bcd3e2cb2265cb24e65ccac62abb",
+        "dependency_digest": "587a01ce1d0dd8dac1310bfb3ce63e9413cf0cb8fef90f75e52c504488df85a5"
+      },
+      {
+        "role": "code",
+        "scene_key": "code",
+        "scene_id": "d9a340ba-7fe1-5800-85b3-58ee39461985",
+        "scene_version": 1,
+        "resource_id": "a91a7d3c-7447-586a-88f0-fe64ecdf4e88",
+        "resource_digest": "3dc160a6f4c2288872ca672661dfad8f8da3f93f429f70090b4bdfebe4bf542e",
+        "dependency_digest": "166d95d2a38c3bd8817dde23485d13b20f8a96c947f0e043d3a5f21780b27e75"
+      },
+      {
+        "role": "exercise",
+        "scene_key": "exercise",
+        "scene_id": "f6adb969-0e7b-5b79-a13e-866e6b398ab5",
+        "scene_version": 1,
+        "resource_id": "2c1a2c03-25b2-539a-845a-e9b8f12a6f87",
+        "resource_digest": "1153a4cdb3c88eaccb0043223b122aa72cf5d59d342c262fab37cda548c009c9",
+        "dependency_digest": "9ba1b8a2060f543a71ff8b60bf2e77ebd4eabf36a122847e8134c3b341983b4b"
+      }
+    ],
+    "actions": {
+      "version": "teaching-actions-v1",
+      "actions": [
+        {
+          "kind": "show_resource",
+          "scene_key": "explanation",
+          "resource_id": "0cb958a5-3952-55f7-9f3e-0482f506183b",
+          "resource_digest": "3485a8c28be48b2370e7fe2ad45a95aea033bcd3e2cb2265cb24e65ccac62abb"
+        },
+        {
+          "kind": "show_resource",
+          "scene_key": "code",
+          "resource_id": "a91a7d3c-7447-586a-88f0-fe64ecdf4e88",
+          "resource_digest": "3dc160a6f4c2288872ca672661dfad8f8da3f93f429f70090b4bdfebe4bf542e"
+        },
+        {
+          "kind": "highlight",
+          "scene_key": "code",
+          "resource_id": "a91a7d3c-7447-586a-88f0-fe64ecdf4e88",
+          "resource_digest": "3dc160a6f4c2288872ca672661dfad8f8da3f93f429f70090b4bdfebe4bf542e",
+          "anchor_id": "a3"
+        },
+        {
+          "kind": "show_resource",
+          "scene_key": "exercise",
+          "resource_id": "2c1a2c03-25b2-539a-845a-e9b8f12a6f87",
+          "resource_digest": "1153a4cdb3c88eaccb0043223b122aa72cf5d59d342c262fab37cda548c009c9"
+        },
+        {
+          "kind": "ask_exercise",
+          "scene_key": "exercise",
+          "resource_id": "2c1a2c03-25b2-539a-845a-e9b8f12a6f87",
+          "resource_digest": "1153a4cdb3c88eaccb0043223b122aa72cf5d59d342c262fab37cda548c009c9",
+          "exercise_id": "q1"
+        },
+        {
+          "kind": "ask_exercise",
+          "scene_key": "exercise",
+          "resource_id": "2c1a2c03-25b2-539a-845a-e9b8f12a6f87",
+          "resource_digest": "1153a4cdb3c88eaccb0043223b122aa72cf5d59d342c262fab37cda548c009c9",
+          "exercise_id": "q2"
+        },
+        {
+          "kind": "ask_exercise",
+          "scene_key": "exercise",
+          "resource_id": "2c1a2c03-25b2-539a-845a-e9b8f12a6f87",
+          "resource_digest": "1153a4cdb3c88eaccb0043223b122aa72cf5d59d342c262fab37cda548c009c9",
+          "exercise_id": "q3"
+        }
+      ],
+      "anchor_catalog": [
+        {
+          "anchor_id": "a1",
+          "resource_id": "0cb958a5-3952-55f7-9f3e-0482f506183b",
+          "resource_digest": "3485a8c28be48b2370e7fe2ad45a95aea033bcd3e2cb2265cb24e65ccac62abb",
+          "json_pointer": "/markdown",
+          "start_utf8": 0,
+          "end_utf8": 168
+        },
+        {
+          "anchor_id": "a2",
+          "resource_id": "a91a7d3c-7447-586a-88f0-fe64ecdf4e88",
+          "resource_digest": "3dc160a6f4c2288872ca672661dfad8f8da3f93f429f70090b4bdfebe4bf542e",
+          "json_pointer": "/expected_output",
+          "start_utf8": 0,
+          "end_utf8": 38
+        },
+        {
+          "anchor_id": "a3",
+          "resource_id": "a91a7d3c-7447-586a-88f0-fe64ecdf4e88",
+          "resource_digest": "3dc160a6f4c2288872ca672661dfad8f8da3f93f429f70090b4bdfebe4bf542e",
+          "json_pointer": "/key_steps/0",
+          "start_utf8": 0,
+          "end_utf8": 131
+        },
+        {
+          "anchor_id": "a4",
+          "resource_id": "a91a7d3c-7447-586a-88f0-fe64ecdf4e88",
+          "resource_digest": "3dc160a6f4c2288872ca672661dfad8f8da3f93f429f70090b4bdfebe4bf542e",
+          "json_pointer": "/language",
+          "start_utf8": 0,
+          "end_utf8": 1
+        },
+        {
+          "anchor_id": "a5",
+          "resource_id": "a91a7d3c-7447-586a-88f0-fe64ecdf4e88",
+          "resource_digest": "3dc160a6f4c2288872ca672661dfad8f8da3f93f429f70090b4bdfebe4bf542e",
+          "json_pointer": "/source",
+          "start_utf8": 0,
+          "end_utf8": 122
+        },
+        {
+          "anchor_id": "a6",
+          "resource_id": "2c1a2c03-25b2-539a-845a-e9b8f12a6f87",
+          "resource_digest": "1153a4cdb3c88eaccb0043223b122aa72cf5d59d342c262fab37cda548c009c9",
+          "json_pointer": "/items/0/answer",
+          "start_utf8": 0,
+          "end_utf8": 1
+        },
+        {
+          "anchor_id": "a7",
+          "resource_id": "2c1a2c03-25b2-539a-845a-e9b8f12a6f87",
+          "resource_digest": "1153a4cdb3c88eaccb0043223b122aa72cf5d59d342c262fab37cda548c009c9",
+          "json_pointer": "/items/0/explanation",
+          "start_utf8": 0,
+          "end_utf8": 29
+        },
+        {
+          "anchor_id": "a8",
+          "resource_id": "2c1a2c03-25b2-539a-845a-e9b8f12a6f87",
+          "resource_digest": "1153a4cdb3c88eaccb0043223b122aa72cf5d59d342c262fab37cda548c009c9",
+          "json_pointer": "/items/0/id",
+          "start_utf8": 0,
+          "end_utf8": 2
+        },
+        {
+          "anchor_id": "a9",
+          "resource_id": "2c1a2c03-25b2-539a-845a-e9b8f12a6f87",
+          "resource_digest": "1153a4cdb3c88eaccb0043223b122aa72cf5d59d342c262fab37cda548c009c9",
+          "json_pointer": "/items/0/question",
+          "start_utf8": 0,
+          "end_utf8": 98
+        },
+        {
+          "anchor_id": "a10",
+          "resource_id": "2c1a2c03-25b2-539a-845a-e9b8f12a6f87",
+          "resource_digest": "1153a4cdb3c88eaccb0043223b122aa72cf5d59d342c262fab37cda548c009c9",
+          "json_pointer": "/items/1/answer",
+          "start_utf8": 0,
+          "end_utf8": 1
+        },
+        {
+          "anchor_id": "a11",
+          "resource_id": "2c1a2c03-25b2-539a-845a-e9b8f12a6f87",
+          "resource_digest": "1153a4cdb3c88eaccb0043223b122aa72cf5d59d342c262fab37cda548c009c9",
+          "json_pointer": "/items/1/explanation",
+          "start_utf8": 0,
+          "end_utf8": 57
+        },
+        {
+          "anchor_id": "a12",
+          "resource_id": "2c1a2c03-25b2-539a-845a-e9b8f12a6f87",
+          "resource_digest": "1153a4cdb3c88eaccb0043223b122aa72cf5d59d342c262fab37cda548c009c9",
+          "json_pointer": "/items/1/id",
+          "start_utf8": 0,
+          "end_utf8": 2
+        },
+        {
+          "anchor_id": "a13",
+          "resource_id": "2c1a2c03-25b2-539a-845a-e9b8f12a6f87",
+          "resource_digest": "1153a4cdb3c88eaccb0043223b122aa72cf5d59d342c262fab37cda548c009c9",
+          "json_pointer": "/items/1/question",
+          "start_utf8": 0,
+          "end_utf8": 131
+        },
+        {
+          "anchor_id": "a14",
+          "resource_id": "2c1a2c03-25b2-539a-845a-e9b8f12a6f87",
+          "resource_digest": "1153a4cdb3c88eaccb0043223b122aa72cf5d59d342c262fab37cda548c009c9",
+          "json_pointer": "/items/2/answer",
+          "start_utf8": 0,
+          "end_utf8": 1
+        },
+        {
+          "anchor_id": "a15",
+          "resource_id": "2c1a2c03-25b2-539a-845a-e9b8f12a6f87",
+          "resource_digest": "1153a4cdb3c88eaccb0043223b122aa72cf5d59d342c262fab37cda548c009c9",
+          "json_pointer": "/items/2/explanation",
+          "start_utf8": 0,
+          "end_utf8": 42
+        },
+        {
+          "anchor_id": "a16",
+          "resource_id": "2c1a2c03-25b2-539a-845a-e9b8f12a6f87",
+          "resource_digest": "1153a4cdb3c88eaccb0043223b122aa72cf5d59d342c262fab37cda548c009c9",
+          "json_pointer": "/items/2/id",
+          "start_utf8": 0,
+          "end_utf8": 2
+        },
+        {
+          "anchor_id": "a17",
+          "resource_id": "2c1a2c03-25b2-539a-845a-e9b8f12a6f87",
+          "resource_digest": "1153a4cdb3c88eaccb0043223b122aa72cf5d59d342c262fab37cda548c009c9",
+          "json_pointer": "/items/2/question",
+          "start_utf8": 0,
+          "end_utf8": 90
+        }
+      ],
+      "digest": "62fb470614362725b6bbe7b0c0eaf9e19cd8172b4bdecca2c128f4b801a67fe0"
+    },
+    "reference_context": {
+      "source": {
+        "reference_id": "graph-node:mvp-0.2.0:array",
+        "version": "mvp-0.2.0",
+        "digest": "f83fd12e754fcda4124aa62b8a29203d97a897605d23dc4e37877393dcb0015d"
+      },
+      "node": {
+        "id": "array",
+        "name": "数组",
+        "chapter": "线性表",
+        "difficulty": 1,
+        "description": "使用连续存储空间、通过下标访问元素的线性结构。",
+        "prerequisites": [],
+        "learning_objectives": [
+          "说出下标访问的时间复杂度",
+          "说明连续存储对插入和删除的影响"
+        ],
+        "common_misconceptions": [
+          "数组每次访问都要从头遍历",
+          "数组插入总是 O(1)"
+        ],
+        "ai_context": "使用连续格子和下标精灵的图示，对比中间插入时的元素搬移。",
+        "mastery_rule_key": "linear-structure-v1"
+      },
+      "learner_evidence": {},
+      "scope": "Background only, not certification of this example."
+    },
+    "teaching_context": {
+      "version": "teaching-node-binding-v1",
+      "teaching_mode": "target",
+      "target_node_id": "array",
+      "recommended_node_id": "array",
+      "teaching_node_id": "array",
+      "selection_reason": "direct_target",
+      "original_request": "讲解场景仅解释数组长度与下标；代码场景给出求和实现，练习场景提供题目。",
+      "segment_goal": "讲解场景仅解释数组长度与下标；代码场景给出求和实现，练习场景提供题目。",
+      "segment_scope": "target_lesson",
+      "path_version_id": "cd075a9d-a465-542d-bf49-f119c72c5338",
+      "path_version": 1,
+      "graph_version": "mvp-0.2.0",
+      "graph_digest": "3639db6aedc9699348e63b5e7e1bdaaea3189592b19540c64e8f175aceb9ef59"
+    },
+    "unit_digest": "c0841a3a3c7a65d6b835ac388f614d5ecefeabe6ed79176dcfea1be689cec0c8"
+  },
+  "input_snapshot": {
+    "metadata": {
+      "node_id": "array",
+      "graph_version": "mvp-0.2.0",
+      "graph_digest": "3639db6aedc9699348e63b5e7e1bdaaea3189592b19540c64e8f175aceb9ef59",
+      "profile_version": null,
+      "profile_evidence_digest": "8838fdd11ee58e08fd54a21272313e784012370b7cf0a2cde8b823ed8806d85d",
+      "goal": "讲解场景仅解释数组长度与下标；代码场景给出求和实现，练习场景提供题目。",
+      "code_language": "C"
+    },
+    "references": {
+      "graph-node:mvp-0.2.0:array": {
+        "reference_id": "graph-node:mvp-0.2.0:array",
+        "version": "mvp-0.2.0",
+        "digest": "f83fd12e754fcda4124aa62b8a29203d97a897605d23dc4e37877393dcb0015d"
+      }
+    },
+    "learner_evidence": {},
+    "node_ids": [
+      "array",
+      "array-stack",
+      "balanced-binary-search-tree",
+      "binary-heap",
+      "binary-search-tree",
+      "binary-tree",
+      "binary-tree-traversal",
+      "breadth-first-search",
+      "bubble-sort",
+      "c-pointer",
+      "circular-linked-list",
+      "circular-queue",
+      "depth-first-search",
+      "doubly-linked-list",
+      "graph-representation",
+      "heap-sort",
+      "insertion-sort",
+      "linked-list-concept",
+      "linked-list-deletion",
+      "linked-list-insertion",
+      "linked-list-traversal",
+      "linked-stack",
+      "merge-sort",
+      "queue",
+      "quick-sort",
+      "selection-sort",
+      "single-linked-list",
+      "sorting-comparison",
+      "stack",
+      "tree-concept"
+    ],
+    "teaching_context": {
+      "version": "teaching-node-binding-v1",
+      "teaching_mode": "target",
+      "target_node_id": "array",
+      "recommended_node_id": "array",
+      "teaching_node_id": "array",
+      "selection_reason": "direct_target",
+      "original_request": "讲解场景仅解释数组长度与下标；代码场景给出求和实现，练习场景提供题目。",
+      "segment_goal": "讲解场景仅解释数组长度与下标；代码场景给出求和实现，练习场景提供题目。",
+      "segment_scope": "target_lesson",
+      "path_version_id": "cd075a9d-a465-542d-bf49-f119c72c5338",
+      "path_version": 1,
+      "graph_version": "mvp-0.2.0",
+      "graph_digest": "3639db6aedc9699348e63b5e7e1bdaaea3189592b19540c64e8f175aceb9ef59"
+    }
+  },
+  "provenance": {
+    "author": "Codex GPT-authored fixture, not independent human truth",
+    "relationship_to_history": "new content, reuses known diagnostic patterns; NOT blind/independent population sample",
+    "historical_failed_stack_sample_reused": false
+  },
+  "actual_model_result": null
+}

@@ -1,0 +1,246 @@
+{
+  "version": "five-hour-gpt-prelabels-v1",
+  "label_method": "GPT-authored plus static reasoning; no runtime execution or independent human truth",
+  "labels": {
+    "A01": {
+      "expected_verdicts": null,
+      "full_generation_required": true,
+      "checklist": [
+        "s:0→7→9→14；首次失败i=3；返回14与打印区分",
+        "三题实际要求过程知识，不能仅问7+2+5"
+      ],
+      "actual_result": null,
+      "label_author": "Codex GPT plus static facts, not independent human truth"
+    },
+    "A02": {
+      "expected_verdicts": null,
+      "full_generation_required": true,
+      "checklist": [
+        "链表[]→[3]→[8,3]，首/次分配失败分别保持[]/[3]，不丢旧头",
+        "malloc检查、next/头指针顺序、调用返回约定与完整释放正确；不得只凭局部NULL检查断言调用方安全"
+      ],
+      "actual_result": null,
+      "label_author": "Codex GPT plus static facts, not independent human truth"
+    },
+    "A03": {
+      "expected_verdicts": null,
+      "full_generation_required": true,
+      "checklist": [
+        "top:0→1→2→1，pop返回11，合法下标0..2",
+        "空/满检查和失败不改状态，先减后读或先读top-1再减均可，不虚构唯一合法形式"
+      ],
+      "actual_result": null,
+      "label_author": "Codex GPT plus static facts, not independent human truth"
+    },
+    "A04": {
+      "expected_verdicts": null,
+      "full_generation_required": true,
+      "checklist": [
+        "首次四次入队后front0/rear0/size4；出队5后front1/size3；再入17后front1/rear1/size4",
+        "最终逻辑顺序9,11,13,17；空size0/满size4，front==rear不单独判空；所有下标取模4"
+      ],
+      "actual_result": null,
+      "label_author": "Codex GPT plus static facts, not independent human truth"
+    },
+    "U01": {
+      "scope": "unit",
+      "selected_role": null,
+      "expected_verdicts": [
+        "reject"
+      ],
+      "required_category": "fact",
+      "expected_severity": "major",
+      "required_findings": [
+        "讲解声明返回17，实际源码按有定义累加返回19，且讲解轨迹本身也得19；须具体指出矛盾，不虚构内存缺陷。"
+      ],
+      "all_claims_and_citations_required": true,
+      "allowed_unresolved": "none unless evidence-based independently documented; never enough to pass",
+      "actual_result": null,
+      "label_author": "Codex GPT plus static mathematical/program facts; no independent human signature"
+    },
+    "U02": {
+      "scope": "unit",
+      "selected_role": null,
+      "expected_verdicts": [
+        "reject"
+      ],
+      "required_category": "code_safety",
+      "expected_severity": "severe",
+      "required_findings": [
+        "长度2数组读取a[2]，合法0/1；调用时越界可达。UB不保证数值或正常返回，不得推导必然不是7。",
+        "安全调用宣称与实际访问冲突是同一安全问题，不要求多报一个fact。"
+      ],
+      "all_claims_and_citations_required": true,
+      "allowed_unresolved": "none unless evidence-based independently documented; never enough to pass",
+      "actual_result": null,
+      "label_author": "Codex GPT plus static mathematical/program facts; no independent human signature"
+    },
+    "U03": {
+      "scope": "unit",
+      "selected_role": null,
+      "expected_verdicts": [
+        "reject"
+      ],
+      "required_category": "code_safety",
+      "expected_severity": "severe",
+      "required_findings": [
+        "长度3却读取a[3]，调用时越界可达；无求和循环实现。",
+        "学生可见内容缺状态/退出教学，三题仅算术，缺过程考查；严重拒绝不能降为仅needs_human。"
+      ],
+      "all_claims_and_citations_required": true,
+      "allowed_unresolved": "specific frozen teaching gaps",
+      "actual_result": null,
+      "label_author": "Codex GPT plus static mathematical/program facts; no independent human signature"
+    },
+    "U04": {
+      "scope": "unit",
+      "selected_role": null,
+      "expected_verdicts": [
+        "needs_human"
+      ],
+      "required_category": null,
+      "expected_severity": null,
+      "required_findings": [
+        "代码正确且过程题存在，但所有可见载体都未给出完整关键状态/退出教学；F答案与未展开解析不能补齐。",
+        "没有事实或安全错误，不把判断题里的假命题当作教学断言。"
+      ],
+      "all_claims_and_citations_required": true,
+      "allowed_unresolved": "specific frozen teaching gaps",
+      "actual_result": null,
+      "label_author": "Codex GPT plus static mathematical/program facts; no independent human signature"
+    },
+    "U05": {
+      "scope": "unit",
+      "selected_role": null,
+      "expected_verdicts": [
+        "needs_human"
+      ],
+      "required_category": null,
+      "expected_severity": null,
+      "required_findings": [
+        "过程已经教过；题目仅测最终算术而不要求过程知识，准确说明已教未考，不虚构事实错误。"
+      ],
+      "all_claims_and_citations_required": true,
+      "allowed_unresolved": "specific frozen teaching gaps",
+      "actual_result": null,
+      "label_author": "Codex GPT plus static mathematical/program facts; no independent human signature"
+    },
+    "U06": {
+      "scope": "unit",
+      "selected_role": null,
+      "expected_verdicts": [
+        "pass"
+      ],
+      "required_category": null,
+      "expected_severity": null,
+      "required_findings": [
+        "状态0→4→10→19、i3退出及过程题完整；无附带误报或未决。"
+      ],
+      "all_claims_and_citations_required": true,
+      "allowed_unresolved": "none unless evidence-based independently documented; never enough to pass",
+      "actual_result": null,
+      "label_author": "Codex GPT plus static mathematical/program facts; no independent human signature"
+    },
+    "U07": {
+      "scope": "unit",
+      "selected_role": null,
+      "expected_verdicts": [
+        "pass"
+      ],
+      "required_category": null,
+      "expected_severity": null,
+      "required_findings": [
+        "状态在代码步骤，退出在q2解析，过程问题完整；没有先教再考承诺，不强求重复或时序。"
+      ],
+      "all_claims_and_citations_required": true,
+      "allowed_unresolved": "none unless evidence-based independently documented; never enough to pass",
+      "actual_result": null,
+      "label_author": "Codex GPT plus static mathematical/program facts; no independent human signature"
+    },
+    "U08": {
+      "scope": "unit",
+      "selected_role": null,
+      "expected_verdicts": [
+        "pass"
+      ],
+      "required_category": null,
+      "expected_severity": null,
+      "required_findings": [
+        "显式recommended授权c-pointer先修，本节不承诺完成头插；未知画像不单独拦截，无动画承诺。",
+        "value存活时读取*p=21，返回int值不是局部地址，不虚构悬垂指针。"
+      ],
+      "all_claims_and_citations_required": true,
+      "allowed_unresolved": "none unless evidence-based independently documented; never enough to pass",
+      "actual_result": null,
+      "label_author": "Codex GPT plus static mathematical/program facts; no independent human signature"
+    },
+    "R01": {
+      "scope": "resource",
+      "selected_role": "explanation",
+      "expected_verdicts": [
+        "pass"
+      ],
+      "required_category": null,
+      "expected_severity": null,
+      "required_findings": [
+        "只审核讲解本身概念和承诺，不要求提供分配给兄弟场景的完整代码或练习。"
+      ],
+      "all_claims_and_citations_required": true,
+      "allowed_unresolved": "none unless evidence-based independently documented; never enough to pass",
+      "actual_result": null,
+      "label_author": "Codex GPT plus static mathematical/program facts; no independent human signature"
+    },
+    "R02": {
+      "scope": "resource",
+      "selected_role": "explanation",
+      "expected_verdicts": [
+        "pass"
+      ],
+      "required_category": null,
+      "expected_severity": null,
+      "required_findings": [
+        "通用讲解事实正确且无个性化断言，不因缺少细分画像而转人工，不推断已掌握或不会。"
+      ],
+      "all_claims_and_citations_required": true,
+      "allowed_unresolved": "none unless evidence-based independently documented; never enough to pass",
+      "actual_result": null,
+      "label_author": "Codex GPT plus static mathematical/program facts; no independent human signature"
+    },
+    "R03": {
+      "scope": "resource",
+      "selected_role": "code",
+      "expected_verdicts": [
+        "revise",
+        "reject"
+      ],
+      "required_category": "fact",
+      "expected_severity": "major",
+      "required_findings": [
+        "源码返回a[0]=4，注释却声称最后元素9；仅非安全事实矛盾，读取合法，无虚构内存问题。",
+        "现资源契约未规定此类真实major事实错误必须revise或必须reject，预冻结两者均可；禁止pass/needs_human。此组不自动修正。"
+      ],
+      "all_claims_and_citations_required": true,
+      "allowed_unresolved": "none unless evidence-based independently documented; never enough to pass",
+      "actual_result": null,
+      "label_author": "Codex GPT plus static mathematical/program facts; no independent human signature"
+    },
+    "R04": {
+      "scope": "resource",
+      "selected_role": "exercise",
+      "expected_verdicts": [
+        "revise",
+        "reject"
+      ],
+      "required_category": "fact",
+      "expected_severity": "major",
+      "required_findings": [
+        "q1命题4+6+9=19成立，解释也写应答T，但答案字段F；具体检出，不把它仅说成过程考查不足。",
+        "预冻结资源revise/reject均可，pass/needs_human不可；不启动修正，不编造兄弟资源缺口。"
+      ],
+      "all_claims_and_citations_required": true,
+      "allowed_unresolved": "none unless evidence-based independently documented; never enough to pass",
+      "actual_result": null,
+      "label_author": "Codex GPT plus static mathematical/program facts; no independent human signature"
+    }
+  }
+}
