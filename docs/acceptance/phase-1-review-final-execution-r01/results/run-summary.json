@@ -1,70 +1,80 @@
 {
   "manifest_sha256": "b9ca8591bce97edca60bf7d17c132f51a8ff8504e4f7a23240e93f707ec9e613",
   "candidate": "Luna/high/v4.9 final only",
-  "actual_requests_this_run": 6,
+  "state": "STOPPED",
+  "persistent_halt": true,
+  "research_batch": "STOPPED_SCOPE_DISCUSSION_REQUIRED",
+  "stop_reason": "TECHNICAL_OR_CRITERION_FAILURE",
+  "specific_failure": "screen-safety/TIMEOUT;no HTTP status/body;not model semantic rejection/miss",
+  "request_reservations_consumed": 7,
+  "transport_send_attempts": 7,
+  "actual_requests_this_run": 7,
+  "request_count_semantics": "counts consumed local send attempts,including1with unknown provider receipt;only6complete HTTP200 responses confirmed",
   "requests_max": 12,
-  "state": "WAITING_HUMAN_REVIEW",
-  "persistent_halt": false,
-  "current_stage": "C/fact-safety-mixed",
-  "cases": {
-    "compat-schema": {
-      "verdict": "pass",
-      "expected": "pass",
-      "receipt_sha256": "d02eb643c3620b29e30f88e94bd0002a3c38cc5edd75e620da10986dfdb682af",
-      "actual_human_confirmation": "confirmed via assessments/compat-schema.json"
-    },
-    "cal-01": {
-      "verdict": "pass",
-      "expected": "pass",
-      "receipt_sha256": "c640889574abb9cd3d2b66939e149d94953b87f37a328490fa58cf39c7341cd6",
-      "actual_human_confirmation": "confirmed via assessments/cal-01.json"
-    },
-    "cal-02": {
-      "verdict": "pass",
-      "expected": "pass",
-      "receipt_sha256": "3858d0830900a0bdfc4937c8091ef59cd2232fb14cacd58c1b109a85b4f678a1",
-      "actual_human_confirmation": "confirmed via assessments/cal-02.json"
-    },
-    "cal-03": {
-      "verdict": "needs_human",
-      "expected": "needs_human",
-      "receipt_sha256": "e345868b6f0cd6f1818e7749cccb17da3d8e3cfb60540d8a7194c8fa400b9bfd",
-      "actual_human_confirmation": "confirmed via assessments/cal-03.json"
-    },
-    "cal-04": {
-      "verdict": "needs_human",
-      "expected": "needs_human",
-      "receipt_sha256": "f5c72624152fefa69009917b4f43b702c06ab7c43ac9bb8c700cc2032e54eb44",
-      "actual_human_confirmation": "confirmed via assessments/cal-04.json"
-    },
-    "screen-fact": {
-      "verdict": "reject",
-      "expected": "reject",
-      "receipt_sha256": "447e5bee40895d2f0baa7209978241cde73883eb03e7cd5f2d1a0b105368433a",
-      "actual_human_confirmation": "pending"
-    }
-  },
-  "stageB": "all four frozen calibration results match and actual human confirmations recorded;not formal independent test evidence",
-  "technical_integrity_all": "HTTP200/exactmodel/highrequest/fullbusinessSchema/6checks/completeRaw/usage/exactwire passed",
-  "input_tokens_provider_reported": 96000,
-  "output_tokens_provider_reported": 2646,
-  "total_tokens_provider_reported": 98646,
-  "model_call_duration_ms_total": 53973,
-  "requested_reasoning": "high",
-  "provider_effective_reasoning": "not independently established",
-  "separate_reasoning_tokens": null,
-  "actual_cost": null,
-  "effective_wall_deadline": "2026-10-21T09:44:16.144212+08:00",
+  "known_complete_HTTP200_results": 6,
+  "unreported_usage_attempts": 1,
   "not_sent": [
-    "screen-safety",
     "screen-mixed",
     "holdout-stack-complete",
     "holdout-stack-fact",
     "holdout-stack-safety",
     "holdout-prerequisite"
   ],
-  "latest_semantic_review": "fact/major reject matches exact17versus15 contradiction;one finding,no extras;both a1/fullmarkdown and a6/fullsource support every assertion",
-  "citation_quality": "fact case2cited anchors checked;earlier no citations,not universal capability claim",
-  "formal_T040_quality": "not run;safety/mixed and unused materials not yet tested",
-  "tests": "source unchanged;106 evidence retained from9288782,not rerun;actual fullSchema/wire/receipts/citation pointers/digests/484source/oldstops/workflow/diff checked"
+  "remaining_slots_reusable": false,
+  "cases": {
+    "compat-schema": {
+      "model_verdict": "pass",
+      "actual_human_confirmation": "confirmed via assessments/compat-schema.json",
+      "receipt_sha256": "d02eb643c3620b29e30f88e94bd0002a3c38cc5edd75e620da10986dfdb682af"
+    },
+    "cal-01": {
+      "model_verdict": "pass",
+      "actual_human_confirmation": "confirmed via assessments/cal-01.json",
+      "receipt_sha256": "c640889574abb9cd3d2b66939e149d94953b87f37a328490fa58cf39c7341cd6"
+    },
+    "cal-02": {
+      "model_verdict": "pass",
+      "actual_human_confirmation": "confirmed via assessments/cal-02.json",
+      "receipt_sha256": "3858d0830900a0bdfc4937c8091ef59cd2232fb14cacd58c1b109a85b4f678a1"
+    },
+    "cal-03": {
+      "model_verdict": "needs_human",
+      "actual_human_confirmation": "confirmed via assessments/cal-03.json",
+      "receipt_sha256": "e345868b6f0cd6f1818e7749cccb17da3d8e3cfb60540d8a7194c8fa400b9bfd"
+    },
+    "cal-04": {
+      "model_verdict": "needs_human",
+      "actual_human_confirmation": "confirmed via assessments/cal-04.json",
+      "receipt_sha256": "f5c72624152fefa69009917b4f43b702c06ab7c43ac9bb8c700cc2032e54eb44"
+    },
+    "screen-fact": {
+      "model_verdict": "reject",
+      "actual_human_confirmation": "confirmed via assessments/screen-fact.json",
+      "receipt_sha256": "447e5bee40895d2f0baa7209978241cde73883eb03e7cd5f2d1a0b105368433a"
+    }
+  },
+  "safety_case": {
+    "error": "TIMEOUT",
+    "http_status": null,
+    "raw_bytes": 0,
+    "model_result": null,
+    "semantic_status": "NOT_EVALUATED",
+    "input_tokens": null,
+    "output_tokens": null,
+    "provider_receipt": "unknown",
+    "receipt_sha256": "3f5836b63440d752a3a4d72e52a9fcf0a228febe01426e79b7d09380a8766667"
+  },
+  "known_input_tokens_from_6_complete_responses": 96000,
+  "known_output_tokens_from_6_complete_responses": 2646,
+  "known_total_tokens_from_6_complete_responses": 98646,
+  "full_run_total_tokens": null,
+  "timeout_elapsed_reservation_to_receipt_seconds": 5.531254768371582,
+  "known_complete_calls_duration_ms_sum": 53973,
+  "actual_cost": null,
+  "separate_reasoning_tokens": null,
+  "provider_effective_reasoning": "not independently established",
+  "final_candidate_retirement": "terminal-decision.json",
+  "formal_T040_quality": "not run;partial diagnostics do not establish98/95/90 thresholds;safety/mixed/unused not evaluated",
+  "old_candidates": "all earlier failures/labels/retirements preserved",
+  "tests": "source unchanged;106 offline evidence retained from9288782,not rerun;484source/receipt/reservation/runtime terminal state/oldstops/workflow/diff checked"
 }
