@@ -19,6 +19,7 @@ from app.services.learning_contract import (
 from app.services.provider_gateway import ChatMessage, StructuredRequest, TaskProfile, TextRequest
 
 PLAN_PROMPT_VERSION = "shared-learning-plan-v1"
+PLAN_REBUILD_VERSION = "plan-rebuild-prompt-v1"
 PLAN_INSTRUCTION = """Create one teaching plan for explanation, code and exercise in that order.
 Use a single shared example, explicit index/capacity/state conventions and consistent terms.
 Return only semantic plan_generation fields. Select only supplied reference/node IDs.
@@ -100,7 +101,11 @@ class PlanInputs:
 
 
 async def generate_shared_plan(
-    gateway: StructuredResourceGateway, inputs: PlanInputs, window: CallWindow
+    gateway: StructuredResourceGateway,
+    inputs: PlanInputs,
+    window: CallWindow,
+    *,
+    repair: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     snapshot = inputs.snapshot()
     if (
@@ -109,19 +114,34 @@ async def generate_shared_plan(
         or inputs.metadata.get("code_language") not in ("C", "Python")
     ):
         raise LearningContractError
+    payload = (
+        snapshot
+        if repair is None
+        else {**snapshot, "independently_verified_plan_correction": repair}
+    )
+    instruction = (
+        PLAN_INSTRUCTION
+        if repair is None
+        else PLAN_INSTRUCTION
+        + "\n"
+        + PLAN_REBUILD_VERSION
+        + ": Correct only independently verified local plan defects. "
+        "Keep original user requirements, metadata and reference bindings. "
+        "Return one complete new plan; do not authorize retries or publication."
+    )
     result = await window.send(
         gateway,
         StructuredRequest(
             prompt=TextRequest(
                 messages=(
-                    ChatMessage(role="system", content=PLAN_INSTRUCTION),
-                    ChatMessage(role="user", content=canonical(snapshot).decode()),
+                    ChatMessage(role="system", content=instruction),
+                    ChatMessage(role="user", content=canonical(payload).decode()),
                 ),
                 task_profile=TaskProfile.QUALITY,
                 max_output_tokens=2048,
             ),
             json_schema=deepcopy(SCHEMA["$defs"]["plan_generation"]),
-            stage="plan_generation",
+            stage="plan_generation" if repair is None else "plan_rebuild",
         ),
     )
     draft = validate_contract(dict(result.value), "plan_generation")

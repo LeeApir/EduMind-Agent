@@ -21,6 +21,7 @@ from app.models.learning_plan import LearningPlanVersion
 from app.models.learning_publication import LearningPublication, LearningPublicationWithdrawal
 from app.models.learning_review import LearningReviewRecord
 from app.models.learning_review_case import LearningReviewCase, LearningReviewDecision
+from app.models.plan_check import PlanCheck, PlanRebuildEvent
 from app.services.learning_contract import LearningContractError, canonical
 from app.services.learning_owner_lock import lock_learning_owner
 from app.services.learning_policy import POLICY_VERSION, active_policy_digest
@@ -30,6 +31,7 @@ from app.services.learning_review_cases import (
     locked_case,
     operation_context_current,
 )
+from app.services.plan_check import owned_plan_check, record_digest, validate_evidence
 from app.services.teaching_actions import anchor_catalog
 from app.services.unit_material import restore_material
 
@@ -170,6 +172,47 @@ async def publication_checks(
         or plan.policy_digest != active_policy_digest()
     ):
         raise LearningContractError("PUBLICATION_PLAN_STALE")
+    checks = (
+        await db.scalars(
+            select(PlanCheck).where(
+                PlanCheck.user_id == plan.user_id,
+                PlanCheck.operation_id == UUID(b["operation_id"]),
+                PlanCheck.plan_id == plan.id,
+            )
+        )
+    ).all()
+    if len(checks) != 1:
+        raise LearningContractError("PUBLICATION_PLAN_CHECK_REQUIRED")
+    checked = await owned_plan_check(db, owner_id=plan.user_id, check_id=checks[0].id)
+    evidence = validate_evidence(checked.record)
+    if (
+        evidence["server_assessment"]["route"] != "accept_plan"
+        or evidence["binding"]["plan_digest"] != plan.plan_digest
+        or evidence["binding"]["policy_digest"] != plan.policy_digest
+    ):
+        raise LearningContractError("PUBLICATION_PLAN_CHECK_REQUIRED")
+    if checked.stage == "plan_recheck":
+        completed = await db.scalar(
+            select(PlanRebuildEvent).where(
+                PlanRebuildEvent.operation_id == checked.operation_id,
+                PlanRebuildEvent.event_type == "completed",
+            )
+        )
+        if (
+            completed is None
+            or completed.record_digest != record_digest(completed.record, "rebuild_event")
+            or completed.record.get("new_plan_id") != str(plan.id)
+            or completed.record.get("new_plan_digest") != plan.plan_digest
+        ):
+            raise LearningContractError("PUBLICATION_REBUILD_CHAIN_REQUIRED")
+        parent = await owned_plan_check(db, owner_id=plan.user_id, check_id=completed.check_id)
+        parent_record = validate_evidence(parent.record)
+        if (
+            parent_record["server_assessment"]["route"] != "rebuild_once"
+            or parent.operation_id != checked.operation_id
+            or parent.plan_id == plan.id
+        ):
+            raise LearningContractError("PUBLICATION_REBUILD_CHAIN_REQUIRED")
     latest = await db.scalar(
         select(func.max(LearningPlanVersion.version)).where(
             LearningPlanVersion.learning_unit_id == plan.learning_unit_id

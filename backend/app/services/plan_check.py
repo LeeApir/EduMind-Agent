@@ -14,12 +14,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.learning import LearningOperation
 from app.models.learning_plan import LearningPlanVersion
 from app.models.plan_check import PlanCheck, PlanCheckResolution, PlanRebuildEvent
+from app.services import plan_verifiers
 from app.services.learning_contract import LearningContractError, canonical, digest
 from app.services.learning_owner_lock import lock_learning_owner
 
 SCHEMA = json.loads(Path(__file__).with_suffix(".schema.json").read_text())
-# Intentionally empty. Approval of the protocol does not approve any semantic verifier.
-APPROVED_VERIFIERS: frozenset[str] = frozenset()
 
 
 def validate_evidence(value: object, kind: str = "record") -> dict[str, Any]:
@@ -111,7 +110,9 @@ def _validate_record(value: dict[str, Any]) -> None:
         for pid in decision["proof_ids"]:
             proof = proofs[pid]
             if (
-                proof["verifier_id"] not in APPROVED_VERIFIERS
+                proof["verifier_id"] not in plan_verifiers.APPROVED_PLAN_VERIFIERS
+                or proof["verifier_version"]
+                != plan_verifiers.APPROVED_PLAN_VERIFIERS[proof["verifier_id"]].version
                 or not proof["machine_checked"]
                 or proof["conclusion"] != "confirmed_local_plan_defect"
             ):
@@ -329,11 +330,40 @@ async def save_rebuild_event(
         or v["proof_ids"] != validated["server_assessment"]["proof_ids"]
     ):
         raise LearningContractError("PLAN_REBUILD_NOT_AUTHORIZED")
-    if v["event_type"] != "reserved":
-        # Lifecycle orchestration is not part of the evidence-storage task.
-        raise LearningContractError("PLAN_REBUILD_EXECUTION_NOT_IMPLEMENTED")
-    if v["new_plan_id"] is not None or v["new_plan_digest"] is not None:
-        raise LearningContractError("PLAN_REBUILD_EVENT_INVALID")
+    if v["event_type"] == "reserved":
+        if v["new_plan_id"] is not None or v["new_plan_digest"] is not None:
+            raise LearningContractError("PLAN_REBUILD_EVENT_INVALID")
+    else:
+        prior = await db.scalar(
+            select(PlanRebuildEvent).where(
+                PlanRebuildEvent.operation_id == parent.operation_id,
+                PlanRebuildEvent.event_type == "reserved",
+            )
+        )
+        if prior is None or prior.check_id != parent.id:
+            raise LearningContractError("PLAN_REBUILD_RESERVATION_MISSING")
+        if v["event_type"] == "completed":
+            new = (
+                await db.get(LearningPlanVersion, UUID(v["new_plan_id"]))
+                if v["new_plan_id"]
+                else None
+            )
+            old = await db.get(LearningPlanVersion, parent.plan_id)
+            if (
+                new is None
+                or old is None
+                or new.version != old.version + 1
+                or new.origin_operation_id != parent.operation_id
+                or new.user_id != parent.user_id
+                or new.learning_unit_id != parent.learning_unit_id
+                or new.plan_digest != v["new_plan_digest"]
+                or new.input_digest != b["input_digest"]
+                or new.references_digest != b["reference_digest"]
+                or new.policy_digest != b["policy_digest"]
+            ):
+                raise LearningContractError("PLAN_REBUILD_BINDING_CHANGED")
+        elif v["new_plan_id"] is not None or v["new_plan_digest"] is not None:
+            raise LearningContractError("PLAN_REBUILD_EVENT_INVALID")
     row = PlanRebuildEvent(
         id=UUID(v["event_id"]),
         user_id=parent.user_id,

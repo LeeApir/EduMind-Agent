@@ -25,8 +25,14 @@ URL = os.getenv("EDUMIND_TEST_DATABASE_URL")
 pytestmark = pytest.mark.skipif(not URL, reason="actual isolated PG required")
 
 
-async def case_fixture(db, *, unit_verdict="needs_human"):
+async def case_fixture(db, *, unit_verdict="needs_human", with_plan_check=True):
     user, unit, op, plan = await plan_fixture(db)
+    # Synthetic accepted pre-content audit, never a real model or actual course signoff.
+    from app.agents.plan_check import inspect_plan
+    from app.services.plan_check import save_plan_check
+
+    if with_plan_check:
+        await save_plan_check(db, await inspect_plan(ReviewGateway([]), CallWindow(), plan, op.id))
     w, _ = material_fixture()
     w.binding = plan_binding(plan, op.id)
     # Rebind all candidate dependency digests to the actual persisted plan.

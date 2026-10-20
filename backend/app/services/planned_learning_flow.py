@@ -29,6 +29,7 @@ from app.services.learning_review_cases import create_review_case, invalidate_ca
 from app.services.learning_review_records import plan_binding, save_review
 from app.services.learning_stage_gateway import LearningStageGateway
 from app.services.plan_check import save_plan_check
+from app.services.plan_rebuild import rebuild_plan
 from app.services.teaching_actions import assemble_actions
 from app.services.unit_material import unit_material
 
@@ -188,6 +189,24 @@ async def run_planned_operation(
         plan_check_id = check_row.id
         await db.commit()
         plan_route = check_record["server_assessment"]["route"]
+        if plan_route == "rebuild_once":
+            plan = await rebuild_plan(
+                db,
+                owner_id=owner_id,
+                check_id=check_row.id,
+                gateway=gateway,
+                window=window,
+                inputs=inputs,
+            )
+            reuse_content = None
+            await phase("plan_recheck")
+            check_record = await inspect_plan(
+                gateway, window, plan, operation_id, stage="plan_recheck"
+            )
+            check_row = await save_plan_check(db, check_record)
+            plan_check_id = check_row.id
+            await db.commit()
+            plan_route = check_record["server_assessment"]["route"]
         if plan_route != "accept_plan":
             if plan_route == "reject":
                 raise LearningContractError("PLAN_REJECTED")
@@ -294,7 +313,7 @@ async def run_planned_operation(
             ):
                 current.error = {
                     **current.error,
-                    "stage": "plan_check",
+                    "stage": check_record["request_stage"],
                     "check_id": str(plan_check_id),
                 }
             await db.commit()

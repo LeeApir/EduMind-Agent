@@ -11,6 +11,7 @@ from app.agents.shared_learning_plan import CallWindow
 from app.models.learning_plan import LearningPlanVersion
 from app.services.learning_contract import LearningContractError, canonical
 from app.services.plan_check import SCHEMA, validate_evidence, verify_snapshots
+from app.services.plan_verifiers import apply_verifiers
 from app.services.provider_gateway import ChatMessage, StructuredRequest, TaskProfile, TextRequest
 
 PLAN_CHECK_VERSION = "plan-check-prompt-v1"
@@ -205,4 +206,4 @@ async def inspect_plan(
         provider_config_digest=result.transport_audit.config_digest,
         created_at=datetime.now(timezone.utc).isoformat(),
     )
-    return validate_evidence(record)
+    return validate_evidence(apply_verifiers(plan, record))

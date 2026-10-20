@@ -15,7 +15,7 @@ from sqlalchemy import select  # noqa: E402
 from sqlalchemy.ext.asyncio import async_sessionmaker  # noqa: E402
 from app.core.database import create_database_engine  # noqa: E402
 from app.models.learning_plan import LearningPlanVersion  # noqa: E402
-from app.models.plan_check import PlanCheck, PlanCheckResolution  # noqa: E402
+from app.models.plan_check import PlanCheck, PlanCheckResolution, PlanRebuildEvent  # noqa: E402
 from app.services.learning_contract import LearningContractError  # noqa: E402
 from app.services.learning_review_cli import export_case, maintainer_identity  # noqa: E402
 from app.services.plan_check import (
@@ -119,6 +119,22 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
                         for note in notes
                     ):
                         raise LearningContractError("PLAN_NOTE_CHANGED")
+                    events = (
+                        await db.scalars(
+                            select(PlanRebuildEvent)
+                            .where(
+                                PlanRebuildEvent.user_id == row.user_id,
+                                PlanRebuildEvent.operation_id == row.operation_id,
+                            )
+                            .order_by(PlanRebuildEvent.created_at, PlanRebuildEvent.id)
+                        )
+                    ).all()
+                    if any(
+                        e.record_digest != record_digest(e.record, "rebuild_event")
+                        for e in events
+                    ):
+                        raise LearningContractError("PLAN_REBUILD_EVIDENCE_CHANGED")
+                    value["rebuild_events"] = [e.record for e in events]
                     value["notes"] = [note.record for note in notes]
                 if args.export:
                     export_case(args.export, value)

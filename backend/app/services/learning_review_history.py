@@ -11,7 +11,7 @@ from app.models.learning import GeneratedResource, LearningScene
 from app.models.learning_plan import LearningPlanVersion
 from app.models.learning_review import LearningReviewRecord
 from app.models.learning_review_case import LearningReviewCase
-from app.models.plan_check import PlanCheck, PlanCheckResolution
+from app.models.plan_check import PlanCheck, PlanCheckResolution, PlanRebuildEvent
 from app.services.learning_contract import LearningContractError, digest, validate_contract
 from app.services.plan_check import record_digest
 
@@ -69,6 +69,22 @@ async def case_review_history(db: AsyncSession, case: LearningReviewCase) -> dic
                 .order_by(PlanCheckResolution.created_at, PlanCheckResolution.id)
             )
         ).all()
+        rebuild_events = (
+            await db.scalars(
+                select(PlanRebuildEvent)
+                .where(
+                    PlanRebuildEvent.user_id == case.user_id,
+                    PlanRebuildEvent.learning_unit_id == case.learning_unit_id,
+                    PlanRebuildEvent.operation_id == case.operation_id,
+                )
+                .order_by(PlanRebuildEvent.created_at, PlanRebuildEvent.id)
+            )
+        ).all()
+        if any(
+            row.record_digest != record_digest(row.record, "rebuild_event")
+            for row in rebuild_events
+        ):
+            raise LearningContractError("PLAN_REBUILD_EVIDENCE_CHANGED")
         if any(row.record_digest != record_digest(row.record) for row in plan_checks) or any(
             row.record_digest != record_digest(row.record, "resolution") for row in plan_notes
         ):
@@ -189,6 +205,7 @@ async def case_review_history(db: AsyncSession, case: LearningReviewCase) -> dic
             prior = current
     return {
         "plan_checks": [deepcopy(row.record) for row in plan_checks],
+        "plan_rebuild_events": [deepcopy(row.record) for row in rebuild_events],
         "plan_check_notes": [deepcopy(row.record) for row in plan_notes],
         "automatic_reviews": records,  # Backward-compatible field now includes all history.
         "review_history": {
