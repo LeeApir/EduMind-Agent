@@ -1,6 +1,8 @@
 """Versioned local publication policy; changing its semantics invalidates pending cases."""
 
 from app.agents.learner_review import LEARNER_REVIEW_VERSION
+from app.agents.learning_resource_prompt import RESOURCE_INSTRUCTION_VERSION
+from app.agents.planned_scene_generation import SCENE_PROMPT_VERSION
 from app.agents.review_evidence import REVIEW_PROMPT_VERSION
 from app.agents.review_input import REVIEW_INPUT_VERSION
 from app.agents.review_responsibilities import RESPONSIBILITY_VERSION, REVIEW_SCOPE_VERSION
@@ -19,6 +21,8 @@ POLICY = {
     "learner_review": LEARNER_REVIEW_VERSION,
     "teaching_scope": TEACHING_BINDING_VERSION,
     "teaching_binding": TEACHING_BINDING_VERSION,
+    "scene_generation_prompt": SCENE_PROMPT_VERSION,
+    "exercise_generation_instructions": RESOURCE_INSTRUCTION_VERSION,
     "plan": "learning-plan-v1",
     "actions": "teaching-actions-v1",
     "max_corrections": 2,

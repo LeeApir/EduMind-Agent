@@ -2296,7 +2296,8 @@
         "PHASE-1-T035",
         "PHASE-1-T039",
         "PHASE-1-T054",
-        "PHASE-1-T070"
+        "PHASE-1-T070",
+        "PHASE-1-T072"
       ],
       "scope": [
         "scripts/",
@@ -3670,6 +3671,78 @@
       "commit_lookup": "Task-Completed: PHASE-1-T070",
       "execution_gate": "2026-10-19用户已明确授权在新分支开发T056–T070，按依赖串行执行；审核契约/API/持久化/执行安全边界仍须对应T056/T060/T065具体设计明确批准后实施，未批准项不得推定。真实Provider与动态开放不在本批授权内。",
       "verification_note": "验证命令是将来任务完成时必须实际执行的接口；新文件/CLI尚待建立，不代表本次已存在或通过。测试须禁止真实Provider；数据库验收用隔离真实PostgreSQL且不得以跳过冒充通过；编译/执行遵守T065已批准隔离方案。"
+    },
+    {
+      "id": "PHASE-1-T071",
+      "phase": "Phase 1",
+      "title": "落实A01明确题数与逐题过程考查生成要求",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1-T070"
+      ],
+      "scope": [
+        "backend/app/agents/",
+        "backend/app/services/learning_policy.py",
+        "backend/tests/",
+        "docs/acceptance/",
+        "docs/agents/prompts/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD §0.2/0.3；ADR0016/0017；用户只针对A01/A02具体改动并零调用回归",
+      "acceptance_criteria": [
+        "明确题数优先于默认2–4；过程题要求按题干逐项核对，不能靠解析补足。",
+        "实际生成及修正请求保留绑定原目标与完整上游，不增加输出字段或语义关键词硬判。",
+        "使用原A01失败及完整/分散正确材料离线回归，Prompt/政策版本化，Provider0。"
+      ],
+      "verification": [
+        "运行对应失败与正确材料的离线请求/结构/路由回归",
+        "运行相关已有生成/审核/政策测试、Ruff和mypy",
+        "git diff --check"
+      ],
+      "verification_results": [
+        "A01原失败/U06完整/U07分散材料经实际生成/既有修正请求构造验证，原绑定请求和上游完整，逐题要求/明确题数优先、篡改前置拒绝；5定向及最终隔离PG7文件65通过0跳过，含不可变记录和政策失效，Ruff/四源码mypy/workflow通过。初57通过1PG跳过、默认旧容器无PG端口失败均保留，改现有白名单T037独立库0031后补齐；Provider0，旧失败未改分，Mock不证明模型语义遵守。生成v9/场景v2加入政策，新源码不能复用旧冻结调用授权；交接generation.md，下一项T072。"
+      ],
+      "started_at": "2026-10-20T17:11:38",
+      "completed_at": "2026-10-20T17:16:19",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T071"
+    },
+    {
+      "id": "PHASE-1-T072",
+      "phase": "Phase 1",
+      "title": "定位A02完整代码上下文并约束作用域证据推断",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1-T071"
+      ],
+      "scope": [
+        "backend/app/agents/",
+        "backend/app/services/learning_policy.py",
+        "backend/tests/",
+        "docs/acceptance/",
+        "docs/agents/prompts/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD §0.2/0.3；ADR0016/0017；用户只针对A01/A02具体改动并零调用回归",
+      "acceptance_criteria": [
+        "离线证明A02原unit请求已含完整源码，提供有摘要/锚点/路径的程序上下文索引，不伪造函数作用域。",
+        "缺函数/调用者前提时沿needs_human/unresolved，保留有据严重拒绝；输出Schema和API不扩展。",
+        "原失败/正确二级指针释放/缺上下文/真实错误对照回归；明确Mock不证明模型语义修复，不发真实调用。"
+      ],
+      "verification": [
+        "运行对应失败与正确材料的离线请求/结构/路由回归",
+        "运行相关已有生成/审核/政策测试、Ruff和mypy",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T072"
     }
   ]
 }

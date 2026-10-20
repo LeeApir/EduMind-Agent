@@ -8,7 +8,7 @@ from app.agents.learning_resource_schema import (
     resource_output_schema,
 )
 
-RESOURCE_INSTRUCTION_VERSION = "learning-resources-instructions-v8"
+RESOURCE_INSTRUCTION_VERSION = "learning-resources-instructions-v9"
 OBJECTIVE_INSTRUCTION_VERSIONS = frozenset(
     {
         "learning-resources-instructions-v4",
@@ -16,6 +16,7 @@ OBJECTIVE_INSTRUCTION_VERSIONS = frozenset(
         "learning-resources-instructions-v6",
         "learning-resources-instructions-v7",
         "learning-resources-instructions-v8",
+        "learning-resources-instructions-v9",
     }
 )
 
@@ -23,6 +24,17 @@ _COMMON_INSTRUCTIONS = """Create exactly one requested learning resource in Chin
 Return only JSON matching the supplied schema. Use the requested prompt_version unchanged.
 Do not claim to execute, compile, or run code; code is display-only. Do not add facts that
 are unsupported by the learning context."""
+
+EXERCISE_PROCESS_INSTRUCTION = """Honor an explicit exercise count in the bound original request
+and plan; use the default count only when no count was requested. When N process questions
+are promised, check EACH of the N question stems before returning: answering must use the
+requested state transition, update order or exit/boundary decision. An isolated legal-index
+fact or final arithmetic calculation does not count just because its explanation discusses
+a process. Choice and true/false formats can test process knowledge. Keep the existing
+id/question/answer/explanation fields; perform this per-item check internally, not in extra
+output fields. Do not claim every detailed trace was assessed if only the final state was
+asked; preserve the assigned plan objective when choosing what each question elicits."""
+
 
 _JSON_SERIALIZATION_INSTRUCTIONS = r"""Serialization contract: emit one complete JSON object,
 not Markdown around JSON. All Markdown and source code belong INSIDE JSON string values.
@@ -112,7 +124,8 @@ _TYPE_INSTRUCTIONS: dict[LearningResourceType, str] = {
         "output, and concise key steps; set display_only to true."
     ),
     LearningResourceType.EXERCISE: (
-        "Create about three independent OBJECTIVE exercises (two to four). The server scores "
+        "Create the explicitly requested number of independent OBJECTIVE exercises; "
+        "only when unspecified, default to about three (two to four). The server scores "
         "normalized exact text, never semantic equivalence. Each question must have exactly "
         "one unambiguous answer and explicitly tell the learner the accepted response format. "
         "Use only these formats: (1) question starts [单选题], has four separate option lines "
@@ -150,7 +163,10 @@ def learning_resource_prompt(resource_type: LearningResourceType | str) -> str:
         f"{_COMMON_INSTRUCTIONS}\nPrompt version: {RESOURCE_PROMPT_VERSION}.\n"
         f"Instruction version: {RESOURCE_INSTRUCTION_VERSION}.\n"
         f"Requested resource type: {normalized_type.value}.\n"
-        f"{_TYPE_INSTRUCTIONS[normalized_type]}\n{_JSON_SERIALIZATION_INSTRUCTIONS}"
+        f"{_TYPE_INSTRUCTIONS[normalized_type]}\n"
+        + (EXERCISE_PROCESS_INSTRUCTION + "\n"
+           if normalized_type == LearningResourceType.EXERCISE else "")
+        + f"{_JSON_SERIALIZATION_INSTRUCTIONS}"
         + "\nRequired output contract (all nested required keys must be present; "
         "use exactly these names and types, including expected_output, key_steps and "
         "display_only for code and answer/explanation for every exercise):\n"

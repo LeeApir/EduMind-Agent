@@ -22,7 +22,7 @@ from app.services.learning_contract import (
 )
 from app.services.provider_gateway import ChatMessage, StructuredRequest, TaskProfile, TextRequest
 
-SCENE_PROMPT_VERSION = "planned-scene-content-v1"
+SCENE_PROMPT_VERSION = "planned-scene-content-v2"
 
 
 @dataclass(frozen=True)
@@ -146,12 +146,37 @@ class PlannedScenes:
         predecessors = ROLES[: ROLES.index(role)]
         if any(self._dispositions.get(r) not in ("pass", "needs_human") for r in predecessors):
             raise LearningContractError("UPSTREAM_NOT_REVIEWED")
-        return {
+        context = {
             "plan": deepcopy(self.plan),
             "scene": deepcopy(self.plan["scenes"][ROLES.index(role)]),
             "upstream": [self._candidates[r].payload() for r in predecessors],
             "adjustment": deepcopy(adjustment),
         }
+        if role == "exercise":
+            # Preserve original requirements even if the generated plan narrowed them.
+            snapshot = self.input_snapshot
+            if snapshot is not None and digest(
+                "input", "learning-input-v1", snapshot=snapshot
+            ) != self.binding["input_digest"]:
+                raise LearningContractError("GENERATION_INPUT_BINDING_MISMATCH")
+            metadata = (snapshot or {}).get("metadata", {})
+            bound_teaching = (snapshot or {}).get("teaching_context")
+            original = (
+                bound_teaching.get("original_request")
+                if isinstance(bound_teaching, dict)
+                else metadata.get("goal") if isinstance(metadata, dict) else None
+            )
+            context["exercise_requirements"] = {
+                "version": SCENE_PROMPT_VERSION,
+                "original_request": original,
+                "input_digest": self.binding["input_digest"],
+                "source": "bound input_snapshot; unavailable if null, not inferred from plan",
+                "assigned_objectives": [
+                    deepcopy(o) for o in self.plan["objectives"]
+                    if o["id"] in context["scene"]["objective_ids"]
+                ],
+            }
+        return context
 
     async def generate(
         self,
