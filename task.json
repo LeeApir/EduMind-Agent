@@ -3859,7 +3859,7 @@
       "id": "PHASE-1-T076",
       "phase": "Phase 1",
       "title": "拆分固定材料审核波动与独立生成诊断",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1-T075"
@@ -3881,9 +3881,11 @@
         "运行Ruff、workflow及git diff --check",
         "保存零调用证据和交接文档"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "拆分fixed_review与generation_draft：审核只读固定材料1次审核，生成只走计划+三内容4次、0审核/修正/DB/发布，内部needs_human仅草稿继续门，显式not_reviewed且正式成功null。12审核Mock wire逐字等于T075，4个G输入沿用原A原文/快照但新运行不恢复旧槽，16生成Mock真实模型/路由/输出限额通过，首计划原wire保持。分开审核重复频数、全部断言引用/外部语义检查和技术失败/未运行，拒绝换wire/重复槽/漏引用/邻近字段误引/伪pass/Mock混真实；生成5维度需理由和真实草稿位置，不以审核结论代分。28隔离回归加17材料回归共45通过0跳过，Ruff/check/workflow/diff及四历史ledger保持；CLI无run入口拒绝。交接phase-1-separated-diagnostics-r01，3×12审核+4×4生成=最多52次仅候选提案，真实授权0，尚需持久执行器/时钟/准确冻结后另批；不宣称模型质量，T040仍blocked。"
+      ],
+      "started_at": "2026-10-20T20:59:30",
+      "completed_at": "2026-10-20T21:12:07",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T076"
     }
