@@ -270,6 +270,7 @@ async def review_once(
             max_output_tokens=2048,
         ),
         json_schema=schema,
+        stage="unit_review" if scope == "unit" else "resource_review",
     )
     result = await window.send(gateway, request)
     audit = result.transport_audit
@@ -370,6 +371,7 @@ async def review_resource(
                     max_output_tokens=4096,
                 ),
                 json_schema=resource_output_schema(LearningResourceType(role)),
+                stage="resource_correction",
             ),
         )
         workspace.stage(role, dict(result.value))

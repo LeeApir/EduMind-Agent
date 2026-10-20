@@ -15,6 +15,7 @@ from app.models.learning import LearningOperation
 from app.models.learning_plan import LearningPlanVersion
 from app.models.plan_check import PlanCheck, PlanCheckResolution, PlanRebuildEvent
 from app.services.learning_contract import LearningContractError, canonical, digest
+from app.services.learning_owner_lock import lock_learning_owner
 
 SCHEMA = json.loads(Path(__file__).with_suffix(".schema.json").read_text())
 # Intentionally empty. Approval of the protocol does not approve any semantic verifier.
@@ -268,6 +269,25 @@ async def save_plan_resolution(
     parent = await owned_plan_check(db, owner_id=owner_id, check_id=UUID(v["check_id"]))
     if v["expected_check_digest"] != parent.record_digest:
         raise LearningContractError("PLAN_CHECK_CHANGED")
+    await lock_learning_owner(db, owner_id)
+    previous = await db.scalar(
+        select(PlanCheckResolution).where(
+            PlanCheckResolution.user_id == owner_id,
+            PlanCheckResolution.idempotency_key == v["idempotency_key"],
+        )
+    )
+    if previous is not None:
+        keys = [
+            "check_id",
+            "expected_check_digest",
+            "reviewer_id",
+            "identity_source",
+            "kind",
+            "reason",
+        ]
+        if any(previous.record[k] != v[k] for k in keys):
+            raise LearningContractError("PLAN_RESOLUTION_IDEMPOTENCY_CONFLICT")
+        return previous
     row = PlanCheckResolution(
         id=UUID(v["resolution_id"]),
         user_id=parent.user_id,

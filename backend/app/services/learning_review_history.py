@@ -11,7 +11,9 @@ from app.models.learning import GeneratedResource, LearningScene
 from app.models.learning_plan import LearningPlanVersion
 from app.models.learning_review import LearningReviewRecord
 from app.models.learning_review_case import LearningReviewCase
+from app.models.plan_check import PlanCheck, PlanCheckResolution
 from app.services.learning_contract import LearningContractError, digest, validate_contract
+from app.services.plan_check import record_digest
 
 
 async def case_review_history(db: AsyncSession, case: LearningReviewCase) -> dict[str, Any]:
@@ -45,6 +47,32 @@ async def case_review_history(db: AsyncSession, case: LearningReviewCase) -> dic
                 )
             )
         ).all()
+        plan_checks = (
+            await db.scalars(
+                select(PlanCheck)
+                .where(
+                    PlanCheck.user_id == case.user_id,
+                    PlanCheck.learning_unit_id == case.learning_unit_id,
+                    PlanCheck.operation_id == case.operation_id,
+                )
+                .order_by(PlanCheck.created_at, PlanCheck.id)
+            )
+        ).all()
+        plan_notes = (
+            await db.scalars(
+                select(PlanCheckResolution)
+                .where(
+                    PlanCheckResolution.user_id == case.user_id,
+                    PlanCheckResolution.learning_unit_id == case.learning_unit_id,
+                    PlanCheckResolution.operation_id == case.operation_id,
+                )
+                .order_by(PlanCheckResolution.created_at, PlanCheckResolution.id)
+            )
+        ).all()
+        if any(row.record_digest != record_digest(row.record) for row in plan_checks) or any(
+            row.record_digest != record_digest(row.record, "resolution") for row in plan_notes
+        ):
+            raise LearningContractError("PLAN_CHECK_CHANGED")
         records = []
         for row in rows:
             value = validate_contract(row.record, "review_record")
@@ -63,7 +91,11 @@ async def case_review_history(db: AsyncSession, case: LearningReviewCase) -> dic
         missing_reviews = sorted(set(final_ids) - found_ids)
         if missing_reviews:
             issues.append({"code": "FINAL_REVIEWS_MISSING", "ids": missing_reviews})
-        plan_ids = {UUID(r["binding"]["plan_id"]) for r in records} | {case.plan_id}
+        plan_ids = (
+            {UUID(r["binding"]["plan_id"]) for r in records}
+            | {case.plan_id}
+            | {row.plan_id for row in plan_checks}
+        )
         plans = (
             await db.scalars(
                 select(LearningPlanVersion).where(
@@ -156,6 +188,8 @@ async def case_review_history(db: AsyncSession, case: LearningReviewCase) -> dic
                 )
             prior = current
     return {
+        "plan_checks": [deepcopy(row.record) for row in plan_checks],
+        "plan_check_notes": [deepcopy(row.record) for row in plan_notes],
         "automatic_reviews": records,  # Backward-compatible field now includes all history.
         "review_history": {
             "version": "learning-review-history-v1",

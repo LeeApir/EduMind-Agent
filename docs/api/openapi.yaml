@@ -1,5 +1,14 @@
 {
   "openapi": "3.1.0",
+  "x-plan-check-contract": {
+    "adr": "ADR-0021",
+    "implementation_task": "PHASE-1-T082",
+    "stage": "plan_check",
+    "early_failure": "error/done with PLAN_REVIEW_REQUIRED or GOAL_CLARIFICATION_REQUIRED and status=failed; PLAN_REJECTED uses status=rejected. No scene_ready, incomplete human case, publication or automatic resume.",
+    "error_optional_fields": {"stage": "plan_check", "check_id": "UUID of server-bound audit, not an authorization token"},
+    "privacy": "Error/recovery exposes IDs and fixed codes only; bodies via trusted local maintenance CLI. Complete-unit review_required remains unchanged."
+  },
+
   "info": {
     "title": "EduMind API contract (Phase 1 Provider design)",
     "version": "0.3.0",
@@ -4965,6 +4974,7 @@
       ],
       "enum": [
         "planning",
+        "plan_check",
         "generating",
         "reviewing",
         "consistency_check",
@@ -5445,7 +5455,7 @@
   "stage_changed": {
     "data": {
       "operation_id": "string",
-      "stage": "planning|generating|reviewing|consistency_check|awaiting_human|publishing|regenerating"
+      "stage": "planning|plan_check|generating|reviewing|consistency_check|awaiting_human|publishing|regenerating"
     }
   },
   "review_pass": {

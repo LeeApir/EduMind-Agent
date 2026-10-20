@@ -64,6 +64,8 @@ class StructuredRequest:
 
     prompt: TextRequest
     json_schema: Mapping[str, object]
+    # Server-owned routing metadata; never parsed from model or sent as user data.
+    stage: str | None = None
 
 
 @dataclass(frozen=True, slots=True)

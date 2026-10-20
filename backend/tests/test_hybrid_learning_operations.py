@@ -87,13 +87,13 @@ def test_shared_plan_sse_pending_safe_get_replay_then_approved_exact_read(config
         headers=headers(csrf, key),
         json={"goal": "学习栈", "preferred_language": "c", "generation_protocol": "shared-plan-v1"},
     )
-    assert "awaiting_human" in repeat.text and len(g.requests) == 8
+    assert "awaiting_human" in repeat.text and len(g.requests) == 9
     changed_protocol = client.post(
         "/api/learning-sessions",
         headers=headers(csrf, key),
         json={"goal": "学习栈", "preferred_language": "c"},
     )
-    assert changed_protocol.status_code == 409 and len(g.requests) == 8
+    assert changed_protocol.status_code == 409 and len(g.requests) == 9
     other, _ = guest()
     assert other.get("/api/learning-operations/" + oid).status_code == 404
 
@@ -229,7 +229,7 @@ def test_planned_reexplanation_http_wait_keeps_old_course_and_rejects_code_scene
         json={"action": "simpler", "base_scene_version": 1},
     )
     assert pending.status_code == 200 and "awaiting_human" in pending.text
-    assert "event: scene_ready" not in pending.text and len(g2.requests) == 5
+    assert "event: scene_ready" not in pending.text and len(g2.requests) == 6
     old = client.get(base + "?publication_version=1")
     assert old.status_code == 200 and old.json()["publication_version"] == 1
 

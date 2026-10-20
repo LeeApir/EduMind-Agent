@@ -54,7 +54,7 @@ async def corrected_case(db):
     result = await run_planned_operation(
         db, owner_id=uid, operation_id=oid, inputs=flow_inputs(), gateway=gateway
     )
-    assert result["status"] == "awaiting_human" and len(gateway.requests) == 12
+    assert result["status"] == "awaiting_human" and len(gateway.requests) == 13
     case = await db.scalar(select(LearningReviewCase).where(LearningReviewCase.operation_id == oid))
     return case, gateway
 
@@ -145,6 +145,8 @@ def test_cli_full_history_two_corrections_scope_and_private_readonly_export(tmp_
             )
             assert summary["state"] == "invalidated"  # History remains inspectable, not approvable.
             full = await cli.run(cli.parser().parse_args(args + ["--body"]))
+            assert len(full["plan_checks"]) == 1
+            assert full["plan_checks"][0]["binding"]["operation_id"] == str(old_operation)
             history = full["review_history"]
             assert history["complete"] and history["issues"] == []
             assert history["scope"]["operation_id"] == str(old_operation)
@@ -181,7 +183,7 @@ def test_cli_full_history_two_corrections_scope_and_private_readonly_export(tmp_
                 await cli.run(cli.parser().parse_args(args + ["--export", str(target)]))
             async with factory() as db:
                 assert await database_state(db) == baseline
-            assert len(gateway.requests) == 12
+            assert len(gateway.requests) == 13
             monkeypatch.delenv("EDUMIND_REVIEWER_CONFIG")
             with pytest.raises(LearningContractError, match="MAINTAINER_NOT_AUTHORIZED"):
                 await cli.run(cli.parser().parse_args(args + ["--body"]))

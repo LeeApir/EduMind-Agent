@@ -48,6 +48,27 @@ class ReviewGateway:
     async def generate_structured(self, request, *, retry_safe=False):
         assert not retry_safe
         self.requests.append(request)
+        if request.stage in ("plan_check", "plan_recheck"):
+            return StructuredResult(
+                {
+                    "schema_version": "plan-review-result-v1",
+                    "verdict": "pass",
+                    "coverage": {
+                        "checked": [
+                            "goal_fidelity",
+                            "internal_consistency",
+                            "scope",
+                            "reference_support",
+                            "downstream_feasibility",
+                        ],
+                        "unchecked": [],
+                    },
+                    "findings": [],
+                    "unresolved": [],
+                },
+                "synthetic",
+                transport_audit=TransportAudit("1" * 64, "2" * 64, "3" * 64),
+            )
         value = self.values.pop(0)
         if isinstance(value, BaseException):
             raise value

@@ -155,16 +155,20 @@ class PlannedScenes:
         if role == "exercise":
             # Preserve original requirements even if the generated plan narrowed them.
             snapshot = self.input_snapshot
-            if snapshot is not None and digest(
-                "input", "learning-input-v1", snapshot=snapshot
-            ) != self.binding["input_digest"]:
+            if (
+                snapshot is not None
+                and digest("input", "learning-input-v1", snapshot=snapshot)
+                != self.binding["input_digest"]
+            ):
                 raise LearningContractError("GENERATION_INPUT_BINDING_MISMATCH")
             metadata = (snapshot or {}).get("metadata", {})
             bound_teaching = (snapshot or {}).get("teaching_context")
             original = (
                 bound_teaching.get("original_request")
                 if isinstance(bound_teaching, dict)
-                else metadata.get("goal") if isinstance(metadata, dict) else None
+                else metadata.get("goal")
+                if isinstance(metadata, dict)
+                else None
             )
             context["exercise_requirements"] = {
                 "version": SCENE_PROMPT_VERSION,
@@ -172,7 +176,8 @@ class PlannedScenes:
                 "input_digest": self.binding["input_digest"],
                 "source": "bound input_snapshot; unavailable if null, not inferred from plan",
                 "assigned_objectives": [
-                    deepcopy(o) for o in self.plan["objectives"]
+                    deepcopy(o)
+                    for o in self.plan["objectives"]
                     if o["id"] in context["scene"]["objective_ids"]
                 ],
             }
@@ -206,6 +211,7 @@ class PlannedScenes:
                     max_output_tokens=4096,
                 ),
                 json_schema=resource_output_schema(kind),
+                stage="resource_generation",
             ),
         )
         return self.stage(role, dict(result.value))

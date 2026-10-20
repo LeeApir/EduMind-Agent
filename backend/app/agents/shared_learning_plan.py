@@ -68,6 +68,7 @@ class PlanInputs:
         )
         if self.teaching_context is not None:
             from app.services.teaching_binding import check_teaching_plan
+
             value["teaching_context"] = check_teaching_plan(self.teaching_context, self.metadata)
         canonical(value)
         return value
@@ -95,6 +96,7 @@ async def generate_shared_plan(
                 max_output_tokens=2048,
             ),
             json_schema=deepcopy(SCHEMA["$defs"]["plan_generation"]),
+            stage="plan_generation",
         ),
     )
     draft = validate_contract(dict(result.value), "plan_generation")

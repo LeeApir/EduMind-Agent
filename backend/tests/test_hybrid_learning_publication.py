@@ -85,8 +85,8 @@ def test_full_automatic_flow_is_atomic_and_budget_is_persistent(monkeypatch):
                 result = await run_planned_operation(
                     db, owner_id=uid, operation_id=oid, inputs=flow_inputs(), gateway=g
                 )
-                assert result["status"] == "completed" and len(g.requests) == 8
-                for index in (2, 4, 6, 7):
+                assert result["status"] == "completed" and len(g.requests) == 9
+                for index in (3, 5, 7, 8):
                     sent = json.loads(g.requests[index].prompt.messages[1].content)
                     assert (
                         sent["authoritative_teaching_goal"]["user_request"]
@@ -101,7 +101,7 @@ def test_full_automatic_flow_is_atomic_and_budget_is_persistent(monkeypatch):
                 assert result["material"]["reference_context"] == flow_inputs().reference_context
                 op = await db.get(LearningOperation, oid)
                 unit = await db.get(LearningUnit, op.learning_unit_id)
-                assert op.generation_call_count == 8 and op.status == "completed"
+                assert op.generation_call_count == 9 and op.status == "completed"
                 assert len(await published_scenes(db, uid, unit.id)) == 3
                 p = await current_publication(db, owner_id=uid, unit_id=unit.id)
                 assert p.approval_source == "auto"
@@ -168,7 +168,7 @@ def test_pending_case_blocks_all_formal_reads_and_approve_publishes_without_mode
                 await decide_case(db, **args)
                 publication = await publish_approved_case(db, owner_id=uid, case_id=args["case_id"])
                 await db.commit()
-                assert publication.approval_source == "human_assisted" and len(g.requests) == 8
+                assert publication.approval_source == "human_assisted" and len(g.requests) == 9
                 assert len(await published_scenes(db, uid, publication.learning_unit_id)) == 3
                 assert (
                     await publish_approved_case(db, owner_id=uid, case_id=args["case_id"])
@@ -293,7 +293,7 @@ def test_planned_reexplanation_rebinds_complete_unit_and_retains_old_snapshot(ac
                     db, owner_id=uid, classroom_operation_id=parent.id, gateway=g
                 )
                 assert result["status"] == "completed" and len(g.requests) == (
-                    5 if action == "simpler" else 8
+                    6 if action == "simpler" else 9
                 )
                 current = await current_publication(db, owner_id=uid, unit_id=unit_id)
                 assert current.version == 2 and current.plan_id == (

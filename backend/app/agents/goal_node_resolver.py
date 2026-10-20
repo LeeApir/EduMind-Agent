@@ -173,6 +173,7 @@ async def resolve_goal_node(
             ),
             task_profile=TaskProfile.FAST,
         ),
+        stage="goal_mapping",
         json_schema={
             "type": "object",
             "additionalProperties": False,

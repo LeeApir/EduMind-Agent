@@ -13,6 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.agents.hybrid_resource_review import review_resource
 from app.agents.learning_unit_generator import StructuredResourceGateway
+from app.agents.plan_check import inspect_plan
 from app.agents.planned_scene_generation import PlannedScenes
 from app.agents.shared_learning_plan import CallWindow, PlanInputs, generate_shared_plan
 from app.agents.unit_consistency_review import review_unit
@@ -26,6 +27,8 @@ from app.services.learning_plans import save_plan
 from app.services.learning_policy import POLICY, POLICY_VERSION
 from app.services.learning_review_cases import create_review_case, invalidate_case
 from app.services.learning_review_records import plan_binding, save_review
+from app.services.learning_stage_gateway import LearningStageGateway
+from app.services.plan_check import save_plan_check
 from app.services.teaching_actions import assemble_actions
 from app.services.unit_material import unit_material
 
@@ -43,6 +46,8 @@ async def run_planned_operation(
     on_phase: Callable[[str], Awaitable[None]] | None = None,
 ) -> dict[str, Any]:
     inputs = deepcopy(inputs)
+    # P0 may explicitly map both roles to one selected gateway. A diagnostic pair remains explicit.
+    gateway = LearningStageGateway(gateway, gateway)
     await lock_learning_owner(db, owner_id)
     op = await db.scalar(
         select(LearningOperation)
@@ -135,6 +140,7 @@ async def run_planned_operation(
         if on_phase is not None:
             await on_phase(value)
 
+    plan_check_id = None
     try:
         await phase("planning")
         if reuse_plan is None:
@@ -173,6 +179,20 @@ async def run_planned_operation(
             plan = reuse_plan
             if plan.user_id != owner_id or plan.learning_unit_id != unit_id:
                 raise LearningContractError
+        await phase("plan_check")
+        check_record = await inspect_plan(gateway, window, plan, operation_id)
+        check_row = await save_plan_check(db, check_record)
+        plan_check_id = check_row.id
+        await db.commit()
+        plan_route = check_record["server_assessment"]["route"]
+        if plan_route != "accept_plan":
+            if plan_route == "reject":
+                raise LearningContractError("PLAN_REJECTED")
+            raise LearningContractError(
+                "GOAL_CLARIFICATION_REQUIRED"
+                if plan_route == "clarify_user"
+                else "PLAN_REVIEW_REQUIRED"
+            )
         workspace = PlannedScenes(
             plan.plan_json,
             plan_binding(plan, operation_id),
@@ -254,7 +274,7 @@ async def run_planned_operation(
             current.status = (
                 "rejected"
                 if isinstance(error, LearningContractError)
-                and error.code == "CURRENT_CANDIDATE_REJECTED"
+                and error.code in ("CURRENT_CANDIDATE_REJECTED", "PLAN_REJECTED")
                 else "failed"
             )
             current.error = {
@@ -264,5 +284,15 @@ async def run_planned_operation(
                 "retryable": False,
                 "message": "Planned operation did not publish.",
             }
+            if isinstance(error, LearningContractError) and error.code in (
+                "PLAN_REVIEW_REQUIRED",
+                "PLAN_REJECTED",
+                "GOAL_CLARIFICATION_REQUIRED",
+            ):
+                current.error = {
+                    **current.error,
+                    "stage": "plan_check",
+                    "check_id": str(plan_check_id),
+                }
             await db.commit()
         raise

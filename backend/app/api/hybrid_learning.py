@@ -202,6 +202,11 @@ async def hybrid_events(
                 if op and op.status not in ("completed", "canceled", "rejected", "failed"):
                     op.status = "failed"
                     op.error = detail
+                if op and isinstance(op.error, dict) and op.error.get("code") == detail.get("code"):
+                    detail = {
+                        **detail,
+                        **{k: op.error[k] for k in ("stage", "check_id") if k in op.error},
+                    }
                 if op and op.status in ("canceled", "rejected", "failed"):
                     op.phase = None
                     op.generation_deadline = None

@@ -117,16 +117,24 @@ def test_persist_isolated_immutable_history_and_no_publication():
                 with pytest.raises(DBAPIError):
                     async with db.begin_nested():
                         await save_plan_check(db, bound_record(plan, op))
-                with pytest.raises(DBAPIError):
-                    async with db.begin_nested():
-                        r["resolution_id"] = str(uuid4())
-                        await save_plan_resolution(
-                            db,
-                            owner_id=plan.user_id,
-                            value=r,
-                            trusted_reviewer_id="synthetic",
-                            trusted_identity_source="test-only",
-                        )
+                r["resolution_id"] = str(uuid4())
+                replay = await save_plan_resolution(
+                    db,
+                    owner_id=plan.user_id,
+                    value=r,
+                    trusted_reviewer_id="synthetic",
+                    trusted_identity_source="test-only",
+                )
+                assert replay.id == note.id
+                r["reason"] = "different reason"
+                with pytest.raises(LearningContractError, match="IDEMPOTENCY_CONFLICT"):
+                    await save_plan_resolution(
+                        db,
+                        owner_id=plan.user_id,
+                        value=r,
+                        trusted_reviewer_id="synthetic",
+                        trusted_identity_source="test-only",
+                    )
                 # DB owner composite FK still guards callers bypassing the service.
                 with pytest.raises(DBAPIError):
                     async with db.begin_nested():
@@ -144,9 +152,21 @@ def test_persist_isolated_immutable_history_and_no_publication():
                         )
                         await db.flush()
                 assert (
-                    await db.scalar(select(func.count()).select_from(LearningReviewDecision)) == 0
+                    await db.scalar(
+                        select(func.count())
+                        .select_from(LearningReviewDecision)
+                        .where(LearningReviewDecision.user_id == plan.user_id)
+                    )
+                    == 0
                 )
-                assert await db.scalar(select(func.count()).select_from(LearningPublication)) == 0
+                assert (
+                    await db.scalar(
+                        select(func.count())
+                        .select_from(LearningPublication)
+                        .where(LearningPublication.user_id == plan.user_id)
+                    )
+                    == 0
+                )
                 # Old human case construction remains compatible on the same migrated DB.
                 from test_learning_review_cases import case_fixture
 
