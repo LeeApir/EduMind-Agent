@@ -1,7 +1,7 @@
 {
   "manifest_sha256": "b9ca8591bce97edca60bf7d17c132f51a8ff8504e4f7a23240e93f707ec9e613",
   "candidate": "Luna/high/v4.9 final only",
-  "actual_requests_this_run": 3,
+  "actual_requests_this_run": 4,
   "requests_max": 12,
   "state": "WAITING_HUMAN_REVIEW",
   "persistent_halt": false,
@@ -9,32 +9,40 @@
   "cases": {
     "compat-schema": {
       "verdict": "pass",
+      "expected": "pass",
       "receipt_sha256": "d02eb643c3620b29e30f88e94bd0002a3c38cc5edd75e620da10986dfdb682af",
       "actual_human_confirmation": "confirmed via assessments/compat-schema.json"
     },
     "cal-01": {
       "verdict": "pass",
+      "expected": "pass",
       "receipt_sha256": "c640889574abb9cd3d2b66939e149d94953b87f37a328490fa58cf39c7341cd6",
       "actual_human_confirmation": "confirmed via assessments/cal-01.json"
     },
     "cal-02": {
       "verdict": "pass",
+      "expected": "pass",
       "receipt_sha256": "3858d0830900a0bdfc4937c8091ef59cd2232fb14cacd58c1b109a85b4f678a1",
+      "actual_human_confirmation": "confirmed via assessments/cal-02.json"
+    },
+    "cal-03": {
+      "verdict": "needs_human",
+      "expected": "needs_human",
+      "receipt_sha256": "e345868b6f0cd6f1818e7749cccb17da3d8e3cfb60540d8a7194c8fa400b9bfd",
       "actual_human_confirmation": "pending"
     }
   },
   "technical_integrity_all": "HTTP200/exactmodel/highrequest/fullbusinessSchema/6checks/completeRaw/usage/exactwire passed",
-  "input_tokens_provider_reported": 48089,
-  "output_tokens_provider_reported": 1074,
-  "total_tokens_provider_reported": 49163,
-  "model_call_duration_ms_total": 24790,
+  "input_tokens_provider_reported": 63985,
+  "output_tokens_provider_reported": 1634,
+  "total_tokens_provider_reported": 65619,
+  "model_call_duration_ms_total": 32142,
   "requested_reasoning": "high",
   "provider_effective_reasoning": "not independently established",
   "separate_reasoning_tokens": null,
   "actual_cost": null,
   "effective_wall_deadline": "2026-10-21T09:44:16.144212+08:00",
   "not_sent": [
-    "cal-03",
     "cal-04",
     "screen-fact",
     "screen-safety",
@@ -44,10 +52,8 @@
     "holdout-stack-safety",
     "holdout-prerequisite"
   ],
-  "distributed_materials_changed": false,
-  "distributed_comparison": "same input/Prompt/projected Schema;only requested low->high;old low needs_human failure retained,new high pass on this attempt,not proof of stable overall quality",
-  "duplicate_notice": "compat andcal01 identical request,not independent materials",
-  "citation_quality": "no finding citations emitted;not exercised",
-  "formal_T040_quality": "not run;negative teaching/assessment controls,severe defects and unused materials not yet tested",
-  "tests": "source unchanged;106 offline evidence retained from9288782,not rerun;484source/actual wire/fullSchema/receipts/oldstops/workflow/diff checked"
+  "latest_semantic_review": "specific missing teaching recognized,existing process questions not denied,no invented fact/safety/timing/evidence issue",
+  "citation_quality": "no finding citations;unresolved text manually checked,not general anchor ability proof",
+  "formal_T040_quality": "not run;assessment gap,severe and unused cases not yet tested",
+  "tests": "source unchanged;106 evidence retained from9288782,not rerun;actual fullSchema/wire/receipts/484source/oldstops/workflow/diff checked"
 }
