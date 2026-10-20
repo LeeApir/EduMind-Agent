@@ -1,7 +1,7 @@
 {
   "manifest_sha256": "b9ca8591bce97edca60bf7d17c132f51a8ff8504e4f7a23240e93f707ec9e613",
   "candidate": "Luna/high/v4.9 final only",
-  "actual_requests_this_run": 2,
+  "actual_requests_this_run": 3,
   "requests_max": 12,
   "state": "WAITING_HUMAN_REVIEW",
   "persistent_halt": false,
@@ -9,27 +9,31 @@
   "cases": {
     "compat-schema": {
       "verdict": "pass",
-      "actual_human_confirmation": "assessments/compat-schema.json user确认",
-      "receipt_sha256": "d02eb643c3620b29e30f88e94bd0002a3c38cc5edd75e620da10986dfdb682af"
+      "receipt_sha256": "d02eb643c3620b29e30f88e94bd0002a3c38cc5edd75e620da10986dfdb682af",
+      "actual_human_confirmation": "confirmed via assessments/compat-schema.json"
     },
     "cal-01": {
       "verdict": "pass",
-      "actual_human_confirmation": "pending",
-      "receipt_sha256": "c640889574abb9cd3d2b66939e149d94953b87f37a328490fa58cf39c7341cd6"
+      "receipt_sha256": "c640889574abb9cd3d2b66939e149d94953b87f37a328490fa58cf39c7341cd6",
+      "actual_human_confirmation": "confirmed via assessments/cal-01.json"
+    },
+    "cal-02": {
+      "verdict": "pass",
+      "receipt_sha256": "3858d0830900a0bdfc4937c8091ef59cd2232fb14cacd58c1b109a85b4f678a1",
+      "actual_human_confirmation": "pending"
     }
   },
-  "technical_integrity_both": "HTTP200/exactmodel/highrequest/fullbusinessSchema/6checks/completeRaw/usage/exactwire passed",
-  "all_findings_unresolved_unchecked": "empty in both results",
-  "input_tokens_provider_reported": 32070,
-  "output_tokens_provider_reported": 657,
-  "total_tokens_provider_reported": 32727,
-  "model_call_duration_ms_total": 14980,
-  "provider_effective_reasoning": "unknown;requested high audited",
+  "technical_integrity_all": "HTTP200/exactmodel/highrequest/fullbusinessSchema/6checks/completeRaw/usage/exactwire passed",
+  "input_tokens_provider_reported": 48089,
+  "output_tokens_provider_reported": 1074,
+  "total_tokens_provider_reported": 49163,
+  "model_call_duration_ms_total": 24790,
+  "requested_reasoning": "high",
+  "provider_effective_reasoning": "not independently established",
   "separate_reasoning_tokens": null,
   "actual_cost": null,
   "effective_wall_deadline": "2026-10-21T09:44:16.144212+08:00",
   "not_sent": [
-    "cal-02",
     "cal-03",
     "cal-04",
     "screen-fact",
@@ -40,8 +44,10 @@
     "holdout-stack-safety",
     "holdout-prerequisite"
   ],
-  "duplicate_notice": "compat-schema andcal01 are same full request,2 actual calls,not2different materials or independent test evidence",
-  "citation_quality": "not exercised,no finding citations",
-  "formal_T040_quality": "not run;distributed coverage and serious defects not yet tested",
-  "tests": "source unchanged;106 offline evidence from9288782 retained,not rerun;484source/fullSchema/exactwire/receipts/oldstops/workflow/diff checked"
+  "distributed_materials_changed": false,
+  "distributed_comparison": "same input/Prompt/projected Schema;only requested low->high;old low needs_human failure retained,new high pass on this attempt,not proof of stable overall quality",
+  "duplicate_notice": "compat andcal01 identical request,not independent materials",
+  "citation_quality": "no finding citations emitted;not exercised",
+  "formal_T040_quality": "not run;negative teaching/assessment controls,severe defects and unused materials not yet tested",
+  "tests": "source unchanged;106 offline evidence retained from9288782,not rerun;484source/actual wire/fullSchema/receipts/oldstops/workflow/diff checked"
 }
