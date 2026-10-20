@@ -1,0 +1,92 @@
+{
+  "version": "zero-call-material-adjudication-v1",
+  "reviewer": "Codex interactive GPT; not independent human or user signature",
+  "scope": "A02 original request, explicit obj-trace and exercise assignment; not a full-course quality regrade",
+  "source_path": "A02-evidence.json",
+  "original_request_process_questions": {
+    "verdict": "met",
+    "count": 3,
+    "reason": "Each question requires linked-list head-insertion process knowledge; final traversal order requires pointer relinking/reversal reasoning, unlike arithmetic-only output."
+  },
+  "process_teaching": {
+    "verdict": "met_for_this_trace",
+    "locations": [
+      "explanation /markdown concrete two-insertion example",
+      "exercise q3 /explanation"
+    ],
+    "note": "Actual student-facing text provides intermediate states. This is teaching evidence, not proof of elicited learner responses."
+  },
+  "plan_commitment": {
+    "objective": {
+      "id": "obj-trace",
+      "text": "对空链表依次头插 3 和 8，逐步写出 head 指向、各结点 data/next 与最终链表顺序，并解释头插导致逆序。"
+    },
+    "exercise_scene": {
+      "depends_on": [
+        "explanation",
+        "code"
+      ],
+      "objective_ids": [
+        "obj-trace",
+        "obj-push-front-contract",
+        "obj-free"
+      ],
+      "role": "exercise",
+      "scene_key": "exercise"
+    },
+    "verdict": "partial_assessment_coverage",
+    "missing": "No question asks the learner to produce or identify the complete successive head targets and node data/next states for both insertions.",
+    "reason": "q1 tests update order; q2 tests the empty-list boundary; q3 asks final traversal order. Partial contributions may be distributed, but supplied answer explanations cannot turn an unasked intermediate-state task into an assessed task."
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "question": "[单选题] 在无头结点单链表中，用 int push_front(Node **head, int value) 实现头插法。malloc 成功后，下列哪一组操作顺序能正确完成插入？\nA. 先执行 *head = n，再执行 n->next = *head\nB. 先执行 n->next = *head，再执行 *head = n\nC. 先执行 n->next = n，再执行 *head = n\nD. 先执行 *head = NULL，再执行 n->next = *head\n仅填 A、B、C 或 D",
+      "answer": "B",
+      "explanation": "正确顺序是让新结点的 next 指向当前首结点（n->next = *head），再把 head 改为指向新结点（*head = n）。若先改 *head，旧首结点就会丢失，新结点的 next 也无法正确指向原来的首结点。",
+      "process_knowledge_required": true,
+      "tests_complete_successive_state_sequence": false,
+      "measures": "next/head update order"
+    },
+    {
+      "id": "q2",
+      "question": "[判断题] 对空链表（head == NULL）调用 push_front(&head, 3) 时，必须先特判空链表，否则新结点的 next 无法正确设置。仅填 T 或 F（T=正确，F=错误）",
+      "answer": "F",
+      "explanation": "空链表时 *head 为 NULL，执行 n->next = *head 就得到 n->next = NULL，正好表示新结点是唯一结点；随后 *head = n 即可。空链表与非空链表走同一套步骤，不需要特判。",
+      "process_knowledge_required": true,
+      "tests_complete_successive_state_sequence": false,
+      "measures": "empty-list next=NULL and update applicability"
+    },
+    {
+      "id": "q3",
+      "question": "[单选题] 初始 head -> NULL，依次调用 push_front(&head, 3) 与 push_front(&head, 8)，两次 malloc 均成功。从头结点开始遍历，输出顺序是什么？\nA. 3 8\nB. 8 3\nC. 3 3\nD. 8 8\n仅填 A、B、C 或 D",
+      "answer": "B",
+      "explanation": "第一次头插 3 后链表为 3 -> NULL；第二次头插 8 时，8 的 next 指向当前首结点 3，head 改为指向 8，链表变为 8 -> 3 -> NULL，因此遍历输出 8 3。头插使元素顺序与插入顺序相反。",
+      "process_knowledge_required": true,
+      "tests_complete_successive_state_sequence": false,
+      "measures": "apply head insertion to infer final traversal order"
+    }
+  ],
+  "recommended_existing_contract_result": {
+    "verdict": "needs_human",
+    "findings": [],
+    "unresolved": [
+      "三题都使用头插过程知识，满足原请求的三道过程题；但计划obj-trace还承诺逐步写出head及结点data/next状态，练习没有要求产出或辨认两次头插的完整逐步状态序列，缺少这一细化目标的直接测量证据。"
+    ]
+  },
+  "not_required": [
+    "Each of the three questions repeating every state",
+    "All process questions using an open-ended format",
+    "Repeating trace teaching in every scene",
+    "New exercise schema or learner input UI"
+  ],
+  "future_repair": "Keep the original goal/plan and replace or refine one question to request a full state sequence, distinguishing the correct trace from traces with a wrong intermediate state even when the final order is the same. This document does not alter actual A02 resources.",
+  "history": {
+    "old_unit_major_rejection": "unsupported premise; old failure retained",
+    "repeat_unit_pass": "no recurrence only; now identified narrower coverage omission, not whole-course acceptance",
+    "resource_needs_human": "specific finer trace-assessment concern supported",
+    "old_scores_and_ledgers_unchanged": true
+  },
+  "real_provider_calls": 0,
+  "production_human_decision": null
+}
