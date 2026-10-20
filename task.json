@@ -3959,6 +3959,76 @@
       "completed_at": "2026-10-20T21:33:31",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T078"
+    },
+    {
+      "id": "PHASE-1-T079",
+      "phase": "Phase 1",
+      "title": "补齐人工只读完整审核与候选修正历史",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1-T078"
+      ],
+      "scope": [
+        "backend/app/services/",
+        "backend/tests/",
+        "scripts/review_learning_cases.py",
+        "docs/acceptance/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD §0.2/§3.3；ADR0015人工完整历史；用户明确先只读修复独立提交再契约提案",
+      "acceptance_criteria": [
+        "show --body及显式私密export展示案件同owner/单元/操作的全部审核记录、最终4记录标识、候选前后版本/摘要/正文，不只显示最终记录。",
+        "稳定排序并区分历史/最终与缺失证据；不跨owner/其他操作混入，不触发模型/发布/决定/修改原记录。",
+        "新隔离PG集成测试覆盖两次修正历史、其他操作/owner隔离、只读不改状态、摘要默认不泄漏与私密不覆盖导出，独立提交。"
+      ],
+      "verification": [
+        "运行相应独立PG/契约预算零调用验证",
+        "Ruff/类型检查(如涉及源码)/workflow/git diff --check",
+        "记录Provider0及H封存、旧停止保持证据"
+      ],
+      "verification_results": [
+        "维护CLI --body/私密export改用新只读history投影：按同owner/单元/操作取全部持久审核，保留最终4标识及原始/local判断，关联候选正文/场景版本/前后摘要和审核ID、计划上下文；历史失效案可查看，缺失证据complete=false，绑定错拒绝，无跨操作/owner内容或伪造修正因果。新独立PG三测试加原CLI/cases/publication四文件共22通过0跳过；两修正6审核/5候选/2对照、同plan另一op/另一owner排除、稳定读取、0600不覆盖、默认无正文、状态/决定/发布/计数不变及no_autoflush均通过。Ruff/两源码mypy/workflow/diff通过，H封存hash与四停止ledger保持；Provider0/真实案件决定0/未改审核Prompt或计划机制。phase-1-review-history-r01交接；旧冻结CLI摘要保持历史不重写，下一T080只准备契约预算任务待确认。"
+      ],
+      "started_at": "2026-10-20T21:43:49",
+      "completed_at": "2026-10-20T21:51:34",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T079"
+    },
+    {
+      "id": "PHASE-1-T080",
+      "phase": "Phase 1",
+      "title": "准备计划纠错契约预算和待批准任务拆分",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1-T079"
+      ],
+      "scope": [
+        "backend/app/services/",
+        "backend/tests/",
+        "scripts/review_learning_cases.py",
+        "docs/acceptance/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD §0.2/§3.3；ADR0015人工完整历史；用户明确先只读修复独立提交再契约提案",
+      "acceptance_criteria": [
+        "提出计划级缺陷/证据/来源/可修复边界与人工分流、版本失效及终止契约，不实施自动重建。",
+        "精确计算目标映射/前置计划检查/最多一次计划重建/资源修正/单元审核的共享上限和时限，明确未批准预算/真实调用0。",
+        "列出可独立验证的候选实现任务及依赖供用户确认；保持H封存与T040 blocked，不新增已授权实现状态。"
+      ],
+      "verification": [
+        "运行相应独立PG/契约预算零调用验证",
+        "Ruff/类型检查(如涉及源码)/workflow/git diff --check",
+        "记录Provider0及H封存、旧停止保持证据"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T080"
     }
   ]
 }

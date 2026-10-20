@@ -7,20 +7,21 @@ import os
 import sys
 from pathlib import Path
 from uuid import UUID
+from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "backend"))
 
 from sqlalchemy import select  # noqa: E402
 from sqlalchemy.ext.asyncio import async_sessionmaker  # noqa: E402
 from app.core.database import create_database_engine  # noqa: E402
-from app.models.learning_review import LearningReviewRecord  # noqa: E402
 from app.models.learning_review_case import LearningReviewCase  # noqa: E402
 from app.services.learning_contract import LearningContractError  # noqa: E402
 from app.services.learning_review_cases import decide_case  # noqa: E402
+from app.services.learning_review_history import case_review_history  # noqa: E402
 from app.services.learning_review_cli import maintainer_identity, export_case  # noqa: E402
 
 
-def parser():
+def parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(description=__doc__)
     subs = p.add_subparsers(dest="command", required=True)
     subs.add_parser("list")
@@ -43,7 +44,7 @@ def parser():
     return p
 
 
-def summary(case):
+def summary(case: LearningReviewCase) -> dict[str, Any]:
     return {
         "case_id": str(case.id),
         "owner_id": str(case.user_id),
@@ -54,7 +55,7 @@ def summary(case):
     }
 
 
-async def run(args):
+async def run(args: argparse.Namespace) -> dict[str, Any]:
     configured = os.getenv("EDUMIND_REVIEWER_CONFIG")
     if not configured:
         raise LearningContractError("MAINTAINER_NOT_AUTHORIZED")
@@ -78,17 +79,8 @@ async def run(args):
             if args.command == "show":
                 value = summary(case)
                 if args.body or args.export:
+                    value.update(await case_review_history(db, case))
                     value["payload"] = case.payload
-                    ids = case.payload["review_ids"]
-                    records = (
-                        await db.scalars(
-                            select(LearningReviewRecord).where(
-                                LearningReviewRecord.id.in_([UUID(v) for v in ids]),
-                                LearningReviewRecord.user_id == case.user_id,
-                            )
-                        )
-                    ).all()
-                    value["automatic_reviews"] = [r.record for r in records]
                 if args.export:
                     export_case(args.export, value)
                     return {**summary(case), "exported": True}
@@ -120,7 +112,7 @@ async def run(args):
         await engine.dispose()
 
 
-def main():
+def main() -> int:
     args = parser().parse_args()
     try:
         result = asyncio.run(run(args))
