@@ -1,0 +1,150 @@
+{
+  "version": "formal-admission-proposal-r01",
+  "state": "PROPOSAL_ONLY_NOT_EXECUTABLE",
+  "real_requests_authorized": 0,
+  "confirmed_principle": {
+    "user_message": "好",
+    "interpretation": "accept recommended split scoring and impact-tiered stopping; not approval of new numerical thresholds or real calls"
+  },
+  "configuration": {
+    "generation_base": "https://api.deepseek.com",
+    "generation_model": "deepseek-flash",
+    "generation_reasoning": "none",
+    "review_base": "https://www.cbbb.fun/v1",
+    "review_model": "gpt-6-luna",
+    "review_reasoning": "high",
+    "review_contract": "v4.9",
+    "review_output_tokens_max": 8192,
+    "plan_output_tokens_max": 2048,
+    "resource_output_tokens_max": 4096,
+    "temperature": 0,
+    "per_call_timeout_seconds": 60,
+    "connect_timeout_seconds": 5,
+    "operation_deadline_seconds": 180,
+    "production_defaults_changed": false
+  },
+  "sample_plan": {
+    "stage_A": {
+      "materials": 50,
+      "severe": 20,
+      "correct": 20,
+      "long": 10,
+      "resource_reviews_per_material": 3,
+      "unit_reviews_per_material": 1,
+      "new_materials_prepared": false,
+      "actual_human_labels_signed": false,
+      "primary_recall_scope": "unit only; no union across scopes"
+    },
+    "stage_B": {
+      "goals": 100,
+      "nodes": 30,
+      "base_goals_per_node": 3,
+      "additional_boundary_goals": 10,
+      "normal_calls_per_goal": 8,
+      "max_calls_per_goal": 20,
+      "normal_generation_calls_per_goal": 4,
+      "normal_review_calls_per_goal": 4,
+      "max_generation_calls_per_goal": 10,
+      "max_review_calls_per_goal": 10,
+      "temporary_profile_calls": 0,
+      "temporary_stream_calls": 0
+    },
+    "stage_C": {
+      "offline_cases": 20,
+      "provider_calls": 0,
+      "must_pass_before_stage_A": true,
+      "required_pass_count": 20
+    }
+  },
+  "proposed_thresholds_not_approved": {
+    "A_unit_schema_min": 49,
+    "A_severe_recall_min": 18,
+    "A_classification_min": 18,
+    "A_correct_controls_min": 19,
+    "A_long_complete_min": 10,
+    "A_fully_correct_materials_min": 48,
+    "A_low_risk_auxiliary_or_citation_error_materials_max": 1,
+    "B_first_schema_min": 98,
+    "B_auto_formal_success_min": 95,
+    "red_events_max": 0,
+    "real_correction_coverage_required_for_full_T040": true
+  },
+  "budget_proposal_not_authority": {
+    "rounds_max": 1,
+    "candidates_max": 1,
+    "A_calls_max": 200,
+    "B_calls_normal": 800,
+    "B_calls_max": 2000,
+    "calls_normal": 1000,
+    "calls_max": 2200,
+    "generation_calls_max": 1000,
+    "review_calls_max": 1200,
+    "plan_outputs_max": 204800,
+    "resource_outputs_max": 3686400,
+    "review_outputs_max": 9830400,
+    "total_output_tokens_max": 13721600,
+    "input_token_bound": "pending; not inferred from UTF8 bytes",
+    "actual_wire_bound": "pending exact material and dependent request envelopes",
+    "model_window_seconds_upper": 30000,
+    "cleanup_seconds_conservative_max": 11000,
+    "wall_seconds_including_human": 604800,
+    "transport_retries": 0,
+    "implicit_fallback": false,
+    "targeted_corrections_per_resource_max": 2,
+    "money_cap": null,
+    "money_policy": "uncapped_by_explicit_user_instruction",
+    "price_per_token": null,
+    "currency": null
+  },
+  "readiness": {
+    "executable_runner_ready": false,
+    "materials_ready": false,
+    "input_bound_proven": false,
+    "actual_route_capture_for_all_new_paths_ready": false,
+    "predecessor_tasks": [
+      "PHASE-1-T035",
+      "PHASE-1-T039",
+      "PHASE-1-T054",
+      "PHASE-1-T070"
+    ],
+    "known_predecessor_task_status": "all done; completion commits independently resolved in validation.json",
+    "formal_T040_pass": false,
+    "catalog_only_unchanged": true
+  },
+  "human_effort_assumption": {
+    "A_minutes_per_material": [
+      10,
+      20
+    ],
+    "B_minutes_per_generated_unit": [
+      10,
+      20
+    ],
+    "total_hours_approx": [
+      25,
+      50
+    ],
+    "extra_corrections_and_long_material_time": "additional; not measured",
+    "codex_not_actual_human_signer": true
+  },
+  "correction_observer_proposal": {
+    "actual_human_precheck_on_every_resource_revise": true,
+    "hook": "existing on_review callback",
+    "check": [
+      "complete candidate",
+      "all findings",
+      "actual pending correction context"
+    ],
+    "deadline_seconds_includes_wait": 180,
+    "deadline_pause_or_reset_allowed": false,
+    "human_content_or_prompt_fix_allowed": false,
+    "human_unavailable_blocks_start": true,
+    "production_gate_changed_now": false,
+    "minimum_natural_real_correction_coverage": [
+      "one explanation or code correction with new-digest subsequent generation",
+      "one exercise correction"
+    ],
+    "missing_natural_coverage": "report incomplete; no forced revise or supplementary calls"
+  },
+  "stopping_scope_clarification": "Only a scope that actually contains a severe defect auto-passing, or final severe unit auto-qualification, triggers that red event; healthy sibling scope pass is valid."
+}
