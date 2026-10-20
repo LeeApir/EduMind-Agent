@@ -37,7 +37,7 @@ def test_general_rule_shared_version_and_original_prompt_prefix():
         REVIEW_V4_PROMPT
         == REVIEW_PROMPT_VERSION
         == POLICY["resource_review_prompt"]
-        == "evidence-resource-review-v4.9"
+        == "evidence-resource-review-v4.10"
     )
     assert (
         EVIDENCE_INSTRUCTION
@@ -76,7 +76,7 @@ def test_outbound_request_uses_new_rules_without_new_fields(scope):
         )
         request = g.requests[0]
         assert request.prompt.messages[0].content == INSTRUCTION
-        assert record["prompt_version"] == "evidence-resource-review-v4.9"
+        assert record["prompt_version"] == "evidence-resource-review-v4.10"
         assert request.json_schema == review_output_schema(
             scope, anchor_ids=[a["anchor_id"] for a in record["anchor_catalog"]]
         )

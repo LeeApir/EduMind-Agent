@@ -5,6 +5,7 @@ from app.agents.learning_resource_prompt import RESOURCE_INSTRUCTION_VERSION
 from app.agents.planned_scene_generation import SCENE_PROMPT_VERSION
 from app.agents.review_evidence import REVIEW_PROMPT_VERSION
 from app.agents.review_input import REVIEW_INPUT_VERSION
+from app.agents.review_program_context import PROGRAM_CONTEXT_VERSION
 from app.agents.review_responsibilities import RESPONSIBILITY_VERSION, REVIEW_SCOPE_VERSION
 from app.services.learning_contract import digest
 from app.services.teaching_binding import TEACHING_BINDING_VERSION
@@ -14,6 +15,7 @@ POLICY = {
     "resource_review": "resource-review-v4",
     "resource_review_prompt": REVIEW_PROMPT_VERSION,
     "review_input": REVIEW_INPUT_VERSION,
+    "review_program_context": PROGRAM_CONTEXT_VERSION,
     "objective_coverage": "student-visible-goal-coverage-v1",
     "review_coverage": "fixed-check-ids-v2",
     "review_scope": REVIEW_SCOPE_VERSION,

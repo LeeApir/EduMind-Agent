@@ -15,6 +15,7 @@ from app.agents.planned_scene_generation import PlannedScenes, SceneCandidate
 from app.agents.review_delivery import COVERAGE_STANDARD_VERSION, delivery_manifest
 from app.agents.review_evidence import EVIDENCE_INSTRUCTION, REVIEW_PROMPT_VERSION
 from app.agents.review_input import REVIEW_INPUT_VERSION, review_input
+from app.agents.review_program_context import PROGRAM_CONTEXT_INSTRUCTION, program_context
 from app.agents.review_responsibilities import (
     RESPONSIBILITY_INSTRUCTION,
     REVIEW_SCOPE_VERSION,
@@ -128,6 +129,7 @@ INSTRUCTION += (
     + LEARNER_INSTRUCTION
     + UNIT_OBJECTIVE_INSTRUCTION
     + TEACHING_SCOPE_INSTRUCTION
+    + PROGRAM_CONTEXT_INSTRUCTION
 )
 
 
@@ -234,6 +236,7 @@ async def review_once(
         "anchor_catalog": catalog,
         "mandatory_checks": sorted(checks),
         "student_delivery": delivery_manifest(payload, candidates),
+        "program_context": program_context(projected, candidates, catalog),
         # Constructed after caller data, so a candidate cannot override the trusted rule.
         "review_contract": {
             "version": REVIEW_SCOPE_VERSION,
