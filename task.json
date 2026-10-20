@@ -4000,16 +4000,15 @@
       "id": "PHASE-1-T080",
       "phase": "Phase 1",
       "title": "准备计划纠错契约预算和待批准任务拆分",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1-T079"
       ],
       "scope": [
-        "backend/app/services/",
-        "backend/tests/",
-        "scripts/review_learning_cases.py",
-        "docs/acceptance/",
+        "scripts/check_plan_correction_proposal.py",
+        "scripts/tests/test_plan_correction_proposal.py",
+        "docs/acceptance/phase-1-plan-correction-proposal-r01/",
         "task.json",
         "process.txt"
       ],
@@ -4024,9 +4023,11 @@
         "Ruff/类型检查(如涉及源码)/workflow/git diff --check",
         "记录Provider0及H封存、旧停止保持证据"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "冻结r01计划检查模型/服务端证据、绑定/锚点/proof/一次重建事件/人工处置候选Schema，方案A早期终止人工查看不批准续跑、方案B延期；默认空验证器不能自动重建。22预算组合/108资源分配共127测试通过0跳过，Ruff/check/workflow/diff通过；初unused import和合成proof非UUID失败保留于validation，修夹具不削Schema。20次180秒共享mapping/检查/最多1重建及资源修正，无重建5对/重建4对、每资源最多2；输出配置上限117248非总Token预算。明确当前Prompt相等路由缺口与拟议512映射新上限，PC-01–05仅待批拆分未进入活动实现；生产源码/Prompt未改、Provider0、H字节封存和四旧ledger保持、T040 blocked。交接phase-1-plan-correction-proposal-r01，待用户确认后同步ADR/API并拆活动任务，不自动发真实请求。"
+      ],
+      "started_at": "2026-10-20T21:55:18",
+      "completed_at": "2026-10-20T22:37:28",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T080"
     }

@@ -1,0 +1,95 @@
+{
+  "active_tasks_created": false,
+  "tasks": [
+    {
+      "proposal_id": "PC-01",
+      "depends_on": [],
+      "title": "计划检查证据持久化",
+      "authorization": "awaiting_user_confirmation",
+      "acceptance_criteria": [
+        "以Alembic建立不可变检查、重建事件、人工处置附记，绑定owner/unit/operation/plan和输入/参考/政策摘要。",
+        "锚点指向不可变UTF-8快照；模型输出不能写服务端授权或摘要。",
+        "合成PG验证隔离、重复写入、篡改拒绝及旧案件兼容。"
+      ],
+      "verification_required": [
+        "隔离PG迁移与不可变记录集成测试",
+        "Schema/锚点/所有权负例"
+      ]
+    },
+    {
+      "proposal_id": "PC-02",
+      "depends_on": [
+        "PC-01"
+      ],
+      "title": "前置计划检查与人工出口",
+      "authorization": "awaiting_user_confirmation",
+      "acceptance_criteria": [
+        "显式服务端stage路由，不靠Prompt相等识别审核。",
+        "生成计划后、生成正文前检查；无法判断/用户歧义终止本操作并分别报告。",
+        "只读维护入口支持查看及追加处置附记，不提供计划批准、继续旧操作或发布。",
+        "捕获真实适配器离线Host/SNI、model、reasoning、完整Schema投影和预算参数。"
+      ],
+      "verification_required": [
+        "Mock出站完整请求捕获与超时/错误/SSE回归",
+        "隔离PG人工附记无发布验证"
+      ]
+    },
+    {
+      "proposal_id": "PC-03",
+      "depends_on": [
+        "PC-01",
+        "PC-02"
+      ],
+      "title": "共享持久预算与时限",
+      "authorization": "awaiting_user_confirmation",
+      "acceptance_criteria": [
+        "持久实际请求最多20、原180秒绝对截止，单次最多60秒且受剩余时间约束。",
+        "可选映射输出明确512；资源修正每项最多2次且共享5/4对额度。",
+        "修正许可与实际发送计数分开；并发预约不能超额，失败不退款、不重试或重置时钟。",
+        "每次修正前保留剩余必需生成/审核/单元审核槽位。"
+      ],
+      "verification_required": [
+        "全部22种计数与108种资源分配离线枚举",
+        "PG并发/中断/超时/尾部保留集成测试"
+      ]
+    },
+    {
+      "proposal_id": "PC-04",
+      "depends_on": [
+        "PC-01",
+        "PC-02",
+        "PC-03"
+      ],
+      "title": "受验证器约束的一次新计划",
+      "authorization": "awaiting_user_confirmation",
+      "acceptance_criteria": [
+        "仅初次计划检查可申请一次重建；所有缺陷已独立验证、无未决、非硬拒绝。",
+        "默认验证器白名单为空；新增验证器需单独明确适用域/前提/反例和批准，不能凭模型自证。",
+        "新plan版本关联旧plan/检查/proof，输入和参考不变；重审仍失败即终止，不循环。",
+        "旧候选/审核/案件失效并保留历史；后续内容全量依新计划生成，正文阶段发现计划错误只交人工新操作。"
+      ],
+      "verification_required": [
+        "合成PG一次预约/版本失效/拒绝降级防护测试",
+        "空白名单不得触发重建及不支持域回归"
+      ]
+    },
+    {
+      "proposal_id": "PC-05",
+      "depends_on": [
+        "PC-04"
+      ],
+      "title": "独立准入准备",
+      "authorization": "awaiting_user_confirmation",
+      "acceptance_criteria": [
+        "先固定开发材料测审核，再独立生成检验计划内容，不混合分母。",
+        "候选通过前不得使用H调优；使用后污染即退出留出集。",
+        "另行冻结真实请求材料/配置/预算/停止条件供批准，不沿用旧槽。",
+        "T040保持blocked，正式98/95/90不能被人工通过补足。"
+      ],
+      "verification_required": [
+        "开发回归与隔离全链Mock测试",
+        "零调用冻结和历史停止台账核验"
+      ]
+    }
+  ]
+}
