@@ -3928,7 +3928,7 @@
       "id": "PHASE-1-T078",
       "phase": "Phase 1",
       "title": "审计计划纠错及人工闭环并明确修复边界",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1-T077"
@@ -3951,9 +3951,11 @@
         "运行Ruff/workflow/git diff --check",
         "保存真实命令结果与源码证据，未签核保持pending"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "完成源码/旧A01真实失败/6边界回放核查：结构合法计划冲突未前置修复、needs_human不修正、资源修正保留计划、单元无revise、人工仅approve/reject；限定自动资源2次与拟议计划最多1次/原文澄清/缺信息人工/已拒绝不可豁免边界，拟议能力未实现或批准。发现CLI仅取case绑定4份最终审核，未展示DB完整修正历史；已发布重解释不能修待审计划，重新生成不等于定向闭环。新隔离PG3文件26通过0跳过及6新脚本边界回放通过，Ruff/holdout/workflow/diff、4历史ledger保持、源证据hash通过；初回放缺原快照触发AUTHORITATIVE_GOAL_MISSING后补正确开发快照，无削弱规则。与68cd367相比backend/app/web/src/agents/ADR零改动，Provider0/真实案件决定0/新C0。plan-repair-audit-r01列设计缺口和先补完整人工历史、再定计划级契约/单次重建与20次180秒预算的待决建议；未改生产实现或Prompt，T040 blocked。"
+      ],
+      "started_at": "2026-10-20T21:27:32",
+      "completed_at": "2026-10-20T21:33:31",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T078"
     }

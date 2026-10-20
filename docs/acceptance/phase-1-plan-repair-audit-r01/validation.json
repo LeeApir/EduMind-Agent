@@ -1,0 +1,25 @@
+{
+  "provider_calls": 0,
+  "new_C_compiled": false,
+  "new_C_executed": false,
+  "real_pending_case_decisions": 0,
+  "production_code_or_prompt_changes": false,
+  "source_baseline": "68cd367",
+  "boundary_regressions": "6 passed in0.21s: structure-valid contradictory plan, no repair on needs_human, plan feedback sent to resource corrector, unit revise rejected, no human revise action, original real A01 remains unpublished and unrepaired",
+  "postgres_tests": "26 passed in3.30s,0skips; dedicated new PostgreSQL and synthetic model/maintainer records only",
+  "checks": [
+    "Ruff passed",
+    "holdout integrity/partition check passed with Lee signature still pending",
+    "workflow and git diff --check passed",
+    "four stopped historical ledgers unchanged",
+    "source evidence file hashes verified",
+    "no production app/web/agents/ADR changes since68cd367"
+  ],
+  "initial_failure": "First boundary replay omitted restored workspace.input_snapshot, so AUTHORITATIVE_GOAL_MISSING correctly routed revise to needs_human (5pass1fail). Supplied the original bound development snapshot as the real pipeline does; no production guard was weakened; final6pass.",
+  "limitations": [
+    "does not prove automatic plan repair or model semantic stability",
+    "source audit and scripted replay show available routes, not real model success frequency",
+    "human lifecycle tests do not establish human correctness, workload or latency",
+    "holdout8 are reserved inputs/prelabels, not signed fixed reviewer samples or formal generalization results"
+  ]
+}
