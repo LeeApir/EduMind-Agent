@@ -1,11 +1,11 @@
 {
   "manifest_sha256": "b9ca8591bce97edca60bf7d17c132f51a8ff8504e4f7a23240e93f707ec9e613",
   "candidate": "Luna/high/v4.9 final only",
-  "actual_requests_this_run": 4,
+  "actual_requests_this_run": 5,
   "requests_max": 12,
   "state": "WAITING_HUMAN_REVIEW",
   "persistent_halt": false,
-  "current_stage": "B/four calibration cases",
+  "current_stage": "B/four calibration model outputs match expected,last actual human check pending",
   "cases": {
     "compat-schema": {
       "verdict": "pass",
@@ -29,21 +29,26 @@
       "verdict": "needs_human",
       "expected": "needs_human",
       "receipt_sha256": "e345868b6f0cd6f1818e7749cccb17da3d8e3cfb60540d8a7194c8fa400b9bfd",
+      "actual_human_confirmation": "confirmed via assessments/cal-03.json"
+    },
+    "cal-04": {
+      "verdict": "needs_human",
+      "expected": "needs_human",
+      "receipt_sha256": "f5c72624152fefa69009917b4f43b702c06ab7c43ac9bb8c700cc2032e54eb44",
       "actual_human_confirmation": "pending"
     }
   },
   "technical_integrity_all": "HTTP200/exactmodel/highrequest/fullbusinessSchema/6checks/completeRaw/usage/exactwire passed",
-  "input_tokens_provider_reported": 63985,
-  "output_tokens_provider_reported": 1634,
-  "total_tokens_provider_reported": 65619,
-  "model_call_duration_ms_total": 32142,
+  "input_tokens_provider_reported": 79980,
+  "output_tokens_provider_reported": 2182,
+  "total_tokens_provider_reported": 82162,
+  "model_call_duration_ms_total": 40026,
   "requested_reasoning": "high",
   "provider_effective_reasoning": "not independently established",
   "separate_reasoning_tokens": null,
   "actual_cost": null,
   "effective_wall_deadline": "2026-10-21T09:44:16.144212+08:00",
   "not_sent": [
-    "cal-04",
     "screen-fact",
     "screen-safety",
     "screen-mixed",
@@ -52,8 +57,8 @@
     "holdout-stack-safety",
     "holdout-prerequisite"
   ],
-  "latest_semantic_review": "specific missing teaching recognized,existing process questions not denied,no invented fact/safety/timing/evidence issue",
-  "citation_quality": "no finding citations;unresolved text manually checked,not general anchor ability proof",
-  "formal_T040_quality": "not run;assessment gap,severe and unused cases not yet tested",
-  "tests": "source unchanged;106 evidence retained from9288782,not rerun;actual fullSchema/wire/receipts/484source/oldstops/workflow/diff checked"
+  "latest_semantic_review": "already taught process,but final-arithmetic-only questions accurately flagged assessment gap,no fact/safety or missing-teaching false claim",
+  "citation_quality": "no finding citations in these cases;not general anchor ability proof",
+  "formal_T040_quality": "not run;calibration not independent test set;severe/unused cases not yet tested",
+  "tests": "source unchanged;106 evidence retained from9288782,not rerun;actual wire/fullSchema/receipts/484source/oldstops/workflow/diff checked"
 }
