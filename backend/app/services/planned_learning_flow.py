@@ -28,7 +28,7 @@ from app.services.learning_policy import POLICY, POLICY_VERSION
 from app.services.learning_review_cases import create_review_case, invalidate_case
 from app.services.learning_review_records import plan_binding, save_review
 from app.services.learning_stage_gateway import LearningStageGateway
-from app.services.plan_check import save_plan_check
+from app.services.plan_check import owned_review_binding, save_plan_check
 from app.services.plan_rebuild import rebuild_plan
 from app.services.teaching_actions import assemble_actions
 from app.services.unit_material import unit_material
@@ -184,7 +184,12 @@ async def run_planned_operation(
             if plan.user_id != owner_id or plan.learning_unit_id != unit_id:
                 raise LearningContractError
         await phase("plan_check")
-        check_record = await inspect_plan(gateway, window, plan, operation_id)
+        review_binding = await owned_review_binding(
+            db, plan, owner_id=owner_id, operation_id=operation_id
+        )
+        check_record = await inspect_plan(
+            gateway, window, plan, operation_id, expected_binding=review_binding
+        )
         check_row = await save_plan_check(db, check_record)
         plan_check_id = check_row.id
         await db.commit()
@@ -200,8 +205,16 @@ async def run_planned_operation(
             )
             reuse_content = None
             await phase("plan_recheck")
+            review_binding = await owned_review_binding(
+                db, plan, owner_id=owner_id, operation_id=operation_id
+            )
             check_record = await inspect_plan(
-                gateway, window, plan, operation_id, stage="plan_recheck"
+                gateway,
+                window,
+                plan,
+                operation_id,
+                stage="plan_recheck",
+                expected_binding=review_binding,
             )
             check_row = await save_plan_check(db, check_record)
             plan_check_id = check_row.id

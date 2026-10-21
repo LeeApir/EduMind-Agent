@@ -15,7 +15,7 @@ from app.models.learning import LearningOperation
 from app.models.learning_plan import LearningPlanVersion
 from app.models.plan_check import PlanCheck, PlanCheckResolution, PlanRebuildEvent
 from app.services import plan_verifiers
-from app.services.learning_contract import LearningContractError, canonical, digest
+from app.services.learning_contract import LearningContractError, canonical, digest, validate_plan
 from app.services.learning_owner_lock import lock_learning_owner
 
 SCHEMA = json.loads(Path(__file__).with_suffix(".schema.json").read_text())
@@ -51,11 +51,16 @@ def _validate_record(value: dict[str, Any]) -> None:
         "user_request": "input_digest",
         "plan": "plan_digest",
         "reference": "reference_digest",
+        "reference_context": "input_digest",
     }
     if any(
         a["source_digest"] != binding[source_bindings[a["source_kind"]]] for a in anchors.values()
     ):
         raise ValueError("ANCHOR_BINDING_CHANGED")
+    if value["schema_version"] == "plan-check-record-v1" and any(
+        a["source_kind"] == "reference_context" for a in anchors.values()
+    ):
+        raise ValueError("NEW_SOURCE_REQUIRES_V2")
     finding_ids = {f["finding_id"] for f in model["findings"]}
     if len(finding_ids) != len(model["findings"]):
         raise ValueError("DUPLICATE_FINDING")
@@ -143,7 +148,14 @@ def _validate_record(value: dict[str, Any]) -> None:
 
 
 def record_digest(value: object, kind: str = "record") -> str:
-    return digest("plan-check-" + kind, "v1", record=value)
+    version = (
+        "v2"
+        if kind == "record"
+        and isinstance(value, dict)
+        and value.get("schema_version") == "plan-check-record-v2"
+        else "v1"
+    )
+    return digest("plan-check-" + kind, version, record=value)
 
 
 def pointer_value(root: Any, pointer: str) -> Any:
@@ -183,6 +195,178 @@ def verify_snapshots(plan: LearningPlanVersion) -> None:
         raise LearningContractError("PLAN_SNAPSHOT_CHANGED")
 
 
+def anchor_text(plan: LearningPlanVersion, anchor: dict[str, Any]) -> str:
+    roots = {
+        "user_request": plan.input_snapshot,
+        "plan": plan.plan_json,
+        "reference": plan.references_snapshot,
+        "reference_context": plan.input_snapshot,
+    }
+    field = pointer_value(roots[anchor["source_kind"]], anchor["json_pointer"])
+    if not isinstance(field, str):
+        raise LearningContractError("PLAN_ANCHOR_NOT_TEXT")
+    raw = field.encode("utf-8")
+    start, end = anchor["start_utf8"], anchor["end_utf8"]
+    try:
+        if not 0 <= start < end <= len(raw):
+            raise ValueError
+        raw[:start].decode("utf-8")
+        raw[end:].decode("utf-8")
+        return raw[start:end].decode("utf-8")
+    except (ValueError, UnicodeError):
+        raise LearningContractError("PLAN_ANCHOR_RANGE_INVALID") from None
+
+
+def verify_review_input(
+    plan: LearningPlanVersion,
+    operation_id: UUID,
+    expected_binding: dict[str, Any] | None = None,
+) -> None:
+    """Mechanical checks before any Provider request. Semantic truth is not inferred."""
+    from app.services.learning_policy import POLICY_VERSION, active_policy_digest
+
+    verify_snapshots(plan)
+    if (
+        not all(
+            isinstance(v, UUID)
+            for v in (
+                plan.id,
+                plan.user_id,
+                plan.learning_unit_id,
+                plan.origin_operation_id,
+                operation_id,
+            )
+        )
+        or type(plan.version) is not int
+        or plan.version < 1
+        or plan.schema_version != "learning-plan-v1"
+        or plan.policy_version != POLICY_VERSION
+        or plan.policy_digest != active_policy_digest()
+    ):
+        raise LearningContractError("PLAN_REVIEW_BINDING_INVALID")
+    if expected_binding is None:
+        if operation_id != plan.origin_operation_id:
+            raise LearningContractError("PLAN_REVIEW_BINDING_INVALID")
+    elif expected_binding != dict(
+        owner_id=plan.user_id,
+        unit_id=plan.learning_unit_id,
+        operation_id=operation_id,
+        plan_id=plan.id,
+        origin_operation_id=plan.origin_operation_id,
+        plan_version=plan.version,
+        plan_digest=plan.plan_digest,
+        input_digest=plan.input_digest,
+        reference_digest=plan.references_digest,
+        policy_digest=plan.policy_digest,
+    ):
+        raise LearningContractError("PLAN_REVIEW_BINDING_INVALID")
+    snapshot = cast(dict[str, Any], plan.input_snapshot)
+    if "references" in snapshot and canonical(snapshot["references"]) != canonical(
+        plan.references_snapshot
+    ):
+        raise LearningContractError("PLAN_REFERENCE_BINDING_MISMATCH")
+    metadata = snapshot.get("metadata", {})
+    fields = (
+        "node_id",
+        "graph_version",
+        "graph_digest",
+        "profile_version",
+        "profile_evidence_digest",
+        "code_language",
+        "goal",
+    )
+    if not isinstance(metadata, dict) or any(
+        k in metadata and plan.plan_json.get(k) != metadata[k] for k in fields
+    ):
+        raise LearningContractError("PLAN_METADATA_BINDING_MISMATCH")
+    plan_value = cast(dict[str, Any], plan.plan_json)
+    node_values = snapshot.get(
+        "node_ids", [plan_value["node_id"], *plan_value["prerequisite_node_ids"]]
+    )
+    if not isinstance(node_values, list) or not all(isinstance(n, str) for n in node_values):
+        raise LearningContractError("PLAN_METADATA_BINDING_MISMATCH")
+    nodes = set(node_values)
+    validate_plan(plan.plan_json, node_ids=nodes, references=plan.references_snapshot)
+    reference = snapshot.get("reference_context")
+    source = reference.get("source") if isinstance(reference, dict) else None
+    if isinstance(source, dict) and "reference_id" in source:
+        match = plan.references_snapshot.get(source["reference_id"])
+        if not isinstance(match, dict) or any(
+            source[k] != match.get(k) for k in ("reference_id", "version", "digest") if k in source
+        ):
+            raise LearningContractError("PLAN_REFERENCE_BINDING_MISMATCH")
+        if source["reference_id"].startswith("graph-node:"):
+            node = reference.get("node") if isinstance(reference, dict) else None
+            if (
+                not isinstance(node, dict)
+                or node.get("id") != plan.plan_json["node_id"]
+                or source.get("version") != plan.plan_json["graph_version"]
+                or source["reference_id"] != f"graph-node:{source.get('version')}:{node.get('id')}"
+                or source.get("digest") != digest("graph-node", "graph-reference-v1", node=node)
+            ):
+                raise LearningContractError("PLAN_REFERENCE_BINDING_MISMATCH")
+
+
+async def owned_review_binding(
+    db: AsyncSession,
+    plan: LearningPlanVersion,
+    *,
+    owner_id: UUID,
+    operation_id: UUID,
+) -> dict[str, Any]:
+    """Check current owner/operation/plan/version in SQL before external review, including reuse."""
+    op = (
+        await db.execute(
+            select(
+                LearningOperation.user_id,
+                LearningOperation.learning_unit_id,
+                LearningOperation.status,
+            ).where(LearningOperation.id == operation_id)
+        )
+    ).one_or_none()
+    latest = (
+        await db.execute(
+            select(
+                LearningPlanVersion.id,
+                LearningPlanVersion.version,
+                LearningPlanVersion.origin_operation_id,
+                LearningPlanVersion.plan_digest,
+                LearningPlanVersion.input_digest,
+                LearningPlanVersion.references_digest,
+                LearningPlanVersion.policy_digest,
+            )
+            .where(
+                LearningPlanVersion.user_id == owner_id,
+                LearningPlanVersion.learning_unit_id == plan.learning_unit_id,
+            )
+            .order_by(LearningPlanVersion.version.desc())
+            .limit(1)
+        )
+    ).one_or_none()
+    if (
+        op is None
+        or latest is None
+        or op.user_id != owner_id
+        or op.learning_unit_id != plan.learning_unit_id
+        or op.status not in ("accepted", "running")
+    ):
+        raise LearningContractError("PLAN_REVIEW_BINDING_INVALID")
+    binding = dict(
+        owner_id=owner_id,
+        unit_id=op.learning_unit_id,
+        operation_id=operation_id,
+        plan_id=latest.id,
+        origin_operation_id=latest.origin_operation_id,
+        plan_version=latest.version,
+        plan_digest=latest.plan_digest,
+        input_digest=latest.input_digest,
+        reference_digest=latest.references_digest,
+        policy_digest=latest.policy_digest,
+    )
+    verify_review_input(plan, operation_id, binding)
+    return binding
+
+
 async def save_plan_check(db: AsyncSession, record: object) -> PlanCheck:
     value = validate_evidence(record)
     b = value["binding"]
@@ -212,6 +396,7 @@ async def save_plan_check(db: AsyncSession, record: object) -> PlanCheck:
         "user_request": plan.input_snapshot,
         "plan": plan.plan_json,
         "reference": plan.references_snapshot,
+        "reference_context": plan.input_snapshot,
     }
     for a in value["anchor_catalog"]:
         field = pointer_value(roots[a["source_kind"]], a["json_pointer"])

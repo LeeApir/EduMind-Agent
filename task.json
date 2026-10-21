@@ -4325,6 +4325,76 @@
       "completed_at": "2026-10-21T09:53:25",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T088"
+    },
+    {
+      "id": "PHASE-1-T089",
+      "phase": "Phase 1",
+      "title": "计划审核机械绑定前移与语义输入投影",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1-T088"
+      ],
+      "scope": [
+        "backend/",
+        "scripts/",
+        "docs/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "用户仅一个有界改进批次：机械校验归代码/开发对照/预冻结预算/失败收敛",
+      "acceptance_criteria": [
+        "摘要/身份/版本/引用绑定在请求前由代码核验，模型仅接收语义内容及可追溯引用。",
+        "版本化新输入及兼容旧审计记录，不隐藏实际教学事实、安全、来源或目标覆盖。",
+        "开发正/错/不足与隔离PG覆盖正确绑定pass链、坏绑定0调用、真实语义矛盾仍完整送审。"
+      ],
+      "verification": [
+        "相应离线/独立PG或Mock出站回归",
+        "Ruff/类型检查(如涉及)/workflow/git diff --check",
+        "独立提交，Provider0/H封存/旧停止账本及失败保持"
+      ],
+      "verification_results": [
+        "实施plan-check-prompt-v2/plan-semantic-input-v1：外发仅原文/语义计划/相关参考正文/实际引用摘录，内部摘要、全局身份和存储/路径/图谱/引用版本归代码，不作P01/f83f/b333或数值特判、不正则删除语义哈希字面量。生产审核调用前SQL核对owner/unit/当前op及origin op/最新plan ID版本/活动状态和四类摘要；本地重算快照及政策/metadata/参考条目绑定，已知graph-node参考重算完整正文摘要与节点/版本标识；错误绑定不发审核。新版record-v2为参考正文增加reference_context来源按input_digest绑定，完整digest/JSON Pointer/UTF8仍服务端持久化、模型仅见片段/角色/字段；原v1读取/摘要兼容、v1不能伪造新来源，无迁移或新增发布权限，输出model_result仍v1，仅裁剪未引用Schema defs。政策/ADR/PRD/OpenAPI说明同步并设本批唯一候选、失败收敛catalog正式课程+动态待审草稿不承诺自动发布，H/正式阈值不变。新增25非PG边界用例：18种绑定负例、真实图谱body/身份摘要、原始语义哈希保留、真实矛盾完整透传和实际适配器出站；隔离PG31文件403通过0跳过/1既有依赖警告（首398、后400记录保留），v1/v2存储/读取及最新版本门验证通过；模型均合成/Mock，不作真实语义能力结论。初18通过2失败系坏绑定夹具原全0改全0，改为不同值而不削断言，原件可逆JSON保留。Ruff/5源码mypy/workflow/OpenAPI解析/diff/旧6停止账本与H字节封存通过，Provider0/T040 blocked；5f17bf6旧源码归档、不重写旧manifest。用户未提交README及无关参考目录不动不提交。独立完成提交后T090冻结跨主题完整开发对照/唯一预算及可执行器，未准确授权不发真实调用。"
+      ],
+      "started_at": "2026-10-21T10:06:12",
+      "completed_at": "2026-10-21T10:20:33",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T089",
+      "execution_gate": "本批候选及输入方案仅一次；真实小诊断须先冻结准确材料/数量/停止规则；不以旧额度或泛指授权发送。"
+    },
+    {
+      "id": "PHASE-1-T090",
+      "phase": "Phase 1",
+      "title": "冻结本批唯一有界开发验证及失败收敛门槛",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1-T089"
+      ],
+      "scope": [
+        "backend/",
+        "scripts/",
+        "docs/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "用户仅一个有界改进批次：机械校验归代码/开发对照/预冻结预算/失败收敛",
+      "acceptance_criteria": [
+        "预登记非H跨主题正/负完整材料与标签、准入/淘汰和唯一候选，不针对P01特判。",
+        "准备可执行独立台账与准确调用/超时/输出上限，语义误拦及漏检分别评估，真实调用仍待准确授权。",
+        "如本批未达标，执行已有签核课程正式产品/动态待审草稿不承诺自动发布的收敛决策，不继续模型或Prompt试错；H未获新授权保持封存。"
+      ],
+      "verification": [
+        "相应离线/独立PG或Mock出站回归",
+        "Ruff/类型检查(如涉及)/workflow/git diff --check",
+        "独立提交，Provider0/H封存/旧停止账本及失败保持"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T090",
+      "execution_gate": "本批候选及输入方案仅一次；真实小诊断须先冻结准确材料/数量/停止规则；不以旧额度或泛指授权发送。"
     }
   ]
 }

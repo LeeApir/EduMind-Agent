@@ -3,6 +3,7 @@
 from app.agents.learner_review import LEARNER_REVIEW_VERSION
 from app.agents.learning_resource_prompt import RESOURCE_INSTRUCTION_VERSION
 from app.agents.plan_check import PLAN_CHECK_VERSION
+from app.agents.plan_semantic_input import PLAN_SEMANTIC_INPUT_VERSION
 from app.agents.planned_scene_generation import SCENE_PROMPT_VERSION
 from app.agents.review_evidence import REVIEW_PROMPT_VERSION
 from app.agents.review_input import REVIEW_INPUT_VERSION
@@ -28,10 +29,11 @@ POLICY = {
     "exercise_generation_instructions": RESOURCE_INSTRUCTION_VERSION,
     "plan": "learning-plan-v1",
     "plan_check": PLAN_CHECK_VERSION,
+    "plan_semantic_input": PLAN_SEMANTIC_INPUT_VERSION,
     "plan_rebuild_prompt": "plan-rebuild-prompt-v1",
     "approved_plan_verifiers": [],
     "approved_plan_verifier_versions": {},
-    "plan_evidence": "plan-check-record-v1",
+    "plan_evidence": "plan-check-record-v2",
     "learning_stage_routing": "learning-stage-v1",
     "actions": "teaching-actions-v1",
     "max_corrections": 2,

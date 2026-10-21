@@ -3,6 +3,9 @@
   "x-plan-check-contract": {
     "adr": "ADR-0021",
     "implementation_task": "PHASE-1-T082",
+    "semantic_input_update_task": "PHASE-1-T089",
+    "preflight": "Before any review request, server code checks current operation owner/unit, latest plan identity/version, snapshot digests and reference bindings. Invalid input emits fixed PLAN_REVIEW_BINDING_INVALID, PLAN_SNAPSHOT_CHANGED, PLAN_REFERENCE_BINDING_MISMATCH or PLAN_METADATA_BINDING_MISMATCH; no model request is sent.",
+    "semantic_view": "plan-check-prompt-v2 / plan-semantic-input-v1: original goal, semantic plan and bound background excerpts; server identity/version/digests retained in private plan-check-record-v2 only. v1 history remains readable.",
     "stage": "plan_check",
     "early_failure": "error/done with PLAN_REVIEW_REQUIRED or GOAL_CLARIFICATION_REQUIRED and status=failed; PLAN_REJECTED uses status=rejected. No scene_ready, incomplete human case, publication or automatic resume.",
     "error_optional_fields": {"stage": "plan_check", "check_id": "UUID of server-bound audit, not an authorization token"},
