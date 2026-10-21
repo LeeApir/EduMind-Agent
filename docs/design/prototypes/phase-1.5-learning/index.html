@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>启智学伴 · 学习体验设计预览</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="preview-bar">
+  <span><b>设计预览</b><span class="preview-note"> · 示例内容，未连接服务</span></span>
+  <nav aria-label="设计页面"><button data-view="home" aria-current="page">学习首页</button><button data-view="plan">生成大纲</button><button data-view="course">课程学习</button></nav>
+</header>
+<div class="shell">
+  <aside class="sidebar" id="global-nav" aria-label="主导航">
+    <a href="#home" class="brand"><span class="brand-mark">启</span><span>启智学伴<small>EduMind</small></span></a>
+    <div class="workspace-label">我的学习空间</div>
+    <nav class="primary-nav" aria-label="功能模块">
+      <button class="selected" data-view="home"><span aria-hidden="true">◫</span>学习</button>
+      <button disabled><span aria-hidden="true">⌘</span>图谱与路径<small>后续设计</small></button>
+      <button disabled><span aria-hidden="true">◎</span>画像与掌握度<small>后续设计</small></button>
+      <button disabled><span aria-hidden="true">◷</span>学习记录<small>后续设计</small></button>
+    </nav>
+    <div class="nav-bottom"><button disabled>模型设置 <small>后续设计</small></button><div class="user"><span class="avatar">李</span><div>小李<small>示例学习者</small></div></div></div>
+  </aside>
+  <main>
+    <div class="topline"><button id="menu-button" class="mobile-menu" aria-expanded="false" aria-controls="global-nav">☰ 菜单</button><span id="breadcrumb">学习空间 / 学习</span><span class="topline-right">数据结构 · 自主学习</span></div>
+
+    <section id="home-view" class="view home-view" aria-labelledby="home-title">
+      <div class="intro"><div class="eyebrow">从一个问题，开始理解</div><h1 id="home-title">今天，想弄懂什么？</h1><p>说说你的目标。我们一起把抽象的知识，一步步变清楚。</p></div>
+      <form id="goal-form" class="goal-card">
+        <label for="goal" class="sr-only">你的学习目标</label>
+        <textarea id="goal" rows="3" maxlength="500" required>我会 C 的基本语法，但不懂指针。想用 15 分钟学会链表头插，最好能看到指针怎么变化，再做几道题。</textarea>
+        <div class="goal-footer"><button type="button" id="preferences-button" class="quiet" aria-expanded="false" aria-controls="preferences">调整学习偏好 <span aria-hidden="true">⌄</span></button><button class="primary" type="submit">开始生成课程 <span aria-hidden="true">→</span></button></div>
+        <div id="preferences" hidden><label>学习时长<select id="duration"><option>15 分钟</option><option>10 分钟</option><option>25 分钟</option></select></label><label>代码语言<select><option>C</option></select></label><p>基础以你描述的内容为准，未提供的学情保持未知。</p></div>
+      </form>
+      <div class="goal-hint"><span class="tiny-dot"></span>无需先选择知识点 · 大纲可调整 · 第一节就绪即可开始学习</div>
+      <div class="section-heading"><h2>继续你的学习</h2><span>以下为设计示例</span></div>
+      <article class="continue-card"><div class="course-art" aria-hidden="true"><span>8</span><i>→</i><span>3</span><i>→</i><small>∅</small><div>指针连接，顺序改变</div></div><div class="continue-info"><span class="badge">AI 生成草稿</span><h3>把链表头插看明白</h3><p>上次看到「一次头插，两个指针动作」</p><div class="course-progress"><span><i></i></span><small>已学 1 / 6 节</small></div></div><button class="secondary" id="continue-course">继续学习 →</button></article>
+      <div class="section-heading library-heading"><h2>已有签核课程</h2><span>先从基础开始也很好</span></div>
+      <div class="library"><article><div class="library-symbol" aria-hidden="true">[ 0 1 2 ]</div><span class="badge neutral">签核课程 · 示例</span><h3>数组：从下标到遍历</h3><p>连续存储、边界与求和过程</p><small>本原型仅展示卡片样式</small></article><article><div class="library-symbol" aria-hidden="true">push ↓ pop ↑</div><span class="badge neutral">签核课程 · 示例</span><h3>栈：最后放入，最先取出</h3><p>用状态变化理解入栈与出栈</p><small>本原型仅展示卡片样式</small></article></div>
+    </section>
+
+    <section id="plan-view" class="view plan-view" hidden aria-labelledby="plan-title">
+      <button class="back-link" data-view="home">← 返回学习目标</button>
+      <div class="plan-heading"><div><div class="eyebrow">为这一次学习组织内容</div><h1 id="plan-title">把链表头插看明白</h1><p>从指针的直觉出发，走到一段你能解释的代码。</p></div><span class="badge">AI 生成草稿</span></div>
+      <div class="plan-grid"><div class="outline-sheet">
+        <div class="sheet-heading"><h2>你的课程大纲</h2><button id="edit-plan" class="quiet">调整大纲</button></div>
+        <div class="outline-summary"><span id="plan-duration">约 15 分钟</span><span>6 个教学场景</span><span>C 语言</span></div>
+        <ol id="outline-list" class="outline-list"></ol>
+        <div id="outline-edit" hidden><label for="plan-note">希望怎样调整？</label><textarea id="plan-note" rows="2" placeholder="例如：多解释 next，少讲语法细节"></textarea><p>预览中仅保存调整文字，不调用模型修改大纲。</p><button id="save-plan" class="secondary">保存调整并继续预览</button></div>
+        <div class="sheet-bottom">大纲会保持你的原始目标，必要的基础解释穿插在课程中。</div>
+      </div><aside class="plan-context"><div class="context-title">这次学习的起点</div><blockquote id="goal-quote"></blockquote><div class="evidence-item"><span>你已说明</span><strong>有 C 语言语法基础</strong></div><div class="evidence-item"><span>这次重点</span><strong>指针关系与头插过程</strong></div><p class="context-note">这是对示例目标的整理，不代表已经测得你的掌握度。</p><hr><div class="status" role="status" id="plan-status">课程结构已准备好，第一节可开始预览。</div><button class="primary full" id="enter-course">开始学习第一节 →</button><button class="quiet full" id="stop-generation" hidden>停止本次模拟生成</button><small class="simulation-note">本页固定演示链表课程；输入与偏好仅用于界面预览。</small></aside></div>
+    </section>
+
+    <section id="course-view" class="view course-view" hidden aria-labelledby="course-title">
+      <div class="course-header"><div><button class="back-link" data-view="home">← 我的学习</button><h1 id="course-title">把链表头插看明白</h1><div class="course-meta"><span class="badge">AI 生成草稿</span><span>内容可能有误，可随时反馈</span></div></div><button id="toggle-directory" class="secondary directory-toggle" aria-expanded="false" aria-controls="course-directory">课程目录</button></div>
+      <div class="classroom"><aside id="course-directory" class="course-directory"><div class="directory-heading">课程目录 <small>6 节</small></div><nav id="lesson-list" aria-label="课程场景"></nav><div class="directory-foot"><span class="tiny-dot"></span>示例：已生成 4 / 6 节<small>第 3 节未完成，回顾生成中</small></div></aside>
+        <article class="lesson-sheet"><div class="lesson-top"><span id="lesson-number">02 / 06</span><span id="lesson-kind">过程演示 · 约 3 分钟</span></div><h2 id="lesson-title">一次头插，两个指针动作</h2><p id="lesson-description" class="lesson-description">先让新结点接住原来的链表，再把 head 移向新结点。</p>
+          <div class="content-switch" aria-label="学习内容"><button data-panel="explain" aria-pressed="true">讲解与演示</button><button data-panel="code" aria-pressed="false">对照代码</button><button data-panel="quiz" aria-pressed="false">随堂练习</button></div>
+          <section id="explain-panel"><div class="simulation"><div class="simulation-title"><span>在链表头部插入 8</span><span class="caption">状态演示 · 非代码执行</span></div><div class="diagram" id="diagram" role="img" aria-label="初始状态：head 指向结点 3，n 指向新结点 8，结点3的next为空。"><div class="head-pointer"><span>head</span><b>↓</b></div><div class="node new-node"><label>n · 新结点</label><strong>8</strong><span>next</span></div><div class="link first-link"><span>→</span></div><div class="node old-node"><label>原链表</label><strong>3</strong><span>next</span></div><div class="link last-link">→</div><div class="null-node">NULL</div><div class="unlinked">尚未连接</div></div><div class="trace-caption" id="trace-caption" aria-live="polite">准备：head 指向 3，新结点 n 的 data 为 8。</div><div class="trace-controls"><button id="prev-step" class="step-button" aria-label="上一步" disabled>←</button><div class="step-dots" aria-label="演示步骤"><button data-step="0" aria-label="准备状态" aria-pressed="true">1</button><button data-step="1" aria-label="连接原链表" aria-pressed="false">2</button><button data-step="2" aria-label="更新头指针" aria-pressed="false">3</button></div><button id="next-step" class="secondary">下一步 →</button></div></div><div class="teaching-note"><span class="mentor-symbol">启</span><div><strong>为什么先连接，再移动 head？</strong><p>旧的 head 是找到原链表的入口。先把它交给 <code>n-&gt;next</code>，再更新 head，就能保住原来的结点。</p></div></div></section>
+          <section id="code-panel" hidden><div class="code-heading"><span>C · 已有有效结点的指针连接片段</span><button class="quiet" id="code-step">跟随步骤高亮</button></div><pre class="code-block"><code><span class="code-line" data-line="0"><em>1</em>// head 指向有效的原链表，n 指向独立有效的新结点</span><span class="code-line" data-line="1"><em>2</em>n-&gt;data = 8;</span><span class="code-line" data-line="2"><em>3</em>n-&gt;next = head;</span><span class="code-line" data-line="3"><em>4</em>head = n;</span></code></pre><p class="code-note" id="code-note">这里演示同一作用域中的指针更新；不包含内存分配、函数传参或完整程序。</p><button class="secondary" id="back-to-demo">回到状态演示 →</button></section>
+          <section id="quiz-panel" hidden><span class="small-label">检查一下理解</span><h3>新结点 8 头插到 [3] 后，从 head 开始遍历，结果是什么？</h3><form id="quiz-form"><label class="answer"><input type="radio" name="answer" value="wrong">3 → 8 → NULL</label><label class="answer"><input type="radio" name="answer" value="correct">8 → 3 → NULL</label><label class="answer"><input type="radio" name="answer" value="lost">8 → NULL</label><button class="primary" type="submit">查看反馈</button></form><div id="quiz-feedback" role="status" hidden></div><p class="caption">示例题反馈仅在本页展示，不保存作答或更新掌握度。</p></section>
+          <section id="waiting-panel" hidden><div class="waiting-symbol">◷</div><h3 id="waiting-title">这一节还在生成</h3><p id="waiting-text">前面的讲解与演示可以继续学习。</p><button id="retry-scene" class="secondary">模拟本节就绪</button></section>
+          <div class="lesson-bottom"><button class="quiet" id="report-issue">反馈内容问题</button><button class="secondary" id="next-lesson">继续下一节 →</button></div>
+        </article>
+        <aside id="tutor" class="tutor"><div class="tutor-heading"><span class="mentor-symbol">启</span><div><strong>启智导师</strong><small>围绕当前内容，问清楚</small></div><button id="close-tutor" aria-label="关闭提问面板" class="quiet">×</button></div><div class="tutor-body"><p class="tutor-message">看指针时，可以先问自己：这个箭头从哪里出发，又指向哪个结点？</p><button id="suggested-question" class="suggested-question">先改 head，会发生什么？ ↗</button><div id="tutor-reply" role="status" hidden></div><small class="caption">此处为预设教学示例，不是真实AI回答。</small></div><form id="question-form"><label class="sr-only" for="question">向导师提问</label><textarea id="question" rows="2" placeholder="关于这一节，你想问……" required></textarea><button type="submit" class="secondary">发送示例问题 ↑</button></form></aside>
+      </div><button id="open-tutor" class="primary tutor-toggle">向导师提问</button>
+    </section>
+    <footer class="prototype-footer">P1.5 页面原型 · 示例课程与学习记录，不代表已接入的产品能力</footer>
+  </main>
+</div>
+<dialog id="feedback-dialog"><form method="dialog"><div class="sheet-heading"><h2>反馈内容问题</h2><button class="quiet" aria-label="关闭反馈">×</button></div><p>此原型仅演示反馈入口，不发送或保存内容。</p><label for="feedback">你发现了什么问题？</label><textarea id="feedback" rows="4" placeholder="例如：这一段的指针方向不清楚"></textarea><button class="primary" value="confirm">完成预览</button></form></dialog>
+<div id="notice" class="notice" role="status" hidden></div>
+<script src="app.js"></script>
+</body>
+</html>
