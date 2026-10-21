@@ -1,14 +1,15 @@
 {
   "schema_version": 3,
-  "product_source": "docs/PRD.md v2.3 §0.4、§9.1；ADR-0022",
+  "product_source": "docs/PRD.md v2.3 §0.5、§9.1；ADR-0023；docs/PRD-phase-1.5-draft.md v0.3",
   "active_phase": "Phase 1.5",
   "execution_policy": {
     "max_in_progress": 1,
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "Await explicit user instruction; do not start Phase 1.5 development.",
-    "completion_rule": "验证与独立Task-Completed完成提交；当前仅治理切换，未授权领取或实现。"
+    "phase_gate": "用户仅要求准备任务：本次全部todo，不领取、不开发。后续按明确执行授权串行领取依赖满足任务；具体重大契约及真实运行仍须批准，已确认A—F原则不重复询问。",
+    "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
+    "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
   "archive_policy": {
     "active_source": "根task.json是唯一活动任务状态来源；docs/tasks均只读历史。",
@@ -27,8 +28,8 @@
     },
     {
       "id": "Phase 1.5",
-      "planning": "contract_only_not_started",
-      "goal": "先明确新课程与待审草稿契约及独立质量／性能验收，具体实现另批"
+      "planning": "detailed_not_started",
+      "goal": "目标驱动自由课程、学生可直接学习AI草稿、渐进教学与全站界面重构；先补齐设计与具体契约再实现。"
     },
     {
       "id": "Phase 2",
@@ -42,17 +43,31 @@
     }
   ],
   "stage_scope": {
-    "authorization": "仅批准P1收尾/原样归档与本活动账本治理切换，不授权Phase 1.5开发。",
+    "authorization": "2026-10-21用户确认A—F与三页原型并要求“可以，准备task”；仅授权细化当前阶段任务，不领取或开发。",
     "product_mode": "catalog_only",
     "formal_product": "已有签核课程",
-    "dynamic_scope": "待审草稿定位，不承诺自动发布；公开草稿运营UI尚未交付。",
+    "dynamic_scope": "已确认学生可直接学习AI生成草稿；普通语义审核不阻断整课。实际运行开放须新契约实现与独立验收后批准，既有签核课程语义不变。",
     "provider_requests_authorized": 0,
     "model_trials_authorized": 0,
     "inherited_request_allowance": 0,
     "dynamic_release_authorized": false,
     "deployment_authorized": false,
     "H": "H01–H08继续封存；新契约确定后重判适用性与独立性，不自动继承验收资格。",
-    "implementation_scope": "未批准；只登记待启动契约规划，不预拆功能实现。"
+    "implementation_scope": "当前细化42项todo；已确认文档/原型为输入，不追认任务done。实施待后续明确授权。",
+    "included": [
+      "自由目标/可变场景/可选多节点关联",
+      "首场景可学与后续持久生成/恢复/局部修订",
+      "生成题反馈与可靠证据准入及修订撤销",
+      "五个功能区域与全部主要页面设计/移动端/可访问性",
+      "开发诊断和独立质量/性能验收的准备与获准执行"
+    ],
+    "excluded": [
+      "Phase2动态分级题库/真并行辩论/教材RAG/学习报告",
+      "新Provider厂商及延期真实接入自动恢复",
+      "任意HTML/JS或C/Python在线执行、放宽Manim隔离",
+      "通用编辑器/PBL/PDF研究/TTS必交付/iOS/导出",
+      "未经批准的真实调用、生产开放、部署、push/merge"
+    ]
   },
   "archive_transition": {
     "from_phase": "Phase 1",
@@ -85,34 +100,1567 @@
     {
       "id": "PHASE-1.5-T001",
       "phase": "Phase 1.5",
-      "title": "冻结新课程与待审草稿契约及独立验收边界",
+      "title": "冻结自由课程、场景与草稿可见性契约",
       "status": "todo",
       "priority": "P0",
       "depends_on": [],
       "scope": [
-        "docs/PRD.md",
-        "docs/ADR/",
-        "docs/acceptance/",
+        "docs/",
         "task.json",
         "process.txt"
       ],
-      "prd_source": "PRD§0.4／ADR-0022；当前仅登记，须用户新指令后才领取",
+      "prd_source": "PRD§0.5/§9.1；ADR0023；需求v0.3；阶段任务说明",
       "acceptance_criteria": [
-        "明确新课程输入、目标与计划承诺、学生可见交付及版本／来源契约，范围经用户确认后再拆实现。",
-        "区分代码硬门、自动辅助审核及人工职责／待审处置，明确草稿入口、闭环和人工成本／SLA的提案，不新增未批准发布权限。",
-        "新链质量与性能分别冻结测量对象、分母、失败处理和证据边界；不继承P1通过结论，H01–H08重新判断适用性／独立性后另批。",
-        "形成独立材料／调用预算／停止条件及待批准实现拆分；本任务真实Provider调用0、模型试错0，不启动正式验收或动态开放。"
+        "以已批准ADR0023为前提定义课程/场景/版本、零或多知识点关联及原始需求与计划来源，不重复审批A—F原则。",
+        "明确草稿可学习但非已签核、owner访问/跨用户拒绝/目录发布边界，列出新旧协议与历史读取兼容矩阵。",
+        "冻结数据迁移与读写API/OpenAPI提案及正负例，具体重大数据/权限契约经批准并绑定准确文件后，才允许相关实现。"
       ],
       "verification": [
-        "核对PRD／ADR／任务与范围一致、引用／版本／证据来源",
-        "零调用检查新契约和验收提案；具体执行器待后续获准任务建立"
+        "人工核对本任务2–5项验收条件、相关PRD/ADR/设计输入与链接；具体契约需要批准时保存准确文件及确认来源。",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
       ],
       "verification_results": [],
       "started_at": null,
       "completed_at": null,
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T001",
-      "execution_gate": "等待用户新指令领取；本次切换不自动启动。"
+      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。本任务交付具体设计；涉及重大契约/验收阈值须获批准后才能done及启动依赖实现，不重复审批A—F方向。"
+    },
+    {
+      "id": "PHASE-1.5-T002",
+      "phase": "Phase 1.5",
+      "title": "冻结渐进生成、恢复与修订状态契约",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T001"
+      ],
+      "scope": [
+        "docs/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5/§9.1；ADR0023；需求v0.3；阶段任务说明",
+      "acceptance_criteria": [
+        "定义需求澄清、大纲自动继续/主动调整、场景可用/失败/依赖等待、整课部分完成以及首场景交付事件，不能用空大纲代表可学。",
+        "明确持久调度、幂等、租约/并发、取消、超时、断线恢复与局部修订失效传播；刷新不能隐式发起新操作。",
+        "冻结场景规模/每阶段调用与共享预算/重试类别和时钟，不沿用旧额度；明确可选媒体降级。状态与API提案获准后才实施。"
+      ],
+      "verification": [
+        "人工核对本任务2–5项验收条件、相关PRD/ADR/设计输入与链接；具体契约需要批准时保存准确文件及确认来源。",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T002",
+      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。本任务交付具体设计；涉及重大契约/验收阈值须获批准后才能done及启动依赖实现，不重复审批A—F方向。"
+    },
+    {
+      "id": "PHASE-1.5-T003",
+      "phase": "Phase 1.5",
+      "title": "冻结质量处理与学习证据契约",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T001",
+        "PHASE-1.5-T002"
+      ],
+      "scope": [
+        "docs/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5/§9.1；ADR0023；需求v0.3；阶段任务说明",
+      "acceptance_criteria": [
+        "区分程序硬门、未证实审核意见、已确认错误；定义反馈定位、确认依据、局部暂停/撤回/修订和受影响依赖，不建立全量语义审核前置门。",
+        "冻结生成题答案可靠性、作答版本、课程内反馈与正式掌握度准入/撤销/重算规则；未校验或未可靠映射的题不改正式掌握度。",
+        "明确现有导师问答/补充解释的上下文与权限范围，不扩展Phase2题库、RAG或辩论；相关数据和评分规则具体批准后实施。"
+      ],
+      "verification": [
+        "人工核对本任务2–5项验收条件、相关PRD/ADR/设计输入与链接；具体契约需要批准时保存准确文件及确认来源。",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T003",
+      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。本任务交付具体设计；涉及重大契约/验收阈值须获批准后才能done及启动依赖实现，不重复审批A—F方向。"
+    },
+    {
+      "id": "PHASE-1.5-T004",
+      "phase": "Phase 1.5",
+      "title": "完成全站主要页面设计与视觉规范",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T001",
+        "PHASE-1.5-T002",
+        "PHASE-1.5-T003"
+      ],
+      "scope": [
+        "docs/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5/§9.1；ADR0023；需求v0.3；信息架构及已确认三页原型",
+      "acceptance_criteria": [
+        "复用已确认三页原型，补齐图谱路径、画像掌握度、记录、模型设置的桌面与窄屏页面；不伪装未实现模块。",
+        "形成统一导航、排版/颜色/间距/组件和加载/空态/错误/未知/失效规范，覆盖课程调整、恢复、修订和反馈流程。",
+        "以可交互原型验证主要旅程、键盘焦点、窄屏无溢出；主要页面设计获用户确认后才启动任何生产前端改造。"
+      ],
+      "verification": [
+        "对全部主要页面原型运行实际浏览器交互、窄屏及键盘检查，记录截图/发现/修正；复用现有三页设计，不拿原型成绩替代业务E2E。",
+        "人工核对本任务2–5项验收条件、相关PRD/ADR/设计输入与链接；具体契约需要批准时保存准确文件及确认来源。",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T004",
+      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。主要页面设计经用户确认后才允许生产前端任务。"
+    },
+    {
+      "id": "PHASE-1.5-T005",
+      "phase": "Phase 1.5",
+      "title": "冻结新链独立验收口径",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T001",
+        "PHASE-1.5-T002",
+        "PHASE-1.5-T003",
+        "PHASE-1.5-T004"
+      ],
+      "scope": [
+        "docs/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5/§9.1；ADR0023；需求v0.3；阶段任务说明",
+      "acceptance_criteria": [
+        "分别定义需求兑现、个性化、事实/答案错误、可学性、恢复/预算、兼容与性能的测量对象、分母、失败和未运行处理。",
+        "明确首个完整可学场景、后续等待和整课生成指标，不等同HTTP首字节；提出具体阈值/样本与停止政策供批准。",
+        "开发材料与独立集分区，H继续封存待资格判断；此任务仅方案，不给真实调用或生产开放授权，也不把P1失败改分。"
+      ],
+      "verification": [
+        "人工核对本任务2–5项验收条件、相关PRD/ADR/设计输入与链接；具体契约需要批准时保存准确文件及确认来源。",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T005",
+      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。本任务交付具体设计；涉及重大契约/验收阈值须获批准后才能done及启动依赖实现，不重复审批A—F方向。"
+    },
+    {
+      "id": "PHASE-1.5-T006",
+      "phase": "Phase 1.5",
+      "title": "建立版本化自由课程数据模型",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T001",
+        "PHASE-1.5-T002",
+        "PHASE-1.5-T003"
+      ],
+      "scope": [
+        "backend/app/",
+        "backend/tests/",
+        "backend/alembic/",
+        "docs/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5/§9.1；ADR0023；需求v0.3；阶段任务说明",
+      "acceptance_criteria": [
+        "按批准契约建立Alembic迁移及ORM，保存owner/原目标/大纲/场景/版本/可见性与可选节点关系，草稿与签核属性独立。",
+        "新空库及含旧数据的隔离库迁移/回退或批准的前向恢复验证通过；不改旧记录签核、节点及掌握度含义。",
+        "数据库约束覆盖跨owner、重复版本与失效引用，迁移及模型与文档一起提交。"
+      ],
+      "verification": [
+        "（待建立；项目根）backend/.venv/bin/python -m pytest backend/tests/test_free_course_migrations.py -q；涉及DB时在已批准隔离PostgreSQL配置下运行并核对0环境skip。",
+        "按实际修改运行 backend/.venv/bin/ruff check 与 backend/.venv/bin/mypy 的相关文件；旧路径风险按需补回归。",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T006",
+      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。"
+    },
+    {
+      "id": "PHASE-1.5-T007",
+      "phase": "Phase 1.5",
+      "title": "实现课程及场景快照仓储",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T006"
+      ],
+      "scope": [
+        "backend/app/",
+        "backend/tests/",
+        "backend/alembic/",
+        "docs/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5/§9.1；ADR0023；需求v0.3；阶段任务说明",
+      "acceptance_criteria": [
+        "按owner读写准确课程和场景版本，保存不可变原始目标/画像来源/候选与当前指针。",
+        "并发更新、取消或版本过期不得覆盖新版本；旧版读取与审计可追溯。",
+        "实际隔离PG覆盖事务回滚、幂等重复和跨owner拒绝，不用进程内字典代替持久化。"
+      ],
+      "verification": [
+        "（待建立；项目根）backend/.venv/bin/python -m pytest backend/tests/test_free_course_snapshots.py -q；涉及DB时在已批准隔离PostgreSQL配置下运行并核对0环境skip。",
+        "按实际修改运行 backend/.venv/bin/ruff check 与 backend/.venv/bin/mypy 的相关文件；旧路径风险按需补回归。",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T007",
+      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。"
+    },
+    {
+      "id": "PHASE-1.5-T008",
+      "phase": "Phase 1.5",
+      "title": "实现自由目标课程规划",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T007"
+      ],
+      "scope": [
+        "backend/app/",
+        "backend/tests/",
+        "backend/alembic/",
+        "docs/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5/§9.1；ADR0023；需求v0.3；阶段任务说明",
+      "acceptance_criteria": [
+        "原始目标与有据画像直接进入规划，不调用单节点解析作为门禁；未知学情保留。",
+        "支持有上限的可变场景与共享示例约定，保留用户要求和模型建议的不同来源。",
+        "多知识点/无图谱命中仍可规划；真实冲突/必要输入缺失/超出范围按批准规则澄清，Provider失败不伪造成功。"
+      ],
+      "verification": [
+        "（待建立；项目根）backend/.venv/bin/python -m pytest backend/tests/test_free_course_planning.py -q；涉及DB时在已批准隔离PostgreSQL配置下运行并核对0环境skip。",
+        "按实际修改运行 backend/.venv/bin/ruff check 与 backend/.venv/bin/mypy 的相关文件；旧路径风险按需补回归。",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T008",
+      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。"
+    },
+    {
+      "id": "PHASE-1.5-T009",
+      "phase": "Phase 1.5",
+      "title": "实现非阻塞知识点关联",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T008"
+      ],
+      "scope": [
+        "backend/app/",
+        "backend/tests/",
+        "backend/alembic/",
+        "docs/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5/§9.1；ADR0023；需求v0.3；阶段任务说明",
+      "acceptance_criteria": [
+        "课程和场景可关联零/一/多已有节点，保存图谱版本和关联依据，不新造节点或默改原目标。",
+        "无匹配/不确定关联不阻止课程学习，也不能被当作评分证据。",
+        "推荐路径作为建议呈现，目标与推荐不互相替换；旧图谱/路径读取保持。"
+      ],
+      "verification": [
+        "（待建立；项目根）backend/.venv/bin/python -m pytest backend/tests/test_free_course_graph_links.py -q；涉及DB时在已批准隔离PostgreSQL配置下运行并核对0环境skip。",
+        "按实际修改运行 backend/.venv/bin/ruff check 与 backend/.venv/bin/mypy 的相关文件；旧路径风险按需补回归。",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T009",
+      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。"
+    },
+    {
+      "id": "PHASE-1.5-T010",
+      "phase": "Phase 1.5",
+      "title": "实现按大纲生成场景内容",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T008"
+      ],
+      "scope": [
+        "backend/app/",
+        "backend/tests/",
+        "backend/alembic/",
+        "docs/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5/§9.1；ADR0023；需求v0.3；阶段任务说明",
+      "acceptance_criteria": [
+        "按场景职责生成讲解/代码/练习等批准类型，传入原始要求、共享示例与必要上游内容，不固定三场景。",
+        "遵守语言、数量/大小上限和真实调用计数；失败候选及原因保留，不声称所有场景已完成。",
+        "Mock验证实际Gateway请求和Provider失败处理，不把脚本输出当真实教学质量。"
+      ],
+      "verification": [
+        "（待建立；项目根）backend/.venv/bin/python -m pytest backend/tests/test_free_scene_generation.py -q；涉及DB时在已批准隔离PostgreSQL配置下运行并核对0环境skip。",
+        "按实际修改运行 backend/.venv/bin/ruff check 与 backend/.venv/bin/mypy 的相关文件；旧路径风险按需补回归。",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T010",
+      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。"
+    },
+    {
+      "id": "PHASE-1.5-T011",
+      "phase": "Phase 1.5",
+      "title": "实现草稿内容的确定性准入检查",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T010"
+      ],
+      "scope": [
+        "backend/app/",
+        "backend/tests/",
+        "backend/alembic/",
+        "docs/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5/§9.1；ADR0023；需求v0.3；阶段任务说明",
+      "acceptance_criteria": [
+        "检查结构、权限、引用和版本绑定；清洗输出，不接受任意脚本或未授权执行。",
+        "普通语义审核不作为草稿可见前提；旧reject/pass和正式签核结果不改写。",
+        "覆盖恶意Markdown/HTML、错误引用、错owner/错版本及合法内容正例，证明新路径与旧发布门隔离。"
+      ],
+      "verification": [
+        "（待建立；项目根）backend/.venv/bin/python -m pytest backend/tests/test_free_scene_validation.py -q；涉及DB时在已批准隔离PostgreSQL配置下运行并核对0环境skip。",
+        "按实际修改运行 backend/.venv/bin/ruff check 与 backend/.venv/bin/mypy 的相关文件；旧路径风险按需补回归。",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T011",
+      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。"
+    },
+    {
+      "id": "PHASE-1.5-T012",
+      "phase": "Phase 1.5",
+      "title": "实现受约束授课动作与状态演示数据",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T011"
+      ],
+      "scope": [
+        "backend/app/",
+        "backend/tests/",
+        "backend/alembic/",
+        "docs/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5/§9.1；ADR0023；需求v0.3；阶段任务说明",
+      "acceptance_criteria": [
+        "按批准组件清单生成并校验讲解定位、代码高亮、状态步骤；动作只引用同版本真实内容。",
+        "数组/链表/栈/队列的首批支持范围以T004设计为准，声明状态演示与代码执行不同；不新增任意HTML/JS。",
+        "损坏动作与可选媒体失败可按契约降级为静态内容，保留诊断，不伪造已执行动画。"
+      ],
+      "verification": [
+        "（待建立；项目根）backend/.venv/bin/python -m pytest backend/tests/test_free_scene_actions.py -q；涉及DB时在已批准隔离PostgreSQL配置下运行并核对0环境skip。",
+        "按实际修改运行 backend/.venv/bin/ruff check 与 backend/.venv/bin/mypy 的相关文件；旧路径风险按需补回归。",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T012",
+      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。"
+    },
+    {
+      "id": "PHASE-1.5-T013",
+      "phase": "Phase 1.5",
+      "title": "实现首场景与后续场景增量可见",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T011",
+        "PHASE-1.5-T012"
+      ],
+      "scope": [
+        "backend/app/",
+        "backend/tests/",
+        "backend/alembic/",
+        "docs/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5/§9.1；ADR0023；需求v0.3；阶段任务说明",
+      "acceptance_criteria": [
+        "完整场景检查并持久化后才变为可学习；第一场景不等待整课或语义签核。",
+        "后续场景逐个追加，场景就绪与整课完成区分，局部失败按依赖传播而非隐藏缺章。",
+        "隔离PG验证提交失败/并发/过期候选不泄露，旧签核课程发布路径不变。"
+      ],
+      "verification": [
+        "（待建立；项目根）backend/.venv/bin/python -m pytest backend/tests/test_free_scene_availability.py -q；涉及DB时在已批准隔离PostgreSQL配置下运行并核对0环境skip。",
+        "按实际修改运行 backend/.venv/bin/ruff check 与 backend/.venv/bin/mypy 的相关文件；旧路径风险按需补回归。",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T013",
+      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。"
+    },
+    {
+      "id": "PHASE-1.5-T014",
+      "phase": "Phase 1.5",
+      "title": "实现持久渐进生成调度与共享预算",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T013"
+      ],
+      "scope": [
+        "backend/app/",
+        "backend/tests/",
+        "backend/alembic/",
+        "docs/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5/§9.1；ADR0023；需求v0.3；阶段任务说明",
+      "acceptance_criteria": [
+        "复用现有队列与PG，按批准并发/阶段依赖调度，浏览器关闭不丢失运行。",
+        "预约先于出站，失败也计入额度，重试分类和截止时间固定，预算不足有持久终态。",
+        "覆盖重复投递、worker中断、租约过期及耗尽，不重复发布或重置计数。"
+      ],
+      "verification": [
+        "（待建立；项目根）backend/.venv/bin/python -m pytest backend/tests/test_free_course_scheduler.py -q；涉及DB时在已批准隔离PostgreSQL配置下运行并核对0环境skip。",
+        "按实际修改运行 backend/.venv/bin/ruff check 与 backend/.venv/bin/mypy 的相关文件；旧路径风险按需补回归。",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T014",
+      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。"
+    },
+    {
+      "id": "PHASE-1.5-T015",
+      "phase": "Phase 1.5",
+      "title": "实现生成取消与断点恢复",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T014"
+      ],
+      "scope": [
+        "backend/app/",
+        "backend/tests/",
+        "backend/alembic/",
+        "docs/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5/§9.1；ADR0023；需求v0.3；阶段任务说明",
+      "acceptance_criteria": [
+        "明确区分停止、继续和新操作，保留已有可学场景及真实失败状态。",
+        "取消后迟到响应不可重新激活运行；刷新恢复读取进度，不隐式生成或扣费。",
+        "覆盖取消/提交竞争、进程重启、重复恢复与过期版本。"
+      ],
+      "verification": [
+        "（待建立；项目根）backend/.venv/bin/python -m pytest backend/tests/test_free_course_recovery.py -q；涉及DB时在已批准隔离PostgreSQL配置下运行并核对0环境skip。",
+        "按实际修改运行 backend/.venv/bin/ruff check 与 backend/.venv/bin/mypy 的相关文件；旧路径风险按需补回归。",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T015",
+      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。"
+    },
+    {
+      "id": "PHASE-1.5-T016",
+      "phase": "Phase 1.5",
+      "title": "实现局部修订及依赖失效",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T015"
+      ],
+      "scope": [
+        "backend/app/",
+        "backend/tests/",
+        "backend/alembic/",
+        "docs/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5/§9.1；ADR0023；需求v0.3；阶段任务说明",
+      "acceptance_criteria": [
+        "按批准范围重生成一个场景或调整大纲，创建新版本并展示影响范围，不静默扩大为整课重生。",
+        "旧候选/动作/答案及受影响下游按契约失效；并发修订和迟到结果不能混用。",
+        "保持原目标、来源、旧作答和历史可读，重建失败保留明确终态与预算。"
+      ],
+      "verification": [
+        "（待建立；项目根）backend/.venv/bin/python -m pytest backend/tests/test_free_course_revision.py -q；涉及DB时在已批准隔离PostgreSQL配置下运行并核对0环境skip。",
+        "按实际修改运行 backend/.venv/bin/ruff check 与 backend/.venv/bin/mypy 的相关文件；旧路径风险按需补回归。",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T016",
+      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。"
+    },
+    {
+      "id": "PHASE-1.5-T017",
+      "phase": "Phase 1.5",
+      "title": "实现准确版本的问题反馈与处置",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T016"
+      ],
+      "scope": [
+        "backend/app/",
+        "backend/tests/",
+        "backend/alembic/",
+        "docs/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5/§9.1；ADR0023；需求v0.3；阶段任务说明",
+      "acceptance_criteria": [
+        "反馈绑定owner/课程/场景/版本及具体位置，保存学生描述，不视作已确认事实。",
+        "按T003定义的可信确认机制处置明确错误，局部暂停/撤回及依赖处理可追溯；不默认全课作废。",
+        "未证实模型意见不能直接当确认或送无界自动修正；覆盖越权、旧版反馈、重复处置。"
+      ],
+      "verification": [
+        "（待建立；项目根）backend/.venv/bin/python -m pytest backend/tests/test_free_course_feedback.py -q；涉及DB时在已批准隔离PostgreSQL配置下运行并核对0环境skip。",
+        "按实际修改运行 backend/.venv/bin/ruff check 与 backend/.venv/bin/mypy 的相关文件；旧路径风险按需补回归。",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T017",
+      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。"
+    },
+    {
+      "id": "PHASE-1.5-T018",
+      "phase": "Phase 1.5",
+      "title": "实现生成练习作答与暂定反馈",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T011",
+        "PHASE-1.5-T007",
+        "PHASE-1.5-T003"
+      ],
+      "scope": [
+        "backend/app/",
+        "backend/tests/",
+        "backend/alembic/",
+        "docs/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5/§9.1；ADR0023；需求v0.3；阶段任务说明",
+      "acceptance_criteria": [
+        "作答与准确题目/答案版本绑定，支持已有题型与反馈，不增加Phase2动态题库。",
+        "未可靠校验答案或无可靠节点关联时，只记录课程内表现，不写正式掌握度。",
+        "校验重复提交、跨owner、失效题目/暂停题目，反馈与正确性证据状态分开记录。"
+      ],
+      "verification": [
+        "（待建立；项目根）backend/.venv/bin/python -m pytest backend/tests/test_free_course_answers.py -q；涉及DB时在已批准隔离PostgreSQL配置下运行并核对0环境skip。",
+        "按实际修改运行 backend/.venv/bin/ruff check 与 backend/.venv/bin/mypy 的相关文件；旧路径风险按需补回归。",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T018",
+      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。"
+    },
+    {
+      "id": "PHASE-1.5-T019",
+      "phase": "Phase 1.5",
+      "title": "实现有效学习证据准入与修订撤销",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T018",
+        "PHASE-1.5-T016",
+        "PHASE-1.5-T017",
+        "PHASE-1.5-T009"
+      ],
+      "scope": [
+        "backend/app/",
+        "backend/tests/",
+        "backend/alembic/",
+        "docs/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5/§9.1；ADR0023；需求v0.3；阶段任务说明",
+      "acceptance_criteria": [
+        "仅符合T003条件的可靠答案和节点映射允许生成正式掌握度贡献，来源与规则版本可查。",
+        "答案/题目/关联修订时撤销或重算受影响贡献，保留原始作答；不使用新题答案评价旧题。",
+        "验证幂等、事务一致性和路径派生状态，旧签核课程证据计算不回归。"
+      ],
+      "verification": [
+        "（待建立；项目根）backend/.venv/bin/python -m pytest backend/tests/test_free_course_evidence.py -q；涉及DB时在已批准隔离PostgreSQL配置下运行并核对0环境skip。",
+        "按实际修改运行 backend/.venv/bin/ruff check 与 backend/.venv/bin/mypy 的相关文件；旧路径风险按需补回归。",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T019",
+      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。"
+    },
+    {
+      "id": "PHASE-1.5-T020",
+      "phase": "Phase 1.5",
+      "title": "接通自由课程API与可恢复事件协议",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T015",
+        "PHASE-1.5-T016",
+        "PHASE-1.5-T017",
+        "PHASE-1.5-T019"
+      ],
+      "scope": [
+        "backend/app/",
+        "backend/tests/",
+        "backend/alembic/",
+        "docs/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5/§9.1；ADR0023；需求v0.3；阶段任务说明",
+      "acceptance_criteria": [
+        "提供批准的创建/读取/恢复/取消/修订/反馈/作答接口，owner隔离、幂等与OpenAPI一致。",
+        "采用批准的POST流/持久GET事件或等效契约，支持断线重连、准确事件顺序与失效版本拒绝。",
+        "隔离测试验证学生可读草稿但不因此获得共享/目录发布权限；生产默认模式不开启。"
+      ],
+      "verification": [
+        "（待建立；项目根）backend/.venv/bin/python -m pytest backend/tests/test_free_course_api.py -q；涉及DB时在已批准隔离PostgreSQL配置下运行并核对0环境skip。",
+        "按实际修改运行 backend/.venv/bin/ruff check 与 backend/.venv/bin/mypy 的相关文件；旧路径风险按需补回归。",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T020",
+      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。"
+    },
+    {
+      "id": "PHASE-1.5-T021",
+      "phase": "Phase 1.5",
+      "title": "验证新旧课程及安全边界兼容",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T020"
+      ],
+      "scope": [
+        "backend/app/",
+        "backend/tests/",
+        "backend/alembic/",
+        "docs/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5/§9.1；ADR0023；需求v0.3；阶段任务说明",
+      "acceptance_criteria": [
+        "目录签核课、旧planned/legacy历史课程、画像路径和模型设置按原协议可用。",
+        "新草稿不能经旧发布接口变成签核内容；历史blocked、评分和归档字节保持。",
+        "组合PG/HTTP验证跨owner、策略切换、旧版读取、XSS及撤回，不需要真实Provider。"
+      ],
+      "verification": [
+        "（待建立；项目根）backend/.venv/bin/python -m pytest backend/tests/test_free_course_compatibility.py -q；涉及DB时在已批准隔离PostgreSQL配置下运行并核对0环境skip。",
+        "按实际修改运行 backend/.venv/bin/ruff check 与 backend/.venv/bin/mypy 的相关文件；旧路径风险按需补回归。",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T021",
+      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。"
+    },
+    {
+      "id": "PHASE-1.5-T022",
+      "phase": "Phase 1.5",
+      "title": "建立统一页面框架与设计组件",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T004"
+      ],
+      "scope": [
+        "web/src/",
+        "web/tests/",
+        "docs/design/",
+        "docs/api/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5/§9.1；ADR0023；需求v0.3；信息架构及已确认三页原型",
+      "acceptance_criteria": [
+        "按批准视觉稿实现导航、页面容器和基础组件；不以换框架代替重构。",
+        "统一加载/空态/未知/无权限/错误及键盘焦点，主导航不显示未实现Phase2功能。",
+        "保留现有路由可达性和未保存输入，不自动触发生成或模型配置变更。"
+      ],
+      "verification": [
+        "（待建立）pnpm --dir web exec vitest run tests/workspace-shell.spec.ts",
+        "pnpm --dir web typecheck",
+        "pnpm --dir web build",
+        "pnpm --dir web lint",
+        "实际浏览器核对本任务页面/关键状态及移动端；使用隔离服务或明确Mock并记录区别。",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T022",
+      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。"
+    },
+    {
+      "id": "PHASE-1.5-T023",
+      "phase": "Phase 1.5",
+      "title": "实现目标驱动学习首页",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T022",
+        "PHASE-1.5-T020"
+      ],
+      "scope": [
+        "web/src/",
+        "web/tests/",
+        "docs/design/",
+        "docs/api/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5/§9.1；ADR0023；需求v0.3；信息架构及已确认三页原型",
+      "acceptance_criteria": [
+        "一句话目标为主入口，时长/语言等偏好可选，不强制画像问卷或节点选择。",
+        "接真实继续学习/课程列表，区分草稿与签核及进度；空数据不使用原型假记录。",
+        "配置不可用、请求失败和重复点击保留目标并按幂等处理。"
+      ],
+      "verification": [
+        "（待建立）pnpm --dir web exec vitest run tests/learning-home.spec.ts",
+        "pnpm --dir web typecheck",
+        "pnpm --dir web build",
+        "pnpm --dir web lint",
+        "实际浏览器核对本任务页面/关键状态及移动端；使用隔离服务或明确Mock并记录区别。",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T023",
+      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。"
+    },
+    {
+      "id": "PHASE-1.5-T024",
+      "phase": "Phase 1.5",
+      "title": "实现大纲预览与生成进度页",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T023"
+      ],
+      "scope": [
+        "web/src/",
+        "web/tests/",
+        "docs/design/",
+        "docs/api/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5/§9.1；ADR0023；需求v0.3；信息架构及已确认三页原型",
+      "acceptance_criteria": [
+        "显示真实原目标、大纲和生成状态，默认自动继续，用户主动调整时阻止错误自动跳转。",
+        "首场景就绪可进入学习；真实澄清才提问，不把图谱未命中作失败。",
+        "停止/恢复/调整展示影响范围，刷新恢复同一操作，不重复请求。"
+      ],
+      "verification": [
+        "（待建立）pnpm --dir web exec vitest run tests/course-outline.spec.ts",
+        "pnpm --dir web typecheck",
+        "pnpm --dir web build",
+        "pnpm --dir web lint",
+        "实际浏览器核对本任务页面/关键状态及移动端；使用隔离服务或明确Mock并记录区别。",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T024",
+      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。"
+    },
+    {
+      "id": "PHASE-1.5-T025",
+      "phase": "Phase 1.5",
+      "title": "实现可渐进学习的课程页面",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T024"
+      ],
+      "scope": [
+        "web/src/",
+        "web/tests/",
+        "docs/design/",
+        "docs/api/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5/§9.1；ADR0023；需求v0.3；信息架构及已确认三页原型",
+      "acceptance_criteria": [
+        "课程目录/正文/按需导师区域按设计呈现，区分课程类型、场景状态和学习进度。",
+        "接入真实增量场景、等待/失败/失效和版本读取，局部失败不隐藏可学内容。",
+        "离开/刷新/切课取消前端等待并忽略迟到事件，恢复准确位置。"
+      ],
+      "verification": [
+        "（待建立）pnpm --dir web exec vitest run tests/course-workspace.spec.ts",
+        "pnpm --dir web typecheck",
+        "pnpm --dir web build",
+        "pnpm --dir web lint",
+        "实际浏览器核对本任务页面/关键状态及移动端；使用隔离服务或明确Mock并记录区别。",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T025",
+      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。"
+    },
+    {
+      "id": "PHASE-1.5-T026",
+      "phase": "Phase 1.5",
+      "title": "实现代码对照与过程可视化",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T025",
+        "PHASE-1.5-T012"
+      ],
+      "scope": [
+        "web/src/",
+        "web/tests/",
+        "docs/design/",
+        "docs/api/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5/§9.1；ADR0023；需求v0.3；信息架构及已确认三页原型",
+      "acceptance_criteria": [
+        "真实场景动作驱动代码高亮与批准的状态组件，播放/暂停/步进及减少动效可用。",
+        "代码展示与实际执行明确区分；未实现执行能力不显示运行按钮。",
+        "动作失效、媒体待生成或失败时提供真实静态替代，不阻断其他内容。"
+      ],
+      "verification": [
+        "（待建立）pnpm --dir web exec vitest run tests/course-visualization.spec.ts",
+        "pnpm --dir web typecheck",
+        "pnpm --dir web build",
+        "pnpm --dir web lint",
+        "实际浏览器核对本任务页面/关键状态及移动端；使用隔离服务或明确Mock并记录区别。",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T026",
+      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。"
+    },
+    {
+      "id": "PHASE-1.5-T027",
+      "phase": "Phase 1.5",
+      "title": "实现课程内练习及证据状态反馈",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T025",
+        "PHASE-1.5-T018",
+        "PHASE-1.5-T019"
+      ],
+      "scope": [
+        "web/src/",
+        "web/tests/",
+        "docs/design/",
+        "docs/api/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5/§9.1；ADR0023；需求v0.3；信息架构及已确认三页原型",
+      "acceptance_criteria": [
+        "连接真实题目和作答接口，覆盖提交/重复/错误/暂停/版本更新状态。",
+        "未校验答案仅显示暂定反馈与课程内表现，不虚构掌握度增长。",
+        "修订后的反馈和评分撤销有明确解释，保存旧题作答对应关系。"
+      ],
+      "verification": [
+        "（待建立）pnpm --dir web exec vitest run tests/course-exercises.spec.ts",
+        "pnpm --dir web typecheck",
+        "pnpm --dir web build",
+        "pnpm --dir web lint",
+        "实际浏览器核对本任务页面/关键状态及移动端；使用隔离服务或明确Mock并记录区别。",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T027",
+      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。"
+    },
+    {
+      "id": "PHASE-1.5-T028",
+      "phase": "Phase 1.5",
+      "title": "接入当前场景导师问答与补充解释",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T025",
+        "PHASE-1.5-T003"
+      ],
+      "scope": [
+        "backend/app/ (仅现有导师场景上下文适配)",
+        "web/src/",
+        "web/tests/",
+        "docs/design/",
+        "docs/api/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5/§9.1；ADR0023；需求v0.3；信息架构及已确认三页原型",
+      "acceptance_criteria": [
+        "复用已有导师能力，绑定当前课程和场景版本的上下文；若适配器需调整仅限该接线。",
+        "支持流式问答、取消与失败恢复，未知事实不来自原型预设回答，不扩展RAG/辩论。",
+        "提问不自动修改课程；影响正文的更换示例/修订走独立批准操作与预算。"
+      ],
+      "verification": [
+        "（待建立）pnpm --dir web exec vitest run tests/course-tutor.spec.ts",
+        "pnpm --dir web typecheck",
+        "pnpm --dir web build",
+        "pnpm --dir web lint",
+        "实际浏览器核对本任务页面/关键状态及移动端；使用隔离服务或明确Mock并记录区别。",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T028",
+      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。"
+    },
+    {
+      "id": "PHASE-1.5-T029",
+      "phase": "Phase 1.5",
+      "title": "实现课程反馈与局部修订交互",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T025",
+        "PHASE-1.5-T016",
+        "PHASE-1.5-T017",
+        "PHASE-1.5-T027"
+      ],
+      "scope": [
+        "web/src/",
+        "web/tests/",
+        "docs/design/",
+        "docs/api/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5/§9.1；ADR0023；需求v0.3；信息架构及已确认三页原型",
+      "acceptance_criteria": [
+        "学生对准确段落/题目反馈问题，能区分已提交、待核对和已确认处置。",
+        "局部重生成前展示影响范围，保留可保留旧内容，明确错误按规则暂停，不静默替换。",
+        "修订失败/取消/完成及下游等待可理解，历史作答与版本不混用。"
+      ],
+      "verification": [
+        "（待建立）pnpm --dir web exec vitest run tests/course-revision.spec.ts",
+        "pnpm --dir web typecheck",
+        "pnpm --dir web build",
+        "pnpm --dir web lint",
+        "实际浏览器核对本任务页面/关键状态及移动端；使用隔离服务或明确Mock并记录区别。",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T029",
+      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。"
+    },
+    {
+      "id": "PHASE-1.5-T030",
+      "phase": "Phase 1.5",
+      "title": "重构图谱与路径页面",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T022",
+        "PHASE-1.5-T009"
+      ],
+      "scope": [
+        "web/src/",
+        "web/tests/",
+        "docs/design/",
+        "docs/api/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5/§9.1；ADR0023；需求v0.3；信息架构及已确认三页原型",
+      "acceptance_criteria": [
+        "列表与图谱均可浏览，推荐理由可读，目标/推荐/实际课程关联明确。",
+        "节点存在、签核课程可用性和掌握度未知分开显示，无课节点可带目标进入生成。",
+        "不强制按先修路径改用户目标，旧图谱版本和路径恢复正确。"
+      ],
+      "verification": [
+        "（待建立）pnpm --dir web exec vitest run tests/graph-paths.spec.ts",
+        "pnpm --dir web typecheck",
+        "pnpm --dir web build",
+        "pnpm --dir web lint",
+        "实际浏览器核对本任务页面/关键状态及移动端；使用隔离服务或明确Mock并记录区别。",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T030",
+      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。"
+    },
+    {
+      "id": "PHASE-1.5-T031",
+      "phase": "Phase 1.5",
+      "title": "重构画像与掌握度页面",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T022",
+        "PHASE-1.5-T019"
+      ],
+      "scope": [
+        "web/src/",
+        "web/tests/",
+        "docs/design/",
+        "docs/api/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5/§9.1；ADR0023；需求v0.3；信息架构及已确认三页原型",
+      "acceptance_criteria": [
+        "展示真实目标、偏好、已有证据与未知字段，区分自述和作答来源。",
+        "接入已有纠正能力，不新增无依据评分或Phase2画像算法。",
+        "掌握度贡献撤销/重算可追溯到记录，空态与读取失败可理解。"
+      ],
+      "verification": [
+        "（待建立）pnpm --dir web exec vitest run tests/profile-mastery.spec.ts",
+        "pnpm --dir web typecheck",
+        "pnpm --dir web build",
+        "pnpm --dir web lint",
+        "实际浏览器核对本任务页面/关键状态及移动端；使用隔离服务或明确Mock并记录区别。",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T031",
+      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。"
+    },
+    {
+      "id": "PHASE-1.5-T032",
+      "phase": "Phase 1.5",
+      "title": "重构学习记录页面",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T022",
+        "PHASE-1.5-T020",
+        "PHASE-1.5-T019"
+      ],
+      "scope": [
+        "web/src/",
+        "web/tests/",
+        "docs/design/",
+        "docs/api/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5/§9.1；ADR0023；需求v0.3；信息架构及已确认三页原型",
+      "acceptance_criteria": [
+        "真实课程/练习记录按准确版本可恢复，区分学习完成、生成完成、部分完成和失败。",
+        "可查修订及原作答，不将记录列表包装成Phase2分析报告。",
+        "覆盖无记录、旧数据、失效内容和跨课程跳转，不泄露其他用户。"
+      ],
+      "verification": [
+        "（待建立）pnpm --dir web exec vitest run tests/learning-history.spec.ts",
+        "pnpm --dir web typecheck",
+        "pnpm --dir web build",
+        "pnpm --dir web lint",
+        "实际浏览器核对本任务页面/关键状态及移动端；使用隔离服务或明确Mock并记录区别。",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T032",
+      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。"
+    },
+    {
+      "id": "PHASE-1.5-T033",
+      "phase": "Phase 1.5",
+      "title": "重构模型设置页面",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T022"
+      ],
+      "scope": [
+        "web/src/",
+        "web/tests/",
+        "docs/design/",
+        "docs/api/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5/§9.1；ADR0023；需求v0.3；信息架构及已确认三页原型",
+      "acceptance_criteria": [
+        "复用现有Provider/模型偏好/凭据API，清晰区分已配置、可用、未真实验收与能力不支持。",
+        "运行中修改设置不静默改变现有操作的模型/Provider，不自动回退或恢复旧验证预算。",
+        "密钥不出现在页面日志、错误或非必要状态；真实连接探测保持原授权与调用规则。"
+      ],
+      "verification": [
+        "（待建立）pnpm --dir web exec vitest run tests/model-settings-redesign.spec.ts",
+        "pnpm --dir web typecheck",
+        "pnpm --dir web build",
+        "pnpm --dir web lint",
+        "实际浏览器核对本任务页面/关键状态及移动端；使用隔离服务或明确Mock并记录区别。",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T033",
+      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。"
+    },
+    {
+      "id": "PHASE-1.5-T034",
+      "phase": "Phase 1.5",
+      "title": "完成全站移动端与可访问性整合",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T023",
+        "PHASE-1.5-T024",
+        "PHASE-1.5-T025",
+        "PHASE-1.5-T026",
+        "PHASE-1.5-T027",
+        "PHASE-1.5-T028",
+        "PHASE-1.5-T029",
+        "PHASE-1.5-T030",
+        "PHASE-1.5-T031",
+        "PHASE-1.5-T032",
+        "PHASE-1.5-T033"
+      ],
+      "scope": [
+        "web/src/",
+        "web/tests/",
+        "docs/design/",
+        "docs/api/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5/§9.1；ADR0023；需求v0.3；信息架构及已确认三页原型",
+      "acceptance_criteria": [
+        "桌面/平板/窄屏主要旅程可完成，代码局部滚动、目录与导师不遮挡关键操作。",
+        "键盘顺序、焦点恢复、表单标签、对比度、非颜色状态和减少动效经过实际检查。",
+        "设计占位/示例数据不混入产品，路由/空态/错误交互跨页一致。"
+      ],
+      "verification": [
+        "（待建立）pnpm --dir web exec vitest run tests/responsive-accessibility.spec.ts",
+        "pnpm --dir web typecheck",
+        "pnpm --dir web build",
+        "pnpm --dir web lint",
+        "实际浏览器核对本任务页面/关键状态及移动端；使用隔离服务或明确Mock并记录区别。",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T034",
+      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。"
+    },
+    {
+      "id": "PHASE-1.5-T035",
+      "phase": "Phase 1.5",
+      "title": "完成新链零Provider集成验收",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T021",
+        "PHASE-1.5-T034",
+        "PHASE-1.5-T005"
+      ],
+      "scope": [
+        "scripts/",
+        "backend/tests/",
+        "web/tests/",
+        "docs/acceptance/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5/§9.1；ADR0023；需求v0.3；阶段任务说明",
+      "acceptance_criteria": [
+        "隔离PG/队列/实际HTTP和MockProvider覆盖目标→规划→首场景→后续→作答→恢复→修订→证据撤销闭环。",
+        "故障注入验证worker重启、事件重连、预算耗尽、取消竞争、跨owner和失效版本，不删失败用例过关。",
+        "复核旧目录、安全配置、历史归档及H封存，记录脚本化与真实能力证据边界。"
+      ],
+      "verification": [
+        "在独立PG/队列环境实际执行任务新增的集成回归和故障注入，报告完整命令、数量、失败/skip与证据。",
+        "（待建立）python3 scripts/check_p15_free_course_integration.py --check；纯离线校验准确证据、配置、授权边界与状态，不在--check隐式发真实请求。",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T035",
+      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。"
+    },
+    {
+      "id": "PHASE-1.5-T036",
+      "phase": "Phase 1.5",
+      "title": "完成主要学习旅程浏览器验收",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T035"
+      ],
+      "scope": [
+        "scripts/",
+        "backend/tests/",
+        "web/tests/",
+        "docs/acceptance/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5/§9.1；ADR0023；需求v0.3；阶段任务说明",
+      "acceptance_criteria": [
+        "在隔离真实API与明确Mock模型下验证全部主要页面桌面/移动关键旅程，截图与请求证据可追溯。",
+        "验证首场景可学习、后续局部失败仍可读、真实刷新恢复、模型设置返回保留目标及反馈修订。",
+        "不以静态原型替代业务E2E；与真实Provider质量分开报告，失败不记通过。"
+      ],
+      "verification": [
+        "建立独立浏览器验收入口并实际运行：真实隔离API+明确MockProvider，记录桌面/移动截图和请求证据，不只调用原有不含新旅程的E2E。",
+        "（待建立）python3 scripts/check_p15_free_course_browser.py --check；纯离线校验准确证据、配置、授权边界与状态，不在--check隐式发真实请求。",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T036",
+      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。"
+    },
+    {
+      "id": "PHASE-1.5-T037",
+      "phase": "Phase 1.5",
+      "title": "准备有界开发诊断执行包",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T036",
+        "PHASE-1.5-T005"
+      ],
+      "scope": [
+        "scripts/",
+        "backend/tests/",
+        "web/tests/",
+        "docs/acceptance/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5/§9.1；ADR0023；需求v0.3；阶段任务说明",
+      "acceptance_criteria": [
+        "冻结实际候选/Prompt/Schema/源码、开发输入、预期和逐项评测方法，原A/G/P/D材料只作开发回归。",
+        "实现独立持久预约/预算/时钟/停止与完整收据，离线验证越界拒绝、缺授权拒绝、重复启动拒绝。",
+        "提出具体调用/费用与候选上限，当前不创建真实授权；未批准配置不调用，H不参与调优。"
+      ],
+      "verification": [
+        "实际执行新执行器的离线正负例，证明缺授权/越额/重复启动被拒绝；不创建占位人工签核。",
+        "（待建立）python3 scripts/check_p15_development_diagnostic.py --check；纯离线校验准确证据、配置、授权边界与状态，不在--check隐式发真实请求。",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T037",
+      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。"
+    },
+    {
+      "id": "PHASE-1.5-T038",
+      "phase": "Phase 1.5",
+      "title": "执行批准的开发诊断并决定候选去向",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T037"
+      ],
+      "scope": [
+        "scripts/",
+        "backend/tests/",
+        "web/tests/",
+        "docs/acceptance/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5/§9.1；ADR0023；需求v0.3；阶段任务说明",
+      "acceptance_criteria": [
+        "只在准确执行包/预算/样本及停止规则获准后运行，保留全部真实结果、失败、未运行、用量与人工/GPT来源区别。",
+        "分别报告生成内容质量与审核建议表现，不能靠重复直到通过或全转人工制造成功。",
+        "按T005预冻结准入判断：未通过则标blocked停止依赖，不自动领取独立验收；通过才冻结候选，任何修复需重新验证。"
+      ],
+      "verification": [
+        "仅按准确授权执行包的真实运行命令执行，记录每次预约/请求/收据/失败/人工核对；不在规划时预填命令参数或结果。",
+        "（待建立）python3 scripts/check_p15_development_diagnostic_results.py --check；纯离线校验准确证据、配置、授权边界与状态，不在--check隐式发真实请求。",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T038",
+      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。真实调用另需本轮准确包、配置、样本/标签、预算和停止条件授权；旧预算不可用。未达准入/质量/性能要求不得done。"
+    },
+    {
+      "id": "PHASE-1.5-T039",
+      "phase": "Phase 1.5",
+      "title": "准备独立质量与性能验收包",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T038"
+      ],
+      "scope": [
+        "scripts/",
+        "backend/tests/",
+        "web/tests/",
+        "docs/acceptance/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5/§9.1；ADR0023；需求v0.3；阶段任务说明",
+      "acceptance_criteria": [
+        "候选冻结后重判H适用性/暴露情况并准备足够独立样本；人工先标实际内容再看审核回答，不用开发对照补独立分母。",
+        "质量与性能分别冻结样本、时钟、分母、失败处理、预算和执行器，保留草稿与签核的不同目标。",
+        "取得准确材料/标签与具体预算批准前不调用；离线证明执行器不会复用旧额度或改写历史。"
+      ],
+      "verification": [
+        "实际执行新执行器的离线正负例，证明缺授权/越额/重复启动被拒绝；不创建占位人工签核。",
+        "（待建立）python3 scripts/check_p15_independent_acceptance.py --check；纯离线校验准确证据、配置、授权边界与状态，不在--check隐式发真实请求。",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T039",
+      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。"
+    },
+    {
+      "id": "PHASE-1.5-T040",
+      "phase": "Phase 1.5",
+      "title": "完成新课程独立质量验收",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T039"
+      ],
+      "scope": [
+        "scripts/",
+        "backend/tests/",
+        "web/tests/",
+        "docs/acceptance/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5/§9.1；ADR0023；需求v0.3；阶段任务说明",
+      "acceptance_criteria": [
+        "按批准方案实际运行独立集并核对需求兑现、个性化、事实/答案错误、教学覆盖和严重缺陷处理，失败/未运行如实计入。",
+        "独立人工结果与模型/GPT草稿严格区分，不以Schema通过代替语义正确；用于修复的样本退出未见集。",
+        "达成T005冻结的本阶段质量门槛才done；否则blocked，不下调标准或追认P1质量通过。"
+      ],
+      "verification": [
+        "仅按准确授权执行包的真实运行命令执行，记录每次预约/请求/收据/失败/人工核对；不在规划时预填命令参数或结果。",
+        "（待建立）python3 scripts/check_p15_quality_results.py --check；纯离线校验准确证据、配置、授权边界与状态，不在--check隐式发真实请求。",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T040",
+      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。真实调用另需本轮准确包、配置、样本/标签、预算和停止条件授权；旧预算不可用。未达准入/质量/性能要求不得done。"
+    },
+    {
+      "id": "PHASE-1.5-T041",
+      "phase": "Phase 1.5",
+      "title": "完成新课程独立性能验收",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T040"
+      ],
+      "scope": [
+        "scripts/",
+        "backend/tests/",
+        "web/tests/",
+        "docs/acceptance/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5/§9.1；ADR0023；需求v0.3；阶段任务说明",
+      "acceptance_criteria": [
+        "测量首完整可学场景、后续场景等待、整课时间及取消/恢复，按预冻结样本与失败规则计数。",
+        "性能请求有独立或明确共享的已批准预算，和质量测试的请求/成本不双计；不以HTTP首字节冒充教学内容。",
+        "达成新链性能门槛才done，否则blocked；旧T041历史不改，不能拼接不同配置数据。"
+      ],
+      "verification": [
+        "仅按准确授权执行包的真实运行命令执行，记录每次预约/请求/收据/失败/人工核对；不在规划时预填命令参数或结果。",
+        "（待建立）python3 scripts/check_p15_performance_results.py --check；纯离线校验准确证据、配置、授权边界与状态，不在--check隐式发真实请求。",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T041",
+      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。真实调用另需本轮准确包、配置、样本/标签、预算和停止条件授权；旧预算不可用。未达准入/质量/性能要求不得done。"
+    },
+    {
+      "id": "PHASE-1.5-T042",
+      "phase": "Phase 1.5",
+      "title": "完成P1.5阶段交接与开放提案",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T040",
+        "PHASE-1.5-T041"
+      ],
+      "scope": [
+        "docs/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5/§9.1；ADR0023；需求v0.3；阶段任务说明",
+      "acceptance_criteria": [
+        "逐项核对完成提交、实际质量/性能/浏览器证据与已交付范围，保留延期项和未验证能力。",
+        "交付启用/回退、数据兼容、用户反馈与运行维护说明，具体开放范围呈交用户决定；不自动部署或切换生产模式。",
+        "阶段退出获批后才按治理规则归档切换，不启动Phase2/3，不将旧P1 blocked改分。"
+      ],
+      "verification": [
+        "人工核对本任务2–5项验收条件、相关PRD/ADR/设计输入与链接；具体契约需要批准时保存准确文件及确认来源。",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T042",
+      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。"
     }
-  ]
+  ],
+  "planning_inputs": {
+    "requirements": "docs/PRD-phase-1.5-draft.md",
+    "direction": "docs/ADR/0023-free-course-learning-and-ui-direction.md",
+    "information_architecture": "docs/design/phase-1.5-information-architecture.md",
+    "accepted_three_page_prototype": "docs/design/prototypes/phase-1.5-learning/README.md",
+    "planning_notes": "docs/phase-1.5-task-plan.md",
+    "status": "Design inputs accepted; implementation and independent validation not completed."
+  }
 }
