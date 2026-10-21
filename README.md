@@ -8,7 +8,11 @@
 
 **动态生成、重解释、实时AI互动及动态辩论仍暂缓**；服务端默认 `catalog_only`，在构建模型依赖前拒绝动态入口。T033 保持 blocked，原模型质量/延迟成绩不变，目录静态性能不作为动态生成通过。固定题由服务端确定性计分，首次完整作答形成掌握度证据，重复练习有反馈但不刷掌握度；做完课程不等于已掌握。
 
-当前开发阶段为**Phase 1功能规划**，根目录 [task.json](task.json)细化42项任务，初始全部todo，范围见[PRD §0.1](docs/PRD.md#01-当前开发阶段phase-1-功能开发2026-10-03)。[MVP 0.3账本](docs/tasks/mvp-0.3.json)已原样归档，保留45 done和T033 blocked；新阶段从`PHASE-1-T001`冻结范围与验收开始。模型/BYOK、队列、动画DSL和图谱扩展尚未实施，目录交付基线持续有效。MVP 0.2 的38项任务亦已[原样归档](docs/tasks/mvp-0.2.json)，其[收尾决定](docs/acceptance/mvp-0.2-closeout-decision.md)保留 Pro 质量/闭环与 Flash 性能的证据边界。架构状态和待决项见 [ADR 索引](docs/ADR/README.md)。
+**P1已按批准的收敛范围结束；Phase 1.5仅切换账本，尚未启动开发。** [最终P1账本](docs/tasks/phase-1.json)共91项：89 done、T040质量／T041旧链性能blocked；不是原动态指标达标。Provider／BYOK、队列、受约束DSL、30节点图谱、共享计划／审核分流及受信人工历史等工程已交付，真实验证和未验边界见[阶段交接](docs/acceptance/phase-1-closeout-20261021/README.md)及[ADR-0022](docs/ADR/0022-phase-1-contracted-closeout-and-phase-1-5.md)。Ollama／Anthropic／Gemini／星火真实接入延期；30节点不等于30套签核课程。
+
+正式产品继续为已有签核课程；动态生成定位为待审草稿，暂不承诺自动发布，公开草稿后台尚未交付，默认catalog_only。根[task.json](task.json)仅保存Phase 1.5一个未领取的契约／独立验收规划任务：新链质量／性能、新课程契约和H01–H08适用性须重新确定，无旧预算或验收资格转入。本次不启动开发、不追加模型试错／真实Provider调用、不部署或开放动态。
+
+[MVP 0.3账本](docs/tasks/mvp-0.3.json)保留45 done／T033 blocked；[MVP 0.2账本](docs/tasks/mvp-0.2.json)及[收尾决定](docs/acceptance/mvp-0.2-closeout-decision.md)继续只读。
 
 ## 后端
 

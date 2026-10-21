@@ -1,5 +1,9 @@
 # EduMind Agent 架构约束
 
+## 当前交付与P1归档（2026-10-21）
+
+P1工程交付、实际验证和延期限制以[阶段交接](acceptance/phase-1-closeout-20261021/README.md)和[ADR-0022](ADR/0022-phase-1-contracted-closeout-and-phase-1-5.md)为当前索引。下文按任务追加的“待实施”描述保留当时上下文，不能代替最终账本。正式产品仍catalog_only签核课程；动态为待审草稿、不承诺自动发布，公开草稿运营UI未交付。T040／T041 blocked；Phase 1.5根账本仅规划未启动，无新模型调用、动态开放或自动计划重建授权。
+
 本文件记录已拆分任务的架构决定及其边界。产品范围和验收标准仍以 [PRD](PRD.md) 为准；重大的 API、数据模型和安全变更必须新增 ADR。
 
 审批状态和待决项见 [ADR 索引](ADR/README.md)。本文区分当前实现与阶段计划，不替代批准记录。

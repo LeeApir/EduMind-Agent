@@ -86,3 +86,5 @@
 2026-10-20：[ADR-0020：受限验收及GPT证据边界](0020-limited-acceptance-and-gpt-evaluation.md)与[PRD补充](../PRD-limited-acceptance-20261020.md)已准备；执行实现/零调用检查获准，准确包与受限完成条件待真实执行批准，T040 blocked、原大样本指标未证明。原PRD及旧冻结附件不改写。
 
 2026-10-20：[ADR-0021：计划检查与受限纠错](0021-plan-check-and-bounded-repair.md)已按[批准记录](0021-approval-20261020.json)接受方案A与PC-01–05（T081–T085）。早期计划问题先终止交人工，空验证器不自动重建；20次/180秒共享预算。真实请求/H调优/方案B/T040解除不在授权内，逐项实施状态见活动账本。
+
+2026-10-21：[ADR-0022](0022-phase-1-contracted-closeout-and-phase-1-5.md)按用户明确五项指令Accepted：P1按收敛范围结束，T040／T041 blocked，T042按交接条件完成；最终账本原样归档、同一治理提交切换Phase 1.5，仅规划todo未启动。默认catalog_only/H封存，无新真实调用或模型试错，不追认旧质量／性能，见[交接](../acceptance/phase-1-closeout-20261021/README.md)。
