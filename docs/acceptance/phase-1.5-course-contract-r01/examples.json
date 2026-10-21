@@ -1,0 +1,156 @@
+{
+  "schema_version": "free-course-contract-examples-v1",
+  "status": "design_cases_not_runtime_results",
+  "cases": [
+    {
+      "id": "P01",
+      "title": "Unmapped goal",
+      "given": "Owner creates supported goal; validated plan node_links=[]",
+      "expected": "201 create; owner may read ready scene; no node mastery contribution"
+    },
+    {
+      "id": "P02",
+      "title": "Multiple nodes",
+      "given": "One course version maps pointers and linked list nodes",
+      "expected": "Both versioned links retained; neither overrides original goal"
+    },
+    {
+      "id": "P03",
+      "title": "Guest owner",
+      "given": "Valid existing guest session reads its course",
+      "expected": "200; same owner as session, no account migration"
+    },
+    {
+      "id": "P04",
+      "title": "Semantic opinion",
+      "given": "Hard-valid scene with unconfirmed model reject",
+      "expected": "Owner can read draft; endorsement remains unendorsed"
+    },
+    {
+      "id": "P05",
+      "title": "Historical version",
+      "given": "Head=3, owner explicitly requests version=1",
+      "expected": "200 exact version 1; no generation or head switch"
+    },
+    {
+      "id": "P06",
+      "title": "Partial course",
+      "given": "Manifest has first ready scene and second null",
+      "expected": "First readable; second 409 SCENE_NOT_READY; complete=false"
+    },
+    {
+      "id": "P07",
+      "title": "Idempotent create",
+      "given": "Same owner/key and canonical request repeated",
+      "expected": "Original 201 IDs; no duplicate course/operation/call"
+    },
+    {
+      "id": "N01",
+      "title": "Cross owner",
+      "given": "User B requests user A course, version or scene",
+      "expected": "404 NOT_FOUND; no content, IDs or existence details"
+    },
+    {
+      "id": "N02",
+      "title": "No session",
+      "given": "Missing/expired cookie",
+      "expected": "401 UNAUTHORIZED"
+    },
+    {
+      "id": "N03",
+      "title": "CSRF",
+      "given": "Authenticated POST with missing CSRF",
+      "expected": "403 CSRF_FAILED; no writes or calls"
+    },
+    {
+      "id": "N04",
+      "title": "Forged privilege",
+      "given": "POST includes owner_id or endorsement=approved",
+      "expected": "422 unknown fields; cannot assign owner or publish"
+    },
+    {
+      "id": "N05",
+      "title": "Foreign nested ID",
+      "given": "Own course with scene from another course",
+      "expected": "404; composite FK rejects equivalent persistence attempt"
+    },
+    {
+      "id": "N06",
+      "title": "Old unpublished unit",
+      "given": "Old failed/review_required unit UUID used in new API",
+      "expected": "404; no import or draft visibility promotion"
+    },
+    {
+      "id": "N07",
+      "title": "Missing history",
+      "given": "Request version 99 when head=3",
+      "expected": "404; no latest fallback"
+    },
+    {
+      "id": "N08",
+      "title": "Withdrawn body",
+      "given": "Old manifest references scene later disabled by confirmed-defect fact",
+      "expected": "409 CONTENT_UNAVAILABLE, no正文; current fact overrides historical readability"
+    },
+    {
+      "id": "N09",
+      "title": "Mixed dependencies",
+      "given": "Ready scene binds upstream version not in this manifest",
+      "expected": "Reject publication/head switch; no mixed visible snapshot"
+    },
+    {
+      "id": "N10",
+      "title": "Forged node",
+      "given": "Unknown node/version or duplicate link",
+      "expected": "Reject binding; unmatched valid goal may instead have []"
+    },
+    {
+      "id": "N11",
+      "title": "Idempotency conflict",
+      "given": "Same owner/key with changed goal",
+      "expected": "409 IDEMPOTENCY_CONFLICT; no new operation"
+    },
+    {
+      "id": "N12",
+      "title": "Catalog gate",
+      "given": "Valid new POST while catalog_only",
+      "expected": "409 FREE_COURSE_DISABLED; no course/receipt/call"
+    },
+    {
+      "id": "N13",
+      "title": "Client answer leak",
+      "given": "Exercise storage includes solution and correct_answer",
+      "expected": "Public projection excludes both; never serialize raw content_json"
+    },
+    {
+      "id": "N14",
+      "title": "Empty goal",
+      "given": "Goal consists only of whitespace",
+      "expected": "422; no writes/calls"
+    },
+    {
+      "id": "N15",
+      "title": "Unsafe content",
+      "given": "Scene invalid schema, executable HTML/JS or invalid action references",
+      "expected": "Not readable and cannot enter ready manifest"
+    },
+    {
+      "id": "N16",
+      "title": "Concurrent head",
+      "given": "Revision uses stale expected_head_version",
+      "expected": "409; previous head and immutable versions preserved"
+    },
+    {
+      "id": "N17",
+      "title": "Destructive rollback",
+      "given": "Attempt downgrade with nonempty new course tables",
+      "expected": "Refuse before dropping tables; use forward recovery"
+    },
+    {
+      "id": "N18",
+      "title": "Unsigned sharing",
+      "given": "Another guest with copied course UUID or URL",
+      "expected": "404; no device-based ownership inference"
+    }
+  ]
+}
