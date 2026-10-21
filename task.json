@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "用户授权继续T002设计；当前准确A—E待批准，后续任务按明确授权与依赖串行推进，不自动扩展真实调用/开放。",
+    "phase_gate": "用户授权并批准T002具体契约；完成验收与独立提交后done，其余40项todo，后续按明确授权及依赖串行推进，不自动扩展真实调用/开放。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -43,7 +43,7 @@
     }
   ],
   "stage_scope": {
-    "authorization": "2026-10-21用户确认A—F与三页原型并要求“可以，准备task”；仅授权细化当前阶段任务，不领取或开发。 2026-10-21用户后续要求“领取T01”，授权领取PHASE-1.5-T001；不扩大为整阶段执行授权。 用户随后要求“开始开发”，本次执行T001契约设计；具体契约批准仍待准确方案确认。 用户随后回复“批准”，接受d9bd7a6的ADR0024 A—D及准确附件；不自动授权后续任务。 用户在T001完成后要求“继续”，授权执行下一项T002具体设计。",
+    "authorization": "2026-10-21用户确认A—F与三页原型并要求“可以，准备task”；仅授权细化当前阶段任务，不领取或开发。 2026-10-21用户后续要求“领取T01”，授权领取PHASE-1.5-T001；不扩大为整阶段执行授权。 用户随后要求“开始开发”，本次执行T001契约设计；具体契约批准仍待准确方案确认。 用户随后回复“批准”，接受d9bd7a6的ADR0024 A—D及准确附件；不自动授权后续任务。 用户在T001完成后要求“继续”，授权执行下一项T002具体设计。 用户随后回复“批准”，接受8f9f21f中ADR0025 A—E及准确附件，不自动授权后续任务或真实调用。",
     "product_mode": "catalog_only",
     "formal_product": "已有签核课程",
     "dynamic_scope": "已确认学生可直接学习AI生成草稿；普通语义审核不阻断整课。实际运行开放须新契约实现与独立验收后批准，既有签核课程语义不变。",
@@ -53,7 +53,7 @@
     "dynamic_release_authorized": false,
     "deployment_authorized": false,
     "H": "H01–H08继续封存；新契约确定后重判适用性与独立性，不自动继承验收资格。",
-    "implementation_scope": "T001 done；T002具体契约已准备，待批准blocked；其余40项todo，无新业务接口或迁移。",
+    "implementation_scope": "T001 done；T002具体契约已批准并验收，完成提交后done；其余40项todo，无新业务接口或迁移。",
     "included": [
       "自由目标/可变场景/可选多节点关联",
       "首场景可学与后续持久生成/恢复/局部修订",
@@ -152,7 +152,7 @@
       "id": "PHASE-1.5-T002",
       "phase": "Phase 1.5",
       "title": "冻结渐进生成、恢复与修订状态契约",
-      "status": "blocked",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1.5-T001"
@@ -188,13 +188,18 @@
           "command": "python3 scripts/check_catalog_workflow.py；git diff --check",
           "result": "passed",
           "evidence": "docs/acceptance/phase-1.5-generation-contract-r01/verification.txt"
+        },
+        {
+          "command": "人工核对AC1–AC3及准确批准来源；SHA256与提案提交逐字节复核",
+          "result": "passed: ADR0025 A—E及6份准确附件批准已登记，设计验收完成；无调度/HTTP/PG/Provider运行通过声明",
+          "evidence": "docs/ADR/0025-approval-20261021.json；docs/acceptance/phase-1.5-generation-contract-r01/verification.txt"
         }
       ],
       "started_at": "2026-10-21T21:57:17",
-      "completed_at": null,
-      "blocker": "ADR-0025 A—E具体状态/API/规模/预算/恢复与修订契约及准确manifest待用户批准；设计材料和离线检查就绪，未实施。",
+      "completed_at": "2026-10-21T23:18:29",
+      "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T002",
-      "execution_gate": "用户要求继续已授权T002设计；ADR0025 A—E及准确manifest待批准，批准后恢复完成，不自动执行后续任务/真实调用。"
+      "execution_gate": "2026-10-21用户已批准8f9f21f的ADR-0025 A—E及准确manifest；登记docs/ADR/0025-approval-20261021.json，恢复完成设计验收，不自动领取后续任务或授权真实调用。"
     },
     {
       "id": "PHASE-1.5-T003",

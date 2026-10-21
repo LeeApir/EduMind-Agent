@@ -181,6 +181,8 @@ EduMind-Agent/
 
 2026-10-21 T002：用户要求继续，已领取并准备ADR0025及docs/acceptance/phase-1.5-generation-contract-r01具体契约；待准确A—E批准，未实施。T001保持done且冻结文件不改；T002状态见根账本，其余40项todo，真实请求0/catalog_only。
 
+2026-10-21 T002后续：用户已批准8f9f21f的ADR0025 A—E及6份准确附件，登记docs/ADR/0025-approval-20261021.json；冻结文件不变，当前接受状态以登记为准。T002完成设计验收后独立提交，其余40项todo，下一T003待执行授权。Provider实际调用0，预算数值不等于真实授权。
+
 ### 以下为历史阶段上下文（状态以当前根账本及只读归档为准）
 
 MVP 0.3 已按 ADR-0007 完成课程目录版退出，46 项最终账本原样归档于 `docs/tasks/mvp-0.3.json`：45 done、原动态验收 T033 blocked。归档任务不得重新领取或改分，历史累计 Provider 请求为2033/2500，额度不自动转为新阶段授权。
