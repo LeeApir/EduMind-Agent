@@ -1,0 +1,47 @@
+{
+  "coverage": {
+    "checked": [
+      "goal_fidelity",
+      "internal_consistency",
+      "scope",
+      "reference_support",
+      "downstream_feasibility"
+    ],
+    "unchecked": []
+  },
+  "findings": [
+    {
+      "category": "missing_premise",
+      "condition_or_counterexample": "The plan binds graph-node:mvp-0.2.0:array to digest f83fd12e754fcda4124aa62b8a29203d97a897605d23dc4e37877393dcb0015d, while the supplied snapshot for the same reference ID and version has digest b3333a8363bf0542b851bf6ea402e5779e515a95328f83138a43f15a7363b219. The available data does not establish which snapshot the plan intended to use.",
+      "evidence_anchors": [
+        "p11",
+        "p34",
+        "p35",
+        "p36"
+      ],
+      "finding_id": "reference-digest-unresolved",
+      "impact": "The reference source cannot be verified against the plan binding, so its support for the lesson remains uncertain.",
+      "severity": "major",
+      "suggested_action": "human_review",
+      "target_anchor": "p11"
+    },
+    {
+      "category": "coverage_plan_gap",
+      "condition_or_counterexample": "The plan promises three questions, but the exercise scene is identified only by its role and key; no planned field specifies or enumerates three questions. The scene may contain them, but this plan does not establish that it will.",
+      "evidence_anchors": [
+        "p9",
+        "p20"
+      ],
+      "finding_id": "exercise-count-unverifiable",
+      "impact": "The requested three-question deliverable cannot be guaranteed from the planned exercise specification.",
+      "severity": "major",
+      "suggested_action": "human_review",
+      "target_anchor": "p20"
+    }
+  ],
+  "schema_version": "plan-review-result-v1",
+  "unresolved": [
+    "Resolve the reference digest discrepancy and make the exercise plan explicit enough to verify the requested three questions."
+  ],
+  "verdict": "needs_human"
+}

@@ -4255,6 +4255,41 @@
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T086",
       "execution_gate": "仅离线执行包准备；已确认59次/5小时/首败停止与16项标签，不激活真实运行。"
+    },
+    {
+      "id": "PHASE-1-T087",
+      "phase": "Phase 1",
+      "title": "执行已批准计划准入r02并记录首败或完整结果",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1-T086"
+      ],
+      "scope": [
+        "docs/acceptance/phase-1-plan-admission-execution-r02/activation.json",
+        "docs/acceptance/phase-1-plan-admission-results-r02/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "ADR0021；用户启动f98502b冻结执行包，已确认59次/5小时/首败停止及16项标签",
+      "acceptance_criteria": [
+        "准确绑定r02 manifest激活一次，先P01，再严格按冻结顺序逐项运行，逐项人工签核后才允许下一项。",
+        "保留实际请求/响应/用量/全部断言及全部引用核对，首次技术或质量失败即停止；0重试回退，无旧余额或H使用。",
+        "完整或首败停止后汇总准确调用/未运行项/质量边界，T040不因此解除，保留所有失败并提交安全摘要。"
+      ],
+      "verification": [
+        "scripts/run_plan_admission.py check/activate/run/report",
+        "实际结果逐项完整Schema/模型参数/用量/传输审计及断言引用核对",
+        "workflow/git diff --check；新账本及旧冻结证据核验"
+      ],
+      "verification_results": [
+        "用户“启动”准确绑定f98502b/r02 manifest b029f15e，activation.json保存原指令；2026-10-21 09:31:19 Asia/Shanghai创建新一次性台账、原5h截止14:31:19。P01唯一真实审核请求HTTP200/gzip完整/新计划完整Schema/精确gpt-6-luna high8192/实际出站及原始和解码回答摘要全部通过；用量输入8713+输出1476=10189。模型needs_human/服务端needs_human不符签核pass/accept_plan，执行器自动halt=FROZEN_LABEL_OR_ROUTE_MISMATCH，剩余58次与28执行项未运行、无重试回退；P02未发。Codex完整审阅17模型文本字段、23原子/类别/建议等断言及6不同实际锚点：计划条目与参考条目digest同f83f…，b333…是整个references快照的域分隔摘要（重算确认），模型借元数据source_digest误报条目冲突；goal/objective明确三题且exercise关联local，不能声称全计划未指定；p20实际code而非exercise，引用错场景。核对表严格标gpt_draft/pending/signed=false，Lee实际输出独立签核仍pending，不代签、不宣称正式质量成绩。实际失败结果/安全摘要/全部断言与引用草稿保存phase-1-plan-admission-results-r02，私密原始包络/请求/账本不提交；保持已halt的awaiting_human原状态，不改DB恢复或人工覆盖。任务done只表示按首败完成执行、停止与交接，候选准入失败、T040仍blocked/H封存/无生产发布；未自动调Prompt、改标签或新轮。实际Schema/传输/原始与解码摘要/模型参数/工件/源快照摘要、所有评分指针与引用集合/Schema、文档链接/原包H与旧ledger及冻结check/workflow/git diff --check通过。下一步需另行讨论研发范围，不能复用本轮未发额度。"
+      ],
+      "started_at": "2026-10-21T09:31:18",
+      "completed_at": "2026-10-21T09:37:35",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T087",
+      "execution_gate": "用户明确“启动”本具体r02；最多59次/18000秒/首败停止，Lee逐项人工门，不自动签核。"
     }
   ]
 }

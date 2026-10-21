@@ -1,0 +1,351 @@
+{
+  "schema_version": "plan-admission-evaluation-v1",
+  "lane": "plan_review",
+  "case_id": "P01",
+  "slot_id": "plan_review:P01:1",
+  "mode": "real",
+  "status": "pending",
+  "artifacts": {
+    "material_sha256": "a5b61eb913a94649fa046b433e9d885b5669d4397def37a6a4445a6d6882b5dd",
+    "request_sha256": "417c90b47646e9a7095812cf2937aa4a8e7232d917163fd71fa1664778f3bc36",
+    "response_sha256": "ff8e335ad1328afcf58d2b9b5b8bd9cb8bc2b9d90d31d87bdb32c2b162d771b9"
+  },
+  "evaluator": {
+    "name": "Codex",
+    "role": "gpt_draft",
+    "signed": false
+  },
+  "inventories_complete": {
+    "all_assertions": true,
+    "all_citations": true
+  },
+  "scores": {
+    "technical_integrity": "pass",
+    "severe_detection": "not_applicable",
+    "incidental_falsehoods": "present",
+    "teaching_coverage": "not_applicable",
+    "citation_quality": "fail",
+    "quality_success": false,
+    "matches_frozen_label": false
+  },
+  "claims": [
+    {
+      "id": "ref-plan-value",
+      "text": "计划的参考条目digest为f83f…b0015d。",
+      "verdict": "supported",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/findings/0/condition_or_counterexample",
+        "/material/plan/references/0/digest"
+      ],
+      "reason": "逐字等于计划条目digest。"
+    },
+    {
+      "id": "ref-identity",
+      "text": "涉及相同reference ID及版本。",
+      "verdict": "supported",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/findings/0/condition_or_counterexample",
+        "/material/plan/references/0/reference_id",
+        "/material/plan/references/0/version",
+        "/review_sources/1:p35/source_text",
+        "/review_sources/1:p36/source_text"
+      ],
+      "reason": "ID与版本相等；该事实不能证明摘要冲突。"
+    },
+    {
+      "id": "ref-snapshot-value",
+      "text": "所提供相同参考条目的digest是b333…3b219。",
+      "verdict": "contradicted",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/findings/0/condition_or_counterexample",
+        "/review_sources/1:p34/source_text",
+        "/review_sources/1:p34/catalog/source_digest"
+      ],
+      "reason": "p34的实际字段值为f83f…b0015d；b333…是references整个不可变快照的域分隔摘要，并非条目digest。已独立重算确认两者含义。"
+    },
+    {
+      "id": "ref-ambiguity",
+      "text": "现有数据不能确定计划意指哪个参考快照。",
+      "verdict": "insufficient",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/findings/0/condition_or_counterexample",
+        "/material/plan/references/0/digest",
+        "/review_sources/1:p34/source_text"
+      ],
+      "reason": "所谓差异不存在，不能以不同层级摘要推出来源歧义。这里不声称所有参考正文或事实已获证明。"
+    },
+    {
+      "id": "ref-impact",
+      "text": "因摘要冲突无法核验计划绑定，课程参考支持不确定。",
+      "verdict": "insufficient",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/findings/0/impact",
+        "/material/plan/references/0/digest",
+        "/review_sources/1:p34/source_text"
+      ],
+      "reason": "影响依赖不存在的摘要冲突；不能由这组证据推出所述绑定缺陷。"
+    },
+    {
+      "id": "ref-category",
+      "text": "本例构成missing_premise缺陷。",
+      "verdict": "insufficient",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/findings/0/category",
+        "/review_sources/1:p11/source_text",
+        "/review_sources/1:p34/source_text"
+      ],
+      "reason": "计划与参考条目的digest一致，缺陷、严重度及处理建议均缺乏所述事实前提。"
+    },
+    {
+      "id": "ref-severity",
+      "text": "该摘要问题应记major。",
+      "verdict": "insufficient",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/findings/0/severity",
+        "/review_sources/1:p11/source_text",
+        "/review_sources/1:p34/source_text"
+      ],
+      "reason": "计划与参考条目的digest一致，缺陷、严重度及处理建议均缺乏所述事实前提。"
+    },
+    {
+      "id": "ref-suggested_action",
+      "text": "应因摘要冲突转人工。",
+      "verdict": "insufficient",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/findings/0/suggested_action",
+        "/review_sources/1:p11/source_text",
+        "/review_sources/1:p34/source_text"
+      ],
+      "reason": "计划与参考条目的digest一致，缺陷、严重度及处理建议均缺乏所述事实前提。"
+    },
+    {
+      "id": "exercise-promise",
+      "text": "计划承诺三道题。",
+      "verdict": "supported",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/findings/1/condition_or_counterexample",
+        "/material/plan/objectives/0/text",
+        "/material/plan/goal"
+      ],
+      "reason": "goal及objectives.text均明确“三题”。"
+    },
+    {
+      "id": "exercise-identification",
+      "text": "练习场景仅由role/key标识，未体现题量要求。",
+      "verdict": "insufficient",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/findings/1/condition_or_counterexample",
+        "/material/plan/scenes/2/objective_ids",
+        "/material/plan/objectives/0/text"
+      ],
+      "reason": "该场景还关联local目标；题量要求可通过该关联取得，不能只读role/key。"
+    },
+    {
+      "id": "exercise-no-field",
+      "text": "计划中没有字段明确指定或列举三道题。",
+      "verdict": "contradicted",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/findings/1/condition_or_counterexample",
+        "/material/plan/objectives/0/text",
+        "/material/plan/goal"
+      ],
+      "reason": "原字段明确“三题”；未在scene添加专用数量字段不等于整个计划未指定三题。"
+    },
+    {
+      "id": "exercise-guarantee",
+      "text": "该计划不足以建立未来练习应有三题的承诺。",
+      "verdict": "insufficient",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/findings/1/condition_or_counterexample",
+        "/parsed_calls/0/value/findings/1/impact",
+        "/material/plan/scenes/2/objective_ids",
+        "/material/plan/objectives/0/text"
+      ],
+      "reason": "原契约未要求计划预先写出三道完整题或新增题量字段；计划承诺与将来内容是否实际兑现须分开验证。"
+    },
+    {
+      "id": "exercise-category",
+      "text": "本例已证明coverage_plan_gap。",
+      "verdict": "insufficient",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/findings/1/category",
+        "/material/plan/objectives/0/text",
+        "/material/plan/scenes/2/objective_ids"
+      ],
+      "reason": "所述缺口未由完整计划成立，p20还实际指向code场景，不能据此支持练习判断。"
+    },
+    {
+      "id": "exercise-severity",
+      "text": "该覆盖缺口应记major。",
+      "verdict": "insufficient",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/findings/1/severity",
+        "/material/plan/objectives/0/text",
+        "/material/plan/scenes/2/objective_ids"
+      ],
+      "reason": "所述缺口未由完整计划成立，p20还实际指向code场景，不能据此支持练习判断。"
+    },
+    {
+      "id": "exercise-suggested_action",
+      "text": "应因计划未指定三题而转人工。",
+      "verdict": "insufficient",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/findings/1/suggested_action",
+        "/material/plan/objectives/0/text",
+        "/material/plan/scenes/2/objective_ids"
+      ],
+      "reason": "所述缺口未由完整计划成立，p20还实际指向code场景，不能据此支持练习判断。"
+    },
+    {
+      "id": "unresolved-reference",
+      "text": "需要解决参考条目digest冲突。",
+      "verdict": "contradicted",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/unresolved/0",
+        "/review_sources/1:p11/source_text",
+        "/review_sources/1:p34/source_text"
+      ],
+      "reason": "两条目digest相同，所谓冲突来自误读容器source_digest。"
+    },
+    {
+      "id": "unresolved-exercise",
+      "text": "需要进一步补充计划才可以核验三题承诺。",
+      "verdict": "insufficient",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/unresolved/0",
+        "/material/plan/objectives/0/text",
+        "/material/plan/scenes/2/objective_ids"
+      ],
+      "reason": "现有明确三题承诺和场景目标关联未被完整使用，不支持将此记为已证缺陷。"
+    },
+    {
+      "id": "verdict",
+      "text": "P01应判needs_human。",
+      "verdict": "insufficient",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/verdict",
+        "/material/plan/objectives/0/text",
+        "/review_sources/1:p11/source_text",
+        "/review_sources/1:p34/source_text"
+      ],
+      "reason": "实际返回needs_human属可观察事实；作为规范结论与已独立签核pass标签不符，列出的理由不能支撑通过该诊断。"
+    },
+    {
+      "id": "coverage-goal_fidelity",
+      "text": "模型登记已检查goal_fidelity。",
+      "verdict": "supported",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/coverage/checked/0",
+        "/parsed_calls/0/value/coverage/checked/0"
+      ],
+      "reason": "只确认回答列出了该检查项，不等于其检查正确或无误报。"
+    },
+    {
+      "id": "coverage-internal_consistency",
+      "text": "模型登记已检查internal_consistency。",
+      "verdict": "supported",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/coverage/checked/1",
+        "/parsed_calls/0/value/coverage/checked/1"
+      ],
+      "reason": "只确认回答列出了该检查项，不等于其检查正确或无误报。"
+    },
+    {
+      "id": "coverage-scope",
+      "text": "模型登记已检查scope。",
+      "verdict": "supported",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/coverage/checked/2",
+        "/parsed_calls/0/value/coverage/checked/2"
+      ],
+      "reason": "只确认回答列出了该检查项，不等于其检查正确或无误报。"
+    },
+    {
+      "id": "coverage-reference_support",
+      "text": "模型登记已检查reference_support。",
+      "verdict": "supported",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/coverage/checked/3",
+        "/parsed_calls/0/value/coverage/checked/3"
+      ],
+      "reason": "只确认回答列出了该检查项，不等于其检查正确或无误报。"
+    },
+    {
+      "id": "coverage-downstream_feasibility",
+      "text": "模型登记已检查downstream_feasibility。",
+      "verdict": "supported",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/coverage/checked/4",
+        "/parsed_calls/0/value/coverage/checked/4"
+      ],
+      "reason": "只确认回答列出了该检查项，不等于其检查正确或无误报。"
+    }
+  ],
+  "citations": [
+    {
+      "anchor_id": "1:p11",
+      "source_pointer": "/review_sources/1:p11/source_text",
+      "quoted_source": "f83fd12e754fcda4124aa62b8a29203d97a897605d23dc4e37877393dcb0015d",
+      "supports_claim_ids": [
+        "ref-plan-value"
+      ],
+      "verdict": "supports",
+      "reason": "实际字段支持计划条目digest；不能单凭它推出与参考条目的冲突。"
+    },
+    {
+      "anchor_id": "1:p34",
+      "source_pointer": "/review_sources/1:p34/source_text",
+      "quoted_source": "f83fd12e754fcda4124aa62b8a29203d97a897605d23dc4e37877393dcb0015d",
+      "supports_claim_ids": [
+        "ref-snapshot-value"
+      ],
+      "verdict": "wrong_source",
+      "reason": "模型借用了锚点元数据source_digest；其json_pointer所指实际值仍为f83f…，不支持b333…这一条目值声明。"
+    },
+    {
+      "anchor_id": "1:p35",
+      "source_pointer": "/review_sources/1:p35/source_text",
+      "quoted_source": "graph-node:mvp-0.2.0:array",
+      "supports_claim_ids": [
+        "ref-identity"
+      ],
+      "verdict": "supports",
+      "reason": "只支持reference ID相同，不支持摘要冲突/来源歧义。"
+    },
+    {
+      "anchor_id": "1:p36",
+      "source_pointer": "/review_sources/1:p36/source_text",
+      "quoted_source": "mvp-0.2.0",
+      "supports_claim_ids": [
+        "ref-identity"
+      ],
+      "verdict": "supports",
+      "reason": "只支持版本相同，不支持摘要冲突/来源歧义。"
+    },
+    {
+      "anchor_id": "1:p9",
+      "source_pointer": "/review_sources/1:p9/source_text",
+      "quoted_source": "用C实现固定数组{4,6,9}求和，返回19且不打印；给出讲解、函数及三题，不要求动画或完整节点。",
+      "supports_claim_ids": [
+        "exercise-promise"
+      ],
+      "verdict": "supports",
+      "reason": "明确支持三题承诺，反驳“没有计划字段指定三题”；不能把支持承诺误记为支持覆盖缺口。"
+    },
+    {
+      "anchor_id": "1:p20",
+      "source_pointer": "/review_sources/1:p20/source_text",
+      "quoted_source": "code",
+      "supports_claim_ids": [
+        "exercise-identification"
+      ],
+      "verdict": "wrong_source",
+      "reason": "该锚点是/scenes/1/scene_key=code，不能替代/scenes/2的exercise场景；与模型目标及论据不对应。"
+    }
+  ],
+  "automatic_publication_completed": false,
+  "eligible_for_T040_denominator": false,
+  "notes": "Codex已逐项审阅实际完整回答及全部引用，独立Lee签核仍pending。冻结标签/路由不符已由执行器不可逆停止，不能用此草稿代签或恢复运行。",
+  "run_id": "plan-admission-execution-r02",
+  "package_manifest_sha256": "b029f15ec9bec5393e911ba47eeb752bc1fd3ed9fdce72d16886cc23bd251e09"
+}
