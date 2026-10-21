@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "用户授权领取并开发T001；当前具体契约待批准，其他任务todo，后续按明确授权串行推进。已确认A—F不重复审批。",
+    "phase_gate": "用户授权并批准T001具体契约；本任务验收及完成提交后done，其余41项todo，后续按明确授权串行推进。已确认A—F不重复审批。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -43,7 +43,7 @@
     }
   ],
   "stage_scope": {
-    "authorization": "2026-10-21用户确认A—F与三页原型并要求“可以，准备task”；仅授权细化当前阶段任务，不领取或开发。 2026-10-21用户后续要求“领取T01”，授权领取PHASE-1.5-T001；不扩大为整阶段执行授权。 用户随后要求“开始开发”，本次执行T001契约设计；具体契约批准仍待准确方案确认。",
+    "authorization": "2026-10-21用户确认A—F与三页原型并要求“可以，准备task”；仅授权细化当前阶段任务，不领取或开发。 2026-10-21用户后续要求“领取T01”，授权领取PHASE-1.5-T001；不扩大为整阶段执行授权。 用户随后要求“开始开发”，本次执行T001契约设计；具体契约批准仍待准确方案确认。 用户随后回复“批准”，接受d9bd7a6的ADR0024 A—D及准确附件；不自动授权后续任务。",
     "product_mode": "catalog_only",
     "formal_product": "已有签核课程",
     "dynamic_scope": "已确认学生可直接学习AI生成草稿；普通语义审核不阻断整课。实际运行开放须新契约实现与独立验收后批准，既有签核课程语义不变。",
@@ -53,7 +53,7 @@
     "dynamic_release_authorized": false,
     "deployment_authorized": false,
     "H": "H01–H08继续封存；新契约确定后重判适用性与独立性，不自动继承验收资格。",
-    "implementation_scope": "T001具体契约提案已准备，待批准blocked；其余41项todo。未实施新业务接口或数据迁移。",
+    "implementation_scope": "T001具体契约设计已批准并验收，完成提交后done；其余41项todo。未实施新业务接口或数据迁移。",
     "included": [
       "自由目标/可变场景/可选多节点关联",
       "首场景可学与后续持久生成/恢复/局部修订",
@@ -101,7 +101,7 @@
       "id": "PHASE-1.5-T001",
       "phase": "Phase 1.5",
       "title": "冻结自由课程、场景与草稿可见性契约",
-      "status": "blocked",
+      "status": "done",
       "priority": "P0",
       "depends_on": [],
       "scope": [
@@ -135,13 +135,18 @@
           "command": "git diff --check",
           "result": "passed",
           "evidence": "docs/acceptance/phase-1.5-course-contract-r01/verification.txt"
+        },
+        {
+          "command": "人工核对验收条件及批准来源；SHA256与提案提交逐字节核对",
+          "result": "passed: AC1–AC3设计与准确批准齐备，5份冻结文件不变；不计运行接口/PG/模型质量通过",
+          "evidence": "docs/ADR/0024-approval-20261021.json；docs/acceptance/phase-1.5-course-contract-r01/verification.txt"
         }
       ],
       "started_at": "2026-10-21T21:27:47",
-      "completed_at": null,
-      "blocker": "ADR-0024 A—D及准确manifest具体数据/API/权限契约待用户批准；设计与离线核对已准备，不能标记done或实施依赖。",
+      "completed_at": "2026-10-21T21:53:38",
+      "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T001",
-      "execution_gate": "用户已要求领取并开始开发T001，已完成可审查设计；ADR-0024具体A—D及manifest待批准，批准后恢复并完成本任务。未授权自动领取后续任务或真实调用。"
+      "execution_gate": "2026-10-21用户已批准d9bd7a6的ADR-0024 A—D及准确manifest；登记docs/ADR/0024-approval-20261021.json。本任务恢复并完成设计验收，不自动领取后续任务或授权真实调用。"
     },
     {
       "id": "PHASE-1.5-T002",

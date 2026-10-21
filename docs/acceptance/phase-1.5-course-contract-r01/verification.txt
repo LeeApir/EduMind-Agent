@@ -18,3 +18,16 @@ Manual AC1: contract sections 1-3 define identities, versions, optional links an
 Manual AC2: sections 3-6 define owner, draft/catalog boundary and compatibility; PASS design readiness.
 Manual AC3: sections 5/7 and OpenAPI/examples ready; approval PENDING, task not complete.
 Independent reader: 7 questions answered; response ID discrepancy fixed; no runtime or approval claim.
+
+Approval completion verification at 2026-10-21T21:53:38
+User approved proposal d9bd7a6 ADR-0024 A-D and exact attachments; approval record docs/ADR/0024-approval-20261021.json.
+PASS: approval manifest SHA256 matches frozen proposal; all 5 files match hashes and proposal commit bytes.
+Manual AC1/AC2/AC3: design coverage and exact approval now complete; no runtime implementation claim.
+$ backend/.venv/bin/python docs/acceptance/phase-1.5-course-contract-r01/check_design.py
+exit_code=0
+PASS: 49 local refs, 6 planned operations, 15 schemas, 8 request examples, 25 design cases, 9 links, 5 frozen files; no runtime verification
+$ python3 scripts/check_catalog_workflow.py
+exit_code=0
+Active Phase 1.5 dependencies valid; catalog ledger valid; T033 blocked
+$ git diff --check
+exit_code=0
