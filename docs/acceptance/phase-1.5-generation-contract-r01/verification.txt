@@ -1,0 +1,25 @@
+T002 proposal verification at 2026-10-21T22:11:35
+Scope: design only, Provider requests0; no PG/HTTP/worker/browser execution.
+Initial OpenAPI model failure: local FastAPI rejects type arrays; changed nullable encoding to equivalent anyOf. All structural/schema checks retained.
+$ backend/.venv/bin/python docs/acceptance/phase-1.5-generation-contract-r01/check_design.py
+exit_code=0
+PASS: OpenAPI structure, 67 refs, 6 planned operations, 25 schemas, budget/state consistency, 15 schema examples, 34 design cases, 13 links, 6 frozen files; no runtime verification
+
+$ backend/.venv/bin/python docs/acceptance/phase-1.5-course-contract-r01/check_design.py
+exit_code=0
+PASS: 49 local refs, 6 planned operations, 15 schemas, 8 request examples, 25 design cases, 9 links, 5 frozen files; no runtime verification
+
+$ python3 scripts/check_catalog_workflow.py
+exit_code=0
+Active Phase 1.5 dependencies valid; catalog ledger valid; T033 blocked
+
+$ git diff --check
+exit_code=0
+
+
+PASS: all 5 T001 approved files match original proposal bytes.
+Manual AC1: outline/clarification/partial/first complete scene contract present; design ready.
+Manual AC2: PG scheduling/receipts/fencing/unknown send quarantine/replay/revision contract present; design ready.
+Manual AC3: exact scale/call/token/time/retry/media proposal ready; approval PENDING.
+Independent reader found 3 contradictions; corrected gateway retry evidence, structural-only impact preview, required text. No approval or runtime pass inferred.
+manifest_sha256=ee6ffbd1911700cdb58c23d0ba9ee2a1e35d5016579da475312419c98ddbf8cf

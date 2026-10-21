@@ -1,0 +1,210 @@
+{
+  "schema_version": "progressive-course-examples-v1",
+  "status": "design_cases_not_runtime_results",
+  "cases": [
+    {
+      "id": "P01",
+      "title": "Outline auto continues",
+      "given": "Valid outline committed",
+      "expected": "outline_ready then worker starts scene 1 without confirmation"
+    },
+    {
+      "id": "P02",
+      "title": "First real scene",
+      "given": "Scene 1 content/actions valid and committed",
+      "expected": "scene_ready + first_scene_ready reference same accurate manifest; no empty first milestone"
+    },
+    {
+      "id": "P03",
+      "title": "Unmapped goal",
+      "given": "Graph no hit or profile unknown",
+      "expected": "No clarification solely for this; plan node_links=[]"
+    },
+    {
+      "id": "P04",
+      "title": "Scene partial failure",
+      "given": "Scene 2 fails, 3 depends on 2, 4 independent",
+      "expected": "2 failed, 3 blocked_dependency, 4 can run; partial result retained"
+    },
+    {
+      "id": "P05",
+      "title": "Browser refresh",
+      "given": "GET operation/manifest/events after reload",
+      "expected": "No POST, new attempt or budget reset"
+    },
+    {
+      "id": "P06",
+      "title": "Lost event connection",
+      "given": "Client reconnects after seq 4",
+      "expected": "Replay seq>4 in order; deduplicate repeated operation_id+seq"
+    },
+    {
+      "id": "P07",
+      "title": "Lease recovery safe",
+      "given": "No sent unresolved attempt",
+      "expected": "New epoch may continue from committed checkpoint"
+    },
+    {
+      "id": "P08",
+      "title": "Cancel race won by ready",
+      "given": "ready transaction commits before cancel lock",
+      "expected": "Keep ready version; cancel prevents subsequent writes"
+    },
+    {
+      "id": "P09",
+      "title": "Cancel race won by cancel",
+      "given": "cancel increments epoch before response",
+      "expected": "Late body cannot publish; attempted charge remains"
+    },
+    {
+      "id": "P10",
+      "title": "Clarify",
+      "given": "Real conflicting original requirements",
+      "expected": "Terminal awaiting_clarification, questions1-3; explicit new clarify operation"
+    },
+    {
+      "id": "P11",
+      "title": "Atomic local revision",
+      "given": "Target and dependent replacement candidates all valid",
+      "expected": "One new plan/manifest head CAS, copied unaffected bindings validated"
+    },
+    {
+      "id": "P12",
+      "title": "Optional missing media",
+      "given": "No approved cache media, text/steps complete",
+      "expected": "No auto Manim request; text scene can become ready"
+    },
+    {
+      "id": "N01",
+      "title": "Unknown send outcome",
+      "given": "Worker crashes after sent reservation",
+      "expected": "Stop OUTCOME_UNKNOWN, no blind resend, reserve unknown usage; quarantine capacity and reject new owner/course operation until verified settlement"
+    },
+    {
+      "id": "N02",
+      "title": "Duplicate delivery",
+      "given": "Two workers see same queued operation",
+      "expected": "Only valid epoch+slot worker can send or publish"
+    },
+    {
+      "id": "N03",
+      "title": "Over budget",
+      "given": "13 attempts used or course40 reached",
+      "expected": "No next call; BUDGET_EXHAUSTED; no refund on cancel"
+    },
+    {
+      "id": "N04",
+      "title": "Deadline restart",
+      "given": "Process restarts 590s after creation",
+      "expected": "Only10s remain; no new600s window"
+    },
+    {
+      "id": "N05",
+      "title": "Manual operation repeated key",
+      "given": "Same owner/route/key with changed body",
+      "expected": "409 IDEMPOTENCY_CONFLICT"
+    },
+    {
+      "id": "N06",
+      "title": "Stale revision",
+      "given": "expected head differs from current",
+      "expected": "409; do not replace mixed subset or silently rebase"
+    },
+    {
+      "id": "N07",
+      "title": "Partial revision failure",
+      "given": "One descendant replacement failed",
+      "expected": "Old head preserved; no partial replacement publication"
+    },
+    {
+      "id": "N08",
+      "title": "Confirmed wrong old content",
+      "given": "Repair fails for disabled old scene",
+      "expected": "Do not restore disabled content; T003 restrictions stay"
+    },
+    {
+      "id": "N09",
+      "title": "Format not semantics",
+      "given": "Valid JSON but model suggests coverage improvement",
+      "expected": "No automatic semantic rewrite/review loop"
+    },
+    {
+      "id": "N10",
+      "title": "Unsafe output",
+      "given": "Executable HTML/JS or action foreign reference",
+      "expected": "Reject hard gate, not format repair bypass"
+    },
+    {
+      "id": "N11",
+      "title": "Foreign operation/event",
+      "given": "Other owner uses known IDs",
+      "expected": "404 no existence details or content"
+    },
+    {
+      "id": "N12",
+      "title": "Future cursor",
+      "given": "after greater than last_event_id",
+      "expected": "409 EVENT_CURSOR_AHEAD; mismatched header/query422"
+    },
+    {
+      "id": "N13",
+      "title": "Unsupported provider quota",
+      "given": "Unknown hidden reasoning budget cannot be bounded",
+      "expected": "Reject configuration for this policy; no silent fallback"
+    },
+    {
+      "id": "N14",
+      "title": "Multiple operations",
+      "given": "Owner already queued/running/cancel_requested",
+      "expected": "409 OPERATION_ACTIVE; no second request reservation"
+    },
+    {
+      "id": "N15",
+      "title": "Edit outline while running",
+      "given": "Student clicks adjust",
+      "expected": "Cancel and await terminal; no in-place plan mutation"
+    },
+    {
+      "id": "N16",
+      "title": "Resume already complete",
+      "given": "No missing/failed scenes",
+      "expected": "409 no-op recovery rejected; no new calls"
+    },
+    {
+      "id": "N17",
+      "title": "Oversize plan/scene",
+      "given": "Plan>16KiB or scene>64KiB or visualization>50 steps",
+      "expected": "Reject, no silent truncation"
+    },
+    {
+      "id": "N18",
+      "title": "Retry pool",
+      "given": "Transport or format pool exhausted, or second same-step retry",
+      "expected": "No retry; failure remains in numerator/usage"
+    },
+    {
+      "id": "N19",
+      "title": "Cross-scope revision",
+      "given": "Local request changes shared example/goal",
+      "expected": "OUTLINE_ADJUSTMENT_REQUIRED; preview full impact before separate POST"
+    },
+    {
+      "id": "N20",
+      "title": "Terminal stream done",
+      "given": "Cursor equals terminal last_event_id",
+      "expected": "204, client stops reconnecting"
+    },
+    {
+      "id": "N21",
+      "title": "Global slots busy",
+      "given": "Two workers hold slots, new owner queues",
+      "expected": "Remain queued within original600s; no third provider call"
+    },
+    {
+      "id": "N22",
+      "title": "Gateway error not cancellation proof",
+      "given": "Gateway504 but upstream may still run",
+      "expected": "OUTCOME_UNKNOWN and quarantine; status alone never authorizes automatic retry"
+    }
+  ]
+}
