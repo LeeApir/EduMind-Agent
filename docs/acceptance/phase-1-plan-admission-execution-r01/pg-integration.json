@@ -1,0 +1,29 @@
+{
+  "exit": 0,
+  "provider_calls": 0,
+  "final_paths": [
+    {
+      "evidence": "pg-integration-05.json",
+      "mode": "complete",
+      "exit": 0,
+      "database": "edumind_catalog_plan_admission_test_1792545451",
+      "actual_command": "backend/.venv/bin/python -m pytest -q scripts/tests/test_plan_admission_execution.py::test_full_isolated_pipeline_records_plan_check_and_original_binding[complete]"
+    },
+    {
+      "evidence": "pg-integration-06.json",
+      "mode": "needs_human",
+      "exit": 0,
+      "database": "edumind_catalog_plan_admission_test_1792545453",
+      "actual_command": "backend/.venv/bin/python -m pytest -q scripts/tests/test_plan_admission_execution.py::test_full_isolated_pipeline_records_plan_check_and_original_binding[needs_human]"
+    },
+    {
+      "evidence": "pg-integration-07.json",
+      "mode": "technical_failure",
+      "exit": 0,
+      "database": "edumind_catalog_plan_admission_test_1792545455",
+      "actual_command": "backend/.venv/bin/python -m pytest -q scripts/tests/test_plan_admission_execution.py::test_full_isolated_pipeline_records_plan_check_and_original_binding[technical_failure]"
+    }
+  ],
+  "correction": "Individual pg-integration-02 through -07 stored an outdated display command (-k full_isolated). Actual executed command selected the parameterized node IDs listed here; records and databases are preserved. -01 used the original unparameterized test. -02/-05=complete; -03/-06=needs_human; -04/-07=technical_failure.",
+  "scope": "Three final actual isolated PostgreSQL paths; all upstream calls MockTransport."
+}

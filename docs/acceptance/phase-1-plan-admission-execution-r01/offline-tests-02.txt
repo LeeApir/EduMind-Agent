@@ -1,0 +1,103 @@
+.....................F.....s                                             [100%]
+=================================== FAILURES ===================================
+_______ test_assessment_demands_real_human_binding_and_exact_field_quote _______
+
+    def test_assessment_demands_real_human_binding_and_exact_field_quote():
+        spec = SLOTS[0]
+        evidence = dict(
+            material=dict(source="own proposition", neighbor="another proposition"),
+            calls=[],
+        )
+        v = evaluated(evidence, spec)
+        schema = read(cli.PARENT / "evaluation.schema.json")
+        assert check_assessment(
+            v, schema=schema, spec=spec, manifest_hash="a" * 64, evidence=evidence
+        )
+        for key, value in [("mode", "mock"), ("package_manifest_sha256", "b" * 64)]:
+            bad = deepcopy(v)
+            bad[key] = value
+            with pytest.raises(Exception):
+                check_assessment(
+                    bad, schema=schema, spec=spec, manifest_hash="a" * 64, evidence=evidence
+                )
+        bad = deepcopy(v)
+        bad["evaluator"]["role"] = "gpt_draft"
+        with pytest.raises(Exception):
+            check_assessment(
+                bad, schema=schema, spec=spec, manifest_hash="a" * 64, evidence=evidence
+            )
+        v["citations"] = [
+            dict(
+                anchor_id="a1",
+                source_pointer="/material/source",
+                quoted_source="another proposition",
+                supports_claim_ids=["claim1"],
+                verdict="supports",
+                reason="Wrong adjacent field",
+            )
+        ]
+        with pytest.raises(ValueError, match="QUOTE_NOT_IN_FIELD"):
+>           check_assessment(
+                v, schema=schema, spec=spec, manifest_hash="a" * 64, evidence=evidence
+            )
+
+scripts/tests/test_plan_admission_execution.py:419: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/acceptance_support/plan_admission_run.py:341: in check_assessment
+    require(required_citations == ids, "ALL_ACTUAL_CITATIONS_REQUIRED")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+ok = False, reason = 'ALL_ACTUAL_CITATIONS_REQUIRED'
+
+    def require(ok, reason):
+        if not ok:
+>           raise ValueError(reason)
+E           ValueError: ALL_ACTUAL_CITATIONS_REQUIRED
+
+scripts/acceptance_support/five_hour_runtime.py:22: ValueError
+
+During handling of the above exception, another exception occurred:
+
+    def test_assessment_demands_real_human_binding_and_exact_field_quote():
+        spec = SLOTS[0]
+        evidence = dict(
+            material=dict(source="own proposition", neighbor="another proposition"),
+            calls=[],
+        )
+        v = evaluated(evidence, spec)
+        schema = read(cli.PARENT / "evaluation.schema.json")
+        assert check_assessment(
+            v, schema=schema, spec=spec, manifest_hash="a" * 64, evidence=evidence
+        )
+        for key, value in [("mode", "mock"), ("package_manifest_sha256", "b" * 64)]:
+            bad = deepcopy(v)
+            bad[key] = value
+            with pytest.raises(Exception):
+                check_assessment(
+                    bad, schema=schema, spec=spec, manifest_hash="a" * 64, evidence=evidence
+                )
+        bad = deepcopy(v)
+        bad["evaluator"]["role"] = "gpt_draft"
+        with pytest.raises(Exception):
+            check_assessment(
+                bad, schema=schema, spec=spec, manifest_hash="a" * 64, evidence=evidence
+            )
+        v["citations"] = [
+            dict(
+                anchor_id="a1",
+                source_pointer="/material/source",
+                quoted_source="another proposition",
+                supports_claim_ids=["claim1"],
+                verdict="supports",
+                reason="Wrong adjacent field",
+            )
+        ]
+>       with pytest.raises(ValueError, match="QUOTE_NOT_IN_FIELD"):
+E       AssertionError: Regex pattern did not match.
+E        Regex: 'QUOTE_NOT_IN_FIELD'
+E        Input: 'ALL_ACTUAL_CITATIONS_REQUIRED'
+
+scripts/tests/test_plan_admission_execution.py:418: AssertionError
+=========================== short test summary info ============================
+FAILED scripts/tests/test_plan_admission_execution.py::test_assessment_demands_real_human_binding_and_exact_field_quote
+1 failed, 26 passed, 1 skipped in 1.31s

@@ -4217,6 +4217,44 @@
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T085",
       "execution_gate": "用户批准方案A、20次180秒共享预算及PC-01–05串行实施；默认空验证器，无真实调用/H调优/T040解除授权。"
+    },
+    {
+      "id": "PHASE-1-T086",
+      "phase": "Phase 1",
+      "title": "冻结独立计划准入持久执行包",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1-T085"
+      ],
+      "scope": [
+        "scripts/",
+        "docs/acceptance/phase-1-plan-admission-execution-r01/",
+        "docs/acceptance/phase-1-plan-admission-execution-r02/",
+        ".gitattributes",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "ADR0021；用户确认59次/5小时/首败停止及16项独立标签后要求继续",
+      "acceptance_criteria": [
+        "新独立持久台账强制顺序、59次总上限、各通道额度、原5小时绝对截止与逐项人工门禁，失败/中断不可退款重跑。",
+        "真实工厂使用既定stage路由/完整本地Schema/SSRF防护并安全捕获请求回答；生成与审核分离，完整链仅隔离数据库。",
+        "绑定原冻结包/预算确认/16项签核，冻结执行代码、配置、预算及新包摘要；离线有意义回归验证，不发真实请求或使用H。"
+      ],
+      "verification": [
+        "运行新增执行器Mock/台账/评分回归及隔离PG完整链测试",
+        "原包check、Ruff/workflow/git diff --check",
+        "冻结新包后运行check，记录Provider0/未激活/T040 blocked"
+      ],
+      "verification_results": [
+        "独立执行包冻结555文件，manifest fe73a779c36dc4235e75d9c6e5aefedc54e48ab6bd12c1da9ace1adbd8d6ce1c，绑定T085原包/预算确认/Lee16项签核；新29项序列/最多59请求/原5小时包含人工等待/单次60和操作180、关闭1槽/0重试回退/先预约失败不退/并发/中断不重放及首败停止落地。真实工厂使用显式stage/实际适配器/完整业务Schema、固定公网SSRF守卫、模型与用量/原始与解码摘要复核及私密不覆盖完整出站返回证据；16审核wire逐份等于原冻结捕获，草稿0审核DB发布。评分沿原Schema，要求Lee签核/全部输出字段与每个实际锚点、精确字段UTF8引用，核心拒绝附带错不得通过；GPT仅草稿，开发不入T040分母。实际隔离PG三个最终新库分别验证正常9请求自动隔离发布/计划待人工2请求不发布/Provider错误2预约且完整旧计划历史保留，3通过0跳过，前次通过原件保留；新57+父36共93离线通过/3PG项目明确deselected并单独真PG验证，初26通过1引用负例夹具失败保留后补实际引用而不削断言。Ruff/workflow/原包H与四账本check/Markdown链接/git diff --check及freeze/check通过；实际activate缺准确回执返回1且未建台账，真实Provider0/未激活/时钟未启。白名单准确执行库空白已迁移0033；无生产代码或默认配置改动、不执行新代码、不用H调优、生产验证器仍空/T040 blocked。目录phase-1-plan-admission-execution-r01含准确命令纠正与全部历史；本任务完成仅准备，下一步对已冻结具体manifest启动确认后从P01并逐项独立人工门推进，不重复预算/标签确认。",
+        "提交前暂存区检查捕获r01法证日志行末空格及源码末尾空行，未执行git commit，依协议恢复in_progress并保留r01原manifest/全部工件与四源码原始字节快照；原样日志用仅限定这些证据路径的gitattributes保留字节，不降低任何测试断言。重新冻结r02，材料/Prompt/Schema/判据/生成审核配置及59次18000秒额度不变，仅格式/日志可逆JSON封装/独立运行与数据库标识及归档绑定更新。r02最终93离线通过、3路径分别全新隔离PG各1通过0跳过、Ruff/已暂存diff --check/workflow/链接/原包/H/四旧ledger检查通过；准确实际命令单列。执行空白库edumind_catalog_plan_admission_r02已0033迁移，r01库未激活。r02 manifest b029f15ec9bec5393e911ba47eeb752bc1fd3ed9fdce72d16886cc23bd251e09绑定583文件；freeze/check及缺activation真实拒绝返回1通过，旧r01全部冻结文件用存档源码逐摘要复核保持。Provider0、r01/r02无真实台账/无activation/时钟未启动，T040 blocked/H封存。当前交付仅r02，r01明确superseded，不需重复预算或16项签核；本具体执行包启动仍待用户指令。"
+      ],
+      "started_at": "2026-10-21T09:01:38",
+      "completed_at": "2026-10-21T09:26:55",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T086",
+      "execution_gate": "仅离线执行包准备；已确认59次/5小时/首败停止与16项标签，不激活真实运行。"
     }
   ]
 }
