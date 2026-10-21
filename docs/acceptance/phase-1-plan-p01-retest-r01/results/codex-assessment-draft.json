@@ -1,0 +1,208 @@
+{
+  "schema_version": "plan-admission-evaluation-v1",
+  "lane": "plan_review",
+  "case_id": "P01",
+  "slot_id": "plan_review:P01:1",
+  "mode": "real",
+  "status": "pending",
+  "artifacts": {
+    "material_sha256": "a5b61eb913a94649fa046b433e9d885b5669d4397def37a6a4445a6d6882b5dd",
+    "request_sha256": "417c90b47646e9a7095812cf2937aa4a8e7232d917163fd71fa1664778f3bc36",
+    "response_sha256": "f4a5e83a718f74c1a75b5014af77b7d8723b24195b23533b738359216f6321b6"
+  },
+  "evaluator": {
+    "name": "Codex",
+    "role": "gpt_draft",
+    "signed": false
+  },
+  "inventories_complete": {
+    "all_assertions": true,
+    "all_citations": true
+  },
+  "scores": {
+    "technical_integrity": "pass",
+    "severe_detection": "not_applicable",
+    "incidental_falsehoods": "present",
+    "teaching_coverage": "not_applicable",
+    "citation_quality": "fail",
+    "quality_success": false,
+    "matches_frozen_label": false
+  },
+  "claims": [
+    {
+      "id": "plan-digest",
+      "text": "计划条目digest为f83f…b0015d。",
+      "verdict": "supported",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/findings/0/condition_or_counterexample",
+        "/review_sources/1:p11/source_text"
+      ],
+      "reason": "实际值一致。"
+    },
+    {
+      "id": "reference-digest",
+      "text": "提供的参考条目digest为b333…3b219。",
+      "verdict": "contradicted",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/findings/0/condition_or_counterexample",
+        "/review_sources/1:p34/source_text",
+        "/review_sources/1:p34/catalog/source_digest"
+      ],
+      "reason": "json_pointer实际字段为f83f…；b333…是引用容器source_digest，已重算其层级含义。"
+    },
+    {
+      "id": "reference-ambiguity",
+      "text": "摘要不一致且不能确定计划绑定的参考内容。",
+      "verdict": "insufficient",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/findings/0/condition_or_counterexample",
+        "/review_sources/1:p11/source_text",
+        "/review_sources/1:p34/source_text"
+      ],
+      "reason": "不存在所述条目摘要差异，不能据此推出绑定歧义；不推导参考正文内容全部正确。"
+    },
+    {
+      "id": "reference-impact",
+      "text": "因摘要差异参考支持不能确认，节点正确性声明未验证。",
+      "verdict": "insufficient",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/findings/0/impact",
+        "/review_sources/1:p11/source_text",
+        "/review_sources/1:p34/source_text"
+      ],
+      "reason": "所述影响依赖错误比较，没有这组证据支持。"
+    },
+    {
+      "id": "category",
+      "text": "本例构成missing_premise。",
+      "verdict": "insufficient",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/findings/0/category",
+        "/review_sources/1:p11/source_text",
+        "/review_sources/1:p34/source_text"
+      ],
+      "reason": "所述缺陷、分级及建议前提未成立。"
+    },
+    {
+      "id": "severity",
+      "text": "所述问题应标major。",
+      "verdict": "insufficient",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/findings/0/severity",
+        "/review_sources/1:p11/source_text",
+        "/review_sources/1:p34/source_text"
+      ],
+      "reason": "所述缺陷、分级及建议前提未成立。"
+    },
+    {
+      "id": "suggested_action",
+      "text": "应因此转human_review。",
+      "verdict": "insufficient",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/findings/0/suggested_action",
+        "/review_sources/1:p11/source_text",
+        "/review_sources/1:p34/source_text"
+      ],
+      "reason": "所述缺陷、分级及建议前提未成立。"
+    },
+    {
+      "id": "unresolved",
+      "text": "需要解决计划和参考条目digest冲突。",
+      "verdict": "contradicted",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/unresolved/0",
+        "/review_sources/1:p11/source_text",
+        "/review_sources/1:p34/source_text"
+      ],
+      "reason": "两条目字段值相同；保留原回答，不将容器hash当条目值。"
+    },
+    {
+      "id": "verdict",
+      "text": "正确对照应转needs_human。",
+      "verdict": "insufficient",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/verdict",
+        "/review_sources/1:p11/source_text",
+        "/review_sources/1:p34/source_text"
+      ],
+      "reason": "实际模型确实返回needs_human；但规范结论与冻结pass标签不符，给出的理由不足。"
+    },
+    {
+      "id": "coverage-goal_fidelity",
+      "text": "模型列出已检查goal_fidelity。",
+      "verdict": "supported",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/coverage/checked/0",
+        "/parsed_calls/0/value/coverage/checked/0"
+      ],
+      "reason": "仅确认模型登记，不证明语义检查正确。"
+    },
+    {
+      "id": "coverage-internal_consistency",
+      "text": "模型列出已检查internal_consistency。",
+      "verdict": "supported",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/coverage/checked/1",
+        "/parsed_calls/0/value/coverage/checked/1"
+      ],
+      "reason": "仅确认模型登记，不证明语义检查正确。"
+    },
+    {
+      "id": "coverage-scope",
+      "text": "模型列出已检查scope。",
+      "verdict": "supported",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/coverage/checked/2",
+        "/parsed_calls/0/value/coverage/checked/2"
+      ],
+      "reason": "仅确认模型登记，不证明语义检查正确。"
+    },
+    {
+      "id": "coverage-reference_support",
+      "text": "模型列出已检查reference_support。",
+      "verdict": "supported",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/coverage/checked/3",
+        "/parsed_calls/0/value/coverage/checked/3"
+      ],
+      "reason": "仅确认模型登记，不证明语义检查正确。"
+    },
+    {
+      "id": "coverage-downstream_feasibility",
+      "text": "模型列出已检查downstream_feasibility。",
+      "verdict": "supported",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/coverage/checked/4",
+        "/parsed_calls/0/value/coverage/checked/4"
+      ],
+      "reason": "仅确认模型登记，不证明语义检查正确。"
+    }
+  ],
+  "citations": [
+    {
+      "anchor_id": "1:p11",
+      "source_pointer": "/review_sources/1:p11/source_text",
+      "quoted_source": "f83fd12e754fcda4124aa62b8a29203d97a897605d23dc4e37877393dcb0015d",
+      "supports_claim_ids": [
+        "plan-digest"
+      ],
+      "verdict": "supports",
+      "reason": "实际字段支持计划digest，不支持冲突推断。"
+    },
+    {
+      "anchor_id": "1:p34",
+      "source_pointer": "/review_sources/1:p34/source_text",
+      "quoted_source": "f83fd12e754fcda4124aa62b8a29203d97a897605d23dc4e37877393dcb0015d",
+      "supports_claim_ids": [
+        "reference-digest"
+      ],
+      "verdict": "wrong_source",
+      "reason": "实际字段值为f83f…，模型借用了元数据source_digest，不能支持b333…条目声明。"
+    }
+  ],
+  "automatic_publication_completed": false,
+  "eligible_for_T040_denominator": false,
+  "notes": "单次重测；原失败与新结果并存。Codex完整核对草稿，不是Lee签核。成功失败均停止，不推进P02。",
+  "run_id": "plan-p01-retest-r01",
+  "package_manifest_sha256": "0be3844d0559888c1d01f391de05bb54e9ab672122a3858906c29c792a0932a9"
+}

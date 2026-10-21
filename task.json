@@ -4290,6 +4290,41 @@
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T087",
       "execution_gate": "用户明确“启动”本具体r02；最多59次/18000秒/首败停止，Lee逐项人工门，不自动签核。"
+    },
+    {
+      "id": "PHASE-1-T088",
+      "phase": "Phase 1",
+      "title": "同配置P01单次独立重测",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1-T087"
+      ],
+      "scope": [
+        "scripts/run_plan_p01_retest.py",
+        "scripts/tests/test_plan_p01_retest.py",
+        "docs/acceptance/phase-1-plan-p01-retest-r01/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "用户重测一次；原r02停止和失败保留，不恢复旧59次",
+      "acceptance_criteria": [
+        "相同P01/Prompt/Schema/high8192/60秒实际线缆摘要；新独立台账最多一次，无重试回退。",
+        "结果完整性/所有断言/引用核对并独立保存，成功失败都停止，不运行P02或覆盖前次失败。",
+        "新单次授权与代码冻结后执行，保留原r02账本摘要及T040 blocked/H封存。"
+      ],
+      "verification": [
+        "单次传输封顶/线缆一致性/不重放回归",
+        "实际单条完整Schema/路由/用量及断言引用核对",
+        "原冻结/旧停止账本/workflow/Ruff/diff检查"
+      ],
+      "verification_results": [
+        "用户“重测一次”单独授权P01最多1请求，原r02停止账本摘要be1ced5…保持；新单槽cap1台账+单次物理发送包装，4离线Mock封顶/失败不重放/错路由或wire不发送回归通过，Ruff/暂存diff检查后冻结manifest0be3844d0559888c1d01f391de05bb54e9ab672122a3858906c29c792a0932a9。实际同一字节请求5377d9…、Luna high8192/60秒/原Prompt及完整Schema，HTTP200/完整Schema/原始gzip与解码摘要及模型/usage通过。实际1次输入8713+输出1123=9836Token；仍needs_human不符签核pass，复发把references容器source_digest=b333…当作条目digest，与相同f83f…条目误报冲突；本次未出现三题/p20意见。Codex14断言覆盖12文本字段/2引用及上下游摘要独立核验，草稿gpt_draft/pending/signed=false，不代签Lee。新运行halt=SINGLE_REPEAT_FINISHED_STOP_NO_CONTINUATION，成功/失败均结束，原轮58次不恢复；两次累计2请求20025Token不是总体错误率。check/report/父冻结/H/历史ledger/链接/workflow/diff验证通过；私密原始包络/账本不进Git。结果和原失败并存于phase-1-plan-p01-retest-r01/results，无第三次/P02、无生产发布，T040 blocked/H封存。任务done表示单次执行和结果交付完成，不表示模型准入通过。"
+      ],
+      "started_at": "2026-10-21T09:49:57",
+      "completed_at": "2026-10-21T09:53:25",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T088"
     }
   ]
 }
