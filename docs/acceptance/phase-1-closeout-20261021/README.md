@@ -17,7 +17,7 @@
 | 共享计划与混合审核（T043–T064／T071–T084／T089） | 不可变计划／三场景／动作／证据锚点、资源与单元审核、受信人工CLI／只读完整历史、准确版本发布、节点绑定／评分、机械校验前移、持久预算／限时；复用最新403项真实隔离PG及其他离线／浏览器记录 | 语义可靠自动放行、完整新课程质量保证、真实自动计划纠错。生产独立验证器注册表为空，合成verifier只验证机制；公开草稿运营后台与人工SLA未交付 |
 | 固定C离线与诊断工程（T065–T070／T075–T078／T085–T091） | 固定封存样本／审阅驱动、禁网受限容器、结果／来源核验；T069/T070每组27预登记案例中12检查pass／9fail／6not_run均保留且符合各自预期。开发／留出分区、独立台账／失败停／全断言引用核对 | 任意用户代码沙箱、所有样本安全或所有27项均pass；开发材料或GPT评分能证明正式泛化指标 |
 
-核心复用证据：[队列](../phase-1-queue-v1/README.md)、[DSL](../phase-1-dsl-v1/README.md)、[目录集成](../phase-1-integration/README.md)、[T070集成](../phase-1-review-binding-preparation-t070/verification.json)、[最新403项隔离PG](../phase-1-plan-semantic-boundary-r01/pg-integration-03.json)、[实际浏览器](../phase-1-browser-evidence-r01/README.md)。这些证据保留原提交／政策／材料作用域，不伪装为本次全部重跑。
+核心复用证据：[队列](../phase-1-queue-v1/README.md)、[DSL](../phase-1-dsl-v1/README.md)、[目录集成](../ARCHIVE.md#phase-1-integration)、[T070集成](../ARCHIVE.md#phase-1-review-binding-preparation-t070)、[最新403项隔离PG](../phase-1-plan-semantic-boundary-r01/pg-integration-03.json)、[实际浏览器](../ARCHIVE.md#phase-1-browser-evidence-r01)。这些证据保留原提交／政策／材料作用域，不伪装为本次全部重跑。
 
 ## 账本与证据核查
 
