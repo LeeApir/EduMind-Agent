@@ -4397,6 +4397,40 @@
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1-T090",
       "execution_gate": "本批候选及输入方案仅一次；真实小诊断须先冻结准确材料/数量/停止规则；不以旧额度或泛指授权发送。"
+    },
+    {
+      "id": "PHASE-1-T091",
+      "phase": "Phase 1",
+      "title": "执行唯一有界计划语义开发验证并保留全部结果",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1-T090"
+      ],
+      "scope": [
+        "docs/acceptance/phase-1-plan-boundary-development-r01/approval.json",
+        "docs/acceptance/phase-1-plan-boundary-results-r01/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "用户批准T090冻结8项标签及最多8请求/3600秒/技术失败停/语义失败固定采集",
+      "acceptance_criteria": [
+        "准确绑定冻结包登记授权，按D01至D08每项最多一次，无重试回退，技术失败即停。",
+        "完整记录实际结果及断言引用草稿，GPT不代签独立人工；语义失败保留并仅采集固定余项。",
+        "实际结果与未评项如实汇总；不合格按既定范围收敛，H封存且T040 blocked。"
+      ],
+      "verification": [
+        "冻结check/report及实际请求Schema/wire/参数/用量审计",
+        "全部实际回答断言引用核对，独立人工评测另存",
+        "workflow/git diff --check及历史封存检查"
+      ],
+      "verification_results": [
+        "用户批准准确8项标签/最多8请求3600秒及技术失败停、语义失败固定采集，approval绑定manifest f0fd9f14…；独立台账D01–D08各一次实际审核，8/8 HTTP200/完整业务Schema/gpt-6-luna high8192/精确wire/原始gzip与解码摘要/模型用量通过，0生成/重试/回退。输入56324+输出6760=63084Token，激活至采集结束333.313秒；原六停止账本/H摘要及699文件冻结check保持。第一命令自动审批在创建进程前拒绝，逐份核对合成非敏感payload和固定第三方端点后同命令复核获准，无绕过/额外Provider请求/时钟重置；首次证据验证读错safe_headers编码键的AssertionError保留原因后按实际content_encoding复核，未改执行源码或放宽断言。正确D02栈/D03有效节点头插返回pass，D01数组issue及D04队列needs_human不符正确pass，故冻结4/4正例门已失败；D05 17/19及D06 LIFO11/4矛盾均具体检出，D07 unsafe_plan/severe reject且未推导UB确定数值，D08缺输入保留未决要求补元素。五项不成立覆盖意见（其中三项为真实缺陷外附带误报）及引用支持不足全部保留，不以核心检出抵消。Codex139断言/102文本字段/24实际锚点核对草稿，8评测Schema/所有字段指针与精确引文/链接/安全扫描通过；全部pending gpt_draft signed=false/quality_success=null，Lee独立实际签核0/8，不运行assess或计正式分子。collector自动COLLECTION_COMPLETE_QUALITY_UNASSESSED，8槽全用无再发，真实采集/技术完整不等于质量pass。按预先约定判本批不准入并收敛已有签核课程正式产品、动态仅待审草稿且不承诺自动发布，不再候选/Prompt试错；草稿公开UI尚非本批交付。T040 blocked/H封存/默认catalog_only，旧用户README编辑及参考目录保留。phase-1-plan-boundary-results-r01完整安全结果/逐项草稿/原始collector报告/技术核验/收敛交接；workflow/diff及freeze check通过。本任务done只表示有界执行与失败证据交付完成，不表示候选或正式验收通过。"
+      ],
+      "started_at": "2026-10-21T14:57:24",
+      "completed_at": "2026-10-21T15:11:21",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1-T091"
     }
   ]
 }

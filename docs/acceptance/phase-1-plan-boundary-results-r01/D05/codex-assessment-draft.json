@@ -1,0 +1,342 @@
+{
+  "schema_version": "plan-boundary-evaluation-v1",
+  "lane": "plan_review",
+  "case_id": "D05",
+  "slot_id": "D05",
+  "mode": "real",
+  "status": "pending",
+  "artifacts": {
+    "material_sha256": "0dc7f160c868c3fb5258a996b401635b6e04ca6949acbd41ae6cddcc309aae77",
+    "request_sha256": "c75b84f7634ec540be306d3ea1a48f737bd65ca0e7ea3066e87870198ecd1002",
+    "response_sha256": "ed22aa154a180fd7e31e47b13e229a6ce06ca4b150f974f1abf69566787e9a5d"
+  },
+  "evaluator": {
+    "name": "Codex",
+    "role": "gpt_draft",
+    "signed": false
+  },
+  "inventories_complete": {
+    "all_assertions": true,
+    "all_citations": true
+  },
+  "scores": {
+    "technical_integrity": "pass",
+    "severe_detection": "not_applicable",
+    "incidental_falsehoods": "present",
+    "teaching_coverage": "gap",
+    "citation_quality": "fail",
+    "quality_success": null,
+    "matches_frozen_label": true
+  },
+  "claims": [
+    {
+      "id": "c001",
+      "text": "自报必检项目：goal_fidelity",
+      "verdict": "supported",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/coverage/checked/0"
+      ],
+      "reason": "仅核对五项必检声明及空unchecked的结构，不把自报已检当作语义正确、独立评分或自动发布证据。"
+    },
+    {
+      "id": "c002",
+      "text": "自报必检项目：internal_consistency",
+      "verdict": "supported",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/coverage/checked/1"
+      ],
+      "reason": "仅核对五项必检声明及空unchecked的结构，不把自报已检当作语义正确、独立评分或自动发布证据。"
+    },
+    {
+      "id": "c003",
+      "text": "自报必检项目：scope",
+      "verdict": "supported",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/coverage/checked/2"
+      ],
+      "reason": "仅核对五项必检声明及空unchecked的结构，不把自报已检当作语义正确、独立评分或自动发布证据。"
+    },
+    {
+      "id": "c004",
+      "text": "自报必检项目：reference_support",
+      "verdict": "supported",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/coverage/checked/3"
+      ],
+      "reason": "仅核对五项必检声明及空unchecked的结构，不把自报已检当作语义正确、独立评分或自动发布证据。"
+    },
+    {
+      "id": "c005",
+      "text": "自报必检项目：downstream_feasibility",
+      "verdict": "supported",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/coverage/checked/4"
+      ],
+      "reason": "仅核对五项必检声明及空unchecked的结构，不把自报已检当作语义正确、独立评分或自动发布证据。"
+    },
+    {
+      "id": "c006",
+      "text": "模型category=plan_internal_conflict",
+      "verdict": "supported",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/findings/0/category",
+        "/material/plan"
+      ],
+      "reason": "该项具体核心缺陷与完整计划一致；只提出人工/重建建议，没有伪造已执行的修复或安全证明。"
+    },
+    {
+      "id": "c007",
+      "text": "权威原文要求返回19。",
+      "verdict": "supported",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/findings/0/condition_or_counterexample",
+        "/material/input_snapshot/teaching_context/original_request"
+      ],
+      "reason": "核对本字段及所列完整原文/计划；保留条件命题与实际缺陷的区别。"
+    },
+    {
+      "id": "c008",
+      "text": "计划goal要求返回19。",
+      "verdict": "supported",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/findings/0/condition_or_counterexample",
+        "/material/plan/goal"
+      ],
+      "reason": "核对本字段及所列完整原文/计划；保留条件命题与实际缺陷的区别。"
+    },
+    {
+      "id": "c009",
+      "text": "目标字段改为返回17。",
+      "verdict": "supported",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/findings/0/condition_or_counterexample",
+        "/material/plan/objectives/0/text"
+      ],
+      "reason": "核对本字段及所列完整原文/计划；保留条件命题与实际缺陷的区别。"
+    },
+    {
+      "id": "c010",
+      "text": "4+6+9=19。",
+      "verdict": "supported",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/findings/0/condition_or_counterexample",
+        "/material/plan/shared_example/input_description"
+      ],
+      "reason": "核对本字段及所列完整原文/计划；保留条件命题与实际缺陷的区别。"
+    },
+    {
+      "id": "c011",
+      "text": "目标17与用户要求19冲突。",
+      "verdict": "supported",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/findings/0/condition_or_counterexample",
+        "/material/plan/objectives/0/text"
+      ],
+      "reason": "核对本字段及所列完整原文/计划；保留条件命题与实际缺陷的区别。"
+    },
+    {
+      "id": "c012",
+      "text": "若按错误目标生成，可能给出错误示例结果。",
+      "verdict": "supported",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/findings/0/impact",
+        "/material/plan/objectives/0/text"
+      ],
+      "reason": "核对本字段及所列完整原文/计划；保留条件命题与实际缺陷的区别。"
+    },
+    {
+      "id": "c013",
+      "text": "模型severity=major",
+      "verdict": "supported",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/findings/0/severity",
+        "/material/plan"
+      ],
+      "reason": "该项具体核心缺陷与完整计划一致；只提出人工/重建建议，没有伪造已执行的修复或安全证明。"
+    },
+    {
+      "id": "c014",
+      "text": "模型suggested_action=consider_rebuild",
+      "verdict": "supported",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/findings/0/suggested_action",
+        "/material/plan"
+      ],
+      "reason": "该项具体核心缺陷与完整计划一致；只提出人工/重建建议，没有伪造已执行的修复或安全证明。"
+    },
+    {
+      "id": "c015",
+      "text": "模型category=coverage_plan_gap",
+      "verdict": "insufficient",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/findings/1/category",
+        "/material/plan"
+      ],
+      "reason": "该覆盖缺口本身未成立，因而coverage_plan_gap/major以及据此转人工或重建的建议均无充分依据；核心真实错误另记，不能被此抵消。"
+    },
+    {
+      "id": "c016",
+      "text": "用户要求三题。",
+      "verdict": "supported",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/findings/1/condition_or_counterexample",
+        "/material/plan/goal"
+      ],
+      "reason": "核对本字段及所列完整原文/计划；保留条件命题与实际缺陷的区别。"
+    },
+    {
+      "id": "c017",
+      "text": "计划有exercise场景。",
+      "verdict": "supported",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/findings/1/condition_or_counterexample",
+        "/material/plan/scenes/2/scene_key"
+      ],
+      "reason": "核对本字段及所列完整原文/计划；保留条件命题与实际缺陷的区别。"
+    },
+    {
+      "id": "c018",
+      "text": "计划尚未列出每道题全文。",
+      "verdict": "supported",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/findings/1/condition_or_counterexample",
+        "/material/plan/scenes/2"
+      ],
+      "reason": "核对本字段及所列完整原文/计划；保留条件命题与实际缺陷的区别。"
+    },
+    {
+      "id": "c019",
+      "text": "整个计划未承诺题数三。",
+      "verdict": "contradicted",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/findings/1/condition_or_counterexample",
+        "/material/plan/goal"
+      ],
+      "reason": "目标/goal已明确承诺相应交付，场景角色只是分工；不能把未来尚未生成的资源当作当前计划已缺承诺，或要求在场景重复同一承诺。条件式“若少交则违约”本身不等于已发生缺口。"
+    },
+    {
+      "id": "c020",
+      "text": "若后续少于三题会漏交要求。",
+      "verdict": "supported",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/findings/1/condition_or_counterexample",
+        "/material/plan/goal"
+      ],
+      "reason": "核对本字段及所列完整原文/计划；保留条件命题与实际缺陷的区别。"
+    },
+    {
+      "id": "c021",
+      "text": "当前计划缺少三题承诺。",
+      "verdict": "contradicted",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/findings/1/condition_or_counterexample",
+        "/material/plan/objectives/0/text"
+      ],
+      "reason": "目标/goal已明确承诺相应交付，场景角色只是分工；不能把未来尚未生成的资源当作当前计划已缺承诺，或要求在场景重复同一承诺。条件式“若少交则违约”本身不等于已发生缺口。"
+    },
+    {
+      "id": "c022",
+      "text": "计划没有落实三道题这一交付承诺。",
+      "verdict": "contradicted",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/findings/1/impact",
+        "/material/plan/goal"
+      ],
+      "reason": "目标/goal已明确承诺相应交付，场景角色只是分工；不能把未来尚未生成的资源当作当前计划已缺承诺，或要求在场景重复同一承诺。条件式“若少交则违约”本身不等于已发生缺口。"
+    },
+    {
+      "id": "c023",
+      "text": "模型severity=major",
+      "verdict": "insufficient",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/findings/1/severity",
+        "/material/plan"
+      ],
+      "reason": "该覆盖缺口本身未成立，因而coverage_plan_gap/major以及据此转人工或重建的建议均无充分依据；核心真实错误另记，不能被此抵消。"
+    },
+    {
+      "id": "c024",
+      "text": "模型suggested_action=human_review",
+      "verdict": "insufficient",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/findings/1/suggested_action",
+        "/material/plan"
+      ],
+      "reason": "该覆盖缺口本身未成立，因而coverage_plan_gap/major以及据此转人工或重建的建议均无充分依据；核心真实错误另记，不能被此抵消。"
+    },
+    {
+      "id": "c025",
+      "text": "The exercise scene's question count and content are unspecified, so fulfillment of the three-question requirement cannot be confirmed.",
+      "verdict": "insufficient",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/unresolved/0",
+        "/material/plan",
+        "/material/input_snapshot"
+      ],
+      "reason": "原文和计划目标已明确约定完整程序/三题（过程题），这是待生成资源后验事项，不能作为本计划未承诺的阻断依据。"
+    },
+    {
+      "id": "c026",
+      "text": "本条结论needs_human及服务端路线needs_human",
+      "verdict": "supported",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/verdict",
+        "/result/plan_check/server_assessment",
+        "/material/plan"
+      ],
+      "reason": "与冻结预标签比较；D05/D06转人工有真实矛盾，D07严重越界应reject，D08应保留未决；D01/D04正确计划被误拦。"
+    }
+  ],
+  "citations": [
+    {
+      "anchor_id": "5:p5",
+      "source_pointer": "/review_sources/5:p5/source_text",
+      "quoted_source": "用C实现固定数组{4,6,9}求和，返回17且不打印；给出讲解、函数及三题，不要求动画或完整节点。",
+      "supports_claim_ids": [
+        "c009"
+      ],
+      "verdict": "supports",
+      "reason": "逐项核对实际/objectives/0/text字段。核心缺陷引用的原要求、错误目标/预期输出、实际操作及相关状态均保留原字段含义；组合推演不借邻近字段冒充该字段内容。"
+    },
+    {
+      "anchor_id": "5:p1",
+      "source_pointer": "/review_sources/5:p1/source_text",
+      "quoted_source": "用C实现固定数组{4,6,9}求和，返回19且不打印；给出讲解、函数及三题，不要求动画或完整节点。",
+      "supports_claim_ids": [
+        "c007",
+        "c016"
+      ],
+      "verdict": "supports",
+      "reason": "逐项核对实际/teaching_context/original_request字段。该字段至多支持原要求/场景角色；不能证明完整计划没有相关承诺。引用未伪造位置，但不能借其他字段推出全局缺失。核心缺陷引用的原要求、错误目标/预期输出、实际操作及相关状态均保留原字段含义；组合推演不借邻近字段冒充该字段内容。"
+    },
+    {
+      "anchor_id": "5:p2",
+      "source_pointer": "/review_sources/5:p2/source_text",
+      "quoted_source": "用C实现固定数组{4,6,9}求和，返回19且不打印；给出讲解、函数及三题，不要求动画或完整节点。",
+      "supports_claim_ids": [
+        "c008"
+      ],
+      "verdict": "supports",
+      "reason": "逐项核对实际/goal字段。核心缺陷引用的原要求、错误目标/预期输出、实际操作及相关状态均保留原字段含义；组合推演不借邻近字段冒充该字段内容。"
+    },
+    {
+      "anchor_id": "5:p23",
+      "source_pointer": "/review_sources/5:p23/source_text",
+      "quoted_source": "exercise",
+      "supports_claim_ids": [
+        "c017"
+      ],
+      "verdict": "insufficient",
+      "reason": "逐项核对实际/scenes/2/scene_key字段。该字段至多支持原要求/场景角色；不能证明完整计划没有相关承诺。引用未伪造位置，但不能借其他字段推出全局缺失。"
+    }
+  ],
+  "automatic_publication_completed": false,
+  "eligible_for_T040_denominator": false,
+  "notes": "Codex逐字段/原子命题和实际锚点核对草稿；不是Lee独立签核。quality_success保持null，不提交assess/不入正式分子。teaching_coverage仅评模型覆盖判断是否成立，不宣称尚未生成的学习资源已交付。每个引用只能支持其实际字段命题，引用表须结合逐命题证据看。",
+  "run_id": "plan-boundary-development-r01",
+  "package_manifest_sha256": "f0fd9f143a39b43fea7b9d7f30f65c0a3da77c23f7c8a5ef13f58ca3e2d52ef1",
+  "dimensions": {
+    "core_detection": "detected",
+    "false_block": null
+  }
+}
