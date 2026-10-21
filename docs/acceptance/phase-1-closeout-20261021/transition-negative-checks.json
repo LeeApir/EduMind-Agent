@@ -1,0 +1,36 @@
+{
+  "valid_transition": "pass",
+  "negative_cases": [
+    {
+      "case": "archive byte alteration",
+      "result": "rejected",
+      "reason": "ARCHIVE_BYTES_CHANGED"
+    },
+    {
+      "case": "T040 relabeled done",
+      "result": "rejected",
+      "reason": "P1_DONE_COUNT"
+    },
+    {
+      "case": "new dynamic mode",
+      "result": "rejected",
+      "reason": "NO_BUDGET_OR_DYNAMIC_INHERITANCE"
+    },
+    {
+      "case": "new stage budget inherited",
+      "result": "rejected",
+      "reason": "NO_BUDGET_OR_DYNAMIC_INHERITANCE"
+    },
+    {
+      "case": "new task auto started",
+      "result": "rejected",
+      "reason": "NEW_TASK_ALREADY_STARTED"
+    },
+    {
+      "case": "blocked task closeout dependency",
+      "result": "rejected",
+      "reason": "CLOSEOUT_DEPENDS_ON_BLOCKED_TASK"
+    }
+  ],
+  "provider_calls": 0
+}

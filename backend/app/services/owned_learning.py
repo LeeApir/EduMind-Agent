@@ -70,8 +70,11 @@ async def published_resource(
 
     if resource is not None:
         unit = await db.get(LearningUnit, resource.learning_unit_id)
-        if (unit is None or (catalog_only() and unit.catalog_release_id is None)
-                or not await resource_provenance_valid(db, resource, unit)):
+        if (
+            unit is None
+            or (catalog_only() and unit.catalog_release_id is None)
+            or not await resource_provenance_valid(db, resource, unit)
+        ):
             return None
     return resource
 
@@ -99,5 +102,20 @@ async def published_scenes(
     unit = await visible_unit(db, owner_id, unit_id)
     if unit is None:
         return []
-    return [(scene, resource) for scene, resource in result.all()
-            if await resource_provenance_valid(db, resource, unit)]
+    pairs = [
+        (scene, resource)
+        for scene, resource in result.all()
+        if await resource_provenance_valid(db, resource, unit)
+    ]
+    if unit.current_publication_id is not None:
+        from app.services.hybrid_learning_publication import current_publication
+
+        publication = await current_publication(db, owner_id=owner_id, unit_id=unit_id)
+        if publication is None:
+            return []
+        material = publication.material
+        scenes = material["scenes"]
+        assert isinstance(scenes, list)
+        ids = {s["resource_id"] for s in scenes if isinstance(s, dict)}
+        pairs = [(s, r) for s, r in pairs if str(r.id) in ids]
+    return pairs

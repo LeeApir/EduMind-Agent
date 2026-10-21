@@ -68,6 +68,9 @@ def mock_api(route: Route) -> None:
     global LAST_QUIZ_RECEIPT, QUIZ_POST_COUNT, PATH_REPLANNED
     request = route.request
     path = urlparse(request.url).path
+    if path == "/api/runtime":
+        route.fulfill(status=200, json={"mode": "dynamic"})
+        return
     if path == "/api/auth/session":
         route.fulfill(status=401, json={"code": "UNAUTHORIZED"})
         return

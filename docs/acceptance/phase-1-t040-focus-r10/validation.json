@@ -1,0 +1,64 @@
+{
+  "version": "fixed-focus-r10-offline-validation-v1",
+  "state": "AWAITING_EXACT_RUN_APPROVAL",
+  "root_sha256": "e8388f55fe970be398d44bf4543d85f3dd03004e6c4fb6e44b98e44b1ef8923a",
+  "tests": {
+    "new": 35,
+    "existing_related": 238,
+    "total_passed": 273
+  },
+  "real_provider_calls": 0,
+  "real_key_read": false,
+  "credential_access": "metadata stat only; test .env synthetic",
+  "sources_bound": 215,
+  "cost_cap_micro_cny": 8551250,
+  "requests_cap": 4,
+  "real_calls_authorized": 0,
+  "real_cost_authorized": 0,
+  "run_approval_exists": false,
+  "live_runtime_ledger_exists": false,
+  "live_strategy_registry_exists": false,
+  "scope_confirmation": "Separate record of actual user faithfulness confirmation only",
+  "commands": [
+    "backend/.venv/bin/pytest -q backend/tests/test_fixed_focus.py backend/tests/test_span_review_offline.py backend/tests/test_claim_review_prototype.py backend/tests/test_acceptance_budget.py backend/tests/test_derived_diagnostic_budget.py backend/tests/test_derived_responses_sender.py backend/tests/test_t040_derived_run.py --tb=short",
+    "backend/.venv/bin/ruff check scripts/prepare_t040_focus.py scripts/run_t040_focus.py scripts/acceptance_support/fixed_focus_gate.py backend/tests/test_fixed_focus.py",
+    "backend/.venv/bin/python scripts/prepare_t040_focus.py",
+    "backend/.venv/bin/python scripts/prepare_t040_focus.py --check",
+    "backend/.venv/bin/python scripts/run_t040_focus.py check",
+    "backend/.venv/bin/python scripts/run_t040_focus.py step (expected exit 1 NOT_AUTHORIZED)",
+    "backend/.venv/bin/python scripts/prepare_t040_span_review.py --check",
+    "backend/.venv/bin/python scripts/prepare_t040_derived_run.py --check",
+    "backend/.venv/bin/python scripts/check_catalog_workflow.py",
+    "backend/.venv/bin/python scripts/verify_phase1_dynamic_freeze.py",
+    "backend/.venv/bin/python scripts/verify_phase1_dynamic_approval.py",
+    "Read-only SHA256 comparison of r09 202 and r08 186 bound files; SQLite attempts/halted checks"
+  ],
+  "failures_resolved": [
+    "Initial Ruff formatting and lambda/unused-variable warnings fixed.",
+    "34 setup errors after adding proof: fixture omitted newly required proof file. Copied exact proof into synthetic root; final full relevant suite 273 passed.",
+    "Self-review identified interruption between persisted receipt and post-send quality gate; assess now repeats that gate, with a crash-window regression. Unapproved r10 root refreshed before any run or approval."
+  ],
+  "old_runs": {
+    "r09": {
+      "sources_checked": 202,
+      "attempts": 1,
+      "halted": "INVALID_OUTPUT"
+    },
+    "r08": {
+      "sources_checked": 186,
+      "attempts": 1,
+      "halted": "CONCRETE_DEFECT_MISSED"
+    }
+  },
+  "limits": [
+    "Synthetic results do not prove model quality, real network or billing.",
+    "Provider-window contract is conservative reservation, not account cap or expected spend.",
+    "Full candidate retained does not establish full semantic coverage.",
+    "Scripts not checked by strict mypy; production app unchanged.",
+    "Frozen sender may lack upstream status/model on invalid response.",
+    "Local trusted approval records are not cryptographic user authentication."
+  ],
+  "production_mode": "catalog_only",
+  "production_registered": false,
+  "t040_complete": false
+}

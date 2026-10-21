@@ -1,0 +1,271 @@
+{
+  "version": "evidence-repair-regression-spec-v1",
+  "status": "PROPOSED_NOT_HUMAN_APPROVED",
+  "provider_requests": 0,
+  "not_a_semantic_classifier": true,
+  "not_a_new_real_acceptance_run": true,
+  "cases": [
+    {
+      "id": "actual-ub-overclaim",
+      "origin": "actual_unchanged_finding",
+      "material_sha256": "ece85986089f110d40824542ab06b0c1b877a9d7dee81e0f866da595bb280dd3",
+      "original_finding_index": 2,
+      "original_finding": {
+        "anchors": [
+          "a1",
+          "a2",
+          "a6"
+        ],
+        "category": "fact",
+        "condition_or_counterexample": "解释 `/markdown` 称“sum()返回16”，代码期望输出 `/expected_output` 称“不打印；由调用方取得返回值”，但实际 `/source` 返回的是越界的 `a[4]`，其值不等于 16 且不确定。",
+        "impact": "对返回值 16 的断言在实际代码上不成立（仅对未出现的累加循环成立），使解释、期望输出与代码三者在核心结论上互相矛盾。",
+        "severity": "major"
+      },
+      "anchors": [
+        {
+          "anchor_id": "a1",
+          "resource_id": "f480e6da-844d-5483-9dbf-91c6c8bbdac2",
+          "resource_digest": "b06705b2ef6a4d09590bae655dd3d91369808240bbb1164cd1751d0a0cb45fa1",
+          "json_pointer": "/markdown",
+          "start_utf8": 0,
+          "end_utf8": 256,
+          "actual_excerpt": "a={2,5,9}，容量3，下标0、1、2。total初始为0。i=0读取a[0]=2后total=2；i=1读取a[1]=5后total=7；i=2读取a[2]=9后total=16。i增至3，i<3为假，停止循环，不访问a[3]，循环体恰执行3次。sum()返回16，不直接打印。",
+          "scope": "field/span only; semantic relevance requires claim-by-claim review"
+        },
+        {
+          "anchor_id": "a2",
+          "resource_id": "5f250662-82b2-5b7b-a97a-0c305554eefe",
+          "resource_digest": "c65dcdad44e18d172d4eb0894a8ed0828a1957c73e7f97cd3c882059f394b1a5",
+          "json_pointer": "/expected_output",
+          "start_utf8": 0,
+          "end_utf8": 42,
+          "actual_excerpt": "不打印；由调用方取得返回值。",
+          "scope": "field/span only; semantic relevance requires claim-by-claim review"
+        },
+        {
+          "anchor_id": "a6",
+          "resource_id": "5f250662-82b2-5b7b-a97a-0c305554eefe",
+          "resource_digest": "c65dcdad44e18d172d4eb0894a8ed0828a1957c73e7f97cd3c882059f394b1a5",
+          "json_pointer": "/source",
+          "start_utf8": 0,
+          "end_utf8": 64,
+          "actual_excerpt": "#include <stddef.h>\nint sum(void){int a[3]={2,5,9};return a[4];}",
+          "scope": "field/span only; semantic relevance requires claim-by-claim review"
+        }
+      ],
+      "expected": {
+        "overall_review_acceptable": false,
+        "core_safety_reject_retained": true,
+        "violation": "CONCLUSION_STRONGER_THAN_EVIDENCE",
+        "note": "No guaranteed16 does not entail a result unequal16. Do not erase original statement or predict a UB runtime."
+      }
+    },
+    {
+      "id": "actual-fact-secondary-anchor",
+      "origin": "actual_unchanged_finding",
+      "material_sha256": "8bede9d8eb0c83a47c748a66af6eeaab4db474653c51e51d9de875c7e4717bd6",
+      "original_finding_index": 0,
+      "original_finding": {
+        "anchors": [
+          "a1",
+          "a15"
+        ],
+        "category": "fact",
+        "condition_or_counterexample": "Explanation markdown states: 累加到 total=16 之后紧接着写 “sum()返回18，不直接打印。” The array {2,5,9} sums to 2+5+9=16, and the code (`return total;`), the code's key_steps, the exercise q3 stem/explanation (返回16), and the authoritative goal/plan (返回值16) all use 16; the explanation's 18 contradicts its own preceding sentence (total=16) and every other supplied resource.",
+        "impact": "The unit's central answer — the function's return value — is stated incorrectly in the student-visible explanation, directly contradicting the goal's required value 16 and the exercise feedback (q3), so learners reading the explanation before the quiz are taught the wrong result.",
+        "severity": "severe"
+      },
+      "anchors": [
+        {
+          "anchor_id": "a1",
+          "resource_id": "fccaefd9-fcc8-56c4-8e67-4242f35be50d",
+          "resource_digest": "aabfa9dbf8c9eb7914528cb1f94c7154432e47415d5e6e139b775fd513830450",
+          "json_pointer": "/markdown",
+          "start_utf8": 0,
+          "end_utf8": 256,
+          "actual_excerpt": "a={2,5,9}，容量3，下标0、1、2。total初始为0。i=0读取a[0]=2后total=2；i=1读取a[1]=5后total=7；i=2读取a[2]=9后total=16。i增至3，i<3为假，停止循环，不访问a[3]，循环体恰执行3次。sum()返回18，不直接打印。",
+          "scope": "field/span only; semantic relevance requires claim-by-claim review"
+        },
+        {
+          "anchor_id": "a15",
+          "resource_id": "b5908630-ec02-59ad-85dd-5d678f28f068",
+          "resource_digest": "7eaf610d07dab1bbf97bb61cfe62e30b920cdc9fa3dc7833b2ce17e50a627a35",
+          "json_pointer": "/items/2/answer",
+          "start_utf8": 0,
+          "end_utf8": 1,
+          "actual_excerpt": "F",
+          "scope": "field/span only; semantic relevance requires claim-by-claim review"
+        }
+      ],
+      "expected": {
+        "core_fact_detection": true,
+        "every_citation_supports_claim": false,
+        "violation": "SECONDARY_ANCHOR_DOES_NOT_SUPPORT_NUMERIC_CLAIM",
+        "note": "a1 locates actual18/16 contradiction; a15 is F, not evidence of return16. Historical human continue does not erase this limitation."
+      }
+    },
+    {
+      "id": "synthetic-ub-bounded-conclusion",
+      "origin": "authored_proposed_contrast_not_model_output",
+      "material_sha256": "ece85986089f110d40824542ab06b0c1b877a9d7dee81e0f866da595bb280dd3",
+      "proposed_conclusion": "长度3却在源代码可达路径读取a[4]，构成未定义行为，不能保证返回16或正常返回。",
+      "anchors": [
+        {
+          "anchor_id": "a6",
+          "resource_id": "5f250662-82b2-5b7b-a97a-0c305554eefe",
+          "resource_digest": "c65dcdad44e18d172d4eb0894a8ed0828a1957c73e7f97cd3c882059f394b1a5",
+          "json_pointer": "/source",
+          "start_utf8": 0,
+          "end_utf8": 64,
+          "actual_excerpt": "#include <stddef.h>\nint sum(void){int a[3]={2,5,9};return a[4];}",
+          "scope": "field/span only; semantic relevance requires claim-by-claim review"
+        }
+      ],
+      "expected": {
+        "evidence_kind": "DEMONSTRATED_SAFETY_DEFECT_WITH_NO_NUMERIC_GUARANTEE",
+        "route": "reject",
+        "category": "code_safety",
+        "severity": "severe",
+        "forbidden_inference": "fixed value, guaranteed unequal16 or guaranteed crash"
+      }
+    },
+    {
+      "id": "synthetic-defined-sum-fact",
+      "origin": "authored_proposed_contrast_not_model_output",
+      "material_sha256": "8bede9d8eb0c83a47c748a66af6eeaab4db474653c51e51d9de875c7e4717bd6",
+      "proposed_conclusion": "固定的定义良好求和循环返回16，讲解声明返回18，与代码及讲解自身total16相矛盾。",
+      "anchors": [
+        {
+          "anchor_id": "a1",
+          "resource_id": "fccaefd9-fcc8-56c4-8e67-4242f35be50d",
+          "resource_digest": "aabfa9dbf8c9eb7914528cb1f94c7154432e47415d5e6e139b775fd513830450",
+          "json_pointer": "/markdown",
+          "start_utf8": 0,
+          "end_utf8": 256,
+          "actual_excerpt": "a={2,5,9}，容量3，下标0、1、2。total初始为0。i=0读取a[0]=2后total=2；i=1读取a[1]=5后total=7；i=2读取a[2]=9后total=16。i增至3，i<3为假，停止循环，不访问a[3]，循环体恰执行3次。sum()返回18，不直接打印。",
+          "scope": "field/span only; semantic relevance requires claim-by-claim review"
+        },
+        {
+          "anchor_id": "a6",
+          "resource_id": "58bb0ed5-8527-5ae3-a882-d0884fcf4391",
+          "resource_digest": "281f23f8b481c1d8d5db61966fbc30d2b8ddb5bede539a5ad968e65c4f453b60",
+          "json_pointer": "/source",
+          "start_utf8": 0,
+          "end_utf8": 109,
+          "actual_excerpt": "#include <stddef.h>\nint sum(void){int a[3]={2,5,9};int total=0;for(int i=0;i<3;i++)total+=a[i];return total;}",
+          "scope": "field/span only; semantic relevance requires claim-by-claim review"
+        }
+      ],
+      "expected": {
+        "evidence_kind": "DEMONSTRATED_CONTRADICTION",
+        "route": "reject",
+        "category": "fact",
+        "severity": "severe"
+      }
+    },
+    {
+      "id": "synthetic-F-valid-role",
+      "origin": "authored_proposed_contrast_not_model_output",
+      "material_sha256": "8bede9d8eb0c83a47c748a66af6eeaab4db474653c51e51d9de875c7e4717bd6",
+      "proposed_conclusion": "该题所列答案是F。",
+      "anchors": [
+        {
+          "anchor_id": "a15",
+          "resource_id": "b5908630-ec02-59ad-85dd-5d678f28f068",
+          "resource_digest": "7eaf610d07dab1bbf97bb61cfe62e30b920cdc9fa3dc7833b2ce17e50a627a35",
+          "json_pointer": "/items/2/answer",
+          "start_utf8": 0,
+          "end_utf8": 1,
+          "actual_excerpt": "F",
+          "scope": "field/span only; semantic relevance requires claim-by-claim review"
+        }
+      ],
+      "expected": {
+        "supports_this_atomic_claim": true,
+        "does_not_prove": "function return value16",
+        "note": "Same ID is valid for another claim; never blacklist IDa15 or textF."
+      }
+    },
+    {
+      "id": "logic-no-guarantee-not-negation",
+      "origin": "abstract_logic_countermodel_not_C_execution",
+      "possible_states": [
+        {
+          "P": true
+        },
+        {
+          "P": false
+        }
+      ],
+      "expected": {
+        "guaranteed_P": false,
+        "guaranteed_not_P": false,
+        "invalid_implication": "not(guaranteed P) => guaranteed(not P)",
+        "note": "This two-state logical counterexample is not a model of actual UB program outputs."
+      }
+    },
+    {
+      "id": "synthetic-insufficient-evidence",
+      "origin": "authored_reasoning_boundary_not_model_output",
+      "evidence": "未提供判断外部断言P所需的来源或前提。",
+      "expected": {
+        "evidence_kind": "INSUFFICIENT_PREMISES",
+        "route": "needs_human",
+        "findings": [],
+        "unresolved": [
+          "明确缺少的来源或前提，不能据此断言非P。"
+        ]
+      }
+    },
+    {
+      "id": "retained-trace-complete",
+      "origin": "unchanged_authored_material_control_not_real_result",
+      "slot": "trace-complete:candidate",
+      "material_sha256": "e422c5a587b691edb34e26de69d40562e601276b0b91ebd069db8e231c3a0701",
+      "expected": {
+        "route": "pass",
+        "note": "Original criterion retained; no real response generated here."
+      }
+    },
+    {
+      "id": "retained-gap-and-safety",
+      "origin": "unchanged_authored_material_control_not_real_result",
+      "slot": "gap-and-safety:candidate",
+      "material_sha256": "967b1960d24d8fd78ad6217ebafb7a04c4bedd881791983390ac394371804720",
+      "expected": {
+        "route": "reject",
+        "note": "Original criterion retained; no real response generated here."
+      }
+    },
+    {
+      "id": "retained-assessment-gap",
+      "origin": "unchanged_authored_material_control_not_real_result",
+      "slot": "assessment-gap:candidate",
+      "material_sha256": "530af5709da6a592e94bd3f5128892b76a66337a74a84d0a914f1cd1075d92e3",
+      "expected": {
+        "route": "needs_human",
+        "note": "Original criterion retained; no real response generated here."
+      }
+    },
+    {
+      "id": "retained-trace-distributed",
+      "origin": "unchanged_authored_material_control_not_real_result",
+      "slot": "trace-distributed:candidate",
+      "material_sha256": "87bcc0bc29edb86451809aedc204f15d4defa5813190a5aeb6961d08075f2d04",
+      "expected": {
+        "route": "pass",
+        "note": "Distributed student-visible support counts; internal plan alone does not."
+      }
+    },
+    {
+      "id": "retained-plan-only-gap",
+      "origin": "unchanged_authored_material_control_not_real_result",
+      "slot": "plan-only-gap:candidate",
+      "material_sha256": "c19deec758d9756b548b797f9af13dcff587143d523c1a25be76d9dd96e74ab3",
+      "expected": {
+        "route": "needs_human",
+        "note": "Distributed student-visible support counts; internal plan alone does not."
+      }
+    }
+  ]
+}

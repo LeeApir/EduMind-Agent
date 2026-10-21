@@ -1,0 +1,38 @@
+{
+  "version": "qwen-continuation-mixed-actual-review-v1",
+  "proposal_sha256": "57f3f42c21973521f7fb26ce6a3fbd58ac62d996182067aa70c4c844ff4326a6",
+  "failure_sha256": "32d81c21f68272f17398354797de26977a82f16fc65f334633ffdf3a2f3e24d8",
+  "complete_review_receipt_sha256": "5471c486693a259dcc112b3d925067eedfbd65b96b4a8d4ba7cd49a621c5c2af",
+  "reviewer_type": "assistant",
+  "transport_and_schema_complete": true,
+  "core_safety_detected": true,
+  "major_reject_retained": true,
+  "mixed_gap_criterion_passed": false,
+  "all_assertions_passed": false,
+  "all_citations_supported": false,
+  "anchor_bindings_valid": true,
+  "listed_anchor_instances_checked": 5,
+  "issues": [
+    {
+      "kind": "missing_teaching_gap_reporting",
+      "evidence": "unresolved is empty; freeze requires explicit teaching gap in unresolved alongside serious reject. Finding2 accurately identifies an unimplemented claimed algorithm, but does not separately identify missing learner-visible loop states/exit support or process measurement."
+    },
+    {
+      "kind": "conclusion_stronger_than_evidence",
+      "finding_index": 1,
+      "exact_text": "whose result is undefined, not 16",
+      "assessment": "a5 establishes out-of-bounds undefined behavior and absent summation; it does not exclude a numeric observation16. Unlike the previously human-confirmed source-expression contrast, this sentence explicitly negates16 as the result. Cannot infer not P from no guarantee P."
+    },
+    {
+      "kind": "UB_impact_precision",
+      "finding_index": 1,
+      "exact_text": "returns undefined value via out-of-bounds access",
+      "assessment": "UB is absence of language guarantees, not a defined special value or guarantee of normal return. Preserve valid code/goal mismatch separately."
+    }
+  ],
+  "independent_assessment": "fail",
+  "human_confirmed": false,
+  "candidate_eliminated": true,
+  "next_call_authorized": false,
+  "t040_passed": false
+}

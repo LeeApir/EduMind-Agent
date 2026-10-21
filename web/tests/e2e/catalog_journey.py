@@ -41,7 +41,17 @@ PLAN = Path(os.environ["EDUMIND_CATALOG_PROTOCOL"])
 
 
 def journey(
-    page, release_id, package, animation_rows, pool, browser, progress, persist
+    page,
+    release_id,
+    package,
+    animation_rows,
+    pool,
+    browser,
+    progress,
+    persist,
+    *,
+    before_withdraw=None,
+    configure_context=None,
 ):
     checks = progress["nodes"]
     # All fixed content through actual server, server answers stripped, real quiz in UI.
@@ -172,6 +182,8 @@ def journey(
             )
         foreign = browser.new_context()
         try:
+            if configure_context is not None:
+                configure_context(foreign)
             foreign_page = foreign.new_page()
             foreign_page.goto(BASE, wait_until="networkidle")
             identity = api(foreign_page, "/api/auth/session")
@@ -186,6 +198,8 @@ def journey(
             )
         finally:
             foreign.close()
+    if before_withdraw is not None:
+        before_withdraw(checks, animation_rows)
     unit = checks[-1]["unit_id"]
     auth = api(page, "/api/auth/session")["body"]
     missing_csrf = api(

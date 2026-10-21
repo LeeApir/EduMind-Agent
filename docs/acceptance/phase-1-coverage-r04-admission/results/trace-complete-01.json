@@ -1,0 +1,75 @@
+{
+  "version": "coverage-r04-trace-complete-01-v1",
+  "source_commit": "5cabe2d",
+  "proposal_sha256": "91c9d5f818d1f675f22691f9e318aec89fc6f0828bb070f245c86cc1b07ea1db",
+  "approval_sha256": "02cdc5c4249c98635559c8608e681caeb2d7182a7fa25d0e6673b057ed863c52",
+  "labels_human_sha256": "61fdfdb86379d86c6ec79d3e305b5f2e36afa64a45a4eb260add908414b526f3",
+  "receipt_sha256": "b4116b0b046fcb40c13e6183d626ab95698b27a6796397a7026b97b194887cc8",
+  "slot": "trace-complete",
+  "real_cloud": true,
+  "mock": false,
+  "r04_requests_sent": 1,
+  "requests_not_sent": [
+    "trace-distributed",
+    "plan-only-gap",
+    "assessment-gap"
+  ],
+  "protocol_schema_wire_model_binding": "passed",
+  "model_verdict": "needs_human",
+  "local_gate": "COVERAGE_ROUTE_MISMATCH",
+  "local_routing": {
+    "verdict": "needs_human",
+    "reason_codes": [
+      "SEMANTIC_UNRESOLVED"
+    ],
+    "policy_version": "hybrid-review-v1"
+  },
+  "review_result": {
+    "coverage": {
+      "checked": [
+        "action_references",
+        "answer_consistency",
+        "conventions",
+        "example_trace",
+        "terminology"
+      ],
+      "unchecked": []
+    },
+    "findings": [],
+    "schema_version": "resource-review-v4",
+    "scope": "unit",
+    "unresolved": [
+      "Student-visible goal coverage is incomplete for the server-bound goal and the node's learning objectives. The delivered unit only traces the sum loop over a={2,5,9} (total=2,7,16, exit at i=3, return 16). It does not teach the node objectives '说出下标访问的时间复杂度' (state the time complexity of index access) or '说明连续存储对插入和删除的影响' (explain the effect of contiguous storage on insertion/deletion), and it does not address the node's common misconceptions ('数组每次访问都要从头遍历', '数组插入总是 O(1)'). The plan itself is narrower than the server-bound goal, so the plan cannot excuse the missing parts. Exact missing support: student-visible explanation/code/exercise content covering O(1) index access and the cost of insertion/deletion in a contiguous array.",
+      "No verified student-visible animation evidence was supplied in this three-resource request; the plan's ai_context mentions a contiguous-cell/index-sprite illustration, but that is internal plan/reference context, not delivered teaching evidence, so any animation-based coverage claim cannot be assessed."
+    ],
+    "verdict": "needs_human"
+  },
+  "input_tokens": 13539,
+  "output_tokens_including_reasoning": 305,
+  "total_tokens": 13844,
+  "cost_reserved_micro_cny": 2192766,
+  "peak_uncached_usage_reference_micro_cny": 29518,
+  "actual_invoice_cost": null,
+  "cost_note": "Peak uncached reference only; actual account/cache/period invoice unknown. Reservation is not invoice.",
+  "request_sha256": "1c0029be8efe9aab1a773b1fea913a3788b88d6322a6bc1a07985a4f16d2d92b",
+  "response_sha256": "a0e2b20c6971441e2439b80928d18ba4803c2d2d9ee5320250ea66930f1701f8",
+  "material_unit_digest": "afbfb8b86af6a801f9cc37c5370a77dbd8b22f1ac5e487cfc121b7ce33c59bf4",
+  "material_sha256": "9dd312b035c8626c054aeac343e0d80127e97e51cc3c08de78e55cd29d0e27e2",
+  "frozen_material_location": "cases.json:trace-complete.material",
+  "assistant_observations_not_human_signoff": [
+    "The actual goal is a fixed C sum trace, indices0..2 and return16; selected objective explicitly states total2/7/16 and i3 termination, with no full-node promise.",
+    "The model acknowledged the complete trace but demanded reference-node access complexity, insertion/deletion and additional misconception teaching. This expands the declared scope contrary to graph_role and the frozen instructions.",
+    "No animation was promised as required delivery for this unit. Absent verified animation prevents counting animation evidence; it does not on its own require needs_human when supplied text/code/key_steps meet the stated goal.",
+    "No factual/safety finding was produced. This is control over-referral / goal-scope noncompliance, not a transport failure or a demonstrated serious-error miss.",
+    "Partial controls cannot demonstrate v4.3 efficacy; distributed and two omission cases remain NOT_RUN. No prompt changes or automatic new round."
+  ],
+  "human_confirmed": false,
+  "ledger": {
+    "attempts": 1,
+    "halted": "INVALID_OUTPUT"
+  },
+  "T040": "blocked",
+  "formal_quality_passed": false,
+  "production_mode": "catalog_only",
+  "next": "Review actual control/model opinion independently; current r04 remains stopped. Do not send remaining three or clear halt."
+}

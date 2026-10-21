@@ -1,0 +1,23 @@
+{
+  "kind": "AI reader review, not independent human truth or candidate quality",
+  "real_provider_calls": 0,
+  "reviewer": "independent Codex reader",
+  "issues": [
+    {
+      "id": "partial-response-loss",
+      "observed": "ReadTimeout after a received chunk discarded HTTP status and received partial body",
+      "resolution": "bounded partial body, failure receipt, safe headers, raw_complete and unknown usage saved; unsafe encoded/reflected-secret body withheld with hash",
+      "tests": [
+        "test_partial_response_is_saved_on_read_timeout",
+        "test_decoded_limit_and_compressed_secret_are_checked"
+      ],
+      "followup": "reader confirmed original evidence gap fixed; no new blocking issue found"
+    }
+  ],
+  "boundaries": [
+    "No actual model authorization",
+    "A02/A03 explicitly human clarified; automatic ambiguous_aliases remains",
+    "GPT performs semantic assertions/citation judgments; mechanical checks only ensure coverage/binding",
+    "No new C runtime result or product human decision"
+  ]
+}

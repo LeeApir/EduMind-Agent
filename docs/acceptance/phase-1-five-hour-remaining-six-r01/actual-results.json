@@ -1,0 +1,2621 @@
+{
+  "kind": "Actual parsed reviews, generated delivery and interactive GPT evaluation; no provider raw reasoning or credentials",
+  "independent_human": false,
+  "new_C_verification": "static_only; not compiled or executed",
+  "cases": [
+    {
+      "case_id": "R03",
+      "evaluation": {
+        "actual": {
+          "actual_call_count": 1,
+          "course_state": null,
+          "duration_ms": 7115,
+          "input_tokens": 9891,
+          "local_verdict": "revise",
+          "model_verdict": "revise",
+          "output_tokens": 289,
+          "request_receipt_paths": [
+            "local-materials/phase-1-five-hour-remaining-six-r01/R03/01-request.json",
+            "local-materials/phase-1-five-hour-remaining-six-r01/R03/01-receipt.json"
+          ],
+          "response_artifact_paths": [
+            "local-materials/phase-1-five-hour-remaining-six-r01/R03/01-response.bin"
+          ],
+          "status": "observed"
+        },
+        "case_id": "R03",
+        "case_sha256": "ac8de10384a8f12bbfe53885f0419e97a0e931044db2de860177049b70fd77ba",
+        "citation_checks": [
+          {
+            "anchor_id": "a4",
+            "end_utf8": 108,
+            "evidence_ids": [
+              "e1",
+              "e2"
+            ],
+            "finding_index": 0,
+            "json_pointer": "/source",
+            "quoted_text": "int first_sample(void) {\n    int a[3] = {4, 6, 9};\n    /* 返回最后一个元素9。 */\n    return a[0];\n}",
+            "reason": "a4正是/source完整片段，实际包含数组初始化、错误注释与return a[0]，单字段直接支持两端矛盾。",
+            "resource_digest": "5fe997d062ff7570db56065fefff2a4e31f0cf647137d786c3cca2b6f0db3d23",
+            "result": "supported",
+            "review_artifact_path": "local-materials/phase-1-five-hour-remaining-six-r01/R03/review-60c5f663-0159-470d-a7a8-75645375032f.json",
+            "start_utf8": 0
+          }
+        ],
+        "claim_checks": [
+          {
+            "evidence_ids": [
+              "e1",
+              "e2"
+            ],
+            "json_pointer": "/result/findings/0/condition_or_counterexample",
+            "quoted_text": "注释称函数返回最后一个元素9，但实际的 return a[0] 返回首元素4。",
+            "reason": "实际source同一字段内含注释“返回最后一个元素9”及return a[0]，初始化为{4,6,9}，因此实际返回4。访问合法，模型没有误报安全错误或从邻近字段借证据。",
+            "result": "supported",
+            "review_artifact_path": "local-materials/phase-1-five-hour-remaining-six-r01/R03/review-60c5f663-0159-470d-a7a8-75645375032f.json"
+          },
+          {
+            "evidence_ids": [
+              "e1",
+              "e2"
+            ],
+            "json_pointer": "/result/findings/0/impact",
+            "quoted_text": "注释与实现不一致，违反了接口与注释必须一致的明确要求。",
+            "reason": "原请求要求接口和注释与实际实现一致，9与4相互矛盾；资源scope返回revise属于预冻允许的revise/reject集合，未擅自启动修正。",
+            "result": "supported",
+            "review_artifact_path": "local-materials/phase-1-five-hour-remaining-six-r01/R03/review-60c5f663-0159-470d-a7a8-75645375032f.json"
+          }
+        ],
+        "code_verification": {
+          "applicability_note": "Actual supplied source checked statically against literal values and control flow. Not compiled or executed; no fixed-C result borrowed.",
+          "fixed_c_evidence_paths": [],
+          "method": "static_only",
+          "new_code_compiled": false,
+          "new_code_executed": false
+        },
+        "conclusion": "R03通过：fact-major准确指出注释9而实现4，revise符合预标签允许集合，全部两条论据及a4引用有据；未启动纠正或发布。",
+        "corrections": {
+          "actual_context_paths": [],
+          "before_after_digest_pairs": [],
+          "new_defect_observed": false,
+          "note": "Independent review only; no correction or publication performed",
+          "observed": false,
+          "unsupported_feedback_entered": false
+        },
+        "evaluator": {
+          "configuration": null,
+          "evaluated_at": "2026-10-20T15:44:11.714080+08:00",
+          "exact_model_id": null,
+          "identity": "Codex interactive GPT evaluator",
+          "independent_human": false,
+          "kind": "gpt",
+          "unknown_metadata_reason": "Exact interactive evaluator model ID/configuration not exposed; do not infer tested Luna identity."
+        },
+        "evidence": [
+          {
+            "applies_to_digest": "65a3b89767f67b548294e55a55b49cb3aa2c7780534147eaa1a4ac84e092de60",
+            "artifact_path": "docs/acceptance/phase-1-five-hour-test-plan-r01/cases/R03.json",
+            "artifact_sha256": "6da1842e7044dafb06af1e0be36c694c2df74ce4c6b76e59d84b168a34433ae2",
+            "id": "e1",
+            "kind": "static_reasoning",
+            "scope_note": "Full immutable student material and explicitly authored static arithmetic/program reasoning; no C execution"
+          },
+          {
+            "applies_to_digest": "65a3b89767f67b548294e55a55b49cb3aa2c7780534147eaa1a4ac84e092de60",
+            "artifact_path": "local-materials/phase-1-five-hour-remaining-six-r01/R03/gpt-reasoning.json",
+            "artifact_sha256": "c71eaf235ebb0de26e00e016ef4f67ee0d82e4ed16757f236cf20e544b5011c9",
+            "id": "e2",
+            "kind": "static_reasoning",
+            "scope_note": "Full immutable student material and explicitly authored static arithmetic/program reasoning; no C execution"
+          },
+          {
+            "applies_to_digest": "65a3b89767f67b548294e55a55b49cb3aa2c7780534147eaa1a4ac84e092de60",
+            "artifact_path": "local-materials/phase-1-five-hour-remaining-six-r01/R03/result.json",
+            "artifact_sha256": "8a6d73c59ca5a573c1967479218f8ca91d133a6005dc297e10fd81d4d5fc7634",
+            "id": "e3",
+            "kind": "transport_receipt",
+            "scope_note": "Actual immutable result and bound transport artifacts; not semantic proof"
+          }
+        ],
+        "grades": {
+          "all_citations": "pass",
+          "all_claims": "pass",
+          "core_expected": "pass",
+          "final_status": "pass",
+          "full_quality": "pass",
+          "impact": "green",
+          "technical_integrity": "pass"
+        },
+        "label_sha256": "d551f93409900a6a246c8eee8e2fb2a29f1ea9361761dde227417f44669d8b7f",
+        "product_human_decision": null,
+        "production_publish_performed": false,
+        "record_version": "five-hour-gpt-evaluation-v1",
+        "reviewed_all_candidates_and_audit_history": true,
+        "run_id": "five-hour-r01",
+        "unresolved": []
+      },
+      "reviews": [
+        {
+          "anchor_catalog": [
+            {
+              "anchor_id": "a1",
+              "end_utf8": 40,
+              "json_pointer": "/expected_output",
+              "resource_digest": "5fe997d062ff7570db56065fefff2a4e31f0cf647137d786c3cca2b6f0db3d23",
+              "resource_id": "02d4e443-0c1b-527e-995f-f253bae226a3",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a2",
+              "end_utf8": 44,
+              "json_pointer": "/key_steps/0",
+              "resource_digest": "5fe997d062ff7570db56065fefff2a4e31f0cf647137d786c3cca2b6f0db3d23",
+              "resource_id": "02d4e443-0c1b-527e-995f-f253bae226a3",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a3",
+              "end_utf8": 1,
+              "json_pointer": "/language",
+              "resource_digest": "5fe997d062ff7570db56065fefff2a4e31f0cf647137d786c3cca2b6f0db3d23",
+              "resource_id": "02d4e443-0c1b-527e-995f-f253bae226a3",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a4",
+              "end_utf8": 108,
+              "json_pointer": "/source",
+              "resource_digest": "5fe997d062ff7570db56065fefff2a4e31f0cf647137d786c3cca2b6f0db3d23",
+              "resource_id": "02d4e443-0c1b-527e-995f-f253bae226a3",
+              "start_utf8": 0
+            }
+          ],
+          "binding": {
+            "input_digest": "e9afe8c59e51ea3c0117aa6a03b695001d0bf29d873f1faa87e5e88726a24962",
+            "operation_id": "284fa120-f346-52cb-8dcd-cda6fe71dfe6",
+            "owner_id": "ba4f9807-adb8-5812-b82f-62bc1bb32f26",
+            "plan_digest": "9f724bc9224a151052c6eef1bb870170ae7d7e821d772c2fbaca27d999f1a7d6",
+            "plan_id": "0bd2c2cf-6fe9-582a-af0d-005afd8ccf94",
+            "plan_version": 1,
+            "policy_digest": "747ec507e0f011d8a82e74d3823964fc2f860ab23693f71e695273ebf696fdad",
+            "policy_version": "hybrid-review-v1",
+            "references_digest": "1335b93c5c57bca280ff7d4076dbd2c6cd8c0bc14bf154738dada80dc5e6281e",
+            "unit_id": "78aa9362-3527-5c68-bbb1-b3a4c684be01"
+          },
+          "created_at": "2026-10-20T07:43:15.488778+00:00",
+          "local_routing": {
+            "policy_version": "hybrid-review-v1",
+            "reason_codes": [],
+            "verdict": "revise"
+          },
+          "prompt_version": "evidence-resource-review-v4.9",
+          "provider_config_digest": "28dc638b729b5ec54ca902a95f07939dceed0a4c23fe35d0a61396a00820643b",
+          "request_digest": "7b4fdd1701c465bd4c929f349a60ae8727b20649a0190dda394876f3dea9a6b9",
+          "response_digest": "d2ff4784800abd1b82f1b775786c55c1fd52c9920384b56044561a0332027557",
+          "result": {
+            "coverage": {
+              "checked": [
+                "code_safety",
+                "facts",
+                "learner_fit",
+                "objectives",
+                "reference_scope"
+              ],
+              "unchecked": []
+            },
+            "findings": [
+              {
+                "anchors": [
+                  "a4"
+                ],
+                "category": "fact",
+                "condition_or_counterexample": "注释称函数返回最后一个元素9，但实际的 return a[0] 返回首元素4。",
+                "impact": "注释与实现不一致，违反了接口与注释必须一致的明确要求。",
+                "severity": "major"
+              }
+            ],
+            "schema_version": "resource-review-v4",
+            "scope": "resource",
+            "unresolved": [],
+            "verdict": "revise"
+          },
+          "review_id": "60c5f663-0159-470d-a7a8-75645375032f",
+          "target_digest": "5fe997d062ff7570db56065fefff2a4e31f0cf647137d786c3cca2b6f0db3d23"
+        }
+      ],
+      "generated_delivery": {
+        "course_state": null
+      }
+    },
+    {
+      "case_id": "R04",
+      "evaluation": {
+        "actual": {
+          "actual_call_count": 1,
+          "course_state": null,
+          "duration_ms": 7684,
+          "input_tokens": 10936,
+          "local_verdict": "revise",
+          "model_verdict": "revise",
+          "output_tokens": 501,
+          "request_receipt_paths": [
+            "local-materials/phase-1-five-hour-remaining-six-r01/R04/02-request.json",
+            "local-materials/phase-1-five-hour-remaining-six-r01/R04/02-receipt.json"
+          ],
+          "response_artifact_paths": [
+            "local-materials/phase-1-five-hour-remaining-six-r01/R04/02-response.bin"
+          ],
+          "status": "observed"
+        },
+        "case_id": "R04",
+        "case_sha256": "aa25cd526054e7864ff4b405d054cfca210455fb62c676c7ea89d8dfd04fa0ca",
+        "citation_checks": [
+          {
+            "anchor_id": "a1",
+            "end_utf8": 1,
+            "evidence_ids": [
+              "e1",
+              "e2"
+            ],
+            "finding_index": 0,
+            "json_pointer": "/items/0/answer",
+            "quoted_text": "F",
+            "reason": "a1仅引用q1答案F，直接支持键为F这一命题，不借解析的T。",
+            "resource_digest": "ff6dada6f4767fcc74b58e0bd7c2059aac4d67a57d61f023a7fb87d7bc6092a8",
+            "result": "supported",
+            "review_artifact_path": "local-materials/phase-1-five-hour-remaining-six-r01/R04/review-f7d3044a-b883-4b10-873d-1c79b23edd0f.json",
+            "start_utf8": 0
+          },
+          {
+            "anchor_id": "a2",
+            "end_utf8": 48,
+            "evidence_ids": [
+              "e1",
+              "e2"
+            ],
+            "finding_index": 0,
+            "json_pointer": "/items/0/explanation",
+            "quoted_text": "4+6+9=19，因此题干命题成立，应答T。",
+            "reason": "a2实际解析包含4+6+9=19及应答T，直接支持解析与答案不一致。",
+            "resource_digest": "ff6dada6f4767fcc74b58e0bd7c2059aac4d67a57d61f023a7fb87d7bc6092a8",
+            "result": "supported",
+            "review_artifact_path": "local-materials/phase-1-five-hour-remaining-six-r01/R04/review-f7d3044a-b883-4b10-873d-1c79b23edd0f.json",
+            "start_utf8": 0
+          },
+          {
+            "anchor_id": "a4",
+            "end_utf8": 63,
+            "evidence_ids": [
+              "e1",
+              "e2"
+            ],
+            "finding_index": 0,
+            "json_pointer": "/items/0/question",
+            "quoted_text": "[判断题] 4+6+9=19 仅填 T 或 F（T=正确，F=错误）。",
+            "reason": "a4实际题干就是4+6+9=19及T/F定义，独立计算4+6=10再加9=19，正确应T。",
+            "resource_digest": "ff6dada6f4767fcc74b58e0bd7c2059aac4d67a57d61f023a7fb87d7bc6092a8",
+            "result": "supported",
+            "review_artifact_path": "local-materials/phase-1-five-hour-remaining-six-r01/R04/review-f7d3044a-b883-4b10-873d-1c79b23edd0f.json",
+            "start_utf8": 0
+          }
+        ],
+        "claim_checks": [
+          {
+            "evidence_ids": [
+              "e1",
+              "e2"
+            ],
+            "json_pointer": "/result/findings/0/condition_or_counterexample",
+            "quoted_text": "题干命题“4+6+9=19”为真，正确答案应为T；但答案字段标为F，而解析也说明命题成立并应答T。",
+            "reason": "q1命题4+6+9=19为真，答案字段实际F，解析实际明说应答T。三个事实分别核对，不能借邻近字段混淆。",
+            "result": "supported",
+            "review_artifact_path": "local-materials/phase-1-five-hour-remaining-six-r01/R04/review-f7d3044a-b883-4b10-873d-1c79b23edd0f.json"
+          },
+          {
+            "evidence_ids": [
+              "e1",
+              "e2"
+            ],
+            "json_pointer": "/result/findings/0/impact",
+            "quoted_text": "答案键与解析相互矛盾，学生按答案键作答会被错误判定。",
+            "reason": "错误F键与正确T解析相反，依错键判断会产生不符合数学真值的测量结果。模型说错误判定，并未声称填F一定被判为不正确；实际接受F或拒绝T均会造成错误评价，影响描述有据。",
+            "result": "supported",
+            "review_artifact_path": "local-materials/phase-1-five-hour-remaining-six-r01/R04/review-f7d3044a-b883-4b10-873d-1c79b23edd0f.json"
+          }
+        ],
+        "code_verification": {
+          "applicability_note": "Actual supplied source checked statically against literal values and control flow. Not compiled or executed; no fixed-C result borrowed.",
+          "fixed_c_evidence_paths": [],
+          "method": "static_only",
+          "new_code_compiled": false,
+          "new_code_executed": false
+        },
+        "conclusion": "R04通过：fact-major/revise准确检出题干真、答案F、解析T的矛盾；两条论据和三个主辅引用逐项有据，无附带误报。独立资源观察不实际启动修正。",
+        "corrections": {
+          "actual_context_paths": [],
+          "before_after_digest_pairs": [],
+          "new_defect_observed": false,
+          "note": "Independent review only; no correction or publication performed",
+          "observed": false,
+          "unsupported_feedback_entered": false
+        },
+        "evaluator": {
+          "configuration": null,
+          "evaluated_at": "2026-10-20T15:45:15.181582+08:00",
+          "exact_model_id": null,
+          "identity": "Codex interactive GPT evaluator",
+          "independent_human": false,
+          "kind": "gpt",
+          "unknown_metadata_reason": "Exact interactive evaluator model ID/configuration not exposed; do not infer tested Luna identity."
+        },
+        "evidence": [
+          {
+            "applies_to_digest": "621cb651ab900d9ca5f5a39e8bf78b71483139532130ef568a9df1c07cf04787",
+            "artifact_path": "docs/acceptance/phase-1-five-hour-test-plan-r01/cases/R04.json",
+            "artifact_sha256": "0de08a6ee54017df9aa51ee36e205929a26e40c3a7db8582f6fecc253511b86f",
+            "id": "e1",
+            "kind": "static_reasoning",
+            "scope_note": "Full immutable student material and explicitly authored static arithmetic/program reasoning; no C execution"
+          },
+          {
+            "applies_to_digest": "621cb651ab900d9ca5f5a39e8bf78b71483139532130ef568a9df1c07cf04787",
+            "artifact_path": "local-materials/phase-1-five-hour-remaining-six-r01/R04/gpt-reasoning.json",
+            "artifact_sha256": "7de0cf261445e72ef7de931becdb668b3481ce8a52a6ea67346517f2f2abd7a3",
+            "id": "e2",
+            "kind": "static_reasoning",
+            "scope_note": "Full immutable student material and explicitly authored static arithmetic/program reasoning; no C execution"
+          },
+          {
+            "applies_to_digest": "621cb651ab900d9ca5f5a39e8bf78b71483139532130ef568a9df1c07cf04787",
+            "artifact_path": "local-materials/phase-1-five-hour-remaining-six-r01/R04/result.json",
+            "artifact_sha256": "45cdc0df361cfd3a4cf2b8cbe5502305af4754c957637eac835cd731efdc0e61",
+            "id": "e3",
+            "kind": "transport_receipt",
+            "scope_note": "Actual immutable result and bound transport artifacts; not semantic proof"
+          }
+        ],
+        "grades": {
+          "all_citations": "pass",
+          "all_claims": "pass",
+          "core_expected": "pass",
+          "final_status": "pass",
+          "full_quality": "pass",
+          "impact": "green",
+          "technical_integrity": "pass"
+        },
+        "label_sha256": "41b293c7d865ab66a3bb63aa42a16428c64c8e375c4a01d80f2780c806e3acbf",
+        "product_human_decision": null,
+        "production_publish_performed": false,
+        "record_version": "five-hour-gpt-evaluation-v1",
+        "reviewed_all_candidates_and_audit_history": true,
+        "run_id": "five-hour-r01",
+        "unresolved": []
+      },
+      "reviews": [
+        {
+          "anchor_catalog": [
+            {
+              "anchor_id": "a1",
+              "end_utf8": 1,
+              "json_pointer": "/items/0/answer",
+              "resource_digest": "ff6dada6f4767fcc74b58e0bd7c2059aac4d67a57d61f023a7fb87d7bc6092a8",
+              "resource_id": "9ae1ea4d-bc2f-51f8-bb2e-5137152165dd",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a2",
+              "end_utf8": 48,
+              "json_pointer": "/items/0/explanation",
+              "resource_digest": "ff6dada6f4767fcc74b58e0bd7c2059aac4d67a57d61f023a7fb87d7bc6092a8",
+              "resource_id": "9ae1ea4d-bc2f-51f8-bb2e-5137152165dd",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a3",
+              "end_utf8": 2,
+              "json_pointer": "/items/0/id",
+              "resource_digest": "ff6dada6f4767fcc74b58e0bd7c2059aac4d67a57d61f023a7fb87d7bc6092a8",
+              "resource_id": "9ae1ea4d-bc2f-51f8-bb2e-5137152165dd",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a4",
+              "end_utf8": 63,
+              "json_pointer": "/items/0/question",
+              "resource_digest": "ff6dada6f4767fcc74b58e0bd7c2059aac4d67a57d61f023a7fb87d7bc6092a8",
+              "resource_id": "9ae1ea4d-bc2f-51f8-bb2e-5137152165dd",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a5",
+              "end_utf8": 1,
+              "json_pointer": "/items/1/answer",
+              "resource_digest": "ff6dada6f4767fcc74b58e0bd7c2059aac4d67a57d61f023a7fb87d7bc6092a8",
+              "resource_id": "9ae1ea4d-bc2f-51f8-bb2e-5137152165dd",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a6",
+              "end_utf8": 30,
+              "json_pointer": "/items/1/explanation",
+              "resource_digest": "ff6dada6f4767fcc74b58e0bd7c2059aac4d67a57d61f023a7fb87d7bc6092a8",
+              "resource_id": "9ae1ea4d-bc2f-51f8-bb2e-5137152165dd",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a7",
+              "end_utf8": 2,
+              "json_pointer": "/items/1/id",
+              "resource_digest": "ff6dada6f4767fcc74b58e0bd7c2059aac4d67a57d61f023a7fb87d7bc6092a8",
+              "resource_id": "9ae1ea4d-bc2f-51f8-bb2e-5137152165dd",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a8",
+              "end_utf8": 97,
+              "json_pointer": "/items/1/question",
+              "resource_digest": "ff6dada6f4767fcc74b58e0bd7c2059aac4d67a57d61f023a7fb87d7bc6092a8",
+              "resource_id": "9ae1ea4d-bc2f-51f8-bb2e-5137152165dd",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a9",
+              "end_utf8": 1,
+              "json_pointer": "/items/2/answer",
+              "resource_digest": "ff6dada6f4767fcc74b58e0bd7c2059aac4d67a57d61f023a7fb87d7bc6092a8",
+              "resource_id": "9ae1ea4d-bc2f-51f8-bb2e-5137152165dd",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a10",
+              "end_utf8": 45,
+              "json_pointer": "/items/2/explanation",
+              "resource_digest": "ff6dada6f4767fcc74b58e0bd7c2059aac4d67a57d61f023a7fb87d7bc6092a8",
+              "resource_id": "9ae1ea4d-bc2f-51f8-bb2e-5137152165dd",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a11",
+              "end_utf8": 2,
+              "json_pointer": "/items/2/id",
+              "resource_digest": "ff6dada6f4767fcc74b58e0bd7c2059aac4d67a57d61f023a7fb87d7bc6092a8",
+              "resource_id": "9ae1ea4d-bc2f-51f8-bb2e-5137152165dd",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a12",
+              "end_utf8": 95,
+              "json_pointer": "/items/2/question",
+              "resource_digest": "ff6dada6f4767fcc74b58e0bd7c2059aac4d67a57d61f023a7fb87d7bc6092a8",
+              "resource_id": "9ae1ea4d-bc2f-51f8-bb2e-5137152165dd",
+              "start_utf8": 0
+            }
+          ],
+          "binding": {
+            "input_digest": "b0d3aa49bb9693f527895d7b96284111e506541f059d200b8449ab34881b11ea",
+            "operation_id": "07c3da76-96de-500d-9d15-2ce67e0f825d",
+            "owner_id": "ccce0fa6-e6fc-56a5-89ac-0a5693ab24b4",
+            "plan_digest": "5e7f48cc3785e369beadd457a33f1f4784cf756d01642c0346edb177c2baeb49",
+            "plan_id": "c3bc0524-c765-5718-b4c2-9a8497b46bff",
+            "plan_version": 1,
+            "policy_digest": "747ec507e0f011d8a82e74d3823964fc2f860ab23693f71e695273ebf696fdad",
+            "policy_version": "hybrid-review-v1",
+            "references_digest": "1335b93c5c57bca280ff7d4076dbd2c6cd8c0bc14bf154738dada80dc5e6281e",
+            "unit_id": "4be032e6-4e92-5f8a-93fa-46d3eab93d3e"
+          },
+          "created_at": "2026-10-20T07:44:25.704034+00:00",
+          "local_routing": {
+            "policy_version": "hybrid-review-v1",
+            "reason_codes": [],
+            "verdict": "revise"
+          },
+          "prompt_version": "evidence-resource-review-v4.9",
+          "provider_config_digest": "28dc638b729b5ec54ca902a95f07939dceed0a4c23fe35d0a61396a00820643b",
+          "request_digest": "9bd403f712cbc0e67ce848704b2dafcdb58d443c19642cba9dadca0a9378d1f4",
+          "response_digest": "0d833d9ea5b878fbe3aa0d1a1ddbdb2fa20fbd7e9c1a1ae4a885b3b2bfd8a4fc",
+          "result": {
+            "coverage": {
+              "checked": [
+                "code_safety",
+                "facts",
+                "learner_fit",
+                "objectives",
+                "reference_scope"
+              ],
+              "unchecked": []
+            },
+            "findings": [
+              {
+                "anchors": [
+                  "a1",
+                  "a2",
+                  "a4"
+                ],
+                "category": "fact",
+                "condition_or_counterexample": "题干命题“4+6+9=19”为真，正确答案应为T；但答案字段标为F，而解析也说明命题成立并应答T。",
+                "impact": "答案键与解析相互矛盾，学生按答案键作答会被错误判定。",
+                "severity": "major"
+              }
+            ],
+            "schema_version": "resource-review-v4",
+            "scope": "resource",
+            "unresolved": [],
+            "verdict": "revise"
+          },
+          "review_id": "f7d3044a-b883-4b10-873d-1c79b23edd0f",
+          "target_digest": "ff6dada6f4767fcc74b58e0bd7c2059aac4d67a57d61f023a7fb87d7bc6092a8"
+        }
+      ],
+      "generated_delivery": {
+        "course_state": null
+      }
+    },
+    {
+      "case_id": "A01",
+      "evaluation": {
+        "actual": {
+          "actual_call_count": 8,
+          "course_state": "awaiting_human",
+          "duration_ms": 49018,
+          "input_tokens": 66324,
+          "local_verdict": "needs_human",
+          "model_verdict": "needs_human",
+          "output_tokens": 5185,
+          "request_receipt_paths": [
+            "local-materials/phase-1-five-hour-remaining-six-r01/A01/03-request.json",
+            "local-materials/phase-1-five-hour-remaining-six-r01/A01/03-receipt.json",
+            "local-materials/phase-1-five-hour-remaining-six-r01/A01/04-request.json",
+            "local-materials/phase-1-five-hour-remaining-six-r01/A01/04-receipt.json",
+            "local-materials/phase-1-five-hour-remaining-six-r01/A01/05-request.json",
+            "local-materials/phase-1-five-hour-remaining-six-r01/A01/05-receipt.json",
+            "local-materials/phase-1-five-hour-remaining-six-r01/A01/06-request.json",
+            "local-materials/phase-1-five-hour-remaining-six-r01/A01/06-receipt.json",
+            "local-materials/phase-1-five-hour-remaining-six-r01/A01/07-request.json",
+            "local-materials/phase-1-five-hour-remaining-six-r01/A01/07-receipt.json",
+            "local-materials/phase-1-five-hour-remaining-six-r01/A01/08-request.json",
+            "local-materials/phase-1-five-hour-remaining-six-r01/A01/08-receipt.json",
+            "local-materials/phase-1-five-hour-remaining-six-r01/A01/09-request.json",
+            "local-materials/phase-1-five-hour-remaining-six-r01/A01/09-receipt.json",
+            "local-materials/phase-1-five-hour-remaining-six-r01/A01/10-request.json",
+            "local-materials/phase-1-five-hour-remaining-six-r01/A01/10-receipt.json"
+          ],
+          "response_artifact_paths": [
+            "local-materials/phase-1-five-hour-remaining-six-r01/A01/03-response.bin",
+            "local-materials/phase-1-five-hour-remaining-six-r01/A01/04-response.bin",
+            "local-materials/phase-1-five-hour-remaining-six-r01/A01/05-response.bin",
+            "local-materials/phase-1-five-hour-remaining-six-r01/A01/06-response.bin",
+            "local-materials/phase-1-five-hour-remaining-six-r01/A01/07-response.bin",
+            "local-materials/phase-1-five-hour-remaining-six-r01/A01/08-response.bin",
+            "local-materials/phase-1-five-hour-remaining-six-r01/A01/09-response.bin",
+            "local-materials/phase-1-five-hour-remaining-six-r01/A01/10-response.bin"
+          ],
+          "status": "observed"
+        },
+        "case_id": "A01",
+        "case_sha256": "e8e3978ad6752718367360dd84826802847869ce324dceac4331d183b34e08bb",
+        "citation_checks": [],
+        "claim_checks": [
+          {
+            "evidence_ids": [
+              "e1",
+              "e2",
+              "e3"
+            ],
+            "json_pointer": "/result/unresolved/0",
+            "quoted_text": "The exercise has three questions, but q1 asks only which array index is out of bounds; answering it does not require tracing the loop process. Therefore the explicit request for exactly three questions that require process tracing is not met. Add a process-tracing requirement to q1 or otherwise ensure all three questions require it. The current q1 question is at /items/0/question.",
+            "reason": "原请求明确“恰好三道要求推演过程的题”。实际q1仅辨认长度3数组哪个下标越界，不要求循环执行知识；q2求第二轮(s,i)，q3判断i=3首次失败/不读a[3]才是过程问题。两份审核均准确指出只有两题满足要求，未因选择/判断题型否定、未强加未承诺目标。资源反馈中的/items/0/question直接指向当前q1原文，已核对。",
+            "result": "supported",
+            "review_artifact_path": "local-materials/phase-1-five-hour-remaining-six-r01/A01/review-1f1bef45-ba33-45e1-8b8e-28a95b7e8a10.json"
+          },
+          {
+            "evidence_ids": [
+              "e1",
+              "e2",
+              "e3"
+            ],
+            "json_pointer": "/result/unresolved/0",
+            "quoted_text": "The request requires exactly three questions that require process tracing. Only two questions require reasoning about the loop’s execution: q2 asks for the state after round two, and q3 asks whether the termination and non-access claim follows. q1 asks only which array index is out of bounds, so it does not require tracing the process. The unit therefore does not establish the requested three process-tracing questions.",
+            "reason": "原请求明确“恰好三道要求推演过程的题”。实际q1仅辨认长度3数组哪个下标越界，不要求循环执行知识；q2求第二轮(s,i)，q3判断i=3首次失败/不读a[3]才是过程问题。两份审核均准确指出只有两题满足要求，未因选择/判断题型否定、未强加未承诺目标。资源反馈中的/items/0/question直接指向当前q1原文，已核对。",
+            "result": "supported",
+            "review_artifact_path": "local-materials/phase-1-five-hour-remaining-six-r01/A01/review-db3f8cf1-b114-4f27-9037-3e67c0792555.json"
+          }
+        ],
+        "code_verification": {
+          "applicability_note": "Actual generated C and all versions checked statically. No new C compilation or execution; fixed C historical evidence not borrowed.",
+          "fixed_c_evidence_paths": [],
+          "method": "static_only",
+          "new_code_compiled": false,
+          "new_code_executed": false
+        },
+        "conclusion": "A01未自动完成，有据awaiting_human。完整C main/stdio/for循环静态正确输出sum=14，s/i=0→7/1→9/2→14/3，i=3首次失败不读a[3]；但三题仅两题要求过程推演，q1只问合法下标，违反全部三题的原目标。两份needs_human论据正确，未错放为发布资格。另注意讲解把for的更新项口语称为循环体步骤略不严谨，本例不据此虚构安全严重错误；代码未编译执行。此项保留A分母，不改成人工通过或自动成功，可作为原A条件允许的1份待人工。",
+        "corrections": {
+          "actual_context_paths": [],
+          "before_after_digest_pairs": [],
+          "new_defect_observed": false,
+          "note": "8 normal calls, no revise/correction; resource exercise and unit both needs_human, no publication",
+          "observed": false,
+          "unsupported_feedback_entered": false
+        },
+        "evaluator": {
+          "configuration": null,
+          "evaluated_at": "2026-10-20T15:47:35.247098+08:00",
+          "exact_model_id": null,
+          "identity": "Codex interactive GPT evaluator",
+          "independent_human": false,
+          "kind": "gpt",
+          "unknown_metadata_reason": "Exact interactive evaluator model ID/configuration not exposed; no independent human label."
+        },
+        "evidence": [
+          {
+            "applies_to_digest": "457c143a81f755cd4e14a059c7ac100ed86bbd45e37cfd87eb352d6fcc0e401d",
+            "artifact_path": "docs/acceptance/phase-1-five-hour-test-plan-r01/cases/A01.json",
+            "artifact_sha256": "b3669bb686f6f1ccb2011ef7a842acc50e919bf0dec0441500615ec1f08f50f8",
+            "id": "e1",
+            "kind": "static_reasoning",
+            "scope_note": "Full actual material/static reasoning/persisted isolation audit; no new C compilation/execution"
+          },
+          {
+            "applies_to_digest": "457c143a81f755cd4e14a059c7ac100ed86bbd45e37cfd87eb352d6fcc0e401d",
+            "artifact_path": "local-materials/phase-1-five-hour-remaining-six-r01/A01/gpt-reasoning.json",
+            "artifact_sha256": "99499e313976af571545cd8231fc090cf51079dfef7688d5524f39d7c44d38a0",
+            "id": "e2",
+            "kind": "static_reasoning",
+            "scope_note": "Full actual material/static reasoning/persisted isolation audit; no new C compilation/execution"
+          },
+          {
+            "applies_to_digest": "457c143a81f755cd4e14a059c7ac100ed86bbd45e37cfd87eb352d6fcc0e401d",
+            "artifact_path": "local-materials/phase-1-five-hour-remaining-six-r01/A01/result.json",
+            "artifact_sha256": "457c143a81f755cd4e14a059c7ac100ed86bbd45e37cfd87eb352d6fcc0e401d",
+            "id": "e3",
+            "kind": "database_assertion",
+            "scope_note": "Full actual material/static reasoning/persisted isolation audit; no new C compilation/execution"
+          }
+        ],
+        "grades": {
+          "all_citations": "pass",
+          "all_claims": "pass",
+          "core_expected": "fail",
+          "final_status": "fail",
+          "full_quality": "fail",
+          "impact": "yellow",
+          "technical_integrity": "pass"
+        },
+        "label_sha256": "cdf9f4772c27128c0c84648a36c704aefec91d156862515418c7769899c2a1c2",
+        "product_human_decision": null,
+        "production_publish_performed": false,
+        "record_version": "five-hour-gpt-evaluation-v1",
+        "reviewed_all_candidates_and_audit_history": true,
+        "run_id": "five-hour-r01",
+        "unresolved": []
+      },
+      "reviews": [
+        {
+          "anchor_catalog": [
+            {
+              "anchor_id": "a1",
+              "end_utf8": 1683,
+              "json_pointer": "/markdown",
+              "resource_digest": "bdb6768e19b258060cd5f319ed4c0cb03b223528d0c1033b13a3acef023eb826",
+              "resource_id": "db719186-7c23-41a8-a047-743313fde901",
+              "start_utf8": 0
+            }
+          ],
+          "binding": {
+            "input_digest": "8164e29392c30200e091a412f867cfd5a4ca02b203fce096feb8490ed56cfb7c",
+            "operation_id": "2c73abe2-026e-4564-95bf-fe1a0a2cf345",
+            "owner_id": "26ada7ef-84f7-548c-bba7-aad77280ad06",
+            "plan_digest": "2b58ea40e11e6f975d8022dcb4fbd183db773090d1dc0acd308f8814c55f81d9",
+            "plan_id": "04e0ffd2-2b9b-47a3-ae10-8411fdf25b97",
+            "plan_version": 1,
+            "policy_digest": "747ec507e0f011d8a82e74d3823964fc2f860ab23693f71e695273ebf696fdad",
+            "policy_version": "hybrid-review-v1",
+            "references_digest": "b3333a8363bf0542b851bf6ea402e5779e515a95328f83138a43f15a7363b219",
+            "unit_id": "693b89a3-d3dd-4573-928b-a385eea7e7cc"
+          },
+          "created_at": "2026-10-20T07:45:39.702804+00:00",
+          "local_routing": {
+            "policy_version": "hybrid-review-v1",
+            "reason_codes": [],
+            "verdict": "pass"
+          },
+          "prompt_version": "evidence-resource-review-v4.9",
+          "provider_config_digest": "28dc638b729b5ec54ca902a95f07939dceed0a4c23fe35d0a61396a00820643b",
+          "request_digest": "c4122c0350c2cba72315e925af665eb4537106f64a691d2253e3a13f2d2a9b9d",
+          "response_digest": "cbf612f6d54a4817b6b27ff618a5801e2d63935463b824f835689661c1819025",
+          "result": {
+            "coverage": {
+              "checked": [
+                "code_safety",
+                "facts",
+                "learner_fit",
+                "objectives",
+                "reference_scope"
+              ],
+              "unchecked": []
+            },
+            "findings": [],
+            "schema_version": "resource-review-v4",
+            "scope": "resource",
+            "unresolved": [],
+            "verdict": "pass"
+          },
+          "review_id": "1cc5dbee-7e15-4ddc-913a-8e4e1624c965",
+          "target_digest": "bdb6768e19b258060cd5f319ed4c0cb03b223528d0c1033b13a3acef023eb826"
+        },
+        {
+          "anchor_catalog": [
+            {
+              "anchor_id": "a1",
+              "end_utf8": 8,
+              "json_pointer": "/expected_output",
+              "resource_digest": "bdc0a8cbdd292d3a3e0ed62bcb6b43e91c58290bd22e1b160b716856f3b7ea2e",
+              "resource_id": "194cac82-d9fa-495b-9d2c-acaaf1bb884d",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a2",
+              "end_utf8": 84,
+              "json_pointer": "/key_steps/0",
+              "resource_digest": "bdc0a8cbdd292d3a3e0ed62bcb6b43e91c58290bd22e1b160b716856f3b7ea2e",
+              "resource_id": "194cac82-d9fa-495b-9d2c-acaaf1bb884d",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a3",
+              "end_utf8": 79,
+              "json_pointer": "/key_steps/1",
+              "resource_digest": "bdc0a8cbdd292d3a3e0ed62bcb6b43e91c58290bd22e1b160b716856f3b7ea2e",
+              "resource_id": "194cac82-d9fa-495b-9d2c-acaaf1bb884d",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a4",
+              "end_utf8": 89,
+              "json_pointer": "/key_steps/2",
+              "resource_digest": "bdc0a8cbdd292d3a3e0ed62bcb6b43e91c58290bd22e1b160b716856f3b7ea2e",
+              "resource_id": "194cac82-d9fa-495b-9d2c-acaaf1bb884d",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a5",
+              "end_utf8": 89,
+              "json_pointer": "/key_steps/3",
+              "resource_digest": "bdc0a8cbdd292d3a3e0ed62bcb6b43e91c58290bd22e1b160b716856f3b7ea2e",
+              "resource_id": "194cac82-d9fa-495b-9d2c-acaaf1bb884d",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a6",
+              "end_utf8": 91,
+              "json_pointer": "/key_steps/4",
+              "resource_digest": "bdc0a8cbdd292d3a3e0ed62bcb6b43e91c58290bd22e1b160b716856f3b7ea2e",
+              "resource_id": "194cac82-d9fa-495b-9d2c-acaaf1bb884d",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a7",
+              "end_utf8": 111,
+              "json_pointer": "/key_steps/5",
+              "resource_digest": "bdc0a8cbdd292d3a3e0ed62bcb6b43e91c58290bd22e1b160b716856f3b7ea2e",
+              "resource_id": "194cac82-d9fa-495b-9d2c-acaaf1bb884d",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a8",
+              "end_utf8": 1,
+              "json_pointer": "/language",
+              "resource_digest": "bdc0a8cbdd292d3a3e0ed62bcb6b43e91c58290bd22e1b160b716856f3b7ea2e",
+              "resource_id": "194cac82-d9fa-495b-9d2c-acaaf1bb884d",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a9",
+              "end_utf8": 193,
+              "json_pointer": "/source",
+              "resource_digest": "bdc0a8cbdd292d3a3e0ed62bcb6b43e91c58290bd22e1b160b716856f3b7ea2e",
+              "resource_id": "194cac82-d9fa-495b-9d2c-acaaf1bb884d",
+              "start_utf8": 0
+            }
+          ],
+          "binding": {
+            "input_digest": "8164e29392c30200e091a412f867cfd5a4ca02b203fce096feb8490ed56cfb7c",
+            "operation_id": "2c73abe2-026e-4564-95bf-fe1a0a2cf345",
+            "owner_id": "26ada7ef-84f7-548c-bba7-aad77280ad06",
+            "plan_digest": "2b58ea40e11e6f975d8022dcb4fbd183db773090d1dc0acd308f8814c55f81d9",
+            "plan_id": "04e0ffd2-2b9b-47a3-ae10-8411fdf25b97",
+            "plan_version": 1,
+            "policy_digest": "747ec507e0f011d8a82e74d3823964fc2f860ab23693f71e695273ebf696fdad",
+            "policy_version": "hybrid-review-v1",
+            "references_digest": "b3333a8363bf0542b851bf6ea402e5779e515a95328f83138a43f15a7363b219",
+            "unit_id": "693b89a3-d3dd-4573-928b-a385eea7e7cc"
+          },
+          "created_at": "2026-10-20T07:45:48.056181+00:00",
+          "local_routing": {
+            "policy_version": "hybrid-review-v1",
+            "reason_codes": [],
+            "verdict": "pass"
+          },
+          "prompt_version": "evidence-resource-review-v4.9",
+          "provider_config_digest": "28dc638b729b5ec54ca902a95f07939dceed0a4c23fe35d0a61396a00820643b",
+          "request_digest": "a7c929573c773c781374116c01275c0328e54402be0d38175a201f4bdd9ddf2c",
+          "response_digest": "b6de28f4e1ad9915687ea5b86206ec7262ce727c2fe8ffeca3435de83977696e",
+          "result": {
+            "coverage": {
+              "checked": [
+                "code_safety",
+                "facts",
+                "learner_fit",
+                "objectives",
+                "reference_scope"
+              ],
+              "unchecked": []
+            },
+            "findings": [],
+            "schema_version": "resource-review-v4",
+            "scope": "resource",
+            "unresolved": [],
+            "verdict": "pass"
+          },
+          "review_id": "42b1f5a6-6d6d-4fce-a3c3-c89cc1e07668",
+          "target_digest": "bdc0a8cbdd292d3a3e0ed62bcb6b43e91c58290bd22e1b160b716856f3b7ea2e"
+        },
+        {
+          "anchor_catalog": [
+            {
+              "anchor_id": "a1",
+              "end_utf8": 1,
+              "json_pointer": "/items/0/answer",
+              "resource_digest": "2ff23d4cb0032b8ce5edbb1ffe00439b08c5fdce15d12ba0b18a273cc0e68977",
+              "resource_id": "58650b49-4c5d-4fdb-bb2d-a249fa2756fa",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a2",
+              "end_utf8": 165,
+              "json_pointer": "/items/0/explanation",
+              "resource_digest": "2ff23d4cb0032b8ce5edbb1ffe00439b08c5fdce15d12ba0b18a273cc0e68977",
+              "resource_id": "58650b49-4c5d-4fdb-bb2d-a249fa2756fa",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a3",
+              "end_utf8": 2,
+              "json_pointer": "/items/0/id",
+              "resource_digest": "2ff23d4cb0032b8ce5edbb1ffe00439b08c5fdce15d12ba0b18a273cc0e68977",
+              "resource_id": "58650b49-4c5d-4fdb-bb2d-a249fa2756fa",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a4",
+              "end_utf8": 137,
+              "json_pointer": "/items/0/question",
+              "resource_digest": "2ff23d4cb0032b8ce5edbb1ffe00439b08c5fdce15d12ba0b18a273cc0e68977",
+              "resource_id": "58650b49-4c5d-4fdb-bb2d-a249fa2756fa",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a5",
+              "end_utf8": 1,
+              "json_pointer": "/items/1/answer",
+              "resource_digest": "2ff23d4cb0032b8ce5edbb1ffe00439b08c5fdce15d12ba0b18a273cc0e68977",
+              "resource_id": "58650b49-4c5d-4fdb-bb2d-a249fa2756fa",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a6",
+              "end_utf8": 183,
+              "json_pointer": "/items/1/explanation",
+              "resource_digest": "2ff23d4cb0032b8ce5edbb1ffe00439b08c5fdce15d12ba0b18a273cc0e68977",
+              "resource_id": "58650b49-4c5d-4fdb-bb2d-a249fa2756fa",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a7",
+              "end_utf8": 2,
+              "json_pointer": "/items/1/id",
+              "resource_digest": "2ff23d4cb0032b8ce5edbb1ffe00439b08c5fdce15d12ba0b18a273cc0e68977",
+              "resource_id": "58650b49-4c5d-4fdb-bb2d-a249fa2756fa",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a8",
+              "end_utf8": 233,
+              "json_pointer": "/items/1/question",
+              "resource_digest": "2ff23d4cb0032b8ce5edbb1ffe00439b08c5fdce15d12ba0b18a273cc0e68977",
+              "resource_id": "58650b49-4c5d-4fdb-bb2d-a249fa2756fa",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a9",
+              "end_utf8": 1,
+              "json_pointer": "/items/2/answer",
+              "resource_digest": "2ff23d4cb0032b8ce5edbb1ffe00439b08c5fdce15d12ba0b18a273cc0e68977",
+              "resource_id": "58650b49-4c5d-4fdb-bb2d-a249fa2756fa",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a10",
+              "end_utf8": 186,
+              "json_pointer": "/items/2/explanation",
+              "resource_digest": "2ff23d4cb0032b8ce5edbb1ffe00439b08c5fdce15d12ba0b18a273cc0e68977",
+              "resource_id": "58650b49-4c5d-4fdb-bb2d-a249fa2756fa",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a11",
+              "end_utf8": 2,
+              "json_pointer": "/items/2/id",
+              "resource_digest": "2ff23d4cb0032b8ce5edbb1ffe00439b08c5fdce15d12ba0b18a273cc0e68977",
+              "resource_id": "58650b49-4c5d-4fdb-bb2d-a249fa2756fa",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a12",
+              "end_utf8": 195,
+              "json_pointer": "/items/2/question",
+              "resource_digest": "2ff23d4cb0032b8ce5edbb1ffe00439b08c5fdce15d12ba0b18a273cc0e68977",
+              "resource_id": "58650b49-4c5d-4fdb-bb2d-a249fa2756fa",
+              "start_utf8": 0
+            }
+          ],
+          "binding": {
+            "input_digest": "8164e29392c30200e091a412f867cfd5a4ca02b203fce096feb8490ed56cfb7c",
+            "operation_id": "2c73abe2-026e-4564-95bf-fe1a0a2cf345",
+            "owner_id": "26ada7ef-84f7-548c-bba7-aad77280ad06",
+            "plan_digest": "2b58ea40e11e6f975d8022dcb4fbd183db773090d1dc0acd308f8814c55f81d9",
+            "plan_id": "04e0ffd2-2b9b-47a3-ae10-8411fdf25b97",
+            "plan_version": 1,
+            "policy_digest": "747ec507e0f011d8a82e74d3823964fc2f860ab23693f71e695273ebf696fdad",
+            "policy_version": "hybrid-review-v1",
+            "references_digest": "b3333a8363bf0542b851bf6ea402e5779e515a95328f83138a43f15a7363b219",
+            "unit_id": "693b89a3-d3dd-4573-928b-a385eea7e7cc"
+          },
+          "created_at": "2026-10-20T07:45:59.777321+00:00",
+          "local_routing": {
+            "policy_version": "hybrid-review-v1",
+            "reason_codes": [
+              "SEMANTIC_UNRESOLVED"
+            ],
+            "verdict": "needs_human"
+          },
+          "prompt_version": "evidence-resource-review-v4.9",
+          "provider_config_digest": "28dc638b729b5ec54ca902a95f07939dceed0a4c23fe35d0a61396a00820643b",
+          "request_digest": "6ddbf5436f670d4d8bb07f062d8f3ef4d890df931c08057215c33e56cb5bf0d8",
+          "response_digest": "c74134f1170bdb8234c02be590c840d51b5c189d75c5993464066a6539834f1a",
+          "result": {
+            "coverage": {
+              "checked": [
+                "code_safety",
+                "facts",
+                "learner_fit",
+                "objectives",
+                "reference_scope"
+              ],
+              "unchecked": []
+            },
+            "findings": [],
+            "schema_version": "resource-review-v4",
+            "scope": "resource",
+            "unresolved": [
+              "The exercise has three questions, but q1 asks only which array index is out of bounds; answering it does not require tracing the loop process. Therefore the explicit request for exactly three questions that require process tracing is not met. Add a process-tracing requirement to q1 or otherwise ensure all three questions require it. The current q1 question is at /items/0/question."
+            ],
+            "verdict": "needs_human"
+          },
+          "review_id": "1f1bef45-ba33-45e1-8b8e-28a95b7e8a10",
+          "target_digest": "2ff23d4cb0032b8ce5edbb1ffe00439b08c5fdce15d12ba0b18a273cc0e68977"
+        },
+        {
+          "anchor_catalog": [
+            {
+              "anchor_id": "a1",
+              "end_utf8": 1683,
+              "json_pointer": "/markdown",
+              "resource_digest": "bdb6768e19b258060cd5f319ed4c0cb03b223528d0c1033b13a3acef023eb826",
+              "resource_id": "db719186-7c23-41a8-a047-743313fde901",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a2",
+              "end_utf8": 8,
+              "json_pointer": "/expected_output",
+              "resource_digest": "bdc0a8cbdd292d3a3e0ed62bcb6b43e91c58290bd22e1b160b716856f3b7ea2e",
+              "resource_id": "194cac82-d9fa-495b-9d2c-acaaf1bb884d",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a3",
+              "end_utf8": 84,
+              "json_pointer": "/key_steps/0",
+              "resource_digest": "bdc0a8cbdd292d3a3e0ed62bcb6b43e91c58290bd22e1b160b716856f3b7ea2e",
+              "resource_id": "194cac82-d9fa-495b-9d2c-acaaf1bb884d",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a4",
+              "end_utf8": 79,
+              "json_pointer": "/key_steps/1",
+              "resource_digest": "bdc0a8cbdd292d3a3e0ed62bcb6b43e91c58290bd22e1b160b716856f3b7ea2e",
+              "resource_id": "194cac82-d9fa-495b-9d2c-acaaf1bb884d",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a5",
+              "end_utf8": 89,
+              "json_pointer": "/key_steps/2",
+              "resource_digest": "bdc0a8cbdd292d3a3e0ed62bcb6b43e91c58290bd22e1b160b716856f3b7ea2e",
+              "resource_id": "194cac82-d9fa-495b-9d2c-acaaf1bb884d",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a6",
+              "end_utf8": 89,
+              "json_pointer": "/key_steps/3",
+              "resource_digest": "bdc0a8cbdd292d3a3e0ed62bcb6b43e91c58290bd22e1b160b716856f3b7ea2e",
+              "resource_id": "194cac82-d9fa-495b-9d2c-acaaf1bb884d",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a7",
+              "end_utf8": 91,
+              "json_pointer": "/key_steps/4",
+              "resource_digest": "bdc0a8cbdd292d3a3e0ed62bcb6b43e91c58290bd22e1b160b716856f3b7ea2e",
+              "resource_id": "194cac82-d9fa-495b-9d2c-acaaf1bb884d",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a8",
+              "end_utf8": 111,
+              "json_pointer": "/key_steps/5",
+              "resource_digest": "bdc0a8cbdd292d3a3e0ed62bcb6b43e91c58290bd22e1b160b716856f3b7ea2e",
+              "resource_id": "194cac82-d9fa-495b-9d2c-acaaf1bb884d",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a9",
+              "end_utf8": 1,
+              "json_pointer": "/language",
+              "resource_digest": "bdc0a8cbdd292d3a3e0ed62bcb6b43e91c58290bd22e1b160b716856f3b7ea2e",
+              "resource_id": "194cac82-d9fa-495b-9d2c-acaaf1bb884d",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a10",
+              "end_utf8": 193,
+              "json_pointer": "/source",
+              "resource_digest": "bdc0a8cbdd292d3a3e0ed62bcb6b43e91c58290bd22e1b160b716856f3b7ea2e",
+              "resource_id": "194cac82-d9fa-495b-9d2c-acaaf1bb884d",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a11",
+              "end_utf8": 1,
+              "json_pointer": "/items/0/answer",
+              "resource_digest": "2ff23d4cb0032b8ce5edbb1ffe00439b08c5fdce15d12ba0b18a273cc0e68977",
+              "resource_id": "58650b49-4c5d-4fdb-bb2d-a249fa2756fa",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a12",
+              "end_utf8": 165,
+              "json_pointer": "/items/0/explanation",
+              "resource_digest": "2ff23d4cb0032b8ce5edbb1ffe00439b08c5fdce15d12ba0b18a273cc0e68977",
+              "resource_id": "58650b49-4c5d-4fdb-bb2d-a249fa2756fa",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a13",
+              "end_utf8": 2,
+              "json_pointer": "/items/0/id",
+              "resource_digest": "2ff23d4cb0032b8ce5edbb1ffe00439b08c5fdce15d12ba0b18a273cc0e68977",
+              "resource_id": "58650b49-4c5d-4fdb-bb2d-a249fa2756fa",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a14",
+              "end_utf8": 137,
+              "json_pointer": "/items/0/question",
+              "resource_digest": "2ff23d4cb0032b8ce5edbb1ffe00439b08c5fdce15d12ba0b18a273cc0e68977",
+              "resource_id": "58650b49-4c5d-4fdb-bb2d-a249fa2756fa",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a15",
+              "end_utf8": 1,
+              "json_pointer": "/items/1/answer",
+              "resource_digest": "2ff23d4cb0032b8ce5edbb1ffe00439b08c5fdce15d12ba0b18a273cc0e68977",
+              "resource_id": "58650b49-4c5d-4fdb-bb2d-a249fa2756fa",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a16",
+              "end_utf8": 183,
+              "json_pointer": "/items/1/explanation",
+              "resource_digest": "2ff23d4cb0032b8ce5edbb1ffe00439b08c5fdce15d12ba0b18a273cc0e68977",
+              "resource_id": "58650b49-4c5d-4fdb-bb2d-a249fa2756fa",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a17",
+              "end_utf8": 2,
+              "json_pointer": "/items/1/id",
+              "resource_digest": "2ff23d4cb0032b8ce5edbb1ffe00439b08c5fdce15d12ba0b18a273cc0e68977",
+              "resource_id": "58650b49-4c5d-4fdb-bb2d-a249fa2756fa",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a18",
+              "end_utf8": 233,
+              "json_pointer": "/items/1/question",
+              "resource_digest": "2ff23d4cb0032b8ce5edbb1ffe00439b08c5fdce15d12ba0b18a273cc0e68977",
+              "resource_id": "58650b49-4c5d-4fdb-bb2d-a249fa2756fa",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a19",
+              "end_utf8": 1,
+              "json_pointer": "/items/2/answer",
+              "resource_digest": "2ff23d4cb0032b8ce5edbb1ffe00439b08c5fdce15d12ba0b18a273cc0e68977",
+              "resource_id": "58650b49-4c5d-4fdb-bb2d-a249fa2756fa",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a20",
+              "end_utf8": 186,
+              "json_pointer": "/items/2/explanation",
+              "resource_digest": "2ff23d4cb0032b8ce5edbb1ffe00439b08c5fdce15d12ba0b18a273cc0e68977",
+              "resource_id": "58650b49-4c5d-4fdb-bb2d-a249fa2756fa",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a21",
+              "end_utf8": 2,
+              "json_pointer": "/items/2/id",
+              "resource_digest": "2ff23d4cb0032b8ce5edbb1ffe00439b08c5fdce15d12ba0b18a273cc0e68977",
+              "resource_id": "58650b49-4c5d-4fdb-bb2d-a249fa2756fa",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a22",
+              "end_utf8": 195,
+              "json_pointer": "/items/2/question",
+              "resource_digest": "2ff23d4cb0032b8ce5edbb1ffe00439b08c5fdce15d12ba0b18a273cc0e68977",
+              "resource_id": "58650b49-4c5d-4fdb-bb2d-a249fa2756fa",
+              "start_utf8": 0
+            }
+          ],
+          "binding": {
+            "input_digest": "8164e29392c30200e091a412f867cfd5a4ca02b203fce096feb8490ed56cfb7c",
+            "operation_id": "2c73abe2-026e-4564-95bf-fe1a0a2cf345",
+            "owner_id": "26ada7ef-84f7-548c-bba7-aad77280ad06",
+            "plan_digest": "2b58ea40e11e6f975d8022dcb4fbd183db773090d1dc0acd308f8814c55f81d9",
+            "plan_id": "04e0ffd2-2b9b-47a3-ae10-8411fdf25b97",
+            "plan_version": 1,
+            "policy_digest": "747ec507e0f011d8a82e74d3823964fc2f860ab23693f71e695273ebf696fdad",
+            "policy_version": "hybrid-review-v1",
+            "references_digest": "b3333a8363bf0542b851bf6ea402e5779e515a95328f83138a43f15a7363b219",
+            "unit_id": "693b89a3-d3dd-4573-928b-a385eea7e7cc"
+          },
+          "created_at": "2026-10-20T07:46:11.450040+00:00",
+          "local_routing": {
+            "policy_version": "hybrid-review-v1",
+            "reason_codes": [
+              "SEMANTIC_UNRESOLVED"
+            ],
+            "verdict": "needs_human"
+          },
+          "prompt_version": "evidence-resource-review-v4.9",
+          "provider_config_digest": "28dc638b729b5ec54ca902a95f07939dceed0a4c23fe35d0a61396a00820643b",
+          "request_digest": "4544b745d8d00664a09f121c2d18572d8ee2c333e79a4caf2552b7c4978fa3cc",
+          "response_digest": "7acfffecf0ba97de61c09bdfe17044ee498bad6f50a585c06ba4bb2e16eff046",
+          "result": {
+            "coverage": {
+              "checked": [
+                "action_references",
+                "answer_consistency",
+                "conventions",
+                "example_trace",
+                "objectives",
+                "terminology"
+              ],
+              "unchecked": []
+            },
+            "findings": [],
+            "schema_version": "resource-review-v4",
+            "scope": "unit",
+            "unresolved": [
+              "The request requires exactly three questions that require process tracing. Only two questions require reasoning about the loop’s execution: q2 asks for the state after round two, and q3 asks whether the termination and non-access claim follows. q1 asks only which array index is out of bounds, so it does not require tracing the process. The unit therefore does not establish the requested three process-tracing questions."
+            ],
+            "verdict": "needs_human"
+          },
+          "review_id": "db3f8cf1-b114-4f27-9037-3e67c0792555",
+          "target_digest": "e7ba280f78b2d39b4a1271cc357acc49269f71586c5ad37eb77fc13111f1c1a3"
+        }
+      ],
+      "generated_delivery": {
+        "course_state": "awaiting_human",
+        "resources": [
+          {
+            "content": {
+              "markdown": "# C 数组求和：逐轮推演 s 与 i\n\n## 关键概念\n\n- **数组**：同类型元素的连续存储序列。本课中为 `int a[3] = {7, 2, 5};`。\n- **下标（索引）**：C 数组下标从 0 开始。长度为 3 的数组有效下标是 0、1、2，分别对应 7、2、5。\n- **越界访问**：`a[3]` 不在有效下标范围内，属于未定义行为，不能访问。\n- **状态表示**：用二元组 `(s, i)` 表示当前状态，`s` 是累加和，`i` 是循环变量。\n\n## 循环结构\n\n```c\nint s = 0;\nfor (int i = 0; i < 3; i++) {\n    s = s + a[i];\n}\n```\n\n每轮先判断条件 `i < 3`：为真则执行循环体 `s = s + a[i];` 与 `i = i + 1;`；为假则退出循环。\n\n## 逐轮推演\n\n初始状态：`(s, i) = (0, 0)`，数组 `a = {7, 2, 5}`。\n\n| 轮次 | 条件判断 | 循环体操作 | 结束状态 |\n| --- | --- | --- | --- |\n| 第 1 轮 | `0 < 3` 为真 | `s = 0 + a[0] = 0 + 7 = 7`；`i = 1` | `(7, 1)` |\n| 第 2 轮 | `1 < 3` 为真 | `s = 7 + a[1] = 7 + 2 = 9`；`i = 2` | `(9, 2)` |\n| 第 3 轮 | `2 < 3` 为真 | `s = 9 + a[2] = 9 + 5 = 14`；`i = 3` | `(14, 3)` |\n| 第 4 轮 | `3 < 3` 为假 | 不执行循环体，退出循环 | `(14, 3)` |\n\n## 首次条件失败与不访问 a[3]\n\n第 4 轮判断 `i < 3` 即 `3 < 3` 为假，这是**首次条件失败**，循环立即终止。由于条件为假时循环体不执行，`s = s + a[i]` 从未以 `i = 3` 执行，因此程序从未访问 `a[3]`。最终 `s = 14`，即 7 + 2 + 5 的和。\n\n## 小结\n\n- 有效下标为 0、1、2，`a[3]` 越界。\n- 循环条件 `i < 3` 保证 `i` 只取 0、1、2 进入循环体。\n- 循环在 `i = 3` 时首次条件失败而终止，累加结果为 14。"
+            },
+            "content_digest": "bdb6768e19b258060cd5f319ed4c0cb03b223528d0c1033b13a3acef023eb826",
+            "id": "db719186-7c23-41a8-a047-743313fde901",
+            "review_status": "pending",
+            "version": 1
+          },
+          {
+            "content": {
+              "display_only": true,
+              "expected_output": "sum = 14",
+              "key_steps": [
+                "定义 int a[3] = {7, 2, 5}，有效下标为 0、1、2，a[3] 越界不可访问。",
+                "初始化累加变量 s = 0、循环变量 i = 0，状态为 (s, i) = (0, 0)。",
+                "第 1 轮判断 0 < 3 为真，执行 s = 0 + a[0] = 7，i 变为 1，状态为 (7, 1)。",
+                "第 2 轮判断 1 < 3 为真，执行 s = 7 + a[1] = 9，i 变为 2，状态为 (9, 2)。",
+                "第 3 轮判断 2 < 3 为真，执行 s = 9 + a[2] = 14，i 变为 3，状态为 (14, 3)。",
+                "第 4 轮判断 3 < 3 为假，首次条件失败，循环体不执行，从未访问 a[3]，输出 sum = 14。"
+              ],
+              "language": "C",
+              "source": "#include <stdio.h>\n\nint main(void) {\n    int a[3] = {7, 2, 5};\n    int s = 0;\n    int i;\n\n    for (i = 0; i < 3; i++) {\n        s = s + a[i];\n    }\n\n    printf(\"sum = %d\\n\", s);\n    return 0;\n}"
+            },
+            "content_digest": "bdc0a8cbdd292d3a3e0ed62bcb6b43e91c58290bd22e1b160b716856f3b7ea2e",
+            "id": "194cac82-d9fa-495b-9d2c-acaaf1bb884d",
+            "review_status": "pending",
+            "version": 1
+          },
+          {
+            "content": {
+              "items": [
+                {
+                  "answer": "D",
+                  "explanation": "C 数组下标从 0 开始，长度为 3 的数组有效下标是 0、1、2，分别对应 7、2、5。a[3] 超出有效范围，属于越界访问，不能访问。",
+                  "id": "q1",
+                  "question": "[单选题] 对于 int a[3] = {7, 2, 5};，下列哪个下标访问是越界的？\nA. a[0]\nB. a[1]\nC. a[2]\nD. a[3]\n仅填 A、B、C 或 D"
+                },
+                {
+                  "answer": "B",
+                  "explanation": "初始 (s, i) = (0, 0)。第 1 轮判断 0 < 3 为真，s = 0 + a[0] = 7，i 变为 1，状态 (7, 1)。第 2 轮判断 1 < 3 为真，s = 7 + a[1] = 9，i 变为 2，状态 (9, 2)。",
+                  "id": "q2",
+                  "question": "[单选题] 用 s = 0、i = 0 和循环条件 i < 3 对 a = {7, 2, 5} 求和，循环体为 s = s + a[i]; i = i + 1;。第 2 轮循环体执行后，状态 (s, i) 是？\nA. (7, 1)\nB. (9, 2)\nC. (14, 3)\nD. (9, 1)\n仅填 A、B、C 或 D"
+                },
+                {
+                  "answer": "T",
+                  "explanation": "第 4 轮判断 3 < 3 为假，这是首次条件失败，循环立即退出。条件为假时循环体不执行，所以 s = s + a[i] 从未以 i = 3 执行，程序从未访问 a[3]。",
+                  "id": "q3",
+                  "question": "[判断题] 在 s = 0、i = 0、循环条件 i < 3 的求和循环中，循环在 i = 3 时首次条件失败而终止，因此循环体从未访问 a[3]。仅填 T 或 F（T=正确，F=错误）"
+                }
+              ]
+            },
+            "content_digest": "2ff23d4cb0032b8ce5edbb1ffe00439b08c5fdce15d12ba0b18a273cc0e68977",
+            "id": "58650b49-4c5d-4fdb-bb2d-a249fa2756fa",
+            "review_status": "pending",
+            "version": 1
+          }
+        ],
+        "plans": [
+          {
+            "id": "04e0ffd2-2b9b-47a3-ae10-8411fdf25b97",
+            "input_snapshot": {
+              "learner_evidence": {},
+              "metadata": {
+                "code_language": "C",
+                "goal": "用C实现数组{7,2,5}的求和，明确逐轮s和i、首次条件失败与不访问a[3]；给出讲解、完整可编译程序（含main调用）、恰好三道要求推演过程的题及答案解析，不要动画。",
+                "graph_digest": "3639db6aedc9699348e63b5e7e1bdaaea3189592b19540c64e8f175aceb9ef59",
+                "graph_version": "mvp-0.2.0",
+                "node_id": "array",
+                "profile_evidence_digest": "8838fdd11ee58e08fd54a21272313e784012370b7cf0a2cde8b823ed8806d85d",
+                "profile_version": null
+              },
+              "node_ids": [
+                "array",
+                "array-stack",
+                "balanced-binary-search-tree",
+                "binary-heap",
+                "binary-search-tree",
+                "binary-tree",
+                "binary-tree-traversal",
+                "breadth-first-search",
+                "bubble-sort",
+                "c-pointer",
+                "circular-linked-list",
+                "circular-queue",
+                "depth-first-search",
+                "doubly-linked-list",
+                "graph-representation",
+                "heap-sort",
+                "insertion-sort",
+                "linked-list-concept",
+                "linked-list-deletion",
+                "linked-list-insertion",
+                "linked-list-traversal",
+                "linked-stack",
+                "merge-sort",
+                "queue",
+                "quick-sort",
+                "selection-sort",
+                "single-linked-list",
+                "sorting-comparison",
+                "stack",
+                "tree-concept"
+              ],
+              "reference_context": {
+                "learner_evidence": {},
+                "node": {
+                  "ai_context": "使用连续格子和下标精灵的图示，对比中间插入时的元素搬移。",
+                  "chapter": "线性表",
+                  "common_misconceptions": [
+                    "数组每次访问都要从头遍历",
+                    "数组插入总是 O(1)"
+                  ],
+                  "description": "使用连续存储空间、通过下标访问元素的线性结构。",
+                  "difficulty": 1,
+                  "id": "array",
+                  "learning_objectives": [
+                    "说出下标访问的时间复杂度",
+                    "说明连续存储对插入和删除的影响"
+                  ],
+                  "mastery_rule_key": "linear-structure-v1",
+                  "name": "数组",
+                  "prerequisites": []
+                },
+                "scope": "Background only, not certification of this example.",
+                "source": {
+                  "digest": "f83fd12e754fcda4124aa62b8a29203d97a897605d23dc4e37877393dcb0015d",
+                  "reference_id": "graph-node:mvp-0.2.0:array",
+                  "version": "mvp-0.2.0"
+                }
+              },
+              "references": {
+                "graph-node:mvp-0.2.0:array": {
+                  "digest": "f83fd12e754fcda4124aa62b8a29203d97a897605d23dc4e37877393dcb0015d",
+                  "reference_id": "graph-node:mvp-0.2.0:array",
+                  "version": "mvp-0.2.0"
+                }
+              },
+              "teaching_context": {
+                "graph_digest": "3639db6aedc9699348e63b5e7e1bdaaea3189592b19540c64e8f175aceb9ef59",
+                "graph_version": "mvp-0.2.0",
+                "original_request": "用C实现数组{7,2,5}的求和，明确逐轮s和i、首次条件失败与不访问a[3]；给出讲解、完整可编译程序（含main调用）、恰好三道要求推演过程的题及答案解析，不要动画。",
+                "path_version": 1,
+                "path_version_id": "f4522ea2-f4c7-5ed0-9c11-5a32ece7f4e1",
+                "recommended_node_id": "array",
+                "segment_goal": "用C实现数组{7,2,5}的求和，明确逐轮s和i、首次条件失败与不访问a[3]；给出讲解、完整可编译程序（含main调用）、恰好三道要求推演过程的题及答案解析，不要动画。",
+                "segment_scope": "target_lesson",
+                "selection_reason": "direct_target",
+                "target_node_id": "array",
+                "teaching_mode": "target",
+                "teaching_node_id": "array",
+                "version": "teaching-node-binding-v1"
+              }
+            },
+            "plan": {
+              "code_language": "C",
+              "conventions": {
+                "capacity": 3,
+                "index_base": 0,
+                "not_applicable_reasons": [],
+                "state_representation": "用二元组 (s, i) 表示状态：s为当前累加和，i为当前循环变量值；每轮先判断 i < 3，为真则执行 s = s + a[i] 后 i = i + 1，为假则退出循环。"
+              },
+              "goal": "用C实现数组{7,2,5}的求和，明确逐轮s和i、首次条件失败与不访问a[3]；给出讲解、完整可编译程序（含main调用）、恰好三道要求推演过程的题及答案解析，不要动画。",
+              "graph_digest": "3639db6aedc9699348e63b5e7e1bdaaea3189592b19540c64e8f175aceb9ef59",
+              "graph_version": "mvp-0.2.0",
+              "node_id": "array",
+              "objectives": [
+                {
+                  "id": "obj-1",
+                  "text": "说明C数组的下标从0开始、长度3的数组a={7,2,5}的有效下标为0、1、2，a[3]越界不可访问"
+                },
+                {
+                  "id": "obj-2",
+                  "text": "用累加变量s与循环变量i逐轮推演求和过程，写出每轮循环条件判断、s与i的取值"
+                },
+                {
+                  "id": "obj-3",
+                  "text": "指出循环在i=3时首次条件失败而终止，因此循环体从未访问a[3]"
+                },
+                {
+                  "id": "obj-4",
+                  "text": "编写并编译含main调用的完整C程序，输出数组{7,2,5}的和为14"
+                }
+              ],
+              "prerequisite_node_ids": [
+                "c-pointer"
+              ],
+              "profile_evidence_digest": "8838fdd11ee58e08fd54a21272313e784012370b7cf0a2cde8b823ed8806d85d",
+              "profile_version": null,
+              "references": [
+                {
+                  "digest": "f83fd12e754fcda4124aa62b8a29203d97a897605d23dc4e37877393dcb0015d",
+                  "reference_id": "graph-node:mvp-0.2.0:array",
+                  "version": "mvp-0.2.0"
+                }
+              ],
+              "scenes": [
+                {
+                  "depends_on": [],
+                  "objective_ids": [
+                    "obj-1",
+                    "obj-2",
+                    "obj-3"
+                  ],
+                  "role": "explanation",
+                  "scene_key": "explanation"
+                },
+                {
+                  "depends_on": [
+                    "explanation"
+                  ],
+                  "objective_ids": [
+                    "obj-4",
+                    "obj-2"
+                  ],
+                  "role": "code",
+                  "scene_key": "code"
+                },
+                {
+                  "depends_on": [
+                    "explanation",
+                    "code"
+                  ],
+                  "objective_ids": [
+                    "obj-2",
+                    "obj-3",
+                    "obj-1"
+                  ],
+                  "role": "exercise",
+                  "scene_key": "exercise"
+                }
+              ],
+              "schema_version": "learning-plan-v1",
+              "shared_example": {
+                "initial_state": "(s, i) = (0, 0)，数组 a = {7, 2, 5}，有效下标 0、1、2。",
+                "input_description": "int a[3] = {7, 2, 5}; 求全部元素之和，使用 s = 0、i = 0 与循环条件 i < 3。",
+                "steps": [
+                  {
+                    "expected_output": null,
+                    "expected_state": "(s, i) = (7, 1)",
+                    "operation": "判断 i < 3，即 0 < 3 为真；执行 s = s + a[0] = 0 + 7 = 7；i = i + 1 = 1"
+                  },
+                  {
+                    "expected_output": null,
+                    "expected_state": "(s, i) = (9, 2)",
+                    "operation": "判断 i < 3，即 1 < 3 为真；执行 s = s + a[1] = 7 + 2 = 9；i = i + 1 = 2"
+                  },
+                  {
+                    "expected_output": null,
+                    "expected_state": "(s, i) = (14, 3)",
+                    "operation": "判断 i < 3，即 2 < 3 为真；执行 s = s + a[2] = 9 + 5 = 14；i = i + 1 = 3"
+                  },
+                  {
+                    "expected_output": "14",
+                    "expected_state": "(s, i) = (14, 3)",
+                    "operation": "判断 i < 3，即 3 < 3 为假，首次条件失败，退出循环；循环体未执行，故未访问 a[3]"
+                  }
+                ]
+              },
+              "terminology": [
+                {
+                  "meaning": "同类型元素的连续存储序列；本课中为int a[3] = {7,2,5}",
+                  "term": "数组"
+                },
+                {
+                  "meaning": "访问数组元素的位置编号，本课采用从0开始，故有效下标为0、1、2",
+                  "term": "下标（索引）"
+                },
+                {
+                  "meaning": "数组元素个数，本课中为3",
+                  "term": "长度"
+                },
+                {
+                  "meaning": "使用不在0至长度减1范围内的下标访问元素，如a[3]，属未定义行为",
+                  "term": "越界访问"
+                },
+                {
+                  "meaning": "保存当前已累加元素之和的int变量，初值为0",
+                  "term": "累加变量 s"
+                },
+                {
+                  "meaning": "控制循环轮次的int变量，初值为0，每轮末尾加1",
+                  "term": "循环变量 i"
+                },
+                {
+                  "meaning": "i < 3；为真时执行循环体，为假时退出循环",
+                  "term": "循环条件"
+                },
+                {
+                  "meaning": "i 首次使 i < 3 为假的那次判断，本课中发生在i=3时",
+                  "term": "首次条件失败"
+                },
+                {
+                  "meaning": "条件为真时执行的部分，本课中为 s = s + a[i]; 与 i++;",
+                  "term": "循环体"
+                }
+              ]
+            }
+          }
+        ],
+        "input_boundary": "frozen PlanInputs fixture; actual resolver checked separately; not a full HTTP input/profile/path integration test",
+        "raw_goal_selection": {
+          "candidates": [
+            "array"
+          ],
+          "manual_clarification": null,
+          "node_id": "array",
+          "reason": "explicit_alias",
+          "selected_node_id": "array"
+        },
+        "result": {
+          "case_id": "1ef69e7c-4455-491e-916b-3ee822499208",
+          "learning_unit_id": "693b89a3-d3dd-4573-928b-a385eea7e7cc",
+          "operation_id": "2c73abe2-026e-4564-95bf-fe1a0a2cf345",
+          "status": "awaiting_human"
+        },
+        "safe_error": null
+      }
+    },
+    {
+      "case_id": "A02",
+      "evaluation": {
+        "actual": {
+          "actual_call_count": 8,
+          "course_state": "rejected",
+          "duration_ms": 57272,
+          "input_tokens": 68869,
+          "local_verdict": "reject",
+          "model_verdict": "reject",
+          "output_tokens": 6155,
+          "request_receipt_paths": [
+            "local-materials/phase-1-five-hour-remaining-six-r01/A02/11-request.json",
+            "local-materials/phase-1-five-hour-remaining-six-r01/A02/11-receipt.json",
+            "local-materials/phase-1-five-hour-remaining-six-r01/A02/12-request.json",
+            "local-materials/phase-1-five-hour-remaining-six-r01/A02/12-receipt.json",
+            "local-materials/phase-1-five-hour-remaining-six-r01/A02/13-request.json",
+            "local-materials/phase-1-five-hour-remaining-six-r01/A02/13-receipt.json",
+            "local-materials/phase-1-five-hour-remaining-six-r01/A02/14-request.json",
+            "local-materials/phase-1-five-hour-remaining-six-r01/A02/14-receipt.json",
+            "local-materials/phase-1-five-hour-remaining-six-r01/A02/15-request.json",
+            "local-materials/phase-1-five-hour-remaining-six-r01/A02/15-receipt.json",
+            "local-materials/phase-1-five-hour-remaining-six-r01/A02/16-request.json",
+            "local-materials/phase-1-five-hour-remaining-six-r01/A02/16-receipt.json",
+            "local-materials/phase-1-five-hour-remaining-six-r01/A02/17-request.json",
+            "local-materials/phase-1-five-hour-remaining-six-r01/A02/17-receipt.json",
+            "local-materials/phase-1-five-hour-remaining-six-r01/A02/18-request.json",
+            "local-materials/phase-1-five-hour-remaining-six-r01/A02/18-receipt.json"
+          ],
+          "response_artifact_paths": [
+            "local-materials/phase-1-five-hour-remaining-six-r01/A02/11-response.bin",
+            "local-materials/phase-1-five-hour-remaining-six-r01/A02/12-response.bin",
+            "local-materials/phase-1-five-hour-remaining-six-r01/A02/13-response.bin",
+            "local-materials/phase-1-five-hour-remaining-six-r01/A02/14-response.bin",
+            "local-materials/phase-1-five-hour-remaining-six-r01/A02/15-response.bin",
+            "local-materials/phase-1-five-hour-remaining-six-r01/A02/16-response.bin",
+            "local-materials/phase-1-five-hour-remaining-six-r01/A02/17-response.bin",
+            "local-materials/phase-1-five-hour-remaining-six-r01/A02/18-response.bin"
+          ],
+          "status": "observed"
+        },
+        "case_id": "A02",
+        "case_sha256": "5517984c4679d0ff59a29aa9611696cd43d4f0f359ee67d07f321d9212d5a83b",
+        "citation_checks": [
+          {
+            "anchor_id": "a1",
+            "end_utf8": 2244,
+            "evidence_ids": [
+              "e1",
+              "e2",
+              "e3"
+            ],
+            "finding_index": 0,
+            "json_pointer": "/markdown",
+            "quoted_text": "# 无头结点单链表头插法\n\n## 核心思路\n\n无头结点单链表中，`head` 指针直接指向第一个存放数据的结点；空链表时 `head == NULL`。头插法把新结点放到最前面，只需三步：\n\n1. 为新结点分配内存，并写入数据；\n2. 让新结点的 `next` 指向当前首结点（即 `*head`）；\n3. 让 `head` 改为指向新结点（即 `*head = 新结点`）。\n\n因为函数要修改调用者的 `head` 指针本身，所以参数用二级指针 `Node **head`，`*head` 就是当前首结点。\n\n## 为什么空链表也适用\n\n空链表时 `*head` 为 `NULL`。第 2 步让新结点的 `next = NULL`，正好表示它是唯一结点、后面没有结点；第 3 步让 `*head` 指向它。因此空链表和非空链表走的是同一套步骤，不需要特判。\n\n## 返回码与失败处理\n\n约定 `int push_front(Node **head, int value)`：成功返回 1，失败返回 0。本课中失败只由 `malloc` 返回 `NULL` 引起。此时必须**先检查再改动**：若分配失败，直接返回 0，`*head` 和所有旧结点都保持原状。\n\n关键顺序是：先 `malloc` 并判断，成功后才写 `data`、改 `next`、改 `*head`。\n\n## 具体例子：空链表依次头插 3 和 8\n\n初始：`head -> NULL`\n\n**第 1 次 `push_front(&head, 3)`**\n- 分配结点 n1，`n1->data = 3`；\n- `n1->next = *head`，即 `NULL`；\n- `*head = n1`；返回 1。\n\n状态：`head -> [3|NULL] -> NULL`\n\n**第 2 次 `push_front(&head, 8)`**\n- 分配结点 n2，`n2->data = 8`；\n- `n2->next = *head`，即指向 n1；\n- `*head = n2`；返回 1。\n\n状态：`head -> [8|*] -> [3|NULL] -> NULL`，遍历输出为 `8 3`。\n\n可以看到：3 先插入却在后面，8 后插入却在最前，所以头插会使元素顺序与插入顺序相反。\n\n## 释放链表\n\n释放时从头结点起逐个 `free`。必须先保存 `next` 再释放当前结点，否则释放后就无法找到后继：\n\n```c\nNode *p = head;\nwhile (p != NULL) {\n    Node *next = p->next;  /* 先保存后继 */\n    free(p);               /* 再释放当前结点 */\n    p = next;\n}\nhead = NULL;               /* 防止悬空指针 */\n```\n\n最后把 `head` 置为 `NULL`，表示链表已空，避免后续误用已释放的内存。",
+            "reason": "a1仅能证明展示了释放片段与head=NULL，不能支持head是函数局部副本或有某调用方遗留指针的命题。没有把实际free_list的二级参数上下文移植到片段；完整源码反而明确*head=NULL。",
+            "resource_digest": "0cfd9d8c9a94d26f51d0d02a67d8697467cf00cd203938473509a49b2862a6ae",
+            "result": "unresolved",
+            "review_artifact_path": "local-materials/phase-1-five-hour-remaining-six-r01/A02/review-96bcb14b-71ab-4933-a67f-02de5d6d6961.json",
+            "start_utf8": 0
+          }
+        ],
+        "claim_checks": [
+          {
+            "evidence_ids": [
+              "e1",
+              "e2",
+              "e3"
+            ],
+            "json_pointer": "/result/unresolved/0",
+            "quoted_text": "The exercise does not fully assess the assigned trace objective: none of the questions requires students to write the successive head targets and each node's data/next links while inserting 3 and then 8. The questions cover operation order and the empty-list case, while the final-order question asks only for the traversal output.",
+            "reason": "plan obj-trace确写逐步写出head及data/next，当前三个题干确未要求学生显式写出这些逐步状态，资源审核仅以needs_human指出这项更细的测量缺口。Q1操作顺序/Q2空链表/Q3遍历顺序的描述均与题干相符。此处不把该补充解读为所有选择题都不能测过程。",
+            "result": "supported",
+            "review_artifact_path": "local-materials/phase-1-five-hour-remaining-six-r01/A02/review-3c38d4eb-44dd-448d-9f5a-fa4853ba7ede.json"
+          },
+          {
+            "evidence_ids": [
+              "e1",
+              "e2",
+              "e3"
+            ],
+            "json_pointer": "/result/findings/0/condition_or_counterexample",
+            "quoted_text": "The release example declares `Node *p = head` and later assigns `head = NULL`. Here `head` is a local pointer copy, so that assignment does not set the caller's head pointer to NULL.",
+            "reason": "a1的释放片段只有Node *p=head和head=NULL，没有外围函数或形参声明。不能确定head是函数内的局部副本；若片段位于main或持有实际head的同一作用域，head=NULL会更新实际变量。实际完整代码free_list(Node **head)使用*head=NULL，且main调用free_list(&head)，没有该所谓局部副本错误。模型把未给出的函数/调用边界当作确定事实，结论强于证据。",
+            "result": "unresolved",
+            "review_artifact_path": "local-materials/phase-1-five-hour-remaining-six-r01/A02/review-96bcb14b-71ab-4933-a67f-02de5d6d6961.json"
+          },
+          {
+            "evidence_ids": [
+              "e1",
+              "e2",
+              "e3"
+            ],
+            "json_pointer": "/result/findings/0/impact",
+            "quoted_text": "The explanation says this prevents later use of freed memory, but the shown code leaves the caller's pointer unchanged and dangling after the nodes are freed.",
+            "reason": "片段没有给出调用方和参数传递，因此无法断言调用方指针必然保持悬空。完整实现通过二级指针更新调用方，实际提供的调用安全。该major fact拒绝依赖未建立的前提，应限定不确定性而非确定拒绝。",
+            "result": "unresolved",
+            "review_artifact_path": "local-materials/phase-1-five-hour-remaining-six-r01/A02/review-96bcb14b-71ab-4933-a67f-02de5d6d6961.json"
+          },
+          {
+            "evidence_ids": [
+              "e1",
+              "e2",
+              "e3"
+            ],
+            "json_pointer": "/result/unresolved/0",
+            "quoted_text": "The third exercise asks only for the final traversal output. It does not require tracing the intermediate head and node data/next states, so the requested set of exactly three process questions lacks a third question assessing the step-by-step trace. The explanation does teach that trace, but does not make the third question assess it.",
+            "reason": "Q3要求空链表先头插3再8、推断最终遍历顺序，必须使用头插链接/逆序过程知识，不是只算最终算术。plan更细的逐步写出head/data/next目标可以单独指出测量范围，但不能据仅问最终遍历顺序就断言原请求第三道过程题不存在；该绝对结论超出已冻结覆盖标准，至少需要限定。",
+            "result": "unresolved",
+            "review_artifact_path": "local-materials/phase-1-five-hour-remaining-six-r01/A02/review-96bcb14b-71ab-4933-a67f-02de5d6d6961.json"
+          }
+        ],
+        "code_verification": {
+          "applicability_note": "Actual generated C and all versions checked statically. No new C compilation or execution; fixed C historical evidence not borrowed.",
+          "fixed_c_evidence_paths": [],
+          "method": "static_only",
+          "new_code_compiled": false,
+          "new_code_executed": false
+        },
+        "conclusion": "A02红停：实际完整代码push_front分配失败前不改链、free_list(Node **head)末尾*head=NULL/main传&head，静态正常两次成功输出8 3；但单元审核给释放片段虚构函数局部副本/调用者边界，确定major fact拒绝没有证据支持。正式a1引用不足支持该前提。另对只问最终遍历顺序就否定过程知识的断言有过强问题。按冻结无据严重拒绝红规则停续测，不追认A02通过，不修Prompt/样本重试，A03/A04保持未发送。所有新C未编译执行。",
+        "corrections": {
+          "actual_context_paths": [],
+          "before_after_digest_pairs": [],
+          "new_defect_observed": false,
+          "note": "8 normal calls; no revise/correction. Unit unsupported major fact reject caused persisted rejected state; no publication.",
+          "observed": false,
+          "unsupported_feedback_entered": false
+        },
+        "evaluator": {
+          "configuration": null,
+          "evaluated_at": "2026-10-20T16:07:27.690528+08:00",
+          "exact_model_id": null,
+          "identity": "Codex interactive GPT evaluator",
+          "independent_human": false,
+          "kind": "gpt",
+          "unknown_metadata_reason": "Exact interactive evaluator model ID/configuration not exposed; no independent human label."
+        },
+        "evidence": [
+          {
+            "applies_to_digest": "268446241b2eaed36ead9eae12635c7b3644279b0544f01f71fc93212ac319e5",
+            "artifact_path": "docs/acceptance/phase-1-five-hour-test-plan-r01/cases/A02.json",
+            "artifact_sha256": "fa0e9b148b5005e3bd3855de39b8357ff8f775d218b1f8d31f867ff63358bdcb",
+            "id": "e1",
+            "kind": "static_reasoning",
+            "scope_note": "Full actual material/static reasoning/persisted isolation audit; no new C compilation/execution"
+          },
+          {
+            "applies_to_digest": "268446241b2eaed36ead9eae12635c7b3644279b0544f01f71fc93212ac319e5",
+            "artifact_path": "local-materials/phase-1-five-hour-remaining-six-r01/A02/gpt-reasoning.json",
+            "artifact_sha256": "667acda8d0931804bf30316e2eba6264c8f55b2a8ea5b9c761a46485df56834b",
+            "id": "e2",
+            "kind": "static_reasoning",
+            "scope_note": "Full actual material/static reasoning/persisted isolation audit; no new C compilation/execution"
+          },
+          {
+            "applies_to_digest": "268446241b2eaed36ead9eae12635c7b3644279b0544f01f71fc93212ac319e5",
+            "artifact_path": "local-materials/phase-1-five-hour-remaining-six-r01/A02/result.json",
+            "artifact_sha256": "268446241b2eaed36ead9eae12635c7b3644279b0544f01f71fc93212ac319e5",
+            "id": "e3",
+            "kind": "database_assertion",
+            "scope_note": "Full actual material/static reasoning/persisted isolation audit; no new C compilation/execution"
+          }
+        ],
+        "grades": {
+          "all_citations": "fail",
+          "all_claims": "fail",
+          "core_expected": "fail",
+          "final_status": "fail",
+          "full_quality": "fail",
+          "impact": "red",
+          "technical_integrity": "pass"
+        },
+        "label_sha256": "72dc42a60e6762d9f02a2f53a6f88458da9b0384912231f1179552b74cc6726e",
+        "product_human_decision": null,
+        "production_publish_performed": false,
+        "record_version": "five-hour-gpt-evaluation-v1",
+        "reviewed_all_candidates_and_audit_history": true,
+        "run_id": "five-hour-r01",
+        "unresolved": [
+          "释放片段外围作用域未给出，不能判为确定局部副本；不据此断言整课所有教学承诺已完成。原始major拒绝及其引用保留。"
+        ]
+      },
+      "reviews": [
+        {
+          "anchor_catalog": [
+            {
+              "anchor_id": "a1",
+              "end_utf8": 2244,
+              "json_pointer": "/markdown",
+              "resource_digest": "0cfd9d8c9a94d26f51d0d02a67d8697467cf00cd203938473509a49b2862a6ae",
+              "resource_id": "bc4266dd-0e32-4aa8-a9a1-c89f15756825",
+              "start_utf8": 0
+            }
+          ],
+          "binding": {
+            "input_digest": "2aa3a94605dc3a0049c7f51ba4f5ad01fa7e0345828436c4f57ba3a1fc4e8459",
+            "operation_id": "bb8ca64f-38c5-4b64-b30a-fb7fa2b70968",
+            "owner_id": "d6b1f046-baac-5c03-8cfd-2b63008e6351",
+            "plan_digest": "f9427cd2225280811db6ace2fa97fdb929e95ce617492ce2402c32eb491c2adc",
+            "plan_id": "e383e2a6-a3e5-4184-85e6-791cd6c0a652",
+            "plan_version": 1,
+            "policy_digest": "747ec507e0f011d8a82e74d3823964fc2f860ab23693f71e695273ebf696fdad",
+            "policy_version": "hybrid-review-v1",
+            "references_digest": "7fefd384ce2f38ea02d9740e59f39379ec9abb6dcfbb45bbef2b2b067f981b81",
+            "unit_id": "e27752c7-e085-4e69-95bf-cc7efe297d5d"
+          },
+          "created_at": "2026-10-20T07:48:02.789491+00:00",
+          "local_routing": {
+            "policy_version": "hybrid-review-v1",
+            "reason_codes": [],
+            "verdict": "pass"
+          },
+          "prompt_version": "evidence-resource-review-v4.9",
+          "provider_config_digest": "28dc638b729b5ec54ca902a95f07939dceed0a4c23fe35d0a61396a00820643b",
+          "request_digest": "313c70ef894be327f19d8fcca2d23bbc0d8b77386b0935155cfb694191a64745",
+          "response_digest": "249cc43f062c5d8afd4f42fd76bf21530f66eb45e1a37ba63c5f0099dd6caa54",
+          "result": {
+            "coverage": {
+              "checked": [
+                "code_safety",
+                "facts",
+                "learner_fit",
+                "objectives",
+                "reference_scope"
+              ],
+              "unchecked": []
+            },
+            "findings": [],
+            "schema_version": "resource-review-v4",
+            "scope": "resource",
+            "unresolved": [],
+            "verdict": "pass"
+          },
+          "review_id": "fdbcc6ea-c623-498b-908b-168b35572b0f",
+          "target_digest": "0cfd9d8c9a94d26f51d0d02a67d8697467cf00cd203938473509a49b2862a6ae"
+        },
+        {
+          "anchor_catalog": [
+            {
+              "anchor_id": "a1",
+              "end_utf8": 24,
+              "json_pointer": "/expected_output",
+              "resource_digest": "faafec959399810cb4db1c09acc6dbc3d978fdb144a1545021599b70bba32763",
+              "resource_id": "10b91057-f7f1-4400-8673-ea09b401b96a",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a2",
+              "end_utf8": 108,
+              "json_pointer": "/key_steps/0",
+              "resource_digest": "faafec959399810cb4db1c09acc6dbc3d978fdb144a1545021599b70bba32763",
+              "resource_id": "10b91057-f7f1-4400-8673-ea09b401b96a",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a3",
+              "end_utf8": 135,
+              "json_pointer": "/key_steps/1",
+              "resource_digest": "faafec959399810cb4db1c09acc6dbc3d978fdb144a1545021599b70bba32763",
+              "resource_id": "10b91057-f7f1-4400-8673-ea09b401b96a",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a4",
+              "end_utf8": 170,
+              "json_pointer": "/key_steps/2",
+              "resource_digest": "faafec959399810cb4db1c09acc6dbc3d978fdb144a1545021599b70bba32763",
+              "resource_id": "10b91057-f7f1-4400-8673-ea09b401b96a",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a5",
+              "end_utf8": 137,
+              "json_pointer": "/key_steps/3",
+              "resource_digest": "faafec959399810cb4db1c09acc6dbc3d978fdb144a1545021599b70bba32763",
+              "resource_id": "10b91057-f7f1-4400-8673-ea09b401b96a",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a6",
+              "end_utf8": 63,
+              "json_pointer": "/key_steps/4",
+              "resource_digest": "faafec959399810cb4db1c09acc6dbc3d978fdb144a1545021599b70bba32763",
+              "resource_id": "10b91057-f7f1-4400-8673-ea09b401b96a",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a7",
+              "end_utf8": 123,
+              "json_pointer": "/key_steps/5",
+              "resource_digest": "faafec959399810cb4db1c09acc6dbc3d978fdb144a1545021599b70bba32763",
+              "resource_id": "10b91057-f7f1-4400-8673-ea09b401b96a",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a8",
+              "end_utf8": 1,
+              "json_pointer": "/language",
+              "resource_digest": "faafec959399810cb4db1c09acc6dbc3d978fdb144a1545021599b70bba32763",
+              "resource_id": "10b91057-f7f1-4400-8673-ea09b401b96a",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a9",
+              "end_utf8": 1286,
+              "json_pointer": "/source",
+              "resource_digest": "faafec959399810cb4db1c09acc6dbc3d978fdb144a1545021599b70bba32763",
+              "resource_id": "10b91057-f7f1-4400-8673-ea09b401b96a",
+              "start_utf8": 0
+            }
+          ],
+          "binding": {
+            "input_digest": "2aa3a94605dc3a0049c7f51ba4f5ad01fa7e0345828436c4f57ba3a1fc4e8459",
+            "operation_id": "bb8ca64f-38c5-4b64-b30a-fb7fa2b70968",
+            "owner_id": "d6b1f046-baac-5c03-8cfd-2b63008e6351",
+            "plan_digest": "f9427cd2225280811db6ace2fa97fdb929e95ce617492ce2402c32eb491c2adc",
+            "plan_id": "e383e2a6-a3e5-4184-85e6-791cd6c0a652",
+            "plan_version": 1,
+            "policy_digest": "747ec507e0f011d8a82e74d3823964fc2f860ab23693f71e695273ebf696fdad",
+            "policy_version": "hybrid-review-v1",
+            "references_digest": "7fefd384ce2f38ea02d9740e59f39379ec9abb6dcfbb45bbef2b2b067f981b81",
+            "unit_id": "e27752c7-e085-4e69-95bf-cc7efe297d5d"
+          },
+          "created_at": "2026-10-20T07:48:13.314665+00:00",
+          "local_routing": {
+            "policy_version": "hybrid-review-v1",
+            "reason_codes": [],
+            "verdict": "pass"
+          },
+          "prompt_version": "evidence-resource-review-v4.9",
+          "provider_config_digest": "28dc638b729b5ec54ca902a95f07939dceed0a4c23fe35d0a61396a00820643b",
+          "request_digest": "30d15e21e74070ae33256a14f9e57398ad36bfff07644cf8ff6eb6e73d42a3dd",
+          "response_digest": "cb0ebbcdba574b5b1633aa83313645c8988f3d3726833226beb8ee76f88a43d0",
+          "result": {
+            "coverage": {
+              "checked": [
+                "code_safety",
+                "facts",
+                "learner_fit",
+                "objectives",
+                "reference_scope"
+              ],
+              "unchecked": []
+            },
+            "findings": [],
+            "schema_version": "resource-review-v4",
+            "scope": "resource",
+            "unresolved": [],
+            "verdict": "pass"
+          },
+          "review_id": "d92c9098-ba65-44ee-a41b-e9db2a37e261",
+          "target_digest": "faafec959399810cb4db1c09acc6dbc3d978fdb144a1545021599b70bba32763"
+        },
+        {
+          "anchor_catalog": [
+            {
+              "anchor_id": "a1",
+              "end_utf8": 1,
+              "json_pointer": "/items/0/answer",
+              "resource_digest": "b25af56df34a8543a9a3b497796f917531773c46176a8598fc1e6e32ebe1569c",
+              "resource_id": "f34b278c-4350-45ff-8678-d139a3386d52",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a2",
+              "end_utf8": 237,
+              "json_pointer": "/items/0/explanation",
+              "resource_digest": "b25af56df34a8543a9a3b497796f917531773c46176a8598fc1e6e32ebe1569c",
+              "resource_id": "f34b278c-4350-45ff-8678-d139a3386d52",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a3",
+              "end_utf8": 2,
+              "json_pointer": "/items/0/id",
+              "resource_digest": "b25af56df34a8543a9a3b497796f917531773c46176a8598fc1e6e32ebe1569c",
+              "resource_id": "f34b278c-4350-45ff-8678-d139a3386d52",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a4",
+              "end_utf8": 399,
+              "json_pointer": "/items/0/question",
+              "resource_digest": "b25af56df34a8543a9a3b497796f917531773c46176a8598fc1e6e32ebe1569c",
+              "resource_id": "f34b278c-4350-45ff-8678-d139a3386d52",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a5",
+              "end_utf8": 1,
+              "json_pointer": "/items/1/answer",
+              "resource_digest": "b25af56df34a8543a9a3b497796f917531773c46176a8598fc1e6e32ebe1569c",
+              "resource_id": "f34b278c-4350-45ff-8678-d139a3386d52",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a6",
+              "end_utf8": 208,
+              "json_pointer": "/items/1/explanation",
+              "resource_digest": "b25af56df34a8543a9a3b497796f917531773c46176a8598fc1e6e32ebe1569c",
+              "resource_id": "f34b278c-4350-45ff-8678-d139a3386d52",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a7",
+              "end_utf8": 2,
+              "json_pointer": "/items/1/id",
+              "resource_digest": "b25af56df34a8543a9a3b497796f917531773c46176a8598fc1e6e32ebe1569c",
+              "resource_id": "f34b278c-4350-45ff-8678-d139a3386d52",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a8",
+              "end_utf8": 187,
+              "json_pointer": "/items/1/question",
+              "resource_digest": "b25af56df34a8543a9a3b497796f917531773c46176a8598fc1e6e32ebe1569c",
+              "resource_id": "f34b278c-4350-45ff-8678-d139a3386d52",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a9",
+              "end_utf8": 1,
+              "json_pointer": "/items/2/answer",
+              "resource_digest": "b25af56df34a8543a9a3b497796f917531773c46176a8598fc1e6e32ebe1569c",
+              "resource_id": "f34b278c-4350-45ff-8678-d139a3386d52",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a10",
+              "end_utf8": 226,
+              "json_pointer": "/items/2/explanation",
+              "resource_digest": "b25af56df34a8543a9a3b497796f917531773c46176a8598fc1e6e32ebe1569c",
+              "resource_id": "f34b278c-4350-45ff-8678-d139a3386d52",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a11",
+              "end_utf8": 2,
+              "json_pointer": "/items/2/id",
+              "resource_digest": "b25af56df34a8543a9a3b497796f917531773c46176a8598fc1e6e32ebe1569c",
+              "resource_id": "f34b278c-4350-45ff-8678-d139a3386d52",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a12",
+              "end_utf8": 223,
+              "json_pointer": "/items/2/question",
+              "resource_digest": "b25af56df34a8543a9a3b497796f917531773c46176a8598fc1e6e32ebe1569c",
+              "resource_id": "f34b278c-4350-45ff-8678-d139a3386d52",
+              "start_utf8": 0
+            }
+          ],
+          "binding": {
+            "input_digest": "2aa3a94605dc3a0049c7f51ba4f5ad01fa7e0345828436c4f57ba3a1fc4e8459",
+            "operation_id": "bb8ca64f-38c5-4b64-b30a-fb7fa2b70968",
+            "owner_id": "d6b1f046-baac-5c03-8cfd-2b63008e6351",
+            "plan_digest": "f9427cd2225280811db6ace2fa97fdb929e95ce617492ce2402c32eb491c2adc",
+            "plan_id": "e383e2a6-a3e5-4184-85e6-791cd6c0a652",
+            "plan_version": 1,
+            "policy_digest": "747ec507e0f011d8a82e74d3823964fc2f860ab23693f71e695273ebf696fdad",
+            "policy_version": "hybrid-review-v1",
+            "references_digest": "7fefd384ce2f38ea02d9740e59f39379ec9abb6dcfbb45bbef2b2b067f981b81",
+            "unit_id": "e27752c7-e085-4e69-95bf-cc7efe297d5d"
+          },
+          "created_at": "2026-10-20T07:48:25.208888+00:00",
+          "local_routing": {
+            "policy_version": "hybrid-review-v1",
+            "reason_codes": [
+              "SEMANTIC_UNRESOLVED"
+            ],
+            "verdict": "needs_human"
+          },
+          "prompt_version": "evidence-resource-review-v4.9",
+          "provider_config_digest": "28dc638b729b5ec54ca902a95f07939dceed0a4c23fe35d0a61396a00820643b",
+          "request_digest": "1148c286aeb6714f3b5f43a4cd0d5bfb4ec644a7d50da0e2fde067309027c244",
+          "response_digest": "3d39512680d7bb59fbfd1313c7f9d064974c6f148bf1fa9c43b75c14ac170e55",
+          "result": {
+            "coverage": {
+              "checked": [
+                "code_safety",
+                "facts",
+                "learner_fit",
+                "objectives",
+                "reference_scope"
+              ],
+              "unchecked": []
+            },
+            "findings": [],
+            "schema_version": "resource-review-v4",
+            "scope": "resource",
+            "unresolved": [
+              "The exercise does not fully assess the assigned trace objective: none of the questions requires students to write the successive head targets and each node's data/next links while inserting 3 and then 8. The questions cover operation order and the empty-list case, while the final-order question asks only for the traversal output."
+            ],
+            "verdict": "needs_human"
+          },
+          "review_id": "3c38d4eb-44dd-448d-9f5a-fa4853ba7ede",
+          "target_digest": "b25af56df34a8543a9a3b497796f917531773c46176a8598fc1e6e32ebe1569c"
+        },
+        {
+          "anchor_catalog": [
+            {
+              "anchor_id": "a1",
+              "end_utf8": 2244,
+              "json_pointer": "/markdown",
+              "resource_digest": "0cfd9d8c9a94d26f51d0d02a67d8697467cf00cd203938473509a49b2862a6ae",
+              "resource_id": "bc4266dd-0e32-4aa8-a9a1-c89f15756825",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a2",
+              "end_utf8": 24,
+              "json_pointer": "/expected_output",
+              "resource_digest": "faafec959399810cb4db1c09acc6dbc3d978fdb144a1545021599b70bba32763",
+              "resource_id": "10b91057-f7f1-4400-8673-ea09b401b96a",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a3",
+              "end_utf8": 108,
+              "json_pointer": "/key_steps/0",
+              "resource_digest": "faafec959399810cb4db1c09acc6dbc3d978fdb144a1545021599b70bba32763",
+              "resource_id": "10b91057-f7f1-4400-8673-ea09b401b96a",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a4",
+              "end_utf8": 135,
+              "json_pointer": "/key_steps/1",
+              "resource_digest": "faafec959399810cb4db1c09acc6dbc3d978fdb144a1545021599b70bba32763",
+              "resource_id": "10b91057-f7f1-4400-8673-ea09b401b96a",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a5",
+              "end_utf8": 170,
+              "json_pointer": "/key_steps/2",
+              "resource_digest": "faafec959399810cb4db1c09acc6dbc3d978fdb144a1545021599b70bba32763",
+              "resource_id": "10b91057-f7f1-4400-8673-ea09b401b96a",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a6",
+              "end_utf8": 137,
+              "json_pointer": "/key_steps/3",
+              "resource_digest": "faafec959399810cb4db1c09acc6dbc3d978fdb144a1545021599b70bba32763",
+              "resource_id": "10b91057-f7f1-4400-8673-ea09b401b96a",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a7",
+              "end_utf8": 63,
+              "json_pointer": "/key_steps/4",
+              "resource_digest": "faafec959399810cb4db1c09acc6dbc3d978fdb144a1545021599b70bba32763",
+              "resource_id": "10b91057-f7f1-4400-8673-ea09b401b96a",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a8",
+              "end_utf8": 123,
+              "json_pointer": "/key_steps/5",
+              "resource_digest": "faafec959399810cb4db1c09acc6dbc3d978fdb144a1545021599b70bba32763",
+              "resource_id": "10b91057-f7f1-4400-8673-ea09b401b96a",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a9",
+              "end_utf8": 1,
+              "json_pointer": "/language",
+              "resource_digest": "faafec959399810cb4db1c09acc6dbc3d978fdb144a1545021599b70bba32763",
+              "resource_id": "10b91057-f7f1-4400-8673-ea09b401b96a",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a10",
+              "end_utf8": 1286,
+              "json_pointer": "/source",
+              "resource_digest": "faafec959399810cb4db1c09acc6dbc3d978fdb144a1545021599b70bba32763",
+              "resource_id": "10b91057-f7f1-4400-8673-ea09b401b96a",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a11",
+              "end_utf8": 1,
+              "json_pointer": "/items/0/answer",
+              "resource_digest": "b25af56df34a8543a9a3b497796f917531773c46176a8598fc1e6e32ebe1569c",
+              "resource_id": "f34b278c-4350-45ff-8678-d139a3386d52",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a12",
+              "end_utf8": 237,
+              "json_pointer": "/items/0/explanation",
+              "resource_digest": "b25af56df34a8543a9a3b497796f917531773c46176a8598fc1e6e32ebe1569c",
+              "resource_id": "f34b278c-4350-45ff-8678-d139a3386d52",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a13",
+              "end_utf8": 2,
+              "json_pointer": "/items/0/id",
+              "resource_digest": "b25af56df34a8543a9a3b497796f917531773c46176a8598fc1e6e32ebe1569c",
+              "resource_id": "f34b278c-4350-45ff-8678-d139a3386d52",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a14",
+              "end_utf8": 399,
+              "json_pointer": "/items/0/question",
+              "resource_digest": "b25af56df34a8543a9a3b497796f917531773c46176a8598fc1e6e32ebe1569c",
+              "resource_id": "f34b278c-4350-45ff-8678-d139a3386d52",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a15",
+              "end_utf8": 1,
+              "json_pointer": "/items/1/answer",
+              "resource_digest": "b25af56df34a8543a9a3b497796f917531773c46176a8598fc1e6e32ebe1569c",
+              "resource_id": "f34b278c-4350-45ff-8678-d139a3386d52",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a16",
+              "end_utf8": 208,
+              "json_pointer": "/items/1/explanation",
+              "resource_digest": "b25af56df34a8543a9a3b497796f917531773c46176a8598fc1e6e32ebe1569c",
+              "resource_id": "f34b278c-4350-45ff-8678-d139a3386d52",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a17",
+              "end_utf8": 2,
+              "json_pointer": "/items/1/id",
+              "resource_digest": "b25af56df34a8543a9a3b497796f917531773c46176a8598fc1e6e32ebe1569c",
+              "resource_id": "f34b278c-4350-45ff-8678-d139a3386d52",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a18",
+              "end_utf8": 187,
+              "json_pointer": "/items/1/question",
+              "resource_digest": "b25af56df34a8543a9a3b497796f917531773c46176a8598fc1e6e32ebe1569c",
+              "resource_id": "f34b278c-4350-45ff-8678-d139a3386d52",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a19",
+              "end_utf8": 1,
+              "json_pointer": "/items/2/answer",
+              "resource_digest": "b25af56df34a8543a9a3b497796f917531773c46176a8598fc1e6e32ebe1569c",
+              "resource_id": "f34b278c-4350-45ff-8678-d139a3386d52",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a20",
+              "end_utf8": 226,
+              "json_pointer": "/items/2/explanation",
+              "resource_digest": "b25af56df34a8543a9a3b497796f917531773c46176a8598fc1e6e32ebe1569c",
+              "resource_id": "f34b278c-4350-45ff-8678-d139a3386d52",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a21",
+              "end_utf8": 2,
+              "json_pointer": "/items/2/id",
+              "resource_digest": "b25af56df34a8543a9a3b497796f917531773c46176a8598fc1e6e32ebe1569c",
+              "resource_id": "f34b278c-4350-45ff-8678-d139a3386d52",
+              "start_utf8": 0
+            },
+            {
+              "anchor_id": "a22",
+              "end_utf8": 223,
+              "json_pointer": "/items/2/question",
+              "resource_digest": "b25af56df34a8543a9a3b497796f917531773c46176a8598fc1e6e32ebe1569c",
+              "resource_id": "f34b278c-4350-45ff-8678-d139a3386d52",
+              "start_utf8": 0
+            }
+          ],
+          "binding": {
+            "input_digest": "2aa3a94605dc3a0049c7f51ba4f5ad01fa7e0345828436c4f57ba3a1fc4e8459",
+            "operation_id": "bb8ca64f-38c5-4b64-b30a-fb7fa2b70968",
+            "owner_id": "d6b1f046-baac-5c03-8cfd-2b63008e6351",
+            "plan_digest": "f9427cd2225280811db6ace2fa97fdb929e95ce617492ce2402c32eb491c2adc",
+            "plan_id": "e383e2a6-a3e5-4184-85e6-791cd6c0a652",
+            "plan_version": 1,
+            "policy_digest": "747ec507e0f011d8a82e74d3823964fc2f860ab23693f71e695273ebf696fdad",
+            "policy_version": "hybrid-review-v1",
+            "references_digest": "7fefd384ce2f38ea02d9740e59f39379ec9abb6dcfbb45bbef2b2b067f981b81",
+            "unit_id": "e27752c7-e085-4e69-95bf-cc7efe297d5d"
+          },
+          "created_at": "2026-10-20T07:48:39.779480+00:00",
+          "local_routing": {
+            "policy_version": "hybrid-review-v1",
+            "reason_codes": [
+              "SEMANTIC_UNRESOLVED"
+            ],
+            "verdict": "reject"
+          },
+          "prompt_version": "evidence-resource-review-v4.9",
+          "provider_config_digest": "28dc638b729b5ec54ca902a95f07939dceed0a4c23fe35d0a61396a00820643b",
+          "request_digest": "eb188688b0609eca776ed37ed4098d2cb480e7cdd54d1adbb85dd9e80870c631",
+          "response_digest": "cd6d398f2d0be6c11566b26e58670e0e61533857267a950bd0cc12f79f84103c",
+          "result": {
+            "coverage": {
+              "checked": [
+                "action_references",
+                "answer_consistency",
+                "conventions",
+                "example_trace",
+                "objectives",
+                "terminology"
+              ],
+              "unchecked": []
+            },
+            "findings": [
+              {
+                "anchors": [
+                  "a1"
+                ],
+                "category": "fact",
+                "condition_or_counterexample": "The release example declares `Node *p = head` and later assigns `head = NULL`. Here `head` is a local pointer copy, so that assignment does not set the caller's head pointer to NULL.",
+                "impact": "The explanation says this prevents later use of freed memory, but the shown code leaves the caller's pointer unchanged and dangling after the nodes are freed.",
+                "severity": "major"
+              }
+            ],
+            "schema_version": "resource-review-v4",
+            "scope": "unit",
+            "unresolved": [
+              "The third exercise asks only for the final traversal output. It does not require tracing the intermediate head and node data/next states, so the requested set of exactly three process questions lacks a third question assessing the step-by-step trace. The explanation does teach that trace, but does not make the third question assess it."
+            ],
+            "verdict": "reject"
+          },
+          "review_id": "96bcb14b-71ab-4933-a67f-02de5d6d6961",
+          "target_digest": "99a106c0b753299eefe92d2cf7310619a70a016316e0bd3309b5c0124e07734f"
+        }
+      ],
+      "generated_delivery": {
+        "course_state": "rejected",
+        "resources": [
+          {
+            "content": {
+              "markdown": "# 无头结点单链表头插法\n\n## 核心思路\n\n无头结点单链表中，`head` 指针直接指向第一个存放数据的结点；空链表时 `head == NULL`。头插法把新结点放到最前面，只需三步：\n\n1. 为新结点分配内存，并写入数据；\n2. 让新结点的 `next` 指向当前首结点（即 `*head`）；\n3. 让 `head` 改为指向新结点（即 `*head = 新结点`）。\n\n因为函数要修改调用者的 `head` 指针本身，所以参数用二级指针 `Node **head`，`*head` 就是当前首结点。\n\n## 为什么空链表也适用\n\n空链表时 `*head` 为 `NULL`。第 2 步让新结点的 `next = NULL`，正好表示它是唯一结点、后面没有结点；第 3 步让 `*head` 指向它。因此空链表和非空链表走的是同一套步骤，不需要特判。\n\n## 返回码与失败处理\n\n约定 `int push_front(Node **head, int value)`：成功返回 1，失败返回 0。本课中失败只由 `malloc` 返回 `NULL` 引起。此时必须**先检查再改动**：若分配失败，直接返回 0，`*head` 和所有旧结点都保持原状。\n\n关键顺序是：先 `malloc` 并判断，成功后才写 `data`、改 `next`、改 `*head`。\n\n## 具体例子：空链表依次头插 3 和 8\n\n初始：`head -> NULL`\n\n**第 1 次 `push_front(&head, 3)`**\n- 分配结点 n1，`n1->data = 3`；\n- `n1->next = *head`，即 `NULL`；\n- `*head = n1`；返回 1。\n\n状态：`head -> [3|NULL] -> NULL`\n\n**第 2 次 `push_front(&head, 8)`**\n- 分配结点 n2，`n2->data = 8`；\n- `n2->next = *head`，即指向 n1；\n- `*head = n2`；返回 1。\n\n状态：`head -> [8|*] -> [3|NULL] -> NULL`，遍历输出为 `8 3`。\n\n可以看到：3 先插入却在后面，8 后插入却在最前，所以头插会使元素顺序与插入顺序相反。\n\n## 释放链表\n\n释放时从头结点起逐个 `free`。必须先保存 `next` 再释放当前结点，否则释放后就无法找到后继：\n\n```c\nNode *p = head;\nwhile (p != NULL) {\n    Node *next = p->next;  /* 先保存后继 */\n    free(p);               /* 再释放当前结点 */\n    p = next;\n}\nhead = NULL;               /* 防止悬空指针 */\n```\n\n最后把 `head` 置为 `NULL`，表示链表已空，避免后续误用已释放的内存。"
+            },
+            "content_digest": "0cfd9d8c9a94d26f51d0d02a67d8697467cf00cd203938473509a49b2862a6ae",
+            "id": "bc4266dd-0e32-4aa8-a9a1-c89f15756825",
+            "review_status": "pending",
+            "version": 1
+          },
+          {
+            "content": {
+              "display_only": true,
+              "expected_output": "1\n1\n8 3 \nhead == NULL: 1",
+              "key_steps": [
+                "定义结点结构体 Node，含 int data 与 struct Node *next；main 中令 head = NULL 表示空链表。",
+                "push_front 先用 malloc 分配新结点并立即检查是否为 NULL，失败直接返回 0，此时 *head 与旧结点均未改动。",
+                "分配成功后依次执行 n->data = value、n->next = *head、*head = n，最后返回 1；空链表时 *head 为 NULL，新结点 next 自然为 NULL，无需特判。",
+                "依次调用 push_front(&head, 3) 与 push_front(&head, 8)，链表变为 head -> [8|*] -> [3|NULL] -> NULL，体现头插导致逆序。",
+                "print_list 从头结点沿 next 遍历并打印，输出 8 3。",
+                "free_list 循环中先保存 next 再 free 当前结点，最后把 head 置为 NULL，避免内存泄漏与悬空指针。"
+              ],
+              "language": "C",
+              "source": "#include <stdio.h>\n#include <stdlib.h>\n\ntypedef struct Node {\n    int data;\n    struct Node *next;\n} Node;\n\n/* 头插法：成功返回 1，失败返回 0；失败时链表保持原状 */\nint push_front(Node **head, int value) {\n    Node *n = (Node *)malloc(sizeof(Node));\n    if (n == NULL) {\n        return 0;              /* 分配失败：不改动 *head 和旧结点 */\n    }\n    n->data = value;\n    n->next = *head;           /* 新结点指向当前首结点（空链表时为 NULL） */\n    *head = n;                 /* head 改为指向新结点 */\n    return 1;\n}\n\nvoid print_list(const Node *head) {\n    const Node *p = head;\n    while (p != NULL) {\n        printf(\"%d \", p->data);\n        p = p->next;\n    }\n    printf(\"\\n\");\n}\n\nvoid free_list(Node **head) {\n    Node *p = *head;\n    while (p != NULL) {\n        Node *next = p->next;  /* 先保存后继 */\n        free(p);               /* 再释放当前结点 */\n        p = next;\n    }\n    *head = NULL;              /* 防止悬空指针 */\n}\n\nint main(void) {\n    Node *head = NULL;         /* 空链表：head -> NULL */\n\n    printf(\"%d\\n\", push_front(&head, 3));\n    printf(\"%d\\n\", push_front(&head, 8));\n\n    print_list(head);\n\n    free_list(&head);\n    printf(\"head == NULL: %d\\n\", head == NULL);\n    return 0;\n}"
+            },
+            "content_digest": "faafec959399810cb4db1c09acc6dbc3d978fdb144a1545021599b70bba32763",
+            "id": "10b91057-f7f1-4400-8673-ea09b401b96a",
+            "review_status": "pending",
+            "version": 1
+          },
+          {
+            "content": {
+              "items": [
+                {
+                  "answer": "B",
+                  "explanation": "正确顺序是让新结点的 next 指向当前首结点（n->next = *head），再把 head 改为指向新结点（*head = n）。若先改 *head，旧首结点就会丢失，新结点的 next 也无法正确指向原来的首结点。",
+                  "id": "q1",
+                  "question": "[单选题] 在无头结点单链表中，用 int push_front(Node **head, int value) 实现头插法。malloc 成功后，下列哪一组操作顺序能正确完成插入？\nA. 先执行 *head = n，再执行 n->next = *head\nB. 先执行 n->next = *head，再执行 *head = n\nC. 先执行 n->next = n，再执行 *head = n\nD. 先执行 *head = NULL，再执行 n->next = *head\n仅填 A、B、C 或 D"
+                },
+                {
+                  "answer": "F",
+                  "explanation": "空链表时 *head 为 NULL，执行 n->next = *head 就得到 n->next = NULL，正好表示新结点是唯一结点；随后 *head = n 即可。空链表与非空链表走同一套步骤，不需要特判。",
+                  "id": "q2",
+                  "question": "[判断题] 对空链表（head == NULL）调用 push_front(&head, 3) 时，必须先特判空链表，否则新结点的 next 无法正确设置。仅填 T 或 F（T=正确，F=错误）"
+                },
+                {
+                  "answer": "B",
+                  "explanation": "第一次头插 3 后链表为 3 -> NULL；第二次头插 8 时，8 的 next 指向当前首结点 3，head 改为指向 8，链表变为 8 -> 3 -> NULL，因此遍历输出 8 3。头插使元素顺序与插入顺序相反。",
+                  "id": "q3",
+                  "question": "[单选题] 初始 head -> NULL，依次调用 push_front(&head, 3) 与 push_front(&head, 8)，两次 malloc 均成功。从头结点开始遍历，输出顺序是什么？\nA. 3 8\nB. 8 3\nC. 3 3\nD. 8 8\n仅填 A、B、C 或 D"
+                }
+              ]
+            },
+            "content_digest": "b25af56df34a8543a9a3b497796f917531773c46176a8598fc1e6e32ebe1569c",
+            "id": "f34b278c-4350-45ff-8678-d139a3386d52",
+            "review_status": "pending",
+            "version": 1
+          }
+        ],
+        "plans": [
+          {
+            "id": "e383e2a6-a3e5-4184-85e6-791cd6c0a652",
+            "input_snapshot": {
+              "learner_evidence": {},
+              "metadata": {
+                "code_language": "C",
+                "goal": "主题是无头结点单链表头插法，C语言，空链表依次头插3和8。用int push_front(Node **head,int value)返回1成功/0失败；malloc失败不改变旧链表。提供讲解、含main和完整释放的可编译程序、恰好三道过程题及解析。指针和分配仅是配套要求，不另选教学主题；不需要动画。",
+                "graph_digest": "3639db6aedc9699348e63b5e7e1bdaaea3189592b19540c64e8f175aceb9ef59",
+                "graph_version": "mvp-0.2.0",
+                "node_id": "linked-list-insertion",
+                "profile_evidence_digest": "8838fdd11ee58e08fd54a21272313e784012370b7cf0a2cde8b823ed8806d85d",
+                "profile_version": null
+              },
+              "node_ids": [
+                "array",
+                "array-stack",
+                "balanced-binary-search-tree",
+                "binary-heap",
+                "binary-search-tree",
+                "binary-tree",
+                "binary-tree-traversal",
+                "breadth-first-search",
+                "bubble-sort",
+                "c-pointer",
+                "circular-linked-list",
+                "circular-queue",
+                "depth-first-search",
+                "doubly-linked-list",
+                "graph-representation",
+                "heap-sort",
+                "insertion-sort",
+                "linked-list-concept",
+                "linked-list-deletion",
+                "linked-list-insertion",
+                "linked-list-traversal",
+                "linked-stack",
+                "merge-sort",
+                "queue",
+                "quick-sort",
+                "selection-sort",
+                "single-linked-list",
+                "sorting-comparison",
+                "stack",
+                "tree-concept"
+              ],
+              "reference_context": {
+                "learner_evidence": {},
+                "node": {
+                  "ai_context": "继续使用箭头比喻：先保存新节点指向的旧后继，再连接前驱。",
+                  "chapter": "线性表",
+                  "common_misconceptions": [
+                    "可以先让 prev->next 指向新节点再保存后继",
+                    "插入中间位置不需要前驱节点"
+                  ],
+                  "description": "在单链表中创建新节点，并以正确顺序重连 next 链接。",
+                  "difficulty": 3,
+                  "id": "linked-list-insertion",
+                  "learning_objectives": [
+                    "写出中间插入的两步连接更新",
+                    "处理头插、尾插和位置不合法的边界情况"
+                  ],
+                  "mastery_rule_key": "linear-structure-v1",
+                  "name": "链表插入",
+                  "prerequisites": [
+                    "c-pointer",
+                    "linked-list-traversal"
+                  ]
+                },
+                "scope": "Background only, not certification of this example.",
+                "source": {
+                  "digest": "b06b9a38c5be73059d9b542efa22a7ddfcb65913cbf036573a69b2b4dcd0ed98",
+                  "reference_id": "graph-node:mvp-0.2.0:linked-list-insertion",
+                  "version": "mvp-0.2.0"
+                }
+              },
+              "references": {
+                "graph-node:mvp-0.2.0:linked-list-insertion": {
+                  "digest": "b06b9a38c5be73059d9b542efa22a7ddfcb65913cbf036573a69b2b4dcd0ed98",
+                  "reference_id": "graph-node:mvp-0.2.0:linked-list-insertion",
+                  "version": "mvp-0.2.0"
+                }
+              },
+              "teaching_context": {
+                "graph_digest": "3639db6aedc9699348e63b5e7e1bdaaea3189592b19540c64e8f175aceb9ef59",
+                "graph_version": "mvp-0.2.0",
+                "original_request": "主题是无头结点单链表头插法，C语言，空链表依次头插3和8。用int push_front(Node **head,int value)返回1成功/0失败；malloc失败不改变旧链表。提供讲解、含main和完整释放的可编译程序、恰好三道过程题及解析。指针和分配仅是配套要求，不另选教学主题；不需要动画。",
+                "path_version": 1,
+                "path_version_id": "3d2bc4ab-6ccc-53e1-b728-a7500511c251",
+                "recommended_node_id": "linked-list-insertion",
+                "segment_goal": "主题是无头结点单链表头插法，C语言，空链表依次头插3和8。用int push_front(Node **head,int value)返回1成功/0失败；malloc失败不改变旧链表。提供讲解、含main和完整释放的可编译程序、恰好三道过程题及解析。指针和分配仅是配套要求，不另选教学主题；不需要动画。",
+                "segment_scope": "target_lesson",
+                "selection_reason": "direct_target",
+                "target_node_id": "linked-list-insertion",
+                "teaching_mode": "target",
+                "teaching_node_id": "linked-list-insertion",
+                "version": "teaching-node-binding-v1"
+              }
+            },
+            "plan": {
+              "code_language": "C",
+              "conventions": {
+                "capacity": null,
+                "index_base": null,
+                "not_applicable_reasons": [
+                  "本主题为链表，不使用数组下标，故 index_base 不适用。",
+                  "链表为动态长度，无固定容量，故 capacity 不适用。"
+                ],
+                "state_representation": "状态用 head 指向的结点序列表示，写作 head -> [d1] -> [d2] -> ... -> NULL；每个结点记作 [data|next]，next 用箭头指向后继或 NULL。空链表记作 head -> NULL。"
+              },
+              "goal": "主题是无头结点单链表头插法，C语言，空链表依次头插3和8。用int push_front(Node **head,int value)返回1成功/0失败；malloc失败不改变旧链表。提供讲解、含main和完整释放的可编译程序、恰好三道过程题及解析。指针和分配仅是配套要求，不另选教学主题；不需要动画。",
+              "graph_digest": "3639db6aedc9699348e63b5e7e1bdaaea3189592b19540c64e8f175aceb9ef59",
+              "graph_version": "mvp-0.2.0",
+              "node_id": "linked-list-insertion",
+              "objectives": [
+                {
+                  "id": "obj-head-insert",
+                  "text": "说明无头结点单链表头插法的核心步骤：为新结点分配内存、把新结点的 next 指向当前首结点、把 head 指针改为指向新结点，并解释为何空链表也适用。"
+                },
+                {
+                  "id": "obj-push-front-contract",
+                  "text": "按约定实现 int push_front(Node **head, int value)：成功返回 1，失败返回 0；malloc 失败时链表保持原状（head 与所有旧结点不变）。"
+                },
+                {
+                  "id": "obj-trace",
+                  "text": "对空链表依次头插 3 和 8，逐步写出 head 指向、各结点 data/next 与最终链表顺序，并解释头插导致逆序。"
+                },
+                {
+                  "id": "obj-free",
+                  "text": "编写并解释完整释放链表的循环，避免内存泄漏，并说明释放后 head 置为 NULL 的意义。"
+                }
+              ],
+              "prerequisite_node_ids": [
+                "single-linked-list",
+                "c-pointer"
+              ],
+              "profile_evidence_digest": "8838fdd11ee58e08fd54a21272313e784012370b7cf0a2cde8b823ed8806d85d",
+              "profile_version": null,
+              "references": [
+                {
+                  "digest": "b06b9a38c5be73059d9b542efa22a7ddfcb65913cbf036573a69b2b4dcd0ed98",
+                  "reference_id": "graph-node:mvp-0.2.0:linked-list-insertion",
+                  "version": "mvp-0.2.0"
+                }
+              ],
+              "scenes": [
+                {
+                  "depends_on": [],
+                  "objective_ids": [
+                    "obj-head-insert",
+                    "obj-push-front-contract",
+                    "obj-trace"
+                  ],
+                  "role": "explanation",
+                  "scene_key": "explanation"
+                },
+                {
+                  "depends_on": [
+                    "explanation"
+                  ],
+                  "objective_ids": [
+                    "obj-push-front-contract",
+                    "obj-free"
+                  ],
+                  "role": "code",
+                  "scene_key": "code"
+                },
+                {
+                  "depends_on": [
+                    "explanation",
+                    "code"
+                  ],
+                  "objective_ids": [
+                    "obj-trace",
+                    "obj-push-front-contract",
+                    "obj-free"
+                  ],
+                  "role": "exercise",
+                  "scene_key": "exercise"
+                }
+              ],
+              "schema_version": "learning-plan-v1",
+              "shared_example": {
+                "initial_state": "head -> NULL",
+                "input_description": "初始为空的无头结点单链表（head == NULL），依次调用 push_front(&head, 3) 与 push_front(&head, 8)，每次 malloc 均成功。",
+                "steps": [
+                  {
+                    "expected_output": "1",
+                    "expected_state": "head -> [3|NULL] -> NULL",
+                    "operation": "push_front(&head, 3)：malloc 新结点 n1，n1->data=3，n1->next=*head(NULL)，*head=n1，返回 1"
+                  },
+                  {
+                    "expected_output": "1",
+                    "expected_state": "head -> [8|*] -> [3|NULL] -> NULL（即 8 -> 3）",
+                    "operation": "push_front(&head, 8)：malloc 新结点 n2，n2->data=8，n2->next=*head(n1)，*head=n2，返回 1"
+                  },
+                  {
+                    "expected_output": "8 3",
+                    "expected_state": "head -> [8|*] -> [3|NULL] -> NULL",
+                    "operation": "遍历打印链表"
+                  },
+                  {
+                    "expected_output": null,
+                    "expected_state": "head -> NULL",
+                    "operation": "释放链表：依次 free 8 的结点、3 的结点，head 置 NULL"
+                  }
+                ]
+              },
+              "terminology": [
+                {
+                  "meaning": "链表没有专门的哨兵/哑结点；head 指针直接指向第一个存放数据的结点，空链表时 head 为 NULL。",
+                  "term": "无头结点单链表"
+                },
+                {
+                  "meaning": "指向链表首结点的指针变量；在 push_front 中通过 Node **head 传入其地址，以便函数内修改调用者的 head。",
+                  "term": "head 指针"
+                },
+                {
+                  "meaning": "含 int data 与 struct Node *next 两个成员的结构体；next 为 NULL 表示其后无结点。",
+                  "term": "结点 Node"
+                },
+                {
+                  "meaning": "新结点插入到链表最前端，成为新的首结点；多次头插使元素顺序与插入顺序相反。",
+                  "term": "头插法"
+                },
+                {
+                  "meaning": "指向 head 指针的指针（二级指针）；*head 即当前首结点，修改 *head 即修改调用者的 head。",
+                  "term": "Node **head 参数"
+                },
+                {
+                  "meaning": "malloc 返回 NULL；此时不得改动 *head 或任何旧结点，函数返回 0。",
+                  "term": "malloc 失败"
+                },
+                {
+                  "meaning": "1 表示插入成功，0 表示失败（本课中失败仅由 malloc 返回 NULL 引起）。",
+                  "term": "返回码约定"
+                },
+                {
+                  "meaning": "从头结点起逐个 free，先保存 next 再释放当前结点，最后把 head 置为 NULL。",
+                  "term": "释放链表"
+                }
+              ]
+            }
+          }
+        ],
+        "input_boundary": "frozen PlanInputs fixture; actual resolver checked separately; not a full HTTP input/profile/path integration test",
+        "raw_goal_selection": {
+          "candidates": [
+            "c-pointer",
+            "linked-list-insertion"
+          ],
+          "manual_clarification": {
+            "automatic_resolution": "ambiguous_aliases; preserved, not passed",
+            "original_request_sha256": "3aee1a37e317610397d128fc8740b1a08e1190256a280ff912ce20da885e03bf",
+            "reviewer": "Lee",
+            "scope": "manual selection only; not live Provider authorization",
+            "selected_node_id": "linked-list-insertion",
+            "source_user_message": "按已列节点澄清，继续准备本轮验收"
+          },
+          "node_id": null,
+          "reason": "ambiguous_aliases",
+          "selected_node_id": "linked-list-insertion"
+        },
+        "result": null,
+        "safe_error": "DIAGNOSTIC_FAILURE"
+      }
+    }
+  ]
+}

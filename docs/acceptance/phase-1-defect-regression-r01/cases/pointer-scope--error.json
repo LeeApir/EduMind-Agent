@@ -1,0 +1,517 @@
+{
+  "id": "pointer-scope--error",
+  "family": "pointer-scope",
+  "variant": "error",
+  "scope": "unit",
+  "selected_role": null,
+  "input_snapshot": {
+    "metadata": {
+      "node_id": "c-pointer",
+      "graph_version": "mvp-0.2.0",
+      "graph_digest": "3639db6aedc9699348e63b5e7e1bdaaea3189592b19540c64e8f175aceb9ef59",
+      "profile_version": null,
+      "profile_evidence_digest": "8838fdd11ee58e08fd54a21272313e784012370b7cf0a2cde8b823ed8806d85d",
+      "goal": "说明C指针形参能否清空调用方head，依据实际形参、赋值和调用点判断释放后安全；给出讲解、代码和三题。不要求数组求和或动画。",
+      "code_language": "C"
+    },
+    "references": {
+      "graph-node:mvp-0.2.0:c-pointer": {
+        "reference_id": "graph-node:mvp-0.2.0:c-pointer",
+        "version": "mvp-0.2.0",
+        "digest": "038e80d56854aedbfc8a65e828b514eb532ebfea54abf7b933ebfe79f8b0dfdc"
+      }
+    },
+    "learner_evidence": {},
+    "node_ids": [
+      "array",
+      "array-stack",
+      "balanced-binary-search-tree",
+      "binary-heap",
+      "binary-search-tree",
+      "binary-tree",
+      "binary-tree-traversal",
+      "breadth-first-search",
+      "bubble-sort",
+      "c-pointer",
+      "circular-linked-list",
+      "circular-queue",
+      "depth-first-search",
+      "doubly-linked-list",
+      "graph-representation",
+      "heap-sort",
+      "insertion-sort",
+      "linked-list-concept",
+      "linked-list-deletion",
+      "linked-list-insertion",
+      "linked-list-traversal",
+      "linked-stack",
+      "merge-sort",
+      "queue",
+      "quick-sort",
+      "selection-sort",
+      "single-linked-list",
+      "sorting-comparison",
+      "stack",
+      "tree-concept"
+    ],
+    "teaching_context": {
+      "version": "teaching-node-binding-v1",
+      "teaching_mode": "target",
+      "target_node_id": "c-pointer",
+      "recommended_node_id": "c-pointer",
+      "teaching_node_id": "c-pointer",
+      "selection_reason": "direct_target",
+      "original_request": "说明C指针形参能否清空调用方head，依据实际形参、赋值和调用点判断释放后安全；给出讲解、代码和三题。不要求数组求和或动画。",
+      "segment_goal": "说明C指针形参能否清空调用方head，依据实际形参、赋值和调用点判断释放后安全；给出讲解、代码和三题。不要求数组求和或动画。",
+      "segment_scope": "target_lesson",
+      "path_version_id": "8e6afea2-030a-5327-9106-194b4395b517",
+      "path_version": 1,
+      "graph_version": "mvp-0.2.0",
+      "graph_digest": "3639db6aedc9699348e63b5e7e1bdaaea3189592b19540c64e8f175aceb9ef59"
+    }
+  },
+  "material": {
+    "binding": {
+      "owner_id": "2ff0b84f-456c-5395-990e-54a598a4747a",
+      "unit_id": "96bd8167-d732-50ac-b666-94ebb4ba93ea",
+      "operation_id": "65d04233-2bd2-53ef-bb11-fa579fd50b7a",
+      "plan_id": "144bbc4a-bd34-5e87-9bfb-02d8659bb41f",
+      "plan_version": 1,
+      "plan_digest": "397c826cf9f1c8adaa8b84c02688af6dc97c6e581afb33ed7c4f77b9f259e772",
+      "input_digest": "6a0faf9b9bd8b0a2b29f785a4484be48cdf50af5bf8ca9631d7d30762ece536b",
+      "references_digest": "b2534947205cbded090c7fbbf4423321245592fcd0702b4dfda3fe1b5abb53d5",
+      "policy_version": "hybrid-review-v1",
+      "policy_digest": "7a9c9eed57fe41e8aa905a917bd015c4a4eae28935bdd53b6654662cd751af0f"
+    },
+    "plan": {
+      "objectives": [
+        {
+          "id": "local",
+          "text": "说明C指针形参能否清空调用方head，依据实际形参、赋值和调用点判断释放后安全；给出讲解、代码和三题。不要求数组求和或动画。"
+        }
+      ],
+      "terminology": [
+        {
+          "term": "形参",
+          "meaning": "调用时取得参数值的函数内参数对象。"
+        }
+      ],
+      "conventions": {
+        "index_base": null,
+        "capacity": null,
+        "state_representation": "区分调用方head与形参；是否释放依具体函数体。",
+        "not_applicable_reasons": [
+          "本例指针接口，不规定容器下标或容量。"
+        ]
+      },
+      "shared_example": {
+        "input_description": "Node指针及释放接口",
+        "initial_state": "依提供的caller与函数体",
+        "steps": [
+          {
+            "operation": "核对接口及调用",
+            "expected_state": "依形参、赋值、调用点确定；缺证据保留未知。",
+            "expected_output": "不打印。"
+          }
+        ]
+      },
+      "prerequisite_node_ids": [],
+      "scenes": [
+        {
+          "role": "explanation",
+          "scene_key": "explanation",
+          "objective_ids": [
+            "local"
+          ],
+          "depends_on": []
+        },
+        {
+          "role": "code",
+          "scene_key": "code",
+          "objective_ids": [
+            "local"
+          ],
+          "depends_on": [
+            "explanation"
+          ]
+        },
+        {
+          "role": "exercise",
+          "scene_key": "exercise",
+          "objective_ids": [
+            "local"
+          ],
+          "depends_on": [
+            "explanation",
+            "code"
+          ]
+        }
+      ],
+      "node_id": "c-pointer",
+      "graph_version": "mvp-0.2.0",
+      "graph_digest": "3639db6aedc9699348e63b5e7e1bdaaea3189592b19540c64e8f175aceb9ef59",
+      "profile_version": null,
+      "profile_evidence_digest": "8838fdd11ee58e08fd54a21272313e784012370b7cf0a2cde8b823ed8806d85d",
+      "goal": "说明C指针形参能否清空调用方head，依据实际形参、赋值和调用点判断释放后安全；给出讲解、代码和三题。不要求数组求和或动画。",
+      "code_language": "C",
+      "schema_version": "learning-plan-v1",
+      "references": [
+        {
+          "reference_id": "graph-node:mvp-0.2.0:c-pointer",
+          "version": "mvp-0.2.0",
+          "digest": "038e80d56854aedbfc8a65e828b514eb532ebfea54abf7b933ebfe79f8b0dfdc"
+        }
+      ]
+    },
+    "candidates": [
+      {
+        "resource_id": "106fc6c3-3f39-50ea-b995-1c5834ad8116",
+        "role": "explanation",
+        "envelope": {
+          "resource_type": "explanation",
+          "prompt_version": "learning-resources-v1",
+          "content": {
+            "markdown": "本例声称free_list中的head=NULL也会清空main的head，因此再次free(head)安全。"
+          }
+        },
+        "content_digest": "ad329111f81cff524dabd0e2c328efc36a607dbb40336998440b9a37b8590891",
+        "dependency_digest": "990e7b28883cf8e85caaa04a8f729ca8ccd64a18e51f149c987e285de3a6360d",
+        "upstream": []
+      },
+      {
+        "resource_id": "81e284d6-afe9-55e9-88f3-5dd40d0aef71",
+        "role": "code",
+        "envelope": {
+          "resource_type": "code",
+          "prompt_version": "learning-resources-v1",
+          "content": {
+            "language": "C",
+            "source": "#include <stdlib.h>\ntypedef struct Node { int data; struct Node *next; } Node;\nvoid free_list(Node *head) { Node *p=head; while(p) { Node *q=p->next; free(p); p=q; } head=NULL; }\nint main(void) { Node *head=malloc(sizeof *head); if(!head) return 0; head->data=4; head->next=NULL; free_list(head); free(head); return 0; }",
+            "expected_output": "不包含打印语句；不主张未定义行为有确定返回值。",
+            "key_steps": [
+              "本例声称free_list中的head=NULL也会清空main的head，因此再次free(head)安全。"
+            ],
+            "display_only": true
+          }
+        },
+        "content_digest": "761e1c6494cc89dbe4fab8b66fcd7c5f3813fa4b2084a2a5ee7c57f7bbe27ce4",
+        "dependency_digest": "6228e1acdb3029df644c22a9f2cd068fd3ca40dc2996102e6d9de3c1d5fb5284",
+        "upstream": [
+          {
+            "resource_id": "106fc6c3-3f39-50ea-b995-1c5834ad8116",
+            "content_digest": "ad329111f81cff524dabd0e2c328efc36a607dbb40336998440b9a37b8590891",
+            "dependency_digest": "990e7b28883cf8e85caaa04a8f729ca8ccd64a18e51f149c987e285de3a6360d"
+          }
+        ]
+      },
+      {
+        "resource_id": "fa31b8f2-ef7e-5747-963a-c46867a63b97",
+        "role": "exercise",
+        "envelope": {
+          "resource_type": "exercise",
+          "prompt_version": "learning-resources-v1",
+          "content": {
+            "items": [
+              {
+                "id": "q1",
+                "question": "[判断题] Node *形参的赋值必然修改调用方指针变量 仅填 T 或 F（T=正确，F=错误）。",
+                "answer": "F",
+                "explanation": "指针值按值传递。"
+              },
+              {
+                "id": "q2",
+                "question": "[判断题] 通过有效的Node **可写入调用方指针对象 仅填 T 或 F（T=正确，F=错误）。",
+                "answer": "T",
+                "explanation": "例如*head=NULL，仍须核对实际调用点。"
+              },
+              {
+                "id": "q3",
+                "question": "[判断题] 只见函数声明就足以证明函数已free对象 仅填 T 或 F（T=正确，F=错误）。",
+                "answer": "F",
+                "explanation": "还需函数体和可达调用路径。"
+              }
+            ]
+          }
+        },
+        "content_digest": "355f4186ca9ef838eab7960059defd733b09577cd9a711cbb26419dc4e6ca875",
+        "dependency_digest": "e5a423820bd900f8cfbb7730ec532748195737dd32aea144436fc21f431384b9",
+        "upstream": [
+          {
+            "resource_id": "106fc6c3-3f39-50ea-b995-1c5834ad8116",
+            "content_digest": "ad329111f81cff524dabd0e2c328efc36a607dbb40336998440b9a37b8590891",
+            "dependency_digest": "990e7b28883cf8e85caaa04a8f729ca8ccd64a18e51f149c987e285de3a6360d"
+          },
+          {
+            "resource_id": "81e284d6-afe9-55e9-88f3-5dd40d0aef71",
+            "content_digest": "761e1c6494cc89dbe4fab8b66fcd7c5f3813fa4b2084a2a5ee7c57f7bbe27ce4",
+            "dependency_digest": "6228e1acdb3029df644c22a9f2cd068fd3ca40dc2996102e6d9de3c1d5fb5284"
+          }
+        ]
+      }
+    ],
+    "scenes": [
+      {
+        "role": "explanation",
+        "scene_key": "explanation",
+        "scene_id": "16bf11f9-36fa-5c64-8e82-70318358d062",
+        "scene_version": 1,
+        "resource_id": "106fc6c3-3f39-50ea-b995-1c5834ad8116",
+        "resource_digest": "ad329111f81cff524dabd0e2c328efc36a607dbb40336998440b9a37b8590891",
+        "dependency_digest": "990e7b28883cf8e85caaa04a8f729ca8ccd64a18e51f149c987e285de3a6360d"
+      },
+      {
+        "role": "code",
+        "scene_key": "code",
+        "scene_id": "5c5f290d-177e-59b8-9618-c4004a379673",
+        "scene_version": 1,
+        "resource_id": "81e284d6-afe9-55e9-88f3-5dd40d0aef71",
+        "resource_digest": "761e1c6494cc89dbe4fab8b66fcd7c5f3813fa4b2084a2a5ee7c57f7bbe27ce4",
+        "dependency_digest": "6228e1acdb3029df644c22a9f2cd068fd3ca40dc2996102e6d9de3c1d5fb5284"
+      },
+      {
+        "role": "exercise",
+        "scene_key": "exercise",
+        "scene_id": "8dc30efb-a355-5ec1-8ee2-0015b670d62f",
+        "scene_version": 1,
+        "resource_id": "fa31b8f2-ef7e-5747-963a-c46867a63b97",
+        "resource_digest": "355f4186ca9ef838eab7960059defd733b09577cd9a711cbb26419dc4e6ca875",
+        "dependency_digest": "e5a423820bd900f8cfbb7730ec532748195737dd32aea144436fc21f431384b9"
+      }
+    ],
+    "actions": {
+      "version": "teaching-actions-v1",
+      "actions": [
+        {
+          "kind": "show_resource",
+          "scene_key": "explanation",
+          "resource_id": "106fc6c3-3f39-50ea-b995-1c5834ad8116",
+          "resource_digest": "ad329111f81cff524dabd0e2c328efc36a607dbb40336998440b9a37b8590891"
+        },
+        {
+          "kind": "show_resource",
+          "scene_key": "code",
+          "resource_id": "81e284d6-afe9-55e9-88f3-5dd40d0aef71",
+          "resource_digest": "761e1c6494cc89dbe4fab8b66fcd7c5f3813fa4b2084a2a5ee7c57f7bbe27ce4"
+        },
+        {
+          "kind": "highlight",
+          "scene_key": "code",
+          "resource_id": "81e284d6-afe9-55e9-88f3-5dd40d0aef71",
+          "resource_digest": "761e1c6494cc89dbe4fab8b66fcd7c5f3813fa4b2084a2a5ee7c57f7bbe27ce4",
+          "anchor_id": "a3"
+        },
+        {
+          "kind": "show_resource",
+          "scene_key": "exercise",
+          "resource_id": "fa31b8f2-ef7e-5747-963a-c46867a63b97",
+          "resource_digest": "355f4186ca9ef838eab7960059defd733b09577cd9a711cbb26419dc4e6ca875"
+        },
+        {
+          "kind": "ask_exercise",
+          "scene_key": "exercise",
+          "resource_id": "fa31b8f2-ef7e-5747-963a-c46867a63b97",
+          "resource_digest": "355f4186ca9ef838eab7960059defd733b09577cd9a711cbb26419dc4e6ca875",
+          "exercise_id": "q1"
+        },
+        {
+          "kind": "ask_exercise",
+          "scene_key": "exercise",
+          "resource_id": "fa31b8f2-ef7e-5747-963a-c46867a63b97",
+          "resource_digest": "355f4186ca9ef838eab7960059defd733b09577cd9a711cbb26419dc4e6ca875",
+          "exercise_id": "q2"
+        },
+        {
+          "kind": "ask_exercise",
+          "scene_key": "exercise",
+          "resource_id": "fa31b8f2-ef7e-5747-963a-c46867a63b97",
+          "resource_digest": "355f4186ca9ef838eab7960059defd733b09577cd9a711cbb26419dc4e6ca875",
+          "exercise_id": "q3"
+        }
+      ],
+      "anchor_catalog": [
+        {
+          "anchor_id": "a1",
+          "resource_id": "106fc6c3-3f39-50ea-b995-1c5834ad8116",
+          "resource_digest": "ad329111f81cff524dabd0e2c328efc36a607dbb40336998440b9a37b8590891",
+          "json_pointer": "/markdown",
+          "start_utf8": 0,
+          "end_utf8": 93
+        },
+        {
+          "anchor_id": "a2",
+          "resource_id": "81e284d6-afe9-55e9-88f3-5dd40d0aef71",
+          "resource_digest": "761e1c6494cc89dbe4fab8b66fcd7c5f3813fa4b2084a2a5ee7c57f7bbe27ce4",
+          "json_pointer": "/expected_output",
+          "start_utf8": 0,
+          "end_utf8": 69
+        },
+        {
+          "anchor_id": "a3",
+          "resource_id": "81e284d6-afe9-55e9-88f3-5dd40d0aef71",
+          "resource_digest": "761e1c6494cc89dbe4fab8b66fcd7c5f3813fa4b2084a2a5ee7c57f7bbe27ce4",
+          "json_pointer": "/key_steps/0",
+          "start_utf8": 0,
+          "end_utf8": 93
+        },
+        {
+          "anchor_id": "a4",
+          "resource_id": "81e284d6-afe9-55e9-88f3-5dd40d0aef71",
+          "resource_digest": "761e1c6494cc89dbe4fab8b66fcd7c5f3813fa4b2084a2a5ee7c57f7bbe27ce4",
+          "json_pointer": "/language",
+          "start_utf8": 0,
+          "end_utf8": 1
+        },
+        {
+          "anchor_id": "a5",
+          "resource_id": "81e284d6-afe9-55e9-88f3-5dd40d0aef71",
+          "resource_digest": "761e1c6494cc89dbe4fab8b66fcd7c5f3813fa4b2084a2a5ee7c57f7bbe27ce4",
+          "json_pointer": "/source",
+          "start_utf8": 0,
+          "end_utf8": 320
+        },
+        {
+          "anchor_id": "a6",
+          "resource_id": "fa31b8f2-ef7e-5747-963a-c46867a63b97",
+          "resource_digest": "355f4186ca9ef838eab7960059defd733b09577cd9a711cbb26419dc4e6ca875",
+          "json_pointer": "/items/0/answer",
+          "start_utf8": 0,
+          "end_utf8": 1
+        },
+        {
+          "anchor_id": "a7",
+          "resource_id": "fa31b8f2-ef7e-5747-963a-c46867a63b97",
+          "resource_digest": "355f4186ca9ef838eab7960059defd733b09577cd9a711cbb26419dc4e6ca875",
+          "json_pointer": "/items/0/explanation",
+          "start_utf8": 0,
+          "end_utf8": 24
+        },
+        {
+          "anchor_id": "a8",
+          "resource_id": "fa31b8f2-ef7e-5747-963a-c46867a63b97",
+          "resource_digest": "355f4186ca9ef838eab7960059defd733b09577cd9a711cbb26419dc4e6ca875",
+          "json_pointer": "/items/0/id",
+          "start_utf8": 0,
+          "end_utf8": 2
+        },
+        {
+          "anchor_id": "a9",
+          "resource_id": "fa31b8f2-ef7e-5747-963a-c46867a63b97",
+          "resource_digest": "355f4186ca9ef838eab7960059defd733b09577cd9a711cbb26419dc4e6ca875",
+          "json_pointer": "/items/0/question",
+          "start_utf8": 0,
+          "end_utf8": 109
+        },
+        {
+          "anchor_id": "a10",
+          "resource_id": "fa31b8f2-ef7e-5747-963a-c46867a63b97",
+          "resource_digest": "355f4186ca9ef838eab7960059defd733b09577cd9a711cbb26419dc4e6ca875",
+          "json_pointer": "/items/1/answer",
+          "start_utf8": 0,
+          "end_utf8": 1
+        },
+        {
+          "anchor_id": "a11",
+          "resource_id": "fa31b8f2-ef7e-5747-963a-c46867a63b97",
+          "resource_digest": "355f4186ca9ef838eab7960059defd733b09577cd9a711cbb26419dc4e6ca875",
+          "json_pointer": "/items/1/explanation",
+          "start_utf8": 0,
+          "end_utf8": 49
+        },
+        {
+          "anchor_id": "a12",
+          "resource_id": "fa31b8f2-ef7e-5747-963a-c46867a63b97",
+          "resource_digest": "355f4186ca9ef838eab7960059defd733b09577cd9a711cbb26419dc4e6ca875",
+          "json_pointer": "/items/1/id",
+          "start_utf8": 0,
+          "end_utf8": 2
+        },
+        {
+          "anchor_id": "a13",
+          "resource_id": "fa31b8f2-ef7e-5747-963a-c46867a63b97",
+          "resource_digest": "355f4186ca9ef838eab7960059defd733b09577cd9a711cbb26419dc4e6ca875",
+          "json_pointer": "/items/1/question",
+          "start_utf8": 0,
+          "end_utf8": 107
+        },
+        {
+          "anchor_id": "a14",
+          "resource_id": "fa31b8f2-ef7e-5747-963a-c46867a63b97",
+          "resource_digest": "355f4186ca9ef838eab7960059defd733b09577cd9a711cbb26419dc4e6ca875",
+          "json_pointer": "/items/2/answer",
+          "start_utf8": 0,
+          "end_utf8": 1
+        },
+        {
+          "anchor_id": "a15",
+          "resource_id": "fa31b8f2-ef7e-5747-963a-c46867a63b97",
+          "resource_digest": "355f4186ca9ef838eab7960059defd733b09577cd9a711cbb26419dc4e6ca875",
+          "json_pointer": "/items/2/explanation",
+          "start_utf8": 0,
+          "end_utf8": 39
+        },
+        {
+          "anchor_id": "a16",
+          "resource_id": "fa31b8f2-ef7e-5747-963a-c46867a63b97",
+          "resource_digest": "355f4186ca9ef838eab7960059defd733b09577cd9a711cbb26419dc4e6ca875",
+          "json_pointer": "/items/2/id",
+          "start_utf8": 0,
+          "end_utf8": 2
+        },
+        {
+          "anchor_id": "a17",
+          "resource_id": "fa31b8f2-ef7e-5747-963a-c46867a63b97",
+          "resource_digest": "355f4186ca9ef838eab7960059defd733b09577cd9a711cbb26419dc4e6ca875",
+          "json_pointer": "/items/2/question",
+          "start_utf8": 0,
+          "end_utf8": 107
+        }
+      ],
+      "digest": "d35dedf5a2a8d6becfe22ee135dfcc256e8fa8c036d8bf020d430fdf610f6762"
+    },
+    "reference_context": {
+      "source": {
+        "reference_id": "graph-node:mvp-0.2.0:c-pointer",
+        "version": "mvp-0.2.0",
+        "digest": "038e80d56854aedbfc8a65e828b514eb532ebfea54abf7b933ebfe79f8b0dfdc"
+      },
+      "node": {
+        "id": "c-pointer",
+        "name": "C 指针",
+        "chapter": "C 基础",
+        "difficulty": 1,
+        "description": "保存内存地址、可以间接访问对象的 C 语言变量。",
+        "prerequisites": [],
+        "learning_objectives": [
+          "区分指针值、地址和所指对象",
+          "安全地使用取地址和解引用运算符"
+        ],
+        "common_misconceptions": [
+          "指针就是数组",
+          "未初始化指针可以直接解引用"
+        ],
+        "ai_context": "将指针表示为带有地址标签的箭头，明确分开变量框和其指向的对象。",
+        "mastery_rule_key": "linear-structure-v1"
+      },
+      "learner_evidence": {},
+      "scope": "Background only, not certification of this example."
+    },
+    "teaching_context": {
+      "version": "teaching-node-binding-v1",
+      "teaching_mode": "target",
+      "target_node_id": "c-pointer",
+      "recommended_node_id": "c-pointer",
+      "teaching_node_id": "c-pointer",
+      "selection_reason": "direct_target",
+      "original_request": "说明C指针形参能否清空调用方head，依据实际形参、赋值和调用点判断释放后安全；给出讲解、代码和三题。不要求数组求和或动画。",
+      "segment_goal": "说明C指针形参能否清空调用方head，依据实际形参、赋值和调用点判断释放后安全；给出讲解、代码和三题。不要求数组求和或动画。",
+      "segment_scope": "target_lesson",
+      "path_version_id": "8e6afea2-030a-5327-9106-194b4395b517",
+      "path_version": 1,
+      "graph_version": "mvp-0.2.0",
+      "graph_digest": "3639db6aedc9699348e63b5e7e1bdaaea3189592b19540c64e8f175aceb9ef59"
+    },
+    "unit_digest": "780c8d6d112263f12ceed6e583ee6afd4f367c89b0bc721f55c9eb01249f23cc"
+  },
+  "provenance": "Authored calibration fixture; known failure types, not holdout or live result",
+  "actual_model_result": null
+}

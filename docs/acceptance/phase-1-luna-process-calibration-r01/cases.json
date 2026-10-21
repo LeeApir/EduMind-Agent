@@ -1,0 +1,2110 @@
+{
+  "cal-01": {
+    "material": {
+      "binding": {
+        "owner_id": "0cd03dd1-0b9d-5fbc-a806-7fe1d9ecf6ea",
+        "unit_id": "ff1e975f-5f63-5820-8ea4-2e45368717ff",
+        "operation_id": "2d7591a6-e774-5bd9-8c68-b6ca3d65e09a",
+        "plan_id": "719ffa85-7b0c-59a0-a19e-ae80f0685e32",
+        "plan_version": 1,
+        "plan_digest": "bd4f2f462c54579b6fc1bba9e2ee646bc4c18548b5001fbe6015dd77f8af0ac9",
+        "input_digest": "ba572617257a74eaa9ac4aab094a21136a9224434221c12f50f5480cacd8bfc2",
+        "references_digest": "1335b93c5c57bca280ff7d4076dbd2c6cd8c0bc14bf154738dada80dc5e6281e",
+        "policy_version": "hybrid-review-v1",
+        "policy_digest": "747ec507e0f011d8a82e74d3823964fc2f860ab23693f71e695273ebf696fdad"
+      },
+      "plan": {
+        "objectives": [
+          {
+            "id": "local",
+            "text": "用C实现并明确追踪数组{3,8,4}求和循环的关键状态和退出条件，并用题目检查是否掌握这个过程。"
+          }
+        ],
+        "terminology": [
+          {
+            "term": "返回值",
+            "meaning": "函数交给调用方的值，不等于打印"
+          }
+        ],
+        "conventions": {
+          "index_base": 0,
+          "capacity": 3,
+          "state_representation": "s为已处理元素总和，i为下一处理下标",
+          "not_applicable_reasons": []
+        },
+        "shared_example": {
+          "input_description": "a={3,8,4}",
+          "initial_state": "s=0,i=0",
+          "steps": [
+            {
+              "operation": "执行固定示例",
+              "expected_state": "s为3、11、15，i=3退出",
+              "expected_output": "无打印，返回15"
+            }
+          ]
+        },
+        "prerequisite_node_ids": [],
+        "scenes": [
+          {
+            "role": "explanation",
+            "scene_key": "explanation",
+            "objective_ids": [
+              "local"
+            ],
+            "depends_on": []
+          },
+          {
+            "role": "code",
+            "scene_key": "code",
+            "objective_ids": [
+              "local"
+            ],
+            "depends_on": [
+              "explanation"
+            ]
+          },
+          {
+            "role": "exercise",
+            "scene_key": "exercise",
+            "objective_ids": [
+              "local"
+            ],
+            "depends_on": [
+              "explanation",
+              "code"
+            ]
+          }
+        ],
+        "node_id": "array",
+        "graph_version": "mvp-0.2.0",
+        "graph_digest": "3639db6aedc9699348e63b5e7e1bdaaea3189592b19540c64e8f175aceb9ef59",
+        "profile_version": null,
+        "profile_evidence_digest": "8838fdd11ee58e08fd54a21272313e784012370b7cf0a2cde8b823ed8806d85d",
+        "goal": "用C实现并明确追踪数组{3,8,4}求和循环的关键状态和退出条件，并用题目检查是否掌握这个过程。",
+        "code_language": "C",
+        "schema_version": "learning-plan-v1",
+        "references": [
+          {
+            "reference_id": "graph-node:mvp-0.2.0:array",
+            "version": "mvp-0.2.0",
+            "digest": "f83fd12e754fcda4124aa62b8a29203d97a897605d23dc4e37877393dcb0015d"
+          }
+        ]
+      },
+      "candidates": [
+        {
+          "resource_id": "0a95ceb1-0299-5455-b8c7-63e11c336b91",
+          "role": "explanation",
+          "envelope": {
+            "resource_type": "explanation",
+            "prompt_version": "learning-resources-v1",
+            "content": {
+              "markdown": "本节仅追踪一个数组求和过程，不承诺覆盖整个数组节点。函数total返回15；没有打印。开始s=0；i=0后s=3，i=1后s=11，i=2后s=15；随后i=3，i<3为假，退出，返回15。"
+            }
+          },
+          "content_digest": "231a158ad0859b38ed2f448c6d8eb8786fea7350cfc9666541e58cafe7f67c0b",
+          "dependency_digest": "662c556857e7b91c1afb24b42ad65f35de7ca86840e89d9164e03e45bf349d90",
+          "upstream": []
+        },
+        {
+          "resource_id": "83d19284-dfcb-5d26-9763-8270068f25e2",
+          "role": "code",
+          "envelope": {
+            "resource_type": "code",
+            "prompt_version": "learning-resources-v1",
+            "content": {
+              "language": "C",
+              "source": "int total(void) {\n    int a[3] = {3, 8, 4};\n    int s = 0;\n    for (int i = 0; i < 3; ++i) s += a[i];\n    return s;\n}",
+              "expected_output": "无标准输出；由调用方获取返回值。",
+              "key_steps": [
+                "处理下标0、1、2，分别累加。",
+                "在i=3时退出，返回累计和。"
+              ],
+              "display_only": true
+            }
+          },
+          "content_digest": "229b73713cd20cd33b3919fd5af8b16556481758f363f3e7c1bda5941539e3e9",
+          "dependency_digest": "2adb6e281e8c00bc60039f83b2120cfb5d4bf81d7895672035b0c72c6132e007",
+          "upstream": [
+            {
+              "resource_id": "0a95ceb1-0299-5455-b8c7-63e11c336b91",
+              "content_digest": "231a158ad0859b38ed2f448c6d8eb8786fea7350cfc9666541e58cafe7f67c0b",
+              "dependency_digest": "662c556857e7b91c1afb24b42ad65f35de7ca86840e89d9164e03e45bf349d90"
+            }
+          ]
+        },
+        {
+          "resource_id": "9b7cdc76-0691-597b-92c6-5154e426c0bb",
+          "role": "exercise",
+          "envelope": {
+            "resource_type": "exercise",
+            "prompt_version": "learning-resources-v1",
+            "content": {
+              "items": [
+                {
+                  "id": "q1",
+                  "question": "[判断题] 不直接复述讲解：从s=0出发，按代码逐轮推演，先在草稿中推算i=0、i=1两轮各自结束时的s，再判断‘i=1这一轮结束后s=12’是否成立。仅填 T 或 F（T=正确，F=错误）。",
+                  "answer": "F",
+                  "explanation": "i=0时s=0+3=3；i=1时s=3+8=11，因此题中12不成立。"
+                },
+                {
+                  "id": "q2",
+                  "question": "[判断题] 请继续推演循环：找出第一次条件检查失败时的i，判断是否会执行访问a[3]的循环体，再判断‘首次失败时i=4，且此前循环体处理过a[3]’是否成立。仅填 T 或 F（T=正确，F=错误）。",
+                  "answer": "F",
+                  "explanation": "i=2这一轮后s=15，递增i至3；检查3<3为假，立即退出，不执行a[3]，不是到i=4才退出。"
+                },
+                {
+                  "id": "q3",
+                  "question": "[判断题] ‘函数将累计和作为返回值交给调用方，但自身不打印。’仅填 T 或 F（T=正确，F=错误）。",
+                  "answer": "T",
+                  "explanation": "函数执行return s，没有打印语句。"
+                }
+              ]
+            }
+          },
+          "content_digest": "41532ed90b8ef378c1a7c65c52399bcc75b2228098ca15921f4246915a5b2aba",
+          "dependency_digest": "717542368b0f53de3d58d03d449876ee3b4194c9438fdf71404706a181ad5e60",
+          "upstream": [
+            {
+              "resource_id": "0a95ceb1-0299-5455-b8c7-63e11c336b91",
+              "content_digest": "231a158ad0859b38ed2f448c6d8eb8786fea7350cfc9666541e58cafe7f67c0b",
+              "dependency_digest": "662c556857e7b91c1afb24b42ad65f35de7ca86840e89d9164e03e45bf349d90"
+            },
+            {
+              "resource_id": "83d19284-dfcb-5d26-9763-8270068f25e2",
+              "content_digest": "229b73713cd20cd33b3919fd5af8b16556481758f363f3e7c1bda5941539e3e9",
+              "dependency_digest": "2adb6e281e8c00bc60039f83b2120cfb5d4bf81d7895672035b0c72c6132e007"
+            }
+          ]
+        }
+      ],
+      "scenes": [
+        {
+          "role": "explanation",
+          "scene_key": "explanation",
+          "scene_id": "f24dfacf-9f14-576d-b927-b223a39a9f3d",
+          "scene_version": 1,
+          "resource_id": "0a95ceb1-0299-5455-b8c7-63e11c336b91",
+          "resource_digest": "231a158ad0859b38ed2f448c6d8eb8786fea7350cfc9666541e58cafe7f67c0b",
+          "dependency_digest": "662c556857e7b91c1afb24b42ad65f35de7ca86840e89d9164e03e45bf349d90"
+        },
+        {
+          "role": "code",
+          "scene_key": "code",
+          "scene_id": "5bd7b07e-3a5e-56ab-8f85-2b9029a39c30",
+          "scene_version": 1,
+          "resource_id": "83d19284-dfcb-5d26-9763-8270068f25e2",
+          "resource_digest": "229b73713cd20cd33b3919fd5af8b16556481758f363f3e7c1bda5941539e3e9",
+          "dependency_digest": "2adb6e281e8c00bc60039f83b2120cfb5d4bf81d7895672035b0c72c6132e007"
+        },
+        {
+          "role": "exercise",
+          "scene_key": "exercise",
+          "scene_id": "b3e19893-0daa-5466-8edc-3a2a02e2e920",
+          "scene_version": 1,
+          "resource_id": "9b7cdc76-0691-597b-92c6-5154e426c0bb",
+          "resource_digest": "41532ed90b8ef378c1a7c65c52399bcc75b2228098ca15921f4246915a5b2aba",
+          "dependency_digest": "717542368b0f53de3d58d03d449876ee3b4194c9438fdf71404706a181ad5e60"
+        }
+      ],
+      "actions": {
+        "version": "teaching-actions-v1",
+        "actions": [
+          {
+            "kind": "show_resource",
+            "scene_key": "explanation",
+            "resource_id": "0a95ceb1-0299-5455-b8c7-63e11c336b91",
+            "resource_digest": "231a158ad0859b38ed2f448c6d8eb8786fea7350cfc9666541e58cafe7f67c0b"
+          },
+          {
+            "kind": "show_resource",
+            "scene_key": "code",
+            "resource_id": "83d19284-dfcb-5d26-9763-8270068f25e2",
+            "resource_digest": "229b73713cd20cd33b3919fd5af8b16556481758f363f3e7c1bda5941539e3e9"
+          },
+          {
+            "kind": "highlight",
+            "scene_key": "code",
+            "resource_id": "83d19284-dfcb-5d26-9763-8270068f25e2",
+            "resource_digest": "229b73713cd20cd33b3919fd5af8b16556481758f363f3e7c1bda5941539e3e9",
+            "anchor_id": "a3"
+          },
+          {
+            "kind": "highlight",
+            "scene_key": "code",
+            "resource_id": "83d19284-dfcb-5d26-9763-8270068f25e2",
+            "resource_digest": "229b73713cd20cd33b3919fd5af8b16556481758f363f3e7c1bda5941539e3e9",
+            "anchor_id": "a4"
+          },
+          {
+            "kind": "show_resource",
+            "scene_key": "exercise",
+            "resource_id": "9b7cdc76-0691-597b-92c6-5154e426c0bb",
+            "resource_digest": "41532ed90b8ef378c1a7c65c52399bcc75b2228098ca15921f4246915a5b2aba"
+          },
+          {
+            "kind": "ask_exercise",
+            "scene_key": "exercise",
+            "resource_id": "9b7cdc76-0691-597b-92c6-5154e426c0bb",
+            "resource_digest": "41532ed90b8ef378c1a7c65c52399bcc75b2228098ca15921f4246915a5b2aba",
+            "exercise_id": "q1"
+          },
+          {
+            "kind": "ask_exercise",
+            "scene_key": "exercise",
+            "resource_id": "9b7cdc76-0691-597b-92c6-5154e426c0bb",
+            "resource_digest": "41532ed90b8ef378c1a7c65c52399bcc75b2228098ca15921f4246915a5b2aba",
+            "exercise_id": "q2"
+          },
+          {
+            "kind": "ask_exercise",
+            "scene_key": "exercise",
+            "resource_id": "9b7cdc76-0691-597b-92c6-5154e426c0bb",
+            "resource_digest": "41532ed90b8ef378c1a7c65c52399bcc75b2228098ca15921f4246915a5b2aba",
+            "exercise_id": "q3"
+          }
+        ],
+        "anchor_catalog": [
+          {
+            "anchor_id": "a1",
+            "resource_id": "0a95ceb1-0299-5455-b8c7-63e11c336b91",
+            "resource_digest": "231a158ad0859b38ed2f448c6d8eb8786fea7350cfc9666541e58cafe7f67c0b",
+            "json_pointer": "/markdown",
+            "start_utf8": 0,
+            "end_utf8": 209
+          },
+          {
+            "anchor_id": "a2",
+            "resource_id": "83d19284-dfcb-5d26-9763-8270068f25e2",
+            "resource_digest": "229b73713cd20cd33b3919fd5af8b16556481758f363f3e7c1bda5941539e3e9",
+            "json_pointer": "/expected_output",
+            "start_utf8": 0,
+            "end_utf8": 48
+          },
+          {
+            "anchor_id": "a3",
+            "resource_id": "83d19284-dfcb-5d26-9763-8270068f25e2",
+            "resource_digest": "229b73713cd20cd33b3919fd5af8b16556481758f363f3e7c1bda5941539e3e9",
+            "json_pointer": "/key_steps/0",
+            "start_utf8": 0,
+            "end_utf8": 39
+          },
+          {
+            "anchor_id": "a4",
+            "resource_id": "83d19284-dfcb-5d26-9763-8270068f25e2",
+            "resource_digest": "229b73713cd20cd33b3919fd5af8b16556481758f363f3e7c1bda5941539e3e9",
+            "json_pointer": "/key_steps/1",
+            "start_utf8": 0,
+            "end_utf8": 36
+          },
+          {
+            "anchor_id": "a5",
+            "resource_id": "83d19284-dfcb-5d26-9763-8270068f25e2",
+            "resource_digest": "229b73713cd20cd33b3919fd5af8b16556481758f363f3e7c1bda5941539e3e9",
+            "json_pointer": "/language",
+            "start_utf8": 0,
+            "end_utf8": 1
+          },
+          {
+            "anchor_id": "a6",
+            "resource_id": "83d19284-dfcb-5d26-9763-8270068f25e2",
+            "resource_digest": "229b73713cd20cd33b3919fd5af8b16556481758f363f3e7c1bda5941539e3e9",
+            "json_pointer": "/source",
+            "start_utf8": 0,
+            "end_utf8": 117
+          },
+          {
+            "anchor_id": "a7",
+            "resource_id": "9b7cdc76-0691-597b-92c6-5154e426c0bb",
+            "resource_digest": "41532ed90b8ef378c1a7c65c52399bcc75b2228098ca15921f4246915a5b2aba",
+            "json_pointer": "/items/0/answer",
+            "start_utf8": 0,
+            "end_utf8": 1
+          },
+          {
+            "anchor_id": "a8",
+            "resource_id": "9b7cdc76-0691-597b-92c6-5154e426c0bb",
+            "resource_digest": "41532ed90b8ef378c1a7c65c52399bcc75b2228098ca15921f4246915a5b2aba",
+            "json_pointer": "/items/0/explanation",
+            "start_utf8": 0,
+            "end_utf8": 59
+          },
+          {
+            "anchor_id": "a9",
+            "resource_id": "9b7cdc76-0691-597b-92c6-5154e426c0bb",
+            "resource_digest": "41532ed90b8ef378c1a7c65c52399bcc75b2228098ca15921f4246915a5b2aba",
+            "json_pointer": "/items/0/id",
+            "start_utf8": 0,
+            "end_utf8": 2
+          },
+          {
+            "anchor_id": "a10",
+            "resource_id": "9b7cdc76-0691-597b-92c6-5154e426c0bb",
+            "resource_digest": "41532ed90b8ef378c1a7c65c52399bcc75b2228098ca15921f4246915a5b2aba",
+            "json_pointer": "/items/0/question",
+            "start_utf8": 0,
+            "end_utf8": 230
+          },
+          {
+            "anchor_id": "a11",
+            "resource_id": "9b7cdc76-0691-597b-92c6-5154e426c0bb",
+            "resource_digest": "41532ed90b8ef378c1a7c65c52399bcc75b2228098ca15921f4246915a5b2aba",
+            "json_pointer": "/items/1/answer",
+            "start_utf8": 0,
+            "end_utf8": 1
+          },
+          {
+            "anchor_id": "a12",
+            "resource_id": "9b7cdc76-0691-597b-92c6-5154e426c0bb",
+            "resource_digest": "41532ed90b8ef378c1a7c65c52399bcc75b2228098ca15921f4246915a5b2aba",
+            "json_pointer": "/items/1/explanation",
+            "start_utf8": 0,
+            "end_utf8": 109
+          },
+          {
+            "anchor_id": "a13",
+            "resource_id": "9b7cdc76-0691-597b-92c6-5154e426c0bb",
+            "resource_digest": "41532ed90b8ef378c1a7c65c52399bcc75b2228098ca15921f4246915a5b2aba",
+            "json_pointer": "/items/1/id",
+            "start_utf8": 0,
+            "end_utf8": 2
+          },
+          {
+            "anchor_id": "a14",
+            "resource_id": "9b7cdc76-0691-597b-92c6-5154e426c0bb",
+            "resource_digest": "41532ed90b8ef378c1a7c65c52399bcc75b2228098ca15921f4246915a5b2aba",
+            "json_pointer": "/items/1/question",
+            "start_utf8": 0,
+            "end_utf8": 249
+          },
+          {
+            "anchor_id": "a15",
+            "resource_id": "9b7cdc76-0691-597b-92c6-5154e426c0bb",
+            "resource_digest": "41532ed90b8ef378c1a7c65c52399bcc75b2228098ca15921f4246915a5b2aba",
+            "json_pointer": "/items/2/answer",
+            "start_utf8": 0,
+            "end_utf8": 1
+          },
+          {
+            "anchor_id": "a16",
+            "resource_id": "9b7cdc76-0691-597b-92c6-5154e426c0bb",
+            "resource_digest": "41532ed90b8ef378c1a7c65c52399bcc75b2228098ca15921f4246915a5b2aba",
+            "json_pointer": "/items/2/explanation",
+            "start_utf8": 0,
+            "end_utf8": 44
+          },
+          {
+            "anchor_id": "a17",
+            "resource_id": "9b7cdc76-0691-597b-92c6-5154e426c0bb",
+            "resource_digest": "41532ed90b8ef378c1a7c65c52399bcc75b2228098ca15921f4246915a5b2aba",
+            "json_pointer": "/items/2/id",
+            "start_utf8": 0,
+            "end_utf8": 2
+          },
+          {
+            "anchor_id": "a18",
+            "resource_id": "9b7cdc76-0691-597b-92c6-5154e426c0bb",
+            "resource_digest": "41532ed90b8ef378c1a7c65c52399bcc75b2228098ca15921f4246915a5b2aba",
+            "json_pointer": "/items/2/question",
+            "start_utf8": 0,
+            "end_utf8": 132
+          }
+        ],
+        "digest": "e335975c5462d614d59b78707484a2f2aa96f826420b4c9e3ea0a81de94b0c9f"
+      },
+      "reference_context": {
+        "source": {
+          "reference_id": "graph-node:mvp-0.2.0:array",
+          "version": "mvp-0.2.0",
+          "digest": "f83fd12e754fcda4124aa62b8a29203d97a897605d23dc4e37877393dcb0015d"
+        },
+        "node": {
+          "id": "array",
+          "name": "数组",
+          "chapter": "线性表",
+          "difficulty": 1,
+          "description": "使用连续存储空间、通过下标访问元素的线性结构。",
+          "prerequisites": [],
+          "learning_objectives": [
+            "说出下标访问的时间复杂度",
+            "说明连续存储对插入和删除的影响"
+          ],
+          "common_misconceptions": [
+            "数组每次访问都要从头遍历",
+            "数组插入总是 O(1)"
+          ],
+          "ai_context": "使用连续格子和下标精灵的图示，对比中间插入时的元素搬移。",
+          "mastery_rule_key": "linear-structure-v1"
+        },
+        "learner_evidence": {},
+        "scope": "Background only; not proof of this example."
+      },
+      "teaching_context": {
+        "version": "teaching-node-binding-v1",
+        "teaching_mode": "target",
+        "target_node_id": "array",
+        "recommended_node_id": "array",
+        "teaching_node_id": "array",
+        "selection_reason": "direct_target",
+        "original_request": "用C实现并明确追踪数组{3,8,4}求和循环的关键状态和退出条件，并用题目检查是否掌握这个过程。",
+        "segment_goal": "用C实现并明确追踪数组{3,8,4}求和循环的关键状态和退出条件，并用题目检查是否掌握这个过程。",
+        "segment_scope": "target_lesson",
+        "path_version_id": "4c276cc4-fc39-5997-a434-b9bc4bb4009c",
+        "path_version": 1,
+        "graph_version": "mvp-0.2.0",
+        "graph_digest": "3639db6aedc9699348e63b5e7e1bdaaea3189592b19540c64e8f175aceb9ef59"
+      },
+      "unit_digest": "26d5c32fe1784360b016d71d0ca2bd2c1890b11e5158d2e24409751d65205c66"
+    },
+    "input_snapshot": {
+      "metadata": {
+        "node_id": "array",
+        "graph_version": "mvp-0.2.0",
+        "graph_digest": "3639db6aedc9699348e63b5e7e1bdaaea3189592b19540c64e8f175aceb9ef59",
+        "profile_version": null,
+        "profile_evidence_digest": "8838fdd11ee58e08fd54a21272313e784012370b7cf0a2cde8b823ed8806d85d",
+        "goal": "用C实现并明确追踪数组{3,8,4}求和循环的关键状态和退出条件，并用题目检查是否掌握这个过程。",
+        "code_language": "C"
+      },
+      "references": {
+        "graph-node:mvp-0.2.0:array": {
+          "reference_id": "graph-node:mvp-0.2.0:array",
+          "version": "mvp-0.2.0",
+          "digest": "f83fd12e754fcda4124aa62b8a29203d97a897605d23dc4e37877393dcb0015d"
+        }
+      },
+      "learner_evidence": {},
+      "node_ids": [
+        "array",
+        "array-stack",
+        "balanced-binary-search-tree",
+        "binary-heap",
+        "binary-search-tree",
+        "binary-tree",
+        "binary-tree-traversal",
+        "breadth-first-search",
+        "bubble-sort",
+        "c-pointer",
+        "circular-linked-list",
+        "circular-queue",
+        "depth-first-search",
+        "doubly-linked-list",
+        "graph-representation",
+        "heap-sort",
+        "insertion-sort",
+        "linked-list-concept",
+        "linked-list-deletion",
+        "linked-list-insertion",
+        "linked-list-traversal",
+        "linked-stack",
+        "merge-sort",
+        "queue",
+        "quick-sort",
+        "selection-sort",
+        "single-linked-list",
+        "sorting-comparison",
+        "stack",
+        "tree-concept"
+      ],
+      "teaching_context": {
+        "version": "teaching-node-binding-v1",
+        "teaching_mode": "target",
+        "target_node_id": "array",
+        "recommended_node_id": "array",
+        "teaching_node_id": "array",
+        "selection_reason": "direct_target",
+        "original_request": "用C实现并明确追踪数组{3,8,4}求和循环的关键状态和退出条件，并用题目检查是否掌握这个过程。",
+        "segment_goal": "用C实现并明确追踪数组{3,8,4}求和循环的关键状态和退出条件，并用题目检查是否掌握这个过程。",
+        "segment_scope": "target_lesson",
+        "path_version_id": "4c276cc4-fc39-5997-a434-b9bc4bb4009c",
+        "path_version": 1,
+        "graph_version": "mvp-0.2.0",
+        "graph_digest": "3639db6aedc9699348e63b5e7e1bdaaea3189592b19540c64e8f175aceb9ef59"
+      }
+    },
+    "fixture_kind": "complete",
+    "provenance": "authored after observed Luna failure for criterion calibration; NOT independent/holdout/formal test",
+    "scope": "unit"
+  },
+  "cal-02": {
+    "material": {
+      "binding": {
+        "owner_id": "615d4967-1510-54c8-b4ea-d8f4edd2a240",
+        "unit_id": "c7099a82-3d74-502f-a205-0a02db5e0c7e",
+        "operation_id": "1419be1c-421c-5e72-a521-272caa486567",
+        "plan_id": "353e8c04-e128-58d5-ac90-fbdd84172da8",
+        "plan_version": 1,
+        "plan_digest": "bd4f2f462c54579b6fc1bba9e2ee646bc4c18548b5001fbe6015dd77f8af0ac9",
+        "input_digest": "438619eee4d3437e976b5c7468819ee97e5b52537b030e1461167263044a8a91",
+        "references_digest": "1335b93c5c57bca280ff7d4076dbd2c6cd8c0bc14bf154738dada80dc5e6281e",
+        "policy_version": "hybrid-review-v1",
+        "policy_digest": "747ec507e0f011d8a82e74d3823964fc2f860ab23693f71e695273ebf696fdad"
+      },
+      "plan": {
+        "objectives": [
+          {
+            "id": "local",
+            "text": "用C实现并明确追踪数组{3,8,4}求和循环的关键状态和退出条件，并用题目检查是否掌握这个过程。"
+          }
+        ],
+        "terminology": [
+          {
+            "term": "返回值",
+            "meaning": "函数交给调用方的值，不等于打印"
+          }
+        ],
+        "conventions": {
+          "index_base": 0,
+          "capacity": 3,
+          "state_representation": "s为已处理元素总和，i为下一处理下标",
+          "not_applicable_reasons": []
+        },
+        "shared_example": {
+          "input_description": "a={3,8,4}",
+          "initial_state": "s=0,i=0",
+          "steps": [
+            {
+              "operation": "执行固定示例",
+              "expected_state": "s为3、11、15，i=3退出",
+              "expected_output": "无打印，返回15"
+            }
+          ]
+        },
+        "prerequisite_node_ids": [],
+        "scenes": [
+          {
+            "role": "explanation",
+            "scene_key": "explanation",
+            "objective_ids": [
+              "local"
+            ],
+            "depends_on": []
+          },
+          {
+            "role": "code",
+            "scene_key": "code",
+            "objective_ids": [
+              "local"
+            ],
+            "depends_on": [
+              "explanation"
+            ]
+          },
+          {
+            "role": "exercise",
+            "scene_key": "exercise",
+            "objective_ids": [
+              "local"
+            ],
+            "depends_on": [
+              "explanation",
+              "code"
+            ]
+          }
+        ],
+        "node_id": "array",
+        "graph_version": "mvp-0.2.0",
+        "graph_digest": "3639db6aedc9699348e63b5e7e1bdaaea3189592b19540c64e8f175aceb9ef59",
+        "profile_version": null,
+        "profile_evidence_digest": "8838fdd11ee58e08fd54a21272313e784012370b7cf0a2cde8b823ed8806d85d",
+        "goal": "用C实现并明确追踪数组{3,8,4}求和循环的关键状态和退出条件，并用题目检查是否掌握这个过程。",
+        "code_language": "C",
+        "schema_version": "learning-plan-v1",
+        "references": [
+          {
+            "reference_id": "graph-node:mvp-0.2.0:array",
+            "version": "mvp-0.2.0",
+            "digest": "f83fd12e754fcda4124aa62b8a29203d97a897605d23dc4e37877393dcb0015d"
+          }
+        ]
+      },
+      "candidates": [
+        {
+          "resource_id": "ce1ede44-41c8-5ba2-b6c6-e68a05a2dd20",
+          "role": "explanation",
+          "envelope": {
+            "resource_type": "explanation",
+            "prompt_version": "learning-resources-v1",
+            "content": {
+              "markdown": "本节用total追踪数组{3,8,4}求和，返回15，无打印；关键状态在代码步骤中，退出边界在练习解析中。仅覆盖该求和过程，不承诺完整数组节点。"
+            }
+          },
+          "content_digest": "61c3fc925859d92414a5fe4f6dacfba47dac5e43d694195d32a4af25c70507cd",
+          "dependency_digest": "e8ebe38f01b6afd89d650c5f9d4ebc5c5e147b0cd50990ebca8b1f727cf958f3",
+          "upstream": []
+        },
+        {
+          "resource_id": "d7cdfbd1-a666-5670-80a6-a1a984702848",
+          "role": "code",
+          "envelope": {
+            "resource_type": "code",
+            "prompt_version": "learning-resources-v1",
+            "content": {
+              "language": "C",
+              "source": "int total(void) {\n    int a[3] = {3, 8, 4};\n    int s = 0;\n    for (int i = 0; i < 3; ++i) s += a[i];\n    return s;\n}",
+              "expected_output": "无标准输出；由调用方获取返回值。",
+              "key_steps": [
+                "初始s=0；i=0时先加a[0]=3得到s=3；i=1时加a[1]=8得到s=11；i=2时加a[2]=4得到s=15。",
+                "退出边界和是否执行a[3]见q2解析；这里不把内部计划当已交付内容。"
+              ],
+              "display_only": true
+            }
+          },
+          "content_digest": "57e1e73992a01e2464847f57e12a169d8c26761accfd1c046333d3fbd0bc68aa",
+          "dependency_digest": "444269f36294558733ac6d696dc620cf989a8148772699687754c4715294d9ee",
+          "upstream": [
+            {
+              "resource_id": "ce1ede44-41c8-5ba2-b6c6-e68a05a2dd20",
+              "content_digest": "61c3fc925859d92414a5fe4f6dacfba47dac5e43d694195d32a4af25c70507cd",
+              "dependency_digest": "e8ebe38f01b6afd89d650c5f9d4ebc5c5e147b0cd50990ebca8b1f727cf958f3"
+            }
+          ]
+        },
+        {
+          "resource_id": "f6defafa-69a5-53b7-a69d-a5b25b7670be",
+          "role": "exercise",
+          "envelope": {
+            "resource_type": "exercise",
+            "prompt_version": "learning-resources-v1",
+            "content": {
+              "items": [
+                {
+                  "id": "q1",
+                  "question": "[判断题] 不直接复述讲解：从s=0出发，按代码逐轮推演，先在草稿中推算i=0、i=1两轮各自结束时的s，再判断‘i=1这一轮结束后s=12’是否成立。仅填 T 或 F（T=正确，F=错误）。",
+                  "answer": "F",
+                  "explanation": "i=0时s=0+3=3；i=1时s=3+8=11，因此题中12不成立。"
+                },
+                {
+                  "id": "q2",
+                  "question": "[判断题] 请继续推演循环：找出第一次条件检查失败时的i，判断是否会执行访问a[3]的循环体，再判断‘首次失败时i=4，且此前循环体处理过a[3]’是否成立。仅填 T 或 F（T=正确，F=错误）。",
+                  "answer": "F",
+                  "explanation": "i=2这一轮后s=15，递增i至3；检查3<3为假，立即退出，不执行a[3]，不是到i=4才退出。"
+                },
+                {
+                  "id": "q3",
+                  "question": "[判断题] ‘函数将累计和作为返回值交给调用方，但自身不打印。’仅填 T 或 F（T=正确，F=错误）。",
+                  "answer": "T",
+                  "explanation": "函数执行return s，没有打印语句。"
+                }
+              ]
+            }
+          },
+          "content_digest": "41532ed90b8ef378c1a7c65c52399bcc75b2228098ca15921f4246915a5b2aba",
+          "dependency_digest": "6ccc5c6f7508ca6fe2ed83c86794be9b0d2c0dd2eeb9b2dc5728e45ad116354d",
+          "upstream": [
+            {
+              "resource_id": "ce1ede44-41c8-5ba2-b6c6-e68a05a2dd20",
+              "content_digest": "61c3fc925859d92414a5fe4f6dacfba47dac5e43d694195d32a4af25c70507cd",
+              "dependency_digest": "e8ebe38f01b6afd89d650c5f9d4ebc5c5e147b0cd50990ebca8b1f727cf958f3"
+            },
+            {
+              "resource_id": "d7cdfbd1-a666-5670-80a6-a1a984702848",
+              "content_digest": "57e1e73992a01e2464847f57e12a169d8c26761accfd1c046333d3fbd0bc68aa",
+              "dependency_digest": "444269f36294558733ac6d696dc620cf989a8148772699687754c4715294d9ee"
+            }
+          ]
+        }
+      ],
+      "scenes": [
+        {
+          "role": "explanation",
+          "scene_key": "explanation",
+          "scene_id": "e0cbf408-bf4d-5d7a-a704-2d98f84e94cc",
+          "scene_version": 1,
+          "resource_id": "ce1ede44-41c8-5ba2-b6c6-e68a05a2dd20",
+          "resource_digest": "61c3fc925859d92414a5fe4f6dacfba47dac5e43d694195d32a4af25c70507cd",
+          "dependency_digest": "e8ebe38f01b6afd89d650c5f9d4ebc5c5e147b0cd50990ebca8b1f727cf958f3"
+        },
+        {
+          "role": "code",
+          "scene_key": "code",
+          "scene_id": "ad632f86-7586-50ad-b46c-ee7539c319b6",
+          "scene_version": 1,
+          "resource_id": "d7cdfbd1-a666-5670-80a6-a1a984702848",
+          "resource_digest": "57e1e73992a01e2464847f57e12a169d8c26761accfd1c046333d3fbd0bc68aa",
+          "dependency_digest": "444269f36294558733ac6d696dc620cf989a8148772699687754c4715294d9ee"
+        },
+        {
+          "role": "exercise",
+          "scene_key": "exercise",
+          "scene_id": "a1cd5607-1578-5b94-bd3a-50c7e30dc4ff",
+          "scene_version": 1,
+          "resource_id": "f6defafa-69a5-53b7-a69d-a5b25b7670be",
+          "resource_digest": "41532ed90b8ef378c1a7c65c52399bcc75b2228098ca15921f4246915a5b2aba",
+          "dependency_digest": "6ccc5c6f7508ca6fe2ed83c86794be9b0d2c0dd2eeb9b2dc5728e45ad116354d"
+        }
+      ],
+      "actions": {
+        "version": "teaching-actions-v1",
+        "actions": [
+          {
+            "kind": "show_resource",
+            "scene_key": "explanation",
+            "resource_id": "ce1ede44-41c8-5ba2-b6c6-e68a05a2dd20",
+            "resource_digest": "61c3fc925859d92414a5fe4f6dacfba47dac5e43d694195d32a4af25c70507cd"
+          },
+          {
+            "kind": "show_resource",
+            "scene_key": "code",
+            "resource_id": "d7cdfbd1-a666-5670-80a6-a1a984702848",
+            "resource_digest": "57e1e73992a01e2464847f57e12a169d8c26761accfd1c046333d3fbd0bc68aa"
+          },
+          {
+            "kind": "highlight",
+            "scene_key": "code",
+            "resource_id": "d7cdfbd1-a666-5670-80a6-a1a984702848",
+            "resource_digest": "57e1e73992a01e2464847f57e12a169d8c26761accfd1c046333d3fbd0bc68aa",
+            "anchor_id": "a3"
+          },
+          {
+            "kind": "highlight",
+            "scene_key": "code",
+            "resource_id": "d7cdfbd1-a666-5670-80a6-a1a984702848",
+            "resource_digest": "57e1e73992a01e2464847f57e12a169d8c26761accfd1c046333d3fbd0bc68aa",
+            "anchor_id": "a4"
+          },
+          {
+            "kind": "show_resource",
+            "scene_key": "exercise",
+            "resource_id": "f6defafa-69a5-53b7-a69d-a5b25b7670be",
+            "resource_digest": "41532ed90b8ef378c1a7c65c52399bcc75b2228098ca15921f4246915a5b2aba"
+          },
+          {
+            "kind": "ask_exercise",
+            "scene_key": "exercise",
+            "resource_id": "f6defafa-69a5-53b7-a69d-a5b25b7670be",
+            "resource_digest": "41532ed90b8ef378c1a7c65c52399bcc75b2228098ca15921f4246915a5b2aba",
+            "exercise_id": "q1"
+          },
+          {
+            "kind": "ask_exercise",
+            "scene_key": "exercise",
+            "resource_id": "f6defafa-69a5-53b7-a69d-a5b25b7670be",
+            "resource_digest": "41532ed90b8ef378c1a7c65c52399bcc75b2228098ca15921f4246915a5b2aba",
+            "exercise_id": "q2"
+          },
+          {
+            "kind": "ask_exercise",
+            "scene_key": "exercise",
+            "resource_id": "f6defafa-69a5-53b7-a69d-a5b25b7670be",
+            "resource_digest": "41532ed90b8ef378c1a7c65c52399bcc75b2228098ca15921f4246915a5b2aba",
+            "exercise_id": "q3"
+          }
+        ],
+        "anchor_catalog": [
+          {
+            "anchor_id": "a1",
+            "resource_id": "ce1ede44-41c8-5ba2-b6c6-e68a05a2dd20",
+            "resource_digest": "61c3fc925859d92414a5fe4f6dacfba47dac5e43d694195d32a4af25c70507cd",
+            "json_pointer": "/markdown",
+            "start_utf8": 0,
+            "end_utf8": 188
+          },
+          {
+            "anchor_id": "a2",
+            "resource_id": "d7cdfbd1-a666-5670-80a6-a1a984702848",
+            "resource_digest": "57e1e73992a01e2464847f57e12a169d8c26761accfd1c046333d3fbd0bc68aa",
+            "json_pointer": "/expected_output",
+            "start_utf8": 0,
+            "end_utf8": 48
+          },
+          {
+            "anchor_id": "a3",
+            "resource_id": "d7cdfbd1-a666-5670-80a6-a1a984702848",
+            "resource_digest": "57e1e73992a01e2464847f57e12a169d8c26761accfd1c046333d3fbd0bc68aa",
+            "json_pointer": "/key_steps/0",
+            "start_utf8": 0,
+            "end_utf8": 98
+          },
+          {
+            "anchor_id": "a4",
+            "resource_id": "d7cdfbd1-a666-5670-80a6-a1a984702848",
+            "resource_digest": "57e1e73992a01e2464847f57e12a169d8c26761accfd1c046333d3fbd0bc68aa",
+            "json_pointer": "/key_steps/1",
+            "start_utf8": 0,
+            "end_utf8": 90
+          },
+          {
+            "anchor_id": "a5",
+            "resource_id": "d7cdfbd1-a666-5670-80a6-a1a984702848",
+            "resource_digest": "57e1e73992a01e2464847f57e12a169d8c26761accfd1c046333d3fbd0bc68aa",
+            "json_pointer": "/language",
+            "start_utf8": 0,
+            "end_utf8": 1
+          },
+          {
+            "anchor_id": "a6",
+            "resource_id": "d7cdfbd1-a666-5670-80a6-a1a984702848",
+            "resource_digest": "57e1e73992a01e2464847f57e12a169d8c26761accfd1c046333d3fbd0bc68aa",
+            "json_pointer": "/source",
+            "start_utf8": 0,
+            "end_utf8": 117
+          },
+          {
+            "anchor_id": "a7",
+            "resource_id": "f6defafa-69a5-53b7-a69d-a5b25b7670be",
+            "resource_digest": "41532ed90b8ef378c1a7c65c52399bcc75b2228098ca15921f4246915a5b2aba",
+            "json_pointer": "/items/0/answer",
+            "start_utf8": 0,
+            "end_utf8": 1
+          },
+          {
+            "anchor_id": "a8",
+            "resource_id": "f6defafa-69a5-53b7-a69d-a5b25b7670be",
+            "resource_digest": "41532ed90b8ef378c1a7c65c52399bcc75b2228098ca15921f4246915a5b2aba",
+            "json_pointer": "/items/0/explanation",
+            "start_utf8": 0,
+            "end_utf8": 59
+          },
+          {
+            "anchor_id": "a9",
+            "resource_id": "f6defafa-69a5-53b7-a69d-a5b25b7670be",
+            "resource_digest": "41532ed90b8ef378c1a7c65c52399bcc75b2228098ca15921f4246915a5b2aba",
+            "json_pointer": "/items/0/id",
+            "start_utf8": 0,
+            "end_utf8": 2
+          },
+          {
+            "anchor_id": "a10",
+            "resource_id": "f6defafa-69a5-53b7-a69d-a5b25b7670be",
+            "resource_digest": "41532ed90b8ef378c1a7c65c52399bcc75b2228098ca15921f4246915a5b2aba",
+            "json_pointer": "/items/0/question",
+            "start_utf8": 0,
+            "end_utf8": 230
+          },
+          {
+            "anchor_id": "a11",
+            "resource_id": "f6defafa-69a5-53b7-a69d-a5b25b7670be",
+            "resource_digest": "41532ed90b8ef378c1a7c65c52399bcc75b2228098ca15921f4246915a5b2aba",
+            "json_pointer": "/items/1/answer",
+            "start_utf8": 0,
+            "end_utf8": 1
+          },
+          {
+            "anchor_id": "a12",
+            "resource_id": "f6defafa-69a5-53b7-a69d-a5b25b7670be",
+            "resource_digest": "41532ed90b8ef378c1a7c65c52399bcc75b2228098ca15921f4246915a5b2aba",
+            "json_pointer": "/items/1/explanation",
+            "start_utf8": 0,
+            "end_utf8": 109
+          },
+          {
+            "anchor_id": "a13",
+            "resource_id": "f6defafa-69a5-53b7-a69d-a5b25b7670be",
+            "resource_digest": "41532ed90b8ef378c1a7c65c52399bcc75b2228098ca15921f4246915a5b2aba",
+            "json_pointer": "/items/1/id",
+            "start_utf8": 0,
+            "end_utf8": 2
+          },
+          {
+            "anchor_id": "a14",
+            "resource_id": "f6defafa-69a5-53b7-a69d-a5b25b7670be",
+            "resource_digest": "41532ed90b8ef378c1a7c65c52399bcc75b2228098ca15921f4246915a5b2aba",
+            "json_pointer": "/items/1/question",
+            "start_utf8": 0,
+            "end_utf8": 249
+          },
+          {
+            "anchor_id": "a15",
+            "resource_id": "f6defafa-69a5-53b7-a69d-a5b25b7670be",
+            "resource_digest": "41532ed90b8ef378c1a7c65c52399bcc75b2228098ca15921f4246915a5b2aba",
+            "json_pointer": "/items/2/answer",
+            "start_utf8": 0,
+            "end_utf8": 1
+          },
+          {
+            "anchor_id": "a16",
+            "resource_id": "f6defafa-69a5-53b7-a69d-a5b25b7670be",
+            "resource_digest": "41532ed90b8ef378c1a7c65c52399bcc75b2228098ca15921f4246915a5b2aba",
+            "json_pointer": "/items/2/explanation",
+            "start_utf8": 0,
+            "end_utf8": 44
+          },
+          {
+            "anchor_id": "a17",
+            "resource_id": "f6defafa-69a5-53b7-a69d-a5b25b7670be",
+            "resource_digest": "41532ed90b8ef378c1a7c65c52399bcc75b2228098ca15921f4246915a5b2aba",
+            "json_pointer": "/items/2/id",
+            "start_utf8": 0,
+            "end_utf8": 2
+          },
+          {
+            "anchor_id": "a18",
+            "resource_id": "f6defafa-69a5-53b7-a69d-a5b25b7670be",
+            "resource_digest": "41532ed90b8ef378c1a7c65c52399bcc75b2228098ca15921f4246915a5b2aba",
+            "json_pointer": "/items/2/question",
+            "start_utf8": 0,
+            "end_utf8": 132
+          }
+        ],
+        "digest": "df0b13c3eb99d412a7b6cc961506e0696c0d52138911417a9e2acf3e05e48025"
+      },
+      "reference_context": {
+        "source": {
+          "reference_id": "graph-node:mvp-0.2.0:array",
+          "version": "mvp-0.2.0",
+          "digest": "f83fd12e754fcda4124aa62b8a29203d97a897605d23dc4e37877393dcb0015d"
+        },
+        "node": {
+          "id": "array",
+          "name": "数组",
+          "chapter": "线性表",
+          "difficulty": 1,
+          "description": "使用连续存储空间、通过下标访问元素的线性结构。",
+          "prerequisites": [],
+          "learning_objectives": [
+            "说出下标访问的时间复杂度",
+            "说明连续存储对插入和删除的影响"
+          ],
+          "common_misconceptions": [
+            "数组每次访问都要从头遍历",
+            "数组插入总是 O(1)"
+          ],
+          "ai_context": "使用连续格子和下标精灵的图示，对比中间插入时的元素搬移。",
+          "mastery_rule_key": "linear-structure-v1"
+        },
+        "learner_evidence": {},
+        "scope": "Background only; not proof of this example."
+      },
+      "teaching_context": {
+        "version": "teaching-node-binding-v1",
+        "teaching_mode": "target",
+        "target_node_id": "array",
+        "recommended_node_id": "array",
+        "teaching_node_id": "array",
+        "selection_reason": "direct_target",
+        "original_request": "用C实现并明确追踪数组{3,8,4}求和循环的关键状态和退出条件，并用题目检查是否掌握这个过程。",
+        "segment_goal": "用C实现并明确追踪数组{3,8,4}求和循环的关键状态和退出条件，并用题目检查是否掌握这个过程。",
+        "segment_scope": "target_lesson",
+        "path_version_id": "d05fcc8a-1349-5896-b0f6-0035703f5daf",
+        "path_version": 1,
+        "graph_version": "mvp-0.2.0",
+        "graph_digest": "3639db6aedc9699348e63b5e7e1bdaaea3189592b19540c64e8f175aceb9ef59"
+      },
+      "unit_digest": "3f46d1d25fa54fcebba624c8d890d3c5731aa08bbf5cd17ada76dd738015127f"
+    },
+    "input_snapshot": {
+      "metadata": {
+        "node_id": "array",
+        "graph_version": "mvp-0.2.0",
+        "graph_digest": "3639db6aedc9699348e63b5e7e1bdaaea3189592b19540c64e8f175aceb9ef59",
+        "profile_version": null,
+        "profile_evidence_digest": "8838fdd11ee58e08fd54a21272313e784012370b7cf0a2cde8b823ed8806d85d",
+        "goal": "用C实现并明确追踪数组{3,8,4}求和循环的关键状态和退出条件，并用题目检查是否掌握这个过程。",
+        "code_language": "C"
+      },
+      "references": {
+        "graph-node:mvp-0.2.0:array": {
+          "reference_id": "graph-node:mvp-0.2.0:array",
+          "version": "mvp-0.2.0",
+          "digest": "f83fd12e754fcda4124aa62b8a29203d97a897605d23dc4e37877393dcb0015d"
+        }
+      },
+      "learner_evidence": {},
+      "node_ids": [
+        "array",
+        "array-stack",
+        "balanced-binary-search-tree",
+        "binary-heap",
+        "binary-search-tree",
+        "binary-tree",
+        "binary-tree-traversal",
+        "breadth-first-search",
+        "bubble-sort",
+        "c-pointer",
+        "circular-linked-list",
+        "circular-queue",
+        "depth-first-search",
+        "doubly-linked-list",
+        "graph-representation",
+        "heap-sort",
+        "insertion-sort",
+        "linked-list-concept",
+        "linked-list-deletion",
+        "linked-list-insertion",
+        "linked-list-traversal",
+        "linked-stack",
+        "merge-sort",
+        "queue",
+        "quick-sort",
+        "selection-sort",
+        "single-linked-list",
+        "sorting-comparison",
+        "stack",
+        "tree-concept"
+      ],
+      "teaching_context": {
+        "version": "teaching-node-binding-v1",
+        "teaching_mode": "target",
+        "target_node_id": "array",
+        "recommended_node_id": "array",
+        "teaching_node_id": "array",
+        "selection_reason": "direct_target",
+        "original_request": "用C实现并明确追踪数组{3,8,4}求和循环的关键状态和退出条件，并用题目检查是否掌握这个过程。",
+        "segment_goal": "用C实现并明确追踪数组{3,8,4}求和循环的关键状态和退出条件，并用题目检查是否掌握这个过程。",
+        "segment_scope": "target_lesson",
+        "path_version_id": "d05fcc8a-1349-5896-b0f6-0035703f5daf",
+        "path_version": 1,
+        "graph_version": "mvp-0.2.0",
+        "graph_digest": "3639db6aedc9699348e63b5e7e1bdaaea3189592b19540c64e8f175aceb9ef59"
+      }
+    },
+    "fixture_kind": "distributed",
+    "provenance": "authored after observed Luna failure for criterion calibration; NOT independent/holdout/formal test",
+    "scope": "unit"
+  },
+  "cal-03": {
+    "material": {
+      "binding": {
+        "owner_id": "0cdfc099-49e6-5922-83e7-77f2fd7cb250",
+        "unit_id": "ab2c8e56-b14e-5684-8206-09671fba6b33",
+        "operation_id": "c36a955c-e536-51ad-a88a-9e74b10d859b",
+        "plan_id": "afde3a65-e44e-51eb-b6e2-3928c2f3777b",
+        "plan_version": 1,
+        "plan_digest": "bd4f2f462c54579b6fc1bba9e2ee646bc4c18548b5001fbe6015dd77f8af0ac9",
+        "input_digest": "448919e7e4e4e8d43172c3d21f26f51387177c40ac3811e8fc8c304c74863c65",
+        "references_digest": "1335b93c5c57bca280ff7d4076dbd2c6cd8c0bc14bf154738dada80dc5e6281e",
+        "policy_version": "hybrid-review-v1",
+        "policy_digest": "747ec507e0f011d8a82e74d3823964fc2f860ab23693f71e695273ebf696fdad"
+      },
+      "plan": {
+        "objectives": [
+          {
+            "id": "local",
+            "text": "用C实现并明确追踪数组{3,8,4}求和循环的关键状态和退出条件，并用题目检查是否掌握这个过程。"
+          }
+        ],
+        "terminology": [
+          {
+            "term": "返回值",
+            "meaning": "函数交给调用方的值，不等于打印"
+          }
+        ],
+        "conventions": {
+          "index_base": 0,
+          "capacity": 3,
+          "state_representation": "s为已处理元素总和，i为下一处理下标",
+          "not_applicable_reasons": []
+        },
+        "shared_example": {
+          "input_description": "a={3,8,4}",
+          "initial_state": "s=0,i=0",
+          "steps": [
+            {
+              "operation": "执行固定示例",
+              "expected_state": "s为3、11、15，i=3退出",
+              "expected_output": "无打印，返回15"
+            }
+          ]
+        },
+        "prerequisite_node_ids": [],
+        "scenes": [
+          {
+            "role": "explanation",
+            "scene_key": "explanation",
+            "objective_ids": [
+              "local"
+            ],
+            "depends_on": []
+          },
+          {
+            "role": "code",
+            "scene_key": "code",
+            "objective_ids": [
+              "local"
+            ],
+            "depends_on": [
+              "explanation"
+            ]
+          },
+          {
+            "role": "exercise",
+            "scene_key": "exercise",
+            "objective_ids": [
+              "local"
+            ],
+            "depends_on": [
+              "explanation",
+              "code"
+            ]
+          }
+        ],
+        "node_id": "array",
+        "graph_version": "mvp-0.2.0",
+        "graph_digest": "3639db6aedc9699348e63b5e7e1bdaaea3189592b19540c64e8f175aceb9ef59",
+        "profile_version": null,
+        "profile_evidence_digest": "8838fdd11ee58e08fd54a21272313e784012370b7cf0a2cde8b823ed8806d85d",
+        "goal": "用C实现并明确追踪数组{3,8,4}求和循环的关键状态和退出条件，并用题目检查是否掌握这个过程。",
+        "code_language": "C",
+        "schema_version": "learning-plan-v1",
+        "references": [
+          {
+            "reference_id": "graph-node:mvp-0.2.0:array",
+            "version": "mvp-0.2.0",
+            "digest": "f83fd12e754fcda4124aa62b8a29203d97a897605d23dc4e37877393dcb0015d"
+          }
+        ]
+      },
+      "candidates": [
+        {
+          "resource_id": "6f675890-21a0-5cd0-8129-c3814a822744",
+          "role": "explanation",
+          "envelope": {
+            "resource_type": "explanation",
+            "prompt_version": "learning-resources-v1",
+            "content": {
+              "markdown": "本节承诺用C实现并追踪数组{3,8,4}求和的关键状态及退出条件，并用题目检查过程掌握。下面给出正确实现，函数返回15，无打印；请自行阅读代码。"
+            }
+          },
+          "content_digest": "c3121d5c61920f1a73fec47c28f38576e04d379c478e0c0f0992c2ff99938631",
+          "dependency_digest": "b3fbcf16ce1d2ef5d1cd415115df2cb7446681a0bb920ecfa6777424aea0e750",
+          "upstream": []
+        },
+        {
+          "resource_id": "152eff97-02e4-5773-b7c8-f3e4983bcbd8",
+          "role": "code",
+          "envelope": {
+            "resource_type": "code",
+            "prompt_version": "learning-resources-v1",
+            "content": {
+              "language": "C",
+              "source": "int total(void) {\n    int a[3] = {3, 8, 4};\n    int s = 0;\n    for (int i = 0; i < 3; ++i) s += a[i];\n    return s;\n}",
+              "expected_output": "无标准输出；由调用方获取返回值。",
+              "key_steps": [
+                "按所给代码运行。",
+                "返回累计和。"
+              ],
+              "display_only": true
+            }
+          },
+          "content_digest": "617b2c66405ba7d977c988e47c0a78906a808cfeb7cd25ab8dc969d1e646ffe8",
+          "dependency_digest": "07e9af9dba7ab377e7009b11a0e335cbd3960edfabfec6ecdf8527e98ff3539c",
+          "upstream": [
+            {
+              "resource_id": "6f675890-21a0-5cd0-8129-c3814a822744",
+              "content_digest": "c3121d5c61920f1a73fec47c28f38576e04d379c478e0c0f0992c2ff99938631",
+              "dependency_digest": "b3fbcf16ce1d2ef5d1cd415115df2cb7446681a0bb920ecfa6777424aea0e750"
+            }
+          ]
+        },
+        {
+          "resource_id": "eb6cd5bc-077f-5736-bc09-cc117825a8ec",
+          "role": "exercise",
+          "envelope": {
+            "resource_type": "exercise",
+            "prompt_version": "learning-resources-v1",
+            "content": {
+              "items": [
+                {
+                  "id": "q1",
+                  "question": "[判断题] 不直接复述讲解：从s=0出发，按代码逐轮推演，先在草稿中推算i=0、i=1两轮各自结束时的s，再判断‘i=1这一轮结束后s=12’是否成立。仅填 T 或 F（T=正确，F=错误）。",
+                  "answer": "F",
+                  "explanation": "答案为F。本题不展示展开的状态表或退出边界推演。"
+                },
+                {
+                  "id": "q2",
+                  "question": "[判断题] 请继续推演循环：找出第一次条件检查失败时的i，判断是否会执行访问a[3]的循环体，再判断‘首次失败时i=4，且此前循环体处理过a[3]’是否成立。仅填 T 或 F（T=正确，F=错误）。",
+                  "answer": "F",
+                  "explanation": "答案为F。本题不展示展开的状态表或退出边界推演。"
+                },
+                {
+                  "id": "q3",
+                  "question": "[判断题] ‘函数将累计和作为返回值交给调用方，但自身不打印。’仅填 T 或 F（T=正确，F=错误）。",
+                  "answer": "T",
+                  "explanation": "函数执行return s，没有打印语句。"
+                }
+              ]
+            }
+          },
+          "content_digest": "a13d7c1eb298c82e421274998061e1237d9f6b946851917880d563d27b95e395",
+          "dependency_digest": "bf3d965efddf3a8b02e3e3c9d750a84cbcd5b0a2d1ce1633a27fccc289f5fdef",
+          "upstream": [
+            {
+              "resource_id": "6f675890-21a0-5cd0-8129-c3814a822744",
+              "content_digest": "c3121d5c61920f1a73fec47c28f38576e04d379c478e0c0f0992c2ff99938631",
+              "dependency_digest": "b3fbcf16ce1d2ef5d1cd415115df2cb7446681a0bb920ecfa6777424aea0e750"
+            },
+            {
+              "resource_id": "152eff97-02e4-5773-b7c8-f3e4983bcbd8",
+              "content_digest": "617b2c66405ba7d977c988e47c0a78906a808cfeb7cd25ab8dc969d1e646ffe8",
+              "dependency_digest": "07e9af9dba7ab377e7009b11a0e335cbd3960edfabfec6ecdf8527e98ff3539c"
+            }
+          ]
+        }
+      ],
+      "scenes": [
+        {
+          "role": "explanation",
+          "scene_key": "explanation",
+          "scene_id": "2a422fe5-98aa-5d24-bee4-bef6cc7dbaa2",
+          "scene_version": 1,
+          "resource_id": "6f675890-21a0-5cd0-8129-c3814a822744",
+          "resource_digest": "c3121d5c61920f1a73fec47c28f38576e04d379c478e0c0f0992c2ff99938631",
+          "dependency_digest": "b3fbcf16ce1d2ef5d1cd415115df2cb7446681a0bb920ecfa6777424aea0e750"
+        },
+        {
+          "role": "code",
+          "scene_key": "code",
+          "scene_id": "77acb18d-526b-5311-adf3-4f59179e749c",
+          "scene_version": 1,
+          "resource_id": "152eff97-02e4-5773-b7c8-f3e4983bcbd8",
+          "resource_digest": "617b2c66405ba7d977c988e47c0a78906a808cfeb7cd25ab8dc969d1e646ffe8",
+          "dependency_digest": "07e9af9dba7ab377e7009b11a0e335cbd3960edfabfec6ecdf8527e98ff3539c"
+        },
+        {
+          "role": "exercise",
+          "scene_key": "exercise",
+          "scene_id": "9c2da1e3-abf5-5c3e-ab83-ec63ba41f4dc",
+          "scene_version": 1,
+          "resource_id": "eb6cd5bc-077f-5736-bc09-cc117825a8ec",
+          "resource_digest": "a13d7c1eb298c82e421274998061e1237d9f6b946851917880d563d27b95e395",
+          "dependency_digest": "bf3d965efddf3a8b02e3e3c9d750a84cbcd5b0a2d1ce1633a27fccc289f5fdef"
+        }
+      ],
+      "actions": {
+        "version": "teaching-actions-v1",
+        "actions": [
+          {
+            "kind": "show_resource",
+            "scene_key": "explanation",
+            "resource_id": "6f675890-21a0-5cd0-8129-c3814a822744",
+            "resource_digest": "c3121d5c61920f1a73fec47c28f38576e04d379c478e0c0f0992c2ff99938631"
+          },
+          {
+            "kind": "show_resource",
+            "scene_key": "code",
+            "resource_id": "152eff97-02e4-5773-b7c8-f3e4983bcbd8",
+            "resource_digest": "617b2c66405ba7d977c988e47c0a78906a808cfeb7cd25ab8dc969d1e646ffe8"
+          },
+          {
+            "kind": "highlight",
+            "scene_key": "code",
+            "resource_id": "152eff97-02e4-5773-b7c8-f3e4983bcbd8",
+            "resource_digest": "617b2c66405ba7d977c988e47c0a78906a808cfeb7cd25ab8dc969d1e646ffe8",
+            "anchor_id": "a3"
+          },
+          {
+            "kind": "highlight",
+            "scene_key": "code",
+            "resource_id": "152eff97-02e4-5773-b7c8-f3e4983bcbd8",
+            "resource_digest": "617b2c66405ba7d977c988e47c0a78906a808cfeb7cd25ab8dc969d1e646ffe8",
+            "anchor_id": "a4"
+          },
+          {
+            "kind": "show_resource",
+            "scene_key": "exercise",
+            "resource_id": "eb6cd5bc-077f-5736-bc09-cc117825a8ec",
+            "resource_digest": "a13d7c1eb298c82e421274998061e1237d9f6b946851917880d563d27b95e395"
+          },
+          {
+            "kind": "ask_exercise",
+            "scene_key": "exercise",
+            "resource_id": "eb6cd5bc-077f-5736-bc09-cc117825a8ec",
+            "resource_digest": "a13d7c1eb298c82e421274998061e1237d9f6b946851917880d563d27b95e395",
+            "exercise_id": "q1"
+          },
+          {
+            "kind": "ask_exercise",
+            "scene_key": "exercise",
+            "resource_id": "eb6cd5bc-077f-5736-bc09-cc117825a8ec",
+            "resource_digest": "a13d7c1eb298c82e421274998061e1237d9f6b946851917880d563d27b95e395",
+            "exercise_id": "q2"
+          },
+          {
+            "kind": "ask_exercise",
+            "scene_key": "exercise",
+            "resource_id": "eb6cd5bc-077f-5736-bc09-cc117825a8ec",
+            "resource_digest": "a13d7c1eb298c82e421274998061e1237d9f6b946851917880d563d27b95e395",
+            "exercise_id": "q3"
+          }
+        ],
+        "anchor_catalog": [
+          {
+            "anchor_id": "a1",
+            "resource_id": "6f675890-21a0-5cd0-8129-c3814a822744",
+            "resource_digest": "c3121d5c61920f1a73fec47c28f38576e04d379c478e0c0f0992c2ff99938631",
+            "json_pointer": "/markdown",
+            "start_utf8": 0,
+            "end_utf8": 196
+          },
+          {
+            "anchor_id": "a2",
+            "resource_id": "152eff97-02e4-5773-b7c8-f3e4983bcbd8",
+            "resource_digest": "617b2c66405ba7d977c988e47c0a78906a808cfeb7cd25ab8dc969d1e646ffe8",
+            "json_pointer": "/expected_output",
+            "start_utf8": 0,
+            "end_utf8": 48
+          },
+          {
+            "anchor_id": "a3",
+            "resource_id": "152eff97-02e4-5773-b7c8-f3e4983bcbd8",
+            "resource_digest": "617b2c66405ba7d977c988e47c0a78906a808cfeb7cd25ab8dc969d1e646ffe8",
+            "json_pointer": "/key_steps/0",
+            "start_utf8": 0,
+            "end_utf8": 24
+          },
+          {
+            "anchor_id": "a4",
+            "resource_id": "152eff97-02e4-5773-b7c8-f3e4983bcbd8",
+            "resource_digest": "617b2c66405ba7d977c988e47c0a78906a808cfeb7cd25ab8dc969d1e646ffe8",
+            "json_pointer": "/key_steps/1",
+            "start_utf8": 0,
+            "end_utf8": 18
+          },
+          {
+            "anchor_id": "a5",
+            "resource_id": "152eff97-02e4-5773-b7c8-f3e4983bcbd8",
+            "resource_digest": "617b2c66405ba7d977c988e47c0a78906a808cfeb7cd25ab8dc969d1e646ffe8",
+            "json_pointer": "/language",
+            "start_utf8": 0,
+            "end_utf8": 1
+          },
+          {
+            "anchor_id": "a6",
+            "resource_id": "152eff97-02e4-5773-b7c8-f3e4983bcbd8",
+            "resource_digest": "617b2c66405ba7d977c988e47c0a78906a808cfeb7cd25ab8dc969d1e646ffe8",
+            "json_pointer": "/source",
+            "start_utf8": 0,
+            "end_utf8": 117
+          },
+          {
+            "anchor_id": "a7",
+            "resource_id": "eb6cd5bc-077f-5736-bc09-cc117825a8ec",
+            "resource_digest": "a13d7c1eb298c82e421274998061e1237d9f6b946851917880d563d27b95e395",
+            "json_pointer": "/items/0/answer",
+            "start_utf8": 0,
+            "end_utf8": 1
+          },
+          {
+            "anchor_id": "a8",
+            "resource_id": "eb6cd5bc-077f-5736-bc09-cc117825a8ec",
+            "resource_digest": "a13d7c1eb298c82e421274998061e1237d9f6b946851917880d563d27b95e395",
+            "json_pointer": "/items/0/explanation",
+            "start_utf8": 0,
+            "end_utf8": 70
+          },
+          {
+            "anchor_id": "a9",
+            "resource_id": "eb6cd5bc-077f-5736-bc09-cc117825a8ec",
+            "resource_digest": "a13d7c1eb298c82e421274998061e1237d9f6b946851917880d563d27b95e395",
+            "json_pointer": "/items/0/id",
+            "start_utf8": 0,
+            "end_utf8": 2
+          },
+          {
+            "anchor_id": "a10",
+            "resource_id": "eb6cd5bc-077f-5736-bc09-cc117825a8ec",
+            "resource_digest": "a13d7c1eb298c82e421274998061e1237d9f6b946851917880d563d27b95e395",
+            "json_pointer": "/items/0/question",
+            "start_utf8": 0,
+            "end_utf8": 230
+          },
+          {
+            "anchor_id": "a11",
+            "resource_id": "eb6cd5bc-077f-5736-bc09-cc117825a8ec",
+            "resource_digest": "a13d7c1eb298c82e421274998061e1237d9f6b946851917880d563d27b95e395",
+            "json_pointer": "/items/1/answer",
+            "start_utf8": 0,
+            "end_utf8": 1
+          },
+          {
+            "anchor_id": "a12",
+            "resource_id": "eb6cd5bc-077f-5736-bc09-cc117825a8ec",
+            "resource_digest": "a13d7c1eb298c82e421274998061e1237d9f6b946851917880d563d27b95e395",
+            "json_pointer": "/items/1/explanation",
+            "start_utf8": 0,
+            "end_utf8": 70
+          },
+          {
+            "anchor_id": "a13",
+            "resource_id": "eb6cd5bc-077f-5736-bc09-cc117825a8ec",
+            "resource_digest": "a13d7c1eb298c82e421274998061e1237d9f6b946851917880d563d27b95e395",
+            "json_pointer": "/items/1/id",
+            "start_utf8": 0,
+            "end_utf8": 2
+          },
+          {
+            "anchor_id": "a14",
+            "resource_id": "eb6cd5bc-077f-5736-bc09-cc117825a8ec",
+            "resource_digest": "a13d7c1eb298c82e421274998061e1237d9f6b946851917880d563d27b95e395",
+            "json_pointer": "/items/1/question",
+            "start_utf8": 0,
+            "end_utf8": 249
+          },
+          {
+            "anchor_id": "a15",
+            "resource_id": "eb6cd5bc-077f-5736-bc09-cc117825a8ec",
+            "resource_digest": "a13d7c1eb298c82e421274998061e1237d9f6b946851917880d563d27b95e395",
+            "json_pointer": "/items/2/answer",
+            "start_utf8": 0,
+            "end_utf8": 1
+          },
+          {
+            "anchor_id": "a16",
+            "resource_id": "eb6cd5bc-077f-5736-bc09-cc117825a8ec",
+            "resource_digest": "a13d7c1eb298c82e421274998061e1237d9f6b946851917880d563d27b95e395",
+            "json_pointer": "/items/2/explanation",
+            "start_utf8": 0,
+            "end_utf8": 44
+          },
+          {
+            "anchor_id": "a17",
+            "resource_id": "eb6cd5bc-077f-5736-bc09-cc117825a8ec",
+            "resource_digest": "a13d7c1eb298c82e421274998061e1237d9f6b946851917880d563d27b95e395",
+            "json_pointer": "/items/2/id",
+            "start_utf8": 0,
+            "end_utf8": 2
+          },
+          {
+            "anchor_id": "a18",
+            "resource_id": "eb6cd5bc-077f-5736-bc09-cc117825a8ec",
+            "resource_digest": "a13d7c1eb298c82e421274998061e1237d9f6b946851917880d563d27b95e395",
+            "json_pointer": "/items/2/question",
+            "start_utf8": 0,
+            "end_utf8": 132
+          }
+        ],
+        "digest": "0a19521ad86f24d415caa843b38f92fd47a177a2e7321807a74696e6d2289bb3"
+      },
+      "reference_context": {
+        "source": {
+          "reference_id": "graph-node:mvp-0.2.0:array",
+          "version": "mvp-0.2.0",
+          "digest": "f83fd12e754fcda4124aa62b8a29203d97a897605d23dc4e37877393dcb0015d"
+        },
+        "node": {
+          "id": "array",
+          "name": "数组",
+          "chapter": "线性表",
+          "difficulty": 1,
+          "description": "使用连续存储空间、通过下标访问元素的线性结构。",
+          "prerequisites": [],
+          "learning_objectives": [
+            "说出下标访问的时间复杂度",
+            "说明连续存储对插入和删除的影响"
+          ],
+          "common_misconceptions": [
+            "数组每次访问都要从头遍历",
+            "数组插入总是 O(1)"
+          ],
+          "ai_context": "使用连续格子和下标精灵的图示，对比中间插入时的元素搬移。",
+          "mastery_rule_key": "linear-structure-v1"
+        },
+        "learner_evidence": {},
+        "scope": "Background only; not proof of this example."
+      },
+      "teaching_context": {
+        "version": "teaching-node-binding-v1",
+        "teaching_mode": "target",
+        "target_node_id": "array",
+        "recommended_node_id": "array",
+        "teaching_node_id": "array",
+        "selection_reason": "direct_target",
+        "original_request": "用C实现并明确追踪数组{3,8,4}求和循环的关键状态和退出条件，并用题目检查是否掌握这个过程。",
+        "segment_goal": "用C实现并明确追踪数组{3,8,4}求和循环的关键状态和退出条件，并用题目检查是否掌握这个过程。",
+        "segment_scope": "target_lesson",
+        "path_version_id": "389553b7-9b85-50c6-9883-62c72f1277d2",
+        "path_version": 1,
+        "graph_version": "mvp-0.2.0",
+        "graph_digest": "3639db6aedc9699348e63b5e7e1bdaaea3189592b19540c64e8f175aceb9ef59"
+      },
+      "unit_digest": "1a96cbd16abb179163da9a77a320cb0f60bd20a2cda82b0bfe07cd4cf2e55d13"
+    },
+    "input_snapshot": {
+      "metadata": {
+        "node_id": "array",
+        "graph_version": "mvp-0.2.0",
+        "graph_digest": "3639db6aedc9699348e63b5e7e1bdaaea3189592b19540c64e8f175aceb9ef59",
+        "profile_version": null,
+        "profile_evidence_digest": "8838fdd11ee58e08fd54a21272313e784012370b7cf0a2cde8b823ed8806d85d",
+        "goal": "用C实现并明确追踪数组{3,8,4}求和循环的关键状态和退出条件，并用题目检查是否掌握这个过程。",
+        "code_language": "C"
+      },
+      "references": {
+        "graph-node:mvp-0.2.0:array": {
+          "reference_id": "graph-node:mvp-0.2.0:array",
+          "version": "mvp-0.2.0",
+          "digest": "f83fd12e754fcda4124aa62b8a29203d97a897605d23dc4e37877393dcb0015d"
+        }
+      },
+      "learner_evidence": {},
+      "node_ids": [
+        "array",
+        "array-stack",
+        "balanced-binary-search-tree",
+        "binary-heap",
+        "binary-search-tree",
+        "binary-tree",
+        "binary-tree-traversal",
+        "breadth-first-search",
+        "bubble-sort",
+        "c-pointer",
+        "circular-linked-list",
+        "circular-queue",
+        "depth-first-search",
+        "doubly-linked-list",
+        "graph-representation",
+        "heap-sort",
+        "insertion-sort",
+        "linked-list-concept",
+        "linked-list-deletion",
+        "linked-list-insertion",
+        "linked-list-traversal",
+        "linked-stack",
+        "merge-sort",
+        "queue",
+        "quick-sort",
+        "selection-sort",
+        "single-linked-list",
+        "sorting-comparison",
+        "stack",
+        "tree-concept"
+      ],
+      "teaching_context": {
+        "version": "teaching-node-binding-v1",
+        "teaching_mode": "target",
+        "target_node_id": "array",
+        "recommended_node_id": "array",
+        "teaching_node_id": "array",
+        "selection_reason": "direct_target",
+        "original_request": "用C实现并明确追踪数组{3,8,4}求和循环的关键状态和退出条件，并用题目检查是否掌握这个过程。",
+        "segment_goal": "用C实现并明确追踪数组{3,8,4}求和循环的关键状态和退出条件，并用题目检查是否掌握这个过程。",
+        "segment_scope": "target_lesson",
+        "path_version_id": "389553b7-9b85-50c6-9883-62c72f1277d2",
+        "path_version": 1,
+        "graph_version": "mvp-0.2.0",
+        "graph_digest": "3639db6aedc9699348e63b5e7e1bdaaea3189592b19540c64e8f175aceb9ef59"
+      }
+    },
+    "fixture_kind": "teaching-gap",
+    "provenance": "authored after observed Luna failure for criterion calibration; NOT independent/holdout/formal test",
+    "scope": "unit"
+  },
+  "cal-04": {
+    "material": {
+      "binding": {
+        "owner_id": "8db4b94f-994e-5cc4-b609-4310d238c9fd",
+        "unit_id": "005f65f0-dcd8-5c9b-9d54-acc41f336197",
+        "operation_id": "4aaabfb7-8a3b-56a4-adb7-c489bc69a60b",
+        "plan_id": "7a3f009e-b35d-51f9-a912-2ddc773184f8",
+        "plan_version": 1,
+        "plan_digest": "bd4f2f462c54579b6fc1bba9e2ee646bc4c18548b5001fbe6015dd77f8af0ac9",
+        "input_digest": "b0bd852fac3af2e20eea3f36aacdb9d37bb40fed4ced06041818a62f518746be",
+        "references_digest": "1335b93c5c57bca280ff7d4076dbd2c6cd8c0bc14bf154738dada80dc5e6281e",
+        "policy_version": "hybrid-review-v1",
+        "policy_digest": "747ec507e0f011d8a82e74d3823964fc2f860ab23693f71e695273ebf696fdad"
+      },
+      "plan": {
+        "objectives": [
+          {
+            "id": "local",
+            "text": "用C实现并明确追踪数组{3,8,4}求和循环的关键状态和退出条件，并用题目检查是否掌握这个过程。"
+          }
+        ],
+        "terminology": [
+          {
+            "term": "返回值",
+            "meaning": "函数交给调用方的值，不等于打印"
+          }
+        ],
+        "conventions": {
+          "index_base": 0,
+          "capacity": 3,
+          "state_representation": "s为已处理元素总和，i为下一处理下标",
+          "not_applicable_reasons": []
+        },
+        "shared_example": {
+          "input_description": "a={3,8,4}",
+          "initial_state": "s=0,i=0",
+          "steps": [
+            {
+              "operation": "执行固定示例",
+              "expected_state": "s为3、11、15，i=3退出",
+              "expected_output": "无打印，返回15"
+            }
+          ]
+        },
+        "prerequisite_node_ids": [],
+        "scenes": [
+          {
+            "role": "explanation",
+            "scene_key": "explanation",
+            "objective_ids": [
+              "local"
+            ],
+            "depends_on": []
+          },
+          {
+            "role": "code",
+            "scene_key": "code",
+            "objective_ids": [
+              "local"
+            ],
+            "depends_on": [
+              "explanation"
+            ]
+          },
+          {
+            "role": "exercise",
+            "scene_key": "exercise",
+            "objective_ids": [
+              "local"
+            ],
+            "depends_on": [
+              "explanation",
+              "code"
+            ]
+          }
+        ],
+        "node_id": "array",
+        "graph_version": "mvp-0.2.0",
+        "graph_digest": "3639db6aedc9699348e63b5e7e1bdaaea3189592b19540c64e8f175aceb9ef59",
+        "profile_version": null,
+        "profile_evidence_digest": "8838fdd11ee58e08fd54a21272313e784012370b7cf0a2cde8b823ed8806d85d",
+        "goal": "用C实现并明确追踪数组{3,8,4}求和循环的关键状态和退出条件，并用题目检查是否掌握这个过程。",
+        "code_language": "C",
+        "schema_version": "learning-plan-v1",
+        "references": [
+          {
+            "reference_id": "graph-node:mvp-0.2.0:array",
+            "version": "mvp-0.2.0",
+            "digest": "f83fd12e754fcda4124aa62b8a29203d97a897605d23dc4e37877393dcb0015d"
+          }
+        ]
+      },
+      "candidates": [
+        {
+          "resource_id": "87cd4dbb-9eda-5d33-9b8f-a86e600c3751",
+          "role": "explanation",
+          "envelope": {
+            "resource_type": "explanation",
+            "prompt_version": "learning-resources-v1",
+            "content": {
+              "markdown": "本节仅追踪一个数组求和过程，不承诺覆盖整个数组节点。函数total返回15；没有打印。开始s=0；i=0后s=3，i=1后s=11，i=2后s=15；随后i=3，i<3为假，退出，返回15。"
+            }
+          },
+          "content_digest": "231a158ad0859b38ed2f448c6d8eb8786fea7350cfc9666541e58cafe7f67c0b",
+          "dependency_digest": "25489069562ef851c5188da4664e2f53926a40a96b640e28b20e730222f69802",
+          "upstream": []
+        },
+        {
+          "resource_id": "b099e748-a3ae-52ac-8542-399403bec104",
+          "role": "code",
+          "envelope": {
+            "resource_type": "code",
+            "prompt_version": "learning-resources-v1",
+            "content": {
+              "language": "C",
+              "source": "int total(void) {\n    int a[3] = {3, 8, 4};\n    int s = 0;\n    for (int i = 0; i < 3; ++i) s += a[i];\n    return s;\n}",
+              "expected_output": "无标准输出；由调用方获取返回值。",
+              "key_steps": [
+                "处理下标0、1、2，分别累加。",
+                "在i=3时退出，返回累计和。"
+              ],
+              "display_only": true
+            }
+          },
+          "content_digest": "229b73713cd20cd33b3919fd5af8b16556481758f363f3e7c1bda5941539e3e9",
+          "dependency_digest": "b51a21ca5f370b99f04120cb90512bb7097ea576ed8c2ef2f3010bf01e261e02",
+          "upstream": [
+            {
+              "resource_id": "87cd4dbb-9eda-5d33-9b8f-a86e600c3751",
+              "content_digest": "231a158ad0859b38ed2f448c6d8eb8786fea7350cfc9666541e58cafe7f67c0b",
+              "dependency_digest": "25489069562ef851c5188da4664e2f53926a40a96b640e28b20e730222f69802"
+            }
+          ]
+        },
+        {
+          "resource_id": "4aca4683-f371-503a-a74e-aa65a62877b6",
+          "role": "exercise",
+          "envelope": {
+            "resource_type": "exercise",
+            "prompt_version": "learning-resources-v1",
+            "content": {
+              "items": [
+                {
+                  "id": "q1",
+                  "question": "[填空题] 3+8+4=____，仅填一个整数。",
+                  "answer": "15",
+                  "explanation": "3+8=11，11+4=15。"
+                },
+                {
+                  "id": "q2",
+                  "question": "[填空题] 8+4+3=____，仅填一个整数。",
+                  "answer": "15",
+                  "explanation": "8+4=12，12+3=15。"
+                },
+                {
+                  "id": "q3",
+                  "question": "[判断题] ‘3+8+4=16’，仅填 T 或 F（T=正确，F=错误）。",
+                  "answer": "F",
+                  "explanation": "算术和为15，不是16。"
+                }
+              ]
+            }
+          },
+          "content_digest": "f3db1e6e6f549c2f07ad26f7588a7b1e167c1f94f45aa3a9c8075f1e04c417f7",
+          "dependency_digest": "103fc533491b6dc5f5c228d76f713eacf4799eaecf0e1ee0d91f8bc6a2447979",
+          "upstream": [
+            {
+              "resource_id": "87cd4dbb-9eda-5d33-9b8f-a86e600c3751",
+              "content_digest": "231a158ad0859b38ed2f448c6d8eb8786fea7350cfc9666541e58cafe7f67c0b",
+              "dependency_digest": "25489069562ef851c5188da4664e2f53926a40a96b640e28b20e730222f69802"
+            },
+            {
+              "resource_id": "b099e748-a3ae-52ac-8542-399403bec104",
+              "content_digest": "229b73713cd20cd33b3919fd5af8b16556481758f363f3e7c1bda5941539e3e9",
+              "dependency_digest": "b51a21ca5f370b99f04120cb90512bb7097ea576ed8c2ef2f3010bf01e261e02"
+            }
+          ]
+        }
+      ],
+      "scenes": [
+        {
+          "role": "explanation",
+          "scene_key": "explanation",
+          "scene_id": "ea9626dc-f13e-53b3-8ecc-3dc3e90b76a7",
+          "scene_version": 1,
+          "resource_id": "87cd4dbb-9eda-5d33-9b8f-a86e600c3751",
+          "resource_digest": "231a158ad0859b38ed2f448c6d8eb8786fea7350cfc9666541e58cafe7f67c0b",
+          "dependency_digest": "25489069562ef851c5188da4664e2f53926a40a96b640e28b20e730222f69802"
+        },
+        {
+          "role": "code",
+          "scene_key": "code",
+          "scene_id": "df3bf6ee-9313-51dc-907a-20afddbc11d2",
+          "scene_version": 1,
+          "resource_id": "b099e748-a3ae-52ac-8542-399403bec104",
+          "resource_digest": "229b73713cd20cd33b3919fd5af8b16556481758f363f3e7c1bda5941539e3e9",
+          "dependency_digest": "b51a21ca5f370b99f04120cb90512bb7097ea576ed8c2ef2f3010bf01e261e02"
+        },
+        {
+          "role": "exercise",
+          "scene_key": "exercise",
+          "scene_id": "bf53d6ee-fe4a-50cc-9bb4-e1d869a2dcee",
+          "scene_version": 1,
+          "resource_id": "4aca4683-f371-503a-a74e-aa65a62877b6",
+          "resource_digest": "f3db1e6e6f549c2f07ad26f7588a7b1e167c1f94f45aa3a9c8075f1e04c417f7",
+          "dependency_digest": "103fc533491b6dc5f5c228d76f713eacf4799eaecf0e1ee0d91f8bc6a2447979"
+        }
+      ],
+      "actions": {
+        "version": "teaching-actions-v1",
+        "actions": [
+          {
+            "kind": "show_resource",
+            "scene_key": "explanation",
+            "resource_id": "87cd4dbb-9eda-5d33-9b8f-a86e600c3751",
+            "resource_digest": "231a158ad0859b38ed2f448c6d8eb8786fea7350cfc9666541e58cafe7f67c0b"
+          },
+          {
+            "kind": "show_resource",
+            "scene_key": "code",
+            "resource_id": "b099e748-a3ae-52ac-8542-399403bec104",
+            "resource_digest": "229b73713cd20cd33b3919fd5af8b16556481758f363f3e7c1bda5941539e3e9"
+          },
+          {
+            "kind": "highlight",
+            "scene_key": "code",
+            "resource_id": "b099e748-a3ae-52ac-8542-399403bec104",
+            "resource_digest": "229b73713cd20cd33b3919fd5af8b16556481758f363f3e7c1bda5941539e3e9",
+            "anchor_id": "a3"
+          },
+          {
+            "kind": "highlight",
+            "scene_key": "code",
+            "resource_id": "b099e748-a3ae-52ac-8542-399403bec104",
+            "resource_digest": "229b73713cd20cd33b3919fd5af8b16556481758f363f3e7c1bda5941539e3e9",
+            "anchor_id": "a4"
+          },
+          {
+            "kind": "show_resource",
+            "scene_key": "exercise",
+            "resource_id": "4aca4683-f371-503a-a74e-aa65a62877b6",
+            "resource_digest": "f3db1e6e6f549c2f07ad26f7588a7b1e167c1f94f45aa3a9c8075f1e04c417f7"
+          },
+          {
+            "kind": "ask_exercise",
+            "scene_key": "exercise",
+            "resource_id": "4aca4683-f371-503a-a74e-aa65a62877b6",
+            "resource_digest": "f3db1e6e6f549c2f07ad26f7588a7b1e167c1f94f45aa3a9c8075f1e04c417f7",
+            "exercise_id": "q1"
+          },
+          {
+            "kind": "ask_exercise",
+            "scene_key": "exercise",
+            "resource_id": "4aca4683-f371-503a-a74e-aa65a62877b6",
+            "resource_digest": "f3db1e6e6f549c2f07ad26f7588a7b1e167c1f94f45aa3a9c8075f1e04c417f7",
+            "exercise_id": "q2"
+          },
+          {
+            "kind": "ask_exercise",
+            "scene_key": "exercise",
+            "resource_id": "4aca4683-f371-503a-a74e-aa65a62877b6",
+            "resource_digest": "f3db1e6e6f549c2f07ad26f7588a7b1e167c1f94f45aa3a9c8075f1e04c417f7",
+            "exercise_id": "q3"
+          }
+        ],
+        "anchor_catalog": [
+          {
+            "anchor_id": "a1",
+            "resource_id": "87cd4dbb-9eda-5d33-9b8f-a86e600c3751",
+            "resource_digest": "231a158ad0859b38ed2f448c6d8eb8786fea7350cfc9666541e58cafe7f67c0b",
+            "json_pointer": "/markdown",
+            "start_utf8": 0,
+            "end_utf8": 209
+          },
+          {
+            "anchor_id": "a2",
+            "resource_id": "b099e748-a3ae-52ac-8542-399403bec104",
+            "resource_digest": "229b73713cd20cd33b3919fd5af8b16556481758f363f3e7c1bda5941539e3e9",
+            "json_pointer": "/expected_output",
+            "start_utf8": 0,
+            "end_utf8": 48
+          },
+          {
+            "anchor_id": "a3",
+            "resource_id": "b099e748-a3ae-52ac-8542-399403bec104",
+            "resource_digest": "229b73713cd20cd33b3919fd5af8b16556481758f363f3e7c1bda5941539e3e9",
+            "json_pointer": "/key_steps/0",
+            "start_utf8": 0,
+            "end_utf8": 39
+          },
+          {
+            "anchor_id": "a4",
+            "resource_id": "b099e748-a3ae-52ac-8542-399403bec104",
+            "resource_digest": "229b73713cd20cd33b3919fd5af8b16556481758f363f3e7c1bda5941539e3e9",
+            "json_pointer": "/key_steps/1",
+            "start_utf8": 0,
+            "end_utf8": 36
+          },
+          {
+            "anchor_id": "a5",
+            "resource_id": "b099e748-a3ae-52ac-8542-399403bec104",
+            "resource_digest": "229b73713cd20cd33b3919fd5af8b16556481758f363f3e7c1bda5941539e3e9",
+            "json_pointer": "/language",
+            "start_utf8": 0,
+            "end_utf8": 1
+          },
+          {
+            "anchor_id": "a6",
+            "resource_id": "b099e748-a3ae-52ac-8542-399403bec104",
+            "resource_digest": "229b73713cd20cd33b3919fd5af8b16556481758f363f3e7c1bda5941539e3e9",
+            "json_pointer": "/source",
+            "start_utf8": 0,
+            "end_utf8": 117
+          },
+          {
+            "anchor_id": "a7",
+            "resource_id": "4aca4683-f371-503a-a74e-aa65a62877b6",
+            "resource_digest": "f3db1e6e6f549c2f07ad26f7588a7b1e167c1f94f45aa3a9c8075f1e04c417f7",
+            "json_pointer": "/items/0/answer",
+            "start_utf8": 0,
+            "end_utf8": 2
+          },
+          {
+            "anchor_id": "a8",
+            "resource_id": "4aca4683-f371-503a-a74e-aa65a62877b6",
+            "resource_digest": "f3db1e6e6f549c2f07ad26f7588a7b1e167c1f94f45aa3a9c8075f1e04c417f7",
+            "json_pointer": "/items/0/explanation",
+            "start_utf8": 0,
+            "end_utf8": 19
+          },
+          {
+            "anchor_id": "a9",
+            "resource_id": "4aca4683-f371-503a-a74e-aa65a62877b6",
+            "resource_digest": "f3db1e6e6f549c2f07ad26f7588a7b1e167c1f94f45aa3a9c8075f1e04c417f7",
+            "json_pointer": "/items/0/id",
+            "start_utf8": 0,
+            "end_utf8": 2
+          },
+          {
+            "anchor_id": "a10",
+            "resource_id": "4aca4683-f371-503a-a74e-aa65a62877b6",
+            "resource_digest": "f3db1e6e6f549c2f07ad26f7588a7b1e167c1f94f45aa3a9c8075f1e04c417f7",
+            "json_pointer": "/items/0/question",
+            "start_utf8": 0,
+            "end_utf8": 46
+          },
+          {
+            "anchor_id": "a11",
+            "resource_id": "4aca4683-f371-503a-a74e-aa65a62877b6",
+            "resource_digest": "f3db1e6e6f549c2f07ad26f7588a7b1e167c1f94f45aa3a9c8075f1e04c417f7",
+            "json_pointer": "/items/1/answer",
+            "start_utf8": 0,
+            "end_utf8": 2
+          },
+          {
+            "anchor_id": "a12",
+            "resource_id": "4aca4683-f371-503a-a74e-aa65a62877b6",
+            "resource_digest": "f3db1e6e6f549c2f07ad26f7588a7b1e167c1f94f45aa3a9c8075f1e04c417f7",
+            "json_pointer": "/items/1/explanation",
+            "start_utf8": 0,
+            "end_utf8": 19
+          },
+          {
+            "anchor_id": "a13",
+            "resource_id": "4aca4683-f371-503a-a74e-aa65a62877b6",
+            "resource_digest": "f3db1e6e6f549c2f07ad26f7588a7b1e167c1f94f45aa3a9c8075f1e04c417f7",
+            "json_pointer": "/items/1/id",
+            "start_utf8": 0,
+            "end_utf8": 2
+          },
+          {
+            "anchor_id": "a14",
+            "resource_id": "4aca4683-f371-503a-a74e-aa65a62877b6",
+            "resource_digest": "f3db1e6e6f549c2f07ad26f7588a7b1e167c1f94f45aa3a9c8075f1e04c417f7",
+            "json_pointer": "/items/1/question",
+            "start_utf8": 0,
+            "end_utf8": 46
+          },
+          {
+            "anchor_id": "a15",
+            "resource_id": "4aca4683-f371-503a-a74e-aa65a62877b6",
+            "resource_digest": "f3db1e6e6f549c2f07ad26f7588a7b1e167c1f94f45aa3a9c8075f1e04c417f7",
+            "json_pointer": "/items/2/answer",
+            "start_utf8": 0,
+            "end_utf8": 1
+          },
+          {
+            "anchor_id": "a16",
+            "resource_id": "4aca4683-f371-503a-a74e-aa65a62877b6",
+            "resource_digest": "f3db1e6e6f549c2f07ad26f7588a7b1e167c1f94f45aa3a9c8075f1e04c417f7",
+            "json_pointer": "/items/2/explanation",
+            "start_utf8": 0,
+            "end_utf8": 28
+          },
+          {
+            "anchor_id": "a17",
+            "resource_id": "4aca4683-f371-503a-a74e-aa65a62877b6",
+            "resource_digest": "f3db1e6e6f549c2f07ad26f7588a7b1e167c1f94f45aa3a9c8075f1e04c417f7",
+            "json_pointer": "/items/2/id",
+            "start_utf8": 0,
+            "end_utf8": 2
+          },
+          {
+            "anchor_id": "a18",
+            "resource_id": "4aca4683-f371-503a-a74e-aa65a62877b6",
+            "resource_digest": "f3db1e6e6f549c2f07ad26f7588a7b1e167c1f94f45aa3a9c8075f1e04c417f7",
+            "json_pointer": "/items/2/question",
+            "start_utf8": 0,
+            "end_utf8": 71
+          }
+        ],
+        "digest": "eb0346772052697c83fb87815271a8d8b47ae6842603e1475ca812b6bce017bf"
+      },
+      "reference_context": {
+        "source": {
+          "reference_id": "graph-node:mvp-0.2.0:array",
+          "version": "mvp-0.2.0",
+          "digest": "f83fd12e754fcda4124aa62b8a29203d97a897605d23dc4e37877393dcb0015d"
+        },
+        "node": {
+          "id": "array",
+          "name": "数组",
+          "chapter": "线性表",
+          "difficulty": 1,
+          "description": "使用连续存储空间、通过下标访问元素的线性结构。",
+          "prerequisites": [],
+          "learning_objectives": [
+            "说出下标访问的时间复杂度",
+            "说明连续存储对插入和删除的影响"
+          ],
+          "common_misconceptions": [
+            "数组每次访问都要从头遍历",
+            "数组插入总是 O(1)"
+          ],
+          "ai_context": "使用连续格子和下标精灵的图示，对比中间插入时的元素搬移。",
+          "mastery_rule_key": "linear-structure-v1"
+        },
+        "learner_evidence": {},
+        "scope": "Background only; not proof of this example."
+      },
+      "teaching_context": {
+        "version": "teaching-node-binding-v1",
+        "teaching_mode": "target",
+        "target_node_id": "array",
+        "recommended_node_id": "array",
+        "teaching_node_id": "array",
+        "selection_reason": "direct_target",
+        "original_request": "用C实现并明确追踪数组{3,8,4}求和循环的关键状态和退出条件，并用题目检查是否掌握这个过程。",
+        "segment_goal": "用C实现并明确追踪数组{3,8,4}求和循环的关键状态和退出条件，并用题目检查是否掌握这个过程。",
+        "segment_scope": "target_lesson",
+        "path_version_id": "1be5e895-5657-5edd-8eeb-3be929e8db57",
+        "path_version": 1,
+        "graph_version": "mvp-0.2.0",
+        "graph_digest": "3639db6aedc9699348e63b5e7e1bdaaea3189592b19540c64e8f175aceb9ef59"
+      },
+      "unit_digest": "95e259176e0762da368338ce2a526ef1d2a3522980d395f54124c72ef4be8777"
+    },
+    "input_snapshot": {
+      "metadata": {
+        "node_id": "array",
+        "graph_version": "mvp-0.2.0",
+        "graph_digest": "3639db6aedc9699348e63b5e7e1bdaaea3189592b19540c64e8f175aceb9ef59",
+        "profile_version": null,
+        "profile_evidence_digest": "8838fdd11ee58e08fd54a21272313e784012370b7cf0a2cde8b823ed8806d85d",
+        "goal": "用C实现并明确追踪数组{3,8,4}求和循环的关键状态和退出条件，并用题目检查是否掌握这个过程。",
+        "code_language": "C"
+      },
+      "references": {
+        "graph-node:mvp-0.2.0:array": {
+          "reference_id": "graph-node:mvp-0.2.0:array",
+          "version": "mvp-0.2.0",
+          "digest": "f83fd12e754fcda4124aa62b8a29203d97a897605d23dc4e37877393dcb0015d"
+        }
+      },
+      "learner_evidence": {},
+      "node_ids": [
+        "array",
+        "array-stack",
+        "balanced-binary-search-tree",
+        "binary-heap",
+        "binary-search-tree",
+        "binary-tree",
+        "binary-tree-traversal",
+        "breadth-first-search",
+        "bubble-sort",
+        "c-pointer",
+        "circular-linked-list",
+        "circular-queue",
+        "depth-first-search",
+        "doubly-linked-list",
+        "graph-representation",
+        "heap-sort",
+        "insertion-sort",
+        "linked-list-concept",
+        "linked-list-deletion",
+        "linked-list-insertion",
+        "linked-list-traversal",
+        "linked-stack",
+        "merge-sort",
+        "queue",
+        "quick-sort",
+        "selection-sort",
+        "single-linked-list",
+        "sorting-comparison",
+        "stack",
+        "tree-concept"
+      ],
+      "teaching_context": {
+        "version": "teaching-node-binding-v1",
+        "teaching_mode": "target",
+        "target_node_id": "array",
+        "recommended_node_id": "array",
+        "teaching_node_id": "array",
+        "selection_reason": "direct_target",
+        "original_request": "用C实现并明确追踪数组{3,8,4}求和循环的关键状态和退出条件，并用题目检查是否掌握这个过程。",
+        "segment_goal": "用C实现并明确追踪数组{3,8,4}求和循环的关键状态和退出条件，并用题目检查是否掌握这个过程。",
+        "segment_scope": "target_lesson",
+        "path_version_id": "1be5e895-5657-5edd-8eeb-3be929e8db57",
+        "path_version": 1,
+        "graph_version": "mvp-0.2.0",
+        "graph_digest": "3639db6aedc9699348e63b5e7e1bdaaea3189592b19540c64e8f175aceb9ef59"
+      }
+    },
+    "fixture_kind": "assessment-gap",
+    "provenance": "authored after observed Luna failure for criterion calibration; NOT independent/holdout/formal test",
+    "scope": "unit"
+  }
+}

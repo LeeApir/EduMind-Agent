@@ -2,7 +2,7 @@
 
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Response
+from fastapi import APIRouter, Depends, Query, Response
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.core.auth import AuthenticatedSession, AuthFailure, require_authenticated_session
@@ -48,6 +48,7 @@ def resource_payload(resource: GeneratedResource) -> dict[str, object]:
 async def get_learning_unit(
     unit_id: UUID,
     response: Response,
+    publication_version: int | None = Query(default=None, ge=1),
     current: AuthenticatedSession = Depends(require_authenticated_session),
     session_factory: async_sessionmaker[AsyncSession] = Depends(database_session_factory),
 ) -> dict[str, object]:
@@ -57,6 +58,32 @@ async def get_learning_unit(
         if unit is None:
             raise not_found()
         pairs = await published_scenes(db, current.user.id, unit_id)
+        publication = None
+        if unit.current_publication_id is not None:
+            from app.models.learning import LearningScene
+            from app.services.hybrid_learning_publication import current_publication
+            from app.services.owned_learning import published_resource
+
+            publication = await current_publication(
+                db, owner_id=current.user.id, unit_id=unit_id, version=publication_version
+            )
+            if publication is None:
+                raise not_found()
+            value = publication.material["scenes"]
+            assert isinstance(value, list)
+            selected = []
+            for item in value:
+                assert isinstance(item, dict)
+                resource = await published_resource(
+                    db, current.user.id, UUID(str(item["resource_id"]))
+                )
+                scene = await db.get(LearningScene, UUID(str(item["scene_id"])))
+                if resource is None or scene is None:
+                    raise not_found()
+                selected.append((scene, resource))
+            pairs = selected
+        elif publication_version is not None:
+            raise not_found()
     scenes: dict[str, dict[str, object]] = {}
     current_versions: dict[str, int] = {}
     for scene, _ in pairs:
@@ -70,25 +97,50 @@ async def get_learning_unit(
                 "id": scene_key,
                 "scene_key": scene.scene_key,
                 "version": scene.version,
-                "is_current": scene.version == current_versions[scene.scene_key],
+                "is_current": publication.id == unit.current_publication_id
+                if publication
+                else scene.version == current_versions[scene.scene_key],
                 "review_status": scene.review_status,
                 "resources": [],
             }
         resources = scenes[scene_key]["resources"]
         assert isinstance(resources, list)
         resources.append(resource_payload(resource))
+    from app.services.teaching_binding import public_teaching_context
+
+    context = (
+        public_teaching_context(publication.material.get("teaching_context"))
+        if publication
+        else None
+    )
     path_snapshot = (unit.outline or {}).get("path_snapshot")
     return {
+        **(
+            {
+                "publication_version": publication.version,
+                "approval_source": publication.approval_source,
+            }
+            if publication
+            else {}
+        ),
         "id": str(unit.id),
         "status": unit.status,
         "scenes": list(scenes.values()),
-        "knowledge_node_id": unit.knowledge_point_id,
+        "knowledge_node_id": context["teaching_node_id"] if context else unit.knowledge_point_id,
+        "teaching_context": context,
+        "binding_status": "bound" if context else "legacy_unverified" if publication else None,
         "origin_type": "curated" if unit.catalog_release_id else "generated",
         "catalog_release_id": str(unit.catalog_release_id) if unit.catalog_release_id else None,
-        "path_target_node_id": path_snapshot.get("target_node_id")
+        "path_target_node_id": context["target_node_id"]
+        if context
+        else path_snapshot.get("target_node_id")
         if isinstance(path_snapshot, dict)
         else None,
-        "path_version": path_snapshot.get("version") if isinstance(path_snapshot, dict) else None,
+        "path_version": context["path_version"]
+        if context
+        else path_snapshot.get("version")
+        if isinstance(path_snapshot, dict)
+        else None,
     }
 
 

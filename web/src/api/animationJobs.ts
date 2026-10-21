@@ -5,12 +5,17 @@ export interface AnimationJob {
   id: string;
   status: AnimationStatus;
   learning_unit_id: string;
-  template_id: AnimationTemplateId;
+  template_id: AnimationTemplateId | null;
   attempt: number;
   progress: number;
   last_event_id: number;
   media_id?: string;
   retry_of?: string;
+  render_kind?: "template" | "dsl";
+  generation_id?: string;
+  candidate_id?: string;
+  fallback_of?: string;
+  fallback_reason_code?: string;
   error?: { code: string; message: string; retryable: boolean };
 }
 
@@ -33,7 +38,10 @@ function isJob(value: unknown): value is AnimationJob {
   const job = value as Record<string, unknown>;
   return typeof job.id === "string" && typeof job.learning_unit_id === "string"
     && ["queued", "running", "succeeded", "failed", "cancelled"].includes(String(job.status))
-    && ["linked-list-insertion", "linked-list-deletion"].includes(String(job.template_id))
+    && ((job.render_kind === "dsl" && job.template_id === null && typeof job.candidate_id === "string"
+      && typeof job.generation_id === "string")
+      || ((job.render_kind === undefined || job.render_kind === "template")
+        && ["linked-list-insertion", "linked-list-deletion"].includes(String(job.template_id))))
     && Number.isInteger(job.attempt) && typeof job.progress === "number"
     && Number.isInteger(job.last_event_id);
 }

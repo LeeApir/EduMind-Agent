@@ -1,0 +1,74 @@
+{
+  "version": "om-redesign-contract-approval-validation-v2",
+  "checks": [
+    {
+      "command": "backend/.venv/bin/python docs/acceptance/phase-1-om-redesign/check_contract.py",
+      "chunk_id": "4b7613",
+      "wall_time_seconds": 7.292e-06,
+      "exit_code": 0,
+      "original_token_count": 116,
+      "output": "{\"schema\": \"Draft202012 valid\", \"positive_examples\": 3, \"negative_examples\": [\"missing goal\", \"extra field\", \"wrong scene key\", \"wrong scene order\", \"missing dependency\", \"invalid digest\", \"invalid verdict\", \"old protocol\", \"missing local routing\", \"model supplied server digest\"], \"scope\": \"structure only; cross-field and runtime checks planned, not run\"}\n{\"manifest_documents\": 12, \"task_contracts\": 12, \"approval\": \"A-D; zero Provider implementation only\"}\n"
+    },
+    {
+      "command": "backend/.venv/bin/ruff check docs/acceptance/phase-1-om-redesign/check_contract.py",
+      "chunk_id": "9fca18",
+      "wall_time_seconds": 1.0875e-05,
+      "exit_code": 0,
+      "original_token_count": 5,
+      "output": "All checks passed!\n"
+    },
+    {
+      "command": "python3 scripts/check_catalog_workflow.py",
+      "chunk_id": "91c35a",
+      "wall_time_seconds": 7.209e-06,
+      "exit_code": 0,
+      "original_token_count": 18,
+      "output": "Active Phase 1 dependencies valid; catalog ledger valid; T033 blocked\n"
+    },
+    {
+      "command": "python3 scripts/verify_legacy_archives.py",
+      "chunk_id": "858f22",
+      "wall_time_seconds": 0.967174167,
+      "exit_code": 0,
+      "original_token_count": 42,
+      "output": "{\"passed\": true, \"source\": \"git_archives\", \"original_files_verified\": 236, \"experiment_files\": 64, \"evidence_files\": 169, \"provider_requests\": 0, \"t033\": \"blocked\"}\n"
+    },
+    {
+      "command": "python3 scripts/verify_phase1_dynamic_approval.py",
+      "chunk_id": "4e4d9d",
+      "wall_time_seconds": 0.13000425,
+      "exit_code": 0,
+      "original_token_count": 31,
+      "output": "PASS: ADR-0011 A-D and labels approved; exact historical manifest verified; Provider requests/cost=0; dynamic opening=false\n"
+    },
+    {
+      "command": "git diff --check",
+      "chunk_id": "a1819b",
+      "wall_time_seconds": 7e-06,
+      "exit_code": 0,
+      "original_token_count": 0,
+      "output": ""
+    }
+  ],
+  "schema_positive_examples": 3,
+  "schema_negative_examples": 10,
+  "reader_review": "reader-check.md; three issues fixed and independently rechecked",
+  "runtime_tests": "NOT_RUN_DOCUMENT_AND_SCHEMA_ONLY",
+  "runtime_implementation": "NOT_IMPLEMENTED",
+  "provider_requests": 0,
+  "fee_authorized": 0,
+  "production_mode": "catalog_only",
+  "T040": "blocked",
+  "T044_to_T054": "todo",
+  "historical_results_changed": false,
+  "initial_validation_notes": [
+    "Ruff multi-import and import placement repaired before final checks; assertions retained."
+  ],
+  "timestamp_local": "2026-10-15T18:50:48+08:00",
+  "proposal_manifest_sha256": "ec8c4322cbee1b2b4d07f8cfd051cf9bdd82b528d3fbcd558300defae1720d31",
+  "additional_checks": [
+    "New document relative links/fences passed",
+    "T040 blocked; T044–T054 todo",
+    "Initial T043 validation.json retained unchanged as historical record"
+  ]
+}

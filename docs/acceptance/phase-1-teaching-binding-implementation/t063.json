@@ -1,0 +1,25 @@
+{
+  "task": "PHASE-1-T063",
+  "provider_calls": 0,
+  "isolated_pg_tests": 29,
+  "skipped": 0,
+  "database": "edumind_t063_20261019",
+  "ruff": "all app/tests passed",
+  "mypy": "196 sources passed",
+  "checks": [
+    "exact publication and plan/resource/unit node agreement",
+    "target vs recommended updates only actually taught node",
+    "replanning retains original target",
+    "old version quiz after reexplanation keeps original publication provenance",
+    "old planned without context blocks new evidence; existing receipts replay",
+    "catalog and unplanned legacy scoring unchanged",
+    "owner serialization covers withdrawal and new evidence write"
+  ],
+  "retained_test_failures": [
+    "two invocations referenced nonexistent extra quiz test paths; no tests ran",
+    "new mock fixture mutated shared DRAFT and omitted scorer arguments/import; corrected tests without changing assertions",
+    "reusing deliberately corrupted catalog test DB produced version conflicts; kept that DB and reran full suite in fresh isolated migrated database"
+  ],
+  "semantic_accuracy": "not measured; all content/model replies synthetic",
+  "historical_mastery": "not rewritten"
+}

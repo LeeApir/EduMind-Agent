@@ -16,9 +16,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.animation import AnimationJob, AnimationJobEvent
 from app.models.learning import LearningScene, LearningUnit
 from app.services.animation_cache import AnimationCache, runtime_identity
+from app.services.animation_job_qualification import animation_job_approved
 from app.services.animation_publication import bind_media, reviewed_media_row
 from app.services.animation_templates import cache_identity, load_template, normalize_parameters
 from app.services.catalog_animation_access import animation_target_approved
+from app.services.durable_job_dispatch import dispatch_backend, enqueue_animation_job
 from app.services.learning_owner_lock import lock_learning_owner
 
 
@@ -46,26 +48,36 @@ class AnimationReservation:
 
 def _digest(value: object) -> str:
     encoded = json.dumps(
-        value, ensure_ascii=False, sort_keys=True, separators=(",", ":"),
+        value,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
     ).encode("utf-8")
     return hashlib.sha256(encoded).hexdigest()
 
 
 def animation_request_digest(
-    *, learning_unit_id: UUID, scene_id: UUID, scene_version: int,
-    template_id: str, template_version: str, parameters: Mapping[str, object],
+    *,
+    learning_unit_id: UUID,
+    scene_id: UUID,
+    scene_version: int,
+    template_id: str,
+    template_version: str,
+    parameters: Mapping[str, object],
     action_kind: str = "request",
 ) -> str:
     """The idempotency comparison excludes owner but includes every request field."""
-    return _digest({
-        "action_kind": action_kind,
-        "learning_unit_id": str(learning_unit_id),
-        "scene_id": str(scene_id),
-        "scene_version": scene_version,
-        "template_id": template_id,
-        "template_version": template_version,
-        "parameters": parameters,
-    })
+    return _digest(
+        {
+            "action_kind": action_kind,
+            "learning_unit_id": str(learning_unit_id),
+            "scene_id": str(scene_id),
+            "scene_version": scene_version,
+            "template_id": template_id,
+            "template_version": template_version,
+            "parameters": parameters,
+        }
+    )
 
 
 async def reserve_animation_job(
@@ -83,21 +95,33 @@ async def reserve_animation_job(
 ) -> AnimationReservation:
     """Atomically create queued job+event or replay the original owner/key result."""
     digest = animation_request_digest(
-        learning_unit_id=learning_unit_id, scene_id=scene_id,
-        scene_version=scene_version, template_id=template_id,
-        template_version=template_version, parameters=parameters,
+        learning_unit_id=learning_unit_id,
+        scene_id=scene_id,
+        scene_version=scene_version,
+        template_id=template_id,
+        template_version=template_version,
+        parameters=parameters,
     )
     try:
         await lock_learning_owner(db, owner_id)
-        if not await animation_target_approved(db, owner_id=owner_id, unit_id=learning_unit_id,
-                scene_id=scene_id, scene_version=scene_version, template_id=template_id,
-                template_version=template_version, lock_release=True):
+        if not await animation_target_approved(
+            db,
+            owner_id=owner_id,
+            unit_id=learning_unit_id,
+            scene_id=scene_id,
+            scene_version=scene_version,
+            template_id=template_id,
+            template_version=template_version,
+            lock_release=True,
+        ):
             raise AnimationTargetUnavailable("Reviewed course is unavailable.")
-        existing = await db.scalar(select(AnimationJob).where(
-            AnimationJob.user_id == owner_id,
-            AnimationJob.action_kind == "request",
-            AnimationJob.idempotency_key == idempotency_key,
-        ))
+        existing = await db.scalar(
+            select(AnimationJob).where(
+                AnimationJob.user_id == owner_id,
+                AnimationJob.action_kind == "request",
+                AnimationJob.idempotency_key == idempotency_key,
+            )
+        )
         if existing is not None:
             if existing.request_digest != digest:
                 raise AnimationIdempotencyConflict("Animation request key conflicts.")
@@ -124,11 +148,17 @@ async def reserve_animation_job(
         normalized = normalize_parameters(spec, parameters)
         runtime = runtime_identity(template_id)
         job = AnimationJob(
-            id=uuid4(), user_id=owner_id, learning_unit_id=learning_unit_id,
-            scene_id=scene_id, scene_version=scene_version,
-            action_kind="request", idempotency_key=idempotency_key,
-            request_digest=digest, parameters_digest=_digest(normalized),
-            parameters=normalized, template_id=template_id,
+            id=uuid4(),
+            user_id=owner_id,
+            learning_unit_id=learning_unit_id,
+            scene_id=scene_id,
+            scene_version=scene_version,
+            action_kind="request",
+            idempotency_key=idempotency_key,
+            request_digest=digest,
+            parameters_digest=_digest(normalized),
+            parameters=normalized,
+            template_id=template_id,
             template_version=template_version,
             review_rule_version=spec.review["rule_version"],
             source_sha256=runtime.source_sha256,
@@ -137,7 +167,12 @@ async def reserve_animation_job(
             renderer_config_sha256=runtime.renderer_config_sha256,
             subtitle_version=runtime.subtitle_version,
             cache_key=cache_identity(spec, normalized, runtime),
-            status="queued", attempt=0, progress=0.0, last_event_id=0,
+            dispatch_backend=dispatch_backend(),
+            dispatch_epoch=1,
+            status="queued",
+            attempt=0,
+            progress=0.0,
+            last_event_id=0,
             cancel_requested=False,
         )
         db.add(job)
@@ -153,14 +188,21 @@ async def reserve_animation_job(
             await db.flush()
             bind_media(db, job, record)
             await append_animation_event(
-                db, owner_id=owner_id, job_id=job.id, event_type="succeeded",
+                db,
+                owner_id=owner_id,
+                job_id=job.id,
+                event_type="succeeded",
                 payload={"stage": "completed", "progress": 1.0, "media_id": str(record.id)},
             )
         else:
             await append_animation_event(
-                db, owner_id=owner_id, job_id=job.id, event_type="queued",
+                db,
+                owner_id=owner_id,
+                job_id=job.id,
+                event_type="queued",
                 payload={"stage": "queued", "progress": 0.0},
             )
+        enqueue_animation_job(db, job)
         await db.commit()
         return AnimationReservation(job, True)
     except Exception:
@@ -169,19 +211,53 @@ async def reserve_animation_job(
 
 
 async def append_animation_event(
-    db: AsyncSession, *, owner_id: UUID, job_id: UUID,
-    event_type: str, payload: dict[str, object],
+    db: AsyncSession,
+    *,
+    owner_id: UUID,
+    job_id: UUID,
+    event_type: str,
+    payload: dict[str, object],
 ) -> AnimationJobEvent:
     """Lock the job; the caller commits this event together with its state change."""
     if event_type not in {
-        "queued", "running", "progress", "succeeded", "failed", "cancelled", "recovered"
+        "queued",
+        "running",
+        "progress",
+        "succeeded",
+        "failed",
+        "cancelled",
+        "recovered",
     }:
         raise ValueError("invalid animation event")
-    if set(payload) - {"stage", "progress", "code", "media_id", "attempt"}:
+    fallback_fields = {"fallback_job_id", "fallback_source", "fallback_of", "source", "reason_code"}
+    if set(payload) - {"stage", "progress", "code", "media_id", "attempt"} - fallback_fields:
         raise ValueError("invalid animation event payload")
+    if set(payload) & fallback_fields:
+        expected = (
+            {"fallback_job_id", "fallback_source"}
+            if event_type == "failed"
+            else {"fallback_of", "source", "reason_code"}
+            if event_type == "queued"
+            else set()
+        )
+        if set(payload) & fallback_fields != expected:
+            raise ValueError("invalid animation fallback event")
+        id_field = "fallback_job_id" if event_type == "failed" else "fallback_of"
+        value = payload[id_field]
+        if not isinstance(value, str) or str(UUID(value)) != value:
+            raise ValueError("invalid animation fallback id")
+        if (
+            payload.get("fallback_source", payload.get("source")) != "template_fallback"
+            or event_type == "queued"
+            and payload["reason_code"] != "DSL_RENDER_FAILED"
+        ):
+            raise ValueError("invalid animation fallback source")
     stage, progress, code, media_id, attempt = (
-        payload.get("stage"), payload.get("progress"), payload.get("code"),
-        payload.get("media_id"), payload.get("attempt"),
+        payload.get("stage"),
+        payload.get("progress"),
+        payload.get("code"),
+        payload.get("media_id"),
+        payload.get("attempt"),
     )
     if stage is not None and (
         not isinstance(stage, str) or not re.fullmatch(r"[a-z_]{1,32}", stage)
@@ -204,43 +280,75 @@ async def append_animation_event(
             raise ValueError("invalid animation media id") from error
     if attempt is not None and (type(attempt) is not int or not 0 <= attempt <= 2):
         raise ValueError("invalid animation event attempt")
-    job = await db.scalar(select(AnimationJob).where(
-        AnimationJob.id == job_id, AnimationJob.user_id == owner_id,
-    ).with_for_update())
+    job = await db.scalar(
+        select(AnimationJob)
+        .where(
+            AnimationJob.id == job_id,
+            AnimationJob.user_id == owner_id,
+        )
+        .with_for_update()
+    )
     if job is None:
         raise AnimationTargetUnavailable("Animation job is unavailable.")
+    if "fallback_of" in payload and (
+        job.render_kind != "template"
+        or str(job.fallback_of) != payload["fallback_of"]
+        or job.fallback_reason_code != payload["reason_code"]
+    ):
+        raise ValueError("invalid animation fallback binding")
+    if "fallback_job_id" in payload:
+        child = await db.scalar(
+            select(AnimationJob).where(
+                AnimationJob.id == UUID(str(payload["fallback_job_id"])),
+                AnimationJob.user_id == owner_id,
+                AnimationJob.fallback_of == job.id,
+                AnimationJob.render_kind == "template",
+            )
+        )
+        if child is None or job.render_kind != "dsl" or job.status != "failed":
+            raise ValueError("invalid animation fallback binding")
     job.last_event_id += 1
     event = AnimationJobEvent(
-        job_id=job_id, event_id=job.last_event_id, user_id=owner_id,
-        event_type=event_type, payload=payload,
+        job_id=job_id,
+        event_id=job.last_event_id,
+        user_id=owner_id,
+        event_type=event_type,
+        payload=payload,
     )
     db.add(event)
     return event
 
 
 async def replay_animation_events(
-    db: AsyncSession, *, owner_id: UUID, job_id: UUID, after: int = 0,
+    db: AsyncSession,
+    *,
+    owner_id: UUID,
+    job_id: UUID,
+    after: int = 0,
 ) -> tuple[AnimationJob, tuple[AnimationJobEvent, ...]]:
-    job = await db.scalar(select(AnimationJob).where(
-        AnimationJob.id == job_id, AnimationJob.user_id == owner_id,
-    ))
+    job = await db.scalar(
+        select(AnimationJob).where(
+            AnimationJob.id == job_id,
+            AnimationJob.user_id == owner_id,
+        )
+    )
     if job is None:
         raise AnimationTargetUnavailable("Animation job is unavailable.")
-    if not await animation_target_approved(db, owner_id=owner_id, unit_id=job.learning_unit_id,
-            scene_id=job.scene_id, scene_version=job.scene_version, template_id=job.template_id,
-            template_version=job.template_version):
+    if not await animation_job_approved(db, job):
         raise AnimationTargetUnavailable("Reviewed course is unavailable.")
     if after < 0 or after > job.last_event_id:
         raise AnimationEventCursorInvalid("Invalid animation event cursor.")
     events = (
-        await db.scalars(select(AnimationJobEvent).where(
-            AnimationJobEvent.job_id == job_id,
-            AnimationJobEvent.user_id == owner_id,
-            AnimationJobEvent.event_id > after,
-        ).order_by(AnimationJobEvent.event_id))
+        await db.scalars(
+            select(AnimationJobEvent)
+            .where(
+                AnimationJobEvent.job_id == job_id,
+                AnimationJobEvent.user_id == owner_id,
+                AnimationJobEvent.event_id > after,
+            )
+            .order_by(AnimationJobEvent.event_id)
+        )
     ).all()
-    if (events and events[0].event_id != after + 1) or (
-        not events and after < job.last_event_id
-    ):
+    if (events and events[0].event_id != after + 1) or (not events and after < job.last_event_id):
         raise AnimationEventCursorExpired("Animation event cursor has expired.")
     return job, tuple(events)

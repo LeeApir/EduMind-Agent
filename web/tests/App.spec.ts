@@ -170,3 +170,56 @@ describe("learning entry", () => {
     expect(sessionStorage.getItem("edumind:scene-selection:unit-history")).toBe("old");
   });
 });
+
+it("shows clarification choices and clears preparation without replacing them with recovery errors", async () => {
+  sessionStorage.clear();
+  const fetchImpl = vi.fn(async (input: RequestInfo | URL) => {
+    const url = String(input);
+    if (url === "/api/auth/session") return Response.json({ csrf_token: "csrf" });
+    if (url === "/api/learning-sessions") return new Response(
+      'event: agent_start\ndata: {"operation_id":"clarify-run","stage":"planning"}\n\n'
+      + 'event: stage_changed\ndata: {"stage":"planning"}\n\n'
+      + 'event: error\ndata: {"operation_id":"clarify-run","code":"GOAL_CLARIFICATION_REQUIRED","reason":"ambiguous_aliases","message":"检测到多个并列主题，请明确目标。","retryable":false,"candidate_nodes":[{"id":"array","name":"数组"},{"id":"queue","name":"队列"}]}\n\n'
+      + 'event: done\ndata: {"status":"failed"}\n\n',
+    );
+    return Response.json({}, { status: 404 });
+  });
+  vi.stubGlobal("fetch", fetchImpl);
+  const wrapper = mount(App, { global: { stubs } });
+  await wrapper.get("textarea").setValue("学习数组和队列");
+  await wrapper.get("form").trigger("submit");
+  await flushPromises();
+  expect(wrapper.get(".error-state").text()).toContain("检测到多个并列主题");
+  expect(wrapper.get('[data-testid="goal-clarification"]').text()).toContain("数组");
+  expect(wrapper.get('[data-testid="goal-clarification"]').text()).toContain("队列");
+  expect(wrapper.find('[data-testid="generation-phase"]').exists()).toBe(false);
+  expect(wrapper.find('[data-testid="loading-state"]').exists()).toBe(false);
+  expect(fetchImpl.mock.calls.some(([url]) => String(url).includes("learning-operations"))).toBe(false);
+  expect(fetchImpl.mock.calls.filter(([url]) => String(url) === "/api/learning-sessions")).toHaveLength(1);
+  wrapper.unmount();
+  sessionStorage.clear(); vi.unstubAllGlobals();
+});
+
+
+it("restores a rejected operation as rejected without reading drafts or generating", async () => {
+  sessionStorage.clear();
+  sessionStorage.setItem("edumind:last-learning-operation", "rejected-operation-001");
+  const fetchImpl = vi.fn(async (input: RequestInfo | URL) => {
+    const url = String(input);
+    if (url === "/api/auth/session") return Response.json({ csrf_token: "csrf" });
+    if (url === "/api/learning-operations/rejected-operation-001") return Response.json({
+      id: "rejected-operation-001", status: "rejected", learning_unit_id: "draft-unit-001",
+    });
+    return Response.json({}, { status: 404 });
+  });
+  vi.stubGlobal("fetch", fetchImpl);
+  const wrapper = mount(App, { global: { stubs } });
+  await flushPromises();
+  expect(wrapper.get('[data-testid="review-rejected-state"]').text()).toContain("未通过审核");
+  expect(wrapper.find('[data-testid="published-state"]').exists()).toBe(false);
+  expect(wrapper.find('[data-testid="explanation-tab"]').exists()).toBe(false);
+  expect(fetchImpl.mock.calls.some(([url]) => String(url).startsWith("/api/learning-units/"))).toBe(false);
+  expect(fetchImpl.mock.calls.some(([url]) => String(url) === "/api/learning-sessions")).toBe(false);
+  wrapper.unmount();
+  sessionStorage.clear(); vi.unstubAllGlobals();
+});

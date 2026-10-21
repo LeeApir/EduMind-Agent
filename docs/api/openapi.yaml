@@ -1,9 +1,21 @@
 {
   "openapi": "3.1.0",
+  "x-plan-check-contract": {
+    "adr": "ADR-0021",
+    "implementation_task": "PHASE-1-T082",
+    "semantic_input_update_task": "PHASE-1-T089",
+    "preflight": "Before any review request, server code checks current operation owner/unit, latest plan identity/version, snapshot digests and reference bindings. Invalid input emits fixed PLAN_REVIEW_BINDING_INVALID, PLAN_SNAPSHOT_CHANGED, PLAN_REFERENCE_BINDING_MISMATCH or PLAN_METADATA_BINDING_MISMATCH; no model request is sent.",
+    "semantic_view": "plan-check-prompt-v2 / plan-semantic-input-v1: original goal, semantic plan and bound background excerpts; server identity/version/digests retained in private plan-check-record-v2 only. v1 history remains readable.",
+    "stage": "plan_check",
+    "early_failure": "error/done with PLAN_REVIEW_REQUIRED or GOAL_CLARIFICATION_REQUIRED and status=failed; PLAN_REJECTED uses status=rejected. No scene_ready, incomplete human case, publication or automatic resume.",
+    "error_optional_fields": {"stage": "plan_check", "check_id": "UUID of server-bound audit, not an authorization token"},
+    "privacy": "Error/recovery exposes IDs and fixed codes only; bodies via trusted local maintenance CLI. Complete-unit review_required remains unchanged."
+  },
+
   "info": {
-    "title": "EduMind MVP 0.3 API contract",
+    "title": "EduMind API contract (Phase 1 Provider design)",
     "version": "0.3.0",
-    "description": "MVP 0.1/0.2已实现接口及MVP 0.3拟实现契约；新增路径仅为T004设计，运行端点由T012–T028交付。JSON是YAML 1.2子集。"
+    "description": "MVP 0.1/0.2已实现接口及MVP 0.3拟实现契约；新增路径仅为T004设计，运行端点由T012–T028交付。JSON是YAML 1.2子集；Phase 1 Provider路径为T003批准边界内设计，x-runtime-status=planned，按x-implementation-task实现，非当前可用端点。"
   },
   "servers": [{"url": "/"}],
   "tags": [
@@ -36,6 +48,2762 @@
     }
   ],
   "paths": {
+    "/api/learning-units/{unit_id}/animations/generate": {
+      "post": {
+        "tags": [
+          "Animation"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "x-implementation-task": "PHASE-1-T028",
+        "x-runtime-status": "implemented",
+        "operationId": "generateAnimation",
+        "summary": "按需生成已审核动画并交付渲染Job",
+        "parameters": [
+          {
+            "name": "unit_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/CsrfToken"
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "name": "X-Animation-Operation-ID",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "UUIDv4非秘密相关ID；预上传temporary handle绑定相同operation/purpose=generation。服务端holder token另行随机生成，不回传。"
+          },
+          {
+            "name": "X-Animation-Quality-Handle",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 32,
+              "maxLength": 200
+            },
+            "description": ""
+          },
+          {
+            "name": "X-Animation-Review-Handle",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 32,
+              "maxLength": 200
+            },
+            "description": ""
+          },
+          {
+            "name": "X-Animation-Allow-Template-Fallback",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "description": "同目标/参数合法模板降级授权；缺省拒绝。不得延长原session expiry。"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnimationGenerateRequest"
+              },
+              "example": {
+                "scene_id": "00000000-0000-4000-8000-000000000001",
+                "scene_version": 1,
+                "goal_kind": "compare",
+                "parameters": {
+                  "values": [
+                    1,
+                    2
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "POST fetch+ReadableStream SSE，agent_start/stage_changed/done；事件数据定义见AnimationPreparationEvent。done不保证渲染成功，handed_off后使用持久Job GET EventSource。",
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/CsrfFailed"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/IdempotencyConflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "429": {
+            "description": "ANIMATION_PREPARATION_LIMIT：最多2个owner活跃准备操作。",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "description": "开发实现受catalog_only门禁（409 FEATURE_UNAVAILABLE）及独立DSL调用预算默认拒绝。相同owner/原session/key/body只观察或重放，不重领handle/启动第二生成；原POST断线取消holder，观察连接断线不取消。绝对deadline<=180s及原session expiry；无Provider/handle/DSL/Python/owner/URL进入body或PG准备记录。"
+      }
+    },
+    "/api/animation-preparations/{operation_id}": {
+      "get": {
+        "tags": [
+          "Animation"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "x-implementation-task": "PHASE-1-T028",
+        "x-runtime-status": "implemented",
+        "operationId": "getAnimationPreparation",
+        "summary": "读取准备快照",
+        "parameters": [
+          {
+            "name": "operation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "owner与不可变原session绑定；private,no-store。handoff后返回Job引用，使用既有Job cancel。到期可CAS固定失败，无持有者接管/后台模型重放。",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnimationPreparation"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      }
+    },
+    "/api/animation-preparations/{operation_id}/cancel": {
+      "post": {
+        "tags": [
+          "Animation"
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "x-implementation-task": "PHASE-1-T028",
+        "x-runtime-status": "implemented",
+        "operationId": "cancelAnimationPreparation",
+        "summary": "取消准备操作",
+        "parameters": [
+          {
+            "name": "operation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/CsrfToken"
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "owner与不可变原session绑定；private,no-store。handoff后返回Job引用，使用既有Job cancel。到期可CAS固定失败，无持有者接管/后台模型重放。",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnimationPreparation"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/CsrfFailed"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/IdempotencyConflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      }
+    },
+
+
+  "/api/providers/catalog": {
+    "get": {
+      "tags": [
+        "Providers"
+      ],
+      "operationId": "getProviderCatalog",
+      "security": [
+        {
+          "sessionCookie": []
+        }
+      ],
+      "parameters": [],
+      "responses": {
+        "200": {
+          "description": "Successful operation.",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "types": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/ProviderType"
+                    }
+                  }
+                },
+                "required": [
+                  "types"
+                ]
+              }
+            }
+          }
+        },
+        "401": {
+          "description": "UNAUTHORIZED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "UNAUTHORIZED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "403": {
+          "description": "CSRF_FAILED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "CSRF_FAILED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "404": {
+          "description": "NOT_FOUND",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "NOT_FOUND",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "409": {
+          "description": "VERSION_CONFLICT",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "VERSION_CONFLICT",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "422": {
+          "description": "VALIDATION_ERROR",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "VALIDATION_ERROR",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "503": {
+          "description": "CREDENTIAL_UNAVAILABLE",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "CREDENTIAL_UNAVAILABLE",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        }
+      },
+      "description": "Static adapter types; no model calls, no private connection data.",
+      "x-implementation-task": "PHASE-1-T011",
+      "x-runtime-status": "implemented"
+    }
+  },
+  "/api/providers/connections": {
+    "get": {
+      "tags": [
+        "Providers"
+      ],
+      "operationId": "listProviderConnections",
+      "security": [
+        {
+          "sessionCookie": []
+        }
+      ],
+      "parameters": [],
+      "responses": {
+        "200": {
+          "description": "Successful operation.",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "connections": {
+                    "type": "array",
+                    "maxItems": 100,
+                    "items": {
+                      "$ref": "#/components/schemas/ProviderConnection"
+                    }
+                  }
+                },
+                "required": [
+                  "connections"
+                ]
+              }
+            }
+          }
+        },
+        "401": {
+          "description": "UNAUTHORIZED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "UNAUTHORIZED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "403": {
+          "description": "CSRF_FAILED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "CSRF_FAILED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "404": {
+          "description": "NOT_FOUND",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "NOT_FOUND",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "409": {
+          "description": "VERSION_CONFLICT",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "VERSION_CONFLICT",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "422": {
+          "description": "VALIDATION_ERROR",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "VALIDATION_ERROR",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "503": {
+          "description": "CREDENTIAL_UNAVAILABLE",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "CREDENTIAL_UNAVAILABLE",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        }
+      },
+      "description": "Current owner only; at most 100 connections; no secret/handle/ciphertext fields and no network probe.",
+      "x-implementation-task": "PHASE-1-T009",
+      "x-runtime-status": "implemented"
+    },
+    "post": {
+      "tags": [
+        "Providers"
+      ],
+      "operationId": "createProviderConnection",
+      "security": [
+        {
+          "sessionCookie": []
+        }
+      ],
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/CsrfToken"
+        }
+      ],
+      "responses": {
+        "201": {
+          "description": "Successful operation.",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderConnection"
+              }
+            }
+          }
+        },
+        "401": {
+          "description": "UNAUTHORIZED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "UNAUTHORIZED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "403": {
+          "description": "CSRF_FAILED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "CSRF_FAILED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "404": {
+          "description": "NOT_FOUND",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "NOT_FOUND",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "409": {
+          "description": "VERSION_CONFLICT",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "VERSION_CONFLICT",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "422": {
+          "description": "VALIDATION_ERROR",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "VALIDATION_ERROR",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "503": {
+          "description": "CREDENTIAL_UNAVAILABLE",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "CREDENTIAL_UNAVAILABLE",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        }
+      },
+      "description": "Owner/session derived from cookie. Persistent mode requires secret, temporary/none forbid it. Syntax and target eligibility only; no automatic model probe. Credential expiry cannot exceed original session.",
+      "x-implementation-task": "PHASE-1-T009",
+      "x-runtime-status": "implemented",
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ProviderConnectionCreate"
+            },
+            "example": {
+              "provider_type": "openai-compatible",
+              "display_name": "Example",
+              "base_url": "https://provider.example/v1",
+              "credential_mode": "persistent",
+              "secret": {
+                "api_key": "TEST_ONLY_EXAMPLE_SECRET"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "/api/providers/connections/{connection_id}": {
+    "get": {
+      "tags": [
+        "Providers"
+      ],
+      "operationId": "getProviderConnection",
+      "security": [
+        {
+          "sessionCookie": []
+        }
+      ],
+      "parameters": [
+        {
+          "name": "connection_id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Successful operation.",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderConnection"
+              }
+            }
+          }
+        },
+        "401": {
+          "description": "UNAUTHORIZED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "UNAUTHORIZED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "403": {
+          "description": "CSRF_FAILED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "CSRF_FAILED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "404": {
+          "description": "NOT_FOUND",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "NOT_FOUND",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "409": {
+          "description": "VERSION_CONFLICT",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "VERSION_CONFLICT",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "422": {
+          "description": "VALIDATION_ERROR",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "VALIDATION_ERROR",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "503": {
+          "description": "CREDENTIAL_UNAVAILABLE",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "CREDENTIAL_UNAVAILABLE",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        }
+      },
+      "description": "Current owner and originating session; foreign or deleted connection is 404; missing/expired session is 401.",
+      "x-implementation-task": "PHASE-1-T009",
+      "x-runtime-status": "implemented"
+    },
+    "patch": {
+      "tags": [
+        "Providers"
+      ],
+      "operationId": "updateProviderConnection",
+      "security": [
+        {
+          "sessionCookie": []
+        }
+      ],
+      "parameters": [
+        {
+          "name": "connection_id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "$ref": "#/components/parameters/CsrfToken"
+        },
+        {
+          "name": "If-Match",
+          "in": "header",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$",
+            "maxLength": 20
+          },
+          "description": "Current positive config_version as an unquoted decimal integer."
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Successful operation.",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderConnection"
+              }
+            }
+          }
+        },
+        "401": {
+          "description": "UNAUTHORIZED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "UNAUTHORIZED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "403": {
+          "description": "CSRF_FAILED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "CSRF_FAILED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "404": {
+          "description": "NOT_FOUND",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "NOT_FOUND",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "409": {
+          "description": "VERSION_CONFLICT",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "VERSION_CONFLICT",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "422": {
+          "description": "VALIDATION_ERROR",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "VALIDATION_ERROR",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "503": {
+          "description": "CREDENTIAL_UNAVAILABLE",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "CREDENTIAL_UNAVAILABLE",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        }
+      },
+      "description": "If-Match mandatory. Target/type change clears old credentials and consent; replacement secret must be explicitly provided for persistent mode. null clears secret. Reject secret in temporary/none mode. All changes increment config_version and invalidate old consent/temporary handles; no model call.",
+      "x-implementation-task": "PHASE-1-T009",
+      "x-runtime-status": "implemented",
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ProviderConnectionPatch"
+            },
+            "example": {
+              "display_name": "Renamed"
+            }
+          }
+        }
+      }
+    },
+    "delete": {
+      "tags": [
+        "Providers"
+      ],
+      "operationId": "deleteProviderConnection",
+      "security": [
+        {
+          "sessionCookie": []
+        }
+      ],
+      "parameters": [
+        {
+          "name": "connection_id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "$ref": "#/components/parameters/CsrfToken"
+        },
+        {
+          "name": "If-Match",
+          "in": "header",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$",
+            "maxLength": 20
+          },
+          "description": "Current positive config_version as an unquoted decimal integer."
+        }
+      ],
+      "responses": {
+        "204": {
+          "description": "Successful operation.",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          }
+        },
+        "401": {
+          "description": "UNAUTHORIZED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "UNAUTHORIZED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "403": {
+          "description": "CSRF_FAILED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "CSRF_FAILED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "404": {
+          "description": "NOT_FOUND",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "NOT_FOUND",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "409": {
+          "description": "VERSION_CONFLICT",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "VERSION_CONFLICT",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "422": {
+          "description": "VALIDATION_ERROR",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "VALIDATION_ERROR",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "503": {
+          "description": "CREDENTIAL_UNAVAILABLE",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "CREDENTIAL_UNAVAILABLE",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        }
+      },
+      "description": "Transaction clears secret, disables and tombstones connection, increments version, invalidates preferences/consent. Repeated delete with last pre-delete If-Match returns 204; another version returns 409. Cross-owner 404. Already sent data cannot be recalled; see ADR-0008 cancellation boundary.",
+      "x-implementation-task": "PHASE-1-T009",
+      "x-runtime-status": "implemented"
+    }
+  },
+  "/api/providers/connections/{connection_id}/temporary-credentials": {
+    "post": {
+      "tags": [
+        "Providers"
+      ],
+      "operationId": "provideTemporaryCredential",
+      "security": [
+        {
+          "sessionCookie": []
+        }
+      ],
+      "parameters": [
+        {
+          "name": "connection_id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "$ref": "#/components/parameters/CsrfToken"
+        }
+      ],
+      "responses": {
+        "201": {
+          "description": "Successful operation.",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TemporaryCredentialReceipt"
+              }
+            }
+          }
+        },
+        "401": {
+          "description": "UNAUTHORIZED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "UNAUTHORIZED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "403": {
+          "description": "CSRF_FAILED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "CSRF_FAILED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "404": {
+          "description": "NOT_FOUND",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "NOT_FOUND",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "409": {
+          "description": "VERSION_CONFLICT",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "VERSION_CONFLICT",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "422": {
+          "description": "VALIDATION_ERROR",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "VALIDATION_ERROR",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "503": {
+          "description": "CREDENTIAL_UNAVAILABLE",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "CREDENTIAL_UNAVAILABLE",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        }
+      },
+      "description": "Only temporary connection at matching consent/config version. Process-local handle bound to authenticated owner/session/operation; pending <=5min, <=4 per session; one claim, total operation <=180s and session deadline. No persistence/network call.",
+      "x-implementation-task": "PHASE-1-T009",
+      "x-runtime-status": "implemented",
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/TemporaryCredentialRequest"
+            },
+            "example": {
+              "secret": {
+                "api_key": "TEST_ONLY_EXAMPLE_SECRET"
+              },
+              "consent": {
+                "accepted": true,
+                "config_version": 1,
+                "model_id": "test-model",
+                "data_categories": [
+                  "probe"
+                ]
+              },
+              "operation_id": "00000000-0000-4000-8000-000000000001",
+              "purpose": "connection_test"
+            }
+          }
+        }
+      }
+    }
+  },
+  "/api/providers/connections/{connection_id}/test": {
+    "post": {
+      "tags": [
+        "Providers"
+      ],
+      "operationId": "testProviderConnection",
+      "security": [
+        {
+          "sessionCookie": []
+        }
+      ],
+      "parameters": [
+        {
+          "name": "connection_id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "$ref": "#/components/parameters/CsrfToken"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "One explicit text probe; this action may contact the selected service. Other capabilities remain unknown.",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderProbeResult"
+              }
+            }
+          }
+        },
+        "401": {
+          "description": "UNAUTHORIZED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "UNAUTHORIZED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "403": {
+          "description": "BUDGET_NOT_AUTHORIZED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "BUDGET_NOT_AUTHORIZED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "404": {
+          "description": "NOT_FOUND",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "NOT_FOUND",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "409": {
+          "description": "VERSION_CONFLICT",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "VERSION_CONFLICT",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "422": {
+          "description": "VALIDATION_ERROR",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "VALIDATION_ERROR",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "503": {
+          "description": "CREDENTIAL_UNAVAILABLE",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "CREDENTIAL_UNAVAILABLE",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "429": {
+          "description": "RATE_LIMITED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "RATE_LIMITED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "502": {
+          "description": "AUTHENTICATION_FAILED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "AUTHENTICATION_FAILED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "504": {
+          "description": "TIMEOUT",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "TIMEOUT",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        }
+      },
+      "description": "Explicit consent for selected version/model and probe-only data. This action may contact the selected service: one fixed short text prompt, maximum 8 output tokens and 10 seconds overall, no retry/fallback/download. Text reachability cannot verify streaming/structured/multimodal capabilities; those stay unknown. target is the actual approved Base URL, is_local reflects all DNS answers at send time and does not prove an offline service. Budget must be separately authorized; otherwise 403 BUDGET_NOT_AUTHORIZED. Temporary handle only for same operation/purpose; unavailable process requires re-entry.",
+      "x-implementation-task": "PHASE-1-T010",
+      "x-runtime-status": "implemented",
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ProviderProbeRequest"
+            },
+            "example": {
+              "operation_id": "00000000-0000-4000-8000-000000000001",
+              "consent": {
+                "accepted": true,
+                "config_version": 1,
+                "model_id": "test-model",
+                "data_categories": [
+                  "probe"
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "/api/providers/connections/{connection_id}/models": {
+    "get": {
+      "tags": [
+        "Providers"
+      ],
+      "operationId": "getCachedProviderModels",
+      "security": [
+        {
+          "sessionCookie": []
+        }
+      ],
+      "parameters": [
+        {
+          "name": "connection_id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Successful operation.",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderModelList"
+              }
+            }
+          }
+        },
+        "401": {
+          "description": "UNAUTHORIZED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "UNAUTHORIZED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "403": {
+          "description": "CSRF_FAILED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "CSRF_FAILED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "404": {
+          "description": "NOT_FOUND",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "NOT_FOUND",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "409": {
+          "description": "VERSION_CONFLICT",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "VERSION_CONFLICT",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "422": {
+          "description": "VALIDATION_ERROR",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "VALIDATION_ERROR",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "503": {
+          "description": "CREDENTIAL_UNAVAILABLE",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "CREDENTIAL_UNAVAILABLE",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        }
+      },
+      "description": "Read existing owner-scoped snapshot only, never refresh or contact Provider. Unknown/undeclared capability is null; empty cache is empty models with refreshed_at=null.",
+      "x-implementation-task": "PHASE-1-T011",
+      "x-runtime-status": "implemented"
+    }
+  },
+  "/api/providers/connections/{connection_id}/models/refresh": {
+    "post": {
+      "tags": [
+        "Providers"
+      ],
+      "operationId": "refreshProviderModels",
+      "security": [
+        {
+          "sessionCookie": []
+        }
+      ],
+      "parameters": [
+        {
+          "name": "connection_id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "$ref": "#/components/parameters/CsrfToken"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Successful operation.",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderModelList"
+              }
+            }
+          }
+        },
+        "401": {
+          "description": "UNAUTHORIZED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "UNAUTHORIZED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "403": {
+          "description": "BUDGET_NOT_AUTHORIZED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "BUDGET_NOT_AUTHORIZED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "404": {
+          "description": "NOT_FOUND",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "NOT_FOUND",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "409": {
+          "description": "VERSION_CONFLICT",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "VERSION_CONFLICT",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "422": {
+          "description": "VALIDATION_ERROR",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "VALIDATION_ERROR",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "503": {
+          "description": "CREDENTIAL_UNAVAILABLE",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "CREDENTIAL_UNAVAILABLE",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "429": {
+          "description": "RATE_LIMITED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "RATE_LIMITED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "502": {
+          "description": "AUTHENTICATION_FAILED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "AUTHENTICATION_FAILED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "504": {
+          "description": "TIMEOUT",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "TIMEOUT",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        }
+      },
+      "description": "Explicit consent/budget; this action may contact the selected service. One GET models or api/tags attempt, 10 second total deadline, 2 MiB body and 1000 unique model IDs maximum, no poll/retry/fallback/download. Only sanitized IDs and capability booleans are cached in PostgreSQL for the selected config version; error retains previous snapshot. Standard lists do not declare capabilities. Optional edumind_capabilities boolean/null metadata is source=declared, never verified; parser rule version is retained, no name inference. GET never refreshes; changed config returns an empty current-version cache. No usage supplied by list endpoints.",
+      "x-implementation-task": "PHASE-1-T011",
+      "x-runtime-status": "implemented",
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ProviderProbeRequest"
+            },
+            "example": {
+              "operation_id": "00000000-0000-4000-8000-000000000001",
+              "consent": {
+                "accepted": true,
+                "config_version": 1,
+                "model_id": "test-model",
+                "data_categories": [
+                  "probe"
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "/api/model-preferences": {
+    "get": {
+      "tags": [
+        "Providers"
+      ],
+      "operationId": "getModelPreferences",
+      "security": [
+        {
+          "sessionCookie": []
+        }
+      ],
+      "parameters": [],
+      "responses": {
+        "200": {
+          "description": "Successful operation.",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "preferences": {
+                    "type": "array",
+                    "maxItems": 4,
+                    "items": {
+                      "$ref": "#/components/schemas/ModelPreference"
+                    }
+                  }
+                },
+                "required": [
+                  "preferences"
+                ]
+              }
+            }
+          }
+        },
+        "401": {
+          "description": "UNAUTHORIZED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "UNAUTHORIZED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "403": {
+          "description": "CSRF_FAILED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "CSRF_FAILED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "404": {
+          "description": "NOT_FOUND",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "NOT_FOUND",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "409": {
+          "description": "VERSION_CONFLICT",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "VERSION_CONFLICT",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "422": {
+          "description": "VALIDATION_ERROR",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "VALIDATION_ERROR",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "503": {
+          "description": "CREDENTIAL_UNAVAILABLE",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "CREDENTIAL_UNAVAILABLE",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        }
+      },
+      "description": "Only persisted user task profiles; missing profile uses documented priority resolution, never overrides explicit unavailable choice. No Provider call. Effective destination must be shown before generation.",
+      "x-implementation-task": "PHASE-1-T012",
+      "x-runtime-status": "implemented"
+    }
+  },
+  "/api/model-preferences/{task_profile}": {
+    "put": {
+      "tags": [
+        "Providers"
+      ],
+      "operationId": "setModelPreference",
+      "security": [
+        {
+          "sessionCookie": []
+        }
+      ],
+      "parameters": [
+        {
+          "name": "task_profile",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "fast",
+              "default",
+              "quality",
+              "review"
+            ]
+          }
+        },
+        {
+          "$ref": "#/components/parameters/CsrfToken"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Successful operation.",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModelPreference"
+              }
+            }
+          }
+        },
+        "401": {
+          "description": "UNAUTHORIZED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "UNAUTHORIZED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "403": {
+          "description": "CSRF_FAILED",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "CSRF_FAILED",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "404": {
+          "description": "NOT_FOUND",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "NOT_FOUND",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "409": {
+          "description": "VERSION_CONFLICT",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "VERSION_CONFLICT",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "422": {
+          "description": "VALIDATION_ERROR",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "VALIDATION_ERROR",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        },
+        "503": {
+          "description": "CREDENTIAL_UNAVAILABLE",
+          "headers": {
+            "Cache-Control": {
+              "schema": {
+                "type": "string",
+                "const": "private, no-store"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderApiError"
+              },
+              "example": {
+                "code": "CREDENTIAL_UNAVAILABLE",
+                "message": "Provider operation is not available.",
+                "retryable": false
+              }
+            }
+          }
+        }
+      },
+      "description": "expected_version=0 creates; otherwise compare exact current version. Consent explicitly approves route and ordered fallbacks/data categories. Deleted/expired/stale connection rejected; model/capability unknown blocks invocation, no automatic discovery. Default empty fallbacks; no silent system route after explicit selection fails.",
+      "x-implementation-task": "PHASE-1-T012",
+      "x-runtime-status": "implemented",
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ModelPreferenceWrite"
+            },
+            "example": {
+              "expected_version": 0,
+              "route": {
+                "connection_id": "00000000-0000-4000-8000-000000000001",
+                "config_version": 1,
+                "model_id": "test-model",
+                "data_categories": [
+                  "learning_goal"
+                ]
+              },
+              "fallbacks": [],
+              "consent_accepted": true
+            }
+          }
+        }
+      }
+    }
+  }
+,
   "/api/catalog/learning-units/{unit_id}/demo": {
     "get": {
       "tags": [
@@ -442,24 +3210,72 @@
       }
     },
     "/api/learning-sessions": {
-      "post": {
-        "tags": ["Learning"],
-        "summary": "创建学习会话，流式返回临时首段并审核发布正式资源",
-        "description": "先将目标映射到已审核图谱节点；不可靠映射返回澄清而不默认节点。可靠目标按路径当前推荐节点生成内容，学习单元保存节点与路径快照。首段 token 是待审核的临时内容；只有 scene_ready 指向的版本可作为正式资源读取。相同 owner、Idempotency-Key 和请求摘要必须返回同一操作或同一澄清结果。重复 POST 只回放持久化状态，不调用 Provider；失败操作不自动创建新 attempt。只有用户明确重新生成或提交新目标才使用新幂等键。",
-        "operationId": "startLearningSession",
-        "security": [{"sessionCookie": []}],
-        "parameters": [{"$ref": "#/components/parameters/IdempotencyKey"}, {"$ref": "#/components/parameters/CsrfToken"}],
-        "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/StartLearningRequest"}}}},
-        "responses": {
-          "200": {"$ref": "#/components/responses/LearningEventStream"},
-          "401": {"$ref": "#/components/responses/Unauthorized"},
-          "403": {"$ref": "#/components/responses/CsrfFailed"},
-          "409": {"$ref": "#/components/responses/IdempotencyConflict"},
-          "422": {"description": "请求无效或目标需要澄清。", "content": {"application/json": {"schema": {"oneOf": [{"$ref": "#/components/schemas/Error"}, {"$ref": "#/components/schemas/GoalClarification"}]}}}},
-          "429": {"$ref": "#/components/responses/RateLimited"}
+  "post": {
+    "tags": [
+      "Learning"
+    ],
+    "summary": "创建学习会话，流式返回临时首段并审核发布正式资源",
+    "description": "先将目标映射到已审核图谱节点；不可靠映射返回澄清而不默认节点。旧协议保留原路径行为；shared-plan-v1 默认直接学习目标，显式 teaching_mode=recommended 才选择冻结路径推荐节点，并发送 teaching_selected 告知三种节点与分段范围，学习单元保存节点与路径快照。首段 token 是待审核的临时内容；只有 scene_ready 指向的版本可作为正式资源读取。相同 owner、Idempotency-Key 和请求摘要必须返回同一操作或同一澄清结果。重复 POST 只回放持久化状态，不调用 Provider；失败操作不自动创建新 attempt。只有用户明确重新生成或提交新目标才使用新幂等键。 generation_protocol=shared-plan-v1选择计划/三场景/混合审核新链；不自动回退。首版新链只使用已存在的有据画像（缺失保持未知），不新增画像推断/临时讲解请求，实际阶段由SSE及操作GET读取。每次最多20个含可选目标映射的请求与180秒总窗；无隐式重试。",
+    "operationId": "startLearningSession",
+    "security": [
+      {
+        "sessionCookie": []
+      }
+    ],
+    "parameters": [
+      {
+        "$ref": "#/components/parameters/IdempotencyKey"
+      },
+      {
+        "$ref": "#/components/parameters/CsrfToken"
+      }
+    ],
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/StartLearningRequest"
+          }
         }
       }
     },
+    "responses": {
+      "200": {
+        "$ref": "#/components/responses/LearningEventStream"
+      },
+      "401": {
+        "$ref": "#/components/responses/Unauthorized"
+      },
+      "403": {
+        "$ref": "#/components/responses/CsrfFailed"
+      },
+      "409": {
+        "$ref": "#/components/responses/IdempotencyConflict"
+      },
+      "422": {
+        "description": "请求无效或目标需要澄清。",
+        "content": {
+          "application/json": {
+            "schema": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/Error"
+                },
+                {
+                  "$ref": "#/components/schemas/GoalClarification"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "429": {
+        "$ref": "#/components/responses/RateLimited"
+      }
+    }
+  }
+},
     "/api/learning-operations/{operationId}": {
       "get": {
         "tags": ["Learning"],
@@ -505,20 +3321,53 @@
       }
     },
     "/api/learning-units/{learningUnitId}": {
-      "get": {
-        "tags": ["Learning"],
-        "summary": "读取学生可见的学习单元",
-        "description": "只返回所有者拥有且已审核发布的场景与资源版本；同一scene_key保留旧版只读，并以is_current标明最新正式版本；不得泄露临时候选。",
-        "operationId": "getLearningUnit",
-        "security": [{"sessionCookie": []}],
-        "parameters": [{"$ref": "#/components/parameters/LearningUnitId"}],
-        "responses": {
-          "200": {"description": "学习单元。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/LearningUnit"}}}},
-          "401": {"$ref": "#/components/responses/Unauthorized"},
-          "404": {"$ref": "#/components/responses/NotFound"}
-        }
+  "get": {
+    "tags": [
+      "Learning"
+    ],
+    "summary": "读取学生可见的学习单元",
+    "description": "只返回所有者拥有且已审核发布的场景与资源版本；同一scene_key保留旧版只读，并以is_current标明最新正式版本；不得泄露临时候选。",
+    "operationId": "getLearningUnit",
+    "security": [
+      {
+        "sessionCookie": []
       }
-    },
+    ],
+    "parameters": [
+      {
+        "$ref": "#/components/parameters/LearningUnitId"
+      },
+      {
+        "name": "publication_version",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "description": "省略取current完整快照，指定只读准确已发布未撤回版本；不可读404，不回退其他版本。旧无计划单元指定此参数404。"
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "学习单元。",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/LearningUnit"
+            }
+          }
+        }
+      },
+      "401": {
+        "$ref": "#/components/responses/Unauthorized"
+      },
+      "404": {
+        "$ref": "#/components/responses/NotFound"
+      }
+    }
+  }
+},
     "/api/resource/{resourceId}": {
       "get": {
         "tags": ["Resources"],
@@ -554,7 +3403,9 @@
         "summary": "读取当前版本的公共知识结构",
         "description": "公共种子图谱不包含任何用户掌握度、画像或学习记录；节点和关系均按稳定 ID 排序。",
         "operationId": "getKnowledgeGraph",
+        "parameters": [{"name": "version", "in": "query", "required": false, "description": "只读明确的已批准历史图版本；省略读取当前配置，未知版本503，不切换配置。", "schema": {"type": "string"}}],
         "responses": {
+          "503": {"description": "配置图版本缺失、损坏或未批准；不回退、不返回空路径。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},
           "200": {"description": "已校验的版本化图谱。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/KnowledgeGraph"}}}}
         }
       }
@@ -564,8 +3415,9 @@
         "tags": ["Knowledge Graph"],
         "summary": "读取公共知识节点详情",
         "operationId": "getKnowledgeNode",
-        "parameters": [{"$ref": "#/components/parameters/NodeId"}],
+        "parameters": [{"$ref": "#/components/parameters/NodeId"}, {"name": "version", "in": "query", "required": false, "description": "只读明确的已批准历史图版本；省略读取当前配置，未知版本503，不切换配置。", "schema": {"type": "string"}}],
         "responses": {
+          "503": {"description": "配置图版本缺失、损坏或未批准；不回退、不返回空路径。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},
           "200": {"description": "节点及其稳定排序的入/出关系。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/KnowledgeNodeDetail"}}}},
           "404": {"$ref": "#/components/responses/GraphNodeNotFound"}
         }
@@ -636,6 +3488,7 @@
         "operationId": "getMyMastery",
         "security": [{"sessionCookie": []}],
         "responses": {
+          "503": {"description": "GRAPH_UNAVAILABLE或LEARNING_AVAILABILITY_UNAVAILABLE；配置/课程校验失败不视为缺课程。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},
           "200": {"description": "当前掌握度投影。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/MasteryList"}}}},
           "401": {"$ref": "#/components/responses/Unauthorized"}
         }
@@ -651,6 +3504,7 @@
         "parameters": [{"$ref": "#/components/parameters/CsrfToken"}, {"$ref": "#/components/parameters/IdempotencyKey"}],
         "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/PathPlanRequest"}}}},
         "responses": {
+          "503": {"description": "GRAPH_UNAVAILABLE或LEARNING_AVAILABILITY_UNAVAILABLE；配置/课程校验失败不视为缺课程。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},
           "201": {"description": "已创建或重放路径版本。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/LearningPath"}}}},
           "401": {"$ref": "#/components/responses/Unauthorized"},
           "403": {"$ref": "#/components/responses/CsrfFailed"},
@@ -669,6 +3523,7 @@
         "security": [{"sessionCookie": []}],
         "parameters": [{"$ref": "#/components/parameters/TargetNodeId"}],
         "responses": {
+          "503": {"description": "GRAPH_UNAVAILABLE或LEARNING_AVAILABILITY_UNAVAILABLE；配置/课程校验失败不视为缺课程。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},
           "200": {"description": "当前路径版本。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/LearningPath"}}}},
           "401": {"$ref": "#/components/responses/Unauthorized"},
           "404": {"$ref": "#/components/responses/NotFound"}
@@ -685,6 +3540,7 @@
         "parameters": [{"$ref": "#/components/parameters/CsrfToken"}, {"$ref": "#/components/parameters/IdempotencyKey"}, {"$ref": "#/components/parameters/IfMatchPathVersion"}],
         "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/PathReplanRequest"}}}},
         "responses": {
+          "503": {"description": "GRAPH_UNAVAILABLE或LEARNING_AVAILABILITY_UNAVAILABLE；配置/课程校验失败不视为缺课程。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},
           "200": {"description": "已创建或重放新路径版本，包含变化理由。", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/LearningPath"}}}},
           "401": {"$ref": "#/components/responses/Unauthorized"},
           "403": {"$ref": "#/components/responses/CsrfFailed"},
@@ -699,13 +3555,91 @@
     "/api/animation-jobs/{jobId}/cancel": {"post": {"tags": ["Animation"],"summary": "取消未完成Job","operationId": "cancelAnimationJob","security": [{"sessionCookie": []}],"parameters": [{"$ref": "#/components/parameters/AnimationJobId"},{"$ref": "#/components/parameters/CsrfToken"},{"$ref": "#/components/parameters/IdempotencyKey"}],"responses": {"200": {"description": "成功。","content": {"application/json": {"schema": {"$ref": "#/components/schemas/AnimationJob"}}}},"401": {"$ref": "#/components/responses/Unauthorized"},"403": {"$ref": "#/components/responses/CsrfFailed"},"404": {"$ref": "#/components/responses/NotFound"},"409": {"description": "IDEMPOTENCY_CONFLICT 或 当前Job终态不允许该操作；code=JOB_STATE_CONFLICT。","content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},"422": {"$ref": "#/components/responses/ValidationError"}},"description": "已成功终态不能取消；取消幂等键按owner唯一持久保存，取消与发布由同一Job行锁确定顺序。Worker检测到取消后终止当前尝试容器。"}},
     "/api/animation-jobs/{jobId}/retry": {"post": {"tags": ["Animation"],"summary": "显式重试失败或已取消Job","operationId": "retryAnimationJob","security": [{"sessionCookie": []}],"parameters": [{"$ref": "#/components/parameters/AnimationJobId"},{"$ref": "#/components/parameters/CsrfToken"},{"$ref": "#/components/parameters/IdempotencyKey"}],"responses": {"202": {"description": "成功。","content": {"application/json": {"schema": {"$ref": "#/components/schemas/AnimationJob"}}}},"401": {"$ref": "#/components/responses/Unauthorized"},"403": {"$ref": "#/components/responses/CsrfFailed"},"404": {"$ref": "#/components/responses/NotFound"},"409": {"description": "IDEMPOTENCY_CONFLICT 或 当前Job终态不允许该操作；code=JOB_STATE_CONFLICT。","content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},"422": {"$ref": "#/components/responses/ValidationError"}},"description": "创建新Job并保存retry_of；原终态不可修改。"}},
     "/api/animation-jobs/{jobId}/events": {"get": {"tags": ["Animation"],"summary": "持久Job事件流","operationId": "subscribeAnimationJob","security": [{"sessionCookie": []}],"parameters": [{"$ref": "#/components/parameters/AnimationJobId"},{"$ref": "#/components/parameters/LastEventId"},{"$ref": "#/components/parameters/AnimationEventAfter"}],"responses": {"200": {"description": "GET EventSource text/event-stream；事件ID为Job内单调整数。","content": {"text/event-stream": {"schema": {"type": "string"}}}},"401": {"$ref": "#/components/responses/Unauthorized"},"404": {"$ref": "#/components/responses/NotFound"},"409": {"$ref": "#/components/responses/EventCursorInvalid"},"410": {"$ref": "#/components/responses/EventCursorExpired"},"503": {"description": "本进程SSE连接容量已满；code=STREAM_CAPACITY。","content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}}},"description": "无游标从头；Last-Event-ID只回放更大ID。终态且游标已消费则立即关闭。410后GET快照取last_event_id再订阅；心跳无持久ID。每进程最多32连接，轮询间隔1.5秒，单连接最多5分钟后由EventSource按游标重连；首次连接可用after查询参数，重连时Last-Event-ID头优先。"}},
-    "/api/animation-media/{mediaId}/mp4": {"get": {"tags": ["Animation"],"summary": "读取或下载已审核MP4","operationId": "downloadAnimationMP4","security": [{"sessionCookie": []}],"parameters": [{"$ref": "#/components/parameters/MediaId"},{"$ref": "#/components/parameters/DownloadMedia"}],"responses": {"200": {"description": "仅owner已绑定且已审核的媒体；固定Content-Type、nosniff、private缓存、安全文件名与来源/版本响应头；默认inline、显式下载attachment。MP4支持Range。","content": {"video/mp4": {"schema": {"type": "string","format": "binary"}}},"headers": {"Content-Disposition": {"description": "默认inline供播放/字幕；download=true用attachment；均使用服务端安全文件名。","schema": {"type": "string"}},"X-Content-Type-Options": {"schema": {"type": "string","const": "nosniff"}},"Cache-Control": {"schema": {"type": "string","const": "private, no-store"}},"X-Animation-Media-ID": {"schema": {"$ref": "#/components/schemas/Identifier"}},"X-Animation-Template-ID": {"schema": {"type": "string"}},"X-Animation-Template-Version": {"schema": {"type": "string"}},"X-Animation-Subtitle-Version": {"schema": {"type": "string"}},"X-Animation-Review-Version": {"schema": {"type": "string"}},"X-Animation-Content-SHA256": {"description": "完整文件的内容摘要；206 Range仍指完整资源。","schema": {"type": "string","pattern": "^[0-9a-f]{64}$"}},"X-Animation-Generated-By": {"schema": {"type": "string","const": "reviewed-manim-template"}},"X-Animation-Published-At": {"schema": {"type": "string","format": "date-time"}}}},"206": {"description": "经授权的MP4部分内容。","content": {"video/mp4": {"schema": {"type": "string","format": "binary"}}},"headers": {"Content-Disposition": {"description": "默认inline供播放/字幕；download=true用attachment；均使用服务端安全文件名。","schema": {"type": "string"}},"X-Content-Type-Options": {"schema": {"type": "string","const": "nosniff"}},"Cache-Control": {"schema": {"type": "string","const": "private, no-store"}},"X-Animation-Media-ID": {"schema": {"$ref": "#/components/schemas/Identifier"}},"X-Animation-Template-ID": {"schema": {"type": "string"}},"X-Animation-Template-Version": {"schema": {"type": "string"}},"X-Animation-Subtitle-Version": {"schema": {"type": "string"}},"X-Animation-Review-Version": {"schema": {"type": "string"}},"X-Animation-Content-SHA256": {"description": "完整文件的内容摘要；206 Range仍指完整资源。","schema": {"type": "string","pattern": "^[0-9a-f]{64}$"}},"X-Animation-Generated-By": {"schema": {"type": "string","const": "reviewed-manim-template"}},"X-Animation-Published-At": {"schema": {"type": "string","format": "date-time"}}}},"401": {"$ref": "#/components/responses/Unauthorized"},"404": {"$ref": "#/components/responses/NotFound"},"409": {"$ref": "#/components/responses/MediaNotReady"},"416": {"description": "无效或越界单段Range；code=RANGE_NOT_SATISFIABLE，返回Content-Range: bytes */size。","content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},"503": {"$ref": "#/components/responses/MediaUnavailable"}}}},
-    "/api/animation-media/{mediaId}/srt": {"get": {"tags": ["Animation"],"summary": "读取或下载已审核SRT","operationId": "downloadAnimationSRT","security": [{"sessionCookie": []}],"parameters": [{"$ref": "#/components/parameters/MediaId"},{"$ref": "#/components/parameters/DownloadMedia"}],"responses": {"200": {"description": "仅owner已绑定且已审核的媒体；固定Content-Type、nosniff、private缓存、安全文件名与来源/版本响应头；默认inline、显式下载attachment。SRT使用UTF-8。","content": {"application/x-subrip": {"schema": {"type": "string","format": "binary"}}},"headers": {"Content-Disposition": {"description": "默认inline供播放/字幕；download=true用attachment；均使用服务端安全文件名。","schema": {"type": "string"}},"X-Content-Type-Options": {"schema": {"type": "string","const": "nosniff"}},"Cache-Control": {"schema": {"type": "string","const": "private, no-store"}},"X-Animation-Media-ID": {"schema": {"$ref": "#/components/schemas/Identifier"}},"X-Animation-Template-ID": {"schema": {"type": "string"}},"X-Animation-Template-Version": {"schema": {"type": "string"}},"X-Animation-Subtitle-Version": {"schema": {"type": "string"}},"X-Animation-Review-Version": {"schema": {"type": "string"}},"X-Animation-Content-SHA256": {"description": "完整文件的内容摘要；206 Range仍指完整资源。","schema": {"type": "string","pattern": "^[0-9a-f]{64}$"}},"X-Animation-Generated-By": {"schema": {"type": "string","const": "reviewed-manim-template"}},"X-Animation-Published-At": {"schema": {"type": "string","format": "date-time"}}}},"401": {"$ref": "#/components/responses/Unauthorized"},"404": {"$ref": "#/components/responses/NotFound"},"409": {"$ref": "#/components/responses/MediaNotReady"},"503": {"$ref": "#/components/responses/MediaUnavailable"}}}},
+    "/api/animation-media/{mediaId}/mp4": {"get": {"tags": ["Animation"],"summary": "读取或下载已审核MP4","operationId": "downloadAnimationMP4","security": [{"sessionCookie": []}],"parameters": [{"$ref": "#/components/parameters/MediaId"},{"$ref": "#/components/parameters/DownloadMedia"}],"responses": {"200": {"description": "仅owner已绑定且已审核的媒体；固定Content-Type、nosniff、private缓存、安全文件名与来源/版本响应头；默认inline、显式下载attachment。MP4支持Range。","content": {"video/mp4": {"schema": {"type": "string","format": "binary"}}},"headers": {"Content-Disposition": {"description": "默认inline供播放/字幕；download=true用attachment；均使用服务端安全文件名。","schema": {"type": "string"}},"X-Content-Type-Options": {"schema": {"type": "string","const": "nosniff"}},"Cache-Control": {"schema": {"type": "string","const": "private, no-store"}},"X-Animation-Media-ID": {"schema": {"$ref": "#/components/schemas/Identifier"}},"X-Animation-Template-ID": {"schema": {"type": "string"}},"X-Animation-Template-Version": {"schema": {"type": "string"}},"X-Animation-Subtitle-Version": {"schema": {"type": "string"}},"X-Animation-Review-Version": {"schema": {"type": "string"}},"X-Animation-Content-SHA256": {"description": "完整文件的内容摘要；206 Range仍指完整资源。","schema": {"type": "string","pattern": "^[0-9a-f]{64}$"}},"X-Animation-Generated-By": {"schema": {"type": "string","enum": ["reviewed-manim-template","reviewed-manim-dsl"]}},"X-Animation-Published-At": {"schema": {"type": "string","format": "date-time"}},"X-Animation-Source-Versions": {"schema": {"type": "string"},"description": "仅DSL：受限ASCII JSON模型、Prompt、binding、graph、schema/compiler/rules版本；无完整URL/Key/handle。DSL省略模板ID/version响应头。"}}},"206": {"description": "经授权的MP4部分内容。","content": {"video/mp4": {"schema": {"type": "string","format": "binary"}}},"headers": {"Content-Disposition": {"description": "默认inline供播放/字幕；download=true用attachment；均使用服务端安全文件名。","schema": {"type": "string"}},"X-Content-Type-Options": {"schema": {"type": "string","const": "nosniff"}},"Cache-Control": {"schema": {"type": "string","const": "private, no-store"}},"X-Animation-Media-ID": {"schema": {"$ref": "#/components/schemas/Identifier"}},"X-Animation-Template-ID": {"schema": {"type": "string"}},"X-Animation-Template-Version": {"schema": {"type": "string"}},"X-Animation-Subtitle-Version": {"schema": {"type": "string"}},"X-Animation-Review-Version": {"schema": {"type": "string"}},"X-Animation-Content-SHA256": {"description": "完整文件的内容摘要；206 Range仍指完整资源。","schema": {"type": "string","pattern": "^[0-9a-f]{64}$"}},"X-Animation-Generated-By": {"schema": {"type": "string","enum": ["reviewed-manim-template","reviewed-manim-dsl"]}},"X-Animation-Published-At": {"schema": {"type": "string","format": "date-time"}},"X-Animation-Source-Versions": {"schema": {"type": "string"},"description": "仅DSL：受限ASCII JSON模型、Prompt、binding、graph、schema/compiler/rules版本；无完整URL/Key/handle。DSL省略模板ID/version响应头。"}}},"401": {"$ref": "#/components/responses/Unauthorized"},"404": {"$ref": "#/components/responses/NotFound"},"409": {"$ref": "#/components/responses/MediaNotReady"},"416": {"description": "无效或越界单段Range；code=RANGE_NOT_SATISFIABLE，返回Content-Range: bytes */size。","content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},"503": {"$ref": "#/components/responses/MediaUnavailable"}}}},
+    "/api/animation-media/{mediaId}/srt": {"get": {"tags": ["Animation"],"summary": "读取或下载已审核SRT","operationId": "downloadAnimationSRT","security": [{"sessionCookie": []}],"parameters": [{"$ref": "#/components/parameters/MediaId"},{"$ref": "#/components/parameters/DownloadMedia"}],"responses": {"200": {"description": "仅owner已绑定且已审核的媒体；固定Content-Type、nosniff、private缓存、安全文件名与来源/版本响应头；默认inline、显式下载attachment。SRT使用UTF-8。","content": {"application/x-subrip": {"schema": {"type": "string","format": "binary"}}},"headers": {"Content-Disposition": {"description": "默认inline供播放/字幕；download=true用attachment；均使用服务端安全文件名。","schema": {"type": "string"}},"X-Content-Type-Options": {"schema": {"type": "string","const": "nosniff"}},"Cache-Control": {"schema": {"type": "string","const": "private, no-store"}},"X-Animation-Media-ID": {"schema": {"$ref": "#/components/schemas/Identifier"}},"X-Animation-Template-ID": {"schema": {"type": "string"}},"X-Animation-Template-Version": {"schema": {"type": "string"}},"X-Animation-Subtitle-Version": {"schema": {"type": "string"}},"X-Animation-Review-Version": {"schema": {"type": "string"}},"X-Animation-Content-SHA256": {"description": "完整文件的内容摘要；206 Range仍指完整资源。","schema": {"type": "string","pattern": "^[0-9a-f]{64}$"}},"X-Animation-Generated-By": {"schema": {"type": "string","enum": ["reviewed-manim-template","reviewed-manim-dsl"]}},"X-Animation-Published-At": {"schema": {"type": "string","format": "date-time"}},"X-Animation-Source-Versions": {"schema": {"type": "string"},"description": "仅DSL：受限ASCII JSON模型、Prompt、binding、graph、schema/compiler/rules版本；无完整URL/Key/handle。DSL省略模板ID/version响应头。"}}},"401": {"$ref": "#/components/responses/Unauthorized"},"404": {"$ref": "#/components/responses/NotFound"},"409": {"$ref": "#/components/responses/MediaNotReady"},"503": {"$ref": "#/components/responses/MediaUnavailable"}}}},
     "/api/learning-units/{learningUnitId}/classroom": {"get": {"tags": ["Classroom"],"summary": "读取课堂快照","operationId": "getClassroom","security": [{"sessionCookie": []}],"parameters": [{"$ref": "#/components/parameters/LearningUnitId"}],"responses": {"200": {"description": "成功。","content": {"application/json": {"schema": {"$ref": "#/components/schemas/ClassroomSnapshot"}}}},"401": {"$ref": "#/components/responses/Unauthorized"},"404": {"$ref": "#/components/responses/NotFound"}}},"post": {"tags": ["Classroom"],"summary": "为已发布学习单元建立默认课堂","operationId": "createClassroom","security": [{"sessionCookie": []}],"parameters": [{"$ref": "#/components/parameters/LearningUnitId"},{"$ref": "#/components/parameters/CsrfToken"},{"$ref": "#/components/parameters/IdempotencyKey"}],"description": "默认focus/仅导师、revision=1；同owner+单元最多一个当前课堂。已存在且同键同摘要回放原快照；仅已审核且published_at非空的intro资源可创建课堂；不启动Provider。","responses": {"201": {"description": "新建默认课堂。","content": {"application/json": {"schema": {"$ref": "#/components/schemas/ClassroomSnapshot"}}}},"200": {"description": "幂等回放已建课堂。","content": {"application/json": {"schema": {"$ref": "#/components/schemas/ClassroomSnapshot"}}}},"401": {"$ref": "#/components/responses/Unauthorized"},"403": {"$ref": "#/components/responses/CsrfFailed"},"404": {"$ref": "#/components/responses/NotFound"},"409": {"description": "IDEMPOTENCY_CONFLICT；迁移前操作无可恢复原回执时为IDEMPOTENCY_RESULT_UNAVAILABLE。","content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},"422": {"$ref": "#/components/responses/ValidationError"}}}},
     "/api/learning-units/{learningUnitId}/classroom/messages": {"get": {"tags": ["Classroom"],"summary": "读取已提交课堂消息","operationId": "getClassroomMessages","security": [{"sessionCookie": []}],"parameters": [{"$ref": "#/components/parameters/LearningUnitId"},{"$ref": "#/components/parameters/AfterMessageCursor"}],"responses": {"200": {"description": "成功。","content": {"application/json": {"schema": {"$ref": "#/components/schemas/ClassroomMessagePage"}}}},"401": {"$ref": "#/components/responses/Unauthorized"},"404": {"$ref": "#/components/responses/NotFound"},"409": {"$ref": "#/components/responses/MessageCursorInvalid"},"410": {"$ref": "#/components/responses/MessageCursorExpired"}},"description": "after只过滤已提交消息，不回放临时token；410后GET课堂快照取得message_cursor。"},"post": {"tags": ["Classroom"],"summary": "课堂发言流","operationId": "streamClassroomSpeech","security": [{"sessionCookie": []}],"parameters": [{"$ref": "#/components/parameters/LearningUnitId"},{"$ref": "#/components/parameters/CsrfToken"},{"$ref": "#/components/parameters/IdempotencyKey"},{"$ref": "#/components/parameters/IfMatchClassroomRevision"}],"responses": {"200": {"description": "POST fetch+ReadableStream；临时token不持久回放，只有审核通过的ready事件指向正式资源。","content": {"text/event-stream": {"schema": {"type": "string"}}}},"401": {"$ref": "#/components/responses/Unauthorized"},"403": {"$ref": "#/components/responses/CsrfFailed"},"404": {"$ref": "#/components/responses/NotFound"},"409": {"description": "IDEMPOTENCY_CONFLICT 或 课堂revision不匹配；code=CLASSROOM_VERSION_CONFLICT。","content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},"422": {"$ref": "#/components/responses/ValidationError"},"503": {"$ref": "#/components/responses/ReviewUnavailable"}},"requestBody": {"required": true,"content": {"application/json": {"schema": {"$ref": "#/components/schemas/ClassroomSpeech"}}}},"description": "事件携带revision、scene_version、generation_id；低风险临时token可见，审核拒绝/不可用发content_retracted并禁止持久发布。 响应头发送前审核不可用可返回HTTP 503；流开始后只能发送content_retracted、error(code=REVIEW_UNAVAILABLE)、done(status=failed)，不能修改HTTP状态。SSE首个agent_start含operation_id，可用GET /api/classroom-operations/{operationId}读取持久操作状态；临时token不重放。"}},
     "/api/learning-units/{learningUnitId}/classroom/mode": {"patch": {"tags": ["Classroom"],"summary": "切换专注/互动和角色启用","operationId": "setClassroomMode","security": [{"sessionCookie": []}],"parameters": [{"$ref": "#/components/parameters/LearningUnitId"},{"$ref": "#/components/parameters/CsrfToken"},{"$ref": "#/components/parameters/IdempotencyKey"},{"$ref": "#/components/parameters/IfMatchClassroomRevision"}],"responses": {"200": {"description": "成功。","content": {"application/json": {"schema": {"$ref": "#/components/schemas/ClassroomSnapshot"}}}},"401": {"$ref": "#/components/responses/Unauthorized"},"403": {"$ref": "#/components/responses/CsrfFailed"},"404": {"$ref": "#/components/responses/NotFound"},"409": {"description": "IDEMPOTENCY_CONFLICT 或 课堂revision不匹配；code=CLASSROOM_VERSION_CONFLICT；迁移前操作无可恢复原回执时为IDEMPOTENCY_RESULT_UNAVAILABLE。","content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},"422": {"$ref": "#/components/responses/ValidationError"}},"requestBody": {"required": true,"content": {"application/json": {"schema": {"$ref": "#/components/schemas/ModeChange"}}}},"description": "幂等命中先于If-Match检查，并返回该命令提交时保存的原快照；关闭角色先提交新revision和generation_id，迟到输出不能发布到当前会话。"}},
     "/api/learning-units/{learningUnitId}/classroom/controls": {"post":{"tags":["Classroom"],"summary":"学习控制","operationId":"controlClassroom","security":[{"sessionCookie":[]}],"parameters":[{"$ref":"#/components/parameters/LearningUnitId"},{"$ref":"#/components/parameters/CsrfToken"},{"$ref":"#/components/parameters/IdempotencyKey"},{"$ref":"#/components/parameters/IfMatchClassroomRevision"}],"responses":{"200":{"description":"成功。","content":{"application/json":{"schema":{"$ref":"#/components/schemas/ClassroomSnapshot"}}}},"401":{"$ref":"#/components/responses/Unauthorized"},"403":{"$ref":"#/components/responses/CsrfFailed"},"404":{"$ref":"#/components/responses/NotFound"},"409":{"description":"IDEMPOTENCY_CONFLICT、IDEMPOTENCY_RESULT_UNAVAILABLE、CLASSROOM_VERSION_CONFLICT或CLASSROOM_CONTROL_CONFLICT。","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Error"}}}},"422":{"$ref":"#/components/responses/ValidationError"}},"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/LearningControl"}}}},"description":"暂停/继续、跳过、补前置和资源选择按owner、revision与幂等键提交；重复请求回放原快照。跳过记录显式反馈但不增加掌握分；资源选择需当前正式资源并记录行为事件；补前置需当前路径推荐的直接前置节点并保存返回点。动画选择不创建Job。"}},
-    "/api/learning-units/{learningUnitId}/classroom/scenes/{sceneKey}/reexplanations": {"post": {"tags": ["Classroom"],"summary": "重解释当前场景","operationId": "reexplainScene","security": [{"sessionCookie": []}],"parameters": [{"$ref": "#/components/parameters/LearningUnitId"},{"$ref": "#/components/parameters/SceneKey"},{"$ref": "#/components/parameters/CsrfToken"},{"$ref": "#/components/parameters/IdempotencyKey"},{"$ref": "#/components/parameters/IfMatchClassroomRevision"}],"responses": {"200": {"description": "POST fetch+ReadableStream；临时token不持久回放，只有审核通过的ready事件指向正式资源。","content": {"text/event-stream": {"schema": {"type": "string"}}}},"401": {"$ref": "#/components/responses/Unauthorized"},"403": {"$ref": "#/components/responses/CsrfFailed"},"404": {"$ref": "#/components/responses/NotFound"},"409": {"description": "IDEMPOTENCY_CONFLICT 或 场景基版本过期；code=SCENE_VERSION_CONFLICT。","content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},"422": {"$ref": "#/components/responses/ValidationError"},"503": {"$ref": "#/components/responses/ReviewUnavailable"}},"requestBody": {"required": true,"content": {"application/json": {"schema": {"$ref": "#/components/schemas/ReexplanationRequest"}}}},"description": "证据仅表示提出需求；候选经schema/Review后用base_scene_version CAS发布。失败/断线保留旧正式版本。 响应头发送前审核不可用可返回HTTP 503；流开始后只能发送content_retracted、error(code=REVIEW_UNAVAILABLE)、done(status=failed)，不能修改HTTP状态。SSE首个agent_start含operation_id，可用GET /api/classroom-operations/{operationId}读取持久操作状态；临时token不重放。"}},
+    "/api/learning-units/{learningUnitId}/classroom/scenes/{sceneKey}/reexplanations": {
+  "post": {
+    "tags": [
+      "Classroom"
+    ],
+    "summary": "重解释当前场景",
+    "operationId": "reexplainScene",
+    "security": [
+      {
+        "sessionCookie": []
+      }
+    ],
+    "parameters": [
+      {
+        "$ref": "#/components/parameters/LearningUnitId"
+      },
+      {
+        "$ref": "#/components/parameters/SceneKey"
+      },
+      {
+        "$ref": "#/components/parameters/CsrfToken"
+      },
+      {
+        "$ref": "#/components/parameters/IdempotencyKey"
+      },
+      {
+        "$ref": "#/components/parameters/IfMatchClassroomRevision"
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "POST fetch+ReadableStream；临时token不持久回放，只有审核通过的ready事件指向正式资源。",
+        "content": {
+          "text/event-stream": {
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "401": {
+        "$ref": "#/components/responses/Unauthorized"
+      },
+      "403": {
+        "$ref": "#/components/responses/CsrfFailed"
+      },
+      "404": {
+        "$ref": "#/components/responses/NotFound"
+      },
+      "409": {
+        "description": "IDEMPOTENCY_CONFLICT 或 场景基版本过期；code=SCENE_VERSION_CONFLICT。",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "422": {
+        "$ref": "#/components/responses/ValidationError"
+      },
+      "503": {
+        "$ref": "#/components/responses/ReviewUnavailable"
+      }
+    },
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/ReexplanationRequest"
+          }
+        }
+      }
+    },
+    "description": "证据仅表示提出需求；候选经schema/Review后用base_scene_version CAS发布。失败/断线保留旧正式版本。 响应头发送前审核不可用可返回HTTP 503；流开始后只能发送content_retracted、error(code=REVIEW_UNAVAILABLE)、done(status=failed)，不能修改HTTP状态。SSE首个agent_start含operation_id，可用GET /api/classroom-operations/{operationId}读取持久操作状态；临时token不重放。 新planned单元仅支持explanation及intro请求别名，响应真实key；code/exercise返回409 REEXPLANATION_SCENE_UNSUPPORTED。关联代码来自同publication快照。待人工无scene_ready，最终通过才发布完整三场景。"
+  }
+},
     "/api/learning-units/{learningUnitId}/classroom/debate": {"post": {"tags": ["Classroom"],"summary": "启动数组vs链表结构化演示","operationId": "startStructuredDebate","security": [{"sessionCookie": []}],"parameters": [{"$ref": "#/components/parameters/LearningUnitId"},{"$ref": "#/components/parameters/CsrfToken"},{"$ref": "#/components/parameters/IdempotencyKey"},{"$ref": "#/components/parameters/IfMatchClassroomRevision"}],"responses": {"401": {"$ref": "#/components/responses/Unauthorized"},"403": {"$ref": "#/components/responses/CsrfFailed"},"404": {"$ref": "#/components/responses/NotFound"},"409": {"description": "IDEMPOTENCY_CONFLICT 或 课堂revision不匹配；code=CLASSROOM_VERSION_CONFLICT。","content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},"422": {"$ref": "#/components/responses/ValidationError"},"503": {"$ref": "#/components/responses/ReviewUnavailable"},"200": {"description": "POST fetch+ReadableStream；结构化候选为临时数据，review_pass后debate_ready携带已发布结果ID；失败仅error/done。","content": {"text/event-stream": {"schema": {"type": "string"}}}}},"requestBody": {"required": true,"content": {"application/json": {"schema": {"$ref": "#/components/schemas/DebateRequest"}}}},"description": "一次结构化流式生成，三个视角及主持人总结整体审核；不并行生成。保存原课堂返回点。 流开始后Review不可用以error/done传达，不改HTTP状态；agent_start含operation_id，状态由GET课堂操作查询。"}},
     "/api/learning-units/{learningUnitId}/classroom/debate/{resultId}": {"get": {"tags": ["Classroom"],"summary": "读取已审核演示结果","operationId": "getStructuredDebate","security": [{"sessionCookie": []}],"parameters": [{"$ref": "#/components/parameters/LearningUnitId"},{"$ref": "#/components/parameters/DebateResultId"}],"responses": {"200": {"description": "成功。","content": {"application/json": {"schema": {"$ref": "#/components/schemas/DebateResult"}}}},"401": {"$ref": "#/components/responses/Unauthorized"},"404": {"$ref": "#/components/responses/NotFound"}}}},
     "/api/learning-units/{learningUnitId}/classroom/debate/{resultId}/exit": {"post": {"tags": ["Classroom"],"summary": "退出演示并恢复课堂","operationId": "exitStructuredDebate","security": [{"sessionCookie": []}],"parameters": [{"$ref": "#/components/parameters/LearningUnitId"},{"$ref": "#/components/parameters/DebateResultId"},{"$ref": "#/components/parameters/CsrfToken"},{"$ref": "#/components/parameters/IdempotencyKey"},{"$ref": "#/components/parameters/IfMatchClassroomRevision"}],"responses": {"200": {"description": "成功。","content": {"application/json": {"schema": {"$ref": "#/components/schemas/ClassroomSnapshot"}}}},"401": {"$ref": "#/components/responses/Unauthorized"},"403": {"$ref": "#/components/responses/CsrfFailed"},"404": {"$ref": "#/components/responses/NotFound"},"409": {"description": "IDEMPOTENCY_CONFLICT 或 课堂revision不匹配；code=CLASSROOM_VERSION_CONFLICT。","content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},"422": {"$ref": "#/components/responses/ValidationError"}},"description": "恢复scene_progress/模式/角色，message_cursor不回拨；若场景已更新则提示当前已审核版本。"}},
@@ -765,6 +3699,1027 @@
       "ReviewUnavailable": {"description": "审核不可用；code=REVIEW_UNAVAILABLE，禁止正式发布。","content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}}
     },
     "schemas": {
+      "AnimationGenerateRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "scene_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "scene_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "goal_kind": {
+            "type": "string",
+            "enum": [
+              "compare",
+              "swap",
+              "traverse",
+              "insert",
+              "delete",
+              "trace_insert",
+              "trace_delete"
+            ]
+          },
+          "parameters": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "values": {
+                "type": "array",
+                "maxItems": 8,
+                "items": {
+                  "type": "integer",
+                  "minimum": -999,
+                  "maximum": 999
+                }
+              },
+              "index": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 7
+              },
+              "value": {
+                "type": "integer",
+                "minimum": -999,
+                "maximum": 999
+              }
+            },
+            "required": [
+              "values"
+            ]
+          }
+        },
+        "required": [
+          "scene_id",
+          "scene_version",
+          "goal_kind",
+          "parameters"
+        ],
+        "description": "受信知识点映射：array compare/swap/traverse，链表概念compare/traverse，链表遍历traverse，链表插入insert/trace_insert，删除delete/trace_delete。严格整数（bool不可替代）；compare/swap至少2项；insert<=7项且0<=index<=len，delete非空且index<len。trace仅详细轨迹表现，不新增DSL动作。",
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "goal_kind": {
+                  "enum": [
+                    "compare",
+                    "swap"
+                  ]
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "parameters": {
+                  "required": [
+                    "values"
+                  ],
+                  "properties": {
+                    "values": {
+                      "minItems": 2,
+                      "maxItems": 8
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "index"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "value"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "goal_kind": {
+                  "enum": [
+                    "traverse"
+                  ]
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "parameters": {
+                  "required": [
+                    "values"
+                  ],
+                  "properties": {
+                    "values": {
+                      "minItems": 0,
+                      "maxItems": 8
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "index"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "value"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "goal_kind": {
+                  "enum": [
+                    "insert",
+                    "trace_insert"
+                  ]
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "parameters": {
+                  "required": [
+                    "values",
+                    "index",
+                    "value"
+                  ],
+                  "properties": {
+                    "values": {
+                      "minItems": 0,
+                      "maxItems": 7
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "goal_kind": {
+                  "enum": [
+                    "delete",
+                    "trace_delete"
+                  ]
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "parameters": {
+                  "required": [
+                    "values",
+                    "index"
+                  ],
+                  "properties": {
+                    "values": {
+                      "minItems": 1,
+                      "maxItems": 8
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "value"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "AnimationPreparation": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "stage": {
+            "type": "string",
+            "enum": [
+              "reserved",
+              "generating",
+              "reviewing",
+              "compiled",
+              "handed_off",
+              "failed",
+              "cancelled"
+            ]
+          },
+          "deadline": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "job_id": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "error_code": {
+            "type": "string",
+            "pattern": "^[A-Z0-9_]{1,64}$"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "reviewed_cache",
+              "parameterized_template",
+              "generated_dsl",
+              "reviewed_dsl_cache",
+              "template_fallback",
+              "unavailable"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "stage",
+          "deadline"
+        ]
+      },
+      "AnimationPreparationEvent": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "event": {
+                "enum": [
+                  "agent_start",
+                  "done"
+                ]
+              },
+              "data": {
+                "$ref": "#/components/schemas/AnimationPreparation"
+              }
+            },
+            "required": [
+              "event",
+              "data"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "event": {
+                "const": "stage_changed"
+              },
+              "data": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "$ref": "#/components/schemas/Identifier"
+                  },
+                  "stage": {
+                    "type": "string",
+                    "enum": [
+                      "generating",
+                      "reviewing",
+                      "compiled"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "stage"
+                ]
+              }
+            },
+            "required": [
+              "event",
+              "data"
+            ]
+          }
+        ],
+        "description": "SSE文本event/data封装。准备事件不持久化token日志、不承诺游标回放；原session失效的终止done可只含id/stage=failed/error_code。持久渲染Job事件另走GET EventSource。"
+      },
+
+
+  "ProviderType": {
+    "type": "string",
+    "enum": [
+      "openai-compatible",
+      "ollama",
+      "anthropic",
+      "gemini",
+      "spark"
+    ]
+  },
+  "CredentialMode": {
+    "type": "string",
+    "enum": [
+      "none",
+      "persistent",
+      "temporary"
+    ]
+  },
+  "ProviderSecret": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "api_key": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4096,
+        "writeOnly": true
+      },
+      "api_secret": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4096,
+        "writeOnly": true
+      },
+      "app_id": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4096,
+        "writeOnly": true
+      }
+    },
+    "required": [
+      "api_key"
+    ],
+    "writeOnly": true
+  },
+  "ProviderConnection": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "provider_type": {
+        "$ref": "#/components/schemas/ProviderType"
+      },
+      "display_name": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 80
+      },
+      "base_url": {
+        "type": "string",
+        "maxLength": 500
+      },
+      "is_local": {
+        "type": "boolean"
+      },
+      "enabled": {
+        "type": "boolean"
+      },
+      "config_version": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "credential_mode": {
+        "$ref": "#/components/schemas/CredentialMode"
+      },
+      "credential_state": {
+        "type": "string",
+        "enum": [
+          "present",
+          "missing",
+          "expired",
+          "revoked"
+        ]
+      },
+      "credential_expires_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time"
+      }
+    },
+    "required": [
+      "id",
+      "provider_type",
+      "display_name",
+      "base_url",
+      "is_local",
+      "enabled",
+      "config_version",
+      "credential_mode",
+      "credential_state",
+      "credential_expires_at"
+    ]
+  },
+  "ProviderConnectionCreate": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "provider_type": {
+        "$ref": "#/components/schemas/ProviderType"
+      },
+      "display_name": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 80
+      },
+      "base_url": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 500
+      },
+      "enabled": {
+        "type": "boolean",
+        "default": true
+      },
+      "credential_mode": {
+        "$ref": "#/components/schemas/CredentialMode"
+      },
+      "secret": {
+        "$ref": "#/components/schemas/ProviderSecret"
+      }
+    },
+    "required": [
+      "provider_type",
+      "display_name",
+      "base_url",
+      "credential_mode"
+    ],
+    "allOf": [
+      {
+        "if": {
+          "properties": {
+            "credential_mode": {
+              "const": "persistent"
+            }
+          }
+        },
+        "then": {
+          "required": [
+            "secret"
+          ]
+        },
+        "else": {
+          "not": {
+            "required": [
+              "secret"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "ProviderConnectionPatch": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "display_name": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 80
+      },
+      "base_url": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 500
+      },
+      "provider_type": {
+        "$ref": "#/components/schemas/ProviderType"
+      },
+      "enabled": {
+        "type": "boolean"
+      },
+      "credential_mode": {
+        "$ref": "#/components/schemas/CredentialMode"
+      },
+      "secret": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/ProviderSecret"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      }
+    },
+    "required": [],
+    "minProperties": 1
+  },
+  "ProviderCapability": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "streaming": {
+        "type": [
+          "boolean",
+          "null"
+        ]
+      },
+      "structured_output": {
+        "type": [
+          "boolean",
+          "null"
+        ]
+      },
+      "tool_calling": {
+        "type": [
+          "boolean",
+          "null"
+        ]
+      },
+      "vision": {
+        "type": [
+          "boolean",
+          "null"
+        ]
+      },
+      "embedding": {
+        "type": [
+          "boolean",
+          "null"
+        ]
+      },
+      "tts": {
+        "type": [
+          "boolean",
+          "null"
+        ]
+      },
+      "asr": {
+        "type": [
+          "boolean",
+          "null"
+        ]
+      },
+      "source": {
+        "type": "string",
+        "enum": [
+          "declared",
+          "verified",
+          "unknown"
+        ]
+      },
+      "version": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 100
+      }
+    },
+    "required": [
+      "streaming",
+      "structured_output",
+      "tool_calling",
+      "vision",
+      "embedding",
+      "tts",
+      "asr",
+      "source",
+      "version"
+    ]
+  },
+  "ProviderModel": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "id": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 160
+      },
+      "capabilities": {
+        "$ref": "#/components/schemas/ProviderCapability"
+      }
+    },
+    "required": [
+      "id",
+      "capabilities"
+    ]
+  },
+  "ProviderModelList": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "connection_id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "config_version": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "models": {
+        "type": "array",
+        "maxItems": 1000,
+        "items": {
+          "$ref": "#/components/schemas/ProviderModel"
+        }
+      },
+      "refreshed_at": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time"
+      }
+    },
+    "required": [
+      "connection_id",
+      "config_version",
+      "models",
+      "refreshed_at"
+    ]
+  },
+  "ProviderDataConsent": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "accepted": {
+        "type": "boolean",
+        "const": true
+      },
+      "config_version": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "model_id": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 160
+      },
+      "data_categories": {
+        "type": "array",
+        "uniqueItems": true,
+        "minItems": 1,
+        "maxItems": 5,
+        "items": {
+          "type": "string",
+          "enum": [
+            "probe",
+            "learning_goal",
+            "profile_evidence",
+            "limited_history",
+            "content_for_review"
+          ]
+        }
+      }
+    },
+    "required": [
+      "accepted",
+      "config_version",
+      "model_id",
+      "data_categories"
+    ]
+  },
+  "ProviderProbeRequest": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "operation_id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "consent": {
+        "$ref": "#/components/schemas/ProviderDataConsent"
+      },
+      "temporary_handle": {
+        "type": "string",
+        "minLength": 32,
+        "maxLength": 200,
+        "writeOnly": true
+      }
+    },
+    "required": [
+      "operation_id",
+      "consent"
+    ]
+  },
+  "ProviderProbeResult": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "connection_id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "config_version": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "model_id": {
+        "type": "string",
+        "maxLength": 160
+      },
+      "target": {
+        "type": "string",
+        "maxLength": 500
+      },
+      "is_local": {
+        "type": "boolean"
+      },
+      "capabilities": {
+        "$ref": "#/components/schemas/ProviderCapability"
+      },
+      "requests": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 1
+      },
+      "usage": {
+        "type": [
+          "object",
+          "null"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "input_tokens": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "output_tokens": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          }
+        }
+      }
+    },
+    "required": [
+      "connection_id",
+      "config_version",
+      "model_id",
+      "target",
+      "is_local",
+      "capabilities",
+      "requests",
+      "usage"
+    ]
+  },
+  "TemporaryCredentialRequest": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "secret": {
+        "$ref": "#/components/schemas/ProviderSecret"
+      },
+      "consent": {
+        "$ref": "#/components/schemas/ProviderDataConsent"
+      },
+      "operation_id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "purpose": {
+        "type": "string",
+        "enum": [
+          "connection_test",
+          "model_refresh",
+          "generation"
+        ]
+      }
+    },
+    "required": [
+      "secret",
+      "consent",
+      "operation_id",
+      "purpose"
+    ]
+  },
+  "TemporaryCredentialReceipt": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "handle": {
+        "type": "string",
+        "minLength": 32,
+        "maxLength": 200
+      },
+      "expires_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "operation_id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "config_version": {
+        "type": "integer",
+        "minimum": 1
+      }
+    },
+    "required": [
+      "handle",
+      "expires_at",
+      "operation_id",
+      "config_version"
+    ]
+  },
+  "ProviderRoute": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "connection_id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "config_version": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "model_id": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 160
+      },
+      "data_categories": {
+        "type": "array",
+        "uniqueItems": true,
+        "minItems": 1,
+        "maxItems": 5,
+        "items": {
+          "type": "string",
+          "enum": [
+            "probe",
+            "learning_goal",
+            "profile_evidence",
+            "limited_history",
+            "content_for_review"
+          ]
+        }
+      }
+    },
+    "required": [
+      "connection_id",
+      "config_version",
+      "model_id",
+      "data_categories"
+    ]
+  },
+  "ProviderFallback": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "route": {
+        "$ref": "#/components/schemas/ProviderRoute"
+      },
+      "on_errors": {
+        "type": "array",
+        "uniqueItems": true,
+        "minItems": 1,
+        "maxItems": 3,
+        "items": {
+          "type": "string",
+          "enum": [
+            "RATE_LIMITED",
+            "TIMEOUT",
+            "TEMPORARILY_UNAVAILABLE"
+          ]
+        }
+      }
+    },
+    "required": [
+      "route",
+      "on_errors"
+    ]
+  },
+  "ModelPreferenceWrite": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "expected_version": {
+        "type": "integer",
+        "minimum": 0
+      },
+      "route": {
+        "$ref": "#/components/schemas/ProviderRoute"
+      },
+      "fallbacks": {
+        "type": "array",
+        "maxItems": 3,
+        "items": {
+          "$ref": "#/components/schemas/ProviderFallback"
+        },
+        "default": []
+      },
+      "consent_accepted": {
+        "type": "boolean",
+        "const": true
+      }
+    },
+    "required": [
+      "expected_version",
+      "route",
+      "fallbacks",
+      "consent_accepted"
+    ]
+  },
+  "ModelPreference": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "task_profile": {
+        "type": "string",
+        "enum": [
+          "fast",
+          "default",
+          "quality",
+          "review"
+        ]
+      },
+      "version": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "route": {
+        "$ref": "#/components/schemas/ProviderRoute"
+      },
+      "fallbacks": {
+        "type": "array",
+        "maxItems": 3,
+        "items": {
+          "$ref": "#/components/schemas/ProviderFallback"
+        }
+      },
+      "state": {
+        "type": "string",
+        "enum": [
+          "available",
+          "unavailable",
+          "consent_required"
+        ]
+      }
+    },
+    "required": [
+      "task_profile",
+      "version",
+      "route",
+      "fallbacks",
+      "state"
+    ]
+  },
+  "ProviderApiError": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "code": {
+        "type": "string",
+        "enum": [
+          "UNAUTHORIZED",
+          "CSRF_FAILED",
+          "NOT_FOUND",
+          "VALIDATION_ERROR",
+          "CONFIGURATION_MISSING",
+          "INVALID_TARGET",
+          "VERSION_CONFLICT",
+          "CREDENTIAL_MISSING",
+          "CREDENTIAL_EXPIRED",
+          "CREDENTIAL_UNAVAILABLE",
+          "CAPABILITY_UNAVAILABLE",
+          "MODEL_UNAVAILABLE",
+          "CONSENT_REQUIRED",
+          "BUDGET_NOT_AUTHORIZED",
+          "RATE_LIMITED",
+          "AUTHENTICATION_FAILED",
+          "TIMEOUT",
+          "TEMPORARILY_UNAVAILABLE",
+          "INVALID_OUTPUT",
+          "FEATURE_UNAVAILABLE"
+        ]
+      },
+      "message": {
+        "type": "string",
+        "maxLength": 200
+      },
+      "retryable": {
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "code",
+      "message",
+      "retryable"
+    ]
+  }
+,
   "CatalogDemoControl": {
     "properties": {
       "action": {
@@ -820,10 +4775,370 @@
       "User": {"type": "object", "required": ["id", "is_guest"], "properties": {"id": {"$ref": "#/components/schemas/Identifier"}, "is_guest": {"type": "boolean"}}},
       "StudentProfile": {"type": "object", "required": ["id", "version", "updated_at"], "properties": {"id": {"$ref": "#/components/schemas/Identifier"}, "version": {"type": "integer", "minimum": 1}, "initial_query": {"type": ["string", "null"]}, "professional_background": {"type": ["object", "null"]}, "knowledge_base": {"type": ["object", "null"]}, "cognitive_style": {"type": ["object", "null"]}, "learning_goals": {"type": ["object", "null"]}, "error_preferences": {"type": ["array", "null"]}, "engineering_preference": {"type": ["object", "null"]}, "extended_dimensions": {"type": ["object", "null"]}, "evidence": {"type": ["object", "null"]}, "updated_at": {"type": "string", "format": "date-time"}}},
       "RegisterRequest": {"type": "object", "additionalProperties": false, "required": ["email", "password"], "properties": {"email": {"type": "string", "format": "email"}, "password": {"type": "string", "minLength": 12, "writeOnly": true}}},
-      "StartLearningRequest": {"type": "object", "additionalProperties": false, "required": ["goal"], "properties": {"goal": {"type": "string", "minLength": 1, "maxLength": 2000, "description": "学生的一句话学习目标或困难。"}, "preferred_language": {"type": "string", "enum": ["c"], "default": "c"}}},
-      "LearningOperation": {"type": "object", "required": ["id", "status", "attempt", "created_at"], "properties": {"id": {"$ref": "#/components/schemas/Identifier"}, "status": {"type": "string", "enum": ["accepted", "preparing", "streaming_temporary", "temporary_complete", "reviewing", "regenerating", "published", "failed", "canceled"]}, "attempt": {"type": "integer", "minimum": 1, "maximum": 3}, "learning_unit_id": {"type": ["string", "null"]}, "published_scene_version": {"type": ["integer", "null"], "minimum": 1}, "error": {"oneOf": [{"$ref": "#/components/schemas/Error"}, {"$ref": "#/components/schemas/GoalClarification"}, {"type": "null"}]}, "created_at": {"type": "string", "format": "date-time"}, "updated_at": {"type": "string", "format": "date-time"}}},
-      "GoalClarification": {"type": "object", "additionalProperties": false, "required": ["code", "message", "retryable", "candidate_nodes"], "properties": {"code": {"const": "GOAL_CLARIFICATION_REQUIRED"}, "message": {"type": "string"}, "retryable": {"const": false}, "candidate_nodes": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["id", "name"], "properties": {"id": {"$ref": "#/components/schemas/KnowledgeNodeId"}, "name": {"type": "string"}}}}}},
-      "LearningUnit": {"type": "object", "required": ["id", "status", "scenes", "knowledge_node_id", "path_target_node_id", "path_version"], "properties": {"id": {"$ref": "#/components/schemas/Identifier"}, "status": {"const": "ready"}, "scenes": {"type": "array", "items": {"$ref": "#/components/schemas/PublishedScene"}}, "knowledge_node_id": {"type": ["string", "null"]}, "path_target_node_id": {"type": ["string", "null"]}, "path_version": {"type": ["integer", "null"], "minimum": 1}, "origin_type": {"type": "string", "enum": ["generated", "curated"]}, "catalog_release_id": {"type": ["string", "null"], "format": "uuid"}}},
+      "TeachingContext": {
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "teaching_mode",
+    "target_node_id",
+    "recommended_node_id",
+    "teaching_node_id",
+    "selection_reason",
+    "original_request",
+    "segment_goal",
+    "segment_scope",
+    "path_version_id",
+    "path_version",
+    "graph_version",
+    "graph_digest"
+  ],
+  "properties": {
+    "version": {
+      "const": "teaching-node-binding-v1"
+    },
+    "teaching_mode": {
+      "enum": [
+        "target",
+        "recommended"
+      ]
+    },
+    "target_node_id": {
+      "type": "string"
+    },
+    "recommended_node_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "teaching_node_id": {
+      "type": "string"
+    },
+    "selection_reason": {
+      "enum": [
+        "direct_target",
+        "recommended_target",
+        "recommended_prerequisite"
+      ]
+    },
+    "original_request": {
+      "type": "string"
+    },
+    "segment_goal": {
+      "type": "string"
+    },
+    "segment_scope": {
+      "enum": [
+        "target_lesson",
+        "prerequisite_segment"
+      ]
+    },
+    "path_version_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "path_version": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1
+    },
+    "graph_version": {
+      "type": "string"
+    },
+    "graph_digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+},
+      "StartLearningRequest": {
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "goal"
+  ],
+  "properties": {
+    "goal": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000,
+      "description": "学生的一句话学习目标或困难。"
+    },
+    "preferred_language": {
+      "type": "string",
+      "enum": [
+        "c"
+      ],
+      "default": "c"
+    },
+    "generation_protocol": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "shared-plan-v1",
+        null
+      ],
+      "description": "新Web显式选择新链；省略保留历史客户端契约，不作新链失败回退。该标识参与幂等摘要。"
+    },
+    "teaching_mode": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "target",
+        "recommended",
+        null
+      ],
+      "description": "shared-plan-v1: omitted/null means target. recommended explicitly selects frozen path.current. Legacy recommended is 422. Mode changes under the same new key are 409; old shared keys only replay when mode is omitted/null."
+    }
+  }
+},
+      "LearningOperation": {
+  "type": "object",
+  "required": [
+    "id",
+    "status",
+    "attempt",
+    "created_at"
+  ],
+  "properties": {
+    "id": {
+      "$ref": "#/components/schemas/Identifier"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "accepted",
+        "preparing",
+        "streaming_temporary",
+        "temporary_complete",
+        "reviewing",
+        "regenerating",
+        "published",
+        "failed",
+        "canceled",
+        "running",
+        "awaiting_human",
+        "rejected",
+        "completed"
+      ]
+    },
+    "attempt": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 3
+    },
+    "learning_unit_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "published_scene_version": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1
+    },
+    "error": {
+      "oneOf": [
+        {
+          "$ref": "#/components/schemas/Error"
+        },
+        {
+          "$ref": "#/components/schemas/GoalClarification"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "phase": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "planning",
+        "plan_check",
+        "generating",
+        "reviewing",
+        "consistency_check",
+        "awaiting_human",
+        "publishing",
+        null
+      ]
+    },
+    "publication_version": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1
+    },
+    "review_summary": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "state": {
+          "enum": [
+            "pending",
+            "approved",
+            "rejected",
+            "invalidated"
+          ]
+        },
+        "approval_source": {
+          "enum": [
+            "auto",
+            "human_assisted",
+            null
+          ]
+        },
+        "reason_code": {
+          "type": "string"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "teaching_context": {
+      "anyOf": [
+        {
+          "$ref": "#/components/schemas/TeachingContext"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "binding_status": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "bound",
+        "legacy_unverified",
+        null
+      ],
+      "description": "Bound to frozen operation/publication context; old planned content is legacy_unverified; unplanned unit may be null."
+    }
+  }
+},
+      "GoalClarification": {"type": "object", "additionalProperties": false, "required": ["code", "message", "retryable", "candidate_nodes"], "properties": {"reason": {"type": "string", "description": "Stable clarification reason; shared-plan SSE error and persisted operation error carry the same reason, message and candidate_nodes. Terminal failures clear the active phase."}, "code": {"const": "GOAL_CLARIFICATION_REQUIRED"}, "message": {"type": "string"}, "retryable": {"const": false}, "candidate_nodes": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["id", "name"], "properties": {"id": {"$ref": "#/components/schemas/KnowledgeNodeId"}, "name": {"type": "string"}}}}}},
+      "LearningUnit": {
+  "type": "object",
+  "required": [
+    "id",
+    "status",
+    "scenes",
+    "knowledge_node_id",
+    "path_target_node_id",
+    "path_version"
+  ],
+  "properties": {
+    "id": {
+      "$ref": "#/components/schemas/Identifier"
+    },
+    "status": {
+      "const": "ready"
+    },
+    "scenes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/components/schemas/PublishedScene"
+      }
+    },
+    "knowledge_node_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "path_target_node_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "path_version": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1
+    },
+    "origin_type": {
+      "type": "string",
+      "enum": [
+        "generated",
+        "curated"
+      ]
+    },
+    "catalog_release_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid"
+    },
+    "publication_version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "approval_source": {
+      "enum": [
+        "auto",
+        "human_assisted"
+      ]
+    },
+    "teaching_context": {
+      "anyOf": [
+        {
+          "$ref": "#/components/schemas/TeachingContext"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "binding_status": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "bound",
+        "legacy_unverified",
+        null
+      ],
+      "description": "Bound to frozen operation/publication context; old planned content is legacy_unverified; unplanned unit may be null."
+    }
+  }
+},
       "PublishedScene": {"type": "object", "required": ["id", "scene_key", "version", "is_current", "resources", "review_status"], "properties": {"id": {"$ref": "#/components/schemas/Identifier"}, "scene_key": {"type": "string"}, "version": {"type": "integer", "minimum": 1}, "is_current": {"type": "boolean"}, "review_status": {"const": "passed"}, "resources": {"type": "array", "items": {"$ref": "#/components/schemas/PublishedResource"}}}},
       "PublishedResource": {"type": "object", "required": ["id", "type", "version", "content", "review_status"], "properties": {"id": {"$ref": "#/components/schemas/Identifier"}, "type": {"type": "string", "enum": ["explanation", "code", "exercise"]}, "version": {"type": "integer", "minimum": 1}, "content": {"type": "object", "description": "按资源类型定义的已清洗内容；练习 items 只包含 id/question，答案键保留在服务端，评分解释由提交回执返回。"}, "review_status": {"const": "passed"}}},
       "ProfileCorrectionRequest": {"type": "object", "additionalProperties": false, "minProperties": 1, "properties": {"professional_background": {"type": "object"}, "learning_goals": {"type": "object"}, "error_preferences": {"type": "array"}, "engineering_preference": {"type": "object"}, "cognitive_style": {"type": "object", "additionalProperties": false, "required": ["preference_persona"], "properties": {"preference_persona": {"type": "string", "enum": ["performance", "engineering", "academic"]}}}}},
@@ -833,7 +5148,7 @@
       "KnowledgeNodeId": {"type": "string", "pattern": "^[a-z][a-z0-9-]{1,63}$"},
       "KnowledgeNode": {"type": "object", "additionalProperties": false, "required": ["id", "name", "chapter", "difficulty", "description", "prerequisites", "learning_objectives", "common_misconceptions", "ai_context", "mastery_rule_key"], "properties": {"id": {"$ref": "#/components/schemas/KnowledgeNodeId"}, "name": {"type": "string"}, "chapter": {"type": "string"}, "difficulty": {"type": "integer", "minimum": 1, "maximum": 5}, "description": {"type": "string"}, "prerequisites": {"type": "array", "items": {"$ref": "#/components/schemas/KnowledgeNodeId"}}, "learning_objectives": {"type": "array", "minItems": 1, "items": {"type": "string"}}, "common_misconceptions": {"type": "array", "items": {"type": "string"}}, "ai_context": {"type": "string"}, "mastery_rule_key": {"type": "string"}}},
       "KnowledgeRelation": {"type": "object", "additionalProperties": false, "required": ["from", "to", "type"], "properties": {"from": {"$ref": "#/components/schemas/KnowledgeNodeId"}, "to": {"$ref": "#/components/schemas/KnowledgeNodeId"}, "type": {"type": "string", "enum": ["DEPENDS_ON", "SIMILAR_TO", "EXTENDS"]}}},
-      "KnowledgeGraph": {"type": "object", "additionalProperties": false, "required": ["schema_version", "graph_version", "nodes", "relations"], "properties": {"schema_version": {"type": "integer", "minimum": 1}, "graph_version": {"type": "string"}, "nodes": {"type": "array", "items": {"$ref": "#/components/schemas/KnowledgeNode"}}, "relations": {"type": "array", "items": {"$ref": "#/components/schemas/KnowledgeRelation"}}}},
+      "KnowledgeGraph": {"type": "object", "additionalProperties": false, "required": ["schema_version", "graph_version", "nodes", "relations"], "properties": {"schema_version": {"type": "integer", "enum": [1, 2]}, "graph_version": {"type": "string"}, "nodes": {"type": "array", "items": {"$ref": "#/components/schemas/KnowledgeNode"}}, "relations": {"type": "array", "items": {"$ref": "#/components/schemas/KnowledgeRelation"}}}},
       "KnowledgeNodeDetail": {"type": "object", "additionalProperties": false, "required": ["graph_version", "node", "incoming_relations", "outgoing_relations"], "properties": {"graph_version": {"type": "string"}, "node": {"$ref": "#/components/schemas/KnowledgeNode"}, "incoming_relations": {"type": "array", "items": {"$ref": "#/components/schemas/KnowledgeRelation"}}, "outgoing_relations": {"type": "array", "items": {"$ref": "#/components/schemas/KnowledgeRelation"}}}},
       "QuizAnswer": {"type": "object", "additionalProperties": false, "required": ["question_id", "answer"], "properties": {"question_id": {"type": "string", "minLength": 1, "maxLength": 128}, "answer": {"type": "string", "maxLength": 500, "description": "v1 固定短答案；允许空串表示未答，服务端只做版本化精确匹配。"}}},
       "QuizSubmissionRequest": {"type": "object", "additionalProperties": false, "required": ["resource_id", "resource_version", "answers"], "properties": {"resource_id": {"$ref": "#/components/schemas/Identifier"}, "resource_version": {"type": "integer", "minimum": 1}, "answers": {"type": "array", "minItems": 1, "maxItems": 10, "items": {"$ref": "#/components/schemas/QuizAnswer"}}}},
@@ -846,9 +5161,9 @@
       "PathPlanRequest": {"type": "object", "additionalProperties": false, "required": ["target_node_id"], "properties": {"target_node_id": {"$ref": "#/components/schemas/KnowledgeNodeId"}}},
       "PathReplanRequest": {"type": "object", "additionalProperties": false, "required": ["target_node_id"], "properties": {"target_node_id": {"$ref": "#/components/schemas/KnowledgeNodeId"}, "reason": {"type": "string", "enum": ["learner_request", "mastery_changed", "profile_changed"]}}},
       "PathReason": {"type": "object", "additionalProperties": false, "required": ["kind", "summary"], "properties": {"kind": {"type": "string", "enum": ["prerequisite", "mastery_evidence", "profile_field", "goal"]}, "summary": {"type": "string"}, "knowledge_node_id": {"$ref": "#/components/schemas/KnowledgeNodeId"}}},
-      "PathNodeDetail": {"type": "object", "additionalProperties": false, "required": ["node_id", "score", "status", "cost", "recommended_resource", "estimated_minutes"], "properties": {"node_id": {"$ref": "#/components/schemas/KnowledgeNodeId"}, "score": {"type": "number", "minimum": 0, "maximum": 1}, "status": {"type": "string", "enum": ["unseen", "learning", "weak", "mastered"]}, "cost": {"type": "number"}, "recommended_resource": {"type": "string", "enum": ["explanation", "code", "exercise", "review"]}, "estimated_minutes": {"type": "integer", "minimum": 1}}},
+      "PathNodeDetail": {"type": "object", "additionalProperties": false, "required": ["node_id", "score", "status", "cost", "recommended_resource", "estimated_minutes"], "properties": {"node_id": {"$ref": "#/components/schemas/KnowledgeNodeId"}, "score": {"type": "number", "minimum": 0, "maximum": 1}, "status": {"type": "string", "enum": ["unseen", "learning", "weak", "mastered"]}, "cost": {"type": "number"}, "recommended_resource": {"type": "string", "enum": ["explanation", "code", "exercise", "review"]}, "estimated_minutes": {"type": "integer", "minimum": 1}, "mastery_known": {"type": "boolean", "description": "存在持久掌握度证据；缺失或false时不把默认score0当作已测得能力。"}}},
       "PathChanges": {"type": "object", "additionalProperties": false, "required": ["kind", "trigger", "added_node_ids", "removed_node_ids", "reordered_node_ids"], "properties": {"kind": {"type": "string", "enum": ["initial_plan", "path_change"]}, "trigger": {"type": "string", "enum": ["initial_plan", "learner_request", "mastery_changed", "profile_changed"]}, "added_node_ids": {"type": "array", "items": {"$ref": "#/components/schemas/KnowledgeNodeId"}}, "removed_node_ids": {"type": "array", "items": {"$ref": "#/components/schemas/KnowledgeNodeId"}}, "reordered_node_ids": {"type": "array", "items": {"$ref": "#/components/schemas/KnowledgeNodeId"}}}},
-      "LearningPath": {"type": "object", "additionalProperties": false, "required": ["version", "target_node_id", "graph_version", "profile_version", "mastery_revision_watermark", "planner_rule_version", "nodes", "node_details", "changes", "current_node_id", "prerequisite_node_ids", "next_node_id", "reasons", "is_stale"], "properties": {"version": {"type": "integer", "minimum": 1}, "target_node_id": {"$ref": "#/components/schemas/KnowledgeNodeId"}, "graph_version": {"type": "string"}, "profile_version": {"type": "integer", "minimum": 1}, "mastery_revision_watermark": {"type": "integer", "minimum": 0}, "planner_rule_version": {"type": "string"}, "nodes": {"type": "array", "items": {"$ref": "#/components/schemas/KnowledgeNodeId"}}, "node_details": {"type": "array", "items": {"$ref": "#/components/schemas/PathNodeDetail"}}, "changes": {"$ref": "#/components/schemas/PathChanges"}, "current_node_id": {"type": ["string", "null"]}, "prerequisite_node_ids": {"type": "array", "items": {"$ref": "#/components/schemas/KnowledgeNodeId"}}, "next_node_id": {"type": ["string", "null"]}, "reasons": {"type": "array", "minItems": 1, "items": {"$ref": "#/components/schemas/PathReason"}}, "is_stale": {"type": "boolean"}}},
+      "LearningPath": {"type": "object", "additionalProperties": false, "required": ["version", "target_node_id", "graph_version", "profile_version", "mastery_revision_watermark", "planner_rule_version", "nodes", "node_details", "changes", "current_node_id", "prerequisite_node_ids", "next_node_id", "reasons", "is_stale"], "properties": {"version": {"type": "integer", "minimum": 1}, "target_node_id": {"$ref": "#/components/schemas/KnowledgeNodeId"}, "graph_version": {"type": "string"}, "profile_version": {"type": "integer", "minimum": 1}, "mastery_revision_watermark": {"type": "integer", "minimum": 0}, "planner_rule_version": {"type": "string"}, "nodes": {"type": "array", "items": {"$ref": "#/components/schemas/KnowledgeNodeId"}}, "node_details": {"type": "array", "items": {"$ref": "#/components/schemas/PathNodeDetail"}}, "changes": {"$ref": "#/components/schemas/PathChanges"}, "current_node_id": {"type": ["string", "null"]}, "prerequisite_node_ids": {"type": "array", "items": {"$ref": "#/components/schemas/KnowledgeNodeId"}}, "next_node_id": {"type": ["string", "null"]}, "reasons": {"type": "array", "minItems": 1, "items": {"$ref": "#/components/schemas/PathReason"}}, "is_stale": {"type": "boolean"}, "learning_availability": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["node_id", "status", "reason", "catalog_release_id", "learning_unit_id"], "properties": {"node_id": {"$ref": "#/components/schemas/KnowledgeNodeId"}, "status": {"enum": ["available", "unavailable"]}, "reason": {"enum": ["approved_catalog", "reviewed_owner_unit", "no_reviewed_course"]}, "catalog_release_id": {"type": ["string", "null"], "format": "uuid"}, "learning_unit_id": {"type": ["string", "null"], "format": "uuid"}}}}}},
       "Error": {
         "type": "object",
         "additionalProperties": false,
@@ -922,8 +5237,135 @@
         ],
         "description": "索引与当前values长度的关系由服务端固定模板注册表进一步校验；owner学习单元知识点必须与template_id相同。"
       },
-      "AnimationJob": {"type": "object","additionalProperties": false,"properties": {"id": {"$ref": "#/components/schemas/Identifier"},"status": {"type": "string","enum": ["queued","running","succeeded","failed","cancelled"]},"learning_unit_id": {"$ref": "#/components/schemas/Identifier"},"template_id": {"type": "string"},"attempt": {"type": "integer","minimum": 0},"progress": {"type": "number","minimum": 0,"maximum": 1},"last_event_id": {"type": "integer","minimum": 0},"media_id": {"$ref": "#/components/schemas/Identifier"},"retry_of": {"$ref": "#/components/schemas/Identifier"},"error": {"$ref": "#/components/schemas/Error"}},"required": ["id","status","learning_unit_id","template_id","attempt","progress","last_event_id"]},
-      "ClassroomSnapshot": {"type":"object","additionalProperties":false,"properties":{"learning_unit_id":{"$ref":"#/components/schemas/Identifier"},"revision":{"type":"integer","minimum":1},"message_cursor":{"type":"integer","minimum":0},"scene_key":{"type":"string"},"scene_version":{"type":"integer","minimum":1},"scene_progress":{"type":"integer","minimum":0},"mode":{"type":"string","enum":["focus","interactive"]},"enabled_roles":{"type":"array","items":{"type":"string","enum":["beginner","advanced"]},"uniqueItems":true},"generation_id":{"$ref":"#/components/schemas/Identifier"},"paused":{"type":"boolean"},"detour":{"type":"object","additionalProperties":false,"properties":{"scene_key":{"type":"string"},"scene_version":{"type":"integer","minimum":1},"scene_progress":{"type":"integer","minimum":0},"kind":{"type":"string","enum":["prerequisite","debate"]},"target_node_id":{"$ref":"#/components/schemas/KnowledgeNodeId"},"path_version_id":{"$ref":"#/components/schemas/Identifier"},"mode":{"type":"string","enum":["focus","interactive"]},"enabled_roles":{"type":"array","items":{"type":"string","enum":["beginner","advanced"]}},"paused":{"type":"boolean"},"result_id":{"$ref":"#/components/schemas/Identifier"}},"required":["scene_key","scene_version","scene_progress"]},"version_changed":{"type":"boolean"}},"required":["learning_unit_id","revision","message_cursor","scene_key","scene_version","scene_progress","mode","enabled_roles","paused"]},
+      "AnimationJob": {"type": "object","additionalProperties": false,"properties": {"id": {"$ref": "#/components/schemas/Identifier"},"status": {"type": "string","enum": ["queued","running","succeeded","failed","cancelled"]},"learning_unit_id": {"$ref": "#/components/schemas/Identifier"},"template_id": {"type": ["string","null"]},"attempt": {"type": "integer","minimum": 0},"progress": {"type": "number","minimum": 0,"maximum": 1},"last_event_id": {"type": "integer","minimum": 0},"media_id": {"$ref": "#/components/schemas/Identifier"},"retry_of": {"$ref": "#/components/schemas/Identifier"},"error": {"$ref": "#/components/schemas/Error"},"render_kind": {"type": "string","enum": ["template","dsl"]},"candidate_id": {"$ref": "#/components/schemas/Identifier"},"generation_id": {"$ref": "#/components/schemas/Identifier"},"fallback_of": {"$ref": "#/components/schemas/Identifier"},"fallback_reason_code": {"type": "string","pattern": "^[A-Z0-9_]{1,64}$"}},"required": ["id","status","learning_unit_id","template_id","attempt","progress","last_event_id"],"description": "保留旧模板响应。新增准备来源Job包含render_kind/generation_id；DSL template_id=null且candidate_id准确。最终失败仍保留原Job，failed事件可带唯一fallback_job_id/fallback_source=template_fallback；新模板queued事件带fallback_of/source/reason_code=DSL_RENDER_FAILED；模板失败无循环。"},
+      "ClassroomSnapshot": {
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "learning_unit_id": {
+      "$ref": "#/components/schemas/Identifier"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "message_cursor": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "scene_key": {
+      "type": "string"
+    },
+    "scene_version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "scene_progress": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "mode": {
+      "type": "string",
+      "enum": [
+        "focus",
+        "interactive"
+      ]
+    },
+    "enabled_roles": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "beginner",
+          "advanced"
+        ]
+      },
+      "uniqueItems": true
+    },
+    "generation_id": {
+      "$ref": "#/components/schemas/Identifier"
+    },
+    "paused": {
+      "type": "boolean"
+    },
+    "detour": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "scene_key": {
+          "type": "string"
+        },
+        "scene_version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "scene_progress": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "prerequisite",
+            "debate"
+          ]
+        },
+        "target_node_id": {
+          "$ref": "#/components/schemas/KnowledgeNodeId"
+        },
+        "path_version_id": {
+          "$ref": "#/components/schemas/Identifier"
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "focus",
+            "interactive"
+          ]
+        },
+        "enabled_roles": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "beginner",
+              "advanced"
+            ]
+          }
+        },
+        "paused": {
+          "type": "boolean"
+        },
+        "result_id": {
+          "$ref": "#/components/schemas/Identifier"
+        }
+      },
+      "required": [
+        "scene_key",
+        "scene_version",
+        "scene_progress"
+      ]
+    },
+    "version_changed": {
+      "type": "boolean"
+    },
+    "publication_version": {
+      "type": "integer",
+      "minimum": 1
+    }
+  },
+  "required": [
+    "learning_unit_id",
+    "revision",
+    "message_cursor",
+    "scene_key",
+    "scene_version",
+    "scene_progress",
+    "mode",
+    "enabled_roles",
+    "paused"
+  ]
+},
       "ClassroomMessage": {"type": "object","additionalProperties": false,"properties": {"id": {"$ref": "#/components/schemas/Identifier"},"cursor": {"type": "integer","minimum": 1},"role": {"type": "string","enum": ["student","tutor","beginner","advanced","system","performance","engineering","academic","moderator"]},"scene_key": {"type": "string"},"scene_version": {"type": "integer","minimum": 1},"text": {"type": "string"},"resource_id": {"$ref": "#/components/schemas/Identifier"}},"required": ["id","cursor","role","scene_key","scene_version"]},
       "ClassroomMessagePage": {"type": "object","additionalProperties": false,"properties": {"messages": {"type": "array","items": {"$ref": "#/components/schemas/ClassroomMessage"}},"last_message_cursor": {"type": "integer","minimum": 0}},"required": ["messages","last_message_cursor"]},
       "ModeChange": {"type": "object","additionalProperties": false,"properties": {"mode": {"type": "string","enum": ["focus","interactive"]},"enabled_roles": {"type": "array","items": {"type": "string","enum": ["beginner","advanced"]},"uniqueItems": true}},"required": ["mode","enabled_roles"]},
@@ -934,22 +5376,283 @@
       "DebateResult": {"type":"object","additionalProperties":false,"properties":{"id":{"$ref":"#/components/schemas/Identifier"},"scene_key":{"type":"string"},"scene_version":{"type":"integer","minimum":1},"status":{"const":"published"},"perspectives":{"type":"object","additionalProperties":false,"properties":{"performance":{"type":"string"},"engineering":{"type":"string"},"academic":{"type":"string"}},"required":["performance","engineering","academic"]},"moderator_summary":{"type":"string"},"question":{"type":"string","minLength":1},"question_conditions":{"type":"object","additionalProperties":false,"required":["stated","unknown"],"properties":{"stated":{"type":"array","items":{"type":"string","minLength":1}},"unknown":{"type":"array","items":{"type":"string","minLength":1}}}},"graph_basis":{"type":"object","additionalProperties":false,"required":["graph_version","nodes","relation"],"properties":{"graph_version":{"type":"string"},"nodes":{"type":"array","minItems":2,"maxItems":2,"items":{"type":"object","additionalProperties":false,"required":["id","name","description","ai_context","learning_objectives"],"properties":{"id":{"type":"string","enum":["array","single-linked-list"]},"name":{"type":"string"},"description":{"type":"string"},"ai_context":{"type":"string"},"learning_objectives":{"type":"array","items":{"type":"string"}}}}},"relation":{"type":"object","additionalProperties":false,"required":["type","node_ids"],"properties":{"type":{"const":"SIMILAR_TO"},"node_ids":{"type":"array","minItems":2,"maxItems":2,"items":{"type":"string","enum":["array","single-linked-list"]}}}}}},"moderator":{"type":"object","additionalProperties":false,"required":["objective_conclusion","tradeoffs","learner_advice"],"properties":{"objective_conclusion":{"type":"string","minLength":1},"tradeoffs":{"type":"string","minLength":1},"learner_advice":{"type":"string","minLength":1}}},"candidate_schema_version":{"type":"string","minLength":1},"candidate_prompt_version":{"type":"string","minLength":1},"generation_model_id":{"type":"string","minLength":1},"review_version":{"type":"string","minLength":1},"review_model_id":{"type":"string","minLength":1},"correction_attempts":{"type":"integer","minimum":0}},"required":["id","scene_key","scene_version","status","question","question_conditions","graph_basis","perspectives","moderator","moderator_summary","candidate_schema_version","candidate_prompt_version","generation_model_id","review_version","review_model_id","correction_attempts"]},
       "PerspectiveFeedback": {"type": "object","additionalProperties": false,"properties": {"perspective": {"type": "string","enum": ["performance","engineering","academic"]},"feedback": {"type": "string","const": "helpful"}},"required": ["perspective","feedback"]},
       "PreferenceReceipt": {"type": "object","additionalProperties": false,"properties": {"evidence_id": {"$ref": "#/components/schemas/Identifier"},"profile_version": {"type": ["integer", "null"],"minimum": 1},"update_status": {"type": "string","enum": ["updated","pending","unchanged","failed"]}},"required": ["evidence_id","profile_version","update_status"]},
-      "ClassroomOperation": {"type": "object","additionalProperties": false,"required": ["id","status","learning_unit_id","kind","base_revision"],"properties": {"id": {"$ref": "#/components/schemas/Identifier"},"status": {"type": "string","enum": ["accepted","running","published","failed","cancelled","superseded"]},"learning_unit_id": {"$ref": "#/components/schemas/Identifier"},"kind": {"type": "string","enum": ["speech","reexplanation","debate"]},"base_revision": {"type": "integer","minimum": 1},"generation_id": {"$ref": "#/components/schemas/Identifier"},"result_id": {"$ref": "#/components/schemas/Identifier"},"error": {"$ref": "#/components/schemas/Error"}}},
+      "ClassroomOperation": {
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "status",
+    "learning_unit_id",
+    "kind",
+    "base_revision"
+  ],
+  "properties": {
+    "id": {
+      "$ref": "#/components/schemas/Identifier"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "accepted",
+        "running",
+        "published",
+        "failed",
+        "cancelled",
+        "superseded",
+        "awaiting_human",
+        "rejected"
+      ]
+    },
+    "learning_unit_id": {
+      "$ref": "#/components/schemas/Identifier"
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "speech",
+        "reexplanation",
+        "debate"
+      ]
+    },
+    "base_revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "generation_id": {
+      "$ref": "#/components/schemas/Identifier"
+    },
+    "result_id": {
+      "$ref": "#/components/schemas/Identifier"
+    },
+    "error": {
+      "$ref": "#/components/schemas/Error"
+    },
+    "learning_operation_id": {
+      "$ref": "#/components/schemas/Identifier"
+    },
+    "publication_version": {
+      "type": "integer",
+      "minimum": 1
+    }
+  }
+},
       "AnimationInsertRequest": {"type": "object","additionalProperties": false,"required": ["template_id","template_version","scene_version","parameters"],"properties": {"template_id": {"const": "linked-list-insertion"},"template_version": {"type": "string","pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$","maxLength": 40},"scene_version": {"type": "integer","minimum": 1},"parameters": {"type": "object","additionalProperties": false,"required": ["values","index","value"],"properties": {"values": {"type": "array","minItems": 0,"maxItems": 7,"items": {"type": "integer","minimum": -99,"maximum": 99}},"index": {"type": "integer","minimum": 0,"maximum": 7},"value": {"type": "integer","minimum": -99,"maximum": 99}}}}},
       "AnimationDeleteRequest": {"type": "object","additionalProperties": false,"required": ["template_id","template_version","scene_version","parameters"],"properties": {"template_id": {"const": "linked-list-deletion"},"template_version": {"type": "string","pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$","maxLength": 40},"scene_version": {"type": "integer","minimum": 1},"parameters": {"type": "object","additionalProperties": false,"required": ["values","index"],"properties": {"values": {"type": "array","minItems": 1,"maxItems": 8,"items": {"type": "integer","minimum": -99,"maximum": 99}},"index": {"type": "integer","minimum": 0,"maximum": 7}}}}}
     }
   },
   "x-sse-events": {
-    "agent_start": {"data": {"operation_id": "string", "stage": "preparing"}},
-    "token": {"description": "临时首段文本，绝不是正式资源。", "data": {"operation_id": "string", "temporary": true, "delta": "string"}},
-    "stage_changed": {"data": {"operation_id": "string", "stage": "reviewing|regenerating"}},
-    "review_pass": {"data": {"operation_id": "string", "attempt": "integer"}},
-    "review_reject": {"data": {"operation_id": "string", "attempt": "integer", "retry": "boolean"}},
-    "scene_ready": {"description": "唯一允许客户端读取为正式资源的信号。", "data": {"operation_id": "string", "learning_unit_id": "string", "scene_id": "string", "version": "integer", "resource_ids": ["string"]}},
-    "error": {"data": {"code": "string", "message": "string", "retryable": "boolean", "operation_id": "string"}},
-    "done": {"data": {"operation_id": "string", "status": "temporary_complete|published|failed|canceled"}}
+  "agent_start": {
+    "data": {
+      "operation_id": "string",
+      "stage": "preparing"
+    }
   },
+  "token": {
+    "description": "临时首段文本，绝不是正式资源。",
+    "data": {
+      "operation_id": "string",
+      "temporary": true,
+      "delta": "string"
+    }
+  },
+  "stage_changed": {
+    "data": {
+      "operation_id": "string",
+      "stage": "planning|plan_check|generating|reviewing|consistency_check|awaiting_human|publishing|regenerating"
+    }
+  },
+  "review_pass": {
+    "data": {
+      "operation_id": "string",
+      "attempt": "integer"
+    }
+  },
+  "review_reject": {
+    "data": {
+      "operation_id": "string",
+      "attempt": "integer",
+      "retry": "boolean"
+    }
+  },
+  "scene_ready": {
+    "description": "唯一允许客户端读取为正式资源的信号。",
+    "data": {
+      "operation_id": "string",
+      "learning_unit_id": "string",
+      "scene_id": "string",
+      "version": "integer",
+      "resource_ids": [
+        "string"
+      ],
+      "scene_key": "intro|explanation",
+      "publication_version": "integer (planned only)"
+    }
+  },
+  "error": {
+    "data": {
+      "code": "string",
+      "message": "string",
+      "retryable": "boolean",
+      "operation_id": "string"
+    }
+  },
+  "done": {
+    "data": {
+      "operation_id": "string",
+      "status": "temporary_complete|published|failed|canceled|awaiting_human|rejected|completed"
+    }
+  },
+  "review_required": {
+    "description": "仅固定原因码，流随后done/awaiting_human；不是发布，不含未审正文。",
+    "data": {
+      "operation_id": "string",
+      "reason_code": "SEMANTIC_REVIEW_REQUIRED"
+    }
+  },
+  "teaching_selected": {
+    "description": "Queued before the first plan/model request; frozen target, recommendation and actual teaching scope. Does not authorize publication.",
+    "data": {
+      "operation_id": "uuid",
+      "teaching_context": {
+        "$ref": "#/components/schemas/TeachingContext"
+      },
+      "binding_status": "bound"
+    }
+  }
+},
   "x-mvp-0.3-contract-status": "T004设计契约；新增端点由T012–T028逐项实现，OpenAPI版本不等于已上线。",
   "x-animation-job-events": {"queued": {"data": {"job_id": "string","status": "queued","progress": "number"}},"running": {"data": {"job_id": "string","status": "running","attempt": "integer","progress": "number"}},"progress": {"data": {"job_id": "string","stage": "validating|rendering|publishing","progress": "number"}},"succeeded": {"data": {"job_id": "string","status": "succeeded","media_id": "string"}},"failed": {"data": {"job_id": "string","status": "failed","code": "string"}},"cancelled": {"data": {"job_id": "string","status": "cancelled"}},"recovered": {"data": {"job_id": "string","status": "queued|failed","attempt": "integer"}}},
-  "x-classroom-stream-events": {"token": {"description": "临时，非正式消息","data": {"revision": "integer","scene_version": "integer","generation_id": "string","temporary": true,"delta": "string","role": "tutor|beginner|advanced"}},"content_retracted": {"description": "审核拒绝、不可用、发布失败或版本冲突时清除本generation临时内容","data": {"revision": "integer","generation_id": "string","code": "REVIEW_REJECTED|REVIEW_UNAVAILABLE|SCENE_PUBLICATION_FAILED|SCENE_VERSION_CONFLICT"}},"message_ready": {"description": "审核/规则通过且已提交的消息","data": {"revision": "integer","message_cursor": "integer","message_id": "string"}},"scene_ready": {"description": "新场景正式版本已发布","data": {"revision": "integer","scene_key": "string","scene_version": "integer","resource_ids": ["string"]}},"error": {"data": {"code": "string","retryable": "boolean"}},"done": {"data": {"status": "published|failed|cancelled"}},"agent_start": {"data": {"operation_id": "string","revision": "integer","scene_version": "integer","generation_id": "string"}},"debate_ready": {"description": "三个视角与主持人总结整体审核发布","data": {"operation_id": "string","result_id": "string","revision": "integer"}},"review_pass": {"data": {"operation_id": "string","kind": "speech|reexplanation|debate"}}}
+  "x-classroom-stream-events": {
+  "token": {
+    "description": "临时，非正式消息",
+    "data": {
+      "revision": "integer",
+      "scene_version": "integer",
+      "generation_id": "string",
+      "temporary": true,
+      "delta": "string",
+      "role": "tutor|beginner|advanced"
+    }
+  },
+  "content_retracted": {
+    "description": "审核拒绝、不可用、发布失败或版本冲突时清除本generation临时内容",
+    "data": {
+      "revision": "integer",
+      "generation_id": "string",
+      "code": "REVIEW_REJECTED|REVIEW_UNAVAILABLE|SCENE_PUBLICATION_FAILED|SCENE_VERSION_CONFLICT"
+    }
+  },
+  "message_ready": {
+    "description": "审核/规则通过且已提交的消息",
+    "data": {
+      "revision": "integer",
+      "message_cursor": "integer",
+      "message_id": "string"
+    }
+  },
+  "scene_ready": {
+    "description": "新场景正式版本已发布",
+    "data": {
+      "revision": "integer",
+      "scene_key": "string",
+      "scene_version": "integer",
+      "resource_ids": [
+        "string"
+      ],
+      "publication_version": "integer (planned only)"
+    }
+  },
+  "error": {
+    "data": {
+      "code": "string",
+      "retryable": "boolean"
+    }
+  },
+  "done": {
+    "data": {
+      "status": "published|failed|cancelled|awaiting_human|rejected"
+    }
+  },
+  "agent_start": {
+    "data": {
+      "operation_id": "string",
+      "revision": "integer",
+      "scene_version": "integer",
+      "generation_id": "string"
+    }
+  },
+  "debate_ready": {
+    "description": "三个视角与主持人总结整体审核发布",
+    "data": {
+      "operation_id": "string",
+      "result_id": "string",
+      "revision": "integer"
+    }
+  },
+  "review_pass": {
+    "data": {
+      "operation_id": "string",
+      "kind": "speech|reexplanation|debate"
+    }
+  },
+  "review_required": {
+    "data": {
+      "operation_id": "string",
+      "learning_operation_id": "string",
+      "reason_code": "SEMANTIC_REVIEW_REQUIRED"
+    }
+  }
+},
+  "x-queue-migration": {
+    "task_id": "PHASE-1-T018",
+    "status": "approved",
+    "adr": "../ADR/0009-durable-animation-queue.md",
+    "implementation_tasks": [
+      "PHASE-1-T019",
+      "PHASE-1-T020",
+      "PHASE-1-T021"
+    ],
+    "public_contract_change": false,
+    "runtime_changed": false,
+    "authority": "PostgreSQL Job and event rows",
+    "broker": "Redis/Celery minimal job_id/dispatch_epoch messages; no credentials or model context",
+    "receipt": "celery mode: 202 only after Job/event/outbox commit; broker outage retains queued receipt",
+    "retained_operations": [
+      "requestAnimation",
+      "getAnimationJob",
+      "cancelAnimationJob",
+      "retryAnimationJob",
+      "subscribeAnimationJob"
+    ],
+    "retained_statuses": [
+      "queued",
+      "running",
+      "succeeded",
+      "failed",
+      "cancelled"
+    ]
+  },
+  "x-animation-dsl": {
+    "task_id": "PHASE-1-T022",
+    "status": "approved",
+    "adr": "../ADR/0010-constrained-animation-dsl.md",
+    "contract": "../agents/animation-dsl-v1/README.md",
+    "schema": "../agents/animation-dsl-v1/schema.json",
+    "implementation_tasks": [
+      "PHASE-1-T023",
+      "PHASE-1-T024",
+      "PHASE-1-T025",
+      "PHASE-1-T026",
+      "PHASE-1-T027",
+      "PHASE-1-T028",
+      "PHASE-1-T029"
+    ],
+    "runtime_changed": true,
+    "existing_public_contract_changed": true,
+    "public_changes": "T028 development implementation: owner/original-session/CSRF/idempotent POST SSE + GET preparation/cancel; explicit render_kind and fallback metadata. catalog_only gate and default-denied DSL budget remain. No uploaded DSL/Python.",
+    "queue_boundary": "Only reviewed credential-free rendering; API model preparation never brokered",
+    "dsl_version": "animation-dsl/1",
+    "dsl_cache_scope": "owner-private; existing reviewed template cache unchanged",
+    "dynamic_entry": "catalog_only remains; separate T035/T040/T041 validation and approval required"
+  }
 }

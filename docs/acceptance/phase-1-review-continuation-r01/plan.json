@@ -1,0 +1,42 @@
+{
+  "candidate_id": "luna-high-v49-final-01",
+  "configuration": {
+    "generation_base": "https://api.deepseek.com",
+    "generation_model": "deepseek-flash",
+    "review_base": "https://www.cbbb.fun/v1",
+    "review_model": "gpt-6-luna",
+    "review_reasoning": "high",
+    "review_output": 8192,
+    "per_call_seconds": 60
+  },
+  "slots": [
+    "screen-mixed",
+    "holdout-stack-complete",
+    "holdout-stack-fact",
+    "holdout-stack-safety",
+    "holdout-prerequisite"
+  ],
+  "expected": {
+    "screen-mixed": "reject",
+    "holdout-stack-complete": "pass",
+    "holdout-stack-fact": "reject",
+    "holdout-stack-safety": "reject",
+    "holdout-prerequisite": "pass"
+  },
+  "requests_max": 5,
+  "output_tokens_total_max": 40960,
+  "per_call_timeout_seconds": 60,
+  "transport_cleanup_seconds_max": 5,
+  "retries": 0,
+  "corrections": 0,
+  "fallback": false,
+  "generation_calls": 0,
+  "monetary_policy": "uncapped_by_explicit_user_instruction",
+  "input_tokens": "provider reports only; exact fixed wires",
+  "expires_at": "2026-10-21T11:02:34.240545+08:00",
+  "old_run_stays_stopped": true,
+  "actual_human_review_required_before_next": true,
+  "stop_on": "any technical, criterion, unsupported assertion/evidence claim, invented requirement, false positive or severe miss; no waiver/relabel/continuation of unused slots",
+  "after_all_pass": "only T040 admission review;freeze formal independent full set separately;98/95/90 thresholds and human-not-in-auto-numerator remain",
+  "holdout_limit": "four old r02 holdout cases did not participate in recent cal repair; visible to preparer,not statistically blind,not formal independent set"
+}

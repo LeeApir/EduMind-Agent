@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { watchHybridOperation } from "../api/hybridReview";
 import { computed, onBeforeUnmount, ref, watch } from "vue";
 import { NButton, NTag } from "naive-ui";
 
@@ -53,7 +54,7 @@ const props = withDefaults(defineProps<{
 });
 const emit = defineEmits<{
   "select-scene": [sceneId: string];
-  "scene-changed": [startedSelectionId: string, sceneKey: string, sceneVersion: number];
+  "scene-changed": [startedSelectionId: string, sceneKey: string, sceneVersion: number, publicationVersion?: number];
   "classroom-changed": [];
 }>();
 
@@ -63,10 +64,11 @@ const busy = ref(false);
 const error = ref("");
 const notice = ref("");
 const temporary = ref("");
-const generationStage = ref<"idle" | "generating" | "reviewing" | "failed">("idle");
+const generationStage = ref<"idle" | "generating" | "reviewing" | "failed" | "awaiting_human">("idle");
 const pendingControl = ref<PendingControl | null>(null);
 const pendingReexplanation = ref<PendingReexplanation | null>(null);
 let generation = 0;
+let stopReviewWatch: (() => void) | undefined;
 
 const selectedScene = computed(() => props.scenes.find((scene) => scene.id === props.selectedSceneId));
 const orderedScenes = computed(() => [...props.scenes].sort((a, b) =>
@@ -104,8 +106,12 @@ function message(errorValue: unknown): string {
   return errorValue instanceof Error && errorValue.message
     ? errorValue.message : "学习控制暂时不可用，请重试。";
 }
+function emitSceneChanged(start: string, key: string, version: number, publication?: number): void {
+  if (publication === undefined) emit("scene-changed", start, key, version);
+  else emit("scene-changed", start, key, version, publication);
+}
 function terminal(status: string): boolean {
-  return ["published", "failed", "cancelled", "superseded"].includes(status);
+  return ["published", "failed", "cancelled", "superseded", "rejected"].includes(status);
 }
 
 async function ensureSnapshot(token: number): Promise<void> {
@@ -144,7 +150,7 @@ watch(() => props.unitId, () => {
   generationStage.value = "idle";
   if (props.unitId) void ensureSnapshot(token);
 }, { immediate: true });
-onBeforeUnmount(() => { generation += 1; });
+onBeforeUnmount(() => { generation += 1; stopReviewWatch?.(); });
 
 async function refreshSnapshot(): Promise<void> {
   const token = generation;
@@ -210,11 +216,26 @@ async function recoverReexplanation(token = generation): Promise<void> {
     if (operation.status === "published") {
       await refreshSnapshot();
       if (token !== generation || !snapshot.value) return;
-      emit("scene-changed", pending.startedSelectionId,
-        snapshot.value.scene_key, snapshot.value.scene_version);
+      emitSceneChanged(pending.startedSelectionId, snapshot.value.scene_key, snapshot.value.scene_version, snapshot.value.publication_version);
       emit("classroom-changed");
       notice.value = "已恢复审核通过的正式新版本。";
       temporary.value = "";
+    } else if (operation.status === "awaiting_human") {
+      generationStage.value = "awaiting_human";
+      temporary.value = "";
+      notice.value = "内容待人工复核，暂不可作为正式课程使用。原正式版本仍可学习，处理时间尚未确定。";
+      stopReviewWatch?.();
+      if (operation.learning_operation_id) stopReviewWatch = watchHybridOperation({
+        id: operation.learning_operation_id,
+        onUpdate: async (value) => {
+          if (token !== generation) return;
+          if (["completed", "rejected", "failed", "canceled"].includes(value.status)) {
+            await recoverReexplanation(token);
+          }
+        },
+        onError: () => { if (token === generation) notice.value = "状态查询已暂停，可手动恢复原请求；不会重复生成。"; },
+      });
+      return;
     } else if (operation.status === "accepted" || operation.status === "running") {
       notice.value = "原请求仍在处理；不会重复生成。";
       return;
@@ -246,6 +267,7 @@ async function runReexplanation(action: ReexplanationAction, retry = false): Pro
   temporary.value = "";
   generationStage.value = "generating";
   let readyVersion: number | null = null;
+  let readyPublication: number | undefined;
   let pending = retry ? pendingReexplanation.value : null;
   if (!pending || pending.action !== action || (!retry && pending.sceneKey !== selected.sceneKey)) {
     try {
@@ -290,6 +312,7 @@ async function runReexplanation(action: ReexplanationAction, retry = false): Pro
           generationStage.value = "failed";
         } else if (event.type === "scene_ready" && typeof event.data.scene_version === "number") {
           readyVersion = event.data.scene_version;
+          readyPublication = typeof event.data.publication_version === "number" ? event.data.publication_version : undefined;
         }
       },
     });
@@ -297,7 +320,7 @@ async function runReexplanation(action: ReexplanationAction, retry = false): Pro
     if (readyVersion !== null) {
       await refreshSnapshot();
       if (token !== generation) return;
-      emit("scene-changed", pending.startedSelectionId, pending.sceneKey, readyVersion);
+      emitSceneChanged(pending.startedSelectionId, pending.sceneKey === "intro" && readyPublication ? "explanation" : pending.sceneKey, readyVersion, readyPublication);
       emit("classroom-changed");
       notice.value = "新版本已通过审核并发布。";
       generationStage.value = "idle";

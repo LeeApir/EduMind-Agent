@@ -1,0 +1,36 @@
+{
+  "commands": [
+    {
+      "command": "backend/.venv/bin/ruff check scripts/prepare_five_hour_materials.py scripts/check_five_hour_materials.py scripts/tests/test_five_hour_materials.py",
+      "result": "passed"
+    },
+    {
+      "command": "backend/.venv/bin/pytest -q scripts/tests/test_five_hour_materials.py",
+      "result": "17 passed,0 skipped"
+    },
+    {
+      "command": "backend/.venv/bin/python scripts/prepare_five_hour_materials.py",
+      "result": "reproduced all16 cases and16 offline request captures, no DNS/HTTP"
+    },
+    {
+      "command": "backend/.venv/bin/python scripts/check_five_hour_materials.py",
+      "result": "material bindings/full business contracts and evaluation invariants passed"
+    }
+  ],
+  "initial_preparation_issues": [
+    "unused import rejected by Ruff,removed",
+    "full reference_context equality assertion rejected intentional v4.9 projection; now requires all student content/bindings exact and permits only reference projection",
+    "after schema strengthening one negative test expected ValueError while earlier JSONschema rejection raised ValidationError; observed 1failed/14passed then1failed/15passed, fixed accepted rejection class without accepting invalid data",
+    "staged diff check found one extra blank line at reading-book EOF; removed before commit, all16 canonical case/label/wire contents unchanged; zero-authority draft manifest refreshed"
+  ],
+  "project_provider_calls": 0,
+  "new_c_compiled": false,
+  "new_c_executed": false,
+  "actual_model_results": 0,
+  "actual_human_signatures": 0,
+  "source_files_bound": 257,
+  "current_scope": "material/label/GPT record format freeze only",
+  "execution_runner_ready": false,
+  "prd_adr_limited_scope_activation": "pending before actual execution",
+  "evaluation_schema_is_not_semantic_oracle": true
+}

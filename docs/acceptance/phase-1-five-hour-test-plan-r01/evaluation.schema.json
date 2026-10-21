@@ -1,0 +1,1086 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "record_version",
+    "run_id",
+    "case_id",
+    "case_sha256",
+    "label_sha256",
+    "evaluator",
+    "actual",
+    "grades",
+    "reviewed_all_candidates_and_audit_history",
+    "evidence",
+    "claim_checks",
+    "citation_checks",
+    "unresolved",
+    "corrections",
+    "code_verification",
+    "production_publish_performed",
+    "product_human_decision",
+    "conclusion"
+  ],
+  "properties": {
+    "record_version": {
+      "const": "five-hour-gpt-evaluation-v1"
+    },
+    "run_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "case_id": {
+      "enum": [
+        "A01",
+        "A02",
+        "A03",
+        "A04",
+        "U01",
+        "U02",
+        "U03",
+        "U04",
+        "U05",
+        "U06",
+        "U07",
+        "U08",
+        "R01",
+        "R02",
+        "R03",
+        "R04"
+      ]
+    },
+    "case_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "label_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "evaluator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "identity",
+        "exact_model_id",
+        "configuration",
+        "unknown_metadata_reason",
+        "independent_human",
+        "evaluated_at"
+      ],
+      "properties": {
+        "kind": {
+          "const": "gpt"
+        },
+        "identity": {
+          "type": "string",
+          "minLength": 1
+        },
+        "exact_model_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "configuration": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "unknown_metadata_reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "independent_human": {
+          "const": false
+        },
+        "evaluated_at": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "actual": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "request_receipt_paths",
+        "response_artifact_paths",
+        "model_verdict",
+        "local_verdict",
+        "course_state",
+        "actual_call_count",
+        "input_tokens",
+        "output_tokens",
+        "duration_ms"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "not_run",
+            "observed",
+            "failed",
+            "unresolved"
+          ]
+        },
+        "request_receipt_paths": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "response_artifact_paths": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "model_verdict": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "enum": [
+                "pass",
+                "revise",
+                "reject",
+                "needs_human"
+              ]
+            }
+          ]
+        },
+        "local_verdict": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "enum": [
+                "pass",
+                "revise",
+                "reject",
+                "needs_human"
+              ]
+            }
+          ]
+        },
+        "course_state": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "actual_call_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 20
+        },
+        "input_tokens": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "output_tokens": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "duration_ms": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        }
+      }
+    },
+    "grades": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "technical_integrity",
+        "core_expected",
+        "all_claims",
+        "all_citations",
+        "full_quality",
+        "impact",
+        "final_status"
+      ],
+      "properties": {
+        "technical_integrity": {
+          "enum": [
+            "pass",
+            "fail",
+            "unassessed"
+          ]
+        },
+        "core_expected": {
+          "enum": [
+            "pass",
+            "fail",
+            "unassessed"
+          ]
+        },
+        "all_claims": {
+          "enum": [
+            "pass",
+            "fail",
+            "unassessed"
+          ]
+        },
+        "all_citations": {
+          "enum": [
+            "pass",
+            "fail",
+            "unassessed"
+          ]
+        },
+        "full_quality": {
+          "enum": [
+            "pass",
+            "fail",
+            "unassessed"
+          ]
+        },
+        "impact": {
+          "enum": [
+            "red",
+            "yellow",
+            "green",
+            "unassessed"
+          ]
+        },
+        "final_status": {
+          "enum": [
+            "pass",
+            "fail",
+            "not_run",
+            "unresolved"
+          ]
+        }
+      }
+    },
+    "reviewed_all_candidates_and_audit_history": {
+      "type": "boolean"
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "kind",
+          "artifact_path",
+          "artifact_sha256",
+          "applies_to_digest",
+          "scope_note"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "kind": {
+            "enum": [
+              "static_reasoning",
+              "arithmetic",
+              "schema_validation",
+              "transport_receipt",
+              "database_assertion",
+              "browser_observation",
+              "fixed_c_mechanical"
+            ]
+          },
+          "artifact_path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "artifact_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "applies_to_digest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "scope_note": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "claim_checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "review_artifact_path",
+          "json_pointer",
+          "quoted_text",
+          "result",
+          "evidence_ids",
+          "reason"
+        ],
+        "properties": {
+          "review_artifact_path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "json_pointer": {
+            "type": "string",
+            "minLength": 1
+          },
+          "quoted_text": {
+            "type": "string",
+            "minLength": 1
+          },
+          "result": {
+            "enum": [
+              "supported",
+              "contradicted",
+              "unresolved"
+            ]
+          },
+          "evidence_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "citation_checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "review_artifact_path",
+          "finding_index",
+          "anchor_id",
+          "resource_digest",
+          "json_pointer",
+          "start_utf8",
+          "end_utf8",
+          "quoted_text",
+          "result",
+          "evidence_ids",
+          "reason"
+        ],
+        "properties": {
+          "review_artifact_path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "finding_index": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "anchor_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "resource_digest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "json_pointer": {
+            "type": "string",
+            "minLength": 1
+          },
+          "start_utf8": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "end_utf8": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "quoted_text": {
+            "type": "string",
+            "minLength": 1
+          },
+          "result": {
+            "enum": [
+              "supported",
+              "contradicted",
+              "unresolved"
+            ]
+          },
+          "evidence_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "unresolved": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "corrections": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "observed",
+        "actual_context_paths",
+        "before_after_digest_pairs",
+        "unsupported_feedback_entered",
+        "new_defect_observed",
+        "note"
+      ],
+      "properties": {
+        "observed": {
+          "type": "boolean"
+        },
+        "actual_context_paths": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "before_after_digest_pairs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "before",
+              "after"
+            ],
+            "properties": {
+              "before": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "after": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            }
+          }
+        },
+        "unsupported_feedback_entered": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "new_defect_observed": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "note": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "code_verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "new_code_compiled",
+        "new_code_executed",
+        "fixed_c_evidence_paths",
+        "applicability_note"
+      ],
+      "properties": {
+        "method": {
+          "enum": [
+            "static_only",
+            "not_applicable",
+            "fixed_sample_separate_evidence"
+          ]
+        },
+        "new_code_compiled": {
+          "const": false
+        },
+        "new_code_executed": {
+          "const": false
+        },
+        "fixed_c_evidence_paths": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "applicability_note": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "production_publish_performed": {
+      "const": false
+    },
+    "product_human_decision": {
+      "type": "null"
+    },
+    "conclusion": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "actual": {
+            "properties": {
+              "status": {
+                "const": "not_run"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "run_id": {
+            "type": "null"
+          },
+          "actual": {
+            "properties": {
+              "actual_call_count": {
+                "const": 0
+              },
+              "model_verdict": {
+                "type": "null"
+              },
+              "local_verdict": {
+                "type": "null"
+              },
+              "request_receipt_paths": {
+                "maxItems": 0
+              },
+              "response_artifact_paths": {
+                "maxItems": 0
+              },
+              "input_tokens": {
+                "type": "null"
+              },
+              "output_tokens": {
+                "type": "null"
+              },
+              "duration_ms": {
+                "type": "null"
+              }
+            }
+          },
+          "grades": {
+            "properties": {
+              "technical_integrity": {
+                "const": "unassessed"
+              },
+              "core_expected": {
+                "const": "unassessed"
+              },
+              "all_claims": {
+                "const": "unassessed"
+              },
+              "all_citations": {
+                "const": "unassessed"
+              },
+              "full_quality": {
+                "const": "unassessed"
+              },
+              "impact": {
+                "const": "unassessed"
+              },
+              "final_status": {
+                "const": "not_run"
+              }
+            }
+          },
+          "reviewed_all_candidates_and_audit_history": {
+            "const": false
+          },
+          "evidence": {
+            "maxItems": 0
+          },
+          "claim_checks": {
+            "maxItems": 0
+          },
+          "citation_checks": {
+            "maxItems": 0
+          },
+          "evaluator": {
+            "properties": {
+              "evaluated_at": {
+                "type": "null"
+              }
+            }
+          },
+          "corrections": {
+            "properties": {
+              "observed": {
+                "const": false
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "grades": {
+            "properties": {
+              "full_quality": {
+                "const": "pass"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "run_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "grades": {
+            "properties": {
+              "technical_integrity": {
+                "const": "pass"
+              },
+              "core_expected": {
+                "const": "pass"
+              },
+              "all_claims": {
+                "const": "pass"
+              },
+              "all_citations": {
+                "const": "pass"
+              }
+            }
+          },
+          "reviewed_all_candidates_and_audit_history": {
+            "const": true
+          },
+          "evidence": {
+            "minItems": 1
+          },
+          "unresolved": {
+            "maxItems": 0
+          },
+          "actual": {
+            "properties": {
+              "status": {
+                "const": "observed"
+              },
+              "actual_call_count": {
+                "minimum": 1
+              },
+              "request_receipt_paths": {
+                "minItems": 1
+              },
+              "response_artifact_paths": {
+                "minItems": 1
+              }
+            }
+          },
+          "evaluator": {
+            "properties": {
+              "evaluated_at": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          },
+          "claim_checks": {
+            "items": {
+              "properties": {
+                "result": {
+                  "const": "supported"
+                },
+                "evidence_ids": {
+                  "minItems": 1
+                }
+              }
+            }
+          },
+          "citation_checks": {
+            "items": {
+              "properties": {
+                "result": {
+                  "const": "supported"
+                },
+                "evidence_ids": {
+                  "minItems": 1
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "grades": {
+            "properties": {
+              "final_status": {
+                "const": "pass"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "grades": {
+            "properties": {
+              "full_quality": {
+                "const": "pass"
+              },
+              "impact": {
+                "const": "green"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "corrections": {
+            "properties": {
+              "unsupported_feedback_entered": {
+                "const": true
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "grades": {
+            "properties": {
+              "impact": {
+                "const": "red"
+              },
+              "final_status": {
+                "const": "fail"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "grades": {
+            "properties": {
+              "impact": {
+                "const": "red"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "grades": {
+            "properties": {
+              "final_status": {
+                "const": "fail"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "case_id": {
+            "pattern": "^[UR]"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "actual": {
+            "properties": {
+              "actual_call_count": {
+                "maximum": 1
+              },
+              "course_state": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "allOf": [
+          {
+            "properties": {
+              "case_id": {
+                "pattern": "^A"
+              }
+            }
+          },
+          {
+            "properties": {
+              "grades": {
+                "properties": {
+                  "core_expected": {
+                    "const": "pass"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "then": {
+        "properties": {
+          "actual": {
+            "properties": {
+              "course_state": {
+                "const": "completed"
+              },
+              "local_verdict": {
+                "const": "pass"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "allOf": [
+          {
+            "properties": {
+              "case_id": {
+                "enum": [
+                  "U01",
+                  "U02",
+                  "U03"
+                ]
+              }
+            }
+          },
+          {
+            "properties": {
+              "grades": {
+                "properties": {
+                  "core_expected": {
+                    "const": "pass"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "then": {
+        "properties": {
+          "actual": {
+            "properties": {
+              "model_verdict": {
+                "enum": [
+                  "reject"
+                ]
+              },
+              "local_verdict": {
+                "enum": [
+                  "reject"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "allOf": [
+          {
+            "properties": {
+              "case_id": {
+                "enum": [
+                  "U04",
+                  "U05"
+                ]
+              }
+            }
+          },
+          {
+            "properties": {
+              "grades": {
+                "properties": {
+                  "core_expected": {
+                    "const": "pass"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "then": {
+        "properties": {
+          "actual": {
+            "properties": {
+              "model_verdict": {
+                "enum": [
+                  "needs_human"
+                ]
+              },
+              "local_verdict": {
+                "enum": [
+                  "needs_human"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "allOf": [
+          {
+            "properties": {
+              "case_id": {
+                "enum": [
+                  "U06",
+                  "U07",
+                  "U08",
+                  "R01",
+                  "R02"
+                ]
+              }
+            }
+          },
+          {
+            "properties": {
+              "grades": {
+                "properties": {
+                  "core_expected": {
+                    "const": "pass"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "then": {
+        "properties": {
+          "actual": {
+            "properties": {
+              "model_verdict": {
+                "enum": [
+                  "pass"
+                ]
+              },
+              "local_verdict": {
+                "enum": [
+                  "pass"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "allOf": [
+          {
+            "properties": {
+              "case_id": {
+                "enum": [
+                  "R03",
+                  "R04"
+                ]
+              }
+            }
+          },
+          {
+            "properties": {
+              "grades": {
+                "properties": {
+                  "core_expected": {
+                    "const": "pass"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "then": {
+        "properties": {
+          "actual": {
+            "properties": {
+              "model_verdict": {
+                "enum": [
+                  "revise",
+                  "reject"
+                ]
+              },
+              "local_verdict": {
+                "enum": [
+                  "revise",
+                  "reject"
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

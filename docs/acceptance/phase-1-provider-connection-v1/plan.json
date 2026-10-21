@@ -1,0 +1,106 @@
+{
+  "version": "phase1-real-connection-v3",
+  "task_id": "PHASE-1-T039",
+  "state": "VERIFIED",
+  "base_commit": "cbf52bcc1a6ac8da8bc34f13eb3de831b462bdb6",
+  "current_authorization": {
+    "requests": 8,
+    "cost_micro": 1000000,
+    "currency": "CNY",
+    "dynamic_opening": false,
+    "source": "docs/acceptance/phase-1-provider-connection-v1/tool-diagnostics-approval.json",
+    "source_sha256": "252dbc853379b0b21d18051e35983af23d030c468ac424d60ef3b0bbdee50fd9"
+  },
+  "targets": [
+    {
+      "provider_type": "openai-compatible",
+      "provider": "aliyun",
+      "model_id": "qwen3.8-max-0902",
+      "endpoint_reference": ".env:EDUMIND_PROVIDER_BASE_URL",
+      "credential_reference": ".env:EDUMIND_PROVIDER_API_KEY",
+      "local_or_cloud": "cloud",
+      "allowed_data_categories": [
+        "probe"
+      ],
+      "capabilities": "Official declarations; actual probe pending",
+      "proposed_requests_hard_limit": 4,
+      "requests_authorized": 8,
+      "pricing_and_currency": {
+        "input_cny_per_million": 12,
+        "output_cny_per_million": 36
+      },
+      "cost_hard_limit": {
+        "currency": "CNY",
+        "amount": 1
+      },
+      "remote_validation": "passed scoped text/json_schema/stream and strict auto tool selection; failed forced-mode attempts preserved"
+    }
+  ],
+  "available_adapter_types": [
+    "openai-compatible",
+    "ollama",
+    "anthropic",
+    "gemini",
+    "spark"
+  ],
+  "required_target_fields": [
+    "provider_type",
+    "endpoint",
+    "model_id_and_revision",
+    "credential_reference_only",
+    "local_or_cloud",
+    "allowed_data_categories",
+    "capability_snapshot",
+    "requests_hard_limit",
+    "pricing_and_currency",
+    "conservative_cost_hard_limit",
+    "user_authorization_evidence"
+  ],
+  "proposed_flow_per_selected_target": [
+    {
+      "step": "connection_probe",
+      "calls": 1,
+      "data": "fixed public probe only"
+    },
+    {
+      "step": "streaming_probe",
+      "calls": 1,
+      "data": "fixed public probe only"
+    },
+    {
+      "step": "declared_structured_capability",
+      "calls_at_most": 1,
+      "condition": "only if explicitly declared supported; otherwise record unknown/not tested"
+    },
+    {
+      "step": "declared_tool_capability",
+      "calls_at_most": 1,
+      "condition": "only if explicitly declared supported; tool execution prohibited"
+    }
+  ],
+  "proposed_constraints": {
+    "concurrency": 1,
+    "retries": 0,
+    "model_list_refresh": false,
+    "max_output_tokens": 64,
+    "request_timeout_seconds": 10,
+    "cross_provider_fallback": false,
+    "send_learner_data": false
+  },
+  "execution_gate": "Scoped current-primary T039 verification complete. Seven of8 approved attempts used. No eighth call after success. Other adapters deferred explicitly; T040/T041 not authorized by this result.",
+  "selection_record": "model-selection-20261014.json",
+  "paid_last_resort": {
+    "model_id": "deepseek-flash",
+    "condition": "all listed Aliyun models unusable",
+    "budget": "not supplied",
+    "enabled": false
+  },
+  "frozen_run": "run-r01.json",
+  "result": "results/r01.json",
+  "diagnostic_result": "results/diagnostic-r02.json",
+  "aggregate_actual_requests": 7,
+  "latest_result": "results/final.json",
+  "pending_budget_proposal": "tool-followup-proposal.json",
+  "target_deferral": "target-deferral-20261014.json",
+  "completion_commit_lookup": "Task-Completed: PHASE-1-T039"
+}

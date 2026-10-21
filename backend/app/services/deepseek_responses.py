@@ -1,9 +1,11 @@
 """DeepSeek Responses API adapter for the server-configured P0 model."""
 
+import hashlib
 import ipaddress
 import json
 import math
 from collections.abc import AsyncIterator, Mapping
+from dataclasses import replace
 from datetime import datetime, timezone
 from email.utils import parsedate_to_datetime
 from typing import Any
@@ -29,6 +31,7 @@ from app.services.provider_gateway import (
     TextRequest,
     TextResult,
     TokenUsage,
+    TransportAudit,
 )
 
 _MAX_RESPONSE_BYTES = 2 * 1024 * 1024
@@ -54,18 +57,23 @@ def _json_syntax_reason(cause: ValueError | UnicodeError) -> JsonSyntaxReason:
         if cause.msg.startswith(prefix):
             return reason
     return JsonSyntaxReason.OTHER
+
+
 def _json_extra_data_kind(cause: ValueError | UnicodeError) -> JsonExtraDataKind | None:
     """Inspect a rejected suffix only; never recover or publish a partial JSON value."""
     if not isinstance(cause, json.JSONDecodeError) or cause.msg != "Extra data":
         return None
-    suffix = cause.doc[cause.pos:].strip()
+    suffix = cause.doc[cause.pos :].strip()
     if suffix.startswith("```"):
         return JsonExtraDataKind.MARKDOWN_FENCE_SUFFIX
     try:
         json.loads(suffix)
     except (ValueError, RecursionError):
-        return (JsonExtraDataKind.JSON_LIKE_SUFFIX if suffix.startswith(("{", "["))
-                else JsonExtraDataKind.OTHER_SUFFIX)
+        return (
+            JsonExtraDataKind.JSON_LIKE_SUFFIX
+            if suffix.startswith(("{", "["))
+            else JsonExtraDataKind.OTHER_SUFFIX
+        )
     return JsonExtraDataKind.JSON_VALUE_SUFFIX
 
 
@@ -143,17 +151,16 @@ def _wire_target(target: ApprovedTarget) -> tuple[str, str]:
     return endpoint, host_header
 
 
-def _request_body(request: TextRequest) -> dict[str, object]:
+def _request_body(request: TextRequest, *, reasoning_effort: str = "none") -> dict[str, object]:
+    if reasoning_effort not in {"none", "low", "high", "max"}:
+        raise ProviderError(ProviderErrorCode.CONFIGURATION_MISSING)
     body: dict[str, object] = {
         "input": [
-            {"role": message.role, "content": message.content}
-            for message in request.messages
+            {"role": message.role, "content": message.content} for message in request.messages
         ],
         "stream": False,
-        # DeepSeek enables thinking by default. P0 requires a fast first screen
-        # and bounded formal-resource calls, so its sole configured model is used
-        # in non-thinking mode unless a later product phase adds a distinct policy.
-        "reasoning": {"effort": "none"},
+        # Server composition must explicitly opt in; existing P0 defaults stay non-thinking.
+        "reasoning": {"effort": reasoning_effort},
         "max_output_tokens": (
             request.max_output_tokens
             if request.max_output_tokens is not None
@@ -207,7 +214,8 @@ def _result(payload: object) -> TextResult:
             raise ProviderError(
                 ProviderErrorCode.INVALID_OUTPUT,
                 output_failure_reason=(
-                    OutputFailureReason.OUTPUT_TOKEN_LIMIT if token_limit
+                    OutputFailureReason.OUTPUT_TOKEN_LIMIT
+                    if token_limit
                     else OutputFailureReason.RESPONSE_INCOMPLETE
                 ),
                 usage=_usage(payload),
@@ -240,8 +248,12 @@ def _result(payload: object) -> TextResult:
     text = "".join(parts)
     if not text:
         raise ProviderError(ProviderErrorCode.INVALID_OUTPUT)
-    return TextResult(text=text, model_id=model, usage=_usage(payload),
-                      output_text_counts=OutputTextCounts(message_count, len(parts)))
+    return TextResult(
+        text=text,
+        model_id=model,
+        usage=_usage(payload),
+        output_text_counts=OutputTextCounts(message_count, len(parts)),
+    )
 
 
 async def _sse_data(chunks: AsyncIterator[bytes]) -> AsyncIterator[str]:
@@ -321,10 +333,14 @@ class DeepSeekResponsesAdapter:
         guard: ProviderTargetGuard,
         *,
         transport: httpx.AsyncBaseTransport | None = None,
+        reasoning_effort: str = "none",
     ) -> None:
+        if reasoning_effort not in {"none", "low", "high", "max"}:
+            raise ProviderError(ProviderErrorCode.CONFIGURATION_MISSING)
         self._settings = settings
         self._guard = guard
         self._transport = transport
+        self._reasoning_effort = reasoning_effort
 
     def _target(self) -> tuple[ApprovedTarget, str, dict[str, str]]:
         try:
@@ -332,10 +348,14 @@ class DeepSeekResponsesAdapter:
         except TargetValidationError:
             raise ProviderError(ProviderErrorCode.INVALID_TARGET) from None
         url, host_header = _wire_target(target)
-        return target, url, {
-            "Authorization": f"Bearer {self._settings.api_key}",
-            "Host": host_header,
-        }
+        return (
+            target,
+            url,
+            {
+                "Authorization": f"Bearer {self._settings.api_key}",
+                "Host": host_header,
+            },
+        )
 
     async def _response(self, body: dict[str, object]) -> TextResult:
         target, url, headers = self._target()
@@ -375,10 +395,23 @@ class DeepSeekResponsesAdapter:
                 ProviderErrorCode.INVALID_OUTPUT,
                 output_failure_reason=OutputFailureReason.RESPONSE_JSON_INVALID,
             ) from None
-        return _result(payload)
+        config = {
+            "provider": "deepseek_responses",
+            "host": target.hostname,
+            "model": body["model"],
+            "reasoning": body.get("reasoning"),
+            "temperature": body.get("temperature"),
+            "max_output_tokens": body.get("max_output_tokens"),
+        }
+        audit = TransportAudit(
+            hashlib.sha256(request.content).hexdigest(),
+            hashlib.sha256(b"".join(chunks)).hexdigest(),
+            hashlib.sha256(json.dumps(config, sort_keys=True).encode()).hexdigest(),
+        )
+        return replace(_result(payload), transport_audit=audit)
 
     async def generate_text(self, request: TextRequest) -> TextResult:
-        return await self._response(_request_body(request))
+        return await self._response(_request_body(request, reasoning_effort=self._reasoning_effort))
 
     async def generate_structured(self, request: StructuredRequest) -> StructuredResult:
         try:
@@ -392,7 +425,7 @@ class DeepSeekResponsesAdapter:
                 ProviderErrorCode.INVALID_OUTPUT,
                 output_failure_reason=OutputFailureReason.REQUEST_SCHEMA_INVALID,
             ) from None
-        body = _request_body(request.prompt)
+        body = _request_body(request.prompt, reasoning_effort=self._reasoning_effort)
         if request.prompt.temperature is None:
             body["temperature"] = 0.0
         body["text"] = {
@@ -425,10 +458,24 @@ class DeepSeekResponsesAdapter:
             Draft202012Validator(schema).validate(value)
         except (ValidationError, SchemaError) as cause:
             keyword = getattr(cause, "validator", None)
-            safe_keyword = keyword if keyword in {
-                "type", "required", "additionalProperties", "const", "enum", "minLength",
-                "maxLength", "minItems", "maxItems", "uniqueItems", "pattern",
-            } else "other"
+            safe_keyword = (
+                keyword
+                if keyword
+                in {
+                    "type",
+                    "required",
+                    "additionalProperties",
+                    "const",
+                    "enum",
+                    "minLength",
+                    "maxLength",
+                    "minItems",
+                    "maxItems",
+                    "uniqueItems",
+                    "pattern",
+                }
+                else "other"
+            )
             raise ProviderError(
                 ProviderErrorCode.INVALID_OUTPUT,
                 output_failure_reason=OutputFailureReason.STRUCTURED_SCHEMA_MISMATCH,
@@ -436,12 +483,17 @@ class DeepSeekResponsesAdapter:
                 usage=result.usage,
                 output_text_counts=result.output_text_counts,
             ) from None
-        return StructuredResult(value=value, model_id=result.model_id, usage=result.usage,
-                                output_text_counts=result.output_text_counts)
+        return StructuredResult(
+            value=value,
+            model_id=result.model_id,
+            usage=result.usage,
+            output_text_counts=result.output_text_counts,
+            transport_audit=result.transport_audit,
+        )
 
     async def stream_text(self, request: TextRequest) -> AsyncIterator[TextDelta]:
         target, url, headers = self._target()
-        body = _request_body(request)
+        body = _request_body(request, reasoning_effort=self._reasoning_effort)
         body["model"] = self._settings.model
         body["stream"] = True
         headers["Accept"] = "text/event-stream"

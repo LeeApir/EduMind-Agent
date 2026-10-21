@@ -1,0 +1,43 @@
+{
+  "real_provider_calls": 0,
+  "test_database": "edumind_catalog_a01_a02_fix_r01",
+  "test_container": "edumind-phase1-t037-pg",
+  "migration": "0031",
+  "pytest_command": "cd backend && EDUMIND_TEST_DATABASE_URL=<isolated-only> .venv/bin/python -m pytest -q tests/test_a01_process_generation.py tests/test_a02_program_context.py tests/test_planned_scene_generation.py tests/test_learning_unit_generator.py tests/test_learning_resource_schema.py tests/test_objective_exercises.py tests/test_hybrid_resource_review.py tests/test_review_evidence_v45.py tests/test_hybrid_review_scope.py tests/test_unit_review_responsibilities.py tests/test_review_input.py tests/test_review_delivery.py tests/test_resource_review_responsibilities.py tests/test_learner_evidence_review.py tests/test_learning_review_cases.py tests/test_hybrid_learning_publication.py tests/test_hybrid_review_check_ids.py tests/test_unit_consistency_review.py",
+  "result": {
+    "passed": 173,
+    "skipped": 0,
+    "files": 18,
+    "seconds": 4.37
+  },
+  "other_commands": [
+    {
+      "command": "backend/.venv/bin/mypy backend/app/agents/review_program_context.py backend/app/agents/hybrid_resource_review.py backend/app/agents/review_evidence.py backend/app/services/learning_policy.py",
+      "result": "4 source files passed"
+    },
+    {
+      "command": "cd backend && .venv/bin/ruff check <modified app/tests files>",
+      "result": "passed"
+    },
+    {
+      "command": "python3 scripts/check_catalog_workflow.py",
+      "result": "passed"
+    }
+  ],
+  "prior_attempts": [
+    {
+      "task": "T071",
+      "result": "57 pass,1 PG skip without test DB; 65 pass,0 skip after explicit isolated DB; default old test container had no PG port, no production access"
+    },
+    {
+      "task": "T072",
+      "result": "33 pass,3 PG skip initially; final 173 pass,0 skip above"
+    },
+    {
+      "task": "T072",
+      "result": "first mypy required two list type annotations; fixed and rechecked"
+    }
+  ],
+  "model_quality_proven": false,
+  "source_freeze_authorizes_execution": false
+}

@@ -1,0 +1,111 @@
+{
+  "version": "qwen-schema-and-error-repair-zero-call-v1",
+  "baseline": "3e19742",
+  "proposal_sha256": "01b527442100d82165b467e1444578b8448a9e35fd829f2c363a84a800024358",
+  "provider_calls": 0,
+  "real_approval_exists": false,
+  "real_private_state_exists": false,
+  "source_files_verified": 658,
+  "changed_old_source_files": [
+    "backend/app/services/openai_compatible.py",
+    "backend/app/services/provider_connection_dispatch.py",
+    "scripts/acceptance_support/qwen_review_attempt.py"
+  ],
+  "previous_acceptance_files_equal": 514,
+  "old13_ledgers_usage_and_halt_unchanged": true,
+  "recent3_ledgers_unchanged": [
+    {
+      "run": "phase-1-qwen-review-execution-r01",
+      "attempts": [
+        [
+          "reachable-safety:candidate",
+          "failed",
+          null,
+          null,
+          13420260,
+          "CAPABILITY_UNAVAILABLE"
+        ]
+      ],
+      "halted": "CAPABILITY_UNAVAILABLE"
+    },
+    {
+      "run": "phase-1-qwen-http400-r01",
+      "attempts": [
+        [
+          "reachable-safety:candidate",
+          "failed",
+          null,
+          null,
+          13420260,
+          "INVALID_OUTPUT"
+        ]
+      ],
+      "halted": "INVALID_OUTPUT"
+    },
+    {
+      "run": "phase-1-qwen-http400-r02",
+      "attempts": [
+        [
+          "reachable-safety:candidate",
+          "failed",
+          null,
+          null,
+          13420260,
+          "CAPABILITY_UNAVAILABLE"
+        ]
+      ],
+      "halted": "CAPABILITY_UNAVAILABLE"
+    }
+  ],
+  "full_business_schema_preserved": true,
+  "old_prompt_material_policy_unchanged": true,
+  "wire_sha256": "e47aa275af3828cc2bef90b5aade6e5ea81c62496e632401c153c9d1c42d9653",
+  "wire_bytes": 33763,
+  "defs_before": 9,
+  "defs_after": 1,
+  "wire_profile": "qwen-strict-20261017-v1",
+  "requests_proposed": 1,
+  "cost_micro_cny": 13283340,
+  "output_request": 8192,
+  "output_reserved_and_checked": 8202,
+  "timeout_seconds": 60,
+  "raw_error_limit": 65536,
+  "decoded_error_limit": 131072,
+  "checks": [
+    {
+      "command": "backend/.venv/bin/python /tmp/edumind_qwen_repair_final_tests.py",
+      "result": "114 passed,0 skipped,7.50s; dedicated test PG env via run_catalog_db_tests; 5 complete review_once/ConnectionOperation/MockHTTP variants plus gateway/dynamic and single-call gates; no real credentials"
+    },
+    {
+      "command": "cd backend && .venv/bin/mypy app",
+      "result": "192 files passed"
+    },
+    {
+      "command": "ruff check 10 changed/new Python files",
+      "result": "passed"
+    },
+    {
+      "command": "python3 scripts/check_catalog_workflow.py",
+      "result": "passed"
+    },
+    {
+      "command": "python3 scripts/verify_legacy_archives.py",
+      "result": "236 originals verified"
+    },
+    {
+      "command": "backend/.venv/bin/python docs/acceptance/phase-1-om-redesign/check_contract.py",
+      "result": "12 docs/12 task contracts valid"
+    },
+    {
+      "command": "backend/.venv/bin/python scripts/run_qwen_compatibility.py --run-one",
+      "result": "exit2 before Key/DB/private state; no approval"
+    },
+    {
+      "command": "git diff --check",
+      "result": "passed"
+    }
+  ],
+  "review": "executor self-review only, independent/user repair review not signed",
+  "T040": "blocked",
+  "production": "catalog_only"
+}

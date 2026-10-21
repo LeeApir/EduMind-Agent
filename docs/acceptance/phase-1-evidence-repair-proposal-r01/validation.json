@@ -1,0 +1,116 @@
+{
+  "version": "evidence-repair-proposal-zero-call-validation-v1",
+  "baseline": "7319f23",
+  "proposal_sha256": "729056c722dac7bbb1966daac7ef23430b74272c3046671b71347383975aa435",
+  "provider_requests": 0,
+  "regression_spec_cases": 12,
+  "source_files_bound": 13,
+  "prior_runtime_closure_files_verified": 607,
+  "historical_evidence_files_byte_equal": 168,
+  "historical_ledgers": [
+    {
+      "run": "phase-1-om-admission-r01",
+      "attempts": 2,
+      "halted": "SAFETY_FAILURE"
+    },
+    {
+      "run": "phase-1-om-admission-r02",
+      "attempts": 1,
+      "halted": "INVALID_OUTPUT"
+    },
+    {
+      "run": "phase-1-om-admission-r03",
+      "attempts": 2,
+      "halted": "INVALID_OUTPUT"
+    },
+    {
+      "run": "phase-1-coverage-r04-real",
+      "attempts": 1,
+      "halted": "INVALID_OUTPUT"
+    },
+    {
+      "run": "phase-1-coverage-r05-real",
+      "attempts": 3,
+      "halted": "INVALID_OUTPUT"
+    },
+    {
+      "run": "phase-1-review-config-r01",
+      "attempts": 3,
+      "halted": "INVALID_OUTPUT"
+    },
+    {
+      "run": "phase-1-distributed-diagnostic-r01",
+      "attempts": 1,
+      "halted": "INVALID_OUTPUT"
+    },
+    {
+      "run": "phase-1-distributed-budget-r01",
+      "attempts": 1,
+      "halted": null
+    },
+    {
+      "run": "phase-1-review-suite-r01",
+      "attempts": 1,
+      "halted": "INVALID_OUTPUT"
+    },
+    {
+      "run": "phase-1-plan-gap-location-r01",
+      "attempts": 1,
+      "halted": null
+    },
+    {
+      "run": "phase-1-review-remaining-r01",
+      "attempts": 3,
+      "halted": "ADMISSION_FAILED"
+    }
+  ],
+  "production_prompt_policy_schema_unchanged": true,
+  "candidate_prompt_active": false,
+  "new_real_package_budget_approval_labels_ledger": false,
+  "checks": [
+    {
+      "command": "backend/.venv/bin/python scripts/prepare_evidence_repair_proposal.py --write",
+      "result": "12 authored/bound regression specs; reproducible; not model verdicts"
+    },
+    {
+      "command": "backend/.venv/bin/python -m pytest -q scripts/tests/test_evidence_repair_proposal.py scripts/tests/test_review_remaining.py scripts/tests/test_plan_gap_location.py scripts/tests/test_schema_failure_observation.py scripts/tests/test_review_suite.py scripts/tests/test_distributed_budget.py scripts/tests/test_distributed_diagnostic.py scripts/tests/test_failure_observation.py scripts/tests/test_review_config_comparison.py scripts/tests/test_review_taxonomy_replay.py scripts/tests/test_coverage_v44.py scripts/tests/test_coverage_admission.py scripts/tests/test_coverage_review.py scripts/tests/test_om_admission.py scripts/tests/test_om_admission_r02.py scripts/tests/test_om_admission_r03.py backend/tests/test_acceptance_budget.py backend/tests/test_derived_diagnostic_budget.py backend/tests/test_real_browser_budget.py",
+      "result": "281 passed;8 new; no cloud Provider calls"
+    },
+    {
+      "command": "backend/.venv/bin/python -m pytest -q scripts/tests/test_evidence_repair_proposal.py",
+      "result": "8 passed again after candidate wording added explicit no invented/computed anchor metadata; no runtime source change"
+    },
+    {
+      "command": "backend/.venv/bin/ruff check scripts/prepare_evidence_repair_proposal.py scripts/tests/test_evidence_repair_proposal.py",
+      "result": "passed"
+    },
+    {
+      "command": "backend/.venv/bin/ruff format --check scripts/prepare_evidence_repair_proposal.py scripts/tests/test_evidence_repair_proposal.py",
+      "result": "2 files already formatted"
+    },
+    {
+      "command": "python3 scripts/check_catalog_workflow.py",
+      "result": "passed"
+    },
+    {
+      "command": "python3 scripts/verify_legacy_archives.py",
+      "result": "236 original files verified"
+    },
+    {
+      "command": "backend/.venv/bin/python docs/acceptance/phase-1-om-redesign/check_contract.py",
+      "result": "12 documents/12 task contracts valid"
+    },
+    {
+      "command": "git diff --check",
+      "result": "passed"
+    }
+  ],
+  "initial_preparation_correction": "Distributed/support-gap controls were absent from five-case subset; explicitly read and verify original seven-case package, preserving all samples. Final checks passed.",
+  "test_claim_limit": "Only immutable material/response binding, exact anchor text/range, abstract logical counterexample and specification coverage are checked. No general natural-language entailment/citation classifier, blind model reader test or semantic success claim.",
+  "history": "First two user confirmations remain; fact a15 limitation remains negative citation regression despite earlier continue. Third original overclaim and halt unchanged.",
+  "implementation": "proposal only; draft v4.5 rules not merged, no output contract fields/enums changed",
+  "semantic_primary_source": "https://blog.llvm.org/2011/05/what-every-c-programmer-should-know.html",
+  "pg_mypy": "not run; production code unchanged",
+  "T040": "blocked",
+  "production_mode": "catalog_only"
+}

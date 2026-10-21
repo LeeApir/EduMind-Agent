@@ -1,0 +1,39 @@
+{
+  "version": "provider-selection-v1",
+  "selected_at": "2026-10-14T19:24:01",
+  "user_instruction": "切换使用deepseek APi做完整测试，先切换下",
+  "followup_question": "还需要拿deepseek重新跑一遍T39么",
+  "active_local_configuration": {
+    "provider": "deepseek",
+    "base_url": "https://api.deepseek.com",
+    "model_id": "deepseek-flash",
+    "structured_transport": "responses_json_schema",
+    "credential_reference": ".env:EDUMIND_PROVIDER_API_KEY",
+    "credential_origin": "existing commented DeepSeek block in local .env; no new key requested or persisted outside .env",
+    "secret_file_mode": "0600"
+  },
+  "planned_usage": [
+    "T040 generation/review same selected model, subject to independent connection and quality freeze",
+    "T041 same configuration that passes T040, subject to separate approved E2E scope/budget"
+  ],
+  "supersedes": "Prior preference to use qwen3.8-max-0902 for T040/T041 and DeepSeek only as last resort; latest explicit instruction makes DeepSeek the selected primary.",
+  "aliyun_configuration": "retained inactive in local .env; no automatic fallback",
+  "checks": {
+    "offline_factory": "DeepSeekResponsesAdapter selected from actual local environment values",
+    "api_key_matches_original_deepseek_block": true,
+    "api_key_differs_from_aliyun_block": true,
+    "dns_or_provider_calls": 0,
+    "offline_pytest_command": "backend/.venv/bin/pytest -q backend/tests/test_config.py backend/tests/test_deepseek_responses.py",
+    "offline_pytest_result": "59 passed, 0 failed",
+    "local_env_gitignored": true,
+    "running_catalog_service_restarted": false
+  },
+  "real_acceptance_status": "NOT_RUN_FOR_NEW_DEEPSEEK_CONFIGURATION",
+  "previous_t039": "bd95f8b remains done for Qwen, original evidence is not transferable; new DeepSeek connection evidence required before T040",
+  "scope_boundary": "Config switch only. No paid probes or full tests started; independent target/transport/capability and budget freeze required. Existing P0 Responses factory selection does not prove a P1 selected Chat Completions path. Verify the exact path to be consumed by T040.",
+  "requests_authorized_for_new_real_run": 0,
+  "cost_authorized_for_new_real_run": null,
+  "dynamic_opening": false,
+  "native_provider_real_tests": "remain deferred",
+  "official_reference": "https://api-docs.deepseek.com/api/create-response/"
+}

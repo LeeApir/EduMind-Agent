@@ -1,0 +1,107 @@
+{
+  "version": "teaching-binding-design-cases-v1",
+  "status": "pending approval; design expectations only",
+  "provider_calls": 0,
+  "cases": [
+    {
+      "id": "direct-target",
+      "condition": "target=linked-list-insertion，推荐c-pointer，默认target",
+      "expected": "teaching=linked-list-insertion；内容/计划/资源/发布/作答都属插入；推荐指针仍显示，不自动掌握先修。"
+    },
+    {
+      "id": "recommended-prerequisite",
+      "condition": "同路径，显式recommended",
+      "expected": "teaching=c-pointer；原始目标保留且未完成，本节明确前置分段，current_segment_scope不能由模型开启。"
+    },
+    {
+      "id": "recommended-target",
+      "condition": "推荐=目标",
+      "expected": "本节仍按原完整目标课审核，不制造前置豁免。"
+    },
+    {
+      "id": "ambiguous-goal",
+      "condition": "真正并列或不能确定目标",
+      "expected": "继续澄清，不按最长关键词选主题。"
+    },
+    {
+      "id": "self-report",
+      "condition": "自述刚学过指针",
+      "expected": "不提升mastery，不改变路径可信证据；直接学目标不代表先修通过。"
+    },
+    {
+      "id": "missing-recommendation",
+      "condition": "recommended缺合法当前推荐",
+      "expected": "TEACHING_SELECTION_UNAVAILABLE，不静默选目标或替代前置。"
+    },
+    {
+      "id": "path-race",
+      "condition": "已选定后路径重排",
+      "expected": "保持冻结teaching与path版本；新操作才重新选择。"
+    },
+    {
+      "id": "scope-conflict",
+      "condition": "原文具体约束与前置分段适用性无法判断",
+      "expected": "明确澄清/未决，不删除原文或声称原目标已完成。"
+    },
+    {
+      "id": "plan-node-drift",
+      "condition": "输入teaching=插入但模型plan.node=指针",
+      "expected": "本地拒绝，不靠模型pass/人工签核豁免。"
+    },
+    {
+      "id": "resource-node-drift",
+      "condition": "plan/单元/三资源存在不同node",
+      "expected": "保存/发布门禁拒绝；不挑一个作为真值补写其他字段。"
+    },
+    {
+      "id": "context-immutability",
+      "condition": "试图二次修改/清空已非空operation上下文",
+      "expected": "DB约束与应用均拒绝，取消失败仍保留选择。"
+    },
+    {
+      "id": "same-key-mode-change",
+      "condition": "相同新幂等键目标/模式变化",
+      "expected": "IDEMPOTENCY_CONFLICT，无重复调用。"
+    },
+    {
+      "id": "old-key-replay",
+      "condition": "旧shared键、未显式提供新模式、旧摘要相同",
+      "expected": "只读历史重放不新增context，不重新生成；显式新模式则409。"
+    },
+    {
+      "id": "old-material-digest",
+      "condition": "无context旧material或有context新material",
+      "expected": "分别验证v1/v2摘要，不给旧内容补新键重签。"
+    },
+    {
+      "id": "wrong-owner-path",
+      "condition": "借用他人或另一目标路径版本",
+      "expected": "选择/写入前拒绝，不泄露路径或课程。"
+    },
+    {
+      "id": "new-quiz-exact-version",
+      "condition": "新planned旧发布题集作答，当前路径已变化",
+      "expected": "只归准确发布snapshot教学node，不从当前路径/可变unit回退。"
+    },
+    {
+      "id": "legacy-planned-quiz",
+      "condition": "旧planned无context",
+      "expected": "可读并标legacy_unverified，新增证据409；已有回执重放不改，目录及无计划legacy不受影响。"
+    },
+    {
+      "id": "reexplanation",
+      "condition": "重解释/换例与当前路径不同",
+      "expected": "继承准确旧发布主题/选择快照，新内容重审；换主题新单元。"
+    },
+    {
+      "id": "known-r02",
+      "condition": "头插法r02实际内容为插入但元数据c-pointer",
+      "expected": "保留原候选/待审/未发布状态，不原地纠正后冒充新通过。"
+    },
+    {
+      "id": "graph-change",
+      "condition": "冻结后当前批准图谱资格不匹配",
+      "expected": "新决定/发布拒绝或明确失效；旧已发布准确读取不改。"
+    }
+  ]
+}

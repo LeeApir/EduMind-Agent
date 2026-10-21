@@ -1,0 +1,69 @@
+{
+  "kind": "zero-call execution readiness verification; NOT real acceptance",
+  "actual_provider_calls": 0,
+  "actual_model_results": 0,
+  "new_c_compiled": false,
+  "new_c_executed": false,
+  "actual_generated_courses": 0,
+  "actual_browser_result_checks": "not_run; requires real A results; read-only browser server mechanically tested",
+  "runtime_ledger_exists": false,
+  "live_approval_present": false,
+  "runner_implemented": true,
+  "environment_verified": true,
+  "commands": [
+    {
+      "command": "backend/.venv/bin/python scripts/prepare_five_hour_environment.py --verify",
+      "result": "62 passed, 0 skipped; isolated PG real, model answers scripted; 1 existing anyio deprecation warning",
+      "evidence": "docs/acceptance/phase-1-five-hour-execution-r01/offline-checks-1792479907.json"
+    },
+    {
+      "command": "backend/.venv/bin/ruff check scripts/run_five_hour_acceptance.py scripts/prepare_five_hour_environment.py scripts/serve_five_hour_results.py scripts/acceptance_support/five_hour_runtime.py scripts/tests/test_five_hour_execution.py",
+      "result": "passed"
+    },
+    {
+      "command": "backend/.venv/bin/python scripts/check_five_hour_materials.py",
+      "result": "16 cases /12 review fixtures /4 generation inputs unchanged; original material root valid"
+    },
+    {
+      "command": "backend/.venv/bin/python scripts/check_catalog_workflow.py",
+      "result": "active dependencies/catalog ledger/T033 blocked valid"
+    }
+  ],
+  "retained_preparation_failures": [
+    {
+      "stage": "initial new runner offline tests",
+      "result": "20 passed, 1 failed, 1 skipped when no PG configured",
+      "cause": "real raw resolver rejects A02/A03 as ambiguous_aliases; not changed to automatic success; user explicitly clarified nodes"
+    },
+    {
+      "stage": "first PG runner evidence extraction",
+      "result": "1 failed, 52 passed; full redacted output retained",
+      "cause": "used nonexistent LearningPlanVersion.operation_id instead of origin_operation_id; corrected script evidence query, production schema unchanged",
+      "evidence": "docs/acceptance/phase-1-five-hour-execution-r01/offline-checks-1792477818.json"
+    },
+    {
+      "stage": "initial two environment collectors",
+      "result": "failed; exact outputs not persisted because unredacted test DSN detected before logging",
+      "cause": "added pre-persistence URL redaction; no DSN/Key printed"
+    },
+    {
+      "stage": "new whole-entry MockTransport test",
+      "result": "1 failed, 23 passed, 4 deselected before correction",
+      "cause": "test temporary folder outside repo could not produce root-relative paths; test injects its temporary root without changing live path checks"
+    },
+    {
+      "stage": "artifact hash guard edit",
+      "result": "two syntax/collection failures before correction",
+      "cause": "extra parenthesis; corrected; no model request"
+    },
+    {
+      "stage": "reader review",
+      "result": "partial response discarded on midstream timeout; fixed and regressed",
+      "evidence": "docs/acceptance/phase-1-five-hour-execution-r01/reader-review.json"
+    }
+  ],
+  "historical_failures": "all old freezes, verdicts, halts, unused slots and unknown usage untouched",
+  "reuse": "135 exact unchanged files, including 87 Web source files and fixed-C applicable evidence; fixed sample report retains 12 pass/9 fail/6 not_run; no new execution",
+  "time_policy": "conservative T0=2026-10-20T11:53:43+08:00 includes preparation/development/waiting; cutoff16:23:43 hard stop16:53:43; no reset",
+  "post_freeze_checks": "exact read-only package check, unauthorized init rejection, diff and commit verification to be recorded in append-only process.txt; not substituted for model-quality evidence"
+}

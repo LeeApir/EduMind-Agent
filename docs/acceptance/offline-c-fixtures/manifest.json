@@ -1,0 +1,62 @@
+{
+  "version": "fixed-c-fixture-manifest-v1",
+  "design_manifest": "docs/acceptance/phase-1-fixed-c-design-r01/manifest.json",
+  "design_manifest_sha256": "9faa908271c13bc099e7597a2c84a77979905567f63d9851324eb68ab75eebbd",
+  "approval": "docs/ADR/0019-approval-20261019.json",
+  "sources": {
+    "edumind-r02-original": {
+      "program": "edumind/candidate.c",
+      "driver": "edumind/checks/fault-injection.c",
+      "course_approval": "pending original case, not signed off"
+    },
+    "om-original": {
+      "program": "om/original-program.c",
+      "driver": "om/function-harness.c",
+      "course_approval": "historical failed checks, not signed off"
+    }
+  },
+  "artifacts": {
+    "edumind/candidate.c": {
+      "bytes": 1492,
+      "sha256": "48f63b2689c128b89cc399fa9aab9fff377804d26ae42f5d7a1253879a2ba394"
+    },
+    "edumind/checks/fault-injection.c": {
+      "bytes": 2786,
+      "sha256": "781fa2b6572914653a3c5b4a1e0087278ec1133f094ba7d5c370c75e62260263"
+    },
+    "om/free-function.c": {
+      "bytes": 146,
+      "sha256": "0a7e44c372f6ef5415ef2e11d15a8b5faff861206fa40153e421b1ced4186cd1"
+    },
+    "om/function-harness.c": {
+      "bytes": 2181,
+      "sha256": "e2b5b02f9684dcea370cab5ad6f6a38f327c07fc46fad5ee7eb28f6595214b3f"
+    },
+    "om/head-functions.c": {
+      "bytes": 493,
+      "sha256": "d2d175f7920fd8bba6723fa1a6d961c11c20b676bc1a12b4106f0fb367cb6641"
+    },
+    "om/main-function.c": {
+      "bytes": 180,
+      "sha256": "1b5d8cb21d5f62e4cf240f8afb325e40c36965bc471d089209b7472a936912dc"
+    },
+    "om/original-program.c": {
+      "bytes": 965,
+      "sha256": "d7d6aa24f1fa5a7f03ed7075b8283bd34c4a1916acc7a5778d912a086673fe78"
+    },
+    "om/print-function.c": {
+      "bytes": 143,
+      "sha256": "52913e0b7b994344bb2596aa01c16e435c67ab6cf2f74c7545903f4bf40875c0"
+    },
+    "spec/extraction.json": {
+      "bytes": 1448,
+      "sha256": "ee4f6dac497e654191d311c6cea706536fcfe1a59ba9fd5e8857802f07533ea5"
+    },
+    "spec/independent.json": {
+      "bytes": 4601,
+      "sha256": "f2f260a288bf483f25fab9c6dcdc9fa54d3f9eb1d34428b2109d95e3c01c8e5f"
+    }
+  },
+  "review_registry_sha256": "30bd79d824ca50eb7c4759cc8c6ed9d7406ecf2c3c9cf25ca880a841b7aa7a94",
+  "execution_authority": "requires frozen toolchain + actual isolation preflight; input admission alone cannot execute/publish"
+}

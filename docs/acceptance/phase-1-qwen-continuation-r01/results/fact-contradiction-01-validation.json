@@ -1,0 +1,70 @@
+{
+  "version": "qwen-continuation-actual-validation-01-v1",
+  "baseline": "fc0207e",
+  "proposal_sha256": "57f3f42c21973521f7fb26ce6a3fbd58ac62d996182067aa70c4c844ff4326a6",
+  "receipt_sha256": "8ab9ec0aa52f1405613f87991f5fba9a82020bd3ce3e9f4d963ec6d2fff2ec73",
+  "source_files_verified": 665,
+  "previous_acceptance_files_equal": 533,
+  "old_ledgers_usage_halt_unchanged": 17,
+  "credential_metadata_unchanged": true,
+  "private_files_mode": "0600",
+  "provider_calls": 1,
+  "actual_command": "backend/.venv/bin/python /tmp/edumind_qwen_continuation_once.py -> scripts/run_qwen_continuation.py --run-one; dedicated PG env, no credentials printed",
+  "actual_model": "qwen3.8-max-0902",
+  "normal_finish": true,
+  "full_schema_valid": true,
+  "cleanup": {
+    "config_version_invalidated": true,
+    "connection_disabled": true,
+    "persistent_secret_absent": true
+  },
+  "usage": {
+    "input": 11587,
+    "output": 174,
+    "total": 11761
+  },
+  "undiscounted_reference_micro_cny": 145308,
+  "not_invoice": true,
+  "snapshot": {
+    "manifest_sha256": "ee6c2bc4a935841621ccba8c2e0dcef933b53d34b9e2ec52258e159d319c2929",
+    "halted": null,
+    "attempts": [
+      [
+        1,
+        "fact-contradiction:candidate",
+        "probe",
+        "2673fefcaee063d54727f49cf731e3064d03318ed90dcc097759c82b98c6c0d9",
+        "b9b0ce2693e51584238b142272c33bc5657f2c1d1737ed3ee197680ce87104ba",
+        13283904,
+        "complete",
+        11587,
+        174,
+        null
+      ]
+    ],
+    "unattempted_slots": [
+      "gap-and-safety:candidate",
+      "trace-complete:candidate",
+      "generalization-search-positive",
+      "generalization-search-fact",
+      "generalization-search-safety",
+      "generalization-search-mixed",
+      "generalization-stack-positive",
+      "generalization-stack-fact",
+      "generalization-stack-safety",
+      "generalization-stack-mixed"
+    ]
+  },
+  "independent_assessment": "pass",
+  "human_confirmed": false,
+  "further_request_this_turn": false,
+  "previous_tests": "21 Mock/isolated PG pass atfc0207e; production192 mypy/114checks unchanged; no source edits, not rerun",
+  "checks": {
+    "workflow": "passed",
+    "archives": "236 originals verified",
+    "ADR_contract": "12 docs/12 task contracts valid",
+    "diff_check": "passed"
+  },
+  "T040": "blocked",
+  "production": "catalog_only"
+}

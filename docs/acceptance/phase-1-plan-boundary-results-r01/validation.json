@@ -1,0 +1,170 @@
+{
+  "validated_at": "2026-10-21T15:08:41+08:00",
+  "manifest_sha256": "f0fd9f143a39b43fea7b9d7f30f65c0a3da77c23f7c8a5ef13f58ca3e2d52ef1",
+  "provider_requests": 8,
+  "automatic_retries": 0,
+  "fallbacks": 0,
+  "technical_checks": [
+    {
+      "case_id": "D01",
+      "http_status": 200,
+      "model": "gpt-6-luna",
+      "reasoning": "high",
+      "output_cap": 8192,
+      "original_business_schema": "pass",
+      "wire_binding": "pass",
+      "raw_and_decoded_hashes": "pass",
+      "source_artifacts": "pass",
+      "duration_ms": 7969,
+      "safe_headers": {
+        "content_encoding": "gzip",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "case_id": "D02",
+      "http_status": 200,
+      "model": "gpt-6-luna",
+      "reasoning": "high",
+      "output_cap": 8192,
+      "original_business_schema": "pass",
+      "wire_binding": "pass",
+      "raw_and_decoded_hashes": "pass",
+      "source_artifacts": "pass",
+      "duration_ms": 11143,
+      "safe_headers": {
+        "content_encoding": "gzip",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "case_id": "D03",
+      "http_status": 200,
+      "model": "gpt-6-luna",
+      "reasoning": "high",
+      "output_cap": 8192,
+      "original_business_schema": "pass",
+      "wire_binding": "pass",
+      "raw_and_decoded_hashes": "pass",
+      "source_artifacts": "pass",
+      "duration_ms": 12747,
+      "safe_headers": {
+        "content_encoding": "gzip",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "case_id": "D04",
+      "http_status": 200,
+      "model": "gpt-6-luna",
+      "reasoning": "high",
+      "output_cap": 8192,
+      "original_business_schema": "pass",
+      "wire_binding": "pass",
+      "raw_and_decoded_hashes": "pass",
+      "source_artifacts": "pass",
+      "duration_ms": 9729,
+      "safe_headers": {
+        "content_encoding": "gzip",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "case_id": "D05",
+      "http_status": 200,
+      "model": "gpt-6-luna",
+      "reasoning": "high",
+      "output_cap": 8192,
+      "original_business_schema": "pass",
+      "wire_binding": "pass",
+      "raw_and_decoded_hashes": "pass",
+      "source_artifacts": "pass",
+      "duration_ms": 13606,
+      "safe_headers": {
+        "content_encoding": "gzip",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "case_id": "D06",
+      "http_status": 200,
+      "model": "gpt-6-luna",
+      "reasoning": "high",
+      "output_cap": 8192,
+      "original_business_schema": "pass",
+      "wire_binding": "pass",
+      "raw_and_decoded_hashes": "pass",
+      "source_artifacts": "pass",
+      "duration_ms": 14375,
+      "safe_headers": {
+        "content_encoding": "gzip",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "case_id": "D07",
+      "http_status": 200,
+      "model": "gpt-6-luna",
+      "reasoning": "high",
+      "output_cap": 8192,
+      "original_business_schema": "pass",
+      "wire_binding": "pass",
+      "raw_and_decoded_hashes": "pass",
+      "source_artifacts": "pass",
+      "duration_ms": 9374,
+      "safe_headers": {
+        "content_encoding": "gzip",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "case_id": "D08",
+      "http_status": 200,
+      "model": "gpt-6-luna",
+      "reasoning": "high",
+      "output_cap": 8192,
+      "original_business_schema": "pass",
+      "wire_binding": "pass",
+      "raw_and_decoded_hashes": "pass",
+      "source_artifacts": "pass",
+      "duration_ms": 11906,
+      "safe_headers": {
+        "content_encoding": "gzip",
+        "media_type": "application/json"
+      }
+    }
+  ],
+  "all_evidence_and_schema": "pass",
+  "H": "sealed_byte_checks_only_no_content_use",
+  "old_six_ledgers": "unchanged",
+  "independent_actual_signatures": 0,
+  "collection_halt": "COLLECTION_COMPLETE_QUALITY_UNASSESSED",
+  "commands": [
+    "backend/.venv/bin/python scripts/run_plan_boundary_batch.py check",
+    "backend/.venv/bin/python scripts/run_plan_boundary_batch.py activate",
+    "backend/.venv/bin/python scripts/run_plan_boundary_batch.py run --case D01 ... D08 (eight separate ordered invocations)",
+    "backend/.venv/bin/python scripts/run_plan_boundary_batch.py report",
+    "backend/.venv/bin/python /tmp/build_plan_boundary_results.py",
+    "backend/.venv/bin/python /tmp/verify_plan_boundary_results.py"
+  ],
+  "retained_verification_attempts": [
+    {
+      "command": "initial inline artifact verification",
+      "result": "AssertionError before writing evidence; used content-encoding instead of safe receipt content_encoding key",
+      "correction": "use exact documented safe_headers.content_encoding; bounded runtime decoding unchanged; all eight raw/decoded digest assertions retained"
+    }
+  ],
+  "limitations": [
+    "Initial automatic escalation refusal before process creation; all payloads inspected as synthetic teaching data, same command re-reviewed successfully; no bypass/no provider retry.",
+    "No semantic score signed by Lee. Frozen-label mismatches D01/D04 suffice to disqualify batch.",
+    "Model/Prompt/Schema/materials/policy frozen throughout collection; no H or generation requests."
+  ],
+  "final_document_checks": {
+    "draft_schema": "8/8 pass; gpt_draft pending signed=false and quality_success=null",
+    "all_claims_fields_citations": "139 claims / 102 text fields / 24 anchors; all pointers and exact quotes pass",
+    "markdown_links": "pass",
+    "sensitive_pattern_scan": "pass",
+    "workflow": "Active Phase 1 dependencies valid; catalog ledger valid; T033 blocked",
+    "diff_check": "pass before staging; final staged check required"
+  }
+}

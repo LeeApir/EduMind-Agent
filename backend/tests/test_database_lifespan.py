@@ -47,6 +47,8 @@ def test_health_does_not_require_or_create_database(monkeypatch):
 
 @pytest.mark.skipif(not os.getenv("EDUMIND_TEST_DATABASE_URL"), reason="isolated PG required")
 def test_pooled_routes_preserve_explicit_profile_correction_prerequisite_and_recovery(monkeypatch):
+    # This integration exercises dynamic routes using only the injected FakeAdapter.
+    monkeypatch.setenv("EDUMIND_PRODUCT_MODE", "dynamic")
     monkeypatch.setenv("EDUMIND_DATABASE_URL", os.environ["EDUMIND_TEST_DATABASE_URL"])
     adapter = FakeAdapter()
     app.dependency_overrides[provider_gateway] = lambda: ProviderGateway(adapter)

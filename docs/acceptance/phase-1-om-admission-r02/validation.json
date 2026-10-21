@@ -1,0 +1,72 @@
+{
+  "version": "om-scope-repair-zero-call-validation-v1",
+  "status": "REPAIRED_AND_PREPARED_NOT_REAL_ACCEPTANCE",
+  "checks": [
+    {
+      "command": "EDUMIND_CATALOG_TEST_PG_CONTAINER=edumind-phase1-t037-pg backend/.venv/bin/python scripts/run_shared_learning_tests.py --database edumind_catalog_phase1_om_scope02 --dynamic-mock-mode tests/test_learning_plan_persistence.py tests/test_shared_learning_plan.py tests/test_planned_scene_generation.py tests/test_teaching_action_assembly.py tests/test_hybrid_resource_review.py tests/test_hybrid_review_scope.py tests/test_unit_consistency_review.py tests/test_learning_review_cases.py tests/test_learning_review_cli.py tests/test_hybrid_learning_publication.py tests/test_hybrid_learning_operations.py tests/test_om_redesign_acceptance_preparation.py tests/test_learning_closed_loop.py tests/test_quiz_api.py tests/test_markdown_notes_api.py tests/test_paths_api.py tests/test_catalog_mode.py tests/test_catalog_sessions.py tests/test_review_agent.py tests/test_provider_gateway.py tests/test_deepseek_responses.py",
+      "result": "187 passed, zero skips, 9.99s; dedicated actual PG, synthetic Gateway/mock HTTP, no .env loaded"
+    },
+    {
+      "command": "backend/.venv/bin/pytest -q scripts/tests/test_om_admission.py scripts/tests/test_om_admission_r02.py backend/tests/test_acceptance_budget.py backend/tests/test_deepseek_responses.py backend/tests/test_provider_target.py backend/tests/test_provider_target_policy.py backend/tests/test_t040_diagnostic_preparation.py backend/tests/test_t040_diagnostic_runner.py --tb=short",
+      "result": "190 passed in 1.07s, zero skips; overlaps some PG suite tests, not an additional semantic denominator"
+    },
+    {
+      "command": "backend/.venv/bin/ruff check backend/app backend/tests scripts/acceptance_support/om_admission_r02.py scripts/prepare_om_admission_r02.py scripts/run_om_admission_r02.py scripts/tests/test_om_admission.py scripts/tests/test_om_admission_r02.py",
+      "result": "All checks passed"
+    },
+    {
+      "command": "backend/.venv/bin/mypy backend/app --config-file backend/pyproject.toml",
+      "result": "Success: no issues found in 188 source files"
+    },
+    {
+      "command": "backend/.venv/bin/python scripts/prepare_om_admission_r02.py --check",
+      "result": "passed; 4 wire slots, 8701900 micro CNY; authorization0"
+    },
+    {
+      "command": "backend/.venv/bin/python scripts/run_om_admission_r02.py --run-one",
+      "result": "exit2 STOPPED_OR_NOT_AUTHORIZED before Key/DNS/real ledger"
+    },
+    {
+      "command": "backend/.venv/bin/python docs/acceptance/phase-1-om-redesign/check_contract.py",
+      "result": "approved 12 documents/12 task contracts unchanged"
+    },
+    {
+      "command": "python3 scripts/verify_legacy_archives.py",
+      "result": "236 original/64 experiments/169 evidence files verified"
+    },
+    {
+      "command": "git diff --check",
+      "result": "passed"
+    }
+  ],
+  "old_r01_integrity": {
+    "files_verified_byte_identical_to_f67245e": 13,
+    "real_requests": 2,
+    "halt": "SAFETY_FAILURE",
+    "receipt_labels_approvals_unchanged": true,
+    "old_load_on_new_source": "FREEZE_CHANGED before credentials/ledger",
+    "old_tests": "Load original frozen requests; now explicitly assert old preparer refuses rebaseline on changed runtime; original route/cost/secret/no-retry assertions retained."
+  },
+  "repairs": [
+    "Project existing unit no-revise rule into outgoing scope-specific schema and explicit Prompt; keep local rejection and resource corrections.",
+    "Prompt clarifies server goal/selected objectives versus broader graph references without excusing unfulfilled user goals or concrete defects.",
+    "Prompt and scope policy enter policy digest; old pending cases use existing invalidation behavior.",
+    "New paired calibration contains direct trace teaching/assessment and real omission counterexample; labels remain human proposals.",
+    "New isolated runtime maps local contract errors to INVALID_OUTPUT; prior real halt stays unchanged."
+  ],
+  "initial_checks": [
+    "First local related pytest run had one PG-dependent skip; actual dedicated PG rerun passed zero skips.",
+    "Ruff imports/line wrapping and mypy Any-return annotation repaired; no assertion or production gate weakened."
+  ],
+  "provider_requests_this_change": 0,
+  "prior_r01_requests_not_reused": 2,
+  "new_fee_authorized_micro_cny": 0,
+  "new_proposed_requests": 4,
+  "new_proposed_cost_micro_cny": 8701900,
+  "human_scope_labels": "PROPOSED_PENDING_REVIEW",
+  "real_model_quality": "NOT_TESTED_FOR_REPAIRED_COMBINATION",
+  "T040": "blocked",
+  "production_mode": "catalog_only",
+  "T041_T042": "not_started",
+  "deployment": "not_performed"
+}

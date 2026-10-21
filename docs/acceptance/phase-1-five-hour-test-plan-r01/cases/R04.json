@@ -1,0 +1,517 @@
+{
+  "id": "R04",
+  "scope": "resource",
+  "selected_role": "exercise",
+  "material": {
+    "binding": {
+      "owner_id": "ccce0fa6-e6fc-56a5-89ac-0a5693ab24b4",
+      "unit_id": "4be032e6-4e92-5f8a-93fa-46d3eab93d3e",
+      "operation_id": "07c3da76-96de-500d-9d15-2ce67e0f825d",
+      "plan_id": "c3bc0524-c765-5718-b4c2-9a8497b46bff",
+      "plan_version": 1,
+      "plan_digest": "5e7f48cc3785e369beadd457a33f1f4784cf756d01642c0346edb177c2baeb49",
+      "input_digest": "b0d3aa49bb9693f527895d7b96284111e506541f059d200b8449ab34881b11ea",
+      "references_digest": "1335b93c5c57bca280ff7d4076dbd2c6cd8c0bc14bf154738dada80dc5e6281e",
+      "policy_version": "hybrid-review-v1",
+      "policy_digest": "747ec507e0f011d8a82e74d3823964fc2f860ab23693f71e695273ebf696fdad"
+    },
+    "plan": {
+      "objectives": [
+        {
+          "id": "local",
+          "text": "用三个判断题检查数组求和、合法下标以及返回与打印的区别。"
+        }
+      ],
+      "terminology": [
+        {
+          "term": "返回值",
+          "meaning": "函数交给调用方的值，不等于打印"
+        }
+      ],
+      "conventions": {
+        "index_base": 0,
+        "capacity": 3,
+        "state_representation": "s为已处理元素和，i为下一个处理下标",
+        "not_applicable_reasons": []
+      },
+      "shared_example": {
+        "input_description": "a={4,6,9}",
+        "initial_state": "s=0,i=0",
+        "steps": [
+          {
+            "operation": "求和循环",
+            "expected_state": "s=4,10,19；i=3条件失败退出",
+            "expected_output": "无打印，返回19"
+          }
+        ]
+      },
+      "prerequisite_node_ids": [],
+      "scenes": [
+        {
+          "role": "explanation",
+          "scene_key": "explanation",
+          "objective_ids": [
+            "local"
+          ],
+          "depends_on": []
+        },
+        {
+          "role": "code",
+          "scene_key": "code",
+          "objective_ids": [
+            "local"
+          ],
+          "depends_on": [
+            "explanation"
+          ]
+        },
+        {
+          "role": "exercise",
+          "scene_key": "exercise",
+          "objective_ids": [
+            "local"
+          ],
+          "depends_on": [
+            "explanation",
+            "code"
+          ]
+        }
+      ],
+      "node_id": "array",
+      "graph_version": "mvp-0.2.0",
+      "graph_digest": "3639db6aedc9699348e63b5e7e1bdaaea3189592b19540c64e8f175aceb9ef59",
+      "profile_version": null,
+      "profile_evidence_digest": "8838fdd11ee58e08fd54a21272313e784012370b7cf0a2cde8b823ed8806d85d",
+      "goal": "用三个判断题检查数组求和、合法下标以及返回与打印的区别。",
+      "code_language": "C",
+      "schema_version": "learning-plan-v1",
+      "references": [
+        {
+          "reference_id": "graph-node:mvp-0.2.0:array",
+          "version": "mvp-0.2.0",
+          "digest": "f83fd12e754fcda4124aa62b8a29203d97a897605d23dc4e37877393dcb0015d"
+        }
+      ]
+    },
+    "candidates": [
+      {
+        "resource_id": "45e14704-85ca-5da2-8591-442053c1514c",
+        "role": "explanation",
+        "envelope": {
+          "resource_type": "explanation",
+          "prompt_version": "learning-resources-v1",
+          "content": {
+            "markdown": "本节只实现并追踪这个求和示例，不承诺整个数组节点。初始s=0；i=0轮后s=4，i=1轮后s=10，i=2轮后s=19；随后i=3，3<3为假，退出，不访问a[3]，返回19，无打印。"
+          }
+        },
+        "content_digest": "de0ff132f35d51c5a6ea0ef0837a18f2683e892a3b0a3406ca733f5e1d75bc8e",
+        "dependency_digest": "0feb022a95bd97eafd16003320b5c2d1fb05189530537475b8c04ae2bb40c688",
+        "upstream": []
+      },
+      {
+        "resource_id": "226a514e-60f7-520b-bee5-077977de5e9b",
+        "role": "code",
+        "envelope": {
+          "resource_type": "code",
+          "prompt_version": "learning-resources-v1",
+          "content": {
+            "language": "C",
+            "source": "int sum_sample(void) {\n    int a[3] = {4, 6, 9};\n    int s = 0;\n    for (int i = 0; i < 3; ++i) s += a[i];\n    return s;\n}",
+            "expected_output": "函数返回19，没有标准输出。",
+            "key_steps": [
+              "初始s=0；i=0轮后s=4，i=1轮后s=10，i=2轮后s=19；随后i=3，3<3为假，退出，不访问a[3]，返回19，无打印。"
+            ],
+            "display_only": true
+          }
+        },
+        "content_digest": "3dc160a6f4c2288872ca672661dfad8f8da3f93f429f70090b4bdfebe4bf542e",
+        "dependency_digest": "f2ac684a7428a19f27340eaa6c2ccce4ab6d830304261efb222e36b801ccd7e1",
+        "upstream": [
+          {
+            "resource_id": "45e14704-85ca-5da2-8591-442053c1514c",
+            "content_digest": "de0ff132f35d51c5a6ea0ef0837a18f2683e892a3b0a3406ca733f5e1d75bc8e",
+            "dependency_digest": "0feb022a95bd97eafd16003320b5c2d1fb05189530537475b8c04ae2bb40c688"
+          }
+        ]
+      },
+      {
+        "resource_id": "9ae1ea4d-bc2f-51f8-bb2e-5137152165dd",
+        "role": "exercise",
+        "envelope": {
+          "resource_type": "exercise",
+          "prompt_version": "learning-resources-v1",
+          "content": {
+            "items": [
+              {
+                "id": "q1",
+                "question": "[判断题] 4+6+9=19 仅填 T 或 F（T=正确，F=错误）。",
+                "answer": "F",
+                "explanation": "4+6+9=19，因此题干命题成立，应答T。"
+              },
+              {
+                "id": "q2",
+                "question": "[判断题] 数组声明int a[3]的合法下标包含3 仅填 T 或 F（T=正确，F=错误）。",
+                "answer": "F",
+                "explanation": "合法下标只有0、1、2。"
+              },
+              {
+                "id": "q3",
+                "question": "[判断题] 执行int f(void){return 19;}会打印19 仅填 T 或 F（T=正确，F=错误）。",
+                "answer": "F",
+                "explanation": "return把值交给调用方，不是打印。"
+              }
+            ]
+          }
+        },
+        "content_digest": "ff6dada6f4767fcc74b58e0bd7c2059aac4d67a57d61f023a7fb87d7bc6092a8",
+        "dependency_digest": "70a35647a5e1e01271dee4edb484a0b7cc4aa06ad9d1767e9164611b963aef3f",
+        "upstream": [
+          {
+            "resource_id": "45e14704-85ca-5da2-8591-442053c1514c",
+            "content_digest": "de0ff132f35d51c5a6ea0ef0837a18f2683e892a3b0a3406ca733f5e1d75bc8e",
+            "dependency_digest": "0feb022a95bd97eafd16003320b5c2d1fb05189530537475b8c04ae2bb40c688"
+          },
+          {
+            "resource_id": "226a514e-60f7-520b-bee5-077977de5e9b",
+            "content_digest": "3dc160a6f4c2288872ca672661dfad8f8da3f93f429f70090b4bdfebe4bf542e",
+            "dependency_digest": "f2ac684a7428a19f27340eaa6c2ccce4ab6d830304261efb222e36b801ccd7e1"
+          }
+        ]
+      }
+    ],
+    "scenes": [
+      {
+        "role": "explanation",
+        "scene_key": "explanation",
+        "scene_id": "694b1e55-1631-5246-82cc-48ef12a4ee1f",
+        "scene_version": 1,
+        "resource_id": "45e14704-85ca-5da2-8591-442053c1514c",
+        "resource_digest": "de0ff132f35d51c5a6ea0ef0837a18f2683e892a3b0a3406ca733f5e1d75bc8e",
+        "dependency_digest": "0feb022a95bd97eafd16003320b5c2d1fb05189530537475b8c04ae2bb40c688"
+      },
+      {
+        "role": "code",
+        "scene_key": "code",
+        "scene_id": "ccd7932a-50c7-589c-bc9f-8c9e81224af3",
+        "scene_version": 1,
+        "resource_id": "226a514e-60f7-520b-bee5-077977de5e9b",
+        "resource_digest": "3dc160a6f4c2288872ca672661dfad8f8da3f93f429f70090b4bdfebe4bf542e",
+        "dependency_digest": "f2ac684a7428a19f27340eaa6c2ccce4ab6d830304261efb222e36b801ccd7e1"
+      },
+      {
+        "role": "exercise",
+        "scene_key": "exercise",
+        "scene_id": "eff35532-a4b5-51b7-81f1-c4c824ffac3e",
+        "scene_version": 1,
+        "resource_id": "9ae1ea4d-bc2f-51f8-bb2e-5137152165dd",
+        "resource_digest": "ff6dada6f4767fcc74b58e0bd7c2059aac4d67a57d61f023a7fb87d7bc6092a8",
+        "dependency_digest": "70a35647a5e1e01271dee4edb484a0b7cc4aa06ad9d1767e9164611b963aef3f"
+      }
+    ],
+    "actions": {
+      "version": "teaching-actions-v1",
+      "actions": [
+        {
+          "kind": "show_resource",
+          "scene_key": "explanation",
+          "resource_id": "45e14704-85ca-5da2-8591-442053c1514c",
+          "resource_digest": "de0ff132f35d51c5a6ea0ef0837a18f2683e892a3b0a3406ca733f5e1d75bc8e"
+        },
+        {
+          "kind": "show_resource",
+          "scene_key": "code",
+          "resource_id": "226a514e-60f7-520b-bee5-077977de5e9b",
+          "resource_digest": "3dc160a6f4c2288872ca672661dfad8f8da3f93f429f70090b4bdfebe4bf542e"
+        },
+        {
+          "kind": "highlight",
+          "scene_key": "code",
+          "resource_id": "226a514e-60f7-520b-bee5-077977de5e9b",
+          "resource_digest": "3dc160a6f4c2288872ca672661dfad8f8da3f93f429f70090b4bdfebe4bf542e",
+          "anchor_id": "a3"
+        },
+        {
+          "kind": "show_resource",
+          "scene_key": "exercise",
+          "resource_id": "9ae1ea4d-bc2f-51f8-bb2e-5137152165dd",
+          "resource_digest": "ff6dada6f4767fcc74b58e0bd7c2059aac4d67a57d61f023a7fb87d7bc6092a8"
+        },
+        {
+          "kind": "ask_exercise",
+          "scene_key": "exercise",
+          "resource_id": "9ae1ea4d-bc2f-51f8-bb2e-5137152165dd",
+          "resource_digest": "ff6dada6f4767fcc74b58e0bd7c2059aac4d67a57d61f023a7fb87d7bc6092a8",
+          "exercise_id": "q1"
+        },
+        {
+          "kind": "ask_exercise",
+          "scene_key": "exercise",
+          "resource_id": "9ae1ea4d-bc2f-51f8-bb2e-5137152165dd",
+          "resource_digest": "ff6dada6f4767fcc74b58e0bd7c2059aac4d67a57d61f023a7fb87d7bc6092a8",
+          "exercise_id": "q2"
+        },
+        {
+          "kind": "ask_exercise",
+          "scene_key": "exercise",
+          "resource_id": "9ae1ea4d-bc2f-51f8-bb2e-5137152165dd",
+          "resource_digest": "ff6dada6f4767fcc74b58e0bd7c2059aac4d67a57d61f023a7fb87d7bc6092a8",
+          "exercise_id": "q3"
+        }
+      ],
+      "anchor_catalog": [
+        {
+          "anchor_id": "a1",
+          "resource_id": "45e14704-85ca-5da2-8591-442053c1514c",
+          "resource_digest": "de0ff132f35d51c5a6ea0ef0837a18f2683e892a3b0a3406ca733f5e1d75bc8e",
+          "json_pointer": "/markdown",
+          "start_utf8": 0,
+          "end_utf8": 206
+        },
+        {
+          "anchor_id": "a2",
+          "resource_id": "226a514e-60f7-520b-bee5-077977de5e9b",
+          "resource_digest": "3dc160a6f4c2288872ca672661dfad8f8da3f93f429f70090b4bdfebe4bf542e",
+          "json_pointer": "/expected_output",
+          "start_utf8": 0,
+          "end_utf8": 38
+        },
+        {
+          "anchor_id": "a3",
+          "resource_id": "226a514e-60f7-520b-bee5-077977de5e9b",
+          "resource_digest": "3dc160a6f4c2288872ca672661dfad8f8da3f93f429f70090b4bdfebe4bf542e",
+          "json_pointer": "/key_steps/0",
+          "start_utf8": 0,
+          "end_utf8": 131
+        },
+        {
+          "anchor_id": "a4",
+          "resource_id": "226a514e-60f7-520b-bee5-077977de5e9b",
+          "resource_digest": "3dc160a6f4c2288872ca672661dfad8f8da3f93f429f70090b4bdfebe4bf542e",
+          "json_pointer": "/language",
+          "start_utf8": 0,
+          "end_utf8": 1
+        },
+        {
+          "anchor_id": "a5",
+          "resource_id": "226a514e-60f7-520b-bee5-077977de5e9b",
+          "resource_digest": "3dc160a6f4c2288872ca672661dfad8f8da3f93f429f70090b4bdfebe4bf542e",
+          "json_pointer": "/source",
+          "start_utf8": 0,
+          "end_utf8": 122
+        },
+        {
+          "anchor_id": "a6",
+          "resource_id": "9ae1ea4d-bc2f-51f8-bb2e-5137152165dd",
+          "resource_digest": "ff6dada6f4767fcc74b58e0bd7c2059aac4d67a57d61f023a7fb87d7bc6092a8",
+          "json_pointer": "/items/0/answer",
+          "start_utf8": 0,
+          "end_utf8": 1
+        },
+        {
+          "anchor_id": "a7",
+          "resource_id": "9ae1ea4d-bc2f-51f8-bb2e-5137152165dd",
+          "resource_digest": "ff6dada6f4767fcc74b58e0bd7c2059aac4d67a57d61f023a7fb87d7bc6092a8",
+          "json_pointer": "/items/0/explanation",
+          "start_utf8": 0,
+          "end_utf8": 48
+        },
+        {
+          "anchor_id": "a8",
+          "resource_id": "9ae1ea4d-bc2f-51f8-bb2e-5137152165dd",
+          "resource_digest": "ff6dada6f4767fcc74b58e0bd7c2059aac4d67a57d61f023a7fb87d7bc6092a8",
+          "json_pointer": "/items/0/id",
+          "start_utf8": 0,
+          "end_utf8": 2
+        },
+        {
+          "anchor_id": "a9",
+          "resource_id": "9ae1ea4d-bc2f-51f8-bb2e-5137152165dd",
+          "resource_digest": "ff6dada6f4767fcc74b58e0bd7c2059aac4d67a57d61f023a7fb87d7bc6092a8",
+          "json_pointer": "/items/0/question",
+          "start_utf8": 0,
+          "end_utf8": 63
+        },
+        {
+          "anchor_id": "a10",
+          "resource_id": "9ae1ea4d-bc2f-51f8-bb2e-5137152165dd",
+          "resource_digest": "ff6dada6f4767fcc74b58e0bd7c2059aac4d67a57d61f023a7fb87d7bc6092a8",
+          "json_pointer": "/items/1/answer",
+          "start_utf8": 0,
+          "end_utf8": 1
+        },
+        {
+          "anchor_id": "a11",
+          "resource_id": "9ae1ea4d-bc2f-51f8-bb2e-5137152165dd",
+          "resource_digest": "ff6dada6f4767fcc74b58e0bd7c2059aac4d67a57d61f023a7fb87d7bc6092a8",
+          "json_pointer": "/items/1/explanation",
+          "start_utf8": 0,
+          "end_utf8": 30
+        },
+        {
+          "anchor_id": "a12",
+          "resource_id": "9ae1ea4d-bc2f-51f8-bb2e-5137152165dd",
+          "resource_digest": "ff6dada6f4767fcc74b58e0bd7c2059aac4d67a57d61f023a7fb87d7bc6092a8",
+          "json_pointer": "/items/1/id",
+          "start_utf8": 0,
+          "end_utf8": 2
+        },
+        {
+          "anchor_id": "a13",
+          "resource_id": "9ae1ea4d-bc2f-51f8-bb2e-5137152165dd",
+          "resource_digest": "ff6dada6f4767fcc74b58e0bd7c2059aac4d67a57d61f023a7fb87d7bc6092a8",
+          "json_pointer": "/items/1/question",
+          "start_utf8": 0,
+          "end_utf8": 97
+        },
+        {
+          "anchor_id": "a14",
+          "resource_id": "9ae1ea4d-bc2f-51f8-bb2e-5137152165dd",
+          "resource_digest": "ff6dada6f4767fcc74b58e0bd7c2059aac4d67a57d61f023a7fb87d7bc6092a8",
+          "json_pointer": "/items/2/answer",
+          "start_utf8": 0,
+          "end_utf8": 1
+        },
+        {
+          "anchor_id": "a15",
+          "resource_id": "9ae1ea4d-bc2f-51f8-bb2e-5137152165dd",
+          "resource_digest": "ff6dada6f4767fcc74b58e0bd7c2059aac4d67a57d61f023a7fb87d7bc6092a8",
+          "json_pointer": "/items/2/explanation",
+          "start_utf8": 0,
+          "end_utf8": 45
+        },
+        {
+          "anchor_id": "a16",
+          "resource_id": "9ae1ea4d-bc2f-51f8-bb2e-5137152165dd",
+          "resource_digest": "ff6dada6f4767fcc74b58e0bd7c2059aac4d67a57d61f023a7fb87d7bc6092a8",
+          "json_pointer": "/items/2/id",
+          "start_utf8": 0,
+          "end_utf8": 2
+        },
+        {
+          "anchor_id": "a17",
+          "resource_id": "9ae1ea4d-bc2f-51f8-bb2e-5137152165dd",
+          "resource_digest": "ff6dada6f4767fcc74b58e0bd7c2059aac4d67a57d61f023a7fb87d7bc6092a8",
+          "json_pointer": "/items/2/question",
+          "start_utf8": 0,
+          "end_utf8": 95
+        }
+      ],
+      "digest": "cafbd20bec337c3be193985ccb47a0580f75988bbab06c6e9af2987f66af33e8"
+    },
+    "reference_context": {
+      "source": {
+        "reference_id": "graph-node:mvp-0.2.0:array",
+        "version": "mvp-0.2.0",
+        "digest": "f83fd12e754fcda4124aa62b8a29203d97a897605d23dc4e37877393dcb0015d"
+      },
+      "node": {
+        "id": "array",
+        "name": "数组",
+        "chapter": "线性表",
+        "difficulty": 1,
+        "description": "使用连续存储空间、通过下标访问元素的线性结构。",
+        "prerequisites": [],
+        "learning_objectives": [
+          "说出下标访问的时间复杂度",
+          "说明连续存储对插入和删除的影响"
+        ],
+        "common_misconceptions": [
+          "数组每次访问都要从头遍历",
+          "数组插入总是 O(1)"
+        ],
+        "ai_context": "使用连续格子和下标精灵的图示，对比中间插入时的元素搬移。",
+        "mastery_rule_key": "linear-structure-v1"
+      },
+      "learner_evidence": {},
+      "scope": "Background only, not certification of this example."
+    },
+    "teaching_context": {
+      "version": "teaching-node-binding-v1",
+      "teaching_mode": "target",
+      "target_node_id": "array",
+      "recommended_node_id": "array",
+      "teaching_node_id": "array",
+      "selection_reason": "direct_target",
+      "original_request": "用三个判断题检查数组求和、合法下标以及返回与打印的区别。",
+      "segment_goal": "用三个判断题检查数组求和、合法下标以及返回与打印的区别。",
+      "segment_scope": "target_lesson",
+      "path_version_id": "f94479c4-2f48-5088-aee9-2263e3337e46",
+      "path_version": 1,
+      "graph_version": "mvp-0.2.0",
+      "graph_digest": "3639db6aedc9699348e63b5e7e1bdaaea3189592b19540c64e8f175aceb9ef59"
+    },
+    "unit_digest": "621cb651ab900d9ca5f5a39e8bf78b71483139532130ef568a9df1c07cf04787"
+  },
+  "input_snapshot": {
+    "metadata": {
+      "node_id": "array",
+      "graph_version": "mvp-0.2.0",
+      "graph_digest": "3639db6aedc9699348e63b5e7e1bdaaea3189592b19540c64e8f175aceb9ef59",
+      "profile_version": null,
+      "profile_evidence_digest": "8838fdd11ee58e08fd54a21272313e784012370b7cf0a2cde8b823ed8806d85d",
+      "goal": "用三个判断题检查数组求和、合法下标以及返回与打印的区别。",
+      "code_language": "C"
+    },
+    "references": {
+      "graph-node:mvp-0.2.0:array": {
+        "reference_id": "graph-node:mvp-0.2.0:array",
+        "version": "mvp-0.2.0",
+        "digest": "f83fd12e754fcda4124aa62b8a29203d97a897605d23dc4e37877393dcb0015d"
+      }
+    },
+    "learner_evidence": {},
+    "node_ids": [
+      "array",
+      "array-stack",
+      "balanced-binary-search-tree",
+      "binary-heap",
+      "binary-search-tree",
+      "binary-tree",
+      "binary-tree-traversal",
+      "breadth-first-search",
+      "bubble-sort",
+      "c-pointer",
+      "circular-linked-list",
+      "circular-queue",
+      "depth-first-search",
+      "doubly-linked-list",
+      "graph-representation",
+      "heap-sort",
+      "insertion-sort",
+      "linked-list-concept",
+      "linked-list-deletion",
+      "linked-list-insertion",
+      "linked-list-traversal",
+      "linked-stack",
+      "merge-sort",
+      "queue",
+      "quick-sort",
+      "selection-sort",
+      "single-linked-list",
+      "sorting-comparison",
+      "stack",
+      "tree-concept"
+    ],
+    "teaching_context": {
+      "version": "teaching-node-binding-v1",
+      "teaching_mode": "target",
+      "target_node_id": "array",
+      "recommended_node_id": "array",
+      "teaching_node_id": "array",
+      "selection_reason": "direct_target",
+      "original_request": "用三个判断题检查数组求和、合法下标以及返回与打印的区别。",
+      "segment_goal": "用三个判断题检查数组求和、合法下标以及返回与打印的区别。",
+      "segment_scope": "target_lesson",
+      "path_version_id": "f94479c4-2f48-5088-aee9-2263e3337e46",
+      "path_version": 1,
+      "graph_version": "mvp-0.2.0",
+      "graph_digest": "3639db6aedc9699348e63b5e7e1bdaaea3189592b19540c64e8f175aceb9ef59"
+    }
+  },
+  "provenance": {
+    "author": "Codex GPT-authored fixture, not independent human truth",
+    "relationship_to_history": "new content, reuses known diagnostic patterns; NOT blind/independent population sample",
+    "historical_failed_stack_sample_reused": false
+  },
+  "actual_model_result": null
+}

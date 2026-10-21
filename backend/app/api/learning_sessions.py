@@ -2,14 +2,15 @@
 
 import json
 from collections.abc import AsyncIterator
+from typing import Literal
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Header, Request
+from fastapi import APIRouter, Depends, Header, Request, Response
 from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from app.agents.goal_node_resolver import resolve_goal_node
+from app.agents.goal_node_resolver import clarification_payload, resolve_goal_node
 from app.api.knowledge_graph import knowledge_graph_repository
 from app.core.auth import AuthenticatedSession, require_authenticated_session
 from app.core.database import database_session_factory
@@ -33,6 +34,8 @@ class StartLearningRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
     goal: str = Field(min_length=1, max_length=2000)
     preferred_language: str = "c"
+    generation_protocol: Literal["shared-plan-v1"] | None = None
+    teaching_mode: Literal["target", "recommended"] | None = None
 
 
 def provider_gateway() -> ProviderGateway:
@@ -174,6 +177,10 @@ async def start_learning_session(
     graph: KnowledgeGraphRepository = Depends(knowledge_graph_repository),
 ) -> StreamingResponse | JSONResponse:
     """Persist only the profile, then stream explicitly temporary first learning content."""
+    if payload.generation_protocol is None and payload.teaching_mode == "recommended":
+        from app.core.auth import AuthFailure
+
+        raise AuthFailure(422, "TEACHING_SELECTION_UNAVAILABLE", "旧协议不支持推荐前置模式。")
     async with session_factory() as db:
         try:
             reservation = await reserve_operation(
@@ -182,6 +189,8 @@ async def start_learning_session(
                 idempotency_key=idempotency_key,
                 goal=payload.goal,
                 preferred_language=payload.preferred_language,
+                generation_protocol=payload.generation_protocol,
+                teaching_mode=payload.teaching_mode,
             )
         except IdempotencyConflict:
             from app.core.auth import AuthFailure
@@ -198,17 +207,26 @@ async def start_learning_session(
                 media_type="text/event-stream",
                 headers={"Cache-Control": "no-store", "X-Accel-Buffering": "no"},
             )
+        if payload.generation_protocol == "shared-plan-v1":
+            from app.api.hybrid_learning import hybrid_events
+
+            return StreamingResponse(
+                hybrid_events(
+                    operation_id=reservation.operation.id,
+                    owner_id=current.user.id,
+                    goal=reservation.operation.goal,
+                    language=payload.preferred_language,
+                    gateway=gateway,
+                    graph=graph,
+                    sessions=session_factory,
+                    teaching_mode=payload.teaching_mode or "target",
+                ),
+                media_type="text/event-stream",
+                headers={"Cache-Control": "no-store", "X-Accel-Buffering": "no"},
+            )
         resolution = await resolve_goal_node(payload.goal, graph=graph, gateway=gateway)
         if resolution.node is None:
-            clarification: dict[str, object] = {
-                "code": "GOAL_CLARIFICATION_REQUIRED",
-                "message": "请明确一个知识点，例如“C 指针”“单链表”或“链表插入”。",
-                "retryable": False,
-                "candidate_nodes": [
-                    {"id": node.id, "name": node.name}
-                    for node in (resolution.candidates or graph.all_nodes())
-                ],
-            }
+            clarification = clarification_payload(resolution, graph)
             await update_operation(db, reservation.operation, status="failed", error=clarification)
             return JSONResponse(
                 status_code=422, content=clarification, headers={"Cache-Control": "no-store"}
@@ -252,9 +270,11 @@ async def _replay_operation_events(operation: object) -> AsyncIterator[str]:
 @router.get("/api/learning-operations/{operation_id}")
 async def get_learning_operation(
     operation_id: UUID,
+    response: Response,
     current: AuthenticatedSession = Depends(require_authenticated_session),
     session_factory: async_sessionmaker[AsyncSession] = Depends(database_session_factory),
 ) -> dict[str, object]:
+    response.headers["Cache-Control"] = "no-store"
     async with session_factory() as db:
         operation = await owned_operation(db, owner_id=current.user.id, operation_id=operation_id)
         if operation is None:

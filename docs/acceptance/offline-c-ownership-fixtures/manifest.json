@@ -1,0 +1,61 @@
+{
+  "version": "fixed-ownership-manifest-v1",
+  "base_fixture_manifest_sha256": "59020455441fb55d1231c1f6ef0ff75403ce633895d6c600c38119cd0f6a106b",
+  "artifacts": {
+    "edumind/negative-double-free.c": {
+      "bytes": 1501,
+      "sha256": "0d3f1c02a0d53ebef8e39b6b0252d5c1341f344374e4cea0fbcaf37d900a26e0"
+    },
+    "edumind/negative-drop-link.c": {
+      "bytes": 1492,
+      "sha256": "8a0d14a8c9e7ae83c6154b8e58d99e580417c651d8737f4f77c187f34f0a84df"
+    },
+    "edumind/negative-ignored-return.c": {
+      "bytes": 1471,
+      "sha256": "fb22704e6790bbcb6080c9c27296534b190e4bba60277ed13c7cd58db49bd302"
+    },
+    "edumind/ownership-driver.c": {
+      "bytes": 3989,
+      "sha256": "a74eccf316ad32fa191c256652eb585fb88c212dd7b614d8657a5a57e0154ca9"
+    },
+    "om/ownership-driver.c": {
+      "bytes": 4029,
+      "sha256": "1e56ae1decebb68e5713cab89ca127866d9c14b8c7e85088fc2c0dddcf8102ac"
+    }
+  },
+  "review_registry_sha256": "eb5877e9ac578a39a848e66cec8eccccd6424967ad784df328c1a6f75f027fb1",
+  "derivations": {
+    "edumind/negative-drop-link.c": [
+      [
+        "new_node->next = head;",
+        "new_node->next = NULL;"
+      ]
+    ],
+    "edumind/negative-double-free.c": [
+      [
+        "        free(p);",
+        "        free(p); free(p);"
+      ]
+    ],
+    "edumind/negative-ignored-return.c": [
+      [
+        "head = insert_head(head, 1);",
+        "insert_head(head, 1);"
+      ],
+      [
+        "head = insert_head(head, 2);",
+        "insert_head(head, 2);"
+      ],
+      [
+        "head = insert_head(head, 3);",
+        "insert_head(head, 3);"
+      ]
+    ]
+  },
+  "actual_state_limits": {
+    "contract": "direct caller head snapshots after each insert; actual head/next/return assertions",
+    "original_main": "allocation-root snapshots before next allocation/first free plus actual printed output and all-allocation release checks; local head reset not observable after main",
+    "abnormal_exit": "partial events retained; missing final summary counters null, no UB numeric inference"
+  },
+  "course_signoff": "not granted"
+}

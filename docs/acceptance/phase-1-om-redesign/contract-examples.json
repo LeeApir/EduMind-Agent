@@ -1,0 +1,240 @@
+{
+  "status": "SYNTHETIC_SCHEMA_EXAMPLES_NOT_SIGNOFF",
+  "note": "所有ID和0摘要仅示范结构，不通过运行时摘要/owner/参考核验，不是实际课程或人工审核结论。",
+  "plan_record": {
+    "binding": {
+      "owner_id": "00000000-0000-4000-8000-000000000001",
+      "unit_id": "00000000-0000-4000-8000-000000000001",
+      "operation_id": "00000000-0000-4000-8000-000000000001",
+      "plan_id": "00000000-0000-4000-8000-000000000001",
+      "plan_version": 1,
+      "plan_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+      "input_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+      "references_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+      "policy_version": "hybrid-review-v1",
+      "policy_digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "plan": {
+      "schema_version": "learning-plan-v1",
+      "node_id": "stack",
+      "graph_version": "synthetic-v1",
+      "graph_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+      "profile_version": null,
+      "profile_evidence_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+      "goal": "理解栈的后进先出",
+      "prerequisite_node_ids": [],
+      "code_language": "C",
+      "objectives": [
+        {
+          "id": "lifo",
+          "text": "识别出栈次序"
+        }
+      ],
+      "terminology": [
+        {
+          "term": "top",
+          "meaning": "栈顶位置"
+        }
+      ],
+      "conventions": {
+        "index_base": 0,
+        "capacity": 4,
+        "state_representation": "size表示元素数，栈顶下标size-1",
+        "not_applicable_reasons": []
+      },
+      "shared_example": {
+        "input_description": "push(10),push(20),pop()",
+        "initial_state": "size=0",
+        "steps": [
+          {
+            "operation": "push(10)",
+            "expected_state": "[10],size=1",
+            "expected_output": null
+          },
+          {
+            "operation": "push(20)",
+            "expected_state": "[10,20],size=2",
+            "expected_output": null
+          },
+          {
+            "operation": "pop()",
+            "expected_state": "[10],size=1",
+            "expected_output": "20"
+          }
+        ]
+      },
+      "references": [
+        {
+          "reference_id": "synthetic-stack",
+          "version": "v1",
+          "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      ],
+      "scenes": [
+        {
+          "role": "explanation",
+          "scene_key": "explanation",
+          "objective_ids": [
+            "lifo"
+          ],
+          "depends_on": []
+        },
+        {
+          "role": "code",
+          "scene_key": "code",
+          "objective_ids": [
+            "lifo"
+          ],
+          "depends_on": [
+            "explanation"
+          ]
+        },
+        {
+          "role": "exercise",
+          "scene_key": "exercise",
+          "objective_ids": [
+            "lifo"
+          ],
+          "depends_on": [
+            "explanation",
+            "code"
+          ]
+        }
+      ]
+    },
+    "created_at": "2026-10-15T16:00:00+08:00"
+  },
+  "review_record": {
+    "review_id": "00000000-0000-4000-8000-000000000002",
+    "binding": {
+      "owner_id": "00000000-0000-4000-8000-000000000001",
+      "unit_id": "00000000-0000-4000-8000-000000000001",
+      "operation_id": "00000000-0000-4000-8000-000000000001",
+      "plan_id": "00000000-0000-4000-8000-000000000001",
+      "plan_version": 1,
+      "plan_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+      "input_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+      "references_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+      "policy_version": "hybrid-review-v1",
+      "policy_digest": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "target_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+    "request_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+    "response_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+    "prompt_version": "synthetic-review-v4",
+    "provider_config_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+    "result": {
+      "schema_version": "resource-review-v4",
+      "scope": "resource",
+      "verdict": "needs_human",
+      "findings": [],
+      "coverage": {
+        "checked": [
+          "facts",
+          "code_safety",
+          "learner_fit",
+          "objectives",
+          "reference_scope"
+        ],
+        "unchecked": []
+      },
+      "unresolved": [
+        "合成演示：参考不足以独立证明候选安全。"
+      ]
+    },
+    "created_at": "2026-10-15T16:00:00+08:00",
+    "anchor_catalog": [
+      {
+        "anchor_id": "a1",
+        "resource_id": "00000000-0000-4000-8000-000000000003",
+        "resource_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+        "json_pointer": "/markdown",
+        "start_utf8": 0,
+        "end_utf8": 3
+      }
+    ],
+    "local_routing": {
+      "verdict": "needs_human",
+      "reason_codes": [
+        "SEMANTIC_UNRESOLVED"
+      ],
+      "policy_version": "hybrid-review-v1"
+    }
+  },
+  "plan_generation": {
+    "prerequisite_node_ids": [],
+    "objectives": [
+      {
+        "id": "lifo",
+        "text": "识别出栈次序"
+      }
+    ],
+    "terminology": [
+      {
+        "term": "top",
+        "meaning": "栈顶位置"
+      }
+    ],
+    "conventions": {
+      "index_base": 0,
+      "capacity": 4,
+      "state_representation": "size表示元素数，栈顶下标size-1",
+      "not_applicable_reasons": []
+    },
+    "shared_example": {
+      "input_description": "push(10),push(20),pop()",
+      "initial_state": "size=0",
+      "steps": [
+        {
+          "operation": "push(10)",
+          "expected_state": "[10],size=1",
+          "expected_output": null
+        },
+        {
+          "operation": "push(20)",
+          "expected_state": "[10,20],size=2",
+          "expected_output": null
+        },
+        {
+          "operation": "pop()",
+          "expected_state": "[10],size=1",
+          "expected_output": "20"
+        }
+      ]
+    },
+    "scenes": [
+      {
+        "role": "explanation",
+        "scene_key": "explanation",
+        "objective_ids": [
+          "lifo"
+        ],
+        "depends_on": []
+      },
+      {
+        "role": "code",
+        "scene_key": "code",
+        "objective_ids": [
+          "lifo"
+        ],
+        "depends_on": [
+          "explanation"
+        ]
+      },
+      {
+        "role": "exercise",
+        "scene_key": "exercise",
+        "objective_ids": [
+          "lifo"
+        ],
+        "depends_on": [
+          "explanation",
+          "code"
+        ]
+      }
+    ],
+    "reference_ids": [
+      "synthetic-stack"
+    ]
+  }
+}

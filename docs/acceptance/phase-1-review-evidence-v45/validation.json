@@ -1,0 +1,72 @@
+{
+  "version": "review-evidence-v45-implementation-validation-v1",
+  "baseline": "194016f",
+  "provider_requests": 0,
+  "prompt_version": "evidence-resource-review-v4.5",
+  "runtime_rule": "generic citation propositions/adjacent fields; no F/a15 special case",
+  "prior_prompt_prefix_preserved": true,
+  "policy_digest_before": "0ae5cb21ae5713f8f25491c3e09596a2519e1f8f45a656bd05dd4ecaed51320e",
+  "policy_digest_after": "13439cff15345af5adca3ecf12cd9a75dfa07e999bb1fd211681c068c455c013",
+  "schema_input_categories_severity_check_ids_unchanged": true,
+  "real_isolated_pg": {
+    "container": "edumind-phase1-t037-pg",
+    "database": "edumind_catalog_v45_20261016",
+    "migrations": "Alembic0001..0030",
+    "tests": "128 passed /0 skipped",
+    "new_invalidation_test": "actual v4.4 prompt/policy pending case invalidated under real v4.5 digest; no approval decision persisted",
+    "pytest_argv": [
+      "backend/.venv/bin/python",
+      "-m",
+      "pytest",
+      "-q",
+      "tests/test_review_evidence_v45.py",
+      "tests/test_learning_review_cases.py",
+      "tests/test_learning_review_cli.py",
+      "tests/test_learning_plan_persistence.py",
+      "tests/test_shared_learning_plan.py",
+      "tests/test_planned_scene_generation.py",
+      "tests/test_teaching_action_assembly.py",
+      "tests/test_hybrid_learning_publication.py",
+      "tests/test_hybrid_learning_operations.py",
+      "tests/test_hybrid_resource_review.py",
+      "tests/test_hybrid_review_scope.py",
+      "tests/test_hybrid_review_check_ids.py",
+      "tests/test_review_input.py",
+      "tests/test_review_delivery.py",
+      "tests/test_unit_consistency_review.py",
+      "tests/test_review_indexing.py",
+      "tests/test_review_failure_paths.py"
+    ],
+    "working_directory": "backend",
+    "environment_setup": "scripts.run_catalog_db_tests.test_environment(database=\"edumind_catalog_v45_20261016\"), EDUMIND_CATALOG_TEST_PG_CONTAINER=edumind-phase1-t037-pg; Provider env removed; URL never printed"
+  },
+  "checks": [
+    {
+      "command": "EDUMIND_CATALOG_TEST_PG_CONTAINER=edumind-phase1-t037-pg backend/.venv/bin/python (test_environment edumind_catalog_v45_20261016; alembic upgrade head;17 related backend test files)",
+      "result": "128 passed,0 skipped; one existing anyio deprecation warning"
+    },
+    {
+      "command": "backend/.venv/bin/mypy --config-file backend/pyproject.toml backend/app",
+      "result": "191 source files passed"
+    },
+    {
+      "command": "backend/.venv/bin/ruff check backend/app/agents/review_evidence.py backend/app/agents/hybrid_resource_review.py backend/app/services/learning_policy.py backend/tests/test_review_evidence_v45.py backend/tests/test_learning_review_cases.py backend/tests/test_hybrid_review_scope.py",
+      "result": "passed after wrapping draft text/import format"
+    },
+    {
+      "command": "old run_review_remaining.load() without step or reservation",
+      "result": "FREEZE_CHANGED as expected, no Key/DNS/Provider"
+    }
+  ],
+  "prior_frozen_source_changes_declared": [
+    "backend/app/agents/hybrid_resource_review.py",
+    "backend/app/services/learning_policy.py",
+    "backend/tests/test_hybrid_review_scope.py",
+    "backend/tests/test_learning_review_cases.py"
+  ],
+  "historical_evidence_files_equal": 173,
+  "old_runtime_state": "3/5 ADMISSION_FAILED unchanged; no unused budget reuse",
+  "not_claimed": "No general semantic verifier or real model success. Historical preparation suites tied to v4.4 live source are not regenerated or passed as v4.5 evidence.",
+  "T040": "blocked",
+  "production_mode": "catalog_only"
+}

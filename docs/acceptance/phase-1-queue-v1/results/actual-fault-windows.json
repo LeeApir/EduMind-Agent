@@ -1,0 +1,191 @@
+{
+  "provider_requests": 0,
+  "passed": true,
+  "template_slots": [],
+  "sse_slots": [],
+  "faults": [
+    {
+      "kind": "accepted-before-send/API-death",
+      "ok": true,
+      "job_id": "27ae670b-de6a-4e8c-9507-2eaed3bd911f",
+      "before": {
+        "status": "queued",
+        "attempt": 0,
+        "epoch": 1,
+        "token": null,
+        "launch": null,
+        "bindings": 0,
+        "media_id": null,
+        "error_code": null
+      },
+      "after": {
+        "status": "succeeded",
+        "attempt": 1,
+        "epoch": 1,
+        "token": null,
+        "launch": null,
+        "bindings": 1,
+        "media_id": "3a2d7907-9fb0-476e-ab8e-de5908981a14",
+        "error_code": null
+      },
+      "restart": {
+        "old_api_pid": 99636,
+        "new_api_pid": 99639
+      }
+    },
+    {
+      "kind": "ACK-before-death/duplicate",
+      "ok": true,
+      "job_id": "29493b5a-48f4-481f-98b3-648cc4a89a17",
+      "ack": {
+        "boundary": "before",
+        "acknowledged": false,
+        "job_id": "29493b5a-48f4-481f-98b3-648cc4a89a17"
+      },
+      "before": {
+        "status": "succeeded",
+        "attempt": 1,
+        "epoch": 1,
+        "token": null,
+        "launch": null,
+        "bindings": 1,
+        "media_id": "cfb1c7d6-5eeb-434b-a710-228089eebc80",
+        "error_code": null
+      },
+      "after": {
+        "status": "succeeded",
+        "attempt": 1,
+        "epoch": 1,
+        "token": null,
+        "launch": null,
+        "bindings": 1,
+        "media_id": "cfb1c7d6-5eeb-434b-a710-228089eebc80",
+        "error_code": null
+      }
+    },
+    {
+      "kind": "ACK-after-death/duplicate",
+      "ok": true,
+      "job_id": "74568fad-1011-42ae-85ba-2ea3b96027dc",
+      "ack": {
+        "boundary": "after",
+        "acknowledged": true,
+        "job_id": "74568fad-1011-42ae-85ba-2ea3b96027dc"
+      },
+      "before": {
+        "status": "succeeded",
+        "attempt": 1,
+        "epoch": 1,
+        "token": null,
+        "launch": null,
+        "bindings": 1,
+        "media_id": "e2a9d3b3-7124-4ccf-a876-39b769af2995",
+        "error_code": null
+      },
+      "after": {
+        "status": "succeeded",
+        "attempt": 1,
+        "epoch": 1,
+        "token": null,
+        "launch": null,
+        "bindings": 1,
+        "media_id": "e2a9d3b3-7124-4ccf-a876-39b769af2995",
+        "error_code": null
+      }
+    },
+    {
+      "kind": "real-Worker-DB-loss",
+      "ok": true,
+      "job_id": "a91647e4-4686-4470-b05b-2b5b9c37975c",
+      "before": {
+        "status": "running",
+        "attempt": 1,
+        "epoch": 1,
+        "token": "ccccc219-8e58-41d0-84e0-76aef16da9fa",
+        "launch": "started",
+        "bindings": 0,
+        "media_id": null,
+        "error_code": null
+      },
+      "recovered": {
+        "status": "queued",
+        "attempt": 1,
+        "epoch": 2,
+        "token": null,
+        "launch": null,
+        "bindings": 0,
+        "media_id": null,
+        "error_code": null
+      },
+      "after": {
+        "status": "succeeded",
+        "attempt": 2,
+        "epoch": 2,
+        "token": null,
+        "launch": null,
+        "bindings": 1,
+        "media_id": "9cd66f54-dbdf-4901-a9f9-aa52b7224271",
+        "error_code": null
+      },
+      "container_cleanup_seconds": 0.8282798749860376
+    },
+    {
+      "kind": "real-rolling-rollback",
+      "ok": true,
+      "job_id": "a25e5fcd-4d9f-403a-aee2-55d65aa2f35f",
+      "before": {
+        "status": "queued",
+        "attempt": 0,
+        "epoch": 1,
+        "token": null,
+        "launch": null,
+        "bindings": 0,
+        "media_id": null,
+        "error_code": null
+      },
+      "after": {
+        "status": "succeeded",
+        "attempt": 1,
+        "epoch": 2,
+        "token": null,
+        "launch": null,
+        "bindings": 1,
+        "media_id": "0caf084f-762e-47f0-a02e-8adbfec40304",
+        "error_code": null
+      }
+    },
+    {
+      "kind": "notes-and-owner-export-authorization",
+      "ok": true,
+      "notes_sha256": "41419098c9d97dbac6bc01528b9dff7b19d3bfb7ea82957a0b5f452782734950"
+    },
+    {
+      "kind": "running-signed-release-withdrawal",
+      "ok": true,
+      "job_id": "86924355-7580-401e-bc41-f88ecf387a5a",
+      "before": {
+        "status": "running",
+        "attempt": 1,
+        "epoch": 1,
+        "token": "16e7f4a4-30a4-41af-8836-3b0f5613929b",
+        "launch": "started",
+        "bindings": 0,
+        "media_id": null,
+        "error_code": null
+      },
+      "after": {
+        "status": "failed",
+        "attempt": 1,
+        "epoch": 1,
+        "token": null,
+        "launch": null,
+        "bindings": 0,
+        "media_id": null,
+        "error_code": "ANIMATION_TARGET_UNAVAILABLE"
+      }
+    }
+  ],
+  "qualification": "actual signed catalog/PG/Redis/Celery/Manim/HTTP/Chromium; classroom uses explicit local MockProvider",
+  "protocol_sha256": "d3ec8450d5f4ce441a2d9782006ac6726fd1438a8897e6a8273ca0c84c0c9bba",
+  "signed_release_digest": "92bb0dd4778391e23aae978b8a411b466d8b5988d1cff61cff01654604af21a1"
+}

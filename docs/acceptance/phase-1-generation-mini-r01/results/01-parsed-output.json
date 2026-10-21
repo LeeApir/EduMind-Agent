@@ -1,0 +1,139 @@
+{
+  "model": "deepseek-flash",
+  "usage": {
+    "input_tokens": 1911,
+    "output_tokens": 991
+  },
+  "value": {
+    "conventions": {
+      "capacity": 3,
+      "index_base": 0,
+      "not_applicable_reasons": [],
+      "state_representation": "用有序对 (s, i) 表示循环条件判断前的状态：s 为当前累加和，i 为当前下标；每轮执行后 s 加上 a[i]，i 加1。"
+    },
+    "objectives": [
+      {
+        "id": "obj-1",
+        "text": "说明C数组的下标从0开始、长度与容量含义，并解释为什么对{7,2,5}求和时循环条件必须写成 i < 3 而不是 i <= 3。"
+      },
+      {
+        "id": "obj-2",
+        "text": "逐轮推演求和循环中累加变量 s 与下标变量 i 的取值，指出首次条件失败发生在 i=3 时，并说明此时不访问 a[3]。"
+      },
+      {
+        "id": "obj-3",
+        "text": "编写并编译一个完整C程序，用循环对数组{7,2,5}求和并输出结果17。"
+      },
+      {
+        "id": "obj-4",
+        "text": "对给定数组与循环写出逐轮状态表，判断循环终止条件首次失败的位置，并说明越界访问的风险。"
+      }
+    ],
+    "prerequisite_node_ids": [
+      "c-pointer"
+    ],
+    "reference_ids": [
+      "graph-node:mvp-0.2.0:array"
+    ],
+    "scenes": [
+      {
+        "depends_on": [],
+        "objective_ids": [
+          "obj-1",
+          "obj-2"
+        ],
+        "role": "explanation",
+        "scene_key": "explanation"
+      },
+      {
+        "depends_on": [
+          "explanation"
+        ],
+        "objective_ids": [
+          "obj-3"
+        ],
+        "role": "code",
+        "scene_key": "code"
+      },
+      {
+        "depends_on": [
+          "explanation",
+          "code"
+        ],
+        "objective_ids": [
+          "obj-4"
+        ],
+        "role": "exercise",
+        "scene_key": "exercise"
+      }
+    ],
+    "shared_example": {
+      "initial_state": "s = 0，i = 0；循环条件为 i < 3。",
+      "input_description": "整型数组 a = {7, 2, 5}，长度3，容量3，下标从0开始；目标为求全部元素之和。",
+      "steps": [
+        {
+          "expected_output": null,
+          "expected_state": "s = 7，i = 1",
+          "operation": "判断 i < 3：0 < 3 为真，执行 s = s + a[0] = 0 + 7，然后 i = i + 1"
+        },
+        {
+          "expected_output": null,
+          "expected_state": "s = 9，i = 2",
+          "operation": "判断 i < 3：1 < 3 为真，执行 s = s + a[1] = 7 + 2，然后 i = i + 1"
+        },
+        {
+          "expected_output": null,
+          "expected_state": "s = 14，i = 3",
+          "operation": "判断 i < 3：2 < 3 为真，执行 s = s + a[2] = 9 + 5，然后 i = i + 1"
+        },
+        {
+          "expected_output": "14",
+          "expected_state": "s = 14，i = 3",
+          "operation": "判断 i < 3：3 < 3 为假，首次条件失败，循环体不执行，不访问 a[3]，退出循环"
+        }
+      ]
+    },
+    "terminology": [
+      {
+        "meaning": "一段连续存放同类型元素的存储区域；本课示例为 int a[3] = {7,2,5}。",
+        "term": "数组"
+      },
+      {
+        "meaning": "访问数组元素时写在方括号中的整数；本课采用从0开始，a[0]=7、a[1]=2、a[2]=5。",
+        "term": "下标（索引）"
+      },
+      {
+        "meaning": "数组中实际有效元素的个数；本课示例长度为3。",
+        "term": "长度"
+      },
+      {
+        "meaning": "数组声明时确定的可容纳元素个数；本课示例容量为3，长度等于容量。",
+        "term": "容量"
+      },
+      {
+        "meaning": "保存当前已累加元素之和的整型变量，初值为0。",
+        "term": "累加变量 s"
+      },
+      {
+        "meaning": "控制循环的整型变量，初值为0，每轮加1，用于依次访问a[0]、a[1]、a[2]。",
+        "term": "下标变量 i"
+      },
+      {
+        "meaning": "每轮循环开始前判断的表达式 i < 3；为真则执行循环体，为假则退出循环。",
+        "term": "循环条件"
+      },
+      {
+        "meaning": "循环条件第一次求值为假的那一轮；本课中发生在 i=3 时，此时循环体不再执行。",
+        "term": "首次条件失败"
+      },
+      {
+        "meaning": "访问下标不在0到长度减1范围内的元素，如 a[3]；属于未定义行为，必须避免。",
+        "term": "越界访问"
+      },
+      {
+        "meaning": "每一轮循环开始时 (s, i) 的取值以及该轮执行后的新取值。",
+        "term": "逐轮状态"
+      }
+    ]
+  }
+}

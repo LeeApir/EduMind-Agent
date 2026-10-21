@@ -82,7 +82,10 @@ async def resource_provenance_valid(
     db: AsyncSession, resource: GeneratedResource, unit: LearningUnit
 ) -> bool:
     if resource.origin_type == "generated":
-        return unit.catalog_release_id is None
+        if resource.plan_id is not None:
+            from app.services.hybrid_learning_publication import publication_for_resource
+            return unit.catalog_release_id is None and await publication_for_resource(db, resource)
+        return unit.catalog_release_id is None and unit.current_publication_id is None
     if (resource.origin_type != "curated" or resource.catalog_release_id is None
             or resource.catalog_release_id != unit.catalog_release_id):
         return False

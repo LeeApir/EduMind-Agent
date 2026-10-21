@@ -103,3 +103,52 @@ def test_unambiguous_provider_candidate_is_checked_against_repository() -> None:
         assert result.node is not None and result.node.id == "stack"
 
     asyncio.run(exercise())
+
+
+@pytest.mark.parametrize(
+    ("goal", "expected"),
+    [
+        ("我已学过数组，请讲解栈", "stack"),
+        ("我已学过单链表，请讲解栈", "stack"),
+        ("学过数组但想学队列，比较二者", None),
+        ("生成一节“单链表头插法”微课。包括链表遍历函数和释放函数。", "linked-list-insertion"),
+        ("为刚学完指针的初学者，讲解单链表头插法", "linked-list-insertion"),
+        ("生成一节“单链表头插法”微课。提供遍历函数、释放函数和完整程序。", "linked-list-insertion"),
+        ("学完数组后想学习队列", None),
+        ("生成一节“单链表头插法”微课。内容包括：数组和队列的比较。", None),
+        ("同时讲解单链表头插法和数组", None),
+        ("讲解指针和单链表头插法", None),
+        ("生成一节“单链表头插法”微课。同时讲解数组。", None),
+        ("生成一节“数组”微课。内容包括：解释栈。", None),
+        ("生成一节“单链表头插法和队列”微课。", None),
+        ("生成一节“单链表头插法”微课。还要一节队列课。", None),
+    ],
+)
+def test_background_primary_and_supporting_scope(goal: str, expected: str | None) -> None:
+    async def exercise() -> None:
+        gateway = StubGateway({})
+        result = await resolve_goal_node(
+            goal, graph=default_knowledge_graph_repository(), gateway=gateway
+        )
+        assert (result.node.id if result.node else None) == expected
+        assert gateway.calls == 0
+
+    asyncio.run(exercise())
+
+
+def test_original_head_insertion_input_resolves_without_rewriting_or_provider() -> None:
+    from pathlib import Path
+
+    original = Path(__file__).resolve().parents[2] / (
+        "docs/reference/edumind/head-insertion-20261019/submitted-input.txt"
+    )
+
+    async def exercise() -> None:
+        gateway = StubGateway({})
+        result = await resolve_goal_node(
+            original.read_text(), graph=default_knowledge_graph_repository(), gateway=gateway
+        )
+        assert result.node is not None and result.node.id == "linked-list-insertion"
+        assert gateway.calls == 0
+
+    asyncio.run(exercise())

@@ -1,0 +1,246 @@
+{
+  "actual": {
+    "actual_call_count": 8,
+    "course_state": "awaiting_human",
+    "duration_ms": 62534,
+    "input_tokens": 68445,
+    "local_verdict": "needs_human",
+    "model_verdict": "needs_human",
+    "output_tokens": 6397,
+    "request_receipt_paths": [
+      "local-materials/phase-1-generation-mini-r01/A01/01-request.json",
+      "local-materials/phase-1-generation-mini-r01/A01/01-receipt.json",
+      "local-materials/phase-1-generation-mini-r01/A01/02-request.json",
+      "local-materials/phase-1-generation-mini-r01/A01/02-receipt.json",
+      "local-materials/phase-1-generation-mini-r01/A01/03-request.json",
+      "local-materials/phase-1-generation-mini-r01/A01/03-receipt.json",
+      "local-materials/phase-1-generation-mini-r01/A01/04-request.json",
+      "local-materials/phase-1-generation-mini-r01/A01/04-receipt.json",
+      "local-materials/phase-1-generation-mini-r01/A01/05-request.json",
+      "local-materials/phase-1-generation-mini-r01/A01/05-receipt.json",
+      "local-materials/phase-1-generation-mini-r01/A01/06-request.json",
+      "local-materials/phase-1-generation-mini-r01/A01/06-receipt.json",
+      "local-materials/phase-1-generation-mini-r01/A01/07-request.json",
+      "local-materials/phase-1-generation-mini-r01/A01/07-receipt.json",
+      "local-materials/phase-1-generation-mini-r01/A01/08-request.json",
+      "local-materials/phase-1-generation-mini-r01/A01/08-receipt.json"
+    ],
+    "response_artifact_paths": [
+      "local-materials/phase-1-generation-mini-r01/A01/01-response.bin",
+      "local-materials/phase-1-generation-mini-r01/A01/02-response.bin",
+      "local-materials/phase-1-generation-mini-r01/A01/03-response.bin",
+      "local-materials/phase-1-generation-mini-r01/A01/04-response.bin",
+      "local-materials/phase-1-generation-mini-r01/A01/05-response.bin",
+      "local-materials/phase-1-generation-mini-r01/A01/06-response.bin",
+      "local-materials/phase-1-generation-mini-r01/A01/07-response.bin",
+      "local-materials/phase-1-generation-mini-r01/A01/08-response.bin"
+    ],
+    "status": "observed"
+  },
+  "case_id": "A01",
+  "case_sha256": "e8e3978ad6752718367360dd84826802847869ce324dceac4331d183b34e08bb",
+  "citation_checks": [],
+  "claim_checks": [
+    {
+      "evidence_ids": [
+        "plan",
+        "code"
+      ],
+      "json_pointer": "/result/unresolved/0",
+      "quoted_text": "计划分配给本代码资源的 obj-3 要求输出 17，但数组 {7,2,5} 的和是 14；候选代码及其预期输出 14 都正确。需先澄清或修正 obj-3，才能判断该资源是否满足分配目标。",
+      "reason": "计划obj-3确实要求17；数组和为14，代码与预期输出14正确。有根据的计划冲突待人工；不将正确代码判作事实错。",
+      "result": "supported",
+      "review_artifact_path": "local-materials/phase-1-generation-mini-r01/A01/review-a87b04ca-b29f-4a26-8ba1-ed6f1b47b74f.json"
+    },
+    {
+      "evidence_ids": [
+        "plan",
+        "exercise",
+        "lecture"
+      ],
+      "json_pointer": "/result/unresolved/0",
+      "quoted_text": "The assigned exercise objective calls for writing a per-iteration state table, but none of the three questions asks learners to produce the full table: q1 asks only for the state after the third iteration, q2 asks what happens at the first failed condition, and q3 is true/false. Add or verify student-visible support requiring the full per-iteration table in this exercise or elsewhere in the unit.",
+      "reason": "obj-4明确让学生写逐轮状态表。q1只问第三轮后一个状态，q2问退出，q3问越界；均涉及过程但没有要求给完整表。讲解展示表不等于练习测量。判断题/选择题本可考完整表，不因题型否定。建议核验或补齐测量有据，不把计划内部错误当用户要求。",
+      "result": "supported",
+      "review_artifact_path": "local-materials/phase-1-generation-mini-r01/A01/review-32c38831-7436-41b4-922e-6cd5e8ea6f6e.json"
+    },
+    {
+      "evidence_ids": [
+        "goal",
+        "plan",
+        "wire",
+        "code"
+      ],
+      "json_pointer": "/result/unresolved/0",
+      "quoted_text": "The bound original request and plan objective obj-3 require the program to output 17, but the supplied array {7,2,5} sums to 14, and the candidate code and explanations consistently produce 14. The requested output cannot be satisfied truthfully for this array; resolve whether the array or required output is authoritative before judging objective completion.",
+      "reason": "同一句中数组和14、代码/讲解14、计划obj-3写17均有据；但“bound original request ... require ...17”被实际user_request直接否定。17仅源于生成计划，不能要求用户在其原本无冲突请求里择一。此附带错误未进入任何修正，无major拒绝或正式发布；yellow且完整质量失败。",
+      "result": "contradicted",
+      "review_artifact_path": "local-materials/phase-1-generation-mini-r01/A01/review-b717a4d0-336b-4fb2-b056-b980b1641793.json"
+    }
+  ],
+  "code_verification": {
+    "applicability_note": "Static only; new C never compiled/executed. Source bounds/output checked by inspection; q1 body/update wording ambiguity retained.",
+    "fixed_c_evidence_paths": [],
+    "method": "static_only",
+    "new_code_compiled": false,
+    "new_code_executed": false
+  },
+  "conclusion": "FAIL and stop before A02. A01 awaiting_human, no auto publication. Generated plan obj-3 wrongly17 vs14, obj-4 measurement unmet, and unit reviewer wrongly attributes17 to original request despite complete authoritative context. Three process items are present but no full-quality automatic success; no re-score or extra retry.",
+  "corrections": {
+    "actual_context_paths": [],
+    "before_after_digest_pairs": [],
+    "new_defect_observed": false,
+    "note": "No correction calls. Shared plan created17 contradiction; subsequent resources consistently14. Unit wrong attribution not consumed by generator; all8 requests audited.",
+    "observed": false,
+    "unsupported_feedback_entered": false
+  },
+  "evaluator": {
+    "configuration": "interactive evaluation; no extra judge API",
+    "evaluated_at": "2026-10-20T12:12:16.935316+00:00",
+    "exact_model_id": null,
+    "identity": "Codex interactive GPT evaluator; static reasoning and actual wire/PG/artifact checks",
+    "independent_human": false,
+    "kind": "gpt",
+    "unknown_metadata_reason": "Exact interactive evaluator model ID is not exposed; tested reviewer is Luna, not evaluator identity"
+  },
+  "evidence": [
+    {
+      "applies_to_digest": "57d3d8c96116f7d14fb669db40d12c96b9d1ed1b1a14c34a884d9230b50b5c11",
+      "artifact_path": "docs/acceptance/phase-1-generation-mini-r01/cases/A01.json",
+      "artifact_sha256": "b3669bb686f6f1ccb2011ef7a842acc50e919bf0dec0441500615ec1f08f50f8",
+      "id": "goal",
+      "kind": "static_reasoning",
+      "scope_note": "Original request asks sum of {7,2,5}, exactly three process questions; never requests 17."
+    },
+    {
+      "applies_to_digest": "57d3d8c96116f7d14fb669db40d12c96b9d1ed1b1a14c34a884d9230b50b5c11",
+      "artifact_path": "local-materials/phase-1-generation-mini-r01/A01/01-parsed.json",
+      "artifact_sha256": "53a222a1f91c58274426f9364d8041d1b151088791592a5ea2985d40eb47e8d8",
+      "id": "plan",
+      "kind": "arithmetic",
+      "scope_note": "7+2+5=14; objective obj-3 alone wrongly promises 17, while shared trace correctly gives14."
+    },
+    {
+      "applies_to_digest": "57d3d8c96116f7d14fb669db40d12c96b9d1ed1b1a14c34a884d9230b50b5c11",
+      "artifact_path": "local-materials/phase-1-generation-mini-r01/A01/02-parsed.json",
+      "artifact_sha256": "5d8d1e2c7729d3c3613051a20ae5a03492b61003c82878443da3894ed4d49cc3",
+      "id": "lecture",
+      "kind": "static_reasoning",
+      "scope_note": "All lecture paragraphs: initial (0,0), states (7,1),(9,2),(14,3), first failed i=3 and no a[3]. Loop-round versus body/update boundary wording retained as ambiguity."
+    },
+    {
+      "applies_to_digest": "57d3d8c96116f7d14fb669db40d12c96b9d1ed1b1a14c34a884d9230b50b5c11",
+      "artifact_path": "local-materials/phase-1-generation-mini-r01/A01/04-parsed.json",
+      "artifact_sha256": "2216c6989f0671e47aa34e4d3aeef944a5c735194a07d23c901fa6a147e83f0a",
+      "id": "code",
+      "kind": "static_reasoning",
+      "scope_note": "Complete main, declared a/s, 0..2 condition, printf14 newline; no reach of a[3], return0 distinct from printed14; no C execution."
+    },
+    {
+      "applies_to_digest": "57d3d8c96116f7d14fb669db40d12c96b9d1ed1b1a14c34a884d9230b50b5c11",
+      "artifact_path": "local-materials/phase-1-generation-mini-r01/A01/06-parsed.json",
+      "artifact_sha256": "c00b3f49259a3c2ee533a64ee7cb4d981fb483f0dc1f38e2de72209aaadb56bc",
+      "id": "exercise",
+      "kind": "static_reasoning",
+      "scope_note": "Exactly3 process-related questions. None elicits entire per-iteration state table promised by obj-4; q1 body-finished vs for-update boundary is additionally ambiguous and not silently treated as proven correct."
+    },
+    {
+      "applies_to_digest": "57d3d8c96116f7d14fb669db40d12c96b9d1ed1b1a14c34a884d9230b50b5c11",
+      "artifact_path": "local-materials/phase-1-generation-mini-r01/A01/08-request.json",
+      "artifact_sha256": "d945aa1b7bff822e17a9a31727a7a4b8098b67da937d37eca8fca37d7024d410",
+      "id": "wire",
+      "kind": "static_reasoning",
+      "scope_note": "Actual unit review wire separately carries authoritative user_request with no17 and plan_commitments obj-3 containing17; no missing original request."
+    },
+    {
+      "applies_to_digest": "57d3d8c96116f7d14fb669db40d12c96b9d1ed1b1a14c34a884d9230b50b5c11",
+      "artifact_path": "local-materials/phase-1-generation-mini-r01/A01/result.json",
+      "artifact_sha256": "57d3d8c96116f7d14fb669db40d12c96b9d1ed1b1a14c34a884d9230b50b5c11",
+      "id": "db",
+      "kind": "database_assertion",
+      "scope_note": "Actual service persisted awaiting_human, publication null; owner/version/pending read gates passed; no corrections or production publication."
+    },
+    {
+      "applies_to_digest": "57d3d8c96116f7d14fb669db40d12c96b9d1ed1b1a14c34a884d9230b50b5c11",
+      "artifact_path": "local-materials/phase-1-generation-mini-r01/A01/01-receipt.json",
+      "artifact_sha256": "a2db9da0dd3cd44e11baa80d1700da885c8bebbd9eca00eb3d8053e6da821c7b",
+      "id": "t1",
+      "kind": "transport_receipt",
+      "scope_note": "HTTP200 completed raw response, route and business Schema accepted by actual adapters; original bytes/parsed/wire bound in result artifact hashes."
+    },
+    {
+      "applies_to_digest": "57d3d8c96116f7d14fb669db40d12c96b9d1ed1b1a14c34a884d9230b50b5c11",
+      "artifact_path": "local-materials/phase-1-generation-mini-r01/A01/02-receipt.json",
+      "artifact_sha256": "3a135aab0c8edd61f3042a00bcf18039f092dc7e9f775052c30717ce2585865f",
+      "id": "t2",
+      "kind": "transport_receipt",
+      "scope_note": "HTTP200 completed raw response, route and business Schema accepted by actual adapters; original bytes/parsed/wire bound in result artifact hashes."
+    },
+    {
+      "applies_to_digest": "57d3d8c96116f7d14fb669db40d12c96b9d1ed1b1a14c34a884d9230b50b5c11",
+      "artifact_path": "local-materials/phase-1-generation-mini-r01/A01/03-receipt.json",
+      "artifact_sha256": "1b91d41827ab010649fb45b5c8667f53e4dde690421f8c59dfd88ea9e322b223",
+      "id": "t3",
+      "kind": "transport_receipt",
+      "scope_note": "HTTP200 completed raw response, route and business Schema accepted by actual adapters; original bytes/parsed/wire bound in result artifact hashes."
+    },
+    {
+      "applies_to_digest": "57d3d8c96116f7d14fb669db40d12c96b9d1ed1b1a14c34a884d9230b50b5c11",
+      "artifact_path": "local-materials/phase-1-generation-mini-r01/A01/04-receipt.json",
+      "artifact_sha256": "70a8ea6d62bc4534fb6eb2fa02403f768435bd748f6b69e2e3fcdeb41b68d677",
+      "id": "t4",
+      "kind": "transport_receipt",
+      "scope_note": "HTTP200 completed raw response, route and business Schema accepted by actual adapters; original bytes/parsed/wire bound in result artifact hashes."
+    },
+    {
+      "applies_to_digest": "57d3d8c96116f7d14fb669db40d12c96b9d1ed1b1a14c34a884d9230b50b5c11",
+      "artifact_path": "local-materials/phase-1-generation-mini-r01/A01/05-receipt.json",
+      "artifact_sha256": "d231a0163c22c1ad2eb3c0db602d2ea4b8c96712b30a31f6e98ef6efdcfdc74f",
+      "id": "t5",
+      "kind": "transport_receipt",
+      "scope_note": "HTTP200 completed raw response, route and business Schema accepted by actual adapters; original bytes/parsed/wire bound in result artifact hashes."
+    },
+    {
+      "applies_to_digest": "57d3d8c96116f7d14fb669db40d12c96b9d1ed1b1a14c34a884d9230b50b5c11",
+      "artifact_path": "local-materials/phase-1-generation-mini-r01/A01/06-receipt.json",
+      "artifact_sha256": "89385d59ec7f2d1316d4f3ac3a55ba711a12b5afae2828ffba6257e8c54732d6",
+      "id": "t6",
+      "kind": "transport_receipt",
+      "scope_note": "HTTP200 completed raw response, route and business Schema accepted by actual adapters; original bytes/parsed/wire bound in result artifact hashes."
+    },
+    {
+      "applies_to_digest": "57d3d8c96116f7d14fb669db40d12c96b9d1ed1b1a14c34a884d9230b50b5c11",
+      "artifact_path": "local-materials/phase-1-generation-mini-r01/A01/07-receipt.json",
+      "artifact_sha256": "6ea9ea82655d814696c086085a27c501ce91da794d87ad56925edd35cb5de4ab",
+      "id": "t7",
+      "kind": "transport_receipt",
+      "scope_note": "HTTP200 completed raw response, route and business Schema accepted by actual adapters; original bytes/parsed/wire bound in result artifact hashes."
+    },
+    {
+      "applies_to_digest": "57d3d8c96116f7d14fb669db40d12c96b9d1ed1b1a14c34a884d9230b50b5c11",
+      "artifact_path": "local-materials/phase-1-generation-mini-r01/A01/08-receipt.json",
+      "artifact_sha256": "6cfb558821c7008d59ef99cf810ec841e92dd00c1859a3e658d56110a589e967",
+      "id": "t8",
+      "kind": "transport_receipt",
+      "scope_note": "HTTP200 completed raw response, route and business Schema accepted by actual adapters; original bytes/parsed/wire bound in result artifact hashes."
+    }
+  ],
+  "grades": {
+    "all_citations": "pass",
+    "all_claims": "fail",
+    "core_expected": "fail",
+    "final_status": "fail",
+    "full_quality": "fail",
+    "impact": "yellow",
+    "technical_integrity": "pass"
+  },
+  "label_sha256": "b4314d5601e6bf3f50ca4f1ed305a6b28dbcbcd49607e305eb9a1ad422decbcd",
+  "product_human_decision": null,
+  "production_publish_performed": false,
+  "record_version": "generation-mini-gpt-evaluation-v1",
+  "reviewed_all_candidates_and_audit_history": true,
+  "run_id": "generation-mini-r01",
+  "unresolved": [
+    "q1在for语法下说“循环体执行完毕”却答i=3：紧接块末且未做i++时为i=2，完成整轮更新后才是3；题干时点有歧义，不把既有答案确认为唯一正确。这一静态疑点不影响已确定的计划错误和自动门禁失败，未执行新C。"
+  ]
+}

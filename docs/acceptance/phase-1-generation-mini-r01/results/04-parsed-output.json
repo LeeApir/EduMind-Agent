@@ -1,0 +1,24 @@
+{
+  "model": "deepseek-flash",
+  "usage": {
+    "input_tokens": 2972,
+    "output_tokens": 287
+  },
+  "value": {
+    "content": {
+      "display_only": true,
+      "expected_output": "14\n",
+      "key_steps": [
+        "声明 int a[3] = {7, 2, 5}，下标从0开始，合法下标为0、1、2，长度为3、容量为3。",
+        "初始化累加变量 s = 0，循环变量 i = 0。",
+        "每轮先判断 i < 3：为真则执行 s = s + a[i]，然后 i 加1；依次累加 a[0]=7、a[1]=2、a[2]=5。",
+        "三轮后 s = 14、i = 3，此时 3 < 3 为假，首次条件失败，循环体不执行，不访问 a[3]。",
+        "用 printf 输出 s，得到 14。"
+      ],
+      "language": "C",
+      "source": "#include <stdio.h>\n\nint main(void) {\n    int a[3] = {7, 2, 5};\n    int s = 0;\n\n    for (int i = 0; i < 3; i++) {\n        s = s + a[i];\n    }\n\n    printf(\"%d\\n\", s);\n    return 0;\n}\n"
+    },
+    "prompt_version": "learning-resources-v1",
+    "resource_type": "code"
+  }
+}

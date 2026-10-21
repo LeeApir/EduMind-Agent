@@ -1,0 +1,190 @@
+{
+  "state": "PENDING_USER_APPROVAL_DO_NOT_APPLY",
+  "reason": "Retain full Phase1 acceptance coverage while making T039 a single approved-primary prerequisite; no failed result rewritten or mandatory phase exit check removed.",
+  "required_user_decision": "是否批准拆分T39：本项只验收当前已通过的qwen文本/严格JSON/流式；工具及Ollama/三类原生真实验证分别列T043–T047，Phase1退出必须依赖它们。",
+  "t039_title": "验证当前已授权主Provider连接与选择路由",
+  "t039_criteria": [
+    "在已批准的qwen3.8-max-0902配置与累计5次/CNY1预算内验证文本/严格JSON/流式及模型路由，保留旧失败及未知用量。",
+    "工具格式探测INVALID_OUTPUT如实保留，不声明工具能力可用，不进入需要工具的任务；T043单独验证。",
+    "Ollama及三类原生的真实条件保持待补齐，移至T044–T047；Mock不代替真实成绩；T040/T041及动态开放须独立批准。"
+  ],
+  "new_tasks": [
+    {
+      "id": "PHASE-1-T043",
+      "phase": "Phase 1",
+      "title": "补齐当前主模型工具格式真实验收",
+      "status": "blocked",
+      "priority": "P1",
+      "depends_on": [
+        "PHASE-1-T039"
+      ],
+      "scope": [
+        "scripts/",
+        "docs/acceptance/",
+        "docs/PROVIDERS.md"
+      ],
+      "prd_source": "PRD §3.8; phase-1-acceptance-plan §1/§3",
+      "acceptance_criteria": [
+        "严格工具响应schema实测通过，字段级安全诊断保留，不执行工具；失败保持blocked",
+        "证据区分实际目标与Mock；无账号/能力/预算不得冒充通过，缺失usage保留unknown。",
+        "权限/SSRF/同意/凭据边界遵从已批准ADR；无静默回退，不开放动态业务。"
+      ],
+      "verification": [
+        "先冻结目标/源码/输入及单独批准的请求/费用硬上限；实际执行并保存脱敏路由、用量、结果与取消证据。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": "独立真实轮次的目标/凭据引用和请求/费用预算待明确；现有主模型预算不转授。",
+      "commit_lookup": "Task-Completed: PHASE-1-T043"
+    },
+    {
+      "id": "PHASE-1-T044",
+      "phase": "Phase 1",
+      "title": "完成Ollama真实接入验收",
+      "status": "blocked",
+      "priority": "P1",
+      "depends_on": [
+        "PHASE-1-T039"
+      ],
+      "scope": [
+        "scripts/",
+        "docs/acceptance/",
+        "docs/PROVIDERS.md"
+      ],
+      "prd_source": "PRD §3.8; phase-1-acceptance-plan §1/§3",
+      "acceptance_criteria": [
+        "独立本地白名单/模型/能力/预算冻结，真实连接与流式/声明能力通过",
+        "证据区分实际目标与Mock；无账号/能力/预算不得冒充通过，缺失usage保留unknown。",
+        "权限/SSRF/同意/凭据边界遵从已批准ADR；无静默回退，不开放动态业务。"
+      ],
+      "verification": [
+        "先冻结目标/源码/输入及单独批准的请求/费用硬上限；实际执行并保存脱敏路由、用量、结果与取消证据。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": "独立真实轮次的目标/凭据引用和请求/费用预算待明确；现有主模型预算不转授。",
+      "commit_lookup": "Task-Completed: PHASE-1-T044"
+    },
+    {
+      "id": "PHASE-1-T045",
+      "phase": "Phase 1",
+      "title": "完成Anthropic原生真实接入验收",
+      "status": "blocked",
+      "priority": "P1",
+      "depends_on": [
+        "PHASE-1-T039"
+      ],
+      "scope": [
+        "scripts/",
+        "docs/acceptance/",
+        "docs/PROVIDERS.md"
+      ],
+      "prd_source": "PRD §3.8; phase-1-acceptance-plan §1/§3",
+      "acceptance_criteria": [
+        "独立原生连接/模型/能力/预算冻结，真实连接与流式/声明能力通过",
+        "证据区分实际目标与Mock；无账号/能力/预算不得冒充通过，缺失usage保留unknown。",
+        "权限/SSRF/同意/凭据边界遵从已批准ADR；无静默回退，不开放动态业务。"
+      ],
+      "verification": [
+        "先冻结目标/源码/输入及单独批准的请求/费用硬上限；实际执行并保存脱敏路由、用量、结果与取消证据。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": "独立真实轮次的目标/凭据引用和请求/费用预算待明确；现有主模型预算不转授。",
+      "commit_lookup": "Task-Completed: PHASE-1-T045"
+    },
+    {
+      "id": "PHASE-1-T046",
+      "phase": "Phase 1",
+      "title": "完成Gemini原生真实接入验收",
+      "status": "blocked",
+      "priority": "P1",
+      "depends_on": [
+        "PHASE-1-T039"
+      ],
+      "scope": [
+        "scripts/",
+        "docs/acceptance/",
+        "docs/PROVIDERS.md"
+      ],
+      "prd_source": "PRD §3.8; phase-1-acceptance-plan §1/§3",
+      "acceptance_criteria": [
+        "独立原生连接/模型/能力/预算冻结，真实连接与流式/声明能力通过",
+        "证据区分实际目标与Mock；无账号/能力/预算不得冒充通过，缺失usage保留unknown。",
+        "权限/SSRF/同意/凭据边界遵从已批准ADR；无静默回退，不开放动态业务。"
+      ],
+      "verification": [
+        "先冻结目标/源码/输入及单独批准的请求/费用硬上限；实际执行并保存脱敏路由、用量、结果与取消证据。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": "独立真实轮次的目标/凭据引用和请求/费用预算待明确；现有主模型预算不转授。",
+      "commit_lookup": "Task-Completed: PHASE-1-T046"
+    },
+    {
+      "id": "PHASE-1-T047",
+      "phase": "Phase 1",
+      "title": "完成星火原生真实接入验收",
+      "status": "blocked",
+      "priority": "P1",
+      "depends_on": [
+        "PHASE-1-T039"
+      ],
+      "scope": [
+        "scripts/",
+        "docs/acceptance/",
+        "docs/PROVIDERS.md"
+      ],
+      "prd_source": "PRD §3.8; phase-1-acceptance-plan §1/§3",
+      "acceptance_criteria": [
+        "独立原生连接/模型/能力/预算冻结，真实连接与流式/声明能力通过",
+        "证据区分实际目标与Mock；无账号/能力/预算不得冒充通过，缺失usage保留unknown。",
+        "权限/SSRF/同意/凭据边界遵从已批准ADR；无静默回退，不开放动态业务。"
+      ],
+      "verification": [
+        "先冻结目标/源码/输入及单独批准的请求/费用硬上限；实际执行并保存脱敏路由、用量、结果与取消证据。"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": "独立真实轮次的目标/凭据引用和请求/费用预算待明确；现有主模型预算不转授。",
+      "commit_lookup": "Task-Completed: PHASE-1-T047"
+    }
+  ],
+  "phase1_exit_dependency_update": {
+    "task_id": "PHASE-1-T042",
+    "existing_dependencies": [
+      "PHASE-1-T032",
+      "PHASE-1-T034",
+      "PHASE-1-T036",
+      "PHASE-1-T037",
+      "PHASE-1-T038",
+      "PHASE-1-T039",
+      "PHASE-1-T040",
+      "PHASE-1-T041"
+    ],
+    "proposed_dependencies": [
+      "PHASE-1-T032",
+      "PHASE-1-T034",
+      "PHASE-1-T036",
+      "PHASE-1-T037",
+      "PHASE-1-T038",
+      "PHASE-1-T039",
+      "PHASE-1-T040",
+      "PHASE-1-T041",
+      "PHASE-1-T043",
+      "PHASE-1-T044",
+      "PHASE-1-T045",
+      "PHASE-1-T046",
+      "PHASE-1-T047"
+    ]
+  },
+  "active_ledger_changed": false,
+  "budget_increase_authorized": false,
+  "t040_t041_execution_authorized": false,
+  "plan_update": "If approved, append explicit split to acceptance plan and log; do not delete original requirements, real results or snapshots."
+}

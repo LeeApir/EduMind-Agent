@@ -1,0 +1,43 @@
+{
+  "manifest_sha256": "137d37516d32e11c6eb3f2352996f24ecc69e2e56ac711eff7645c383b704ed7",
+  "state": "STOPPED",
+  "persistent_halt": true,
+  "stop_reason": "TECHNICAL_OR_CRITERION_FAILURE",
+  "specific_failure": "cal-02/FROZEN_CRITERION_FAILED: needs_human instead of pass;unsupported pre-quiz sequencing demand and anchor availability claim",
+  "actual_requests_this_run": 2,
+  "max_requests_this_run": 4,
+  "reserved_slots": [
+    "cal-01",
+    "cal-02"
+  ],
+  "not_sent": [
+    "cal-03",
+    "cal-04"
+  ],
+  "remaining_slots_reusable": false,
+  "cases": {
+    "cal-01": {
+      "model_verdict": "pass",
+      "frozen_criterion": true,
+      "actual_human_confirmation": "assessments/cal-01.json;user继续",
+      "receipt_sha256": "9f953503985fedb66ade3c0ed1957979fcd4b2b769b7fad2938f6cd60e71b392"
+    },
+    "cal-02": {
+      "model_verdict": "needs_human",
+      "frozen_criterion": false,
+      "actual_human_confirmation": "not signed",
+      "receipt_sha256": "32c9465d84cd6ba6bffb8280daf5405c16960726b8fd95e09e6ccbc67d2c35d1"
+    }
+  },
+  "technical_integrity_both": "HTTP200/exactModel/fullOriginalSchema/6checks/rawComplete/usage/exactWire passed",
+  "input_tokens_provider_reported": 32054,
+  "output_tokens_provider_reported": 286,
+  "total_tokens_provider_reported": 32340,
+  "model_call_duration_ms_total": 9106,
+  "separate_reasoning_tokens": null,
+  "actual_cost": null,
+  "citation_quality": "no findings citations in either case;cal02 ancillary evidence-location claim incorrect",
+  "formal_T040_metrics": "not run;calibration route failed",
+  "prior_runs": "all historical stopped runs/labels/failures preserved,old11 slots unsent",
+  "tests": "source unchanged;84 passing evidence retained from8e49321,not rerun;actual receipts/freeze/fullSchema/anchor resolution/oldstops/workflow/diff checked"
+}

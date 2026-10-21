@@ -1,0 +1,68 @@
+{
+  "version": "final-focus-r11-offline-validation-v1",
+  "state": "AWAITING_EXACT_FINAL_RUN_APPROVAL",
+  "root_sha256": "89bf93924db5da5850bdfbe2bdba8dcb63fb1f09f1347750202203f6f7faaf3e",
+  "sources_bound": 228,
+  "new_tests_passed": 19,
+  "existing_related_tests_passed": 273,
+  "total_tests_passed": 292,
+  "real_provider_calls": 0,
+  "real_key_read": false,
+  "credential_access": "Real .env metadata stat only; test credentials synthetic",
+  "real_requests_authorized": 0,
+  "real_cost_authorized": 0,
+  "max_requests": 4,
+  "cost_cap_micro_cny": 8516778,
+  "last_round": true,
+  "prior_attempts": 2,
+  "maximum_possible_combined_attempts": 6,
+  "global_strategy_limits": {
+    "max_rounds": 2,
+    "max_total_attempts": 8
+  },
+  "actual_r11_ledger_exists": false,
+  "actual_round_2_registry_exists": false,
+  "actual_run_approval_exists": false,
+  "human_new_sample_scope_confirmed": false,
+  "new_samples": "Hand-authored assistant diagnostic fixtures, not statistical independence or formal held-out data",
+  "control_checks": {
+    "stack_operation_sequences": 729,
+    "operations_per_sequence": 6,
+    "binary_search_cases": 280,
+    "compiler": "Local cc -shared -fPIC -Wall -Wextra -Werror",
+    "oracle": "Python list LIFO and independent membership/index validity",
+    "executed_generated_model_code": false,
+    "executed_unsafe_error_fixture": false
+  },
+  "commands": [
+    "backend/.venv/bin/pytest -q backend/tests/test_final_focus.py backend/tests/test_fixed_focus.py backend/tests/test_span_review_offline.py backend/tests/test_claim_review_prototype.py backend/tests/test_acceptance_budget.py backend/tests/test_derived_diagnostic_budget.py backend/tests/test_derived_responses_sender.py backend/tests/test_t040_derived_run.py --tb=short",
+    "backend/.venv/bin/ruff check scripts/acceptance_support/final_focus_contract.py scripts/prepare_t040_final_focus.py scripts/run_t040_final_focus.py backend/tests/test_final_focus.py",
+    "backend/.venv/bin/python scripts/prepare_t040_final_focus.py",
+    "backend/.venv/bin/python scripts/prepare_t040_final_focus.py --check",
+    "backend/.venv/bin/python scripts/run_t040_final_focus.py check",
+    "backend/.venv/bin/python scripts/run_t040_final_focus.py step (expected exit1 NOT_AUTHORIZED)",
+    "backend/.venv/bin/python scripts/prepare_t040_focus.py --check",
+    "backend/.venv/bin/python scripts/prepare_t040_span_review.py --check",
+    "backend/.venv/bin/python scripts/prepare_t040_derived_run.py --check",
+    "backend/.venv/bin/python scripts/check_catalog_workflow.py",
+    "backend/.venv/bin/python scripts/verify_phase1_dynamic_approval.py",
+    "backend/.venv/bin/python scripts/verify_phase1_dynamic_freeze.py",
+    "Readonly SHA256/SQLite checks of r10 215/2 ADMISSION_FAILED; r09 202/1 INVALID_OUTPUT; r08 186/1 CONCRETE_DEFECT_MISSED; r11 actual state absent"
+  ],
+  "initial_failures_resolved": [
+    "Ruff unused fixture/redefinition warning resolved with targeted pytest fixture annotation.",
+    "One malformed-wire test failed because strict_json raised ProviderError before freeze mapping. New isolated final CLI maps malformed frozen JSON to FREEZE_CHANGED and safely handles ProviderError. Same assertion then passes; no source sample or quality label weakened.",
+    "Unapproved r11 proposal refreshed after this correction; no real approval/registry/request existed."
+  ],
+  "limitations": [
+    "Mock verifies protocol/control flow, not true model semantic quality or real transport/billing.",
+    "Cost is whole-context Provider-contract reservation, not expected consumption/account hard cap.",
+    "Finite C control checks do not exhaust all integers, lengths or caller behaviors.",
+    "App unchanged; production mypy not rerun; scripts not strictly typechecked.",
+    "Four diagnostic cases cannot establish full T040, full-resource or cross-course quality.",
+    "Human semantic checks remain separate from coarse schema/category checks."
+  ],
+  "production_mode": "catalog_only",
+  "production_registered": false,
+  "t040_complete": false
+}

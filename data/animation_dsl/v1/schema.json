@@ -1,0 +1,503 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "EduMind Animation DSL v1 (Proposed, not runtime-enabled)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "knowledge_point_id",
+    "language",
+    "title",
+    "pointers",
+    "actions"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "animation-dsl/1"
+    },
+    "knowledge_point_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{0,63}$"
+    },
+    "language": {
+      "const": "zh-CN"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80
+    },
+    "pointers": {
+      "type": "array",
+      "maxItems": 4,
+      "items": {
+        "$ref": "#/$defs/pointer"
+      }
+    },
+    "actions": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 120,
+      "items": {
+        "$ref": "#/$defs/action"
+      }
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]{0,31}$"
+    },
+    "node_ref": {
+      "$ref": "#/$defs/id"
+    },
+    "target": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/node_ref"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "pointer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "label"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 16
+        }
+      }
+    },
+    "create_node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "op",
+        "id",
+        "value",
+        "column",
+        "row",
+        "duration_ms",
+        "hold_ms",
+        "caption"
+      ],
+      "properties": {
+        "op": {
+          "const": "create_node"
+        },
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "value": {
+          "type": "integer",
+          "minimum": -999,
+          "maximum": 999
+        },
+        "column": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 7
+        },
+        "row": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2
+        },
+        "duration_ms": {
+          "type": "integer",
+          "minimum": 200,
+          "maximum": 2000,
+          "multipleOf": 200
+        },
+        "hold_ms": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3000,
+          "multipleOf": 200
+        },
+        "caption": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        }
+      }
+    },
+    "connect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "op",
+        "id",
+        "source",
+        "target",
+        "duration_ms",
+        "hold_ms",
+        "caption"
+      ],
+      "properties": {
+        "op": {
+          "const": "connect"
+        },
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "source": {
+          "$ref": "#/$defs/node_ref"
+        },
+        "target": {
+          "$ref": "#/$defs/target"
+        },
+        "duration_ms": {
+          "type": "integer",
+          "minimum": 200,
+          "maximum": 2000,
+          "multipleOf": 200
+        },
+        "hold_ms": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3000,
+          "multipleOf": 200
+        },
+        "caption": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        }
+      }
+    },
+    "disconnect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "op",
+        "edge",
+        "duration_ms",
+        "hold_ms",
+        "caption"
+      ],
+      "properties": {
+        "op": {
+          "const": "disconnect"
+        },
+        "edge": {
+          "$ref": "#/$defs/id"
+        },
+        "duration_ms": {
+          "type": "integer",
+          "minimum": 200,
+          "maximum": 2000,
+          "multipleOf": 200
+        },
+        "hold_ms": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3000,
+          "multipleOf": 200
+        },
+        "caption": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        }
+      }
+    },
+    "move_pointer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "op",
+        "pointer",
+        "target",
+        "duration_ms",
+        "hold_ms",
+        "caption"
+      ],
+      "properties": {
+        "op": {
+          "const": "move_pointer"
+        },
+        "pointer": {
+          "$ref": "#/$defs/id"
+        },
+        "target": {
+          "$ref": "#/$defs/target"
+        },
+        "duration_ms": {
+          "type": "integer",
+          "minimum": 200,
+          "maximum": 2000,
+          "multipleOf": 200
+        },
+        "hold_ms": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3000,
+          "multipleOf": 200
+        },
+        "caption": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        }
+      }
+    },
+    "highlight": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "op",
+        "object",
+        "style",
+        "duration_ms",
+        "hold_ms",
+        "caption"
+      ],
+      "properties": {
+        "op": {
+          "const": "highlight"
+        },
+        "object": {
+          "$ref": "#/$defs/id"
+        },
+        "style": {
+          "type": "string",
+          "enum": [
+            "focus",
+            "success",
+            "warning",
+            "reset"
+          ]
+        },
+        "duration_ms": {
+          "type": "integer",
+          "minimum": 200,
+          "maximum": 2000,
+          "multipleOf": 200
+        },
+        "hold_ms": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3000,
+          "multipleOf": 200
+        },
+        "caption": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        }
+      }
+    },
+    "compare": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "op",
+        "left",
+        "right",
+        "duration_ms",
+        "hold_ms",
+        "caption"
+      ],
+      "properties": {
+        "op": {
+          "const": "compare"
+        },
+        "left": {
+          "$ref": "#/$defs/node_ref"
+        },
+        "right": {
+          "$ref": "#/$defs/node_ref"
+        },
+        "duration_ms": {
+          "type": "integer",
+          "minimum": 200,
+          "maximum": 2000,
+          "multipleOf": 200
+        },
+        "hold_ms": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3000,
+          "multipleOf": 200
+        },
+        "caption": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        }
+      }
+    },
+    "swap": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "op",
+        "left",
+        "right",
+        "duration_ms",
+        "hold_ms",
+        "caption"
+      ],
+      "properties": {
+        "op": {
+          "const": "swap"
+        },
+        "left": {
+          "$ref": "#/$defs/node_ref"
+        },
+        "right": {
+          "$ref": "#/$defs/node_ref"
+        },
+        "duration_ms": {
+          "type": "integer",
+          "minimum": 200,
+          "maximum": 2000,
+          "multipleOf": 200
+        },
+        "hold_ms": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3000,
+          "multipleOf": 200
+        },
+        "caption": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        }
+      }
+    },
+    "visit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "op",
+        "node",
+        "duration_ms",
+        "hold_ms",
+        "caption"
+      ],
+      "properties": {
+        "op": {
+          "const": "visit"
+        },
+        "node": {
+          "$ref": "#/$defs/node_ref"
+        },
+        "duration_ms": {
+          "type": "integer",
+          "minimum": 200,
+          "maximum": 2000,
+          "multipleOf": 200
+        },
+        "hold_ms": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3000,
+          "multipleOf": 200
+        },
+        "caption": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        }
+      }
+    },
+    "show_complexity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "op",
+        "time",
+        "space",
+        "duration_ms",
+        "hold_ms",
+        "caption"
+      ],
+      "properties": {
+        "op": {
+          "const": "show_complexity"
+        },
+        "time": {
+          "type": "string",
+          "enum": [
+            "O(1)",
+            "O(log n)",
+            "O(n)",
+            "O(n log n)",
+            "O(n^2)"
+          ]
+        },
+        "space": {
+          "type": "string",
+          "enum": [
+            "O(1)",
+            "O(log n)",
+            "O(n)",
+            "O(n^2)"
+          ]
+        },
+        "duration_ms": {
+          "type": "integer",
+          "minimum": 200,
+          "maximum": 2000,
+          "multipleOf": 200
+        },
+        "hold_ms": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3000,
+          "multipleOf": 200
+        },
+        "caption": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        }
+      }
+    },
+    "action": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/create_node"
+        },
+        {
+          "$ref": "#/$defs/connect"
+        },
+        {
+          "$ref": "#/$defs/disconnect"
+        },
+        {
+          "$ref": "#/$defs/move_pointer"
+        },
+        {
+          "$ref": "#/$defs/highlight"
+        },
+        {
+          "$ref": "#/$defs/compare"
+        },
+        {
+          "$ref": "#/$defs/swap"
+        },
+        {
+          "$ref": "#/$defs/visit"
+        },
+        {
+          "$ref": "#/$defs/show_complexity"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,51 @@
+docs/reference/openmaic/head-insertion-20261019/independent-review/original-program.c:18:16: error: must use 'struct' tag to refer to type 'Node'
+   18 | void printList(Node *head) {
+      |                ^
+      |                struct 
+docs/reference/openmaic/head-insertion-20261019/independent-review/original-program.c:19:3: error: must use 'struct' tag to refer to type 'Node'
+   19 |   Node *p = head;
+      |   ^
+      |   struct 
+docs/reference/openmaic/head-insertion-20261019/independent-review/original-program.c:27:15: error: must use 'struct' tag to refer to type 'Node'
+   27 | void freeList(Node **head) {
+      |               ^
+      |               struct 
+docs/reference/openmaic/head-insertion-20261019/independent-review/original-program.c:28:3: error: must use 'struct' tag to refer to type 'Node'
+   28 |   Node *p = *head, *next;
+      |   ^
+      |   struct 
+docs/reference/openmaic/head-insertion-20261019/independent-review/original-program.c:38:3: error: must use 'struct' tag to refer to type 'Node'
+   38 |   Node *head = NULL;
+      |   ^
+      |   struct 
+docs/reference/openmaic/head-insertion-20261019/independent-review/original-program.c:39:21: warning: incompatible pointer types passing 'Node *' to parameter of type 'struct Node **'; take the address with & [-Wincompatible-pointer-types]
+   39 |   head = insertHead(head, 1);
+      |                     ^~~~
+      |                     &
+docs/reference/openmaic/head-insertion-20261019/independent-review/original-program.c:12:31: note: passing argument to parameter 'head' here
+   12 | void insertHead(struct Node **head, int value) { /* ③ 头插 */
+      |                               ^
+docs/reference/openmaic/head-insertion-20261019/independent-review/original-program.c:39:8: error: assigning to 'Node *' from incompatible type 'void'
+   39 |   head = insertHead(head, 1);
+      |        ^ ~~~~~~~~~~~~~~~~~~~
+docs/reference/openmaic/head-insertion-20261019/independent-review/original-program.c:40:21: warning: incompatible pointer types passing 'Node *' to parameter of type 'struct Node **'; take the address with & [-Wincompatible-pointer-types]
+   40 |   head = insertHead(head, 2);
+      |                     ^~~~
+      |                     &
+docs/reference/openmaic/head-insertion-20261019/independent-review/original-program.c:12:31: note: passing argument to parameter 'head' here
+   12 | void insertHead(struct Node **head, int value) { /* ③ 头插 */
+      |                               ^
+docs/reference/openmaic/head-insertion-20261019/independent-review/original-program.c:40:8: error: assigning to 'Node *' from incompatible type 'void'
+   40 |   head = insertHead(head, 2);
+      |        ^ ~~~~~~~~~~~~~~~~~~~
+docs/reference/openmaic/head-insertion-20261019/independent-review/original-program.c:41:21: warning: incompatible pointer types passing 'Node *' to parameter of type 'struct Node **'; take the address with & [-Wincompatible-pointer-types]
+   41 |   head = insertHead(head, 3);
+      |                     ^~~~
+      |                     &
+docs/reference/openmaic/head-insertion-20261019/independent-review/original-program.c:12:31: note: passing argument to parameter 'head' here
+   12 | void insertHead(struct Node **head, int value) { /* ③ 头插 */
+      |                               ^
+docs/reference/openmaic/head-insertion-20261019/independent-review/original-program.c:41:8: error: assigning to 'Node *' from incompatible type 'void'
+   41 |   head = insertHead(head, 3);
+      |        ^ ~~~~~~~~~~~~~~~~~~~
+3 warnings and 8 errors generated.

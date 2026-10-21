@@ -1,0 +1,519 @@
+{
+  "id": "U08",
+  "scope": "unit",
+  "selected_role": null,
+  "material": {
+    "binding": {
+      "owner_id": "7fd8ad5f-ee61-55de-b42b-30a0df67f858",
+      "unit_id": "36c1a04e-bdac-5b9b-9751-8d33abfd14dd",
+      "operation_id": "509f4c1e-49c5-5967-8175-250b176ae04b",
+      "plan_id": "fc26d961-d57b-5456-8b45-ca6ba49020c0",
+      "plan_version": 1,
+      "plan_digest": "89140755a2daa1dcc3a2fbe9f2ddd555745164744db767410d978db65dfc05ef",
+      "input_digest": "b5a120befa49e8e5ff567a1cbf60246d2206c8cac99d7b88c4472ea875dfac8c",
+      "references_digest": "b2534947205cbded090c7fbbf4423321245592fcd0702b4dfda3fe1b5abb53d5",
+      "policy_version": "hybrid-review-v1",
+      "policy_digest": "747ec507e0f011d8a82e74d3823964fc2f860ab23693f71e695273ebf696fdad"
+    },
+    "plan": {
+      "objectives": [
+        {
+          "id": "local",
+          "text": "为学习链表插入，本节先学习路径推荐的C 指针。原目标尚待后续完成。"
+        }
+      ],
+      "terminology": [
+        {
+          "term": "返回值",
+          "meaning": "函数交给调用方的值，不等于打印"
+        }
+      ],
+      "conventions": {
+        "index_base": null,
+        "capacity": null,
+        "state_representation": "p保存value地址",
+        "not_applicable_reasons": [
+          "标量指针例不涉及容器容量或下标。"
+        ]
+      },
+      "shared_example": {
+        "input_description": "value=21",
+        "initial_state": "value初始化21",
+        "steps": [
+          {
+            "operation": "取地址再解引用",
+            "expected_state": "p=&value，*p=21",
+            "expected_output": "无打印，返回21"
+          }
+        ]
+      },
+      "prerequisite_node_ids": [],
+      "scenes": [
+        {
+          "role": "explanation",
+          "scene_key": "explanation",
+          "objective_ids": [
+            "local"
+          ],
+          "depends_on": []
+        },
+        {
+          "role": "code",
+          "scene_key": "code",
+          "objective_ids": [
+            "local"
+          ],
+          "depends_on": [
+            "explanation"
+          ]
+        },
+        {
+          "role": "exercise",
+          "scene_key": "exercise",
+          "objective_ids": [
+            "local"
+          ],
+          "depends_on": [
+            "explanation",
+            "code"
+          ]
+        }
+      ],
+      "node_id": "c-pointer",
+      "graph_version": "mvp-0.2.0",
+      "graph_digest": "3639db6aedc9699348e63b5e7e1bdaaea3189592b19540c64e8f175aceb9ef59",
+      "profile_version": null,
+      "profile_evidence_digest": "8838fdd11ee58e08fd54a21272313e784012370b7cf0a2cde8b823ed8806d85d",
+      "goal": "为学习链表插入，本节先学习路径推荐的C 指针。原目标尚待后续完成。",
+      "code_language": "C",
+      "schema_version": "learning-plan-v1",
+      "references": [
+        {
+          "reference_id": "graph-node:mvp-0.2.0:c-pointer",
+          "version": "mvp-0.2.0",
+          "digest": "038e80d56854aedbfc8a65e828b514eb532ebfea54abf7b933ebfe79f8b0dfdc"
+        }
+      ]
+    },
+    "candidates": [
+      {
+        "resource_id": "a07276f4-eb59-5ef7-a077-909c28e37eff",
+        "role": "explanation",
+        "envelope": {
+          "resource_type": "explanation",
+          "prompt_version": "learning-resources-v1",
+          "content": {
+            "markdown": "p保存value的地址；value初始化为21，*p在value仍存活时读到21，返回21，不打印。本节只补指针先修，尚未交付链表头插法，原目标留待后续。"
+          }
+        },
+        "content_digest": "fac23cc7ff6788a8cb236c7f085c25604c0537451f7518773ae09781650e9722",
+        "dependency_digest": "67aef8da2680a47eac0142b9fab11b41853b86f01d4abe5f8efd9a84ef5f952a",
+        "upstream": []
+      },
+      {
+        "resource_id": "742cdeec-7006-5800-af95-e5290bc0243f",
+        "role": "code",
+        "envelope": {
+          "resource_type": "code",
+          "prompt_version": "learning-resources-v1",
+          "content": {
+            "language": "C",
+            "source": "int pointer_sample(void) {\n    int value = 21;\n    int *p = &value;\n    return *p;\n}",
+            "expected_output": "函数返回21，没有标准输出。",
+            "key_steps": [
+              "先取value地址，再在value存活期间解引用；返回的是int值，不是局部变量地址。"
+            ],
+            "display_only": true
+          }
+        },
+        "content_digest": "f8f6b67bba5c70efdc9237b81f7d0a580c615225fafc27a0b2f99774075d88ee",
+        "dependency_digest": "8e403c853aee6ba993bdae28cad441fbf6ae5d81f197ca54f8088ff90ab1dc3c",
+        "upstream": [
+          {
+            "resource_id": "a07276f4-eb59-5ef7-a077-909c28e37eff",
+            "content_digest": "fac23cc7ff6788a8cb236c7f085c25604c0537451f7518773ae09781650e9722",
+            "dependency_digest": "67aef8da2680a47eac0142b9fab11b41853b86f01d4abe5f8efd9a84ef5f952a"
+          }
+        ]
+      },
+      {
+        "resource_id": "adbfff6d-253b-50a6-95c1-92e57a40f150",
+        "role": "exercise",
+        "envelope": {
+          "resource_type": "exercise",
+          "prompt_version": "learning-resources-v1",
+          "content": {
+            "items": [
+              {
+                "id": "q1",
+                "question": "[判断题] p保存value的地址 仅填 T 或 F（T=正确，F=错误）。",
+                "answer": "T",
+                "explanation": "&value取地址。"
+              },
+              {
+                "id": "q2",
+                "question": "[判断题] 这次*p读取21 仅填 T 或 F（T=正确，F=错误）。",
+                "answer": "T",
+                "explanation": "读取发生在value存活期间，value初始化为21。"
+              },
+              {
+                "id": "q3",
+                "question": "[判断题] 返回int值等于返回局部变量地址 仅填 T 或 F（T=正确，F=错误）。",
+                "answer": "F",
+                "explanation": "这里返回的是*p的整数值。"
+              }
+            ]
+          }
+        },
+        "content_digest": "ed8e2efc24c20cf016c795490811e3152aa7794c59b1ba21fa4ac2a780204bed",
+        "dependency_digest": "7385d5eccd9683c92667e66c8917758eb379e3581ee8d86c75f9029b5031a2cd",
+        "upstream": [
+          {
+            "resource_id": "a07276f4-eb59-5ef7-a077-909c28e37eff",
+            "content_digest": "fac23cc7ff6788a8cb236c7f085c25604c0537451f7518773ae09781650e9722",
+            "dependency_digest": "67aef8da2680a47eac0142b9fab11b41853b86f01d4abe5f8efd9a84ef5f952a"
+          },
+          {
+            "resource_id": "742cdeec-7006-5800-af95-e5290bc0243f",
+            "content_digest": "f8f6b67bba5c70efdc9237b81f7d0a580c615225fafc27a0b2f99774075d88ee",
+            "dependency_digest": "8e403c853aee6ba993bdae28cad441fbf6ae5d81f197ca54f8088ff90ab1dc3c"
+          }
+        ]
+      }
+    ],
+    "scenes": [
+      {
+        "role": "explanation",
+        "scene_key": "explanation",
+        "scene_id": "d622f9f6-b422-5aff-89c1-89f300a3055b",
+        "scene_version": 1,
+        "resource_id": "a07276f4-eb59-5ef7-a077-909c28e37eff",
+        "resource_digest": "fac23cc7ff6788a8cb236c7f085c25604c0537451f7518773ae09781650e9722",
+        "dependency_digest": "67aef8da2680a47eac0142b9fab11b41853b86f01d4abe5f8efd9a84ef5f952a"
+      },
+      {
+        "role": "code",
+        "scene_key": "code",
+        "scene_id": "6efc9ed5-0692-5b03-b944-02924e4b7b72",
+        "scene_version": 1,
+        "resource_id": "742cdeec-7006-5800-af95-e5290bc0243f",
+        "resource_digest": "f8f6b67bba5c70efdc9237b81f7d0a580c615225fafc27a0b2f99774075d88ee",
+        "dependency_digest": "8e403c853aee6ba993bdae28cad441fbf6ae5d81f197ca54f8088ff90ab1dc3c"
+      },
+      {
+        "role": "exercise",
+        "scene_key": "exercise",
+        "scene_id": "a1d5f9a0-0118-51aa-8eba-809dcb9364c9",
+        "scene_version": 1,
+        "resource_id": "adbfff6d-253b-50a6-95c1-92e57a40f150",
+        "resource_digest": "ed8e2efc24c20cf016c795490811e3152aa7794c59b1ba21fa4ac2a780204bed",
+        "dependency_digest": "7385d5eccd9683c92667e66c8917758eb379e3581ee8d86c75f9029b5031a2cd"
+      }
+    ],
+    "actions": {
+      "version": "teaching-actions-v1",
+      "actions": [
+        {
+          "kind": "show_resource",
+          "scene_key": "explanation",
+          "resource_id": "a07276f4-eb59-5ef7-a077-909c28e37eff",
+          "resource_digest": "fac23cc7ff6788a8cb236c7f085c25604c0537451f7518773ae09781650e9722"
+        },
+        {
+          "kind": "show_resource",
+          "scene_key": "code",
+          "resource_id": "742cdeec-7006-5800-af95-e5290bc0243f",
+          "resource_digest": "f8f6b67bba5c70efdc9237b81f7d0a580c615225fafc27a0b2f99774075d88ee"
+        },
+        {
+          "kind": "highlight",
+          "scene_key": "code",
+          "resource_id": "742cdeec-7006-5800-af95-e5290bc0243f",
+          "resource_digest": "f8f6b67bba5c70efdc9237b81f7d0a580c615225fafc27a0b2f99774075d88ee",
+          "anchor_id": "a3"
+        },
+        {
+          "kind": "show_resource",
+          "scene_key": "exercise",
+          "resource_id": "adbfff6d-253b-50a6-95c1-92e57a40f150",
+          "resource_digest": "ed8e2efc24c20cf016c795490811e3152aa7794c59b1ba21fa4ac2a780204bed"
+        },
+        {
+          "kind": "ask_exercise",
+          "scene_key": "exercise",
+          "resource_id": "adbfff6d-253b-50a6-95c1-92e57a40f150",
+          "resource_digest": "ed8e2efc24c20cf016c795490811e3152aa7794c59b1ba21fa4ac2a780204bed",
+          "exercise_id": "q1"
+        },
+        {
+          "kind": "ask_exercise",
+          "scene_key": "exercise",
+          "resource_id": "adbfff6d-253b-50a6-95c1-92e57a40f150",
+          "resource_digest": "ed8e2efc24c20cf016c795490811e3152aa7794c59b1ba21fa4ac2a780204bed",
+          "exercise_id": "q2"
+        },
+        {
+          "kind": "ask_exercise",
+          "scene_key": "exercise",
+          "resource_id": "adbfff6d-253b-50a6-95c1-92e57a40f150",
+          "resource_digest": "ed8e2efc24c20cf016c795490811e3152aa7794c59b1ba21fa4ac2a780204bed",
+          "exercise_id": "q3"
+        }
+      ],
+      "anchor_catalog": [
+        {
+          "anchor_id": "a1",
+          "resource_id": "a07276f4-eb59-5ef7-a077-909c28e37eff",
+          "resource_digest": "fac23cc7ff6788a8cb236c7f085c25604c0537451f7518773ae09781650e9722",
+          "json_pointer": "/markdown",
+          "start_utf8": 0,
+          "end_utf8": 183
+        },
+        {
+          "anchor_id": "a2",
+          "resource_id": "742cdeec-7006-5800-af95-e5290bc0243f",
+          "resource_digest": "f8f6b67bba5c70efdc9237b81f7d0a580c615225fafc27a0b2f99774075d88ee",
+          "json_pointer": "/expected_output",
+          "start_utf8": 0,
+          "end_utf8": 38
+        },
+        {
+          "anchor_id": "a3",
+          "resource_id": "742cdeec-7006-5800-af95-e5290bc0243f",
+          "resource_digest": "f8f6b67bba5c70efdc9237b81f7d0a580c615225fafc27a0b2f99774075d88ee",
+          "json_pointer": "/key_steps/0",
+          "start_utf8": 0,
+          "end_utf8": 103
+        },
+        {
+          "anchor_id": "a4",
+          "resource_id": "742cdeec-7006-5800-af95-e5290bc0243f",
+          "resource_digest": "f8f6b67bba5c70efdc9237b81f7d0a580c615225fafc27a0b2f99774075d88ee",
+          "json_pointer": "/language",
+          "start_utf8": 0,
+          "end_utf8": 1
+        },
+        {
+          "anchor_id": "a5",
+          "resource_id": "742cdeec-7006-5800-af95-e5290bc0243f",
+          "resource_digest": "f8f6b67bba5c70efdc9237b81f7d0a580c615225fafc27a0b2f99774075d88ee",
+          "json_pointer": "/source",
+          "start_utf8": 0,
+          "end_utf8": 84
+        },
+        {
+          "anchor_id": "a6",
+          "resource_id": "adbfff6d-253b-50a6-95c1-92e57a40f150",
+          "resource_digest": "ed8e2efc24c20cf016c795490811e3152aa7794c59b1ba21fa4ac2a780204bed",
+          "json_pointer": "/items/0/answer",
+          "start_utf8": 0,
+          "end_utf8": 1
+        },
+        {
+          "anchor_id": "a7",
+          "resource_id": "adbfff6d-253b-50a6-95c1-92e57a40f150",
+          "resource_digest": "ed8e2efc24c20cf016c795490811e3152aa7794c59b1ba21fa4ac2a780204bed",
+          "json_pointer": "/items/0/explanation",
+          "start_utf8": 0,
+          "end_utf8": 18
+        },
+        {
+          "anchor_id": "a8",
+          "resource_id": "adbfff6d-253b-50a6-95c1-92e57a40f150",
+          "resource_digest": "ed8e2efc24c20cf016c795490811e3152aa7794c59b1ba21fa4ac2a780204bed",
+          "json_pointer": "/items/0/id",
+          "start_utf8": 0,
+          "end_utf8": 2
+        },
+        {
+          "anchor_id": "a9",
+          "resource_id": "adbfff6d-253b-50a6-95c1-92e57a40f150",
+          "resource_digest": "ed8e2efc24c20cf016c795490811e3152aa7794c59b1ba21fa4ac2a780204bed",
+          "json_pointer": "/items/0/question",
+          "start_utf8": 0,
+          "end_utf8": 76
+        },
+        {
+          "anchor_id": "a10",
+          "resource_id": "adbfff6d-253b-50a6-95c1-92e57a40f150",
+          "resource_digest": "ed8e2efc24c20cf016c795490811e3152aa7794c59b1ba21fa4ac2a780204bed",
+          "json_pointer": "/items/1/answer",
+          "start_utf8": 0,
+          "end_utf8": 1
+        },
+        {
+          "anchor_id": "a11",
+          "resource_id": "adbfff6d-253b-50a6-95c1-92e57a40f150",
+          "resource_digest": "ed8e2efc24c20cf016c795490811e3152aa7794c59b1ba21fa4ac2a780204bed",
+          "json_pointer": "/items/1/explanation",
+          "start_utf8": 0,
+          "end_utf8": 57
+        },
+        {
+          "anchor_id": "a12",
+          "resource_id": "adbfff6d-253b-50a6-95c1-92e57a40f150",
+          "resource_digest": "ed8e2efc24c20cf016c795490811e3152aa7794c59b1ba21fa4ac2a780204bed",
+          "json_pointer": "/items/1/id",
+          "start_utf8": 0,
+          "end_utf8": 2
+        },
+        {
+          "anchor_id": "a13",
+          "resource_id": "adbfff6d-253b-50a6-95c1-92e57a40f150",
+          "resource_digest": "ed8e2efc24c20cf016c795490811e3152aa7794c59b1ba21fa4ac2a780204bed",
+          "json_pointer": "/items/1/question",
+          "start_utf8": 0,
+          "end_utf8": 71
+        },
+        {
+          "anchor_id": "a14",
+          "resource_id": "adbfff6d-253b-50a6-95c1-92e57a40f150",
+          "resource_digest": "ed8e2efc24c20cf016c795490811e3152aa7794c59b1ba21fa4ac2a780204bed",
+          "json_pointer": "/items/2/answer",
+          "start_utf8": 0,
+          "end_utf8": 1
+        },
+        {
+          "anchor_id": "a15",
+          "resource_id": "adbfff6d-253b-50a6-95c1-92e57a40f150",
+          "resource_digest": "ed8e2efc24c20cf016c795490811e3152aa7794c59b1ba21fa4ac2a780204bed",
+          "json_pointer": "/items/2/explanation",
+          "start_utf8": 0,
+          "end_utf8": 35
+        },
+        {
+          "anchor_id": "a16",
+          "resource_id": "adbfff6d-253b-50a6-95c1-92e57a40f150",
+          "resource_digest": "ed8e2efc24c20cf016c795490811e3152aa7794c59b1ba21fa4ac2a780204bed",
+          "json_pointer": "/items/2/id",
+          "start_utf8": 0,
+          "end_utf8": 2
+        },
+        {
+          "anchor_id": "a17",
+          "resource_id": "adbfff6d-253b-50a6-95c1-92e57a40f150",
+          "resource_digest": "ed8e2efc24c20cf016c795490811e3152aa7794c59b1ba21fa4ac2a780204bed",
+          "json_pointer": "/items/2/question",
+          "start_utf8": 0,
+          "end_utf8": 97
+        }
+      ],
+      "digest": "41ee14fc6aa521d5fd165db9b49c9698f4a0ccf632c2101347a9fe89614f8012"
+    },
+    "reference_context": {
+      "source": {
+        "reference_id": "graph-node:mvp-0.2.0:c-pointer",
+        "version": "mvp-0.2.0",
+        "digest": "038e80d56854aedbfc8a65e828b514eb532ebfea54abf7b933ebfe79f8b0dfdc"
+      },
+      "node": {
+        "id": "c-pointer",
+        "name": "C 指针",
+        "chapter": "C 基础",
+        "difficulty": 1,
+        "description": "保存内存地址、可以间接访问对象的 C 语言变量。",
+        "prerequisites": [],
+        "learning_objectives": [
+          "区分指针值、地址和所指对象",
+          "安全地使用取地址和解引用运算符"
+        ],
+        "common_misconceptions": [
+          "指针就是数组",
+          "未初始化指针可以直接解引用"
+        ],
+        "ai_context": "将指针表示为带有地址标签的箭头，明确分开变量框和其指向的对象。",
+        "mastery_rule_key": "linear-structure-v1"
+      },
+      "learner_evidence": {},
+      "scope": "Background only, not certification of this example."
+    },
+    "teaching_context": {
+      "version": "teaching-node-binding-v1",
+      "teaching_mode": "recommended",
+      "target_node_id": "linked-list-insertion",
+      "recommended_node_id": "c-pointer",
+      "teaching_node_id": "c-pointer",
+      "selection_reason": "recommended_prerequisite",
+      "original_request": "用C学习单链表头插法。",
+      "segment_goal": "为学习链表插入，本节先学习路径推荐的C 指针。原目标尚待后续完成。",
+      "segment_scope": "prerequisite_segment",
+      "path_version_id": "f3a23722-59ed-5db7-8a0a-0d1045848c19",
+      "path_version": 1,
+      "graph_version": "mvp-0.2.0",
+      "graph_digest": "3639db6aedc9699348e63b5e7e1bdaaea3189592b19540c64e8f175aceb9ef59"
+    },
+    "unit_digest": "42989c76c8f2b0c484ae459ac6b1f4c64143868168375600036a11e59710edaa"
+  },
+  "input_snapshot": {
+    "metadata": {
+      "node_id": "c-pointer",
+      "graph_version": "mvp-0.2.0",
+      "graph_digest": "3639db6aedc9699348e63b5e7e1bdaaea3189592b19540c64e8f175aceb9ef59",
+      "profile_version": null,
+      "profile_evidence_digest": "8838fdd11ee58e08fd54a21272313e784012370b7cf0a2cde8b823ed8806d85d",
+      "goal": "为学习链表插入，本节先学习路径推荐的C 指针。原目标尚待后续完成。",
+      "code_language": "C"
+    },
+    "references": {
+      "graph-node:mvp-0.2.0:c-pointer": {
+        "reference_id": "graph-node:mvp-0.2.0:c-pointer",
+        "version": "mvp-0.2.0",
+        "digest": "038e80d56854aedbfc8a65e828b514eb532ebfea54abf7b933ebfe79f8b0dfdc"
+      }
+    },
+    "learner_evidence": {},
+    "node_ids": [
+      "array",
+      "array-stack",
+      "balanced-binary-search-tree",
+      "binary-heap",
+      "binary-search-tree",
+      "binary-tree",
+      "binary-tree-traversal",
+      "breadth-first-search",
+      "bubble-sort",
+      "c-pointer",
+      "circular-linked-list",
+      "circular-queue",
+      "depth-first-search",
+      "doubly-linked-list",
+      "graph-representation",
+      "heap-sort",
+      "insertion-sort",
+      "linked-list-concept",
+      "linked-list-deletion",
+      "linked-list-insertion",
+      "linked-list-traversal",
+      "linked-stack",
+      "merge-sort",
+      "queue",
+      "quick-sort",
+      "selection-sort",
+      "single-linked-list",
+      "sorting-comparison",
+      "stack",
+      "tree-concept"
+    ],
+    "teaching_context": {
+      "version": "teaching-node-binding-v1",
+      "teaching_mode": "recommended",
+      "target_node_id": "linked-list-insertion",
+      "recommended_node_id": "c-pointer",
+      "teaching_node_id": "c-pointer",
+      "selection_reason": "recommended_prerequisite",
+      "original_request": "用C学习单链表头插法。",
+      "segment_goal": "为学习链表插入，本节先学习路径推荐的C 指针。原目标尚待后续完成。",
+      "segment_scope": "prerequisite_segment",
+      "path_version_id": "f3a23722-59ed-5db7-8a0a-0d1045848c19",
+      "path_version": 1,
+      "graph_version": "mvp-0.2.0",
+      "graph_digest": "3639db6aedc9699348e63b5e7e1bdaaea3189592b19540c64e8f175aceb9ef59"
+    }
+  },
+  "provenance": {
+    "author": "Codex GPT-authored fixture, not independent human truth",
+    "relationship_to_history": "new content, reuses known diagnostic patterns; NOT blind/independent population sample",
+    "historical_failed_stack_sample_reused": false
+  },
+  "actual_model_result": null
+}

@@ -1,0 +1,102 @@
+{
+  "case": "published",
+  "source": {
+    "course_state": "completed",
+    "database": "edumind_catalog_a01_a02_fix_r01",
+    "learning_unit_id": "5382a05d-36ed-484c-9ea8-d289998f9e70",
+    "operation_id": "c58fcd05-fdc6-458b-b7ac-9a97bbc419df",
+    "owner_id": "2fffd5e5-073c-46e6-a00b-ed8cb48a4301",
+    "source": "existing scripted PG auto publication; NOT actual LLM success",
+    "version": 1
+  },
+  "status": "pass",
+  "failure": null,
+  "observations": {
+    "exact_unit_status": 200,
+    "wrong_version_status": 404,
+    "generation_write_status": 403,
+    "anonymous_read_status": 401
+  },
+  "page_errors": [],
+  "network": [
+    {
+      "path": "/api/__acceptance/bootstrap",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/runtime",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/auth/session",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/catalog",
+      "status": 403,
+      "method": "GET"
+    },
+    {
+      "path": "/api/graph",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/profile/me",
+      "status": 404,
+      "method": "GET"
+    },
+    {
+      "path": "/api/mastery",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/learning-units/5382a05d-36ed-484c-9ea8-d289998f9e70?publication_version=1",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/learning-units/5382a05d-36ed-484c-9ea8-d289998f9e70/classroom",
+      "status": 403,
+      "method": "GET"
+    },
+    {
+      "path": "/api/quiz-submissions/latest?resource_id=b22e1b6c-234d-4ba6-a58e-6d33eb7d50c3&resource_version=1",
+      "status": 403,
+      "method": "GET"
+    },
+    {
+      "path": "/api/learning-units/5382a05d-36ed-484c-9ea8-d289998f9e70/classroom",
+      "status": 403,
+      "method": "GET"
+    },
+    {
+      "path": "/api/learning-units/5382a05d-36ed-484c-9ea8-d289998f9e70/classroom",
+      "status": 403,
+      "method": "GET"
+    },
+    {
+      "path": "/api/learning-operations/c58fcd05-fdc6-458b-b7ac-9a97bbc419df",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/learning-units/5382a05d-36ed-484c-9ea8-d289998f9e70?publication_version=1",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/quiz-submissions/latest?resource_id=b22e1b6c-234d-4ba6-a58e-6d33eb7d50c3&resource_version=1",
+      "status": 403,
+      "method": "GET"
+    }
+  ],
+  "real_provider_calls": 0,
+  "networkidle_warning": "networkidle not reached; explicit final URL/UI/API gates used",
+  "ui_source": "pnpm build output + actual read-only backend, no mocked HTTP replies",
+  "screenshot_sha256": "6355008bdcea3163a1bd3b1c39e7d98200e01cf59a0b7526889864f10c435fd8"
+}

@@ -1,0 +1,64 @@
+{
+  "version": "qwen-continuation-zero-call-validation-v1",
+  "baseline": "9c60b5e",
+  "proposal_sha256": "57f3f42c21973521f7fb26ce6a3fbd58ac62d996182067aa70c4c844ff4326a6",
+  "provider_calls": 0,
+  "real_approval_exists": false,
+  "real_private_or_ledger_exists": false,
+  "sources_verified": 665,
+  "previous_acceptance_files_equal": 527,
+  "old_ledgers_usage_halt_unchanged": 17,
+  "credential_metadata_unchanged": true,
+  "imported_first_result": {
+    "receipt_sha256": "0714575a1e6eaa38373c9c3da28690e5dfaa77c4fd9ae43b834cc21130a2f885",
+    "human_confirmation_explicit": true,
+    "new_request_count": 0,
+    "original_receipt_and_assistant_assessment_unchanged": true
+  },
+  "requests_proposed": 11,
+  "screen_requests": 3,
+  "generalization_requests": 8,
+  "cost_micro_cny": 146144880,
+  "screen_cost_micro_cny": 39841788,
+  "generalization_cost_micro_cny": 106303092,
+  "parameters": {
+    "schema_profile": "qwen-strict-20261017-v1",
+    "request_output": 8192,
+    "output_reserved": 8202,
+    "timeout_seconds": 60
+  },
+  "checks": [
+    {
+      "command": "backend/.venv/bin/python /tmp/edumind_qwen_continuation_tests.py",
+      "result": "21 passed,0 skipped,1.85s; dedicated test PG/MockHTTP;11 real dispatch exact wires; all11 fake gate completion; per-receipt human/screen-pass/negative binding/semantic stop/ledger deletion/no approval; no real Key read or Provider calls"
+    },
+    {
+      "command": "backend/.venv/bin/ruff check scripts/run_qwen_continuation.py scripts/prepare_qwen_continuation.py scripts/tests/test_qwen_continuation.py",
+      "result": "passed"
+    },
+    {
+      "command": "backend/.venv/bin/python scripts/run_qwen_continuation.py --run-one",
+      "result": "exit2 NOT_AUTHORIZED before credentials/DB/private state"
+    },
+    {
+      "command": "python3 scripts/check_catalog_workflow.py",
+      "result": "passed"
+    },
+    {
+      "command": "python3 scripts/verify_legacy_archives.py",
+      "result": "236 originals verified"
+    },
+    {
+      "command": "backend/.venv/bin/python docs/acceptance/phase-1-om-redesign/check_contract.py",
+      "result": "12 docs/12 task contracts valid"
+    },
+    {
+      "command": "git diff --check",
+      "result": "passed"
+    }
+  ],
+  "previous114_mock_and_mypy192": "unchanged c87d14d production code; not rerun",
+  "T040": "blocked",
+  "production": "catalog_only",
+  "next": "approve new exact11/146.144880 budget then first fact-contradiction only, each-result human signoff; do not resume old ledger"
+}

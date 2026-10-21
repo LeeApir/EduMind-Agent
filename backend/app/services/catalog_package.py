@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import cast
 
 from app.agents.learning_resource_schema import ResourceSchemaError, validate_resource_content
-from app.services.knowledge_graph import default_knowledge_graph_repository
+from app.services.knowledge_graph_versions import catalog_knowledge_graph_repository
 
 CATALOG_SCHEMA_VERSION = "catalog-content-v1"
 KINDS = ("explanation", "code", "exercise")
@@ -67,7 +67,7 @@ def validate_package(payload: object) -> CatalogPackage:
     outer = _object(payload, {"manifest", "nodes", "demo"})
     manifest = _object(outer["manifest"], {"schema_version", "package_id", "version",
         "graph_version", "nodes", "demo_digest", "templates"})
-    graph = default_knowledge_graph_repository()
+    graph = catalog_knowledge_graph_repository()
     expected_ids = {node.id for node in graph.all_nodes()}
     if (manifest["schema_version"] != CATALOG_SCHEMA_VERSION
             or manifest["graph_version"] != graph.graph_version

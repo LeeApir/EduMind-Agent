@@ -3,9 +3,10 @@
 import asyncio
 import math
 from collections.abc import AsyncIterator, Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import StrEnum
 from typing import Awaitable, Callable, Literal, Protocol, TypeVar
+from uuid import UUID
 
 MessageRole = Literal["system", "user", "assistant"]
 _Result = TypeVar("_Result")
@@ -28,11 +29,33 @@ class ChatMessage:
 
 
 @dataclass(frozen=True, slots=True)
+class InlineImage:
+    """Caller-owned bytes only; no path, remote URI or implicit file read."""
+
+    mime_type: str
+    data: bytes = field(repr=False)
+
+
+@dataclass(frozen=True, slots=True)
+class InlineImageConsent:
+    """Internal explicit consent, resolved by server code for one exact operation."""
+
+    connection_id: UUID
+    config_version: int
+    model_id: str
+    operation_id: UUID
+    manifest_sha256: str
+    accepted: bool = False
+
+
+@dataclass(frozen=True, slots=True)
 class TextRequest:
     messages: tuple[ChatMessage, ...]
     task_profile: TaskProfile = TaskProfile.DEFAULT
     max_output_tokens: int | None = None
     temperature: float | None = None
+    images: tuple[InlineImage, ...] = field(default=(), repr=False)
+    image_consent: InlineImageConsent | None = field(default=None, repr=False)
 
 
 @dataclass(frozen=True, slots=True)
@@ -41,6 +64,8 @@ class StructuredRequest:
 
     prompt: TextRequest
     json_schema: Mapping[str, object]
+    # Server-owned routing metadata; never parsed from model or sent as user data.
+    stage: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -62,11 +87,21 @@ class OutputTextCounts:
 
 
 @dataclass(frozen=True, slots=True)
+class TransportAudit:
+    """Content-free exact body digests; excludes authorization headers and raw reasoning."""
+
+    request_digest: str
+    response_digest: str
+    config_digest: str
+
+
+@dataclass(frozen=True, slots=True)
 class TextResult:
     text: str
     model_id: str
     usage: TokenUsage | None = None
     output_text_counts: OutputTextCounts | None = None
+    transport_audit: TransportAudit | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -75,6 +110,7 @@ class StructuredResult:
     model_id: str
     usage: TokenUsage | None = None
     output_text_counts: OutputTextCounts | None = None
+    transport_audit: TransportAudit | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -296,18 +332,23 @@ class ProviderGateway:
         raise AssertionError("unreachable retry state")
 
     async def generate_text(self, request: TextRequest, *, retry_safe: bool = False) -> TextResult:
+        self._check_images(request)
         return await self._retry_call(
-            lambda: self._adapter.generate_text(request), retry_safe=retry_safe
+            lambda: self._adapter.generate_text(request),
+            retry_safe=retry_safe and not request.images,
         )
 
     async def generate_structured(
         self, request: StructuredRequest, *, retry_safe: bool = False
     ) -> StructuredResult:
+        self._check_images(request.prompt)
         return await self._retry_call(
-            lambda: self._adapter.generate_structured(request), retry_safe=retry_safe
+            lambda: self._adapter.generate_structured(request),
+            retry_safe=retry_safe and not request.prompt.images,
         )
 
     async def stream_text(self, request: TextRequest) -> AsyncIterator[TextDelta]:
+        self._check_images(request)
         stream = self._adapter.stream_text(request)
         try:
             async for delta in stream:
@@ -316,3 +357,9 @@ class ProviderGateway:
             close = getattr(stream, "aclose", None)
             if close is not None:
                 await close()
+
+    def _check_images(self, request: TextRequest) -> None:
+        if (request.images or request.image_consent is not None) and getattr(
+            self._adapter, "supports_inline_images", False
+        ) is not True:
+            raise ProviderError(ProviderErrorCode.CAPABILITY_UNAVAILABLE)

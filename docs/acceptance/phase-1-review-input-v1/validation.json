@@ -1,0 +1,73 @@
+{
+  "checked_on": "2026-10-16T11:22:03",
+  "provider_requests": 0,
+  "new_fee_authorization": 0,
+  "versions": {
+    "prompt": "evidence-resource-review-v4.4",
+    "input": "authoritative-review-input-v1",
+    "scope": "goal-bound-review-scope-v2"
+  },
+  "checks": [
+    {
+      "command": "EDUMIND_CATALOG_TEST_PG_CONTAINER=edumind-phase1-t037-pg backend/.venv/bin/python scripts/run_shared_learning_tests.py --database edumind_catalog_phase1_om_input05 --dynamic-mock-mode tests/test_review_input.py tests/test_review_delivery.py tests/test_hybrid_resource_review.py tests/test_hybrid_review_scope.py tests/test_hybrid_review_check_ids.py tests/test_unit_consistency_review.py tests/test_learning_review_cases.py tests/test_learning_review_cli.py tests/test_hybrid_learning_publication.py tests/test_hybrid_learning_operations.py tests/test_planned_scene_generation.py tests/test_teaching_action_assembly.py tests/test_shared_learning_plan.py tests/test_learning_plan_persistence.py tests/test_om_redesign_acceptance_preparation.py tests/test_learning_closed_loop.py tests/test_quiz_api.py tests/test_markdown_notes_api.py tests/test_paths_api.py tests/test_catalog_mode.py tests/test_catalog_sessions.py tests/test_review_agent.py tests/test_provider_gateway.py tests/test_deepseek_responses.py",
+      "result": "219 passed, zero skips, one existing Starlette deprecation warning; final15 input tests also rechecked after making safety fixture actual a[4] code"
+    },
+    {
+      "command": "backend/.venv/bin/python -m pytest -q backend/tests/test_review_input.py",
+      "result": "15 passed; verifies protocol projection and scripted routing, not model semantics"
+    },
+    {
+      "command": "backend/.venv/bin/python -m pytest -q scripts/tests/test_coverage_admission.py scripts/tests/test_coverage_review.py scripts/tests/test_om_admission.py scripts/tests/test_om_admission_r02.py scripts/tests/test_om_admission_r03.py backend/tests/test_acceptance_budget.py backend/tests/test_derived_diagnostic_budget.py backend/tests/test_real_browser_budget.py",
+      "result": "125 passed"
+    },
+    {
+      "command": "Ruff check explicit changed backend/scripts Python files (scripts config separately)",
+      "result": "passed"
+    },
+    {
+      "command": "backend/.venv/bin/mypy backend/app",
+      "result": "190 source files passed"
+    },
+    {
+      "command": "backend/.venv/bin/python docs/acceptance/phase-1-om-redesign/check_contract.py",
+      "result": "12 original documents/12 task contracts and schema valid"
+    },
+    {
+      "command": "python3 scripts/verify_legacy_archives.py",
+      "result": "236 original files verified"
+    },
+    {
+      "command": "python3 scripts/check_catalog_workflow.py",
+      "result": "valid"
+    },
+    {
+      "command": "Original r04 runtime.load(Path.cwd()) read only",
+      "result": "FREEZE_CHANGED; no key/DNS/ledger writes"
+    }
+  ],
+  "history": {
+    "compared_to": "ef1cbdd",
+    "byte_equal_frozen_diagnosis_files": 57,
+    "old_attempt_counts": [
+      2,
+      1,
+      2,
+      1
+    ],
+    "old_halts": [
+      "SAFETY_FAILURE",
+      "INVALID_OUTPUT",
+      "INVALID_OUTPUT",
+      "INVALID_OUTPUT"
+    ]
+  },
+  "initial_checks_and_repairs": [
+    "First PG check195 passed/9 failed because synthetic DB fixtures still bound an empty snapshot while test workspaces now held original goal snapshots. Fixtures now bind the same original snapshot; existing assertions preserved.",
+    "First historical offline check rejected source changes as intended. Tests now replay the actual frozen inputs and assert old preparation refuses rebaseline; stopped proposal/results unchanged."
+  ],
+  "limitations": [
+    "No free-text goal/media semantic classifier added; explicit broad commitments retained, insufficient references cannot establish complete coverage.",
+    "Scripted responses verify payload/routing behavior only. No real model-quality or cross-course efficacy claim.",
+    "No real Provider invocation, new run approval, recovery of r04 slots, dynamic opening or formal T040 completion."
+  ]
+}

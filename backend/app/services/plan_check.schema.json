@@ -1,0 +1,633 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://edumind.invalid/contracts/plan-check-v1",
+  "title": "Plan inspection evidence v1",
+  "$defs": {
+    "anchor": {
+      "type": "object",
+      "properties": {
+        "anchor_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "source_kind": {
+          "enum": [
+            "user_request",
+            "plan",
+            "reference",
+            "reference_context"
+          ]
+        },
+        "source_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "json_pointer": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "start_utf8": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "end_utf8": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "anchor_id",
+        "source_kind",
+        "source_digest",
+        "json_pointer",
+        "start_utf8",
+        "end_utf8"
+      ],
+      "additionalProperties": false
+    },
+    "finding": {
+      "type": "object",
+      "properties": {
+        "finding_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "category": {
+          "enum": [
+            "plan_internal_conflict",
+            "requirement_origin_confusion",
+            "unsupported_commitment",
+            "coverage_plan_gap",
+            "missing_premise",
+            "unsafe_plan"
+          ]
+        },
+        "severity": {
+          "enum": [
+            "minor",
+            "major",
+            "severe"
+          ]
+        },
+        "target_anchor": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "evidence_anchors": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "minItems": 1,
+          "maxItems": 8
+        },
+        "condition_or_counterexample": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "impact": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "suggested_action": {
+          "enum": [
+            "consider_rebuild",
+            "human_review",
+            "clarify_user",
+            "reject"
+          ]
+        }
+      },
+      "required": [
+        "finding_id",
+        "category",
+        "severity",
+        "target_anchor",
+        "evidence_anchors",
+        "condition_or_counterexample",
+        "impact",
+        "suggested_action"
+      ],
+      "additionalProperties": false
+    },
+    "model_result": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": "plan-review-result-v1"
+        },
+        "verdict": {
+          "enum": [
+            "pass",
+            "issue",
+            "needs_human",
+            "reject"
+          ]
+        },
+        "coverage": {
+          "type": "object",
+          "properties": {
+            "checked": {
+              "type": "array",
+              "items": {
+                "enum": [
+                  "goal_fidelity",
+                  "internal_consistency",
+                  "scope",
+                  "reference_support",
+                  "downstream_feasibility"
+                ]
+              },
+              "minItems": 0,
+              "maxItems": 5
+            },
+            "unchecked": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000
+              },
+              "minItems": 0,
+              "maxItems": 5
+            }
+          },
+          "required": [
+            "checked",
+            "unchecked"
+          ],
+          "additionalProperties": false
+        },
+        "findings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/finding"
+          },
+          "minItems": 0,
+          "maxItems": 16
+        },
+        "unresolved": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "minItems": 0,
+          "maxItems": 16
+        }
+      },
+      "required": [
+        "schema_version",
+        "verdict",
+        "coverage",
+        "findings",
+        "unresolved"
+      ],
+      "additionalProperties": false
+    },
+    "proof": {
+      "type": "object",
+      "properties": {
+        "proof_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "verifier_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "verifier_version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "plan_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "input_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "reference_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "finding_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "minItems": 1,
+          "maxItems": 16
+        },
+        "evidence_anchors": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "minItems": 1,
+          "maxItems": 16
+        },
+        "premises_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "conclusion": {
+          "enum": [
+            "confirmed_local_plan_defect",
+            "confirmed_user_ambiguity",
+            "not_verified"
+          ]
+        },
+        "machine_checked": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "proof_id",
+        "verifier_id",
+        "verifier_version",
+        "plan_digest",
+        "input_digest",
+        "reference_digest",
+        "finding_ids",
+        "evidence_anchors",
+        "premises_digest",
+        "conclusion",
+        "machine_checked"
+      ],
+      "additionalProperties": false
+    },
+    "binding": {
+      "type": "object",
+      "properties": {
+        "owner_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "unit_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "operation_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "plan_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "plan_version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "plan_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "input_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "reference_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "policy_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "owner_id",
+        "unit_id",
+        "operation_id",
+        "plan_id",
+        "plan_version",
+        "plan_digest",
+        "input_digest",
+        "reference_digest",
+        "policy_digest"
+      ],
+      "additionalProperties": false
+    },
+    "assessment": {
+      "type": "object",
+      "properties": {
+        "route": {
+          "enum": [
+            "accept_plan",
+            "rebuild_once",
+            "needs_human",
+            "clarify_user",
+            "reject",
+            "failed"
+          ]
+        },
+        "reason_codes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "minItems": 1,
+          "maxItems": 16
+        },
+        "verified_finding_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "minItems": 0,
+          "maxItems": 16
+        },
+        "proof_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "minItems": 0,
+          "maxItems": 16
+        },
+        "rebuilds_already_reserved": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "required": [
+        "route",
+        "reason_codes",
+        "verified_finding_ids",
+        "proof_ids",
+        "rebuilds_already_reserved"
+      ],
+      "additionalProperties": false
+    },
+    "record": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "enum": [
+            "plan-check-record-v1",
+            "plan-check-record-v2"
+          ]
+        },
+        "check_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "binding": {
+          "$ref": "#/$defs/binding"
+        },
+        "request_stage": {
+          "enum": [
+            "plan_check",
+            "plan_recheck"
+          ]
+        },
+        "model_result": {
+          "$ref": "#/$defs/model_result"
+        },
+        "anchor_catalog": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/anchor"
+          },
+          "minItems": 1,
+          "maxItems": 128
+        },
+        "proofs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/proof"
+          },
+          "minItems": 0,
+          "maxItems": 16
+        },
+        "server_assessment": {
+          "$ref": "#/$defs/assessment"
+        },
+        "request_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "response_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "provider_config_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "schema_version",
+        "check_id",
+        "binding",
+        "request_stage",
+        "model_result",
+        "anchor_catalog",
+        "proofs",
+        "server_assessment",
+        "request_digest",
+        "response_digest",
+        "provider_config_digest",
+        "created_at"
+      ],
+      "additionalProperties": false
+    },
+    "resolution": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": "plan-issue-resolution-v1"
+        },
+        "resolution_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "check_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "expected_check_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "reviewer_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "identity_source": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "kind": {
+          "enum": [
+            "clarification_needed",
+            "new_request_needed",
+            "false_positive_confirmed",
+            "rejected"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "idempotency_key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "schema_version",
+        "resolution_id",
+        "check_id",
+        "expected_check_digest",
+        "reviewer_id",
+        "identity_source",
+        "kind",
+        "reason",
+        "idempotency_key",
+        "created_at"
+      ],
+      "additionalProperties": false
+    },
+    "rebuild_event": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": "plan-rebuild-event-v1"
+        },
+        "event_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "operation_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "event_type": {
+          "enum": [
+            "reserved",
+            "completed",
+            "failed"
+          ]
+        },
+        "attempt": {
+          "const": 1
+        },
+        "prior_plan_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "prior_plan_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "trigger_check_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "proof_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "minItems": 1,
+          "maxItems": 16
+        },
+        "new_plan_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "new_plan_digest": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "input_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "reference_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "policy_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "schema_version",
+        "event_id",
+        "operation_id",
+        "event_type",
+        "attempt",
+        "prior_plan_id",
+        "prior_plan_digest",
+        "trigger_check_id",
+        "proof_ids",
+        "new_plan_id",
+        "new_plan_digest",
+        "input_digest",
+        "reference_digest",
+        "policy_digest",
+        "created_at"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "$ref": "#/$defs/record"
+}

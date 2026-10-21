@@ -1,0 +1,36 @@
+{
+  "version": "deepseek-final-focus-context-bound-v1",
+  "checked_on": "2026-10-15",
+  "model": "deepseek-flash",
+  "documented_revision": "DeepSeek-V4.1-Flash",
+  "runtime_weights_revision": "unknown",
+  "transport": "responses_json_schema",
+  "status": "CONSERVATIVE_PROVIDER_CONTRACT_BOUND",
+  "documented_context_window": "1M",
+  "context_token_ceiling": 1048576,
+  "input_overhead_tokens": 1048576,
+  "kernel_input_bound_formula": "actual_wire_bytes + input_overhead_tokens",
+  "derivation": "The documented model input/context window bounds all model input including service formatting; over-window Responses requests are rejected. Interpret 1M conservatively as max(1000000, 2**20). The kernel's existing positive wire_bytes term adds slack; this proof does not equate bytes with Tokens or rely on a 1024-token formatting estimate.",
+  "output_token_ceiling_including_reasoning": 2048,
+  "currency": "CNY",
+  "input_price_micro_per_million": 2000000,
+  "output_price_micro_per_million": 8000000,
+  "slot_cost_micro_formula": "ceil((wire_bytes+1048576)*2000000/1000000) + ceil(2048*8000000/1000000)",
+  "discounts_cache_hits_or_off_peak_assumed": false,
+  "expected_consumption_estimate": null,
+  "actual_bill": null,
+  "assumptions": [
+    "DeepSeek honors the documented model window, usage semantics and peak unit prices for this approved run.",
+    "Only the frozen text-only Responses body is sent; no tool/image/web-search or other charged operation.",
+    "Model identity, API behavior and price are rechecked before a real approved run; changed or unverifiable terms stop execution.",
+    "This is a contract-based conservative reservation, not an independently enforced provider-account spending limit. A provider violation may exceed an application cap and must halt the run without claiming the excess was prevented."
+  ],
+  "sources": [
+    "https://api-docs.deepseek.com/zh-cn/quick_start/pricing/",
+    "https://api-docs.deepseek.com/guides/responses_api/",
+    "https://api-docs.deepseek.com/api/create-response/"
+  ],
+  "source_access": "Direct page opens timed out; official-domain search results supplied the price/window/overflow and total-output facts. No API/model call or tokenizer download.",
+  "reasoning_effort": "none",
+  "basis": "Final round-2 proposal; four new static text-only diagnostic requests, 2048 total output. No r10 leftover budget transferred."
+}

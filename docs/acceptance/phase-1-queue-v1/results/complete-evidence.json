@@ -1,0 +1,53 @@
+{
+  "task_id": "PHASE-1-T036",
+  "passed": true,
+  "provider_requests": 0,
+  "hardware": {
+    "platform": "macOS-15.6.1-arm64-arm-64bit",
+    "machine": "arm64",
+    "cpu": "Apple M3",
+    "logical_cpu": 8,
+    "memory_bytes": 17179869184,
+    "concurrency": 1
+  },
+  "fault_tests": {
+    "tests": 55,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "templates": {
+    "denominator": 100,
+    "passed": 100,
+    "uncached": 20,
+    "uncached_p95_seconds": 9.522317457944155
+  },
+  "sse": {
+    "denominator": 100,
+    "passed": 100,
+    "job": 50,
+    "classroom": 50,
+    "classroom_provider": "explicit MockProvider"
+  },
+  "additional_actual_fault_windows": 8,
+  "evidence_sha256": {
+    "r01/fault-result.json": "bce322b7fa69e896a6a0d6f2a9046b69044902e4b3f3c7e5d747fcb0302e47ef",
+    "matrix-r02/matrix-result.json": "7acfbf97458e3b06c57de056ab9e419f921f97174749afd9136c24ca7820f381",
+    "fault-matrix-r01/matrix-result.json": "d276bae3e58dcb64c83fd63cd607ef2c7493283455bd83370dab6065ea7fa773",
+    "publish-fault-r01/matrix-result.json": "d8acb462fdacf2f053e5152a578aa00fc2d10f0946bb281f24ab724214076bc8"
+  },
+  "prior_environment_failure": {
+    "path": "matrix-r01/matrix-result.json",
+    "sha256": "026562a5229a4f033c46d1b318c7bd754bdd80b87041e905a922854fbd86d37a",
+    "reason": "RuntimeError: Isolated API failed to start",
+    "templates_unrun": 100,
+    "sse_unrun": 100,
+    "p95": "+inf",
+    "qualification": "not a passed run"
+  },
+  "limitations": [
+    "classroom speech is MockProvider; no real model quality claim",
+    "supplementary media frames are not new human course signoff",
+    "catalog_only stays default; no deployment or dynamic opening"
+  ]
+}

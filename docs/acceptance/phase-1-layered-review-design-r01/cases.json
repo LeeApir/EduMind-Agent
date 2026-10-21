@@ -1,0 +1,179 @@
+{
+  "version": "layered-review-design-cases-v1",
+  "status": "design expectations pending approval; not human truth labels or model runs",
+  "provider_calls": 0,
+  "cases": [
+    {
+      "id": "split-complete",
+      "scope": "resource",
+      "resource_role": "explanation",
+      "material_condition": "用户要讲解、完整程序与三题；本讲解承担概念/指针过程，计划将程序/三题分配代码/练习，当前仅给讲解。",
+      "expected": "pass",
+      "required_reason": "不得因未附兄弟正文制造整课缺失；unit仍须独立检查全套。"
+    },
+    {
+      "id": "own-promise-missing",
+      "scope": "resource",
+      "resource_role": "explanation",
+      "material_condition": "本讲解明确说下方给出完整可编译程序，但实际没有；不能用计划分工抹去正文承诺。",
+      "expected": "needs_human",
+      "required_reason": "unresolved具体指出本资源未兑现的承诺；不虚构fact来触发revise。"
+    },
+    {
+      "id": "own-process-missing",
+      "scope": "resource",
+      "resource_role": "explanation",
+      "material_condition": "讲解场景明确负责追踪头指针变化，学生正文只有最终输出；内部计划有完整轨迹。",
+      "expected": "needs_human",
+      "required_reason": "指出自身过程支持缺口，内部计划不算交付。"
+    },
+    {
+      "id": "fragment-unsafe",
+      "scope": "resource",
+      "resource_role": "exercise",
+      "material_condition": "练习解析给出长度3数组，学生可执行示例无保护访问a[4]，却声称安全；并非只要求识别错误的反面例。",
+      "expected": "reject",
+      "required_reason": "具体指出可达越界，不能因为exercise而省略安全检查；不得从UB推出必非16。"
+    },
+    {
+      "id": "no-profile",
+      "scope": "resource",
+      "resource_role": "explanation",
+      "material_condition": "无画像、错题和偏好；正确课程无针对学生的掌握度或困难归因，无依赖未知事实的保证。",
+      "expected": "pass",
+      "required_reason": "learner_fit可以完成无编造/约束一致检查；不要求确认这门课必适合此人。"
+    },
+    {
+      "id": "self-report",
+      "scope": "resource",
+      "resource_role": "explanation",
+      "material_condition": "用户自述刚学完结构体和指针；课程准确称这是用户自述，提供一般先修提醒。",
+      "expected": "pass",
+      "required_reason": "不升级为熟练掌握，也不因无行为测验而阻止发布。"
+    },
+    {
+      "id": "unsupported-personalization",
+      "scope": "resource",
+      "resource_role": "explanation",
+      "material_condition": "无任何相关证据，课程却说你经常混淆二级指针，或保证你已熟练掌握指针。",
+      "expected": "needs_human",
+      "required_reason": "具体标出无据个性化，需要改写或证据；未知不推出事实为假，不编造difficulty/fact。"
+    },
+    {
+      "id": "explicit-attribution-conflict",
+      "scope": "resource",
+      "resource_role": "explanation",
+      "material_condition": "原始输入明确说没学过指针，课程却引用学生说法称你说已经学过指针。",
+      "expected": "revise",
+      "required_reason": "针对准确自述的归因矛盾有据fact；不由此推断学生实际掌握情况。"
+    },
+    {
+      "id": "necessary-unknown",
+      "scope": "resource",
+      "resource_role": "explanation",
+      "material_condition": "课程实际保证该学生不需要先修指针即可完成涉及指针的任务，但没有支撑此具体跳过结论的证据。",
+      "expected": "needs_human",
+      "required_reason": "说明该保证依赖的未知前提及影响；不是一般先修提醒或未知学情本身。"
+    },
+    {
+      "id": "unit-split-complete",
+      "scope": "unit",
+      "resource_role": null,
+      "material_condition": "同一绑定三资源已正确交付讲解、程序和三题，完整需求在学生可见载体合集中满足；讲解未重复程序/题目。",
+      "expected": "pass",
+      "required_reason": "完成六个unit检查；资源pass本身不能证明整课覆盖。"
+    },
+    {
+      "id": "plan-omits-request",
+      "scope": "unit",
+      "resource_role": null,
+      "material_condition": "原文要求完整程序和三题，计划仅安排概念讲解，三资源实际也缺程序/三题。",
+      "expected": "needs_human",
+      "required_reason": "原文优先于窄计划，具体指出缺失交付。"
+    },
+    {
+      "id": "distributed-process",
+      "scope": "unit",
+      "resource_role": null,
+      "material_condition": "用户未要求答题前教完过程；完整过程教学分布在代码注释、关键步骤和提交后练习解析，问题本身也考查过程。",
+      "expected": "pass",
+      "required_reason": "区分交付时机，无额外先教后练假设。"
+    },
+    {
+      "id": "only-internal-process",
+      "scope": "unit",
+      "resource_role": null,
+      "material_condition": "目标要求追踪循环状态和退出条件，只有内部plan有轨迹，实际三资源只给正确实现和最终数值。",
+      "expected": "needs_human",
+      "required_reason": "精确报告教学支持不足，不能因代码可推导而放行。"
+    },
+    {
+      "id": "assessment-only-final",
+      "scope": "unit",
+      "resource_role": null,
+      "material_condition": "明确要求过程测量，过程教学已充分，但三题只问最终算术结果，过程只出现在解析。",
+      "expected": "needs_human",
+      "required_reason": "已教未考；解析提供教学不代表题目测了过程。"
+    },
+    {
+      "id": "before-quiz-gap",
+      "scope": "unit",
+      "resource_role": null,
+      "material_condition": "明确要求答题前展示过程，唯一过程教学在提交后反馈。",
+      "expected": "needs_human",
+      "required_reason": "指出可见时序缺口，不用事后解析回补。"
+    },
+    {
+      "id": "free-list-ownership",
+      "scope": "unit",
+      "resource_role": null,
+      "material_condition": "free_list(Node *head)只释放局部形参指向的节点，正文却称free_list会把调用者head置空；实际main另有head=NULL。",
+      "expected": "not_pass_with_fact",
+      "required_reason": "准确定位函数仅改局部形参与main显式赋值，检出正文归属错误；不得因main另行置空忽略错误，不预定该历史样本为major，也不可编造已发生双重释放。unit无revise，保持事实报告与禁止自动发布，按证据/严重度拒绝或转人工。",
+      "allowed_verdicts": [
+        "reject",
+        "needs_human"
+      ]
+    },
+    {
+      "id": "mixed-severe-gap",
+      "scope": "unit",
+      "resource_role": null,
+      "material_condition": "完整候选存在确定可达越界，也缺承诺的过程考查。",
+      "expected": "reject",
+      "required_reason": "严重错误拒绝优先且unresolved仍报告独立教学缺口；不能漏缺口或全降人工。"
+    },
+    {
+      "id": "resource-unresolved-unit-pass",
+      "scope": "routing",
+      "resource_role": null,
+      "material_condition": "某资源仍有真正未决；之后unit完整返回pass。",
+      "expected": "needs_human",
+      "required_reason": "三资源真实未决不能被unit pass清掉。"
+    },
+    {
+      "id": "old-unit-five-checks",
+      "scope": "routing",
+      "resource_role": null,
+      "material_condition": "新T059政策的unit回答只返回旧五个checked，未含objectives。",
+      "expected": "needs_human",
+      "required_reason": "COVERAGE_INCOMPLETE；不回填新ID或把五项解释成已完成新项。"
+    },
+    {
+      "id": "binding-mismatch",
+      "scope": "preflight",
+      "resource_role": null,
+      "material_condition": "资源角色与payload/计划scene不一致，或input/plan摘要与服务端绑定不同。",
+      "expected": "local_reject",
+      "required_reason": "绑定不一致发请求前失败，Provider发送0；不能静默选择角色。"
+    },
+    {
+      "id": "old-case-new-policy",
+      "scope": "persistence",
+      "resource_role": null,
+      "material_condition": "旧政策案件尝试新政策决定/发布；旧发布版本已有正式记录。",
+      "expected": "invalidate_pending_preserve_published",
+      "required_reason": "旧待审失效，不复制旧批准；不回写旧模型回答/checked/已发布内容和历史评分。"
+    }
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "version": "plan-gap-location-actual-01-v1",
+  "source_commit": "9e03129",
+  "proposal_sha256": "0dd2bd5bf068a86abebcf0bcd9f9ce049e040b5781e34403065c255a7c89b284",
+  "approval_sha256": "d95d18015edf8e4243c289e73a66d72d76fed22bb59db7b22ff5534e871a474b",
+  "receipt_sha256": "3a33ba6eb73e3c41a638103b8034c2be028ef8fb08b930b7b446505bfff108d5",
+  "slot": "plan-only-gap:candidate",
+  "real_cloud": true,
+  "mock": false,
+  "cli_exit_code": 0,
+  "requests_sent_this_step": 1,
+  "attempts_authorized": 1,
+  "attempts_used": 1,
+  "remaining_attempts": 0,
+  "request_sha256": "5cfdfa15cc68e61959d10e5ef60d2a6e8bd53e0f17e24bc4872e8df3fa46798b",
+  "response_sha256": "80280d6e7f615050d11d5202ff7e807fb47a29bebce1f42fbf1cd31b3d80b487",
+  "material_sha256": "c19deec758d9756b548b797f9af13dcff587143d523c1a25be76d9dd96e74ab3",
+  "completeness": {
+    "actual_request_digest_matches": true,
+    "provider_response_completed": true,
+    "response_model_matches": true,
+    "single_assistant_message_and_text_block": true,
+    "structured_json_schema_valid": true,
+    "usage_known_and_within_frozen_bound": true
+  },
+  "structured_review": {
+    "coverage": {
+      "checked": [
+        "action_references",
+        "answer_consistency",
+        "conventions",
+        "example_trace",
+        "terminology"
+      ],
+      "unchecked": []
+    },
+    "findings": [],
+    "schema_version": "resource-review-v4",
+    "scope": "unit",
+    "unresolved": [
+      "Student-visible goal/plan commitment coverage gap: the goal requires tracing the C sum loop and explaining total=2,7,16 plus the i=3 boundary, but the delivered explanation only says a={2,5,9}, capacity 3, indices 0,1,2, and that sum() returns 16 without printing. The code source/expected_output/key_steps show a correct loop but only a generic 'traverse and sum then return' step, with no per-iteration total values or explicit explanation that at i=3 the condition is false and no a[3] access occurs. The exercises ask only whether length-3 indices are legal, whether 2+5+9=16, and whether a return value is necessarily printed; none require tracing total=2,7,16 or the i=3 termination/boundary. Missing student-visible support is needed in the explanation, code key steps, or exercise questions to cover the trace/explain-process objective."
+    ],
+    "verdict": "needs_human"
+  },
+  "input_tokens": 13613,
+  "output_tokens_including_reasoning": 3380,
+  "total_tokens": 16993,
+  "output_limit_including_reasoning": 8192,
+  "reasoning_visible_split": "UNKNOWN_NOT_RETAINED",
+  "cost_reserved_micro_cny": 2245566,
+  "peak_uncached_usage_reference_micro_cny": 54266,
+  "actual_invoice_cost": null,
+  "cost_note": "Peak uncached pricing reference, not invoice; reservation not charge.",
+  "assistant_semantic_assessment": {
+    "criterion_satisfied": true,
+    "evidence": [
+      "Original review explicitly cites missing visible per-iteration totals2/7/16 and i3 false/no a3 access.",
+      "Original review cites existing arithmetic/index/return questions not testing execution process.",
+      "No findings or invented missing-callsite fact; unresolved string array valid."
+    ],
+    "scope": "One authored pure-gap control; does not establish stability or complete T040 suite."
+  },
+  "schema_failure_reproduced": false,
+  "schema_failure_location": null,
+  "old_extra_property": "UNKNOWN_NOT_RECOVERED_OR_INFERRED",
+  "repair_decision": "No contract or prompt fix justified by this conforming response; preserve exact request and actual evidence.",
+  "human_confirmed": false,
+  "formal_quality_passed": false,
+  "T040": "blocked",
+  "production_mode": "catalog_only",
+  "stopped_after_one": true,
+  "retry_or_second_cli": false,
+  "old_suite_remaining_six": "NOT_RUN; old suite remains halted",
+  "next": "Stop; independent human signoff pending. No retry, auto repair, next case or old run continuation."
+}

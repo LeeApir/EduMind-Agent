@@ -1,0 +1,167 @@
+{
+  "version": "t040-review-coverage-r08-result-v1",
+  "recorded_at": "2026-10-15T08:15:18",
+  "state": "BLOCKED_PARTIAL_DEFECT_DETECTION",
+  "execution_source_commit": "f8faff5",
+  "model_id": "deepseek-flash",
+  "review_instruction_version": "resource-review-instructions-v6",
+  "reasoning_effort": "low",
+  "max_total_output_tokens": 8192,
+  "approved_requests": 2,
+  "approved_cost_micro_cny": 180000,
+  "real_requests": 1,
+  "observations": [
+    {
+      "completion_metadata": {
+        "incomplete_reason": null,
+        "output_item_counts": {
+          "message": 1,
+          "reasoning": 1
+        },
+        "status": "completed"
+      },
+      "duration_seconds": 15.189834,
+      "error_category": null,
+      "error_code": null,
+      "freeze": "8ced28c5e364110ccef184f94c76555795f3fd8fc6454cbab11405e86df07482",
+      "http_status": 200,
+      "human_confirmed": false,
+      "mock": false,
+      "outbound_sends": 1,
+      "protocol_passed": true,
+      "quality_failure": null,
+      "real_cloud": true,
+      "request_sha256": "bc45d9d9d5fbc95697da827f570ef2b986c498a0d42bf7960f0ffdf935142662",
+      "response": {
+        "arguments_schema_valid": false,
+        "completed": true,
+        "function_count": 0,
+        "function_name_matches": false,
+        "input_tokens": 2944,
+        "model_matches": true,
+        "output_tokens": 1966,
+        "reasoning_tokens": 1770
+      },
+      "response_sha256": "cad251486ba0cd705a97e6b47e973bc80727d3adaa32a400b94899e7e858740e",
+      "review": {
+        "issues": [
+          {
+            "area": "fact",
+            "message": "“关键公式”中的 `size = rear - front`（仅标注“在 rear 指向下一个空位的约定下”）并不适用于本文随后给出的实现：该 C 代码用 `% CAPACITY` 回绕形成循环队列，而回绕后 `rear - front` 会变为负数或与真实元素数脱节。反例：CAPACITY=8，连续 enqueue 8 个元素后再 dequeue 1 次，此时 front=1、rear=0、size=7，而 rear-front = -1，与公式给出的 size 不一致。该式只在无回绕的线性队列中成立，资源未说明这一限制即把与后文实现冲突的式子列为通用公式。",
+            "severity": "minor"
+          }
+        ],
+        "review_version": "resource-review-v3",
+        "verdict": "revise"
+      },
+      "slot": "review_scope:01",
+      "wire_response_sha256": "9da2a063a94bb9fcf78c923e26d1a288fb0df32517b69b2fca3fe5abc353f83b"
+    }
+  ],
+  "unattempted_slots": [
+    "review_scope:02"
+  ],
+  "budget_snapshot": {
+    "manifest_sha256": "8ced28c5e364110ccef184f94c76555795f3fd8fc6454cbab11405e86df07482",
+    "halted": "CONCRETE_DEFECT_MISSED",
+    "attempts": [
+      [
+        1,
+        "review_scope:01",
+        "review",
+        "f676bdb07bf2fb68312e9f00928ce159882f88a5cafa0cb75652a94fd3db5048",
+        "bc45d9d9d5fbc95697da827f570ef2b986c498a0d42bf7960f0ffdf935142662",
+        92476,
+        "complete",
+        2944,
+        1966,
+        null
+      ]
+    ],
+    "unattempted_slots": [
+      "review_scope:02"
+    ]
+  },
+  "input_tokens": 2944,
+  "output_tokens": 1966,
+  "reasoning_tokens": 1770,
+  "known_total_tokens": 4910,
+  "reserved_cost_micro_cny": 92476,
+  "known_token_peak_list_reference_micro_cny": 21616,
+  "actual_bill": "unknown",
+  "assistant_semantic_assessment": {
+    "detection": {
+      "count_formula_concretely_detected": true,
+      "empty_full_condition_concretely_detected": false,
+      "overall_frozen_two_defect_criterion_met": false,
+      "why": "The sole finding concerns rear-front and a valid wrapped-state counterexample. It does not identify that a full all-slots-used queue also satisfies front==rear. The pre-frozen diagnostic requires concrete detection of both defects."
+    },
+    "classification": {
+      "returned_area": "fact",
+      "expected_area": "fact",
+      "matched": true
+    },
+    "review_scope_and_factual_quality": {
+      "findings_only_observed": true,
+      "replacement_formula_code_or_patch_observed": false,
+      "reported_counterexample_valid": true
+    },
+    "completion_schema": "PASSED",
+    "correct_control": "NOT_RUN",
+    "repair_quality": "NOT_RUN",
+    "gate": "CONCRETE_DEFECT_MISSED",
+    "gate_assessment_separate_from_automatic_observation": true,
+    "automatic_quality_failure_field_preserved": null,
+    "human_fact_confirmation": false,
+    "no_relabeling_of_detected_count_error": true,
+    "severity_reported": "minor",
+    "severity_was_not_used_as_an_additional_failure_condition": true
+  },
+  "witnesses": {
+    "reviewer_count_counterexample": {
+      "capacity": 8,
+      "front": 1,
+      "rear": 0,
+      "size": 7,
+      "rear_minus_front": -1,
+      "reachable_sequence": "enqueue 8, dequeue 1 from empty"
+    },
+    "missed_empty_full_counterexample": {
+      "capacity": 8,
+      "front": 0,
+      "rear": 0,
+      "size": 8,
+      "front_equals_rear": true,
+      "actually_empty": false,
+      "reachable_sequence": "enqueue 8 from empty"
+    },
+    "candidate_code_executed": false,
+    "method": "Integer queue-state arithmetic only."
+  },
+  "interpretation": "r07 v5 and r08 v6 low runs both concretely detect count error and omit the empty/full error. The v6 instruction has no demonstrated improvement on this case. These two observations do not establish unique internal causes or general model reliability. Stop real calls; reconsider strategy before another proposal, rather than blind prompt replay.",
+  "retained_visible_evidence": {
+    "path": "local-materials/phase-1-t040-review-coverage-check/review_scope/review_scope-01-response.json",
+    "sha256": "53a9d88f416e3e1dd91fb77ac2952e83cf5f5687cb920cd5da6b4cf521653341",
+    "review_sha256": "66bb8f653752c90cb126740eec691f41681edc26641ffdfff1569dfbcc5581ff",
+    "reasoning_text_retained": false,
+    "raw_response_retained": false,
+    "decoded_response_hash_reconstructible_from_sanitized_evidence": false
+  },
+  "checks": {
+    "source_hash_file_checks": 186,
+    "source_files_unchanged": true,
+    "request_matches_frozen_slot": true,
+    "retained_final_answer_matches_review": true,
+    "sqlite_attempts": 1,
+    "halted_before_second_call": true,
+    "prior_offline_tests": 148
+  },
+  "retries": 0,
+  "fallbacks": 0,
+  "correction_calls": 0,
+  "formal_quality_started": false,
+  "dsl_quality_started": false,
+  "t041_started": false,
+  "production_mode": "catalog_only",
+  "production_default_effort": "none"
+}

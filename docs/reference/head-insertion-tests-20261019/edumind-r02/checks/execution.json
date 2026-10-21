@@ -1,0 +1,172 @@
+{
+  "compiler": "Apple clang version 17.0.0 (clang-1700.3.19.1)\nTarget: arm64-apple-darwin24.6.0\nThread model: posix\nInstalledDir: /Library/Developer/CommandLineTools/usr/bin\n",
+  "strict_compile_initial_result": {
+    "flags": [
+      "-std=c11",
+      "-Wall",
+      "-Wextra",
+      "-Wpedantic",
+      "-Werror",
+      "-fsanitize=address,undefined",
+      "-fno-omit-frame-pointer",
+      "-g"
+    ],
+    "exit_code": 1,
+    "diagnostic": "candidate.c:59:2: error: no newline at end of file [-Werror,-Wnewline-eof]",
+    "interpretation": "Preserved failure. Original bytes were not changed. Standard warning-enabled compilation and sanitizer executions recorded separately."
+  },
+  "records": [
+    {
+      "kind": "compile_original_with_warnings",
+      "command": [
+        "clang",
+        "-std=c11",
+        "-Wall",
+        "-Wextra",
+        "-Wpedantic",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "-g",
+        "docs/reference/edumind/head-insertion-20261019-r02/candidate.c",
+        "-o",
+        "/tmp/edumind-head-20261019-r02/candidate"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "docs/reference/edumind/head-insertion-20261019-r02/candidate.c:59:2: warning: no newline at end of file [-Wnewline-eof]\n   59 | }\n      |  ^\n1 warning generated.\n"
+    },
+    {
+      "kind": "compile_original_with_warnings",
+      "command": [
+        "clang",
+        "-std=c11",
+        "-Wall",
+        "-Wextra",
+        "-Wpedantic",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "-g",
+        "docs/reference/edumind/head-insertion-20261019-r02/checks/fault-injection.c",
+        "-o",
+        "/tmp/edumind-head-20261019-r02/fault-injection"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "In file included from docs/reference/edumind/head-insertion-20261019-r02/checks/fault-injection.c:45:\ndocs/reference/edumind/head-insertion-20261019-r02/checks/../candidate.c:59:2: warning: no newline at end of file [-Wnewline-eof]\n   59 | }\n      |  ^\n1 warning generated.\n"
+    },
+    {
+      "kind": "original_program",
+      "command": [
+        "/tmp/edumind-head-20261019-r02/candidate"
+      ],
+      "exit_code": 0,
+      "stdout": "3 2 1 \n",
+      "stderr": ""
+    },
+    {
+      "kind": "program",
+      "fail_at": 0,
+      "command": [
+        "/tmp/edumind-head-20261019-r02/fault-injection",
+        "program",
+        "0"
+      ],
+      "exit_code": 0,
+      "stdout": "3 2 1 \n",
+      "stderr": "PASS mode=program fail_at=0 attempts=3 allocated=3 freed=3 live=0\n"
+    },
+    {
+      "kind": "program",
+      "fail_at": 1,
+      "command": [
+        "/tmp/edumind-head-20261019-r02/fault-injection",
+        "program",
+        "1"
+      ],
+      "exit_code": 0,
+      "stdout": "3 2 \n",
+      "stderr": "PASS mode=program fail_at=1 attempts=3 allocated=2 freed=2 live=0\n"
+    },
+    {
+      "kind": "program",
+      "fail_at": 2,
+      "command": [
+        "/tmp/edumind-head-20261019-r02/fault-injection",
+        "program",
+        "2"
+      ],
+      "exit_code": 0,
+      "stdout": "3 1 \n",
+      "stderr": "PASS mode=program fail_at=2 attempts=3 allocated=2 freed=2 live=0\n"
+    },
+    {
+      "kind": "program",
+      "fail_at": 3,
+      "command": [
+        "/tmp/edumind-head-20261019-r02/fault-injection",
+        "program",
+        "3"
+      ],
+      "exit_code": 0,
+      "stdout": "2 1 \n",
+      "stderr": "PASS mode=program fail_at=3 attempts=3 allocated=2 freed=2 live=0\n"
+    },
+    {
+      "kind": "contract",
+      "fail_at": 0,
+      "command": [
+        "/tmp/edumind-head-20261019-r02/fault-injection",
+        "contract",
+        "0"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "PASS mode=contract fail_at=0 attempts=3 allocated=3 freed=3 live=0\n"
+    },
+    {
+      "kind": "contract",
+      "fail_at": 1,
+      "command": [
+        "/tmp/edumind-head-20261019-r02/fault-injection",
+        "contract",
+        "1"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "PASS mode=contract fail_at=1 attempts=3 allocated=2 freed=2 live=0\n"
+    },
+    {
+      "kind": "contract",
+      "fail_at": 2,
+      "command": [
+        "/tmp/edumind-head-20261019-r02/fault-injection",
+        "contract",
+        "2"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "PASS mode=contract fail_at=2 attempts=3 allocated=2 freed=2 live=0\n"
+    },
+    {
+      "kind": "contract",
+      "fail_at": 3,
+      "command": [
+        "/tmp/edumind-head-20261019-r02/fault-injection",
+        "contract",
+        "3"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "PASS mode=contract fail_at=3 attempts=3 allocated=2 freed=2 live=0\n"
+    }
+  ],
+  "normal_expected_output_exact": "3 2 1 \n",
+  "normal_output_matches_display_after_whitespace_normalization": true,
+  "malloc_failure_slots": [
+    1,
+    2,
+    3
+  ],
+  "tracked_live_allocations_final": 0,
+  "leak_sanitizer": "not separately run; explicit allocator tracking covers every malloc/free in this generated program"
+}

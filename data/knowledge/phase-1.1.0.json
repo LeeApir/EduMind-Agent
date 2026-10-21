@@ -1,0 +1,980 @@
+{
+  "schema_version": 2,
+  "graph_version": "phase-1.1.0",
+  "review": {
+    "source": "ADR-0012 approved plan; source/reference and structural checks, not human course sign-off",
+    "fact_checked_at": "2026-10-09",
+    "status": "reference_checked"
+  },
+  "relationship_direction": "from 指向 to；DEPENDS_ON 表示 from 以 to 为前置，EXTENDS 表示 from 是 to 的进阶，SIMILAR_TO 表示两节点需要对比讲解。",
+  "references": {
+    "file": "phase-1.1.0.sources.json",
+    "sha256": "47685855947e8b2b520e14a1f30f1c10925f21645636733ef98784b1811d7fa1"
+  },
+  "nodes": [
+    {
+      "id": "array",
+      "name": "数组",
+      "chapter": "线性表",
+      "difficulty": 1,
+      "description": "使用连续存储空间、通过下标访问元素的线性结构。",
+      "prerequisites": [],
+      "learning_objectives": [
+        "说出下标访问的时间复杂度",
+        "说明连续存储对插入和删除的影响"
+      ],
+      "common_misconceptions": [
+        "数组每次访问都要从头遍历",
+        "数组插入总是 O(1)"
+      ],
+      "ai_context": "使用连续格子和下标精灵的图示，对比中间插入时的元素搬移。",
+      "mastery_rule_key": "linear-structure-v1"
+    },
+    {
+      "id": "array-stack",
+      "name": "顺序栈",
+      "chapter": "栈和队列",
+      "difficulty": 2,
+      "description": "用数组及栈顶位置实现后进先出的栈。",
+      "prerequisites": [
+        "array",
+        "stack"
+      ],
+      "learning_objectives": [
+        "解释push/pop与栈顶变化",
+        "区分固定容量溢出与动态数组扩容"
+      ],
+      "common_misconceptions": [
+        "栈顶索引与元素数总相等",
+        "数组扩容使每次push都具有最坏O(1)复杂度"
+      ],
+      "ai_context": "明确栈顶约定，区分固定容量和扩容的摊销代价。",
+      "mastery_rule_key": "graph-metadata-v1"
+    },
+    {
+      "id": "balanced-binary-search-tree",
+      "name": "平衡二叉搜索树（红黑树概念）",
+      "chapter": "树",
+      "difficulty": 4,
+      "description": "限制树高度增长的二叉搜索树；本节点以红黑树概念为例。",
+      "prerequisites": [
+        "binary-search-tree"
+      ],
+      "learning_objectives": [
+        "说明平衡约束如何控制搜索高度",
+        "辨认旋转与保持搜索顺序的关系"
+      ],
+      "common_misconceptions": [
+        "平衡要求左右子树完全等高",
+        "一次旋转会改变中序键值顺序"
+      ],
+      "ai_context": "只讲红黑树平衡动机、颜色约束和旋转概念，不声称已教完整删除修复或AVL实现。",
+      "mastery_rule_key": "graph-metadata-v1"
+    },
+    {
+      "id": "binary-heap",
+      "name": "二叉堆",
+      "chapter": "树",
+      "difficulty": 3,
+      "description": "满足堆序且结构完全的二叉树，通常用数组存储。",
+      "prerequisites": [
+        "binary-tree",
+        "array"
+      ],
+      "learning_objectives": [
+        "区分堆序与二叉搜索树顺序",
+        "按明确下标约定推导上浮/下沉"
+      ],
+      "common_misconceptions": [
+        "堆的中序遍历必然有序",
+        "堆的左右子树必须按BST键值规则分隔"
+      ],
+      "ai_context": "固定零基下标及最小/最大堆约定，说明根与完整排序不同。",
+      "mastery_rule_key": "graph-metadata-v1"
+    },
+    {
+      "id": "binary-search-tree",
+      "name": "二叉搜索树",
+      "chapter": "树",
+      "difficulty": 3,
+      "description": "用左右子树键值约束支持查找的二叉树。",
+      "prerequisites": [
+        "binary-tree-traversal"
+      ],
+      "learning_objectives": [
+        "按约定完成查找与插入推理",
+        "区分高度相关代价与退化为链的最坏情况"
+      ],
+      "common_misconceptions": [
+        "二叉搜索树必然平衡",
+        "所有实现对重复键的策略都一样"
+      ],
+      "ai_context": "先规定重复键策略，复杂度按高度而非无条件log n讲解。",
+      "mastery_rule_key": "graph-metadata-v1"
+    },
+    {
+      "id": "binary-tree",
+      "name": "二叉树",
+      "chapter": "树",
+      "difficulty": 2,
+      "description": "每个节点至多有左右两个孩子的有序树结构。",
+      "prerequisites": [
+        "tree-concept"
+      ],
+      "learning_objectives": [
+        "区分左右子树与空树",
+        "区分满、完全与一般二叉树"
+      ],
+      "common_misconceptions": [
+        "二叉树每个节点必须有两个孩子",
+        "完全二叉树必然是二叉搜索树"
+      ],
+      "ai_context": "先说明结构性质，不把二叉树当成有序搜索结构。",
+      "mastery_rule_key": "graph-metadata-v1"
+    },
+    {
+      "id": "binary-tree-traversal",
+      "name": "二叉树遍历（递归、迭代与层序）",
+      "chapter": "树",
+      "difficulty": 3,
+      "description": "按明确顺序访问二叉树，可用递归、显式栈或队列。",
+      "prerequisites": [
+        "binary-tree",
+        "stack",
+        "queue"
+      ],
+      "learning_objectives": [
+        "比较先序、中序、后序访问位置",
+        "说明显式栈迭代与队列层序的区别"
+      ],
+      "common_misconceptions": [
+        "任意二叉树的中序结果都已排序",
+        "层序遍历可以直接用后进先出栈替代队列"
+      ],
+      "ai_context": "先讲递归基例与返回，再映射显式栈；层序单列队列。",
+      "mastery_rule_key": "graph-metadata-v1"
+    },
+    {
+      "id": "breadth-first-search",
+      "name": "广度优先搜索 BFS",
+      "chapter": "图",
+      "difficulty": 3,
+      "description": "以队列按距离层次扩展图节点的遍历。",
+      "prerequisites": [
+        "graph-representation",
+        "queue"
+      ],
+      "learning_objectives": [
+        "维护访问标记并说明入队时机",
+        "限定无权/等权边时的最短路径性质"
+      ],
+      "common_misconceptions": [
+        "BFS对任意带权图都给出最短路径",
+        "无访问标记也不会重复入队"
+      ],
+      "ai_context": "区分单源可达分量和全图遍历，复杂度注明邻接表示。",
+      "mastery_rule_key": "graph-metadata-v1"
+    },
+    {
+      "id": "bubble-sort",
+      "name": "冒泡排序",
+      "chapter": "排序",
+      "difficulty": 2,
+      "description": "反复比较并按逆序条件交换相邻元素的排序过程。",
+      "prerequisites": [
+        "array"
+      ],
+      "learning_objectives": [
+        "说明一趟扫描后的边界不变式",
+        "区分带提前停止与无提前停止的最好情况"
+      ],
+      "common_misconceptions": [
+        "冒泡排序所有实现的最好情况都为线性",
+        "交换相等键不会影响稳定性"
+      ],
+      "ai_context": "固定扫描方向与严格大于交换条件，展示有序输入的提前停止。",
+      "mastery_rule_key": "graph-metadata-v1"
+    },
+    {
+      "id": "c-pointer",
+      "name": "C 指针",
+      "chapter": "C 基础",
+      "difficulty": 1,
+      "description": "保存内存地址、可以间接访问对象的 C 语言变量。",
+      "prerequisites": [],
+      "learning_objectives": [
+        "区分指针值、地址和所指对象",
+        "安全地使用取地址和解引用运算符"
+      ],
+      "common_misconceptions": [
+        "指针就是数组",
+        "未初始化指针可以直接解引用"
+      ],
+      "ai_context": "将指针表示为带有地址标签的箭头，明确分开变量框和其指向的对象。",
+      "mastery_rule_key": "linear-structure-v1"
+    },
+    {
+      "id": "circular-linked-list",
+      "name": "循环链表",
+      "chapter": "线性表",
+      "difficulty": 2,
+      "description": "末节点链接返回起点的链式结构；可用哨兵统一边界。",
+      "prerequisites": [
+        "single-linked-list",
+        "linked-list-traversal"
+      ],
+      "learning_objectives": [
+        "说明循环与终止条件",
+        "识别空表、单节点与哨兵边界"
+      ],
+      "common_misconceptions": [
+        "循环链表以NULL作为唯一遍历终止条件",
+        "哨兵一定是有效数据节点"
+      ],
+      "ai_context": "用环和哨兵示例解释回到起点的终止条件，避免无限遍历。",
+      "mastery_rule_key": "graph-metadata-v1"
+    },
+    {
+      "id": "circular-queue",
+      "name": "循环队列",
+      "chapter": "线性表",
+      "difficulty": 3,
+      "description": "使用定长数组和模运算维护队首、队尾的队列实现。",
+      "prerequisites": [
+        "array",
+        "queue"
+      ],
+      "learning_objectives": [
+        "解释队首、队尾环绕的原因",
+        "处理队空与队满的判定"
+      ],
+      "common_misconceptions": [
+        "队首等于队尾总表示队空",
+        "循环队列无法判断队满"
+      ],
+      "ai_context": "用环形数组和 front/rear 指针动画呈现模运算后的位置。",
+      "mastery_rule_key": "linear-structure-v1"
+    },
+    {
+      "id": "depth-first-search",
+      "name": "深度优先搜索 DFS",
+      "chapter": "图",
+      "difficulty": 3,
+      "description": "递归或显式栈先沿一条分支深入再回退的图遍历。",
+      "prerequisites": [
+        "graph-representation",
+        "stack"
+      ],
+      "learning_objectives": [
+        "说明访问标记与回退过程",
+        "区分搜索树边与原图边"
+      ],
+      "common_misconceptions": [
+        "DFS总给出最短路径",
+        "只访问一个起点就一定覆盖不连通图"
+      ],
+      "ai_context": "说明递归栈与显式栈；固定邻接顺序才讨论访问序列。",
+      "mastery_rule_key": "graph-metadata-v1"
+    },
+    {
+      "id": "doubly-linked-list",
+      "name": "双向链表",
+      "chapter": "线性表",
+      "difficulty": 2,
+      "description": "节点同时保存前驱和后继链接的线性结构。",
+      "prerequisites": [
+        "single-linked-list",
+        "linked-list-insertion",
+        "linked-list-deletion"
+      ],
+      "learning_objectives": [
+        "辨认prev与next的方向",
+        "按顺序更新插入/删除节点的双向链接"
+      ],
+      "common_misconceptions": [
+        "只改next就完成双向链表插入",
+        "已知节点删除与按下标定位具有相同开销"
+      ],
+      "ai_context": "画出四处链接更新，区分定位成本和局部修改成本。",
+      "mastery_rule_key": "graph-metadata-v1"
+    },
+    {
+      "id": "graph-representation",
+      "name": "图的表示（邻接矩阵与邻接表）",
+      "chapter": "图",
+      "difficulty": 3,
+      "description": "用顶点与边建模关系，并用邻接矩阵或邻接表存储。",
+      "prerequisites": [
+        "array",
+        "single-linked-list"
+      ],
+      "learning_objectives": [
+        "比较稠密/稀疏图的两种存储",
+        "区分有向/无向边和邻接遍历成本"
+      ],
+      "common_misconceptions": [
+        "无向图每条边只需记录一个方向",
+        "邻接矩阵和邻接表遍历邻居的成本相同"
+      ],
+      "ai_context": "固定简单图示例与有向性，不把存储选择当作算法保证。",
+      "mastery_rule_key": "graph-metadata-v1"
+    },
+    {
+      "id": "heap-sort",
+      "name": "堆排序",
+      "chapter": "排序",
+      "difficulty": 3,
+      "description": "利用堆序不断取出极值确定有序区间的排序。",
+      "prerequisites": [
+        "binary-heap"
+      ],
+      "learning_objectives": [
+        "说明建堆与反复调整阶段",
+        "区分普通堆排序的稳定性与最坏代价"
+      ],
+      "common_misconceptions": [
+        "逐个插入建堆和自底向上建堆代价总相同",
+        "普通堆排序是稳定排序"
+      ],
+      "ai_context": "固定升序最大堆，分开线性建堆和重复下沉的成本。",
+      "mastery_rule_key": "graph-metadata-v1"
+    },
+    {
+      "id": "insertion-sort",
+      "name": "插入排序",
+      "chapter": "排序",
+      "difficulty": 2,
+      "description": "将当前元素插入已排序前缀的合适位置。",
+      "prerequisites": [
+        "array"
+      ],
+      "learning_objectives": [
+        "维护已排序前缀不变式",
+        "说明搬移成本与近乎有序输入的影响"
+      ],
+      "common_misconceptions": [
+        "找到插入位置后不会搬移元素",
+        "二分定位使数组插入排序最坏代价变成n log n"
+      ],
+      "ai_context": "分开定位和搬移成本，严格大于时搬移以保持相等键顺序。",
+      "mastery_rule_key": "graph-metadata-v1"
+    },
+    {
+      "id": "linked-list-concept",
+      "name": "链表概念",
+      "chapter": "线性表",
+      "difficulty": 1,
+      "description": "由分散节点通过链接形成的线性结构，节点同时保存数据和后继连接。",
+      "prerequisites": [
+        "c-pointer"
+      ],
+      "learning_objectives": [
+        "说出链表节点的数据域与链域",
+        "对比链表与数组的存储方式"
+      ],
+      "common_misconceptions": [
+        "链表节点在内存中必须连续",
+        "指针保存的是下一个节点的数值"
+      ],
+      "ai_context": "先讲数据域和 next 链域，再展示分散地址之间的箭头连接。",
+      "mastery_rule_key": "linear-structure-v1"
+    },
+    {
+      "id": "linked-list-deletion",
+      "name": "链表删除",
+      "chapter": "线性表",
+      "difficulty": 3,
+      "description": "在单链表中通过修改前驱节点的 next 链接移除目标节点。",
+      "prerequisites": [
+        "c-pointer",
+        "linked-list-traversal"
+      ],
+      "learning_objectives": [
+        "写出删除中间节点的链接更新顺序",
+        "处理删除首节点和未找到目标的边界情况"
+      ],
+      "common_misconceptions": [
+        "可以直接跳过目标节点而不保存前驱",
+        "删除头节点与删除中间节点的代码完全相同"
+      ],
+      "ai_context": "高亮 prev、target和target->next，分步动画先断开哪条连接、后更新哪个 next。",
+      "mastery_rule_key": "linear-structure-v1"
+    },
+    {
+      "id": "linked-list-insertion",
+      "name": "链表插入",
+      "chapter": "线性表",
+      "difficulty": 3,
+      "description": "在单链表中创建新节点，并以正确顺序重连 next 链接。",
+      "prerequisites": [
+        "c-pointer",
+        "linked-list-traversal"
+      ],
+      "learning_objectives": [
+        "写出中间插入的两步连接更新",
+        "处理头插、尾插和位置不合法的边界情况"
+      ],
+      "common_misconceptions": [
+        "可以先让 prev->next 指向新节点再保存后继",
+        "插入中间位置不需要前驱节点"
+      ],
+      "ai_context": "继续使用箭头比喻：先保存新节点指向的旧后继，再连接前驱。",
+      "mastery_rule_key": "linear-structure-v1"
+    },
+    {
+      "id": "linked-list-traversal",
+      "name": "链表遍历",
+      "chapter": "线性表",
+      "difficulty": 2,
+      "description": "从头指针出发，依次访问每个节点直到 NULL 的过程。",
+      "prerequisites": [
+        "single-linked-list"
+      ],
+      "learning_objectives": [
+        "写出以 NULL 为结束条件的遍历循环",
+        "解释链表按位置访问的时间复杂度"
+      ],
+      "common_misconceptions": [
+        "链表可以像数组一样按下标访问",
+        "遍历到最后节点时应该停在节点本身而不是 NULL"
+      ],
+      "ai_context": "用一个移动的 cur 指针标记当前节点，每步强调 cur = cur->next。",
+      "mastery_rule_key": "linear-structure-v1"
+    },
+    {
+      "id": "linked-stack",
+      "name": "链栈",
+      "chapter": "栈和队列",
+      "difficulty": 2,
+      "description": "用链表头部作为栈顶实现后进先出的栈。",
+      "prerequisites": [
+        "stack",
+        "linked-list-insertion",
+        "linked-list-deletion"
+      ],
+      "learning_objectives": [
+        "说明头插与头删对应push/pop",
+        "识别空栈与节点释放边界"
+      ],
+      "common_misconceptions": [
+        "单链表尾端pop总是O(1)",
+        "链栈无需检查分配失败或空栈"
+      ],
+      "ai_context": "只演示头部栈顶，说明C节点所有权与释放。",
+      "mastery_rule_key": "graph-metadata-v1"
+    },
+    {
+      "id": "merge-sort",
+      "name": "归并排序",
+      "chapter": "排序",
+      "difficulty": 3,
+      "description": "递归拆分并合并已排序区间的分治排序。",
+      "prerequisites": [
+        "array"
+      ],
+      "learning_objectives": [
+        "解释递归基例与合并不变式",
+        "说明数组辅助空间及稳定合并条件"
+      ],
+      "common_misconceptions": [
+        "合并不需要比较两个区间的头部元素",
+        "所有归并排序实现都不需要额外空间"
+      ],
+      "ai_context": "先补递归/分治；数组实现说明辅助缓冲，相等键先取左侧。",
+      "mastery_rule_key": "graph-metadata-v1"
+    },
+    {
+      "id": "queue",
+      "name": "队列",
+      "chapter": "线性表",
+      "difficulty": 2,
+      "description": "遵循先进先出（FIFO）规则的受限线性结构。",
+      "prerequisites": [
+        "array"
+      ],
+      "learning_objectives": [
+        "区分入队、出队与查看队首",
+        "说明 FIFO 规则与实际队列的对应"
+      ],
+      "common_misconceptions": [
+        "队列与栈都是后进先出",
+        "入队和出队都在同一端进行"
+      ],
+      "ai_context": "用排队比喻固定 front 和 rear，展示 enqueue 与 dequeue 发生在不同端。",
+      "mastery_rule_key": "linear-structure-v1"
+    },
+    {
+      "id": "quick-sort",
+      "name": "快速排序",
+      "chapter": "排序",
+      "difficulty": 3,
+      "description": "以枢轴划分区间并递归处理子区间的分治排序。",
+      "prerequisites": [
+        "array"
+      ],
+      "learning_objectives": [
+        "说明递归基例与划分后的边界",
+        "区分平均与最坏复杂度及普通版本稳定性"
+      ],
+      "common_misconceptions": [
+        "任意枢轴选择都保证最坏n log n",
+        "一次划分已把所有元素完全排序"
+      ],
+      "ai_context": "先补递归/分治，固定一种划分方案，不混用不同边界规则。",
+      "mastery_rule_key": "graph-metadata-v1"
+    },
+    {
+      "id": "selection-sort",
+      "name": "选择排序",
+      "chapter": "排序",
+      "difficulty": 2,
+      "description": "每趟选取未排序区间的极值并放到确定位置。",
+      "prerequisites": [
+        "array"
+      ],
+      "learning_objectives": [
+        "解释选取位置与交换次数",
+        "区分比较次数与稳定性"
+      ],
+      "common_misconceptions": [
+        "选择排序只有线性比较次数",
+        "普通交换式选择排序一定稳定"
+      ],
+      "ai_context": "用带标识的重复键举例，区分少交换与稳定。",
+      "mastery_rule_key": "graph-metadata-v1"
+    },
+    {
+      "id": "single-linked-list",
+      "name": "单链表",
+      "chapter": "线性表",
+      "difficulty": 2,
+      "description": "每个节点只保存一个 next 指针的链式线性表。",
+      "prerequisites": [
+        "c-pointer",
+        "linked-list-concept"
+      ],
+      "learning_objectives": [
+        "定义包含数据域和 next 的节点",
+        "说明 head 为 NULL 的空链表表示"
+      ],
+      "common_misconceptions": [
+        "最后一个节点的 next 指向自身",
+        "链表只需要保存头结点值而不需要头指针"
+      ],
+      "ai_context": "将 head 、普通节点、NULL 绘制为三种角色，明确标出最后一个 next 为 NULL。",
+      "mastery_rule_key": "linear-structure-v1"
+    },
+    {
+      "id": "sorting-comparison",
+      "name": "排序算法对比",
+      "chapter": "排序",
+      "difficulty": 3,
+      "description": "依据稳定性、空间、输入分布和复杂度选择排序策略。",
+      "prerequisites": [
+        "bubble-sort",
+        "selection-sort",
+        "insertion-sort",
+        "quick-sort",
+        "merge-sort",
+        "heap-sort"
+      ],
+      "learning_objectives": [
+        "比较六种排序的适用条件",
+        "区分稳定性、原地与时间复杂度三个维度"
+      ],
+      "common_misconceptions": [
+        "渐近复杂度较好就对所有小输入都更快",
+        "原地排序一定稳定"
+      ],
+      "ai_context": "同一实现条件下对比，最好/平均/最坏与额外空间分别标注。",
+      "mastery_rule_key": "graph-metadata-v1"
+    },
+    {
+      "id": "stack",
+      "name": "栈",
+      "chapter": "线性表",
+      "difficulty": 2,
+      "description": "遵循后进先出（LIFO）规则的受限线性结构。",
+      "prerequisites": [
+        "array"
+      ],
+      "learning_objectives": [
+        "区分入栈、出栈与查看栈顶",
+        "说明 LIFO 规则与调用栈的直观关系"
+      ],
+      "common_misconceptions": [
+        "栈可以从栈底直接删除元素",
+        "栈与队列的出元素顺序一样"
+      ],
+      "ai_context": "使用盘子堆叠的比喻，将所有操作聚焦在栈顶。",
+      "mastery_rule_key": "linear-structure-v1"
+    },
+    {
+      "id": "tree-concept",
+      "name": "树的基本概念",
+      "chapter": "树",
+      "difficulty": 2,
+      "description": "表达根、父子关系和层次的树结构。",
+      "prerequisites": [
+        "c-pointer"
+      ],
+      "learning_objectives": [
+        "辨认根、父节点、叶子和子树",
+        "说明深度与高度的计数约定"
+      ],
+      "common_misconceptions": [
+        "所有树节点都有父节点",
+        "深度和高度始终相同"
+      ],
+      "ai_context": "固定以边数计数的约定，区分一般树与二叉树。",
+      "mastery_rule_key": "graph-metadata-v1"
+    }
+  ],
+  "relations": [
+    {
+      "from": "array",
+      "to": "single-linked-list",
+      "type": "SIMILAR_TO"
+    },
+    {
+      "from": "array-stack",
+      "to": "array",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "array-stack",
+      "to": "linked-stack",
+      "type": "SIMILAR_TO"
+    },
+    {
+      "from": "array-stack",
+      "to": "stack",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "array-stack",
+      "to": "stack",
+      "type": "EXTENDS"
+    },
+    {
+      "from": "balanced-binary-search-tree",
+      "to": "binary-search-tree",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "balanced-binary-search-tree",
+      "to": "binary-search-tree",
+      "type": "EXTENDS"
+    },
+    {
+      "from": "binary-heap",
+      "to": "array",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "binary-heap",
+      "to": "binary-tree",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "binary-heap",
+      "to": "binary-tree",
+      "type": "EXTENDS"
+    },
+    {
+      "from": "binary-search-tree",
+      "to": "binary-tree",
+      "type": "EXTENDS"
+    },
+    {
+      "from": "binary-search-tree",
+      "to": "binary-tree-traversal",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "binary-tree",
+      "to": "tree-concept",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "binary-tree",
+      "to": "tree-concept",
+      "type": "EXTENDS"
+    },
+    {
+      "from": "binary-tree-traversal",
+      "to": "binary-tree",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "binary-tree-traversal",
+      "to": "queue",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "binary-tree-traversal",
+      "to": "stack",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "breadth-first-search",
+      "to": "depth-first-search",
+      "type": "SIMILAR_TO"
+    },
+    {
+      "from": "breadth-first-search",
+      "to": "graph-representation",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "breadth-first-search",
+      "to": "queue",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "bubble-sort",
+      "to": "array",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "circular-linked-list",
+      "to": "doubly-linked-list",
+      "type": "SIMILAR_TO"
+    },
+    {
+      "from": "circular-linked-list",
+      "to": "linked-list-traversal",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "circular-linked-list",
+      "to": "single-linked-list",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "circular-linked-list",
+      "to": "single-linked-list",
+      "type": "EXTENDS"
+    },
+    {
+      "from": "circular-queue",
+      "to": "array",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "circular-queue",
+      "to": "queue",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "circular-queue",
+      "to": "queue",
+      "type": "EXTENDS"
+    },
+    {
+      "from": "depth-first-search",
+      "to": "breadth-first-search",
+      "type": "SIMILAR_TO"
+    },
+    {
+      "from": "depth-first-search",
+      "to": "graph-representation",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "depth-first-search",
+      "to": "stack",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "doubly-linked-list",
+      "to": "circular-linked-list",
+      "type": "SIMILAR_TO"
+    },
+    {
+      "from": "doubly-linked-list",
+      "to": "linked-list-deletion",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "doubly-linked-list",
+      "to": "linked-list-insertion",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "doubly-linked-list",
+      "to": "single-linked-list",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "doubly-linked-list",
+      "to": "single-linked-list",
+      "type": "EXTENDS"
+    },
+    {
+      "from": "graph-representation",
+      "to": "array",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "graph-representation",
+      "to": "single-linked-list",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "heap-sort",
+      "to": "binary-heap",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "insertion-sort",
+      "to": "array",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "linked-list-concept",
+      "to": "c-pointer",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "linked-list-deletion",
+      "to": "c-pointer",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "linked-list-deletion",
+      "to": "linked-list-traversal",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "linked-list-insertion",
+      "to": "c-pointer",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "linked-list-insertion",
+      "to": "linked-list-traversal",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "linked-list-traversal",
+      "to": "single-linked-list",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "linked-stack",
+      "to": "array-stack",
+      "type": "SIMILAR_TO"
+    },
+    {
+      "from": "linked-stack",
+      "to": "linked-list-deletion",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "linked-stack",
+      "to": "linked-list-insertion",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "linked-stack",
+      "to": "stack",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "linked-stack",
+      "to": "stack",
+      "type": "EXTENDS"
+    },
+    {
+      "from": "merge-sort",
+      "to": "array",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "merge-sort",
+      "to": "quick-sort",
+      "type": "SIMILAR_TO"
+    },
+    {
+      "from": "queue",
+      "to": "array",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "quick-sort",
+      "to": "array",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "quick-sort",
+      "to": "merge-sort",
+      "type": "SIMILAR_TO"
+    },
+    {
+      "from": "selection-sort",
+      "to": "array",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "single-linked-list",
+      "to": "array",
+      "type": "SIMILAR_TO"
+    },
+    {
+      "from": "single-linked-list",
+      "to": "c-pointer",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "single-linked-list",
+      "to": "linked-list-concept",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "single-linked-list",
+      "to": "linked-list-concept",
+      "type": "EXTENDS"
+    },
+    {
+      "from": "sorting-comparison",
+      "to": "bubble-sort",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "sorting-comparison",
+      "to": "heap-sort",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "sorting-comparison",
+      "to": "insertion-sort",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "sorting-comparison",
+      "to": "merge-sort",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "sorting-comparison",
+      "to": "quick-sort",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "sorting-comparison",
+      "to": "selection-sort",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "stack",
+      "to": "array",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "tree-concept",
+      "to": "c-pointer",
+      "type": "DEPENDS_ON"
+    }
+  ]
+}

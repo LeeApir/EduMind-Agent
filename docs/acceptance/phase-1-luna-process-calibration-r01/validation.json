@@ -1,0 +1,42 @@
+{
+  "scope": "zero-call criterion calibration preparation only; not execution freeze or formal quality evidence",
+  "real_provider_requests": 0,
+  "authorized_requests": 0,
+  "independent_human_labels": "pending",
+  "commands": [
+    {
+      "command": "backend/.venv/bin/pytest -q scripts/tests/test_luna_process_calibration.py scripts/tests/test_luna_schema_validation.py",
+      "result": "29 passed; no skipped"
+    },
+    {
+      "command": "backend/.venv/bin/ruff check scripts/prepare_luna_process_calibration.py scripts/tests/test_luna_process_calibration.py",
+      "result": "passed"
+    },
+    {
+      "command": "backend/.venv/bin/python scripts/prepare_luna_process_calibration.py",
+      "result": "4 complete materials reproduced; model/instruction/projected schema unchanged; no network/key access"
+    },
+    {
+      "command": "python3 scripts/check_catalog_workflow.py",
+      "result": "passed"
+    },
+    {
+      "command": "git diff --check",
+      "result": "passed"
+    }
+  ],
+  "limits": [
+    "semantic judgments are author review pending independent human confirmation",
+    "request previews are derived offline, not final executor outbound proof",
+    "no production changes or new business integration tests",
+    "no code compilation/execution or new mastery evidence"
+  ],
+  "initial_failures_retained_in_log": [
+    "initial builder hit existing objective-exercise format gate; corrected material suffixes/blank formats, no gate relaxation",
+    "initial exact schema equality detected one fewer code-step anchor in teaching-gap; retained two generic non-teaching steps and same schema enum size",
+    "first test run 28 passed/1 failed: old r02 summary uses actual_http_requests/run_halted, corrected version-specific assertion; no original result modified"
+  ],
+  "historical_evidence": "all files in old 412/427 manifests hash-verified unchanged; r02 actual1/halted/11 unsent, schema-validation actual1/stopped/needs_human/not accepted",
+  "production_mode": "catalog_only unchanged",
+  "T040": "blocked"
+}

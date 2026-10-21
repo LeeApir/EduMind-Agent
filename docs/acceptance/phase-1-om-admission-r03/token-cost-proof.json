@@ -1,0 +1,29 @@
+{
+  "checked_on": "2026-10-15",
+  "model": "deepseek-flash",
+  "documented_revision": "DeepSeek-V4.1-Flash",
+  "immutable_weights_revision": "UNKNOWN",
+  "currency": "CNY",
+  "context_input_ceiling": 1048576,
+  "input_bound": "1048576 + exact_wire_bytes (positive slack only; bytes are not Tokens)",
+  "derivation": "Official 1M model window bounds all accepted text input including service formatting. Use max(1000000,2**20). Output reserve is separate, deliberately double conservative. No exact tokenizer or consumption prediction claimed.",
+  "input_micro_cny_per_million": 2000000,
+  "output_micro_cny_per_million": 8000000,
+  "output_ceiling_per_request_including_reasoning": 2048,
+  "discount_assumed": false,
+  "expected_cost": null,
+  "sources": [
+    "https://api-docs.deepseek.com/zh-cn/quick_start/pricing/",
+    "https://api-docs.deepseek.com/quick_start/pricing/",
+    "https://api-docs.deepseek.com/api/create-response/"
+  ],
+  "source_access": "2026-10-15 official English page and Responses direct open; Chinese official search excerpt (direct opens timed out). CNY prices not converted from USD.",
+  "assumptions": [
+    "Provider honors current window, prices and total-output cap.",
+    "Only text JSON Responses; no tools, image, search or extra charges.",
+    "Recheck official terms on execution day; changed or unverifiable terms stop.",
+    "Application reservation is not a provider-account hard spend limit; a provider violation may exceed it and must halt."
+  ],
+  "prior_proof_sha256": "5c4c8b6b0f46d9abf4b0c4e7f3a2da8e14c64a6bee17b509ee298510edb7a520",
+  "scope": "New r03 fixed-ID calibration only; no old approval inherited. Recheck prices on execution day."
+}

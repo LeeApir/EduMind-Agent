@@ -1,0 +1,73 @@
+{
+  "type": "quiz",
+  "questions": [
+    {
+      "id": "q1",
+      "type": "single",
+      "question": "从一个空链表开始，依次用头插法插入结点 1、2、3，每次都把新结点插在链表头部。插入完成后，从 head 开始遍历并输出结点数据，输出顺序是什么？",
+      "options": [
+        {
+          "value": "A",
+          "label": "1 2 3"
+        },
+        {
+          "value": "B",
+          "label": "3 2 1"
+        },
+        {
+          "value": "C",
+          "label": "1 3 2"
+        },
+        {
+          "value": "D",
+          "label": "2 1 3"
+        }
+      ],
+      "answer": [
+        "B"
+      ],
+      "analysis": "头插法的特点是后插入的结点总在链表最前面。空链表插入 1 后为 1；再头插 2，得到 2 -> 1；再头插 3，得到 3 -> 2 -> 1。因此从头遍历输出顺序是 3 2 1。",
+      "points": 10,
+      "hasAnswer": true
+    },
+    {
+      "id": "q2",
+      "type": "multiple",
+      "question": "下列用头插法把值为 value 的新结点插入到以 head 为头指针的单链表中的代码片段，哪些写法是正确的？（多选）",
+      "options": [
+        {
+          "value": "A",
+          "label": "struct Node *newNode = (struct Node *)malloc(sizeof(struct Node)); newNode->data = value; newNode->next = head; head = newNode;"
+        },
+        {
+          "value": "B",
+          "label": "struct Node *newNode = (struct Node *)malloc(sizeof(struct Node)); head = newNode; newNode->data = value; newNode->next = head;"
+        },
+        {
+          "value": "C",
+          "label": "struct Node *newNode = (struct Node *)malloc(sizeof(struct Node)); newNode->next = head; newNode->data = value; head = newNode;"
+        },
+        {
+          "value": "D",
+          "label": "struct Node *newNode = (struct Node *)malloc(sizeof(struct Node)); newNode->data = value; newNode->next = head; head = newNode; free(newNode);"
+        }
+      ],
+      "answer": [
+        "A",
+        "C"
+      ],
+      "analysis": "A 和 C 都先把 newNode->next 指向原来的 head，再把 head 改为 newNode，所以新结点正确接到旧链表前面。B 先把 head 改成 newNode，再执行 newNode->next = head，会让 newNode->next 指向自己，并且丢失原来的链表。D 在把 newNode 接入链表后又 free(newNode)，head 会指向已经释放的内存，造成悬空指针。",
+      "points": 15,
+      "hasAnswer": true
+    },
+    {
+      "id": "q3",
+      "type": "short_answer",
+      "question": "在头插法中，为什么必须先写 newNode->next = head，再写 head = newNode？请结合从空链表依次插入 1、2、3 的过程说明。",
+      "commentPrompt": "评分细则：(1) 能指出 head 保存旧链表首结点地址，若先改 head 会丢失旧链表，占 40%；(2) 能说明 newNode->next = head 是把新结点接到旧链表前面，占 30%；(3) 能结合 1、2、3 的插入过程说明最终链表为 3 -> 2 -> 1，占 20%；(4) 表达清晰、术语准确，占 10%。",
+      "analysis": "head 中保存的是当前链表第一个结点的地址。执行 newNode->next = head 时，新结点的 next 先记住旧链表头，这样新结点才能接到旧链表前面；然后再执行 head = newNode，让头指针指向新结点。如果顺序反过来，先执行 head = newNode，旧链表第一个结点的地址就被覆盖了，旧链表会丢失。结合例子：空链表插入 1 后 head 指向 1；插入 2 时先让 2->next 指向 1，再让 head 指向 2，得到 2 -> 1；插入 3 时先让 3->next 指向 2，再让 head 指向 3，最终得到 3 -> 2 -> 1。",
+      "points": 20,
+      "hasAnswer": false
+    }
+  ]
+}

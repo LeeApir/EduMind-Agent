@@ -1,0 +1,190 @@
+{
+  "schema_version": "plan-boundary-evaluation-v1",
+  "lane": "plan_review",
+  "case_id": "D01",
+  "slot_id": "D01",
+  "mode": "real",
+  "status": "pending",
+  "artifacts": {
+    "material_sha256": "c01264fb5412fe15b040bf38d0ed9e560d9e124342d3b725fa67968d527d993e",
+    "request_sha256": "0faa9e9c9ff46191e566a8a43db694e4224172e9ab0ca3bc7a54789d469bef06",
+    "response_sha256": "7add562092363576eb248148e15965c32dbc99c7d8f25aa4ad3cb3f8782699fd"
+  },
+  "evaluator": {
+    "name": "Codex",
+    "role": "gpt_draft",
+    "signed": false
+  },
+  "inventories_complete": {
+    "all_assertions": true,
+    "all_citations": true
+  },
+  "scores": {
+    "technical_integrity": "pass",
+    "severe_detection": "not_applicable",
+    "incidental_falsehoods": "present",
+    "teaching_coverage": "gap",
+    "citation_quality": "fail",
+    "quality_success": null,
+    "matches_frozen_label": false
+  },
+  "claims": [
+    {
+      "id": "c001",
+      "text": "自报必检项目：goal_fidelity",
+      "verdict": "supported",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/coverage/checked/0"
+      ],
+      "reason": "仅核对五项必检声明及空unchecked的结构，不把自报已检当作语义正确、独立评分或自动发布证据。"
+    },
+    {
+      "id": "c002",
+      "text": "自报必检项目：internal_consistency",
+      "verdict": "supported",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/coverage/checked/1"
+      ],
+      "reason": "仅核对五项必检声明及空unchecked的结构，不把自报已检当作语义正确、独立评分或自动发布证据。"
+    },
+    {
+      "id": "c003",
+      "text": "自报必检项目：scope",
+      "verdict": "supported",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/coverage/checked/2"
+      ],
+      "reason": "仅核对五项必检声明及空unchecked的结构，不把自报已检当作语义正确、独立评分或自动发布证据。"
+    },
+    {
+      "id": "c004",
+      "text": "自报必检项目：reference_support",
+      "verdict": "supported",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/coverage/checked/3"
+      ],
+      "reason": "仅核对五项必检声明及空unchecked的结构，不把自报已检当作语义正确、独立评分或自动发布证据。"
+    },
+    {
+      "id": "c005",
+      "text": "自报必检项目：downstream_feasibility",
+      "verdict": "supported",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/coverage/checked/4"
+      ],
+      "reason": "仅核对五项必检声明及空unchecked的结构，不把自报已检当作语义正确、独立评分或自动发布证据。"
+    },
+    {
+      "id": "c006",
+      "text": "模型category=coverage_plan_gap",
+      "verdict": "insufficient",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/findings/0/category",
+        "/material/plan"
+      ],
+      "reason": "该覆盖缺口本身未成立，因而coverage_plan_gap/major以及据此转人工或重建的建议均无充分依据；核心真实错误另记，不能被此抵消。"
+    },
+    {
+      "id": "c007",
+      "text": "计划包含exercise场景。",
+      "verdict": "supported",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/findings/0/condition_or_counterexample",
+        "/material/plan/scenes/2/role"
+      ],
+      "reason": "核对本字段及所列完整原文/计划；保留条件命题与实际缺陷的区别。"
+    },
+    {
+      "id": "c008",
+      "text": "整个计划没有承诺三道题。",
+      "verdict": "contradicted",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/findings/0/condition_or_counterexample",
+        "/material/plan/objectives/0/text"
+      ],
+      "reason": "目标/goal已明确承诺相应交付，场景角色只是分工；不能把未来尚未生成的资源当作当前计划已缺承诺，或要求在场景重复同一承诺。条件式“若少交则违约”本身不等于已发生缺口。"
+    },
+    {
+      "id": "c009",
+      "text": "若以后只交少于三题，将不满足三题要求。",
+      "verdict": "supported",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/findings/0/condition_or_counterexample",
+        "/material/plan/goal"
+      ],
+      "reason": "核对本字段及所列完整原文/计划；保留条件命题与实际缺陷的区别。"
+    },
+    {
+      "id": "c010",
+      "text": "因此当前计划缺少题数承诺，需拦截或重建。",
+      "verdict": "insufficient",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/findings/0/condition_or_counterexample",
+        "/material/plan/goal"
+      ],
+      "reason": "目标/goal已明确承诺相应交付，场景角色只是分工；不能把未来尚未生成的资源当作当前计划已缺承诺，或要求在场景重复同一承诺。条件式“若少交则违约”本身不等于已发生缺口。"
+    },
+    {
+      "id": "c011",
+      "text": "实际后续课程可能漏交练习；当前材料足以把它认定为计划缺口。",
+      "verdict": "insufficient",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/findings/0/impact",
+        "/material/plan/goal"
+      ],
+      "reason": "目标/goal已明确承诺相应交付，场景角色只是分工；不能把未来尚未生成的资源当作当前计划已缺承诺，或要求在场景重复同一承诺。条件式“若少交则违约”本身不等于已发生缺口。"
+    },
+    {
+      "id": "c012",
+      "text": "模型severity=major",
+      "verdict": "insufficient",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/findings/0/severity",
+        "/material/plan"
+      ],
+      "reason": "该覆盖缺口本身未成立，因而coverage_plan_gap/major以及据此转人工或重建的建议均无充分依据；核心真实错误另记，不能被此抵消。"
+    },
+    {
+      "id": "c013",
+      "text": "模型suggested_action=consider_rebuild",
+      "verdict": "insufficient",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/findings/0/suggested_action",
+        "/material/plan"
+      ],
+      "reason": "该覆盖缺口本身未成立，因而coverage_plan_gap/major以及据此转人工或重建的建议均无充分依据；核心真实错误另记，不能被此抵消。"
+    },
+    {
+      "id": "c014",
+      "text": "本条结论issue及服务端路线needs_human",
+      "verdict": "contradicted",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/verdict",
+        "/result/plan_check/server_assessment",
+        "/material/plan"
+      ],
+      "reason": "与冻结预标签比较；D05/D06转人工有真实矛盾，D07严重越界应reject，D08应保留未决；D01/D04正确计划被误拦。"
+    }
+  ],
+  "citations": [
+    {
+      "anchor_id": "1:p22",
+      "source_pointer": "/review_sources/1:p22/source_text",
+      "quoted_source": "exercise",
+      "supports_claim_ids": [
+        "c007"
+      ],
+      "verdict": "insufficient",
+      "reason": "逐项核对实际/scenes/2/role字段。该字段至多支持原要求/场景角色；不能证明完整计划没有相关承诺。引用未伪造位置，但不能借其他字段推出全局缺失。"
+    }
+  ],
+  "automatic_publication_completed": false,
+  "eligible_for_T040_denominator": false,
+  "notes": "Codex逐字段/原子命题和实际锚点核对草稿；不是Lee独立签核。quality_success保持null，不提交assess/不入正式分子。teaching_coverage仅评模型覆盖判断是否成立，不宣称尚未生成的学习资源已交付。每个引用只能支持其实际字段命题，引用表须结合逐命题证据看。",
+  "run_id": "plan-boundary-development-r01",
+  "package_manifest_sha256": "f0fd9f143a39b43fea7b9d7f30f65c0a3da77c23f7c8a5ef13f58ca3e2d52ef1",
+  "dimensions": {
+    "core_detection": "not_applicable",
+    "false_block": true
+  }
+}

@@ -1,0 +1,99 @@
+{
+  "schema_version": "plan-boundary-evaluation-v1",
+  "lane": "plan_review",
+  "case_id": "D02",
+  "slot_id": "D02",
+  "mode": "real",
+  "status": "pending",
+  "artifacts": {
+    "material_sha256": "32a95da97e58f096099bd85cdc0e3f096d55c011848f795b9b675661044a33c6",
+    "request_sha256": "1291f0d277c5c6e84d1d48815cd9bd33ce2ce7fd2876d406b6326ebbe4818b29",
+    "response_sha256": "3921ad25e14ebb145fc081f72753be9d2bb13be441c1276a8513ac7c4fd46bbe"
+  },
+  "evaluator": {
+    "name": "Codex",
+    "role": "gpt_draft",
+    "signed": false
+  },
+  "inventories_complete": {
+    "all_assertions": true,
+    "all_citations": true
+  },
+  "scores": {
+    "technical_integrity": "pass",
+    "severe_detection": "not_applicable",
+    "incidental_falsehoods": "none",
+    "teaching_coverage": "pass",
+    "citation_quality": "not_applicable",
+    "quality_success": null,
+    "matches_frozen_label": true
+  },
+  "claims": [
+    {
+      "id": "c001",
+      "text": "自报必检项目：goal_fidelity",
+      "verdict": "supported",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/coverage/checked/0"
+      ],
+      "reason": "仅核对五项必检声明及空unchecked的结构，不把自报已检当作语义正确、独立评分或自动发布证据。"
+    },
+    {
+      "id": "c002",
+      "text": "自报必检项目：internal_consistency",
+      "verdict": "supported",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/coverage/checked/1"
+      ],
+      "reason": "仅核对五项必检声明及空unchecked的结构，不把自报已检当作语义正确、独立评分或自动发布证据。"
+    },
+    {
+      "id": "c003",
+      "text": "自报必检项目：scope",
+      "verdict": "supported",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/coverage/checked/2"
+      ],
+      "reason": "仅核对五项必检声明及空unchecked的结构，不把自报已检当作语义正确、独立评分或自动发布证据。"
+    },
+    {
+      "id": "c004",
+      "text": "自报必检项目：reference_support",
+      "verdict": "supported",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/coverage/checked/3"
+      ],
+      "reason": "仅核对五项必检声明及空unchecked的结构，不把自报已检当作语义正确、独立评分或自动发布证据。"
+    },
+    {
+      "id": "c005",
+      "text": "自报必检项目：downstream_feasibility",
+      "verdict": "supported",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/coverage/checked/4"
+      ],
+      "reason": "仅核对五项必检声明及空unchecked的结构，不把自报已检当作语义正确、独立评分或自动发布证据。"
+    },
+    {
+      "id": "c006",
+      "text": "本条结论pass及服务端路线accept_plan",
+      "verdict": "supported",
+      "evidence_pointers": [
+        "/parsed_calls/0/value/verdict",
+        "/result/plan_check/server_assessment",
+        "/material/plan"
+      ],
+      "reason": "与冻结预标签比较；D05/D06转人工有真实矛盾，D07严重越界应reject，D08应保留未决；D01/D04正确计划被误拦。"
+    }
+  ],
+  "citations": [],
+  "automatic_publication_completed": false,
+  "eligible_for_T040_denominator": false,
+  "notes": "Codex逐字段/原子命题和实际锚点核对草稿；不是Lee独立签核。quality_success保持null，不提交assess/不入正式分子。teaching_coverage仅评模型覆盖判断是否成立，不宣称尚未生成的学习资源已交付。每个引用只能支持其实际字段命题，引用表须结合逐命题证据看。",
+  "run_id": "plan-boundary-development-r01",
+  "package_manifest_sha256": "f0fd9f143a39b43fea7b9d7f30f65c0a3da77c23f7c8a5ef13f58ca3e2d52ef1",
+  "dimensions": {
+    "core_detection": "not_applicable",
+    "false_block": false
+  }
+}

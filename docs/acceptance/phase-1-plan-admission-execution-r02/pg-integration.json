@@ -1,0 +1,29 @@
+{
+  "exit": 0,
+  "provider_calls": 0,
+  "final_paths": [
+    {
+      "evidence": "pg-integration-08.json",
+      "mode": "complete",
+      "exit": 0,
+      "database": "edumind_catalog_plan_admission_test_1792545922",
+      "actual_command": "backend/.venv/bin/python -m pytest -q scripts/tests/test_plan_admission_execution.py::test_full_isolated_pipeline_records_plan_check_and_original_binding[complete]"
+    },
+    {
+      "evidence": "pg-integration-09.json",
+      "mode": "needs_human",
+      "exit": 0,
+      "database": "edumind_catalog_plan_admission_test_1792545924",
+      "actual_command": "backend/.venv/bin/python -m pytest -q scripts/tests/test_plan_admission_execution.py::test_full_isolated_pipeline_records_plan_check_and_original_binding[needs_human]"
+    },
+    {
+      "evidence": "pg-integration-10.json",
+      "mode": "technical_failure",
+      "exit": 0,
+      "database": "edumind_catalog_plan_admission_test_1792545927",
+      "actual_command": "backend/.venv/bin/python -m pytest -q scripts/tests/test_plan_admission_execution.py::test_full_isolated_pipeline_records_plan_check_and_original_binding[technical_failure]"
+    }
+  ],
+  "correction": "Copied r01 pg-integration-02 through -07 retain outdated display commands. Their corrections are in r01/pg-integration.json. New r02 -08 through -10 record the exact executed parameterized command.",
+  "scope": "Three final actual isolated PostgreSQL paths; all upstream calls MockTransport."
+}

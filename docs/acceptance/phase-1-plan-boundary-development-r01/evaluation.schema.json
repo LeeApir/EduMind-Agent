@@ -1,0 +1,522 @@
+{
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "plan-boundary-evaluation-v1"
+    },
+    "lane": {
+      "enum": [
+        "fixed_review",
+        "plan_review",
+        "generation_draft",
+        "full_pipeline"
+      ]
+    },
+    "case_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "slot_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "mode": {
+      "enum": [
+        "not_run",
+        "mock",
+        "real"
+      ]
+    },
+    "status": {
+      "enum": [
+        "pending",
+        "technical_failure",
+        "evaluated"
+      ]
+    },
+    "artifacts": {
+      "type": "object",
+      "properties": {
+        "material_sha256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "request_sha256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "response_sha256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "material_sha256",
+        "request_sha256",
+        "response_sha256"
+      ],
+      "additionalProperties": false
+    },
+    "evaluator": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "role": {
+          "enum": [
+            "unassigned",
+            "gpt_draft",
+            "independent_human"
+          ]
+        },
+        "signed": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "name",
+        "role",
+        "signed"
+      ],
+      "additionalProperties": false
+    },
+    "inventories_complete": {
+      "type": "object",
+      "properties": {
+        "all_assertions": {
+          "type": "boolean"
+        },
+        "all_citations": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "all_assertions",
+        "all_citations"
+      ],
+      "additionalProperties": false
+    },
+    "scores": {
+      "type": "object",
+      "properties": {
+        "technical_integrity": {
+          "anyOf": [
+            {
+              "enum": [
+                "pass",
+                "fail"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "severe_detection": {
+          "anyOf": [
+            {
+              "enum": [
+                "pass",
+                "fail",
+                "not_applicable"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "incidental_falsehoods": {
+          "anyOf": [
+            {
+              "enum": [
+                "none",
+                "present",
+                "unassessed"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "teaching_coverage": {
+          "anyOf": [
+            {
+              "enum": [
+                "pass",
+                "gap",
+                "insufficient",
+                "not_applicable"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "citation_quality": {
+          "anyOf": [
+            {
+              "enum": [
+                "pass",
+                "fail",
+                "not_applicable"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "quality_success": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "matches_frozen_label": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "technical_integrity",
+        "severe_detection",
+        "incidental_falsehoods",
+        "teaching_coverage",
+        "citation_quality",
+        "quality_success",
+        "matches_frozen_label"
+      ],
+      "additionalProperties": false
+    },
+    "claims": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1
+          },
+          "verdict": {
+            "enum": [
+              "supported",
+              "contradicted",
+              "insufficient"
+            ]
+          },
+          "evidence_pointers": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^/"
+            },
+            "minItems": 1
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "id",
+          "text",
+          "verdict",
+          "evidence_pointers",
+          "reason"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "citations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "anchor_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_pointer": {
+            "type": "string",
+            "pattern": "^/"
+          },
+          "quoted_source": {
+            "type": "string",
+            "minLength": 1
+          },
+          "supports_claim_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "minItems": 1
+          },
+          "verdict": {
+            "enum": [
+              "supports",
+              "wrong_source",
+              "insufficient"
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "anchor_id",
+          "source_pointer",
+          "quoted_source",
+          "supports_claim_ids",
+          "verdict",
+          "reason"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "automatic_publication_completed": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "eligible_for_T040_denominator": {
+      "const": false
+    },
+    "notes": {
+      "type": "string"
+    },
+    "run_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "package_manifest_sha256": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "dimensions": {
+      "type": "object",
+      "properties": {
+        "core_detection": {
+          "enum": [
+            "detected",
+            "missed",
+            "not_applicable",
+            null
+          ]
+        },
+        "false_block": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "core_detection",
+        "false_block"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "schema_version",
+    "lane",
+    "case_id",
+    "slot_id",
+    "mode",
+    "status",
+    "artifacts",
+    "evaluator",
+    "inventories_complete",
+    "scores",
+    "claims",
+    "citations",
+    "automatic_publication_completed",
+    "eligible_for_T040_denominator",
+    "notes",
+    "run_id",
+    "package_manifest_sha256",
+    "dimensions"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "evaluated"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "mode": {
+            "const": "real"
+          },
+          "evaluator": {
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "role": {
+                "const": "independent_human"
+              },
+              "signed": {
+                "const": true
+              }
+            }
+          },
+          "inventories_complete": {
+            "properties": {
+              "all_assertions": {
+                "const": true
+              },
+              "all_citations": {
+                "const": true
+              }
+            }
+          },
+          "artifacts": {
+            "properties": {
+              "material_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "request_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "response_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            }
+          },
+          "run_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "package_manifest_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "scores": {
+            "properties": {
+              "quality_success": {
+                "const": true
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "status": {
+            "const": "evaluated"
+          },
+          "scores": {
+            "properties": {
+              "technical_integrity": {
+                "const": "pass"
+              },
+              "matches_frozen_label": {
+                "const": true
+              },
+              "incidental_falsehoods": {
+                "const": "none"
+              },
+              "citation_quality": {
+                "enum": [
+                  "pass",
+                  "not_applicable"
+                ]
+              },
+              "severe_detection": {
+                "enum": [
+                  "pass",
+                  "not_applicable"
+                ]
+              }
+            }
+          },
+          "claims": {
+            "items": {
+              "properties": {
+                "verdict": {
+                  "const": "supported"
+                }
+              }
+            }
+          },
+          "citations": {
+            "items": {
+              "properties": {
+                "verdict": {
+                  "const": "supports"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

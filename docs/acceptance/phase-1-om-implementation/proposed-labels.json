@@ -1,0 +1,352 @@
+[
+  {
+    "id": "new-severe-01",
+    "status": "ASSISTANT_PROPOSAL_PENDING_INDEPENDENT_HUMAN_REVIEW",
+    "expected_automatic_result": "reject_or_revise",
+    "primary_category": "code_safety",
+    "concrete_condition_or_counterexample": "a[3]越过长度3数组的最后合法下标2。"
+  },
+  {
+    "id": "new-correct-01",
+    "status": "ASSISTANT_PROPOSAL_PENDING_INDEPENDENT_HUMAN_REVIEW",
+    "expected_automatic_result": "pass",
+    "primary_category": null,
+    "concrete_condition_or_counterexample": "对照使用修正后的真实代码/准确返回值，仍须人工独立核对；不把此标签发送给模型。"
+  },
+  {
+    "id": "new-severe-02",
+    "status": "ASSISTANT_PROPOSAL_PENDING_INDEPENDENT_HUMAN_REVIEW",
+    "expected_automatic_result": "reject_or_revise",
+    "primary_category": "code_safety",
+    "concrete_condition_or_counterexample": "释放p后读取*p，访问已结束生命周期的对象。"
+  },
+  {
+    "id": "new-correct-02",
+    "status": "ASSISTANT_PROPOSAL_PENDING_INDEPENDENT_HUMAN_REVIEW",
+    "expected_automatic_result": "pass",
+    "primary_category": null,
+    "concrete_condition_or_counterexample": "对照使用修正后的真实代码/准确返回值，仍须人工独立核对；不把此标签发送给模型。"
+  },
+  {
+    "id": "new-severe-03",
+    "status": "ASSISTANT_PROPOSAL_PENDING_INDEPENDENT_HUMAN_REVIEW",
+    "expected_automatic_result": "reject_or_revise",
+    "primary_category": "code_safety",
+    "concrete_condition_or_counterexample": "局部自动对象x在函数返回时结束生命周期，返回指针被调用方解引用。"
+  },
+  {
+    "id": "new-correct-03",
+    "status": "ASSISTANT_PROPOSAL_PENDING_INDEPENDENT_HUMAN_REVIEW",
+    "expected_automatic_result": "pass",
+    "primary_category": null,
+    "concrete_condition_or_counterexample": "对照使用修正后的真实代码/准确返回值，仍须人工独立核对；不把此标签发送给模型。"
+  },
+  {
+    "id": "new-severe-04",
+    "status": "ASSISTANT_PROPOSAL_PENDING_INDEPENDENT_HUMAN_REVIEW",
+    "expected_automatic_result": "reject_or_revise",
+    "primary_category": "code_safety",
+    "concrete_condition_or_counterexample": "同一分配对象被free两次；第二次释放不是合法释放。"
+  },
+  {
+    "id": "new-correct-04",
+    "status": "ASSISTANT_PROPOSAL_PENDING_INDEPENDENT_HUMAN_REVIEW",
+    "expected_automatic_result": "pass",
+    "primary_category": null,
+    "concrete_condition_or_counterexample": "对照使用修正后的真实代码/准确返回值，仍须人工独立核对；不把此标签发送给模型。"
+  },
+  {
+    "id": "new-severe-05",
+    "status": "ASSISTANT_PROPOSAL_PENDING_INDEPENDENT_HUMAN_REVIEW",
+    "expected_automatic_result": "reject_or_revise",
+    "primary_category": "code_safety",
+    "concrete_condition_or_counterexample": "p为NULL时解引用。"
+  },
+  {
+    "id": "new-correct-05",
+    "status": "ASSISTANT_PROPOSAL_PENDING_INDEPENDENT_HUMAN_REVIEW",
+    "expected_automatic_result": "pass",
+    "primary_category": null,
+    "concrete_condition_or_counterexample": "对照使用修正后的真实代码/准确返回值，仍须人工独立核对；不把此标签发送给模型。"
+  },
+  {
+    "id": "new-severe-06",
+    "status": "ASSISTANT_PROPOSAL_PENDING_INDEPENDENT_HUMAN_REVIEW",
+    "expected_automatic_result": "reject_or_revise",
+    "primary_category": "code_safety",
+    "concrete_condition_or_counterexample": "对两个不同数组的指针做减法，不满足同一数组内指针差的前提。"
+  },
+  {
+    "id": "new-correct-06",
+    "status": "ASSISTANT_PROPOSAL_PENDING_INDEPENDENT_HUMAN_REVIEW",
+    "expected_automatic_result": "pass",
+    "primary_category": null,
+    "concrete_condition_or_counterexample": "对照使用修正后的真实代码/准确返回值，仍须人工独立核对；不把此标签发送给模型。"
+  },
+  {
+    "id": "new-severe-07",
+    "status": "ASSISTANT_PROPOSAL_PENDING_INDEPENDENT_HUMAN_REVIEW",
+    "expected_automatic_result": "reject_or_revise",
+    "primary_category": "code_safety",
+    "concrete_condition_or_counterexample": "把自动存储对象的地址传给free；它不是分配函数返回的指针。"
+  },
+  {
+    "id": "new-correct-07",
+    "status": "ASSISTANT_PROPOSAL_PENDING_INDEPENDENT_HUMAN_REVIEW",
+    "expected_automatic_result": "pass",
+    "primary_category": null,
+    "concrete_condition_or_counterexample": "对照使用修正后的真实代码/准确返回值，仍须人工独立核对；不把此标签发送给模型。"
+  },
+  {
+    "id": "new-severe-08",
+    "status": "ASSISTANT_PROPOSAL_PENDING_INDEPENDENT_HUMAN_REVIEW",
+    "expected_automatic_result": "reject_or_revise",
+    "primary_category": "code_safety",
+    "concrete_condition_or_counterexample": "实际整数除数为0，执行整数除法发生未定义行为。"
+  },
+  {
+    "id": "new-correct-08",
+    "status": "ASSISTANT_PROPOSAL_PENDING_INDEPENDENT_HUMAN_REVIEW",
+    "expected_automatic_result": "pass",
+    "primary_category": null,
+    "concrete_condition_or_counterexample": "对照使用修正后的真实代码/准确返回值，仍须人工独立核对；不把此标签发送给模型。"
+  },
+  {
+    "id": "new-severe-09",
+    "status": "ASSISTANT_PROPOSAL_PENDING_INDEPENDENT_HUMAN_REVIEW",
+    "expected_automatic_result": "reject_or_revise",
+    "primary_category": "code_safety",
+    "concrete_condition_or_counterexample": "写入字符串字面量，数组对象不可按这种方式修改。"
+  },
+  {
+    "id": "new-correct-09",
+    "status": "ASSISTANT_PROPOSAL_PENDING_INDEPENDENT_HUMAN_REVIEW",
+    "expected_automatic_result": "pass",
+    "primary_category": null,
+    "concrete_condition_or_counterexample": "对照使用修正后的真实代码/准确返回值，仍须人工独立核对；不把此标签发送给模型。"
+  },
+  {
+    "id": "new-severe-10",
+    "status": "ASSISTANT_PROPOSAL_PENDING_INDEPENDENT_HUMAN_REVIEW",
+    "expected_automatic_result": "reject_or_revise",
+    "primary_category": "code_safety",
+    "concrete_condition_or_counterexample": "循环i=2时写a[2]，超出合法下标0、1。"
+  },
+  {
+    "id": "new-correct-10",
+    "status": "ASSISTANT_PROPOSAL_PENDING_INDEPENDENT_HUMAN_REVIEW",
+    "expected_automatic_result": "pass",
+    "primary_category": null,
+    "concrete_condition_or_counterexample": "对照使用修正后的真实代码/准确返回值，仍须人工独立核对；不把此标签发送给模型。"
+  },
+  {
+    "id": "new-severe-11",
+    "status": "ASSISTANT_PROPOSAL_PENDING_INDEPENDENT_HUMAN_REVIEW",
+    "expected_automatic_result": "reject_or_revise",
+    "primary_category": "fact",
+    "concrete_condition_or_counterexample": "1+3+5+7=16。"
+  },
+  {
+    "id": "new-correct-11",
+    "status": "ASSISTANT_PROPOSAL_PENDING_INDEPENDENT_HUMAN_REVIEW",
+    "expected_automatic_result": "pass",
+    "primary_category": null,
+    "concrete_condition_or_counterexample": "对照使用修正后的真实代码/准确返回值，仍须人工独立核对；不把此标签发送给模型。"
+  },
+  {
+    "id": "new-severe-12",
+    "status": "ASSISTANT_PROPOSAL_PENDING_INDEPENDENT_HUMAN_REVIEW",
+    "expected_automatic_result": "reject_or_revise",
+    "primary_category": "fact",
+    "concrete_condition_or_counterexample": "循环体分别处理a、b、c，count递增3次。"
+  },
+  {
+    "id": "new-correct-12",
+    "status": "ASSISTANT_PROPOSAL_PENDING_INDEPENDENT_HUMAN_REVIEW",
+    "expected_automatic_result": "pass",
+    "primary_category": null,
+    "concrete_condition_or_counterexample": "对照使用修正后的真实代码/准确返回值，仍须人工独立核对；不把此标签发送给模型。"
+  },
+  {
+    "id": "new-severe-13",
+    "status": "ASSISTANT_PROPOSAL_PENDING_INDEPENDENT_HUMAN_REVIEW",
+    "expected_automatic_result": "reject_or_revise",
+    "primary_category": "fact",
+    "concrete_condition_or_counterexample": "第一趟先交换3/1再交换3/2，共2次。"
+  },
+  {
+    "id": "new-correct-13",
+    "status": "ASSISTANT_PROPOSAL_PENDING_INDEPENDENT_HUMAN_REVIEW",
+    "expected_automatic_result": "pass",
+    "primary_category": null,
+    "concrete_condition_or_counterexample": "对照使用修正后的真实代码/准确返回值，仍须人工独立核对；不把此标签发送给模型。"
+  },
+  {
+    "id": "new-severe-14",
+    "status": "ASSISTANT_PROPOSAL_PENDING_INDEPENDENT_HUMAN_REVIEW",
+    "expected_automatic_result": "reject_or_revise",
+    "primary_category": "fact",
+    "concrete_condition_or_counterexample": "行列均从0开始，2*4+1=9。"
+  },
+  {
+    "id": "new-correct-14",
+    "status": "ASSISTANT_PROPOSAL_PENDING_INDEPENDENT_HUMAN_REVIEW",
+    "expected_automatic_result": "pass",
+    "primary_category": null,
+    "concrete_condition_or_counterexample": "对照使用修正后的真实代码/准确返回值，仍须人工独立核对；不把此标签发送给模型。"
+  },
+  {
+    "id": "new-severe-15",
+    "status": "ASSISTANT_PROPOSAL_PENDING_INDEPENDENT_HUMAN_REVIEW",
+    "expected_automatic_result": "reject_or_revise",
+    "primary_category": "fact",
+    "concrete_condition_or_counterexample": "只前进一步，(4+1)%6=5，不回绕到0。"
+  },
+  {
+    "id": "new-correct-15",
+    "status": "ASSISTANT_PROPOSAL_PENDING_INDEPENDENT_HUMAN_REVIEW",
+    "expected_automatic_result": "pass",
+    "primary_category": null,
+    "concrete_condition_or_counterexample": "对照使用修正后的真实代码/准确返回值，仍须人工独立核对；不把此标签发送给模型。"
+  },
+  {
+    "id": "new-severe-16",
+    "status": "ASSISTANT_PROPOSAL_PENDING_INDEPENDENT_HUMAN_REVIEW",
+    "expected_automatic_result": "reject_or_revise",
+    "primary_category": "fact",
+    "concrete_condition_or_counterexample": "根和两个叶结点，共3个非空结点。"
+  },
+  {
+    "id": "new-correct-16",
+    "status": "ASSISTANT_PROPOSAL_PENDING_INDEPENDENT_HUMAN_REVIEW",
+    "expected_automatic_result": "pass",
+    "primary_category": null,
+    "concrete_condition_or_counterexample": "对照使用修正后的真实代码/准确返回值，仍须人工独立核对；不把此标签发送给模型。"
+  },
+  {
+    "id": "new-severe-17",
+    "status": "ASSISTANT_PROPOSAL_PENDING_INDEPENDENT_HUMAN_REVIEW",
+    "expected_automatic_result": "reject_or_revise",
+    "primary_category": "fact",
+    "concrete_condition_or_counterexample": "给定数组下标0的值为2。"
+  },
+  {
+    "id": "new-correct-17",
+    "status": "ASSISTANT_PROPOSAL_PENDING_INDEPENDENT_HUMAN_REVIEW",
+    "expected_automatic_result": "pass",
+    "primary_category": null,
+    "concrete_condition_or_counterexample": "对照使用修正后的真实代码/准确返回值，仍须人工独立核对；不把此标签发送给模型。"
+  },
+  {
+    "id": "new-severe-18",
+    "status": "ASSISTANT_PROPOSAL_PENDING_INDEPENDENT_HUMAN_REVIEW",
+    "expected_automatic_result": "reject_or_revise",
+    "primary_category": "fact",
+    "concrete_condition_or_counterexample": "只有0→1→2路径，从0到2的最少边数为2。"
+  },
+  {
+    "id": "new-correct-18",
+    "status": "ASSISTANT_PROPOSAL_PENDING_INDEPENDENT_HUMAN_REVIEW",
+    "expected_automatic_result": "pass",
+    "primary_category": null,
+    "concrete_condition_or_counterexample": "对照使用修正后的真实代码/准确返回值，仍须人工独立核对；不把此标签发送给模型。"
+  },
+  {
+    "id": "new-severe-19",
+    "status": "ASSISTANT_PROPOSAL_PENDING_INDEPENDENT_HUMAN_REVIEW",
+    "expected_automatic_result": "reject_or_revise",
+    "primary_category": "fact",
+    "concrete_condition_or_counterexample": "只搬移已有元素6一次；插入5自身的写入不计moves。"
+  },
+  {
+    "id": "new-correct-19",
+    "status": "ASSISTANT_PROPOSAL_PENDING_INDEPENDENT_HUMAN_REVIEW",
+    "expected_automatic_result": "pass",
+    "primary_category": null,
+    "concrete_condition_or_counterexample": "对照使用修正后的真实代码/准确返回值，仍须人工独立核对；不把此标签发送给模型。"
+  },
+  {
+    "id": "new-severe-20",
+    "status": "ASSISTANT_PROPOSAL_PENDING_INDEPENDENT_HUMAN_REVIEW",
+    "expected_automatic_result": "reject_or_revise",
+    "primary_category": "fact",
+    "concrete_condition_or_counterexample": "本例size是元素数；递减后size=1，读取a[1]得到9。"
+  },
+  {
+    "id": "new-correct-20",
+    "status": "ASSISTANT_PROPOSAL_PENDING_INDEPENDENT_HUMAN_REVIEW",
+    "expected_automatic_result": "pass",
+    "primary_category": null,
+    "concrete_condition_or_counterexample": "对照使用修正后的真实代码/准确返回值，仍须人工独立核对；不把此标签发送给模型。"
+  },
+  {
+    "id": "new-long-01",
+    "status": "ASSISTANT_PROPOSAL_PENDING_INDEPENDENT_HUMAN_REVIEW",
+    "expected_automatic_result": "complete_schema_valid_and_pass",
+    "primary_category": null,
+    "concrete_condition_or_counterexample": "全文完整审核；重复段落不代表独立样本。"
+  },
+  {
+    "id": "new-long-02",
+    "status": "ASSISTANT_PROPOSAL_PENDING_INDEPENDENT_HUMAN_REVIEW",
+    "expected_automatic_result": "complete_schema_valid_and_pass",
+    "primary_category": null,
+    "concrete_condition_or_counterexample": "全文完整审核；重复段落不代表独立样本。"
+  },
+  {
+    "id": "new-long-03",
+    "status": "ASSISTANT_PROPOSAL_PENDING_INDEPENDENT_HUMAN_REVIEW",
+    "expected_automatic_result": "complete_schema_valid_and_pass",
+    "primary_category": null,
+    "concrete_condition_or_counterexample": "全文完整审核；重复段落不代表独立样本。"
+  },
+  {
+    "id": "new-long-04",
+    "status": "ASSISTANT_PROPOSAL_PENDING_INDEPENDENT_HUMAN_REVIEW",
+    "expected_automatic_result": "complete_schema_valid_and_pass",
+    "primary_category": null,
+    "concrete_condition_or_counterexample": "全文完整审核；重复段落不代表独立样本。"
+  },
+  {
+    "id": "new-long-05",
+    "status": "ASSISTANT_PROPOSAL_PENDING_INDEPENDENT_HUMAN_REVIEW",
+    "expected_automatic_result": "complete_schema_valid_and_pass",
+    "primary_category": null,
+    "concrete_condition_or_counterexample": "全文完整审核；重复段落不代表独立样本。"
+  },
+  {
+    "id": "new-long-06",
+    "status": "ASSISTANT_PROPOSAL_PENDING_INDEPENDENT_HUMAN_REVIEW",
+    "expected_automatic_result": "complete_schema_valid_and_pass",
+    "primary_category": null,
+    "concrete_condition_or_counterexample": "全文完整审核；重复段落不代表独立样本。"
+  },
+  {
+    "id": "new-long-07",
+    "status": "ASSISTANT_PROPOSAL_PENDING_INDEPENDENT_HUMAN_REVIEW",
+    "expected_automatic_result": "complete_schema_valid_and_pass",
+    "primary_category": null,
+    "concrete_condition_or_counterexample": "全文完整审核；重复段落不代表独立样本。"
+  },
+  {
+    "id": "new-long-08",
+    "status": "ASSISTANT_PROPOSAL_PENDING_INDEPENDENT_HUMAN_REVIEW",
+    "expected_automatic_result": "complete_schema_valid_and_pass",
+    "primary_category": null,
+    "concrete_condition_or_counterexample": "全文完整审核；重复段落不代表独立样本。"
+  },
+  {
+    "id": "new-long-09",
+    "status": "ASSISTANT_PROPOSAL_PENDING_INDEPENDENT_HUMAN_REVIEW",
+    "expected_automatic_result": "complete_schema_valid_and_pass",
+    "primary_category": null,
+    "concrete_condition_or_counterexample": "全文完整审核；重复段落不代表独立样本。"
+  },
+  {
+    "id": "new-long-10",
+    "status": "ASSISTANT_PROPOSAL_PENDING_INDEPENDENT_HUMAN_REVIEW",
+    "expected_automatic_result": "complete_schema_valid_and_pass",
+    "primary_category": null,
+    "concrete_condition_or_counterexample": "全文完整审核；重复段落不代表独立样本。"
+  }
+]

@@ -1,0 +1,70 @@
+{
+  "checked_on": "2026-10-16T10:43:19",
+  "provider_requests": 0,
+  "new_fees_authorized": 0,
+  "checks": [
+    {
+      "command": "EDUMIND_CATALOG_TEST_PG_CONTAINER=edumind-phase1-t037-pg backend/.venv/bin/python scripts/run_shared_learning_tests.py --database edumind_catalog_phase1_om_coverage04 --dynamic-mock-mode tests/test_review_delivery.py tests/test_hybrid_resource_review.py tests/test_hybrid_review_scope.py tests/test_hybrid_review_check_ids.py tests/test_unit_consistency_review.py tests/test_learning_review_cases.py tests/test_learning_review_cli.py tests/test_hybrid_learning_publication.py tests/test_hybrid_learning_operations.py tests/test_planned_scene_generation.py tests/test_teaching_action_assembly.py tests/test_shared_learning_plan.py tests/test_learning_plan_persistence.py tests/test_om_redesign_acceptance_preparation.py tests/test_learning_closed_loop.py tests/test_quiz_api.py tests/test_markdown_notes_api.py tests/test_paths_api.py tests/test_catalog_mode.py tests/test_catalog_sessions.py tests/test_review_agent.py tests/test_provider_gateway.py tests/test_deepseek_responses.py",
+      "result": "204 passed; zero skips; one existing Starlette deprecation warning"
+    },
+    {
+      "command": "backend/.venv/bin/python -m pytest -q scripts/tests/test_coverage_review.py scripts/tests/test_om_admission.py scripts/tests/test_om_admission_r02.py scripts/tests/test_om_admission_r03.py backend/tests/test_acceptance_budget.py backend/tests/test_derived_diagnostic_budget.py backend/tests/test_real_browser_budget.py",
+      "result": "106 passed"
+    },
+    {
+      "command": "backend/.venv/bin/mypy backend/app",
+      "result": "189 source files passed"
+    },
+    {
+      "command": "Ruff check explicit changed Python files (backend defaults; scripts/acceptance_support/ruff.toml for scripts)",
+      "result": "passed"
+    },
+    {
+      "command": "backend/.venv/bin/python docs/acceptance/phase-1-om-redesign/check_contract.py",
+      "result": "12 original documents / 12 task contracts valid; schema checks pass"
+    },
+    {
+      "command": "python3 scripts/verify_legacy_archives.py",
+      "result": "236 original files verified; T033 blocked"
+    },
+    {
+      "command": "python3 scripts/check_catalog_workflow.py",
+      "result": "valid"
+    },
+    {
+      "command": "backend/.venv/bin/python scripts/prepare_coverage_review.py",
+      "result": "root 1e2ae4e392c2e151f6ab9555206a2f9d11e4436db2d910e8d862b868ce3832ca reproduced"
+    },
+    {
+      "command": "git diff --check",
+      "result": "passed"
+    }
+  ],
+  "historical_integrity": {
+    "against_commit": "958dd5c",
+    "frozen_r01_r02_r03_files_equal": 37,
+    "read_only_sqlite_attempts": [
+      2,
+      1,
+      2
+    ],
+    "halts": [
+      "SAFETY_FAILURE",
+      "INVALID_OUTPUT",
+      "INVALID_OUTPUT"
+    ]
+  },
+  "reader_check": {
+    "method": "fresh doc-coauthoring reader; actual body cross-check; not independent human truth labels",
+    "issues_resolved": [
+      "implementation-only control explicitly separated from four real proposal slots",
+      "safety case cross-carrier inconsistency recorded"
+    ]
+  },
+  "limitations": [
+    "No real model response tested against v4.3",
+    "No new independent human signoff of all labels",
+    "No executable new admission, fresh terms or budget approval",
+    "T040 remains blocked; catalog_only retained"
+  ]
+}

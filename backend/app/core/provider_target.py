@@ -20,6 +20,30 @@ _CLOUD_METADATA = frozenset(
         ipaddress.ip_address("fd00:ec2::254"),
     }
 )
+_NAT64_PREFIXES = (ipaddress.ip_network("64:ff9b::/96"), ipaddress.ip_network("64:ff9b:1::/48"))
+
+
+def _unsafe_special(ip: ipaddress.IPv4Address | ipaddress.IPv6Address) -> bool:
+    if ip.is_link_local or ip.is_unspecified or ip.is_multicast or _is_cloud_metadata(ip):
+        return True
+    if isinstance(ip, ipaddress.IPv6Address):
+        if "%" in str(ip) or ip.is_site_local or ip.sixtofour or ip.teredo:
+            return True
+        if any(ip in network for network in _NAT64_PREFIXES):
+            return True
+        if ip.ipv4_mapped is not None:
+            return _unsafe_special(ip.ipv4_mapped)
+    return False
+
+
+def is_public_address(ip: ipaddress.IPv4Address | ipaddress.IPv6Address) -> bool:
+    """Global unicast only; mapped IPv4 follows the embedded IPv4 classification."""
+    if _unsafe_special(ip):
+        return False
+    effective: ipaddress.IPv4Address | ipaddress.IPv6Address = ip
+    if isinstance(ip, ipaddress.IPv6Address) and ip.ipv4_mapped is not None:
+        effective = ip.ipv4_mapped
+    return effective.is_global and not effective.is_reserved
 
 
 def _is_cloud_metadata(ip: ipaddress.IPv4Address | ipaddress.IPv6Address) -> bool:
@@ -53,11 +77,9 @@ class TargetPolicy:
             if (
                 str(ip) != address
                 or not 1 <= port <= 65535
-                or ip.is_global
-                or ip.is_link_local
-                or ip.is_unspecified
-                or ip.is_multicast
-                or _is_cloud_metadata(ip)
+                or is_public_address(ip)
+                or (ip.is_reserved and not ip.is_loopback)
+                or _unsafe_special(ip)
             ):
                 raise TargetValidationError
 
@@ -142,6 +164,7 @@ def approve_target(
         parsed = urlsplit(url)
         if (
             parsed.scheme not in {"https", "http"}
+            or (parsed.scheme == "http" and policy.deployment == "cloud")
             or not parsed.netloc
             or parsed.hostname is None
             or parsed.username is not None
@@ -170,7 +193,7 @@ def approve_target(
         raise TargetValidationError
 
     ip_values = tuple(ipaddress.ip_address(address) for address in addresses)
-    public = all(ip.is_global and not _is_cloud_metadata(ip) for ip in ip_values)
+    public = all(is_public_address(ip) for ip in ip_values)
     local = policy.deployment == "local" and all(
         (address, port) in policy.local_allowlist for address in addresses
     )
@@ -187,9 +210,7 @@ def approve_redirect(
     resolver: Resolver = resolve_addresses,
 ) -> ApprovedTarget:
     """Revalidate a same-origin redirect; never forward credentials to another origin."""
-    if not location or any(
-        ord(char) < 32 or ord(char) == 127 or char == "\\" for char in location
-    ):
+    if not location or any(ord(char) < 32 or ord(char) == 127 or char == "\\" for char in location):
         raise TargetValidationError
     try:
         candidate_url = urljoin(previous.url, location)
@@ -204,9 +225,7 @@ def approve_redirect(
         or parsed.scheme != urlsplit(previous.url).scheme
     ):
         raise TargetValidationError
-    candidate = approve_target(
-        candidate_url, policy=policy, resolver=resolver, allow_query=True
-    )
+    candidate = approve_target(candidate_url, policy=policy, resolver=resolver, allow_query=True)
     return candidate
 
 

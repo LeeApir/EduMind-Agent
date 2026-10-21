@@ -1,0 +1,517 @@
+{
+  "id": "R03",
+  "scope": "resource",
+  "selected_role": "code",
+  "material": {
+    "binding": {
+      "owner_id": "ba4f9807-adb8-5812-b82f-62bc1bb32f26",
+      "unit_id": "78aa9362-3527-5c68-bbb1-b3a4c684be01",
+      "operation_id": "284fa120-f346-52cb-8dcd-cda6fe71dfe6",
+      "plan_id": "0bd2c2cf-6fe9-582a-af0d-005afd8ccf94",
+      "plan_version": 1,
+      "plan_digest": "9f724bc9224a151052c6eef1bb870170ae7d7e821d772c2fbaca27d999f1a7d6",
+      "input_digest": "e9afe8c59e51ea3c0117aa6a03b695001d0bf29d873f1faa87e5e88726a24962",
+      "references_digest": "1335b93c5c57bca280ff7d4076dbd2c6cd8c0bc14bf154738dada80dc5e6281e",
+      "policy_version": "hybrid-review-v1",
+      "policy_digest": "747ec507e0f011d8a82e74d3823964fc2f860ab23693f71e695273ebf696fdad"
+    },
+    "plan": {
+      "objectives": [
+        {
+          "id": "local",
+          "text": "用固定数组的首元素读取函数展示下标0和返回值，接口与注释必须一致。"
+        }
+      ],
+      "terminology": [
+        {
+          "term": "返回值",
+          "meaning": "函数交给调用方的值，不等于打印"
+        }
+      ],
+      "conventions": {
+        "index_base": 0,
+        "capacity": 3,
+        "state_representation": "s为已处理元素和，i为下一个处理下标",
+        "not_applicable_reasons": []
+      },
+      "shared_example": {
+        "input_description": "a={4,6,9}",
+        "initial_state": "数组初始化",
+        "steps": [
+          {
+            "operation": "读取下标0",
+            "expected_state": "读取首元素4",
+            "expected_output": "返回4，不打印"
+          }
+        ]
+      },
+      "prerequisite_node_ids": [],
+      "scenes": [
+        {
+          "role": "explanation",
+          "scene_key": "explanation",
+          "objective_ids": [
+            "local"
+          ],
+          "depends_on": []
+        },
+        {
+          "role": "code",
+          "scene_key": "code",
+          "objective_ids": [
+            "local"
+          ],
+          "depends_on": [
+            "explanation"
+          ]
+        },
+        {
+          "role": "exercise",
+          "scene_key": "exercise",
+          "objective_ids": [
+            "local"
+          ],
+          "depends_on": [
+            "explanation",
+            "code"
+          ]
+        }
+      ],
+      "node_id": "array",
+      "graph_version": "mvp-0.2.0",
+      "graph_digest": "3639db6aedc9699348e63b5e7e1bdaaea3189592b19540c64e8f175aceb9ef59",
+      "profile_version": null,
+      "profile_evidence_digest": "8838fdd11ee58e08fd54a21272313e784012370b7cf0a2cde8b823ed8806d85d",
+      "goal": "用固定数组的首元素读取函数展示下标0和返回值，接口与注释必须一致。",
+      "code_language": "C",
+      "schema_version": "learning-plan-v1",
+      "references": [
+        {
+          "reference_id": "graph-node:mvp-0.2.0:array",
+          "version": "mvp-0.2.0",
+          "digest": "f83fd12e754fcda4124aa62b8a29203d97a897605d23dc4e37877393dcb0015d"
+        }
+      ]
+    },
+    "candidates": [
+      {
+        "resource_id": "51fd7595-5998-5dbd-94e4-d2a4000bca87",
+        "role": "explanation",
+        "envelope": {
+          "resource_type": "explanation",
+          "prompt_version": "learning-resources-v1",
+          "content": {
+            "markdown": "first_sample读取固定数组首元素4，函数不打印。"
+          }
+        },
+        "content_digest": "b624cec7f39126cad0dc8d75a49b2be8f1bd151be0359caf989013c243a46d30",
+        "dependency_digest": "8749c26686c66ac7a4f796e1d41b138dfadeafdc40c1ec7e84fff70c38623d52",
+        "upstream": []
+      },
+      {
+        "resource_id": "02d4e443-0c1b-527e-995f-f253bae226a3",
+        "role": "code",
+        "envelope": {
+          "resource_type": "code",
+          "prompt_version": "learning-resources-v1",
+          "content": {
+            "language": "C",
+            "source": "int first_sample(void) {\n    int a[3] = {4, 6, 9};\n    /* 返回最后一个元素9。 */\n    return a[0];\n}",
+            "expected_output": "返回首元素4，没有标准输出。",
+            "key_steps": [
+              "读取合法下标0的元素，其值为4。"
+            ],
+            "display_only": true
+          }
+        },
+        "content_digest": "5fe997d062ff7570db56065fefff2a4e31f0cf647137d786c3cca2b6f0db3d23",
+        "dependency_digest": "acfec42c1c4d8c3226e1aeb3e02e732847be728b4d591d6d8e41cad170eed092",
+        "upstream": [
+          {
+            "resource_id": "51fd7595-5998-5dbd-94e4-d2a4000bca87",
+            "content_digest": "b624cec7f39126cad0dc8d75a49b2be8f1bd151be0359caf989013c243a46d30",
+            "dependency_digest": "8749c26686c66ac7a4f796e1d41b138dfadeafdc40c1ec7e84fff70c38623d52"
+          }
+        ]
+      },
+      {
+        "resource_id": "c5ec4481-de52-5e88-aee2-6ff228179f34",
+        "role": "exercise",
+        "envelope": {
+          "resource_type": "exercise",
+          "prompt_version": "learning-resources-v1",
+          "content": {
+            "items": [
+              {
+                "id": "q1",
+                "question": "[判断题] 请从s=0逐轮推演：i=1轮结束后s=10 仅填 T 或 F（T=正确，F=错误）。",
+                "answer": "T",
+                "explanation": "先加4得4，再加6得10。"
+              },
+              {
+                "id": "q2",
+                "question": "[判断题] 请推演首次条件失败：i=3时退出，不执行访问a[3]的循环体 仅填 T 或 F（T=正确，F=错误）。",
+                "answer": "T",
+                "explanation": "i=2轮后s=19，i递增为3，3<3为假，因此退出。"
+              },
+              {
+                "id": "q3",
+                "question": "[判断题] 函数会自行把19打印到屏幕 仅填 T 或 F（T=正确，F=错误）。",
+                "answer": "F",
+                "explanation": "函数只有return，没有打印语句。"
+              }
+            ]
+          }
+        },
+        "content_digest": "1153a4cdb3c88eaccb0043223b122aa72cf5d59d342c262fab37cda548c009c9",
+        "dependency_digest": "e4c56bd52ff843adca02b723d94bb5ec0e0282761aa796adc733ed49b2f33351",
+        "upstream": [
+          {
+            "resource_id": "51fd7595-5998-5dbd-94e4-d2a4000bca87",
+            "content_digest": "b624cec7f39126cad0dc8d75a49b2be8f1bd151be0359caf989013c243a46d30",
+            "dependency_digest": "8749c26686c66ac7a4f796e1d41b138dfadeafdc40c1ec7e84fff70c38623d52"
+          },
+          {
+            "resource_id": "02d4e443-0c1b-527e-995f-f253bae226a3",
+            "content_digest": "5fe997d062ff7570db56065fefff2a4e31f0cf647137d786c3cca2b6f0db3d23",
+            "dependency_digest": "acfec42c1c4d8c3226e1aeb3e02e732847be728b4d591d6d8e41cad170eed092"
+          }
+        ]
+      }
+    ],
+    "scenes": [
+      {
+        "role": "explanation",
+        "scene_key": "explanation",
+        "scene_id": "e0fe3940-60c1-5a51-9a8b-5168609618d0",
+        "scene_version": 1,
+        "resource_id": "51fd7595-5998-5dbd-94e4-d2a4000bca87",
+        "resource_digest": "b624cec7f39126cad0dc8d75a49b2be8f1bd151be0359caf989013c243a46d30",
+        "dependency_digest": "8749c26686c66ac7a4f796e1d41b138dfadeafdc40c1ec7e84fff70c38623d52"
+      },
+      {
+        "role": "code",
+        "scene_key": "code",
+        "scene_id": "0d3d1fc3-254d-5d79-a320-3a0aae5eec58",
+        "scene_version": 1,
+        "resource_id": "02d4e443-0c1b-527e-995f-f253bae226a3",
+        "resource_digest": "5fe997d062ff7570db56065fefff2a4e31f0cf647137d786c3cca2b6f0db3d23",
+        "dependency_digest": "acfec42c1c4d8c3226e1aeb3e02e732847be728b4d591d6d8e41cad170eed092"
+      },
+      {
+        "role": "exercise",
+        "scene_key": "exercise",
+        "scene_id": "6b43da3e-608f-5235-8482-9b706dc98f76",
+        "scene_version": 1,
+        "resource_id": "c5ec4481-de52-5e88-aee2-6ff228179f34",
+        "resource_digest": "1153a4cdb3c88eaccb0043223b122aa72cf5d59d342c262fab37cda548c009c9",
+        "dependency_digest": "e4c56bd52ff843adca02b723d94bb5ec0e0282761aa796adc733ed49b2f33351"
+      }
+    ],
+    "actions": {
+      "version": "teaching-actions-v1",
+      "actions": [
+        {
+          "kind": "show_resource",
+          "scene_key": "explanation",
+          "resource_id": "51fd7595-5998-5dbd-94e4-d2a4000bca87",
+          "resource_digest": "b624cec7f39126cad0dc8d75a49b2be8f1bd151be0359caf989013c243a46d30"
+        },
+        {
+          "kind": "show_resource",
+          "scene_key": "code",
+          "resource_id": "02d4e443-0c1b-527e-995f-f253bae226a3",
+          "resource_digest": "5fe997d062ff7570db56065fefff2a4e31f0cf647137d786c3cca2b6f0db3d23"
+        },
+        {
+          "kind": "highlight",
+          "scene_key": "code",
+          "resource_id": "02d4e443-0c1b-527e-995f-f253bae226a3",
+          "resource_digest": "5fe997d062ff7570db56065fefff2a4e31f0cf647137d786c3cca2b6f0db3d23",
+          "anchor_id": "a3"
+        },
+        {
+          "kind": "show_resource",
+          "scene_key": "exercise",
+          "resource_id": "c5ec4481-de52-5e88-aee2-6ff228179f34",
+          "resource_digest": "1153a4cdb3c88eaccb0043223b122aa72cf5d59d342c262fab37cda548c009c9"
+        },
+        {
+          "kind": "ask_exercise",
+          "scene_key": "exercise",
+          "resource_id": "c5ec4481-de52-5e88-aee2-6ff228179f34",
+          "resource_digest": "1153a4cdb3c88eaccb0043223b122aa72cf5d59d342c262fab37cda548c009c9",
+          "exercise_id": "q1"
+        },
+        {
+          "kind": "ask_exercise",
+          "scene_key": "exercise",
+          "resource_id": "c5ec4481-de52-5e88-aee2-6ff228179f34",
+          "resource_digest": "1153a4cdb3c88eaccb0043223b122aa72cf5d59d342c262fab37cda548c009c9",
+          "exercise_id": "q2"
+        },
+        {
+          "kind": "ask_exercise",
+          "scene_key": "exercise",
+          "resource_id": "c5ec4481-de52-5e88-aee2-6ff228179f34",
+          "resource_digest": "1153a4cdb3c88eaccb0043223b122aa72cf5d59d342c262fab37cda548c009c9",
+          "exercise_id": "q3"
+        }
+      ],
+      "anchor_catalog": [
+        {
+          "anchor_id": "a1",
+          "resource_id": "51fd7595-5998-5dbd-94e4-d2a4000bca87",
+          "resource_digest": "b624cec7f39126cad0dc8d75a49b2be8f1bd151be0359caf989013c243a46d30",
+          "json_pointer": "/markdown",
+          "start_utf8": 0,
+          "end_utf8": 61
+        },
+        {
+          "anchor_id": "a2",
+          "resource_id": "02d4e443-0c1b-527e-995f-f253bae226a3",
+          "resource_digest": "5fe997d062ff7570db56065fefff2a4e31f0cf647137d786c3cca2b6f0db3d23",
+          "json_pointer": "/expected_output",
+          "start_utf8": 0,
+          "end_utf8": 40
+        },
+        {
+          "anchor_id": "a3",
+          "resource_id": "02d4e443-0c1b-527e-995f-f253bae226a3",
+          "resource_digest": "5fe997d062ff7570db56065fefff2a4e31f0cf647137d786c3cca2b6f0db3d23",
+          "json_pointer": "/key_steps/0",
+          "start_utf8": 0,
+          "end_utf8": 44
+        },
+        {
+          "anchor_id": "a4",
+          "resource_id": "02d4e443-0c1b-527e-995f-f253bae226a3",
+          "resource_digest": "5fe997d062ff7570db56065fefff2a4e31f0cf647137d786c3cca2b6f0db3d23",
+          "json_pointer": "/language",
+          "start_utf8": 0,
+          "end_utf8": 1
+        },
+        {
+          "anchor_id": "a5",
+          "resource_id": "02d4e443-0c1b-527e-995f-f253bae226a3",
+          "resource_digest": "5fe997d062ff7570db56065fefff2a4e31f0cf647137d786c3cca2b6f0db3d23",
+          "json_pointer": "/source",
+          "start_utf8": 0,
+          "end_utf8": 108
+        },
+        {
+          "anchor_id": "a6",
+          "resource_id": "c5ec4481-de52-5e88-aee2-6ff228179f34",
+          "resource_digest": "1153a4cdb3c88eaccb0043223b122aa72cf5d59d342c262fab37cda548c009c9",
+          "json_pointer": "/items/0/answer",
+          "start_utf8": 0,
+          "end_utf8": 1
+        },
+        {
+          "anchor_id": "a7",
+          "resource_id": "c5ec4481-de52-5e88-aee2-6ff228179f34",
+          "resource_digest": "1153a4cdb3c88eaccb0043223b122aa72cf5d59d342c262fab37cda548c009c9",
+          "json_pointer": "/items/0/explanation",
+          "start_utf8": 0,
+          "end_utf8": 29
+        },
+        {
+          "anchor_id": "a8",
+          "resource_id": "c5ec4481-de52-5e88-aee2-6ff228179f34",
+          "resource_digest": "1153a4cdb3c88eaccb0043223b122aa72cf5d59d342c262fab37cda548c009c9",
+          "json_pointer": "/items/0/id",
+          "start_utf8": 0,
+          "end_utf8": 2
+        },
+        {
+          "anchor_id": "a9",
+          "resource_id": "c5ec4481-de52-5e88-aee2-6ff228179f34",
+          "resource_digest": "1153a4cdb3c88eaccb0043223b122aa72cf5d59d342c262fab37cda548c009c9",
+          "json_pointer": "/items/0/question",
+          "start_utf8": 0,
+          "end_utf8": 98
+        },
+        {
+          "anchor_id": "a10",
+          "resource_id": "c5ec4481-de52-5e88-aee2-6ff228179f34",
+          "resource_digest": "1153a4cdb3c88eaccb0043223b122aa72cf5d59d342c262fab37cda548c009c9",
+          "json_pointer": "/items/1/answer",
+          "start_utf8": 0,
+          "end_utf8": 1
+        },
+        {
+          "anchor_id": "a11",
+          "resource_id": "c5ec4481-de52-5e88-aee2-6ff228179f34",
+          "resource_digest": "1153a4cdb3c88eaccb0043223b122aa72cf5d59d342c262fab37cda548c009c9",
+          "json_pointer": "/items/1/explanation",
+          "start_utf8": 0,
+          "end_utf8": 57
+        },
+        {
+          "anchor_id": "a12",
+          "resource_id": "c5ec4481-de52-5e88-aee2-6ff228179f34",
+          "resource_digest": "1153a4cdb3c88eaccb0043223b122aa72cf5d59d342c262fab37cda548c009c9",
+          "json_pointer": "/items/1/id",
+          "start_utf8": 0,
+          "end_utf8": 2
+        },
+        {
+          "anchor_id": "a13",
+          "resource_id": "c5ec4481-de52-5e88-aee2-6ff228179f34",
+          "resource_digest": "1153a4cdb3c88eaccb0043223b122aa72cf5d59d342c262fab37cda548c009c9",
+          "json_pointer": "/items/1/question",
+          "start_utf8": 0,
+          "end_utf8": 131
+        },
+        {
+          "anchor_id": "a14",
+          "resource_id": "c5ec4481-de52-5e88-aee2-6ff228179f34",
+          "resource_digest": "1153a4cdb3c88eaccb0043223b122aa72cf5d59d342c262fab37cda548c009c9",
+          "json_pointer": "/items/2/answer",
+          "start_utf8": 0,
+          "end_utf8": 1
+        },
+        {
+          "anchor_id": "a15",
+          "resource_id": "c5ec4481-de52-5e88-aee2-6ff228179f34",
+          "resource_digest": "1153a4cdb3c88eaccb0043223b122aa72cf5d59d342c262fab37cda548c009c9",
+          "json_pointer": "/items/2/explanation",
+          "start_utf8": 0,
+          "end_utf8": 42
+        },
+        {
+          "anchor_id": "a16",
+          "resource_id": "c5ec4481-de52-5e88-aee2-6ff228179f34",
+          "resource_digest": "1153a4cdb3c88eaccb0043223b122aa72cf5d59d342c262fab37cda548c009c9",
+          "json_pointer": "/items/2/id",
+          "start_utf8": 0,
+          "end_utf8": 2
+        },
+        {
+          "anchor_id": "a17",
+          "resource_id": "c5ec4481-de52-5e88-aee2-6ff228179f34",
+          "resource_digest": "1153a4cdb3c88eaccb0043223b122aa72cf5d59d342c262fab37cda548c009c9",
+          "json_pointer": "/items/2/question",
+          "start_utf8": 0,
+          "end_utf8": 90
+        }
+      ],
+      "digest": "80c238fa499d2859083989481a67098ded2a799af6c43a4e93216b87e9be46b5"
+    },
+    "reference_context": {
+      "source": {
+        "reference_id": "graph-node:mvp-0.2.0:array",
+        "version": "mvp-0.2.0",
+        "digest": "f83fd12e754fcda4124aa62b8a29203d97a897605d23dc4e37877393dcb0015d"
+      },
+      "node": {
+        "id": "array",
+        "name": "数组",
+        "chapter": "线性表",
+        "difficulty": 1,
+        "description": "使用连续存储空间、通过下标访问元素的线性结构。",
+        "prerequisites": [],
+        "learning_objectives": [
+          "说出下标访问的时间复杂度",
+          "说明连续存储对插入和删除的影响"
+        ],
+        "common_misconceptions": [
+          "数组每次访问都要从头遍历",
+          "数组插入总是 O(1)"
+        ],
+        "ai_context": "使用连续格子和下标精灵的图示，对比中间插入时的元素搬移。",
+        "mastery_rule_key": "linear-structure-v1"
+      },
+      "learner_evidence": {},
+      "scope": "Background only, not certification of this example."
+    },
+    "teaching_context": {
+      "version": "teaching-node-binding-v1",
+      "teaching_mode": "target",
+      "target_node_id": "array",
+      "recommended_node_id": "array",
+      "teaching_node_id": "array",
+      "selection_reason": "direct_target",
+      "original_request": "用固定数组的首元素读取函数展示下标0和返回值，接口与注释必须一致。",
+      "segment_goal": "用固定数组的首元素读取函数展示下标0和返回值，接口与注释必须一致。",
+      "segment_scope": "target_lesson",
+      "path_version_id": "3d360e3e-3f76-5da3-8d5e-cfe308e86c14",
+      "path_version": 1,
+      "graph_version": "mvp-0.2.0",
+      "graph_digest": "3639db6aedc9699348e63b5e7e1bdaaea3189592b19540c64e8f175aceb9ef59"
+    },
+    "unit_digest": "65a3b89767f67b548294e55a55b49cb3aa2c7780534147eaa1a4ac84e092de60"
+  },
+  "input_snapshot": {
+    "metadata": {
+      "node_id": "array",
+      "graph_version": "mvp-0.2.0",
+      "graph_digest": "3639db6aedc9699348e63b5e7e1bdaaea3189592b19540c64e8f175aceb9ef59",
+      "profile_version": null,
+      "profile_evidence_digest": "8838fdd11ee58e08fd54a21272313e784012370b7cf0a2cde8b823ed8806d85d",
+      "goal": "用固定数组的首元素读取函数展示下标0和返回值，接口与注释必须一致。",
+      "code_language": "C"
+    },
+    "references": {
+      "graph-node:mvp-0.2.0:array": {
+        "reference_id": "graph-node:mvp-0.2.0:array",
+        "version": "mvp-0.2.0",
+        "digest": "f83fd12e754fcda4124aa62b8a29203d97a897605d23dc4e37877393dcb0015d"
+      }
+    },
+    "learner_evidence": {},
+    "node_ids": [
+      "array",
+      "array-stack",
+      "balanced-binary-search-tree",
+      "binary-heap",
+      "binary-search-tree",
+      "binary-tree",
+      "binary-tree-traversal",
+      "breadth-first-search",
+      "bubble-sort",
+      "c-pointer",
+      "circular-linked-list",
+      "circular-queue",
+      "depth-first-search",
+      "doubly-linked-list",
+      "graph-representation",
+      "heap-sort",
+      "insertion-sort",
+      "linked-list-concept",
+      "linked-list-deletion",
+      "linked-list-insertion",
+      "linked-list-traversal",
+      "linked-stack",
+      "merge-sort",
+      "queue",
+      "quick-sort",
+      "selection-sort",
+      "single-linked-list",
+      "sorting-comparison",
+      "stack",
+      "tree-concept"
+    ],
+    "teaching_context": {
+      "version": "teaching-node-binding-v1",
+      "teaching_mode": "target",
+      "target_node_id": "array",
+      "recommended_node_id": "array",
+      "teaching_node_id": "array",
+      "selection_reason": "direct_target",
+      "original_request": "用固定数组的首元素读取函数展示下标0和返回值，接口与注释必须一致。",
+      "segment_goal": "用固定数组的首元素读取函数展示下标0和返回值，接口与注释必须一致。",
+      "segment_scope": "target_lesson",
+      "path_version_id": "3d360e3e-3f76-5da3-8d5e-cfe308e86c14",
+      "path_version": 1,
+      "graph_version": "mvp-0.2.0",
+      "graph_digest": "3639db6aedc9699348e63b5e7e1bdaaea3189592b19540c64e8f175aceb9ef59"
+    }
+  },
+  "provenance": {
+    "author": "Codex GPT-authored fixture, not independent human truth",
+    "relationship_to_history": "new content, reuses known diagnostic patterns; NOT blind/independent population sample",
+    "historical_failed_stack_sample_reused": false
+  },
+  "actual_model_result": null
+}

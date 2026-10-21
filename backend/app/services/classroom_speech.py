@@ -128,6 +128,19 @@ async def reviewed_scene_resources(
     scene_version: int,
 ) -> list[GeneratedResource]:
     """Published, review-passed resources for the session's current scene."""
+    unit = await db.get(LearningUnit, unit_id)
+    if unit is not None and unit.user_id == owner_id and unit.current_publication_id is not None:
+        from app.services.hybrid_learning_publication import current_publication
+        from app.services.owned_learning import published_scenes
+        publication = await current_publication(db, owner_id=owner_id, unit_id=unit_id)
+        if publication is None:
+            return []
+        scenes = publication.material["scenes"]
+        assert isinstance(scenes, list) and isinstance(scenes[0], dict)
+        if scene_key not in ("intro", "explanation") or scenes[0]["scene_version"] != scene_version:
+            return []
+        return [r for _, r in await published_scenes(db, owner_id, unit_id)]
+
     result = await db.execute(
         select(GeneratedResource)
         .join(LearningScene, LearningScene.id == GeneratedResource.scene_id)
@@ -287,6 +300,11 @@ def classroom_operation_payload(operation: ClassroomOperation) -> dict[str, obje
         "kind": operation.kind,
         "base_revision": operation.base_revision,
     }
+    snapshot = operation.result_snapshot or {}
+    if isinstance(snapshot.get("learning_operation_id"), str):
+        payload["learning_operation_id"] = snapshot["learning_operation_id"]
+    if isinstance(snapshot.get("publication_version"), int):
+        payload["publication_version"] = snapshot["publication_version"]
     if operation.generation_id is not None:
         payload["generation_id"] = str(operation.generation_id)
     if operation.result_id is not None:

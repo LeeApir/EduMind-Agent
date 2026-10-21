@@ -1,0 +1,56 @@
+{
+  "version": "final-focus-r11-real-result-v1",
+  "execution_source_commit": "7a1467a",
+  "root_sha256": "89bf93924db5da5850bdfbe2bdba8dcb63fb1f09f1347750202203f6f7faaf3e",
+  "state": "HALTED_ADMISSION_FAILED",
+  "phase_result": "FAILED_DIAGNOSTIC_CATEGORY_GATE",
+  "provider_requests": 1,
+  "attempted_slots": [
+    "final-01"
+  ],
+  "remaining_unrun_slots": [
+    "final-02",
+    "final-03",
+    "final-04"
+  ],
+  "reasoning_effort_requested": "none",
+  "input_tokens": 1519,
+  "output_tokens": 195,
+  "reasoning_tokens_included": 0,
+  "total_tokens": 1714,
+  "reserved_micro_cny": 2125910,
+  "peak_usage_reference_micro_cny": 4598,
+  "actual_bill": null,
+  "request_sha256": "fbe49856866736aa00f6f0f5d9ffce37fda7dcd025dd4426425ce546c90f58fb",
+  "response_sha256": "f0dc9b0e9b33872979b599129455b8b3afb3805c7557683ed28f6d4d5cf8566d",
+  "value_hash": "77e616d355a5421f37bb12331d549729804fe513a025b57fcc41dab1993cb22e",
+  "model_and_completed_status_verified_by_frozen_finish": true,
+  "http_status_not_retained": true,
+  "protocol_and_schema_complete": true,
+  "target_defect_detected": true,
+  "category_expected": "fact",
+  "category_observed": "misconception",
+  "category_gate_passed": false,
+  "observation": "The response correctly identifies FIFO/LIFO contradiction and gives the supplied push(10),push(20),pop()->20 counterexample. It classifies the focused conceptual contradiction as misconception rather than the frozen fact category. This is not a concrete-defect miss, not a timeout/truncation/API failure, and not evidence about unrun controls.",
+  "actual_response": {
+    "findings": [
+      {
+        "area": "misconception",
+        "message": "The focused claim states that a stack deletes elements in first-in-first-out (FIFO) order. This directly contradicts the stack's defining LIFO behavior, which the same resource later asserts: push(10), push(20), pop() returns 20, and pop removes the most recently added undeleted top element. Under the stated convention, the first element pushed (10) is the last to be removed, so the claim is false and would teach the queue ordering as the stack ordering.",
+        "severity": "severe"
+      }
+    ],
+    "other_findings": [],
+    "request_id": "74f461e5d3f4dbe649b0f6521ac0ef1e4d0403d3988f81030e8309dcd7456b11",
+    "uncertain": false,
+    "verdict": "reject",
+    "version": "span-focus-review-v1"
+  },
+  "human_future_fact_signoff": null,
+  "automatic_extraction_verified": false,
+  "full_resource_coverage_verified": false,
+  "formal_quality_tested": false,
+  "cross_course_quality_tested": false,
+  "t040_complete": false,
+  "production_mode": "catalog_only"
+}

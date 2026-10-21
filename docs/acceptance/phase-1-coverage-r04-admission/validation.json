@@ -1,0 +1,65 @@
+{
+  "checked_on": "2026-10-16T10:58:59",
+  "provider_requests": 0,
+  "new_fees_authorized": 0,
+  "checks": [
+    {
+      "command": "backend/.venv/bin/python -m pytest -q scripts/tests/test_coverage_admission.py scripts/tests/test_coverage_review.py scripts/tests/test_om_admission.py scripts/tests/test_om_admission_r02.py scripts/tests/test_om_admission_r03.py backend/tests/test_acceptance_budget.py backend/tests/test_derived_diagnostic_budget.py backend/tests/test_real_browser_budget.py",
+      "result": "125 passed; includes 19 new actual r04 composition regressions with synthetic approvals/mock HTTP"
+    },
+    {
+      "command": "backend/.venv/bin/ruff check --config scripts/acceptance_support/ruff.toml scripts/run_coverage_review.py scripts/prepare_coverage_admission.py scripts/tests/test_coverage_admission.py",
+      "result": "passed"
+    },
+    {
+      "command": "backend/.venv/bin/python scripts/prepare_coverage_admission.py",
+      "result": "exact root reproduced: 91c9d5f818d1f675f22691f9e318aec89fc6f0828bb070f245c86cc1b07ea1db"
+    },
+    {
+      "command": "backend/.venv/bin/python scripts/run_coverage_review.py --run-one",
+      "exit_code": 2,
+      "result": "STOPPED_OR_NOT_AUTHORIZED; no key/DNS/new private ledger; no send"
+    },
+    {
+      "command": "backend/.venv/bin/python docs/acceptance/phase-1-om-redesign/check_contract.py",
+      "result": "12 documents/12 task contracts and schema checks pass"
+    },
+    {
+      "command": "python3 scripts/verify_legacy_archives.py",
+      "result": "236 original files verified"
+    },
+    {
+      "command": "python3 scripts/check_catalog_workflow.py",
+      "result": "valid"
+    },
+    {
+      "command": "backend/.venv/bin/python scripts/prepare_coverage_review.py",
+      "result": "original r04 plan root unchanged"
+    }
+  ],
+  "history_integrity": {
+    "against_commit": "dbe861d",
+    "frozen_r01_r02_r03_r04_equal_files": 44,
+    "old_attempts": [
+      2,
+      1,
+      2
+    ],
+    "old_halts": [
+      "SAFETY_FAILURE",
+      "INVALID_OUTPUT",
+      "INVALID_OUTPUT"
+    ],
+    "new_private_ledger_exists": false
+  },
+  "not_repeated": {
+    "production_database_tests": "No backend application or Web changes this turn; 204 database tests last passed at dbe861d. Not rerun or counted as current execution.",
+    "production_mypy": "No application changes; prior189-file result not newly executed."
+  },
+  "limits": [
+    "No independent human label signoff exists",
+    "No exact new execution/budget approval record exists",
+    "No real response evaluated against v4.3",
+    "Calibration never substitutes formal acceptance or opens dynamic mode"
+  ]
+}

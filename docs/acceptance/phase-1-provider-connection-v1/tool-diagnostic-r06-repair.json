@@ -1,0 +1,45 @@
+{
+  "previous_result_sha256": "3a920b4b9c421b9de2588873e7b6538e3a1b815da76e9840549420f3338af76b",
+  "concrete_defect": "Named forced-tool probe demands full tool-decision finish_reason; r05 has stop with all nine other identity/tool/schema checks passing. Forced argument-generation and automatic tool-decision modes were conflated.",
+  "fix": "Use explicitly frozen tool_choice=auto for full selection probe. Keep all ten strict response assertions, including finish_reason=tool_calls; no normalization, plain text acceptance or reduced schema. Preserve forced-mode failures.",
+  "source_evidence": "https://help.aliyun.com/zh/model-studio/qwen-function-calling",
+  "source_interpretation": "Official docs describe auto as model tool selection and named forced mode as argument-only generation; applying that distinction to observed finish_reason is an inference, not a claim that docs guarantee stop.",
+  "offline_status": "passed",
+  "offline_command": "pytest tests/test_phase1_tool_connection.py tests/test_phase1_connection_diagnostics.py tests/test_phase1_connection_runner.py tests/test_phase1_dynamic_gate.py",
+  "offline_result": "60 passed; fixtures now create synthetic ledgers, no dependency on ignored local run artifacts",
+  "revised_public_request": {
+    "model": "qwen3.8-max-0902",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Call emit_probe with ok=true. Do not write prose."
+      }
+    ],
+    "max_completion_tokens": 64,
+    "enable_thinking": false,
+    "stream": false,
+    "temperature": 0,
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "emit_probe",
+          "description": "Return the fixed probe flag.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "ok": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "ok"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    ],
+    "tool_choice": "auto"
+  }
+}

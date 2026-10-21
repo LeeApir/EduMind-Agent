@@ -1,0 +1,7 @@
+# HTTP400 复现与证据边界
+
+真实HTTP1，准确request SHA256 0c503bda442a2f8e37a1b7815532b0c8fbe8129ac77f58c2260abf052ce3a736，与原首条一致。HTTP400/CAPABILITY_UNAVAILABLE复现，错误响应流已完整读取并计算hash。只保存白名单诊断，provider_error.parse=NON_JSON_OR_UNRECOGNIZED，没有可报告的标准JSON错误码或字段原因。该状态可能表示非JSON、JSON结构不符合当前识别器或解析异常，不能据此确诊一定是HTML/网关/Schema/模型/额度。原始正文未保存，不补造供应商消息。
+
+旧问题是_check_status在读正文前抛错。本次独立ErrorTransport在生产状态检查前读取最多64KiB，仅提取有限技术词；原生产适配器和旧冻结未改。此次读取完整仍没得到可识别原因，故定位未完成；不能把复现失败当模型语义淘汰或质量通过。未来若继续，需先零调用扩充安全响应形态识别（媒体类型、有限HTML标题/错误标记、JSON根类型/标准错误字段形态），测试后另行决定是否真实探测。当前不追加任何请求。
+
+Token和实际费用均未知；1次保守占槽13.420260元不是实际账单。独立账本已持久停止，临时连接disabled/持久Key为空/配置版本失效三项清理通过。既有候选和所有旧账本保持停止，T040 blocked/catalog_only不变。

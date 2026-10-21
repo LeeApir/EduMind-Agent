@@ -1,0 +1,49 @@
+{
+  "scope": "zero-call retirement plus single final candidate proposal,NOT executable authorization",
+  "new_candidate_real_provider_requests": 0,
+  "authorized_requests": 0,
+  "candidate_count_max": 1,
+  "requests_proposed_max": 12,
+  "commands": [
+    {
+      "command": "backend/.venv/bin/pytest -q scripts/tests/test_last_review_candidate.py scripts/tests/test_luna_process_execution.py scripts/tests/test_luna_process_calibration.py scripts/tests/test_luna_schema_validation.py scripts/tests/test_luna_admission.py",
+      "result": "93 passed,0 skipped;9 new plus84 prior regressions"
+    },
+    {
+      "command": "backend/.venv/bin/python scripts/prepare_last_review_candidate.py",
+      "result": "12 actual agent/adapter Mock review captures reproduced;full material unchanged;only requested review reasoning differs after already-approved projection"
+    },
+    {
+      "command": "backend/.venv/bin/ruff check scripts/acceptance_support/luna_high_candidate.py scripts/prepare_last_review_candidate.py scripts/freeze_last_review_candidate.py scripts/tests/test_last_review_candidate.py",
+      "result": "passed"
+    }
+  ],
+  "actual_model_semantic_quality": "not tested",
+  "real_full_schema_compatibility": "not tested for high;stageA first before four-case semantics",
+  "generation_mock_proof": "same candidate router;DeepSeek/none unchanged for plan/explanation/code/exercise",
+  "boundaries": [
+    "no ENV or production app source changes",
+    "no Key/DNS/network in offline capture;synthetic placeholders only",
+    "no new real ledger or approval",
+    "retired low2requests/2unsent/oldlabels/halt untouched",
+    "existing projection/full local duplicate checks retained",
+    "source-label truth carried from same material human confirmations,not new result signoff",
+    "4 preexisting unused cases are not statistically blind or formal independent tests",
+    "new live12-slot durable stage/research-exit executor not implemented in this proposal"
+  ],
+  "official_references": [
+    {
+      "url": "https://developers.openai.com/api/docs/models/gpt-6-luna",
+      "checked_on": "2026-10-20",
+      "supported_claim": "official Luna supports high and structured output;not third-party availability assurance"
+    },
+    {
+      "url": "https://developers.openai.com/api/docs/guides/deployment-checklist",
+      "checked_on": "2026-10-20",
+      "supported_claim": "medium/high can be evaluated for diagnosis and code reasoning;not quality guarantee"
+    }
+  ],
+  "preparation_issue": "first Ruff flagged new helper import ordering;sorted only new file,no behavior/schema/assertion weakening",
+  "research_exit": "new candidate fails once -> stop batch automatic review R&D and discuss delivery scope,not another configuration",
+  "T040": "blocked;catalog_only remains"
+}

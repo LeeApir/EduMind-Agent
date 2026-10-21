@@ -1,0 +1,32 @@
+{
+  "coverage": {
+    "checked": [
+      "goal_fidelity",
+      "internal_consistency",
+      "scope",
+      "reference_support",
+      "downstream_feasibility"
+    ],
+    "unchecked": []
+  },
+  "findings": [
+    {
+      "category": "missing_premise",
+      "condition_or_counterexample": "The plan's reference digest is f83fd12e754fcda4124aa62b8a29203d97a897605d23dc4e37877393dcb0015d, while the supplied graph-node reference digest is b3333a8363bf0542b851bf6ea402e5779e515a95328f83138a43f15a7363b219. The available data does not explain this discrepancy or establish which reference content the plan is bound to.",
+      "evidence_anchors": [
+        "p11",
+        "p34"
+      ],
+      "finding_id": "F1",
+      "impact": "Reference support cannot be confirmed, so correctness claims based on that node remain unverified.",
+      "severity": "major",
+      "suggested_action": "human_review",
+      "target_anchor": "p11"
+    }
+  ],
+  "schema_version": "plan-review-result-v1",
+  "unresolved": [
+    "Resolve the mismatch between the plan's graph-node reference digest and the supplied graph-node reference digest."
+  ],
+  "verdict": "needs_human"
+}

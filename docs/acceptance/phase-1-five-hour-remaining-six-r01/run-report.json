@@ -1,0 +1,478 @@
+{
+  "reported_at": "2026-10-20T16:17:54.320381+08:00",
+  "manifest_sha256": "1119783f141ac63fd03c4a37535746ca2cde2b3b66b6fb2409d5297c7d48b4bd",
+  "parent_execution_root": "27f6e415ec004ef5eb41c2875dc60336a63426946fe3d39d29185bb03e844669",
+  "status": "STOPPED_RED_EVENT / NOT_COMPLETED",
+  "task": "PHASE-1-T040",
+  "task_status": "blocked",
+  "results": [
+    {
+      "id": "R03",
+      "status": "observed",
+      "calls": 1,
+      "course_state": null,
+      "grades": {
+        "all_citations": "pass",
+        "all_claims": "pass",
+        "core_expected": "pass",
+        "final_status": "pass",
+        "full_quality": "pass",
+        "impact": "green",
+        "technical_integrity": "pass"
+      },
+      "conclusion": "R03通过：fact-major准确指出注释9而实现4，revise符合预标签允许集合，全部两条论据及a4引用有据；未启动纠正或发布。"
+    },
+    {
+      "id": "R04",
+      "status": "observed",
+      "calls": 1,
+      "course_state": null,
+      "grades": {
+        "all_citations": "pass",
+        "all_claims": "pass",
+        "core_expected": "pass",
+        "final_status": "pass",
+        "full_quality": "pass",
+        "impact": "green",
+        "technical_integrity": "pass"
+      },
+      "conclusion": "R04通过：fact-major/revise准确检出题干真、答案F、解析T的矛盾；两条论据和三个主辅引用逐项有据，无附带误报。独立资源观察不实际启动修正。"
+    },
+    {
+      "id": "A01",
+      "status": "observed",
+      "calls": 8,
+      "course_state": "awaiting_human",
+      "grades": {
+        "all_citations": "pass",
+        "all_claims": "pass",
+        "core_expected": "fail",
+        "final_status": "fail",
+        "full_quality": "fail",
+        "impact": "yellow",
+        "technical_integrity": "pass"
+      },
+      "conclusion": "A01未自动完成，有据awaiting_human。完整C main/stdio/for循环静态正确输出sum=14，s/i=0→7/1→9/2→14/3，i=3首次失败不读a[3]；但三题仅两题要求过程推演，q1只问合法下标，违反全部三题的原目标。两份needs_human论据正确，未错放为发布资格。另注意讲解把for的更新项口语称为循环体步骤略不严谨，本例不据此虚构安全严重错误；代码未编译执行。此项保留A分母，不改成人工通过或自动成功，可作为原A条件允许的1份待人工。"
+    },
+    {
+      "id": "A02",
+      "status": "observed",
+      "calls": 8,
+      "course_state": "rejected",
+      "grades": {
+        "all_citations": "fail",
+        "all_claims": "fail",
+        "core_expected": "fail",
+        "final_status": "fail",
+        "full_quality": "fail",
+        "impact": "red",
+        "technical_integrity": "pass"
+      },
+      "conclusion": "A02红停：实际完整代码push_front分配失败前不改链、free_list(Node **head)末尾*head=NULL/main传&head，静态正常两次成功输出8 3；但单元审核给释放片段虚构函数局部副本/调用者边界，确定major fact拒绝没有证据支持。正式a1引用不足支持该前提。另对只问最终遍历顺序就否定过程知识的断言有过强问题。按冻结无据严重拒绝红规则停续测，不追认A02通过，不修Prompt/样本重试，A03/A04保持未发送。所有新C未编译执行。"
+    },
+    {
+      "id": "A03",
+      "status": "not_run",
+      "calls": 0,
+      "reason": "RED_EVENT at A02; no reservation or send"
+    },
+    {
+      "id": "A04",
+      "status": "not_run",
+      "calls": 0,
+      "reason": "RED_EVENT at A02; no reservation or send"
+    }
+  ],
+  "counts": {
+    "new_observed_cases": 4,
+    "new_unrun_cases": 2,
+    "new_requests": 18,
+    "combined_requests": 28,
+    "new_generation_requests": 8,
+    "new_review_requests": 10,
+    "complete_schema_valid_responses": 18,
+    "new_input_tokens": 156020,
+    "new_output_tokens": 12130,
+    "new_total_tokens": 168150,
+    "combined_input_tokens": 300285,
+    "combined_output_tokens": 17845,
+    "combined_total_tokens": 318130,
+    "new_summed_response_duration_ms": 121089,
+    "combined_summed_response_duration_ms": 210214,
+    "transport_retries": 0,
+    "fallbacks": 0,
+    "project_judge_API_calls": 0,
+    "corrections": 0,
+    "actual_bill": null
+  },
+  "combined_case_accounting": {
+    "fixed_denominator": 16,
+    "observed": 14,
+    "frozen_core_matches": 11,
+    "nonmatches_or_conflicts": [
+      "R02 label/material conflict",
+      "A01 genuine pending",
+      "A02 unsupported serious rejection"
+    ],
+    "unrun": [
+      "A03",
+      "A04"
+    ],
+    "automatic_formal_A_successes": 0,
+    "not_a_population_error_rate": true
+  },
+  "A02_analysis": {
+    "primary_finding": "A02: unsupported fact/major rejection assumes local pointer copy and caller scope absent from the cited standalone markdown fragment; actual complete free_list(Node **head) resets *head.",
+    "evidence_limit": "No enclosing function/parameter/caller is supplied for the markdown snippet. The actual complete implementation uses a double pointer. Do not infer the snippet must be a by-value function parameter.",
+    "auxiliary_assessment": "Plan asks writing successive head/data/next states; resource-level finer trace-measurement concern is grounded. Unit blanket claim that a head-insertion ordering question uses no process knowledge is overstrong; retain uncertainty rather than assert every teaching goal passed.",
+    "technical_error_mapping": "DIAGNOSTIC_FAILURE is safe generic mapping of service rejection. Persisted operation error is CURRENT_CANDIDATE_REJECTED; all 18 responses were HTTP 200, not a Provider connectivity error.",
+    "unsupported_feedback_entered_correction": false
+  },
+  "actual_routes": [
+    {
+      "case_id": "R03",
+      "n": 1,
+      "model": "gpt-6-luna",
+      "host": "www.cbbb.fun",
+      "path": "/v1/responses",
+      "reasoning_requested": "high",
+      "http_status": 200,
+      "raw_complete": true,
+      "usage": {
+        "input_tokens": 9891,
+        "output_tokens": 289
+      },
+      "duration_ms": 7115,
+      "request_artifact_sha256": "252f75895d3581e4ecf7ad6ebfbeb9a222c5b5d91acc1eac50f36c769d4ac62e",
+      "response_sha256": "481e19eaa301b6c0f11b6749e936dabce19672354aa064be0bf615dd918ebc5e"
+    },
+    {
+      "case_id": "R04",
+      "n": 2,
+      "model": "gpt-6-luna",
+      "host": "www.cbbb.fun",
+      "path": "/v1/responses",
+      "reasoning_requested": "high",
+      "http_status": 200,
+      "raw_complete": true,
+      "usage": {
+        "input_tokens": 10936,
+        "output_tokens": 501
+      },
+      "duration_ms": 7684,
+      "request_artifact_sha256": "06b67ec9110d7deaa3c49561e26007ea3f886611dd27b4195aca4cbdb725913c",
+      "response_sha256": "1db913d0425c041270b05fa9f0e0b72b14488c840e181191893589d858900a03"
+    },
+    {
+      "case_id": "A01",
+      "n": 3,
+      "model": "deepseek-flash",
+      "host": "api.deepseek.com",
+      "path": "/responses",
+      "reasoning_requested": "none",
+      "http_status": 200,
+      "raw_complete": true,
+      "usage": {
+        "input_tokens": 1911,
+        "output_tokens": 992
+      },
+      "duration_ms": 4699,
+      "request_artifact_sha256": "6961a73bbfeda2c2fe8142d5071ff672558de8521154382b64781acc3a2870a0",
+      "response_sha256": "313af0713e95e9c5f5c61d104fe269c73831659ec50a675bde5c89081bffc3e1"
+    },
+    {
+      "case_id": "A01",
+      "n": 4,
+      "model": "deepseek-flash",
+      "host": "api.deepseek.com",
+      "path": "/responses",
+      "reasoning_requested": "none",
+      "http_status": 200,
+      "raw_complete": true,
+      "usage": {
+        "input_tokens": 1941,
+        "output_tokens": 774
+      },
+      "duration_ms": 3985,
+      "request_artifact_sha256": "0d2cda77dc855d7dbd5f5c7555d7716b4c7ea6e942a90db50662d0fb3e9ae928",
+      "response_sha256": "67a5a2731f13645a67128147ed6de1cc9ef75daeb89e38d93685529dccdff27e"
+    },
+    {
+      "case_id": "A01",
+      "n": 5,
+      "model": "gpt-6-luna",
+      "host": "www.cbbb.fun",
+      "path": "/v1/responses",
+      "reasoning_requested": "high",
+      "http_status": 200,
+      "raw_complete": true,
+      "usage": {
+        "input_tokens": 11362,
+        "output_tokens": 351
+      },
+      "duration_ms": 9023,
+      "request_artifact_sha256": "b31b180edd20bdc13967a3ccecc86422001703cab3ed7a068045bec07429556c",
+      "response_sha256": "39b0b6a6fe7807b29e11dd2ed4acff8111093bbd2c0421be6d277c5f54f364db"
+    },
+    {
+      "case_id": "A01",
+      "n": 6,
+      "model": "deepseek-flash",
+      "host": "api.deepseek.com",
+      "path": "/responses",
+      "reasoning_requested": "none",
+      "http_status": 200,
+      "raw_complete": true,
+      "usage": {
+        "input_tokens": 2969,
+        "output_tokens": 380
+      },
+      "duration_ms": 2036,
+      "request_artifact_sha256": "525567c4c1b3ef81b9630ad31dced1a320acab5ad1181458d5de8aea85e12d87",
+      "response_sha256": "c7b64169cf82178a784ea74bd1bdd6e1585e55be2095c9cff763f6cc31958db6"
+    },
+    {
+      "case_id": "A01",
+      "n": 7,
+      "model": "gpt-6-luna",
+      "host": "www.cbbb.fun",
+      "path": "/v1/responses",
+      "reasoning_requested": "high",
+      "http_status": 200,
+      "raw_complete": true,
+      "usage": {
+        "input_tokens": 11877,
+        "output_tokens": 340
+      },
+      "duration_ms": 6161,
+      "request_artifact_sha256": "39fdff54fd74ec4576ea6859876dc06c3341e619fc714c5cb0937cc428f80010",
+      "response_sha256": "ed2c9556c83fa9aa3705e5f0e805dcf62e12116f3af78823154341cc56cecf7e"
+    },
+    {
+      "case_id": "A01",
+      "n": 8,
+      "model": "deepseek-flash",
+      "host": "api.deepseek.com",
+      "path": "/responses",
+      "reasoning_requested": "none",
+      "http_status": 200,
+      "raw_complete": true,
+      "usage": {
+        "input_tokens": 4161,
+        "output_tokens": 534
+      },
+      "duration_ms": 2697,
+      "request_artifact_sha256": "822dcf36889f927c6165b2cffca012733d93666e028a89578dfafb2a615bcdc1",
+      "response_sha256": "e50728ac38c6461db7bbeb69ed9c2beb5dd33621ba634e72ccca728b0fed982d"
+    },
+    {
+      "case_id": "A01",
+      "n": 9,
+      "model": "gpt-6-luna",
+      "host": "www.cbbb.fun",
+      "path": "/v1/responses",
+      "reasoning_requested": "high",
+      "http_status": 200,
+      "raw_complete": true,
+      "usage": {
+        "input_tokens": 12486,
+        "output_tokens": 787
+      },
+      "duration_ms": 8855,
+      "request_artifact_sha256": "4cff8e68158d87891b0586f5ee62eb138c1baf78d31b92178d1d874fbd0081a4",
+      "response_sha256": "27c88806cce31dd601aebc0e4b74740f7d31edf641ce0c367c3f5ac10a323371"
+    },
+    {
+      "case_id": "A01",
+      "n": 10,
+      "model": "gpt-6-luna",
+      "host": "www.cbbb.fun",
+      "path": "/v1/responses",
+      "reasoning_requested": "high",
+      "http_status": 200,
+      "raw_complete": true,
+      "usage": {
+        "input_tokens": 19617,
+        "output_tokens": 1027
+      },
+      "duration_ms": 11562,
+      "request_artifact_sha256": "de6de7150542b0c721d56c534da9b3dd9e862204972aa0bc71713cb6ee141843",
+      "response_sha256": "a18cabc6b927f969588f23f1b9cfd4004ede420545afac586f85c4c10d635277"
+    },
+    {
+      "case_id": "A02",
+      "n": 11,
+      "model": "deepseek-flash",
+      "host": "api.deepseek.com",
+      "path": "/responses",
+      "reasoning_requested": "none",
+      "http_status": 200,
+      "raw_complete": true,
+      "usage": {
+        "input_tokens": 2005,
+        "output_tokens": 1002
+      },
+      "duration_ms": 4990,
+      "request_artifact_sha256": "04bd2c1a1242b0e18a00ab36e0902cefc57d425a1cedfd0f86e151e120db48a1",
+      "response_sha256": "4564e7773217531e1157b902c463c2bb9143465318b9b2547f374154058efe41"
+    },
+    {
+      "case_id": "A02",
+      "n": 12,
+      "model": "deepseek-flash",
+      "host": "api.deepseek.com",
+      "path": "/responses",
+      "reasoning_requested": "none",
+      "http_status": 200,
+      "raw_complete": true,
+      "usage": {
+        "input_tokens": 1991,
+        "output_tokens": 773
+      },
+      "duration_ms": 3795,
+      "request_artifact_sha256": "d9b58aeb7fcf0094ae528c7aa5cb461acfbfbf5b757651646df7532c75c31721",
+      "response_sha256": "23b7f5ab9eaeeb09172dc96c9aeabcaf3f7fbbded4bfebeb015535cc2aab1309"
+    },
+    {
+      "case_id": "A02",
+      "n": 13,
+      "model": "gpt-6-luna",
+      "host": "www.cbbb.fun",
+      "path": "/v1/responses",
+      "reasoning_requested": "high",
+      "http_status": 200,
+      "raw_complete": true,
+      "usage": {
+        "input_tokens": 11834,
+        "output_tokens": 877
+      },
+      "duration_ms": 11932,
+      "request_artifact_sha256": "94d60b5cb46e29bd00e289c137e954d2c72d38bad90412cfd190046b4b744fbd",
+      "response_sha256": "1eedd381288696de767b747163d39745657a6667584bb1575cd32758ea184f1c"
+    },
+    {
+      "case_id": "A02",
+      "n": 14,
+      "model": "deepseek-flash",
+      "host": "api.deepseek.com",
+      "path": "/responses",
+      "reasoning_requested": "none",
+      "http_status": 200,
+      "raw_complete": true,
+      "usage": {
+        "input_tokens": 3023,
+        "output_tokens": 705
+      },
+      "duration_ms": 2966,
+      "request_artifact_sha256": "268e3809263f97968517a9343a36df78550b53c67a0927073154b60794aa0e33",
+      "response_sha256": "d09b395734c3bf56f6be5006c6172b5de7e794b251f06b9fbc823515d9e00c02"
+    },
+    {
+      "case_id": "A02",
+      "n": 15,
+      "model": "gpt-6-luna",
+      "host": "www.cbbb.fun",
+      "path": "/v1/responses",
+      "reasoning_requested": "high",
+      "http_status": 200,
+      "raw_complete": true,
+      "usage": {
+        "input_tokens": 12475,
+        "output_tokens": 443
+      },
+      "duration_ms": 7408,
+      "request_artifact_sha256": "debf6a17cc22f0b904ee5b5288c96da984cc205cb26965eda229fbc02311354c",
+      "response_sha256": "75f4606495b7878e46df814cfb804d2d5f1d63210472e1200c527c27f97df416"
+    },
+    {
+      "case_id": "A02",
+      "n": 16,
+      "model": "deepseek-flash",
+      "host": "api.deepseek.com",
+      "path": "/responses",
+      "reasoning_requested": "none",
+      "http_status": 200,
+      "raw_complete": true,
+      "usage": {
+        "input_tokens": 4533,
+        "output_tokens": 518
+      },
+      "duration_ms": 3199,
+      "request_artifact_sha256": "381b5b90be2764726db3418f0d8aa7f6022ac9cc6d0da34d3817b2d1f55745c0",
+      "response_sha256": "f552a8df5faaeb011776dd5314eb1d85135632283c872f45bf05378b9d392f62"
+    },
+    {
+      "case_id": "A02",
+      "n": 17,
+      "model": "gpt-6-luna",
+      "host": "www.cbbb.fun",
+      "path": "/v1/responses",
+      "reasoning_requested": "high",
+      "http_status": 200,
+      "raw_complete": true,
+      "usage": {
+        "input_tokens": 12799,
+        "output_tokens": 600
+      },
+      "duration_ms": 8523,
+      "request_artifact_sha256": "c5eb3f1e4165c5162e5a0ee70d7add31f294acef4d37766a2388510b77af95eb",
+      "response_sha256": "c29af82089022815b3d8447433345d98b4188e5f598fe0c90915abaf5d9c70f9"
+    },
+    {
+      "case_id": "A02",
+      "n": 18,
+      "model": "gpt-6-luna",
+      "host": "www.cbbb.fun",
+      "path": "/v1/responses",
+      "reasoning_requested": "high",
+      "http_status": 200,
+      "raw_complete": true,
+      "usage": {
+        "input_tokens": 20209,
+        "output_tokens": 1237
+      },
+      "duration_ms": 14459,
+      "request_artifact_sha256": "b2c24882e4a17c1546176fe2a32b58943d551735b59a2b03758b9b14a95efe53",
+      "response_sha256": "624dd64bab8ee89457b8852ca6d630c0ecf3d55399430ea58df8412a7bed2091"
+    }
+  ],
+  "provider_effective_reasoning": "unknown; outbound requested high/none verified, not proof of provider internal effort",
+  "cleanup": {
+    "auth_sessions_after_cleanup": 0,
+    "browser_result": "not_completed: backend readiness timeout then Playwright navigation networkidle timeout; no screenshot or UI pass",
+    "browser_test_listeners_closed": true,
+    "counts_before_session_cleanup": {
+      "auth_sessions": 1,
+      "learning_operations": 2,
+      "learning_publications": 0,
+      "learning_review_cases": 1,
+      "learning_review_decisions": 0,
+      "learning_units": 2,
+      "users": 2
+    },
+    "isolated_database": "edumind_catalog_five_hour_r01",
+    "no_human_decision_created": true,
+    "operation_states": {
+      "A01": {
+        "safe_error_code": null,
+        "status": "awaiting_human"
+      },
+      "A02": {
+        "safe_error_code": "CURRENT_CANDIDATE_REJECTED",
+        "status": "rejected"
+      }
+    },
+    "production_database_accessed": false,
+    "student_published_scenes": {
+      "A01": 0,
+      "A02": 0
+    }
+  },
+  "limits": [
+    "Old R02 label and stop preserved; continuation does not retroactively pass the 16-case suite.",
+    "Interactive GPT scoring is not independent human truth or product human approval.",
+    "New C inspected statically only; no compilation/execution evidence.",
+    "Browser UI checks not completed due to readiness/navigation timeouts; no screenshot or UI pass.",
+    "No production database access, publication, dynamic activation, T041/T042, or original 100-goal / 98/95/90 acceptance."
+  ]
+}

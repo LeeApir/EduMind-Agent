@@ -1,0 +1,24 @@
+Get:1 https://snapshot.debian.org/archive/debian/20260505T000000Z trixie InRelease [140 kB]
+Get:2 https://snapshot.debian.org/archive/debian/20260505T000000Z trixie/main arm64 Packages [9607 kB]
+Fetched 9747 kB in 7s (1481 kB/s)
+Reading package lists...
+Reading package lists...
+Building dependency tree...
+Reading state information...
+Solving dependencies...
+Some packages could not be installed. This may mean that you have
+requested an impossible situation or if you are using the unstable
+distribution that some required packages have not yet been created
+or been moved out of Incoming.
+The following information may help to resolve the situation:
+
+The following packages have unmet dependencies:
+ libc6-dev : Depends: libc6 (= 2.41-12+deb13u2) but 2.41-12+deb13u3 is to be installed
+E: Unable to correct problems, you have held broken packages.
+E: The following information from --solver 3.0 may provide additional context:
+   Unable to satisfy dependencies. Reached two conflicting decisions:
+   1. libc6:arm64=2.41-12+deb13u2 is not selected for install
+   2. libc6:arm64=2.41-12+deb13u2 is selected as a downgrade because:
+      1. clang-19:arm64=1:19.1.7-3+b1 is selected for install
+      2. clang-19:arm64 Depends libc6-dev
+      3. libc6-dev:arm64 Depends libc6 (= 2.41-12+deb13u2)

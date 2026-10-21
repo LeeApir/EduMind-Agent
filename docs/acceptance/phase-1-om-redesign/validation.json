@@ -1,0 +1,68 @@
+{
+  "version": "om-redesign-t043-design-validation-v1",
+  "timestamp_local": "2026-10-15T15:44:48",
+  "base_commit": "e21d34099daeb48626913bdbef7c10e95fd72456",
+  "proposal_manifest_sha256": "e22737963a350f770d4b29b736c416d09118cfaa212e011e597191b149632740",
+  "checks": [
+    {
+      "command": [
+        "python3",
+        "-m",
+        "json.tool",
+        "task.json"
+      ],
+      "exit_code": 0,
+      "result": "valid JSON"
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/check_catalog_workflow.py"
+      ],
+      "exit_code": 0,
+      "result": "Active Phase 1 dependencies valid; catalog ledger valid; T033 blocked"
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/verify_legacy_archives.py"
+      ],
+      "exit_code": 0,
+      "result": "{\"passed\": true, \"source\": \"git_archives\", \"original_files_verified\": 236, \"experiment_files\": 64, \"evidence_files\": 169, \"provider_requests\": 0, \"t033\": \"blocked\"}"
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/verify_phase1_dynamic_approval.py"
+      ],
+      "exit_code": 0,
+      "result": "PASS: ADR-0011 A-D and labels approved; exact historical manifest verified; Provider requests/cost=0; dynamic opening=false"
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "result": ""
+    },
+    {
+      "command": "Python standard-library inline document hashes/relative links/fences/task contracts/state/arithmetic audit (this record)",
+      "exit_code": 0,
+      "result": "4 documents; 12 task contracts; 54 active tasks; original blocked T040 and pending implementation preserved; 20/22 call bound verified"
+    }
+  ],
+  "reader_check": "reader-check.md",
+  "reader_issues_fixed": [
+    "Current severe reject cannot be approved through a human case",
+    "Invalidated unpublished case terminates its operation",
+    "T049 and pipeline diagram match the decision priority and per-scene ordering"
+  ],
+  "runtime_tests": "NOT_RUN_DOCUMENT_ONLY",
+  "provider_requests": 0,
+  "code_implementation": "NOT_IMPLEMENTED",
+  "adr_status": "PROPOSED_A_D_PENDING",
+  "production_mode": "catalog_only",
+  "historical_outcomes_changed": false
+}

@@ -1,0 +1,36 @@
+{
+  "scope": "zero-call retrospective and unapproved decision proposal",
+  "baseline": "14bba23",
+  "provider_calls": 0,
+  "production_changes": false,
+  "checks": [
+    {
+      "command": "backend/.venv/bin/python docs/acceptance/phase-1-review-retrospective-20261017/check_results.py",
+      "result": "passed; counts, budgets, 37 local links, 20 readonly ledgers, 546 historical evidence files and 665 frozen sources unchanged"
+    },
+    {
+      "command": "python3 scripts/check_catalog_workflow.py",
+      "result": "passed; T040 remains blocked"
+    },
+    {
+      "command": "python3 scripts/verify_legacy_archives.py",
+      "result": "passed; 236 originals"
+    },
+    {
+      "command": "backend/.venv/bin/python docs/acceptance/phase-1-om-redesign/check_contract.py",
+      "result": "passed; 12 documents and 12 task contracts; structural checks only"
+    },
+    {
+      "command": "git diff --check",
+      "result": "passed"
+    }
+  ],
+  "reader_test": "AI fresh-context reader and final revision recheck passed; not human quality approval",
+  "limits": [
+    "No statistical reliability inferred from selected stopped diagnostics",
+    "Human workload is an estimate, not measured",
+    "Future candidate and budget unapproved",
+    "No old stopped balance restored",
+    "No app code changed; production tests not rerun"
+  ]
+}

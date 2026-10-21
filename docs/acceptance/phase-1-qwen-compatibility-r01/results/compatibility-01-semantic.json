@@ -1,0 +1,24 @@
+{
+  "proposal_sha256": "01b527442100d82165b467e1444578b8448a9e35fd829f2c363a84a800024358",
+  "receipt_sha256": "0714575a1e6eaa38373c9c3da28690e5dfaa77c4fd9ae43b834cc21130a2f885",
+  "reviewer_type": "assistant",
+  "compatibility_passed": true,
+  "core_safety_detection": true,
+  "core_source_explanation_mismatch": true,
+  "listed_anchor_instances_checked": 3,
+  "additional_prose_anchor_ids_checked": [
+    "a3",
+    "a4"
+  ],
+  "citation_support": "Listed a6 and a1/a6 support respective concrete claims; prose a3/a4 match exact actual key_steps; no irrelevant auxiliary anchor found. No new rule requiring prose IDs to also be listed in anchors is invented.",
+  "all_semantic_assertions_clean_pass": false,
+  "semantic_status": "needs_human_review_of_ambiguous_wording",
+  "issue": {
+    "finding_index": 1,
+    "exact_text": "returns `a[4]` (undefined behavior) instead of 16",
+    "assessment": "The expression a[4] and its undefined behavior are supported. The phrase instead of 16 can be read as contrasting the source expression/implementation, or as excluding the numeric outcome 16. The latter is unsupported; the former is valid. Finding0 expressly says no particular return or normal execution is guaranteed. Do not label this an explicit guaranteed-unequal claim, and do not silently rewrite it into a clean bounded statement. Retain actual text for human review."
+  },
+  "human_confirmed": false,
+  "t040_passed": false,
+  "next_call_authorized": false
+}

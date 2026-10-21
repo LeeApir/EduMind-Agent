@@ -1,0 +1,210 @@
+{
+  "source": "docs/acceptance/phase-1-five-hour-remaining-six-r01/actual-results.json",
+  "source_sha256": "d8371eab54ec1d1ca8aeb0fae4360a3f71d299b414e1ef24460924220a3e44a4",
+  "source_pointer": "/cases/3/generated_delivery",
+  "original_request": "主题是无头结点单链表头插法，C语言，空链表依次头插3和8。用int push_front(Node **head,int value)返回1成功/0失败；malloc失败不改变旧链表。提供讲解、含main和完整释放的可编译程序、恰好三道过程题及解析。指针和分配仅是配套要求，不另选教学主题；不需要动画。",
+  "plan": {
+    "code_language": "C",
+    "conventions": {
+      "capacity": null,
+      "index_base": null,
+      "not_applicable_reasons": [
+        "本主题为链表，不使用数组下标，故 index_base 不适用。",
+        "链表为动态长度，无固定容量，故 capacity 不适用。"
+      ],
+      "state_representation": "状态用 head 指向的结点序列表示，写作 head -> [d1] -> [d2] -> ... -> NULL；每个结点记作 [data|next]，next 用箭头指向后继或 NULL。空链表记作 head -> NULL。"
+    },
+    "goal": "主题是无头结点单链表头插法，C语言，空链表依次头插3和8。用int push_front(Node **head,int value)返回1成功/0失败；malloc失败不改变旧链表。提供讲解、含main和完整释放的可编译程序、恰好三道过程题及解析。指针和分配仅是配套要求，不另选教学主题；不需要动画。",
+    "graph_digest": "3639db6aedc9699348e63b5e7e1bdaaea3189592b19540c64e8f175aceb9ef59",
+    "graph_version": "mvp-0.2.0",
+    "node_id": "linked-list-insertion",
+    "objectives": [
+      {
+        "id": "obj-head-insert",
+        "text": "说明无头结点单链表头插法的核心步骤：为新结点分配内存、把新结点的 next 指向当前首结点、把 head 指针改为指向新结点，并解释为何空链表也适用。"
+      },
+      {
+        "id": "obj-push-front-contract",
+        "text": "按约定实现 int push_front(Node **head, int value)：成功返回 1，失败返回 0；malloc 失败时链表保持原状（head 与所有旧结点不变）。"
+      },
+      {
+        "id": "obj-trace",
+        "text": "对空链表依次头插 3 和 8，逐步写出 head 指向、各结点 data/next 与最终链表顺序，并解释头插导致逆序。"
+      },
+      {
+        "id": "obj-free",
+        "text": "编写并解释完整释放链表的循环，避免内存泄漏，并说明释放后 head 置为 NULL 的意义。"
+      }
+    ],
+    "prerequisite_node_ids": [
+      "single-linked-list",
+      "c-pointer"
+    ],
+    "profile_evidence_digest": "8838fdd11ee58e08fd54a21272313e784012370b7cf0a2cde8b823ed8806d85d",
+    "profile_version": null,
+    "references": [
+      {
+        "digest": "b06b9a38c5be73059d9b542efa22a7ddfcb65913cbf036573a69b2b4dcd0ed98",
+        "reference_id": "graph-node:mvp-0.2.0:linked-list-insertion",
+        "version": "mvp-0.2.0"
+      }
+    ],
+    "scenes": [
+      {
+        "depends_on": [],
+        "objective_ids": [
+          "obj-head-insert",
+          "obj-push-front-contract",
+          "obj-trace"
+        ],
+        "role": "explanation",
+        "scene_key": "explanation"
+      },
+      {
+        "depends_on": [
+          "explanation"
+        ],
+        "objective_ids": [
+          "obj-push-front-contract",
+          "obj-free"
+        ],
+        "role": "code",
+        "scene_key": "code"
+      },
+      {
+        "depends_on": [
+          "explanation",
+          "code"
+        ],
+        "objective_ids": [
+          "obj-trace",
+          "obj-push-front-contract",
+          "obj-free"
+        ],
+        "role": "exercise",
+        "scene_key": "exercise"
+      }
+    ],
+    "schema_version": "learning-plan-v1",
+    "shared_example": {
+      "initial_state": "head -> NULL",
+      "input_description": "初始为空的无头结点单链表（head == NULL），依次调用 push_front(&head, 3) 与 push_front(&head, 8)，每次 malloc 均成功。",
+      "steps": [
+        {
+          "expected_output": "1",
+          "expected_state": "head -> [3|NULL] -> NULL",
+          "operation": "push_front(&head, 3)：malloc 新结点 n1，n1->data=3，n1->next=*head(NULL)，*head=n1，返回 1"
+        },
+        {
+          "expected_output": "1",
+          "expected_state": "head -> [8|*] -> [3|NULL] -> NULL（即 8 -> 3）",
+          "operation": "push_front(&head, 8)：malloc 新结点 n2，n2->data=8，n2->next=*head(n1)，*head=n2，返回 1"
+        },
+        {
+          "expected_output": "8 3",
+          "expected_state": "head -> [8|*] -> [3|NULL] -> NULL",
+          "operation": "遍历打印链表"
+        },
+        {
+          "expected_output": null,
+          "expected_state": "head -> NULL",
+          "operation": "释放链表：依次 free 8 的结点、3 的结点，head 置 NULL"
+        }
+      ]
+    },
+    "terminology": [
+      {
+        "meaning": "链表没有专门的哨兵/哑结点；head 指针直接指向第一个存放数据的结点，空链表时 head 为 NULL。",
+        "term": "无头结点单链表"
+      },
+      {
+        "meaning": "指向链表首结点的指针变量；在 push_front 中通过 Node **head 传入其地址，以便函数内修改调用者的 head。",
+        "term": "head 指针"
+      },
+      {
+        "meaning": "含 int data 与 struct Node *next 两个成员的结构体；next 为 NULL 表示其后无结点。",
+        "term": "结点 Node"
+      },
+      {
+        "meaning": "新结点插入到链表最前端，成为新的首结点；多次头插使元素顺序与插入顺序相反。",
+        "term": "头插法"
+      },
+      {
+        "meaning": "指向 head 指针的指针（二级指针）；*head 即当前首结点，修改 *head 即修改调用者的 head。",
+        "term": "Node **head 参数"
+      },
+      {
+        "meaning": "malloc 返回 NULL；此时不得改动 *head 或任何旧结点，函数返回 0。",
+        "term": "malloc 失败"
+      },
+      {
+        "meaning": "1 表示插入成功，0 表示失败（本课中失败仅由 malloc 返回 NULL 引起）。",
+        "term": "返回码约定"
+      },
+      {
+        "meaning": "从头结点起逐个 free，先保存 next 再释放当前结点，最后把 head 置为 NULL。",
+        "term": "释放链表"
+      }
+    ]
+  },
+  "resources": [
+    {
+      "content": {
+        "markdown": "# 无头结点单链表头插法\n\n## 核心思路\n\n无头结点单链表中，`head` 指针直接指向第一个存放数据的结点；空链表时 `head == NULL`。头插法把新结点放到最前面，只需三步：\n\n1. 为新结点分配内存，并写入数据；\n2. 让新结点的 `next` 指向当前首结点（即 `*head`）；\n3. 让 `head` 改为指向新结点（即 `*head = 新结点`）。\n\n因为函数要修改调用者的 `head` 指针本身，所以参数用二级指针 `Node **head`，`*head` 就是当前首结点。\n\n## 为什么空链表也适用\n\n空链表时 `*head` 为 `NULL`。第 2 步让新结点的 `next = NULL`，正好表示它是唯一结点、后面没有结点；第 3 步让 `*head` 指向它。因此空链表和非空链表走的是同一套步骤，不需要特判。\n\n## 返回码与失败处理\n\n约定 `int push_front(Node **head, int value)`：成功返回 1，失败返回 0。本课中失败只由 `malloc` 返回 `NULL` 引起。此时必须**先检查再改动**：若分配失败，直接返回 0，`*head` 和所有旧结点都保持原状。\n\n关键顺序是：先 `malloc` 并判断，成功后才写 `data`、改 `next`、改 `*head`。\n\n## 具体例子：空链表依次头插 3 和 8\n\n初始：`head -> NULL`\n\n**第 1 次 `push_front(&head, 3)`**\n- 分配结点 n1，`n1->data = 3`；\n- `n1->next = *head`，即 `NULL`；\n- `*head = n1`；返回 1。\n\n状态：`head -> [3|NULL] -> NULL`\n\n**第 2 次 `push_front(&head, 8)`**\n- 分配结点 n2，`n2->data = 8`；\n- `n2->next = *head`，即指向 n1；\n- `*head = n2`；返回 1。\n\n状态：`head -> [8|*] -> [3|NULL] -> NULL`，遍历输出为 `8 3`。\n\n可以看到：3 先插入却在后面，8 后插入却在最前，所以头插会使元素顺序与插入顺序相反。\n\n## 释放链表\n\n释放时从头结点起逐个 `free`。必须先保存 `next` 再释放当前结点，否则释放后就无法找到后继：\n\n```c\nNode *p = head;\nwhile (p != NULL) {\n    Node *next = p->next;  /* 先保存后继 */\n    free(p);               /* 再释放当前结点 */\n    p = next;\n}\nhead = NULL;               /* 防止悬空指针 */\n```\n\n最后把 `head` 置为 `NULL`，表示链表已空，避免后续误用已释放的内存。"
+      },
+      "content_digest": "0cfd9d8c9a94d26f51d0d02a67d8697467cf00cd203938473509a49b2862a6ae",
+      "id": "bc4266dd-0e32-4aa8-a9a1-c89f15756825",
+      "review_status": "pending",
+      "version": 1
+    },
+    {
+      "content": {
+        "display_only": true,
+        "expected_output": "1\n1\n8 3 \nhead == NULL: 1",
+        "key_steps": [
+          "定义结点结构体 Node，含 int data 与 struct Node *next；main 中令 head = NULL 表示空链表。",
+          "push_front 先用 malloc 分配新结点并立即检查是否为 NULL，失败直接返回 0，此时 *head 与旧结点均未改动。",
+          "分配成功后依次执行 n->data = value、n->next = *head、*head = n，最后返回 1；空链表时 *head 为 NULL，新结点 next 自然为 NULL，无需特判。",
+          "依次调用 push_front(&head, 3) 与 push_front(&head, 8)，链表变为 head -> [8|*] -> [3|NULL] -> NULL，体现头插导致逆序。",
+          "print_list 从头结点沿 next 遍历并打印，输出 8 3。",
+          "free_list 循环中先保存 next 再 free 当前结点，最后把 head 置为 NULL，避免内存泄漏与悬空指针。"
+        ],
+        "language": "C",
+        "source": "#include <stdio.h>\n#include <stdlib.h>\n\ntypedef struct Node {\n    int data;\n    struct Node *next;\n} Node;\n\n/* 头插法：成功返回 1，失败返回 0；失败时链表保持原状 */\nint push_front(Node **head, int value) {\n    Node *n = (Node *)malloc(sizeof(Node));\n    if (n == NULL) {\n        return 0;              /* 分配失败：不改动 *head 和旧结点 */\n    }\n    n->data = value;\n    n->next = *head;           /* 新结点指向当前首结点（空链表时为 NULL） */\n    *head = n;                 /* head 改为指向新结点 */\n    return 1;\n}\n\nvoid print_list(const Node *head) {\n    const Node *p = head;\n    while (p != NULL) {\n        printf(\"%d \", p->data);\n        p = p->next;\n    }\n    printf(\"\\n\");\n}\n\nvoid free_list(Node **head) {\n    Node *p = *head;\n    while (p != NULL) {\n        Node *next = p->next;  /* 先保存后继 */\n        free(p);               /* 再释放当前结点 */\n        p = next;\n    }\n    *head = NULL;              /* 防止悬空指针 */\n}\n\nint main(void) {\n    Node *head = NULL;         /* 空链表：head -> NULL */\n\n    printf(\"%d\\n\", push_front(&head, 3));\n    printf(\"%d\\n\", push_front(&head, 8));\n\n    print_list(head);\n\n    free_list(&head);\n    printf(\"head == NULL: %d\\n\", head == NULL);\n    return 0;\n}"
+      },
+      "content_digest": "faafec959399810cb4db1c09acc6dbc3d978fdb144a1545021599b70bba32763",
+      "id": "10b91057-f7f1-4400-8673-ea09b401b96a",
+      "review_status": "pending",
+      "version": 1
+    },
+    {
+      "content": {
+        "items": [
+          {
+            "answer": "B",
+            "explanation": "正确顺序是让新结点的 next 指向当前首结点（n->next = *head），再把 head 改为指向新结点（*head = n）。若先改 *head，旧首结点就会丢失，新结点的 next 也无法正确指向原来的首结点。",
+            "id": "q1",
+            "question": "[单选题] 在无头结点单链表中，用 int push_front(Node **head, int value) 实现头插法。malloc 成功后，下列哪一组操作顺序能正确完成插入？\nA. 先执行 *head = n，再执行 n->next = *head\nB. 先执行 n->next = *head，再执行 *head = n\nC. 先执行 n->next = n，再执行 *head = n\nD. 先执行 *head = NULL，再执行 n->next = *head\n仅填 A、B、C 或 D"
+          },
+          {
+            "answer": "F",
+            "explanation": "空链表时 *head 为 NULL，执行 n->next = *head 就得到 n->next = NULL，正好表示新结点是唯一结点；随后 *head = n 即可。空链表与非空链表走同一套步骤，不需要特判。",
+            "id": "q2",
+            "question": "[判断题] 对空链表（head == NULL）调用 push_front(&head, 3) 时，必须先特判空链表，否则新结点的 next 无法正确设置。仅填 T 或 F（T=正确，F=错误）"
+          },
+          {
+            "answer": "B",
+            "explanation": "第一次头插 3 后链表为 3 -> NULL；第二次头插 8 时，8 的 next 指向当前首结点 3，head 改为指向 8，链表变为 8 -> 3 -> NULL，因此遍历输出 8 3。头插使元素顺序与插入顺序相反。",
+            "id": "q3",
+            "question": "[单选题] 初始 head -> NULL，依次调用 push_front(&head, 3) 与 push_front(&head, 8)，两次 malloc 均成功。从头结点开始遍历，输出顺序是什么？\nA. 3 8\nB. 8 3\nC. 3 3\nD. 8 8\n仅填 A、B、C 或 D"
+          }
+        ]
+      },
+      "content_digest": "b25af56df34a8543a9a3b497796f917531773c46176a8598fc1e6e32ebe1569c",
+      "id": "f34b278c-4350-45ff-8678-d139a3386d52",
+      "review_status": "pending",
+      "version": 1
+    }
+  ],
+  "actual_model_output_modified": false
+}

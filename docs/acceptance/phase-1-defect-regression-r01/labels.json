@@ -1,0 +1,186 @@
+{
+  "labels": {
+    "pointer-scope--correct": {
+      "expected_verdict": "pass",
+      "required_claims": [
+        "按形参Node **、赋值*head=NULL和调用&head判断；不可将讲解局部变量片段脱离完整源码而判调用方悬垂。"
+      ],
+      "forbidden_claims": [
+        "将模型计划承诺冒称为原始用户要求",
+        "把无法保证P当作确定非P",
+        "无据断言调用者悬垂或UB的确定数值"
+      ],
+      "expected_category": null,
+      "expected_severity": null,
+      "author": "Codex authored calibration labels; not independent human truth",
+      "actual_result": null
+    },
+    "pointer-scope--error": {
+      "expected_verdict": "reject",
+      "required_claims": [
+        "malloc成功路径中Node *按值传递，函数已释放对象，main再次free同一地址构成可达二次释放；不推导UB确定返回值。"
+      ],
+      "forbidden_claims": [
+        "将模型计划承诺冒称为原始用户要求",
+        "把无法保证P当作确定非P",
+        "无据断言调用者悬垂或UB的确定数值"
+      ],
+      "expected_category": "code_safety",
+      "expected_severity": "severe",
+      "author": "Codex authored calibration labels; not independent human truth",
+      "actual_result": null
+    },
+    "pointer-scope--insufficient": {
+      "expected_verdict": "needs_human",
+      "required_claims": [
+        "函数体/后续用途缺失，不能保证安全也不能断定已释放或二次释放；不能把Node *声明当函数已释放的证据。"
+      ],
+      "forbidden_claims": [
+        "将模型计划承诺冒称为原始用户要求",
+        "把无法保证P当作确定非P",
+        "无据断言调用者悬垂或UB的确定数值"
+      ],
+      "expected_category": null,
+      "expected_severity": null,
+      "author": "Codex authored calibration labels; not independent human truth",
+      "actual_result": null
+    },
+    "plan-consistency--correct": {
+      "expected_verdict": "pass",
+      "required_claims": [
+        "目标、轨迹、学生实现均为19，无计划矛盾误报。"
+      ],
+      "forbidden_claims": [
+        "将模型计划承诺冒称为原始用户要求",
+        "把无法保证P当作确定非P",
+        "无据断言调用者悬垂或UB的确定数值"
+      ],
+      "expected_category": null,
+      "expected_severity": null,
+      "author": "Codex authored calibration labels; not independent human truth",
+      "actual_result": null
+    },
+    "plan-consistency--error": {
+      "expected_verdict": "needs_human",
+      "required_claims": [
+        "计划目标17与自身轨迹/数组和19矛盾；学生代码19正确。需修正/澄清计划，不怪用户。"
+      ],
+      "forbidden_claims": [
+        "将模型计划承诺冒称为原始用户要求",
+        "把无法保证P当作确定非P",
+        "无据断言调用者悬垂或UB的确定数值"
+      ],
+      "expected_category": null,
+      "expected_severity": null,
+      "author": "Codex authored calibration labels; not independent human truth",
+      "actual_result": null
+    },
+    "plan-consistency--insufficient": {
+      "expected_verdict": "needs_human",
+      "required_claims": [
+        "缺指定元素，无法核验该次和是否19；不宣布计划确定自相矛盾或一定非19。"
+      ],
+      "forbidden_claims": [
+        "将模型计划承诺冒称为原始用户要求",
+        "把无法保证P当作确定非P",
+        "无据断言调用者悬垂或UB的确定数值"
+      ],
+      "expected_category": null,
+      "expected_severity": null,
+      "author": "Codex authored calibration labels; not independent human truth",
+      "actual_result": null
+    },
+    "requirement-origin--correct": {
+      "expected_verdict": "pass",
+      "required_claims": [
+        "原文19、计划19、代码19一致；不把图谱背景扩大成必达目标或要求动画。"
+      ],
+      "forbidden_claims": [
+        "将模型计划承诺冒称为原始用户要求",
+        "把无法保证P当作确定非P",
+        "无据断言调用者悬垂或UB的确定数值"
+      ],
+      "expected_category": null,
+      "expected_severity": null,
+      "author": "Codex authored calibration labels; not independent human truth",
+      "actual_result": null
+    },
+    "requirement-origin--error": {
+      "expected_verdict": "reject",
+      "required_claims": [
+        "原文要求19，只有计划追加17；讲解把17归给用户无据，实际求和代码仍返回19，与讲解/预期17矛盾。"
+      ],
+      "forbidden_claims": [
+        "将模型计划承诺冒称为原始用户要求",
+        "把无法保证P当作确定非P",
+        "无据断言调用者悬垂或UB的确定数值"
+      ],
+      "expected_category": "fact",
+      "expected_severity": "major",
+      "author": "Codex authored calibration labels; not independent human truth",
+      "actual_result": null
+    },
+    "requirement-origin--insufficient": {
+      "expected_verdict": "needs_human",
+      "required_claims": [
+        "已知求和19正确，附件的附加要求不可核验；不能虚构附件要求17或声称全部满足。"
+      ],
+      "forbidden_claims": [
+        "将模型计划承诺冒称为原始用户要求",
+        "把无法保证P当作确定非P",
+        "无据断言调用者悬垂或UB的确定数值"
+      ],
+      "expected_category": null,
+      "expected_severity": null,
+      "author": "Codex authored calibration labels; not independent human truth",
+      "actual_result": null
+    },
+    "assessment-coverage--correct": {
+      "expected_verdict": "pass",
+      "required_claims": [
+        "教学分散覆盖且完整状态表判断题真实要求推演，干净pass；不能因不是开放题或讲解未重写轨迹而误拒。"
+      ],
+      "forbidden_claims": [
+        "将模型计划承诺冒称为原始用户要求",
+        "把无法保证P当作确定非P",
+        "无据断言调用者悬垂或UB的确定数值"
+      ],
+      "expected_category": null,
+      "expected_severity": null,
+      "author": "Codex authored calibration labels; not independent human truth",
+      "actual_result": null
+    },
+    "assessment-coverage--error": {
+      "expected_verdict": "needs_human",
+      "required_claims": [
+        "过程已在代码步骤明确教过；三题仅算术，未测完整状态和退出；needs_human，不编造fact。"
+      ],
+      "forbidden_claims": [
+        "将模型计划承诺冒称为原始用户要求",
+        "把无法保证P当作确定非P",
+        "无据断言调用者悬垂或UB的确定数值"
+      ],
+      "expected_category": null,
+      "expected_severity": null,
+      "author": "Codex authored calibration labels; not independent human truth",
+      "actual_result": null
+    },
+    "assessment-coverage--insufficient": {
+      "expected_verdict": "needs_human",
+      "required_claims": [
+        "缺题本正文，不能判断实际过程测量；指出缺证据，不能声称未见题本一定只考算术或一定合格。"
+      ],
+      "forbidden_claims": [
+        "将模型计划承诺冒称为原始用户要求",
+        "把无法保证P当作确定非P",
+        "无据断言调用者悬垂或UB的确定数值"
+      ],
+      "expected_category": null,
+      "expected_severity": null,
+      "author": "Codex authored calibration labels; not independent human truth",
+      "actual_result": null
+    }
+  },
+  "independent_human": false,
+  "status": "authored calibration; do not inject labels into reviewer requests"
+}

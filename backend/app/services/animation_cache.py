@@ -16,6 +16,7 @@ from app.animation_templates.insertion_plan import srt_for_insertion
 from app.services.animation_renderer import (
     IMAGE,
     ROOT,
+    RenderController,
     RenderedCandidate,
     render_template,
 )
@@ -195,7 +196,7 @@ class AnimationCache:
 
     def resolve(
         self, template_id: str, parameters: Mapping[str, object],
-        *, container_name: str | None = None,
+        *, container_name: str | None = None, controller: RenderController | None = None,
     ) -> CachedAnimation:
         """Hit an audited public asset first; otherwise render only its fixed template."""
         if template_id not in _ALLOWED:
@@ -224,6 +225,8 @@ class AnimationCache:
             render_options: dict[str, object] = {"work_root": self.root / "attempts"}
             if container_name is not None:
                 render_options["container_name"] = container_name
+            if controller is not None and self.renderer is render_template:
+                render_options["controller"] = controller
             candidate = self.renderer(template_id, normalized, **render_options)
             try:
                 object_lock = self.root / "locks" / "objects.lock"

@@ -2,7 +2,7 @@
 import { computed, ref } from "vue";
 import { NButton, NTag } from "naive-ui";
 
-export type ReviewState = "idle" | "reviewing" | "published" | "rejected";
+export type ReviewState = "idle" | "reviewing" | "published" | "rejected" | "awaiting_human";
 
 export interface PublishedResource {
   id: string;
@@ -12,6 +12,8 @@ export interface PublishedResource {
 
 const props = defineProps<{
   temporaryText: string;
+  phaseLabel?: string;
+  approvalSource?: string;
   reviewState: ReviewState;
   publishedResources?: PublishedResource[];
   reloadPublished?: () => Promise<void>;
@@ -38,36 +40,115 @@ async function reload(): Promise<void> {
 </script>
 
 <template>
-  <section class="learning-progress" aria-live="polite">
-    <section v-if="hasTemporaryText" class="temporary-card" data-testid="temporary-explanation">
-      <div class="resource-label"><NTag type="warning" size="small">临时流式内容</NTag><span>尚未审核，不会作为正式资源保存</span></div>
+  <section
+    class="learning-progress"
+    aria-live="polite"
+  >
+    <section
+      v-if="hasTemporaryText"
+      class="temporary-card"
+      data-testid="temporary-explanation"
+    >
+      <div class="resource-label">
+        <NTag
+          type="warning"
+          size="small"
+        >
+          临时流式内容
+        </NTag><span>尚未审核，不会作为正式资源保存</span>
+      </div>
       <h2>首段讲解</h2>
       <p class="temporary-body">
         {{ temporaryText }}
       </p>
     </section>
-    <section v-else class="empty-card" data-testid="empty-state">
+    <section
+      v-else-if="reviewState !== 'published' && reviewState !== 'awaiting_human'"
+      class="empty-card"
+      data-testid="empty-state"
+    >
       <h2>首段讲解会显示在这里</h2>
-      <p>输入学习目标后，启智会先流式展示一段临时讲解。</p>
+      <p>输入学习目标后，启智会准备讲解、代码和练习，审核完成后显示正式内容。</p>
     </section>
 
-    <section v-if="reviewState === 'reviewing'" class="review-state" data-testid="reviewing-state">
+    <p
+      v-if="phaseLabel"
+      data-testid="generation-phase"
+    >
+      {{ phaseLabel }}
+    </p>
+    <section
+      v-if="reviewState === 'awaiting_human'"
+      class="review-state"
+      data-testid="human-review-state"
+    >
+      内容待人工复核，暂不可作为正式课程使用。你可以继续已有课程；处理时间尚未确定。
+      <NButton
+        v-if="reloadPublished"
+        size="small"
+        @click="reload"
+      >
+        刷新复核状态
+      </NButton>
+    </section>
+    <section
+      v-else-if="reviewState === 'reviewing'"
+      class="review-state"
+      data-testid="reviewing-state"
+    >
       正在审核并准备正式学习资源。临时首段仍可继续阅读。
     </section>
-    <section v-else-if="reviewState === 'rejected'" class="review-state rejected" data-testid="review-rejected-state">
+    <section
+      v-else-if="reviewState === 'rejected'"
+      class="review-state rejected"
+      data-testid="review-rejected-state"
+    >
       本次正式资源未通过审核，临时首段不会被保存。请调整学习目标后重新开始。
     </section>
-    <section v-else-if="reviewState === 'published'" class="published-state" data-testid="published-state">
+    <section
+      v-else-if="reviewState === 'published'"
+      class="published-state"
+      data-testid="published-state"
+    >
       <div>
-        <NTag type="success" size="small">已审核正式资源</NTag>
+        <NTag
+          type="success"
+          size="small"
+        >
+          已审核正式资源
+        </NTag>
+        <p v-if="approvalSource">
+          {{ approvalSource === "human_assisted" ? "人工复核后发布" : "自动审核后发布" }}
+        </p>
         <p>以下资源已通过审核，可安全继续学习。</p>
       </div>
-      <NButton :loading="reloadState === 'loading'" @click="reload">重新加载</NButton>
-      <p v-if="reloadState === 'error'" class="reload-error" role="alert">{{ reloadError }}</p>
-      <ul v-if="publishedResources?.length" aria-label="已发布资源">
-        <li v-for="resource in publishedResources" :key="resource.id">{{ resource.type }} · v{{ resource.version }}</li>
+      <NButton
+        :loading="reloadState === 'loading'"
+        @click="reload"
+      >
+        重新加载
+      </NButton>
+      <p
+        v-if="reloadState === 'error'"
+        class="reload-error"
+        role="alert"
+      >
+        {{ reloadError }}
+      </p>
+      <ul
+        v-if="publishedResources?.length"
+        aria-label="已发布资源"
+      >
+        <li
+          v-for="resource in publishedResources"
+          :key="resource.id"
+        >
+          {{ resource.type }} · v{{ resource.version }}
+        </li>
       </ul>
-      <p v-else>正式资源已准备好；正在读取资源清单。</p>
+      <p v-else>
+        正式资源已准备好；正在读取资源清单。
+      </p>
     </section>
   </section>
 </template>

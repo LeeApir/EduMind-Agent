@@ -1,0 +1,62 @@
+{
+  "version": "derived-r09-readiness-validation-v1",
+  "recorded_at": "2026-10-15T13:23:32",
+  "baseline_commit": "6b8ba27",
+  "authorization": "User 开始: complete prerequisites and prepare exact reviewable run; no exact paid-run approval yet",
+  "root_sha256": "9fafc55d9034be4f6958004a921a2ec8bcf0972bb379d95a84b0bd7e6cab8db4",
+  "frozen_source_files": 202,
+  "new_tests": 28,
+  "baseline_tests": 311,
+  "combined_tests": 339,
+  "combined_result": "passed",
+  "ruff": "passed",
+  "production_mypy_source_files": 166,
+  "production_mypy_result": "passed",
+  "scripts_strict_type_check": "NOT_RUN: outside app scope",
+  "source_sha256": {
+    "scripts/prepare_t040_derived_run.py": "980a188e699c686ab16263fa643bbdca49b4d478eaa20c1bcb7752ca172fbdc0",
+    "scripts/run_t040_derived_calibration.py": "73aba54fc43c5b78e5a4d4f39be773e56b29927566096ca3aae2f4a4d72380dc",
+    "backend/tests/test_t040_derived_run.py": "4582065f8dc7dc6cac6a995fb3797fe1e9002cebf1d80c21df5aa4cc63d27df7"
+  },
+  "token_bound_kind": "provider-context-contract ceiling with extra positive wire slack, not byte/token conversion or tokenizer proof",
+  "requested_potential_calls": 38,
+  "requested_cost_micro_cny": 120149000,
+  "expected_consumption": null,
+  "actual_bill": null,
+  "provider_requests": 0,
+  "provider_cost": 0,
+  "run_approval_created": false,
+  "real_env_metadata_accessed": true,
+  "real_key_read": false,
+  "real_ledger_or_registry_created": false,
+  "actual_cli_unapproved_step": {
+    "exit_code": 1,
+    "error": "NOT_AUTHORIZED",
+    "result": "expected fail-closed, not a passed live run"
+  },
+  "mock_only_tests": true,
+  "rule_sources_checked": 6,
+  "r08_sources_checked": 186,
+  "r08_ledger_attempts": 1,
+  "r08_halted": "CONCRETE_DEFECT_MISSED",
+  "production_mode": "catalog_only",
+  "t040_complete": false,
+  "commands": [
+    "backend/.venv/bin/pytest -q backend/tests/test_t040_derived_run.py backend/tests/test_derived_responses_sender.py backend/tests/test_derived_diagnostic_budget.py backend/tests/test_claim_review_prototype.py backend/tests/test_review_scope.py backend/tests/test_review_indexing.py backend/tests/test_review_agent.py backend/tests/test_review_failure_paths.py backend/tests/test_deepseek_reasoning.py backend/tests/test_t040_high_plan.py backend/tests/test_t040_diagnostic_runner.py backend/tests/test_t040_diagnostic_preparation.py backend/tests/test_deepseek_responses.py backend/tests/test_phase1_dynamic_gate.py backend/tests/test_acceptance_budget.py --tb=short",
+    "backend/.venv/bin/ruff check scripts/prepare_t040_derived_run.py scripts/run_t040_derived_calibration.py backend/tests/test_t040_derived_run.py",
+    "cd backend then .venv/bin/mypy app",
+    "backend/.venv/bin/python scripts/prepare_t040_derived_run.py --check",
+    "backend/.venv/bin/python scripts/run_t040_derived_calibration.py check",
+    "backend/.venv/bin/python scripts/run_t040_derived_calibration.py step",
+    "backend/.venv/bin/python scripts/check_catalog_workflow.py",
+    "backend/.venv/bin/python scripts/verify_phase1_dynamic_approval.py",
+    "backend/.venv/bin/python scripts/verify_phase1_dynamic_freeze.py"
+  ],
+  "limitations": [
+    "Contract bound depends on provider honoring published window/usage/prices; not an account hard limit.",
+    "Trusted approval/assessment records derive from actual user messages; parser does not authenticate arbitrary human identity.",
+    "Metadata binding prevents ordinary env replacement/rotation, not an attacker with authority to rewrite all local state.",
+    "Synthetic leases/facts do not establish real semantic quality, TLS or costs.",
+    "Actual model weights revision unknown, K16 extraction success unverified."
+  ]
+}

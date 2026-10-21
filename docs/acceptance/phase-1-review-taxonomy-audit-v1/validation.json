@@ -1,0 +1,94 @@
+{
+  "version": "review-taxonomy-audit-v1",
+  "baseline": "b9bf094",
+  "provider_requests": 0,
+  "production_prompt_schema_changes": false,
+  "historical_result_changes": false,
+  "checks": [
+    {
+      "command": "backend/.venv/bin/python -m pytest -q scripts/tests/test_review_taxonomy_replay.py scripts/tests/test_coverage_v44.py scripts/tests/test_coverage_admission.py scripts/tests/test_coverage_review.py scripts/tests/test_om_admission.py scripts/tests/test_om_admission_r02.py scripts/tests/test_om_admission_r03.py backend/tests/test_acceptance_budget.py backend/tests/test_derived_diagnostic_budget.py backend/tests/test_real_browser_budget.py",
+      "result": "149 passed; 5 new offline evidence/routing tests"
+    },
+    {
+      "command": "backend/.venv/bin/ruff check scripts/tests/test_review_taxonomy_replay.py",
+      "result": "passed"
+    },
+    {
+      "command": "backend/.venv/bin/python docs/acceptance/phase-1-om-redesign/check_contract.py",
+      "result": "12 original documents /12 task contracts valid"
+    },
+    {
+      "command": "python3 scripts/verify_legacy_archives.py",
+      "result": "236 original files verified"
+    },
+    {
+      "command": "python3 scripts/check_catalog_workflow.py",
+      "result": "valid"
+    }
+  ],
+  "historical_integrity": {
+    "against_commit": "b9bf094",
+    "unchanged_files": 71,
+    "ledgers": [
+      {
+        "run": "phase-1-om-admission-r01",
+        "attempts": 2,
+        "halted": "SAFETY_FAILURE",
+        "states": {
+          "complete": 1,
+          "failed": 1
+        }
+      },
+      {
+        "run": "phase-1-om-admission-r02",
+        "attempts": 1,
+        "halted": "INVALID_OUTPUT",
+        "states": {
+          "failed": 1
+        }
+      },
+      {
+        "run": "phase-1-om-admission-r03",
+        "attempts": 2,
+        "halted": "INVALID_OUTPUT",
+        "states": {
+          "complete": 1,
+          "failed": 1
+        }
+      },
+      {
+        "run": "phase-1-coverage-r04-real",
+        "attempts": 1,
+        "halted": "INVALID_OUTPUT",
+        "states": {
+          "failed": 1
+        }
+      },
+      {
+        "run": "phase-1-coverage-r05-real",
+        "attempts": 3,
+        "halted": "INVALID_OUTPUT",
+        "states": {
+          "complete": 2,
+          "failed": 1
+        }
+      }
+    ],
+    "fourth_slot": "NOT_RUN"
+  },
+  "actual_result_replay": {
+    "local_verdict": "needs_human",
+    "reason": "SEMANTIC_UNRESOLVED",
+    "admission": "PURE_COVERAGE_FINDING_INVALID"
+  },
+  "not_rerun": "No production changes; PG219 and mypy190 baseline4d66a7d not rerun or counted here.",
+  "limits": [
+    "Assistant audit is not human signoff",
+    "Synthetic routing tests are not model semantic evaluation",
+    "Closed reference model is not arbitrary C execution",
+    "No keyword reclassification or deletion of actual findings",
+    "No new paid run authorized or executed"
+  ],
+  "T040": "blocked",
+  "production_mode": "catalog_only"
+}

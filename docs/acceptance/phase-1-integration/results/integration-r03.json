@@ -1,0 +1,5068 @@
+{
+  "source_commit": "1f46d5b8fac1ecb932380ff8fce0144dfb4987af",
+  "clean_before": true,
+  "protocol_sha256": "7e8ae7cecabdd28acb87c712f2ed98658f13d4d635e340d46ab39bef1833655e",
+  "provider_requests": 0,
+  "dependency_method": "cached locked installations; no new network install",
+  "python_versions": {
+    "alembic": "1.15.2",
+    "asyncpg": "0.30.0",
+    "cryptography": "50.0.2",
+    "celery": "5.6.3",
+    "kombu": "5.6.2",
+    "redis": "6.4.0",
+    "fastapi": "0.115.12",
+    "httpx": "0.28.1",
+    "jsonschema": "4.25.1",
+    "sqlalchemy": "2.0.40",
+    "uvicorn": "0.34.0",
+    "mypy": "1.15.0",
+    "playwright": "1.63.0",
+    "pytest": "8.3.5",
+    "ruff": "0.11.9"
+  },
+  "lock_sha256": {
+    "backend/uv.lock": "f891dba550dab343335b714bb3cbbe7e498ed18afa001f5123c7e7dccefc5efe",
+    "web/pnpm-lock.yaml": "695c3e8402a5582d4fbdded2ef46cee3fdcd550cbd8f08bca800b9a1d8374705"
+  },
+  "commands": [
+    {
+      "name": "backend-mypy",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "mypy",
+        "app"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-ruff",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "ruff",
+        "check",
+        "app",
+        "tests"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "web-dependencies",
+      "command": [
+        "pnpm",
+        "list",
+        "--depth",
+        "0",
+        "--json"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "web-unit",
+      "command": [
+        "pnpm",
+        "test",
+        "--run"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "web-typecheck",
+      "command": [
+        "pnpm",
+        "typecheck"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "web-lint",
+      "command": [
+        "pnpm",
+        "lint"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "web-build",
+      "command": [
+        "pnpm",
+        "build"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-000-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-000",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_acceptance_budget.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-000.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-001-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-001",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_animation_cache.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-001.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-002-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-002",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_animation_dsl_compiler.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-002.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-003-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-003",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_animation_dsl_review.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-003.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-004-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-004",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_animation_dsl_validation.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-004.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-005-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-005",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_animation_events_api.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-005.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-006-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-006",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_animation_job_api.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-006.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-007-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-007",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_animation_job_persistence.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-007.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-008-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-008",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_animation_media_api.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-008.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-009-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-009",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_animation_renderer.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-009.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-010-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-010",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_animation_templates.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-010.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-011-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-011",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_animation_worker.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-011.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-012-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-012",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_anthropic_adapter.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-012.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-013-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-013",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_auth.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-013.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-014-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-014",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_catalog_acceptance_metrics.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-014.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-015-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-015",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_catalog_component_gate.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-015.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-016-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-016",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_catalog_content.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-016.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-017-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-017",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_catalog_demo.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-017.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-018-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-018",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_catalog_exports.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-018.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-019-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-019",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_catalog_mode.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-019.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-020-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-020",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_catalog_package.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-020.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-021-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-021",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_catalog_publication.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-021.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-022-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-022",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_catalog_quiz.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-022.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-023-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-023",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_catalog_release_preflight.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-023.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-024-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-024",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_catalog_sessions.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-024.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-025-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-025",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_celery_job_recovery.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-025.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-026-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-026",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_classroom_context.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-026.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-027-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-027",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_classroom_controls_api.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-027.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-028-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-028",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_classroom_mode_api.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-028.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-029-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-029",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_classroom_persistence.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-029.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-030-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-030",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_classroom_roles.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-030.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-031-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-031",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_classroom_speech_api.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-031.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-032-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-032",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_classroom_speech_review.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-032.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-033-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-033",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_classroom_speech_rules.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-033.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-034-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-034",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_config.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-034.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-035-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-035",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_database.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-035.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-036-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-036",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_database_lifespan.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-036.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-037-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-037",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_debate_api.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-037.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-038-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-038",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_debate_candidate_generator.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-038.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-039-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-039",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_debate_feedback_api.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-039.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-040-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-040",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_debate_review.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-040.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-041-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-041",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_deepseek_beta_tools.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-041.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-042-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-042",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_deepseek_responses.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-042.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-043-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-043",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_diagnostic_three.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-043.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-044-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-044",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_dsl_animation_api.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-044.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-045-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-045",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_dsl_animation_failure.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-045.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-046-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-046",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_dsl_animation_gc.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-046.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-047-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-047",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_dsl_animation_jobs.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-047.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-048-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-048",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_dsl_render_worker.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-048.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-049-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-049",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_dsl_selected_flow.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-049.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-050-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-050",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_durable_job_dispatch.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-050.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-051-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-051",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_expanded_graph_repository.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-051.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-052-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-052",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_expanded_knowledge_structure.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-052.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-053-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-053",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_expanded_learning_paths.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-053.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-054-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-054",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_file_lock.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-054.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-055-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-055",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_first_screen_diagnostics.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-055.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-056-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-056",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_first_screen_measurement.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-056.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-057-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-057",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_first_screen_pool_latency.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-057.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-058-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-058",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_first_screen_v2.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-058.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-059-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-059",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_gemini_adapter.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-059.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-060-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-060",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_goal_node_resolver.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-060.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-061-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-061",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_health.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-061.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-062-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-062",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_knowledge_graph.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-062.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-063-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-063",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_knowledge_graph_api.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-063.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-064-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-064",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_learning_closed_loop.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-064.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-065-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-065",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_learning_events_api.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-065.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-066-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-066",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_learning_persistence.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-066.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-067-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-067",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_learning_resource_schema.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-067.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-068-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-068",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_learning_sessions.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-068.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-069-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-069",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_learning_state_models.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-069.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-070-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-070",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_learning_unit_generator.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-070.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-071-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-071",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_legacy_archives.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-071.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-072-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-072",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_linked_list_deletion_plan.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-072.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-073-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-073",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_linked_list_insertion_plan.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-073.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-074-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-074",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_markdown_notes_api.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-074.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-075-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-075",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_mastery_rules.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-075.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-076-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-076",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_mastery_updates.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-076.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-077-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-077",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_model_preferences.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-077.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-078-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-078",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_mvp03_openapi_contract.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-078.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-079-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-079",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_objective_exercises.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-079.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-080-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-080",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_ollama_adapter.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-080.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-081-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-081",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_owner_reads.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-081.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-082-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-082",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_path_rules.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-082.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-083-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-083",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_path_versions.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-083.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-084-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-084",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_paths_api.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-084.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-085-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-085",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_phase1_dynamic_gate.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-085.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-086-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-086",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_profile_agent.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-086.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-087-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-087",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_profile_api.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-087.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-088-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-088",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_profile_behavior_updates.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-088.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-089-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-089",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_profile_events.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-089.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-090-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-090",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_profile_merge.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-090.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-091-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-091",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_profile_persistence.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-091.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-092-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-092",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_profile_schema.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-092.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-093-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-093",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_provider_connection_gateway.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-093.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-094-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-094",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_provider_connection_test_api.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-094.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-095-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-095",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_provider_connections_api.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-095.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-096-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-096",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_provider_connections_persistence.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-096.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-097-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-097",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_provider_gateway.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-097.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-098-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-098",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_provider_model_catalog.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-098.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-099-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-099",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_provider_retry.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-099.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-100-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-100",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_provider_stream.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-100.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-101-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-101",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_provider_target.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-101.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-102-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-102",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_provider_target_policy.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-102.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-103-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-103",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_queued_job_events.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-103.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-104-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-104",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_quiz_api.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-104.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-105-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-105",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_quiz_scoring.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-105.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-106-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-106",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_real_browser_budget.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-106.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-107-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-107",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_resource_publication.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-107.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-108-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-108",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_resource_quality.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-108.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-109-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-109",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_review_agent.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-109.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-110-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-110",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_review_context.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-110.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-111-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-111",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_scene_reexplanation_api.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-111.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-112-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-112",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_spark_adapter.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-112.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-113-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-113",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_stage_acceptance_tools.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-113.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-114-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-114",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_temporary_provider_credentials.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-114.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-115-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-115",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_transient_profiles.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-115.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-116-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-116",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_tutor_agent.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-116.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-117-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "backend-117",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "tests/test_video_dsl_generation.py",
+        "--junitxml=/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/backend-117.xml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "mock-core-browser",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "web/tests/e2e/run.py"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "mock-settings-path-browser",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "web/tests/e2e/phase1_mock_integration.py",
+        "--output",
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/local-materials/phase-1-t038/r03/mock-ui"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "catalog-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "catalog-real-browser",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "web/tests/e2e/phase1_catalog_integration.py"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "sse-migration",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "sse-template-matrix",
+      "command": [
+        "/Users/apir/Code/EduMind_Agent/local-materials/phase-1-t038/checkout-r03/backend/.venv/bin/python",
+        "-m",
+        "tests.queue_acceptance_matrix"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "backend": [
+    {
+      "file": "tests/test_acceptance_budget.py",
+      "database": "edumind_catalog_phase1_t038_r03_000",
+      "counts": {
+        "tests": 8,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_animation_cache.py",
+      "database": "edumind_catalog_phase1_t038_r03_001",
+      "counts": {
+        "tests": 7,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_animation_dsl_compiler.py",
+      "database": "edumind_catalog_phase1_t038_r03_002",
+      "counts": {
+        "tests": 72,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_animation_dsl_review.py",
+      "database": "edumind_catalog_phase1_t025_t038_r03_003",
+      "counts": {
+        "tests": 44,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_animation_dsl_validation.py",
+      "database": "edumind_catalog_phase1_t038_r03_004",
+      "counts": {
+        "tests": 137,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_animation_events_api.py",
+      "database": "edumind_catalog_phase1_t038_r03_005",
+      "counts": {
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_animation_job_api.py",
+      "database": "edumind_catalog_phase1_t038_r03_006",
+      "counts": {
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_animation_job_persistence.py",
+      "database": "edumind_catalog_phase1_t038_r03_007",
+      "counts": {
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_animation_media_api.py",
+      "database": "edumind_catalog_phase1_t038_r03_008",
+      "counts": {
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_animation_renderer.py",
+      "database": "edumind_catalog_phase1_t038_r03_009",
+      "counts": {
+        "tests": 18,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_animation_templates.py",
+      "database": "edumind_catalog_phase1_t038_r03_010",
+      "counts": {
+        "tests": 32,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_animation_worker.py",
+      "database": "edumind_catalog_phase1_t038_r03_011",
+      "counts": {
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_anthropic_adapter.py",
+      "database": "edumind_catalog_phase1_t038_r03_012",
+      "counts": {
+        "tests": 65,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_auth.py",
+      "database": "edumind_catalog_phase1_t038_r03_013",
+      "counts": {
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_catalog_acceptance_metrics.py",
+      "database": "edumind_catalog_phase1_t038_r03_014",
+      "counts": {
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_catalog_component_gate.py",
+      "database": "edumind_catalog_phase1_t038_r03_015",
+      "counts": {
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_catalog_content.py",
+      "database": "edumind_catalog_phase1_t038_r03_016",
+      "counts": {
+        "tests": 30,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_catalog_demo.py",
+      "database": "edumind_catalog_phase1_t038_r03_017",
+      "counts": {
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_catalog_exports.py",
+      "database": "edumind_catalog_phase1_t038_r03_018",
+      "counts": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_catalog_mode.py",
+      "database": "edumind_catalog_phase1_t038_r03_019",
+      "counts": {
+        "tests": 7,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_catalog_package.py",
+      "database": "edumind_catalog_phase1_t038_r03_020",
+      "counts": {
+        "tests": 13,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_catalog_publication.py",
+      "database": "edumind_catalog_phase1_t038_r03_021",
+      "counts": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_catalog_quiz.py",
+      "database": "edumind_catalog_phase1_t038_r03_022",
+      "counts": {
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_catalog_release_preflight.py",
+      "database": "edumind_catalog_phase1_t038_r03_023",
+      "counts": {
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_catalog_sessions.py",
+      "database": "edumind_catalog_phase1_t038_r03_024",
+      "counts": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_celery_job_recovery.py",
+      "database": "edumind_catalog_phase1_t038_r03_025",
+      "counts": {
+        "tests": 8,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_classroom_context.py",
+      "database": "edumind_catalog_phase1_t038_r03_026",
+      "counts": {
+        "tests": 8,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_classroom_controls_api.py",
+      "database": "edumind_catalog_phase1_t038_r03_027",
+      "counts": {
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_classroom_mode_api.py",
+      "database": "edumind_catalog_phase1_t038_r03_028",
+      "counts": {
+        "tests": 12,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_classroom_persistence.py",
+      "database": "edumind_catalog_phase1_t038_r03_029",
+      "counts": {
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_classroom_roles.py",
+      "database": "edumind_catalog_phase1_t038_r03_030",
+      "counts": {
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_classroom_speech_api.py",
+      "database": "edumind_catalog_phase1_t038_r03_031",
+      "counts": {
+        "tests": 11,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_classroom_speech_review.py",
+      "database": "edumind_catalog_phase1_t038_r03_032",
+      "counts": {
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_classroom_speech_rules.py",
+      "database": "edumind_catalog_phase1_t038_r03_033",
+      "counts": {
+        "tests": 14,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_config.py",
+      "database": "edumind_catalog_phase1_t038_r03_034",
+      "counts": {
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_database.py",
+      "database": "edumind_catalog_phase1_t038_r03_035",
+      "counts": {
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_database_lifespan.py",
+      "database": "edumind_catalog_phase1_t038_r03_036",
+      "counts": {
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_debate_api.py",
+      "database": "edumind_catalog_phase1_t038_r03_037",
+      "counts": {
+        "tests": 7,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_debate_candidate_generator.py",
+      "database": "edumind_catalog_phase1_t038_r03_038",
+      "counts": {
+        "tests": 11,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_debate_feedback_api.py",
+      "database": "edumind_catalog_phase1_t038_r03_039",
+      "counts": {
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_debate_review.py",
+      "database": "edumind_catalog_phase1_t038_r03_040",
+      "counts": {
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_deepseek_beta_tools.py",
+      "database": "edumind_catalog_phase1_t038_r03_041",
+      "counts": {
+        "tests": 17,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_deepseek_responses.py",
+      "database": "edumind_catalog_phase1_t038_r03_042",
+      "counts": {
+        "tests": 55,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_diagnostic_three.py",
+      "database": "edumind_catalog_phase1_t038_r03_043",
+      "counts": {
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_dsl_animation_api.py",
+      "database": "edumind_catalog_phase1_t038_r03_044",
+      "counts": {
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_dsl_animation_failure.py",
+      "database": "edumind_catalog_phase1_t038_r03_045",
+      "counts": {
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_dsl_animation_gc.py",
+      "database": "edumind_catalog_phase1_t038_r03_046",
+      "counts": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_dsl_animation_jobs.py",
+      "database": "edumind_catalog_phase1_t038_r03_047",
+      "counts": {
+        "tests": 8,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_dsl_render_worker.py",
+      "database": "edumind_catalog_phase1_t038_r03_048",
+      "counts": {
+        "tests": 21,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_dsl_selected_flow.py",
+      "database": "edumind_catalog_phase1_t038_r03_049",
+      "counts": {
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_durable_job_dispatch.py",
+      "database": "edumind_catalog_phase1_t038_r03_050",
+      "counts": {
+        "tests": 23,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_expanded_graph_repository.py",
+      "database": "edumind_catalog_phase1_t038_r03_051",
+      "counts": {
+        "tests": 19,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_expanded_knowledge_structure.py",
+      "database": "edumind_catalog_phase1_t038_r03_052",
+      "counts": {
+        "tests": 27,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_expanded_learning_paths.py",
+      "database": "edumind_catalog_phase1_t038_r03_053",
+      "counts": {
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_file_lock.py",
+      "database": "edumind_catalog_phase1_t038_r03_054",
+      "counts": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_first_screen_diagnostics.py",
+      "database": "edumind_catalog_phase1_t038_r03_055",
+      "counts": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_first_screen_measurement.py",
+      "database": "edumind_catalog_phase1_t038_r03_056",
+      "counts": {
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_first_screen_pool_latency.py",
+      "database": "edumind_catalog_phase1_t038_r03_057",
+      "counts": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_first_screen_v2.py",
+      "database": "edumind_catalog_phase1_t038_r03_058",
+      "counts": {
+        "tests": 10,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_gemini_adapter.py",
+      "database": "edumind_catalog_phase1_t038_r03_059",
+      "counts": {
+        "tests": 96,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_goal_node_resolver.py",
+      "database": "edumind_catalog_phase1_t038_r03_060",
+      "counts": {
+        "tests": 13,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_health.py",
+      "database": "edumind_catalog_phase1_t038_r03_061",
+      "counts": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_knowledge_graph.py",
+      "database": "edumind_catalog_phase1_t038_r03_062",
+      "counts": {
+        "tests": 7,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_knowledge_graph_api.py",
+      "database": "edumind_catalog_phase1_t038_r03_063",
+      "counts": {
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_learning_closed_loop.py",
+      "database": "edumind_catalog_phase1_t038_r03_064",
+      "counts": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_learning_events_api.py",
+      "database": "edumind_catalog_phase1_t038_r03_065",
+      "counts": {
+        "tests": 9,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_learning_persistence.py",
+      "database": "edumind_catalog_phase1_t038_r03_066",
+      "counts": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_learning_resource_schema.py",
+      "database": "edumind_catalog_phase1_t038_r03_067",
+      "counts": {
+        "tests": 12,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_learning_sessions.py",
+      "database": "edumind_catalog_phase1_t038_r03_068",
+      "counts": {
+        "tests": 18,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_learning_state_models.py",
+      "database": "edumind_catalog_phase1_t038_r03_069",
+      "counts": {
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_learning_unit_generator.py",
+      "database": "edumind_catalog_phase1_t038_r03_070",
+      "counts": {
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_legacy_archives.py",
+      "database": "edumind_catalog_phase1_t038_r03_071",
+      "counts": {
+        "tests": 7,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_linked_list_deletion_plan.py",
+      "database": "edumind_catalog_phase1_t038_r03_072",
+      "counts": {
+        "tests": 9,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_linked_list_insertion_plan.py",
+      "database": "edumind_catalog_phase1_t038_r03_073",
+      "counts": {
+        "tests": 9,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_markdown_notes_api.py",
+      "database": "edumind_catalog_phase1_t038_r03_074",
+      "counts": {
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_mastery_rules.py",
+      "database": "edumind_catalog_phase1_t038_r03_075",
+      "counts": {
+        "tests": 10,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_mastery_updates.py",
+      "database": "edumind_catalog_phase1_t038_r03_076",
+      "counts": {
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_model_preferences.py",
+      "database": "edumind_catalog_phase1_t038_r03_077",
+      "counts": {
+        "tests": 26,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_mvp03_openapi_contract.py",
+      "database": "edumind_catalog_phase1_t038_r03_078",
+      "counts": {
+        "tests": 7,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_objective_exercises.py",
+      "database": "edumind_catalog_phase1_t038_r03_079",
+      "counts": {
+        "tests": 24,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_ollama_adapter.py",
+      "database": "edumind_catalog_phase1_t038_r03_080",
+      "counts": {
+        "tests": 59,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_owner_reads.py",
+      "database": "edumind_catalog_phase1_t038_r03_081",
+      "counts": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_path_rules.py",
+      "database": "edumind_catalog_phase1_t038_r03_082",
+      "counts": {
+        "tests": 9,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_path_versions.py",
+      "database": "edumind_catalog_phase1_t038_r03_083",
+      "counts": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_paths_api.py",
+      "database": "edumind_catalog_phase1_t038_r03_084",
+      "counts": {
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_phase1_dynamic_gate.py",
+      "database": "edumind_catalog_phase1_t038_r03_085",
+      "counts": {
+        "tests": 26,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_profile_agent.py",
+      "database": "edumind_catalog_phase1_t038_r03_086",
+      "counts": {
+        "tests": 9,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_profile_api.py",
+      "database": "edumind_catalog_phase1_t038_r03_087",
+      "counts": {
+        "tests": 7,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_profile_behavior_updates.py",
+      "database": "edumind_catalog_phase1_t038_r03_088",
+      "counts": {
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_profile_events.py",
+      "database": "edumind_catalog_phase1_t038_r03_089",
+      "counts": {
+        "tests": 14,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_profile_merge.py",
+      "database": "edumind_catalog_phase1_t038_r03_090",
+      "counts": {
+        "tests": 15,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_profile_persistence.py",
+      "database": "edumind_catalog_phase1_t038_r03_091",
+      "counts": {
+        "tests": 7,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_profile_schema.py",
+      "database": "edumind_catalog_phase1_t038_r03_092",
+      "counts": {
+        "tests": 13,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_provider_connection_gateway.py",
+      "database": "edumind_catalog_phase1_t038_r03_093",
+      "counts": {
+        "tests": 55,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_provider_connection_test_api.py",
+      "database": "edumind_catalog_phase1_t038_r03_094",
+      "counts": {
+        "tests": 29,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_provider_connections_api.py",
+      "database": "edumind_catalog_phase1_t038_r03_095",
+      "counts": {
+        "tests": 40,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_provider_connections_persistence.py",
+      "database": "edumind_catalog_phase1_t038_r03_096",
+      "counts": {
+        "tests": 14,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_provider_gateway.py",
+      "database": "edumind_catalog_phase1_t038_r03_097",
+      "counts": {
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_provider_model_catalog.py",
+      "database": "edumind_catalog_phase1_t038_r03_098",
+      "counts": {
+        "tests": 37,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_provider_retry.py",
+      "database": "edumind_catalog_phase1_t038_r03_099",
+      "counts": {
+        "tests": 14,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_provider_stream.py",
+      "database": "edumind_catalog_phase1_t038_r03_100",
+      "counts": {
+        "tests": 11,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_provider_target.py",
+      "database": "edumind_catalog_phase1_t038_r03_101",
+      "counts": {
+        "tests": 31,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_provider_target_policy.py",
+      "database": "edumind_catalog_phase1_t038_r03_102",
+      "counts": {
+        "tests": 49,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_queued_job_events.py",
+      "database": "edumind_catalog_phase1_t038_r03_103",
+      "counts": {
+        "tests": 11,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_quiz_api.py",
+      "database": "edumind_catalog_phase1_t038_r03_104",
+      "counts": {
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_quiz_scoring.py",
+      "database": "edumind_catalog_phase1_t038_r03_105",
+      "counts": {
+        "tests": 10,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_real_browser_budget.py",
+      "database": "edumind_catalog_phase1_t038_r03_106",
+      "counts": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_resource_publication.py",
+      "database": "edumind_catalog_phase1_t038_r03_107",
+      "counts": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_resource_quality.py",
+      "database": "edumind_catalog_phase1_t038_r03_108",
+      "counts": {
+        "tests": 11,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_review_agent.py",
+      "database": "edumind_catalog_phase1_t038_r03_109",
+      "counts": {
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_review_context.py",
+      "database": "edumind_catalog_phase1_t038_r03_110",
+      "counts": {
+        "tests": 11,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_scene_reexplanation_api.py",
+      "database": "edumind_catalog_phase1_t038_r03_111",
+      "counts": {
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_spark_adapter.py",
+      "database": "edumind_catalog_phase1_t038_r03_112",
+      "counts": {
+        "tests": 80,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_stage_acceptance_tools.py",
+      "database": "edumind_catalog_phase1_t038_r03_113",
+      "counts": {
+        "tests": 24,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_temporary_provider_credentials.py",
+      "database": "edumind_catalog_phase1_t038_r03_114",
+      "counts": {
+        "tests": 23,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_transient_profiles.py",
+      "database": "edumind_catalog_phase1_t038_r03_115",
+      "counts": {
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_tutor_agent.py",
+      "database": "edumind_catalog_phase1_t038_r03_116",
+      "counts": {
+        "tests": 15,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_video_dsl_generation.py",
+      "database": "edumind_catalog_phase1_t038_r03_117",
+      "counts": {
+        "tests": 40,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "exit_code": 0
+    }
+  ],
+  "passed": true,
+  "sse_counts": {
+    "total": 100,
+    "ok": 100
+  },
+  "sse_matrix_passed": true,
+  "path_metrics": {
+    "environment": "TestClient + isolated PG + signed TEST_ONLY catalog",
+    "denominator": {
+      "plan": 30,
+      "read": 30,
+      "historical_replay": 40
+    },
+    "slots": [
+      {
+        "kind": "plan",
+        "target": "array",
+        "layer": "legacy",
+        "ms": 53.53754200041294
+      },
+      {
+        "kind": "read",
+        "target": "array",
+        "layer": "legacy",
+        "ms": 34.80720904190093
+      },
+      {
+        "kind": "plan",
+        "target": "array-stack",
+        "layer": "expanded",
+        "ms": 51.14875000435859
+      },
+      {
+        "kind": "read",
+        "target": "array-stack",
+        "layer": "expanded",
+        "ms": 42.29462496004999
+      },
+      {
+        "kind": "plan",
+        "target": "balanced-binary-search-tree",
+        "layer": "expanded",
+        "ms": 51.75487510859966
+      },
+      {
+        "kind": "read",
+        "target": "balanced-binary-search-tree",
+        "layer": "expanded",
+        "ms": 31.963750021532178
+      },
+      {
+        "kind": "plan",
+        "target": "binary-heap",
+        "layer": "expanded",
+        "ms": 49.49758399743587
+      },
+      {
+        "kind": "read",
+        "target": "binary-heap",
+        "layer": "expanded",
+        "ms": 38.95562491379678
+      },
+      {
+        "kind": "plan",
+        "target": "binary-search-tree",
+        "layer": "expanded",
+        "ms": 47.590750036761165
+      },
+      {
+        "kind": "read",
+        "target": "binary-search-tree",
+        "layer": "expanded",
+        "ms": 32.80570905189961
+      },
+      {
+        "kind": "plan",
+        "target": "binary-tree",
+        "layer": "expanded",
+        "ms": 84.74770898465067
+      },
+      {
+        "kind": "read",
+        "target": "binary-tree",
+        "layer": "expanded",
+        "ms": 40.671875001862645
+      },
+      {
+        "kind": "plan",
+        "target": "binary-tree-traversal",
+        "layer": "expanded",
+        "ms": 51.89799994695932
+      },
+      {
+        "kind": "read",
+        "target": "binary-tree-traversal",
+        "layer": "expanded",
+        "ms": 39.462874992750585
+      },
+      {
+        "kind": "plan",
+        "target": "breadth-first-search",
+        "layer": "expanded",
+        "ms": 46.96495796088129
+      },
+      {
+        "kind": "read",
+        "target": "breadth-first-search",
+        "layer": "expanded",
+        "ms": 36.72066703438759
+      },
+      {
+        "kind": "plan",
+        "target": "bubble-sort",
+        "layer": "expanded",
+        "ms": 53.4514170140028
+      },
+      {
+        "kind": "read",
+        "target": "bubble-sort",
+        "layer": "expanded",
+        "ms": 46.21674993541092
+      },
+      {
+        "kind": "plan",
+        "target": "c-pointer",
+        "layer": "legacy",
+        "ms": 59.760708012618124
+      },
+      {
+        "kind": "read",
+        "target": "c-pointer",
+        "layer": "legacy",
+        "ms": 37.25412499625236
+      },
+      {
+        "kind": "plan",
+        "target": "circular-linked-list",
+        "layer": "expanded",
+        "ms": 53.73766692355275
+      },
+      {
+        "kind": "read",
+        "target": "circular-linked-list",
+        "layer": "expanded",
+        "ms": 36.09891701489687
+      },
+      {
+        "kind": "plan",
+        "target": "circular-queue",
+        "layer": "legacy",
+        "ms": 52.95095802284777
+      },
+      {
+        "kind": "read",
+        "target": "circular-queue",
+        "layer": "legacy",
+        "ms": 40.95962503924966
+      },
+      {
+        "kind": "plan",
+        "target": "depth-first-search",
+        "layer": "expanded",
+        "ms": 49.599583027884364
+      },
+      {
+        "kind": "read",
+        "target": "depth-first-search",
+        "layer": "expanded",
+        "ms": 35.79333296511322
+      },
+      {
+        "kind": "plan",
+        "target": "doubly-linked-list",
+        "layer": "expanded",
+        "ms": 48.26866707298905
+      },
+      {
+        "kind": "read",
+        "target": "doubly-linked-list",
+        "layer": "expanded",
+        "ms": 32.05220797099173
+      },
+      {
+        "kind": "plan",
+        "target": "graph-representation",
+        "layer": "expanded",
+        "ms": 42.483082972466946
+      },
+      {
+        "kind": "read",
+        "target": "graph-representation",
+        "layer": "expanded",
+        "ms": 37.62933297548443
+      },
+      {
+        "kind": "plan",
+        "target": "heap-sort",
+        "layer": "expanded",
+        "ms": 52.41962498985231
+      },
+      {
+        "kind": "read",
+        "target": "heap-sort",
+        "layer": "expanded",
+        "ms": 36.22637502849102
+      },
+      {
+        "kind": "plan",
+        "target": "insertion-sort",
+        "layer": "expanded",
+        "ms": 53.703291923739016
+      },
+      {
+        "kind": "read",
+        "target": "insertion-sort",
+        "layer": "expanded",
+        "ms": 41.41866695135832
+      },
+      {
+        "kind": "plan",
+        "target": "linked-list-concept",
+        "layer": "legacy",
+        "ms": 49.51570800039917
+      },
+      {
+        "kind": "read",
+        "target": "linked-list-concept",
+        "layer": "legacy",
+        "ms": 34.38458300661296
+      },
+      {
+        "kind": "plan",
+        "target": "linked-list-deletion",
+        "layer": "legacy",
+        "ms": 42.750915978103876
+      },
+      {
+        "kind": "read",
+        "target": "linked-list-deletion",
+        "layer": "legacy",
+        "ms": 32.785541960038245
+      },
+      {
+        "kind": "plan",
+        "target": "linked-list-insertion",
+        "layer": "legacy",
+        "ms": 40.337041951715946
+      },
+      {
+        "kind": "read",
+        "target": "linked-list-insertion",
+        "layer": "legacy",
+        "ms": 32.70391596015543
+      },
+      {
+        "kind": "plan",
+        "target": "linked-list-traversal",
+        "layer": "legacy",
+        "ms": 45.762249967083335
+      },
+      {
+        "kind": "read",
+        "target": "linked-list-traversal",
+        "layer": "legacy",
+        "ms": 35.22362501826137
+      },
+      {
+        "kind": "plan",
+        "target": "linked-stack",
+        "layer": "expanded",
+        "ms": 46.38504108879715
+      },
+      {
+        "kind": "read",
+        "target": "linked-stack",
+        "layer": "expanded",
+        "ms": 35.0200409302488
+      },
+      {
+        "kind": "plan",
+        "target": "merge-sort",
+        "layer": "expanded",
+        "ms": 41.0382499685511
+      },
+      {
+        "kind": "read",
+        "target": "merge-sort",
+        "layer": "expanded",
+        "ms": 31.47412498947233
+      },
+      {
+        "kind": "plan",
+        "target": "queue",
+        "layer": "legacy",
+        "ms": 49.39941701013595
+      },
+      {
+        "kind": "read",
+        "target": "queue",
+        "layer": "legacy",
+        "ms": 38.593375007621944
+      },
+      {
+        "kind": "plan",
+        "target": "quick-sort",
+        "layer": "expanded",
+        "ms": 42.903500027023256
+      },
+      {
+        "kind": "read",
+        "target": "quick-sort",
+        "layer": "expanded",
+        "ms": 37.126791081391275
+      },
+      {
+        "kind": "plan",
+        "target": "selection-sort",
+        "layer": "expanded",
+        "ms": 54.35750004835427
+      },
+      {
+        "kind": "read",
+        "target": "selection-sort",
+        "layer": "expanded",
+        "ms": 42.55125008057803
+      },
+      {
+        "kind": "plan",
+        "target": "single-linked-list",
+        "layer": "legacy",
+        "ms": 97.40962495561689
+      },
+      {
+        "kind": "read",
+        "target": "single-linked-list",
+        "layer": "legacy",
+        "ms": 43.351665954105556
+      },
+      {
+        "kind": "plan",
+        "target": "sorting-comparison",
+        "layer": "expanded",
+        "ms": 54.57404104527086
+      },
+      {
+        "kind": "read",
+        "target": "sorting-comparison",
+        "layer": "expanded",
+        "ms": 38.613875047303736
+      },
+      {
+        "kind": "plan",
+        "target": "stack",
+        "layer": "legacy",
+        "ms": 54.17258304078132
+      },
+      {
+        "kind": "read",
+        "target": "stack",
+        "layer": "legacy",
+        "ms": 35.37766693625599
+      },
+      {
+        "kind": "plan",
+        "target": "tree-concept",
+        "layer": "expanded",
+        "ms": 59.11016697064042
+      },
+      {
+        "kind": "read",
+        "target": "tree-concept",
+        "layer": "expanded",
+        "ms": 42.44737501721829
+      },
+      {
+        "kind": "historical_replay",
+        "target": "array",
+        "repeat": 0,
+        "layer": "historical",
+        "ms": 39.677832974120975
+      },
+      {
+        "kind": "historical_replay",
+        "target": "c-pointer",
+        "repeat": 0,
+        "layer": "historical",
+        "ms": 42.03779203817248
+      },
+      {
+        "kind": "historical_replay",
+        "target": "circular-queue",
+        "repeat": 0,
+        "layer": "historical",
+        "ms": 41.72470897901803
+      },
+      {
+        "kind": "historical_replay",
+        "target": "linked-list-concept",
+        "repeat": 0,
+        "layer": "historical",
+        "ms": 46.82691697962582
+      },
+      {
+        "kind": "historical_replay",
+        "target": "linked-list-deletion",
+        "repeat": 0,
+        "layer": "historical",
+        "ms": 43.70149993337691
+      },
+      {
+        "kind": "historical_replay",
+        "target": "linked-list-insertion",
+        "repeat": 0,
+        "layer": "historical",
+        "ms": 42.742750025354326
+      },
+      {
+        "kind": "historical_replay",
+        "target": "linked-list-traversal",
+        "repeat": 0,
+        "layer": "historical",
+        "ms": 41.868000058457255
+      },
+      {
+        "kind": "historical_replay",
+        "target": "queue",
+        "repeat": 0,
+        "layer": "historical",
+        "ms": 35.4020829545334
+      },
+      {
+        "kind": "historical_replay",
+        "target": "single-linked-list",
+        "repeat": 0,
+        "layer": "historical",
+        "ms": 39.48599996510893
+      },
+      {
+        "kind": "historical_replay",
+        "target": "stack",
+        "repeat": 0,
+        "layer": "historical",
+        "ms": 33.724459004588425
+      },
+      {
+        "kind": "historical_replay",
+        "target": "array",
+        "repeat": 1,
+        "layer": "historical",
+        "ms": 36.84191592037678
+      },
+      {
+        "kind": "historical_replay",
+        "target": "c-pointer",
+        "repeat": 1,
+        "layer": "historical",
+        "ms": 31.815749942325056
+      },
+      {
+        "kind": "historical_replay",
+        "target": "circular-queue",
+        "repeat": 1,
+        "layer": "historical",
+        "ms": 37.942458991892636
+      },
+      {
+        "kind": "historical_replay",
+        "target": "linked-list-concept",
+        "repeat": 1,
+        "layer": "historical",
+        "ms": 30.71712504606694
+      },
+      {
+        "kind": "historical_replay",
+        "target": "linked-list-deletion",
+        "repeat": 1,
+        "layer": "historical",
+        "ms": 29.685292043723166
+      },
+      {
+        "kind": "historical_replay",
+        "target": "linked-list-insertion",
+        "repeat": 1,
+        "layer": "historical",
+        "ms": 30.167542048729956
+      },
+      {
+        "kind": "historical_replay",
+        "target": "linked-list-traversal",
+        "repeat": 1,
+        "layer": "historical",
+        "ms": 34.99704098794609
+      },
+      {
+        "kind": "historical_replay",
+        "target": "queue",
+        "repeat": 1,
+        "layer": "historical",
+        "ms": 34.255083999596536
+      },
+      {
+        "kind": "historical_replay",
+        "target": "single-linked-list",
+        "repeat": 1,
+        "layer": "historical",
+        "ms": 33.11445808503777
+      },
+      {
+        "kind": "historical_replay",
+        "target": "stack",
+        "repeat": 1,
+        "layer": "historical",
+        "ms": 31.783583108335733
+      },
+      {
+        "kind": "historical_replay",
+        "target": "array",
+        "repeat": 2,
+        "layer": "historical",
+        "ms": 29.480166034772992
+      },
+      {
+        "kind": "historical_replay",
+        "target": "c-pointer",
+        "repeat": 2,
+        "layer": "historical",
+        "ms": 34.26433401182294
+      },
+      {
+        "kind": "historical_replay",
+        "target": "circular-queue",
+        "repeat": 2,
+        "layer": "historical",
+        "ms": 37.78400004375726
+      },
+      {
+        "kind": "historical_replay",
+        "target": "linked-list-concept",
+        "repeat": 2,
+        "layer": "historical",
+        "ms": 37.43787494022399
+      },
+      {
+        "kind": "historical_replay",
+        "target": "linked-list-deletion",
+        "repeat": 2,
+        "layer": "historical",
+        "ms": 39.490707917138934
+      },
+      {
+        "kind": "historical_replay",
+        "target": "linked-list-insertion",
+        "repeat": 2,
+        "layer": "historical",
+        "ms": 30.64491704571992
+      },
+      {
+        "kind": "historical_replay",
+        "target": "linked-list-traversal",
+        "repeat": 2,
+        "layer": "historical",
+        "ms": 33.153624972328544
+      },
+      {
+        "kind": "historical_replay",
+        "target": "queue",
+        "repeat": 2,
+        "layer": "historical",
+        "ms": 29.36404198408127
+      },
+      {
+        "kind": "historical_replay",
+        "target": "single-linked-list",
+        "repeat": 2,
+        "layer": "historical",
+        "ms": 34.30629090871662
+      },
+      {
+        "kind": "historical_replay",
+        "target": "stack",
+        "repeat": 2,
+        "layer": "historical",
+        "ms": 36.11158300191164
+      },
+      {
+        "kind": "historical_replay",
+        "target": "array",
+        "repeat": 3,
+        "layer": "historical",
+        "ms": 36.84854099992663
+      },
+      {
+        "kind": "historical_replay",
+        "target": "c-pointer",
+        "repeat": 3,
+        "layer": "historical",
+        "ms": 35.26695806067437
+      },
+      {
+        "kind": "historical_replay",
+        "target": "circular-queue",
+        "repeat": 3,
+        "layer": "historical",
+        "ms": 36.02116694673896
+      },
+      {
+        "kind": "historical_replay",
+        "target": "linked-list-concept",
+        "repeat": 3,
+        "layer": "historical",
+        "ms": 31.47700009867549
+      },
+      {
+        "kind": "historical_replay",
+        "target": "linked-list-deletion",
+        "repeat": 3,
+        "layer": "historical",
+        "ms": 33.60229195095599
+      },
+      {
+        "kind": "historical_replay",
+        "target": "linked-list-insertion",
+        "repeat": 3,
+        "layer": "historical",
+        "ms": 35.37904191762209
+      },
+      {
+        "kind": "historical_replay",
+        "target": "linked-list-traversal",
+        "repeat": 3,
+        "layer": "historical",
+        "ms": 34.01804098393768
+      },
+      {
+        "kind": "historical_replay",
+        "target": "queue",
+        "repeat": 3,
+        "layer": "historical",
+        "ms": 37.07341605331749
+      },
+      {
+        "kind": "historical_replay",
+        "target": "single-linked-list",
+        "repeat": 3,
+        "layer": "historical",
+        "ms": 36.54120897408575
+      },
+      {
+        "kind": "historical_replay",
+        "target": "stack",
+        "repeat": 3,
+        "layer": "historical",
+        "ms": 36.28287499304861
+      }
+    ],
+    "samples_ms": {
+      "plan": [
+        53.53754200041294,
+        51.14875000435859,
+        51.75487510859966,
+        49.49758399743587,
+        47.590750036761165,
+        84.74770898465067,
+        51.89799994695932,
+        46.96495796088129,
+        53.4514170140028,
+        59.760708012618124,
+        53.73766692355275,
+        52.95095802284777,
+        49.599583027884364,
+        48.26866707298905,
+        42.483082972466946,
+        52.41962498985231,
+        53.703291923739016,
+        49.51570800039917,
+        42.750915978103876,
+        40.337041951715946,
+        45.762249967083335,
+        46.38504108879715,
+        41.0382499685511,
+        49.39941701013595,
+        42.903500027023256,
+        54.35750004835427,
+        97.40962495561689,
+        54.57404104527086,
+        54.17258304078132,
+        59.11016697064042
+      ],
+      "read": [
+        34.80720904190093,
+        42.29462496004999,
+        31.963750021532178,
+        38.95562491379678,
+        32.80570905189961,
+        40.671875001862645,
+        39.462874992750585,
+        36.72066703438759,
+        46.21674993541092,
+        37.25412499625236,
+        36.09891701489687,
+        40.95962503924966,
+        35.79333296511322,
+        32.05220797099173,
+        37.62933297548443,
+        36.22637502849102,
+        41.41866695135832,
+        34.38458300661296,
+        32.785541960038245,
+        32.70391596015543,
+        35.22362501826137,
+        35.0200409302488,
+        31.47412498947233,
+        38.593375007621944,
+        37.126791081391275,
+        42.55125008057803,
+        43.351665954105556,
+        38.613875047303736,
+        35.37766693625599,
+        42.44737501721829
+      ],
+      "historical_replay": [
+        39.677832974120975,
+        42.03779203817248,
+        41.72470897901803,
+        46.82691697962582,
+        43.70149993337691,
+        42.742750025354326,
+        41.868000058457255,
+        35.4020829545334,
+        39.48599996510893,
+        33.724459004588425,
+        36.84191592037678,
+        31.815749942325056,
+        37.942458991892636,
+        30.71712504606694,
+        29.685292043723166,
+        30.167542048729956,
+        34.99704098794609,
+        34.255083999596536,
+        33.11445808503777,
+        31.783583108335733,
+        29.480166034772992,
+        34.26433401182294,
+        37.78400004375726,
+        37.43787494022399,
+        39.490707917138934,
+        30.64491704571992,
+        33.153624972328544,
+        29.36404198408127,
+        34.30629090871662,
+        36.11158300191164,
+        36.84854099992663,
+        35.26695806067437,
+        36.02116694673896,
+        31.47700009867549,
+        33.60229195095599,
+        35.37904191762209,
+        34.01804098393768,
+        37.07341605331749,
+        36.54120897408575,
+        36.28287499304861
+      ]
+    },
+    "nearest_rank_p95_ms": {
+      "plan": 84.74770898465067,
+      "read": 43.351665954105556,
+      "historical_replay": 42.742750025354326
+    },
+    "nearest_rank_p99_ms": {
+      "plan": 97.40962495561689,
+      "read": 46.21674993541092,
+      "historical_replay": 46.82691697962582
+    },
+    "provider_requests": 0
+  },
+  "backend_counts": {
+    "tests": 1758,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "clean_after": true,
+  "external_attempts": 0
+}

@@ -1,0 +1,73 @@
+{
+  "version": "t039-tool-r04",
+  "slot": "tool",
+  "real_cloud": true,
+  "mock": false,
+  "http_status": 200,
+  "outbound_sends": 1,
+  "parser_passed": false,
+  "error_code": "INVALID_OUTPUT",
+  "diagnostic": {
+    "exception_class": "ProbeFailure",
+    "category": "probe_validation",
+    "stage": "dispatch_and_production_parser",
+    "trace": [
+      {
+        "file": "scripts/run_phase1_tool_connection.py",
+        "line": 304
+      },
+      {
+        "file": "scripts/run_phase1_tool_connection.py",
+        "line": 72
+      }
+    ],
+    "output_failure_reason": null
+  },
+  "model": null,
+  "matches_original_exact_OK": null,
+  "response": {
+    "decoded_bytes": 514,
+    "content_encoding": "gzip",
+    "json_object": true,
+    "has_error": false,
+    "choices_count": 1,
+    "input_tokens": 293,
+    "output_tokens": 19
+  },
+  "response_wire_sha256": "d99304f0a80b8f28df64768833c520c3d6aa8ac0c2cfbf2d0ca14a7605bc07ec",
+  "response_decoded_sha256": "447cabe4cda5817c4349da6047c8e82d2bb9aa86319abb7c4c2627932db077e4",
+  "duration_seconds": 1.309903,
+  "budget": {
+    "manifest_sha256": "82539d665eb56e1311f27f18aceb9eacb5419c3c3f26dfb826ecc2380aabf75e",
+    "halted": "INVALID_OUTPUT",
+    "attempts": [
+      [
+        1,
+        "tool",
+        "probe",
+        "fa778c31b5c44771649b85adbedbf685e2bb284487fa0fbb3b2173c74394259b",
+        "0bce87e574ea248a8d0c43f31ed6667f527924bef799248140507fcb41945a91",
+        14724,
+        "failed",
+        293,
+        19,
+        "INVALID_OUTPUT"
+      ]
+    ],
+    "unattempted_slots": []
+  },
+  "aggregate_attempts_including_r01": 5,
+  "aggregate_reserved_cost_micro": 61212,
+  "persistent_secret_absent": true,
+  "connection_revoked": true,
+  "retries": 0,
+  "fallbacks": 0,
+  "tool_executions": 0,
+  "t040_t041_started": false,
+  "source_commit": "fa9f467",
+  "audit": {
+    "all_frozen_file_hashes_match_before_diagnostic_update": true,
+    "raw_result_sha256": "3bdc459b907c1b12897ab02956beb6c6379db44f8b3579a5fdfd9fa04e395d6c"
+  },
+  "diagnostic_limit": "The strict tool verifier rejected a field/shape, but retained only ProbeFailure(tool_response_schema); failed field and original body were not persisted. Cannot retrospectively identify a unique mismatch or claim remote capability unavailable."
+}

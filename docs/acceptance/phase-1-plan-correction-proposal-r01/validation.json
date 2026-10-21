@@ -1,0 +1,36 @@
+{
+  "kind": "OFFLINE_PROPOSAL_VALIDATION_NOT_IMPLEMENTATION_OR_QUALITY_EVIDENCE",
+  "commands": [
+    {
+      "command": "backend/.venv/bin/python -m pytest -q scripts/tests/test_plan_correction_proposal.py",
+      "result": "127 passed, 0 skipped"
+    },
+    {
+      "command": "backend/.venv/bin/python scripts/check_plan_correction_proposal.py",
+      "result": "22 cases, max20 requests/max117248 output tokens, proposal only"
+    },
+    {
+      "command": "backend/.venv/bin/ruff check scripts/check_plan_correction_proposal.py scripts/tests/test_plan_correction_proposal.py",
+      "result": "passed"
+    },
+    {
+      "command": "python3 scripts/check_catalog_workflow.py",
+      "result": "passed"
+    },
+    {
+      "command": "git diff --check",
+      "result": "passed"
+    }
+  ],
+  "prior_failures": [
+    "Initial unused sys import rejected by Ruff; removed.",
+    "Initial synthetic proof ID proof1 failed UUID format before verifier guard: 126 passed/1 failed; corrected fixture to a UUID, kept schema and authorization guard unchanged."
+  ],
+  "provider_calls": 0,
+  "real_case_decisions": 0,
+  "holdout_use": "Only original sealed byte hashes checked; no content used in fixtures or tuning.",
+  "production_changes_after_t079": false,
+  "t040": "blocked",
+  "old_ledgers": "All four hashes unchanged",
+  "limits": "Synthetic consistency tests do not verify semantic correctness, actual stage routing, persistence or rebuild success."
+}

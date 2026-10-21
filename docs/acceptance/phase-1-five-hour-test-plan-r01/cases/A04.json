@@ -1,0 +1,108 @@
+{
+  "id": "A04",
+  "kind": "generation_input",
+  "original_request": "用C实现容量4的循环队列，front指下一读取位置、rear指下一写入位置、size表示元素数，初始均0。入队5、9、11、13，出队一次，再入队17。提供讲解、含main完整程序、恰好三道过程题及解析；追踪回绕并以size区分空满，失败不改状态；无需动画。",
+  "input_snapshot": {
+    "metadata": {
+      "node_id": "circular-queue",
+      "graph_version": "mvp-0.2.0",
+      "graph_digest": "3639db6aedc9699348e63b5e7e1bdaaea3189592b19540c64e8f175aceb9ef59",
+      "profile_version": null,
+      "profile_evidence_digest": "8838fdd11ee58e08fd54a21272313e784012370b7cf0a2cde8b823ed8806d85d",
+      "goal": "用C实现容量4的循环队列，front指下一读取位置、rear指下一写入位置、size表示元素数，初始均0。入队5、9、11、13，出队一次，再入队17。提供讲解、含main完整程序、恰好三道过程题及解析；追踪回绕并以size区分空满，失败不改状态；无需动画。",
+      "code_language": "C"
+    },
+    "references": {
+      "graph-node:mvp-0.2.0:circular-queue": {
+        "reference_id": "graph-node:mvp-0.2.0:circular-queue",
+        "version": "mvp-0.2.0",
+        "digest": "bae1a2d3b0ae7b45a1edfe13f67123c26886158c35bd2967b88a24fe64c5360a"
+      }
+    },
+    "learner_evidence": {},
+    "node_ids": [
+      "array",
+      "array-stack",
+      "balanced-binary-search-tree",
+      "binary-heap",
+      "binary-search-tree",
+      "binary-tree",
+      "binary-tree-traversal",
+      "breadth-first-search",
+      "bubble-sort",
+      "c-pointer",
+      "circular-linked-list",
+      "circular-queue",
+      "depth-first-search",
+      "doubly-linked-list",
+      "graph-representation",
+      "heap-sort",
+      "insertion-sort",
+      "linked-list-concept",
+      "linked-list-deletion",
+      "linked-list-insertion",
+      "linked-list-traversal",
+      "linked-stack",
+      "merge-sort",
+      "queue",
+      "quick-sort",
+      "selection-sort",
+      "single-linked-list",
+      "sorting-comparison",
+      "stack",
+      "tree-concept"
+    ],
+    "teaching_context": {
+      "version": "teaching-node-binding-v1",
+      "teaching_mode": "target",
+      "target_node_id": "circular-queue",
+      "recommended_node_id": "circular-queue",
+      "teaching_node_id": "circular-queue",
+      "selection_reason": "direct_target",
+      "original_request": "用C实现容量4的循环队列，front指下一读取位置、rear指下一写入位置、size表示元素数，初始均0。入队5、9、11、13，出队一次，再入队17。提供讲解、含main完整程序、恰好三道过程题及解析；追踪回绕并以size区分空满，失败不改状态；无需动画。",
+      "segment_goal": "用C实现容量4的循环队列，front指下一读取位置、rear指下一写入位置、size表示元素数，初始均0。入队5、9、11、13，出队一次，再入队17。提供讲解、含main完整程序、恰好三道过程题及解析；追踪回绕并以size区分空满，失败不改状态；无需动画。",
+      "segment_scope": "target_lesson",
+      "path_version_id": "e2c7d468-fa71-56bb-9cc7-b59b6aab01cf",
+      "path_version": 1,
+      "graph_version": "mvp-0.2.0",
+      "graph_digest": "3639db6aedc9699348e63b5e7e1bdaaea3189592b19540c64e8f175aceb9ef59"
+    }
+  },
+  "reference_context": {
+    "source": {
+      "reference_id": "graph-node:mvp-0.2.0:circular-queue",
+      "version": "mvp-0.2.0",
+      "digest": "bae1a2d3b0ae7b45a1edfe13f67123c26886158c35bd2967b88a24fe64c5360a"
+    },
+    "node": {
+      "id": "circular-queue",
+      "name": "循环队列",
+      "chapter": "线性表",
+      "difficulty": 3,
+      "description": "使用定长数组和模运算维护队首、队尾的队列实现。",
+      "prerequisites": [
+        "array",
+        "queue"
+      ],
+      "learning_objectives": [
+        "解释队首、队尾环绕的原因",
+        "处理队空与队满的判定"
+      ],
+      "common_misconceptions": [
+        "队首等于队尾总表示队空",
+        "循环队列无法判断队满"
+      ],
+      "ai_context": "用环形数组和 front/rear 指针动画呈现模运算后的位置。",
+      "mastery_rule_key": "linear-structure-v1"
+    },
+    "learner_evidence": {},
+    "scope": "Background only, not certification of this example."
+  },
+  "expected_checklist": [
+    "首次四次入队后front0/rear0/size4；出队5后front1/size3；再入17后front1/rear1/size4",
+    "最终逻辑顺序9,11,13,17；空size0/满size4，front==rear不单独判空；所有下标取模4"
+  ],
+  "generated_material": null,
+  "actual_model_result": null,
+  "provenance": "GPT authored input and acceptance checklist; not an existing generated course or independently human-scored sample"
+}

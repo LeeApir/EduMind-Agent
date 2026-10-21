@@ -1,0 +1,167 @@
+{
+  "version": "review-remaining-freeze-validation-v1",
+  "baseline": "43feeba",
+  "proposal_sha256": "7b7d495f9fd7d64ad0db40e5b03cc55c01ce804de61f82a99348691186b90d8f",
+  "provider_requests": 0,
+  "requests_authorized": 0,
+  "fees_authorized": 0,
+  "new_approval_labels_ledger_exist": false,
+  "requests_max": 5,
+  "cost_micro_cny": 11235560,
+  "order": [
+    "assessment-gap:candidate",
+    "fact-contradiction:candidate",
+    "reachable-safety:candidate",
+    "gap-and-safety:candidate",
+    "trace-complete:candidate"
+  ],
+  "slots": [
+    {
+      "id": "assessment-gap:candidate",
+      "wire_sha256": "bbadd5aabb2ca38f96c54dbecf202c97ccf7025d285bb5188dda81c029e88559",
+      "wire_bytes": 42634,
+      "cost_micro_cny": 2247956
+    },
+    {
+      "id": "fact-contradiction:candidate",
+      "wire_sha256": "0aee3d1068a17a0045c872e850d053d50da7fd5c308628470eb9168f9f5ae3af",
+      "wire_bytes": 42325,
+      "cost_micro_cny": 2247338
+    },
+    {
+      "id": "reachable-safety:candidate",
+      "wire_sha256": "3d22574ccc7fbd88c72f08b95ff5ec516acbc4f4881e75e23701069b41f5ab25",
+      "wire_bytes": 42278,
+      "cost_micro_cny": 2247244
+    },
+    {
+      "id": "gap-and-safety:candidate",
+      "wire_sha256": "10724001648371bb45e03a4790d2918d1939aecda2ba0f19a9b771ef96ae1516",
+      "wire_bytes": 41392,
+      "cost_micro_cny": 2245472
+    },
+    {
+      "id": "trace-complete:candidate",
+      "wire_sha256": "1311972347f9a952ab44e874bf57aa7535359df8ff0c98748fc949a3d08e2a4c",
+      "wire_bytes": 42431,
+      "cost_micro_cny": 2247550
+    }
+  ],
+  "whole_case_and_wire_identical_to_suite_r01": true,
+  "fixed_configuration": {
+    "reasoning": "low",
+    "total_output": 8192,
+    "timeout_seconds": 60,
+    "contract": "v4.4 unchanged Prompt/Schema/input/anchors",
+    "model": "deepseek-flash"
+  },
+  "no_extra_plan_gap_or_distributed_slot": true,
+  "source_files_verified": 607,
+  "old_evidence_files_byte_equal": 147,
+  "old_ledgers": [
+    {
+      "run": "phase-1-om-admission-r01",
+      "attempts": 2,
+      "halted": "SAFETY_FAILURE"
+    },
+    {
+      "run": "phase-1-om-admission-r02",
+      "attempts": 1,
+      "halted": "INVALID_OUTPUT"
+    },
+    {
+      "run": "phase-1-om-admission-r03",
+      "attempts": 2,
+      "halted": "INVALID_OUTPUT"
+    },
+    {
+      "run": "phase-1-coverage-r04-real",
+      "attempts": 1,
+      "halted": "INVALID_OUTPUT"
+    },
+    {
+      "run": "phase-1-coverage-r05-real",
+      "attempts": 3,
+      "halted": "INVALID_OUTPUT"
+    },
+    {
+      "run": "phase-1-review-config-r01",
+      "attempts": 3,
+      "halted": "INVALID_OUTPUT"
+    },
+    {
+      "run": "phase-1-distributed-diagnostic-r01",
+      "attempts": 1,
+      "halted": "INVALID_OUTPUT"
+    },
+    {
+      "run": "phase-1-distributed-budget-r01",
+      "attempts": 1,
+      "halted": null
+    },
+    {
+      "run": "phase-1-review-suite-r01",
+      "attempts": 1,
+      "halted": "INVALID_OUTPUT"
+    },
+    {
+      "run": "phase-1-plan-gap-location-r01",
+      "attempts": 1,
+      "halted": null
+    }
+  ],
+  "unapproved_budget_preview": {
+    "files": 611,
+    "requests": 5,
+    "approval": null,
+    "reserve_or_snapshot_called": false
+  },
+  "checks": [
+    {
+      "command": "backend/.venv/bin/python scripts/prepare_review_remaining.py --write",
+      "result": "frozen and reproducible"
+    },
+    {
+      "command": "backend/.venv/bin/python -m pytest -q scripts/tests/test_review_remaining.py scripts/tests/test_plan_gap_location.py scripts/tests/test_schema_failure_observation.py scripts/tests/test_review_suite.py scripts/tests/test_distributed_budget.py scripts/tests/test_distributed_diagnostic.py scripts/tests/test_failure_observation.py scripts/tests/test_review_config_comparison.py scripts/tests/test_review_taxonomy_replay.py scripts/tests/test_coverage_v44.py scripts/tests/test_coverage_admission.py scripts/tests/test_coverage_review.py scripts/tests/test_om_admission.py scripts/tests/test_om_admission_r02.py scripts/tests/test_om_admission_r03.py backend/tests/test_acceptance_budget.py backend/tests/test_derived_diagnostic_budget.py backend/tests/test_real_browser_budget.py",
+      "result": "273 passed;11 new; five mocked steps not real Provider calls"
+    },
+    {
+      "command": "backend/.venv/bin/ruff check scripts/prepare_review_remaining.py scripts/run_review_remaining.py scripts/tests/test_review_remaining.py",
+      "result": "passed"
+    },
+    {
+      "command": "backend/.venv/bin/python scripts/run_review_remaining.py --run-one",
+      "exit_code": 2,
+      "result": "no approval; refused before Key/DNS/private directory"
+    },
+    {
+      "command": "python3 scripts/check_catalog_workflow.py",
+      "result": "passed"
+    },
+    {
+      "command": "python3 scripts/verify_legacy_archives.py",
+      "result": "236 original files verified"
+    },
+    {
+      "command": "backend/.venv/bin/python docs/acceptance/phase-1-om-redesign/check_contract.py",
+      "result": "12 manifest documents/12 task contracts valid"
+    },
+    {
+      "command": "git diff --check",
+      "result": "passed"
+    }
+  ],
+  "human_review": "each actual response requires concrete evidence check; category/route only not semantic success; receipt-bound real human continue before next slot",
+  "stop_on": "technical/structural or semantic mismatch; no retries/fallback/correction; stop after fifth",
+  "terms_checked_on": "2026-10-16",
+  "official_sources": [
+    "https://api-docs.deepseek.com/zh-cn/quick_start/pricing/",
+    "https://api-docs.deepseek.com/api/create-response/",
+    "https://api-docs.deepseek.com/guides/responses_api/"
+  ],
+  "terms_access": "CNY pricing direct failure then official indexed text rechecked2/8peak and384K; Responses official index and compatibility page corroborated low/format/total cap. No strict configuration change.",
+  "prior_plan_gap": "One conforming actual response, actual human_confirmed false; not new suite result or stability proof",
+  "pg_mypy": "not rerun; production code unchanged",
+  "T040": "blocked",
+  "production_mode": "catalog_only"
+}

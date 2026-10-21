@@ -17,7 +17,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.animation import AnimationJob, AnimationMedia, AnimationResourceBinding
 from app.models.learning import LearningScene, LearningUnit
 from app.services.animation_cache import AnimationCache
-from app.services.catalog_animation_access import animation_target_approved
+from app.services.animation_dsl_media_cache import private_dsl_root
+from app.services.animation_job_qualification import animation_job_approved
+from app.services.animation_renderer import RenderError
 
 MAX_MEDIA_BYTES = 64 * 1024 * 1024
 _O_NOFOLLOW = getattr(os, "O_NOFOLLOW", 0)
@@ -39,47 +41,68 @@ class VerifiedMediaFile:
 
 
 async def owned_reviewed_media(
-    db: AsyncSession, *, owner_id: UUID, media_id: UUID,
+    db: AsyncSession,
+    *,
+    owner_id: UUID,
+    media_id: UUID,
 ) -> AnimationMedia | None:
     """A media row alone grants no permission; require a published owner binding."""
-    rows = (await db.execute(
-        select(AnimationMedia, AnimationJob)
-        .join(AnimationResourceBinding,
-              AnimationResourceBinding.media_id == AnimationMedia.id)
-        .join(AnimationJob, and_(
-            AnimationJob.id == AnimationResourceBinding.job_id,
-            AnimationJob.user_id == AnimationResourceBinding.user_id,
-            AnimationJob.media_id == AnimationMedia.id,
-        ))
-        .join(LearningUnit, and_(
-            LearningUnit.id == AnimationResourceBinding.learning_unit_id,
-            LearningUnit.user_id == AnimationResourceBinding.user_id,
-        ))
-        .join(LearningScene, and_(
-            LearningScene.id == AnimationResourceBinding.scene_id,
-            LearningScene.learning_unit_id == LearningUnit.id,
-            LearningScene.version == AnimationResourceBinding.scene_version,
-        ))
-        .where(
-            AnimationMedia.id == media_id,
-            AnimationMedia.review_status == "passed",
-            AnimationResourceBinding.user_id == owner_id,
-            AnimationJob.status == "succeeded",
-            LearningUnit.status == "ready",
-            LearningScene.generation_status == "complete",
-            LearningScene.review_status == "passed",
+    rows = (
+        await db.execute(
+            select(AnimationMedia, AnimationJob)
+            .join(AnimationResourceBinding, AnimationResourceBinding.media_id == AnimationMedia.id)
+            .join(
+                AnimationJob,
+                and_(
+                    AnimationJob.id == AnimationResourceBinding.job_id,
+                    AnimationJob.user_id == AnimationResourceBinding.user_id,
+                    AnimationJob.media_id == AnimationMedia.id,
+                ),
+            )
+            .join(
+                LearningUnit,
+                and_(
+                    LearningUnit.id == AnimationResourceBinding.learning_unit_id,
+                    LearningUnit.user_id == AnimationResourceBinding.user_id,
+                ),
+            )
+            .join(
+                LearningScene,
+                and_(
+                    LearningScene.id == AnimationResourceBinding.scene_id,
+                    LearningScene.learning_unit_id == LearningUnit.id,
+                    LearningScene.version == AnimationResourceBinding.scene_version,
+                ),
+            )
+            .where(
+                AnimationMedia.id == media_id,
+                AnimationMedia.review_status == "passed",
+                AnimationResourceBinding.user_id == owner_id,
+                AnimationJob.status == "succeeded",
+                LearningUnit.status == "ready",
+                LearningScene.generation_status == "complete",
+                LearningScene.review_status == "passed",
+            )
         )
-    )).all()
+    ).all()
     for media, job in rows:
-        if await animation_target_approved(db, owner_id=owner_id, unit_id=job.learning_unit_id,
-                scene_id=job.scene_id, scene_version=job.scene_version,
-                template_id=job.template_id, template_version=job.template_version):
+        if (
+            media.render_kind == job.render_kind
+            and (
+                media.render_kind == "template"
+                or (media.user_id == owner_id and media.candidate_id == job.candidate_id)
+            )
+            and await animation_job_approved(db, job)
+        ):
             return cast(AnimationMedia, media)
     return None
 
 
 def open_verified_media(
-    media: AnimationMedia, *, extension: str, cache: AnimationCache,
+    media: AnimationMedia,
+    *,
+    extension: str,
+    cache: AnimationCache,
 ) -> VerifiedMediaFile:
     """Open by trusted digest with O_NOFOLLOW; hash the same FD used for response."""
     if extension not in {"mp4", "srt"}:
@@ -88,9 +111,17 @@ def open_verified_media(
     expected_size = media.mp4_size if extension == "mp4" else media.srt_size
     if not re.fullmatch(r"[0-9a-f]{64}", digest):
         raise MediaUnavailable("Media unavailable.")
-    objects = cache.root / "objects"
+    base = cache.root
+    if media.render_kind == "dsl":
+        if media.user_id is None or media.candidate_id is None:
+            raise MediaUnavailable("Media unavailable.")
+        try:
+            base = private_dsl_root(cache.root, media.user_id)
+        except (ValueError, RenderError):
+            raise MediaUnavailable("Media unavailable.") from None
+    objects = base / "objects"
     path: Path = objects / f"{digest}.{extension}"
-    if cache.root.is_symlink() or objects.is_symlink() or path.is_symlink():
+    if cache.root.is_symlink() or base.is_symlink() or objects.is_symlink() or path.is_symlink():
         raise MediaUnavailable("Media unavailable.")
     fd = -1
     try:

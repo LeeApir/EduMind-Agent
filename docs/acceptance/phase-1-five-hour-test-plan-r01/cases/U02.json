@@ -1,0 +1,517 @@
+{
+  "id": "U02",
+  "scope": "unit",
+  "selected_role": null,
+  "material": {
+    "binding": {
+      "owner_id": "9ea74430-93de-5424-8b04-bd2906938297",
+      "unit_id": "efb0431d-e1cf-529c-b6bc-8dec7485f9ba",
+      "operation_id": "fe06bfd5-9dae-55cb-8416-7c0bb9a2c52b",
+      "plan_id": "a92f4d83-f90c-5a57-bb13-35ba29940968",
+      "plan_version": 1,
+      "plan_digest": "2cf9fdfa0a1caf0216e806e92336ba108baa561932f9742871de49f0187ddce6",
+      "input_digest": "96919fac227ef1f13d30f2195db858b22501686dde790f49db511aef70886170",
+      "references_digest": "1335b93c5c57bca280ff7d4076dbd2c6cd8c0bc14bf154738dada80dc5e6281e",
+      "policy_version": "hybrid-review-v1",
+      "policy_digest": "747ec507e0f011d8a82e74d3823964fc2f860ab23693f71e695273ebf696fdad"
+    },
+    "plan": {
+      "objectives": [
+        {
+          "id": "local",
+          "text": "提供一个可直接调用且数组访问安全的固定读取函数，说明下标与返回约定。"
+        }
+      ],
+      "terminology": [
+        {
+          "term": "返回值",
+          "meaning": "函数交给调用方的值，不等于打印"
+        }
+      ],
+      "conventions": {
+        "index_base": 0,
+        "capacity": 2,
+        "state_representation": "a为长度2数组，下标必须在0或1",
+        "not_applicable_reasons": []
+      },
+      "shared_example": {
+        "input_description": "a={5,7},长度2",
+        "initial_state": "数组初始化",
+        "steps": [
+          {
+            "operation": "固定数组读取",
+            "expected_state": "只允许下标0或1",
+            "expected_output": "返回值交给调用方，无打印"
+          }
+        ]
+      },
+      "prerequisite_node_ids": [],
+      "scenes": [
+        {
+          "role": "explanation",
+          "scene_key": "explanation",
+          "objective_ids": [
+            "local"
+          ],
+          "depends_on": []
+        },
+        {
+          "role": "code",
+          "scene_key": "code",
+          "objective_ids": [
+            "local"
+          ],
+          "depends_on": [
+            "explanation"
+          ]
+        },
+        {
+          "role": "exercise",
+          "scene_key": "exercise",
+          "objective_ids": [
+            "local"
+          ],
+          "depends_on": [
+            "explanation",
+            "code"
+          ]
+        }
+      ],
+      "node_id": "array",
+      "graph_version": "mvp-0.2.0",
+      "graph_digest": "3639db6aedc9699348e63b5e7e1bdaaea3189592b19540c64e8f175aceb9ef59",
+      "profile_version": null,
+      "profile_evidence_digest": "8838fdd11ee58e08fd54a21272313e784012370b7cf0a2cde8b823ed8806d85d",
+      "goal": "提供一个可直接调用且数组访问安全的固定读取函数，说明下标与返回约定。",
+      "code_language": "C",
+      "schema_version": "learning-plan-v1",
+      "references": [
+        {
+          "reference_id": "graph-node:mvp-0.2.0:array",
+          "version": "mvp-0.2.0",
+          "digest": "f83fd12e754fcda4124aa62b8a29203d97a897605d23dc4e37877393dcb0015d"
+        }
+      ]
+    },
+    "candidates": [
+      {
+        "resource_id": "c73db55c-57ca-5b18-98c6-22c9ff461a28",
+        "role": "explanation",
+        "envelope": {
+          "resource_type": "explanation",
+          "prompt_version": "learning-resources-v1",
+          "content": {
+            "markdown": "read_example是一个可直接调用的固定数组读取函数。本例声称其访问安全，函数无打印。"
+          }
+        },
+        "content_digest": "7648a44b6d24b2b1cf49f2ad1921fa9449a84f1a83e7ec30224752522edb69f9",
+        "dependency_digest": "9cb5994f11efae168b2902cb9261aaf463825162a7286427da7e54082f6cb0d9",
+        "upstream": []
+      },
+      {
+        "resource_id": "8ffbe81b-e344-5545-8a67-a1e631b79a9f",
+        "role": "code",
+        "envelope": {
+          "resource_type": "code",
+          "prompt_version": "learning-resources-v1",
+          "content": {
+            "language": "C",
+            "source": "int read_example(void) {\n    int a[2] = {5, 7};\n    return a[2];\n}",
+            "expected_output": "没有标准输出；函数尝试返回一个数组元素。",
+            "key_steps": [
+              "声明a含两个元素，随后执行return表达式。"
+            ],
+            "display_only": true
+          }
+        },
+        "content_digest": "dc47794e9bb5263bcc8ca70e1c5fd6aec1c2c3e7a98416ef677ef4253d94f079",
+        "dependency_digest": "bbec7bd97750f004c840d326dd905da26c1b7c93a948b437317c3a6a58392318",
+        "upstream": [
+          {
+            "resource_id": "c73db55c-57ca-5b18-98c6-22c9ff461a28",
+            "content_digest": "7648a44b6d24b2b1cf49f2ad1921fa9449a84f1a83e7ec30224752522edb69f9",
+            "dependency_digest": "9cb5994f11efae168b2902cb9261aaf463825162a7286427da7e54082f6cb0d9"
+          }
+        ]
+      },
+      {
+        "resource_id": "05fd9a0a-da0b-50d2-b405-d5adc9e93e3a",
+        "role": "exercise",
+        "envelope": {
+          "resource_type": "exercise",
+          "prompt_version": "learning-resources-v1",
+          "content": {
+            "items": [
+              {
+                "id": "q1",
+                "question": "[判断题] 声明int a[2]后合法元素下标为0和1 仅填 T 或 F（T=正确，F=错误）。",
+                "answer": "T",
+                "explanation": "长度2的元素下标是0、1。"
+              },
+              {
+                "id": "q2",
+                "question": "[判断题] int a[2]中的a[2]是可合法读取的第三个元素 仅填 T 或 F（T=正确，F=错误）。",
+                "answer": "F",
+                "explanation": "第三个位置不属于这两个数组元素。"
+              },
+              {
+                "id": "q3",
+                "question": "[判断题] read_example包含打印语句 仅填 T 或 F（T=正确，F=错误）。",
+                "answer": "F",
+                "explanation": "函数只有数组声明和return。"
+              }
+            ]
+          }
+        },
+        "content_digest": "e088fe8581c37cacec6c59344961a56ace1407d004e3042b3410cac5e25aa3ae",
+        "dependency_digest": "785161b4a7669857ab32bbe1439d11a64e0bdce251fa5cea57eff81a182333b2",
+        "upstream": [
+          {
+            "resource_id": "c73db55c-57ca-5b18-98c6-22c9ff461a28",
+            "content_digest": "7648a44b6d24b2b1cf49f2ad1921fa9449a84f1a83e7ec30224752522edb69f9",
+            "dependency_digest": "9cb5994f11efae168b2902cb9261aaf463825162a7286427da7e54082f6cb0d9"
+          },
+          {
+            "resource_id": "8ffbe81b-e344-5545-8a67-a1e631b79a9f",
+            "content_digest": "dc47794e9bb5263bcc8ca70e1c5fd6aec1c2c3e7a98416ef677ef4253d94f079",
+            "dependency_digest": "bbec7bd97750f004c840d326dd905da26c1b7c93a948b437317c3a6a58392318"
+          }
+        ]
+      }
+    ],
+    "scenes": [
+      {
+        "role": "explanation",
+        "scene_key": "explanation",
+        "scene_id": "18348a8a-3480-57c3-9665-8393cb01479b",
+        "scene_version": 1,
+        "resource_id": "c73db55c-57ca-5b18-98c6-22c9ff461a28",
+        "resource_digest": "7648a44b6d24b2b1cf49f2ad1921fa9449a84f1a83e7ec30224752522edb69f9",
+        "dependency_digest": "9cb5994f11efae168b2902cb9261aaf463825162a7286427da7e54082f6cb0d9"
+      },
+      {
+        "role": "code",
+        "scene_key": "code",
+        "scene_id": "1601c0dd-1ef4-5746-a371-2dc49afdfd37",
+        "scene_version": 1,
+        "resource_id": "8ffbe81b-e344-5545-8a67-a1e631b79a9f",
+        "resource_digest": "dc47794e9bb5263bcc8ca70e1c5fd6aec1c2c3e7a98416ef677ef4253d94f079",
+        "dependency_digest": "bbec7bd97750f004c840d326dd905da26c1b7c93a948b437317c3a6a58392318"
+      },
+      {
+        "role": "exercise",
+        "scene_key": "exercise",
+        "scene_id": "a327e5ed-21c2-572b-b19a-945eec136355",
+        "scene_version": 1,
+        "resource_id": "05fd9a0a-da0b-50d2-b405-d5adc9e93e3a",
+        "resource_digest": "e088fe8581c37cacec6c59344961a56ace1407d004e3042b3410cac5e25aa3ae",
+        "dependency_digest": "785161b4a7669857ab32bbe1439d11a64e0bdce251fa5cea57eff81a182333b2"
+      }
+    ],
+    "actions": {
+      "version": "teaching-actions-v1",
+      "actions": [
+        {
+          "kind": "show_resource",
+          "scene_key": "explanation",
+          "resource_id": "c73db55c-57ca-5b18-98c6-22c9ff461a28",
+          "resource_digest": "7648a44b6d24b2b1cf49f2ad1921fa9449a84f1a83e7ec30224752522edb69f9"
+        },
+        {
+          "kind": "show_resource",
+          "scene_key": "code",
+          "resource_id": "8ffbe81b-e344-5545-8a67-a1e631b79a9f",
+          "resource_digest": "dc47794e9bb5263bcc8ca70e1c5fd6aec1c2c3e7a98416ef677ef4253d94f079"
+        },
+        {
+          "kind": "highlight",
+          "scene_key": "code",
+          "resource_id": "8ffbe81b-e344-5545-8a67-a1e631b79a9f",
+          "resource_digest": "dc47794e9bb5263bcc8ca70e1c5fd6aec1c2c3e7a98416ef677ef4253d94f079",
+          "anchor_id": "a3"
+        },
+        {
+          "kind": "show_resource",
+          "scene_key": "exercise",
+          "resource_id": "05fd9a0a-da0b-50d2-b405-d5adc9e93e3a",
+          "resource_digest": "e088fe8581c37cacec6c59344961a56ace1407d004e3042b3410cac5e25aa3ae"
+        },
+        {
+          "kind": "ask_exercise",
+          "scene_key": "exercise",
+          "resource_id": "05fd9a0a-da0b-50d2-b405-d5adc9e93e3a",
+          "resource_digest": "e088fe8581c37cacec6c59344961a56ace1407d004e3042b3410cac5e25aa3ae",
+          "exercise_id": "q1"
+        },
+        {
+          "kind": "ask_exercise",
+          "scene_key": "exercise",
+          "resource_id": "05fd9a0a-da0b-50d2-b405-d5adc9e93e3a",
+          "resource_digest": "e088fe8581c37cacec6c59344961a56ace1407d004e3042b3410cac5e25aa3ae",
+          "exercise_id": "q2"
+        },
+        {
+          "kind": "ask_exercise",
+          "scene_key": "exercise",
+          "resource_id": "05fd9a0a-da0b-50d2-b405-d5adc9e93e3a",
+          "resource_digest": "e088fe8581c37cacec6c59344961a56ace1407d004e3042b3410cac5e25aa3ae",
+          "exercise_id": "q3"
+        }
+      ],
+      "anchor_catalog": [
+        {
+          "anchor_id": "a1",
+          "resource_id": "c73db55c-57ca-5b18-98c6-22c9ff461a28",
+          "resource_digest": "7648a44b6d24b2b1cf49f2ad1921fa9449a84f1a83e7ec30224752522edb69f9",
+          "json_pointer": "/markdown",
+          "start_utf8": 0,
+          "end_utf8": 114
+        },
+        {
+          "anchor_id": "a2",
+          "resource_id": "8ffbe81b-e344-5545-8a67-a1e631b79a9f",
+          "resource_digest": "dc47794e9bb5263bcc8ca70e1c5fd6aec1c2c3e7a98416ef677ef4253d94f079",
+          "json_pointer": "/expected_output",
+          "start_utf8": 0,
+          "end_utf8": 60
+        },
+        {
+          "anchor_id": "a3",
+          "resource_id": "8ffbe81b-e344-5545-8a67-a1e631b79a9f",
+          "resource_digest": "dc47794e9bb5263bcc8ca70e1c5fd6aec1c2c3e7a98416ef677ef4253d94f079",
+          "json_pointer": "/key_steps/0",
+          "start_utf8": 0,
+          "end_utf8": 55
+        },
+        {
+          "anchor_id": "a4",
+          "resource_id": "8ffbe81b-e344-5545-8a67-a1e631b79a9f",
+          "resource_digest": "dc47794e9bb5263bcc8ca70e1c5fd6aec1c2c3e7a98416ef677ef4253d94f079",
+          "json_pointer": "/language",
+          "start_utf8": 0,
+          "end_utf8": 1
+        },
+        {
+          "anchor_id": "a5",
+          "resource_id": "8ffbe81b-e344-5545-8a67-a1e631b79a9f",
+          "resource_digest": "dc47794e9bb5263bcc8ca70e1c5fd6aec1c2c3e7a98416ef677ef4253d94f079",
+          "json_pointer": "/source",
+          "start_utf8": 0,
+          "end_utf8": 66
+        },
+        {
+          "anchor_id": "a6",
+          "resource_id": "05fd9a0a-da0b-50d2-b405-d5adc9e93e3a",
+          "resource_digest": "e088fe8581c37cacec6c59344961a56ace1407d004e3042b3410cac5e25aa3ae",
+          "json_pointer": "/items/0/answer",
+          "start_utf8": 0,
+          "end_utf8": 1
+        },
+        {
+          "anchor_id": "a7",
+          "resource_id": "05fd9a0a-da0b-50d2-b405-d5adc9e93e3a",
+          "resource_digest": "e088fe8581c37cacec6c59344961a56ace1407d004e3042b3410cac5e25aa3ae",
+          "json_pointer": "/items/0/explanation",
+          "start_utf8": 0,
+          "end_utf8": 33
+        },
+        {
+          "anchor_id": "a8",
+          "resource_id": "05fd9a0a-da0b-50d2-b405-d5adc9e93e3a",
+          "resource_digest": "e088fe8581c37cacec6c59344961a56ace1407d004e3042b3410cac5e25aa3ae",
+          "json_pointer": "/items/0/id",
+          "start_utf8": 0,
+          "end_utf8": 2
+        },
+        {
+          "anchor_id": "a9",
+          "resource_id": "05fd9a0a-da0b-50d2-b405-d5adc9e93e3a",
+          "resource_digest": "e088fe8581c37cacec6c59344961a56ace1407d004e3042b3410cac5e25aa3ae",
+          "json_pointer": "/items/0/question",
+          "start_utf8": 0,
+          "end_utf8": 98
+        },
+        {
+          "anchor_id": "a10",
+          "resource_id": "05fd9a0a-da0b-50d2-b405-d5adc9e93e3a",
+          "resource_digest": "e088fe8581c37cacec6c59344961a56ace1407d004e3042b3410cac5e25aa3ae",
+          "json_pointer": "/items/1/answer",
+          "start_utf8": 0,
+          "end_utf8": 1
+        },
+        {
+          "anchor_id": "a11",
+          "resource_id": "05fd9a0a-da0b-50d2-b405-d5adc9e93e3a",
+          "resource_digest": "e088fe8581c37cacec6c59344961a56ace1407d004e3042b3410cac5e25aa3ae",
+          "json_pointer": "/items/1/explanation",
+          "start_utf8": 0,
+          "end_utf8": 48
+        },
+        {
+          "anchor_id": "a12",
+          "resource_id": "05fd9a0a-da0b-50d2-b405-d5adc9e93e3a",
+          "resource_digest": "e088fe8581c37cacec6c59344961a56ace1407d004e3042b3410cac5e25aa3ae",
+          "json_pointer": "/items/1/id",
+          "start_utf8": 0,
+          "end_utf8": 2
+        },
+        {
+          "anchor_id": "a13",
+          "resource_id": "05fd9a0a-da0b-50d2-b405-d5adc9e93e3a",
+          "resource_digest": "e088fe8581c37cacec6c59344961a56ace1407d004e3042b3410cac5e25aa3ae",
+          "json_pointer": "/items/1/question",
+          "start_utf8": 0,
+          "end_utf8": 109
+        },
+        {
+          "anchor_id": "a14",
+          "resource_id": "05fd9a0a-da0b-50d2-b405-d5adc9e93e3a",
+          "resource_digest": "e088fe8581c37cacec6c59344961a56ace1407d004e3042b3410cac5e25aa3ae",
+          "json_pointer": "/items/2/answer",
+          "start_utf8": 0,
+          "end_utf8": 1
+        },
+        {
+          "anchor_id": "a15",
+          "resource_id": "05fd9a0a-da0b-50d2-b405-d5adc9e93e3a",
+          "resource_digest": "e088fe8581c37cacec6c59344961a56ace1407d004e3042b3410cac5e25aa3ae",
+          "json_pointer": "/items/2/explanation",
+          "start_utf8": 0,
+          "end_utf8": 36
+        },
+        {
+          "anchor_id": "a16",
+          "resource_id": "05fd9a0a-da0b-50d2-b405-d5adc9e93e3a",
+          "resource_digest": "e088fe8581c37cacec6c59344961a56ace1407d004e3042b3410cac5e25aa3ae",
+          "json_pointer": "/items/2/id",
+          "start_utf8": 0,
+          "end_utf8": 2
+        },
+        {
+          "anchor_id": "a17",
+          "resource_id": "05fd9a0a-da0b-50d2-b405-d5adc9e93e3a",
+          "resource_digest": "e088fe8581c37cacec6c59344961a56ace1407d004e3042b3410cac5e25aa3ae",
+          "json_pointer": "/items/2/question",
+          "start_utf8": 0,
+          "end_utf8": 85
+        }
+      ],
+      "digest": "a80ac20c5243943395559851e2abf2906e8b19a07e64fc2b39544db0b1d759d7"
+    },
+    "reference_context": {
+      "source": {
+        "reference_id": "graph-node:mvp-0.2.0:array",
+        "version": "mvp-0.2.0",
+        "digest": "f83fd12e754fcda4124aa62b8a29203d97a897605d23dc4e37877393dcb0015d"
+      },
+      "node": {
+        "id": "array",
+        "name": "数组",
+        "chapter": "线性表",
+        "difficulty": 1,
+        "description": "使用连续存储空间、通过下标访问元素的线性结构。",
+        "prerequisites": [],
+        "learning_objectives": [
+          "说出下标访问的时间复杂度",
+          "说明连续存储对插入和删除的影响"
+        ],
+        "common_misconceptions": [
+          "数组每次访问都要从头遍历",
+          "数组插入总是 O(1)"
+        ],
+        "ai_context": "使用连续格子和下标精灵的图示，对比中间插入时的元素搬移。",
+        "mastery_rule_key": "linear-structure-v1"
+      },
+      "learner_evidence": {},
+      "scope": "Background only, not certification of this example."
+    },
+    "teaching_context": {
+      "version": "teaching-node-binding-v1",
+      "teaching_mode": "target",
+      "target_node_id": "array",
+      "recommended_node_id": "array",
+      "teaching_node_id": "array",
+      "selection_reason": "direct_target",
+      "original_request": "提供一个可直接调用且数组访问安全的固定读取函数，说明下标与返回约定。",
+      "segment_goal": "提供一个可直接调用且数组访问安全的固定读取函数，说明下标与返回约定。",
+      "segment_scope": "target_lesson",
+      "path_version_id": "64ae6732-c9b3-5c6d-a479-392c0e9faceb",
+      "path_version": 1,
+      "graph_version": "mvp-0.2.0",
+      "graph_digest": "3639db6aedc9699348e63b5e7e1bdaaea3189592b19540c64e8f175aceb9ef59"
+    },
+    "unit_digest": "cce85799095260868c2153ceb4aba880e5ecacbdb8a1b6d42cabcd537516f836"
+  },
+  "input_snapshot": {
+    "metadata": {
+      "node_id": "array",
+      "graph_version": "mvp-0.2.0",
+      "graph_digest": "3639db6aedc9699348e63b5e7e1bdaaea3189592b19540c64e8f175aceb9ef59",
+      "profile_version": null,
+      "profile_evidence_digest": "8838fdd11ee58e08fd54a21272313e784012370b7cf0a2cde8b823ed8806d85d",
+      "goal": "提供一个可直接调用且数组访问安全的固定读取函数，说明下标与返回约定。",
+      "code_language": "C"
+    },
+    "references": {
+      "graph-node:mvp-0.2.0:array": {
+        "reference_id": "graph-node:mvp-0.2.0:array",
+        "version": "mvp-0.2.0",
+        "digest": "f83fd12e754fcda4124aa62b8a29203d97a897605d23dc4e37877393dcb0015d"
+      }
+    },
+    "learner_evidence": {},
+    "node_ids": [
+      "array",
+      "array-stack",
+      "balanced-binary-search-tree",
+      "binary-heap",
+      "binary-search-tree",
+      "binary-tree",
+      "binary-tree-traversal",
+      "breadth-first-search",
+      "bubble-sort",
+      "c-pointer",
+      "circular-linked-list",
+      "circular-queue",
+      "depth-first-search",
+      "doubly-linked-list",
+      "graph-representation",
+      "heap-sort",
+      "insertion-sort",
+      "linked-list-concept",
+      "linked-list-deletion",
+      "linked-list-insertion",
+      "linked-list-traversal",
+      "linked-stack",
+      "merge-sort",
+      "queue",
+      "quick-sort",
+      "selection-sort",
+      "single-linked-list",
+      "sorting-comparison",
+      "stack",
+      "tree-concept"
+    ],
+    "teaching_context": {
+      "version": "teaching-node-binding-v1",
+      "teaching_mode": "target",
+      "target_node_id": "array",
+      "recommended_node_id": "array",
+      "teaching_node_id": "array",
+      "selection_reason": "direct_target",
+      "original_request": "提供一个可直接调用且数组访问安全的固定读取函数，说明下标与返回约定。",
+      "segment_goal": "提供一个可直接调用且数组访问安全的固定读取函数，说明下标与返回约定。",
+      "segment_scope": "target_lesson",
+      "path_version_id": "64ae6732-c9b3-5c6d-a479-392c0e9faceb",
+      "path_version": 1,
+      "graph_version": "mvp-0.2.0",
+      "graph_digest": "3639db6aedc9699348e63b5e7e1bdaaea3189592b19540c64e8f175aceb9ef59"
+    }
+  },
+  "provenance": {
+    "author": "Codex GPT-authored fixture, not independent human truth",
+    "relationship_to_history": "new content, reuses known diagnostic patterns; NOT blind/independent population sample",
+    "historical_failed_stack_sample_reused": false
+  },
+  "actual_model_result": null
+}

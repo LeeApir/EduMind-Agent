@@ -1,0 +1,42 @@
+{
+  "task": "PHASE-1-T062",
+  "provider_calls": 0,
+  "pg_mock_tests": 94,
+  "skipped": 0,
+  "ruff": "all app/tests passed",
+  "mypy": "195 sources passed",
+  "migration": "0031 upgrade/downgrade/re-upgrade on isolated DB passed before non-null bindings; with bound data downgrade rejected and revision unchanged",
+  "policy": {
+    "resource_review": "resource-review-v4",
+    "resource_review_prompt": "evidence-resource-review-v4.9",
+    "review_input": "authoritative-review-input-v4",
+    "objective_coverage": "student-visible-goal-coverage-v1",
+    "review_coverage": "fixed-check-ids-v2",
+    "review_scope": "teaching-bound-review-scope-v6",
+    "review_responsibilities": "review-responsibilities-v1",
+    "learner_review": "learner-evidence-review-v1",
+    "teaching_scope": "teaching-node-binding-v1",
+    "teaching_binding": "teaching-node-binding-v1",
+    "plan": "learning-plan-v1",
+    "actions": "teaching-actions-v1",
+    "max_corrections": 2,
+    "max_formal_calls": 20,
+    "max_with_temporary_calls": 22,
+    "model_deadline_seconds": 180,
+    "human_requires_complete_unit": true,
+    "hard_gate_override": false
+  },
+  "policy_digest": "747ec507e0f011d8a82e74d3823964fc2f860ab23693f71e695273ebf696fdad",
+  "checks": [
+    "immutable-once operation JSONB and SQL NULL compatibility",
+    "input/plan/unit/resources/context/graph/decision/publication equality",
+    "v2 material binds context; old v1 bytes unchanged",
+    "fresh DB reload rejects late node drift after model pass",
+    "simpler/another-example inherit exact teaching context and leave old publication readable"
+  ],
+  "retained_failures": [
+    "initial5 failures: SQLAlchemy JSON null versus SQL NULL and migration subprocess wrong DB",
+    "after null fix one migration subprocess failure remained; pinned subprocess to test DB and checked new stronger teaching-data guard"
+  ],
+  "not_tested": "real model topic correctness or actual course human signoff"
+}

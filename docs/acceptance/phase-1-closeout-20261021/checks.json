@@ -1,0 +1,75 @@
+{
+  "checked_at": "2026-10-21T16:13:21",
+  "provider_calls_this_closeout": 0,
+  "original_88_done": {
+    "result": "pass",
+    "source": "completed-task-audit.json",
+    "checks": [
+      "exact reachable completion marker",
+      "done snapshot and nonempty actual verification in completion commit",
+      "VERIFIED process entry in completion commit",
+      "Git evidence blobs and present logs, relocated paths, later valid integration reuse"
+    ]
+  },
+  "targeted_tests": [
+    {
+      "command": "backend/.venv/bin/python -m pytest -q backend/tests/test_catalog_mode.py -k 'default_and_invalid_scope_fail_closed or profile_updates_stop_before_db_or_gateway' backend/tests/test_unit_consistency_review.py",
+      "result": "5 passed, 12 deselected, 1 existing Starlette deprecation; the -k expression also deselected 10 unit tests, not counted as passed",
+      "kind": "actual default catalog boundary, no DB/provider"
+    },
+    {
+      "command": "backend/.venv/bin/python -m pytest -q backend/tests/test_unit_consistency_review.py",
+      "result": "10 passed in0.11s, no skips",
+      "kind": "actual existing unit-review mechanics with synthetic model responses"
+    },
+    {
+      "command": "backend/.venv/bin/python scripts/check_provider_contract.py",
+      "result": "575 references, 63 unique operations, 85 examples, 15 implemented operations",
+      "kind": "current zero-call contract"
+    }
+  ],
+  "transition_negative_checks": "1 valid transition / 6 invalid variants rejected; transition-negative-checks.json",
+  "lint": {
+    "command": "backend/.venv/bin/ruff check scripts/check_phase_handoff.py",
+    "result": "pass"
+  },
+  "historical_reuse": [
+    "403 latest isolated PG / synthetic model replies at T089",
+    "T038 exact original snapshot1758/189, queue55 and DSL295/matrix",
+    "T070 frontend200 and T073 actual browser/API existing data"
+  ],
+  "preservation": "all SQLite / JSON receipts / H / protected user-edit and reference file hashes pass",
+  "not_run": [
+    "No full quality/performance/provider/rendering reacceptance",
+    "No H material input/semantic evaluation",
+    "No new database, model credentials or Provider network",
+    "No Phase1.5 development or deployment"
+  ],
+  "scope_limits": [
+    "No independent model-quality claim from test sources or GPT drafts",
+    "T040/T041 remain blocked; T042 is only contracted closeout",
+    "Known usage is subtotal; physical total and fees unknown"
+  ],
+  "transition_check": "PASS: scripts/check_phase_handoff.py --before-commit; 88 original markers/evidence, exact final-root archive hash, new todo unstarted/root boundary and protected hashes all checked. T042 exact marker/same commit checked by default mode immediately after commit.",
+  "retained_read_attempt_corrections": [
+    "First evidence lookup used obsolete local-materials paths; found existing moved logs under local-materials/phase-1; no missing evidence fabricated.",
+    "A filename guess validation.json for T070 was absent; correct verification.json used.",
+    "Initial result rendering assumed all verification_results strings; actual mixed dict/string records kept intact."
+  ],
+  "local_document_links": {
+    "checked": 109,
+    "missing": 0
+  },
+  "product_mode_configuration": {
+    "process_override": null,
+    "local_env_explicit_mode": null,
+    "example_env_explicit_mode": null,
+    "effective_default": "catalog_only",
+    "secrets": "only product-mode assignments inspected; no credential logged"
+  },
+  "archive_task_object_changes": [
+    "PHASE-1-T041",
+    "PHASE-1-T042"
+  ],
+  "final_staged_check": "git diff --cached --check required immediately before commit"
+}

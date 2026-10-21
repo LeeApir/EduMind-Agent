@@ -1,6 +1,106 @@
 # Provider Gateway：现行契约与验证边界
 
-PRD §3.8 规定 P0 使用单一服务端 OpenAI-compatible Provider。当前实现连接一个由服务端配置的 DeepSeek 模型，默认使用 Responses 传输；本文件定义业务代码和网络适配器之间的内部契约，不开放 BYOK、模型选择页或自动跨厂商回退。
+PRD §3.8 规定 P0 使用单一服务端 OpenAI-compatible Provider。系统默认连接由服务端配置的 DeepSeek 模型，使用 Responses 传输；Phase 1 新增内部连接网关、连接管理/显式测试 API 与连接管理、四档偏好页面。两条路径均不自动跨厂商回退。
+
+## Phase 1已批准边界
+
+用户已授权串行推进PHASE-1-T002至T005；[ADR-0008](ADR/0008-provider-credentials-and-egress-boundary.md)已于2026-10-04获用户A–D批准。确定匿名持久BYOK随原2h会话失效/清理、主密钥信封加密与显式轮换、进程/会话/单次操作内临时Key，以及配置版本绑定的数据去向同意和明确回退。批准登记见[具体记录](ADR/0008-provider-approval-20261004.json)。API/持久化/临时Key由T003至T005分别交付；批准不代表BYOK已可用，也不授权实际模型出口。
+
+用户随后授权持续串行完成 Phase 1。T007 的 `build_connection_provider_gateway` 接受服务端解析的 owner/原会话、连接 ID/配置版本、精确模型和数据类别同意，以及绑定同一连接版本与模型的能力声明。未知或未声明的流式/结构化能力拒绝调用；能力声明不等于真实模型验收。调用方必须注入每次尝试的预算/操作授权函数，没有默认授权；持久预算账本由 T035 交付。当前没有新增对外生成端点，`catalog_only` 仍拒绝生成，仅允许声明为 `probe` 的连接测试/模型刷新操作；真实模型出口仍需独立预算授权。
+
+内部操作与网关消费必须放在同一个 asyncio task 的上下文内；SSE 调用方应在消费任务内创建网关，不能跨任务借用已激活的凭据。每次重试都重新锁定连接、核验会话/版本/启用状态，重新解析并固定目标 IP，然后取得该次授权并读取凭据。持久 Key 不缓存，临时 Key 绑定原操作/用途/模型；明确无 Key 的连接不会借用系统 Key。禁用环境代理及跳转，保留原始 Host 与 TLS SNI。
+
+发送与删除/禁用共用 PostgreSQL 行锁；HTTPX 异步 trace 在实际 headers/body 发送开始前再次检查会话和期限，在请求体发送完成后提交并释放锁。流式读取不长期持锁。没有 trace 的测试传输保守地保持锁至响应头返回。每个操作最长 180 秒，或原会话/凭据更早的期限；同进程提交撤销立即取消，跨进程每 0.9 秒作无锁 MVCC 状态检查，检查最多 1 秒，失败同样取消。无锁观察不授予发送权限，避免观察者等待自己持有的发送锁。取消、消费者关闭、失败和正常结束均关闭上游并清理授权头/临时凭据。依据：[HTTPX trace 与 SNI](https://www.python-httpx.org/advanced/extensions/)。
+
+连接适配器固定调用所选 Base URL 的 `/chat/completions`，只发送本次消息、选定模型和受限参数（请求 1 MiB、响应累计 2 MiB、SSE 单帧 1 MiB）。文本只接受单个 assistant 结果与 `finish_reason=stop`；流式只转发可见 content，必须收到正常 finish 和 `[DONE]`。结构化传输显式声明为 `json_schema`、`json_object` 或 `text_json`，没有自动试探/降级；三种模式都做本地 JSON/schema 校验，重复键、非有限数、工具/拒绝输出与截断均拒绝。依据：[OpenAI 结构化输出](https://developers.openai.com/api/docs/guides/structured-outputs)、[流式输出](https://developers.openai.com/api/docs/guides/streaming-responses)。正式资源仍需业务审核。
+
+T007 验证：隔离 PostgreSQL 迁移往返及连接/临时凭据/系统 Provider 回归 276 项通过，无跳过；包括真实 HTTPX 到本机合成 HTTP 服务的发送事件测试。其余出站均为 Mock/受控 DNS，真实 Provider 请求 0。这些证据证明协议和并发边界，不证明供应商或模型可用性。
+
+## Phase 1 Ollama 原生适配
+
+T008 为 `provider_type=ollama` 选择原生适配器，其他业务接口仍是同一个 `ProviderGateway`。Base URL 是服务根或代理前缀，例如 `http://127.0.0.1:11434`，适配器只追加 `/api/chat`；不会访问 `/api/pull`、下载模型或自动探测能力。管理员必须同时启用 `EDUMIND_PROVIDER_DEPLOYMENT=local` 与精确 `EDUMIND_PROVIDER_LOCAL_ALLOWLIST=127.0.0.1:11434`。每次出站重新核验全部 DNS 答案，全部必须在白名单；即使是合法公网 HTTPS，也不能作为 Ollama 原生目标。通用连接元数据保存仍遵循 SSRF 资格校验，保存不证明其能通过 Ollama 的发送门禁。本地只指已批准的服务端连接目标，不保证该服务不转发到云端。
+
+原生文本请求显式发送 `stream=false`，输出上限映射到 `options.num_predict`，温度放在 `options.temperature`；token 用量来自 `prompt_eval_count`/`eval_count`，缺失保持未知。单个完成结果必须是 assistant 文本、`done=true` 和 `done_reason=stop`。流式显式开启 `stream=true`，解析有界 UTF-8 NDJSON（含 CRLF 和无末尾换行的完整记录），只暴露 `message.content`，忽略独立 `thinking`，在正常 done 结束；截断、错误记录、工具/非文本输出均以统一安全错误终止，不自动重放。模型缺失的 404 映射为 `CAPABILITY_UNAVAILABLE`，连接失败为 `TEMPORARILY_UNAVAILABLE`，超时为 `TIMEOUT`，不回显原始错误正文。依据：[Ollama Chat](https://docs.ollama.com/api/chat)、[流式协议](https://docs.ollama.com/api/streaming)、[错误协议](https://docs.ollama.com/api/errors)。
+
+模型能力仍显式绑定连接配置版本、模型 ID 和声明版本，不根据模型名称推断。声明支持结构化输出时，`json_schema` 使用原生 `format=<schema>`，`json_object` 使用 `format="json"`，`text_json` 仅注入 JSON 指令；三种传输必须由能力声明明确选择，不自动降级。全部结果继续经过本地严格 JSON/schema 校验与业务审核。JSON/消息参数/字节限制提取为厂商无关共享校验，兼容适配器继续使用相同规则，网络 JSON 只接受 UTF-8。依据：[Ollama 结构化输出](https://docs.ollama.com/capabilities/structured-outputs)。
+
+Ollama 复用 T007 的 owner/会话/配置版本/同意、每次预算授权、发送行锁、撤销和临时 Key 生命周期；无 Key 连接不借用系统凭据。T008 只提供内部适配，没有增加对外生成端点或解除 `catalog_only`。真实本地实例可用性属于后续独立接入验收；本任务实际模型请求为 0。
+
+## Anthropic 原生适配（T015）
+
+连接管理可选Anthropic，Base URL包含版本前缀（例如供应商的`/v1`），原生适配只追加`/messages`。发送层使用`x-api-key`和`anthropic-version: 2023-06-01`，固定已批准IP、原Host/TLS SNI，关闭环境代理、重定向和自动重试；成功/失败/取消均移除Key头。复用HTTPX 0.28.1及jsonschema 4.25.1锁定依赖，无新增SDK或固定模型。模型来自确切连接选择，业务仍只依赖Gateway。依据：[Messages协议](https://platform.claude.com/docs/en/api/messages/create)。
+
+前置system消息映射为顶层文本块，不将后置system指令跨轮提升。无用户消息、assistant前缀补全及超出原生0–1范围的温度在发送前拒绝；用户明确温度仍照传，较新模型不支持时返回安全能力错误，不能删除参数重放。固定8token/10秒/一次连接探测对Anthropic不设置已弃用的采样参数，不发送学生上下文。只返回正常end_turn的可见文本；max_tokens、refusal、pause_turn、非文本/工具结果拒绝。用量仅映射实际input_tokens/output_tokens，缺失保持未知，不推算价格或缓存账单。
+
+流式解析有界SSE，核验message_start、顺序索引的内容块及其关闭、正常message_delta和最终message_stop；只转发text_delta，隐藏thinking/signature块。截断、错误、工具块与失序关闭连接，已输出后仍不会重试或拼接其他目标。共享1MiB请求/单帧及2MiB累计响应限制；客户端取消和临时凭据一次性清理由发送层执行。依据：[流式事件与错误](https://platform.claude.com/docs/en/build-with-claude/streaming)、[HTTP错误](https://platform.claude.com/docs/en/api/errors)。
+
+结构化能力必须明确声明并绑定版本/模型。json_schema使用原生`output_config.format`；text_json只在明确选择时发送JSON指令。新增内部tool_schema模式还必须声明tool_calling=true，只允许固定`edumind_result`、strict input_schema及禁止并行的强制选择，返回单个同名tool_use输入作为结构化值，不执行工具。所有模式都严格解析JSON并在本地按原schema校验；不削弱schema、不自动换模式，其他适配器拒绝tool_schema。上游不支持的schema返回安全错误，正式资源仍需ReviewAgent。依据：[JSON与严格工具结构化输出](https://platform.claude.com/docs/en/build-with-claude/structured-outputs)。
+
+显式模型刷新使用一次`GET <base>/models?limit=1000`；has_more=true或格式无效时保留旧缓存，不自动翻页。仅映射官方明确的structured_outputs.supported与image_input.supported为声明能力，streaming/tool_calling等无明确字段仍未知；项目扩展声明可补充，但与官方声明冲突则拒绝。规则版本anthropic-model-capabilities-v1，不把声明当真实验证；当前Key回显禁止进入模型缓存或生成结果。依据：[模型列表及能力字段](https://platform.claude.com/docs/en/api/models/list)。默认生产预算仍拒绝，catalog_only持续，本任务真实Provider请求0；实际模型质量和连通性待独立授权验收。
+
+## Gemini 原生适配（T016）
+
+连接管理可选Google Gemini。Base URL包含版本前缀（例如`https://generativelanguage.googleapis.com/v1beta`），不包含模型路径或Key；适配器追加`models/<选定模型>:generateContent`，流式改为`:streamGenerateContent?alt=sse`。允许短模型ID或规范`models/<ID>`，拒绝斜线、查询、百分号编码和方法注入；不固定型号。发送层使用`x-goog-api-key`头，Key不进入URL，继续固定批准IP与原Host/TLS SNI，关闭环境代理和重定向，终止后清除Key头。复用已锁定HTTPX 0.28.1、jsonschema 4.25.1，不新增SDK。协议于2026-10-04核对：[GenerateContent及流式API](https://ai.google.dev/api/generate-content)、[API认证](https://ai.google.dev/api)。
+
+前置system映射为`systemInstruction.parts`，assistant映射为`model`，不跨轮提升后置system；只接受以user开始和结束的对话。`generationConfig`保留显式温度、受限`maxOutputTokens`，固定单候选和TEXT输出，不配置工具、搜索、代码执行或安全阈值覆盖。只发布正常STOP的可见text，thought/signature保持内部；MAX_TOKENS、拒绝、工具/二进制输出和畸形候选失败。SSE解析有界UTF-8帧，按增量转发，必须正常STOP且EOF；可接受无正文的用量尾帧，禁止完成后的额外正文或模型版本变化。取消/截断/错误关闭连接，不重放流。请求及单帧1MiB、累计响应2MiB；错误只返回安全枚举，JSON转义后的当前Key回显也在发送上下文内拒绝。
+
+结构化需明确能力与传输声明：`json_schema`使用当前官方`generationConfig.responseFormat.text={mimeType:"application/json",schema:<原schema>}`，`text_json`仅在明确选择时追加JSON指令；不使用自动模式探测或降级，不削弱schema。全部结果在本地严格解析并校验原schema，正式资源仍需ReviewAgent。用量仅映射实际`promptTokenCount`和`candidatesTokenCount`，如同时报告`thoughtsTokenCount`则计入输出；缺失保持未知，不用total反推或推算费用。依据：[结构化REST示例](https://ai.google.dev/gemini-api/docs/generate-content/structured-output)、[响应及用量字段](https://ai.google.dev/api/generate-content)。
+
+按[T001冻结计划](acceptance/phase-1-acceptance-plan.md)的多模态边界，内部厂商无关`TextRequest`可携带`InlineImage`及`InlineImageConsent`，仅支持PNG/JPEG/WEBP内存字节，最多4张、合计512KiB，校验MIME与文件头且整个请求仍受1MiB限制。图片仅加入最后一条user消息，不读取文件/URL、不调用Files API；HEIC/HEIF、音频、视频、PDF及工具消费入口未实现，明确拒绝而非降级。依据：[官方内联图片与格式](https://ai.google.dev/gemini-api/docs/generate-content/image-understanding)。
+
+图片必须有vision=true声明、generation用途与`content_for_review`类别，同时满足原连接同意和独立图片同意。后者绑定connection/config/model/operation及SHA256清单（有序图片的MIME和字节摘要、完整消息、档位、参数、结构化schema）；改变任一项须重新授权，计算摘要本身不授予同意。每个网关图片操作只发送一次，包括失败/取消，不因retry_safe自动重传；其他适配器与Gateway拒绝携图请求，避免静默丢弃。没有新增HTTP/前端上传入口，当前没有产品调用方替用户构造图片同意。未来调用方必须先取得明确目标与具体数据授权，不能把文本类别勾选视为上传授权；真实上传及云端探测仍须T035/T039单独预算和授权。
+
+显式模型刷新为单次`GET <base>/models?pageSize=1000`；非空nextPageToken、畸形数据或Key回显失败并保留旧缓存，不自动分页。缓存保留规范`models/<ID>`，能力规则`gemini-model-capabilities-v1`；只映射明确声明的streamGenerateContent或项目布尔声明，generateContent本身不证明vision/structured_output/streaming，未声明保持未知。依据：[Models列表和字段](https://ai.google.dev/api/models)。固定8token/10秒/一次的文本探测不含图片/学生上下文，也不能将成功当成多模态或结构化证明。生产预算默认拒绝、catalog_only持续；本任务真实Provider请求0。
+
+## 讯飞星火可选 HTTP 适配（T017）
+
+`provider_type=spark`选择独立SparkAdapter，业务仍只依赖Gateway。按2026-10-05核对的[官方HTTP文档](https://www.xfyun.cn/doc/spark/HTTP%E8%B0%83%E7%94%A8%E6%96%87%E6%A1%A3.html)、[X2 HTTP文档](https://www.xfyun.cn/doc/spark/X1http.html)和[星辰MaaS接入说明](https://www.xfyun.cn/doc/spark/%E4%BA%A7%E5%93%81%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.html)，使用所选模型对应的HTTP服务前缀（例如`/v1`、`/v2`或`/x2`），只追加`/chat/completions`，不固定域名或型号、不跨端点自动切换。只写secret.api_key承载HTTP APIPassword/API Key，通过Bearer头发送；不消费APISecret/AppID三件套或生成WebSocket/HMAC签名URL，传入额外凭据在发送前拒绝。复用锁定HTTPX0.28.1，不新增SDK/迁移。
+
+请求保持原消息、模型、受限max_tokens及显式温度，不发送owner/session/user标识。明确设置web_search.enable=false和tool_choice=none，因为官方部分型号默认允许搜索；不注册或执行工具。若目标不支持这些禁止参数，返回能力错误，不删除参数重放。探测只发固定8token/一次/10秒的合成文本，不设置跨版本范围不同的温度，不含学生上下文。设置页可选星火并提示HTTP凭据方式；保存、打开页面和读取缓存都不触发模型请求。
+
+原生文档的完整非流式响应没有model/finish_reason，因此以完整合法HTTP JSON响应、成功code（出现时必须整数0）、单个assistant文本作为完成依据；显式finish_reason出现时仍须stop，length/拒绝/工具/二进制/异常状态拒绝。TextResult.model_id记录所选路由，不将缺失的上游型号伪造为独立模型验证。流式按有界SSE增量处理，必须收到[DONE]且自然读到EOF，只有可见content转发；reasoning_content和HIDE_CONTINUE思考块隐藏，带隐藏建议的正文拒绝。完成后额外正文、版本变化、截断、工具/搜索、非法JSON及取消都终止并关闭，不自动重试或拼接另一Provider。
+
+实际prompt_tokens/completion_tokens映射到中立用量，缺失保持未知；非零search_prompt_tokens或搜索输出违反禁搜索范围而失败，不推算费用。原生code10007/11201/11202/11203映射限流，11200为鉴权失败，10907为能力不支持，10013/10014/10019为无效输出；未知错误码保守拒绝，HTTP状态使用统一映射，错误正文/sid不公开。当前Key的转义回显在凭据上下文内拒绝。共用1MiB请求/帧、2MiB响应上限、目标固定IP/Host/SNI、禁代理/重定向、owner/会话/配置版本/同意、发送行锁/撤销和临时凭据单次清理。
+
+本任务只开放已核对的文本/流式契约，结构化、图片、函数/搜索执行及模型列表刷新显式CAPABILITY_UNAVAILABLE；不因官方提到JSON/工具能力自动推断具体模型已可用于正式生成。Spark的GET模型缓存仍只读，POST刷新在出站前拒绝，不假设存在未记录的/models接口。生产预算默认拒绝、catalog_only持续；真实账号、所选型号/协议及禁搜索参数是否实际生效留T039独立授权验收，本任务真实Provider请求0。
+
+## 显式连接测试
+
+T010 的 POST `/api/providers/connections/{id}/test` 只接受操作ID、精确版本/模型/probe-only同意和可选临时handle；固定短提示、最多8输出token、10秒总期限、一次尝试、不回退。target是发送当时批准的Base URL，is_local来自该次DNS全部地址，不证明服务离线；文本成功仍将所有高级能力标为未知，不返回上游生成正文。响应private/no-store并提示可能调用服务。默认预算拒绝出站；Mock测试注入的授权不是生产预算或真实Provider验收，实际预算与计数由T035交付。
+
+## 模型缓存与声明
+
+T011提供认证静态类型目录GET `/api/providers/catalog`、owner/原会话过滤的缓存GET `/api/providers/connections/{id}/models`，以及显式POST `.../models/refresh`。类型目录包含后续原生类型，不承诺尚未实现的适配器可调用；不加载主密钥或调用模型。缓存绑定连接配置版本，存PostgreSQL `provider_model_snapshots`（Alembic0019）；空缓存/配置变更返回models=[]、refreshed_at=null，不证明供应商没有模型。读取不刷新、不做DNS/模型出口，重启可恢复同一有效会话的快照。
+
+刷新只在精确版本/模型/probe-only同意和预算授权后，复用发送行锁、凭据/临时handle和固定IP边界。固定GET `<base>/models` 或原生 `<base>/api/tags`，不发送学生上下文；10秒总期限、2MiB累计响应、最多1000唯一模型ID，无重试/分页/回退/下载。全部响应校验后，在同一连接行锁及会话/版本复核下原子更新；错误保留旧快照，配置变更或撤销禁止发布。模型ID只允许有界无控制字符文本；原始owned_by/digest/details/secret等元数据丢弃，当前Key回显被拒绝而不是缓存/返回。用量未提供，不伪造token计数。默认预算仍拒绝，实际Provider调用0。
+
+官方列表协议只提供模型ID等元数据，不能据名称或family推断能力：[OpenAI列表](https://developers.openai.com/api/reference/resources/models/methods/list)、[Ollama列表](https://docs.ollama.com/api/tags)。若兼容服务显式提供项目可选字段 `edumind_capabilities`，只读取已定义的streaming/structured_output/tool_calling/vision/embedding/tts/asr布尔或null；这不是官方字段。输出source=declared与本地解析规则版本model-list-declarations-v1；绝不接受上游自称verified，缺字段仍null/source=unknown，不把声明当真实质量验收。`resolve_capabilities`只解析owner/当前配置/确切模型的缓存声明，流式/结构化能力未知或不匹配由网关在预算/发送前拒绝。后续原生声明和真实验证仍各自验收。
+
+## 四档偏好与选择
+
+T012提供GET `/api/model-preferences` 与CSRF PUT `/api/model-preferences/{task_profile}`，保存fast/default/quality/review四档。Alembic0020的偏好按owner/原会话隔离，expected_version=0仅首次创建，随后精确比较当前单调版本；同owner行锁保护首次创建竞争。route和最多3个有序fallback包含连接/配置版本/模型/数据类别，必须明确同意，不能重复同一连接版本与模型或把鉴权/无效输出列入回退条件。不存Key/handle/响应正文，不读取主密钥或接触模型。GET只列已有档位；state=available是配置资格，能力/真实连通性仍须另验。禁用/删除/过期/缺凭据返回unavailable；有效连接版本变化为consent_required，原偏好保留便于解释和重选。
+
+`select_route`返回内部临时覆盖→用户该档位→default用户默认→系统默认来源；未配置才继续查下一层，已保存的失效选择不自动降级。review可独立选择连接/模型。`generate_selected`只处理非流式文本/结构化请求；当前catalog_only先拒绝，所有被选目标先核验owner/会话、当前版本/资格、精确模型缓存能力、本次独立同意和实际数据类别，再由发送锁进行逐次预算授权。只有RATE_LIMITED/TIMEOUT/TEMPORARILY_UNAVAILABLE匹配用户有序fallback的on_errors时尝试对应目标，每目标一次；最多主路由+3个fallback，无同意/能力/预算即停止，无默认系统Key回退。审核结构化能力未知或不可用不返回审核结果，不能发布正式资源。临时Key分别绑定每一目标的本次操作，流式仍只用原目标、不拼接回退正文。
+
+安全记录回调只包含所用route、收到上游响应的实际Base URL、选择来源、固定回退原因与结果码；无请求/响应正文或秘密。连接失败未收到响应则target=null，不把批准但未发送的目标记为完成。系统默认分支需调用方显式提供独立authorize_system与网关，缺少即拒绝，旧学习路由不因此切换。T013/T014负责前端设置；业务调用接入及真实预算/动态开放仍单独验收。
+
+## 连接管理页面（T013）
+
+课程入口中的“模型设置”可新增、修改、禁用及确认删除兼容服务/Ollama连接。打开页面只读取当前匿名会话、连接元数据和模型缓存；保存连接不测试、不刷新、不下载模型。课程组件保留在原页面，返回后继续当前练习；设置错误不会解除目录门禁或阻塞已发布课程。课程与设置同时初次读取身份时，共享正在进行的会话请求，结束后不缓存身份或CSRF。
+
+持久化Key只在密码输入框和该次保存请求中暂存，提交前清空输入；服务端在原匿名会话期限内加密保存。替换Key留空保留，明确清除或更换地址/类型遵循后端撤销规则。临时模式只保存连接信息，测试/刷新需重新输入Key，并先上传绑定确切操作、用途、配置版本、模型及probe-only同意的一次handle；操作完成、失败或离开时清空组件秘密，handle不写任何浏览器存储。页面关闭期间仍在上传时，不继续发起测试；已上传但未消费的服务端临时凭据按ADR-0008的期限清理。
+
+每次测试或刷新前，需选择精确模型ID并明确同意只发送探测数据。改动配置或模型、操作结束后重置同意；未保存配置不能测试。页面显示保存的Base URL与服务端白名单/公网属性，成功测试再展示该次实际目标；能力分别显示支持/不支持/未知和声明来源，不从模型名称或文本成功推断高级能力。默认预算拒绝时给出管理员授权提示，不自动重试。响应只保留安全字段，供应商原始错误不展示，所有服务文本默认转义。
+
+验证入口：`cd web && pnpm test --run tests/provider-settings.spec.ts`；浏览器Mock流程为`web/tests/e2e/provider_settings.py`，可通过webapp-testing的`with_server.py`启动本机Vite并传入`--evidence`目录。该核验只证明界面协议、Key清空、手机布局和目录返回，不证明真实Provider可用。
+
+## 档位与数据去向页面（T014）
+
+“档位与数据去向”设置fast/default/quality/review四档，default同时作为用户默认连接，review可选择独立审核模型。打开仅读取会话、连接、偏好和所选连接的模型缓存，不测试/刷新/生成。未配置档位才继承default或服务端系统默认；已有的unavailable/consent_required选择显示阻塞原因，不自动换模型。页面按服务端保存回执和T012相同优先级展示配置解析，尚未发生请求的目标不称为实际调用记录。旧配置版本匹配失败时，不用新Base URL冒充旧目标。
+
+每个主/回退目标分别显示服务类型、确切模型、Base URL、白名单/公网属性、配置版本、凭据方式和允许的数据类型。回退初始为空，可明确添加最多3个有序目标并分别选择限流/超时/暂时不可用条件；其他错误和流式输出不跨目标。改动连接、模型、数据类别、条件或顺序后取消同意，保存需重新确认全部目标。偏好只存路由元数据；临时Key仍需在调用时逐目标单次输入，保存同意不替代本次数据去向确认、能力校验、预算或动态开放批准。
+
+验证入口：`cd web && pnpm test --run tests/model-preferences.spec.ts`；`web/tests/e2e/model_preferences.py`覆盖用户默认继承、显式回退、独立审核、目标/数据回执、手机布局及返回目录，全部API为Mock，真实Provider请求为0。
 
 ## 内部调用边界
 
@@ -103,8 +203,96 @@ Provider失败只携带固定输出类别与验证过的非负整数token用量�
 原错误集、检测口径及阈值不变，不把正确拒绝但分类不符的历史样本改计为通过。
 `safety-diagnostic` 仅固定三请求（两个内存安全错误和一个正确对照），不是完整质量门禁。
 
+2026-10-14 T040 诊断首例真实漏检后，当前指令升级为 `resource-review-instructions-v3`：
+在 v2 分类规则上，要求检查失败返回值与调用者赋值、原有状态和内存所有权、后续清理及注释是否一致；
+具体的所有权丢失/内存泄漏按 `code_safety` 报告。已检查的临时返回值或保留所有权的契约可正确，
+不得只因存在失败分支或返回 NULL 就拒绝。规则适用于代码资源及讲解/练习中的代码，未注入案例 ID、
+预期 verdict 或正式样本答案。审核输出 schema-v3 和原验收阈值不变。
+此为修复候选，离线流程回归不证明模型已能检出；新 Prompt 须通过独立冻结/预算的真实历史诊断，
+旧失败仍保留，正式质量与动态开放不自动授权。
+
+2026-10-14 完整 high 诊断 r04 在索引约定样本漏检后，审核指令升级为
+`resource-review-instructions-v4`：区分自然语言位置/零基索引、访问节点数/经过链接数、数据头/哨兵头，
+核对起点与首元素、单节点和端点。约定缺失且会改变公式真值时不得默选有利约定放行，
+须以具体边界说明 fact 问题；上下文已明确的零基、一基及哨兵公式不应误拒，不凭记号问题虚构内存风险。
+原 schema-v3、安全/上下文规则及验收阈值保持；原历史/正式标签不重写。
+离线组装和对照回归通过不等于模型已修复，仍需新 Prompt 的独立真实诊断与预算。
+
+2026-10-14 审核指令升级为 `resource-review-instructions-v5`：issue 只报告当前问题、位置、
+触发条件及具体反例/后果；允许引用原候选定位，不输出替换代码、通用修复公式或补丁步骤。
+修正步骤使用 `resource-correction-instructions-v2`，独立核实问题，不能盲信 issue 中夹带的建议，
+保留原表示方式/容量/状态不变量，完整有效候选再次审核，仍最多两轮。
+修正结果的资源 schema 无效时安全拒绝，不再由未捕获 ResourceSchemaError 中断流程。
+检出、分类、审核职责范围、修正质量分别记录；未执行修正不记为修正质量通过，不追加运行后临时指标。
+
+2026-10-15 审核指令升级为 `resource-review-instructions-v6` 修复候选：逐项核对候选已给出的
+定量断言、公式、状态谓词与操作规则，发现一处错误后继续检查其余独立断言，不只报告代表性一条。
+各独立具体缺陷需要定位与条件/反例；不重复同一缺陷、不要求额外课程主题或固定问题数量。
+覆盖过程不增加输出字段，schema-v3、findings-only、独立修正和完整复审/最多两轮保持。
+本地代码/schema没有截断单issue，r07原回答确实仅含一条；不将此观察推断为唯一模型内部原因。
+148离线回归通过不证明模型漏检已修复；r08同模型low两例/独立预算待批准，旧结果和停止台账不改。
+
+2026-10-14 两次非思考审核均漏检后，Responses 适配器支持由服务端组合层显式传入
+`reasoning_effort=none/low/high/max`，默认仍为 `none`；无新增前端参数或自动回退。
+无效档位在 DNS/发送前拒绝，Beta transport 不会静默忽略非 none 的请求。
+文本、结构化和流式请求使用同一配置；`max_output_tokens` 仍约束推理与可见输出总量。
+当前只准备同模型 high 策略的两例独立诊断，尚无实测通过或生产切换。
+验收证据只保留最终回答及推理 Token 数，不持久化 reasoning 文本；细分用量缺失不推测为 0。
+
 画像提取指令 `profile-instructions-v2` 在消息中重申原schema的精确根字段及证据记录字段；
 行为更新指令 `profile-behavior-instructions-v2` 要求唯一根字段 `updates`，证据不足时
 仅返回 `{"updates": {}}`。原schema、允许字段、服务端证据归属和失败降级策略不变。
 `diagnose_profile_contract.py` 以三次无重试请求验证一次提取和两次行为更新；
 合法的无变化不是失败，也不能以此宣称已证明完整学习闭环。
+
+## Phase 1 API契约
+
+[T003契约落实](ADR/0008-provider-api-contract.md)与[OpenAPI](api/openapi.yaml)定义12个Provider操作，包括临时凭据提交及GET模型缓存/POST显式刷新。If-Match/配置版本、owner与CSRF、只写secret、同意与统一错误均固定；x-runtime-status=planned端点尚未实现。可运行 `backend/.venv/bin/python scripts/check_provider_contract.py` 离线核验引用/示例/安全字段，不能替代实际HTTP验收。
+
+## Phase 1持久化与管理员轮换（T004）
+
+迁移`0018_provider_connections`保存owner/原会话/到期时间、配置与凭据版本、非敏感KEK ID和AES-GCM信封；元数据只读响应不含secret/密文。`ProviderConnectionStore`在创建/更新/读取/解密/删除时验证会话与owner，行锁和版本检查防止并发覆盖；目标变更清除旧凭据，删除留禁用墓碑。内部`decrypt`不提供出站许可，T007仍须实现发送边界锁/同意与预算门禁。
+
+依赖固定为[cryptography 50.0.2](https://pypi.org/project/cryptography/50.0.2/)，由pyproject/uv.lock锁定。服务端配置：`EDUMIND_CREDENTIAL_ACTIVE_KEY_ID`指向`EDUMIND_CREDENTIAL_KEYRING_JSON`中的KEK ID；JSON值为32字节KEK的标准base64。不要把真实值写入文档/仓库/输出。无配置不生成替代密钥，目录与health继续可用，凭据写入/解密失败关闭。
+
+管理员从安全配置注入新旧KEK，设新active后在backend运行 `.venv/bin/python -m app.core.rotate_provider_credentials`。CLI按100行批次锁定并重包裹DEK，保留payload密文；中断可重入，失败只输出安全代码或计数，非零退出。仅所有有效凭据不再引用旧KEK、并明确处理历史备份后才退役旧KEK；提前移除会使旧信封不可解密。此CLI不创建/调用Provider，学生没有轮换HTTP入口。
+
+凭据服务每次访问前幂等清理到期/丢失父会话的密文，API数据库runtime从首次使用开始每60s后台清理，退出时取消清理task；不加载KEK，失败只记录固定错误。过期使用独立逻辑检查，不依赖物理清理及时性。数据库/服务停机不能保证物理清空时限，恢复后先清理再操作。清理不删User或学习历史，不处理备份擦除。
+
+隔离验证入口：`backend/.venv/bin/python scripts/run_provider_storage_tests.py edumind_catalog_phase1_<新轮次> tests/test_provider_connections_persistence.py tests/test_auth.py`，只接受专用测试库名，复用既有测试PG容器，运行迁移升/降/升与实际测试，移除Provider/主密钥环境配置；不要指向用户开发或生产库。HTTP连接管理仍由T009实现，T004只交付内部存储/维护服务。
+
+## Phase 1临时凭据生命周期（T005）
+
+每个ASGI lifespan拥有独立`DatabaseRuntime.temporary_credentials`注册表，关闭lifespan清除所有条目并取消活动operation；无需数据库/主密钥即可维持health。`TemporaryCredentialService`以服务端认证身份读取连接，要求当前版本、enabled与temporary模式，使用原始会话期限注册；不允许用临时清理路径改动持久信封或系统Key。后续HTTP依赖必须复用该lifespan注册表，嵌入式无lifespan调用不能临时创建另一个注册表冒充可恢复状态。
+
+handle为32随机字节的URL-safe编码，只在所属进程/loop有效。绑定owner/session/connection/version/operation/purpose/model，不能独立鉴权。每会话最多4个待领取条目，等待最多300s或会话到期；原子单次领取后最长180s或会话到期，使用独立绝对计时器，持续token不能延长期限。所有终止路径清零并清空受控bytearray、释放条目；Python和HTTP库产生的明文副本仍遵循ADR-B7的有限保证。
+
+后续T009连接修改/删除依赖必须使用`ProviderConnectionStore(..., on_change=registry.revoke)`，事务成功提交后同步通知所属注册表；`TemporaryCredentialService`也会为自己的store配置该回调，拒绝混用另一注册表回调。失败事务不通知。每秒另行检查DB owner/session/连接版本，检查1s未完成或失败即触发取消；取消慢的数据库检查不会延迟取消operation或等待无限清理，检查task被取消且异常不输出。session/operation绝对计时器独立于DB检查。业务代码必须在`async with registry.lease(handle, binding)`内管理并关闭上游流；租约只允许所属operation task读取secret。
+
+注册表/条目/租约拒绝pickle与默认JSON序列化，不提供转发、恢复或持久Key替代路径。API/队列实现仍须遵守ADR-C6：不得把原始secret、handle或租约放进后台模型任务，只能移交已审核且不含凭据的DSL/Job ID。注册表与内部解密均不授予出站许可，T007须在实际发送边界实施锁、同意、目标校验和预算；T009接入HTTP时还须落实Cookie/CSRF、no-store、输入错误脱敏与前端表单清空。
+
+测试入口：`cd backend && .venv/bin/python -m pytest -q tests/test_temporary_provider_credentials.py`运行离线生命周期测试，PG项在未配置隔离库时明确跳过；完整验收使用`backend/.venv/bin/python scripts/run_provider_storage_tests.py edumind_catalog_phase1_<新轮次> tests/test_temporary_provider_credentials.py tests/test_provider_connections_persistence.py tests/test_auth.py tests/test_catalog_mode.py tests/test_database_lifespan.py tests/test_health.py`。仅测试标记secret、受控DNS和FakeAdapter，无真实模型调用。
+
+## Phase 1目标策略回归（T006）
+
+云端目标须为公网单播HTTPS。除原有私网/回环/链路本地/元数据阻断外，拒绝组播、IPv6 site-local、带scope的DNS答案、保留地址、NAT64/6to4/Teredo转换地址；IPv4-mapped IPv6按内嵌IPv4分类。不能只用`is_global`判定；[Python官方ipaddress说明](https://docs.python.org/3/library/ipaddress.html)区分全球可达、组播、保留和site-local属性，分类也曾跨版本修正。本项目对转换地址采用保守拒绝，不宣称能够验证转换后的实际路由。云端HTTP在DNS前拒绝。
+
+本地访问必须管理员设置`EDUMIND_PROVIDER_DEPLOYMENT=local`及精确IP:port白名单；回环IPv4/IPv6可以显式允许，危险特殊地址仍不能放行。域名全部A/AAAA须在白名单，混合公网/本地答案拒绝HTTP。本地判定不能由客户端标记扩大。每次实际尝试重新校验DNS，传给HTTP库的是固定IP URL，Host及TLS SNI保留原域名与端口，`trust_env=False`、`follow_redirects=False`；所有3xx（含同源）停止，无自动第二请求。
+
+运行`cd backend && .venv/bin/python -m pytest -q tests/test_provider_target_policy.py tests/test_provider_target.py tests/test_provider_retry.py tests/test_provider_stream.py tests/test_deepseek_responses.py tests/test_deepseek_beta_tools.py`验证受控DNS、HTTPX Mock及实际构造的请求，不创建真实网络连接。后续T007/T008/原生适配器必须继续遵守同一目标策略与固定IP传输，不把保存连接时的DNS检查当成永久发送许可。
+
+### T039 有界兼容探测
+
+服务端内部 `ModelCapabilities.output_token_parameter` 只能显式选择 `max_tokens`（默认）或 `max_completion_tokens`；`thinking_enabled` 仅接受 bool/None，None不发送该字段。兼容适配器普通、结构化、流式共享此配置，不按模型名称猜测能力，不提供任意extra_body透传，不新增公共API/数据库字段。对默认开启思考的服务，冻结声明应选择覆盖思考与回答的总输出上限；不能把仅限制回答的max_tokens当作总费用上限。默认既有请求保持原样。
+
+本轮主模型以64总输出加官方最多10 token偏差保留74输出预算，并显式关闭思考；定价/授权/冻结与实际结果见 `docs/acceptance/phase-1-provider-connection-v1/`。工具探测只验证远端函数调用格式，经同一ConnectionOperation权限/SSRF/预算/临时凭据通路，不执行工具，不宣称新增业务Tools接口。
+
+T039修复版探测入口为 `scripts/run_phase1_provider_checks_v2.py`，r01/r02脚本和结果保留为历史证据。接入验收依据正常协议终止、非空有效响应、实际模型身份及严格schema；词面OK匹配单列诊断，不把不匹配冒称服务故障，不改写旧失败。新增服务端内部 `include_stream_usage: bool = False`，显式启用才发送 `stream_options.include_usage=true`；非流式/默认请求不变，无公共API/数据库字段。兼容能力声明及使用量须绑定具体配置，遵从目标声明，未知usage仍unknown。解码后的有界响应被观测后再解析，gzip/SSE用量不会直接从压缩wire读取；本地校验失败归probe_validation/INVALID_OUTPUT，本地意外错误归local_unexpected/SAFETY_FAILURE，Provider错误保留类型，敏感异常消息不记录。
+
+T039实际工具诊断结果：当前Qwen端点强制指定函数时返回合法工具/参数但finish_reason=stop；探测原本要求完整tool_calls终止而失败。修复只将完整工具选择探测改为显式auto，全部10项严格检查实测通过，未全局放宽finish_reason或结构化校验，未修改文本适配器拒绝tool_calls的保护。具体证据及适用路径见 `docs/acceptance/phase-1-provider-connection-v1/results/final.json`。仅此P1连接文本/json_schema/流式/auto工具格式可声明通过，P0默认Responses传输及强制函数模式不转授成绩，其他4类真实接入延期。
+
+### 当前本机选择更新：DeepSeek（2026-10-14）
+
+用户指定先切换到自有DeepSeek作后续完整测试；当前本机私有.env选择 `https://api.deepseek.com` / `deepseek-flash` / `responses_json_schema`，沿用原DeepSeek私有Key，Aliyun三项改为注释保留，不启用回退。原responses_json_object不是当前server factory支持项，已同步修正为Responses schema传输；官方接口声明见[DeepSeek Responses API](https://api-docs.deepseek.com/api/create-response/)。只离线核对配置/工厂选择和59项Mock测试，未请求DNS/模型，也未重启只提供目录基线的本地服务。
+
+本选择不意味着DeepSeek已通过本轮接入或质量验收。已完成的T039仍只证明其Qwen目标，后续需对DeepSeek实际消费路径独立核对文本/结构化/流式及所需工具；如果P1使用Chat Completions，不得把P0 Responses成绩冒充其通过。保持生成/审核模型组合独立冻结、真实请求与费用硬上限；当前没有启动T040/T041或付费探测。详见[非密钥配置记录](acceptance/phase-1-provider-selection/deepseek-20261014.json)。

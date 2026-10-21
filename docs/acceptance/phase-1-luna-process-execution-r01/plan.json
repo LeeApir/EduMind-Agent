@@ -1,0 +1,45 @@
+{
+  "kind": "criterion calibration ONLY; not independent/formal benchmark",
+  "slots": [
+    "cal-01",
+    "cal-02",
+    "cal-03",
+    "cal-04"
+  ],
+  "expected": {
+    "cal-01": "pass",
+    "cal-02": "pass",
+    "cal-03": "needs_human",
+    "cal-04": "needs_human"
+  },
+  "review_model": "gpt-6-luna",
+  "generation_model_unchanged_not_called": "deepseek-flash",
+  "review_base_url": "https://www.cbbb.fun/v1",
+  "reasoning_effort": "low",
+  "output_tokens_per_call_max": 8192,
+  "output_tokens_total_max": 32768,
+  "per_call_timeout_seconds": 60,
+  "model_wait_total_seconds_max": 240,
+  "transport_cleanup_timeout_seconds_max": 5,
+  "wall_seconds_from_first_reservation_including_human_wait": 1800,
+  "expires_at": "2026-10-22T23:59:59+08:00",
+  "requests_max": 4,
+  "requests_authorized_at_freeze": 0,
+  "retries": 0,
+  "fallback": false,
+  "corrections": 0,
+  "cost_cap": null,
+  "cost_policy": "uncapped_by_explicit_user_instruction",
+  "input_tokens": "unknown until provider reports; exact finite wire per slot, bytes are not tokens",
+  "wire_bytes": {
+    "cal-01": 43228,
+    "cal-02": 43320,
+    "cal-03": 43152,
+    "cal-04": 42628
+  },
+  "pause": "after EVERY result; integrity/all claims/all citations/criterion actual human signoff required before next slot",
+  "stop": "any technical/criterion/assertion/citation failure, deadline, uncertain send, crash or 4-slot exhaustion; no reuse/retry",
+  "severe_defect_and_new_material_checks": "not included; subsequent separately frozen/approved package only",
+  "formal_T040": "not run; thresholds98/95/90 unchanged; human does not fill automatic numerator",
+  "criteria_added_to_prompt": false
+}

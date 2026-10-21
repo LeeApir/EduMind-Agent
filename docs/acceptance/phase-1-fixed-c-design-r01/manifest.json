@@ -1,0 +1,184 @@
+{
+  "version": "fixed-c-design-manifest-v1",
+  "baseline": "8a9b38fb6f1ef16b7e004a31a98f60224aaf7adf",
+  "status": "pending_specific_approval",
+  "approved": false,
+  "approval_scope": [
+    "ADR-0019 A-D",
+    "listed input/isolation/result and fixed cases contracts",
+    "official package preparation, offline image build and reviewed fixed-domain T066-T069 after toolchain lock"
+  ],
+  "documents": {
+    "docs/ADR/0019-fixed-c-offline-verification.md": "faba7988f4cfb6b3a405990e11fcb9a8e499ceacbe3202e8836ad50a3ea7f29d",
+    "docs/acceptance/phase-1-fixed-c-design-r01/README.md": "562beb904207a2517eed6088bd00bfc8ca7c5fbe6abe754a2db6d87f9b778152",
+    "docs/acceptance/phase-1-fixed-c-design-r01/execution-contract.md": "8a42159e0f4cbbfa63907362aeb1cdd8a0a6446045115415f2d3222aba56043a",
+    "docs/acceptance/phase-1-fixed-c-design-r01/cases.json": "21d3c72ffc830824734ad34fc39b2b3543bd489006eec7a6c7a2d19d1cc40aa9",
+    "docs/acceptance/phase-1-fixed-c-design-r01/environment-preparation.json": "f60ef008309019f9b3430bca82bc16a1260f9f6e513d8ca041fb00cdae404d99",
+    "docs/acceptance/phase-1-fixed-c-design-r01/check_proposal.py": "7158d6f515e4f63ddf500d3e03852fff98a5bb3f63ad0d027728ea8ef03f45cc"
+  },
+  "task_contracts": {
+    "PHASE-1-T065": {
+      "id": "PHASE-1-T065",
+      "depends_on": [
+        "PHASE-1-T064"
+      ],
+      "scope": [
+        "docs/ADR/",
+        "docs/acceptance/",
+        "docs/PRD.md"
+      ],
+      "acceptance_criteria": [
+        "限定本地维护者审阅并明确登记的固定C样本/驱动，绑定原件摘要、提取过程、接口检查规格及独立预期；不实现任意模型代码自动执行或学生线上运行。",
+        "冻结编译与执行的隔离、禁网、非特权、最小文件挂载、CPU/内存/进程/时间/输出上限、无凭据及清理规则；具体技术方案先批准，环境不可用不降级宿主直接执行。",
+        "冻结结果协议：样本/原件/驱动/规格/工具链/命令/参数/退出码/超时/stdout/stderr/分配释放证据及通过、失败、未运行/不支持的明确区分。",
+        "严格与普通编译、原程序与独立函数驱动、数值与格式、Sanitizer与显式跟踪分别报告；模型expected_output/计划轨迹不是真值，检查范围不得外推。",
+        "形成独立安全/数据契约批准入口后才实施T066–T069；离线结果不写模型pass、不代人工签核、不赋予正式发布资格。"
+      ],
+      "verification": [
+        "核对隔离威胁边界、固定样本准入、结果协议和环境失败行为，记录具体设计批准。",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "execution_gate": "2026-10-19用户已明确授权在新分支开发T056–T070，按依赖串行执行；审核契约/API/持久化/执行安全边界仍须对应T056/T060/T065具体设计明确批准后实施，未批准项不得推定。真实Provider与动态开放不在本批授权内。"
+    },
+    "PHASE-1-T066": {
+      "id": "PHASE-1-T066",
+      "depends_on": [
+        "PHASE-1-T065"
+      ],
+      "scope": [
+        "scripts/",
+        "scripts/tests/",
+        "docs/acceptance/"
+      ],
+      "acceptance_criteria": [
+        "按T065批准契约为EduMind r02和OM原件创建派生样本登记，绑定原输入/课程/source摘要、提取映射、驱动/检查规格版本及维护者审阅准入。",
+        "不修改reference证据；提取不自动补typedef、改签名或补末尾换行；原程序与独立函数驱动分开登记。",
+        "登记机制拒绝未审阅/未列入名单/摘要变更/越界路径/符号链接逃逸，不扫描并执行新生成内容；准入不是语义人工签核。",
+        "原始生成输出与独立预期/检查规格分开，标签仍按实际签核状态保存；来源变化需新登记，不覆盖原样本或旧成绩。"
+      ],
+      "verification": [
+        "backend/.venv/bin/python -m pytest -q scripts/tests/test_offline_c_fixture_manifest.py",
+        "backend/.venv/bin/python scripts/check_offline_c_fixtures.py --check",
+        "git diff --check"
+      ],
+      "execution_gate": "2026-10-19用户已明确授权在新分支开发T056–T070，按依赖串行执行；审核契约/API/持久化/执行安全边界仍须对应T056/T060/T065具体设计明确批准后实施，未批准项不得推定。真实Provider与动态开放不在本批授权内。"
+    },
+    "PHASE-1-T067": {
+      "id": "PHASE-1-T067",
+      "depends_on": [
+        "PHASE-1-T066"
+      ],
+      "scope": [
+        "scripts/",
+        "scripts/tests/",
+        "docs/acceptance/"
+      ],
+      "acceptance_criteria": [
+        "实现T065批准隔离方案的固定样本编译/运行入口，编译器及程序都受限；默认只处理批准清单，禁网/限额/输出限制与不传凭据可验证。",
+        "原字节严格编译和普通编译分别留证，编译失败不运行原程序，不静默修复或更换为驱动冒充通过。",
+        "正常运行对比独立登记的输出规格，精确字节与允许规范化的比较规则显式分列；模型expected_output仅作为待核对主张。",
+        "覆盖正常、编译失败、非零退出、超时、输出超限和隔离不可用；不可用记未运行并失败退出，不回退无隔离执行。",
+        "实际隔离运行保存工具链版本和证据；复现OM编译失败与EduMind严格失败/普通编译运行结果，不以Mock证明隔离或C程序通过。"
+      ],
+      "verification": [
+        "backend/.venv/bin/python -m pytest -q scripts/tests/test_offline_c_runner.py",
+        "backend/.venv/bin/python scripts/run_offline_c_checks.py --manifest docs/acceptance/offline-c-fixtures/manifest.json --suite compile-output --output /tmp/edumind-offline-c-compile-output",
+        "核对实际报告与独立预期一致；已知失败作为被检出缺陷保留，不记作原程序通过。",
+        "git diff --check"
+      ],
+      "execution_gate": "2026-10-19用户已明确授权在新分支开发T056–T070，按依赖串行执行；审核契约/API/持久化/执行安全边界仍须对应T056/T060/T065具体设计明确批准后实施，未批准项不得推定。真实Provider与动态开放不在本批授权内。"
+    },
+    "PHASE-1-T068": {
+      "id": "PHASE-1-T068",
+      "depends_on": [
+        "PHASE-1-T067"
+      ],
+      "scope": [
+        "scripts/",
+        "scripts/tests/",
+        "docs/acceptance/"
+      ],
+      "acceptance_criteria": [
+        "对可编译且已登记的原main/函数驱动分别覆盖正常及malloc第1/2/3次失败，每个场景独立进程并遵守隔离/限额；OM原main保持编译失败，运行项记未运行及原因，不为凑场景数修改原件或用驱动替代。",
+        "逐次检查head返回/调用者接收、链的可达性和值序、成功分配与释放次数、重复释放及最终存活分配，不能只用进程退出或无Sanitizer报告判通过。",
+        "ASan/UBSan与显式分配跟踪分别记实际是否运行；未运行LeakSanitizer不声称已测；发生UB不推断必然崩溃或固定数值。",
+        "OM函数驱动与原main分别留证，不能让适配驱动掩盖接口不一致；EduMind失败返回旧head的正确路径保留，静默跳过插入的输出按实际情况报告。",
+        "派生反例覆盖丢链/错误赋值/NULL访问/重复释放，验证检查器能失败；仅说明本固定样本和故障位置，不声称证明任意代码安全。"
+      ],
+      "verification": [
+        "backend/.venv/bin/python -m pytest -q scripts/tests/test_offline_head_insertion_checks.py",
+        "backend/.venv/bin/python scripts/run_offline_c_checks.py --manifest docs/acceptance/offline-c-fixtures/manifest.json --suite ownership --output /tmp/edumind-offline-c-ownership",
+        "核对隔离真实执行中可编译样本的main/接口各正常及三次失败（共8场景）、派生负例及逐项跟踪；OM原main编译失败后运行项须未运行，函数驱动独立报告，不以Mock或改原件代实际检查。",
+        "git diff --check"
+      ],
+      "execution_gate": "2026-10-19用户已明确授权在新分支开发T056–T070，按依赖串行执行；审核契约/API/持久化/执行安全边界仍须对应T056/T060/T065具体设计明确批准后实施，未批准项不得推定。真实Provider与动态开放不在本批授权内。"
+    },
+    "PHASE-1-T069": {
+      "id": "PHASE-1-T069",
+      "depends_on": [
+        "PHASE-1-T068"
+      ],
+      "scope": [
+        "scripts/",
+        "scripts/tests/",
+        "docs/acceptance/",
+        "docs/agents/"
+      ],
+      "acceptance_criteria": [
+        "为编译/输出/失败路径报告提供统一聚合入口，保存样本/工具链/检查规格/原件/驱动摘要、准确命令、结果及证据路径，拒绝缺失/篡改/跨样本混配。",
+        "检查器执行成功、样本检查通过、检出预期缺陷分别表达；失败/未运行/不支持保留，环境不可用或缺工具不计通过。",
+        "保留OM/EduMind原始失败及派生驱动边界；独立预期与模型主张分开，不补写历史审核pass或人工决定，不修改原件以获得通过。",
+        "工具只输出离线维护证据，不读Provider凭据/调用模型/写生产审核或发布数据库；集成方式明确为将来审核参考，不自动授予课程发布资格。",
+        "交付可复现离线操作文档和报告示例，故意篡改/缺证据的报告必须被校验器拒绝。"
+      ],
+      "verification": [
+        "backend/.venv/bin/python -m pytest -q scripts/tests/test_offline_c_evidence.py",
+        "backend/.venv/bin/python scripts/run_offline_c_checks.py --manifest docs/acceptance/offline-c-fixtures/manifest.json --suite all --output /tmp/edumind-offline-c-report",
+        "backend/.venv/bin/python scripts/check_offline_c_report.py --report /tmp/edumind-offline-c-report/report.json",
+        "按新文档完整执行两样本离线流程并检查原件摘要未变，报告中真实缺陷保持失败。",
+        "git diff --check"
+      ],
+      "execution_gate": "2026-10-19用户已明确授权在新分支开发T056–T070，按依赖串行执行；审核契约/API/持久化/执行安全边界仍须对应T056/T060/T065具体设计明确批准后实施，未批准项不得推定。真实Provider与动态开放不在本批授权内。"
+    },
+    "PHASE-1-T070": {
+      "id": "PHASE-1-T070",
+      "depends_on": [
+        "PHASE-1-T069"
+      ],
+      "scope": [
+        "docs/acceptance/",
+        "backend/tests/",
+        "web/tests/",
+        "scripts/",
+        "task.json",
+        "process.txt"
+      ],
+      "acceptance_criteria": [
+        "零Provider验证新审核职责/未知学情/整单元覆盖与目标-教学节点-发布-作答-路径闭环，包含严重缺陷优先、目录/旧课堂/重解释/SSE取消恢复回归。",
+        "按批准隔离方案实际执行固定C样本验收并汇总证据，分别报告契约Mock、真实PG、浏览器和实际C检查；漏检/未运行/严格编译失败不混入通过项。",
+        "绑定新源码/政策/数据契约/正反例及独立标签状态，建立新的真实模型验证准备清单；旧冻结组合、停止账本、原候选和历史签核只读不刷新。",
+        "明确真实模型是否遵守职责、误拦截率/严重错误召回/性能仍待T040/T041；保留98%/95%/90%原阈值、人工不补自动分子，本任务不创建真实预算或调用。",
+        "交接遗留问题、实际验证命令/证据、待批准事项和T040准入所缺条件；T040原阻塞与catalog_only保持，不自动恢复旧余额或进入Phase 2/3。"
+      ],
+      "verification": [
+        "backend/.venv/bin/python scripts/check_review_binding_preparation.py --check",
+        "运行已建立的T057–T069相关零Provider测试及隔离真实PG/浏览器/C样本检查，保存实际命令与结果。",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "execution_gate": "2026-10-19用户已明确授权在新分支开发T056–T070，按依赖串行执行；审核契约/API/持久化/执行安全边界仍须对应T056/T060/T065具体设计明确批准后实施，未批准项不得推定。真实Provider与动态开放不在本批授权内。"
+    }
+  },
+  "provider_calls_authorized": 0,
+  "sample_execution_before_approval": 0,
+  "excluded": [
+    "arbitrary generated code execution",
+    "online runner/API",
+    "host unsandboxed fallback",
+    "production configuration or publication",
+    "human approval of course content",
+    "real Provider budget",
+    "T040 unblock"
+  ]
+}

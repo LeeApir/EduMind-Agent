@@ -89,6 +89,17 @@ async def current_intro_scene(
     db: AsyncSession, *, owner_id: UUID, unit_id: UUID
 ) -> LearningScene | None:
     """The latest reviewed, generated intro scene of a ready owned unit."""
+    unit = await db.get(LearningUnit, unit_id)
+    if unit is not None and unit.user_id == owner_id and unit.current_publication_id is not None:
+        from app.services.hybrid_learning_publication import current_publication
+
+        publication = await current_publication(db, owner_id=owner_id, unit_id=unit_id)
+        if publication is None:
+            return None
+        scenes = publication.material["scenes"]
+        assert isinstance(scenes, list) and isinstance(scenes[0], dict)
+        return await db.get(LearningScene, UUID(str(scenes[0]["scene_id"])))
+
     return cast(
         LearningScene | None,
         await db.scalar(
@@ -130,6 +141,8 @@ def classroom_payload(session: ClassroomSession) -> dict[str, object]:
         "enabled_roles": session.enabled_roles,
         "paused": session.paused,
     }
+    if session.publication_version is not None:
+        payload["publication_version"] = session.publication_version
     if session.generation_id is not None:
         payload["generation_id"] = str(session.generation_id)
     if session.detour is not None:
@@ -167,10 +180,18 @@ async def create_classroom(
         intro = await current_intro_scene(db, owner_id=owner_id, unit_id=unit_id)
         if intro is None:
             raise ClassroomNotFound("No published intro scene for this learning unit.")
+        unit = await db.get(LearningUnit, unit_id)
+        publication_version = None
+        if unit is not None and unit.current_publication_id is not None:
+            from app.models.learning_publication import LearningPublication
+
+            publication = await db.get(LearningPublication, unit.current_publication_id)
+            publication_version = publication.version if publication else None
         session = ClassroomSession(
+            publication_version=publication_version,
             user_id=owner_id,
             learning_unit_id=unit_id,
-            scene_key="intro",
+            scene_key=intro.scene_key,
             scene_version=intro.version,
             scene_progress=0,
             mode="focus",

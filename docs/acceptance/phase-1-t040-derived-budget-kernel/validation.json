@@ -1,0 +1,53 @@
+{
+  "version": "derived-budget-kernel-offline-validation-v1",
+  "recorded_at": "2026-10-15T13:00:55",
+  "proposal_commit": "b7ed6a6",
+  "proposal_manifest_sha256": "1cb3f160a0fd5388f10e0a1bb9ae7a68fc17635ff3cef6343c48071f0ea8acb2",
+  "approved_sections": [
+    "A",
+    "B",
+    "C",
+    "D"
+  ],
+  "authorization": "Isolated mechanism implementation and zero-Provider tests only",
+  "provider_requests": 0,
+  "provider_cost": 0,
+  "synthetic_only": true,
+  "new_tests": 60,
+  "existing_related_tests": 209,
+  "combined_tests": 269,
+  "combined_result": "passed",
+  "ruff": "passed",
+  "production_mypy_source_files": 166,
+  "production_mypy_result": "passed",
+  "kernel_strict_type_check": "NOT_RUN: scripts outside app scope",
+  "source_sha256": {
+    "scripts/acceptance_support/derived_diagnostic_budget.py": "4f5e485c9e476848501115fc19c744166432c57cda79513299de1e3d35db5546",
+    "backend/tests/test_derived_diagnostic_budget.py": "5e422fc6ee4e4737420f57cffa613deea860423d66d1b32fea129399227ce220"
+  },
+  "rule_sources_checked": 6,
+  "r08_frozen_source_files_checked": 186,
+  "r08_ledger_attempts": 1,
+  "r08_ledger_halted": "CONCRETE_DEFECT_MISSED",
+  "http_sender_implemented": false,
+  "actual_budget_or_token_proof_verified": false,
+  "formal_benchmark_accessed": false,
+  "model_quality_verified": false,
+  "formal_t040_complete": false,
+  "production_mode": "catalog_only",
+  "commands": [
+    "backend/.venv/bin/pytest -q backend/tests/test_derived_diagnostic_budget.py backend/tests/test_claim_review_prototype.py backend/tests/test_review_scope.py backend/tests/test_review_indexing.py backend/tests/test_review_agent.py backend/tests/test_review_failure_paths.py backend/tests/test_deepseek_reasoning.py backend/tests/test_t040_high_plan.py backend/tests/test_t040_diagnostic_runner.py backend/tests/test_t040_diagnostic_preparation.py backend/tests/test_deepseek_responses.py backend/tests/test_phase1_dynamic_gate.py backend/tests/test_acceptance_budget.py",
+    "backend/.venv/bin/ruff check scripts/acceptance_support/derived_diagnostic_budget.py backend/tests/test_derived_diagnostic_budget.py",
+    "cd backend then .venv/bin/mypy app",
+    "backend/.venv/bin/python scripts/check_catalog_workflow.py",
+    "backend/.venv/bin/python scripts/verify_phase1_dynamic_approval.py",
+    "backend/.venv/bin/python scripts/verify_phase1_dynamic_freeze.py"
+  ],
+  "limitations": [
+    "No HTTP/credential/egress integration or real approval parser.",
+    "Approval and assessment hooks trust their caller; not signature/factual verifiers.",
+    "Synthetic cost/token proof only; no actual pricing guarantee.",
+    "Local one-shot byte consumption does not establish network exactly-once delivery.",
+    "No formal resource schema/AST/publishing replacement; no model semantic quality evidence."
+  ]
+}

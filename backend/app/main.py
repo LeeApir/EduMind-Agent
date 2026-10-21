@@ -5,6 +5,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
 from app.api.animation_events import router as animation_events_router
+from app.api.animation_generation import router as animation_generation_router
 from app.api.animation_jobs import router as animation_jobs_router
 from app.api.animation_media import router as animation_media_router
 from app.api.auth import router as auth_router
@@ -16,12 +17,17 @@ from app.api.learning_events import router as learning_events_router
 from app.api.learning_reads import router as learning_reads_router
 from app.api.learning_sessions import router as learning_sessions_router
 from app.api.markdown_notes import router as markdown_notes_router
+from app.api.model_preferences import router as model_preferences_router
 from app.api.paths import router as paths_router
 from app.api.profile import router as profile_router
+from app.api.provider_connections import router as provider_connections_router
+from app.api.provider_model_catalog import router as provider_model_catalog_router
+from app.api.provider_probe import router as provider_probe_router
 from app.api.quiz import router as quiz_router
 from app.core.auth import AuthFailure
 from app.core.database import database_lifespan
 from app.core.product_mode import catalog_only, require_dynamic_mode
+from app.services.knowledge_graph import KnowledgeGraphValidationError
 
 app = FastAPI(title="EduMind Agent API", version="0.1.0", lifespan=database_lifespan)
 app.include_router(auth_router)
@@ -29,6 +35,7 @@ app.include_router(catalog_router)
 app.include_router(classroom_router)
 app.include_router(debate_router, dependencies=[Depends(require_dynamic_mode)])
 app.include_router(animation_jobs_router)
+app.include_router(animation_generation_router)
 app.include_router(animation_media_router)
 app.include_router(animation_events_router)
 app.include_router(knowledge_graph_router)
@@ -36,9 +43,29 @@ app.include_router(learning_reads_router)
 app.include_router(learning_events_router)
 app.include_router(learning_sessions_router, dependencies=[Depends(require_dynamic_mode)])
 app.include_router(markdown_notes_router)
+app.include_router(model_preferences_router)
 app.include_router(profile_router)
+app.include_router(provider_connections_router)
+app.include_router(provider_model_catalog_router)
+app.include_router(provider_probe_router)
 app.include_router(paths_router)
 app.include_router(quiz_router)
+
+
+@app.exception_handler(KnowledgeGraphValidationError)
+async def graph_failure_handler(
+    _request: Request, _error: KnowledgeGraphValidationError
+) -> JSONResponse:
+    """Fail closed for every graph consumer, without exposing source/configuration paths."""
+    return JSONResponse(
+        status_code=503,
+        content={
+            "code": "GRAPH_UNAVAILABLE",
+            "message": "Knowledge graph unavailable.",
+            "retryable": False,
+        },
+        headers={"Cache-Control": "no-store"},
+    )
 
 
 @app.exception_handler(AuthFailure)

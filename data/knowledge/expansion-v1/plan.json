@@ -1,0 +1,829 @@
+{
+  "plan_version": "phase-1-graph-plan-v1",
+  "status": "Proposed",
+  "runtime_graph_version": "mvp-0.2.0",
+  "proposed_graph_version": "phase-1.1.0",
+  "reference_checked_at": "2026-10-09",
+  "qualification_note": "Curriculum metadata proposal only; no reviewed lessons, quiz evidence or mastery generated. Source texts are references, not copied course content. Dependencies are project pedagogical choices, not textbook-mandated order.",
+  "relationship_direction": "from 指向 to；DEPENDS_ON 表示 from 以 to 为前置，EXTENDS 表示 from 是 to 的进阶，SIMILAR_TO 表示两节点需要对比讲解。",
+  "references": {
+    "gnu-pointers": {
+      "title": "GNU C Language Manual — Pointers",
+      "url": "https://www.gnu.org/software/c-intro-and-ref/manual/html_node/Pointers.html",
+      "sections": "Pointers / Pointer Declarations",
+      "verification": "official search index; direct fetch timed out"
+    },
+    "ods-array": {
+      "title": "Open Data Structures (C++), edition 0.1G",
+      "url": "https://opendatastructures.org/ods-cpp/2_Array_Based_Lists.html",
+      "sections": "Chapter 2, array-based stacks and queues",
+      "verification": "official page fetched"
+    },
+    "ods-list": {
+      "title": "Open Data Structures (C++), edition 0.1G",
+      "url": "https://opendatastructures.org/ods-cpp/3_Linked_Lists.html",
+      "sections": "Chapter 3, singly-linked lists and Stack/Queue interfaces",
+      "verification": "official page fetched"
+    },
+    "ods-doubly": {
+      "title": "Open Data Structures (C++), edition 0.1G",
+      "url": "https://opendatastructures.org/ods-cpp/3_2_Doubly_Linked_List.html",
+      "sections": "3.2, doubly-linked list and circular dummy sentinel",
+      "verification": "official page fetched"
+    },
+    "ods-tree": {
+      "title": "Open Data Structures (C++), edition 0.1G",
+      "url": "https://opendatastructures.org/ods-cpp/6_Binary_Trees.html",
+      "sections": "Chapter 6, rooted ordered binary trees; 6.1 traversal; 6.2 BST",
+      "verification": "official page fetched"
+    },
+    "ods-balance": {
+      "title": "Open Data Structures (C++), edition 0.1G",
+      "url": "https://opendatastructures.org/ods-cpp/9_Red_Black_Trees.html",
+      "sections": "Chapter 9, balanced search trees / red-black tree concepts",
+      "verification": "official page fetched"
+    },
+    "ods-heap": {
+      "title": "Open Data Structures (C++), edition 0.1G",
+      "url": "https://opendatastructures.org/ods-cpp/10_Heaps.html",
+      "sections": "Chapter 10, BinaryHeap",
+      "verification": "official page fetched"
+    },
+    "ods-sort": {
+      "title": "Open Data Structures (C++), edition 0.1G",
+      "url": "https://opendatastructures.org/ods-cpp/11_Sorting_Algorithms.html",
+      "sections": "Chapter 11 / 11.1, comparison sorting, merge/quick/heap",
+      "verification": "official page fetched"
+    },
+    "opendsa-simple-sort": {
+      "title": "OpenDSA Complete Catalog",
+      "url": "https://opendsa.org/OpenDSA/Books/Catalog/html/genindex.html",
+      "sections": "Insertion Sort / Bubble Sort / Selection Sort",
+      "verification": "official index and SelectionSort indexed; some direct module requests unavailable"
+    },
+    "ods-graph": {
+      "title": "Open Data Structures (C++), edition 0.1G",
+      "url": "https://opendatastructures.org/ods-cpp/12_Graphs.html",
+      "sections": "Chapter 12, matrix/list representations and graph traversal",
+      "verification": "official page fetched"
+    }
+  },
+  "nodes": [
+    {
+      "id": "array",
+      "name": "数组",
+      "chapter": "线性表",
+      "prerequisites": [],
+      "references": [
+        "ods-array"
+      ],
+      "origin": "legacy",
+      "initial_course_qualification": "existing_signed_catalog_only"
+    },
+    {
+      "id": "c-pointer",
+      "name": "C 指针",
+      "chapter": "C 基础",
+      "prerequisites": [],
+      "references": [
+        "gnu-pointers"
+      ],
+      "origin": "legacy",
+      "initial_course_qualification": "existing_signed_catalog_only"
+    },
+    {
+      "id": "circular-queue",
+      "name": "循环队列",
+      "chapter": "线性表",
+      "prerequisites": [
+        "array",
+        "queue"
+      ],
+      "references": [
+        "ods-array"
+      ],
+      "origin": "legacy",
+      "initial_course_qualification": "existing_signed_catalog_only"
+    },
+    {
+      "id": "linked-list-concept",
+      "name": "链表概念",
+      "chapter": "线性表",
+      "prerequisites": [
+        "c-pointer"
+      ],
+      "references": [
+        "ods-list"
+      ],
+      "origin": "legacy",
+      "initial_course_qualification": "existing_signed_catalog_only"
+    },
+    {
+      "id": "linked-list-deletion",
+      "name": "链表删除",
+      "chapter": "线性表",
+      "prerequisites": [
+        "c-pointer",
+        "linked-list-traversal"
+      ],
+      "references": [
+        "ods-list"
+      ],
+      "origin": "legacy",
+      "initial_course_qualification": "existing_signed_catalog_only"
+    },
+    {
+      "id": "linked-list-insertion",
+      "name": "链表插入",
+      "chapter": "线性表",
+      "prerequisites": [
+        "c-pointer",
+        "linked-list-traversal"
+      ],
+      "references": [
+        "ods-list"
+      ],
+      "origin": "legacy",
+      "initial_course_qualification": "existing_signed_catalog_only"
+    },
+    {
+      "id": "linked-list-traversal",
+      "name": "链表遍历",
+      "chapter": "线性表",
+      "prerequisites": [
+        "single-linked-list"
+      ],
+      "references": [
+        "ods-list"
+      ],
+      "origin": "legacy",
+      "initial_course_qualification": "existing_signed_catalog_only"
+    },
+    {
+      "id": "queue",
+      "name": "队列",
+      "chapter": "线性表",
+      "prerequisites": [
+        "array"
+      ],
+      "references": [
+        "ods-array"
+      ],
+      "origin": "legacy",
+      "initial_course_qualification": "existing_signed_catalog_only"
+    },
+    {
+      "id": "single-linked-list",
+      "name": "单链表",
+      "chapter": "线性表",
+      "prerequisites": [
+        "c-pointer",
+        "linked-list-concept"
+      ],
+      "references": [
+        "ods-list"
+      ],
+      "origin": "legacy",
+      "initial_course_qualification": "existing_signed_catalog_only"
+    },
+    {
+      "id": "stack",
+      "name": "栈",
+      "chapter": "线性表",
+      "prerequisites": [
+        "array"
+      ],
+      "references": [
+        "ods-array"
+      ],
+      "origin": "legacy",
+      "initial_course_qualification": "existing_signed_catalog_only"
+    },
+    {
+      "id": "doubly-linked-list",
+      "name": "双向链表",
+      "chapter": "线性表",
+      "prerequisites": [
+        "single-linked-list",
+        "linked-list-insertion",
+        "linked-list-deletion"
+      ],
+      "references": [
+        "ods-doubly"
+      ],
+      "origin": "new",
+      "initial_course_qualification": "metadata_only"
+    },
+    {
+      "id": "circular-linked-list",
+      "name": "循环链表",
+      "chapter": "线性表",
+      "prerequisites": [
+        "single-linked-list",
+        "linked-list-traversal"
+      ],
+      "references": [
+        "ods-doubly"
+      ],
+      "origin": "new",
+      "initial_course_qualification": "metadata_only"
+    },
+    {
+      "id": "array-stack",
+      "name": "顺序栈",
+      "chapter": "栈和队列",
+      "prerequisites": [
+        "array",
+        "stack"
+      ],
+      "references": [
+        "ods-array"
+      ],
+      "origin": "new",
+      "initial_course_qualification": "metadata_only"
+    },
+    {
+      "id": "linked-stack",
+      "name": "链栈",
+      "chapter": "栈和队列",
+      "prerequisites": [
+        "stack",
+        "linked-list-insertion",
+        "linked-list-deletion"
+      ],
+      "references": [
+        "ods-list"
+      ],
+      "origin": "new",
+      "initial_course_qualification": "metadata_only"
+    },
+    {
+      "id": "tree-concept",
+      "name": "树的基本概念",
+      "chapter": "树",
+      "prerequisites": [
+        "c-pointer"
+      ],
+      "references": [
+        "ods-tree"
+      ],
+      "origin": "new",
+      "initial_course_qualification": "metadata_only"
+    },
+    {
+      "id": "binary-tree",
+      "name": "二叉树",
+      "chapter": "树",
+      "prerequisites": [
+        "tree-concept"
+      ],
+      "references": [
+        "ods-tree"
+      ],
+      "origin": "new",
+      "initial_course_qualification": "metadata_only"
+    },
+    {
+      "id": "binary-tree-traversal",
+      "name": "二叉树遍历（递归、迭代与层序）",
+      "chapter": "树",
+      "prerequisites": [
+        "binary-tree",
+        "stack",
+        "queue"
+      ],
+      "references": [
+        "ods-tree"
+      ],
+      "origin": "new",
+      "initial_course_qualification": "metadata_only"
+    },
+    {
+      "id": "binary-search-tree",
+      "name": "二叉搜索树",
+      "chapter": "树",
+      "prerequisites": [
+        "binary-tree-traversal"
+      ],
+      "references": [
+        "ods-tree"
+      ],
+      "origin": "new",
+      "initial_course_qualification": "metadata_only"
+    },
+    {
+      "id": "balanced-binary-search-tree",
+      "name": "平衡二叉搜索树（红黑树概念）",
+      "chapter": "树",
+      "prerequisites": [
+        "binary-search-tree"
+      ],
+      "references": [
+        "ods-balance"
+      ],
+      "origin": "new",
+      "initial_course_qualification": "metadata_only"
+    },
+    {
+      "id": "binary-heap",
+      "name": "二叉堆",
+      "chapter": "树",
+      "prerequisites": [
+        "binary-tree",
+        "array"
+      ],
+      "references": [
+        "ods-heap"
+      ],
+      "origin": "new",
+      "initial_course_qualification": "metadata_only"
+    },
+    {
+      "id": "bubble-sort",
+      "name": "冒泡排序",
+      "chapter": "排序",
+      "prerequisites": [
+        "array"
+      ],
+      "references": [
+        "opendsa-simple-sort"
+      ],
+      "origin": "new",
+      "initial_course_qualification": "metadata_only"
+    },
+    {
+      "id": "selection-sort",
+      "name": "选择排序",
+      "chapter": "排序",
+      "prerequisites": [
+        "array"
+      ],
+      "references": [
+        "opendsa-simple-sort"
+      ],
+      "origin": "new",
+      "initial_course_qualification": "metadata_only"
+    },
+    {
+      "id": "insertion-sort",
+      "name": "插入排序",
+      "chapter": "排序",
+      "prerequisites": [
+        "array"
+      ],
+      "references": [
+        "opendsa-simple-sort"
+      ],
+      "origin": "new",
+      "initial_course_qualification": "metadata_only"
+    },
+    {
+      "id": "quick-sort",
+      "name": "快速排序",
+      "chapter": "排序",
+      "prerequisites": [
+        "array"
+      ],
+      "references": [
+        "ods-sort"
+      ],
+      "origin": "new",
+      "initial_course_qualification": "metadata_only"
+    },
+    {
+      "id": "merge-sort",
+      "name": "归并排序",
+      "chapter": "排序",
+      "prerequisites": [
+        "array"
+      ],
+      "references": [
+        "ods-sort"
+      ],
+      "origin": "new",
+      "initial_course_qualification": "metadata_only"
+    },
+    {
+      "id": "heap-sort",
+      "name": "堆排序",
+      "chapter": "排序",
+      "prerequisites": [
+        "binary-heap"
+      ],
+      "references": [
+        "ods-sort",
+        "ods-heap"
+      ],
+      "origin": "new",
+      "initial_course_qualification": "metadata_only"
+    },
+    {
+      "id": "sorting-comparison",
+      "name": "排序算法对比",
+      "chapter": "排序",
+      "prerequisites": [
+        "bubble-sort",
+        "selection-sort",
+        "insertion-sort",
+        "quick-sort",
+        "merge-sort",
+        "heap-sort"
+      ],
+      "references": [
+        "ods-sort",
+        "opendsa-simple-sort"
+      ],
+      "origin": "new",
+      "initial_course_qualification": "metadata_only"
+    },
+    {
+      "id": "graph-representation",
+      "name": "图的表示（邻接矩阵与邻接表）",
+      "chapter": "图",
+      "prerequisites": [
+        "array",
+        "single-linked-list"
+      ],
+      "references": [
+        "ods-graph"
+      ],
+      "origin": "new",
+      "initial_course_qualification": "metadata_only"
+    },
+    {
+      "id": "breadth-first-search",
+      "name": "广度优先搜索 BFS",
+      "chapter": "图",
+      "prerequisites": [
+        "graph-representation",
+        "queue"
+      ],
+      "references": [
+        "ods-graph"
+      ],
+      "origin": "new",
+      "initial_course_qualification": "metadata_only"
+    },
+    {
+      "id": "depth-first-search",
+      "name": "深度优先搜索 DFS",
+      "chapter": "图",
+      "prerequisites": [
+        "graph-representation",
+        "stack"
+      ],
+      "references": [
+        "ods-graph"
+      ],
+      "origin": "new",
+      "initial_course_qualification": "metadata_only"
+    }
+  ],
+  "relations": [
+    {
+      "from": "array",
+      "to": "single-linked-list",
+      "type": "SIMILAR_TO"
+    },
+    {
+      "from": "array-stack",
+      "to": "array",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "array-stack",
+      "to": "linked-stack",
+      "type": "SIMILAR_TO"
+    },
+    {
+      "from": "array-stack",
+      "to": "stack",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "array-stack",
+      "to": "stack",
+      "type": "EXTENDS"
+    },
+    {
+      "from": "balanced-binary-search-tree",
+      "to": "binary-search-tree",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "balanced-binary-search-tree",
+      "to": "binary-search-tree",
+      "type": "EXTENDS"
+    },
+    {
+      "from": "binary-heap",
+      "to": "array",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "binary-heap",
+      "to": "binary-tree",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "binary-heap",
+      "to": "binary-tree",
+      "type": "EXTENDS"
+    },
+    {
+      "from": "binary-search-tree",
+      "to": "binary-tree",
+      "type": "EXTENDS"
+    },
+    {
+      "from": "binary-search-tree",
+      "to": "binary-tree-traversal",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "binary-tree",
+      "to": "tree-concept",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "binary-tree",
+      "to": "tree-concept",
+      "type": "EXTENDS"
+    },
+    {
+      "from": "binary-tree-traversal",
+      "to": "binary-tree",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "binary-tree-traversal",
+      "to": "queue",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "binary-tree-traversal",
+      "to": "stack",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "breadth-first-search",
+      "to": "depth-first-search",
+      "type": "SIMILAR_TO"
+    },
+    {
+      "from": "breadth-first-search",
+      "to": "graph-representation",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "breadth-first-search",
+      "to": "queue",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "bubble-sort",
+      "to": "array",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "circular-linked-list",
+      "to": "doubly-linked-list",
+      "type": "SIMILAR_TO"
+    },
+    {
+      "from": "circular-linked-list",
+      "to": "linked-list-traversal",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "circular-linked-list",
+      "to": "single-linked-list",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "circular-linked-list",
+      "to": "single-linked-list",
+      "type": "EXTENDS"
+    },
+    {
+      "from": "circular-queue",
+      "to": "array",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "circular-queue",
+      "to": "queue",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "circular-queue",
+      "to": "queue",
+      "type": "EXTENDS"
+    },
+    {
+      "from": "depth-first-search",
+      "to": "breadth-first-search",
+      "type": "SIMILAR_TO"
+    },
+    {
+      "from": "depth-first-search",
+      "to": "graph-representation",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "depth-first-search",
+      "to": "stack",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "doubly-linked-list",
+      "to": "circular-linked-list",
+      "type": "SIMILAR_TO"
+    },
+    {
+      "from": "doubly-linked-list",
+      "to": "linked-list-deletion",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "doubly-linked-list",
+      "to": "linked-list-insertion",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "doubly-linked-list",
+      "to": "single-linked-list",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "doubly-linked-list",
+      "to": "single-linked-list",
+      "type": "EXTENDS"
+    },
+    {
+      "from": "graph-representation",
+      "to": "array",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "graph-representation",
+      "to": "single-linked-list",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "heap-sort",
+      "to": "binary-heap",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "insertion-sort",
+      "to": "array",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "linked-list-concept",
+      "to": "c-pointer",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "linked-list-deletion",
+      "to": "c-pointer",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "linked-list-deletion",
+      "to": "linked-list-traversal",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "linked-list-insertion",
+      "to": "c-pointer",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "linked-list-insertion",
+      "to": "linked-list-traversal",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "linked-list-traversal",
+      "to": "single-linked-list",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "linked-stack",
+      "to": "array-stack",
+      "type": "SIMILAR_TO"
+    },
+    {
+      "from": "linked-stack",
+      "to": "linked-list-deletion",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "linked-stack",
+      "to": "linked-list-insertion",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "linked-stack",
+      "to": "stack",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "linked-stack",
+      "to": "stack",
+      "type": "EXTENDS"
+    },
+    {
+      "from": "merge-sort",
+      "to": "array",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "merge-sort",
+      "to": "quick-sort",
+      "type": "SIMILAR_TO"
+    },
+    {
+      "from": "queue",
+      "to": "array",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "quick-sort",
+      "to": "array",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "quick-sort",
+      "to": "merge-sort",
+      "type": "SIMILAR_TO"
+    },
+    {
+      "from": "selection-sort",
+      "to": "array",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "single-linked-list",
+      "to": "array",
+      "type": "SIMILAR_TO"
+    },
+    {
+      "from": "single-linked-list",
+      "to": "c-pointer",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "single-linked-list",
+      "to": "linked-list-concept",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "single-linked-list",
+      "to": "linked-list-concept",
+      "type": "EXTENDS"
+    },
+    {
+      "from": "sorting-comparison",
+      "to": "bubble-sort",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "sorting-comparison",
+      "to": "heap-sort",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "sorting-comparison",
+      "to": "insertion-sort",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "sorting-comparison",
+      "to": "merge-sort",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "sorting-comparison",
+      "to": "quick-sort",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "sorting-comparison",
+      "to": "selection-sort",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "stack",
+      "to": "array",
+      "type": "DEPENDS_ON"
+    },
+    {
+      "from": "tree-concept",
+      "to": "c-pointer",
+      "type": "DEPENDS_ON"
+    }
+  ]
+}

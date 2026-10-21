@@ -1,0 +1,67 @@
+{
+  "state": "DRAFT_NOT_AUTHORIZED",
+  "purpose": "当前Qwen工具格式字段级诊断及必要修复后的有界复验",
+  "provider_type": "openai-compatible",
+  "model_id": "qwen3.8-max-0902",
+  "endpoint_reference": "configuration.json",
+  "credential_reference": ".env:EDUMIND_PROVIDER_API_KEY",
+  "existing_attempts": 5,
+  "existing_reserved_cost_cny": 0.061212,
+  "proposed_additional_request_limit": 3,
+  "proposed_aggregate_request_limit": 8,
+  "aggregate_cost_limit_cny": 1,
+  "next_diagnostic_request": {
+    "model": "qwen3.8-max-0902",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Call emit_probe with ok=true. Do not write prose."
+      }
+    ],
+    "max_completion_tokens": 64,
+    "enable_thinking": false,
+    "stream": false,
+    "temperature": 0,
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "emit_probe",
+          "description": "Return the fixed probe flag.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "ok": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "ok"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    ],
+    "tool_choice": {
+      "type": "function",
+      "function": {
+        "name": "emit_probe"
+      }
+    }
+  },
+  "next_diagnostic_request_sha256": "0bce87e574ea248a8d0c43f31ed6667f527924bef799248140507fcb41945a91",
+  "safe_observation": "只记录model/choice/finish/role/tool type/name/arguments schema各字段布尔校验结果、固定错误码、usage；不执行工具或保存Key/正文。",
+  "source": "scripts/acceptance_support/tool_probe_observation.py",
+  "steps": [
+    "首次只做一次字段级诊断；如全部通过则停止，不用完额度。",
+    "若失败，先根据具体字段离线修复/回归，再冻结下一次至多1次复验；不盲目重发相同失败请求。",
+    "最多3次新增请求；同一问题两轮有实质差别修复仍失败即blocked，不追加第4次。"
+  ],
+  "per_request_timeout_seconds": 10,
+  "automated_retries": 0,
+  "fallbacks": false,
+  "other_real_targets": "deferred_by_user; no calls authorized",
+  "t040_t041_started": false,
+  "execution_gate": "DRAFT only. No call until explicit approval of aggregate8/CNY1 and new concrete run freeze; all old ledgers retained."
+}

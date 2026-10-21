@@ -1,0 +1,217 @@
+{
+  "version": "fixed-c-toolchain-preparation-evidence-v1",
+  "status": "blocked_pending_snapshot_amendment",
+  "original_approved_snapshot": "20251015T000000Z",
+  "original_attempt": {
+    "operation": "APT signed metadata refresh then --download-only --no-install-recommends fixed clang19/runtime versions; no C source in container",
+    "result": "exit100 before any deb download; dependency resolution failed",
+    "conflict": {
+      "required_libc6_for_snapshot_libc6_dev": "2.41-12",
+      "existing_base_libc6": "2.41-12+deb13u3"
+    },
+    "evidence_origin": "captured terminal tool transcript; not a native log file",
+    "transcript_excerpt": "libc6-dev : Depends: libc6 (= 2.41-12) but 2.41-12+deb13u3 is to be installed\nE: Unable to correct problems, you have held broken packages.",
+    "automatic_downgrade": false
+  },
+  "read_only_candidate_simulations": [
+    {
+      "snapshot": "20260505T000000Z",
+      "exit_code": 100,
+      "result": "libc6-dev requires2.41-12+deb13u2; baseu3 unchanged",
+      "log": "candidate-20260505.txt",
+      "packages_installed": 0,
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--network",
+        "bridge",
+        "--entrypoint",
+        "/usr/bin/env",
+        "--user",
+        "0:0",
+        "manimcommunity/manim@sha256:89ab433ce59134a4dcf351deb2511e067ab354393c0bb7d1859f3e8f0b2406a3",
+        "-i",
+        "PATH=/usr/bin:/bin",
+        "HOME=/tmp",
+        "LANG=C",
+        "/bin/sh",
+        "-ceu",
+        "rm -f /etc/apt/sources.list /etc/apt/sources.list.d/*; printf \"%s\\n\" \"deb [check-valid-until=no signed-by=/usr/share/keyrings/debian-archive-keyring.gpg] https://snapshot.debian.org/archive/debian/20260505T000000Z trixie main\" > /etc/apt/sources.list; apt-get -o Acquire::Retries=0 -o Acquire::https::Timeout=25 update; apt-get --simulate --no-install-recommends install clang-19=1:19.1.7-3+b1 libclang-rt-19-dev=1:19.1.7-3+b1"
+      ]
+    },
+    {
+      "snapshot": "20260601T000000Z",
+      "exit_code": 0,
+      "result": "32 new packages,0 upgrades,0 removals, no libc downgrade; simulation only",
+      "log": "candidate-20260601.txt",
+      "packages_installed": 0,
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--network",
+        "bridge",
+        "--entrypoint",
+        "/usr/bin/env",
+        "--user",
+        "0:0",
+        "manimcommunity/manim@sha256:89ab433ce59134a4dcf351deb2511e067ab354393c0bb7d1859f3e8f0b2406a3",
+        "-i",
+        "PATH=/usr/bin:/bin",
+        "HOME=/tmp",
+        "LANG=C",
+        "/bin/sh",
+        "-ceu",
+        "rm -f /etc/apt/sources.list /etc/apt/sources.list.d/*; printf \"%s\\n\" \"deb [check-valid-until=no signed-by=/usr/share/keyrings/debian-archive-keyring.gpg] https://snapshot.debian.org/archive/debian/20260601T000000Z trixie main\" > /etc/apt/sources.list; apt-get -o Acquire::Retries=0 -o Acquire::https::Timeout=25 update; apt-get --simulate --no-install-recommends install clang-19=1:19.1.7-3+b1 libclang-rt-19-dev=1:19.1.7-3+b1"
+      ]
+    }
+  ],
+  "official_metadata_urls": [
+    "https://snapshot.debian.org/mr/binary/libc6-dev/2.41-12%2Bdeb13u3/binfiles",
+    "https://snapshot.debian.org/mr/file/b009545d0ef35bce018084a2ca524f3cbe3481e0/info"
+  ],
+  "proposed_snapshot": "20260601T000000Z",
+  "base_image": "manimcommunity/manim@sha256:89ab433ce59134a4dcf351deb2511e067ab354393c0bb7d1859f3e8f0b2406a3",
+  "platform": "linux/arm64",
+  "clang": "1:19.1.7-3+b1",
+  "runtime": "1:19.1.7-3+b1",
+  "simulated_new_packages": [
+    {
+      "name": "libsframe1",
+      "version": "2.44-3"
+    },
+    {
+      "name": "binutils-common",
+      "version": "2.44-3"
+    },
+    {
+      "name": "libbinutils",
+      "version": "2.44-3"
+    },
+    {
+      "name": "libgprofng0",
+      "version": "2.44-3"
+    },
+    {
+      "name": "libctf-nobfd0",
+      "version": "2.44-3"
+    },
+    {
+      "name": "libctf0",
+      "version": "2.44-3"
+    },
+    {
+      "name": "libjansson4",
+      "version": "2.14-2+b3"
+    },
+    {
+      "name": "binutils-aarch64-linux-gnu",
+      "version": "2.44-3"
+    },
+    {
+      "name": "binutils",
+      "version": "2.44-3"
+    },
+    {
+      "name": "libclang-cpp19",
+      "version": "1:19.1.7-3+b1"
+    },
+    {
+      "name": "libgomp1",
+      "version": "14.2.0-19"
+    },
+    {
+      "name": "libitm1",
+      "version": "14.2.0-19"
+    },
+    {
+      "name": "libasan8",
+      "version": "14.2.0-19"
+    },
+    {
+      "name": "liblsan0",
+      "version": "14.2.0-19"
+    },
+    {
+      "name": "libtsan2",
+      "version": "14.2.0-19"
+    },
+    {
+      "name": "libubsan1",
+      "version": "14.2.0-19"
+    },
+    {
+      "name": "libhwasan0",
+      "version": "14.2.0-19"
+    },
+    {
+      "name": "libgcc-14-dev",
+      "version": "14.2.0-19"
+    },
+    {
+      "name": "libc-dev-bin",
+      "version": "2.41-12+deb13u3"
+    },
+    {
+      "name": "linux-libc-dev",
+      "version": "6.12.86-1"
+    },
+    {
+      "name": "libcrypt-dev",
+      "version": "1:4.4.38-1"
+    },
+    {
+      "name": "rpcsvc-proto",
+      "version": "1.4.3-1+b1"
+    },
+    {
+      "name": "libc6-dev",
+      "version": "2.41-12+deb13u3"
+    },
+    {
+      "name": "libstdc++-14-dev",
+      "version": "14.2.0-19"
+    },
+    {
+      "name": "libgc1",
+      "version": "1:8.2.8-1"
+    },
+    {
+      "name": "libobjc4",
+      "version": "14.2.0-19"
+    },
+    {
+      "name": "libobjc-14-dev",
+      "version": "14.2.0-19"
+    },
+    {
+      "name": "libclang-common-19-dev",
+      "version": "1:19.1.7-3+b1"
+    },
+    {
+      "name": "llvm-19-linker-tools",
+      "version": "1:19.1.7-3+b1"
+    },
+    {
+      "name": "libclang1-19",
+      "version": "1:19.1.7-3+b1"
+    },
+    {
+      "name": "clang-19",
+      "version": "1:19.1.7-3+b1"
+    },
+    {
+      "name": "libclang-rt-19-dev",
+      "version": "1:19.1.7-3+b1"
+    }
+  ],
+  "downloaded_deb_count": 0,
+  "image_builds": 0,
+  "sample_compilations": 0,
+  "sample_executions": 0,
+  "provider_calls": 0,
+  "temporary_containers": "--rm; no final execution image created",
+  "host_metadata_access_note": "Python urllib lacked local issuer trust; system curl and container APT succeeded with certificate/signature verification enabled; no TLS/signature bypass used",
+  "qualification": "simulation proves current dependency solvability only, not package download/build/runtime or isolation effectiveness"
+}

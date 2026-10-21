@@ -18,7 +18,7 @@ from app.models.learning import (
 )
 from app.services.catalog_package import CatalogError, content_digest
 from app.services.catalog_publication import release_package
-from app.services.knowledge_graph import default_knowledge_graph_repository
+from app.services.knowledge_graph_versions import catalog_knowledge_graph_repository
 from app.services.learning_operations import IdempotencyConflict, request_digest
 from app.services.learning_owner_lock import lock_learning_owner
 from app.services.owned_learning import latest_profile, visible_unit
@@ -27,7 +27,7 @@ from app.services.profile_updates import snapshot_profile
 
 
 async def catalog_listing(db: AsyncSession) -> dict[str, object]:
-    graph = default_knowledge_graph_repository()
+    graph = catalog_knowledge_graph_repository()
     releases = (await db.scalars(select(CatalogRelease).where(
         CatalogRelease.status == "approved").order_by(CatalogRelease.approved_at.desc(),
                                                      CatalogRelease.id))).all()
@@ -71,7 +71,7 @@ async def create_catalog_session(
     if release is None:
         raise CatalogError("CATALOG_NOT_READY")
     package = release_package(release)
-    graph = default_knowledge_graph_repository()
+    graph = catalog_knowledge_graph_repository()
     node = graph.get_node(node_id)
     if node is None or node_id not in package.nodes:
         raise CatalogError("CATALOG_NODE_NOT_FOUND")
