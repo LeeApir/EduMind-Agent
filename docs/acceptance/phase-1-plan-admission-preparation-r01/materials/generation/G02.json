@@ -1,0 +1,108 @@
+{
+  "id": "G02",
+  "kind": "generation_input",
+  "original_request": "主题是无头结点单链表头插法，C语言，空链表依次头插3和8。用int push_front(Node **head,int value)返回1成功/0失败；malloc失败不改变旧链表。提供讲解、含main和完整释放的可编译程序、恰好三道过程题及解析。指针和分配仅是配套要求，不另选教学主题；不需要动画。",
+  "input_snapshot": {
+    "metadata": {
+      "node_id": "linked-list-insertion",
+      "graph_version": "mvp-0.2.0",
+      "graph_digest": "3639db6aedc9699348e63b5e7e1bdaaea3189592b19540c64e8f175aceb9ef59",
+      "profile_version": null,
+      "profile_evidence_digest": "8838fdd11ee58e08fd54a21272313e784012370b7cf0a2cde8b823ed8806d85d",
+      "goal": "主题是无头结点单链表头插法，C语言，空链表依次头插3和8。用int push_front(Node **head,int value)返回1成功/0失败；malloc失败不改变旧链表。提供讲解、含main和完整释放的可编译程序、恰好三道过程题及解析。指针和分配仅是配套要求，不另选教学主题；不需要动画。",
+      "code_language": "C"
+    },
+    "references": {
+      "graph-node:mvp-0.2.0:linked-list-insertion": {
+        "reference_id": "graph-node:mvp-0.2.0:linked-list-insertion",
+        "version": "mvp-0.2.0",
+        "digest": "b06b9a38c5be73059d9b542efa22a7ddfcb65913cbf036573a69b2b4dcd0ed98"
+      }
+    },
+    "learner_evidence": {},
+    "node_ids": [
+      "array",
+      "array-stack",
+      "balanced-binary-search-tree",
+      "binary-heap",
+      "binary-search-tree",
+      "binary-tree",
+      "binary-tree-traversal",
+      "breadth-first-search",
+      "bubble-sort",
+      "c-pointer",
+      "circular-linked-list",
+      "circular-queue",
+      "depth-first-search",
+      "doubly-linked-list",
+      "graph-representation",
+      "heap-sort",
+      "insertion-sort",
+      "linked-list-concept",
+      "linked-list-deletion",
+      "linked-list-insertion",
+      "linked-list-traversal",
+      "linked-stack",
+      "merge-sort",
+      "queue",
+      "quick-sort",
+      "selection-sort",
+      "single-linked-list",
+      "sorting-comparison",
+      "stack",
+      "tree-concept"
+    ],
+    "teaching_context": {
+      "version": "teaching-node-binding-v1",
+      "teaching_mode": "target",
+      "target_node_id": "linked-list-insertion",
+      "recommended_node_id": "linked-list-insertion",
+      "teaching_node_id": "linked-list-insertion",
+      "selection_reason": "direct_target",
+      "original_request": "主题是无头结点单链表头插法，C语言，空链表依次头插3和8。用int push_front(Node **head,int value)返回1成功/0失败；malloc失败不改变旧链表。提供讲解、含main和完整释放的可编译程序、恰好三道过程题及解析。指针和分配仅是配套要求，不另选教学主题；不需要动画。",
+      "segment_goal": "主题是无头结点单链表头插法，C语言，空链表依次头插3和8。用int push_front(Node **head,int value)返回1成功/0失败；malloc失败不改变旧链表。提供讲解、含main和完整释放的可编译程序、恰好三道过程题及解析。指针和分配仅是配套要求，不另选教学主题；不需要动画。",
+      "segment_scope": "target_lesson",
+      "path_version_id": "3d2bc4ab-6ccc-53e1-b728-a7500511c251",
+      "path_version": 1,
+      "graph_version": "mvp-0.2.0",
+      "graph_digest": "3639db6aedc9699348e63b5e7e1bdaaea3189592b19540c64e8f175aceb9ef59"
+    }
+  },
+  "reference_context": {
+    "source": {
+      "reference_id": "graph-node:mvp-0.2.0:linked-list-insertion",
+      "version": "mvp-0.2.0",
+      "digest": "b06b9a38c5be73059d9b542efa22a7ddfcb65913cbf036573a69b2b4dcd0ed98"
+    },
+    "node": {
+      "id": "linked-list-insertion",
+      "name": "链表插入",
+      "chapter": "线性表",
+      "difficulty": 3,
+      "description": "在单链表中创建新节点，并以正确顺序重连 next 链接。",
+      "prerequisites": [
+        "c-pointer",
+        "linked-list-traversal"
+      ],
+      "learning_objectives": [
+        "写出中间插入的两步连接更新",
+        "处理头插、尾插和位置不合法的边界情况"
+      ],
+      "common_misconceptions": [
+        "可以先让 prev->next 指向新节点再保存后继",
+        "插入中间位置不需要前驱节点"
+      ],
+      "ai_context": "继续使用箭头比喻：先保存新节点指向的旧后继，再连接前驱。",
+      "mastery_rule_key": "linear-structure-v1"
+    },
+    "learner_evidence": {},
+    "scope": "Background only, not certification of this example."
+  },
+  "expected_checklist": [
+    "链表[]→[3]→[8,3]，首/次分配失败分别保持[]/[3]，不丢旧头",
+    "malloc检查、next/头指针顺序、调用返回约定与完整释放正确；不得只凭局部NULL检查断言调用方安全"
+  ],
+  "generated_material": null,
+  "actual_model_result": null,
+  "provenance": "Same original A goal/snapshot, new isolated generation-only diagnostic; never reopens stopped A run; no new independent holdout claim."
+}

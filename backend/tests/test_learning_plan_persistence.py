@@ -187,6 +187,22 @@ def test_plan_persistence_and_database_guards() -> None:
                     )
                 ):
                     expected_guard = "teaching data prevents downgrade"
+                # Newer append-only migrations stop first; assert the exact highest guard.
+                plan_evidence = await db.scalar(text("SELECT to_regclass('learning_plan_checks')"))
+                if plan_evidence and await db.scalar(
+                    text("SELECT count(*) FROM learning_plan_checks")
+                ):
+                    expected_guard = "plan evidence prevents downgrade"
+                budget_table = await db.scalar(
+                    text("SELECT to_regclass('learning_generation_attempts')")
+                )
+                if budget_table and await db.scalar(
+                    text(
+                        "SELECT count(*) FROM learning_operations "
+                        "WHERE generation_budget_version IS NOT NULL"
+                    )
+                ):
+                    expected_guard = "budget evidence prevents downgrade"
             result = subprocess.run(
                 [sys.executable, "-m", "alembic", "downgrade", "0025_animation_dsl_media"],
                 cwd=ROOT / "backend",

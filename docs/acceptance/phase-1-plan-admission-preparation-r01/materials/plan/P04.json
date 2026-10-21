@@ -1,0 +1,160 @@
+{
+  "id": "P04",
+  "source_development_case": "requirement-origin--error",
+  "input_snapshot": {
+    "metadata": {
+      "node_id": "array",
+      "graph_version": "mvp-0.2.0",
+      "graph_digest": "3639db6aedc9699348e63b5e7e1bdaaea3189592b19540c64e8f175aceb9ef59",
+      "profile_version": null,
+      "profile_evidence_digest": "8838fdd11ee58e08fd54a21272313e784012370b7cf0a2cde8b823ed8806d85d",
+      "goal": "用C实现固定数组{4,6,9}求和，返回19且不打印；给出讲解、函数及三题，不要求动画或完整节点。",
+      "code_language": "C"
+    },
+    "references": {
+      "graph-node:mvp-0.2.0:array": {
+        "reference_id": "graph-node:mvp-0.2.0:array",
+        "version": "mvp-0.2.0",
+        "digest": "f83fd12e754fcda4124aa62b8a29203d97a897605d23dc4e37877393dcb0015d"
+      }
+    },
+    "learner_evidence": {},
+    "node_ids": [
+      "array",
+      "array-stack",
+      "balanced-binary-search-tree",
+      "binary-heap",
+      "binary-search-tree",
+      "binary-tree",
+      "binary-tree-traversal",
+      "breadth-first-search",
+      "bubble-sort",
+      "c-pointer",
+      "circular-linked-list",
+      "circular-queue",
+      "depth-first-search",
+      "doubly-linked-list",
+      "graph-representation",
+      "heap-sort",
+      "insertion-sort",
+      "linked-list-concept",
+      "linked-list-deletion",
+      "linked-list-insertion",
+      "linked-list-traversal",
+      "linked-stack",
+      "merge-sort",
+      "queue",
+      "quick-sort",
+      "selection-sort",
+      "single-linked-list",
+      "sorting-comparison",
+      "stack",
+      "tree-concept"
+    ],
+    "teaching_context": {
+      "version": "teaching-node-binding-v1",
+      "teaching_mode": "target",
+      "target_node_id": "array",
+      "recommended_node_id": "array",
+      "teaching_node_id": "array",
+      "selection_reason": "direct_target",
+      "original_request": "用C实现固定数组{4,6,9}求和，返回19且不打印；给出讲解、函数及三题，不要求动画或完整节点。",
+      "segment_goal": "用C实现固定数组{4,6,9}求和，返回19且不打印；给出讲解、函数及三题，不要求动画或完整节点。",
+      "segment_scope": "target_lesson",
+      "path_version_id": "512b8cf0-4da6-55cc-82c5-039a3aa5af1e",
+      "path_version": 1,
+      "graph_version": "mvp-0.2.0",
+      "graph_digest": "3639db6aedc9699348e63b5e7e1bdaaea3189592b19540c64e8f175aceb9ef59"
+    }
+  },
+  "plan": {
+    "objectives": [
+      {
+        "id": "local",
+        "text": "按模型追加的承诺返回17。"
+      }
+    ],
+    "terminology": [
+      {
+        "term": "返回值",
+        "meaning": "函数交给调用方的值，不等于打印"
+      }
+    ],
+    "conventions": {
+      "index_base": 0,
+      "capacity": 3,
+      "state_representation": "s为已处理元素和，i为下一个处理下标",
+      "not_applicable_reasons": []
+    },
+    "shared_example": {
+      "input_description": "a={4,6,9}",
+      "initial_state": "s=0,i=0",
+      "steps": [
+        {
+          "operation": "求和循环",
+          "expected_state": "s=4,10,19；i=3条件失败退出",
+          "expected_output": "无打印，返回19"
+        }
+      ]
+    },
+    "prerequisite_node_ids": [],
+    "scenes": [
+      {
+        "role": "explanation",
+        "scene_key": "explanation",
+        "objective_ids": [
+          "local"
+        ],
+        "depends_on": []
+      },
+      {
+        "role": "code",
+        "scene_key": "code",
+        "objective_ids": [
+          "local"
+        ],
+        "depends_on": [
+          "explanation"
+        ]
+      },
+      {
+        "role": "exercise",
+        "scene_key": "exercise",
+        "objective_ids": [
+          "local"
+        ],
+        "depends_on": [
+          "explanation",
+          "code"
+        ]
+      }
+    ],
+    "node_id": "array",
+    "graph_version": "mvp-0.2.0",
+    "graph_digest": "3639db6aedc9699348e63b5e7e1bdaaea3189592b19540c64e8f175aceb9ef59",
+    "profile_version": null,
+    "profile_evidence_digest": "8838fdd11ee58e08fd54a21272313e784012370b7cf0a2cde8b823ed8806d85d",
+    "goal": "用C实现固定数组{4,6,9}求和，返回19且不打印；给出讲解、函数及三题，不要求动画或完整节点。",
+    "code_language": "C",
+    "schema_version": "learning-plan-v1",
+    "references": [
+      {
+        "reference_id": "graph-node:mvp-0.2.0:array",
+        "version": "mvp-0.2.0",
+        "digest": "f83fd12e754fcda4124aa62b8a29203d97a897605d23dc4e37877393dcb0015d"
+      }
+    ]
+  },
+  "binding": {
+    "owner_id": "3eae0e18-52ad-5f7f-ae22-8fc762156e39",
+    "unit_id": "a65d7c27-68b6-5719-93b0-2c59bb8b428f",
+    "operation_id": "089612cb-454d-5cf7-b77a-92d3be27926d",
+    "plan_id": "fe3b2a86-0aec-5734-b333-6ccbbb06458c",
+    "plan_version": 1,
+    "plan_digest": "78a20b92be26adaffd52d052c956411231ed151c2bcf461916ca56b75acb50c5",
+    "input_digest": "7fc7faf37588b2b57ba68f5d3b41f0e45cd36cd82875a267a2c203f489ad6338",
+    "references_digest": "1335b93c5c57bca280ff7d4076dbd2c6cd8c0bc14bf154738dada80dc5e6281e",
+    "policy_version": "hybrid-review-v1",
+    "policy_digest": "7a9c9eed57fe41e8aa905a917bd015c4a4eae28935bdd53b6654662cd751af0f"
+  }
+}

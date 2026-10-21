@@ -136,7 +136,8 @@ def test_persisted_cross_layer_mismatch_is_not_repaired(change):
 
 
 @pytest.mark.parametrize("action", ["simpler", "another_example"])
-def test_reexplanation_preserves_exact_bound_teaching_context(action):
+def test_reexplanation_preserves_exact_bound_teaching_context(action, monkeypatch):
+    monkeypatch.setenv("EDUMIND_PRODUCT_MODE", "dynamic")
     from test_hybrid_learning_publication import classroom_reexplanation
 
     from app.services.hybrid_learning_publication import current_publication
