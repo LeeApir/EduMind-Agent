@@ -104,6 +104,8 @@ AI生成草稿可供学生学习，不以独立人工签核或普通语义审核
 
 2026-10-22 T004：用户在T003完成后要求继续，已复用原三页并补齐七个主要页面的[静态原型](design/prototypes/phase-1.5-learning/README.md)及[视觉/状态规范](design/phase-1.5-visual-spec.md)。实际浏览器检查与准确设计包见[T004交接](acceptance/phase-1.5-ui-design-r01/README.md)，当前待用户确认主要页面；未实施生产前端/后端，静态预览不是业务E2E或真实生成验收。
 
+2026-10-22 T004后续：用户确认13b5dd7七页主要页面设计及准确附件，[确认登记](design/phase-1.5-ui-approval-20261022.json)确立设计接受状态；冻结文件保留原字节。静态响应式、状态和键盘验证见[T004交接](acceptance/phase-1.5-ui-design-r01/README.md)。本次完成设计前置，下一T005仍待执行授权，生产实施及真实调用未启动。
+
 ## 目录
 
 1. [项目概览](#一项目概览)
