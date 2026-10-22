@@ -1,0 +1,28 @@
+T003 proposal verification at 2026-10-22T10:47:48
+Scope: design only; Provider requests0; no DB/HTTP/scoring/worker/browser execution.
+$ backend/.venv/bin/python docs/acceptance/phase-1.5-quality-contract-r01/check_design.py
+exit_code=0
+PASS: OpenAPI structure, 65 refs, 6 planned operations, 24 schemas, 19 schema examples, shared-budget consistency, 44 design cases, 12 links, 6 frozen files; no runtime verification
+
+$ backend/.venv/bin/python docs/acceptance/phase-1.5-course-contract-r01/check_design.py
+exit_code=0
+PASS: 49 local refs, 6 planned operations, 15 schemas, 8 request examples, 25 design cases, 9 links, 5 frozen files; no runtime verification
+
+$ backend/.venv/bin/python docs/acceptance/phase-1.5-generation-contract-r01/check_design.py
+exit_code=0
+PASS: OpenAPI structure, 67 refs, 6 planned operations, 25 schemas, budget/state consistency, 15 schema examples, 34 design cases, 13 links, 6 frozen files; no runtime verification
+
+$ python3 scripts/check_catalog_workflow.py
+exit_code=0
+Active Phase 1.5 dependencies valid; catalog ledger valid; T033 blocked
+
+$ git diff --check
+exit_code=0
+
+
+PASS: 11 T001/T002 approved files unchanged from approved proposal bytes.
+Manual AC1: hard gate / opinion / exact evidence confirmation and scoped dependency withdrawal ready.
+Manual AC2: tentative feedback / exact attestation / first-complete independence / revocation-replay and legacy source dispatch ready.
+Manual AC3: exact owner-scene tutor context, one-attempt90s shared budget and explicit revision ready; exact contract approval PENDING.
+Independent reader: two gaps fixed (ready tutor historical body withdrawal; original legacy stem check); no runtime success inferred.
+manifest_sha256=a232fff9a2bd99e427ce7439bec3be5bab828b8e333c0774ee8bdf2d0d104e54

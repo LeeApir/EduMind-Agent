@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "用户授权并批准T002具体契约；完成验收与独立提交后done，其余40项todo，后续按明确授权及依赖串行推进，不自动扩展真实调用/开放。",
+    "phase_gate": "用户授权继续并恢复T003设计，当前准确A—E待批准；后续按明确授权和依赖串行推进，不自动扩展真实调用/开放。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -43,7 +43,7 @@
     }
   ],
   "stage_scope": {
-    "authorization": "2026-10-21用户确认A—F与三页原型并要求“可以，准备task”；仅授权细化当前阶段任务，不领取或开发。 2026-10-21用户后续要求“领取T01”，授权领取PHASE-1.5-T001；不扩大为整阶段执行授权。 用户随后要求“开始开发”，本次执行T001契约设计；具体契约批准仍待准确方案确认。 用户随后回复“批准”，接受d9bd7a6的ADR0024 A—D及准确附件；不自动授权后续任务。 用户在T001完成后要求“继续”，授权执行下一项T002具体设计。 用户随后回复“批准”，接受8f9f21f中ADR0025 A—E及准确附件，不自动授权后续任务或真实调用。",
+    "authorization": "2026-10-21用户确认A—F与三页原型并要求“可以，准备task”；仅授权细化当前阶段任务，不领取或开发。 2026-10-21用户后续要求“领取T01”，授权领取PHASE-1.5-T001；不扩大为整阶段执行授权。 用户随后要求“开始开发”，本次执行T001契约设计；具体契约批准仍待准确方案确认。 用户随后回复“批准”，接受d9bd7a6的ADR0024 A—D及准确附件；不自动授权后续任务。 用户在T001完成后要求“继续”，授权执行下一项T002具体设计。 用户随后回复“批准”，接受8f9f21f中ADR0025 A—E及准确附件，不自动授权后续任务或真实调用。 用户在T002完成后要求“继续”，授权领取并执行T003设计。 2026-10-22用户在中断后要求继续，恢复T003设计；具体契约仍待准确批准。",
     "product_mode": "catalog_only",
     "formal_product": "已有签核课程",
     "dynamic_scope": "已确认学生可直接学习AI生成草稿；普通语义审核不阻断整课。实际运行开放须新契约实现与独立验收后批准，既有签核课程语义不变。",
@@ -53,7 +53,7 @@
     "dynamic_release_authorized": false,
     "deployment_authorized": false,
     "H": "H01–H08继续封存；新契约确定后重判适用性与独立性，不自动继承验收资格。",
-    "implementation_scope": "T001 done；T002具体契约已批准并验收，完成提交后done；其余40项todo，无新业务接口或迁移。",
+    "implementation_scope": "T001/T002 done；T003具体设计就绪待批准blocked；其余39项todo，无新业务接口或迁移。",
     "included": [
       "自由目标/可变场景/可选多节点关联",
       "首场景可学与后续持久生成/恢复/局部修订",
@@ -205,7 +205,7 @@
       "id": "PHASE-1.5-T003",
       "phase": "Phase 1.5",
       "title": "冻结质量处理与学习证据契约",
-      "status": "todo",
+      "status": "blocked",
       "priority": "P0",
       "depends_on": [
         "PHASE-1.5-T001",
@@ -227,12 +227,28 @@
         "python3 scripts/check_catalog_workflow.py",
         "git diff --check"
       ],
-      "verification_results": [],
-      "started_at": null,
+      "verification_results": [
+        {
+          "command": "backend/.venv/bin/python docs/acceptance/phase-1.5-quality-contract-r01/check_design.py",
+          "result": "passed: OpenAPI结构/65refs/6planned操作/24schemas/19结构正负例/共享预算/44设计用例/12链接/6冻结摘要；仅设计",
+          "evidence": "docs/acceptance/phase-1.5-quality-contract-r01/verification.txt"
+        },
+        {
+          "command": "T001/T002 check_design.py；批准摘要及提案提交逐字节核对",
+          "result": "passed: 11 approved frozen files unchanged",
+          "evidence": "docs/acceptance/phase-1.5-quality-contract-r01/verification.txt"
+        },
+        {
+          "command": "python3 scripts/check_catalog_workflow.py；git diff --check",
+          "result": "passed",
+          "evidence": "docs/acceptance/phase-1.5-quality-contract-r01/verification.txt"
+        }
+      ],
+      "started_at": "2026-10-21T23:26:47",
       "completed_at": null,
-      "blocker": null,
+      "blocker": "ADR-0026 A—E具体确认权限/练习核定与正式准入/撤销重放/导师预算及API契约和准确manifest待用户批准；设计与离线检查就绪，尚未实施。",
       "commit_lookup": "Task-Completed: PHASE-1.5-T003",
-      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。本任务交付具体设计；涉及重大契约/验收阈值须获批准后才能done及启动依赖实现，不重复审批A—F方向。"
+      "execution_gate": "用户授权继续并恢复T003设计；ADR0026 A—E及准确附件待批准，批准后恢复完成，不自动执行T004或真实调用。"
     },
     {
       "id": "PHASE-1.5-T004",

@@ -1,0 +1,2136 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "EduMind quality, attempts and tutor contract proposal",
+    "version": "0.1.0",
+    "description": "ADR-0026 Proposed; all routes planned. ExerciseBlock/DisabledExerciseBlock extend T002 SceneProjection. TutorEvent extends existing operation event route, Tutor operation snapshots add kind=tutor_turn and one-attempt90s budget; T020 merges approved contracts. No admin confirmation endpoint, no automatic mastery or real Provider authorization."
+  },
+  "x-extensions": {
+    "scene_projection": "Use extended ExerciseBlock or DisabledExerciseBlock for exercise slots; whole scene disabled still409. Other T002 blocks/actions unchanged.",
+    "operation_snapshot": "Existing T002 operation snapshot route uses TutorOperation for kind=tutor_turn and original Operation otherwise.",
+    "events": "Existing T002 events path uses Event for generation operations and TutorEvent for tutor_turn operations; same SSE owner/replay/cursor/no-store/204 semantics."
+  },
+  "paths": {
+    "/api/free-courses/{course_id}/feedback": {
+      "post": {
+        "operationId": "submitFreeCourseFeedback",
+        "x-runtime-status": "planned",
+        "x-implementation-task": "PHASE-1.5-T020",
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CourseId"
+          },
+          {
+            "$ref": "#/components/parameters/Csrf"
+          },
+          {
+            "$ref": "#/components/parameters/Key"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Owner-scoped public projection",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeedbackReceipt"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHORIZED",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NOT_FOUND",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version, availability, idempotency, mode or active-operation conflict",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "VALIDATION_ERROR",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "CSRF_FAILED",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FeedbackRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/free-courses/{course_id}/feedback/{feedback_id}": {
+      "get": {
+        "operationId": "readFreeCourseFeedback",
+        "x-runtime-status": "planned",
+        "x-implementation-task": "PHASE-1.5-T020",
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CourseId"
+          },
+          {
+            "$ref": "#/components/parameters/FeedbackId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Owner-scoped public projection",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Feedback"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHORIZED",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NOT_FOUND",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version, availability, idempotency, mode or active-operation conflict",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "VALIDATION_ERROR",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/free-courses/{course_id}/attempts": {
+      "post": {
+        "operationId": "submitFreeCourseAttempt",
+        "x-runtime-status": "planned",
+        "x-implementation-task": "PHASE-1.5-T020",
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CourseId"
+          },
+          {
+            "$ref": "#/components/parameters/Csrf"
+          },
+          {
+            "$ref": "#/components/parameters/Key"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Owner-scoped public projection",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttemptReceipt"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHORIZED",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NOT_FOUND",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version, availability, idempotency, mode or active-operation conflict",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "VALIDATION_ERROR",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "CSRF_FAILED",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AttemptRequest"
+              }
+            }
+          }
+        },
+        "description": "New submissions require supplied course_version to be current head; stale baseline409, no latest fallback. Replays keep attempt_id only."
+      }
+    },
+    "/api/free-courses/{course_id}/attempts/{attempt_id}": {
+      "get": {
+        "operationId": "readFreeCourseAttempt",
+        "x-runtime-status": "planned",
+        "x-implementation-task": "PHASE-1.5-T020",
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CourseId"
+          },
+          {
+            "$ref": "#/components/parameters/AttemptId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Owner-scoped public projection",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Attempt"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHORIZED",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NOT_FOUND",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version, availability, idempotency, mode or active-operation conflict",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "VALIDATION_ERROR",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/free-courses/{course_id}/tutor-turns": {
+      "post": {
+        "operationId": "startFreeCourseTutorTurn",
+        "x-runtime-status": "planned",
+        "x-implementation-task": "PHASE-1.5-T020",
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CourseId"
+          },
+          {
+            "$ref": "#/components/parameters/Csrf"
+          },
+          {
+            "$ref": "#/components/parameters/Key"
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Owner-scoped public projection",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TutorReceipt"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHORIZED",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NOT_FOUND",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version, availability, idempotency, mode or active-operation conflict",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "VALIDATION_ERROR",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "CSRF_FAILED",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TutorRequest"
+              }
+            }
+          }
+        },
+        "description": "Current-head binding only; acknowledge assistance for scene practice. Active generation409, no implicit cancel. One attempt90s in shared course pool."
+      }
+    },
+    "/api/free-courses/{course_id}/tutor-turns/{turn_id}": {
+      "get": {
+        "operationId": "readFreeCourseTutorTurn",
+        "x-runtime-status": "planned",
+        "x-implementation-task": "PHASE-1.5-T020",
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CourseId"
+          },
+          {
+            "$ref": "#/components/parameters/TurnId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Owner-scoped public projection",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TutorTurn"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHORIZED",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NOT_FOUND",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version, availability, idempotency, mode or active-operation conflict",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "VALIDATION_ERROR",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "sessionCookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "edumind_session"
+      }
+    },
+    "parameters": {
+      "CourseId": {
+        "name": "course_id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "FeedbackId": {
+        "name": "feedback_id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "AttemptId": {
+        "name": "attempt_id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "TurnId": {
+        "name": "turn_id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "Csrf": {
+        "name": "X-CSRF-Token",
+        "in": "header",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "Key": {
+        "name": "Idempotency-Key",
+        "in": "header",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[ -~]+$"
+        }
+      }
+    },
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "retryable": {
+            "const": false
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "retryable"
+        ]
+      },
+      "Binding": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "course_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "scene_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "scene_version_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "course_version",
+          "scene_id",
+          "scene_version_id"
+        ]
+      },
+      "FeedbackRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "course_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "scene_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "scene_version_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "anchor_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "exercise_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "exercise_version_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "course_version",
+          "scene_id",
+          "scene_version_id",
+          "anchor_id",
+          "exercise_id",
+          "exercise_version_id",
+          "description"
+        ],
+        "allOf": [
+          {
+            "oneOf": [
+              {
+                "properties": {
+                  "exercise_id": {
+                    "type": "null"
+                  },
+                  "exercise_version_id": {
+                    "type": "null"
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "exercise_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "exercise_version_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "FeedbackReceipt": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "feedback_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "feedback_id"
+        ]
+      },
+      "Feedback": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "feedback_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "binding": {
+            "$ref": "#/components/schemas/Binding"
+          },
+          "anchor_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "status": {
+            "enum": [
+              "pending",
+              "confirmed",
+              "not_confirmed",
+              "corrected"
+            ]
+          },
+          "reason_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "feedback_id",
+          "binding",
+          "anchor_id",
+          "description",
+          "status",
+          "reason_code"
+        ]
+      },
+      "Question": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "question_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "question": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "input_type": {
+            "const": "short_text"
+          }
+        },
+        "required": [
+          "question_id",
+          "question",
+          "input_type"
+        ]
+      },
+      "ExerciseBlock": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "const": "exercise"
+          },
+          "anchor_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "exercise_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "exercise_version_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "question": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "items": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 4,
+            "items": {
+              "$ref": "#/components/schemas/Question"
+            }
+          }
+        },
+        "required": [
+          "kind",
+          "anchor_id",
+          "exercise_id",
+          "exercise_version_id",
+          "question",
+          "items"
+        ]
+      },
+      "DisabledExerciseBlock": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "const": "exercise_unavailable"
+          },
+          "anchor_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "exercise_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "exercise_version_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "reason_code": {
+            "const": "EXERCISE_UNAVAILABLE"
+          }
+        },
+        "required": [
+          "kind",
+          "anchor_id",
+          "exercise_id",
+          "exercise_version_id",
+          "reason_code"
+        ]
+      },
+      "Answer": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "question_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "answer": {
+            "type": "string",
+            "maxLength": 500
+          }
+        },
+        "required": [
+          "question_id",
+          "answer"
+        ]
+      },
+      "AttemptRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "course_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "scene_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "scene_version_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "exercise_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "exercise_version_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "answers": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 4,
+            "items": {
+              "$ref": "#/components/schemas/Answer"
+            }
+          }
+        },
+        "required": [
+          "course_version",
+          "scene_id",
+          "scene_version_id",
+          "exercise_id",
+          "exercise_version_id",
+          "answers"
+        ]
+      },
+      "AttemptReceipt": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "attempt_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "attempt_id"
+        ]
+      },
+      "QuestionResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "question_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "matches_reference": {
+            "type": "boolean"
+          },
+          "explanation": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "question_id",
+          "matches_reference",
+          "explanation"
+        ]
+      },
+      "Attempt": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "attempt_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "binding": {
+            "$ref": "#/components/schemas/Binding"
+          },
+          "exercise_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "exercise_version_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "answers": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 4,
+            "items": {
+              "$ref": "#/components/schemas/Answer"
+            }
+          },
+          "completeness": {
+            "enum": [
+              "incomplete",
+              "complete"
+            ]
+          },
+          "reliability": {
+            "enum": [
+              "provisional",
+              "verified",
+              "unavailable",
+              "withdrawn"
+            ]
+          },
+          "comparison_score": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "question_results": {
+            "type": "array",
+            "maxItems": 4,
+            "items": {
+              "$ref": "#/components/schemas/QuestionResult"
+            }
+          },
+          "mastery_effect": {
+            "enum": [
+              "course_only",
+              "admitted",
+              "revoked"
+            ]
+          },
+          "reason_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "attempt_id",
+          "binding",
+          "exercise_id",
+          "exercise_version_id",
+          "answers",
+          "completeness",
+          "reliability",
+          "comparison_score",
+          "question_results",
+          "mastery_effect",
+          "reason_code"
+        ],
+        "allOf": [
+          {
+            "if": {
+              "anyOf": [
+                {
+                  "properties": {
+                    "completeness": {
+                      "const": "incomplete"
+                    }
+                  },
+                  "required": [
+                    "completeness"
+                  ]
+                },
+                {
+                  "properties": {
+                    "reliability": {
+                      "enum": [
+                        "unavailable",
+                        "withdrawn"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "reliability"
+                  ]
+                }
+              ]
+            },
+            "then": {
+              "properties": {
+                "comparison_score": {
+                  "type": "null"
+                },
+                "question_results": {
+                  "maxItems": 0
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "comparison_score": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "question_results": {
+                  "minItems": 2
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "mastery_effect": {
+                  "const": "admitted"
+                }
+              },
+              "required": [
+                "mastery_effect"
+              ]
+            },
+            "then": {
+              "properties": {
+                "completeness": {
+                  "const": "complete"
+                },
+                "reliability": {
+                  "const": "verified"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "TutorRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "course_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "scene_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "scene_version_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "message": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "acknowledge_assisted_practice": {
+            "const": true
+          }
+        },
+        "required": [
+          "course_version",
+          "scene_id",
+          "scene_version_id",
+          "message",
+          "acknowledge_assisted_practice"
+        ]
+      },
+      "TutorReceipt": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "operation_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "turn_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "operation_id",
+          "turn_id"
+        ]
+      },
+      "TutorTurn": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "turn_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "operation_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "binding": {
+            "$ref": "#/components/schemas/Binding"
+          },
+          "message": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "status": {
+            "enum": [
+              "queued",
+              "running",
+              "ready",
+              "failed",
+              "cancelled",
+              "timed_out",
+              "invalidated"
+            ]
+          },
+          "markdown": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 6000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "anchor_refs": {
+            "type": "array",
+            "maxItems": 32,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          "reason_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "turn_id",
+          "operation_id",
+          "binding",
+          "message",
+          "status",
+          "markdown",
+          "anchor_refs",
+          "reason_code"
+        ],
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "const": "ready"
+                }
+              },
+              "required": [
+                "status"
+              ]
+            },
+            "then": {
+              "properties": {
+                "markdown": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 6000
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "markdown": {
+                  "type": "null"
+                },
+                "anchor_refs": {
+                  "maxItems": 0
+                }
+              }
+            }
+          }
+        ]
+      },
+      "TutorEvent": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "schema_version": {
+            "const": "free-course-events-v1"
+          },
+          "operation_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "seq": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "type": {
+            "enum": [
+              "queued",
+              "started",
+              "tutor_ready",
+              "cancel_requested",
+              "error",
+              "done"
+            ]
+          },
+          "course_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "payload": {
+            "$ref": "#/components/schemas/TutorEventPayload"
+          }
+        },
+        "required": [
+          "schema_version",
+          "operation_id",
+          "seq",
+          "type",
+          "course_version",
+          "payload"
+        ],
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "tutor_ready"
+                }
+              },
+              "required": [
+                "type"
+              ]
+            },
+            "then": {
+              "properties": {
+                "payload": {
+                  "required": [
+                    "turn_id"
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "done"
+                }
+              },
+              "required": [
+                "type"
+              ]
+            },
+            "then": {
+              "properties": {
+                "payload": {
+                  "required": [
+                    "state"
+                  ],
+                  "properties": {
+                    "state": {
+                      "enum": [
+                        "succeeded",
+                        "failed",
+                        "cancelled",
+                        "timed_out"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "error"
+                }
+              },
+              "required": [
+                "type"
+              ]
+            },
+            "then": {
+              "properties": {
+                "payload": {
+                  "required": [
+                    "reason_code"
+                  ]
+                }
+              }
+            }
+          }
+        ]
+      },
+      "TutorEventPayload": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "turn_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "reason_code": {
+            "type": "string"
+          },
+          "state": {
+            "enum": [
+              "queued",
+              "running",
+              "cancel_requested",
+              "succeeded",
+              "failed",
+              "cancelled",
+              "timed_out"
+            ]
+          }
+        },
+        "required": []
+      },
+      "TutorBudget": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "attempts_used": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "attempts_remaining": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "course_attempts_remaining": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 40
+          },
+          "input_tokens_charged": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 16000
+          },
+          "output_tokens_charged": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2000
+          },
+          "usage_unknown": {
+            "type": "boolean"
+          },
+          "input_tokens_remaining": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 16000
+          },
+          "output_tokens_remaining": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2000
+          },
+          "course_input_tokens_remaining": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 600000
+          },
+          "course_output_tokens_remaining": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 144000
+          }
+        },
+        "required": [
+          "attempts_used",
+          "attempts_remaining",
+          "course_attempts_remaining",
+          "input_tokens_charged",
+          "output_tokens_charged",
+          "usage_unknown",
+          "input_tokens_remaining",
+          "output_tokens_remaining",
+          "course_input_tokens_remaining",
+          "course_output_tokens_remaining"
+        ]
+      },
+      "Step": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "step_key": {
+            "type": "string"
+          },
+          "scene_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "state": {
+            "enum": [
+              "pending",
+              "blocked_dependency",
+              "running",
+              "ready",
+              "failed",
+              "invalidated",
+              "cancelled"
+            ]
+          },
+          "reason_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "step_key",
+          "scene_id",
+          "state",
+          "reason_code"
+        ]
+      },
+      "TutorOperation": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "operation_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "course_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "const": "tutor_turn"
+          },
+          "state": {
+            "enum": [
+              "queued",
+              "running",
+              "cancel_requested",
+              "succeeded",
+              "failed",
+              "cancelled",
+              "timed_out"
+            ]
+          },
+          "base_head_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "head_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "last_event_id": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "deadline_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "reason_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "clarification_questions": {
+            "type": "array",
+            "maxItems": 0,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 300
+            }
+          },
+          "steps": {
+            "type": "array",
+            "maxItems": 1,
+            "items": {
+              "$ref": "#/components/schemas/Step"
+            }
+          },
+          "budget": {
+            "$ref": "#/components/schemas/TutorBudget"
+          },
+          "request_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "operation_id",
+          "course_id",
+          "kind",
+          "state",
+          "base_head_version",
+          "head_version",
+          "last_event_id",
+          "deadline_at",
+          "reason_code",
+          "clarification_questions",
+          "steps",
+          "budget",
+          "request_id"
+        ],
+        "description": "Used for tutor_turn only on existing T002 operation snapshot endpoint; deadline and used/remaining budget obey ADR0026."
+      },
+      "EvidenceBasis": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "enum": [
+              "manual_derivation",
+              "trusted_reference",
+              "approved_offline_result",
+              "mechanical_rule"
+            ]
+          },
+          "source_ref": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "excerpt": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "kind",
+          "source_ref",
+          "excerpt",
+          "reason"
+        ]
+      },
+      "QualityDecisionDraft": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "decision_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "course_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "binding": {
+            "$ref": "#/components/schemas/Binding"
+          },
+          "exercise_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "exercise_version_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "action": {
+            "enum": [
+              "confirm_defect",
+              "not_confirmed",
+              "decision_correction",
+              "restore"
+            ]
+          },
+          "target_decision_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "scope": {
+            "enum": [
+              "exercise",
+              "scene",
+              "course"
+            ]
+          },
+          "impact_digest": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "basis": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 8,
+            "items": {
+              "$ref": "#/components/schemas/EvidenceBasis"
+            }
+          }
+        },
+        "required": [
+          "decision_key",
+          "course_id",
+          "binding",
+          "exercise_id",
+          "exercise_version_id",
+          "action",
+          "target_decision_id",
+          "scope",
+          "impact_digest",
+          "reason",
+          "basis"
+        ],
+        "x-internal": true,
+        "description": "Trusted local maintenance input only, no HTTP endpoint. Server verifies authority, exact digests/references, hard gates and impact before commit; source labels alone do not establish truth."
+      },
+      "AttestationDraft": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "decision_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "course_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "binding": {
+            "$ref": "#/components/schemas/Binding"
+          },
+          "exercise_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "exercise_version_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "enum": [
+              "answer_attestation",
+              "mapping_attestation"
+            ]
+          },
+          "node_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "graph_version": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "content_digest": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "basis": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 8,
+            "items": {
+              "$ref": "#/components/schemas/EvidenceBasis"
+            }
+          }
+        },
+        "required": [
+          "decision_key",
+          "course_id",
+          "binding",
+          "exercise_id",
+          "exercise_version_id",
+          "kind",
+          "node_id",
+          "graph_version",
+          "content_digest",
+          "reason",
+          "basis"
+        ],
+        "x-internal": true,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "mapping_attestation"
+                }
+              },
+              "required": [
+                "kind"
+              ]
+            },
+            "then": {
+              "properties": {
+                "node_id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "graph_version": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "node_id": {
+                  "type": "null"
+                },
+                "graph_version": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        ],
+        "description": "Trusted local CLI only; not student API. Final stored record additionally has authenticated local authority, rule version, server digests and database timestamp. Mechanical/model opinion alone cannot attest semantic answers/mapping."
+      }
+    }
+  }
+}
