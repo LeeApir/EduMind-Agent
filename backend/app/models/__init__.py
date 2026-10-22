@@ -1,5 +1,12 @@
 """Persistent ORM models."""
 
+from app.models.free_course import FreeCourse as FreeCourse
+from app.models.free_course import FreeCourseNodeLink as FreeCourseNodeLink
+from app.models.free_course import FreeCoursePlan as FreeCoursePlan
+from app.models.free_course import FreeCourseRequest as FreeCourseRequest
+from app.models.free_course import FreeCourseScene as FreeCourseScene
+from app.models.free_course import FreeCourseSceneVersion as FreeCourseSceneVersion
+from app.models.free_course import FreeCourseVersion as FreeCourseVersion
 from app.models.learning_budget import LearningCorrectionPermit as LearningCorrectionPermit
 from app.models.learning_budget import LearningGenerationAttempt as LearningGenerationAttempt
 from app.models.learning_plan import LearningPlanVersion as LearningPlanVersion
