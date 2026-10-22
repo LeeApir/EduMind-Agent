@@ -213,6 +213,8 @@ EduMind-Agent/
 
 2026-10-22 T014：用户明确要求继续T14，已实现PG渐进调度、两槽租约、先预约后唯一dispatch出站、13/40累计及token/费用边界、分类重试和未知结果隔离；0041只追加审计，原收据兼容。实际PG/Mock及回归445 passed/0skip，交接docs/acceptance/phase-1.5-course-scheduler-t014/README.md。私有显式Worker循环，无生产Provider/HTTP/SSE/部署接线，Provider0/catalog_only/H保持；下一T015取消恢复待授权。
 
+2026-10-23 T015：用户要求继续并在中断后恢复，已实现取消epoch围栏/扫描收尾、在途尽力中断与迟到仅结算、显式resume/clarify新操作及只读刷新，0042只追加来源关系，保留ready版本及失败历史。实际PG/Mock回归474 passed/0skip，交接docs/acceptance/phase-1.5-course-recovery-t015/README.md。Provider0/catalog_only/H及旧签核保持，无公开HTTP/CSRF/SSE/生产Worker或真实调用；下一T016局部修订待授权。
+
 ### 以下为历史阶段上下文（状态以当前根账本及只读归档为准）
 
 MVP 0.3 已按 ADR-0007 完成课程目录版退出，46 项最终账本原样归档于 `docs/tasks/mvp-0.3.json`：45 done、原动态验收 T033 blocked。归档任务不得重新领取或改分，历史累计 Provider 请求为2033/2500，额度不自动转为新阶段授权。

@@ -391,6 +391,7 @@ async def read_availability(
                     FreeCourseStep.course_id == cid,
                     FreeCourseStep.plan_id == UUID(manifest["plan_id"]),
                 )
+                .order_by(FreeCourseStep.created_at.desc(), FreeCourseStep.id.desc())
                 .execution_options(populate_existing=True)
             )
         ).all()

@@ -10,7 +10,7 @@ from typing import Any, Protocol
 from uuid import UUID, uuid4
 
 from jsonschema import Draft202012Validator  # type: ignore[import-untyped]
-from sqlalchemy import func, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.agents import free_course_planning as planner
@@ -326,7 +326,20 @@ class Scheduler:
         )
         if slot:
             if quarantine:
-                slot.state = "quarantined"
+                pending = await db.scalar(
+                    select(FreeCourseAttempt.id)
+                    .outerjoin(
+                        FreeCourseSettlement,
+                        FreeCourseSettlement.attempt_id == FreeCourseAttempt.id,
+                    )
+                    .where(
+                        FreeCourseAttempt.operation_id == op.id, FreeCourseSettlement.id.is_(None)
+                    )
+                )
+                if pending:
+                    slot.state, slot.pending_attempt_id = "quarantined", pending
+                else:
+                    self._free(slot)  # A trusted late settlement may have won this same lock.
             else:
                 self._free(slot)
         op.state, op.reason_code = state, reason
@@ -335,6 +348,31 @@ class Scheduler:
         if reason:
             await self._event(db, lease, "error", {"reason_code": reason})
         await self._event(db, lease, "done", {"state": state})
+
+    async def _finish_cancel(self, db: AsyncSession, lease: Lease, op: FreeCourseOperation) -> None:
+        for step in await visibility._steps(db, lease.owner, lease.course, op.id):
+            if step.state in ("pending", "running"):
+                step.state, step.reason_code = "cancelled", "CANCELLED"
+        slot = await db.scalar(
+            select(FreeCourseCapacity)
+            .where(FreeCourseCapacity.operation_id == op.id)
+            .with_for_update()
+        )
+        pending = await db.scalar(
+            select(FreeCourseAttempt.id)
+            .outerjoin(
+                FreeCourseSettlement, FreeCourseSettlement.attempt_id == FreeCourseAttempt.id
+            )
+            .where(FreeCourseAttempt.operation_id == op.id, FreeCourseSettlement.id.is_(None))
+        )
+        if slot:
+            if pending:
+                slot.state, slot.pending_attempt_id = "quarantined", pending
+            else:
+                self._free(slot)
+        op.state, op.reason_code = "cancelled", "CANCELLED"
+        op.lease_token = op.lease_expires_at = None
+        await self._event(db, lease, "done", {"state": "cancelled"})
 
     async def reconcile(self) -> int:
         """Restart scan. Local timeout never proves that a remote execution has stopped."""
@@ -347,8 +385,12 @@ class Scheduler:
                         FreeCourseOperation.course_id,
                         FreeCourseOperation.id,
                     ).where(
-                        FreeCourseOperation.state.in_(("queued", "running")),
-                        FreeCourseOperation.policy_snapshot == POLICY,
+                        FreeCourseOperation.state.in_(ACTIVE),
+                        FreeCourseOperation.kind != "tutor_turn",
+                        or_(
+                            FreeCourseOperation.policy_snapshot == POLICY,
+                            FreeCourseOperation.state == "cancel_requested",
+                        ),
                     )
                 )
             ).all()
@@ -357,6 +399,10 @@ class Scheduler:
                 lease = Lease(owner, cid, WriteFence(oid, 0, uuid4()))
                 repo, _, op = await self._locked(db, lease, live=False)
                 now = await repo._now()
+                if op.state == "cancel_requested":
+                    await self._finish_cancel(db, lease, op)
+                    count += 1
+                    continue
                 if op.state not in ("queued", "running"):
                     continue
                 expired = op.lease_expires_at is not None and op.lease_expires_at <= now
@@ -455,15 +501,20 @@ class Scheduler:
         first = next(iter(scene_steps.values()))
         assert first.plan_id is not None
         current = await repo.get_plan(lease.course, first.plan_id)
+        head = (await repo.get_course(lease.course))["head_version"]
+        available = await visibility.read_availability(db, lease.owner, lease.course, version=head)
+        ready = {
+            item["scene_id"] for item in available["scenes"] if item["content_state"] == "ready"
+        }
         for scene in current["scenes"]:
-            step = scene_steps[scene["scene_id"]]
-            if step.state not in ("pending", "running"):
+            step = scene_steps.get(scene["scene_id"])
+            if step is None or step.state not in ("pending", "running"):
                 continue
-            deps = [scene_steps[d] for d in scene["depends_on"]]
+            deps = [scene_steps[d] for d in scene["depends_on"] if d in scene_steps]
             if any(s.state in ("failed", "blocked_dependency") for s in deps):
                 step.state, step.reason_code = "blocked_dependency", "DEPENDENCY_UNAVAILABLE"
                 continue
-            if all(s.state == "ready" for s in deps):
+            if set(scene["depends_on"]) <= ready:
                 return step
         return None
 
@@ -679,6 +730,9 @@ class Scheduler:
                     existing.outcome_json,
                 ) != (reply.evidence, reply.evidence_digest, inp, out, outcome):
                     raise SnapshotError("SETTLEMENT_CONFLICT")
+                if slot and slot.state == "quarantined" and slot.pending_attempt_id == attempt_id:
+                    self._free(slot)
+                    await db.commit()
                 return True
             db.add(
                 FreeCourseSettlement(
@@ -727,11 +781,44 @@ class Scheduler:
             timeout = min(120.0, (op.deadline_at - await repo._now()).total_seconds())
             stop_at = asyncio.get_running_loop().time() + timeout
             await db.commit()
+
+        async def watch_fence() -> None:
+            while True:
+                await asyncio.sleep(1)
+                async with self.sessions() as db:
+                    current = await db.get(FreeCourseOperation, lease.fence.operation_id)
+                    if (
+                        current is None
+                        or current.state != "running"
+                        or current.lease_epoch != lease.fence.epoch
+                        or current.lease_token != lease.fence.token
+                    ):
+                        return
+
+        async def late_settlement(task: asyncio.Task[Reply]) -> None:
+            try:
+                result = task.result()
+                await self.settle(attempt_id, result)  # Facts only; never consumes/publishes.
+            except (Exception, asyncio.CancelledError):
+                pass  # No trustworthy fact: keep the durable reservation/quarantine.
+
+        sender = asyncio.create_task(adapter.send(request, retry_safe=False))
+        watcher = asyncio.create_task(watch_fence())
         try:
-            async with asyncio.timeout(max(0, stop_at - asyncio.get_running_loop().time())):
-                reply = await adapter.send(request, retry_safe=False)
+            done, _ = await asyncio.wait(
+                [sender, watcher],
+                timeout=max(0, stop_at - asyncio.get_running_loop().time()),
+                return_when=asyncio.FIRST_COMPLETED,
+            )
+            reply = sender.result() if sender in done and not sender.cancelled() else Reply()
         except Exception:
             reply = Reply()  # Generic exceptions cannot prove remote termination.
+        finally:
+            watcher.cancel()
+            await asyncio.gather(watcher, return_exceptions=True)
+            if not sender.done():
+                sender.cancel()  # Best effort local abort; cannot prove remote execution stopped.
+                sender.add_done_callback(lambda task: asyncio.create_task(late_settlement(task)))
         if not await self.settle(attempt_id, reply):
             async with self.sessions() as db, db.begin():
                 _, _, op = await self._locked(db, lease, live=False)

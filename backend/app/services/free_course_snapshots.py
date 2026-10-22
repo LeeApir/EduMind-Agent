@@ -174,7 +174,14 @@ class SnapshotRepository:
         return deepcopy(row.response_json)
 
     async def _record(
-        self, course: UUID, route: str, key: str, request: str, result: dict[str, Any]
+        self,
+        course: UUID,
+        route: str,
+        key: str,
+        request: str,
+        result: dict[str, Any],
+        *,
+        status_code: int = 201,
     ) -> dict[str, Any]:
         self.db.add(
             FreeCourseReceipt(
@@ -183,7 +190,7 @@ class SnapshotRepository:
                 route=route,
                 idempotency_key=key,
                 request_digest=request,
-                status_code=201,
+                status_code=status_code,
                 response_json=result,
             )
         )

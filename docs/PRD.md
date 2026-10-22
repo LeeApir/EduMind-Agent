@@ -128,6 +128,8 @@ AI生成草稿可供学生学习，不以独立人工签核或普通语义审核
 
 2026-10-22 T014实现记录：私有PG队列串行推进规划与依赖场景、两槽租约及心跳、预约/dispatch/结算持久化、13/40共享计数和token/费用封顶，未知发送隔离且迟到不发布。实际隔离PG/Mock共445项通过、0skip，见[调度T014交接](acceptance/phase-1.5-course-scheduler-t014/README.md)。0041增量迁移，Provider0/catalog_only，无公开API/SSE/生产Worker或真实厂商/计费/性能验收；取消恢复留T015。
 
+2026-10-23 T015实现记录：私有取消立即撤销旧epoch，扫描收尾并按可信结算隔离/释放容量；显式resume/clarify创建新操作，缺章沿准确旧计划逐章补全，原ready及失败/预算历史保留，刷新只读。0042独立只追加来源表，实际PG/Mock474项通过、0skip，见[恢复T015交接](acceptance/phase-1.5-course-recovery-t015/README.md)。Provider0/catalog_only，无公开HTTP/CSRF/SSE/生产Worker或真实质量/计费声明；下一T016未领取。
+
 ## 目录
 
 1. [项目概览](#一项目概览)
