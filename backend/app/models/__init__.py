@@ -10,6 +10,7 @@ from app.models.free_course import FreeCourseVersion as FreeCourseVersion
 from app.models.free_course_planning import FreeCoursePlanningResult as FreeCoursePlanningResult
 from app.models.free_course_writes import FreeCourseOperation as FreeCourseOperation
 from app.models.free_course_writes import FreeCourseReceipt as FreeCourseReceipt
+from app.models.free_scene_generation import FreeSceneGenerationResult as FreeSceneGenerationResult
 from app.models.learning_budget import LearningCorrectionPermit as LearningCorrectionPermit
 from app.models.learning_budget import LearningGenerationAttempt as LearningGenerationAttempt
 from app.models.learning_plan import LearningPlanVersion as LearningPlanVersion

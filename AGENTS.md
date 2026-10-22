@@ -203,6 +203,8 @@ EduMind-Agent/
 
 2026-10-22 T009：用户要求继续，已实现非阻塞节点提及建议、准确图谱/原文依据及新清单绑定，路径以独立建议返回，不替换原目标或产生评分资格。实际隔离PG及回归259 passed/0skip，交接docs/acceptance/phase-1.5-graph-links-t009/README.md。无新增迁移/API/Worker或真实Provider，catalog_only/H封存保持；下一T010待执行授权。
 
+2026-10-22 T010：用户要求继续，已实现按准确可变大纲/原要求/共享约定/必要上游生成混合场景、生成epoch绑定及0037私有候选/失败审计；未写ready或切head。实际隔离PG/Mock及回归313 passed、0skip，交接docs/acceptance/phase-1.5-scene-generation-t010/README.md。完整准入/动作及可学习清单留T011–T013，预算/attempt留T014/T015；Provider0/catalog_only/H封存保持，下一T011待授权。
+
 ### 以下为历史阶段上下文（状态以当前根账本及只读归档为准）
 
 MVP 0.3 已按 ADR-0007 完成课程目录版退出，46 项最终账本原样归档于 `docs/tasks/mvp-0.3.json`：45 done、原动态验收 T033 blocked。归档任务不得重新领取或改分，历史累计 Provider 请求为2033/2500，额度不自动转为新阶段授权。
