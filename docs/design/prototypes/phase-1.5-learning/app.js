@@ -6,7 +6,7 @@ const lessons = [
   ['一次头插，两个指针动作', '先连接原链表，再更新头指针', '演示', '3 分钟'],
   ['再插入一个结点会怎样？', '沿着指针走一遍，观察顺序的变化', '演示', '2 分钟'],
   ['把动作写成 C 代码', '对照语句，解释每一步改变了什么', '代码', '3 分钟'],
-  ['用一道题检查理解', '判断头插后的遍历结果', '练习', '2 分钟'],
+  ['用一组题检查理解', '判断头插后的遍历结果', '练习', '2 分钟'],
   ['回顾与下一步', '整理过程，再选择需要补充的内容', '回顾', '3 分钟'],
 ];
 let scene = 1;
@@ -24,7 +24,7 @@ function notice(message) {
 }
 function stopTimers() { clearTimeout(generationTimer); clearTimeout(transitionTimer); }
 function showView(name, direct = false) {
-  if (!['home', 'plan', 'course'].includes(name)) name = 'home';
+  if (!['home', 'plan', 'course', 'graph', 'profile', 'records', 'settings'].includes(name)) name = 'home';
   stopTimers();
   clearTimeout(notificationTimer);
   $('notice').hidden = true;
@@ -33,7 +33,15 @@ function showView(name, direct = false) {
     if (button.dataset.view === name) button.setAttribute('aria-current', 'page');
     else button.removeAttribute('aria-current');
   });
-  $('breadcrumb').textContent = { home: '学习空间 / 学习', plan: '学习 / 生成课程', course: '学习 / 把链表头插看明白' }[name];
+  $('breadcrumb').textContent = { home: '学习空间 / 学习', plan: '学习 / 生成课程', course: '学习 / 把链表头插看明白', graph: '学习空间 / 图谱与路径', profile: '学习空间 / 画像与掌握度', records: '学习空间 / 学习记录', settings: '设置 / 模型设置' }[name];
+  document.querySelectorAll('.sidebar [data-view]').forEach((button) => {
+    const selected = button.dataset.view === (['plan', 'course'].includes(name) ? 'home' : name);
+    button.classList.toggle('selected', selected);
+    if (selected) button.setAttribute('aria-current', 'page');
+    else button.removeAttribute('aria-current');
+  });
+  $('page-state').hidden = true;
+  $('page-fixture').value = 'normal';
   $('global-nav').classList.remove('open');
   $('menu-button').setAttribute('aria-expanded', 'false');
   $('tutor').classList.remove('open');
@@ -47,6 +55,10 @@ function showView(name, direct = false) {
   if (name === 'course' && direct) selectScene(1);
   history.replaceState(null, '', `#${name}`);
   window.scrollTo({ top: 0, behavior: 'instant' });
+  const heading = document.querySelector(`#${name}-view h1`);
+  heading?.setAttribute('tabindex', '-1');
+  if (direct) heading?.focus({ preventScroll: true });
+  window.dispatchEvent(new CustomEvent('prototype:view', { detail: name }));
 }
 document.querySelectorAll('[data-view]').forEach((button) => button.addEventListener('click', () => showView(button.dataset.view, true)));
 document.querySelector('.brand').addEventListener('click', (event) => { event.preventDefault(); showView('home'); });
@@ -77,11 +89,12 @@ $('stop-generation').addEventListener('click', () => {
 $('edit-plan').addEventListener('click', () => {
   stopTimers();
   $('outline-edit').hidden = false;
-  $('plan-status').textContent = '正在调整大纲，自动进入已暂停。';
+  $('plan-status').textContent = '示例：旧生成已停止，正在调整大纲；确认后才开始新操作预览。';
   $('stop-generation').hidden = true;
   $('plan-note').focus();
 });
 $('save-plan').addEventListener('click', () => {
+  if (!$('plan-confirm').checked) { notice('请先确认重新规划的影响。'); $('plan-confirm').focus(); return; }
   $('outline-edit').hidden = true;
   $('plan-status').textContent = '调整文字已保留在本页；示例大纲不变，点击开始学习预览。';
   $('enter-course').disabled = false;
@@ -155,21 +168,41 @@ $('code-step').addEventListener('click', () => { setStep(step === 2 ? 0 : step +
 $('back-to-demo').addEventListener('click', () => showPanel('explain'));
 $('quiz-form').addEventListener('submit', (event) => {
   event.preventDefault();
-  const answer = new FormData(event.currentTarget).get('answer');
+  const one = $('answer-one').value.trim();
+  const two = $('answer-two').value.trim();
   $('quiz-feedback').hidden = false;
-  $('quiz-feedback').textContent = !answer ? '先选择一个结果，再查看反馈。' : answer === 'correct' ? '判断正确。head 先找到新结点 8，再沿 next 到 3，最后到 NULL。' : '再沿着箭头走一遍：head 已经指向 8，8 的 next 仍连接 3，因此原结点没有丢失。';
+  if ($('course-fixture').value === 'withdrawn') {
+    $('quiz-feedback').textContent = '题组已停用，不能提交或查看原答案反馈。';
+  } else if (!one && !two) {
+    $('quiz-feedback').textContent = '请至少填写一个非空作答。';
+  } else if (!one || !two) {
+    $('quiz-feedback').textContent = '示例：部分作答已留在本页。题组尚未完整，不显示答案或逐题对错。';
+  } else {
+    $('quiz-feedback').textContent = '暂定比较 · 仅作学习参考：先执行 n->next = head，再执行 head = n，遍历为 8 → 3 → NULL。本例无独立核定，不计正式掌握度；你的文字没有被自动判为已掌握。';
+  }
 });
 $('toggle-directory').addEventListener('click', () => { const open = $('course-directory').classList.toggle('open'); $('toggle-directory').setAttribute('aria-expanded', String(open)); });
 $('open-tutor').addEventListener('click', () => { $('tutor').classList.add('open'); $('question').focus(); });
 $('close-tutor').addEventListener('click', () => { $('tutor').classList.remove('open'); $('open-tutor').focus(); });
 function reply() {
+  if (!$('tutor-assistance').checked) { notice('请先了解提问对练习记录的影响。'); $('tutor-assistance').focus(); return; }
+  if ($('course-fixture').value === 'generating') { notice('生成尚未结束。可以等待或主动停止生成后提问。'); return; }
+  if ($('course-fixture').value === 'tutor-invalid') { notice('该回复来源已失效，正文停止展示。'); return; }
   $('tutor-reply').hidden = false;
   $('tutor-reply').textContent = '预设示例：如果先执行 head = n，再执行 n->next = head，n->next 就会指回 n 自己，形成自环。先连接旧 head，才能保留原链表。';
 }
 $('suggested-question').addEventListener('click', reply);
-$('question-form').addEventListener('submit', (event) => { event.preventDefault(); $('tutor-reply').hidden = false; $('tutor-reply').textContent = '你的问题已在本页输入。这个原型没有接入AI；可点击上面的示例问题预览回答样式。'; });
+$('question-form').addEventListener('submit', (event) => { event.preventDefault(); if (!$('tutor-assistance').checked) { notice('请先确认练习辅助记录。'); $('tutor-assistance').focus(); return; } if (['generating', 'tutor-invalid'].includes($('course-fixture').value)) { notice('当前状态不能开始新的导师回复，请查看状态说明。'); return; } $('tutor-reply').hidden = false; $('tutor-reply').textContent = '你的问题已在本页输入。这个原型没有接入AI；可点击上面的示例问题预览回答样式。'; });
 $('report-issue').addEventListener('click', () => $('feedback-dialog').showModal());
 document.addEventListener('keydown', (event) => { if (event.key === 'Escape') { $('global-nav').classList.remove('open'); $('menu-button').setAttribute('aria-expanded', 'false'); $('tutor').classList.remove('open'); } });
 selectScene(1);
 setStep(0);
 showView(location.hash.slice(1) || 'home');
+// Direct fragment links and browser navigation must resolve the displayed page.
+window.addEventListener('hashchange', () => {
+  const name = location.hash.slice(1) || 'home';
+  if (['home', 'plan', 'course', 'graph', 'profile', 'records', 'settings'].includes(name)) showView(name, true);
+});
+document.querySelector('.skip-link').addEventListener('click', (event) => {
+  event.preventDefault(); $('main-content').focus(); $('main-content').scrollIntoView({ block: 'start' });
+});
