@@ -193,6 +193,8 @@ EduMind-Agent/
 
 2026-10-22 T005：用户要求继续，已准备ADR0027 A—E及docs/acceptance/phase-1.5-acceptance-contract-r01新链验收口径，具体阈值/样本/计时/停止与T038/T040门禁对象澄清待准确批准。T001–T004 done，T005状态见根账本，其余37项todo；Provider0/catalog_only/H封存，不自动推进T006。
 
+2026-10-22 T005后续：用户已批准3102c15的ADR0027 A—E与5份准确规范文件（含ADR），登记docs/ADR/0027-approval-20261022.json；冻结文件不变，当前接受状态以登记为准。T005完成设计验收后独立提交，其余37项todo，下一T006待执行授权；不是实际样本签核或真实质量/性能通过，Provider0/catalog_only/H封存保持。
+
 ### 以下为历史阶段上下文（状态以当前根账本及只读归档为准）
 
 MVP 0.3 已按 ADR-0007 完成课程目录版退出，46 项最终账本原样归档于 `docs/tasks/mvp-0.3.json`：45 done、原动态验收 T033 blocked。归档任务不得重新领取或改分，历史累计 Provider 请求为2033/2500，额度不自动转为新阶段授权。
