@@ -1,0 +1,335 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "needs_clarification": {
+      "type": "boolean"
+    },
+    "plan": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/PlanCandidate"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "questions": {
+      "type": "array",
+      "maxItems": 3,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 300
+      }
+    },
+    "reason": {
+      "enum": [
+        null,
+        "requirements_conflict",
+        "required_material_missing",
+        "out_of_scope"
+      ]
+    },
+    "source_keys": {
+      "type": "array",
+      "maxItems": 16,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 64
+      }
+    }
+  },
+  "required": [
+    "needs_clarification",
+    "plan",
+    "questions",
+    "reason",
+    "source_keys"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "needs_clarification": {
+            "const": true
+          }
+        },
+        "required": [
+          "needs_clarification"
+        ]
+      },
+      "then": {
+        "properties": {
+          "plan": {
+            "type": "null"
+          },
+          "questions": {
+            "minItems": 1
+          },
+          "reason": {
+            "type": "string"
+          },
+          "source_keys": {
+            "minItems": 1
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "plan": {
+            "$ref": "#/$defs/PlanCandidate"
+          },
+          "questions": {
+            "maxItems": 0
+          },
+          "reason": {
+            "type": "null"
+          },
+          "source_keys": {
+            "maxItems": 0
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "PlanCandidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "objectives": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "items": {
+            "$ref": "#/$defs/PlanObjective"
+          }
+        },
+        "shared_example": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "terminology": {
+          "type": "array",
+          "maxItems": 32,
+          "items": {
+            "$ref": "#/$defs/Term"
+          }
+        },
+        "conventions": {
+          "type": "array",
+          "maxItems": 16,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        },
+        "scenes": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "items": {
+            "$ref": "#/$defs/PlanScene"
+          }
+        }
+      },
+      "required": [
+        "title",
+        "objectives",
+        "shared_example",
+        "terminology",
+        "conventions",
+        "scenes"
+      ],
+      "x-internal": true,
+      "description": "Model structural candidate, not public REST body. Server binds actual request IDs/owner/scene UUIDs. Local checks verify source_key whitelist and real excerpts, unique IDs/terms/scene keys, preceding dependencies and objective references; size<=16KiB. Unknown graph links do not block."
+    },
+    "PlanObjective": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "source": {
+          "enum": [
+            "user_requirement",
+            "planner_suggestion"
+          ]
+        },
+        "source_key": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2000
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source_excerpt": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2000
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "description",
+        "source",
+        "source_key",
+        "source_excerpt"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "source": {
+                "const": "user_requirement"
+              }
+            },
+            "required": [
+              "source"
+            ]
+          },
+          "then": {
+            "properties": {
+              "source_key": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+              },
+              "source_excerpt": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "source_key": {
+                "type": "null"
+              },
+              "source_excerpt": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "PlanScene": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "scene_key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "purpose": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "forms": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "text",
+              "code",
+              "exercise",
+              "visualization"
+            ]
+          }
+        },
+        "objective_ids": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          }
+        },
+        "depends_on": {
+          "type": "array",
+          "maxItems": 7,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          }
+        }
+      },
+      "required": [
+        "scene_key",
+        "title",
+        "purpose",
+        "forms",
+        "objective_ids",
+        "depends_on"
+      ]
+    },
+    "Term": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "term": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "meaning": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        }
+      },
+      "required": [
+        "term",
+        "meaning"
+      ]
+    }
+  }
+}

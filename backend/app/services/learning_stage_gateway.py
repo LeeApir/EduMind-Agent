@@ -8,6 +8,7 @@ GENERATION_STAGES = frozenset(
     {
         "goal_mapping",
         "plan_generation",
+        "free_course_plan_generation",
         "plan_rebuild",
         "resource_generation",
         "resource_correction",

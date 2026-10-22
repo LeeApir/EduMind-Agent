@@ -24,6 +24,11 @@ from app.models.free_course import Identity
 class FreeCourseOperation(Identity, Base):
     __tablename__ = "free_course_operations"
     __table_args__ = (
+        CheckConstraint(
+            "jsonb_typeof(clarification_questions)='array' AND "
+            "jsonb_array_length(clarification_questions)<=3",
+            name="ck_fc_operation_questions",
+        ),
         UniqueConstraint("user_id", "course_id", "id", name="uq_fc_operation_identity"),
         ForeignKeyConstraint(
             ["user_id", "course_id", "request_id"],
@@ -80,6 +85,11 @@ class FreeCourseOperation(Identity, Base):
     lease_token: Mapped[UUID | None] = mapped_column(PGUUID(as_uuid=True))
     lease_expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     cancel_requested_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+    reason_code: Mapped[str | None] = mapped_column(String(64))
+    clarification_questions: Mapped[list[object]] = mapped_column(
+        JSONB, nullable=False, server_default=text("'[]'::jsonb")
+    )
 
 
 class FreeCourseReceipt(Base):

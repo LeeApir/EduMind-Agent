@@ -1,0 +1,16 @@
+2026-10-22T12:59:45 T008 verification
+backend/.venv/bin/python docs/acceptance/phase-1.5-free-planning-t008/run_checks.py --run-id r02 --output /tmp/edumind-p15-t008-r02
+PASS: 182 tests, zero failures/errors/skips; actual isolated PostgreSQL and Mock Provider.
+backend/.venv/bin/ruff check backend/app/agents/free_course_planning.py backend/app/services/free_course_planning.py backend/app/models/free_course_planning.py backend/app/models/free_course_writes.py backend/app/models/__init__.py backend/app/services/learning_stage_gateway.py backend/alembic/versions/0036_free_course_planning.py backend/tests/test_free_course_planning.py backend/tests/test_free_course_migrations.py docs/acceptance/phase-1.5-free-planning-t008/run_checks.py
+PASS: All checks passed.
+(cd backend && .venv/bin/mypy app/agents/free_course_planning.py app/services/free_course_planning.py app/models/free_course_planning.py app/models/free_course_writes.py app/models/__init__.py app/services/learning_stage_gateway.py)
+PASS: no issues found in 6 source files.
+Frozen verification: SHA256 checked 30 approved files and 5 manifests; 0034/0035 match HEAD bytes.
+Self-review: no graph resolver, original request/evidence preserved; no network under locks; exact citations, immutable audit, SQL time fencing, rollback and changed result refusal covered. Structural tests are not semantic proof.
+Initial r01:181 passed; added mutable-response regression and body_digest check; final r02:182 passed.
+No real Provider, secrets, .env, H content, production migration or public API exercised.
+Workflow/diff checks recorded in the final completion log after documentation updates.
+python3 scripts/check_catalog_workflow.py
+PASS: Active Phase 1.5 dependencies valid; catalog ledger valid; T033 blocked.
+git diff --check
+PASS: no whitespace errors.

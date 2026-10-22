@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "T007仓储/前向修复已验收，完成独立提交；T008、真实Provider、运行开放仍需后续明确授权。",
+    "phase_gate": "T008已验收，完成本地提交后停止；T009及后续任务/真实Provider/运行开放须独立授权。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -43,7 +43,7 @@
     }
   ],
   "stage_scope": {
-    "authorization": "2026-10-21用户确认A—F与三页原型并要求“可以，准备task”；仅授权细化当前阶段任务，不领取或开发。 2026-10-21用户后续要求“领取T01”，授权领取PHASE-1.5-T001；不扩大为整阶段执行授权。 用户随后要求“开始开发”，本次执行T001契约设计；具体契约批准仍待准确方案确认。 用户随后回复“批准”，接受d9bd7a6的ADR0024 A—D及准确附件；不自动授权后续任务。 用户在T001完成后要求“继续”，授权执行下一项T002具体设计。 用户随后回复“批准”，接受8f9f21f中ADR0025 A—E及准确附件，不自动授权后续任务或真实调用。 用户在T002完成后要求“继续”，授权领取并执行T003设计。 2026-10-22用户在中断后要求继续，恢复T003设计；具体契约仍待准确批准。 用户随后回复“批准”，接受78c95ce中ADR0026 A—E及准确附件，不自动授权后续任务或真实调用。 用户在T003完成后要求“继续”，授权领取并执行T004静态主要页面设计与浏览器验证。 用户随后回复“确认”，接受13b5dd7七页主要页面设计与准确附件，仅解除T004设计确认门禁。 用户在T004完成后要求“继续”，授权领取并执行T005独立验收口径设计，具体阈值待准确批准。 用户随后回复“批准”，接受3102c15中ADR0027 A—E及manifest绑定的5份规范文件，包含T038/T040验收对象澄清，不授予真实执行或后续任务授权。 用户在T005完成后要求“继续”，授权领取并执行T006版本化数据模型与迁移验证。 用户在T006完成后要求“继续”，授权领取并执行T007快照仓储与事务验证。",
+    "authorization": "2026-10-21用户确认A—F与三页原型并要求“可以，准备task”；仅授权细化当前阶段任务，不领取或开发。 2026-10-21用户后续要求“领取T01”，授权领取PHASE-1.5-T001；不扩大为整阶段执行授权。 用户随后要求“开始开发”，本次执行T001契约设计；具体契约批准仍待准确方案确认。 用户随后回复“批准”，接受d9bd7a6的ADR0024 A—D及准确附件；不自动授权后续任务。 用户在T001完成后要求“继续”，授权执行下一项T002具体设计。 用户随后回复“批准”，接受8f9f21f中ADR0025 A—E及准确附件，不自动授权后续任务或真实调用。 用户在T002完成后要求“继续”，授权领取并执行T003设计。 2026-10-22用户在中断后要求继续，恢复T003设计；具体契约仍待准确批准。 用户随后回复“批准”，接受78c95ce中ADR0026 A—E及准确附件，不自动授权后续任务或真实调用。 用户在T003完成后要求“继续”，授权领取并执行T004静态主要页面设计与浏览器验证。 用户随后回复“确认”，接受13b5dd7七页主要页面设计与准确附件，仅解除T004设计确认门禁。 用户在T004完成后要求“继续”，授权领取并执行T005独立验收口径设计，具体阈值待准确批准。 用户随后回复“批准”，接受3102c15中ADR0027 A—E及manifest绑定的5份规范文件，包含T038/T040验收对象澄清，不授予真实执行或后续任务授权。 用户在T005完成后要求“继续”，授权领取并执行T006版本化数据模型与迁移验证。 用户在T006完成后要求“继续”，授权领取并执行T007快照仓储与事务验证。 用户在T007完成后要求“继续”，授权领取并执行T008自由目标课程规划及零真实Provider验证。",
     "product_mode": "catalog_only",
     "formal_product": "已有签核课程",
     "dynamic_scope": "已确认学生可直接学习AI生成草稿；普通语义审核不阻断整课。实际运行开放须新契约实现与独立验收后批准，既有签核课程语义不变。",
@@ -53,7 +53,7 @@
     "dynamic_release_authorized": false,
     "deployment_authorized": false,
     "H": "H01–H08继续封存；新契约确定后重判适用性与独立性，不自动继承验收资格。",
-    "implementation_scope": "T001–T007 done；私有快照仓储/持久幂等与写入围栏已完成117项实际PG及回归验证，其余35项todo；无新增对外API或生产开放。",
+    "implementation_scope": "T001–T008 done；其余34项todo。",
     "included": [
       "自由目标/可变场景/可选多节点关联",
       "首场景可学与后续持久生成/恢复/局部修订",
@@ -467,7 +467,7 @@
       "id": "PHASE-1.5-T008",
       "phase": "Phase 1.5",
       "title": "实现自由目标课程规划",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1.5-T007"
@@ -492,12 +492,23 @@
         "python3 scripts/check_catalog_workflow.py",
         "git diff --check"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "command": "backend/.venv/bin/python docs/acceptance/phase-1.5-free-planning-t008/run_checks.py --run-id r02 --output /tmp/edumind-p15-t008-r02",
+          "result": "passed: 新规划59/仓储44/迁移57/旧22共182 passed，0失败/错误/跳过；Mock Provider及真实隔离PG，实际Provider0",
+          "evidence": "docs/acceptance/phase-1.5-free-planning-t008/results.json"
+        },
+        {
+          "command": "backend/.venv/bin/ruff check backend/app/agents/free_course_planning.py backend/app/services/free_course_planning.py backend/app/models/free_course_planning.py backend/app/models/free_course_writes.py backend/app/models/__init__.py backend/app/services/learning_stage_gateway.py backend/alembic/versions/0036_free_course_planning.py backend/tests/test_free_course_planning.py backend/tests/test_free_course_migrations.py docs/acceptance/phase-1.5-free-planning-t008/run_checks.py；(cd backend && .venv/bin/mypy app/agents/free_course_planning.py app/services/free_course_planning.py app/models/free_course_planning.py app/models/free_course_writes.py app/models/__init__.py app/services/learning_stage_gateway.py)；python3 scripts/check_catalog_workflow.py；git diff --check",
+          "result": "passed；30份批准文件及5 manifest摘要/0034–0035原字节不变；私有规划非质量/性能或运行开放",
+          "evidence": "docs/acceptance/phase-1.5-free-planning-t008/verification.txt"
+        }
+      ],
+      "started_at": "2026-10-22T12:46:46",
+      "completed_at": "2026-10-22T12:59:45",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T008",
-      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。"
+      "execution_gate": "用户在T007完成f5c868d后要求继续，授权T008自由目标规划及Mock/隔离PG验证；真实Provider0，不自动执行T009或开放运行。"
     },
     {
       "id": "PHASE-1.5-T009",

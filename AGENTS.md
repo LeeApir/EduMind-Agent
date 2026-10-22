@@ -199,6 +199,8 @@ EduMind-Agent/
 
 2026-10-22 T007：用户要求继续，已实现私有快照仓储/规范摘要/持久幂等和操作写入围栏，0035前向修复0034节点名单及SAVEPOINT事务身份，原0034字节不改。实际隔离PG仓储44/迁移57/旧16共117 passed、0skip；交接docs/acceptance/phase-1.5-snapshot-repository-t007/README.md。操作表只建存储原语，无调度/出站/完整取消或对外API；下一T008待执行授权，Provider0/catalog_only/H封存保持。
 
+2026-10-22 T008：用户要求继续，已实现原目标/准确画像证据驱动的可变场景私有规划、来源核对/澄清/失败及0036审计原子持久化，未接线API/Worker。Mock与实际隔离PG共182 passed/0skip，交接docs/acceptance/phase-1.5-free-planning-t008/README.md。真实预算/attempt/未知隔离留T014/T015；Provider0/catalog_only/H封存保持，下一T009待执行授权。
+
 ### 以下为历史阶段上下文（状态以当前根账本及只读归档为准）
 
 MVP 0.3 已按 ADR-0007 完成课程目录版退出，46 项最终账本原样归档于 `docs/tasks/mvp-0.3.json`：45 done、原动态验收 T033 blocked。归档任务不得重新领取或改分，历史累计 Provider 请求为2033/2500，额度不自动转为新阶段授权。
