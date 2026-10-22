@@ -930,7 +930,7 @@
       "id": "PHASE-1.5-T018",
       "phase": "Phase 1.5",
       "title": "实现生成练习作答与暂定反馈",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1.5-T011",
@@ -957,12 +957,15 @@
         "python3 scripts/check_catalog_workflow.py",
         "git diff --check"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "r02: 507 passed, 0 failed/error/skipped, 25 isolated PostgreSQL groups; docs/acceptance/phase-1.5-course-answers-t018/results.json",
+        "Ruff7 PASS; strict mypy3 PASS; workflow/diff/frozen30files5manifests PASS; Provider0/catalog_only"
+      ],
+      "started_at": "2026-10-23T03:30:31",
+      "completed_at": "2026-10-23T03:35:27",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T018",
-      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。"
+      "execution_gate": "用户持续工作至T020授权内，T017完成9cbcf1c后串行领取；仅离线Mock/隔离PG，真实Provider0。"
     },
     {
       "id": "PHASE-1.5-T019",
