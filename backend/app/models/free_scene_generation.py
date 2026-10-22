@@ -14,6 +14,7 @@ from app.models.free_course import Identity
 class FreeSceneGenerationResult(Identity, Base):
     __tablename__ = "free_course_scene_generation_results"
     __table_args__ = (
+        UniqueConstraint("user_id", "course_id", "id", name="uq_fc_scene_gen_identity"),
         CheckConstraint(
             "lease_epoch >= 1 AND (expected_head IS NULL OR expected_head>0)",
             name="ck_fc_scene_gen_epoch",
