@@ -91,8 +91,8 @@ def exercise(action):
     asyncio.run(run())
 
 
-async def practice(s, sessions, owner):
-    created = await s.enqueue(owner, GOAL, key="create")
+async def practice(s, sessions, owner, *, create_key="create", raw=None):
+    created = await s.enqueue(owner, GOAL, key=create_key)
     cid = UUID(created["course_id"])
     plan = candidate(2, GOAL)
     for scene in plan["plan"]["scenes"]:
@@ -100,7 +100,7 @@ async def practice(s, sessions, owner):
     adapter = FakeAdapter(
         [Reply("complete_response", PROOF, plan, 100, 100)]
         + [
-            Reply("complete_response", PROOF, response(["text", "exercise"]), 100, 100)
+            Reply("complete_response", PROOF, raw or response(["text", "exercise"]), 100, 100)
             for _ in range(2)
         ]
     )

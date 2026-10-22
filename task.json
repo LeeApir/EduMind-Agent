@@ -971,7 +971,7 @@
       "id": "PHASE-1.5-T019",
       "phase": "Phase 1.5",
       "title": "实现有效学习证据准入与修订撤销",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1.5-T018",
@@ -999,12 +999,15 @@
         "python3 scripts/check_catalog_workflow.py",
         "git diff --check"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "r05:566 passed,0 failed/error/skipped,34isolatedPG; docs/acceptance/phase-1.5-course-evidence-t019/results.json",
+        "Ruff16/strict mypy11/workflow/diff/frozenSHA PASS; Provider0/production catalog_only"
+      ],
+      "started_at": "2026-10-23T03:36:12",
+      "completed_at": "2026-10-23T03:49:31",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T019",
-      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。"
+      "execution_gate": "用户持续至T020批次授权内，T018完成0a5b7ba后串行领取；按T003已批准可靠核定/来源分派/撤销重放契约实施，Provider0。"
     },
     {
       "id": "PHASE-1.5-T020",

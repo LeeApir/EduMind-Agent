@@ -34,6 +34,38 @@ class LearningEvidence(Base):
             ["learning_evidence.user_id", "learning_evidence.id"],
             name="fk_learning_evidence_corrects_owner",
         ),
+        ForeignKeyConstraint(
+            ["user_id", "free_course_attempt_id"],
+            ["free_course_attempts_answers.user_id", "free_course_attempts_answers.id"],
+            name="fk_learning_free_attempt",
+            deferrable=True,
+            initially="DEFERRED",
+            use_alter=True,
+        ),
+        ForeignKeyConstraint(
+            ["user_id", "free_course_attempt_id", "id"],
+            [
+                "free_course_evidence_admissions.user_id",
+                "free_course_evidence_admissions.attempt_id",
+                "free_course_evidence_admissions.evidence_id",
+            ],
+            name="fk_learning_free_admission",
+            deferrable=True,
+            initially="DEFERRED",
+            use_alter=True,
+        ),
+        CheckConstraint(
+            "(source_protocol IS NULL AND free_course_attempt_id IS NULL "
+            "AND evidence_type<>'evidence_correction') OR "
+            "(source_protocol IS NOT NULL AND source_protocol='free-course-v1' "
+            "AND free_course_attempt_id IS NOT NULL AND evidence_type='quiz_attempt' "
+            "AND resource_id IS NULL AND learning_unit_id IS NULL AND scene_id IS NULL "
+            "AND resource_version IS NULL) OR "
+            "(source_protocol IS NOT NULL AND source_protocol='free-course-correction-v1' "
+            "AND free_course_attempt_id IS NULL AND evidence_type='evidence_correction' "
+            "AND corrects_evidence_id IS NOT NULL)",
+            name="ck_learning_evidence_source",
+        ),
         CheckConstraint("schema_version >= 1", name="ck_learning_evidence_schema_positive"),
         CheckConstraint(
             "resource_version IS NULL OR resource_version >= 1",
@@ -41,7 +73,7 @@ class LearningEvidence(Base):
         ),
         CheckConstraint(
             "evidence_type IN ('quiz_attempt', 'hint_used', 'reexplanation_requested', "
-            "'resource_selected', 'explicit_feedback')",
+            "'resource_selected', 'explicit_feedback', 'evidence_correction')",
             name="ck_learning_evidence_type",
         ),
     )
@@ -70,6 +102,9 @@ class LearningEvidence(Base):
     corrects_evidence_id: Mapped[UUID | None] = mapped_column(PostgreSQLUUID(as_uuid=True))
     occurred_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
+
+    source_protocol: Mapped[str | None] = mapped_column(String(40))
+    free_course_attempt_id: Mapped[UUID | None] = mapped_column(PostgreSQLUUID(as_uuid=True))
 
 
 class NodeMasteryRevision(Base):

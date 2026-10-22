@@ -2,7 +2,7 @@
 
 from copy import deepcopy
 from typing import Any
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
@@ -193,6 +193,8 @@ class Answers:
                 await record_exposure(db, owner, exercise, "first_complete", binding)
             manifest = await repo.get_version(cid, body["course_version"])
             attempt = FreeCourseAnswerAttempt(
+                id=uuid4(),
+                created_at=await repo._now(),
                 user_id=owner,
                 course_id=cid,
                 course_version_id=UUID(manifest["id"]),
@@ -204,8 +206,15 @@ class Answers:
                 qualification_json=qualification,
                 request_digest=fingerprint,
             )
+            from app.services.free_course_evidence import admit_attempt
+
+            evidence = await admit_attempt(db, owner, exercise, attempt)
             db.add(attempt)
             await db.flush()
+            if evidence is not None:
+                from app.services.mastery_updates import apply_mastery_evidence
+
+                await apply_mastery_evidence(db, evidence)
             return await repo._record(
                 cid, route, key, fingerprint, dict(attempt_id=str(attempt.id))
             )
@@ -226,15 +235,42 @@ class Answers:
             if exercise is None:
                 raise SnapshotError("NOT_FOUND")
             feedback = deepcopy(row.feedback_json)
-            if await visibility_state(
+            from app.services.free_course_evidence import active_attestations, admission_state
+
+            admission, revoked = await admission_state(db, owner, aid)
+            active = await active_attestations(db, owner, exercise)
+            from app.models.free_course_evidence import (
+                FreeCourseAttestation,
+                FreeCourseAttestationRevocation,
+            )
+
+            revocations = (
+                await db.scalars(
+                    select(FreeCourseAttestationRevocation)
+                    .join(
+                        FreeCourseAttestation,
+                        FreeCourseAttestation.id == FreeCourseAttestationRevocation.attestation_id,
+                    )
+                    .where(
+                        FreeCourseAttestation.user_id == owner,
+                        FreeCourseAttestation.exercise_version_id == exercise.id,
+                        FreeCourseAttestation.kind == "answer_attestation",
+                    )
+                )
+            ).all()
+            withdrawn = revoked or any(
+                "answer_attestation" not in active or rev.created_at >= row.created_at
+                for rev in revocations
+            )
+            if withdrawn or await visibility_state(
                 db, owner, cid, exercise.scene_version_id, exercise.anchor_id
             ):
                 feedback.update(
                     reliability="withdrawn",
                     comparison_score=None,
                     question_results=[],
-                    mastery_effect="course_only",
-                    reason_code="CONTENT_UNAVAILABLE",
+                    mastery_effect="revoked" if revoked else "course_only",
+                    reason_code="EVIDENCE_REVOKED" if revoked else "CONTENT_UNAVAILABLE",
                 )
             return dict(
                 attempt_id=str(aid),

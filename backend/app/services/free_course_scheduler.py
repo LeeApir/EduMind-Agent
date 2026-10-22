@@ -122,8 +122,11 @@ def from_json(value: dict[str, Any]) -> StructuredRequest:
 class Scheduler:
     """Every public mutation commits its own short transaction; network stays outside it."""
 
-    def __init__(self, sessions: async_sessionmaker[AsyncSession]):
+    def __init__(
+        self, sessions: async_sessionmaker[AsyncSession], *, graph_version: str | None = None
+    ):
         self.sessions = sessions
+        self.graph_version = graph_version
 
     async def _locked(
         self, db: AsyncSession, lease: Lease, *, live: bool = True
@@ -998,6 +1001,7 @@ class Scheduler:
                             lease.fence,
                             plan_id=UUID(saved["plan_id"]),
                             key=f"scheduler-outline:{a.id}",
+                            graph_version=self.graph_version,
                         )
             else:
                 usage = dict(input_tokens=settled.input_tokens, output_tokens=settled.output_tokens)

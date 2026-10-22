@@ -12,6 +12,16 @@ from app.models.free_course_answers import (
     FreeCourseAssessmentExposure as FreeCourseAssessmentExposure,
 )
 from app.models.free_course_answers import FreeCourseExerciseVersion as FreeCourseExerciseVersion
+from app.models.free_course_evidence import FreeCourseAttestation as FreeCourseAttestation
+from app.models.free_course_evidence import (
+    FreeCourseAttestationRevocation as FreeCourseAttestationRevocation,
+)
+from app.models.free_course_evidence import (
+    FreeCourseEvidenceAdmission as FreeCourseEvidenceAdmission,
+)
+from app.models.free_course_evidence import (
+    FreeCourseEvidenceRevocation as FreeCourseEvidenceRevocation,
+)
 from app.models.free_course_planning import FreeCoursePlanningResult as FreeCoursePlanningResult
 from app.models.free_course_progress import FreeCourseEvent as FreeCourseEvent
 from app.models.free_course_progress import FreeCourseStep as FreeCourseStep

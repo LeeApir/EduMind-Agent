@@ -385,7 +385,7 @@ class Maintenance:
             impact = await compute_impact(db, owner, cid, draft)
             if impact["impact_digest"] != draft["impact_digest"]:
                 raise SnapshotError("IMPACT_CHANGED")
-            manifest, row, _, _ = await locate(
+            manifest, row, _, selected = await locate(
                 db,
                 owner,
                 cid,
@@ -406,7 +406,8 @@ class Maintenance:
                 if not any(
                     t["scene_version_id"] == str(row.id)
                     and (
-                        t["scope"] == "scene" or t["anchor_id"] == impact["targets"][0]["anchor_id"]
+                        t["scope"] == "scene"
+                        or (selected is not None and t["anchor_id"] == selected["anchor_id"])
                     )
                     for t in target.impact_json["targets"]
                 ):

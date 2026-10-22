@@ -44,7 +44,7 @@ from app.models.learning_state import LearningEvidence, NodeMasteryCurrent, Node
 
 ROOT = Path(__file__).resolve().parents[2]
 OLD = "0033_learning_shared_budget"
-HEAD = "0045_free_course_answers"
+HEAD = "0046_free_course_evidence"
 DIGEST = "0" * 64
 
 
@@ -87,10 +87,28 @@ async def legacy_digest(engine):
             .all()
         )
         payload = {}
+        source_columns = await conn.scalar(
+            text(
+                "SELECT EXISTS(SELECT 1 FROM information_schema.columns "
+                "WHERE table_name='learning_evidence' AND column_name='source_protocol')"
+            )
+        )
         for table in tables:
+            projection = "to_jsonb(t)"
+            if table == "learning_evidence" and source_columns:
+                assert (
+                    await conn.scalar(
+                        text(
+                            "SELECT count(*) FROM learning_evidence WHERE "
+                            "source_protocol IS NULL AND free_course_attempt_id IS NOT NULL"
+                        )
+                    )
+                    == 0
+                )
+                projection = "(to_jsonb(t)-ARRAY['source_protocol','free_course_attempt_id'])"
             payload[table] = await conn.scalar(
                 text(
-                    f"SELECT coalesce(jsonb_agg(to_jsonb(t) ORDER BY to_jsonb(t)::text),"
+                    f"SELECT coalesce(jsonb_agg({projection} ORDER BY {projection}::text),"
                     f"'[]'::jsonb)::text FROM \"{table}\" t"
                 )
             )
@@ -240,7 +258,15 @@ async def seed_legacy(engine):
             rule_version="mastery-v1",
             payload={"test_only": True, "score": 1},
         )
-        db.add(evidence)
+        from sqlalchemy import MetaData, Table
+
+        evidence.id = uuid4()
+        evidence.created_at = utc_now()
+        table = await db.run_sync(
+            lambda sync: Table("learning_evidence", MetaData(), autoload_with=sync.connection())
+        )
+        values = {c.name: getattr(evidence, c.name) for c in table.columns}
+        await db.execute(table.insert().values(**values))
         await db.flush()
         revision = NodeMasteryRevision(
             user_id=user.id,
