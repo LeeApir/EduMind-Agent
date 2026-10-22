@@ -44,7 +44,7 @@ from app.models.learning_state import LearningEvidence, NodeMasteryCurrent, Node
 
 ROOT = Path(__file__).resolve().parents[2]
 OLD = "0033_learning_shared_budget"
-HEAD = "0039_free_scene_actions"
+HEAD = "0040_free_scene_availability"
 DIGEST = "0" * 64
 
 
