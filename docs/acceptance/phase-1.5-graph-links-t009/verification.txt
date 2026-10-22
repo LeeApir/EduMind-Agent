@@ -1,0 +1,15 @@
+2026-10-22T13:08:30 PHASE-1.5-T009
+backend/.venv/bin/python docs/acceptance/phase-1.5-graph-links-t009/run_checks.py --run-id r03 --output /tmp/edumind-p15-t009-r03
+PASS: 259 tests, zero failures/errors/skips. New association30; preceding free-course182; old graph/path47.
+backend/.venv/bin/ruff check backend/app/services/free_course_graph_links.py backend/tests/test_free_course_graph_links.py docs/acceptance/phase-1.5-graph-links-t009/run_checks.py
+PASS: All checks passed.
+(cd backend && .venv/bin/mypy app/services/free_course_graph_links.py)
+PASS: no issues found in 1 source file.
+python3 scripts/check_catalog_workflow.py
+PASS: Active Phase 1.5 dependencies valid; catalog ledger valid; T033 blocked.
+git diff --check
+PASS: no whitespace errors.
+SHA256 checks:30 approved files+5 manifests unchanged; migrations0034–0036 match HEAD. All32 original evidence log/XML hashes verified.
+Self-review: source snapshots owner/hash bound, suggestions not user selections; identity errors not swallowed; exact versions/no graph fallback; no mastery/legacy path mutation. Paths omit synthetic default scores.
+Initial Ruff line length/mypy inferred object issues corrected. r01:256 passed; r02:259 passed. Added final projection safeguard (omit default0 reason score), r03:259 passed. Longest matching uses sorted scan, not pairwise comparisons.
+No Provider, H content, secrets/.env, public API, production DB migration, dynamic opening, push/merge/deploy. Synthetic scene read is storage verification, not business E2E or teaching-quality evidence.
