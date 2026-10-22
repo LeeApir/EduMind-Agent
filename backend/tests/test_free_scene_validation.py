@@ -195,6 +195,7 @@ def migrate_database(record_testsuite_property):
     old = migrate("0037_free_scene_generation")
     assert old.returncode == 0, old.stderr
     owner = uuid4()
+    baseline_tables = []
 
     async def storage(create=False, clean=False):
         engine = create_database_engine(database_url())
@@ -232,6 +233,9 @@ def migrate_database(record_testsuite_property):
                         )
                     )
                 ).all()
+                # Compare every pre-upgrade table; additive tables are not old row changes.
+                if not baseline_tables:
+                    baseline_tables.extend(tables)
                 values = {
                     t: await conn.scalar(
                         text(
@@ -239,7 +243,7 @@ def migrate_database(record_testsuite_property):
                             f"'[]'::jsonb)::text FROM \"{t}\" r"
                         )
                     )
-                    for t in tables
+                    for t in baseline_tables
                 }
                 return hashlib.sha256(json.dumps(values, sort_keys=True).encode()).hexdigest()
         finally:

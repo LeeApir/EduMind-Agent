@@ -207,6 +207,8 @@ EduMind-Agent/
 
 2026-10-22 T011：用户要求继续，已实现机械准入/准确绑定/引用及Markdown清洗，0038独立保存只追加准入事实，不改原候选或旧reject/pass/签核/评分。实际隔离PG及回归353 passed/0skip，交接docs/acceptance/phase-1.5-scene-validation-t011/README.md；渲染必须禁raw HTML/autolink/plugins并转义纯文本，未做浏览器或语义质量验收。无ready/API/运行开放，Provider0/catalog_only/H保持；下一T012待授权。
 
+2026-10-22 T012：用户要求继续，已实现受约束动作/四类结构状态快照及纯播放状态切换、块级代码高亮与静态故障诊断，0039只追加持久化；不执行代码/媒体，不返回私有答案。实际PG及回归387 passed/0skip，交接docs/acceptance/phase-1.5-scene-actions-t012/README.md。未接线前端播放器/公开API/ready，Provider0/catalog_only/H保持；下一T013待授权。
+
 ### 以下为历史阶段上下文（状态以当前根账本及只读归档为准）
 
 MVP 0.3 已按 ADR-0007 完成课程目录版退出，46 项最终账本原样归档于 `docs/tasks/mvp-0.3.json`：45 done、原动态验收 T033 blocked。归档任务不得重新领取或改分，历史累计 Provider 请求为2033/2500，额度不自动转为新阶段授权。

@@ -14,6 +14,7 @@ from app.models.free_course import Identity
 class FreeSceneValidation(Identity, Base):
     __tablename__ = "free_course_scene_validations"
     __table_args__ = (
+        UniqueConstraint("user_id", "course_id", "id", name="uq_fc_validation_identity"),
         ForeignKeyConstraint(
             ["user_id", "course_id", "generation_result_id"],
             [
