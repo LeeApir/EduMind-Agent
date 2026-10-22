@@ -17,6 +17,7 @@ from app.agents.free_scene_generation import (
     snapshot_input,
     validate_response,
 )
+from app.models.free_course import FreeCourseSceneVersion
 from app.models.free_course_writes import FreeCourseOperation
 from app.models.free_scene_generation import FreeSceneGenerationResult
 from app.services.free_course_planning import load_inputs as load_request_inputs
@@ -80,17 +81,38 @@ async def load_inputs(
     manifest = (
         await repo.get_version(course_id, expected_head) if expected_head is not None else None
     )
-    if manifest is not None and manifest["plan_id"] != str(plan_id):
+    from app.services.free_course_revision import context, plan_binding, stages
+
+    revision = await context(db, operation_id)
+    if revision is not None:
+        if revision.base_head != expected_head or await plan_binding(db, operation_id) != plan_id:
+            raise SnapshotError("SCENE_INPUT_INVALID")
+    elif manifest is not None and manifest["plan_id"] != str(plan_id):
         raise SnapshotError("SCENE_INPUT_INVALID")
     upstream = []
     for predecessor in plan["scenes"]:
         sid = predecessor["scene_id"]
         if sid not in necessary:
             continue
-        if manifest is None:
+        if manifest is None and revision is None:
             raise SnapshotError("DEPENDENCY_UNAVAILABLE")
         try:
-            snapshot = await repo.get_scene_snapshot(course_id, expected_head, UUID(sid))
+            if revision is not None:
+                saved = await stages(db, operation_id)
+                if sid not in saved:
+                    raise SnapshotError("DEPENDENCY_UNAVAILABLE")
+                row = await db.get(FreeCourseSceneVersion, saved[sid].scene_version_id)
+                if row is None or row.plan_id != plan_id:
+                    raise SnapshotError("SCENE_INPUT_INVALID")
+                snapshot = dict(
+                    scene_version_id=str(row.id),
+                    digest=row.content_digest,
+                    content=deepcopy(row.content_json),
+                    actions=deepcopy(row.actions_json),
+                    dependencies=deepcopy(row.dependency_bindings),
+                )
+            else:
+                snapshot = await repo.get_scene_snapshot(course_id, expected_head, UUID(sid))
         except SnapshotError as error:
             if error.code == "SCENE_NOT_READY":
                 raise SnapshotError("DEPENDENCY_UNAVAILABLE") from None

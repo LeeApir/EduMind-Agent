@@ -130,6 +130,8 @@ AI生成草稿可供学生学习，不以独立人工签核或普通语义审核
 
 2026-10-23 T015实现记录：私有取消立即撤销旧epoch，扫描收尾并按可信结算隔离/释放容量；显式resume/clarify创建新操作，缺章沿准确旧计划逐章补全，原ready及失败/预算历史保留，刷新只读。0042独立只追加来源表，实际PG/Mock474项通过、0skip，见[恢复T015交接](acceptance/phase-1.5-course-recovery-t015/README.md)。Provider0/catalog_only，无公开HTTP/CSRF/SSE/生产Worker或真实质量/计费声明；下一T016未领取。
 
+2026-10-23 T016实现记录：私有修订影响确认、新计划暂存及完整集合原子替换，保留旧head/原始要求/历史；调整澄清与空基线可用，过期不复用私有集合。0043及实际PG/Mock484通过、0skip，见[修订交接](acceptance/phase-1.5-course-revision-t016/README.md)。T019证据撤销接点待实现，当前Provider0/catalog_only/API未开放；用户已授权串行至T020。
+
 ## 目录
 
 1. [项目概览](#一项目概览)

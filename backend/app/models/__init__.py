@@ -11,6 +11,9 @@ from app.models.free_course_planning import FreeCoursePlanningResult as FreeCour
 from app.models.free_course_progress import FreeCourseEvent as FreeCourseEvent
 from app.models.free_course_progress import FreeCourseStep as FreeCourseStep
 from app.models.free_course_recovery import FreeCourseOperationSource as FreeCourseOperationSource
+from app.models.free_course_revision import FreeCourseRevision as FreeCourseRevision
+from app.models.free_course_revision import FreeCourseRevisionPlan as FreeCourseRevisionPlan
+from app.models.free_course_revision import FreeCourseRevisionStage as FreeCourseRevisionStage
 from app.models.free_course_scheduler import FreeCourseAttempt as FreeCourseAttempt
 from app.models.free_course_scheduler import FreeCourseCapacity as FreeCourseCapacity
 from app.models.free_course_scheduler import FreeCourseDispatch as FreeCourseDispatch

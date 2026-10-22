@@ -215,6 +215,8 @@ EduMind-Agent/
 
 2026-10-23 T015：用户要求继续并在中断后恢复，已实现取消epoch围栏/扫描收尾、在途尽力中断与迟到仅结算、显式resume/clarify新操作及只读刷新，0042只追加来源关系，保留ready版本及失败历史。实际PG/Mock回归474 passed/0skip，交接docs/acceptance/phase-1.5-course-recovery-t015/README.md。Provider0/catalog_only/H及旧签核保持，无公开HTTP/CSRF/SSE/生产Worker或真实调用；下一T016局部修订待授权。
 
+2026-10-23 T016：用户授权持续完成T016–T020。T016已实现结构影响确认、私有新计划/来源复制、完整替换集合原子发布、调整澄清/null基线及过期围栏，484 passed/0skip，交接docs/acceptance/phase-1.5-course-revision-t016/README.md。T019撤销接点尚空且API未开放，Provider0/catalog_only/H保持；完成提交后按既有授权领取T017，T020后停止。
+
 ### 以下为历史阶段上下文（状态以当前根账本及只读归档为准）
 
 MVP 0.3 已按 ADR-0007 完成课程目录版退出，46 项最终账本原样归档于 `docs/tasks/mvp-0.3.json`：45 done、原动态验收 T033 blocked。归档任务不得重新领取或改分，历史累计 Provider 请求为2033/2500，额度不自动转为新阶段授权。

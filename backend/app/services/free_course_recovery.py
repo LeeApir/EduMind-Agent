@@ -146,6 +146,9 @@ class Recovery:
                 raise SnapshotError("STALE_SOURCE_OPERATION")
             if kind == "clarify" and source.state != "awaiting_clarification":
                 raise SnapshotError("CLARIFICATION_NOT_REQUIRED")
+            from app.services.free_course_revision import context as revision_context
+
+            source_revision = await revision_context(db, source.id) if kind == "clarify" else None
             request = await db.get(FreeCourseRequest, source.request_id)
             if request is None:
                 raise SnapshotError("SNAPSHOT_CORRUPT")
@@ -180,9 +183,11 @@ class Recovery:
                 if not recoverable:
                     raise SnapshotError("NOTHING_TO_RESUME")
             if kind == "clarify":
-                if expected_head is not None:
-                    # T014 clarification is planning before any visible head; changing an
-                    # existing complete outline belongs to the explicit T016 adjustment flow.
+                if expected_head is not None and (
+                    source_revision is None
+                    or source_revision.kind != "adjust_outline"
+                    or source_revision.base_head != expected_head
+                ):
                     raise SnapshotError("STALE_COURSE_VERSION")
                 number = await db.scalar(
                     select(func.max(FreeCourseRequest.version)).where(
@@ -236,6 +241,21 @@ class Recovery:
                     user_id=owner, course_id=cid, operation_id=op.id, source_operation_id=source.id
                 )
             )
+            if source_revision is not None:
+                from app.models.free_course_revision import FreeCourseRevision
+
+                db.add(
+                    FreeCourseRevision(
+                        user_id=owner,
+                        course_id=cid,
+                        operation_id=op.id,
+                        kind=source_revision.kind,
+                        base_head=source_revision.base_head,
+                        instruction=supplement or "",
+                        impact_json=deepcopy(source_revision.impact_json),
+                        impact_digest=source_revision.impact_digest,
+                    )
+                )
             if recoverable is None:
                 db.add(
                     FreeCourseStep(

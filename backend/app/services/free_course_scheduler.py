@@ -430,17 +430,23 @@ class Scheduler:
                     )
                 elif op.deadline_at <= now:
                     await self._terminal(db, lease, op, "timed_out", "DEADLINE_EXCEEDED")
-                else:
-                    # Completed responses have durable settlement facts; reprocess those rather
-                    # than issuing another send. Ready steps stay ready and counts never reset.
-                    for step in steps:
-                        if step.state == "running":
-                            step.state = "pending"
-                    if slot:
-                        self._free(slot)
-                    op.state = "queued"
-                    op.lease_epoch += 1
-                    op.lease_token = op.lease_expires_at = None
+                elif expired:
+                    from app.services.free_course_revision import context, plan_binding
+
+                    revision = await context(db, op.id)
+                    if revision is not None and await plan_binding(db, op.id) is not None:
+                        # Private replacement snapshots belong to their original epoch. Do not
+                        # mix/relabel them or spend calls on a plan that cannot legally publish.
+                        await self._terminal(db, lease, op, "failed", "LEASE_LOST")
+                    else:
+                        for step in steps:
+                            if step.state == "running":
+                                step.state = "pending"
+                        if slot:
+                            self._free(slot)
+                        op.state = "queued"
+                        op.lease_epoch += 1
+                        op.lease_token = op.lease_expires_at = None
                 count += 1
         return count
 
@@ -495,6 +501,10 @@ class Scheduler:
             return plan
         if plan and plan.state == "failed":
             return None
+        from app.services import free_course_revision as revisions
+
+        if await revisions.context(db, lease.fence.operation_id) is not None:
+            return await revisions.next_step(db, lease.owner, lease.course, lease.fence)
         scene_steps = {str(s.scene_id): s for s in steps if s.scene_id is not None}
         if not scene_steps:
             return None
@@ -525,6 +535,11 @@ class Scheduler:
             raise SnapshotError("EXECUTION_NOT_AUTHORIZED")
         async with self.sessions() as db, db.begin():
             repo, course, op = await self._locked(db, lease)
+            from app.services import free_course_revision as revisions
+
+            revision = await revisions.context(db, op.id)
+            if revision is not None:
+                await revisions.ensure_plan(db, lease.owner, lease.course, lease.fence)
             step = await self._work(db, lease)
             slot = await self._slot(db, lease)
             if slot.pending_attempt_id:
@@ -532,6 +547,10 @@ class Scheduler:
                     slot.pending_attempt_id
                 )  # Caller must process settlement or quarantine, never resend.
             if step is None:
+                if revision is not None:
+                    await revisions.publish(db, lease.owner, lease.course, lease.fence)
+                    await self._terminal(db, lease, op, "succeeded", None)
+                    return None
                 steps = await visibility._steps(db, lease.owner, lease.course, op.id)
                 scene_steps = [s for s in steps if s.scene_id]
                 ready = sum(s.state == "ready" for s in scene_steps)
@@ -951,7 +970,7 @@ class Scheduler:
                     lease.owner,
                     lease.course,
                     lease.fence,
-                    expected_head=None,
+                    expected_head=op.base_head_version,
                     call_key=str(a.id),
                     inputs=inputs,
                     outcome=outcome,
@@ -965,14 +984,21 @@ class Scheduler:
                 else:
                     # Completed planning step is separate from learnable scene readiness.
                     step.state = "ready"
-                    await visibility.commit_outline(
-                        db,
-                        lease.owner,
-                        lease.course,
-                        lease.fence,
-                        plan_id=UUID(saved["plan_id"]),
-                        key=f"scheduler-outline:{a.id}",
-                    )
+                    from app.services import free_course_revision as revisions
+
+                    if await revisions.context(db, op.id) is not None:
+                        await revisions.bind_plan(
+                            db, lease.owner, lease.course, lease.fence, UUID(saved["plan_id"])
+                        )
+                    else:
+                        await visibility.commit_outline(
+                            db,
+                            lease.owner,
+                            lease.course,
+                            lease.fence,
+                            plan_id=UUID(saved["plan_id"]),
+                            key=f"scheduler-outline:{a.id}",
+                        )
             else:
                 usage = dict(input_tokens=settled.input_tokens, output_tokens=settled.output_tokens)
                 scene_outcome = generator.SceneOutcome(
@@ -995,15 +1021,22 @@ class Scheduler:
                 admitted = await validate_candidate(
                     db, lease.owner, lease.course, lease.fence, result_id=UUID(saved["result_id"])
                 )
-                await visibility.commit_scene(
-                    db,
-                    lease.owner,
-                    lease.course,
-                    lease.fence,
-                    validation_id=UUID(admitted["validation_id"]),
-                    expected_head=inputs["expected_head"],
-                    key=f"scheduler-scene:{a.id}",
-                )
+                from app.services import free_course_revision as revisions
+
+                if await revisions.context(db, op.id) is not None:
+                    await revisions.stage_validation(
+                        db, lease.owner, lease.course, lease.fence, UUID(admitted["validation_id"])
+                    )
+                else:
+                    await visibility.commit_scene(
+                        db,
+                        lease.owner,
+                        lease.course,
+                        lease.fence,
+                        validation_id=UUID(admitted["validation_id"]),
+                        expected_head=inputs["expected_head"],
+                        key=f"scheduler-scene:{a.id}",
+                    )
             if slot.state == "held":
                 slot.pending_attempt_id = None
 
@@ -1015,7 +1048,9 @@ class Scheduler:
         step: FreeCourseStep,
         reason: str,
     ) -> None:
-        if step.scene_id is None:
+        from app.services.free_course_revision import context
+
+        if step.scene_id is None or await context(db, op.id) is not None:
             await self._terminal(db, lease, op, "failed", reason)
         else:
             repo = SnapshotRepository(db, lease.owner)
