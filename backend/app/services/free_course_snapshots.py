@@ -199,8 +199,11 @@ class SnapshotRepository:
         teaching_language: str = "zh-CN",
         code_language: str | None = "C",
         config: dict[str, Any] | None = None,
+        policy_snapshot: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         config = deepcopy(config or {})
+        policy_snapshot = deepcopy(policy_snapshot or {})
+        canonical(policy_snapshot)
         if (
             not isinstance(goal, str)
             or not goal.strip()
@@ -222,6 +225,7 @@ class SnapshotRepository:
             code_language=code_language,
             profile_id=str(profile_id) if profile_id else None,
             config=config,
+            **({"policy_snapshot": policy_snapshot} if policy_snapshot else {}),
         )
         route = "/api/free-courses"
         async with self.db.begin_nested():
@@ -287,7 +291,7 @@ class SnapshotRepository:
                 request_id=req.id,
                 kind="create",
                 config_snapshot=config,
-                policy_snapshot={},
+                policy_snapshot=policy_snapshot,
             )
             self.db.add(operation)
             await self.db.flush()

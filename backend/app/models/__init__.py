@@ -10,6 +10,10 @@ from app.models.free_course import FreeCourseVersion as FreeCourseVersion
 from app.models.free_course_planning import FreeCoursePlanningResult as FreeCoursePlanningResult
 from app.models.free_course_progress import FreeCourseEvent as FreeCourseEvent
 from app.models.free_course_progress import FreeCourseStep as FreeCourseStep
+from app.models.free_course_scheduler import FreeCourseAttempt as FreeCourseAttempt
+from app.models.free_course_scheduler import FreeCourseCapacity as FreeCourseCapacity
+from app.models.free_course_scheduler import FreeCourseDispatch as FreeCourseDispatch
+from app.models.free_course_scheduler import FreeCourseSettlement as FreeCourseSettlement
 from app.models.free_course_writes import FreeCourseOperation as FreeCourseOperation
 from app.models.free_course_writes import FreeCourseReceipt as FreeCourseReceipt
 from app.models.free_scene_actions import FreeScenePresentation as FreeScenePresentation

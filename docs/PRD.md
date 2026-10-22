@@ -126,6 +126,8 @@ AI生成草稿可供学生学习，不以独立人工签核或普通语义审核
 
 2026-10-22 T013实现记录：私有后端已原子提交准确场景正文、完整清单/head、ready步骤及就绪事件；首章里程碑course唯一，后续逐个追加，局部失败按依赖明确缺章。0040与实际PG并发/回滚/历史读取回归406项通过、0skip，见[增量可见T013交接](acceptance/phase-1.5-scene-availability-t013/README.md)。未开放HTTP/SSE/前端或调度，内容就绪不冒充操作成功，Provider0/catalog_only保持，下一T014未领取。
 
+2026-10-22 T014实现记录：私有PG队列串行推进规划与依赖场景、两槽租约及心跳、预约/dispatch/结算持久化、13/40共享计数和token/费用封顶，未知发送隔离且迟到不发布。实际隔离PG/Mock共445项通过、0skip，见[调度T014交接](acceptance/phase-1.5-course-scheduler-t014/README.md)。0041增量迁移，Provider0/catalog_only，无公开API/SSE/生产Worker或真实厂商/计费/性能验收；取消恢复留T015。
+
 ## 目录
 
 1. [项目概览](#一项目概览)

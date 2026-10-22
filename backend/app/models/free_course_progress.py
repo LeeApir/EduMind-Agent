@@ -1,9 +1,11 @@
 """Durable incremental scene steps and append-only public-safe event identifiers."""
 
+from datetime import datetime
 from uuid import UUID
 
 from sqlalchemy import (
     CheckConstraint,
+    DateTime,
     ForeignKeyConstraint,
     Index,
     Integer,
@@ -33,6 +35,7 @@ def owner_fk(table: str, column: str, name: str, *, cascade: bool = False) -> Fo
 class FreeCourseStep(Identity, Base):
     __tablename__ = "free_course_steps"
     __table_args__ = (
+        UniqueConstraint("user_id", "course_id", "id", name="uq_fc_step_identity"),
         owner_fk("free_course_operations", "operation_id", "fk_fc_step_operation", cascade=True),
         owner_fk("free_course_plans", "plan_id", "fk_fc_step_plan"),
         owner_fk("free_course_scenes", "scene_id", "fk_fc_step_scene"),
@@ -47,16 +50,19 @@ class FreeCourseStep(Identity, Base):
             name="ck_fc_step_state",
         ),
         CheckConstraint(
-            "(state='ready' AND scene_version_id IS NOT NULL AND presentation_id IS NOT NULL "
-            "AND reason_code IS NULL) OR state<>'ready'",
+            "(state='ready' AND reason_code IS NULL AND ((scene_id IS NULL AND step_key='plan' "
+            "AND scene_version_id IS NULL AND presentation_id IS NULL) OR (scene_id IS NOT NULL "
+            "AND scene_version_id IS NOT NULL AND presentation_id IS NOT NULL))) OR state<>'ready'",
             name="ck_fc_step_ready",
         ),
         owner_fk("free_course_scene_presentations", "presentation_id", "fk_fc_step_presentation"),
     )
     course_id: Mapped[UUID] = mapped_column(PGUUID(as_uuid=True), nullable=False)
     operation_id: Mapped[UUID] = mapped_column(PGUUID(as_uuid=True), nullable=False)
-    plan_id: Mapped[UUID] = mapped_column(PGUUID(as_uuid=True), nullable=False)
-    scene_id: Mapped[UUID] = mapped_column(PGUUID(as_uuid=True), nullable=False)
+    plan_id: Mapped[UUID | None] = mapped_column(PGUUID(as_uuid=True))
+    scene_id: Mapped[UUID | None] = mapped_column(PGUUID(as_uuid=True))
+    next_attempt_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    retry_purpose: Mapped[str | None] = mapped_column(String(32))
     step_key: Mapped[str] = mapped_column(String(128), nullable=False)
     state: Mapped[str] = mapped_column(String(32), nullable=False)
     reason_code: Mapped[str | None] = mapped_column(String(64))
