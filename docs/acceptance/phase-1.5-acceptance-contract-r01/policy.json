@@ -1,0 +1,107 @@
+{
+  "schema_version": "p15-acceptance-policy-v1",
+  "status": "proposed",
+  "task_id": "PHASE-1.5-T005",
+  "actual_provider_requests_authorized": 0,
+  "actual_fee_authorized": 0,
+  "production_mode": "catalog_only",
+  "quality": {
+    "first_schema_min": 0.98,
+    "complete_draft_min": 0.95,
+    "requirements_min": 0.95,
+    "learnability_min": 0.95,
+    "personalization_pair_min": 0.9,
+    "fact_correct_min": 0.99,
+    "answer_correct_min": 1.0,
+    "severe_recall_min": 0.9,
+    "opinion_precision_min": 0.9,
+    "natural_severe_errors_max": 0,
+    "correct_controls_false_blocks_max": 0,
+    "unresolved_max": 0,
+    "course_strata": [
+      "topic",
+      "known_unknown_profile"
+    ],
+    "stratum_course_min": 0.95
+  },
+  "samples": {
+    "development_courses": 12,
+    "development_pairs": 6,
+    "development_severe_probes": 10,
+    "development_correct_probes": 10,
+    "quality_courses": 40,
+    "quality_pairs": 10,
+    "quality_single_goals": 20,
+    "quality_topics_min": 8,
+    "quality_courses_per_topic_min": 4,
+    "quality_unknown_profiles_min": 10,
+    "quality_first_schema_objects_min": 100,
+    "independent_severe_probes": 20,
+    "independent_correct_probes": 20,
+    "performance_create_slots": 40,
+    "performance_pairs": 20,
+    "performance_cold": 20,
+    "performance_warm": 20,
+    "performance_target_lengths": [
+      2,
+      4,
+      6,
+      8
+    ],
+    "performance_targets_per_length": 5,
+    "performance_cancel_slots": 10,
+    "performance_restore_slots": 10
+  },
+  "performance": {
+    "percentile": 0.95,
+    "quantile_method": "nearest_rank_ceil",
+    "failed_missing_unrun": "positive_infinity",
+    "first_complete_scene_seconds": 10,
+    "original_first_passage_seconds": 10,
+    "later_per_course_max_wait_seconds": 30,
+    "full_course_1_to_4_seconds": 180,
+    "full_course_5_to_8_seconds": 480,
+    "cancel_seconds": 5,
+    "restore_saved_content_seconds": 2,
+    "operation_max_seconds": 600,
+    "cold_warm_pass_separately": true,
+    "first_token_2s_blocking": false
+  },
+  "engineering": {
+    "required_pass_rate": 1.0,
+    "environment_skips_max": 0,
+    "evidence": "isolated_real_pg_queue_http_browser_explicit_mock_separate_from_real_quality"
+  },
+  "independence": {
+    "H_content_access_authorized": false,
+    "H_tuning_allowed": false,
+    "exposed_samples_reusable_as_independent": false,
+    "new_candidate_requires_new_independent_set": true,
+    "human_labels_required": true
+  },
+  "stop": {
+    "candidates_per_pack": 1,
+    "batches_per_pack": 1,
+    "immediate": [
+      "natural_severe_error",
+      "security_boundary_violation",
+      "budget_or_clock_anomaly",
+      "unknown_send_outcome",
+      "independence_contamination"
+    ],
+    "mathematically_impossible_rate_gate": "stop_keep_remaining_unrun",
+    "automatic_second_batch": false
+  },
+  "runtime_limits_source": [
+    "docs/acceptance/phase-1.5-generation-contract-r01/policy.json",
+    "docs/acceptance/phase-1.5-quality-contract-r01/policy.json"
+  ],
+  "later_exact_authorization_required": [
+    "candidate_and_source_digests",
+    "provider_model_prompt_schema_sampling",
+    "inputs_labels_access_log",
+    "requests_tokens_currency_seconds_caps",
+    "persistent_executor_and_batch_id",
+    "quality_and_performance_separate_reservations"
+  ]
+}

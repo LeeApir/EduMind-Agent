@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "用户已确认T004准确主要页面设计；完成该任务验收与本地提交，不自动执行后续任务、生产实施、真实调用或运行开放。",
+    "phase_gate": "仅执行T005验收口径设计，具体阈值/样本/停止政策待批准；不自动实施后续任务、真实调用或运行开放。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -43,7 +43,7 @@
     }
   ],
   "stage_scope": {
-    "authorization": "2026-10-21用户确认A—F与三页原型并要求“可以，准备task”；仅授权细化当前阶段任务，不领取或开发。 2026-10-21用户后续要求“领取T01”，授权领取PHASE-1.5-T001；不扩大为整阶段执行授权。 用户随后要求“开始开发”，本次执行T001契约设计；具体契约批准仍待准确方案确认。 用户随后回复“批准”，接受d9bd7a6的ADR0024 A—D及准确附件；不自动授权后续任务。 用户在T001完成后要求“继续”，授权执行下一项T002具体设计。 用户随后回复“批准”，接受8f9f21f中ADR0025 A—E及准确附件，不自动授权后续任务或真实调用。 用户在T002完成后要求“继续”，授权领取并执行T003设计。 2026-10-22用户在中断后要求继续，恢复T003设计；具体契约仍待准确批准。 用户随后回复“批准”，接受78c95ce中ADR0026 A—E及准确附件，不自动授权后续任务或真实调用。 用户在T003完成后要求“继续”，授权领取并执行T004静态主要页面设计与浏览器验证。 用户随后回复“确认”，接受13b5dd7七页主要页面设计与准确附件，仅解除T004设计确认门禁。",
+    "authorization": "2026-10-21用户确认A—F与三页原型并要求“可以，准备task”；仅授权细化当前阶段任务，不领取或开发。 2026-10-21用户后续要求“领取T01”，授权领取PHASE-1.5-T001；不扩大为整阶段执行授权。 用户随后要求“开始开发”，本次执行T001契约设计；具体契约批准仍待准确方案确认。 用户随后回复“批准”，接受d9bd7a6的ADR0024 A—D及准确附件；不自动授权后续任务。 用户在T001完成后要求“继续”，授权执行下一项T002具体设计。 用户随后回复“批准”，接受8f9f21f中ADR0025 A—E及准确附件，不自动授权后续任务或真实调用。 用户在T002完成后要求“继续”，授权领取并执行T003设计。 2026-10-22用户在中断后要求继续，恢复T003设计；具体契约仍待准确批准。 用户随后回复“批准”，接受78c95ce中ADR0026 A—E及准确附件，不自动授权后续任务或真实调用。 用户在T003完成后要求“继续”，授权领取并执行T004静态主要页面设计与浏览器验证。 用户随后回复“确认”，接受13b5dd7七页主要页面设计与准确附件，仅解除T004设计确认门禁。 用户在T004完成后要求“继续”，授权领取并执行T005独立验收口径设计，具体阈值待准确批准。",
     "product_mode": "catalog_only",
     "formal_product": "已有签核课程",
     "dynamic_scope": "已确认学生可直接学习AI生成草稿；普通语义审核不阻断整课。实际运行开放须新契约实现与独立验收后批准，既有签核课程语义不变。",
@@ -53,7 +53,7 @@
     "dynamic_release_authorized": false,
     "deployment_authorized": false,
     "H": "H01–H08继续封存；新契约确定后重判适用性与独立性，不自动继承验收资格。",
-    "implementation_scope": "T001–T004 done；T004准确七页静态设计已获确认并通过设计验收，其余38项todo，无生产前端/后端实施。",
+    "implementation_scope": "T001–T004 done；T005准确验收口径提案已准备，待批准blocked；其余37项todo，无生产前端/后端实施。",
     "included": [
       "自由目标/可变场景/可选多节点关联",
       "首场景可学与后续持久生成/恢复/局部修订",
@@ -315,7 +315,7 @@
       "id": "PHASE-1.5-T005",
       "phase": "Phase 1.5",
       "title": "冻结新链独立验收口径",
-      "status": "todo",
+      "status": "blocked",
       "priority": "P0",
       "depends_on": [
         "PHASE-1.5-T001",
@@ -339,12 +339,28 @@
         "python3 scripts/check_catalog_workflow.py",
         "git diff --check"
       ],
-      "verification_results": [],
-      "started_at": null,
+      "verification_results": [
+        {
+          "command": "python3 docs/acceptance/phase-1.5-acceptance-contract-r01/check_design.py",
+          "result": "passed: 14率/5时延/5停止边界例、4链接、5方案摘要及25既有批准文件摘要；纯离线规范校验",
+          "evidence": "docs/acceptance/phase-1.5-acceptance-contract-r01/verification.txt"
+        },
+        {
+          "command": "backend/.venv/bin/ruff check docs/acceptance/phase-1.5-acceptance-contract-r01/check_design.py；backend/.venv/bin/python docs/acceptance/phase-1.5-{course,generation,quality}-contract-r01/check_design.py；python3 scripts/check_catalog_workflow.py；git diff --check",
+          "result": "passed；前置检查曾用系统python缺依赖，改项目venv后三项通过，不装新依赖；未运行真实模型/性能/PG/业务浏览器",
+          "evidence": "docs/acceptance/phase-1.5-acceptance-contract-r01/verification.txt"
+        },
+        {
+          "command": "验收条件逐项自查及doc-coauthoring只读读者审查",
+          "result": "完成：分母/草稿与核定/独立性/停止/冷暖计时可读；发现T038/T040泛化门禁歧义已纳入ADR0027 E待准确批准，无真实人工质量标签",
+          "evidence": "docs/acceptance/phase-1.5-acceptance-contract-r01/verification.txt"
+        }
+      ],
+      "started_at": "2026-10-22T11:51:11",
       "completed_at": null,
-      "blocker": null,
+      "blocker": "ADR0027 A—E与manifest绑定的5份规范文件（含ADR）的具体验收阈值/样本/计时/停止政策（含T038/T040验收对象澄清）待用户批准；manifest 92082148162b0c4bfff2561de5781acd1a9f2a57f3d0d9e5ad237ca19f88778a；仅方案，不授权实际Provider或后续任务。",
       "commit_lookup": "Task-Completed: PHASE-1.5-T005",
-      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。本任务交付具体设计；涉及重大契约/验收阈值须获批准后才能done及启动依赖实现，不重复审批A—F方向。"
+      "execution_gate": "用户在T004完成93949f0后要求继续，授权T005具体验收方案设计；重大阈值/样本/停止契约须准确批准后done；真实调用0，不自动推进T006。"
     },
     {
       "id": "PHASE-1.5-T006",
@@ -1595,7 +1611,7 @@
       "completed_at": null,
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T038",
-      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。真实调用另需本轮准确包、配置、样本/标签、预算和停止条件授权；旧预算不可用。未达准入/质量/性能要求不得done。"
+      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。真实调用另需本轮准确包、配置、样本/标签、预算和停止条件授权；旧预算不可用。未达T005冻结的开发质量准入及工程要求不得done；性能只作开发诊断报告，独立性能由T041判定。此项口径随T005准确提案待批准。"
     },
     {
       "id": "PHASE-1.5-T039",
@@ -1667,7 +1683,7 @@
       "completed_at": null,
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T040",
-      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。真实调用另需本轮准确包、配置、样本/标签、预算和停止条件授权；旧预算不可用。未达准入/质量/性能要求不得done。"
+      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。真实调用另需本轮准确包、配置、样本/标签、预算和停止条件授权；旧预算不可用。未达T005冻结的本任务独立质量门槛不得done；独立性能另由T041判定。此项口径随T005准确提案待批准。"
     },
     {
       "id": "PHASE-1.5-T041",

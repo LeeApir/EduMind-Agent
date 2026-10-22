@@ -1,0 +1,20 @@
+2026-10-22T11:57:37 T005 proposal validation (design only)
+Proposal manifest SHA256: 92082148162b0c4bfff2561de5781acd1a9f2a57f3d0d9e5ad237ca19f88778a
+python3 docs/acceptance/phase-1.5-acceptance-contract-r01/check_design.py
+PASS: 14 rate / 5 latency / 5 stop arithmetic examples, 4 local links, 5 proposal hashes, 25 previously approved file hashes unchanged.
+backend/.venv/bin/ruff check docs/acceptance/phase-1.5-acceptance-contract-r01/check_design.py
+PASS: All checks passed.
+Initial supplemental prerequisite commands used system python3 and failed: course jsonschema missing, generation/quality fastapi missing. No result counted as pass and no dependencies installed. Corrected interpreter commands actually executed:
+backend/.venv/bin/python docs/acceptance/phase-1.5-course-contract-r01/check_design.py
+PASS:49 refs/6 planned operations/15 schemas/8 examples/25 design cases/9 links/5 frozen files.
+backend/.venv/bin/python docs/acceptance/phase-1.5-generation-contract-r01/check_design.py
+PASS:OpenAPI/67 refs/6 planned operations/25 schemas/budget-state/15 schema examples/34 design cases/13 links/6 files.
+backend/.venv/bin/python docs/acceptance/phase-1.5-quality-contract-r01/check_design.py
+PASS:OpenAPI/65 refs/6 planned operations/24 schemas/19 schema examples/shared-budget/44 cases/12 links/6 files.
+python3 scripts/check_catalog_workflow.py
+PASS:Active Phase 1.5 dependencies valid; catalog ledger valid; T033 blocked.
+git diff --check: PASS.
+AC1: seven required measurement areas have distinct objects/denominators/failure/missing handling. AC2: first complete/later wait/full course clocks, exact proposed thresholds and sample/stop rules specified. AC3: development/independent/H separation, zero authorization and old failure preservation explicit. Exact user approval still PENDING.
+Reader testing by isolated acceptance_reader (doc-coauthoring workflow): five questions on failed plans/retries/unrun, draft vs attestation, independence/stopping, cold-warm/length buckets, contradictions answered; no P0/P1 identified. P2 T038/T040 generic gate wording conflicted with per-task purposes; clarified in proposed ADR0027 E, contract and task gates, pending user approval. Reader is not a human quality labeler or approver; no reviewer field added to process log.
+No Provider/network/H content/credentials read, no PG/browser/performance run. Synthetic arithmetic examples are not observed product results.
+Handoff: T005 blocked pending exact A—E approval; register source and proposal commit/manifest after approval, preserve frozen bytes, recheck and create Task-Completed only then. T006 remains todo, unrelated user report/reference directory excluded.
