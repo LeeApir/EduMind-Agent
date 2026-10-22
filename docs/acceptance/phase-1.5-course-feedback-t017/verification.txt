@@ -1,0 +1,8 @@
+backend/.venv/bin/python docs/acceptance/phase-1.5-course-feedback-t017/run_checks.py --run-id r06 --output /tmp/edumind-p15-t017-r06
+PASS: 495; 24 isolated groups; 0 fail/error/skip
+Ruff: 13 explicit changed Python files PASS
+mypy --config-file backend/pyproject.toml: 8 source files strict PASS
+python3 scripts/check_catalog_workflow.py PASS
+git diff --check PASS
+30 frozen files/5 manifests SHA256 intact; 0034–0043 unchanged
+Earlier runs retained in /tmp: r01 5 pass/1 fail (fenced lease expectation corrected); r02/r03/r04 old0037 fixture missing new quality table; r05 HEAD assertion old0043 and cleanup consequence. Fixtures corrected only at historical seed boundary; final495 all pass, old byte assertions preserved.

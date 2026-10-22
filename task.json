@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "T016验收，完成独立提交后按既有授权领取T017并串行至T020；T020后停止。真实Provider/运行开放/部署无授权。",
+    "phase_gate": "T017执行中，独立验收提交后继续T018–T020；T020后停止。Provider0/catalog_only/H保持。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -53,7 +53,7 @@
     "dynamic_release_authorized": false,
     "deployment_authorized": false,
     "H": "H01–H08继续封存；新契约确定后重判适用性与独立性，不自动继承验收资格。",
-    "implementation_scope": "T001–T016 done；其余26项todo。",
+    "implementation_scope": "T001–T016 done；T017 in_progress；其余25项todo。",
     "included": [
       "自由目标/可变场景/可选多节点关联",
       "首场景可学与后续持久生成/恢复/局部修订",
@@ -891,7 +891,7 @@
       "id": "PHASE-1.5-T017",
       "phase": "Phase 1.5",
       "title": "实现准确版本的问题反馈与处置",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1.5-T016"
@@ -916,12 +916,15 @@
         "python3 scripts/check_catalog_workflow.py",
         "git diff --check"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "r06: 495 passed, 0 failed/error/skipped, 24 isolated PostgreSQL groups; docs/acceptance/phase-1.5-course-feedback-t017/results.json",
+        "Ruff13 PASS; strict mypy8 PASS; workflow/diff/frozen30files5manifests PASS; Provider0/catalog_only"
+      ],
+      "started_at": "2026-10-23T03:16:10",
+      "completed_at": "2026-10-23T03:29:54",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T017",
-      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。"
+      "execution_gate": "用户持续至T020授权内，T016完成756c1cd后串行领取T017；可信确认/准确禁用按已批准T003实施，不启动真实Provider。"
     },
     {
       "id": "PHASE-1.5-T018",

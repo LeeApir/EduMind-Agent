@@ -9,6 +9,7 @@ import sys
 from copy import deepcopy
 from html.parser import HTMLParser
 from pathlib import Path
+from unittest.mock import AsyncMock, patch
 from uuid import UUID, uuid4
 
 import pytest
@@ -202,6 +203,10 @@ def migrate_database(record_testsuite_property):
         try:
             if create:
                 async with AsyncSession(engine) as db:
+                    assert (
+                        await db.scalar(text("SELECT to_regclass('free_course_visibility_facts')"))
+                        is None
+                    )
                     db.add(User(id=owner, is_guest=True))
                     await db.commit()
                     _, cid, fence, pid, plan, _ = await prepare(db, owner)
@@ -249,7 +254,15 @@ def migrate_database(record_testsuite_property):
         finally:
             await engine.dispose()
 
-    before = asyncio.run(storage(create=True))
+    # Seed the frozen 0037 protocol: quality facts do not exist in that schema.
+    # Only this pre-migration setup uses the former no-quality-check boundary.
+    from app.services.free_course_quality import assert_visible
+
+    with patch("app.services.free_course_quality.assert_visible", AsyncMock()):
+        before = asyncio.run(storage(create=True))
+    from app.services import free_course_quality
+
+    assert free_course_quality.assert_visible is assert_visible
     new = migrate("head")
     assert new.returncode == 0, new.stderr
     assert asyncio.run(storage()) == before

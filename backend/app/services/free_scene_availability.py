@@ -396,6 +396,8 @@ async def read_availability(
             )
         ).all()
     )
+    from app.services.free_course_quality import visibility_state
+
     scenes = []
     for item in manifest["scenes"]:
         ready = next(
@@ -407,12 +409,17 @@ async def read_availability(
             None,
         )
         step = next((s for s in admitted if str(s.scene_id) == item["scene_id"]), None)
+        disabled = bool(item["scene_version_id"]) and await visibility_state(
+            db, owner, cid, UUID(item["scene_version_id"])
+        )
         scenes.append(
             dict(
                 **item,
-                content_state="ready" if ready else "not_ready",
+                content_state="ready" if ready and not disabled else "not_ready",
                 generation_state=step.state if step else "pending",
-                reason_code=step.reason_code if step else None,
+                reason_code="CONTENT_UNAVAILABLE"
+                if disabled
+                else (step.reason_code if step else None),
             )
         )
     count = sum(s["content_state"] == "ready" for s in scenes)
@@ -430,6 +437,8 @@ async def read_ready_scene(
 ) -> dict[str, Any]:
     availability = await read_availability(db, owner, cid, version=version)
     binding = next((s for s in availability["scenes"] if s["scene_id"] == str(scene_id)), None)
+    if binding and binding["reason_code"] == "CONTENT_UNAVAILABLE":
+        raise SnapshotError("CONTENT_UNAVAILABLE")
     if binding is None or binding["content_state"] != "ready":
         raise SnapshotError("SCENE_NOT_READY")
     step = await db.scalar(
@@ -450,12 +459,22 @@ async def read_ready_scene(
     from app.services.free_scene_actions import initial_state
 
     initial_state(row.presentation_json)  # Recheck the stored presentation body digest.
+    from app.services.free_course_quality import visibility_state
+
+    blocks: Any = deepcopy(row.presentation_json["blocks"])
+    for block in blocks:
+        if block["kind"] == "exercise" and await visibility_state(
+            db, owner, cid, UUID(binding["scene_version_id"]), block["anchor_id"]
+        ):
+            block["disabled"] = True
+            block["reason_code"] = "CONTENT_UNAVAILABLE"
+            block["items"] = []
     return dict(
         course_id=str(cid),
         course_version=version,
         scene_id=str(scene_id),
         scene_version_id=binding["scene_version_id"],
-        blocks=deepcopy(row.presentation_json["blocks"]),
+        blocks=blocks,
         actions=deepcopy(row.presentation_json["timeline"]),
         diagnostics=deepcopy(row.presentation_json["diagnostics"]),
     )

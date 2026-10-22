@@ -117,6 +117,9 @@ async def load_inputs(
             if error.code == "SCENE_NOT_READY":
                 raise SnapshotError("DEPENDENCY_UNAVAILABLE") from None
             raise
+        from app.services.free_course_quality import assert_visible
+
+        await assert_visible(db, owner_id, course_id, UUID(str(snapshot["scene_version_id"])))
         upstream.append(dict(scene_id=sid, **snapshot))
     return snapshot_input(
         dict(

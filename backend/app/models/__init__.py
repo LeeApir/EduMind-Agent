@@ -10,6 +10,9 @@ from app.models.free_course import FreeCourseVersion as FreeCourseVersion
 from app.models.free_course_planning import FreeCoursePlanningResult as FreeCoursePlanningResult
 from app.models.free_course_progress import FreeCourseEvent as FreeCourseEvent
 from app.models.free_course_progress import FreeCourseStep as FreeCourseStep
+from app.models.free_course_quality import FreeCourseFeedback as FreeCourseFeedback
+from app.models.free_course_quality import FreeCourseQualityDecision as FreeCourseQualityDecision
+from app.models.free_course_quality import FreeCourseVisibilityFact as FreeCourseVisibilityFact
 from app.models.free_course_recovery import FreeCourseOperationSource as FreeCourseOperationSource
 from app.models.free_course_revision import FreeCourseRevision as FreeCourseRevision
 from app.models.free_course_revision import FreeCourseRevisionPlan as FreeCourseRevisionPlan
