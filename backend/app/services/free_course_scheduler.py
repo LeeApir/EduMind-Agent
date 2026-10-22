@@ -183,12 +183,26 @@ class Scheduler:
         )
         await db.flush()
 
-    async def enqueue(self, owner: UUID, goal: str, *, key: str) -> dict[str, Any]:
+    async def enqueue(
+        self,
+        owner: UUID,
+        goal: str,
+        *,
+        key: str,
+        teaching_language: str = "zh-CN",
+        code_language: str | None = "C",
+    ) -> dict[str, Any]:
         """Private create transaction; owner unresolved sends also bar creating another course."""
         async with self.sessions() as db, db.begin():
             repo = SnapshotRepository(db, owner)
             await repo._owner_lock()
-            result = await repo.create_course(goal, key=key, policy_snapshot=POLICY)
+            result = await repo.create_course(
+                goal,
+                key=key,
+                policy_snapshot=POLICY,
+                teaching_language=teaching_language,
+                code_language=code_language,
+            )
             op = await repo._operation(UUID(result["course_id"]), UUID(result["operation_id"]))
             if op.policy_snapshot != POLICY:
                 raise SnapshotError("POLICY_MISMATCH")

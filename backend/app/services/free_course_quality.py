@@ -1,6 +1,5 @@
 """Owner feedback stays pending; local maintenance authority alone controls accurate facts."""
 
-import json
 import os
 from copy import deepcopy
 from dataclasses import dataclass, field
@@ -8,7 +7,6 @@ from pathlib import Path
 from typing import Any, cast
 from uuid import UUID, uuid4
 
-from jsonschema import Draft202012Validator, FormatChecker  # type: ignore[import-untyped]
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
@@ -24,9 +22,6 @@ from app.services.free_course_exercise_identity import exercise_identity
 from app.services.free_course_snapshots import SnapshotError, SnapshotRepository, WriteFence, digest
 
 ROOT = Path(__file__).resolve().parents[3]
-SCHEMAS = json.loads((ROOT / "docs/api/phase-1.5-quality.openapi.json").read_text())["components"][
-    "schemas"
-]
 RULE = "free-course-quality-v1"
 _TOKEN = object()
 
@@ -46,11 +41,11 @@ def local_authority() -> MaintenanceAuthority:
 
 
 def validate_schema(name: str, value: dict[str, Any]) -> None:
-    schema = {**SCHEMAS[name], "$defs": SCHEMAS}
-    schema = json.loads(json.dumps(schema).replace("#/components/schemas/", "#/$defs/"))
+    from app.services.free_course_contract import validate
+
     try:
-        Draft202012Validator(schema, format_checker=FormatChecker()).validate(value)
-    except Exception:
+        validate(name, value)
+    except SnapshotError:
         raise SnapshotError("INVALID_QUALITY_INPUT") from None
 
 

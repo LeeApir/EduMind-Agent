@@ -1,7 +1,10 @@
 """Application entry point for the EduMind MVP API."""
 
+from typing import Any
+
 from fastapi import Depends, FastAPI, Request
 from fastapi.exceptions import RequestValidationError
+from fastapi.openapi.utils import get_openapi
 from fastapi.responses import JSONResponse
 
 from app.api.animation_events import router as animation_events_router
@@ -12,6 +15,7 @@ from app.api.auth import router as auth_router
 from app.api.catalog import router as catalog_router
 from app.api.classroom import router as classroom_router
 from app.api.debate import router as debate_router
+from app.api.free_courses import router as free_courses_router
 from app.api.knowledge_graph import router as knowledge_graph_router
 from app.api.learning_events import router as learning_events_router
 from app.api.learning_reads import router as learning_reads_router
@@ -27,6 +31,8 @@ from app.api.quiz import router as quiz_router
 from app.core.auth import AuthFailure
 from app.core.database import database_lifespan
 from app.core.product_mode import catalog_only, require_dynamic_mode
+from app.services.free_course_contract import public_openapi
+from app.services.free_course_snapshots import SnapshotError
 from app.services.knowledge_graph import KnowledgeGraphValidationError
 
 app = FastAPI(title="EduMind Agent API", version="0.1.0", lifespan=database_lifespan)
@@ -50,6 +56,7 @@ app.include_router(provider_model_catalog_router)
 app.include_router(provider_probe_router)
 app.include_router(paths_router)
 app.include_router(quiz_router)
+app.include_router(free_courses_router)
 
 
 @app.exception_handler(KnowledgeGraphValidationError)
@@ -103,3 +110,39 @@ async def health_check() -> dict[str, str]:
 @app.get("/api/runtime", tags=["system"])
 async def runtime_scope() -> dict[str, str]:
     return {"mode": "catalog_only" if catalog_only() else "dynamic"}
+
+
+@app.exception_handler(SnapshotError)
+async def free_course_failure(_request: Request, error: SnapshotError) -> JSONResponse:
+    invalid = error.code.startswith("INVALID_") or error.code in {
+        "EVENT_CURSOR_INVALID",
+        "OPERATION_KIND_INVALID",
+    }
+    code = "VALIDATION_ERROR" if invalid else error.code
+    status = (
+        404
+        if error.code == "NOT_FOUND"
+        else 422
+        if invalid
+        else 503
+        if error.code == "PUBLIC_PROJECTION_INVALID"
+        else 409
+    )
+    return JSONResponse(
+        status_code=status,
+        content=dict(
+            code=code, message="Free course request could not be completed.", retryable=False
+        ),
+        headers={"Cache-Control": "no-store"},
+    )
+
+
+def free_course_openapi() -> dict[str, Any]:
+    if app.openapi_schema is None:
+        app.openapi_schema = public_openapi(
+            get_openapi(title=app.title, version=app.version, routes=app.routes)
+        )
+    return app.openapi_schema
+
+
+app.openapi = free_course_openapi  # type: ignore[method-assign]
