@@ -4,6 +4,7 @@ from datetime import datetime
 from uuid import UUID, uuid4
 
 from sqlalchemy import (
+    BigInteger,
     CheckConstraint,
     DateTime,
     ForeignKey,
@@ -14,6 +15,7 @@ from sqlalchemy import (
     Text,
     UniqueConstraint,
     func,
+    text,
 )
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.dialects.postgresql import UUID as PGUUID
@@ -137,6 +139,21 @@ class FreeCourseRequest(CourseSnapshot, Base):
 class FreeCoursePlan(CourseSnapshot, Base):
     __tablename__ = "free_course_plans"
     __table_args__ = (
+        ForeignKeyConstraint(
+            ["user_id", "course_id", "origin_operation_id"],
+            [
+                "free_course_operations.user_id",
+                "free_course_operations.course_id",
+                "free_course_operations.id",
+            ],
+            name="fk_free_course_plans_operation",
+            deferrable=True,
+            initially="DEFERRED",
+        ),
+        CheckConstraint(
+            "(origin_operation_id IS NULL) = (origin_lease_epoch IS NULL)",
+            name="ck_free_course_plans_origin",
+        ),
         *snapshot_constraints("fc_plan"),
         ForeignKeyConstraint(
             ["user_id", "course_id", "request_id"],
@@ -153,6 +170,9 @@ class FreeCoursePlan(CourseSnapshot, Base):
     digest: Mapped[str] = mapped_column(String(64), nullable=False)
     request_id: Mapped[UUID] = mapped_column(PGUUID(as_uuid=True), nullable=False)
     plan_json: Mapped[dict[str, object]] = mapped_column(JSONB, nullable=False)
+
+    origin_operation_id: Mapped[UUID | None] = mapped_column(PGUUID(as_uuid=True))
+    origin_lease_epoch: Mapped[int | None] = mapped_column(Integer)
 
 
 class FreeCourseScene(Identity, Base):
@@ -174,6 +194,21 @@ class FreeCourseScene(Identity, Base):
 class FreeCourseSceneVersion(CourseSnapshot, Base):
     __tablename__ = "free_course_scene_versions"
     __table_args__ = (
+        ForeignKeyConstraint(
+            ["user_id", "course_id", "origin_operation_id"],
+            [
+                "free_course_operations.user_id",
+                "free_course_operations.course_id",
+                "free_course_operations.id",
+            ],
+            name="fk_free_course_scene_versions_operation",
+            deferrable=True,
+            initially="DEFERRED",
+        ),
+        CheckConstraint(
+            "(origin_operation_id IS NULL) = (origin_lease_epoch IS NULL)",
+            name="ck_free_course_scene_versions_origin",
+        ),
         UniqueConstraint("user_id", "course_id", "id", name="uq_fc_scene_version_identity"),
         UniqueConstraint(
             "user_id", "course_id", "scene_id", "version", name="uq_fc_scene_version_number"
@@ -203,6 +238,9 @@ class FreeCourseSceneVersion(CourseSnapshot, Base):
     dependency_bindings: Mapped[list[object]] = mapped_column(JSONB, nullable=False)
     content_digest: Mapped[str] = mapped_column(String(64), nullable=False)
 
+    origin_operation_id: Mapped[UUID | None] = mapped_column(PGUUID(as_uuid=True))
+    origin_lease_epoch: Mapped[int | None] = mapped_column(Integer)
+
 
 class FreeCourseVersion(CourseSnapshot, Base):
     __tablename__ = "free_course_versions"
@@ -219,6 +257,10 @@ class FreeCourseVersion(CourseSnapshot, Base):
     plan_id: Mapped[UUID] = mapped_column(PGUUID(as_uuid=True), nullable=False)
     digest: Mapped[str] = mapped_column(String(64), nullable=False)
     manifest_json: Mapped[dict[str, object]] = mapped_column(JSONB, nullable=False)
+
+    creation_txid: Mapped[int | None] = mapped_column(
+        BigInteger, server_default=text("pg_current_xact_id()::text::bigint")
+    )
 
 
 class FreeCourseNodeLink(Base):
@@ -261,18 +303,18 @@ class FreeCourseNodeLink(Base):
             postgresql_where="scene_id IS NOT NULL",
         ),
         CheckConstraint(
-            "(graph_version = 'mvp-0.2.0' AND node_id IN ('array', 'c-pointer', 'circular- "
-            "queue', 'linked-list-concept', 'linked-list-deletion', 'linked-list- "
-            "insertion', 'linked-list-traversal', 'queue', 'single-linked-list', 'stack')) "
-            "OR (graph_version = 'phase-1.1.0' AND node_id IN ('array', 'array-stack', "
-            "'balanced-binary-search-tree', 'binary-heap', 'binary-search-tree', 'binary- "
-            "tree', 'binary-tree-traversal', 'breadth-first-search', 'bubble-sort', "
-            "'c-pointer', 'circular-linked-list', 'circular-queue', 'depth-first-search', "
-            "'doubly-linked-list', 'graph-representation', 'heap-sort', 'insertion-sort', "
-            "'linked-list-concept', 'linked-list-deletion', 'linked-list-insertion', "
-            "'linked-list-traversal', 'linked-stack', 'merge-sort', 'queue', 'quick-sort', "
-            "'selection-sort', 'single-linked-list', 'sorting-comparison', 'stack', 'tree- "
-            "concept'))",
+            "(graph_version = 'mvp-0.2.0' AND node_id IN ('array', 'c-pointer', "
+            "'circular-queue', 'linked-list-concept', 'linked-list-deletion', "
+            "'linked-list-insertion', 'linked-list-traversal', 'queue', "
+            "'single-linked-list', 'stack')) OR (graph_version = 'phase-1.1.0' AND node_id "
+            "IN ('array', 'array-stack', 'balanced-binary-search-tree', 'binary-heap', "
+            "'binary-search-tree', 'binary-tree', 'binary-tree-traversal', "
+            "'breadth-first-search', 'bubble-sort', 'c-pointer', 'circular-linked-list', "
+            "'circular-queue', 'depth-first-search', 'doubly-linked-list', "
+            "'graph-representation', 'heap-sort', 'insertion-sort', 'linked-list-concept', "
+            "'linked-list-deletion', 'linked-list-insertion', 'linked-list-traversal', "
+            "'linked-stack', 'merge-sort', 'queue', 'quick-sort', 'selection-sort', "
+            "'single-linked-list', 'sorting-comparison', 'stack', 'tree-concept'))",
             name="ck_fc_link_known_node",
         ),
         CheckConstraint("relation IN ('target','supporting')", name="ck_fc_link_relation"),
