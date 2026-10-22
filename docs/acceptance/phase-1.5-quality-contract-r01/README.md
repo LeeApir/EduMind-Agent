@@ -1,10 +1,10 @@
 # T003 质量处理与学习证据契约提案
 
-状态：具体设计已准备，ADR-0026 A—E待准确批准；不是Task-Completed，未实施业务接口、迁移或真实评分。
+状态：用户已批准ADR-0026 A—E及准确附件，T003设计验收完成；未实施业务接口、迁移或真实评分。
 
 ## 审批入口与取舍
 
-[ADR-0026](../../ADR/0026-course-quality-and-learning-evidence.md)列出五项具体决定；[contract](contract.md)说明确认、暂停/撤回、准入与重放，[policy](policy.json)记录规则，[OpenAPI](../../api/phase-1.5-quality.openapi.json)提供6个planned反馈/作答/导师接口及内部维护结构，[44条用例](examples.json)描述后续实现验收预期。[manifest](manifest.json)绑定6份规范文件；当前没有批准登记。T001/T002冻结文件保持原字节。
+[ADR-0026](../../ADR/0026-course-quality-and-learning-evidence.md)列出五项具体决定；[contract](contract.md)说明确认、暂停/撤回、准入与重放，[policy](policy.json)记录规则，[OpenAPI](../../api/phase-1.5-quality.openapi.json)提供6个planned反馈/作答/导师接口及内部维护结构，[44条用例](examples.json)描述后续实现验收预期。[manifest](manifest.json)绑定6份规范文件；用户随后回复“批准”，[批准登记](../../ADR/0026-approval-20261022.json)绑定准确提案提交及摘要。冻结文件中Proposed/pending保持批准前原字节，当前接受状态以登记为准。T001/T002冻结文件保持原字节。
 
 学生仍可直接学习草稿、做题并获得暂定比较；仅正式掌握度贡献要求准确答案和单节点核定发生在首次完整作答前，且没有已记录辅助或重复。首版核定由可信本地维护者完成，不以模型pass冒充真值，也不建立全量审核前置。缺核定/映射、多节点或历史独立性未知时只保存课程表现。
 
@@ -26,6 +26,6 @@
 
 ## 恢复与交接
 
-T003待ADR-0026 A—E与准确manifest批准；获准后登记来源与提案摘要，追加RESUME并重核检查，独立Task-Completed提交后才done。下一项T004为全站主要页面设计，尚未领取；不把本提案当成后续执行授权。
+T003准确A—E已批准，来源与提案摘要已登记，已追加RESUME并重核冻结文件；完成设计验收与独立Task-Completed提交后done。下一项T004为全站主要页面设计，尚未领取；不把本提案当成后续执行授权。
 
 当前分支codex/phase-1.5-t001，用户旧验收报告修改与OpenMAIC参考目录保留且不纳入本任务提交。catalog_only/H封存/Provider实际调用0保持；无生产开放、部署、push或merge。

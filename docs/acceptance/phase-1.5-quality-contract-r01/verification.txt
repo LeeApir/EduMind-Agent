@@ -26,3 +26,22 @@ Manual AC2: tentative feedback / exact attestation / first-complete independence
 Manual AC3: exact owner-scene tutor context, one-attempt90s shared budget and explicit revision ready; exact contract approval PENDING.
 Independent reader: two gaps fixed (ready tutor historical body withdrawal; original legacy stem check); no runtime success inferred.
 manifest_sha256=a232fff9a2bd99e427ce7439bec3be5bab828b8e333c0774ee8bdf2d0d104e54
+
+Approval completion verification at 2026-10-22T11:00:03
+User approved 78c95ce ADR-0026 A-E and exact attachments; recorded in docs/ADR/0026-approval-20261022.json.
+PASS: manifest SHA256 and 6 files match approved proposal commit bytes; technical contents unchanged.
+Manual AC1-AC3: quality confirmation/visibility, exact-version answer+mapping admission/revocation, tutor context/authority/budget and exact approval complete; design only.
+$ backend/.venv/bin/python docs/acceptance/phase-1.5-quality-contract-r01/check_design.py
+exit_code=0
+PASS: OpenAPI structure, 65 refs, 6 planned operations, 24 schemas, 19 schema examples, shared-budget consistency, 44 design cases, 12 links, 6 frozen files; no runtime verification
+$ backend/.venv/bin/python docs/acceptance/phase-1.5-course-contract-r01/check_design.py
+exit_code=0
+PASS: 49 local refs, 6 planned operations, 15 schemas, 8 request examples, 25 design cases, 9 links, 5 frozen files; no runtime verification
+$ backend/.venv/bin/python docs/acceptance/phase-1.5-generation-contract-r01/check_design.py
+exit_code=0
+PASS: OpenAPI structure, 67 refs, 6 planned operations, 25 schemas, budget/state consistency, 15 schema examples, 34 design cases, 13 links, 6 frozen files; no runtime verification
+$ python3 scripts/check_catalog_workflow.py
+exit_code=0
+Active Phase 1.5 dependencies valid; catalog ledger valid; T033 blocked
+$ git diff --check
+exit_code=0
