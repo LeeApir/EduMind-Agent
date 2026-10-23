@@ -93,6 +93,7 @@ onMounted(load);
       <template v-if="page === 'course' && selectedCourse">
         <CourseWorkspace
           :key="selectedCourse"
+          :mode="mode"
           :course-id="selectedCourse"
           :initial-version="selectedVersion"
           :initial-scene="selectedScene"

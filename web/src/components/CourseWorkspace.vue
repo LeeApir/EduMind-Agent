@@ -2,9 +2,10 @@
 import { computed, nextTick, onBeforeUnmount, ref, toRef, watch } from 'vue';
 import { FreeCourseError, listVersions, readManifest, readScene, readStored, terminalOperation, writeStored, type Manifest, type SceneProjection } from '../api/freeCourses';
 import { useCourseFeed } from '../composables/useCourseFeed';
+import CourseExercise from './CourseExercise.vue';
 import CoursePresentation from './CoursePresentation.vue';
 import WorkspaceState from './WorkspaceState.vue';
-const props = withDefaults(defineProps<{courseId:string;operationId:string;initialVersion:number;initialScene:string;active?:boolean}>(),{active:true});
+const props = withDefaults(defineProps<{courseId:string;operationId:string;initialVersion:number;initialScene:string;mode?:'catalog_only'|'dynamic';active?:boolean}>(),{active:true,mode:'catalog_only'});
 const emit = defineEmits<{ outline:[]; home:[]; position:[version:number,scene:string] }>();
 const {course,operation,owner,error,loading,reload,inaccessible}=useCourseFeed(toRef(props,'courseId'),toRef(props,'operationId'),toRef(props,'active'));
 const manifest=ref<Manifest>();const scene=ref<SceneProjection>();const selectedScene=ref(props.initialScene);const version=ref(props.initialVersion);
@@ -276,19 +277,18 @@ onBeforeUnmount(()=>{save();epoch+=1;manifestEpoch+=1;versionsEpoch+=1;controlle
                 <h3>C 语言代码</h3><pre><code>{{ block.source }}</code></pre><small>代码仅供阅读，没有执行。</small>
               </section>
               <span v-else-if="block.kind === 'visualization'" />
-              <section
+              <CourseExercise
                 v-else-if="block.kind === 'exercise'"
-                class="exercise-reading"
-              >
-                <h3>随堂思考</h3><p>{{ block.question }}</p><ol>
-                  <li
-                    v-for="question in block.items"
-                    :key="question.question_id"
-                  >
-                    {{ question.question }}
-                  </li>
-                </ol><small>本页先提供题目阅读，作答与暂定反馈将在练习功能接入后提供。</small>
-              </section>
+                :key="`${scene.course_version}:${block.exercise_version_id}`"
+                :course-id="courseId"
+                :course-version="scene.course_version"
+                :scene-id="scene.scene_id"
+                :scene-version-id="scene.scene_version_id"
+                :block="block"
+                :head-version="course.head?.version ?? null"
+                :mode="mode"
+                :active="active"
+              />
               <WorkspaceState
                 v-else
                 heading="题组已停用"

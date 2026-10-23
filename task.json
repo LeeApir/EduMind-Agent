@@ -53,7 +53,7 @@
     "dynamic_release_authorized": false,
     "deployment_authorized": false,
     "H": "H01–H08继续封存；新契约确定后重判适用性与独立性，不自动继承验收资格。",
-    "implementation_scope": "T001–T026 done；T027–T042按依赖继续，真实执行预算/重大契约仍需独立批准。",
+    "implementation_scope": "T001–T027 done；T028–T042按依赖持续执行，真实预算门禁不变。",
     "included": [
       "自由目标/可变场景/可选多节点关联",
       "首场景可学与后续持久生成/恢复/局部修订",
@@ -1311,7 +1311,7 @@
       "id": "PHASE-1.5-T027",
       "phase": "Phase 1.5",
       "title": "实现课程内练习及证据状态反馈",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1.5-T025",
@@ -1340,12 +1340,17 @@
         "实际浏览器核对本任务页面/关键状态及移动端；使用隔离服务或明确Mock并记录区别。",
         "git diff --check"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "全量241单测0失败/skip，练习6项",
+        "typecheck/build通过，lint0错误35原有警告",
+        "Chromium六宽度/部分完整提交/撤回/准确恢复通过，明确HTTP/SSE Mock；证据docs/design/phase-1.5-exercises-t027",
+        "工作流/diff通过，Provider0/catalog_only"
+      ],
+      "started_at": "2026-10-23T12:35:39",
+      "completed_at": "2026-10-23T12:40:42",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T027",
-      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。"
+      "execution_gate": "验收通过，独立提交后按持续阶段授权继续。"
     },
     {
       "id": "PHASE-1.5-T028",
