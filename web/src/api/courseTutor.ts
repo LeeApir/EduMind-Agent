@@ -7,9 +7,13 @@ export async function createTutor(course:string,body:TutorRequest,csrf:string,ke
   const result=await courseRequest<TutorReceipt>(`${coursePath(course)}/tutor-turns`,command(csrf,key,body));
   if(!result||typeof result.operation_id!=='string'||typeof result.turn_id!=='string')throw new FreeCourseError(502,'INVALID_RESPONSE');return result;
 }
-export async function readTutor(course:string,receipt:TutorReceipt,signal?:AbortSignal):Promise<TutorTurn>{
-  const value=await courseRequest<TutorTurn>(`${coursePath(course)}/tutor-turns/${encodeURIComponent(receipt.turn_id)}`,{signal});
-  if(!value||value.turn_id!==receipt.turn_id||value.operation_id!==receipt.operation_id||!value.binding||!Number.isInteger(value.binding.course_version)||typeof value.binding.scene_id!=='string'||typeof value.binding.scene_version_id!=='string'||typeof value.message!=='string'||!['queued','running','ready','failed','cancelled','timed_out','invalidated'].includes(value.status)||!Array.isArray(value.anchor_refs))throw new FreeCourseError(502,'INVALID_RESPONSE');
+export async function readTutorRecord(course:string,id:string,signal?:AbortSignal):Promise<TutorTurn>{
+  const value=await courseRequest<TutorTurn>(`${coursePath(course)}/tutor-turns/${encodeURIComponent(id)}`,{signal});
+  if(!value||value.turn_id!==id||typeof value.operation_id!=='string'||!value.binding||!Number.isInteger(value.binding.course_version)||typeof value.binding.scene_id!=='string'||typeof value.binding.scene_version_id!=='string'||typeof value.message!=='string'||!['queued','running','ready','failed','cancelled','timed_out','invalidated'].includes(value.status)||!Array.isArray(value.anchor_refs))throw new FreeCourseError(502,'INVALID_RESPONSE');
   if(value.status!=='ready'){value.markdown=null;value.anchor_refs=[];}
   else if(typeof value.markdown!=='string'||!value.markdown.trim()||value.markdown.length>6000||!value.anchor_refs.every(a=>typeof a==='string'&&a.length<=128))throw new FreeCourseError(502,'INVALID_RESPONSE');return value;
+}
+
+export async function readTutor(course:string,receipt:TutorReceipt,signal?:AbortSignal):Promise<TutorTurn>{
+ const value=await readTutorRecord(course,receipt.turn_id,signal);if(value.operation_id!==receipt.operation_id)throw new FreeCourseError(502,'INVALID_RESPONSE');return value;
 }

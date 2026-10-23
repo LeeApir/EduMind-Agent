@@ -4,7 +4,7 @@ import { ensureCatalogSession } from '../api/catalog';
 import { cancelOperation, readImpact, readStored, submitOperation, terminalOperation, writeStored, type Impact, type OperationRequest } from '../api/freeCourses';
 import { useCourseFeed } from '../composables/useCourseFeed';
 import WorkspaceState from './WorkspaceState.vue';
-const props = withDefaults(defineProps<{ courseId: string; operationId: string; mode: 'catalog_only' | 'dynamic'; active?: boolean }>(), { active: true });
+const props = withDefaults(defineProps<{ courseId: string; operationId: string; mode: 'catalog_only' | 'dynamic'; active?: boolean;autoEnter?:boolean }>(), { active: true,autoEnter:true });
 const emit = defineEmits<{ learn: [version: number, scene: string]; operation: [id: string]; back: [] }>();
 const active = computed(() => props.active !== false);
 const { course, operation, owner, error, loading, reload } = useCourseFeed(toRef(props,'courseId'),toRef(props,'operationId'),active);
@@ -21,7 +21,7 @@ watch(owner, id => {
 });
 watch([editing,instruction], () => { if (owner.value) writeStored(`edumind:free:outline-edit:${owner.value}:${props.courseId}`, {editing:editing.value,instruction:instruction.value}); });
 watch([firstReady,editing,error], () => {
-  if (active.value && firstReady.value && course.value?.head && !editing.value && !error.value && !autoEntered) { autoEntered = true; emit('learn',course.value.head.version,firstReady.value.scene_id); }
+  if (props.autoEnter && active.value && firstReady.value && course.value?.head && !editing.value && !error.value && !autoEntered) { autoEntered = true; emit('learn',course.value.head.version,firstReady.value.scene_id); }
 });
 watch(() => props.courseId, () => { editing.value = false; instruction.value = ''; impact.value = undefined; autoEntered = false; });
 watch(() => course.value?.head?.version, () => { impact.value = undefined; confirmed.value = false; });

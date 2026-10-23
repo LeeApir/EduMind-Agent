@@ -53,7 +53,7 @@
     "dynamic_release_authorized": false,
     "deployment_authorized": false,
     "H": "H01–H08继续封存；新契约确定后重判适用性与独立性，不自动继承验收资格。",
-    "implementation_scope": "T001–T031及T043–T048 done；按依赖继续T032及其余任务，当前48项。",
+    "implementation_scope": "T001–T032及T043–T048 done；按依赖继续T033及其余任务，当前48项。",
     "included": [
       "自由目标/可变场景/可选多节点关联",
       "首场景可学与后续持久生成/恢复/局部修订",
@@ -1776,7 +1776,7 @@
       "id": "PHASE-1.5-T032",
       "phase": "Phase 1.5",
       "title": "重构学习记录页面",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1.5-T022",
@@ -1806,12 +1806,17 @@
         "实际浏览器核对本任务页面/关键状态及移动端；使用隔离服务或明确Mock并记录区别。",
         "git diff --check"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "全量39文件284单测通过，记录9/大纲7/导航9，0skip",
+        "typecheck/build通过，lint0错误35既有警告，最终相关9文件eslint无警告",
+        "Chromium明确HTTP Mock六宽度/准确旧作答及旧发布/管理刷新不跳转/固定原版本恢复、POST0通过",
+        "41批准/manifest及50历史SHA、用户原README SHA、工作流/diff通过，证据docs/design/phase-1.5-learning-history-t032"
+      ],
+      "started_at": "2026-10-23T21:47:45",
+      "completed_at": "2026-10-23T22:03:12",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T032",
-      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。"
+      "execution_gate": "阶段持续授权；T022/T020/T019/T047完成，T031 d882942核对，复用已批准只读接口及原恢复协议。"
     },
     {
       "id": "PHASE-1.5-T033",

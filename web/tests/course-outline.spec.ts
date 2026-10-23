@@ -25,6 +25,9 @@ describe('durable course outline',()=>{
     const w=mount(Outline,{props:{courseId:'c',operationId:'op',mode:'dynamic'}});await flushPromises();expect(fixture.posts).toHaveLength(0);expect(w.text()).toContain('原始目标');expect(w.emitted('learn')).toBeUndefined();
     fixture.ready=true;Stream.instances[0]!.send();await flushPromises();expect(w.emitted('learn')?.[0]).toEqual([1,'s']);w.unmount();expect(Stream.instances[0]!.closed).toBe(true);
   });
+  it('stays in management when reopened from history, while keeping a readable scene entry',async()=>{
+    fixture.ready=true;const w=mount(Outline,{props:{courseId:'c',operationId:'op',mode:'dynamic',autoEnter:false}});await flushPromises();expect(w.emitted('learn')).toBeUndefined();expect(w.text()).toContain('第一场景');expect(fixture.posts).toHaveLength(0);w.unmount();
+  });
   it('keeps adjustment text and suppresses automatic navigation while editing; cancel is explicit',async()=>{
     const w=mount(Outline,{props:{courseId:'c',operationId:'op',mode:'dynamic'}});await flushPromises();await w.findAll('button').find(b=>b.text()==='调整大纲')!.trigger('click');await flushPromises();
     await w.get('#outline-instruction').setValue('增加基础说明');fixture.ready=true;Stream.instances[0]!.send();await flushPromises();expect(w.emitted('learn')).toBeUndefined();expect(fixture.posts).toHaveLength(0);
