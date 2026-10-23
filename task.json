@@ -53,7 +53,7 @@
     "dynamic_release_authorized": false,
     "deployment_authorized": false,
     "H": "H01–H08继续封存；新契约确定后重判适用性与独立性，不自动继承验收资格。",
-    "implementation_scope": "T001–T027 done；T028–T042按依赖持续执行，真实预算门禁不变。",
+    "implementation_scope": "T001–T027 done；T028新增T043–T045批准契约实现前置，按文件顺序串行从T043继续；当前阶段45项，产品范围不变。",
     "included": [
       "自由目标/可变场景/可选多节点关联",
       "首场景可学与后续持久生成/恢复/局部修订",
@@ -1353,6 +1353,119 @@
       "execution_gate": "验收通过，独立提交后按持续阶段授权继续。"
     },
     {
+      "id": "PHASE-1.5-T043",
+      "phase": "Phase 1.5",
+      "title": "实现准确场景导师记录与上下文准入",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T003",
+        "PHASE-1.5-T019",
+        "PHASE-1.5-T020"
+      ],
+      "scope": [
+        "backend/app/models/",
+        "backend/app/services/",
+        "backend/app/agents/",
+        "backend/alembic/",
+        "backend/tests/",
+        "docs/api/",
+        "docs/design/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5/§9.1；已批准ADR0025/ADR0026及准确附件；T028实现前置细化，不增加产品范围",
+      "acceptance_criteria": [
+        "按ADR0026建立导师轮次/上下文依赖的增量持久化，owner/准确head/场景/幂等/辅助暴露同事务绑定；旧表和原记录不改义。",
+        "只选当前公共场景、最多2个必要上游、有据相关画像及最多2轮仍有效同版历史；不发送私有答案、未知推断或凭据。",
+        "读取ready轮次重新验证全部依赖，已确认撤回/禁用/画像证据失效隐藏正文且保留问题；原始事实只追加。"
+      ],
+      "verification": [
+        "（待建立）backend/.venv/bin/python docs/design/phase-1.5-tutor-context-t043/run_checks.py --run-id r01 --output /tmp/edumind-p15-t043-r01",
+        "实际隔离PostgreSQL迁移/事务/身份/依赖失效回归，不以skip或Mock替代。",
+        "Ruff/strict mypy及冻结原件SHA/工作流/diff检查"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T043",
+      "execution_gate": "用户已授权持续完成当前阶段；依赖完成后串行实施，真实Provider授权仍为0。"
+    },
+    {
+      "id": "PHASE-1.5-T044",
+      "phase": "Phase 1.5",
+      "title": "实现导师共享预算调度与取消恢复",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T043",
+        "PHASE-1.5-T014",
+        "PHASE-1.5-T015"
+      ],
+      "scope": [
+        "backend/app/",
+        "backend/tests/",
+        "docs/api/",
+        "docs/design/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5/§9.1；已批准ADR0025/ADR0026及准确附件；T028实现前置细化，不增加产品范围",
+      "acceptance_criteria": [
+        "复用T002的PG预约/全局两槽/单课累计池，导师最多1次发送、90秒、16k输入/2k输出，禁止自动重试/格式修复。",
+        "准确输入提交前复核head/全部来源与辅助暴露；输出按安全Markdown及上下文引用校验，不修改课程或授予评分/缺陷确认权限。",
+        "取消/期限/未知发送隔离及迟到只结算遵循现有围栏；持久恢复不重复发送，复用已有导师编排能力且保留旧课堂语义。"
+      ],
+      "verification": [
+        "（待建立）backend/.venv/bin/python docs/design/phase-1.5-tutor-scheduler-t044/run_checks.py --run-id r01 --output /tmp/edumind-p15-t044-r01",
+        "实际隔离PG/明确FakeAdapter覆盖并发槽/预算/取消/未知发送/重启，真实Provider0。",
+        "Ruff/strict mypy/工作流/diff检查"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T044",
+      "execution_gate": "用户已授权持续完成当前阶段；依赖完成后串行实施，真实Provider授权仍为0。"
+    },
+    {
+      "id": "PHASE-1.5-T045",
+      "phase": "Phase 1.5",
+      "title": "接通准确导师REST与持久SSE",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T044",
+        "PHASE-1.5-T020"
+      ],
+      "scope": [
+        "backend/app/",
+        "backend/tests/",
+        "docs/api/",
+        "docs/design/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5/§9.1；已批准ADR0025/ADR0026及准确附件；T028实现前置细化，不增加产品范围",
+      "acceptance_criteria": [
+        "按既有批准TutorRequest/Receipt/Turn/Operation/Event提供owner/CSRF/幂等的创建和读取，不新设未批准API。",
+        "现有操作/取消/游标事件路由支持tutor_turn/tutor_ready，事件不含正文；refresh只GET，已失效正文不经回执/历史泄露。",
+        "catalog_only禁止新导师发送但允许本人旧轮次/操作只读恢复与取消；错误/no-store/跨owner一致，旧生成与课堂不回归。"
+      ],
+      "verification": [
+        "（待建立）backend/.venv/bin/python docs/design/phase-1.5-tutor-api-t045/run_checks.py --run-id r01 --output /tmp/edumind-p15-t045-r01",
+        "实际PG/HTTP/SSE验证，与既有free-course API及旧课堂组合回归，真实Provider0。",
+        "Ruff/strict mypy/累计契约/工作流/diff检查"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T045",
+      "execution_gate": "用户已授权持续完成当前阶段；依赖完成后串行实施，真实Provider授权仍为0。"
+    },
+    {
       "id": "PHASE-1.5-T028",
       "phase": "Phase 1.5",
       "title": "接入当前场景导师问答与补充解释",
@@ -1360,7 +1473,8 @@
       "priority": "P0",
       "depends_on": [
         "PHASE-1.5-T025",
-        "PHASE-1.5-T003"
+        "PHASE-1.5-T003",
+        "PHASE-1.5-T045"
       ],
       "scope": [
         "backend/app/ (仅现有导师场景上下文适配)",
@@ -1390,7 +1504,7 @@
       "completed_at": null,
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T028",
-      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。"
+      "execution_gate": "用户已授权持续完成当前阶段；现有导师只覆盖旧课堂，先完成按批准ADR0026细化的T043–T045，再接T028页面。"
     },
     {
       "id": "PHASE-1.5-T029",
