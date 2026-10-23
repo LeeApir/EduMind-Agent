@@ -227,6 +227,7 @@ describe("connection settings", () => {
   it("returns to the same mounted course draft even when settings fail", async () => {
     intercept = (path) => path === "/api/providers/connections" ? Promise.resolve(json({ code: "CONFIGURATION_MISSING" }, 503)) : undefined;
     const wrapper = mounted(ProductApp as typeof ProviderSettings); await flushPromises();
+    await wrapper.findAll("nav button").find(button => button.text() === "签核课程目录")!.trigger("click"); await flushPromises();
     await wrapper.get('[aria-label="课程草稿"]').setValue("保留我的练习");
     await click(wrapper, "模型设置");
     expect(wrapper.text()).toContain("目录课程仍可学习");

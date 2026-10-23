@@ -53,7 +53,7 @@
     "dynamic_release_authorized": false,
     "deployment_authorized": false,
     "H": "H01–H08继续封存；新契约确定后重判适用性与独立性，不自动继承验收资格。",
-    "implementation_scope": "T001–T022 done；T023 in_progress；T024–T025待串行，T026以后不领取。",
+    "implementation_scope": "T001–T023 done；T024 in_progress；随后T025，T026以后不领取。",
     "included": [
       "自由目标/可变场景/可选多节点关联",
       "首场景可学与后续持久生成/恢复/局部修订",
@@ -1181,7 +1181,7 @@
       "id": "PHASE-1.5-T024",
       "phase": "Phase 1.5",
       "title": "实现大纲预览与生成进度页",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1.5-T023"
@@ -1208,12 +1208,17 @@
         "实际浏览器核对本任务页面/关键状态及移动端；使用隔离服务或明确Mock并记录区别。",
         "git diff --check"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "全量Vitest31文件220通过0失败/跳过，大纲6回归",
+        "typecheck/build通过；lint0错误35原有警告",
+        "Chromium显式HTTP/SSE Mock4宽度、编辑/停止/调整/首场景/刷新通过；证据docs/design/phase-1.5-outline-t024",
+        "工作流/diff通过；Provider0/catalog_only"
+      ],
+      "started_at": "2026-10-23T11:56:26",
+      "completed_at": "2026-10-23T12:04:39",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T024",
-      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。"
+      "execution_gate": "验收通过，独立完成提交后领取T025。"
     },
     {
       "id": "PHASE-1.5-T025",

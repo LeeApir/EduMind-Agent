@@ -41,3 +41,34 @@ export async function readCourse(id: string, signal?: AbortSignal): Promise<Cour
 }
 export function readStored<T>(key: string): T | null { try { const value = sessionStorage.getItem(key); return value ? JSON.parse(value) as T : null; } catch { return null; } }
 export function writeStored(key: string, value: unknown): void { try { sessionStorage.setItem(key, JSON.stringify(value)); } catch { /* Reading remains available without browser storage. */ } }
+export interface OperationStep { step_key: string; scene_id: string | null; state: 'pending' | 'blocked_dependency' | 'running' | 'ready' | 'failed' | 'invalidated' | 'cancelled'; reason_code: string | null }
+export interface Operation { course_id: string; operation_id: string; kind: string; state: string; base_head_version: number | null; head_version: number | null; last_event_id: number; deadline_at: string; reason_code: string | null; clarification_questions: string[]; steps: OperationStep[]; budget: { max_attempts: number; max_seconds: number; [key: string]: unknown }; request_id: string }
+export interface Impact { course_id: string; base_head_version: number | null; kind: 'adjust_outline' | 'revise_scene'; affected_scene_ids: string[]; requires_outline_adjustment: boolean; max_attempts: number; max_seconds: number; impact_digest: string }
+export type OperationRequest = { kind: 'resume'; expected_head_version: number | null; source_operation_id: string } | { kind: 'clarify'; expected_head_version: number | null; source_operation_id: string; supplement: string } | { kind: 'adjust_outline'; expected_head_version: number | null; instruction: string; impact_digest: string };
+export function coursePath(id: string): string { return `/${encodeURIComponent(id)}`; }
+export const terminalOperation = (state: string): boolean => ['succeeded','partially_succeeded','awaiting_clarification','failed','cancelled','timed_out'].includes(state);
+export async function readOperation(course: string, id: string, signal?: AbortSignal): Promise<Operation> {
+  const value = await courseRequest<Operation>(`${coursePath(course)}/operations/${encodeURIComponent(id)}`, { signal });
+  if (!value || value.course_id !== course || value.operation_id !== id || !['queued','running','cancel_requested','succeeded','partially_succeeded','awaiting_clarification','failed','cancelled','timed_out'].includes(value.state) || !Number.isInteger(value.last_event_id) || value.last_event_id < 0 || !Array.isArray(value.steps) || !value.steps.every(s => typeof s.step_key === 'string' && ['pending','blocked_dependency','running','ready','failed','invalidated','cancelled'].includes(s.state)) || !Array.isArray(value.clarification_questions) || !value.clarification_questions.every(q => typeof q === 'string')) throw new FreeCourseError(502,'INVALID_RESPONSE');
+  return value;
+}
+export async function readImpact(course: string, version: number | null, signal?: AbortSignal): Promise<Impact> {
+  const value = await courseRequest<Impact>(`${coursePath(course)}/impact?kind=adjust_outline${version === null ? '' : `&base_version=${version}`}`, { signal });
+  if (!value || value.course_id !== course || value.base_head_version !== version || value.kind !== 'adjust_outline' || !Array.isArray(value.affected_scene_ids) || typeof value.impact_digest !== 'string') throw new FreeCourseError(502,'INVALID_RESPONSE');
+  return value;
+}
+export async function submitOperation(course: string, body: OperationRequest, csrf: string, key: string): Promise<CreatedCourse> {
+  const result = await courseRequest<CreatedCourse>(`${coursePath(course)}/operations`, command(csrf,key,body));
+  if (!result || result.course_id !== course || typeof result.operation_id !== 'string') throw new FreeCourseError(502,'INVALID_RESPONSE');
+  return result;
+}
+export async function cancelOperation(course: string, id: string, csrf: string, key: string): Promise<Operation> {
+  return courseRequest<Operation>(`${coursePath(course)}/operations/${encodeURIComponent(id)}/cancel`, command(csrf,key,{}));
+}
+export type SceneBlock = {kind:'text';anchor_id:string;markdown:string} | {kind:'code';anchor_id:string;language:'c';source:string} | {kind:'exercise';anchor_id:string;exercise_id:string;exercise_version_id:string;question:string;items:{question_id:string;question:string;input_type:'short_text'}[]} | {kind:'exercise_unavailable';anchor_id:string;exercise_id:string;exercise_version_id:string;reason_code:string} | {kind:'visualization';anchor_id:string;text_alternative:string;visualization_type:string;steps:{caption:string;elements:unknown[];highlight_ids:string[]}[]};
+export interface SceneProjection {course_id:string;course_version:number;scene_id:string;scene_version_id:string;blocks:SceneBlock[];actions:unknown[]}
+export async function readScene(course: string, version: number, scene: string, signal?: AbortSignal): Promise<SceneProjection> {
+  const value = await courseRequest<SceneProjection>(`${coursePath(course)}/versions/${version}/scenes/${encodeURIComponent(scene)}`,{signal});
+  if (!value || value.course_id !== course || value.course_version !== version || value.scene_id !== scene || typeof value.scene_version_id !== 'string' || !Array.isArray(value.blocks) || !value.blocks.every(b => typeof b.anchor_id === 'string' && ['text','code','exercise','exercise_unavailable','visualization'].includes(b.kind))) throw new FreeCourseError(502,'INVALID_RESPONSE');
+  return value;
+}
