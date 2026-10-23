@@ -53,7 +53,7 @@
     "dynamic_release_authorized": false,
     "deployment_authorized": false,
     "H": "H01–H08继续封存；新契约确定后重判适用性与独立性，不自动继承验收资格。",
-    "implementation_scope": "T001–T032及T043–T048 done；按依赖继续T033及其余任务，当前48项。",
+    "implementation_scope": "T001–T033及T043–T048 done；按依赖继续T034及集成验收，当前48项。",
     "included": [
       "自由目标/可变场景/可选多节点关联",
       "首场景可学与后续持久生成/恢复/局部修订",
@@ -1822,7 +1822,7 @@
       "id": "PHASE-1.5-T033",
       "phase": "Phase 1.5",
       "title": "重构模型设置页面",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1.5-T022"
@@ -1849,12 +1849,17 @@
         "实际浏览器核对本任务页面/关键状态及移动端；使用隔离服务或明确Mock并记录区别。",
         "git diff --check"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "全量40文件292通过，新增设置8/原Provider17/偏好11/导航9，0skip",
+        "typecheck/build通过，lint0错误35既有警告，相关5文件eslint无警告",
+        "Chromium明确HTTP Mock六宽度×3区域、清密钥/原配置不变/显式元数据保存/刷新返回通过；探测生成0",
+        "41批准/manifest及50历史SHA、用户原README SHA、工作流/diff通过，证据docs/design/phase-1.5-model-settings-t033"
+      ],
+      "started_at": "2026-10-23T22:10:05",
+      "completed_at": "2026-10-23T22:29:01",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T033",
-      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。"
+      "execution_gate": "阶段持续授权；T022已完成，T032 9b653e6核对；仅复用原连接/偏好API，禁止真实探测或新预算调用。"
     },
     {
       "id": "PHASE-1.5-T034",

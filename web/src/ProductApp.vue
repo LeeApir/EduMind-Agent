@@ -7,14 +7,13 @@ import { readStored, writeStored } from "./api/freeCourses";
 import CourseOutline from "./components/CourseOutline.vue";
 import CourseWorkspace from "./components/CourseWorkspace.vue";
 import LearningHome from "./components/LearningHome.vue";
+import ModelSettings from './components/ModelSettings.vue';
 import LearningHistory from './components/LearningHistory.vue';
 import ProfileMastery from './components/ProfileMastery.vue';
 import GraphPaths from './components/GraphPaths.vue';
 import CatalogPage from "./components/CatalogPage.vue";
 
 const DynamicApp = defineAsyncComponent(() => import("./App.vue"));
-const ProviderSettings = defineAsyncComponent(() => import("./components/ProviderSettings.vue"));
-const ModelPreferences = defineAsyncComponent(() => import("./components/ModelPreferences.vue"));
 const page = ref("learning");
 const opened = ref(new Set(["learning"]));
 const owner = ref("");
@@ -22,7 +21,7 @@ const goalSuggestion=ref('');
 function suggestGoal(value:string):void{goalSuggestion.value=value;navigate('learning');}
 const settingsReturn = ref("learning");
 function navigate(value: string): void { if (["connections","preferences"].includes(value) && !["connections","preferences"].includes(page.value)) settingsReturn.value=page.value; page.value = value; opened.value.add(value); persist(); }
-function persist(): void { if (owner.value) writeStored(`edumind:free:location:${owner.value}`, { page: page.value, course: selectedCourse.value, operation: selectedOperation.value, version: selectedVersion.value, scene: selectedScene.value,outlineAutoEnter:outlineAutoEnter.value }); }
+function persist(): void { if (owner.value) writeStored(`edumind:free:location:${owner.value}`, { page: page.value, course: selectedCourse.value, operation: selectedOperation.value, version: selectedVersion.value, scene: selectedScene.value,outlineAutoEnter:outlineAutoEnter.value,returnPage:settingsReturn.value }); }
 const mode = ref<"catalog_only" | "dynamic" | "">("");
 const error = ref("");
 const selectedCourse = ref("");
@@ -44,10 +43,10 @@ async function load(): Promise<void> {
   try {
     const runtime = await loadProductMode(); const session = await ensureCatalogSession(); if (owner.value && owner.value !== session.owner) { selectedCourse.value='';selectedOperation.value='';selectedScene.value='';page.value='learning'; }
     owner.value = session.owner;
-    const saved = readStored<{page:string;course:string;operation:string;version:number;scene:string;outlineAutoEnter?:boolean}>(`edumind:free:location:${owner.value}`);
-    if(saved?.page==='graph'||saved?.page==='profile'||saved?.page==='history'){page.value=saved.page;selectedCourse.value=typeof saved.course==='string'?saved.course:'';selectedOperation.value=typeof saved.operation==='string'?saved.operation:'';selectedVersion.value=Number.isInteger(saved.version)&&saved.version>0?saved.version:1;selectedScene.value=typeof saved.scene==='string'?saved.scene:'';}
+    const saved = readStored<{page:string;course:string;operation:string;version:number;scene:string;outlineAutoEnter?:boolean;returnPage?:string}>(`edumind:free:location:${owner.value}`);
+    if(saved?.page==='graph'||saved?.page==='profile'||saved?.page==='history'||saved?.page==='connections'||saved?.page==='preferences'){page.value=saved.page;opened.value.add(saved.page);selectedCourse.value=typeof saved.course==='string'?saved.course:'';selectedOperation.value=typeof saved.operation==='string'?saved.operation:'';selectedVersion.value=Number.isInteger(saved.version)&&saved.version>0?saved.version:1;selectedScene.value=typeof saved.scene==='string'?saved.scene:'';}
     if (saved && ['outline','course'].includes(saved.page) && typeof saved.course === 'string' && typeof saved.operation === 'string') { selectedCourse.value=saved.course; selectedOperation.value=saved.operation; selectedVersion.value=Number.isInteger(saved.version) && saved.version>0 ? saved.version:1; selectedScene.value=typeof saved.scene==='string'?saved.scene:''; page.value=saved.page==='course' && !selectedScene.value?'outline':saved.page; }
-    if(saved)outlineAutoEnter.value=saved.outlineAutoEnter!==false;
+    if(saved){outlineAutoEnter.value=saved.outlineAutoEnter!==false;if(typeof saved.returnPage==='string'&&['learning','outline','course','graph','profile','history','catalog'].includes(saved.returnPage))settingsReturn.value=saved.returnPage;}
     mode.value = runtime;
   }
   catch { error.value = "无法读取课程入口，请重试。"; }
@@ -70,15 +69,13 @@ onMounted(load);
       @retry="load"
     />
     <template v-else>
-      <section v-show="page === 'connections'">
-        <ProviderSettings
-          v-if="opened.has('connections')"
-          @close="navigate(settingsReturn)"
-        />
-      </section>
-      <section v-show="page === 'preferences'">
-        <ModelPreferences
-          v-if="opened.has('preferences')"
+      <section v-show="['connections','preferences'].includes(page)">
+        <ModelSettings
+          v-if="opened.has('connections') || opened.has('preferences')"
+          :active="['connections','preferences'].includes(page)"
+          :initial-panel="page==='preferences'?'preferences':'overview'"
+          :course-id="selectedCourse"
+          :operation-id="selectedOperation"
           @close="navigate(settingsReturn)"
         />
       </section>
