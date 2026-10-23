@@ -3,6 +3,7 @@ import { defineAsyncComponent, onMounted, ref } from "vue";
 import { loadProductMode } from "./api/catalog";
 import WorkspaceShell from "./components/WorkspaceShell.vue";
 import WorkspaceState from "./components/WorkspaceState.vue";
+import LearningHome from "./components/LearningHome.vue";
 import CatalogPage from "./components/CatalogPage.vue";
 
 const DynamicApp = defineAsyncComponent(() => import("./App.vue"));
@@ -13,6 +14,9 @@ const opened = ref(new Set(["learning"]));
 function navigate(value: string): void { page.value = value; opened.value.add(value); }
 const mode = ref<"catalog_only" | "dynamic" | "">("");
 const error = ref("");
+const selectedCourse = ref("");
+const selectedOperation = ref("");
+function openCourse(course: string, operation: string): void { selectedCourse.value = course; selectedOperation.value = operation; navigate("outline"); }
 async function load(): Promise<void> {
   error.value = "";
   try { mode.value = await loadProductMode(); }
@@ -47,8 +51,29 @@ onMounted(load);
           @close="navigate('learning')"
         />
       </section>
-      <section v-show="page === 'learning' || page === 'catalog'">
-        <CatalogPage />
+      <section v-show="page === 'learning'">
+        <LearningHome
+          :mode="mode"
+          @open="openCourse"
+          @catalog="navigate('catalog')"
+        />
+      </section>
+      <section v-show="page === 'outline'">
+        <WorkspaceState
+          kind="loading"
+          detail="课程请求已保存，可读取同一课程的生成状态。"
+        />
+        <p>课程 {{ selectedCourse }} · 操作 {{ selectedOperation || '只读恢复' }}</p>
+        <button
+          type="button"
+          class="secondary"
+          @click="navigate('learning')"
+        >
+          返回目标
+        </button>
+      </section>
+      <section v-show="page === 'catalog'">
+        <CatalogPage v-if="opened.has('catalog')" />
       </section>
       <section v-show="page === 'legacy'">
         <DynamicApp v-if="opened.has('legacy') && mode === 'dynamic'" />

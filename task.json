@@ -53,7 +53,7 @@
     "dynamic_release_authorized": false,
     "deployment_authorized": false,
     "H": "H01–H08继续封存；新契约确定后重判适用性与独立性，不自动继承验收资格。",
-    "implementation_scope": "T001–T021 done；T022 in_progress；T023–T025依次执行，T026以后不领取。",
+    "implementation_scope": "T001–T022 done；T023 in_progress；T024–T025待串行，T026以后不领取。",
     "included": [
       "自由目标/可变场景/可选多节点关联",
       "首场景可学与后续持久生成/恢复/局部修订",
@@ -1137,7 +1137,7 @@
       "id": "PHASE-1.5-T023",
       "phase": "Phase 1.5",
       "title": "实现目标驱动学习首页",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1.5-T022",
@@ -1165,12 +1165,17 @@
         "实际浏览器核对本任务页面/关键状态及移动端；使用隔离服务或明确Mock并记录区别。",
         "git diff --check"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "目标首页5+框架8=13单测通过",
+        "typecheck/build通过，lint0错误35原有警告",
+        "Chromium4宽度/不可用/网络失败刷新幂等通过，显式HTTP Mock，证据docs/design/phase-1.5-home-t023",
+        "工作流/diff通过；Provider0/catalog_only"
+      ],
+      "started_at": "2026-10-23T11:51:50",
+      "completed_at": "2026-10-23T11:56:02",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T023",
-      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。"
+      "execution_gate": "验收通过，独立提交后领取T024。"
     },
     {
       "id": "PHASE-1.5-T024",

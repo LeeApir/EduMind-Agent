@@ -21,7 +21,7 @@ describe('workspace shell', () => {
     expect(w.get('h2').text()).toBeTruthy(); await w.get('button').trigger('click'); expect(w.emitted('retry')).toHaveLength(1);
   });
   it('keeps unsaved inputs and existing settings reachable without generation', async () => {
-    const w = mount(Product, { global: { stubs: { CatalogPage: { template: '<div><h1>课程目录</h1><input aria-label="未保存" /></div>' }, ProviderSettings: { template: '<h1>连接设置</h1>' }, ModelPreferences: { template: '<h1>偏好</h1>' } } } });
+    const w = mount(Product, { global: { stubs: { LearningHome: { template: '<div><h1>学习</h1><input aria-label="未保存" /></div>' }, CatalogPage: { template: '<div><h1>课程目录</h1><input aria-label="未保存" /></div>' }, ProviderSettings: { template: '<h1>连接设置</h1>' }, ModelPreferences: { template: '<h1>偏好</h1>' } } } });
     await flushPromises(); await w.get('input').setValue('保留我的输入');
     await w.findAll('nav button').find(b => b.text() === '模型设置')!.trigger('click');
     await flushPromises();
