@@ -22,6 +22,7 @@ from app.models.free_course import FreeCourse, FreeCourseVersion
 from app.services.free_course_answers import Answers, public_exercise
 from app.services.free_course_contract import SCHEMAS, validate
 from app.services.free_course_quality import Feedback, visibility_state
+from app.services.free_course_records import RecordKind, read_records
 from app.services.free_course_recovery import Recovery
 from app.services.free_course_revision import Revisions
 from app.services.free_course_scheduler import Scheduler
@@ -482,3 +483,19 @@ async def tutor_read(
     course_id: UUID, turn_id: UUID, current: Owner, sessions: Sessions
 ) -> JSONResponse:
     return reply("TutorTurn", await TutorTurns(sessions).read(current.user.id, course_id, turn_id))
+
+
+@router.get("/{course_id}/records")
+async def records(
+    course_id: UUID,
+    kind: RecordKind,
+    current: Owner,
+    sessions: Sessions,
+    limit: int = Query(20, ge=1, le=50),
+    before_id: UUID | None = None,
+) -> JSONResponse:
+    async with sessions() as db:
+        result = await read_records(
+            db, current.user.id, course_id, kind, limit=limit, before_id=before_id
+        )
+    return reply("RecordPage", result)

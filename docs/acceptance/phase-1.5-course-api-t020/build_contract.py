@@ -30,12 +30,23 @@ def main() -> None:
             merged["paths"].setdefault(route, {}).update(methods)
         for section in ["schemas", "parameters", "securitySchemes"]:
             merged["components"][section].update(value["components"].get(section, {}))
+    # ADR0028 source stays frozen; publish only the T047 implemented index projection.
+    relative = "docs/api/phase-1.5-record-read.proposed.openapi.json"
+    read_source = ROOT / relative
+    supplement = json.loads(read_source.read_text())
+    sources.append(dict(path=relative, sha256=hashlib.sha256(read_source.read_bytes()).hexdigest()))
+    route = "/api/free-courses/{course_id}/records"
+    merged["paths"][route] = supplement["paths"][route]
+    merged["paths"][route]["get"]["x-status"] = "implemented"
+    for name in ["RecordRef", "RecordPage"]:
+        merged["components"]["schemas"][name] = supplement["components"]["schemas"][name]
+    merged["components"]["securitySchemes"].update(supplement["components"]["securitySchemes"])
     merged["components"]["schemas"]["SceneProjection"]["properties"]["blocks"]["items"][
         "oneOf"
     ].append({"$ref": "#/components/schemas/DisabledExerciseBlock"})
     merged["x-contract-sources"] = sources
     merged["x-integration"] = (
-        "T001 base + T002 generation + approved T003 quality/tutor DTOs; tutor routes integrated in T045"
+        "T001 base + T002 generation + approved T003 quality/tutor DTOs; tutor routes integrated in T045; ADR0028 owner record index integrated in T047"
     )
     for route, method in [
         ("/api/free-courses/{course_id}/operations/{operation_id}", "get"),

@@ -2008,6 +2008,88 @@
           }
         }
       }
+    },
+    "/api/free-courses/{course_id}/records": {
+      "get": {
+        "x-status": "implemented",
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "course_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "kind",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "enum": [
+                "attempt",
+                "operation",
+                "feedback",
+                "tutor"
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20
+            }
+          },
+          {
+            "name": "before_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Private no-store owner projection",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecordPage"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Session required"
+          },
+          "404": {
+            "description": "Uniform NOT_FOUND"
+          },
+          "422": {
+            "description": "Invalid parameters"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -4838,6 +4920,66 @@
           }
         ],
         "description": "Trusted local CLI only; not student API. Final stored record additionally has authenticated local authority, rule version, server digests and database timestamp. Mechanical/model opinion alone cannot attest semantic answers/mapping."
+      },
+      "RecordRef": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "record_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "record_id",
+          "created_at"
+        ]
+      },
+      "RecordPage": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "course_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "enum": [
+              "attempt",
+              "operation",
+              "feedback",
+              "tutor"
+            ]
+          },
+          "items": {
+            "type": "array",
+            "maxItems": 50,
+            "items": {
+              "$ref": "#/components/schemas/RecordRef"
+            }
+          },
+          "next_before_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "course_id",
+          "kind",
+          "items",
+          "next_before_id"
+        ]
       }
     },
     "parameters": {
@@ -4963,6 +5105,11 @@
         "type": "apiKey",
         "in": "cookie",
         "name": "edumind_session"
+      },
+      "session": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "edumind_session"
       }
     }
   },
@@ -4978,7 +5125,11 @@
     {
       "path": "docs/api/phase-1.5-quality.openapi.json",
       "sha256": "3c6bb5d5e253843e4a4d53efc00c63437bf318cc43820cd7cf73df22198ba25c"
+    },
+    {
+      "path": "docs/api/phase-1.5-record-read.proposed.openapi.json",
+      "sha256": "2d5dcae2b98bef0102be6b1d25c47d3b0fae03f9c666a36b1b14a5ccf00445e9"
     }
   ],
-  "x-integration": "T001 base + T002 generation + approved T003 quality/tutor DTOs; tutor routes integrated in T045"
+  "x-integration": "T001 base + T002 generation + approved T003 quality/tutor DTOs; tutor routes integrated in T045; ADR0028 owner record index integrated in T047"
 }
