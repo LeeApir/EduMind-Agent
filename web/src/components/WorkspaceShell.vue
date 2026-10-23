@@ -41,7 +41,7 @@ const links = [{ id: 'learning', label: '学习' }, { id: 'catalog', label: '签
       ref="navigation"
       class="workspace-sidebar"
       :class="{ 'is-open': open }"
-     
+
       @keydown="trap"
     >
       <div class="workspace-brand">
