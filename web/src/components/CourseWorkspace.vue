@@ -2,6 +2,7 @@
 import { computed, nextTick, onBeforeUnmount, ref, toRef, watch } from 'vue';
 import { FreeCourseError, listVersions, readManifest, readScene, readStored, terminalOperation, writeStored, type Manifest, type SceneProjection } from '../api/freeCourses';
 import { useCourseFeed } from '../composables/useCourseFeed';
+import CourseTutor from './CourseTutor.vue';
 import CourseExercise from './CourseExercise.vue';
 import CoursePresentation from './CoursePresentation.vue';
 import WorkspaceState from './WorkspaceState.vue';
@@ -327,15 +328,24 @@ onBeforeUnmount(()=>{save();epoch+=1;manifestEpoch+=1;versionsEpoch+=1;controlle
                 >
                   关闭导师
                 </button>
-              </div><p v-if="generating">
-                当前生成仍在进行；可在大纲页主动停止后再处理提问。
-              </p><p>导师发送尚未接入。可以先记下问题，输入按本机当前学习身份保留，不发送模型。</p><label for="tutor-question-draft">记下问题</label><textarea
-                id="tutor-question-draft"
+              </div>
+              <CourseTutor
+                v-if="scene"
+                :key="`${scene.course_version}:${scene.scene_version_id}`"
                 v-model="tutorQuestion"
-                rows="3"
-                maxlength="4000"
-                @input="saveQuestion"
+                :course-id="courseId"
+                :course-version="scene.course_version"
+                :scene-id="scene.scene_id"
+                :scene-version-id="scene.scene_version_id"
+                :head-version="course.head?.version ?? null"
+                :mode="mode"
+                :generation-active="Boolean(generating)"
+                :active="active"
+                @update:model-value="saveQuestion"
               />
+              <p v-else>
+                当前场景尚未可读，暂不能发送提问；已有问题保留。
+              </p>
             </section>
           </div>
         </article>

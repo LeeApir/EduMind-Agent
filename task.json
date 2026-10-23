@@ -53,7 +53,7 @@
     "dynamic_release_authorized": false,
     "deployment_authorized": false,
     "H": "H01–H08继续封存；新契约确定后重判适用性与独立性，不自动继承验收资格。",
-    "implementation_scope": "T001–T027及T043–T045 done；T028页面接入随后，当前阶段45项。",
+    "implementation_scope": "T001–T028及T043–T045 done；T029–T042按依赖继续，当前阶段45项。",
     "included": [
       "自由目标/可变场景/可选多节点关联",
       "首场景可学与后续持久生成/恢复/局部修订",
@@ -1484,7 +1484,7 @@
       "id": "PHASE-1.5-T028",
       "phase": "Phase 1.5",
       "title": "接入当前场景导师问答与补充解释",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1.5-T025",
@@ -1514,12 +1514,17 @@
         "实际浏览器核对本任务页面/关键状态及移动端；使用隔离服务或明确Mock并记录区别。",
         "git diff --check"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "全量35文件248单测0失败/skip，导师7项",
+        "typecheck/build通过；lint0错误35既有警告",
+        "Chromium六宽度/辅助确认/SSEready/只读刷新/失效正文/明确取消通过，HTTP/SSE明确Mock；证据docs/design/phase-1.5-tutor-ui-t028",
+        "工作流/diff通过，Provider0/catalog_only"
+      ],
+      "started_at": "2026-10-23T14:10:15",
+      "completed_at": "2026-10-23T14:30:59",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T028",
-      "execution_gate": "用户已授权持续完成当前阶段；现有导师只覆盖旧课堂，先完成按批准ADR0026细化的T043–T045，再接T028页面。"
+      "execution_gate": "页面验收通过，独立完成提交后按持续阶段授权继续T029。"
     },
     {
       "id": "PHASE-1.5-T029",

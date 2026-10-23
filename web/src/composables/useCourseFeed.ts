@@ -41,7 +41,7 @@ export function useCourseFeed(courseId: Ref<string>, operationId: Ref<string>, a
         if (data.type === 'done') { stream.close(); if (source === stream) source = undefined; }
       } catch { stream.close(); error.value = '进度事件无效，请重新读取。'; }
     };
-    for (const type of ['queued','started','clarification_required','outline_ready','scene_started','scene_ready','first_scene_ready','progress','cancel_requested','error','done']) stream.addEventListener(type,receive);
+    for (const type of ['queued','started','clarification_required','outline_ready','scene_started','scene_ready','first_scene_ready','tutor_ready','progress','cancel_requested','error','done']) stream.addEventListener(type,receive);
     stream.onerror = (event) => {
       if (typeof (event as MessageEvent).data === 'string') return;
       if (token !== epoch) return; stream.close(); if (source === stream) source = undefined; failures += 1;
