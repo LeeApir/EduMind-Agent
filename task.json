@@ -2003,7 +2003,7 @@
       "id": "PHASE-1.5-T049",
       "phase": "Phase 1.5",
       "title": "修复自由课程创建时采用当前owner画像并保持重放快照",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1.5-T020",
@@ -2028,9 +2028,13 @@
         "python3 scripts/check_catalog_workflow.py",
         "git diff --check"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "r01实际4隔离PG/HTTP共92通过0失败/skip：新增2/API7/调度39/快照44",
+        "Ruff服务及测试/strict mypy1/工作流/diff通过；证据docs/acceptance/phase-1.5-profile-create-t049",
+        "首次采用owner当前画像，重放保留原画像/旧null，真实规划Prompt验证；Provider0/catalog_only"
+      ],
+      "started_at": "2026-10-23T23:49:32",
+      "completed_at": "2026-10-23T23:53:01",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T049",
       "execution_gate": "用户继续T037所必需的已批准画像行为修复；不增加产品API字段或真实调用。"

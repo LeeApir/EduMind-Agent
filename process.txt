@@ -2169,3 +2169,9 @@ T089完成1b2b89d后冻结本批唯一开发验证，准备8份跨数组/栈/链
 
 [2026-10-23T23:48:41] [PHASE-1.5-T037] BLOCKED | executor=Lee
 改动摘要：登记用户最新候选/费用方向及Lee采纳准确材料、自报耗时1h，核对官方型号和总输出计量；预算内核支持显式费用例外并保留其他硬界 | 验证结果：32离线测试通过，实际Responses桥含逐次token计数/准确wire及异常停发，无真实调用；官方参考不冒充中转发票 | 遗留问题：实际Scheduler.enqueue未绑定owner画像，不能用测试特注画像制造个性化；新增T049为T037依赖，T037继续blocked | 下一步：先独立修复T049实际API画像/幂等快照，随后恢复T037最终执行器与冻结；本次进度无Task-Completed
+
+[2026-10-23T23:49:32] [PHASE-1.5-T049] START | executor=Lee | branch=codex/phase-1.5-t001
+改动摘要：领取T037前置的真实自由课程创建画像缺陷修复；只采用同owner当前画像，重放保留原快照 | 验证结果：Scheduler.enqueue确实未传profile_id，仓储已有owner校验及画像ID/版本/证据快照能力 | 遗留问题：不能改公开API形状、把未知当事实或使画像更新破坏旧幂等重放；Provider0/catalog_only | 下一步：owner锁内新建选择/原收据复用，真实PG/HTTP及规划快照/旧重放回归后独立提交
+
+[2026-10-23T23:53:01] [PHASE-1.5-T049] VERIFIED | executor=Lee
+改动摘要：真实创建owner当前画像快照、幂等重放保留原画像及旧null；无公开API/迁移变更 | 验证结果：r01实际4新库92通过0skip，Ruff2/strict mypy1/工作流/diff通过，证据docs/acceptance/phase-1.5-profile-create-t049 | 遗留问题：自述不当掌握度，未借其他owner，Provider0/catalog_only | 下一步：独立完成提交核对后恢复T037最终执行包，真实执行仍未授权

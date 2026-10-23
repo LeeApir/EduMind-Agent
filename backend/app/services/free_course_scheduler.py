@@ -16,7 +16,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from app.agents import free_course_planning as planner
 from app.agents import free_scene_generation as generator
 from app.models.auth import User
-from app.models.free_course import FreeCourse
+from app.models.free_course import FreeCourse, FreeCourseRequest
 from app.models.free_course_progress import FreeCourseEvent, FreeCourseStep
 from app.models.free_course_scheduler import (
     FreeCourseAttempt,
@@ -24,7 +24,8 @@ from app.models.free_course_scheduler import (
     FreeCourseDispatch,
     FreeCourseSettlement,
 )
-from app.models.free_course_writes import FreeCourseOperation
+from app.models.free_course_writes import FreeCourseOperation, FreeCourseReceipt
+from app.models.learning import StudentProfile
 from app.services import free_course_planning as plans
 from app.services import free_scene_availability as visibility
 from app.services import free_scene_generation as scenes
@@ -205,9 +206,30 @@ class Scheduler:
         async with self.sessions() as db, db.begin():
             repo = SnapshotRepository(db, owner)
             await repo._owner_lock()
+            receipt = await db.get(FreeCourseReceipt, (owner, "/api/free-courses", key))
+            if receipt is not None:
+                # Replay is bound to the original request, even after a profile correction.
+                original = await repo._operation(
+                    UUID(str(receipt.response_json["course_id"])),
+                    UUID(str(receipt.response_json["operation_id"])),
+                )
+                profile_id = await db.scalar(
+                    select(FreeCourseRequest.profile_id).where(
+                        FreeCourseRequest.user_id == owner,
+                        FreeCourseRequest.id == original.request_id,
+                    )
+                )
+            else:
+                profile_id = await db.scalar(
+                    select(StudentProfile.id)
+                    .where(StudentProfile.user_id == owner)
+                    .order_by(StudentProfile.version.desc())
+                    .limit(1)
+                )
             result = await repo.create_course(
                 goal,
                 key=key,
+                profile_id=profile_id,
                 policy_snapshot=POLICY,
                 teaching_language=teaching_language,
                 code_language=code_language,
