@@ -7,6 +7,7 @@ import { readStored, writeStored } from "./api/freeCourses";
 import CourseOutline from "./components/CourseOutline.vue";
 import CourseWorkspace from "./components/CourseWorkspace.vue";
 import LearningHome from "./components/LearningHome.vue";
+import GraphPaths from './components/GraphPaths.vue';
 import CatalogPage from "./components/CatalogPage.vue";
 
 const DynamicApp = defineAsyncComponent(() => import("./App.vue"));
@@ -15,6 +16,8 @@ const ModelPreferences = defineAsyncComponent(() => import("./components/ModelPr
 const page = ref("learning");
 const opened = ref(new Set(["learning"]));
 const owner = ref("");
+const goalSuggestion=ref('');
+function suggestGoal(value:string):void{goalSuggestion.value=value;navigate('learning');}
 const settingsReturn = ref("learning");
 function navigate(value: string): void { if (["connections","preferences"].includes(value) && !["connections","preferences"].includes(page.value)) settingsReturn.value=page.value; page.value = value; opened.value.add(value); persist(); }
 function persist(): void { if (owner.value) writeStored(`edumind:free:location:${owner.value}`, { page: page.value, course: selectedCourse.value, operation: selectedOperation.value, version: selectedVersion.value, scene: selectedScene.value }); }
@@ -37,6 +40,7 @@ async function load(): Promise<void> {
     const runtime = await loadProductMode(); const session = await ensureCatalogSession(); if (owner.value && owner.value !== session.owner) { selectedCourse.value='';selectedOperation.value='';selectedScene.value='';page.value='learning'; }
     owner.value = session.owner;
     const saved = readStored<{page:string;course:string;operation:string;version:number;scene:string}>(`edumind:free:location:${owner.value}`);
+    if(saved?.page==='graph'){page.value='graph';selectedCourse.value=typeof saved.course==='string'?saved.course:'';selectedOperation.value=typeof saved.operation==='string'?saved.operation:'';selectedVersion.value=Number.isInteger(saved.version)&&saved.version>0?saved.version:1;selectedScene.value=typeof saved.scene==='string'?saved.scene:'';}
     if (saved && ['outline','course'].includes(saved.page) && typeof saved.course === 'string' && typeof saved.operation === 'string') { selectedCourse.value=saved.course; selectedOperation.value=saved.operation; selectedVersion.value=Number.isInteger(saved.version) && saved.version>0 ? saved.version:1; selectedScene.value=typeof saved.scene==='string'?saved.scene:''; page.value=saved.page==='course' && !selectedScene.value?'outline':saved.page; }
     mode.value = runtime;
   }
@@ -76,6 +80,8 @@ onMounted(load);
         <LearningHome
           :active="page === 'learning'"
           :mode="mode"
+          :suggested-goal="goalSuggestion"
+          @clear-suggestion="goalSuggestion = ''"
           @open="openCourse"
           @catalog="navigate('catalog')"
         />
@@ -104,6 +110,13 @@ onMounted(load);
           @operation="setOperation"
         />
       </template>
+      <GraphPaths
+        v-if="page === 'graph'"
+        :course-id="selectedCourse"
+        :course-version="selectedVersion"
+        @goal="suggestGoal"
+        @catalog="navigate('catalog')"
+      />
       <section v-show="page === 'catalog'">
         <CatalogPage v-if="opened.has('catalog')" />
       </section>

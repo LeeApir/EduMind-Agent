@@ -3,8 +3,8 @@ import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { ensureCatalogSession, loadCatalog, type CatalogListing } from '../api/catalog';
 import { createCourse, listCourses, readStored, writeStored, type CourseSummary, type CreatedCourse, type CreateCourse } from '../api/freeCourses';
 import WorkspaceState from './WorkspaceState.vue';
-const props = withDefaults(defineProps<{ mode: 'catalog_only' | 'dynamic'; active?: boolean }>(), {active:true});
-const emit = defineEmits<{ open: [course: string, operation: string]; catalog: [] }>();
+const props = withDefaults(defineProps<{ mode: 'catalog_only' | 'dynamic'; active?: boolean; suggestedGoal?:string }>(), {active:true,suggestedGoal:''});
+const emit = defineEmits<{ open: [course: string, operation: string]; catalog: [];clearSuggestion:[] }>();
 const goal = ref(''); const language = ref<'c' | ''>('c'); const owner = ref('');
 const loading = ref(true); const busy = ref(false); const error = ref(''); const listError = ref('');
 const courses = ref<CourseSummary[]>([]); const cursor = ref<string | null>(null); const catalog = ref<CatalogListing>();
@@ -60,6 +60,25 @@ onMounted(initialize); onBeforeUnmount(() => { epoch += 1; controller.abort(); }
     </p><h1>今天，你想弄懂什么？</h1><p class="page-lead">
       说说你的目标。无需先选知识点，也不用填写一张画像问卷。
     </p>
+    <section
+      v-if="suggestedGoal"
+      class="surface"
+      aria-label="待确认节点目标"
+    >
+      <h2>从图谱带来的目标</h2><p>{{ suggestedGoal }}</p><p>仅在确认后放入输入框；已有输入将被替换，课程与生成不会自动开始。</p><button
+        class="secondary"
+        type="button"
+        @click="goal = suggestedGoal; emit('clearSuggestion')"
+      >
+        确认替换目标输入
+      </button><button
+        class="secondary"
+        type="button"
+        @click="emit('clearSuggestion')"
+      >
+        保留原输入
+      </button>
+    </section>
     <form
       class="goal-card surface"
       @submit.prevent="start"

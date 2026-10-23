@@ -53,7 +53,7 @@
     "dynamic_release_authorized": false,
     "deployment_authorized": false,
     "H": "H01–H08继续封存；新契约确定后重判适用性与独立性，不自动继承验收资格。",
-    "implementation_scope": "T001–T029及T043–T045 done；T030–T042按依赖继续，当前阶段45项。",
+    "implementation_scope": "T001–T030及T043–T045 done；T031–T042按依赖继续，当前阶段45项。",
     "included": [
       "自由目标/可变场景/可选多节点关联",
       "首场景可学与后续持久生成/恢复/局部修订",
@@ -1576,7 +1576,7 @@
       "id": "PHASE-1.5-T030",
       "phase": "Phase 1.5",
       "title": "重构图谱与路径页面",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1.5-T022",
@@ -1604,12 +1604,17 @@
         "实际浏览器核对本任务页面/关键状态及移动端；使用隔离服务或明确Mock并记录区别。",
         "git diff --check"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "全量37文件264单测通过，graph-paths8项；最终相关16项通过，0skip",
+        "typecheck/build通过，lint0错误35既有警告；定向eslint无警告",
+        "Chromium明确HTTP Mock六宽度/30节点/图列表/目标确认/路径显式POST及刷新GET通过",
+        "工作流/diff通过，证据docs/design/phase-1.5-graph-paths-t030"
+      ],
+      "started_at": "2026-10-23T15:19:02",
+      "completed_at": "2026-10-23T15:23:30",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T030",
-      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。"
+      "execution_gate": "阶段持续授权；T022/T009完成提交已核对，串行执行。"
     },
     {
       "id": "PHASE-1.5-T031",
