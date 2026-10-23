@@ -2090,6 +2090,75 @@
           }
         }
       }
+    },
+    "/api/mastery/nodes/{node_id}/revisions": {
+      "get": {
+        "x-status": "implemented",
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "node_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]{1,63}$"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20
+            }
+          },
+          {
+            "name": "before_revision",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Private no-store owner projection",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RevisionPage"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Session required"
+          },
+          "404": {
+            "description": "Uniform NOT_FOUND"
+          },
+          "422": {
+            "description": "Invalid parameters"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -4980,6 +5049,244 @@
           "items",
           "next_before_id"
         ]
+      },
+      "FreeAttemptRef": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "const": "free_course_attempt"
+          },
+          "course_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "course_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "scene_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "scene_version_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "exercise_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "exercise_version_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "attempt_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "kind",
+          "course_id",
+          "course_version",
+          "scene_id",
+          "scene_version_id",
+          "exercise_id",
+          "exercise_version_id",
+          "attempt_id"
+        ]
+      },
+      "LegacyRef": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "const": "legacy_evidence"
+          },
+          "resource_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "resource_version": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "learning_unit_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "kind",
+          "resource_id",
+          "resource_version",
+          "learning_unit_id"
+        ]
+      },
+      "RevisionSource": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "protocol": {
+            "enum": [
+              "free-course-v1",
+              "free-course-correction-v1",
+              "legacy",
+              "unavailable"
+            ]
+          },
+          "evidence_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reference": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/FreeAttemptRef"
+              },
+              {
+                "$ref": "#/components/schemas/LegacyRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "protocol",
+          "evidence_id",
+          "reference"
+        ]
+      },
+      "MasteryRevision": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "previous_score": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "score": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "status": {
+            "enum": [
+              "unseen",
+              "weak",
+              "learning",
+              "mastered"
+            ]
+          },
+          "rule_version": {
+            "type": "string",
+            "maxLength": 64
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "evidence_summary": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "recomputed_from_revision": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "source": {
+            "$ref": "#/components/schemas/RevisionSource"
+          }
+        },
+        "required": [
+          "revision",
+          "previous_score",
+          "score",
+          "status",
+          "rule_version",
+          "created_at",
+          "evidence_summary",
+          "recomputed_from_revision",
+          "source"
+        ]
+      },
+      "RevisionPage": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "node_id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]{1,63}$"
+          },
+          "items": {
+            "type": "array",
+            "maxItems": 50,
+            "items": {
+              "$ref": "#/components/schemas/MasteryRevision"
+            }
+          },
+          "next_before_revision": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "node_id",
+          "items",
+          "next_before_revision"
+        ]
       }
     },
     "parameters": {
@@ -5131,5 +5438,5 @@
       "sha256": "2d5dcae2b98bef0102be6b1d25c47d3b0fae03f9c666a36b1b14a5ccf00445e9"
     }
   ],
-  "x-integration": "T001 base + T002 generation + approved T003 quality/tutor DTOs; tutor routes integrated in T045; ADR0028 owner record index integrated in T047"
+  "x-integration": "T001 base + T002 generation + approved T003 quality/tutor DTOs; tutor routes integrated in T045; ADR0028 owner record index integrated in T047; mastery provenance integrated in T048"
 }

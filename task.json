@@ -53,7 +53,7 @@
     "dynamic_release_authorized": false,
     "deployment_authorized": false,
     "H": "H01–H08继续封存；新契约确定后重判适用性与独立性，不自动继承验收资格。",
-    "implementation_scope": "T001–T030及T043–T047 done；T048按依赖实施后继续T031/T032，其余串行推进，当前48项。",
+    "implementation_scope": "T001–T030及T043–T048 done；按依赖继续T031/T032及其余任务，当前48项。",
     "included": [
       "自由目标/可变场景/可选多节点关联",
       "首场景可学与后续持久生成/恢复/局部修订",
@@ -1693,7 +1693,7 @@
       "id": "PHASE-1.5-T048",
       "phase": "Phase 1.5",
       "title": "实现owner掌握度修订来源读取",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1.5-T046",
@@ -1716,12 +1716,16 @@
         "（待建立）backend/.venv/bin/python -m pytest backend/tests/test_mastery_revision_api.py -q；实际隔离PG，0环境skip",
         "相关ruff/mypy、runtime OpenAPI一致检查、工作流与git diff --check"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "r03:43 passed,0 failed/error/skipped,5新隔离PG；新HTTP来源5项/索引4/原证据15/API7/兼容12",
+        "Ruff5/strict mypy2/runtime契约/设计SHA/工作流/diff通过",
+        "41批准/manifest及50历史SHA、用户原README SHA保持；证据docs/acceptance/phase-1.5-mastery-history-t048"
+      ],
+      "started_at": "2026-10-23T21:16:43",
+      "completed_at": "2026-10-23T21:24:24",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T048",
-      "execution_gate": "准确ADR0028批准前禁止实现新接口；不扩展Provider/生产/跨owner权限。"
+      "execution_gate": "ADR0028准确批准及T046完成；T047 e6a1204核对，用户恢复持续授权，零Provider实施。"
     },
     {
       "id": "PHASE-1.5-T031",

@@ -30,7 +30,7 @@ def main() -> None:
             merged["paths"].setdefault(route, {}).update(methods)
         for section in ["schemas", "parameters", "securitySchemes"]:
             merged["components"][section].update(value["components"].get(section, {}))
-    # ADR0028 source stays frozen; publish only the T047 implemented index projection.
+    # ADR0028 source stays frozen; merge only implemented T047/T048 read projections.
     relative = "docs/api/phase-1.5-record-read.proposed.openapi.json"
     read_source = ROOT / relative
     supplement = json.loads(read_source.read_text())
@@ -38,7 +38,10 @@ def main() -> None:
     route = "/api/free-courses/{course_id}/records"
     merged["paths"][route] = supplement["paths"][route]
     merged["paths"][route]["get"]["x-status"] = "implemented"
-    for name in ["RecordRef", "RecordPage"]:
+    route = "/api/mastery/nodes/{node_id}/revisions"
+    merged["paths"][route] = supplement["paths"][route]
+    merged["paths"][route]["get"]["x-status"] = "implemented"
+    for name in ["RecordRef", "RecordPage", "FreeAttemptRef", "LegacyRef", "RevisionSource", "MasteryRevision", "RevisionPage"]:
         merged["components"]["schemas"][name] = supplement["components"]["schemas"][name]
     merged["components"]["securitySchemes"].update(supplement["components"]["securitySchemes"])
     merged["components"]["schemas"]["SceneProjection"]["properties"]["blocks"]["items"][
@@ -46,7 +49,7 @@ def main() -> None:
     ].append({"$ref": "#/components/schemas/DisabledExerciseBlock"})
     merged["x-contract-sources"] = sources
     merged["x-integration"] = (
-        "T001 base + T002 generation + approved T003 quality/tutor DTOs; tutor routes integrated in T045; ADR0028 owner record index integrated in T047"
+        "T001 base + T002 generation + approved T003 quality/tutor DTOs; tutor routes integrated in T045; ADR0028 owner record index integrated in T047; mastery provenance integrated in T048"
     )
     for route, method in [
         ("/api/free-courses/{course_id}/operations/{operation_id}", "get"),
