@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { nextTick, ref, watch } from 'vue';
-const props = defineProps<{ page: string; dynamic?: boolean }>();
+const props = defineProps<{ page: string; focusKey?: string; dynamic?: boolean }>();
 const emit = defineEmits<{ navigate: [page: string] }>();
 const open = ref(false);
 const menuButton = ref<HTMLButtonElement>();
@@ -17,7 +17,7 @@ function trap(event: KeyboardEvent): void {
   else if (!event.shiftKey && document.activeElement === targets[targets.length - 1]) { event.preventDefault(); targets[0]?.focus(); }
 }
 async function toggle(): Promise<void> { open.value = !open.value; if (open.value) { await nextTick(); navigation.value?.querySelector('button')?.focus(); } }
-watch(() => props.page, async () => { open.value = false; await nextTick(); const heading = content.value?.querySelector<HTMLElement>('section:not([style*="display: none"]) h1, h1'); if (heading) { heading.tabIndex = -1; heading.focus(); } else content.value?.focus(); });
+watch(() => props.focusKey ?? props.page, async () => { open.value = false; await nextTick(); const heading = Array.from(content.value?.querySelectorAll<HTMLElement>('h1') ?? []).find(h => !h.closest('[style*="display: none"]')); if (heading) { heading.tabIndex = -1; heading.focus(); } else content.value?.focus(); });
 const links = [{ id: 'learning', label: '学习' }, { id: 'catalog', label: '签核课程目录' }, { id: 'legacy', label: '原学习入口' }, { id: 'connections', label: '模型设置' }, { id: 'preferences', label: '档位与数据去向' }];
 </script>
 <template>

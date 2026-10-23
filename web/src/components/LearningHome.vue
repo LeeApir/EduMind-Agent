@@ -3,7 +3,7 @@ import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { ensureCatalogSession, loadCatalog, type CatalogListing } from '../api/catalog';
 import { createCourse, listCourses, readStored, writeStored, type CourseSummary, type CreatedCourse, type CreateCourse } from '../api/freeCourses';
 import WorkspaceState from './WorkspaceState.vue';
-const props = defineProps<{ mode: 'catalog_only' | 'dynamic' }>();
+const props = withDefaults(defineProps<{ mode: 'catalog_only' | 'dynamic'; active?: boolean }>(), {active:true});
 const emit = defineEmits<{ open: [course: string, operation: string]; catalog: [] }>();
 const goal = ref(''); const language = ref<'c' | ''>('c'); const owner = ref('');
 const loading = ref(true); const busy = ref(false); const error = ref(''); const listError = ref('');
@@ -50,6 +50,7 @@ async function start(): Promise<void> {
   finally { if (token === epoch) busy.value = false; }
 }
 function openCourse(course: CourseSummary): void { emit('open', course.course_id, readStored<string>(`edumind:free:operation:${owner.value}:${course.course_id}`) ?? ''); }
+watch(() => props.active, value => { if (value) void initialize(); });
 onMounted(initialize); onBeforeUnmount(() => { epoch += 1; controller.abort(); });
 </script>
 <template>

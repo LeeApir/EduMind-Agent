@@ -72,3 +72,13 @@ export async function readScene(course: string, version: number, scene: string, 
   if (!value || value.course_id !== course || value.course_version !== version || value.scene_id !== scene || typeof value.scene_version_id !== 'string' || !Array.isArray(value.blocks) || !value.blocks.every(b => typeof b.anchor_id === 'string' && ['text','code','exercise','exercise_unavailable','visualization'].includes(b.kind))) throw new FreeCourseError(502,'INVALID_RESPONSE');
   return value;
 }
+export async function readManifest(course: string, version: number, signal?: AbortSignal): Promise<Manifest> {
+  const value = await courseRequest<Manifest>(`${coursePath(course)}/versions/${version}`,{signal});
+  if (!validManifest(value) || value.course_id !== course || value.version !== version) throw new FreeCourseError(502,'INVALID_RESPONSE');
+  return value;
+}
+export async function listVersions(course: string, cursor = '', signal?: AbortSignal): Promise<{items:{version:number;created_at:string}[];next_cursor:string|null}> {
+  const value = await courseRequest<{items:{version:number;created_at:string}[];next_cursor:string|null}>(`${coursePath(course)}/versions?limit=20${cursor ? `&cursor=${encodeURIComponent(cursor)}` : ''}`,{signal});
+  if (!value || !Array.isArray(value.items) || !value.items.every(v=>Number.isInteger(v.version)&&v.version>0) || !(value.next_cursor===null || typeof value.next_cursor==='string')) throw new FreeCourseError(502,'INVALID_RESPONSE');
+  return value;
+}

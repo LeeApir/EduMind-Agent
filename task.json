@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "用户明确授权T022–T025连续工作；每项完成提交后才领取下一项，T025后停止；Provider0/catalog_only/H保持。",
+    "phase_gate": "用户授权的T022–T025已验收完成；独立完成提交并核对后停止，不自动领取T026；Provider0/catalog_only/H保持。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -53,7 +53,7 @@
     "dynamic_release_authorized": false,
     "deployment_authorized": false,
     "H": "H01–H08继续封存；新契约确定后重判适用性与独立性，不自动继承验收资格。",
-    "implementation_scope": "T001–T023 done；T024 in_progress；随后T025，T026以后不领取。",
+    "implementation_scope": "T001–T025 done；T026–T042保持todo。本批完成后停止，无真实调用/部署/开放授权。",
     "included": [
       "自由目标/可变场景/可选多节点关联",
       "首场景可学与后续持久生成/恢复/局部修订",
@@ -1224,7 +1224,7 @@
       "id": "PHASE-1.5-T025",
       "phase": "Phase 1.5",
       "title": "实现可渐进学习的课程页面",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1.5-T024"
@@ -1251,12 +1251,17 @@
         "实际浏览器核对本任务页面/关键状态及移动端；使用隔离服务或明确Mock并记录区别。",
         "git diff --check"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "全量Vitest32文件227通过0失败/跳过；工作区7项",
+        "typecheck/build通过；lint0错误35原有警告",
+        "Chromium显式HTTP/SSE Mock6宽度/增量/准确恢复/历史失效/导师草稿通过，POST0",
+        "35规范manifest/50历史原件/用户README SHA通过；工作流/diff通过；证据docs/design/phase-1.5-course-workspace-t025"
+      ],
+      "started_at": "2026-10-23T12:05:08",
+      "completed_at": "2026-10-23T12:14:38",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T025",
-      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。"
+      "execution_gate": "本批T022–T025验收通过，独立完成提交核对后停止；不领取T026。"
     },
     {
       "id": "PHASE-1.5-T026",
