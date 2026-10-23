@@ -2,18 +2,22 @@
 import { computed, nextTick, onBeforeUnmount, ref, toRef, watch } from 'vue';
 import { FreeCourseError, listVersions, readManifest, readScene, readStored, terminalOperation, writeStored, type Manifest, type SceneProjection } from '../api/freeCourses';
 import { useCourseFeed } from '../composables/useCourseFeed';
+import CourseFeedback from './CourseFeedback.vue';
+import CourseRevision from './CourseRevision.vue';
 import CourseTutor from './CourseTutor.vue';
 import CourseExercise from './CourseExercise.vue';
 import CoursePresentation from './CoursePresentation.vue';
 import WorkspaceState from './WorkspaceState.vue';
 const props = withDefaults(defineProps<{courseId:string;operationId:string;initialVersion:number;initialScene:string;mode?:'catalog_only'|'dynamic';active?:boolean}>(),{active:true,mode:'catalog_only'});
-const emit = defineEmits<{ outline:[]; home:[]; position:[version:number,scene:string] }>();
+const emit = defineEmits<{ outline:[]; home:[]; position:[version:number,scene:string];operation:[id:string] }>();
 const {course,operation,owner,error,loading,reload,inaccessible}=useCourseFeed(toRef(props,'courseId'),toRef(props,'operationId'),toRef(props,'active'));
 const manifest=ref<Manifest>();const scene=ref<SceneProjection>();const selectedScene=ref(props.initialScene);const version=ref(props.initialVersion);
 const following=ref(true);const sceneLoading=ref(false);const sceneError=ref('');const sceneErrorKind=ref<'error'|'invalid'|'forbidden'>('error');const manifestError=ref('');const invalid=ref(false);
 const highlightedAnchor=ref('');
 const directoryOpen=ref(false);const tutorOpen=ref(false);const tutorTrigger=ref<HTMLButtonElement>();const tutorQuestion=ref('');
 const visited=ref<string[]>([]);const versions=ref<{version:number;created_at:string}[]>([]);const versionsCursor=ref<string|null>(null);const versionsOpen=ref(false);const versionsError=ref('');
+const unavailableVersions=ref(new Set<string>());
+const sceneTitles=computed(()=>Object.fromEntries(manifest.value?.scenes.map(s=>[s.scene_id,s.title])??[]));
 const courseTitle=ref<HTMLElement>();const readingPane=ref<HTMLElement>();let epoch=0;let controller:AbortController|undefined;let manifestEpoch=0;let manifestController:AbortController|undefined;let versionsEpoch=0;let versionsController:AbortController|undefined;let restored=false;let scroll=0;
 interface Position {version:number;scene:string;following:boolean;scroll:number;visited:string[];tutorQuestion?:string}
 const positionKey=()=>`edumind:free:reading:${owner.value}:${props.courseId}`;
@@ -21,11 +25,11 @@ function save():void {if(owner.value && manifest.value && !invalid.value)writeSt
 function rememberScroll():void {scroll=window.scrollY;save();}
 function saveQuestion():void {save();}
 const selected=computed(()=>manifest.value?.scenes.find(s=>s.scene_id===selectedScene.value));
-const readyCount=computed(()=>manifest.value?.scenes.filter(s=>s.scene_version_id).length ?? 0);
+const readyCount=computed(()=>manifest.value?.scenes.filter(s=>s.scene_version_id&&!unavailableVersions.value.has(s.scene_version_id)).length ?? 0);
 const generating=computed(()=>operation.value && !terminalOperation(operation.value.state));
 const newer=computed(()=>course.value?.head && manifest.value && course.value.head.version>manifest.value.version);
 const stepLabels:Record<string,string>={pending:'等待生成',running:'正在生成',blocked_dependency:'等待前置场景',failed:'生成失败',cancelled:'已停止',invalidated:'内容失效'};
-function stateOf(id:string,ready:string|null):string {if(ready)return '可学习';const state=operation.value?.steps.find(s=>s.scene_id===id)?.state;return state ? stepLabels[state] ?? '等待生成':'等待生成';}
+function stateOf(id:string,ready:string|null):string {if(ready)return unavailableVersions.value.has(ready)?'内容暂不可用':'可学习';const state=operation.value?.steps.find(s=>s.scene_id===id)?.state;return state ? stepLabels[state] ?? '等待生成':'等待生成';}
 async function loadScene(resetScroll=false):Promise<void>{
   const token=++epoch;controller?.abort();controller=new AbortController();if(scene.value?.course_version!==version.value || scene.value?.scene_id!==selectedScene.value)scene.value=undefined;sceneError.value='';sceneErrorKind.value='error';sceneLoading.value=false;
   if(!props.active || !manifest.value || invalid.value)return;
@@ -34,11 +38,11 @@ async function loadScene(resetScroll=false):Promise<void>{
   const cid=props.courseId;const v=version.value;const sid=selectedScene.value;const expected=selected.value.scene_version_id;sceneLoading.value=true;
   try{
     const value=await readScene(cid,v,sid,controller.signal);if(token!==epoch || !props.active)return;
-    if(value.scene_version_id!==expected)throw new FreeCourseError(502,'VERSION_MISMATCH');scene.value=value;
+    if(value.scene_version_id!==expected)throw new FreeCourseError(502,'VERSION_MISMATCH');scene.value=value;unavailableVersions.value.delete(value.scene_version_id);
     if(!visited.value.includes(sid))visited.value.push(sid);emit('position',v,sid);save();
     await nextTick();if(token!==epoch || !props.active)return;
     if(resetScroll){readingPane.value?.querySelector<HTMLElement>('h2')?.focus();scroll=0;}else window.scrollTo({top:scroll,behavior:'instant'});
-  }catch(failure){if(token!==epoch)return;sceneError.value=failure instanceof Error?failure.message:'场景暂时无法读取。';if(failure instanceof FreeCourseError){if([401,403,404,409].includes(failure.status))scene.value=undefined;sceneErrorKind.value=[404,409].includes(failure.status)?'invalid':[401,403].includes(failure.status)?'forbidden':'error';if([401,403].includes(failure.status)){invalid.value=true;manifest.value=undefined;course.value=undefined;inaccessible.value=true;error.value='无法访问此内容，请重新读取。';}}}
+  }catch(failure){if(token!==epoch)return;sceneError.value=failure instanceof Error?failure.message:'场景暂时无法读取。';if(failure instanceof FreeCourseError){if([401,403,404,409].includes(failure.status)){scene.value=undefined;if(expected)unavailableVersions.value.add(expected);}sceneErrorKind.value=[404,409].includes(failure.status)?'invalid':[401,403].includes(failure.status)?'forbidden':'error';if([401,403].includes(failure.status)){invalid.value=true;manifest.value=undefined;course.value=undefined;inaccessible.value=true;error.value='无法访问此内容，请重新读取。';}}}
   finally{if(token===epoch)sceneLoading.value=false;}
 }
 async function loadVersion(target:number,desired=selectedScene.value,pin=true):Promise<void>{
@@ -303,6 +307,32 @@ onBeforeUnmount(()=>{save();epoch+=1;manifestEpoch+=1;versionsEpoch+=1;controlle
               @highlight="highlightedAnchor = $event"
             />
           </div>
+          <template v-if="selected?.scene_version_id">
+            <CourseFeedback
+              :key="`feedback:${version}:${selected.scene_version_id}`"
+              :course-id="courseId"
+              :course-version="version"
+              :scene-id="selectedScene"
+              :scene-version-id="selected.scene_version_id"
+              :blocks="scene?.blocks ?? []"
+              @confirmed="loadScene()"
+            />
+            <CourseRevision
+              :key="`revision:${version}:${selected.scene_version_id}`"
+              :course-id="courseId"
+              :course-version="version"
+              :scene-id="selectedScene"
+              :scene-version-id="selected.scene_version_id"
+              :head-version="course.head?.version ?? null"
+              :mode="mode"
+              :generation-active="Boolean(generating)"
+              :scene-titles="sceneTitles"
+              :blocked-content="!scene && Boolean(sceneError)"
+              @operation="$emit('operation',$event)"
+              @adopt="followLatest"
+              @outline="$emit('outline')"
+            />
+          </template>
           <div class="tutor-area">
             <button
               ref="tutorTrigger"

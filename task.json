@@ -53,7 +53,7 @@
     "dynamic_release_authorized": false,
     "deployment_authorized": false,
     "H": "H01–H08继续封存；新契约确定后重判适用性与独立性，不自动继承验收资格。",
-    "implementation_scope": "T001–T028及T043–T045 done；T029–T042按依赖继续，当前阶段45项。",
+    "implementation_scope": "T001–T029及T043–T045 done；T030–T042按依赖继续，当前阶段45项。",
     "included": [
       "自由目标/可变场景/可选多节点关联",
       "首场景可学与后续持久生成/恢复/局部修订",
@@ -1530,7 +1530,7 @@
       "id": "PHASE-1.5-T029",
       "phase": "Phase 1.5",
       "title": "实现课程反馈与局部修订交互",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1.5-T025",
@@ -1560,12 +1560,17 @@
         "实际浏览器核对本任务页面/关键状态及移动端；使用隔离服务或明确Mock并记录区别。",
         "git diff --check"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "全量Vitest36文件256通过，0失败/跳过；修订8项",
+        "typecheck/build通过；lint0错误35既有警告",
+        "真实Chromium/明确HTTP及SSE Mock六宽度、反馈确认暂停、影响确认、原回执恢复、显式读取新版本通过",
+        "工作流/diff、35批准/50历史SHA通过；证据docs/design/phase-1.5-revision-t029"
+      ],
+      "started_at": "2026-10-23T14:31:10",
+      "completed_at": "2026-10-23T15:01:24",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T029",
-      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。"
+      "execution_gate": "阶段持续授权，T025/T016/T017/T027依赖完成；串行领取。"
     },
     {
       "id": "PHASE-1.5-T030",

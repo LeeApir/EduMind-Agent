@@ -101,6 +101,7 @@ onMounted(load);
           @outline="navigate('outline')"
           @home="navigate('learning')"
           @position="position"
+          @operation="setOperation"
         />
       </template>
       <section v-show="page === 'catalog'">

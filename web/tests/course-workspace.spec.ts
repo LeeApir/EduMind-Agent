@@ -43,7 +43,7 @@ describe('progressive course workspace',()=>{
   it('restores exact reading position and keeps a local tutor question without sending',async()=>{
     sessionStorage.setItem('edumind:free:reading:owner:c',JSON.stringify({version:2,scene:'s2',following:false,scroll:123,visited:['s1'],tutorQuestion:'为什么先改next？'}));fixture.head=2;
     const w=mount(Workspace,{props:{...props,initialVersion:2,initialScene:'s2'},attachTo:document.body});await flushPromises();expect(w.text()).toContain('第二节新增讲解');expect(window.scrollTo).toHaveBeenCalledWith({top:123,behavior:'instant'});
-    await click(w,'有疑问？打开导师区域');expect((w.get('textarea').element as HTMLTextAreaElement).value).toBe('为什么先改next？');expect(w.text()).toContain('当前只开放签核课程');await w.get('textarea').setValue('保存草稿');await click(w,'关闭导师');expect(document.activeElement?.textContent).toContain('有疑问');expect(fixture.posts).toBe(0);w.unmount();
+    await click(w,'有疑问？打开导师区域');expect((w.get('#tutor-question-draft').element as HTMLTextAreaElement).value).toBe('为什么先改next？');expect(w.text()).toContain('当前只开放签核课程');await w.get('#tutor-question-draft').setValue('保存草稿');await click(w,'关闭导师');expect(document.activeElement?.textContent).toContain('有疑问');expect(fixture.posts).toBe(0);w.unmount();
     const saved=JSON.parse(sessionStorage.getItem('edumind:free:reading:owner:c')!);expect(saved.version).toBe(2);expect(saved.scene).toBe('s2');expect(saved.tutorQuestion).toBe('保存草稿');
   });
   it('does not substitute a missing saved scene, and drops content when owner changes',async()=>{
