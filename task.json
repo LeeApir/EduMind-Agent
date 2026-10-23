@@ -53,7 +53,7 @@
     "dynamic_release_authorized": false,
     "deployment_authorized": false,
     "H": "H01–H08继续封存；新契约确定后重判适用性与独立性，不自动继承验收资格。",
-    "implementation_scope": "T001–T030及T043–T045 done；T031–T042按依赖继续，当前阶段45项。",
+    "implementation_scope": "T001–T030及T043–T045 done；T046只读具体契约待批准，T047/T048及T031/T032受其依赖；其余按依赖推进，当前48项。",
     "included": [
       "自由目标/可变场景/可选多节点关联",
       "首场景可学与后续持久生成/恢复/局部修订",
@@ -1617,6 +1617,108 @@
       "execution_gate": "阶段持续授权；T022/T009完成提交已核对，串行执行。"
     },
     {
+      "id": "PHASE-1.5-T046",
+      "phase": "Phase 1.5",
+      "title": "冻结记录索引与掌握度追溯读取补充契约",
+      "status": "blocked",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T020",
+        "PHASE-1.5-T019"
+      ],
+      "scope": [
+        "docs/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5/§9.1；已批准T004主要页面；T031/T032验收；ADR0028只读具体方案待准确批准",
+      "acceptance_criteria": [
+        "两个读取接口的字段、owner隔离、分页和历史投影形成可核对规范与准确manifest。",
+        "新来源/撤销准确引用原作答，旧来源/缺失不虚构；不公开私有答案、核定原文或请求配置。",
+        "用户准确批准A—C后登记批准，冻结提案保持原字节。"
+      ],
+      "verification": [
+        "backend/.venv/bin/python docs/acceptance/phase-1.5-record-read-contract-r01/check_design.py",
+        "准确批准及SHA登记核对；git diff --check"
+      ],
+      "verification_results": [
+        "设计检查通过：2个GET/no-store/会话/分页上限，6份合成结构例与未知字段拒绝，manifest SHA；无API/PG/Provider执行"
+      ],
+      "started_at": "2026-10-23T15:30:04",
+      "completed_at": null,
+      "blocker": "ADR0028 A—C及manifest准确字节待用户批准；未实施新读取路由",
+      "commit_lookup": "Task-Completed: PHASE-1.5-T046",
+      "execution_gate": "准确ADR0028批准前禁止实现新接口；不扩展Provider/生产/跨owner权限。"
+    },
+    {
+      "id": "PHASE-1.5-T047",
+      "phase": "Phase 1.5",
+      "title": "实现owner课程记录分页索引",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T046",
+        "PHASE-1.5-T020"
+      ],
+      "scope": [
+        "backend/app/",
+        "backend/tests/",
+        "docs/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5/§9.1；已批准T004主要页面；T031/T032验收；ADR0028只读具体方案待准确批准",
+      "acceptance_criteria": [
+        "四种记录按owner/course/kind稳定分页，零/多页及同时间戳不遗漏重复。",
+        "外域课程/游标统一404，catalog_only只读；正文沿既有GET最新投影，索引不返回缓存答案。",
+        "实际隔离PG/HTTP及旧API兼容验证，更新runtime契约与证据。"
+      ],
+      "verification": [
+        "（待建立）backend/.venv/bin/python -m pytest backend/tests/test_free_course_records_api.py -q；实际隔离PG，0环境skip",
+        "相关ruff/mypy、runtime OpenAPI一致检查、工作流与git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T047",
+      "execution_gate": "准确ADR0028批准前禁止实现新接口；不扩展Provider/生产/跨owner权限。"
+    },
+    {
+      "id": "PHASE-1.5-T048",
+      "phase": "Phase 1.5",
+      "title": "实现owner掌握度修订来源读取",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T046",
+        "PHASE-1.5-T019"
+      ],
+      "scope": [
+        "backend/app/",
+        "backend/tests/",
+        "docs/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5/§9.1；已批准T004主要页面；T031/T032验收；ADR0028只读具体方案待准确批准",
+      "acceptance_criteria": [
+        "按owner/node分页读取已有revision、规则及同owner重算前一revision，不将历史分数当当前贡献。",
+        "新准入/撤销追到准确原attempt，旧来源只给允许资源引用，缺失/未知关闭来源，不公开原始payload。",
+        "实际隔离PG/HTTP验证普通准入及修订/缺陷撤销，兼容旧规则和无证据节点。"
+      ],
+      "verification": [
+        "（待建立）backend/.venv/bin/python -m pytest backend/tests/test_mastery_revision_api.py -q；实际隔离PG，0环境skip",
+        "相关ruff/mypy、runtime OpenAPI一致检查、工作流与git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T048",
+      "execution_gate": "准确ADR0028批准前禁止实现新接口；不扩展Provider/生产/跨owner权限。"
+    },
+    {
       "id": "PHASE-1.5-T031",
       "phase": "Phase 1.5",
       "title": "重构画像与掌握度页面",
@@ -1624,7 +1726,8 @@
       "priority": "P0",
       "depends_on": [
         "PHASE-1.5-T022",
-        "PHASE-1.5-T019"
+        "PHASE-1.5-T019",
+        "PHASE-1.5-T048"
       ],
       "scope": [
         "web/src/",
@@ -1664,7 +1767,8 @@
       "depends_on": [
         "PHASE-1.5-T022",
         "PHASE-1.5-T020",
-        "PHASE-1.5-T019"
+        "PHASE-1.5-T019",
+        "PHASE-1.5-T047"
       ],
       "scope": [
         "web/src/",

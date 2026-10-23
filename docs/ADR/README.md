@@ -90,3 +90,5 @@
 2026-10-21：[ADR-0022](0022-phase-1-contracted-closeout-and-phase-1-5.md)按用户明确五项指令Accepted：P1按收敛范围结束，T040／T041 blocked，T042按交接条件完成；最终账本原样归档、同一治理提交切换Phase 1.5，仅规划todo未启动。默认catalog_only/H封存，无新真实调用或模型试错，不追认旧质量／性能，见[交接](../acceptance/phase-1-closeout-20261021/README.md)。
 
 2026-10-21：[ADR-0023](0023-free-course-learning-and-ui-direction.md)记录用户确认的P1.5自由课程学习及界面重构方向（A—F）。学生可直接学习AI草稿，节点不再是新流程生成门禁；程序安全与掌握度证据边界保留。仅需求及设计文档同步，具体实现契约未冻结，不拆task、不开发、不开放运行。
+
+2026-10-23：[ADR-0028](0028-owner-record-index-and-mastery-provenance.md)为T031/T032缺失的持久记录索引与掌握度追溯提出2个owner只读GET，A—C及准确manifest待批准；新API未实现，不改变旧已批准附件、评分算法、权限、运行模式或真实预算。任务拆分T046–T048，活动状态以根账本为准。
