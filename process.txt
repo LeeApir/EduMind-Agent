@@ -2145,3 +2145,9 @@ T089完成1b2b89d后冻结本批唯一开发验证，准备8份跨数组/栈/链
 
 [2026-10-23T22:43:29] [PHASE-1.5-T034] VERIFIED | executor=Lee
 改动摘要：移动导航含关闭焦点/背景隔离/宽屏解除、长代码键盘滚动、缓存全部型号可达，保持批准视觉 | 验证结果：298单测/新增6、typecheck/build、lint0错误35既有警告；Chromium八页六宽度/原生键盘及对比度通过，证据docs/design/phase-1.5-accessibility-t034，41批准50历史完整性/工作流/diff通过 | 遗留问题：明确HTTP Mock不补真实集成/质量/性能；Provider0/catalog_only | 下一步：独立完成提交核对后继续T035真实隔离PG与MockProvider集成
+
+[2026-10-23T22:44:18] [PHASE-1.5-T035] START | executor=Lee | branch=codex/phase-1.5-t001
+改动摘要：领取新链零Provider集成验收，T034 8e3b9df核对 | 验证结果：新链已具备生成/恢复/作答/修订/来源接口，前端298测试通过 | 遗留问题：不得用前端Mock充当真实PG/持久队列；生产catalog_only/真实Provider0 | 下一步：隔离数据库跨HTTP闭环与故障注入，建立离线准确证据检查器后独立提交
+
+[2026-10-23T22:53:25] [PHASE-1.5-T035] VERIFIED | executor=Lee
+改动摘要：新增真实ASGI HTTP/PG持久调度单闭环，整合故障与旧边界回归，准确证据离线检查拒绝伪通过 | 验证结果：r02实际18新库251通过0skip，离线检查器11正负例、Ruff3/41批准50历史/工作流/diff通过，证据docs/acceptance/phase-1.5-integration-t035 | 遗留问题：r01运行器导师DB前缀错误保留并全量新库重验；不计浏览器/真实质量/性能，Provider0/catalog_only | 下一步：独立完成提交核对后继续T036实际隔离API和MockProvider浏览器旅程
