@@ -1,0 +1,222 @@
+[
+  {
+    "probe_id": "R01-severe",
+    "category": "definition",
+    "content": "栈的弹出顺序是先进先出。",
+    "proposed_label": "severe",
+    "proposed_reason": "栈push A再push B，则先pop B。",
+    "label_status": "assistant_draft_requires_human_verification",
+    "author_kind": "assistant",
+    "human_review": null,
+    "exposure": "development_only; visible to implementation agent"
+  },
+  {
+    "probe_id": "R01-correct",
+    "category": "definition",
+    "content": "栈的弹出顺序是后进先出。",
+    "proposed_label": "correct",
+    "proposed_reason": "栈push A再push B，则先pop B。",
+    "label_status": "assistant_draft_requires_human_verification",
+    "author_kind": "assistant",
+    "human_review": null,
+    "exposure": "development_only; visible to implementation agent"
+  },
+  {
+    "probe_id": "R02-severe",
+    "category": "definition",
+    "content": "对任意未排序数组都可直接用标准二分查找保证正确。",
+    "proposed_label": "severe",
+    "proposed_reason": "未排序[3,1,2]会破坏按中点排除区间的推理。",
+    "label_status": "assistant_draft_requires_human_verification",
+    "author_kind": "assistant",
+    "human_review": null,
+    "exposure": "development_only; visible to implementation agent"
+  },
+  {
+    "probe_id": "R02-correct",
+    "category": "definition",
+    "content": "标准二分查找需要与比较规则一致的有序数组。",
+    "proposed_label": "correct",
+    "proposed_reason": "未排序[3,1,2]会破坏按中点排除区间的推理。",
+    "label_status": "assistant_draft_requires_human_verification",
+    "author_kind": "assistant",
+    "human_review": null,
+    "exposure": "development_only; visible to implementation agent"
+  },
+  {
+    "probe_id": "R03-severe",
+    "category": "steps",
+    "content": "单链表头插直接先head=n，再n->next=head，保留原链表。",
+    "proposed_label": "severe",
+    "proposed_reason": "错误顺序令n->next指向n，且丢失原head引用。",
+    "label_status": "assistant_draft_requires_human_verification",
+    "author_kind": "assistant",
+    "human_review": null,
+    "exposure": "development_only; visible to implementation agent"
+  },
+  {
+    "probe_id": "R03-correct",
+    "category": "steps",
+    "content": "先n->next=head，再head=n，保留原链表。",
+    "proposed_label": "correct",
+    "proposed_reason": "错误顺序令n->next指向n，且丢失原head引用。",
+    "label_status": "assistant_draft_requires_human_verification",
+    "author_kind": "assistant",
+    "human_review": null,
+    "exposure": "development_only; visible to implementation agent"
+  },
+  {
+    "probe_id": "R04-severe",
+    "category": "code",
+    "content": "p非空且指向堆结点，free(p); int x=p->value; 可安全读取原值。",
+    "proposed_label": "severe",
+    "proposed_reason": "释放后对象生命周期结束，不能依赖旧内容仍在。",
+    "label_status": "assistant_draft_requires_human_verification",
+    "author_kind": "assistant",
+    "human_review": null,
+    "exposure": "development_only; visible to implementation agent"
+  },
+  {
+    "probe_id": "R04-correct",
+    "category": "code",
+    "content": "p非空且指向堆结点，先int x=p->value; 再free(p);，之后不再解引用p。",
+    "proposed_label": "correct",
+    "proposed_reason": "释放后对象生命周期结束，不能依赖旧内容仍在。",
+    "label_status": "assistant_draft_requires_human_verification",
+    "author_kind": "assistant",
+    "human_review": null,
+    "exposure": "development_only; visible to implementation agent"
+  },
+  {
+    "probe_id": "R05-severe",
+    "category": "code",
+    "content": "int非负lo<=hi<=INT_MAX时，mid=(lo+hi)/2 永不发生有符号溢出。",
+    "proposed_label": "severe",
+    "proposed_reason": "lo和hi接近INT_MAX时和可能越界；hi-lo在[0,INT_MAX]且结果不大于hi。",
+    "label_status": "assistant_draft_requires_human_verification",
+    "author_kind": "assistant",
+    "human_review": null,
+    "exposure": "development_only; visible to implementation agent"
+  },
+  {
+    "probe_id": "R05-correct",
+    "category": "code",
+    "content": "int非负lo<=hi<=INT_MAX时，mid=lo+(hi-lo)/2 不因求中点发生有符号溢出。",
+    "proposed_label": "correct",
+    "proposed_reason": "lo和hi接近INT_MAX时和可能越界；hi-lo在[0,INT_MAX]且结果不大于hi。",
+    "label_status": "assistant_draft_requires_human_verification",
+    "author_kind": "assistant",
+    "human_review": null,
+    "exposure": "development_only; visible to implementation agent"
+  },
+  {
+    "probe_id": "R06-severe",
+    "category": "complexity",
+    "content": "RAM模型中按有效下标读取已分配数组单个元素需要O(n)时间。",
+    "proposed_label": "severe",
+    "proposed_reason": "地址由基址和下标计算，读取一次，不包含查找目标值。",
+    "label_status": "assistant_draft_requires_human_verification",
+    "author_kind": "assistant",
+    "human_review": null,
+    "exposure": "development_only; visible to implementation agent"
+  },
+  {
+    "probe_id": "R06-correct",
+    "category": "complexity",
+    "content": "RAM模型中按有效下标读取已分配数组单个元素需要O(1)时间。",
+    "proposed_label": "correct",
+    "proposed_reason": "地址由基址和下标计算，读取一次，不包含查找目标值。",
+    "label_status": "assistant_draft_requires_human_verification",
+    "author_kind": "assistant",
+    "human_review": null,
+    "exposure": "development_only; visible to implementation agent"
+  },
+  {
+    "probe_id": "R07-severe",
+    "category": "complexity",
+    "content": "只有头指针的单链表读取第n个结点在最坏情况下为O(1)。",
+    "proposed_label": "severe",
+    "proposed_reason": "无额外索引，需要沿next走n-1次。",
+    "label_status": "assistant_draft_requires_human_verification",
+    "author_kind": "assistant",
+    "human_review": null,
+    "exposure": "development_only; visible to implementation agent"
+  },
+  {
+    "probe_id": "R07-correct",
+    "category": "complexity",
+    "content": "只有头指针的单链表读取第n个结点在最坏情况下为O(n)。",
+    "proposed_label": "correct",
+    "proposed_reason": "无额外索引，需要沿next走n-1次。",
+    "label_status": "assistant_draft_requires_human_verification",
+    "author_kind": "assistant",
+    "human_review": null,
+    "exposure": "development_only; visible to implementation agent"
+  },
+  {
+    "probe_id": "R08-severe",
+    "category": "answer",
+    "content": "数组[5,2,4]进行一次从左到右的冒泡扫描后为[2,5,4]。",
+    "proposed_label": "severe",
+    "proposed_reason": "先交换5与2得到[2,5,4]，再交换5与4。",
+    "label_status": "assistant_draft_requires_human_verification",
+    "author_kind": "assistant",
+    "human_review": null,
+    "exposure": "development_only; visible to implementation agent"
+  },
+  {
+    "probe_id": "R08-correct",
+    "category": "answer",
+    "content": "数组[5,2,4]进行一次从左到右的冒泡扫描后为[2,4,5]。",
+    "proposed_label": "correct",
+    "proposed_reason": "先交换5与2得到[2,5,4]，再交换5与4。",
+    "label_status": "assistant_draft_requires_human_verification",
+    "author_kind": "assistant",
+    "human_review": null,
+    "exposure": "development_only; visible to implementation agent"
+  },
+  {
+    "probe_id": "R09-severe",
+    "category": "answer",
+    "content": "根深度为0、高度按边数计，三个结点的链状二叉树高度为3。",
+    "proposed_label": "severe",
+    "proposed_reason": "最长根叶路径两条边，不能把结点数当高度。",
+    "label_status": "assistant_draft_requires_human_verification",
+    "author_kind": "assistant",
+    "human_review": null,
+    "exposure": "development_only; visible to implementation agent"
+  },
+  {
+    "probe_id": "R09-correct",
+    "category": "answer",
+    "content": "根深度为0、高度按边数计，三个结点的链状二叉树高度为2。",
+    "proposed_label": "correct",
+    "proposed_reason": "最长根叶路径两条边，不能把结点数当高度。",
+    "label_status": "assistant_draft_requires_human_verification",
+    "author_kind": "assistant",
+    "human_review": null,
+    "exposure": "development_only; visible to implementation agent"
+  },
+  {
+    "probe_id": "R10-severe",
+    "category": "cross_scene",
+    "content": "场景1约定循环队列保留一格、容量数组长N；场景2又称可存N个元素，且无需变更约定。",
+    "proposed_label": "severe",
+    "proposed_reason": "保留一格区分空满，最大存放数为N-1。",
+    "label_status": "assistant_draft_requires_human_verification",
+    "author_kind": "assistant",
+    "human_review": null,
+    "exposure": "development_only; visible to implementation agent"
+  },
+  {
+    "probe_id": "R10-correct",
+    "category": "cross_scene",
+    "content": "场景1约定循环队列保留一格、容量数组长N；场景2称最多可存N-1个元素，约定一致。",
+    "proposed_label": "correct",
+    "proposed_reason": "保留一格区分空满，最大存放数为N-1。",
+    "label_status": "assistant_draft_requires_human_verification",
+    "author_kind": "assistant",
+    "human_review": null,
+    "exposure": "development_only; visible to implementation agent"
+  }
+]

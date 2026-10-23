@@ -53,7 +53,7 @@
     "dynamic_release_authorized": false,
     "deployment_authorized": false,
     "H": "H01–H08继续封存；新契约确定后重判适用性与独立性，不自动继承验收资格。",
-    "implementation_scope": "T001–T036及T043–T048 done，共42/48；用户要求完成T036后停止，T037–T042保持todo，不自动继续。",
+    "implementation_scope": "T001–T036及T043–T048 done；T037准备中因供应商准确计费/版本/输出上界及人工标签缺失blocked；T038–T042 todo，真实Provider0。",
     "included": [
       "自由目标/可变场景/可选多节点关联",
       "首场景可学与后续持久生成/恢复/局部修订",
@@ -2003,7 +2003,7 @@
       "id": "PHASE-1.5-T037",
       "phase": "Phase 1.5",
       "title": "准备有界开发诊断执行包",
-      "status": "todo",
+      "status": "blocked",
       "priority": "P0",
       "depends_on": [
         "PHASE-1.5-T036",
@@ -2029,12 +2029,17 @@
         "python3 scripts/check_catalog_workflow.py",
         "git diff --check"
       ],
-      "verification_results": [],
-      "started_at": null,
+      "verification_results": [
+        "独立预算账本21项离线测试通过，0失败/skip；XML /tmp/edumind-p15-t037-ledger-r01.xml",
+        "12课程/6画像对/2负例/20助手probe草稿、单候选202请求/30元/3小时预算提案及259源码SHA已准备；无人工签核/真实授权",
+        "--check准确返回2：PARTIAL/BLOCKED，未视为验收通过；真实执行器最终绑定待准确配置",
+        "Ruff3文件、T035/T036原证据/41批准50历史/用户README/工作流/diff复核；Provider0/catalog_only"
+      ],
+      "started_at": "2026-10-23T23:16:08",
       "completed_at": null,
-      "blocker": null,
+      "blocker": "当前env候选为cbbb.fun/v1的gpt-6-luna（Responses/none）；缺本供应商模型版本、价格及总输出含推理token边界依据，20个probe/课程预期未人工核定。须据准确资料完成最终真实适配/逐槽执行绑定，不能把预算内核及草稿当已冻结执行包。",
       "commit_lookup": "Task-Completed: PHASE-1.5-T037",
-      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。"
+      "execution_gate": "用户明确继续T37，仅授权准备本轮准确诊断执行包和零调用验证；不沿用旧候选/预算/人工标签，不启动T038或真实调用。"
     },
     {
       "id": "PHASE-1.5-T038",
