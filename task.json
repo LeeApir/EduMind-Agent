@@ -53,7 +53,7 @@
     "dynamic_release_authorized": false,
     "deployment_authorized": false,
     "H": "H01–H08继续封存；新契约确定后重判适用性与独立性，不自动继承验收资格。",
-    "implementation_scope": "T001–T027 done；T028新增T043–T045批准契约实现前置，按文件顺序串行从T043继续；当前阶段45项，产品范围不变。",
+    "implementation_scope": "T001–T027及T043 done；T044/T045/T028随后按依赖继续，当前阶段45项。",
     "included": [
       "自由目标/可变场景/可选多节点关联",
       "首场景可学与后续持久生成/恢复/局部修订",
@@ -1356,7 +1356,7 @@
       "id": "PHASE-1.5-T043",
       "phase": "Phase 1.5",
       "title": "实现准确场景导师记录与上下文准入",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1.5-T003",
@@ -1385,12 +1385,17 @@
         "实际隔离PostgreSQL迁移/事务/身份/依赖失效回归，不以skip或Mock替代。",
         "Ruff/strict mypy及冻结原件SHA/工作流/diff检查"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "r04隔离PG178项通过0失败/skip，导师上下文10项",
+        "Ruff7文件/strict mypy2模块通过；迁移空库往返/有审计拒回退/旧数据SHA保持",
+        "35批准规范manifest/50旧原件/用户README SHA不变；工作流/diff通过",
+        "证据docs/design/phase-1.5-tutor-context-t043；Provider0/catalog_only，调度/HTTP待T044/T045"
+      ],
+      "started_at": "2026-10-23T12:43:26",
+      "completed_at": "2026-10-23T12:57:25",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T043",
-      "execution_gate": "用户已授权持续完成当前阶段；依赖完成后串行实施，真实Provider授权仍为0。"
+      "execution_gate": "实际PG验收通过；独立完成提交后继续T044共享调度。"
     },
     {
       "id": "PHASE-1.5-T044",

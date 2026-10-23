@@ -36,6 +36,8 @@ from app.models.free_course_scheduler import FreeCourseAttempt as FreeCourseAtte
 from app.models.free_course_scheduler import FreeCourseCapacity as FreeCourseCapacity
 from app.models.free_course_scheduler import FreeCourseDispatch as FreeCourseDispatch
 from app.models.free_course_scheduler import FreeCourseSettlement as FreeCourseSettlement
+from app.models.free_course_tutor import FreeCourseTutorReply as FreeCourseTutorReply
+from app.models.free_course_tutor import FreeCourseTutorTurn as FreeCourseTutorTurn
 from app.models.free_course_writes import FreeCourseOperation as FreeCourseOperation
 from app.models.free_course_writes import FreeCourseReceipt as FreeCourseReceipt
 from app.models.free_scene_actions import FreeScenePresentation as FreeScenePresentation
