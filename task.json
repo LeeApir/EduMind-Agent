@@ -53,7 +53,7 @@
     "dynamic_release_authorized": false,
     "deployment_authorized": false,
     "H": "H01–H08继续封存；新契约确定后重判适用性与独立性，不自动继承验收资格。",
-    "implementation_scope": "T001–T035及T043–T048 done；按依赖继续T036实际浏览器旅程，当前48项。",
+    "implementation_scope": "T001–T036及T043–T048 done，共42/48；用户要求完成T036后停止，T037–T042保持todo，不自动继续。",
     "included": [
       "自由目标/可变场景/可选多节点关联",
       "首场景可学与后续持久生成/恢复/局部修订",
@@ -1961,7 +1961,7 @@
       "id": "PHASE-1.5-T036",
       "phase": "Phase 1.5",
       "title": "完成主要学习旅程浏览器验收",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1.5-T035"
@@ -1986,12 +1986,18 @@
         "python3 scripts/check_catalog_workflow.py",
         "git diff --check"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "r04实际独立API/PG/持久调度+Chromium桌面1440/移动320主要旅程通过，28截图、0 API路由Mock、0页面异常",
+        "4create/2作答/2反馈/2导师/2修订；刷新重复写0，后续局部失败仍可读；Mock生成20/导师2，真实Provider0",
+        "真实网关/非回环网络保护9测试通过；Ruff4文件/离线准确证据检查/41批准50历史/工作流/diff通过",
+        "失败r01–r03原件保留，自动化位置/折叠目录/源码304统计错误已修正，新库r04全重验；证据docs/acceptance/phase-1.5-browser-t036",
+        "按用户最新要求T036提交后停止，不领取T037；生产catalog_only且无push/merge/部署"
+      ],
+      "started_at": "2026-10-23T22:54:00",
+      "completed_at": "2026-10-23T23:09:38",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T036",
-      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。"
+      "execution_gate": "用户最新要求完成当前T036后停止；仅真实隔离API/PG与显式MockProvider，完成提交后不领取T037；无真实凭据/调用或生产dynamic。"
     },
     {
       "id": "PHASE-1.5-T037",
