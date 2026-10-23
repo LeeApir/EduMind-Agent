@@ -50,7 +50,8 @@ class FreeCourseStep(Identity, Base):
             name="ck_fc_step_state",
         ),
         CheckConstraint(
-            "(state='ready' AND reason_code IS NULL AND ((scene_id IS NULL AND step_key='plan' "
+            "(state='ready' AND reason_code IS NULL AND ((scene_id IS NULL "
+            "AND step_key IN ('plan','tutor') "
             "AND scene_version_id IS NULL AND presentation_id IS NULL) OR (scene_id IS NOT NULL "
             "AND scene_version_id IS NOT NULL AND presentation_id IS NOT NULL))) OR state<>'ready'",
             name="ck_fc_step_ready",
@@ -86,7 +87,7 @@ class FreeCourseEvent(Identity, Base):
         CheckConstraint(
             "event_type IN ('queued','started','clarification_required','outline_ready',"
             "'scene_started','scene_ready','first_scene_ready','progress',"
-            "'cancel_requested','error','done')",
+            "'cancel_requested','error','done','tutor_ready')",
             name="ck_fc_event_type",
         ),
         CheckConstraint("jsonb_typeof(payload)='object'", name="ck_fc_event_payload"),

@@ -122,6 +122,15 @@ def from_json(value: dict[str, Any]) -> StructuredRequest:
 class Scheduler:
     """Every public mutation commits its own short transaction; network stays outside it."""
 
+    operation_policy = POLICY
+    operation_kinds: tuple[str, ...] = (
+        "create",
+        "clarify",
+        "resume",
+        "adjust_outline",
+        "revise_scene",
+    )
+
     def __init__(
         self, sessions: async_sessionmaker[AsyncSession], *, graph_version: str | None = None
     ):
@@ -248,7 +257,8 @@ class Scheduler:
                     )
                     .where(
                         FreeCourseOperation.state.in_(("queued", "running")),
-                        FreeCourseOperation.policy_snapshot == POLICY,
+                        FreeCourseOperation.policy_snapshot == self.operation_policy,
+                        FreeCourseOperation.kind.in_(self.operation_kinds),
                     )
                     .order_by(FreeCourseOperation.created_at)
                     .limit(64)
@@ -403,9 +413,9 @@ class Scheduler:
                         FreeCourseOperation.id,
                     ).where(
                         FreeCourseOperation.state.in_(ACTIVE),
-                        FreeCourseOperation.kind != "tutor_turn",
+                        FreeCourseOperation.kind.in_(self.operation_kinds),
                         or_(
-                            FreeCourseOperation.policy_snapshot == POLICY,
+                            FreeCourseOperation.policy_snapshot == self.operation_policy,
                             FreeCourseOperation.state == "cancel_requested",
                         ),
                     )
@@ -788,6 +798,12 @@ class Scheduler:
             await db.commit()
             return True
 
+    async def before_dispatch(
+        self, db: AsyncSession, lease: Lease, attempt: FreeCourseAttempt
+    ) -> bool:
+        """Protocol specialization may recheck its exact sources under existing dispatch locks."""
+        return True
+
     async def deliver(self, lease: Lease, attempt_id: UUID, adapter: Adapter) -> None:
         """Send only a reservation created by THIS invocation of run_once (never queue payload)."""
         async with self.sessions() as db:
@@ -805,6 +821,9 @@ class Scheduler:
                 select(FreeCourseDispatch.id).where(FreeCourseDispatch.attempt_id == attempt_id)
             )
             if dispatched is not None:
+                return
+            if not await self.before_dispatch(db, lease, attempt):
+                await db.commit()
                 return
             db.add(
                 FreeCourseDispatch(

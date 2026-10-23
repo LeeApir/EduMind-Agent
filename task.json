@@ -53,7 +53,7 @@
     "dynamic_release_authorized": false,
     "deployment_authorized": false,
     "H": "H01–H08继续封存；新契约确定后重判适用性与独立性，不自动继承验收资格。",
-    "implementation_scope": "T001–T027及T043 done；T044/T045/T028随后按依赖继续，当前阶段45项。",
+    "implementation_scope": "T001–T027、T043、T044 done；T045/T028按依赖继续，当前阶段45项。",
     "included": [
       "自由目标/可变场景/可选多节点关联",
       "首场景可学与后续持久生成/恢复/局部修订",
@@ -1401,7 +1401,7 @@
       "id": "PHASE-1.5-T044",
       "phase": "Phase 1.5",
       "title": "实现导师共享预算调度与取消恢复",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1.5-T043",
@@ -1427,12 +1427,17 @@
         "实际隔离PG/明确FakeAdapter覆盖并发槽/预算/取消/未知发送/重启，真实Provider0。",
         "Ruff/strict mypy/工作流/diff检查"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "r05隔离PG/Mock161通过0失败/skip，导师调度11/上下文10/旧调度39/恢复29/导师15/迁移57",
+        "Ruff9/strict mypy4/累计契约/工作流/diff通过",
+        "35批准原件/50历史/0047迁移/用户README SHA保持；证据docs/design/phase-1.5-tutor-scheduler-t044",
+        "共享40次/两槽/单次90s/未知隔离/取消迟到/readySQL围栏；真实Provider0/catalog_only"
+      ],
+      "started_at": "2026-10-23T12:57:49",
+      "completed_at": "2026-10-23T14:05:36",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T044",
-      "execution_gate": "用户已授权持续完成当前阶段；依赖完成后串行实施，真实Provider授权仍为0。"
+      "execution_gate": "实际验收通过，独立完成提交后继续T045。"
     },
     {
       "id": "PHASE-1.5-T045",

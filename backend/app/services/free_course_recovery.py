@@ -26,6 +26,8 @@ from app.services.free_scene_availability import read_availability
 class Recovery:
     """Private service facade. HTTP owner/CSRF/mode controllers remain T020, not opened here."""
 
+    tutor_allowed = False
+
     def __init__(self, sessions: async_sessionmaker[AsyncSession]):
         self.sessions = sessions
         self.scheduler = Scheduler(sessions)
@@ -41,7 +43,7 @@ class Recovery:
             if replay is not None:
                 return replay
             op = await repo._operation(cid, oid)
-            if op.kind == "tutor_turn":
+            if op.kind == "tutor_turn" and not self.tutor_allowed:
                 raise SnapshotError("OPERATION_KIND_INVALID")
             if op.state in ACTIVE and op.state != "cancel_requested":
                 steps = await db.scalars(
@@ -308,7 +310,7 @@ class Recovery:
                 FreeCourseOperation.id == oid,
             )
         )
-        if op is None or op.kind == "tutor_turn":
+        if op is None or (op.kind == "tutor_turn" and not self.tutor_allowed):
             raise SnapshotError("NOT_FOUND")
         steps = (
             await db.scalars(
@@ -364,13 +366,19 @@ class Recovery:
             ],
             budget=dict(
                 attempts_used=b["operation_attempts"],
-                attempts_remaining=max(0, 13 - b["operation_attempts"]),
+                attempts_remaining=max(
+                    0, (1 if op.kind == "tutor_turn" else 13) - b["operation_attempts"]
+                ),
                 course_attempts_remaining=max(0, 40 - b["course_attempts"]),
                 input_tokens_charged=b["operation_input"],
                 output_tokens_charged=b["operation_output"],
                 usage_unknown=unknown is not None,
-                input_tokens_remaining=max(0, 200000 - b["operation_input"]),
-                output_tokens_remaining=max(0, 48000 - b["operation_output"]),
+                input_tokens_remaining=max(
+                    0, (16000 if op.kind == "tutor_turn" else 200000) - b["operation_input"]
+                ),
+                output_tokens_remaining=max(
+                    0, (2000 if op.kind == "tutor_turn" else 48000) - b["operation_output"]
+                ),
                 course_input_tokens_remaining=max(0, 600000 - b["course_input"]),
                 course_output_tokens_remaining=max(0, 144000 - b["course_output"]),
             ),
