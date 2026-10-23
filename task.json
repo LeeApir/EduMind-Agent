@@ -53,7 +53,7 @@
     "dynamic_release_authorized": false,
     "deployment_authorized": false,
     "H": "H01–H08继续封存；新契约确定后重判适用性与独立性，不自动继承验收资格。",
-    "implementation_scope": "T001–T030及T043–T045 done；T046只读具体契约待批准，T047/T048及T031/T032受其依赖；其余按依赖推进，当前48项。",
+    "implementation_scope": "T001–T030及T043–T046 done；ADR0028已准确批准，T047/T048按依赖实施后继续T031/T032；其余按依赖推进，当前48项。",
     "included": [
       "自由目标/可变场景/可选多节点关联",
       "首场景可学与后续持久生成/恢复/局部修订",
@@ -1620,7 +1620,7 @@
       "id": "PHASE-1.5-T046",
       "phase": "Phase 1.5",
       "title": "冻结记录索引与掌握度追溯读取补充契约",
-      "status": "blocked",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1.5-T020",
@@ -1642,13 +1642,14 @@
         "准确批准及SHA登记核对；git diff --check"
       ],
       "verification_results": [
-        "设计检查通过：2个GET/no-store/会话/分页上限，6份合成结构例与未知字段拒绝，manifest SHA；无API/PG/Provider执行"
+        "设计检查通过：2个GET/no-store/会话/分页上限，6份合成结构例与未知字段拒绝，manifest SHA；无API/PG/Provider执行",
+        "用户准确批准及5源文件/manifest SHA核对通过，登记docs/ADR/0028-approval-20261023.json；不含真实调用/部署授权"
       ],
       "started_at": "2026-10-23T15:30:04",
-      "completed_at": null,
-      "blocker": "ADR0028 A—C及manifest准确字节待用户批准；未实施新读取路由",
+      "completed_at": "2026-10-23T15:31:53",
+      "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T046",
-      "execution_gate": "准确ADR0028批准前禁止实现新接口；不扩展Provider/生产/跨owner权限。"
+      "execution_gate": "用户准确批准faad52e中ADR0028 A—C与manifest附件；批准登记已复核，允许按依赖零Provider实施T047/T048。"
     },
     {
       "id": "PHASE-1.5-T047",
