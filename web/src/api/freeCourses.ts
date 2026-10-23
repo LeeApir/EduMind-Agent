@@ -69,7 +69,7 @@ export type SceneBlock = {kind:'text';anchor_id:string;markdown:string} | {kind:
 export interface SceneProjection {course_id:string;course_version:number;scene_id:string;scene_version_id:string;blocks:SceneBlock[];actions:unknown[]}
 export async function readScene(course: string, version: number, scene: string, signal?: AbortSignal): Promise<SceneProjection> {
   const value = await courseRequest<SceneProjection>(`${coursePath(course)}/versions/${version}/scenes/${encodeURIComponent(scene)}`,{signal});
-  if (!value || value.course_id !== course || value.course_version !== version || value.scene_id !== scene || typeof value.scene_version_id !== 'string' || !Array.isArray(value.blocks) || !value.blocks.every(b => typeof b.anchor_id === 'string' && ['text','code','exercise','exercise_unavailable','visualization'].includes(b.kind))) throw new FreeCourseError(502,'INVALID_RESPONSE');
+  if (!value || value.course_id !== course || value.course_version !== version || value.scene_id !== scene || typeof value.scene_version_id !== 'string' || !Array.isArray(value.actions) || !Array.isArray(value.blocks) || !value.blocks.every(b => typeof b.anchor_id === 'string' && ['text','code','exercise','exercise_unavailable','visualization'].includes(b.kind))) throw new FreeCourseError(502,'INVALID_RESPONSE');
   return value;
 }
 export async function readManifest(course: string, version: number, signal?: AbortSignal): Promise<Manifest> {

@@ -2,12 +2,14 @@
 import { computed, nextTick, onBeforeUnmount, ref, toRef, watch } from 'vue';
 import { FreeCourseError, listVersions, readManifest, readScene, readStored, terminalOperation, writeStored, type Manifest, type SceneProjection } from '../api/freeCourses';
 import { useCourseFeed } from '../composables/useCourseFeed';
+import CoursePresentation from './CoursePresentation.vue';
 import WorkspaceState from './WorkspaceState.vue';
 const props = withDefaults(defineProps<{courseId:string;operationId:string;initialVersion:number;initialScene:string;active?:boolean}>(),{active:true});
 const emit = defineEmits<{ outline:[]; home:[]; position:[version:number,scene:string] }>();
 const {course,operation,owner,error,loading,reload,inaccessible}=useCourseFeed(toRef(props,'courseId'),toRef(props,'operationId'),toRef(props,'active'));
 const manifest=ref<Manifest>();const scene=ref<SceneProjection>();const selectedScene=ref(props.initialScene);const version=ref(props.initialVersion);
 const following=ref(true);const sceneLoading=ref(false);const sceneError=ref('');const sceneErrorKind=ref<'error'|'invalid'|'forbidden'>('error');const manifestError=ref('');const invalid=ref(false);
+const highlightedAnchor=ref('');
 const directoryOpen=ref(false);const tutorOpen=ref(false);const tutorTrigger=ref<HTMLButtonElement>();const tutorQuestion=ref('');
 const visited=ref<string[]>([]);const versions=ref<{version:number;created_at:string}[]>([]);const versionsCursor=ref<string|null>(null);const versionsOpen=ref(false);const versionsError=ref('');
 const courseTitle=ref<HTMLElement>();const readingPane=ref<HTMLElement>();let epoch=0;let controller:AbortController|undefined;let manifestEpoch=0;let manifestController:AbortController|undefined;let versionsEpoch=0;let versionsController:AbortController|undefined;let restored=false;let scroll=0;
@@ -262,25 +264,18 @@ onBeforeUnmount(()=>{save();epoch+=1;manifestEpoch+=1;versionsEpoch+=1;controlle
               <div
                 v-if="block.kind === 'text'"
                 class="scene-prose"
+                :class="{'presentation-highlight': highlightedAnchor === block.anchor_id}"
               >
                 {{ block.markdown }}
               </div>
               <section
                 v-else-if="block.kind === 'code'"
                 class="code-reading"
+                :class="{'presentation-highlight': highlightedAnchor === block.anchor_id}"
               >
                 <h3>C 语言代码</h3><pre><code>{{ block.source }}</code></pre><small>代码仅供阅读，没有执行。</small>
               </section>
-              <section v-else-if="block.kind === 'visualization'">
-                <h3>状态演示的文字说明</h3><p>{{ block.text_alternative }}</p><ol>
-                  <li
-                    v-for="(step,index) in block.steps"
-                    :key="index"
-                  >
-                    {{ step.caption }}
-                  </li>
-                </ol>
-              </section>
+              <span v-else-if="block.kind === 'visualization'" />
               <section
                 v-else-if="block.kind === 'exercise'"
                 class="exercise-reading"
@@ -301,6 +296,11 @@ onBeforeUnmount(()=>{save();epoch+=1;manifestEpoch+=1;versionsEpoch+=1;controlle
                 detail="题组已停用，不展示错误反馈；无关讲解与代码可继续阅读。"
               />
             </template>
+            <CoursePresentation
+              :scene="scene"
+              :active="active"
+              @highlight="highlightedAnchor = $event"
+            />
           </div>
           <div class="tutor-area">
             <button
