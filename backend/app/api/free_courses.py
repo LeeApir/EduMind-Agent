@@ -26,6 +26,8 @@ from app.services.free_course_recovery import Recovery
 from app.services.free_course_revision import Revisions
 from app.services.free_course_scheduler import Scheduler
 from app.services.free_course_snapshots import SnapshotError, SnapshotRepository
+from app.services.free_course_tutor import TutorTurns
+from app.services.free_course_tutor_scheduler import TutorRecovery
 from app.services.free_scene_availability import read_events, read_ready_scene
 
 router = APIRouter(prefix="/api/free-courses", tags=["Free Courses"])
@@ -279,14 +281,22 @@ async def operation(
     return reply("AcceptedOperation", result, 202)
 
 
+async def operation_recovery(
+    sessions: async_sessionmaker[AsyncSession], owner: UUID, cid: UUID, oid: UUID
+) -> Recovery:
+    async with sessions() as db:
+        op = await SnapshotRepository(db, owner)._operation(cid, oid)
+        tutor = op.kind == "tutor_turn"
+    return TutorRecovery(sessions) if tutor else Recovery(sessions)
+
+
 @router.get("/{course_id}/operations/{operation_id}")
 async def operation_read(
     course_id: UUID, operation_id: UUID, current: Owner, sessions: Sessions
 ) -> JSONResponse:
-    return reply(
-        "Operation",
-        await Recovery(sessions).read_operation(current.user.id, course_id, operation_id),
-    )
+    service = await operation_recovery(sessions, current.user.id, course_id, operation_id)
+    view = await service.read_operation(current.user.id, course_id, operation_id)
+    return reply("TutorOperation" if view["kind"] == "tutor_turn" else "Operation", view)
 
 
 @router.post("/{course_id}/operations/{operation_id}/cancel")
@@ -299,12 +309,9 @@ async def cancel(
     idempotency_key: Key,
 ) -> JSONResponse:
     validate("CancelRequest", body)
-    return reply(
-        "Operation",
-        await Recovery(sessions).cancel(
-            current.user.id, course_id, operation_id, key=idempotency_key
-        ),
-    )
+    service = await operation_recovery(sessions, current.user.id, course_id, operation_id)
+    view = await service.cancel(current.user.id, course_id, operation_id, key=idempotency_key)
+    return reply("TutorOperation" if view["kind"] == "tutor_turn" else "Operation", view)
 
 
 @router.get("/{course_id}/impact")
@@ -388,9 +395,10 @@ async def raw_event_frames(
                 events = await read_events(db, owner, cid, oid, after=after)
             except SnapshotError:
                 return
-        view = await Recovery(sessions).read_operation(owner, cid, oid)
+        service = await operation_recovery(sessions, owner, cid, oid)
+        view = await service.read_operation(owner, cid, oid)
         for event in events:
-            validate("Event", event)
+            validate("TutorEvent" if view["kind"] == "tutor_turn" else "Event", event)
             after = event["seq"]
             data = json.dumps(event, ensure_ascii=False, separators=(",", ":"))
             yield f"id: {after}\nevent: {event['type']}\ndata: {data}\n\n"
@@ -436,7 +444,8 @@ async def events(
     cursor = last if last is not None else after or 0
     async with sessions() as db:
         await read_events(db, current.user.id, course_id, operation_id, after=cursor)
-    view = await Recovery(sessions).read_operation(current.user.id, course_id, operation_id)
+    service = await operation_recovery(sessions, current.user.id, course_id, operation_id)
+    view = await service.read_operation(current.user.id, course_id, operation_id)
     if view["state"] in TERMINAL and cursor == view["last_event_id"]:
         return Response(status_code=204, headers={"Cache-Control": "no-store"})
     if not STREAM_LIMIT.acquire(blocking=False):
@@ -454,3 +463,22 @@ async def events(
         media_type="text/event-stream",
         headers={"Cache-Control": "no-store", "X-Accel-Buffering": "no"},
     )
+
+
+@router.post("/{course_id}/tutor-turns", status_code=202)
+async def tutor_create(
+    course_id: UUID, body: dict[str, Any], current: Owner, sessions: Sessions, idempotency_key: Key
+) -> JSONResponse:
+    enabled()
+    return reply(
+        "TutorReceipt",
+        await TutorTurns(sessions).enqueue(current.user.id, course_id, body, key=idempotency_key),
+        202,
+    )
+
+
+@router.get("/{course_id}/tutor-turns/{turn_id}")
+async def tutor_read(
+    course_id: UUID, turn_id: UUID, current: Owner, sessions: Sessions
+) -> JSONResponse:
+    return reply("TutorTurn", await TutorTurns(sessions).read(current.user.id, course_id, turn_id))

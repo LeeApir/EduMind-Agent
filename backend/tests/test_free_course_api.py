@@ -460,7 +460,8 @@ def test_pagination_openapi_contract_and_disabled_surface(api):
                     "#/components/schemas/", "#/components/schemas/FreeCourse"
                 )
             )
-    assert not any("tutor-turns" in p for p in spec["paths"])
+    assert "/api/free-courses/{course_id}/tutor-turns" in spec["paths"]
+    assert "/api/free-courses/{course_id}/tutor-turns/{turn_id}" in spec["paths"]
     assert client.post(f"{url}/attestations", json={}, headers=headers).status_code == 404
     assert client.post(f"{url}/quality-decisions", json={}, headers=headers).status_code == 404
 

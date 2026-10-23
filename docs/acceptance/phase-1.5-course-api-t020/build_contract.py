@@ -27,8 +27,7 @@ def main() -> None:
             dict(path=relative, sha256=hashlib.sha256(path.read_bytes()).hexdigest())
         )
         for route, methods in value["paths"].items():
-            if "tutor-turns" not in route:
-                merged["paths"].setdefault(route, {}).update(methods)
+            merged["paths"].setdefault(route, {}).update(methods)
         for section in ["schemas", "parameters", "securitySchemes"]:
             merged["components"][section].update(value["components"].get(section, {}))
     merged["components"]["schemas"]["SceneProjection"]["properties"]["blocks"]["items"][
@@ -36,8 +35,23 @@ def main() -> None:
     ].append({"$ref": "#/components/schemas/DisabledExerciseBlock"})
     merged["x-contract-sources"] = sources
     merged["x-integration"] = (
-        "T001 base + T002 generation + T003 exercise DTO/disabled block; T023 tutor routes excluded"
+        "T001 base + T002 generation + approved T003 quality/tutor DTOs; tutor routes integrated in T045"
     )
+    for route, method in [
+        ("/api/free-courses/{course_id}/operations/{operation_id}", "get"),
+        ("/api/free-courses/{course_id}/operations/{operation_id}/cancel", "post"),
+    ]:
+        merged["paths"][route][method]["responses"]["200"]["content"][
+            "application/json"
+        ]["schema"] = {
+            "oneOf": [
+                {"$ref": "#/components/schemas/Operation"},
+                {"$ref": "#/components/schemas/TutorOperation"},
+            ]
+        }
+    merged["paths"]["/api/free-courses/{course_id}/operations/{operation_id}/events"][
+        "get"
+    ]["x-event-schemas"] = ["Event", "TutorEvent"]
     raw = (json.dumps(merged, ensure_ascii=False, indent=2) + "\n").encode()
     for relative in [
         "backend/app/contracts/free_course.openapi.json",
