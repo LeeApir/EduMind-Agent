@@ -33,11 +33,16 @@ class Limits:
     requests: int
     input_tokens: int
     output_tokens: int
-    fee_micros: int
+    fee_micros: int | None
     wall_seconds: int
 
     def validate(self):
-        if any(type(v) is not int or v <= 0 for v in asdict(self).values()):
+        if any(
+            type(v) is not int or v <= 0 for k, v in asdict(self).items() if k != "fee_micros"
+        ) or (
+            self.fee_micros is not None
+            and (type(self.fee_micros) is not int or self.fee_micros <= 0)
+        ):
             raise Refused("INVALID_LIMIT")
 
 
@@ -122,6 +127,8 @@ class Ledger:
             or not approval.get("evidence_ref")
         ):
             raise Refused("APPROVAL_BINDING_MISMATCH")
+        if limits.fee_micros is None and approval.get("fee_cap_waiver") is not True:
+            raise Refused("EXPLICIT_FEE_CAP_WAIVER_REQUIRED")
         wall, mono = self.clock()
         if not all(math.isfinite(t) for t in [wall, mono]):
             raise Refused("CLOCK_ANOMALY")
@@ -196,8 +203,10 @@ class Ledger:
     def reserve(self, batch, package, attempt, *, input_max, output_max, fee_max, seconds=120):
         if (
             any(type(v) is not int or v < 0 for v in [input_max, output_max, fee_max])
-            or input_max == 0
-            or output_max == 0
+            or (
+                (input_max == 0 or output_max == 0)
+                and (input_max != 0 or output_max != 0 or fee_max != 0)
+            )
             or type(seconds) is not int
             or not 1 <= seconds <= 120
             or input_max > 32000
@@ -214,7 +223,7 @@ class Ledger:
             increment = dict(
                 requests=1, input_tokens=input_max, output_tokens=output_max, fee_micros=fee_max
             )
-            if any(used[k] + v > limits[k] for k, v in increment.items()):
+            if any(limits[k] is not None and used[k] + v > limits[k] for k, v in increment.items()):
                 self.stop(batch, "BUDGET_EXHAUSTED")
                 raise Refused("BUDGET_EXHAUSTED")
             wall, mono = self.clock()
@@ -318,6 +327,7 @@ class Ledger:
             "independence_contaminated",
             "threshold_unreachable",
             "human_pause",
+            "provider_contract_failure",
         ]:
             raise Refused("STOP_REASON_INVALID")
         with self.transaction():

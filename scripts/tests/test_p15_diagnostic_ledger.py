@@ -260,3 +260,30 @@ def test_concurrent_reservations_cannot_overrun_shared_budget(setup):
         results = list(pool.map(once, range(4)))
     assert sum(results) == 2
     assert db.usage("TEST_ONLY")["requests"] == 2
+
+
+def test_unlimited_fee_requires_explicit_accurate_user_waiver(setup):
+    db, _, _, a = setup
+    from dataclasses import asdict
+
+    limits = Limits(2, 200, 200, None, 600)
+    approval = {**a, "limits": asdict(limits)}
+    with pytest.raises(Refused, match="FEE_CAP_WAIVER"):
+        db.start(
+            "TEST_ONLY",
+            PACKAGE,
+            limits,
+            approval,
+            pinned_approval_sha256=digest(approval),
+        )
+    approval["fee_cap_waiver"] = True
+    db.start(
+        "TEST_ONLY", PACKAGE, limits, approval, pinned_approval_sha256=digest(approval)
+    )
+    reserve(db, fee_max=1000000000)
+    db.reserve(
+        "TEST_ONLY", PACKAGE, "count", input_max=0, output_max=0, fee_max=0, seconds=10
+    )
+    with pytest.raises(Refused, match="BUDGET_EXHAUSTED"):
+        reserve(db, "extra")
+    assert db.usage("TEST_ONLY")["requests"] == 2
