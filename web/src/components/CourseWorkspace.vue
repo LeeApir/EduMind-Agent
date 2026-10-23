@@ -279,7 +279,11 @@ onBeforeUnmount(()=>{save();epoch+=1;manifestEpoch+=1;versionsEpoch+=1;controlle
                 class="code-reading"
                 :class="{'presentation-highlight': highlightedAnchor === block.anchor_id}"
               >
-                <h3>C 语言代码</h3><pre><code>{{ block.source }}</code></pre><small>代码仅供阅读，没有执行。</small>
+                <h3>C 语言代码</h3><pre
+                  tabindex="0"
+                  role="region"
+                  aria-label="C 语言代码，可横向滚动"
+                ><code>{{ block.source }}</code></pre><small>代码仅供阅读，没有执行。</small>
               </section>
               <span v-else-if="block.kind === 'visualization'" />
               <CourseExercise

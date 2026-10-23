@@ -53,7 +53,7 @@
     "dynamic_release_authorized": false,
     "deployment_authorized": false,
     "H": "H01–H08继续封存；新契约确定后重判适用性与独立性，不自动继承验收资格。",
-    "implementation_scope": "T001–T033及T043–T048 done；按依赖继续T034及集成验收，当前48项。",
+    "implementation_scope": "T001–T034及T043–T048 done；按依赖继续T035集成验收，当前48项。",
     "included": [
       "自由目标/可变场景/可选多节点关联",
       "首场景可学与后续持久生成/恢复/局部修订",
@@ -1865,7 +1865,7 @@
       "id": "PHASE-1.5-T034",
       "phase": "Phase 1.5",
       "title": "完成全站移动端与可访问性整合",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1.5-T023",
@@ -1902,12 +1902,17 @@
         "实际浏览器核对本任务页面/关键状态及移动端；使用隔离服务或明确Mock并记录区别。",
         "git diff --check"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "41文件298测试通过，新可访问性6项，0失败/skip",
+        "typecheck/build通过，lint0错误35既有警告",
+        "实际Chromium八页六宽度48截图及原生键盘/焦点/inert/局部代码滚动/减少动效/只读恢复/标签/对比度通过；业务HTTP明确Mock，写0",
+        "41批准50历史及用户README完整性、工作流/diff通过；证据docs/design/phase-1.5-accessibility-t034"
+      ],
+      "started_at": "2026-10-23T22:36:20",
+      "completed_at": "2026-10-23T22:43:29",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T034",
-      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。"
+      "execution_gate": "用户恢复阶段持续执行；T023–T033依赖完成，T033 a5033ee核对；仅整合现有界面，无真实Provider调用。"
     },
     {
       "id": "PHASE-1.5-T035",

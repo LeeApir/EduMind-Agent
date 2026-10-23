@@ -1,18 +1,22 @@
 <script setup lang="ts">
-import { nextTick, ref, watch } from 'vue';
+import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 const props = defineProps<{ page: string; focusKey?: string; dynamic?: boolean }>();
 const emit = defineEmits<{ navigate: [page: string] }>();
 const open = ref(false);
 const menuButton = ref<HTMLButtonElement>();
 const navigation = ref<HTMLElement>();
 const content = ref<HTMLElement>();
+let mobile: MediaQueryList | undefined;
+function resize(): void { if (!mobile?.matches) open.value = false; }
+onMounted(() => { mobile = window.matchMedia?.('(max-width: 850px)'); mobile?.addEventListener('change', resize); });
+onBeforeUnmount(() => mobile?.removeEventListener('change', resize));
 function close(): void { open.value = false; void nextTick(() => menuButton.value?.focus()); }
 function trap(event: KeyboardEvent): void {
   if (!open.value) return;
   if (event.key === 'Escape') { event.preventDefault(); close(); }
   if (event.key !== 'Tab') return;
-  const targets = navigation.value?.querySelectorAll<HTMLButtonElement>('button:not(:disabled)');
-  if (!targets?.length) return;
+  const targets = [menuButton.value, ...Array.from(navigation.value?.querySelectorAll<HTMLButtonElement>('button:not(:disabled)') ?? [])].filter((el): el is HTMLButtonElement => !!el);
+  if (!targets.length) return;
   if (event.shiftKey && document.activeElement === targets[0]) { event.preventDefault(); targets[targets.length - 1]?.focus(); }
   else if (!event.shiftKey && document.activeElement === targets[targets.length - 1]) { event.preventDefault(); targets[0]?.focus(); }
 }
@@ -21,10 +25,14 @@ watch(() => props.focusKey ?? props.page, async () => { open.value = false; awai
 const links = [{ id: 'learning', label: '学习' }, { id: 'graph', label: '图谱与路径' }, { id:'profile',label:'画像与掌握度' }, { id:'history',label:'学习记录' }, { id: 'catalog', label: '签核课程目录' }, { id: 'legacy', label: '原学习入口' }, { id: 'connections', label: '模型设置' }, { id: 'preferences', label: '档位与数据去向' }];
 </script>
 <template>
-  <div class="workspace-shell">
+  <div
+    class="workspace-shell"
+    @keydown="trap"
+  >
     <a
       class="skip-link"
       href="#workspace-main"
+      :inert="open ? true : undefined"
     >跳到主要内容</a>
     <button
       ref="menuButton"
@@ -41,8 +49,6 @@ const links = [{ id: 'learning', label: '学习' }, { id: 'graph', label: '图�
       ref="navigation"
       class="workspace-sidebar"
       :class="{ 'is-open': open }"
-
-      @keydown="trap"
     >
       <div class="workspace-brand">
         <span aria-hidden="true">启</span><div>启智学伴<small>EDUMIND · 学习空间</small></div>
@@ -69,7 +75,10 @@ const links = [{ id: 'learning', label: '学习' }, { id: 'graph', label: '图�
         围绕一个目标，循序理解。<br>课程类型与内容状态分别标注。
       </p>
     </aside>
-    <div class="workspace-body">
+    <div
+      class="workspace-body"
+      :inert="open ? true : undefined"
+    >
       <header class="workspace-topline">
         学习空间 <span>数据结构 · Web</span>
       </header>

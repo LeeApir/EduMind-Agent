@@ -152,6 +152,14 @@ onMounted(load);onBeforeUnmount(()=>{alive=false;epoch+=1;cacheEpoch+=1;});
               </template>
             </dl>
           </article>
+          <button
+            v-if="cache && cache.models.length>modelLimit"
+            type="button"
+            class="secondary"
+            @click="modelLimit+=5"
+          >
+            查看更多缓存型号
+          </button>
         </section>
       </div>
       <section
