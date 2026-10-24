@@ -2199,3 +2199,9 @@ T089完成1b2b89d后冻结本批唯一开发验证，准备8份跨数组/栈/链
 
 [2026-10-24T15:06:38] [PHASE-1.5-T038] BLOCKED | executor=Lee
 改动摘要：r03首槽服务返回completed/gpt-6-luna规划回执，但输入计数1677与reported usage6507输入/480输出不一致，按准确包已停止，不再收到原allOf拒绝 | 验证结果：本批2真实HTTP/1生成，unknown全32k/8k预约保留，场景正文0且33槽未运行；r03只读checker退出2、14防篡改测试通过，原r02独立核对仍blocked，363冻结SHA不改；证据docs/acceptance/phase-1.5-development-diagnostic-results-r03 | 遗留问题：门禁不满足，不能把reported usage当可信结算/实际费用，也不能据未保存的状态臆测HTTP码；累计4 HTTP/2生成，两批unknown合计64k/16k，质量/审核未评测，T039阻断 | 下一步：保存无完成标记的本地进度提交并停止；需核对中转计数口径，或先严谨论证/审批独立输入上界及新契约，不自行放宽、重启、补样本、换模型、push/merge/部署
+
+[2026-10-24T15:20:33] [PHASE-1.5-T051] START | executor=Lee | branch=codex/phase-1.5-t001
+改动摘要：按用户明确要求领取r03零调用输入计数根因排查，T038保持blocked | 验证结果：核对HEAD39b983c/当前任务/PRD/ADR0027及私有原件，发现回执instructions追加21336字符且max_output_tokens由8000显示null | 遗留问题：回执不是服务端实际上下文证明，不能精确归因4830token或退款/重启；用户无关改动保留 | 下一步：请求对照、离线同体重放及门禁判断，必要变更先提案，不发真实请求
+
+[2026-10-24T15:25:08] [PHASE-1.5-T051] VERIFIED | executor=Lee
+改动摘要：交付r03请求对照/根因证据边界/一致性门禁适用性及待审上下文与上限证据提案，零运行修改 | 验证结果：9离线测试0skip、准确SHA只读audit/Ruff2/工作流/diff通过；原r02/r03 checker预期退出2，证据docs/acceptance/phase-1.5-input-count-audit-t051 | 遗留问题：回执追加21336字符/上限null支持中转转换但无服务端实证，不能精确归因差额或证明硬界；T038 blocked，两批unknown保留 | 下一步：独立完成本地提交并停止；无需真实探测，不申请预算、不重启r03/执行r04/完整课程；后续契约变更先准确批准，不push/merge/部署

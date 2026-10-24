@@ -1,0 +1,43 @@
+{
+  "task_id": "PHASE-1.5-T051",
+  "offline_tests": {
+    "command": "backend/.venv/bin/python -m pytest scripts/tests/test_p15_input_count_audit.py -q --junitxml=/tmp/edumind-p15-t051-offline-r01.xml",
+    "passed": 9,
+    "failed": 0,
+    "skipped": 0,
+    "junit_path": "/tmp/edumind-p15-t051-offline-r01.xml",
+    "junit_sha256": "c929b93ca6dc5cc63e8512caec76e29ad12a4b84856759ac5cb51d824d8013ef"
+  },
+  "checks": [
+    {
+      "command": "python3 scripts/audit_p15_input_count.py --check",
+      "exit_code": 0
+    },
+    {
+      "command": "python3 scripts/check_p15_r03_diagnostic_results.py --check",
+      "exit_code": 2,
+      "expected": "verified blocked, not acceptance pass"
+    },
+    {
+      "command": "python3 scripts/check_p15_development_diagnostic_results.py --check",
+      "exit_code": 2,
+      "expected": "verified blocked, not acceptance pass"
+    },
+    {
+      "command": "python3 scripts/check_catalog_workflow.py",
+      "exit_code": 0
+    },
+    {
+      "command": "backend/.venv/bin/ruff check scripts/audit_p15_input_count.py scripts/tests/test_p15_input_count_audit.py",
+      "exit_code": 0
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0
+    }
+  ],
+  "new_provider_http_requests": 0,
+  "production_or_frozen_runtime_changed": false,
+  "T038_status": "blocked",
+  "next": "Stop after audit commit; proposal not approved, no r03 restart/r04 or complete course diagnostic."
+}

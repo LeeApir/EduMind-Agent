@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "T038/r03因真实输入计数不一致停止；需决策核对口径或严格论证新的输入上界/契约，不能自动放宽或重跑。两批剩余额度不转授，不push/merge/部署。",
+    "phase_gate": "T051零调用排查完成；r03回执追加指令及上限回显异常，计数一致性门禁保留，增强契约仅提案未批准。T038继续blocked，不重启r03、不执行r04或完整课程诊断，不push/merge/部署。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -2132,6 +2132,47 @@
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T050",
       "execution_gate": "用户继续授权零调用兼容修复与新包准备；仅离线/隔离PG/Mock，不启动真实新批次；T038保留blocked至新包准确执行批准及实际准入。"
+    },
+    {
+      "id": "PHASE-1.5-T051",
+      "phase": "Phase 1.5",
+      "title": "零调用排查r03输入计数差异并判断一致性门禁适用性",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T050"
+      ],
+      "scope": [
+        "scripts/",
+        "docs/acceptance/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5；ADR0027；用户明确要求r03零调用根因排查，不重启或执行新诊断",
+      "acceptance_criteria": [
+        "准确对照冻结客户端请求、计数响应、生成回执及传输路径，区分实际原件、代码重建与离线Mock证据。",
+        "交付证据支持的结论、未决原因和现有一致性门禁适用判断；契约变动仅提案，不放宽或追认旧批次。",
+        "零网络离线重放验证同体发送及计数差异停发，验证新增指令/输出上限异常的提议分类与干净对照；保留r02/r03全部冻结证据及unknown预约。"
+      ],
+      "verification": [
+        "backend/.venv/bin/python -m pytest scripts/tests/test_p15_input_count_audit.py -q",
+        "python3 scripts/audit_p15_input_count.py --check",
+        "python3 scripts/check_p15_r03_diagnostic_results.py --check（预期退出2）",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [
+        "准确请求体/回执SHA与所有363冻结源码及原停止账本保持；comparison.json逐字段可复算，无凭据或正文复制。",
+        "发现回执instructions精确前缀后追加21336字符及max_output_tokens 8000→null；支持下游转换/计量差异，但不声称已验证实际模型上下文或4830token精确归因。",
+        "9离线测试0skip，原CountedTransport实际原件Mock重放停发；反例证明计数相等仍可携带额外指令/null上限，待审分类器与干净/各维异常对照通过。",
+        "只读audit、Ruff2、工作流、diff通过；原r02/r03 checker均预期退出2。证据docs/acceptance/phase-1.5-input-count-audit-t051/validation.json。",
+        "保留现有一致性门禁，另交付最终上下文/输出上限/观测证据具体提案但未实施；本次无需真实探测，无新预算/新调用，T038继续blocked且unknown占额不改。"
+      ],
+      "started_at": "2026-10-24T15:20:33",
+      "completed_at": "2026-10-24T15:25:08",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T051",
+      "execution_gate": "只读本地证据及明确Mock，无.env/凭据/真实Provider/批次入口；T038继续blocked，禁止r03重启/r04/完整课程。"
     },
     {
       "id": "PHASE-1.5-T038",
