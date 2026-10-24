@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "T051零调用排查完成；r03回执追加指令及上限回显异常，计数一致性门禁保留，增强契约仅提案未批准。T038继续blocked，不重启r03、不执行r04或完整课程诊断，不push/merge/部署。",
+    "phase_gate": "T052本地诊断完整性/留证缺口已修复并通过离线Mock验证；真实传输仍拒绝，运行契约/供应商硬界未获证。T038保持blocked，不重启r03、不创建/执行r04或完整课程诊断，不push/merge/部署。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -2173,6 +2173,46 @@
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T051",
       "execution_gate": "只读本地证据及明确Mock，无.env/凭据/真实Provider/批次入口；T038继续blocked，禁止r03重启/r04/完整课程。"
+    },
+    {
+      "id": "PHASE-1.5-T052",
+      "phase": "Phase 1.5",
+      "title": "修复诊断上下文核对与失败留证缺口",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T051"
+      ],
+      "scope": [
+        "scripts/",
+        "docs/acceptance/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5；ADR0027；T051报告与具体提案；用户“修复”授权本地零调用修复",
+      "acceptance_criteria": [
+        "新版本在结算前拒绝额外/缺失指令、无法核对的输出上限和Schema差异，保留原计数一致性与unknown占额。",
+        "分别保留准确出站摘要、响应状态/安全原件/具体失败原因，不记录请求头/凭据，留证故障不准入。",
+        "实际原件/计数相等反例/干净对照及故障、脱敏、真实传输拒绝测试通过；不修改冻结源码、旧账本或启动任何真实入口。"
+      ],
+      "verification": [
+        "backend/.venv/bin/python -m pytest scripts/tests/test_p15_guarded_transport.py -q",
+        "python3 scripts/check_p15_r03_diagnostic_results.py --check（预期2）",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [
+        "新增GuardedStrictDiagnosticAdapter组合原完整Schema与账本；计数相等但指令追加/null上限的旧漏检反例在结算前拒绝，原unknown占额保持。",
+        "发送摘要、HTTP状态、安全原件/SHA和固定原因先留证；凭据回显/异常消息不落盘，磁盘失败停发；真实传输入口因缺事前独立证明明确拒绝。",
+        "最终r06共50 passed/0skip（新增17、T051九项、原严格Schema24项）；r01组合IP核对缺陷已修复，r04/r05历史目录测试隔离错误保留，临时父目录保留原-r03名字与全部原断言后通过。",
+        "Ruff3、T051只读audit/工作流/diff通过；原r02/r03结果checker均预期退出2，全部冻结源码/原始证据/unknown账本保持。证据docs/acceptance/phase-1.5-guarded-transport-t052。",
+        "新增真实请求0；中转最终上下文/输出硬界仍无证明，T038继续blocked；仅离线组件交付，没有生产工厂/旧CLI切换、r04包或真实预算批准。"
+      ],
+      "started_at": "2026-10-24T15:29:26",
+      "completed_at": "2026-10-24T15:35:25",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T052",
+      "execution_gate": "只修复并离线Mock验证收紧防护；不把用户修复指令当真实授权/供应商硬界证明，不创建r04，不改变旧批准契约；生产/冻结入口保持。"
     },
     {
       "id": "PHASE-1.5-T038",
