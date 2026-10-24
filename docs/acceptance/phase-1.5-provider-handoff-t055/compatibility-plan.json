@@ -1,0 +1,105 @@
+{
+  "status": "proposal_only_no_execution_authority",
+  "preferred_candidate": {
+    "provider": "OpenAI official direct",
+    "base_url": "https://api.openai.com/v1",
+    "model": "gpt-6-luna",
+    "model_reference": "https://developers.openai.com/api/docs/models/gpt-6-luna",
+    "transport": "responses_json_schema",
+    "reasoning": "none",
+    "selection_approved": false,
+    "credentials_checked": false,
+    "actual_access_verified": false,
+    "immutable_snapshot_verified": false,
+    "expected_response_model_mapping_requires_freeze": true
+  },
+  "alternative_route": {
+    "provider": "user-nominated transparent compatible endpoint",
+    "base_url": null,
+    "model": null,
+    "automatic_fallback": false,
+    "requires_new_metadata_and_evidence": true
+  },
+  "paused_route_allowed": false,
+  "runtime_adapter_available": false,
+  "probe_order": [
+    {
+      "id": "S1",
+      "body": "probes/S1.json",
+      "purpose": "same minimal p01 baseline via a separately selected provider",
+      "count_http_max": 1,
+      "generation_http_max": 1,
+      "input_reservation_max": 4096,
+      "requested_output_max": 16
+    },
+    {
+      "id": "S2",
+      "body": "probes/S2.json",
+      "purpose": "top-level instructions, closed Schema and encoding-only fixed object",
+      "count_http_max": 1,
+      "generation_http_max": 1,
+      "input_reservation_max": 4096,
+      "requested_output_max": 128
+    }
+  ],
+  "limits": {
+    "candidates": 1,
+    "batches": 1,
+    "http_requests_max": 4,
+    "count_requests_max": 2,
+    "model_requests_max": 2,
+    "input_local_reservation_total": 8192,
+    "output_requested_total": 144,
+    "wall_seconds_max": 90,
+    "count_timeout_seconds": 10,
+    "generation_timeout_seconds": 30,
+    "response_bytes_max_each": 2097152,
+    "concurrency": 1,
+    "retries": 0,
+    "redirects": 0,
+    "unbudgeted_probes": 0
+  },
+  "fee": {
+    "status": "must_freeze_rates_currency_and_budget_before_execution",
+    "local_limit_suggestion_usd": "0.01",
+    "approved": false,
+    "amount_is_not_enforced_upstream_invoice_cap": true,
+    "prior_unlimited_fee_waiver_inherited": false,
+    "count_endpoint_charging_verified": false
+  },
+  "gates": [
+    "G0 exact candidate identity/official capability sources, price and separate credentials authorization; offline source-bound adapter and Mock negatives, exact new package/budget approval before egress",
+    "G1 S1 full observable evidence passes; otherwise never send S2",
+    "G2 S2 full observable evidence passes; no missing or unresolved required evidence",
+    "G3 freeze compatibility result and exact config; only then prepare a separate course diagnostic package, without automatic course generation"
+  ],
+  "evidence_rules": {
+    "request_body_identical_within_pair": true,
+    "count_equals_reported_input": true,
+    "integer_usage_required": true,
+    "model_mapping_frozen_before_execution": true,
+    "S1_input_system_instructions_null_is_not_automatic_failure": true,
+    "S2_top_level_instructions_echo_must_match_or_remain_unresolved": true,
+    "unrequested_added_instruction_rejected": true,
+    "output_limit_null_is_unresolved_not_proof_of_disabled_limit": true,
+    "output_limit_mismatch_or_unresolved_blocks_admission": true,
+    "reported_output_exceeds_requested_limit_stops": true,
+    "full_local_schema_and_fixed_expected_object_required": true,
+    "extract_output_text_by_documented_types_not_first_item_assumption": true,
+    "response_echo_is_not_independent_context_proof": true
+  },
+  "stop_on": [
+    "first HTTP/transport/auth/rate-limit error; no retry or fallback",
+    "count unavailable/noninteger/outside1..4096 or generator usage mismatch/missing",
+    "extra instructions/unknown model mapping/schema deviation/fixed literal mismatch",
+    "output bound contradiction/unresolved required field or status incomplete/refusal",
+    "unknown send, clock/budget anomaly, evidence write failure or credential echo",
+    "user stop; never reuse batch/remaining allowance after stop"
+  ],
+  "course_prompt_change_allowed": false,
+  "teaching_threshold_change_allowed": false,
+  "H_access_allowed": false,
+  "old_batches_restart_allowed": false,
+  "live_commands_provided": false,
+  "new_real_requests_authorized": 0
+}

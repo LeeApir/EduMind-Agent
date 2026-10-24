@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "p01一次合成计数/生成探针已按准确批准执行并因相同额外指令/计数差/上限null停止；T038 blocked，累计6 HTTP/3生成。所有已批批次均已停止，不自动新增调用、修复重试、换候选或恢复课程，不push/merge/部署。",
+    "phase_gate": "用户明确暂停当前候选新增真实调用；本轮只整理脱敏服务商问题单和替代兼容验证方案。接口兼容获验证通过后才准备课程诊断，不改Prompt/教学阈值，不重启旧批次或发送消息，不push/merge/部署。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -47,13 +47,13 @@
     "product_mode": "catalog_only",
     "formal_product": "已有签核课程",
     "dynamic_scope": "已确认学生可直接学习AI生成草稿；普通语义审核不阻断整课。实际运行开放须新契约实现与独立验收后批准，既有签核课程语义不变。",
-    "provider_requests_authorized": 404,
-    "model_trials_authorized": 1,
+    "provider_requests_authorized": 0,
+    "model_trials_authorized": 0,
     "inherited_request_allowance": 0,
     "dynamic_release_authorized": false,
     "deployment_authorized": false,
     "H": "H01–H08继续封存；新契约确定后重判适用性与独立性，不自动继承验收资格。",
-    "implementation_scope": "T038/r03已真实2 HTTP/1生成，返回completed但输入计数1677与reported6507不一致，已停止并blocked；含r02累计4 HTTP/2生成，两个unknown占额保留，T039未领取，生产catalog_only。",
+    "implementation_scope": "p01最小合成探针复现额外指令/计数差/上限null；当前候选暂停新增真实调用，累计6 HTTP/3生成，unknown96k/16016保留；本轮仅脱敏问题单及替代兼容方案准备，T038 blocked，catalog_only。",
     "included": [
       "自由目标/可变场景/可选多节点关联",
       "首场景可学与后续持久生成/恢复/局部修订",
@@ -71,7 +71,9 @@
     "provider_requests_attempted": 6,
     "real_model_requests_attempted": 3,
     "active_provider_batch_id": null,
-    "last_stopped_provider_batch_id": "p15-compatibility-probe-p01"
+    "last_stopped_provider_batch_id": "p15-compatibility-probe-p01",
+    "current_candidate_real_calls": "paused_by_user",
+    "current_authorization_note": "用户明确暂停当前cbbb/gpt-6-luna候选新增真实调用；历史404等授权仅留在原登记/记录，全部已停止，不作为当前可用额度。"
   },
   "archive_transition": {
     "from_phase": "Phase 1",
@@ -2298,6 +2300,48 @@
       "execution_gate": "仅零调用准确准备；ADR风险例外与准确真实执行须分别明确批准，不以本次“好”代替，T038仍blocked，不重启r03/创建r04。"
     },
     {
+      "id": "PHASE-1.5-T055",
+      "phase": "Phase 1.5",
+      "title": "暂停当前候选并准备脱敏服务商问题单与替代兼容验证方案",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T054"
+      ],
+      "scope": [
+        "docs/acceptance/",
+        "scripts/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5；ADR0027/0029；p01真实停止证据；用户明确只准备、不调用、不改课程Prompt或教学标准",
+      "acceptance_criteria": [
+        "当前cbbb/gpt-6-luna候选明确暂停新增真实调用，旧批次/unknown/失败与冻结文件不改，T038仍blocked。",
+        "交付可转交但未发送的脱敏问题单和纯合成请求/回执摘要，不含密钥、请求头、请求ID、用户课程/画像、内部路径/账号或完整追加指令。",
+        "提出候选优先级、最小兼容验证矩阵、准入证据、精确请求上限/停止条件与接口通过后才准备课程的阶段门禁，不自动选型或获得新真实授权。",
+        "只读核对证据来源、脱敏清单、预算算术和零真实调用边界，保留原教学Prompt/验收阈值及H封存。"
+      ],
+      "verification": [
+        "python3 scripts/check_p15_replacement_compatibility_plan.py --check",
+        "python3 scripts/check_p15_compatibility_probe_results.py --check（预期2）",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [
+        "当前候选paused_by_user，活动真实调用/候选试用授权0；历史r02/r03/p01停止、6HTTP/3生成及unknown96k/16016保持，生产catalog_only。",
+        "外发范围严格为vendor四文件：脱敏问题单/准确549字节合成请求/选择性摘要/相对manifest；未代发，排除请求ID/账号/路径/头部/密钥/课程画像/追加模板全文。",
+        "首选官方直连gpt-6-luna/Responses/none仅提案；已查阅官方模型/计数/结构输出/响应字段说明，未选型、未查凭据/实际可用性。",
+        "最小矩阵S1/S2各1计数+1生成，单候选4HTTP/2生成、预约输入8192/请求输出144、90秒/无重试重定向/首错停；费用及准确入口后续另冻，不继承旧无上限或探索例外。",
+        "明确合法instructions null与异常追加区别，Schema/计数/输出边界/证据未决不准入；兼容真正通过后才准备课程诊断，不改Prompt/教学阈值/H封存。",
+        "只读材料/脱敏/算术check及Ruff1/工作流/diff通过；11材料SHA及374历史SHA保持，原p01/r03 checker预期2；证据docs/acceptance/phase-1.5-provider-handoff-t055/validation.json；本轮新增实际接口请求0。"
+      ],
+      "started_at": "2026-10-24T16:54:17",
+      "completed_at": "2026-10-24T17:04:13",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T055",
+      "execution_gate": "本轮只有治理暂停、脱敏材料及提案准备；无实际接口请求、密钥读取、外部发送或Prompt/标准修改，后续选型/包/预算另行批准。"
+    },
+    {
       "id": "PHASE-1.5-T038",
       "phase": "Phase 1.5",
       "title": "执行批准的开发诊断并决定候选去向",
@@ -2347,13 +2391,14 @@
         "回执94字符原system准确前缀后追加21336字符，与r03后缀SHA405163336914c9b2b4342e94a5f53acab1ca31f491a9fea8d3755de4c1159225完全相同；request16回显null；reported instructions4401恰等于输入差额，不把回执归因当真实内部上下文证明。",
         "独立p01账本stopped/provider_contract_failure，count complete/model unknown，32k/16占额不退款；provider_reported_usage与verified_protocol_usage(null)明确分开，实际收费未知；一致性快照与所有安全原件SHA保留。",
         "p01只读结果checker预期退出2，9项防假pass/退款/零费用/假done/隐藏历史/计数篡改/批准风险篡改/WAL测试passed0skip；原r02/r03 checker均保持预期2；Ruff2/原包check/工作流/diff通过；证据docs/acceptance/phase-1.5-compatibility-probe-p01-results。",
-        "累计6真实HTTP/3生成、unknown96000输入/16016输出；未运行c01/课程r04或教学场景，无自然质量/审核评分/生产开放；按批准执行后立即停止，不创建Task-Completed。"
+        "累计6真实HTTP/3生成、unknown96000输入/16016输出；未运行c01/课程r04或教学场景，无自然质量/审核评分/生产开放；按批准执行后立即停止，不创建Task-Completed。",
+        "用户在p01后明确暂停当前候选；T055仅完成脱敏服务商问题单/替代兼容提案，活动授权0，未调用或发送。未来接口兼容真实通过后才准备课程诊断，原阈值/Prompt不改。"
       ],
       "started_at": "2026-10-24T12:25:09",
       "completed_at": null,
       "blocker": "获准p01最小纯合成探针亦复现中转兼容矛盾：两HTTP200、计数37而reported input4438/output13，差额4401；回执追加与r03完全相同21336字符编码助手后缀，max_output_tokens仍null。模型attempt unknown保留32k/16，本次准确单次授权已消耗，不重试；累计6 HTTP/3生成、unknown96k/16016。服务商转换/计量/参数映射仍待修正或另决准确替代方案，课程/T039不解锁。",
       "commit_lookup": "Task-Completed: PHASE-1.5-T038",
-      "execution_gate": "ADR0029及准确p01已获准并执行终止，不能复用授权/目录/余量；原r02/r03仍停止。任何后续调用/候选/课程恢复另需准确方案和批准，T038不能done。"
+      "execution_gate": "用户明确暂停当前cbbb/gpt-6-luna候选所有新增真实调用；所有旧批次已终止且不可重启。本轮只准备T055问题单/替代方案，不改课程Prompt/标准。兼容通过后才准备新课程诊断，任何新执行另准确批准。"
     },
     {
       "id": "PHASE-1.5-T039",
