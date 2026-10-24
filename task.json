@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "T054按官方契约的最小p01合成兼容探针已离线准备；ADR0029探索风险例外及准确执行/新费用例外均待明确批准。T038 blocked，旧r02/r03停止不重启、不创建课程r04，不push/merge/部署。",
+    "phase_gate": "p01一次合成计数/生成探针已按准确批准执行并因相同额外指令/计数差/上限null停止；T038 blocked，累计6 HTTP/3生成。所有已批批次均已停止，不自动新增调用、修复重试、换候选或恢复课程，不push/merge/部署。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -68,10 +68,10 @@
       "通用编辑器/PBL/PDF研究/TTS必交付/iOS/导出",
       "未经批准的真实调用、生产开放、部署、push/merge"
     ],
-    "provider_requests_attempted": 4,
-    "real_model_requests_attempted": 2,
+    "provider_requests_attempted": 6,
+    "real_model_requests_attempted": 3,
     "active_provider_batch_id": null,
-    "last_stopped_provider_batch_id": "p15-development-r03"
+    "last_stopped_provider_batch_id": "p15-compatibility-probe-p01"
   },
   "archive_transition": {
     "from_phase": "Phase 1",
@@ -2322,6 +2322,7 @@
         "按T005预冻结准入判断：未通过则标blocked停止依赖，不自动领取独立验收；通过才冻结候选，任何修复需重新验证。"
       ],
       "verification": [
+        "python3 scripts/check_p15_compatibility_probe_results.py --check；预期退出2，纯只读验证p01 stopped证据，不发请求。",
         "仅按准确授权执行包的真实运行命令执行，记录每次预约/请求/收据/失败/人工核对；不在规划时预填命令参数或结果。",
         "python3 scripts/check_p15_r03_diagnostic_results.py --check；预期退出2，纯只读准确核对r03 stopped/用量不一致，不发请求。",
         "python3 scripts/check_p15_development_diagnostic_results.py --check；纯离线校验准确证据、配置、授权边界与状态，不在--check隐式发真实请求。",
@@ -2340,13 +2341,19 @@
         "独立账本stopped/provider_contract_failure，首槽failed/OUTCOME_UNKNOWN，无可信结算及场景正文；provider_reported_usage单独保留，不伪称缺usage或可信实际计费，unknown全32k/8k预约不退款",
         "r03 34槽首槽失败未知/33未运行，12支持课程完成0，人工内容质量/审核表现未评测；没有再收到invalid_json_schema不等于质量准入或逐条strict保证",
         "r03结果只读checker --check预期退出2，14防篡改/伪造计数相等/退款/隐藏旧失败测试passed0skip，证据docs/acceptance/phase-1.5-development-diagnostic-results-r03；原r02 checker继续退出2",
-        "累计4真实HTTP/2生成，两批合计unknown占额64k输入/16k输出，所有旧失败/未运行不改；T038不能done，T039未领取，生产catalog_only/H封存，无push/merge/部署"
+        "累计4真实HTTP/2生成，两批合计unknown占额64k输入/16k输出，所有旧失败/未运行不改；T038不能done，T039未领取，生产catalog_only/H封存，无push/merge/部署",
+        "p01真人批准登记contract-approval.json/execution-approval.json位于docs/acceptance/phase-1.5-compatibility-probe-p01，绑定f7d620f及manifest160adb246d63464c05abb6e23f110ecbc40ffe20efa3f86e8c6ee4c98065d3f4；370冻结文件未改。",
+        "实际仅一次--execute：2 HTTP均200/1生成；两端549字节同体SHA相同；计数37，reported usage4438输入/13输出/4451总；固定OK满足最小Schema，但3项完整性拒绝后停发。",
+        "回执94字符原system准确前缀后追加21336字符，与r03后缀SHA405163336914c9b2b4342e94a5f53acab1ca31f491a9fea8d3755de4c1159225完全相同；request16回显null；reported instructions4401恰等于输入差额，不把回执归因当真实内部上下文证明。",
+        "独立p01账本stopped/provider_contract_failure，count complete/model unknown，32k/16占额不退款；provider_reported_usage与verified_protocol_usage(null)明确分开，实际收费未知；一致性快照与所有安全原件SHA保留。",
+        "p01只读结果checker预期退出2，9项防假pass/退款/零费用/假done/隐藏历史/计数篡改/批准风险篡改/WAL测试passed0skip；原r02/r03 checker均保持预期2；Ruff2/原包check/工作流/diff通过；证据docs/acceptance/phase-1.5-compatibility-probe-p01-results。",
+        "累计6真实HTTP/3生成、unknown96000输入/16016输出；未运行c01/课程r04或教学场景，无自然质量/审核评分/生产开放；按批准执行后立即停止，不创建Task-Completed。"
       ],
       "started_at": "2026-10-24T12:25:09",
       "completed_at": null,
-      "blocker": "准确r03首槽返回gpt-6-luna completed规划回执，但计数接口1677与服务usage输入6507/输出480不一致；provider_contract_failure已停止，模型结算unknown保留32k/8k占额，未生成场景正文。计数一致性门禁不能自动放宽或重跑。连同r02累计4 HTTP/2生成，两个unknown预约保留；需决定核对中转计数口径或先研究并批准独立可证输入上界/新契约，T039仍不可领取。",
+      "blocker": "获准p01最小纯合成探针亦复现中转兼容矛盾：两HTTP200、计数37而reported input4438/output13，差额4401；回执追加与r03完全相同21336字符编码助手后缀，max_output_tokens仍null。模型attempt unknown保留32k/16，本次准确单次授权已消耗，不重试；累计6 HTTP/3生成、unknown96k/16016。服务商转换/计量/参数映射仍待修正或另决准确替代方案，课程/T039不解锁。",
       "commit_lookup": "Task-Completed: PHASE-1.5-T038",
-      "execution_gate": "r02和r03两份准确已批准包均已停止，当前r03因输入计数与回执usage不一致保持blocked；不得自动放宽契约/重启/补样本/换模型或复用剩余额度。任何新上界或计数机制须先准确方案/验证及必要审批，新执行另获准。"
+      "execution_gate": "ADR0029及准确p01已获准并执行终止，不能复用授权/目录/余量；原r02/r03仍停止。任何后续调用/候选/课程恢复另需准确方案和批准，T038不能done。"
     },
     {
       "id": "PHASE-1.5-T039",

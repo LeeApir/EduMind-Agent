@@ -1,0 +1,32 @@
+{
+  "task_id": "PHASE-1.5-T038",
+  "scope": "real p01 stopped evidence only, not task completion",
+  "result_checker_command": "python3 scripts/check_p15_compatibility_probe_results.py --check",
+  "result_checker_exit": 2,
+  "expected_meaning": "VERIFIED BLOCKED; not quality pass",
+  "tests": {
+    "command": "backend/.venv/bin/python -m pytest scripts/tests/test_p15_compatibility_probe_results.py -q --junitxml=/tmp/edumind-p15-p01-results-r01.xml",
+    "passed": 9,
+    "failed": 0,
+    "skipped": 0,
+    "xml_sha256": "23bc21fa5f26c11a3d426bb1d1e77a99e6737b1e92157585021eee3d1edee863"
+  },
+  "source_sha256": {
+    "scripts/check_p15_compatibility_probe_results.py": "f351cb364791513749541c5419192b7238428a94ac1080904629d54a412de26f",
+    "scripts/tests/test_p15_compatibility_probe_results.py": "5498115be8f29a44c5222465941c476e938561c71193c2578004cffe1454681c"
+  },
+  "checks": {
+    "old_r02_checker_exit": 2,
+    "old_r03_checker_exit": 2,
+    "frozen_package_check_exit": 0,
+    "ruff_files": 2,
+    "ruff_exit": 0,
+    "workflow_exit": 0,
+    "diff_check_exit": 0
+  },
+  "real_probe_http": 2,
+  "real_probe_model_requests": 1,
+  "cumulative_real_http": 6,
+  "cumulative_real_model_requests": 3,
+  "T038_status": "blocked"
+}
