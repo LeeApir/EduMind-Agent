@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "官方候选p15-candidate-compat-r01准确单次合成包已获批准，但缺独立凭据，预检前置阻塞；仅安全配置后在价格有效窗口重核才可启动。旧中转仍暂停，不重启旧批次，不改教学链路或推进课程诊断；兼容真实通过后才另准备课程诊断。",
+    "phase_gate": "用户改用当前.env的新cbbb供应，要求原兼容故障复查且仍失败即弃用；先完成T057准确最小复测包/离线门禁。未知实际币种/价格及上游硬限风险未批准，不发送真实请求；旧批次不重启、教学链路不改。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -43,17 +43,17 @@
     }
   ],
   "stage_scope": {
-    "authorization": "2026-10-21用户确认A—F与三页原型并要求“可以，准备task”；仅授权细化当前阶段任务，不领取或开发。 2026-10-21用户后续要求“领取T01”，授权领取PHASE-1.5-T001；不扩大为整阶段执行授权。 用户随后要求“开始开发”，本次执行T001契约设计；具体契约批准仍待准确方案确认。 用户随后回复“批准”，接受d9bd7a6的ADR0024 A—D及准确附件；不自动授权后续任务。 用户在T001完成后要求“继续”，授权执行下一项T002具体设计。 用户随后回复“批准”，接受8f9f21f中ADR0025 A—E及准确附件，不自动授权后续任务或真实调用。 用户在T002完成后要求“继续”，授权领取并执行T003设计。 2026-10-22用户在中断后要求继续，恢复T003设计；具体契约仍待准确批准。 用户随后回复“批准”，接受78c95ce中ADR0026 A—E及准确附件，不自动授权后续任务或真实调用。 用户在T003完成后要求“继续”，授权领取并执行T004静态主要页面设计与浏览器验证。 用户随后回复“确认”，接受13b5dd7七页主要页面设计与准确附件，仅解除T004设计确认门禁。 用户在T004完成后要求“继续”，授权领取并执行T005独立验收口径设计，具体阈值待准确批准。 用户随后回复“批准”，接受3102c15中ADR0027 A—E及manifest绑定的5份规范文件，包含T038/T040验收对象澄清，不授予真实执行或后续任务授权。 用户在T005完成后要求“继续”，授权领取并执行T006版本化数据模型与迁移验证。 用户在T006完成后要求“继续”，授权领取并执行T007快照仓储与事务验证。 用户在T007完成后要求“继续”，授权领取并执行T008自由目标课程规划及零真实Provider验证。 用户在T008完成后要求“继续”，授权领取并执行T009非阻塞知识点关联。 用户在T009完成后要求“继续”，授权领取并执行T010按大纲生成场景内容。 用户在T010完成后要求“继续”，授权领取并执行T011确定性准入检查。 用户在T011完成后要求“继续”，授权领取并执行T012受约束授课动作与状态演示。 用户在T012完成后要求“继续”，授权领取并执行T013首场景与后续场景增量可见。 用户明确要求“继续T14”，授权PHASE-1.5-T014实现与零真实Provider验证。 用户在T014完成后要求“继续”，授权PHASE-1.5-T015取消与断点恢复。 2026-10-23用户要求“持续工作，知道完成T20”（按直到完成T020理解），授权T016–T020串行实现及零真实Provider验证，无需逐项再确认。 用户随后要求“继续T21”，授权PHASE-1.5-T021新旧课程及安全边界兼容验证与必要修复，不自动推进T022或真实调用。 2026-10-23用户要求“持续工作，直到完成T25”，授权T022–T025串行开发、验收与独立本地提交，完成T025后停止。 2026-10-23用户明确持续完成Pause 1.5（按当前Phase 1.5理解）依赖满足的任务，逐项验证/本地提交直至阶段验收或需决策阻塞/额度耗尽；不push/merge。真实Provider仍须准确执行包与预算另行批准。 用户最新要求“完成后停止”：完成当前T037准确准备包及本地提交后停止，不领取或执行T038；价格无上限仅本次单批次提案例外，不是准确包的真实执行批准。 2026-10-24用户明确答复“批准该准确包执行 T038”，接受7d3fef3的r02 manifest 4d987857ab227a366c8b506f4ed365c8360b778017aa9418425493a212527f44、单批次准确请求/token/时钟/货币例外及停止规则；登记docs/acceptance/phase-1.5-development-diagnostic-r02/execution-approval.json。 用户在T038 r02真实Schema拒绝后要求“继续”，本次只完成T050零调用兼容修复及新r03准备；不推定新预算/费用例外或新真实执行已获批准。 2026-10-24用户明确答复“批准该准确 r03 包执行 T038”，接受bd477dd manifest a734e125e8ea1d6aef8eb8223fbc773b55fdf495f6e5098dddd8b921e38ae857及准确新预算/费用例外/人工检查点/停发边界；独立登记r03/execution-approval.json，不继承或重启r02。 2026-10-24用户要求建立指定候选最小兼容入口、离线测试及可审批准确包，并明确确认官方https://api.openai.com/v1/gpt-6-luna；仅授权T056准备，不真实调用或修改教学链路，通过接口兼容后才准备课程诊断。 2026-10-24用户在d336e33准确执行包交付后直接回复“批准”，登记ADR0030 A—C及manifest 7689138e71165ef06fa474bb66107a4ea2b61354d18fadb4d50c585d8d9f0f21的官方最小单次兼容执行授权；预检因独立凭据缺失阻塞，尚无实际请求。",
+    "authorization": "2026-10-21用户确认A—F与三页原型并要求“可以，准备task”；仅授权细化当前阶段任务，不领取或开发。 2026-10-21用户后续要求“领取T01”，授权领取PHASE-1.5-T001；不扩大为整阶段执行授权。 用户随后要求“开始开发”，本次执行T001契约设计；具体契约批准仍待准确方案确认。 用户随后回复“批准”，接受d9bd7a6的ADR0024 A—D及准确附件；不自动授权后续任务。 用户在T001完成后要求“继续”，授权执行下一项T002具体设计。 用户随后回复“批准”，接受8f9f21f中ADR0025 A—E及准确附件，不自动授权后续任务或真实调用。 用户在T002完成后要求“继续”，授权领取并执行T003设计。 2026-10-22用户在中断后要求继续，恢复T003设计；具体契约仍待准确批准。 用户随后回复“批准”，接受78c95ce中ADR0026 A—E及准确附件，不自动授权后续任务或真实调用。 用户在T003完成后要求“继续”，授权领取并执行T004静态主要页面设计与浏览器验证。 用户随后回复“确认”，接受13b5dd7七页主要页面设计与准确附件，仅解除T004设计确认门禁。 用户在T004完成后要求“继续”，授权领取并执行T005独立验收口径设计，具体阈值待准确批准。 用户随后回复“批准”，接受3102c15中ADR0027 A—E及manifest绑定的5份规范文件，包含T038/T040验收对象澄清，不授予真实执行或后续任务授权。 用户在T005完成后要求“继续”，授权领取并执行T006版本化数据模型与迁移验证。 用户在T006完成后要求“继续”，授权领取并执行T007快照仓储与事务验证。 用户在T007完成后要求“继续”，授权领取并执行T008自由目标课程规划及零真实Provider验证。 用户在T008完成后要求“继续”，授权领取并执行T009非阻塞知识点关联。 用户在T009完成后要求“继续”，授权领取并执行T010按大纲生成场景内容。 用户在T010完成后要求“继续”，授权领取并执行T011确定性准入检查。 用户在T011完成后要求“继续”，授权领取并执行T012受约束授课动作与状态演示。 用户在T012完成后要求“继续”，授权领取并执行T013首场景与后续场景增量可见。 用户明确要求“继续T14”，授权PHASE-1.5-T014实现与零真实Provider验证。 用户在T014完成后要求“继续”，授权PHASE-1.5-T015取消与断点恢复。 2026-10-23用户要求“持续工作，知道完成T20”（按直到完成T020理解），授权T016–T020串行实现及零真实Provider验证，无需逐项再确认。 用户随后要求“继续T21”，授权PHASE-1.5-T021新旧课程及安全边界兼容验证与必要修复，不自动推进T022或真实调用。 2026-10-23用户要求“持续工作，直到完成T25”，授权T022–T025串行开发、验收与独立本地提交，完成T025后停止。 2026-10-23用户明确持续完成Pause 1.5（按当前Phase 1.5理解）依赖满足的任务，逐项验证/本地提交直至阶段验收或需决策阻塞/额度耗尽；不push/merge。真实Provider仍须准确执行包与预算另行批准。 用户最新要求“完成后停止”：完成当前T037准确准备包及本地提交后停止，不领取或执行T038；价格无上限仅本次单批次提案例外，不是准确包的真实执行批准。 2026-10-24用户明确答复“批准该准确包执行 T038”，接受7d3fef3的r02 manifest 4d987857ab227a366c8b506f4ed365c8360b778017aa9418425493a212527f44、单批次准确请求/token/时钟/货币例外及停止规则；登记docs/acceptance/phase-1.5-development-diagnostic-r02/execution-approval.json。 用户在T038 r02真实Schema拒绝后要求“继续”，本次只完成T050零调用兼容修复及新r03准备；不推定新预算/费用例外或新真实执行已获批准。 2026-10-24用户明确答复“批准该准确 r03 包执行 T038”，接受bd477dd manifest a734e125e8ea1d6aef8eb8223fbc773b55fdf495f6e5098dddd8b921e38ae857及准确新预算/费用例外/人工检查点/停发边界；独立登记r03/execution-approval.json，不继承或重启r02。 2026-10-24用户要求建立指定候选最小兼容入口、离线测试及可审批准确包，并明确确认官方https://api.openai.com/v1/gpt-6-luna；仅授权T056准备，不真实调用或修改教学链路，通过接口兼容后才准备课程诊断。 2026-10-24用户在d336e33准确执行包交付后直接回复“批准”，登记ADR0030 A—C及manifest 7689138e71165ef06fa474bb66107a4ea2b61354d18fadb4d50c585d8d9f0f21的官方最小单次兼容执行授权；预检因独立凭据缺失阻塞，尚无实际请求。 用户随后明确改用当前.env的新cbbb供应，先复查原故障，仍失败即停止使用该中转，并答复没有实际价格资料。T057已完成准确单对复测入口/离线准备；新实际收费及上游硬界未知风险仍须独立批准，方向指令不登记为对此未知风险接受。",
     "product_mode": "catalog_only",
     "formal_product": "已有签核课程",
     "dynamic_scope": "已确认学生可直接学习AI生成草稿；普通语义审核不阻断整课。实际运行开放须新契约实现与独立验收后批准，既有签核课程语义不变。",
-    "provider_requests_authorized": 4,
-    "model_trials_authorized": 1,
+    "provider_requests_authorized": 0,
+    "model_trials_authorized": 0,
     "inherited_request_allowance": 0,
     "dynamic_release_authorized": false,
     "deployment_authorized": false,
     "H": "H01–H08继续封存；新契约确定后重判适用性与独立性，不自动继承验收资格。",
-    "implementation_scope": "官方最小兼容准确包已批准，预检缺EDUMIND_COMPAT_API_KEY阻塞且未启动。累计仍6 HTTP/3生成、旧unknown96k/16016；T038 blocked/catalog_only，未解锁课程诊断。",
+    "implementation_scope": "T057当前env新cbbb原S1单对复测准确包/离线入口完成；实际费率/币种/上游硬界未知，新准确风险批准仍待，无真实复测。累计仍6 HTTP/3生成、旧unknown96k/16016，T038 blocked/catalog_only。",
     "included": [
       "自由目标/可变场景/可选多节点关联",
       "首场景可学与后续持久生成/恢复/局部修订",
@@ -73,8 +73,8 @@
     "active_provider_batch_id": null,
     "last_stopped_provider_batch_id": "p15-compatibility-probe-p01",
     "current_candidate_real_calls": "paused_by_user",
-    "current_authorization_note": "仅官方p15-candidate-compat-r01准确包获用户批准，4HTTP/2生成单次有限USD0.02；缺独立凭据尚未开始，授权未消耗，受费率窗口约束。当前cbbb候选仍暂停，旧批次额度不复活。",
-    "pending_approved_provider_batch_id": "p15-candidate-compat-r01"
+    "current_authorization_note": "用户选择当前env cbbb新供应的原故障复查；旧官方批准只留准确登记不用于该中转。现准备T057两HTTP单对包，当前无准确新费用风险批准，不读出密钥或出站。",
+    "pending_approved_provider_batch_id": null
   },
   "archive_transition": {
     "from_phase": "Phase 1",
@@ -2379,7 +2379,46 @@
       "completed_at": "2026-10-24T18:11:12",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T056",
-      "execution_gate": "用户已明确官方https://api.openai.com/v1/gpt-6-luna选型。仅完成离线入口和准确提案；ADR0030 A—C及本manifest单次执行仍待独立明确批准，需独立EDUMIND_COMPAT_API_KEY及价格窗口；本轮不调用/重启/课程诊断。"
+      "execution_gate": "官方准确r01已获用户批准并登记，但未启动（缺官方专用凭据）；用户随后选择当前.env中转，官方批准只留原准确登记，不转授中转。当前方向以T057/ADR0031具体包为准。"
+    },
+    {
+      "id": "PHASE-1.5-T057",
+      "phase": "Phase 1.5",
+      "title": "准备新env中转的原故障单次复测包",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T056"
+      ],
+      "scope": [
+        "scripts/",
+        "docs/ADR/",
+        "docs/acceptance/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5；ADR0027/0029/0030；用户选择当前env新供应，要求原故障复查且失败弃用",
+      "acceptance_criteria": [
+        "冻结当前env非敏感身份、显式root到/v1映射、原S1字节与完整期望，不修改旧冻结包或教学链路。",
+        "新一次性入口仅一对同体计数/生成，最多2HTTP/1生成；准确契约/费用风险批准后才读凭据/DNS/创建输出，失败终止并排除该候选。",
+        "独立离线测试覆盖旧故障、配置绑定/专用授权/未获准拒绝/失败不补样及保密，实际价格与币种未知如实记，不套官方费率或继承旧例外。",
+        "交付可审查的准确预算/风险及待批准包；真实执行独立批准，准备不算兼容或教学通过。"
+      ],
+      "verification": [
+        "backend/.venv/bin/python -m pytest scripts/tests/test_p15_relay_regression.py -q",
+        "backend/.venv/bin/python scripts/run_p15_relay_regression.py --check",
+        "backend/.venv/bin/python scripts/run_p15_candidate_compatibility.py --check",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [
+        "2026-10-24T22:22:32：新env中转原S1单对入口与ADR0031准确提案完成；23 Mock passed/0skip，Ruff/402 SHA/原official SHA/原p01预期2/工作流/diff通过，证据docs/acceptance/phase-1.5-relay-regression-r01/validation.json；manifest 2c379b62b70dbc0d99e9534558e5c3e67edd6403f698c39582997ae1bb8fc9c2；真实0，未生成执行批准。"
+      ],
+      "started_at": "2026-10-24T22:15:37",
+      "completed_at": "2026-10-24T22:22:32",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T057",
+      "execution_gate": "仅完成T057准备；ADR0031 A—C、root到/v1映射、2HTTP/1生成/4096本地输入/16请求输出/90秒/本地USD0.01且实际币种价格及上游硬界未知的准确风险仍待独立批准；不得沿用official/p01批准，不运行旧批次或课程。"
     },
     {
       "id": "PHASE-1.5-T038",
@@ -2433,13 +2472,14 @@
         "p01只读结果checker预期退出2，9项防假pass/退款/零费用/假done/隐藏历史/计数篡改/批准风险篡改/WAL测试passed0skip；原r02/r03 checker均保持预期2；Ruff2/原包check/工作流/diff通过；证据docs/acceptance/phase-1.5-compatibility-probe-p01-results。",
         "累计6真实HTTP/3生成、unknown96000输入/16016输出；未运行c01/课程r04或教学场景，无自然质量/审核评分/生产开放；按批准执行后立即停止，不创建Task-Completed。",
         "用户在p01后明确暂停当前候选；T055仅完成脱敏服务商问题单/替代兼容提案，活动授权0，未调用或发送。未来接口兼容真实通过后才准备课程诊断，原阈值/Prompt不改。",
-        "2026-10-24T20:36:02：用户明确批准d336e33/manifest 7689138e71165ef06fa474bb66107a4ea2b61354d18fadb4d50c585d8d9f0f21的ADR0030 A—C及官方候选两合成单次包，contract/execution登记已存；394 SHA/价格窗口通过；独立EDUMIND_COMPAT_API_KEY未就绪，在DNS/transport/输出/预约前阻塞，新增真实0；证据docs/acceptance/phase-1.5-candidate-compatibility-r01/preflight-20261024.json。"
+        "2026-10-24T20:36:02：用户明确批准d336e33/manifest 7689138e71165ef06fa474bb66107a4ea2b61354d18fadb4d50c585d8d9f0f21的ADR0030 A—C及官方候选两合成单次包，contract/execution登记已存；394 SHA/价格窗口通过；独立EDUMIND_COMPAT_API_KEY未就绪，在DNS/transport/输出/预约前阻塞，新增真实0；证据docs/acceptance/phase-1.5-candidate-compatibility-r01/preflight-20261024.json。",
+        "2026-10-24T22:22:32：用户改用当前env新cbbb供应，明确无费率资料；T057仅准备原S1两HTTP复测，23 Mock/402 SHA通过，真实0；当前等待ADR0031具体新风险批准，官方/旧p01授权不转授。"
       ],
       "started_at": "2026-10-24T12:25:09",
       "completed_at": null,
-      "blocker": "官方替代候选准确单次兼容包已批准，但当前执行环境缺少可用EDUMIND_COMPAT_API_KEY。预检即阻塞，0 DNS/HTTP/生成/预约，单次授权未消耗；须安全配置官方专用凭据并在费率窗口内重核后才可启动。cbbb旧候选暂停及旧unknown96k/16016不变，T038未完成，课程诊断不解锁。",
+      "blocker": "用户改用当前.env新cbbb供应，只授权原故障复查且失败弃用；T057已冻新单对准确包，但实际币种/价格及上游硬限未知，ADR0031准确风险与执行批准未到。旧official批准不覆盖该中转；真实复测0，旧unknown96k/16016不变，课程诊断不解锁。",
       "commit_lookup": "Task-Completed: PHASE-1.5-T038",
-      "execution_gate": "用户“批准”绑定d336e33/manifest 7689138e71165ef06fa474bb66107a4ea2b61354d18fadb4d50c585d8d9f0f21及ADR0030 A—C，最多4HTTP/2生成、8192生成输入/144总输出/90秒/本地USD0.02；当前仅凭据前置阻塞，未启动、未消耗。只准官方单次合成包，旧批次/课程不准；费率过期或包变化需重冻批准。"
+      "execution_gate": "仅在ADR0031及新p15-relay-regression-r01准确manifest 2c379b62b70dbc0d99e9534558e5c3e67edd6403f698c39582997ae1bb8fc9c2获明确风险/执行批准后，才可新启动当前env单对复测；2HTTP/1生成，失败按用户规则弃用，无重试/旧批次恢复/课程。"
     },
     {
       "id": "PHASE-1.5-T039",
