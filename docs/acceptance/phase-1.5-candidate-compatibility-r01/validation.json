@@ -1,0 +1,64 @@
+{
+  "task_id": "PHASE-1.5-T056",
+  "prepared_only": true,
+  "real_http_requests": 0,
+  "real_model_requests": 0,
+  "credentials_read": false,
+  "dotenv_read": false,
+  "course_pipeline_modified": false,
+  "package_sha256": "7689138e71165ef06fa474bb66107a4ea2b61354d18fadb4d50c585d8d9f0f21",
+  "checks": [
+    {
+      "command": "backend/.venv/bin/python -m pytest scripts/tests/test_p15_candidate_compatibility.py -q --junitxml=/tmp/edumind-p15-t056-offline.xml",
+      "exit_code": 0,
+      "result": "47 passed, 0 skipped; all Mock, sockets/DNS/.env prohibited",
+      "junit_sha256": "eeb13a34a82c10028ada7128923a5f6eda9c6a48da3b7bd23fdf5a1f244e1de2"
+    },
+    {
+      "command": "backend/.venv/bin/ruff check scripts/run_p15_candidate_compatibility.py scripts/acceptance_support/p15_candidate_compatibility.py scripts/tests/test_p15_candidate_compatibility.py",
+      "exit_code": 0,
+      "result": "All checks passed"
+    },
+    {
+      "command": "backend/.venv/bin/python scripts/run_p15_candidate_compatibility.py --check",
+      "exit_code": 0,
+      "result": "394 frozen files verified; no credentials/network/output"
+    },
+    {
+      "command": "python3 scripts/check_p15_compatibility_probe_results.py --check",
+      "exit_code": 2,
+      "expected_exit_code": 2,
+      "result": "original p01 blocked result preserved"
+    },
+    {
+      "command": "python3 scripts/check_p15_r03_diagnostic_results.py --check",
+      "exit_code": 2,
+      "expected_exit_code": 2,
+      "result": "original r03 blocked result preserved"
+    },
+    {
+      "command": "python3 scripts/check_p15_replacement_compatibility_plan.py --check",
+      "exit_code": 0,
+      "result": "T055 and historical files preserved"
+    },
+    {
+      "command": "python3 scripts/check_catalog_workflow.py",
+      "exit_code": 0,
+      "result": "active dependencies/catalog ledger valid"
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "result": "clean"
+    }
+  ],
+  "self_review": "Reviewed exact bytes/config gates, pinned public IP and TLS SNI, bounded DNS subprocess, counter fee allowance, fail-closed stop/unknown, output aggregation, one-shot barrier, no teaching edits; not an independent human review",
+  "remaining": [
+    "ADR0030 A-C and exact execution approval pending",
+    "dedicated official credential/account access not inspected",
+    "counter endpoint independent fee not documented; finite allowance is not invoice guarantee",
+    "no actual compatibility observation; T038 stays blocked",
+    "pricing has 24h validity and >=90s start margin"
+  ],
+  "unrelated_readme_sha256": "11bdc0d68463f47b9c7afbdbd514771e33a675e9c2ef698cc54896a8eb810567"
+}
