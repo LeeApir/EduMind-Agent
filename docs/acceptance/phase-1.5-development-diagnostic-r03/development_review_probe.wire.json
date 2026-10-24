@@ -1,0 +1,59 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "review_version",
+    "verdict",
+    "issues"
+  ],
+  "properties": {
+    "review_version": {
+      "type": "string",
+      "enum": [
+        "resource-review-v3"
+      ]
+    },
+    "verdict": {
+      "enum": [
+        "pass",
+        "revise",
+        "reject"
+      ],
+      "type": "string"
+    },
+    "issues": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "area",
+          "severity",
+          "message"
+        ],
+        "properties": {
+          "area": {
+            "enum": [
+              "fact",
+              "difficulty",
+              "misconception",
+              "code_safety"
+            ],
+            "type": "string"
+          },
+          "severity": {
+            "enum": [
+              "minor",
+              "major",
+              "severe"
+            ],
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "passing_runs": [
+    {
+      "xml": "/tmp/edumind-p15-t050-unit-r03.xml",
+      "sha256": "e057242082af551f99d56eb60001086350209cff0d0aa8692fac3f4b0e6f69e4",
+      "counts": {
+        "tests": 24,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "xml": "/tmp/edumind-p15-t050-pg-r02.xml",
+      "sha256": "a7c78ebeae8d42ebbfc9919c0357fb2922167c5c94c838f71080fe293ea53abf",
+      "counts": {
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  ],
+  "new_real_provider_calls": 0,
+  "pg_database": "edumind_catalog_p15_t020_t050_r02",
+  "pg_log": {
+    "path": "/tmp/edumind-p15-t050-pg-r02.log",
+    "sha256": "a7ae12edf9ed013ac45c53a83b4503259584a315137c03615450d8df099658aa"
+  },
+  "commands": [
+    "backend/.venv/bin/python -m pytest scripts/tests/test_p15_strict_schema.py -q --junitxml=/tmp/edumind-p15-t050-unit-r03.xml",
+    "dedicated test_environment(edumind_catalog_p15_t020_t050_r02); backend/.venv/bin/python -m pytest backend/tests/test_p15_strict_diagnostic.py -q --junitxml=/tmp/edumind-p15-t050-pg-r02.xml"
+  ],
+  "limitations": [
+    "Mock is not real relay schema support or teaching quality verification.",
+    "Production factory has not been switched.",
+    "Existing Starlette anyio deprecation warning only; no skipped tests."
+  ],
+  "actual_cli_gate": {
+    "command": "backend/.venv/bin/python scripts/run_p15_strict_diagnostic.py --start",
+    "exit_code": 1,
+    "reason": "EXACT_T038_HUMAN_APPROVAL_REQUIRED",
+    "output_directory_created": false,
+    "new_provider_calls": 0
+  }
+}
