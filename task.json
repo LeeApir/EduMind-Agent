@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "用户最新要求完成当前T037后停止；本次仅交付零调用准备包，不领取T038或后续任务。以后继续仍受准确真实执行批准门禁；不push/merge/部署，不跨阶段。",
+    "phase_gate": "当前T038真实接口不接受冻结Schema根层allOf，批次已停止；质量未准入且后续依赖阻断。须用户决定新包方向；不得自动重启/补样本/换模型/push/merge/部署。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -43,17 +43,17 @@
     }
   ],
   "stage_scope": {
-    "authorization": "2026-10-21用户确认A—F与三页原型并要求“可以，准备task”；仅授权细化当前阶段任务，不领取或开发。 2026-10-21用户后续要求“领取T01”，授权领取PHASE-1.5-T001；不扩大为整阶段执行授权。 用户随后要求“开始开发”，本次执行T001契约设计；具体契约批准仍待准确方案确认。 用户随后回复“批准”，接受d9bd7a6的ADR0024 A—D及准确附件；不自动授权后续任务。 用户在T001完成后要求“继续”，授权执行下一项T002具体设计。 用户随后回复“批准”，接受8f9f21f中ADR0025 A—E及准确附件，不自动授权后续任务或真实调用。 用户在T002完成后要求“继续”，授权领取并执行T003设计。 2026-10-22用户在中断后要求继续，恢复T003设计；具体契约仍待准确批准。 用户随后回复“批准”，接受78c95ce中ADR0026 A—E及准确附件，不自动授权后续任务或真实调用。 用户在T003完成后要求“继续”，授权领取并执行T004静态主要页面设计与浏览器验证。 用户随后回复“确认”，接受13b5dd7七页主要页面设计与准确附件，仅解除T004设计确认门禁。 用户在T004完成后要求“继续”，授权领取并执行T005独立验收口径设计，具体阈值待准确批准。 用户随后回复“批准”，接受3102c15中ADR0027 A—E及manifest绑定的5份规范文件，包含T038/T040验收对象澄清，不授予真实执行或后续任务授权。 用户在T005完成后要求“继续”，授权领取并执行T006版本化数据模型与迁移验证。 用户在T006完成后要求“继续”，授权领取并执行T007快照仓储与事务验证。 用户在T007完成后要求“继续”，授权领取并执行T008自由目标课程规划及零真实Provider验证。 用户在T008完成后要求“继续”，授权领取并执行T009非阻塞知识点关联。 用户在T009完成后要求“继续”，授权领取并执行T010按大纲生成场景内容。 用户在T010完成后要求“继续”，授权领取并执行T011确定性准入检查。 用户在T011完成后要求“继续”，授权领取并执行T012受约束授课动作与状态演示。 用户在T012完成后要求“继续”，授权领取并执行T013首场景与后续场景增量可见。 用户明确要求“继续T14”，授权PHASE-1.5-T014实现与零真实Provider验证。 用户在T014完成后要求“继续”，授权PHASE-1.5-T015取消与断点恢复。 2026-10-23用户要求“持续工作，知道完成T20”（按直到完成T020理解），授权T016–T020串行实现及零真实Provider验证，无需逐项再确认。 用户随后要求“继续T21”，授权PHASE-1.5-T021新旧课程及安全边界兼容验证与必要修复，不自动推进T022或真实调用。 2026-10-23用户要求“持续工作，直到完成T25”，授权T022–T025串行开发、验收与独立本地提交，完成T025后停止。 2026-10-23用户明确持续完成Pause 1.5（按当前Phase 1.5理解）依赖满足的任务，逐项验证/本地提交直至阶段验收或需决策阻塞/额度耗尽；不push/merge。真实Provider仍须准确执行包与预算另行批准。 用户最新要求“完成后停止”：完成当前T037准确准备包及本地提交后停止，不领取或执行T038；价格无上限仅本次单批次提案例外，不是准确包的真实执行批准。",
+    "authorization": "2026-10-21用户确认A—F与三页原型并要求“可以，准备task”；仅授权细化当前阶段任务，不领取或开发。 2026-10-21用户后续要求“领取T01”，授权领取PHASE-1.5-T001；不扩大为整阶段执行授权。 用户随后要求“开始开发”，本次执行T001契约设计；具体契约批准仍待准确方案确认。 用户随后回复“批准”，接受d9bd7a6的ADR0024 A—D及准确附件；不自动授权后续任务。 用户在T001完成后要求“继续”，授权执行下一项T002具体设计。 用户随后回复“批准”，接受8f9f21f中ADR0025 A—E及准确附件，不自动授权后续任务或真实调用。 用户在T002完成后要求“继续”，授权领取并执行T003设计。 2026-10-22用户在中断后要求继续，恢复T003设计；具体契约仍待准确批准。 用户随后回复“批准”，接受78c95ce中ADR0026 A—E及准确附件，不自动授权后续任务或真实调用。 用户在T003完成后要求“继续”，授权领取并执行T004静态主要页面设计与浏览器验证。 用户随后回复“确认”，接受13b5dd7七页主要页面设计与准确附件，仅解除T004设计确认门禁。 用户在T004完成后要求“继续”，授权领取并执行T005独立验收口径设计，具体阈值待准确批准。 用户随后回复“批准”，接受3102c15中ADR0027 A—E及manifest绑定的5份规范文件，包含T038/T040验收对象澄清，不授予真实执行或后续任务授权。 用户在T005完成后要求“继续”，授权领取并执行T006版本化数据模型与迁移验证。 用户在T006完成后要求“继续”，授权领取并执行T007快照仓储与事务验证。 用户在T007完成后要求“继续”，授权领取并执行T008自由目标课程规划及零真实Provider验证。 用户在T008完成后要求“继续”，授权领取并执行T009非阻塞知识点关联。 用户在T009完成后要求“继续”，授权领取并执行T010按大纲生成场景内容。 用户在T010完成后要求“继续”，授权领取并执行T011确定性准入检查。 用户在T011完成后要求“继续”，授权领取并执行T012受约束授课动作与状态演示。 用户在T012完成后要求“继续”，授权领取并执行T013首场景与后续场景增量可见。 用户明确要求“继续T14”，授权PHASE-1.5-T014实现与零真实Provider验证。 用户在T014完成后要求“继续”，授权PHASE-1.5-T015取消与断点恢复。 2026-10-23用户要求“持续工作，知道完成T20”（按直到完成T020理解），授权T016–T020串行实现及零真实Provider验证，无需逐项再确认。 用户随后要求“继续T21”，授权PHASE-1.5-T021新旧课程及安全边界兼容验证与必要修复，不自动推进T022或真实调用。 2026-10-23用户要求“持续工作，直到完成T25”，授权T022–T025串行开发、验收与独立本地提交，完成T025后停止。 2026-10-23用户明确持续完成Pause 1.5（按当前Phase 1.5理解）依赖满足的任务，逐项验证/本地提交直至阶段验收或需决策阻塞/额度耗尽；不push/merge。真实Provider仍须准确执行包与预算另行批准。 用户最新要求“完成后停止”：完成当前T037准确准备包及本地提交后停止，不领取或执行T038；价格无上限仅本次单批次提案例外，不是准确包的真实执行批准。 2026-10-24用户明确答复“批准该准确包执行 T038”，接受7d3fef3的r02 manifest 4d987857ab227a366c8b506f4ed365c8360b778017aa9418425493a212527f44、单批次准确请求/token/时钟/货币例外及停止规则；登记docs/acceptance/phase-1.5-development-diagnostic-r02/execution-approval.json。",
     "product_mode": "catalog_only",
     "formal_product": "已有签核课程",
     "dynamic_scope": "已确认学生可直接学习AI生成草稿；普通语义审核不阻断整课。实际运行开放须新契约实现与独立验收后批准，既有签核课程语义不变。",
-    "provider_requests_authorized": 0,
-    "model_trials_authorized": 0,
+    "provider_requests_authorized": 404,
+    "model_trials_authorized": 1,
     "inherited_request_allowance": 0,
     "dynamic_release_authorized": false,
     "deployment_authorized": false,
     "H": "H01–H08继续封存；新契约确定后重判适用性与独立性，不自动继承验收资格。",
-    "implementation_scope": "T049前置修复555f226已完成；T037完成准确r02包/实际PG与Mock验证后停止，当前49项；真实Provider0/catalog_only，T038未领取未授权。",
+    "implementation_scope": "T038准确r02已执行2 HTTP/1生成，首槽Schema被拒且无usage，停止并blocked；原批次和未知预约封存，T039未领取，生产catalog_only。",
     "included": [
       "自由目标/可变场景/可选多节点关联",
       "首场景可学与后续持久生成/恢复/局部修订",
@@ -67,7 +67,9 @@
       "任意HTML/JS或C/Python在线执行、放宽Manim隔离",
       "通用编辑器/PBL/PDF研究/TTS必交付/iOS/导出",
       "未经批准的真实调用、生产开放、部署、push/merge"
-    ]
+    ],
+    "provider_requests_attempted": 2,
+    "real_model_requests_attempted": 1
   },
   "archive_transition": {
     "from_phase": "Phase 1",
@@ -2088,7 +2090,7 @@
       "id": "PHASE-1.5-T038",
       "phase": "Phase 1.5",
       "title": "执行批准的开发诊断并决定候选去向",
-      "status": "todo",
+      "status": "blocked",
       "priority": "P0",
       "depends_on": [
         "PHASE-1.5-T037"
@@ -2109,16 +2111,23 @@
       ],
       "verification": [
         "仅按准确授权执行包的真实运行命令执行，记录每次预约/请求/收据/失败/人工核对；不在规划时预填命令参数或结果。",
-        "（待建立）python3 scripts/check_p15_development_diagnostic_results.py --check；纯离线校验准确证据、配置、授权边界与状态，不在--check隐式发真实请求。",
+        "python3 scripts/check_p15_development_diagnostic_results.py --check；纯离线校验准确证据、配置、授权边界与状态，不在--check隐式发真实请求。",
         "python3 scripts/check_catalog_workflow.py",
         "git diff --check"
       ],
-      "verification_results": [],
-      "started_at": null,
+      "verification_results": [
+        "真实批准登记docs/acceptance/phase-1.5-development-diagnostic-r02/execution-approval.json；严格绑定原7d3fef3/r02 manifest 4d987857ab227a366c8b506f4ed365c8360b778017aa9418425493a212527f44，329源码材料SHA不变",
+        "实际按--start和一次--advance执行；2真实HTTP含1计数和1生成；预输入计数635，生成返回error invalid_json_schema/text.format.schema/allOf，HTTP状态未被冻结适配器持久化，不臆测",
+        "批次stopped/provider_contract_failure，首槽failed/OUTCOME_UNKNOWN，实际模型usage/收费未知；保留全32,000输入/8,000总输出占额及全部预约/收据；无自动重试/第二候选/补样本",
+        "12支持课程完成0/失败未知1/未运行11，2负例及20审核probe未运行；自然质量、人工内容核对和审核表现均未验证，不以Mock或人工假pass补分",
+        "结果只读checker --check退出2准确验证blocked；独立11篡改/丢失/伪造通过/unknown用量/账本WAL拒绝测试passed0skip，证据docs/acceptance/phase-1.5-development-diagnostic-results-r02/validation.json",
+        "原始私有证据留/tmp/edumind-p15-t038-r02；仅提交metadata/SHA及批准登记。生产catalog_only/H封存，T039未领取，无push/merge/部署；不创建Task-Completed"
+      ],
+      "started_at": "2026-10-24T12:25:09",
       "completed_at": null,
-      "blocker": null,
+      "blocker": "准确r02首槽真实接口返回invalid_json_schema：text.format.schema根层allOf不被允许；无model/usage，独立账本已provider_contract_failure停止。2 HTTP/1生成，模型结果unknown保留32k输入/8k输出预约，其余33槽未运行；无内容质量准入，不能领取T039。修复须离线验证并冻结新准确包/预算另获批准，原批次不重启。",
       "commit_lookup": "Task-Completed: PHASE-1.5-T038",
-      "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。真实调用另需本轮准确包、配置、样本/标签、预算和停止条件授权；旧预算不可用。未达T005冻结的开发质量准入及工程要求不得done；性能只作开发诊断报告，独立性能由T041判定。此项口径已随ADR0027 E获准，准确来源见docs/ADR/0027-approval-20261022.json。"
+      "execution_gate": "准确r02已获准并执行，批次因真实请求Schema兼容性失败停发；原授权不转为修复后新批次或其他模型授权，T038不得done。新的准确修复包及执行须另审，T039依赖阻断。"
     },
     {
       "id": "PHASE-1.5-T039",
