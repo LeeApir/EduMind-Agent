@@ -257,7 +257,7 @@ def prepare():
     )
 
 
-def check():
+def check_legacy():
     manifest = json.loads((BASE / "manifest.json").read_text())
     for name, h in manifest["material_sha256"].items():
         assert sha(BASE / name) == h, name
@@ -294,7 +294,8 @@ def check():
             v["slots"] * v[key] for v in budget["allocation"].values()
         ), total
     print(
-        "PARTIAL: 12 courses/6 pairs + 2 negatives + 20 unverified probe drafts and source hashes valid; no credentials/network used."
+        "PARTIAL: 12 courses/6 pairs + 2 negatives + 20 unverified probes; "
+        "source hashes valid; no credentials/network used."
     )
     print(
         "BLOCKED: preparation is not a frozen authorized executable package. Missing:"
@@ -302,6 +303,70 @@ def check():
     for item in manifest["missing"]:
         print("- " + item)
     return 2
+
+
+def check():
+    """Final r02 preparation acceptance, without loading environment or credentials."""
+    import xml.etree.ElementTree as ET
+
+    base = ROOT / "docs/acceptance/phase-1.5-development-diagnostic-r02"
+    manifest = json.loads((base / "manifest.json").read_text())
+    assert manifest["status"] == "frozen_preparation_not_execution_authorization"
+    assert manifest["candidate_count"] == 1
+    assert manifest["real_requests_authorized"] == manifest["real_provider_calls"] == 0
+    assert not (base / "execution-approval.json").exists(), "T038 authority is separate"
+    for name, expected in manifest["sha256"].items():
+        assert sha(ROOT / name) == expected, name
+    material = json.loads(
+        (base / "user-direction-and-material-approval.json").read_text()
+    )
+    for name, expected in material["materials"].items():
+        assert sha(ROOT / name) == expected, name
+    assert (
+        material["reviewer"] == "Lee"
+        and material["review_duration_user_reported"] == "1h"
+    )
+    assert material["review_start_at"] is material["review_end_at"] is None
+    assert material["fee_cap_waiver"] and material["real_requests_authorized"] == 0
+    slots = manifest["slots"]
+    assert len(slots) == len({s["slot_id"] for s in slots}) == 34
+    assert [
+        sum(s["kind"] == kind for s in slots)
+        for kind in ["course", "negative", "probe"]
+    ] == [12, 2, 20]
+    assert sum(s.get("proposed_label") == "severe" for s in slots) == 10
+    assert len({s["pair_id"] for s in slots if s["kind"] == "course"}) == 6
+    assert manifest["limits"] == dict(
+        requests=404,
+        input_tokens=3440000,
+        output_tokens=832000,
+        fee_micros=None,
+        wall_seconds=10800,
+    )
+    assert manifest["model_attempts_max"] == 202
+    results = json.loads((base / "offline-results.json").read_text())
+    total = 0
+    for run in results["passing_runs"]:
+        path = Path(run["xml"])
+        assert sha(path) == run["sha256"]
+        root = ET.parse(path).getroot()
+        counts = {
+            key: sum(int(s.get(key, "0")) for s in root)
+            for key in ["tests", "failures", "errors", "skipped"]
+        }
+        assert counts == run["counts"] and counts["tests"] > 0
+        assert counts["failures"] == counts["errors"] == counts["skipped"] == 0
+        total += counts["tests"]
+    assert total >= 50
+    print(
+        f"PASS: r02 frozen preparation; {total} offline/PG tests, 34 fixed slots; "
+        "no T038 grant, zero live calls."
+    )
+    print(
+        "404 HTTP / 202 model attempts, 3,440,000 input / 832,000 output tokens; "
+        "10,800 seconds; scoped fee-cap waiver."
+    )
+    return 0
 
 
 def main():

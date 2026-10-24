@@ -14,6 +14,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path[:0] = [str(ROOT / "scripts"), str(ROOT / "backend")]
 from acceptance_support.p15_diagnostic_ledger import Ledger, Limits, Refused, digest  # noqa: E402
 from acceptance_support.p15_diagnostic_transport import DiagnosticAdapter  # noqa: E402
+
 from app.core.config import ProviderSettings  # noqa: E402
 from app.core.provider_target import ApprovedTarget  # noqa: E402
 from app.services.provider_gateway import ChatMessage, StructuredRequest, TextRequest  # noqa: E402
@@ -148,7 +149,9 @@ def test_counted_wire_and_fail_closed_shared_ledger(tmp_path, mode):
                 ledger.reserve(
                     "TEST_ONLY", "a" * 64, "new", input_max=1, output_max=1, fee_max=0
                 )
-            assert not list(tmp_path.glob("*-response.json"))
+            assert len(list(tmp_path.glob("*-stopped.json"))) == 1
+            if mode in ["count_404", "count_large", "secret_echo", "timeout"]:
+                assert not list(tmp_path.glob("*-response.json"))
         if mode in ["count_404", "count_large"]:
             assert len(seen) == 1
         for p in tmp_path.glob("*.json"):

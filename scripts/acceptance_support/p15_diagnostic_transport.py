@@ -29,7 +29,11 @@ class DiagnosticResponsesAdapter(DeepSeekResponsesAdapter):
 
 def redact_check(raw, key):
     text = raw.decode("utf-8")
-    if key and (key in text or key in json.dumps(json.loads(text), ensure_ascii=False)):
+    try:
+        decoded = json.dumps(json.loads(text), ensure_ascii=False)
+    except ValueError:
+        decoded = text
+    if key and (key in text or key in decoded):
         raise Refused("CREDENTIAL_ECHO")
 
 
@@ -113,6 +117,8 @@ class CountedTransport(httpx.AsyncBaseTransport):
             counter = await self.underlying.handle_async_request(count_request)
             count_status = counter.status_code
             raw_count = await self.read(counter)
+            (self.output / (identity + "-count.json")).write_bytes(raw_count)
+            (self.output / (identity + "-request.json")).write_bytes(request.content)
             if count_status != 200:
                 raise Refused("COUNT_UNAVAILABLE_NO_FALLBACK")
             counted = json.loads(raw_count)
@@ -137,6 +143,7 @@ class CountedTransport(httpx.AsyncBaseTransport):
             response = await self.underlying.handle_async_request(request)
             status = response.status_code
             raw = await self.read(response)
+            (self.output / (identity + "-response.json")).write_bytes(raw)
             payload = json.loads(raw)
             usage = payload.get("usage")
             if status != 200 or payload.get("model") != "gpt-6-luna" or not isinstance(usage, dict):
@@ -187,9 +194,20 @@ class CountedTransport(httpx.AsyncBaseTransport):
                 + "\n"
             )
             return httpx.Response(status, content=raw, request=request)
-        except BaseException:
+        except BaseException as exc:
             # Unknown count/model outcome stops the whole batch. No implicit retry or fallback.
             self.ledger.halt(self.batch, "provider_contract_failure")
+            (self.output / (identity + "-stopped.json")).write_text(
+                json.dumps(
+                    {
+                        "stopped": True,
+                        "error_type": type(exc).__name__,
+                        "model_sent": self.sent,
+                        "automatic_retry": False,
+                    }
+                )
+                + "\n"
+            )
             for ticket in [count_ticket, model_ticket]:
                 try:
                     self.ledger.settle(self.batch, ticket, outcome="unknown")
