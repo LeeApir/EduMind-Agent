@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "T053资料核查及两次计数/零生成的准确合成提案已完成；未获服务商最终上下文/计数/上限证据或新费用/执行批准，提案无真实入口。T038保持blocked，不重启r03/创建r04或继续课程诊断，不push/merge/部署。",
+    "phase_gate": "T054按官方契约的最小p01合成兼容探针已离线准备；ADR0029探索风险例外及准确执行/新费用例外均待明确批准。T038 blocked，旧r02/r03停止不重启、不创建课程r04，不push/merge/部署。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -2254,6 +2254,48 @@
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T053",
       "execution_gate": "只做公开网页只读资料核对及离线提案，无.env/密钥/真实计数或生成请求；不创建r04或课程诊断包。"
+    },
+    {
+      "id": "PHASE-1.5-T054",
+      "phase": "Phase 1.5",
+      "title": "准备按官方契约核对的最小计数与生成兼容探针",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T053"
+      ],
+      "scope": [
+        "scripts/",
+        "docs/ADR/",
+        "docs/acceptance/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5；ADR0027；用户同意准备最小真实兼容性方案及独立预算，不授予实际执行",
+      "acceptance_criteria": [
+        "冻结一个纯合成请求用于一次计数/一次生成，明确官方规范作为测试预期、请求值与真实上界未知的区别，风险例外仅提案。",
+        "准确源码/材料/预算/停止规则及双重批准门禁，缺具体契约或准确执行批准时不读凭据、不创建输出、不发请求；不继承旧额度/费用例外。",
+        "离线Mock覆盖正常/差异/未知/泄漏/超时/重启拒绝及准入边界，保留旧冻结/账本，任何结果均不自动开放课程或T039。"
+      ],
+      "verification": [
+        "backend/.venv/bin/python -m pytest scripts/tests/test_p15_compatibility_probe.py -q",
+        "backend/.venv/bin/python scripts/run_p15_compatibility_probe.py --check",
+        "python3 scripts/check_p15_r03_diagnostic_results.py --check（预期2）",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [
+        "ADR0029 A—C准确探索例外提案、同体一次计数/一次生成合成请求、独立2HTTP/1生成预算和双重批准入口已准备；不把请求16或本地32k/16占额当中转硬上界。",
+        "16离线Mock测试passed0skip，覆盖准确双批准/旧批次拒绝/缺费用或风险确认/字节变更、真实main缺授权无副作用、干净/指令追加/计数差/上限null/输出超限/错误Schema/计数HTTP失败/凭据回显/超时/重复启动。",
+        "原件safe审计与独立SQLite先预约/唯一发送/终态占额保持；provider_reported_usage与verified_protocol_usage分开保存，干净观察也不称质量准入或独立硬界证明。",
+        "最终manifest 160adb246d63464c05abb6e23f110ecbc40ffe20efa3f86e8c6ee4c98065d3f4 冻结370文件；--check/实际缺批准--execute拒绝/Ruff2/工作流/diff通过；原r02/r03结果checker继续预期2，证据docs/acceptance/phase-1.5-compatibility-probe-p01。",
+        "新增真实请求0；两个准确批准均不存在，旧r02/r03与unknown64k/16k保持，T038仍blocked、不执行counter-c01、不创建课程r04或开放生产。"
+      ],
+      "started_at": "2026-10-24T15:47:46",
+      "completed_at": "2026-10-24T15:58:32",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T054",
+      "execution_gate": "仅零调用准确准备；ADR风险例外与准确真实执行须分别明确批准，不以本次“好”代替，T038仍blocked，不重启r03/创建r04。"
     },
     {
       "id": "PHASE-1.5-T038",
