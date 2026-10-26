@@ -2481,13 +2481,14 @@
         "2026-10-24T22:57:08：按用户最新明确“新Key直接调用一次”，新d01只发1次POST /v1/responses，HTTP200/固定OK及完整本地Schema通过；reported4438/13/4451，额外21336字符后缀SHA与p01相同，max_output_tokens回显null；无计数/重试/课程。观察器Schema全对象比较被额外description:null触发，独立核对核心type/name/schema/strict均一致，已更正结论、未改冻结原件。私有一致快照/tmp/edumind-p15-direct-relay-once-d01-snapshot，脱敏结果docs/acceptance/phase-1.5-direct-relay-once-d01/results.json，4096/16/本地规划USD0.01占额全保留、实际费用未知。",
         "2026-10-24T23:04:17：d01执行后只读checker预期2核对HTTP200固定OK/同旧后缀/上限null/Schema核心匹配；6项description:null及真实核心Schema漂移离线回归passed0skip，原7项出站Mock passed0skip；Ruff通过，源/快照/执行前冻结SHA保持，证据docs/acceptance/phase-1.5-direct-relay-once-d01/validation.json。不把新manifest追溯冻结伪造成人工逐哈希审阅，不将单次HTTP200写成完整兼容或T038 done。",
         "2026-10-26：独立aiapi/gpt-6.1-sol/Responses最小包已冻结；9离线停止规则测试/0skip、Ruff/manifest/工作流通过。自动审批因具体项目Prompt/Schema外传授权及平台费用无硬限拒绝，执行进程未启动，真实新增0，S1/S2均未运行；证据docs/acceptance/phase-1.5-aiapi-minimal-r01/results.json。历史累计字段保持原口径，本轮此前聊天接口探测独立见local-materials，不伪造合并或准入。",
-        "2026-10-26：用户明确具体外传及费用风险后执行冻结aiapi r01；1HTTP/1生成HTTP200，S1教学指令原样/角色标记/未知画像null/Schema通过，reported130输入62输出，max_output_tokens=null未证实强制上限，依包停发S2；结果docs/acceptance/phase-1.5-aiapi-minimal-r01/results.json；旧累计账本不改，新批独立记录，T038仍blocked。"
+        "2026-10-26：用户明确具体外传及费用风险后执行冻结aiapi r01；1HTTP/1生成HTTP200，S1教学指令原样/角色标记/未知画像null/Schema通过，reported130输入62输出，max_output_tokens=null未证实强制上限，依包停发S2；结果docs/acceptance/phase-1.5-aiapi-minimal-r01/results.json；旧累计账本不改，新批独立记录，T038仍blocked。",
+        "2026-10-26：用户明确“执行S2”单独豁免S1前置，原S2字节一次POST，HTTP200/流完成/正文一致，生产Schema失败（10项含派生错误）；reported1291输入802输出2093总量，超请求512，终态关键字段缺失。证据docs/acceptance/phase-1.5-aiapi-s2-once/results.json；本地USD0.035unknown保留、真实费用未知，T038仍blocked。"
       ],
       "started_at": "2026-10-24T12:25:09",
       "completed_at": null,
       "blocker": "用户明确新Key直接生成一次（跳过计数）已执行：1HTTP/1生成，HTTP200固定OK，但额外21336字符指令后缀与旧p01相同、max_output_tokens请求16回显null；reported4438输入/13输出，未独立计数不能称本次计数差。Schema核心字段实际匹配，额外description:null导致观察器全对象比较假异常已更正且冻结原件不改。当前供应继续停用，无追加请求，课程不解锁，累计8HTTP/4生成。",
       "commit_lookup": "Task-Completed: PHASE-1.5-T038",
-      "execution_gate": "具体S1/S2外传获准后r01实际1HTTP/1生成，S1输出上限回显null按包停止，S2未发；一次执行授权结束，不自动补发，T038 blocked/catalog_only/旧门禁保持。",
+      "execution_gate": "S2独立一次已执行完；真实规划Schema失败、报告输出802超过请求512；无追加/重试/旧包恢复/课程，T038 blocked/catalog_only保持。",
       "scoped_observations": [
         {
           "batch_id": "p15-aiapi-minimal-r01",
@@ -2503,6 +2504,17 @@
             "S2"
           ],
           "results": "docs/acceptance/phase-1.5-aiapi-minimal-r01/results.json"
+        },
+        {
+          "batch_id": "p15-aiapi-s2-once",
+          "state": "stopped_schema_failed_output_report_over_cap",
+          "authorization": "用户明确执行S2，准确负载此前获准，本次单独豁免S1前置",
+          "limits": "1HTTP/1生成/40秒/输出512/本地输入8192/USD0.035，实际硬限未知",
+          "unlocks_course": false,
+          "actual_new_http_requests": 1,
+          "actual_new_generation_requests": 1,
+          "results": "docs/acceptance/phase-1.5-aiapi-s2-once/results.json",
+          "blocker": "HTTP200/流完成，但真实规划Schema失败；请求输出512而报告802，终态model/instructions/store/cap字段缺失。无重试。"
         }
       ]
     },
