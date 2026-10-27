@@ -133,7 +133,7 @@ def test_r03_declaration_is_correct_after_admission_without_changing_answers_or_
     raw["blocks"][2]["items"][0]["solution"] = "Use `scores[3]` and `0 <= i && i < 6`."
     original = deepcopy(raw)
     checked = check_scene(raw, inputs())
-    assert checked["state"] == "accepted" and RULE_VERSION == "free-scene-hard-gate-v2"
+    assert checked["state"] == "accepted" and RULE_VERSION == "free-scene-hard-gate-v3"
     blocks = checked["cleaned"]["content"]["blocks"]
     assert codes(blocks[0]["markdown"]) == codes(raw["blocks"][0]["markdown"])
     assert r"scores\[6\]" not in blocks[0]["markdown"]

@@ -2919,7 +2919,7 @@
       "id": "PHASE-1.5-T063",
       "phase": "Phase 1.5",
       "title": "为课程私有准入审计增加跨内容一致性待复核发现",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1.5-T062",
@@ -2942,13 +2942,20 @@
         "旧D02错误、正确修复及变体离线回归，实际PG核对只追加v3审计、原件/owner/幂等及机械失败不受影响。"
       ],
       "verification": [
-        "实现时建立并实际执行对应离线/隔离PG-Mock接口",
+        "cd backend && .venv/bin/python -m pytest tests/test_free_scene_consistency.py tests/test_free_scene_markdown.py tests/test_free_scene_semantics.py tests/test_free_scene_answer_contract.py tests/test_free_scene_form_contract.py -q --junitxml=/tmp/edumind-t063-unit.xml",
+        "python3 docs/acceptance/phase-1.5-scene-consistency-t063/run_pg_offline.py",
+        "cd backend && .venv/bin/mypy app/services/free_scene_consistency.py app/services/free_scene_validation.py app/services/free_scene_markdown.py",
+        "cd backend && .venv/bin/ruff check app/services/free_scene_consistency.py app/services/free_scene_validation.py app/services/free_scene_markdown.py tests/test_free_scene_consistency.py tests/test_free_scene_consistency_pg.py tests/test_free_scene_markdown.py tests/test_free_scene_markdown_pg.py tests/test_free_scene_validation.py",
         "python3 scripts/check_catalog_workflow.py",
         "git diff --check"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "211 passed / 0skip: unit99, actual isolated PG-Mock3+40+19+39+11; source-bound D02/correct/renamed/unknown and immutable v2/v3 coexistence, owner/idempotency/cleaned content/quality decision checks passed.",
+        "mypy 3 sources / Ruff / workflow / diff passed; evidence docs/acceptance/phase-1.5-scene-consistency-t063/validation.json.",
+        "Real Provider requests 0; dedicated PG exited; T038 stays blocked and original stopped diagnostic facts remain unchanged."
+      ],
+      "started_at": "2026-10-27T23:47:07+08:00",
+      "completed_at": "2026-10-28T00:03:38+08:00",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T063",
       "execution_gate": "当前用户明确授权两项离线实现；不增加语义自动确认/硬阻断或真实调用，不重启旧批次，不自动语义重生成。"

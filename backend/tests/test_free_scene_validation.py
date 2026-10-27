@@ -87,11 +87,14 @@ def test_legal_content_is_accepted_without_review_and_original_is_preserved():
     raw["blocks"][2]["items"][0]["solution"] = "[参考](javascript:bad) <b>解释</b>"
     prior = deepcopy(raw)
     checked = check_scene(raw, inputs())
-    assert (
-        checked["state"] == "accepted"
-        and checked["reason_code"] is None
-        and not checked["findings"]
-    )
+    assert checked["state"] == "accepted" and checked["reason_code"] is None
+    assert len(checked["findings"]) == 1
+    advisory = checked["findings"][0]
+    assert advisory["code"] == "SEMANTIC_ADVISORY"
+    assert advisory["report"]["status"] == "not_assessed"
+    assert advisory["report"]["findings"] == []
+    assert advisory["report"]["semantic_correctness_verified"] is False
+    assert advisory["report"]["execution_performed"] is False
     assert raw == prior
     blocks = checked["cleaned"]["content"]["blocks"]
     assert blocks[0]["markdown"] == raw["blocks"][0]["markdown"]

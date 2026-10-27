@@ -1,4 +1,4 @@
-"""Real isolated PG: v2 adds validation facts while preserving v1 and raw candidates."""
+"""Real isolated PG: current validation preserves v1 cleaning facts and raw candidates."""
 
 from copy import deepcopy
 from uuid import uuid4
@@ -49,7 +49,7 @@ def test_rule_upgrade_keeps_old_facts_and_original_code_without_publishing(
                 second = await validation.validate_candidate(db, owner, cid, fence, result_id=rid)
                 replay = await validation.validate_candidate(db, owner, cid, fence, result_id=rid)
                 assert second == replay and first["validation_id"] != second["validation_id"]
-                assert second["rule_version"] == "free-scene-hard-gate-v2"
+                assert second["rule_version"] == "free-scene-hard-gate-v3"
                 cleaned = second["cleaned"]["content"]["blocks"][0]["markdown"]
                 assert "int scores[6];" in cleaned and "#include <stdio.h>" in cleaned
                 assert r'printf("%d\n", scores[3]);' in cleaned
@@ -66,13 +66,13 @@ def test_rule_upgrade_keeps_old_facts_and_original_code_without_publishing(
                 ).all()
                 assert len(rows) == 2 and {r.rule_version for r in rows} == {
                     "free-scene-hard-gate-v1",
-                    "free-scene-hard-gate-v2",
+                    "free-scene-hard-gate-v3",
                 }
                 previous = next(r for r in rows if r.rule_version == "free-scene-hard-gate-v1")
                 assert (
                     previous.cleaned_json == old_json
                     and previous.raw_digest
-                    == next(r for r in rows if r.rule_version.endswith("v2")).raw_digest
+                    == next(r for r in rows if r.rule_version == second["rule_version"]).raw_digest
                 )
                 assert (await db.get(FreeSceneGenerationResult, rid)).response_json == raw
                 assert (
@@ -94,7 +94,7 @@ def test_rule_upgrade_keeps_old_facts_and_original_code_without_publishing(
                                 dict(i=row.id),
                             )
                 record_testsuite_property("v1_validation_preserved", first["validation_id"])
-                record_testsuite_property("v2_validation_appended", second["validation_id"])
+                record_testsuite_property("current_validation_appended", second["validation_id"])
         finally:
             async with sessions() as db, db.begin():
                 await db.execute(

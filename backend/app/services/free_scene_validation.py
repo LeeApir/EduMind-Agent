@@ -1,4 +1,4 @@
-"""Versioned mechanical draft checks; never a semantic review or publication grant."""
+"""Versioned mechanical checks and private advisories; never semantic approval."""
 
 from copy import deepcopy
 from html import escape
@@ -20,10 +20,11 @@ from app.services.free_course_snapshots import (
     canonical,
     digest,
 )
+from app.services.free_scene_consistency import check_consistency
 from app.services.free_scene_generation import load_inputs
 from app.services.free_scene_markdown import clean_code_markdown
 
-RULE_VERSION = "free-scene-hard-gate-v2"
+RULE_VERSION = "free-scene-hard-gate-v3"
 
 
 def clean_markdown(value: str) -> str:
@@ -100,7 +101,19 @@ def check_scene(raw: Any, inputs: dict[str, Any]) -> dict[str, Any]:
     )
     if len(canonical(payload)) > 65536:
         return rejected("CLEANED_SIZE_EXCEEDED")
-    return dict(state="accepted", reason_code=None, findings=[], cleaned=payload)
+    advisory = check_consistency(value, inputs)
+    return dict(
+        state="accepted",
+        reason_code=None,
+        findings=[
+            dict(
+                rule_id=f"{RULE_VERSION}:SEMANTIC_ADVISORY",
+                code="SEMANTIC_ADVISORY",
+                report=advisory,
+            )
+        ],
+        cleaned=payload,
+    )
 
 
 async def validate_candidate(

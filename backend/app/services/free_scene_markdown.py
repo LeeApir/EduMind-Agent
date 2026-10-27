@@ -70,7 +70,7 @@ class _InertRenderer(MarkdownRenderer):
         return ()
 
     def block_code(self, token: dict[str, Any], state: BlockState) -> str:
-        code = token["raw"]
+        code: str = token["raw"]
         if token.get("style") == "indent":
             # Indented-code tokens omit the final newline; retain their own syntax
             # rather than adding a newline to the code payload via a fence.
@@ -78,7 +78,7 @@ class _InertRenderer(MarkdownRenderer):
         # Canonical fences cannot be closed by any delimiter inside the code.
         longest = max((len(v) for v in re.findall(r"~+", code)), default=0)
         marker = "~" * max(3, longest + 1)
-        info = token.get("attrs", {}).get("info", "")
+        info: str = token.get("attrs", {}).get("info", "")
         language = info.split(maxsplit=1)[0] if info.strip() else ""
         if not re.fullmatch(r"[A-Za-z0-9_+.-]{0,32}", language):
             language = ""

@@ -1,0 +1,500 @@
+{
+  "origin": "already-exposed synthetic r05 D02-known scene2; no holdout or real learner",
+  "raw": {
+    "blocks": [
+      {
+        "kind": "text",
+        "markdown": "# 场景二：头插法练习与错误排查\n\n本场景沿用统一示例：结点定义为 `struct Node { int data; struct Node *next; };`，用头插法依次插入 1、2、3，最终链表为 `3 -> 2 -> 1 -> NULL`，头指针 `head` 指向 3。\n\n场景一已经说明：头插的两步是 `newNode->next = head;` 再 `head = newNode;`，顺序颠倒会造成**断链**。本场景先看一个可运行的完整程序（建表 + 遍历输出），再通过练习检查你对指针状态与常见错误的掌握。\n\n**排查要点清单**：\n\n1. 新结点的 `next` 是否在修改 `head` 之前完成赋值？\n2. `malloc` 返回值是否检查？失败时链表是否保持原状？\n3. 遍历时是否用临时指针 `p` 前进，而不是直接移动 `head`（否则丢失链表入口）？\n4. 循环条件是否为 `p != NULL`，避免访问空指针的 `data`？\n",
+        "anchor_id": "s2_intro"
+      },
+      {
+        "kind": "code",
+        "source": "#include <stdio.h>\n#include <stdlib.h>\n\nstruct Node {\n    int data;\n    struct Node *next;\n};\n\n/* 头插法建表：依次插入 1、2、3，得到 3 -> 2 -> 1 -> NULL */\nstruct Node *insertHead(struct Node *head, int value) {\n    struct Node *newNode = (struct Node *)malloc(sizeof(struct Node));\n    if (newNode == NULL) {\n        return head;            /* 分配失败：不改动原链表 */\n    }\n    newNode->data = value;\n    newNode->next = head;       /* 先接：新结点抓住旧链表 */\n    head = newNode;             /* 后断：头指针改指向新结点 */\n    return head;\n}\n\n/* 遍历输出，用临时指针 p 前进，保留 head 不变 */\nvoid printList(struct Node *head) {\n    struct Node *p = head;\n    while (p != NULL) {\n        printf(\"%d -> \", p->data);\n        p = p->next;\n    }\n    printf(\"NULL\\n\");\n}\n\nint main(void) {\n    struct Node *head = NULL;\n    head = insertHead(head, 1);\n    head = insertHead(head, 2);\n    head = insertHead(head, 3);\n    printList(head);            /* 输出：3 -> 2 -> 1 -> NULL */\n    return 0;\n}\n",
+        "language": "c",
+        "anchor_id": "s2_code"
+      },
+      {
+        "kind": "text",
+        "markdown": "## 常见错误对照\n\n**错误写法（断链）**：\n\n```c\nhead = newNode;          /* 先改头：旧链表入口丢失 */\nnewNode->next = head;    /* 此时 head 就是 newNode，形成自环 */\n```\n\n结果：`newNode->next` 指向自己，原来的链表再也无法访问。\n\n**正确写法**：\n\n```c\nnewNode->next = head;    /* 先接 */\nhead = newNode;          /* 后断 */\n```\n\n**另一个易错点**：遍历时写 `head = head->next;` 会永久丢失链表入口，函数返回后无法再访问任何结点。应使用临时指针 `p`。\n\n下面的练习要求你给出确定的状态或数值，请只填写一个规范答案。\n",
+        "anchor_id": "s2_error"
+      },
+      {
+        "kind": "exercise",
+        "items": [
+          {
+            "question": "初始状态：head = NULL，链表为空。依次执行 insertHead(head,1)、insertHead(head,2)、insertHead(head,3)（每次均先 newNode->next = head，再 head = newNode）。问最终从 head 开始遍历输出的数字序列是什么？答案格式：三个数字用英文逗号分隔、无空格，例如 9,8,7。",
+            "solution": "头插使新结点成为首元结点：插入 1 得 1；插入 2 得 2,1；插入 3 得 3,2,1。故输出序列为 3,2,1。",
+            "answer_key": "3,2,1",
+            "input_type": "short_text",
+            "question_id": "q1_final_order"
+          },
+          {
+            "question": "初始状态：head = NULL。已依次头插 1、2、3，当前链表为 3 -> 2 -> 1 -> NULL。问此时 head->data 的值是多少？答案范围：1 到 3 之间的一个整数，只填数字。",
+            "solution": "头插后 head 指向最后插入的结点，其 data 为 3。",
+            "answer_key": "3",
+            "input_type": "short_text",
+            "question_id": "q2_head_data"
+          },
+          {
+            "question": "初始状态：head 指向链表 2 -> 1 -> NULL，newNode 是 data = 3、next 尚未赋值的孤立结点。若错误地先执行 head = newNode，再执行 newNode->next = head，问执行完后 newNode->next 指向哪个结点的 data？答案范围：1、2、3 中选一个整数，只填数字。",
+            "solution": "先执行 head = newNode 后 head 即 newNode；再执行 newNode->next = head 等价于 newNode->next = newNode，形成自环，故 newNode->next 指向自身，其 data 为 3。",
+            "answer_key": "3",
+            "input_type": "short_text",
+            "question_id": "q3_broken_next"
+          }
+        ],
+        "question": "围绕统一示例（头插依次插入 1、2、3）完成 3 道小题，每题只填一个规范答案。",
+        "anchor_id": "s2_ex",
+        "exercise_key": "head_insert_practice_1"
+      }
+    ],
+    "actions": [
+      {
+        "type": "highlight_block",
+        "anchor_id": "s2_intro",
+        "step_index": null
+      },
+      {
+        "type": "highlight_block",
+        "anchor_id": "s2_code",
+        "step_index": null
+      },
+      {
+        "type": "highlight_block",
+        "anchor_id": "s2_error",
+        "step_index": null
+      },
+      {
+        "type": "highlight_block",
+        "anchor_id": "s2_ex",
+        "step_index": null
+      }
+    ]
+  },
+  "inputs": {
+    "plan": {
+      "id": "2e678e82-0382-425c-9519-45abe8072041",
+      "digest": "ad759c58c31da068b33985560a89b411587cccbc1d85654b21845c1bec1a3bd7",
+      "scenes": [
+        {
+          "forms": [
+            "text",
+            "code",
+            "visualization"
+          ],
+          "title": "场景一：头插法原理与 C 代码实现",
+          "purpose": "讲清头插法的指针操作机制，并给出可读的 C 实现，让学习者理解赋值顺序的必要性。",
+          "scene_id": "7873880e-b1be-44be-a9f4-b1670823ab5c",
+          "scene_key": "scene_1_concept_code",
+          "depends_on": [],
+          "objective_ids": [
+            "obj_head_insert_concept",
+            "obj_head_insert_code"
+          ]
+        },
+        {
+          "forms": [
+            "exercise",
+            "code"
+          ],
+          "title": "场景二：头插法练习与错误排查",
+          "purpose": "通过编写头插建表与遍历输出的练习巩固实现，并针对断链等常见错误进行排查。",
+          "scene_id": "7d696c12-52c5-4413-8e21-3aab69b089db",
+          "scene_key": "scene_2_practice",
+          "depends_on": [
+            "7873880e-b1be-44be-a9f4-b1670823ab5c"
+          ],
+          "objective_ids": [
+            "obj_head_insert_practice",
+            "obj_two_scenes"
+          ]
+        }
+      ],
+      "version": 1,
+      "candidate": {
+        "title": "单链表头插法：C 代码与练习（2 场景）",
+        "scenes": [
+          {
+            "forms": [
+              "text",
+              "code",
+              "visualization"
+            ],
+            "title": "场景一：头插法原理与 C 代码实现",
+            "purpose": "讲清头插法的指针操作机制，并给出可读的 C 实现，让学习者理解赋值顺序的必要性。",
+            "scene_key": "scene_1_concept_code",
+            "depends_on": [],
+            "objective_ids": [
+              "obj_head_insert_concept",
+              "obj_head_insert_code"
+            ]
+          },
+          {
+            "forms": [
+              "exercise",
+              "code"
+            ],
+            "title": "场景二：头插法练习与错误排查",
+            "purpose": "通过编写头插建表与遍历输出的练习巩固实现，并针对断链等常见错误进行排查。",
+            "scene_key": "scene_2_practice",
+            "depends_on": [
+              "scene_1_concept_code"
+            ],
+            "objective_ids": [
+              "obj_head_insert_practice",
+              "obj_two_scenes"
+            ]
+          }
+        ],
+        "objectives": [
+          {
+            "id": "obj_head_insert_concept",
+            "source": "user_requirement",
+            "source_key": "request_1",
+            "description": "理解单链表头插法的核心机制：新结点始终插入在头结点之后/链表首部，成为新的首元结点，并说明其时间复杂度为 O(1)。",
+            "source_excerpt": "学习单链表头插"
+          },
+          {
+            "id": "obj_head_insert_code",
+            "source": "user_requirement",
+            "source_key": "request_1",
+            "description": "能读懂并写出 C 语言实现单链表头插的函数（含结点定义、malloc 分配、指针赋值顺序），并解释指针赋值顺序为何不能颠倒。",
+            "source_excerpt": "用C代码和练习组织2个场景"
+          },
+          {
+            "id": "obj_head_insert_practice",
+            "source": "user_requirement",
+            "source_key": "request_1",
+            "description": "通过练习独立完成头插建表与遍历输出，能排查常见的指针丢失/断链错误。",
+            "source_excerpt": "用C代码和练习组织2个场景"
+          },
+          {
+            "id": "obj_two_scenes",
+            "source": "user_requirement",
+            "source_key": "request_1",
+            "description": "课程按 2 个场景组织：场景一讲原理与代码，场景二做练习与纠错。",
+            "source_excerpt": "组织2个场景"
+          }
+        ],
+        "conventions": [
+          "代码语言统一为 C，使用 struct Node 与 int data。",
+          "指针赋值顺序统一为：先 new->next = head，再 head = new。",
+          "图示统一用箭头表示 next 指向，NULL 表示链尾。",
+          "每个场景默认 15 分钟学习时长。"
+        ],
+        "terminology": [
+          {
+            "term": "单链表",
+            "meaning": "每个结点含数据域和指向后继的指针域 next，最后一个结点 next 为 NULL 的线性结构。"
+          },
+          {
+            "term": "头指针 head",
+            "meaning": "指向链表第一个结点的指针；空链表时 head 为 NULL。"
+          },
+          {
+            "term": "头插法",
+            "meaning": "每次把新结点插入到链表最前端，使其成为新的首元结点。"
+          },
+          {
+            "term": "新结点",
+            "meaning": "通过 malloc 分配、尚未接入链表的结点，其 next 需先正确赋值再修改 head。"
+          },
+          {
+            "term": "断链",
+            "meaning": "因指针赋值顺序错误导致后续结点无法再被访问的错误。"
+          }
+        ],
+        "shared_example": "统一示例：单链表结点定义为 struct Node { int data; struct Node *next; };，用头插法依次插入 1、2、3，最终链表为 3 -> 2 -> 1 -> NULL（头指针 head 指向 3）。所有场景的代码、图示与练习都围绕这一条链表展开。"
+      },
+      "request_id": "5a5837d3-8d6f-4575-bb11-1afd0e7a6b6f"
+    },
+    "request": {
+      "course_id": "9c69ca6d-9c83-441a-9c4c-49a1f030a2e5",
+      "profile_id": "97204687-54f7-4fe6-823f-26146a5b5d7c",
+      "request_id": "5a5837d3-8d6f-4575-bb11-1afd0e7a6b6f",
+      "operation_id": "824295cc-5c14-4224-9c54-d1151515b8d6",
+      "code_language": "C",
+      "original_goal": "学习单链表头插，用C代码和练习组织2个场景。",
+      "profile_version": 1,
+      "request_sources": {
+        "request_1": {
+          "text": "学习单链表头插，用C代码和练习组织2个场景。",
+          "version": 1,
+          "request_id": "5a5837d3-8d6f-4575-bb11-1afd0e7a6b6f"
+        }
+      },
+      "learner_evidence": {
+        "evidence": {
+          "knowledge_base": {
+            "source": "learner_statement"
+          },
+          "engineering_preference": {
+            "source": "learner_statement"
+          }
+        },
+        "knowledge_base": {
+          "source": "learner_statement",
+          "self_report": "会C变量和循环，尚未系统学习指针与数据结构"
+        },
+        "learning_goals": null,
+        "cognitive_style": null,
+        "error_preferences": null,
+        "extended_dimensions": null,
+        "engineering_preference": {
+          "source": "learner_statement",
+          "code_first": true
+        },
+        "professional_background": null
+      },
+      "teaching_language": "zh-CN"
+    },
+    "scene_id": "7d696c12-52c5-4413-8e21-3aab69b089db",
+    "upstream": [
+      {
+        "digest": "10341f663c91dafb20bcfaa7a56a61e97173e738c7839a664595758be147ec07",
+        "actions": [
+          {
+            "type": "highlight_block",
+            "anchor_id": "s1_intro",
+            "step_index": null
+          },
+          {
+            "type": "highlight_block",
+            "anchor_id": "s1_order",
+            "step_index": null
+          },
+          {
+            "type": "show_step",
+            "anchor_id": "s1_vis",
+            "step_index": 0
+          },
+          {
+            "type": "show_step",
+            "anchor_id": "s1_vis",
+            "step_index": 2
+          },
+          {
+            "type": "show_step",
+            "anchor_id": "s1_vis",
+            "step_index": 4
+          },
+          {
+            "type": "show_step",
+            "anchor_id": "s1_vis",
+            "step_index": 6
+          },
+          {
+            "type": "highlight_block",
+            "anchor_id": "s1_code",
+            "step_index": null
+          },
+          {
+            "type": "highlight_block",
+            "anchor_id": "s1_summary",
+            "step_index": null
+          }
+        ],
+        "content": {
+          "blocks": [
+            {
+              "kind": "text",
+              "markdown": "# 场景一：头插法原理与 C 代码实现\n\n本场景围绕统一示例展开：结点定义为 `struct Node { int data; struct Node *next; };`，用头插法依次插入 1、2、3，最终链表为 `3 -> 2 -> 1 -> NULL`，头指针 `head` 指向 3。\n\n**头插法的核心机制**：每次申请一个新结点，把新结点的 `next` 指向当前的头结点，再让 `head` 指向新结点。于是新结点永远成为链表的首元结点，原来的整条链表被“挂”在它后面。\n\n**时间复杂度为 O\\(1\\)**：无论链表已有多少个结点，头插只做常数次指针赋值，不需要遍历链表。这与尾插法（需要走到链尾，O\\(n\\)）形成对比。\n",
+              "anchor_id": "s1_intro"
+            },
+            {
+              "kind": "text",
+              "markdown": "## 为什么赋值顺序不能颠倒\n\n正确顺序是两步：\n\n1. `new->next = head;` —— 先让新结点记住原来的链表；\n2. `head = new;` —— 再让头指针改指向新结点。\n\n如果颠倒成先 `head = new;` 再 `new->next = head;`，那么第二步读到的 `head` 已经是新结点自己，结果是 `new->next = new`，形成自环；而原来的整条链表失去了唯一的入口指针，再也无法访问——这就是**断链**（指针丢失）。\n\n一句话记忆：**先接后断，先连后改头**。新结点必须先“抓住”旧链表，头指针才能“松手”改指向。\n",
+              "anchor_id": "s1_order"
+            },
+            {
+              "kind": "visualization",
+              "steps": [
+                {
+                  "caption": "初始状态：空链表，head = NULL。",
+                  "elements": [
+                    {
+                      "id": "h0",
+                      "label": "head = NULL",
+                      "next_id": null
+                    }
+                  ],
+                  "highlight_ids": [
+                    "h0"
+                  ]
+                },
+                {
+                  "caption": "申请新结点 n1，data = 1，其 next 暂为 NULL。",
+                  "elements": [
+                    {
+                      "id": "h0",
+                      "label": "head = NULL",
+                      "next_id": null
+                    },
+                    {
+                      "id": "n1",
+                      "label": "1",
+                      "next_id": null
+                    }
+                  ],
+                  "highlight_ids": [
+                    "n1"
+                  ]
+                },
+                {
+                  "caption": "执行 n1->next = head（即 NULL），再执行 head = n1。链表为 1 -> NULL。",
+                  "elements": [
+                    {
+                      "id": "h1",
+                      "label": "head",
+                      "next_id": "n1"
+                    },
+                    {
+                      "id": "n1",
+                      "label": "1",
+                      "next_id": null
+                    }
+                  ],
+                  "highlight_ids": [
+                    "h1",
+                    "n1"
+                  ]
+                },
+                {
+                  "caption": "申请新结点 n2，data = 2。",
+                  "elements": [
+                    {
+                      "id": "h1",
+                      "label": "head",
+                      "next_id": "n1"
+                    },
+                    {
+                      "id": "n1",
+                      "label": "1",
+                      "next_id": null
+                    },
+                    {
+                      "id": "n2",
+                      "label": "2",
+                      "next_id": null
+                    }
+                  ],
+                  "highlight_ids": [
+                    "n2"
+                  ]
+                },
+                {
+                  "caption": "执行 n2->next = head（指向 1），再执行 head = n2。链表为 2 -> 1 -> NULL。",
+                  "elements": [
+                    {
+                      "id": "h2",
+                      "label": "head",
+                      "next_id": "n2"
+                    },
+                    {
+                      "id": "n2",
+                      "label": "2",
+                      "next_id": "n1"
+                    },
+                    {
+                      "id": "n1",
+                      "label": "1",
+                      "next_id": null
+                    }
+                  ],
+                  "highlight_ids": [
+                    "h2",
+                    "n2",
+                    "n1"
+                  ]
+                },
+                {
+                  "caption": "申请新结点 n3，data = 3。",
+                  "elements": [
+                    {
+                      "id": "h2",
+                      "label": "head",
+                      "next_id": "n2"
+                    },
+                    {
+                      "id": "n2",
+                      "label": "2",
+                      "next_id": "n1"
+                    },
+                    {
+                      "id": "n1",
+                      "label": "1",
+                      "next_id": null
+                    },
+                    {
+                      "id": "n3",
+                      "label": "3",
+                      "next_id": null
+                    }
+                  ],
+                  "highlight_ids": [
+                    "n3"
+                  ]
+                },
+                {
+                  "caption": "执行 n3->next = head（指向 2），再执行 head = n3。最终链表为 3 -> 2 -> 1 -> NULL，head 指向 3。",
+                  "elements": [
+                    {
+                      "id": "h3",
+                      "label": "head",
+                      "next_id": "n3"
+                    },
+                    {
+                      "id": "n3",
+                      "label": "3",
+                      "next_id": "n2"
+                    },
+                    {
+                      "id": "n2",
+                      "label": "2",
+                      "next_id": "n1"
+                    },
+                    {
+                      "id": "n1",
+                      "label": "1",
+                      "next_id": null
+                    }
+                  ],
+                  "highlight_ids": [
+                    "h3",
+                    "n3",
+                    "n2",
+                    "n1"
+                  ]
+                }
+              ],
+              "anchor_id": "s1_vis",
+              "text_alternative": "用头插法依次插入 1、2、3 的过程：初始 head 为 NULL；插入 1 后链表为 1 -> NULL；插入 2 后为 2 -> 1 -> NULL；插入 3 后为 3 -> 2 -> 1 -> NULL。每一步都先让新结点的 next 指向当前 head，再让 head 指向新结点。",
+              "visualization_type": "linked_list"
+            },
+            {
+              "kind": "text",
+              "markdown": "## C 代码实现\n\n下面给出完整的头插建表与遍历输出程序。注意 `insertHead` 中两条指针赋值的先后顺序，以及 `malloc` 返回值检查。\n",
+              "anchor_id": "s1_code_intro"
+            },
+            {
+              "kind": "code",
+              "source": "#include <stdio.h>\n#include <stdlib.h>\n\nstruct Node {\n    int data;\n    struct Node *next;\n};\n\n/* 头插法：把值 value 插入到链表首部，返回新的头指针 */\nstruct Node *insertHead(struct Node *head, int value) {\n    struct Node *newNode = (struct Node *)malloc(sizeof(struct Node));\n    if (newNode == NULL) {\n        return head;            /* 分配失败，保持原链表不变 */\n    }\n    newNode->data = value;\n    newNode->next = head;       /* 第一步：新结点先接住旧链表 */\n    head = newNode;             /* 第二步：头指针再改指向新结点 */\n    return head;\n}\n\n/* 遍历输出：3 -> 2 -> 1 -> NULL */\nvoid printList(struct Node *head) {\n    struct Node *p = head;\n    while (p != NULL) {\n        printf(\"%d -> \", p->data);\n        p = p->next;\n    }\n    printf(\"NULL\\n\");\n}\n\nint main(void) {\n    struct Node *head = NULL;\n    head = insertHead(head, 1);\n    head = insertHead(head, 2);\n    head = insertHead(head, 3);\n    printList(head);            /* 输出：3 -> 2 -> 1 -> NULL */\n    return 0;\n}\n",
+              "language": "c",
+              "anchor_id": "s1_code"
+            },
+            {
+              "kind": "text",
+              "markdown": "## 小结\n\n- 头插法两步：`newNode->next = head;` 然后 `head = newNode;`，顺序不可颠倒。\n- 时间复杂度 O\\(1\\)，空间上每个元素额外一个结点。\n- 头插建表得到的是**逆序**链表：依次插入 1、2、3，输出 3、2、1。\n- 常见错误：先改 `head` 导致断链；忘记给 `newNode->next` 赋值导致野指针；`malloc` 失败未检查。\n\n下一场景将通过练习巩固建表、遍历与错误排查。\n",
+              "anchor_id": "s1_summary"
+            }
+          ]
+        },
+        "scene_id": "7873880e-b1be-44be-a9f4-b1670823ab5c",
+        "dependencies": [],
+        "scene_version_id": "13f6e5e0-eb66-4720-83a3-f62d6592301c"
+      }
+    ],
+    "lease_epoch": 1,
+    "expected_head": 2
+  }
+}
