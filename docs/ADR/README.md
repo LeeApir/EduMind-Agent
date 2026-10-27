@@ -92,3 +92,5 @@
 2026-10-21：[ADR-0023](0023-free-course-learning-and-ui-direction.md)记录用户确认的P1.5自由课程学习及界面重构方向（A—F）。学生可直接学习AI草稿，节点不再是新流程生成门禁；程序安全与掌握度证据边界保留。仅需求及设计文档同步，具体实现契约未冻结，不拆task、不开发、不开放运行。
 
 2026-10-23：[ADR-0028](0028-owner-record-index-and-mastery-provenance.md)为T031/T032缺失的持久记录索引与掌握度追溯提出2个owner只读GET，A—C及准确manifest待批准；新API未实现，不改变旧已批准附件、评分算法、权限、运行模式或真实预算。任务拆分T046–T048，活动状态以根账本为准。
+
+2026-10-27：[ADR-0033](0033-split-provider-course-diagnostic.md) A—C、E 按[准确批准登记](0033-approval-20261027.json)接受并完成隔离实施；[交接](../acceptance/phase-1.5-split-provider-implementation-r01/README.md)记录47项离线/PG-Mock通过、真实调用0。D真实输入/输出边界保留，T038仍blocked，250HTTP/USD20仅提案，未授权生产或付费执行。
