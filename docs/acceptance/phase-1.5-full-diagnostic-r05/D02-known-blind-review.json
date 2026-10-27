@@ -1,0 +1,357 @@
+{
+  "slot_id": "D02-known",
+  "reviewer": "Codex assistant",
+  "review_type": "delegated_assistant",
+  "independent_human_truth": false,
+  "reviewed_at": "2026-10-27T22:15:10+08:00",
+  "model_opinion_seen_before_review": false,
+  "exhaustive_coverage_attested": true,
+  "natural_severe_errors": 1,
+  "atomic_facts": [
+    {
+      "source_sha256": "3f7f27367d5eec7db636ca000cb30fbee27deed0cc1cc92f08bff980c5716ae3",
+      "anchor_id": "s1_intro",
+      "source_pointer": "/scene/content/blocks/0/markdown",
+      "evidence_quote": "新结点永远成为链表的首元结点",
+      "statement": "无哨兵head指向首元素，1/2/3头插后3→2→1。",
+      "reason": "与结构定义和正常分配成功的主函数一致。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "3f7f27367d5eec7db636ca000cb30fbee27deed0cc1cc92f08bff980c5716ae3",
+      "anchor_id": "s1_intro",
+      "source_pointer": "/scene/content/blocks/0/markdown",
+      "evidence_quote": "常数次指针赋值",
+      "statement": "已有head时头部接链无需遍历，指针接链为O(1)。",
+      "reason": "尾插O(n)对比限于本例仅维护head、不维护尾指针的表示，不泛化到带tail的实现。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "3f7f27367d5eec7db636ca000cb30fbee27deed0cc1cc92f08bff980c5716ae3",
+      "anchor_id": "s1_order",
+      "source_pointer": "/scene/content/blocks/1/markdown",
+      "evidence_quote": "new->next = new",
+      "statement": "先head=new再new->next=head形成自环且丢掉仅有的旧入口。",
+      "reason": "赋值后的head已指向新结点，第二句读到同对象。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "3f7f27367d5eec7db636ca000cb30fbee27deed0cc1cc92f08bff980c5716ae3",
+      "anchor_id": "s1_vis",
+      "source_pointer": "/scene/content/blocks/2/steps/0/caption",
+      "evidence_quote": "初始状态：空链表，head = NULL。",
+      "statement": "头插图步骤0的节点顺序与已接链状态一致。",
+      "reason": "已读七个状态：空、孤立1、1、孤立2、2→1、孤立3、3→2→1；逐项比对head箭头、next和NULL。申请后next=null是示意孤立状态，不证明malloc清零。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "3f7f27367d5eec7db636ca000cb30fbee27deed0cc1cc92f08bff980c5716ae3",
+      "anchor_id": "s1_vis",
+      "source_pointer": "/scene/content/blocks/2/steps/1/caption",
+      "evidence_quote": "申请新结点 n1，data = 1，其 next 暂为 NULL。",
+      "statement": "头插图步骤1的节点顺序与已接链状态一致。",
+      "reason": "已读七个状态：空、孤立1、1、孤立2、2→1、孤立3、3→2→1；逐项比对head箭头、next和NULL。申请后next=null是示意孤立状态，不证明malloc清零。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "3f7f27367d5eec7db636ca000cb30fbee27deed0cc1cc92f08bff980c5716ae3",
+      "anchor_id": "s1_vis",
+      "source_pointer": "/scene/content/blocks/2/steps/2/caption",
+      "evidence_quote": "执行 n1->next = head（即 NULL），再执行 head = n1。链表为 1 -> NULL。",
+      "statement": "头插图步骤2的节点顺序与已接链状态一致。",
+      "reason": "已读七个状态：空、孤立1、1、孤立2、2→1、孤立3、3→2→1；逐项比对head箭头、next和NULL。申请后next=null是示意孤立状态，不证明malloc清零。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "3f7f27367d5eec7db636ca000cb30fbee27deed0cc1cc92f08bff980c5716ae3",
+      "anchor_id": "s1_vis",
+      "source_pointer": "/scene/content/blocks/2/steps/3/caption",
+      "evidence_quote": "申请新结点 n2，data = 2。",
+      "statement": "头插图步骤3的节点顺序与已接链状态一致。",
+      "reason": "已读七个状态：空、孤立1、1、孤立2、2→1、孤立3、3→2→1；逐项比对head箭头、next和NULL。申请后next=null是示意孤立状态，不证明malloc清零。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "3f7f27367d5eec7db636ca000cb30fbee27deed0cc1cc92f08bff980c5716ae3",
+      "anchor_id": "s1_vis",
+      "source_pointer": "/scene/content/blocks/2/steps/4/caption",
+      "evidence_quote": "执行 n2->next = head（指向 1），再执行 head = n2。链表为 2 -> 1 -> NULL。",
+      "statement": "头插图步骤4的节点顺序与已接链状态一致。",
+      "reason": "已读七个状态：空、孤立1、1、孤立2、2→1、孤立3、3→2→1；逐项比对head箭头、next和NULL。申请后next=null是示意孤立状态，不证明malloc清零。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "3f7f27367d5eec7db636ca000cb30fbee27deed0cc1cc92f08bff980c5716ae3",
+      "anchor_id": "s1_vis",
+      "source_pointer": "/scene/content/blocks/2/steps/5/caption",
+      "evidence_quote": "申请新结点 n3，data = 3。",
+      "statement": "头插图步骤5的节点顺序与已接链状态一致。",
+      "reason": "已读七个状态：空、孤立1、1、孤立2、2→1、孤立3、3→2→1；逐项比对head箭头、next和NULL。申请后next=null是示意孤立状态，不证明malloc清零。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "3f7f27367d5eec7db636ca000cb30fbee27deed0cc1cc92f08bff980c5716ae3",
+      "anchor_id": "s1_vis",
+      "source_pointer": "/scene/content/blocks/2/steps/6/caption",
+      "evidence_quote": "执行 n3->next = head（指向 2），再执行 head = n3。最终链表为 3 -> 2 -> 1 -> NULL，head 指向 3。",
+      "statement": "头插图步骤6的节点顺序与已接链状态一致。",
+      "reason": "已读七个状态：空、孤立1、1、孤立2、2→1、孤立3、3→2→1；逐项比对head箭头、next和NULL。申请后next=null是示意孤立状态，不证明malloc清零。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "3f7f27367d5eec7db636ca000cb30fbee27deed0cc1cc92f08bff980c5716ae3",
+      "anchor_id": "s1_vis",
+      "source_pointer": "/scene/content/blocks/2/text_alternative",
+      "evidence_quote": "3 -> 2 -> 1 -> NULL",
+      "statement": "替代文本复述头插三次的逆序及先接再改头。",
+      "reason": "与已读七步图及正确分支代码一致。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "3f7f27367d5eec7db636ca000cb30fbee27deed0cc1cc92f08bff980c5716ae3",
+      "anchor_id": "s1_code_intro",
+      "source_pointer": "/scene/content/blocks/3/markdown",
+      "evidence_quote": "malloc",
+      "statement": "完整C程序要求检查malloc结果和赋值顺序。",
+      "reason": "代码确有检查NULL并返回原head，正常分支先next后head。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "3f7f27367d5eec7db636ca000cb30fbee27deed0cc1cc92f08bff980c5716ae3",
+      "anchor_id": "s1_code",
+      "source_pointer": "/scene/content/blocks/4/source",
+      "evidence_quote": "struct Node *insertHead(struct Node *head, int value)",
+      "statement": "insertHead的head形参按值传入，修改本地变量并返回新头。",
+      "reason": "C的指针值参数不是调用者指针变量的引用；main显式head=insertHead(...)接收返回值。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "3f7f27367d5eec7db636ca000cb30fbee27deed0cc1cc92f08bff980c5716ae3",
+      "anchor_id": "s1_code",
+      "source_pointer": "/scene/content/blocks/4/source",
+      "evidence_quote": "return head;",
+      "statement": "malloc失败返回旧头；成功新结点含value并指向旧链。",
+      "reason": "未发现非法解引用；main在分配成功下依次接回返回值，最终3→2→1。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "3f7f27367d5eec7db636ca000cb30fbee27deed0cc1cc92f08bff980c5716ae3",
+      "anchor_id": "s1_code",
+      "source_pointer": "/scene/content/blocks/4/source",
+      "evidence_quote": "struct Node *p = head;",
+      "statement": "printList用局部游标p访问非NULL节点并前进。",
+      "reason": "while保护p解引用，打印3、2、1及NULL；函数不改调用者head。示例未free，属短程序资源收尾不足，不把它当已实现完整生命周期。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "3f7f27367d5eec7db636ca000cb30fbee27deed0cc1cc92f08bff980c5716ae3",
+      "anchor_id": "s1_summary",
+      "source_pointer": "/scene/content/blocks/5/markdown",
+      "evidence_quote": "逆序",
+      "statement": "小结的头插两步、逆序和未初始化next/malloc错误风险成立。",
+      "reason": "不倒置先next后head；每个新元素一个动态结点；未执行C。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "23bba98d9b6a45093cb3feb42d3e8ee6f3781ab4580f3de82473297c69b20e30",
+      "anchor_id": "s2_intro",
+      "source_pointer": "/scene/content/blocks/0/markdown",
+      "evidence_quote": "用临时指针",
+      "statement": "排查清单建议游标遍历保留入口。",
+      "reason": "这是良好实践；只对需要保留同一局部变量入口而言，不能推导传值函数会改调用者指针。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "23bba98d9b6a45093cb3feb42d3e8ee6f3781ab4580f3de82473297c69b20e30",
+      "anchor_id": "s2_code",
+      "source_pointer": "/scene/content/blocks/1/source",
+      "evidence_quote": "struct Node *insertHead(struct Node *head, int value)",
+      "statement": "第二场景重复的insertHead仍以返回值更新调用者。",
+      "reason": "与准确上游相同，main三次都用head=insertHead；已逐行对照。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "23bba98d9b6a45093cb3feb42d3e8ee6f3781ab4580f3de82473297c69b20e30",
+      "anchor_id": "s2_code",
+      "source_pointer": "/scene/content/blocks/1/source",
+      "evidence_quote": "struct Node *p = head;",
+      "statement": "本场景遍历输出只移动临时p。",
+      "reason": "分配成功后3→2→1→NULL，NULL检查先于解引用；未运行代码。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "23bba98d9b6a45093cb3feb42d3e8ee6f3781ab4580f3de82473297c69b20e30",
+      "anchor_id": "s2_error",
+      "source_pointer": "/scene/content/blocks/2/markdown",
+      "evidence_quote": "newNode->next` 指向自己",
+      "statement": "错误头插顺序造成自环的对照正确。",
+      "reason": "局部head先改新对象再把next设同对象。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "23bba98d9b6a45093cb3feb42d3e8ee6f3781ab4580f3de82473297c69b20e30",
+      "anchor_id": "s2_error",
+      "source_pointer": "/scene/content/blocks/2/markdown",
+      "evidence_quote": "函数返回后无法再访问任何结点",
+      "statement": "遍历函数内head=head->next会永久丢失调用者入口。",
+      "reason": "该断言错误：上文printList(struct Node *head)按值接收指针；移动局部head不会修改main的head。只有覆盖唯一保留的入口等额外条件下才丢失入口。",
+      "verdict": "fail"
+    },
+    {
+      "source_sha256": "23bba98d9b6a45093cb3feb42d3e8ee6f3781ab4580f3de82473297c69b20e30",
+      "anchor_id": "s2_ex",
+      "source_pointer": "/scene/content/blocks/3/question",
+      "evidence_quote": "3 道小题",
+      "statement": "题组含3题且每题要求规范答案。",
+      "reason": "q2/q3状态明确；q1调用语义与真实C函数接口不一致，不能视可靠精确键。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "23bba98d9b6a45093cb3feb42d3e8ee6f3781ab4580f3de82473297c69b20e30",
+      "anchor_id": "s2_ex",
+      "source_pointer": "/scene/content/blocks/3/items/0/question",
+      "evidence_quote": "初始状态：head = NULL，链表为空。依次执行 insertHead(head,1)、insertHead(head,2)、insertHead(head,3)（每次均先 newNode->next = head，再 head = newNode）。问最终从 head 开始遍历输出的数字序列是什么？答案格式：三个数字用英文逗号分隔、无空格，例如 9,8,7。",
+      "statement": "q1_final_order的题干/解析与实际C状态是否一致。",
+      "reason": "题干只写insertHead(head,1/2/3)，未接收返回值；真实函数head按值，调用者head仍NULL，不能得到参考3,2,1。括号给出的是函数内局部赋值，不能代替调用者head=返回值。至少存在与C接口直接冲突的歧义，不可可靠判卷。",
+      "verdict": "fail"
+    },
+    {
+      "source_sha256": "23bba98d9b6a45093cb3feb42d3e8ee6f3781ab4580f3de82473297c69b20e30",
+      "anchor_id": "s2_ex",
+      "source_pointer": "/scene/content/blocks/3/items/0/solution",
+      "evidence_quote": "头插使新结点成为首元结点：插入 1 得 1；插入 2 得 2,1；插入 3 得 3,2,1。故输出序列为 3,2,1。",
+      "statement": "q1_final_order的题干/解析与实际C状态是否一致。",
+      "reason": "题干只写insertHead(head,1/2/3)，未接收返回值；真实函数head按值，调用者head仍NULL，不能得到参考3,2,1。括号给出的是函数内局部赋值，不能代替调用者head=返回值。至少存在与C接口直接冲突的歧义，不可可靠判卷。",
+      "verdict": "fail"
+    },
+    {
+      "source_sha256": "23bba98d9b6a45093cb3feb42d3e8ee6f3781ab4580f3de82473297c69b20e30",
+      "anchor_id": "s2_ex",
+      "source_pointer": "/scene/content/blocks/3/items/1/question",
+      "evidence_quote": "初始状态：head = NULL。已依次头插 1、2、3，当前链表为 3 -> 2 -> 1 -> NULL。问此时 head->data 的值是多少？答案范围：1 到 3 之间的一个整数，只填数字。",
+      "statement": "q2_head_data的题干/解析与实际C状态是否一致。",
+      "reason": "本题直接规定当前链3→2→1，head->data确定3。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "23bba98d9b6a45093cb3feb42d3e8ee6f3781ab4580f3de82473297c69b20e30",
+      "anchor_id": "s2_ex",
+      "source_pointer": "/scene/content/blocks/3/items/1/solution",
+      "evidence_quote": "头插后 head 指向最后插入的结点，其 data 为 3。",
+      "statement": "q2_head_data的题干/解析与实际C状态是否一致。",
+      "reason": "本题直接规定当前链3→2→1，head->data确定3。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "23bba98d9b6a45093cb3feb42d3e8ee6f3781ab4580f3de82473297c69b20e30",
+      "anchor_id": "s2_ex",
+      "source_pointer": "/scene/content/blocks/3/items/2/question",
+      "evidence_quote": "初始状态：head 指向链表 2 -> 1 -> NULL，newNode 是 data = 3、next 尚未赋值的孤立结点。若错误地先执行 head = newNode，再执行 newNode->next = head，问执行完后 newNode->next 指向哪个结点的 data？答案范围：1、2、3 中选一个整数，只填数字。",
+      "statement": "q3_broken_next的题干/解析与实际C状态是否一致。",
+      "reason": "明确旧head指2、新结点data3，先改head后连next形成自身指向，data为3。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "23bba98d9b6a45093cb3feb42d3e8ee6f3781ab4580f3de82473297c69b20e30",
+      "anchor_id": "s2_ex",
+      "source_pointer": "/scene/content/blocks/3/items/2/solution",
+      "evidence_quote": "先执行 head = newNode 后 head 即 newNode；再执行 newNode-&gt;next = head 等价于 newNode-&gt;next = newNode，形成自环，故 newNode-&gt;next 指向自身，其 data 为 3。",
+      "statement": "q3_broken_next的题干/解析与实际C状态是否一致。",
+      "reason": "明确旧head指2、新结点data3，先改head后连next形成自身指向，data为3。",
+      "verdict": "pass"
+    }
+  ],
+  "answer_checks": [
+    {
+      "source_sha256": "23bba98d9b6a45093cb3feb42d3e8ee6f3781ab4580f3de82473297c69b20e30",
+      "anchor_id": "s2_ex",
+      "question_id": "q1_final_order",
+      "answer_key": "3,2,1",
+      "verdict": "fail",
+      "reason": "题干只写insertHead(head,1/2/3)，未接收返回值；真实函数head按值，调用者head仍NULL，不能得到参考3,2,1。括号给出的是函数内局部赋值，不能代替调用者head=返回值。至少存在与C接口直接冲突的歧义，不可可靠判卷。",
+      "safe_for_exact_scoring": false,
+      "accepted_inputs": [],
+      "rejected_inputs": []
+    },
+    {
+      "source_sha256": "23bba98d9b6a45093cb3feb42d3e8ee6f3781ab4580f3de82473297c69b20e30",
+      "anchor_id": "s2_ex",
+      "question_id": "q2_head_data",
+      "answer_key": "3",
+      "verdict": "pass",
+      "reason": "本题直接规定当前链3→2→1，head->data确定3。",
+      "safe_for_exact_scoring": true,
+      "accepted_inputs": [
+        "3"
+      ],
+      "rejected_inputs": [
+        "2"
+      ]
+    },
+    {
+      "source_sha256": "23bba98d9b6a45093cb3feb42d3e8ee6f3781ab4580f3de82473297c69b20e30",
+      "anchor_id": "s2_ex",
+      "question_id": "q3_broken_next",
+      "answer_key": "3",
+      "verdict": "pass",
+      "reason": "明确旧head指2、新结点data3，先改head后连next形成自身指向，data为3。",
+      "safe_for_exact_scoring": true,
+      "accepted_inputs": [
+        "3"
+      ],
+      "rejected_inputs": [
+        "2"
+      ]
+    }
+  ],
+  "blind_items": [
+    {
+      "area": "requirements",
+      "location": "/scene",
+      "verdict": "pass",
+      "reason": "2场景，头插C代码、图及3题均覆盖分配形式，上下游版本正确绑定。"
+    },
+    {
+      "area": "learnability",
+      "location": "/scene",
+      "verdict": "fail",
+      "reason": "第二场景对传值指针的解释错误，且第一题参考键依赖未表达的调用者赋值，不能作为正确练习学习。"
+    },
+    {
+      "area": "facts",
+      "location": "/scene",
+      "verdict": "fail",
+      "reason": "s2_error把移动传值形参等同永久丢失调用者head，反例为原程序printList(struct Node *head)。"
+    },
+    {
+      "area": "answers",
+      "location": "/scene",
+      "verdict": "fail",
+      "reason": "q1未接收insertHead返回值，按原C定义caller head仍NULL，却以3,2,1判卷；不能擅自给题干加head=或改答案。"
+    },
+    {
+      "area": "profile",
+      "location": "/scene",
+      "verdict": "pass",
+      "reason": "仍以自述而非掌握度入参；未编造已系统掌握指针。第一场景先机制再代码而非完整代码优先，仅作为有限偏好响应记录，不以此掩盖事实/答案失败。"
+    }
+  ],
+  "confirmed_issues": [
+    {
+      "id": "caller-pointer-preservation",
+      "severity": "major",
+      "source_sha256": "23bba98d9b6a45093cb3feb42d3e8ee6f3781ab4580f3de82473297c69b20e30",
+      "source_pointer": "/scene/content/blocks/2/markdown",
+      "reason": "C按值传递局部head不改调用者。"
+    },
+    {
+      "id": "ignored-return-answer-key",
+      "severity": "severe",
+      "source_sha256": "23bba98d9b6a45093cb3feb42d3e8ee6f3781ab4580f3de82473297c69b20e30",
+      "source_pointer": "/scene/content/blocks/3/items/0/question",
+      "reason": "题干只写insertHead(head,1/2/3)，未接收返回值；真实函数head按值，调用者head仍NULL，不能得到参考3,2,1。括号给出的是函数内局部赋值，不能代替调用者head=返回值。至少存在与C接口直接冲突的歧义，不可可靠判卷。"
+    }
+  ],
+  "review_scope": "Out-of-band blind evidence if engineering/protocol stop prevents slot_output; never fabricate standard import.",
+  "c_execution_performed": false
+}

@@ -2460,7 +2460,8 @@
         "python3 scripts/check_catalog_workflow.py",
         "git diff --check",
         "backend/.venv/bin/python scripts/run_p15_full_diagnostic_r04.py --check；完整新包离线450SHA核对；--step在pending批准时实际预期退出2，--assessment只读核对固定分母/证据与性能观察，不隐式出站。",
-        "backend/.venv/bin/python scripts/run_p15_full_diagnostic_r05.py --check；新完整包461源码/材料SHA，--step在准确新批准前退出2，--assessment只读重新核对原始观测证据。"
+        "backend/.venv/bin/python scripts/run_p15_full_diagnostic_r05.py --check；新完整包461源码/材料SHA，--step在准确新批准前退出2，--assessment只读重新核对原始观测证据。",
+        "backend/.venv/bin/python scripts/check_p15_full_r05_results.py --check；预期退出2，只读核对r05停止/unknown、准确来源、真实用量与独立盲核，不发请求。"
       ],
       "verification_results": [
         "真实批准登记docs/acceptance/phase-1.5-development-diagnostic-r02/execution-approval.json；严格绑定原7d3fef3/r02 manifest 4d987857ab227a366c8b506f4ed365c8360b778017aa9418425493a212527f44，329源码材料SHA不变",
@@ -2506,13 +2507,14 @@
         "2026-10-27T17:25:08：用户继续完成T38后准备完整r04而非再次仅首槽。原34槽逐字保留；DeepSeek none生成v2/准入v2及sol low场景v2/原20probe Schema，原质量阈值和分母保持。新非severe失败复核可真实typed入账后停，误报续审不重做生成/改slot_output；83离线+2实际PG/Mock=85 passed0skip，Ruff/450SHA/工作流/diff通过，pending入口预期2，真实0。负例夹具非法reason先被正确拒绝，核对原enum out_of_scope修正后PG通过，无改Schema/断言。独立测试容器exited；准确包beeca0bb41eaa659cc1bcda76b7236dd9b398e3dd7b16a44fbf5ff9e91cb50b2待新250HTTP/3h/具体合成外发与费用例外批准，原10请求/失败保留，不完成T038或领取T039。",
         "2026-10-27T18:09:30：用户明确批准beeca0bb/ADR0037 A-C/全34槽后独立r04实际4HTTP均200；规划primary正确，场景primary多出空markdown非法字段/一次原预算内format_repair通过，first_schema保留[true,false]，PG succeeded/1ready且v2清洗保真。sol报告45128入102出含33推理/最终source SHA准确的pass，但缺instructions且summary1项422字符触发原门禁；runtime UNKNOWN_SEND且review unknown保留，未改原件/重发。全部报告52884入3107出，旧10后累计14/81890/14958，费unknown；33槽未运行，标准助手复核0，实际盲核单独保存并记录开放题评分未决。12结果回归passed0skip、只读PG/SHA/原始与反事实差异核对通过，checker预期2，容器exited。ADR0038 A-B只准备零调用新契约，不降低教学阈值/不改本批Prompt，不完成T038。",
         "2026-10-27：ADR0038 A-B准确获批，T060审核观测109项/T061答案契约158项离线和实际隔离PG-Mock通过；新真实0。仅修复前置完成，T038不因此完成，旧r04 unknown及33未运行保持。",
-        "2026-10-27T22:00:50：r05接线已批准的T060观察规则与T061生成v3，原34槽字节不变；126离线+2实际PG/HTTPX Mock共128 passed0skip，Ruff/工作流/diff通过；461SHA 2896fc5f9c02bcce67a2c32a2a1773f106a3d49ebae42ca199335db8a9371723，pending --step在Key/PG/输出前拒绝。初次PG启动竞态2setup错误后确认就绪/创建offline库重跑通过，归档脚本加入就绪/标签保护；容器exited、原r04原件及unknown ledger SHA不变、新真实0。准备包docs/acceptance/phase-1.5-full-diagnostic-r05；未获本新窗口/准确包/外发预算费用例外执行批准，不完成T038。"
+        "2026-10-27T22:00:50：r05接线已批准的T060观察规则与T061生成v3，原34槽字节不变；126离线+2实际PG/HTTPX Mock共128 passed0skip，Ruff/工作流/diff通过；461SHA 2896fc5f9c02bcce67a2c32a2a1773f106a3d49ebae42ca199335db8a9371723，pending --step在Key/PG/输出前拒绝。初次PG启动竞态2setup错误后确认就绪/创建offline库重跑通过，归档脚本加入就绪/标签保护；容器exited、原r04原件及unknown ledger SHA不变、新真实0。准备包docs/acceptance/phase-1.5-full-diagnostic-r05；未获本新窗口/准确包/外发预算费用例外执行批准，不完成T038。",
+        "2026-10-27T22:27:47：r05准确授权登记call_4c391511662944b7a9c6aa25f9d701dd后执行10HTTP均200，7生成/3审核、7首次Schema均通过；D01两槽逐块/8题/画像对照实际入账。D02生成2场景ready，但首场景审核报告50推理token无reasoning项，REASONING_ITEM_MISSING触发unknown停止，非HTTP不通。D02助手先于模型独立发现局部head传值说明错误、q1忽略返回值却判3,2,1的可靠评分键缺陷，保留1自然严重问题，标准slot_output缺失不伪造。报告33184入10317出，可信29750/9891，unknown3434/426保留，旧14后24/115074/25275，真实费unknown；其余31未运行。只读PG三操作succeeded/4ready、2正式助手报告和另存盲核/模型对照、原始文件SHA保存，20结果回归passed0skip/结果checker预期2/Ruff/工作流/diff通过，PG已exited，停止后新真实0；证据docs/acceptance/phase-1.5-full-diagnostic-r05/RESULTS.md。不完成T038。"
       ],
       "started_at": "2026-10-24T12:25:09",
       "completed_at": null,
-      "blocker": "r05完整新执行包已准备并通过128项离线/隔离PG-Mock；尚待准确manifest 2896fc5f9c02bcce67a2c32a2a1773f106a3d49ebae42ca199335db8a9371723 的独立执行授权（原34槽、250HTTP/3小时、两服务合成外发、token/金额不限例外）。ADR0038 A-B仅覆盖离线实现，旧r04停止/unknown保持，未开展新真实诊断。",
+      "blocker": "r05在D02-known首场景审核HTTP200后触发REASONING_ITEM_MISSING：报告50推理token但output无reasoning项，原严格门禁拒绝并保留unknown。实际助手盲核另确认第二场景局部head传值解释错误、q1未接收返回值却给出3,2,1精确键，质量亦失败；旧停止批次不重启。",
       "commit_lookup": "Task-Completed: PHASE-1.5-T038",
-      "execution_gate": "新r05批准登记false，拟250HTTP(182生成/68审核)/10800秒，token金额不限待明确接受；旧14请求保留，累计至多264。不得用继续执行或旧费用例外代替准确包新授权；不重启旧批次/不推进T039/不开放生产。",
+      "execution_gate": "r05已停止UNKNOWN_SEND；新10HTTP均200(7生成/3审核)，已完成两槽实际复核，第3槽仅独立盲核/未完成标准入账，其余31槽未运行。reported33184入10317总出、可信结算29750入9891出；unknown3434/426不退款。旧14后累计24/115074报告入/25275报告总出。停止后仅零调用取证/交接，不延长窗口或自动新批。",
       "scoped_observations": [
         {
           "batch_id": "p15-aiapi-minimal-r01",
