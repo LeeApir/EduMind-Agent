@@ -1,0 +1,39 @@
+{
+  "status": "offline_prepared_not_executed",
+  "validated_at": "2026-10-27T13:49:19+08:00",
+  "manifest_sha256": "2ad4e67a437e2f5b34feedc084d712161162e55160679d8d25c403fb22b613f2",
+  "real_provider_calls": 0,
+  "T038_completed": false,
+  "distinct_tests_passed": 63,
+  "skipped": 0,
+  "groups": [
+    {
+      "command": "backend/.venv/bin/python -m pytest scripts/tests/test_p15_course_sol_bridge.py scripts/tests/test_p15_course_exploration_r03.py scripts/tests/test_p15_course_r03_gate.py scripts/tests/test_p15_sol_compatibility_proposal.py -q --junitxml=/tmp/edumind-p15-course-recheck-offline.xml",
+      "passed": 62
+    },
+    {
+      "command": "python3 /tmp/edumind-r03-pg-test.py",
+      "expanded_test": "backend/.venv/bin/python -m pytest backend/tests/test_p15_course_recheck_r03.py -q --junitxml=/tmp/edumind-p15-course-r03-pg.xml",
+      "passed": 1,
+      "network": "dedicated isolated PostgreSQL only; providers HTTPX Mock"
+    }
+  ],
+  "checks": {
+    "manifest_exit": 0,
+    "pending_step_exit": 2,
+    "pending_step_reason": "EXACT_FIRST_SLOT_AND_NEW_WINDOW_APPROVAL_REQUIRED",
+    "ruff_exit": 0,
+    "workflow_exit": 0
+  },
+  "first_failed_pg": "Original experimental scheduler correctly refused the new class and 14-request policy; separate explicit fork created without changing production or old scheduler; final PG run passed.",
+  "setup_failures": "createdb edumind/postgres roles absent; checked POSTGRES_USER=edumind_test, then created dedicated offline database",
+  "warning": "Existing Starlette anyio BlockingPortal deprecation (1 warning)",
+  "pg_database": "edumind_catalog_p15_t020_course_r03_offline",
+  "pg_container_restored": "exited",
+  "live_database_created": false,
+  "live_output_created": false,
+  "junit_sha256": {
+    "/tmp/edumind-p15-course-recheck-offline.xml": "6b0cdd4814922205de13dc3dce990bf787f288bb4fc237b46c8c2374c8a365e7",
+    "/tmp/edumind-p15-course-r03-pg.xml": "e8e7a854001c68fdb4b09cc8b2e3ebfa1ed9a274937caae0feb35115fd0c1feb"
+  }
+}
