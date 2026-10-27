@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "获批首槽r03已执行3HTTP均200；sol low/非零推理48/37字符回显/路径v2兼容通过，但助手与sol确认本地clean_markdown把正确C代码方括号转义，准入正文含非法声明。批次threshold_unreachable停止；需离线修复清洗且保留XSS/链接边界后新包重验，不恢复本批。",
+    "phase_gate": "T059已完成离线清洗修复及103项验证，原r03内容失败/停止及其他33槽未运行保持；需基于新规则/新源码准备新准确诊断包与时间请求范围再获授权。零调用重放不作为新的真实质量通过。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -2429,7 +2429,8 @@
       "depends_on": [
         "PHASE-1.5-T037",
         "PHASE-1.5-T050",
-        "PHASE-1.5-T058"
+        "PHASE-1.5-T058",
+        "PHASE-1.5-T059"
       ],
       "scope": [
         "scripts/",
@@ -2501,9 +2502,9 @@
       ],
       "started_at": "2026-10-24T12:25:09",
       "completed_at": null,
-      "blocker": "获批首槽r03已执行3HTTP均200；sol low/非零推理48/37字符回显/路径v2兼容通过，但助手与sol确认本地clean_markdown把正确C代码方括号转义，准入正文含非法声明。批次threshold_unreachable停止；需离线修复清洗且保留XSS/链接边界后新包重验，不恢复本批。",
+      "blocker": "T059已完成离线清洗修复及103项验证，原r03内容失败/停止及其他33槽未运行保持；需基于新规则/新源码准备新准确诊断包与时间请求范围再获授权。零调用重放不作为新的真实质量通过。",
       "commit_lookup": "Task-Completed: PHASE-1.5-T038",
-      "execution_gate": "准确r03已消费3HTTP，登记窗口不延长，批次已停止；此前合计10请求/29006输入/11851总输出。无未知重发/其他课程；T038未完成。",
+      "execution_gate": "原r03窗口及批次保持停止，当前Provider新增0；T059只追加新准入规则，不修改旧原始/cleaned/签核。后续真实课程须独立新准确包及授权，不重启旧r03/r02。",
       "scoped_observations": [
         {
           "batch_id": "p15-aiapi-minimal-r01",
@@ -2741,6 +2742,46 @@
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T058",
       "execution_gate": "用户持续完成项目授权下修复r01具体工程缺陷；只开发及离线/隔离PG-Mock，不恢复旧停止批次。生产/真实新批次另按准确新配置验证。"
+    },
+    {
+      "id": "PHASE-1.5-T059",
+      "phase": "Phase 1.5",
+      "title": "修复草稿Markdown清洗对代码记号的破坏",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T011",
+        "PHASE-1.5-T058"
+      ],
+      "scope": [
+        "backend/app/services/",
+        "backend/tests/",
+        "backend/pyproject.toml",
+        "backend/uv.lock",
+        "docs/acceptance/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5；T011；r03本地清洗破坏正确代码证据；用户继续离线修复",
+      "acceptance_criteria": [
+        "版本化新清洗规则准确保留合法围栏/缩进/行内代码内容，原始生成审计及v1函数/已有准入行保持不变。",
+        "HTML/链接/图片不获得执行或活动能力；保留纯文本渲染及禁raw HTML/autolink/plugins约束，不新增v-html/代码执行。",
+        "实际隔离PG证明同一原始候选可按新规则追加准入事实，旧事实不可改写，输出代码正确且owner/操作/期限围栏仍生效。"
+      ],
+      "verification": [
+        "backend/.venv/bin/python -m pytest backend/tests/test_free_scene_markdown.py -q",
+        "实际隔离PG运行新规则版本/代码保真与原T011回归",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [
+        "2026-10-27T16:43:56：新AST/代码35、新实际PG版本1、原准入40、原就绪19、前端jsdom8共103 passed/0skip。目标mypy/Ruff/前端eslint和typecheck/锁一致性/工作流/diff通过；首次缩进末尾换行与mypy联合类型修复后通过，不弱化断言。r03原始7字段零调用重放保留代码与slot SHA；旧b7d4b7f源码冻结checker仍预期2，旧失败未改。证据docs/acceptance/phase-1.5-markdown-cleaning-t059；无真实Provider，PG容器exited。"
+      ],
+      "started_at": "2026-10-27T16:29:07",
+      "completed_at": "2026-10-27T16:43:56",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T059",
+      "execution_gate": "仅离线实现与隔离PG/Mock；不修改冻结r03、不重启真实批次，不push/merge/部署。"
     }
   ],
   "planning_inputs": {

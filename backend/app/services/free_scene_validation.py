@@ -21,8 +21,9 @@ from app.services.free_course_snapshots import (
     digest,
 )
 from app.services.free_scene_generation import load_inputs
+from app.services.free_scene_markdown import clean_code_markdown
 
-RULE_VERSION = "free-scene-hard-gate-v1"
+RULE_VERSION = "free-scene-hard-gate-v2"
 
 
 def clean_markdown(value: str) -> str:
@@ -71,13 +72,16 @@ def check_scene(raw: Any, inputs: dict[str, Any]) -> dict[str, Any]:
         ):
             return rejected("ACTION_REFERENCE_INVALID")
     cleaned = deepcopy(value)
-    for block in cleaned["blocks"]:
-        if block["kind"] == "text":
-            block["markdown"] = clean_markdown(block["markdown"])
-        if block["kind"] == "exercise":
-            # Private answer keys remain exact. Questions/labels/code are plain text data.
-            for question in block["items"]:
-                question["solution"] = clean_markdown(question["solution"])
+    try:
+        for block in cleaned["blocks"]:
+            if block["kind"] == "text":
+                block["markdown"] = clean_code_markdown(block["markdown"])
+            if block["kind"] == "exercise":
+                # Private answer keys remain exact. Questions/labels/code are plain text data.
+                for question in block["items"]:
+                    question["solution"] = clean_code_markdown(question["solution"])
+    except ValueError:
+        return rejected("MARKDOWN_INVALID")
     # Persistent scene content+actions+exact direct dependencies, not only response bytes.
     scene = next(s for s in inputs["plan"]["scenes"] if s["scene_id"] == inputs["scene_id"])
     dependencies = [

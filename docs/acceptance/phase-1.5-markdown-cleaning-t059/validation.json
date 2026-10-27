@@ -1,0 +1,79 @@
+{
+  "validated_at": "2026-10-27T16:43:56",
+  "task_id": "PHASE-1.5-T059",
+  "rule_version": "free-scene-hard-gate-v2",
+  "dependency": "mistune==3.4.0",
+  "provider_calls": 0,
+  "distinct_tests_passed": 103,
+  "skipped": 0,
+  "groups": [
+    {
+      "command": "backend/.venv/bin/python -m pytest backend/tests/test_free_scene_markdown.py -q --junitxml=/tmp/edumind-p15-t059-markdown.xml",
+      "passed": 35
+    },
+    {
+      "command": "python3 /tmp/edumind-t059-pg.py new",
+      "passed": 1
+    },
+    {
+      "command": "python3 /tmp/edumind-t059-pg.py old",
+      "passed": 40
+    },
+    {
+      "command": "python3 /tmp/edumind-t059-pg.py ready",
+      "passed": 19
+    },
+    {
+      "command": "cd web && pnpm exec vitest run tests/course-markdown-text-safety.spec.ts tests/course-workspace.spec.ts",
+      "passed": 8,
+      "environment": "jsdom, not actual browser"
+    }
+  ],
+  "checks": [
+    {
+      "command": "backend/.venv/bin/ruff check backend/app/services/free_scene_markdown.py backend/app/services/free_scene_validation.py backend/tests/test_free_scene_markdown.py backend/tests/test_free_scene_markdown_pg.py",
+      "exit_code": 0
+    },
+    {
+      "command": "backend/.venv/bin/mypy --follow-imports=silent backend/app/services/free_scene_markdown.py backend/app/services/free_scene_validation.py",
+      "exit_code": 0
+    },
+    {
+      "command": "cd web && pnpm exec eslint tests/course-markdown-text-safety.spec.ts",
+      "exit_code": 0
+    },
+    {
+      "command": "cd web && pnpm typecheck",
+      "exit_code": 0
+    },
+    {
+      "command": "uv --cache-dir /tmp/edumind-uv-cache lock --project backend --check --offline",
+      "exit_code": 0
+    },
+    {
+      "command": "python3 scripts/check_catalog_workflow.py",
+      "exit_code": 0
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0
+    }
+  ],
+  "pg_container_restored": "exited",
+  "pg_runner_archived_sha256": "2e26c70816c5f0ff98054bcf84b9aed32e2059766db06dab8ba307a6dd969410",
+  "pg_runner_executed_sha256": "2e26c70816c5f0ff98054bcf84b9aed32e2059766db06dab8ba307a6dd969410",
+  "junit_sha256": {
+    "/tmp/edumind-p15-t059-markdown.xml": "ae9347a980b50dbaa004e558b04f8bcab015133c607055e7db1fbcb72bc00007",
+    "/tmp/edumind-p15-t059-new.xml": "a69d1c8e2a0f45082936a876e253bfe8511b5d86cae6571c7d06d8cb849a9bfc",
+    "/tmp/edumind-p15-t059-old.xml": "a130d34d0ead82ceafa5c2451fb21fc8964295ce586307b951ca8ccd7388ce07",
+    "/tmp/edumind-p15-t059-ready.xml": "a6d4028e724563ae4119bedcd728d91cc35f52219aa729f1a61bf70ea014c428"
+  },
+  "initial_failures": [
+    "Unchanged indented code content acquired trailing newline when reserialized as fenced code; retained indented syntax instead, no assertion changes.",
+    "Strict mypy found parser return union; added fail-closed runtime AST type checks."
+  ],
+  "warning": "Existing Starlette BlockingPortal deprecation in isolated PG test",
+  "historical_source": "b7d4b7fd70d16d51482ef8797f4b29ab2943e548",
+  "T038_completed": false,
+  "production_mode": "catalog_only"
+}
