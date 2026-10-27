@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "按用户不考虑上界/费用及明确合成外发授权完成新隔离r01首槽；实际3次DeepSeek请求，规划通过、场景及格式修复均因额外visualization失败，sol0次，批次stopped。用户委托助手复核已完成并按来源记录，非独立人工真值；T038仍blocked于场景契约，非上界/费用或等待用户核对，不推进T039–T042。",
+    "phase_gate": "T058形式约束修复31ca187完成144测试；新r02助手复核入口8测试通过，但自动审批要求新准确包外发单独确认，已询问待复。r02真实0、凭据外发0，gate预期2；不再以上界/费用或用户填复核材料阻塞，旧r01失败保留，T038 blocked。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -2492,13 +2492,14 @@
         "2026-10-27：按用户新增每场景sol审核范围，准备ADR0033及双供应商设计r01（16份SHA）；原34槽原样，最多48场景审核+20探针=68sol，DeepSeek最多182，共250HTTP/4,976,000输入/1,216,000输出；公开参考USD15.2464/本地USD20仅提案。15新增离线正负例passed0skip，准确stage/Schema/来源SHA与引用/未决/标签隔离/预算验证通过，非PG-Mock或真实审核通过；无出站/凭据读取，不将bounded_output_verified伪置true，准确设计批准及输入/输出边界证据仍缺。",
         "2026-10-27：用户批准ADR0033 A-C/E隔离实施，登记docs/ADR/0033-approval-20261027.json；准确路由/Mock-only传输/PG场景来源绑定/持久预约与未知停止/逐场景人工检查接入完成。最终42离线+5实际隔离PG-Mock共47 passed/0skip，真实Provider0；证据docs/acceptance/phase-1.5-split-provider-implementation-r01。首次计划candidate读取缺陷修复，DB不可变约束拒绝与合法前移失效分别验证；D未解除，生产及旧冻结包不变。",
         "2026-10-27：按用户“不考虑上界与费用，先完成项目”建立ADR0034独立实验入口；10离线+1实际隔离PG-Mock passed0skip，保留原生产拒绝且上界标志false，实际用量超占位/请求值仍如实记录，当前无新增真实调用；准确包docs/acceptance/phase-1.5-split-exploration-r01，准备从D01-known真实执行。",
-        "2026-10-27：用户明确授权9183ba4b合成外发后执行新r01，实际3HTTP/3DeepSeek均200，规划+primary场景+format_repair；input10455/output5465，sol0次。首槽场景两次额外visualization违反计划forms，JSON Schema0错但上下文校验拒绝，0ready；批次stopped/threshold_unreachable，其余33槽未运行。新增只读checker纠正旧CLI误报human_review_required并预期退出2，5结果回归+10执行器离线+1实际隔离PG-Mock共16 passed0skip；助手按用户委托复核，非human标签，准确证据docs/acceptance/phase-1.5-split-exploration-r01。"
+        "2026-10-27：用户明确授权9183ba4b合成外发后执行新r01，实际3HTTP/3DeepSeek均200，规划+primary场景+format_repair；input10455/output5465，sol0次。首槽场景两次额外visualization违反计划forms，JSON Schema0错但上下文校验拒绝，0ready；批次stopped/threshold_unreachable，其余33槽未运行。新增只读checker纠正旧CLI误报human_review_required并预期退出2，5结果回归+10执行器离线+1实际隔离PG-Mock共16 passed0skip；助手按用户委托复核，非human标签，准确证据docs/acceptance/phase-1.5-split-exploration-r01。",
+        "2026-10-27：T058完成31ca187后新r02助手复核/原预算共用/CLI终态修正已准备；7离线+1实际隔离PG-Mock共8 passed0skip，准确包cf5ee9e9bfada7f5816cd27b58ef22daa28063b1279d6fb8bd60b06f2e1a447a。自动审批认为原r01准确外发批准不涵盖新r02并拒绝，实际0新进程/PG/HTTP；已询问新准确外发许可，空evidence_ref门禁实际退出2。状态docs/acceptance/phase-1.5-split-exploration-r02/STATUS.md，不伪造任务完成。"
       ],
       "started_at": "2026-10-24T12:25:09",
       "completed_at": null,
-      "blocker": "新隔离r01首槽规划成功，但场景primary及format_repair都输出未计划visualization，原机械校验拒绝，op failed、批次stopped/threshold_unreachable；3次DeepSeek/0次sol，输入10455输出5465，实际费未知。助手已按用户委托复核，不等待本次失败候选的真人材料；需修复精确形式约束/结构反馈并用新版本重新验证，不重启停止批次或削弱标准。",
+      "blocker": "T058修复完成，新r02源代码/配置cf5ee9e9及7离线+1实际PG-Mock通过；自动审批拒绝真实执行，理由为原合成外发授权仅绑定r01准确9183包，不能自动扩展到新r02。已询问新准确授权，未启动进程/新PG/输出或HTTP；gate以空evidence_ref拒绝，等待答复。不是token/费用证明或要求用户填内容复核。",
       "commit_lookup": "Task-Completed: PHASE-1.5-T038",
-      "execution_gate": "用户已明确不考虑token/费用上界及授权两指定供应合成材料外发；r01已停止，不自动重启/重抽样。本次失败由助手复核完成、未冒充human；后续先修复形式契约和精确结构反馈，再冻结新配置验证。原教学阈值/独立验收/生产门禁保持，不以本例外宣称项目完成。",
+      "execution_gate": "新r02准确包cf5ee9e9待明确外发授权；scope/模型/合成数据类别保持原两个服务，旧3次+新≤247、原截止不重置，助手复核事件独立标记，token/金额不限。缺新授权时--check/执行均拒绝，不借其他入口绕过。",
       "scoped_observations": [
         {
           "batch_id": "p15-aiapi-minimal-r01",

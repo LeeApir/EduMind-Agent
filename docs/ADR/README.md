@@ -96,3 +96,5 @@
 2026-10-27：[ADR-0033](0033-split-provider-course-diagnostic.md) A—C、E 按[准确批准登记](0033-approval-20261027.json)接受并完成隔离实施；[交接](../acceptance/phase-1.5-split-provider-implementation-r01/README.md)记录47项离线/PG-Mock通过、真实调用0。D真实输入/输出边界保留，T038仍blocked，250HTTP/USD20仅提案，未授权生产或付费执行。
 
 2026-10-27：[ADR-0034](0034-user-directed-unbounded-exploration.md)登记用户“不考虑上界与费用，先完成项目”的直接指令；新隔离实验不要求token/金额上界，保留请求数、时间、教学与真人检查，生产SendPolicy仍false，旧冻结材料不改。
+
+2026-10-27：[ADR-0035](0035-delegated-development-review.md)登记用户委托助手复核与T058修复后的新r02；旧3次+剩247次、共用原截止，助手事件与human来源隔离，非独立质量验收或生产开放。
