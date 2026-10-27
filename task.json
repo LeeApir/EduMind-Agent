@@ -2792,7 +2792,7 @@
       "id": "PHASE-1.5-T060",
       "phase": "Phase 1.5",
       "title": "分离隔离审核适配器的响应可观测性与硬内容校验",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1.5-T059"
@@ -2805,23 +2805,26 @@
         "task.json",
         "process.txt"
       ],
-      "prd_source": "PRD§0.5；ADR0027；r04实际观察；ADR0038具体提案待批准",
+      "prd_source": "PRD§0.5；ADR0027；r04实际观察；ADR0038A-B已批准，登记docs/ADR/0038-approval-20261027.json",
       "acceptance_criteria": [
         "仅在ADR0038 A获准后实现缺失回显未知标记与有界摘要隔离，原Schema/来源/工具/用量门禁及生产网关保持。",
         "实际r04变体只作离线材料，不把反事实改成真实通过或重启旧批次；新增Provider0。",
         "覆盖缺失/null/已存在但漂移、摘要形状/大小/不转发、准确引用与失败保留，必要隔离PG-Mock0skip。"
       ],
       "verification": [
-        "待准确A-B批准后建立并执行相应单元/隔离PG-Mock接口，不把此规划当已验证。",
+        "backend/.venv/bin/python -m pytest scripts/tests/test_p15_review_observability.py scripts/tests/test_p15_sol_compatibility_proposal.py scripts/tests/test_p15_full_r04_results.py -q",
+        "python3 docs/acceptance/phase-1.5-review-observability-t060/run_pg_offline.py t060 backend/tests/test_p15_review_observability_pg.py",
         "python3 scripts/check_catalog_workflow.py",
         "git diff --check"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        "107离线+2实际隔离PG/HTTPX Mock passed，0skip；原r04只读回放/原账本SHA不变；Ruff通过；真实Provider0。证据docs/acceptance/phase-1.5-review-observability-t060"
+      ],
+      "started_at": "2026-10-27T21:18:43+08:00",
+      "completed_at": "2026-10-27T21:22:21+08:00",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T060",
-      "execution_gate": "ADR0038 A-B准确提案待批准；todo不领取，不实施或真实调用。"
+      "execution_gate": "ADR0038 A-B已准确批准，仅离线实现/隔离PG-Mock；真实调用0，不重启旧批次。"
     },
     {
       "id": "PHASE-1.5-T061",
@@ -2841,7 +2844,7 @@
         "task.json",
         "process.txt"
       ],
-      "prd_source": "PRD§0.5；ADR0027；r04实际观察；ADR0038具体提案待批准",
+      "prd_source": "PRD§0.5；ADR0027；r04实际观察；ADR0038A-B已批准，登记docs/ADR/0038-approval-20261027.json",
       "acceptance_criteria": [
         "仅在ADR0038 B获准后版本化请求/Prompt，题干明确状态前提/唯一答案域和格式，不将开放长句视作唯一精确键。",
         "保留原输出Schema/课程目标/题数形式/教学阈值和原审计，不通过裁剪/改写答案追通过；新请求字节边界完整覆盖。",
@@ -2857,7 +2860,7 @@
       "completed_at": null,
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T061",
-      "execution_gate": "ADR0038 A-B准确提案待批准；todo不领取，不实施或真实调用。"
+      "execution_gate": "ADR0038 A-B已准确批准，仅离线实现/隔离PG-Mock；真实调用0，不重启旧批次。"
     }
   ],
   "planning_inputs": {
