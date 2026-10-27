@@ -1,0 +1,50 @@
+{
+  "real_model_requests": 3,
+  "DeepSeek_requests": 3,
+  "AIAPI_requests": 0,
+  "safe_result": "stopped/threshold_unreachable",
+  "actual_fee": null,
+  "checks": [
+    {
+      "command": "backend/.venv/bin/python scripts/check_p15_split_exploration_results.py --check",
+      "exit_code": 2,
+      "expected": true
+    },
+    {
+      "command": "backend/.venv/bin/python -m pytest scripts/tests/test_p15_exploration_results.py -q --junitxml=/tmp/edumind-p15-exploration-result-unit-r01.xml",
+      "passed": 5,
+      "skipped": 0
+    },
+    {
+      "command": "backend/.venv/bin/python scripts/run_p15_split_exploration.py --check",
+      "exit_code": 0
+    },
+    {
+      "command": "backend/.venv/bin/python scripts/check_p15_split_provider_implementation.py --check",
+      "exit_code": 0
+    },
+    {
+      "command": "backend/.venv/bin/python scripts/check_p15_split_provider_design.py",
+      "exit_code": 0
+    },
+    {
+      "command": "backend/.venv/bin/python scripts/run_p15_deepseek_flash_r01.py --check",
+      "exit_code": 0
+    }
+  ],
+  "private_evidence_sha256": {
+    "/tmp/edumind-p15-split-exploration-r01/0f9f5ccc592c2b41406dc40962d6dd29db7d0fd71ffa23000f385c748033bac8-request.json": "c740834871b3a431d88ccce6b1a881d3fcfef0811862a176f4e4a5253e368e61",
+    "/tmp/edumind-p15-split-exploration-r01/0f9f5ccc592c2b41406dc40962d6dd29db7d0fd71ffa23000f385c748033bac8-response.json": "8eff97bf6eb82fa98f03df729eb4e79d8f885690b4ba5a85f6ed271b2b18abf8",
+    "/tmp/edumind-p15-split-exploration-r01/0f9f5ccc592c2b41406dc40962d6dd29db7d0fd71ffa23000f385c748033bac8-status.json": "c70c360ed114e1327dba8e111ad17f9b1ab28678ed64bcc406f207056e46d9b3",
+    "/tmp/edumind-p15-split-exploration-r01/1e4ef8d2486b80397d158fe843f4a34dcc3f9d9b2a18416c47f37b4495d84398-request.json": "c0f76c2fa07a59989a6dda554451e18846037acf08a8a286fdcb65230e90f460",
+    "/tmp/edumind-p15-split-exploration-r01/1e4ef8d2486b80397d158fe843f4a34dcc3f9d9b2a18416c47f37b4495d84398-response.json": "c199eda0b17f6d52610b7aef7026a9067fd5f795be0237484e11423b3506f073",
+    "/tmp/edumind-p15-split-exploration-r01/1e4ef8d2486b80397d158fe843f4a34dcc3f9d9b2a18416c47f37b4495d84398-status.json": "c70c360ed114e1327dba8e111ad17f9b1ab28678ed64bcc406f207056e46d9b3",
+    "/tmp/edumind-p15-split-exploration-r01/D01-known.json": "29c30a42f0aae1b21dce64a6012728c26f717fd84c9f12020b440bff7f48e327",
+    "/tmp/edumind-p15-split-exploration-r01/a02543166dd8172846eb2cf10fa8ec496fe6953736a7aa46516086b8a86c7a10-request.json": "bfa3746d4909fef32b77c69c7aa2c498d5727c98d912c78ad94b274c8af855ec",
+    "/tmp/edumind-p15-split-exploration-r01/a02543166dd8172846eb2cf10fa8ec496fe6953736a7aa46516086b8a86c7a10-response.json": "538e8da24ddc98dc741906f77ea8d76e40c6c485ecba907350d2b558258d2e69",
+    "/tmp/edumind-p15-split-exploration-r01/a02543166dd8172846eb2cf10fa8ec496fe6953736a7aa46516086b8a86c7a10-status.json": "c70c360ed114e1327dba8e111ad17f9b1ab28678ed64bcc406f207056e46d9b3",
+    "/tmp/edumind-p15-split-exploration-r01/ledger.sqlite": "37a058670c0dc252c7189cbf9f33b1475abb8a3cd762d1559a82b10305223e04",
+    "/tmp/edumind-p15-split-exploration-r01/step-1.json": "f688e8a483dc75dc50c268da24de69d1b60a5c0bfa5b2244da796bccd36822de"
+  },
+  "readonly_results_did_not_change_original_request_or_course": true
+}

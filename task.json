@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "ADR0033 A-C/E已批准并完成隔离实现：42离线+5隔离PG-Mock共47 passed/0skip，真实调用0；D输入/输出边界及当前费率仍未证，execution_ready=false。250HTTP/USD20仅提案，无课程整批授权；T038 blocked，catalog_only/H封存/cbbb停用保持。",
+    "phase_gate": "按用户不考虑上界/费用及明确合成外发授权完成新隔离r01首槽；实际3次DeepSeek请求，规划通过、场景及格式修复均因额外visualization失败，sol0次，批次stopped。用户委托助手复核已完成并按来源记录，非独立人工真值；T038仍blocked于场景契约，非上界/费用或等待用户核对，不推进T039–T042。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -2489,13 +2489,15 @@
         "2026-10-27按用户选型零调用准备DeepSeek官方deepseek-flash候选，材料docs/acceptance/phase-1.5-deepseek-flash-preparation；2纯合成请求/离线检查器无execute/不读密钥或联网，7新回归及15旧AIAPI回归共22 passed/0skip；官方Responses能力/参数差异/峰时参考费率及USD0.01本地提案已记录，不代表新兼容门禁或真实执行批准，不改旧结果。",
         "2026-10-27：用户明确“直接执行，不用批准”后补齐独立DeepSeek Flash合成r01；314源码/材料SHA冻结、30新增+22相关共52离线passed0skip。首次专用Key缺失预检0HTTP；用户安全填入后仅2HTTP/2生成均200，S1 reported147/25/172、S2 reported205/28/233；本地探针Schema/固定对象/原样136字符instructions/上限128与512回显/store false/流正文一致均通过。私有只读快照和去敏证据docs/acceptance/phase-1.5-deepseek-flash-r01/results.json；实际发票未知、两槽USD0.01全部unknown，未独立计数或验证课程/审核，不把直接指令伪记独立逐哈希审阅，T038仍blocked。",
         "2026-10-27：按用户新增每场景sol审核范围，准备ADR0033及双供应商设计r01（16份SHA）；原34槽原样，最多48场景审核+20探针=68sol，DeepSeek最多182，共250HTTP/4,976,000输入/1,216,000输出；公开参考USD15.2464/本地USD20仅提案。15新增离线正负例passed0skip，准确stage/Schema/来源SHA与引用/未决/标签隔离/预算验证通过，非PG-Mock或真实审核通过；无出站/凭据读取，不将bounded_output_verified伪置true，准确设计批准及输入/输出边界证据仍缺。",
-        "2026-10-27：用户批准ADR0033 A-C/E隔离实施，登记docs/ADR/0033-approval-20261027.json；准确路由/Mock-only传输/PG场景来源绑定/持久预约与未知停止/逐场景人工检查接入完成。最终42离线+5实际隔离PG-Mock共47 passed/0skip，真实Provider0；证据docs/acceptance/phase-1.5-split-provider-implementation-r01。首次计划candidate读取缺陷修复，DB不可变约束拒绝与合法前移失效分别验证；D未解除，生产及旧冻结包不变。"
+        "2026-10-27：用户批准ADR0033 A-C/E隔离实施，登记docs/ADR/0033-approval-20261027.json；准确路由/Mock-only传输/PG场景来源绑定/持久预约与未知停止/逐场景人工检查接入完成。最终42离线+5实际隔离PG-Mock共47 passed/0skip，真实Provider0；证据docs/acceptance/phase-1.5-split-provider-implementation-r01。首次计划candidate读取缺陷修复，DB不可变约束拒绝与合法前移失效分别验证；D未解除，生产及旧冻结包不变。",
+        "2026-10-27：按用户“不考虑上界与费用，先完成项目”建立ADR0034独立实验入口；10离线+1实际隔离PG-Mock passed0skip，保留原生产拒绝且上界标志false，实际用量超占位/请求值仍如实记录，当前无新增真实调用；准确包docs/acceptance/phase-1.5-split-exploration-r01，准备从D01-known真实执行。",
+        "2026-10-27：用户明确授权9183ba4b合成外发后执行新r01，实际3HTTP/3DeepSeek均200，规划+primary场景+format_repair；input10455/output5465，sol0次。首槽场景两次额外visualization违反计划forms，JSON Schema0错但上下文校验拒绝，0ready；批次stopped/threshold_unreachable，其余33槽未运行。新增只读checker纠正旧CLI误报human_review_required并预期退出2，5结果回归+10执行器离线+1实际隔离PG-Mock共16 passed0skip；助手按用户委托复核，非human标签，准确证据docs/acceptance/phase-1.5-split-exploration-r01。"
       ],
       "started_at": "2026-10-24T12:25:09",
       "completed_at": null,
-      "blocker": "隔离实现已通过47项验证，真实独立输入界和sol总输出限制尚未证明，当前账号分组费率未知；不得伪置SendPolicy验证标志或执行250次提案。完整课程/审核/质量/性能未真实验证，T038 blocked、T039–T042未领取。",
+      "blocker": "新隔离r01首槽规划成功，但场景primary及format_repair都输出未计划visualization，原机械校验拒绝，op failed、批次stopped/threshold_unreachable；3次DeepSeek/0次sol，输入10455输出5465，实际费未知。助手已按用户委托复核，不等待本次失败候选的真人材料；需修复精确形式约束/结构反馈并用新版本重新验证，不重启停止批次或削弱标准。",
       "commit_lookup": "Task-Completed: PHASE-1.5-T038",
-      "execution_gate": "仅ADR0033 A-C/E隔离实现获准并完成，真实调用0；D门禁保留，--execute固定退出2。未来真实执行需准确输入/输出边界证据、当前费率和独立新包/预算授权；250HTTP/USD20不等于付费许可，不改教学阈值或生产模式。",
+      "execution_gate": "用户已明确不考虑token/费用上界及授权两指定供应合成材料外发；r01已停止，不自动重启/重抽样。本次失败由助手复核完成、未冒充human；后续先修复形式契约和精确结构反馈，再冻结新配置验证。原教学阈值/独立验收/生产门禁保持，不以本例外宣称项目完成。",
       "scoped_observations": [
         {
           "batch_id": "p15-aiapi-minimal-r01",
