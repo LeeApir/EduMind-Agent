@@ -2433,7 +2433,8 @@
         "PHASE-1.5-T059",
         "PHASE-1.5-T060",
         "PHASE-1.5-T061",
-        "PHASE-1.5-T063"
+        "PHASE-1.5-T063",
+        "PHASE-1.5-T064"
       ],
       "scope": [
         "scripts/",
@@ -2963,6 +2964,40 @@
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T063",
       "execution_gate": "当前用户明确授权两项离线实现；不增加语义自动确认/硬阻断或真实调用，不重启旧批次，不自动语义重生成。"
+    },
+    {
+      "id": "PHASE-1.5-T064",
+      "phase": "Phase 1.5",
+      "title": "对齐链表状态题的代码变体、结果范围与环语义观察",
+      "status": "in_progress",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T062",
+        "PHASE-1.5-T063"
+      ],
+      "scope": [
+        "backend/app/agents/",
+        "backend/app/services/",
+        "backend/tests/",
+        "docs/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5；ADR0039既有私有待复核边界；用户最后一次离线修复指令",
+      "acceptance_criteria": [
+        "生成语义v2与Prompt v5要求题目绑定实际显示程序/变体、完整遍历与有限步观察区分，并覆盖非终止/不确定等真实结果，不以答案格式替代正确性。",
+        "以有界静态指针关系及准确题目/解答证据定位环与有限序列冲突，消除d01中间状态/故意丢弃返回值误报；未知范围不冒充通过，不执行C、不改Schema/机械准入权限或真实审核协议。",
+        "冻结开发用例矩阵后实现，原d01/r05、改名/正确/受限遍历/未知语法及PG版本共存回归必须通过；任一新增实质性失败则记录并停止追加修补，真实复测待独立准确授权，不重启旧包。"
+      ],
+      "verification": [
+        "实现并执行对应单元/隔离PG-Mock、mypy/Ruff、工作流和diff检查"
+      ],
+      "verification_results": [],
+      "started_at": "2026-10-28T00:43:38+08:00",
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T064",
+      "execution_gate": "仅本轮最后一次离线语义修复；不放宽审核协议、不真实调用或重启旧批次，不调整教学阈值。后续冻结真实复测出现新实质错误则停止补丁并重新评估方案。"
     }
   ],
   "planning_inputs": {
