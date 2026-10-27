@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "用户已选择DeepSeek官方deepseek-flash作为生成兼容验证候选，AIAPI gpt-6.1-sol审核仍仅实验候选。已零调用准备合成请求与离线入口，未授权新真实批次；旧批次不重启、cbbb停用、catalog_only/H封存保持。T038仍blocked，真实兼容门禁差异、独立执行器、准确配置与新预算须完成准备并获准后才发请求，不领取T039–T042。",
+    "phase_gate": "DeepSeek官方deepseek-flash新合成r01按用户直接执行指令完成2HTTP/2生成；非流式/流式本地Schema、原样指令与输出上限回显、usage及流正文一致性均通过。仅两例合成观察，独立计数/真实快照/发票仍未证，T038保持blocked，不领取T039–T042；下一步另准备完整课程契约/DeepSeek生成+sol审核诊断及准确预算，不自动调用。cbbb停用、catalog_only/H封存/旧unknown保持。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -2445,6 +2445,7 @@
         "按T005预冻结准入判断：未通过则标blocked停止依赖，不自动领取独立验收；通过才冻结候选，任何修复需重新验证。"
       ],
       "verification": [
+        "backend/.venv/bin/python scripts/check_p15_deepseek_flash_results.py；纯只读复核两例合成协议观察、真实收据/全额unknown与未授课程状态，不联网、不解锁T038。",
         "python3 scripts/check_p15_direct_relay_once_results.py --check；预期退出2，只读核对单次直生成HTTP200/额外指令/上限null及Schema核心一致更正，不发请求。",
         "python3 scripts/check_p15_relay_regression_results.py --check；预期退出2，只读验证新env复测计数404/0生成/unknown与弃用，不发请求。",
         "python3 scripts/check_p15_compatibility_probe_results.py --check；预期退出2，纯只读验证p01 stopped证据，不发请求。",
@@ -2484,13 +2485,14 @@
         "2026-10-26：用户明确具体外传及费用风险后执行冻结aiapi r01；1HTTP/1生成HTTP200，S1教学指令原样/角色标记/未知画像null/Schema通过，reported130输入62输出，max_output_tokens=null未证实强制上限，依包停发S2；结果docs/acceptance/phase-1.5-aiapi-minimal-r01/results.json；旧累计账本不改，新批独立记录，T038仍blocked。",
         "2026-10-26：用户明确“执行S2”单独豁免S1前置，原S2字节一次POST，HTTP200/流完成/正文一致，生产Schema失败（10项含派生错误）；reported1291输入802输出2093总量，超请求512，终态关键字段缺失。证据docs/acceptance/phase-1.5-aiapi-s2-once/results.json；本地USD0.035unknown保留、真实费用未知，T038仍blocked。",
         "2026-10-27：新aiapi审核建议探针1HTTP/1生成，HTTP200/JSON Schema及12唯一ID通过；6明确错误检出6、漏0；6正确误报0；证据引用/理由经主助手核对，非人类标签或独立验收。reported876输入620输出1496，上限回显null；估算USD0.01149/实际未知。计分器6离线回归passed0skip；证据docs/acceptance/phase-1.5-aiapi-review-probe-r01/results.json。主任务仍blocked，不自动生产审核。",
-        "2026-10-27按用户选型零调用准备DeepSeek官方deepseek-flash候选，材料docs/acceptance/phase-1.5-deepseek-flash-preparation；2纯合成请求/离线检查器无execute/不读密钥或联网，7新回归及15旧AIAPI回归共22 passed/0skip；官方Responses能力/参数差异/峰时参考费率及USD0.01本地提案已记录，不代表新兼容门禁或真实执行批准，不改旧结果。"
+        "2026-10-27按用户选型零调用准备DeepSeek官方deepseek-flash候选，材料docs/acceptance/phase-1.5-deepseek-flash-preparation；2纯合成请求/离线检查器无execute/不读密钥或联网，7新回归及15旧AIAPI回归共22 passed/0skip；官方Responses能力/参数差异/峰时参考费率及USD0.01本地提案已记录，不代表新兼容门禁或真实执行批准，不改旧结果。",
+        "2026-10-27：用户明确“直接执行，不用批准”后补齐独立DeepSeek Flash合成r01；314源码/材料SHA冻结、30新增+22相关共52离线passed0skip。首次专用Key缺失预检0HTTP；用户安全填入后仅2HTTP/2生成均200，S1 reported147/25/172、S2 reported205/28/233；本地探针Schema/固定对象/原样136字符instructions/上限128与512回显/store false/流正文一致均通过。私有只读快照和去敏证据docs/acceptance/phase-1.5-deepseek-flash-r01/results.json；实际发票未知、两槽USD0.01全部unknown，未独立计数或验证课程/审核，不把直接指令伪记独立逐哈希审阅，T038仍blocked。"
       ],
       "started_at": "2026-10-24T12:25:09",
       "completed_at": null,
-      "blocker": "用户明确新Key直接生成一次（跳过计数）已执行：1HTTP/1生成，HTTP200固定OK，但额外21336字符指令后缀与旧p01相同、max_output_tokens请求16回显null；reported4438输入/13输出，未独立计数不能称本次计数差。Schema核心字段实际匹配，额外description:null导致观察器全对象比较假异常已更正且冻结原件不改。当前供应继续停用，无追加请求，课程不解锁，累计8HTTP/4生成。",
+      "blocker": "DeepSeek官方Flash两例最小合成观察通过，但独立输入计数、上游日期快照及实际费用未证；完整课程契约/质量/性能尚未验证，sol审核仅12样例实验候选。需另准备准确新生成+审核诊断契约及预算，旧失败/unknown不改，T039–T042仍依赖T038。",
       "commit_lookup": "Task-Completed: PHASE-1.5-T038",
-      "execution_gate": "新审核建议模型一次12样例探针结束，6/6检出及0/6误报仅小样本观察；不续发/接线，T038 blocked/catalog_only/旧门禁保持。",
+      "execution_gate": "用户直接执行的DeepSeek官方Flash合成r01已结束，两例成功仅作协议观察；准确单次授权已消费，无真实课程/审核续发或生产接线授权。后续可准备新课程诊断契约和预算，T038保持blocked，旧门禁/unknown/catalog_only不改。",
       "scoped_observations": [
         {
           "batch_id": "p15-aiapi-minimal-r01",
@@ -2536,6 +2538,17 @@
             "uncertain": 0
           },
           "limitations": "单批明显成对短例/助手gold，非独立人类签核；上限null/实际费率未知，不授予生产审核或课程准入"
+        },
+        {
+          "batch_id": "p15-deepseek-flash-r01",
+          "state": "two_synthetic_observations_only_unsettled",
+          "authorization": "用户明确“直接执行，不用批准”，专用凭据安全配置后确认“填好了”；不声称独立逐哈希人工审阅",
+          "limits": "最多2HTTP/2生成，输入本地8192、请求输出640、全批90秒、本地USD0.01留额非发票硬限，无重试/回退",
+          "unlocks_course": false,
+          "actual_new_http_requests": 2,
+          "actual_new_generation_requests": 2,
+          "results": "docs/acceptance/phase-1.5-deepseek-flash-r01/results.json",
+          "limitations": "仅合成Schema/固定对象/流及回显观察，独立计数/日期快照/实际发票未证；全额unknown，不代表T038准入或sol审核通过"
         }
       ]
     },
