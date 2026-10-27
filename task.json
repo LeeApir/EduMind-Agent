@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "T059已完成离线清洗修复及103项验证，原r03内容失败/停止及其他33槽未运行保持；需基于新规则/新源码准备新准确诊断包与时间请求范围再获授权。零调用重放不作为新的真实质量通过。",
+    "phase_gate": "基于T059修复的完整r04已准备：原34槽不改、低推理probe兼容及逐块逐题委托复核接线，83离线+2实际隔离PG/Mock共85 passed0skip；待准确ADR0037 A-C/完整250请求/新3小时/具体合成外发及费用例外批准。新增真实0，旧批次不恢复。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -2456,7 +2456,8 @@
         "python3 scripts/check_p15_r03_diagnostic_results.py --check；预期退出2，纯只读准确核对r03 stopped/用量不一致，不发请求。",
         "python3 scripts/check_p15_development_diagnostic_results.py --check；纯离线校验准确证据、配置、授权边界与状态，不在--check隐式发真实请求。",
         "python3 scripts/check_catalog_workflow.py",
-        "git diff --check"
+        "git diff --check",
+        "backend/.venv/bin/python scripts/run_p15_full_diagnostic_r04.py --check；完整新包离线450SHA核对；--step在pending批准时实际预期退出2，--assessment只读核对固定分母/证据与性能观察，不隐式出站。"
       ],
       "verification_results": [
         "真实批准登记docs/acceptance/phase-1.5-development-diagnostic-r02/execution-approval.json；严格绑定原7d3fef3/r02 manifest 4d987857ab227a366c8b506f4ed365c8360b778017aa9418425493a212527f44，329源码材料SHA不变",
@@ -2498,13 +2499,14 @@
         "2026-10-27：r02准确获准执行3HTTP均200（2DeepSeek+1sol）；规划/场景primary均通过，PGsucceeded/1ready/code-text-exercise，原forms缺陷修复真实有效。sol none->low/89推理、728->765指令回显追加37字符、revise3minor但/source路径不符；原契约UNEXPECTED_REASONING即停/unknown，未重发。全部响应报告8066入2638出，旧r01合计18521入8103出/6请求；费unknown。助手先看课再看意见另存来源，不写human；结果checker预期2。按用户选择保留sol仅准备ADR0036及原型34+结果8共42离线passed0skip，新真实0；证据sol-compatibility-plan-r01与split-exploration-r02，未宣称T038完成。",
         "2026-10-27：用户在ADR0036最小提案后明确“执行”；新p01包479937db6b8d5b75d494efb699f4916fed4dc23e746d3af242dc4c224dc0d67e按直接指令一次纯合成sol审核，1HTTP200/5.009秒/834入203出；low回显、准确37字符后缀、v2路径源摘要引用通过，检出错误句、正确对照无误报，revise1major。推理报告0，非零路径本次未见；没有课程/PG调用或恢复r02。44离线+3结果回归共47 passed0skip，结果checker退出0；累计7请求/19355入8306出/实际费unknown。证据phase-1.5-sol-compatibility-once-p01；T038未完成，后续准确课程包及授权另准备。",
         "2026-10-27T13:49:41：用户继续后完成独立首槽r03执行器及准确包；DeepSeek none/sol low、场景v2路径、准确37字符回显兼容、来源绑定及委托助手检查点。62离线+1实际隔离PG/HTTPX Mock共63 passed0skip，生产拒绝保持。首次PG旧类/250门禁正确拒绝后分离新14请求调度副本，容器恢复exited。434SHA 2ad4e67a437e2f5b34feedc084d712161162e55160679d8d25c403fb22b613f2；旧窗口过期，新增真实0。准确包docs/acceptance/phase-1.5-course-recheck-r03，待准确新900秒窗口/外发授权，T038仍blocked。",
-        "2026-10-27T14:02:41：用户准确批准6476d0b/r03后执行D01-known，2DeepSeek+1sol均HTTP200，规划/场景primary及原Schema通过，PG succeeded/1ready；sol low/非零推理48/准确37字符后缀/v2引用通过，revise1major。助手先读课后读意见，确认本地clean_markdown改变合法原始C声明，非服务商故障；批次threshold_unreachable停止。9651入3545总出，旧7次合计10/29006/11851，费unknown；助手报告独立delegated_assistant_course_review保存，旧checkpoint不伪记human/误报。只读PG来源及10结果离线回归passed0skip，结果checker预期2、Ruff通过，容器恢复exited；证据docs/acceptance/phase-1.5-course-recheck-r03/RESULTS.md。"
+        "2026-10-27T14:02:41：用户准确批准6476d0b/r03后执行D01-known，2DeepSeek+1sol均HTTP200，规划/场景primary及原Schema通过，PG succeeded/1ready；sol low/非零推理48/准确37字符后缀/v2引用通过，revise1major。助手先读课后读意见，确认本地clean_markdown改变合法原始C声明，非服务商故障；批次threshold_unreachable停止。9651入3545总出，旧7次合计10/29006/11851，费unknown；助手报告独立delegated_assistant_course_review保存，旧checkpoint不伪记human/误报。只读PG来源及10结果离线回归passed0skip，结果checker预期2、Ruff通过，容器恢复exited；证据docs/acceptance/phase-1.5-course-recheck-r03/RESULTS.md。",
+        "2026-10-27T17:25:08：用户继续完成T38后准备完整r04而非再次仅首槽。原34槽逐字保留；DeepSeek none生成v2/准入v2及sol low场景v2/原20probe Schema，原质量阈值和分母保持。新非severe失败复核可真实typed入账后停，误报续审不重做生成/改slot_output；83离线+2实际PG/Mock=85 passed0skip，Ruff/450SHA/工作流/diff通过，pending入口预期2，真实0。负例夹具非法reason先被正确拒绝，核对原enum out_of_scope修正后PG通过，无改Schema/断言。独立测试容器exited；准确包beeca0bb41eaa659cc1bcda76b7236dd9b398e3dd7b16a44fbf5ff9e91cb50b2待新250HTTP/3h/具体合成外发与费用例外批准，原10请求/失败保留，不完成T038或领取T039。"
       ],
       "started_at": "2026-10-24T12:25:09",
       "completed_at": null,
-      "blocker": "T059已完成离线清洗修复及103项验证，原r03内容失败/停止及其他33槽未运行保持；需基于新规则/新源码准备新准确诊断包与时间请求范围再获授权。零调用重放不作为新的真实质量通过。",
+      "blocker": "基于T059修复的完整r04已准备：原34槽不改、低推理probe兼容及逐块逐题委托复核接线，83离线+2实际隔离PG/Mock共85 passed0skip；待准确ADR0037 A-C/完整250请求/新3小时/具体合成外发及费用例外批准。新增真实0，旧批次不恢复。",
       "commit_lookup": "Task-Completed: PHASE-1.5-T038",
-      "execution_gate": "原r03窗口及批次保持停止，当前Provider新增0；T059只追加新准入规则，不修改旧原始/cleaned/签核。后续真实课程须独立新准确包及授权，不重启旧r03/r02。",
+      "execution_gate": "待准确full-diagnostic-r04 manifest beeca0bb41eaa659cc1bcda76b7236dd9b398e3dd7b16a44fbf5ff9e91cb50b2；新250HTTP/10800秒(182生成+68审核)、旧10保留累计最多260。批准登记false，入口在Key/输出/PG/DNS前拒绝；不将方向“继续完成T38”登记为独立准确预算批准。",
       "scoped_observations": [
         {
           "batch_id": "p15-aiapi-minimal-r01",
