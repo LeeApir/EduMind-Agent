@@ -140,6 +140,8 @@ AI生成草稿可供学生学习，不以独立人工签核或普通语义审核
 
 2026-10-27 T060/T061：用户批准[ADR0038 A—B](ADR/0038-approval-20261027.json)，隔离审核新增缺回显未知及有界摘要隔离，生产网关不继承；场景生成Prompt v3要求每题明确状态、有限唯一答案域与输入格式，解释保留在讲解/解析。原输出Schema、教学门槛、私有答案和评分/掌握度权限不变，格式不证明正确。离线/隔离PG-Mock分别109和158项通过，见[审核交接](acceptance/phase-1.5-review-observability-t060/README.md)及[答案交接](acceptance/phase-1.5-answer-contract-t061/README.md)。真实调用0，旧r04仍停止/unknown，T038尚未完成；新真实诊断须新准确包与授权。
 
+2026-10-27 T062：用户明确要求完成生成语义约定及跨内容一致性检查，按[ADR0039](ADR/0039-generation-semantics-and-consistency.md)串行实施。生成请求v4现携带服务端C语义约定及必要上游准确代码AST接口提示；仅受限语法观察，不执行C或证明语义正确。原Schema/教学/评分权限保持，97项离线/实际PG-Mock通过，见[T062交接](acceptance/phase-1.5-generation-semantics-t062/README.md)。T063私有待复核审计接点继续实施，真实0，旧r05及T038失败不追认。
+
 ## 目录
 
 1. [项目概览](#一项目概览)

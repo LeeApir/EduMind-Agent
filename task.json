@@ -2432,7 +2432,8 @@
         "PHASE-1.5-T058",
         "PHASE-1.5-T059",
         "PHASE-1.5-T060",
-        "PHASE-1.5-T061"
+        "PHASE-1.5-T061",
+        "PHASE-1.5-T063"
       ],
       "scope": [
         "scripts/",
@@ -2871,6 +2872,86 @@
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T061",
       "execution_gate": "ADR0038 A-B已准确批准，仅离线实现/隔离PG-Mock；真实调用0，不重启旧批次。"
+    },
+    {
+      "id": "PHASE-1.5-T062",
+      "phase": "Phase 1.5",
+      "title": "为场景生成绑定版本化C语义约定与准确上游接口",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T061"
+      ],
+      "scope": [
+        "backend/app/agents/",
+        "backend/app/services/",
+        "backend/tests/",
+        "backend/pyproject.toml",
+        "backend/uv.lock",
+        "docs/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5；ADR0026/0027；用户明确完成生成语义约定及跨内容一致性检查；ADR0039实现边界记录",
+      "acceptance_criteria": [
+        "服务端生成v4请求绑定C参数传递/返回值/初始化/复杂度前提约定；仅从必要上游提取带摘要的语法接口提示，不把模型自述作为已核实事实。",
+        "保留原输出Schema/形式/题数/画像/上下游与完整字节门禁，覆盖改名/二级指针/未知语法和零执行边界。",
+        "离线及实际隔离PG-Mock证明请求摘要与v3历史事实保持隔离，无真实模型调用。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/python -m pytest tests/test_free_scene_semantics.py tests/test_free_scene_answer_contract.py tests/test_free_scene_form_contract.py -q",
+        "python3 docs/acceptance/phase-1.5-generation-semantics-t062/run_pg_offline.py",
+        "cd backend && .venv/bin/mypy app/agents/free_scene_generation.py app/services/free_scene_semantics.py",
+        "cd backend && uv lock --check --offline",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [
+        "40单元+3实际PG/Mock+54原生成共97 passed0skip，mypy/Ruff/锁/工作流/diff通过。证据docs/acceptance/phase-1.5-generation-semantics-t062；真实0，不执行C。"
+      ],
+      "started_at": "2026-10-27T23:35:29+08:00",
+      "completed_at": "2026-10-27T23:43:19+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T062",
+      "execution_gate": "当前用户明确授权两项离线实现；不增加语义自动确认/硬阻断或真实调用，不重启旧批次，不自动语义重生成。"
+    },
+    {
+      "id": "PHASE-1.5-T063",
+      "phase": "Phase 1.5",
+      "title": "为课程私有准入审计增加跨内容一致性待复核发现",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T062",
+        "PHASE-1.5-T059"
+      ],
+      "scope": [
+        "backend/app/agents/",
+        "backend/app/services/",
+        "backend/tests/",
+        "backend/pyproject.toml",
+        "backend/uv.lock",
+        "docs/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5；ADR0026/0027；用户明确完成生成语义约定及跨内容一致性检查；ADR0039实现边界记录",
+      "acceptance_criteria": [
+        "跨代码/说明/题目/必要上游记录受限一致性发现，覆盖返回值未接收与局部指针说明冲突；基于语法接口而非仅head字符串。",
+        "不支持范围标未评估，发现只作待复核建议，无自动确认/拒绝/评分或重生成；机械准入/清洗及旧记录保持。",
+        "旧D02错误、正确修复及变体离线回归，实际PG核对只追加v3审计、原件/owner/幂等及机械失败不受影响。"
+      ],
+      "verification": [
+        "实现时建立并实际执行对应离线/隔离PG-Mock接口",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T063",
+      "execution_gate": "当前用户明确授权两项离线实现；不增加语义自动确认/硬阻断或真实调用，不重启旧批次，不自动语义重生成。"
     }
   ],
   "planning_inputs": {

@@ -69,7 +69,7 @@ def test_kind_fields_and_answer_contract_preserve_schema_forms_and_sources(forms
     req = build_request(data)
     wire = json.loads(req.prompt.messages[-1].content)
     contract = wire["response_contract"]
-    assert wire["prompt_version"] == "free-scene-generation-v3"
+    assert wire["prompt_version"] == "free-scene-generation-v4"
     assert set(contract["fields_by_block_kind"]) == set(forms) | {"text"}
     for definition in SCHEMA["$defs"].values():
         kind = definition.get("properties", {}).get("kind", {}).get("const")

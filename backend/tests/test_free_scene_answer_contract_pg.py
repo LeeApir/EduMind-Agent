@@ -93,7 +93,7 @@ def test_v3_request_and_original_v2_facts_coexist_without_reclassifying(tmp_path
             new_gateway = Gateway(closed_candidate())
             new_outcome = await agent.generate_once(new_gateway, data, authorize_send=authorize)
             payload = json.loads(new_gateway.requests[0].prompt.messages[-1].content)
-            assert payload["prompt_version"] == "free-scene-generation-v3"
+            assert payload["prompt_version"] == "free-scene-generation-v4"
             assert payload["upstream"] == data["upstream"] and len(data["upstream"]) == 2
             assert payload["request"] == data["request"]
             assert new_outcome.request_digest != old_identity
@@ -136,7 +136,7 @@ def test_v3_request_and_original_v2_facts_coexist_without_reclassifying(tmp_path
                 assert len(rows) == 2
                 assert {r.prompt_version for r in rows} == {
                     "free-scene-generation-v2",
-                    "free-scene-generation-v3",
+                    "free-scene-generation-v4",
                 }
                 previous = next(r for r in rows if r.id == UUID(old["result_id"]))
                 assert previous.response_json == old_raw and previous.response_digest == old_digest

@@ -13,6 +13,7 @@ from jsonschema import Draft202012Validator  # type: ignore[import-untyped]
 from app.agents.free_course_planning import request_digest
 from app.agents.learning_unit_generator import StructuredResourceGateway
 from app.services.free_course_snapshots import SnapshotError, canonical, digest
+from app.services.free_scene_semantics import generation_semantics
 from app.services.provider_gateway import (
     ChatMessage,
     ProviderError,
@@ -22,7 +23,7 @@ from app.services.provider_gateway import (
     TextRequest,
 )
 
-PROMPT_VERSION = "free-scene-generation-v3"
+PROMPT_VERSION = "free-scene-generation-v4"
 SCHEMA_VERSION = "free-scene-candidate-v1"
 SCHEMA = json.loads(Path(__file__).with_suffix(".schema.json").read_text())
 INSTRUCTION = """Generate exactly the assigned scene of a data-structures learning course.
@@ -49,6 +50,15 @@ Do not use an open-ended explanation, justification or arbitrary sentence as an 
 Keep reasoning and explanation in the lesson and solution; test understanding with explicit
 alternatives or a determinate trace, preserving the assigned objectives and difficulty.
 Candidate keys remain unverified: neither token shape nor a model pass proves scoring reliability.
+The response_contract.semantic_contract supplies versioned server guidance and syntax-only upstream
+interface observations. Follow the actual C parameter/return convention: local pointer reassignment
+does not rebind the caller; a returned new head must be captured/propagated when updating it.
+Never silently repair a question by inventing a missing caller assignment. Derive questions and keys
+from explicitly stated operations using the actual supplied interface.
+Keep allocation initialization,
+execution assumptions and complexity preconditions consistent across prose/code/diagrams/exercises.
+Upstream syntax hints are not proof of correctness.
+Unsupported semantics require review, not guessing.
 Each block must contain only fields allowed by its own kind's Schema. Never add markdown to a code
 block, including an empty string; do not copy other block kinds' fields as placeholders.
 exercise_key is local, never a server UUID; no scores or qualification claims.
@@ -126,6 +136,7 @@ def build_request(inputs: dict[str, Any]) -> StructuredRequest:
                 "scoring_reliability": "unverified; requires actual per-question source review",
                 "question_count": "unchanged: 2-4 short_text questions per group",
             },
+            "semantic_contract": generation_semantics(snapshot),
             "format_repair": {
                 "unexpected_block_kind": "remove the block and actions targeting its anchor",
                 "missing_required_kind": "supply that required kind; never change the plan",
