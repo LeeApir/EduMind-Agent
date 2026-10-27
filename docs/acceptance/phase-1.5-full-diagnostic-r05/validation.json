@@ -1,0 +1,52 @@
+{
+  "distinct_tests_passed": 128,
+  "skipped": 0,
+  "groups": [
+    {
+      "group": "offline",
+      "command": "backend/.venv/bin/python -m pytest scripts/tests/test_p15_full_diagnostic_r05.py scripts/tests/test_p15_full_r05_observation.py scripts/tests/test_p15_review_observability.py scripts/tests/test_p15_full_r05_gate.py -q --junitxml=/tmp/edumind-full-r05-offline.xml",
+      "xml": "/tmp/edumind-full-r05-offline.xml",
+      "xml_sha256": "d2ec793400a6582477a1d9f32da2630e5409d4939e1b01f4fcce0f02ddb7f128",
+      "tests": 126,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0
+    },
+    {
+      "group": "pg-mock",
+      "command": "python3 docs/acceptance/phase-1.5-full-diagnostic-r05/run_pg_offline.py",
+      "xml": "/tmp/edumind-p15-full-r05-pg.xml",
+      "xml_sha256": "f477241720ba2db7d6d3b3c594d622717074c13592dcb777bfa978c8e0272af5",
+      "tests": 2,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0
+    }
+  ],
+  "real_provider_requests": 0,
+  "initial_pg_setup_failure": {
+    "errors": 2,
+    "passed": 0,
+    "cause": "Container startup readiness raced the database creation; actual fixture failed, not counted as passed; confirmed pg_isready and created offline DB, reran unchanged tests successfully."
+  },
+  "warnings": [
+    "Starlette anyio deprecation only in final PG test"
+  ],
+  "container_final_state": "exited",
+  "old_r04_raw_and_stopped_ledger_sha256": {
+    "faeee7d15cb5f60e4a701f29b989d46185a93a6a538e25758e75f8f1bef61287-request.json": "68aeb9147d1522bbc29941bd3d0b4e90c0dc69565b465bd08c01de77c6ccaeb6",
+    "faeee7d15cb5f60e4a701f29b989d46185a93a6a538e25758e75f8f1bef61287-response.json": "4d34ae0c4d453f3a799d3fe881e91a6b588168cb20ab79591885a35caaa1dd39",
+    "ledger.sqlite": "2d6222e3e2562a98a0cfe2d238025c74ab0ab20a8773735f6cf1f12e8e43c546"
+  },
+  "old_r04_unchanged": true,
+  "real_output_directory_created": false,
+  "execution_approved": false,
+  "production_modified": false,
+  "not_independent_quality_evidence": true,
+  "checks": [
+    "Ruff all ten new Python implementation/test files passed",
+    "catalog workflow and diff checks passed",
+    "--check no credential/DNS/PG access",
+    "pending --step refused before dependencies, exit2"
+  ]
+}

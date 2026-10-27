@@ -2459,7 +2459,8 @@
         "python3 scripts/check_p15_development_diagnostic_results.py --check；纯离线校验准确证据、配置、授权边界与状态，不在--check隐式发真实请求。",
         "python3 scripts/check_catalog_workflow.py",
         "git diff --check",
-        "backend/.venv/bin/python scripts/run_p15_full_diagnostic_r04.py --check；完整新包离线450SHA核对；--step在pending批准时实际预期退出2，--assessment只读核对固定分母/证据与性能观察，不隐式出站。"
+        "backend/.venv/bin/python scripts/run_p15_full_diagnostic_r04.py --check；完整新包离线450SHA核对；--step在pending批准时实际预期退出2，--assessment只读核对固定分母/证据与性能观察，不隐式出站。",
+        "backend/.venv/bin/python scripts/run_p15_full_diagnostic_r05.py --check；新完整包461源码/材料SHA，--step在准确新批准前退出2，--assessment只读重新核对原始观测证据。"
       ],
       "verification_results": [
         "真实批准登记docs/acceptance/phase-1.5-development-diagnostic-r02/execution-approval.json；严格绑定原7d3fef3/r02 manifest 4d987857ab227a366c8b506f4ed365c8360b778017aa9418425493a212527f44，329源码材料SHA不变",
@@ -2504,13 +2505,14 @@
         "2026-10-27T14:02:41：用户准确批准6476d0b/r03后执行D01-known，2DeepSeek+1sol均HTTP200，规划/场景primary及原Schema通过，PG succeeded/1ready；sol low/非零推理48/准确37字符后缀/v2引用通过，revise1major。助手先读课后读意见，确认本地clean_markdown改变合法原始C声明，非服务商故障；批次threshold_unreachable停止。9651入3545总出，旧7次合计10/29006/11851，费unknown；助手报告独立delegated_assistant_course_review保存，旧checkpoint不伪记human/误报。只读PG来源及10结果离线回归passed0skip，结果checker预期2、Ruff通过，容器恢复exited；证据docs/acceptance/phase-1.5-course-recheck-r03/RESULTS.md。",
         "2026-10-27T17:25:08：用户继续完成T38后准备完整r04而非再次仅首槽。原34槽逐字保留；DeepSeek none生成v2/准入v2及sol low场景v2/原20probe Schema，原质量阈值和分母保持。新非severe失败复核可真实typed入账后停，误报续审不重做生成/改slot_output；83离线+2实际PG/Mock=85 passed0skip，Ruff/450SHA/工作流/diff通过，pending入口预期2，真实0。负例夹具非法reason先被正确拒绝，核对原enum out_of_scope修正后PG通过，无改Schema/断言。独立测试容器exited；准确包beeca0bb41eaa659cc1bcda76b7236dd9b398e3dd7b16a44fbf5ff9e91cb50b2待新250HTTP/3h/具体合成外发与费用例外批准，原10请求/失败保留，不完成T038或领取T039。",
         "2026-10-27T18:09:30：用户明确批准beeca0bb/ADR0037 A-C/全34槽后独立r04实际4HTTP均200；规划primary正确，场景primary多出空markdown非法字段/一次原预算内format_repair通过，first_schema保留[true,false]，PG succeeded/1ready且v2清洗保真。sol报告45128入102出含33推理/最终source SHA准确的pass，但缺instructions且summary1项422字符触发原门禁；runtime UNKNOWN_SEND且review unknown保留，未改原件/重发。全部报告52884入3107出，旧10后累计14/81890/14958，费unknown；33槽未运行，标准助手复核0，实际盲核单独保存并记录开放题评分未决。12结果回归passed0skip、只读PG/SHA/原始与反事实差异核对通过，checker预期2，容器exited。ADR0038 A-B只准备零调用新契约，不降低教学阈值/不改本批Prompt，不完成T038。",
-        "2026-10-27：ADR0038 A-B准确获批，T060审核观测109项/T061答案契约158项离线和实际隔离PG-Mock通过；新真实0。仅修复前置完成，T038不因此完成，旧r04 unknown及33未运行保持。"
+        "2026-10-27：ADR0038 A-B准确获批，T060审核观测109项/T061答案契约158项离线和实际隔离PG-Mock通过；新真实0。仅修复前置完成，T038不因此完成，旧r04 unknown及33未运行保持。",
+        "2026-10-27T22:00:50：r05接线已批准的T060观察规则与T061生成v3，原34槽字节不变；126离线+2实际PG/HTTPX Mock共128 passed0skip，Ruff/工作流/diff通过；461SHA 2896fc5f9c02bcce67a2c32a2a1773f106a3d49ebae42ca199335db8a9371723，pending --step在Key/PG/输出前拒绝。初次PG启动竞态2setup错误后确认就绪/创建offline库重跑通过，归档脚本加入就绪/标签保护；容器exited、原r04原件及unknown ledger SHA不变、新真实0。准备包docs/acceptance/phase-1.5-full-diagnostic-r05；未获本新窗口/准确包/外发预算费用例外执行批准，不完成T038。"
       ],
       "started_at": "2026-10-24T12:25:09",
       "completed_at": null,
-      "blocker": "准确r04首槽4HTTP后按旧协议停止，unknown及其余33槽未运行保持；ADR0038 A-B已获批准并分别完成T060/T061离线修复，但新版本尚未实际全槽诊断，不追认原r04通过。须接线新观测记录、冻结准确新执行包及独立请求/时间授权后再验证。",
+      "blocker": "r05完整新执行包已准备并通过128项离线/隔离PG-Mock；尚待准确manifest 2896fc5f9c02bcce67a2c32a2a1773f106a3d49ebae42ca199335db8a9371723 的独立执行授权（原34槽、250HTTP/3小时、两服务合成外发、token/金额不限例外）。ADR0038 A-B仅覆盖离线实现，旧r04停止/unknown保持，未开展新真实诊断。",
       "commit_lookup": "Task-Completed: PHASE-1.5-T038",
-      "execution_gate": "r04停止账本保持，累计这些实验14请求/81890报告输入/14958报告总输出，费unknown；ADR0038 A-B仅授权已完成离线实现，不授权新真实调用或重启旧批次。",
+      "execution_gate": "新r05批准登记false，拟250HTTP(182生成/68审核)/10800秒，token金额不限待明确接受；旧14请求保留，累计至多264。不得用继续执行或旧费用例外代替准确包新授权；不重启旧批次/不推进T039/不开放生产。",
       "scoped_observations": [
         {
           "batch_id": "p15-aiapi-minimal-r01",
