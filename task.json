@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "DeepSeek官方deepseek-flash新合成r01按用户直接执行指令完成2HTTP/2生成；非流式/流式本地Schema、原样指令与输出上限回显、usage及流正文一致性均通过。仅两例合成观察，独立计数/真实快照/发票仍未证，T038保持blocked，不领取T039–T042；下一步另准备完整课程契约/DeepSeek生成+sol审核诊断及准确预算，不自动调用。cbbb停用、catalog_only/H封存/旧unknown保持。",
+    "phase_gate": "用户已选DeepSeek官方Flash生成+AIAPI sol每场景审核；新双供应设计r01冻结34原槽/最多48场景审核+20探针，250HTTP/4.976M输入/1.216M输出/本地USD20仅提案。ADR0033具体场景意见契约/来源外传/路由A-C/E待实施批准；独立输入界与sol输出硬界/账号费率未证，execution_ready=false，无新真实批次或课程授权。T038仍blocked，旧合成结果/unknown/catalog_only/H封存/cbbb停用保持。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -2445,6 +2445,7 @@
         "按T005预冻结准入判断：未通过则标blocked停止依赖，不自动领取独立验收；通过才冻结候选，任何修复需重新验证。"
       ],
       "verification": [
+        "backend/.venv/bin/python scripts/check_p15_split_provider_design.py；纯离线核对新双供应商设计/原34槽/最大48场景与250请求预算，execution_ready=false，不发请求。",
         "backend/.venv/bin/python scripts/check_p15_deepseek_flash_results.py；纯只读复核两例合成协议观察、真实收据/全额unknown与未授课程状态，不联网、不解锁T038。",
         "python3 scripts/check_p15_direct_relay_once_results.py --check；预期退出2，只读核对单次直生成HTTP200/额外指令/上限null及Schema核心一致更正，不发请求。",
         "python3 scripts/check_p15_relay_regression_results.py --check；预期退出2，只读验证新env复测计数404/0生成/unknown与弃用，不发请求。",
@@ -2486,13 +2487,14 @@
         "2026-10-26：用户明确“执行S2”单独豁免S1前置，原S2字节一次POST，HTTP200/流完成/正文一致，生产Schema失败（10项含派生错误）；reported1291输入802输出2093总量，超请求512，终态关键字段缺失。证据docs/acceptance/phase-1.5-aiapi-s2-once/results.json；本地USD0.035unknown保留、真实费用未知，T038仍blocked。",
         "2026-10-27：新aiapi审核建议探针1HTTP/1生成，HTTP200/JSON Schema及12唯一ID通过；6明确错误检出6、漏0；6正确误报0；证据引用/理由经主助手核对，非人类标签或独立验收。reported876输入620输出1496，上限回显null；估算USD0.01149/实际未知。计分器6离线回归passed0skip；证据docs/acceptance/phase-1.5-aiapi-review-probe-r01/results.json。主任务仍blocked，不自动生产审核。",
         "2026-10-27按用户选型零调用准备DeepSeek官方deepseek-flash候选，材料docs/acceptance/phase-1.5-deepseek-flash-preparation；2纯合成请求/离线检查器无execute/不读密钥或联网，7新回归及15旧AIAPI回归共22 passed/0skip；官方Responses能力/参数差异/峰时参考费率及USD0.01本地提案已记录，不代表新兼容门禁或真实执行批准，不改旧结果。",
-        "2026-10-27：用户明确“直接执行，不用批准”后补齐独立DeepSeek Flash合成r01；314源码/材料SHA冻结、30新增+22相关共52离线passed0skip。首次专用Key缺失预检0HTTP；用户安全填入后仅2HTTP/2生成均200，S1 reported147/25/172、S2 reported205/28/233；本地探针Schema/固定对象/原样136字符instructions/上限128与512回显/store false/流正文一致均通过。私有只读快照和去敏证据docs/acceptance/phase-1.5-deepseek-flash-r01/results.json；实际发票未知、两槽USD0.01全部unknown，未独立计数或验证课程/审核，不把直接指令伪记独立逐哈希审阅，T038仍blocked。"
+        "2026-10-27：用户明确“直接执行，不用批准”后补齐独立DeepSeek Flash合成r01；314源码/材料SHA冻结、30新增+22相关共52离线passed0skip。首次专用Key缺失预检0HTTP；用户安全填入后仅2HTTP/2生成均200，S1 reported147/25/172、S2 reported205/28/233；本地探针Schema/固定对象/原样136字符instructions/上限128与512回显/store false/流正文一致均通过。私有只读快照和去敏证据docs/acceptance/phase-1.5-deepseek-flash-r01/results.json；实际发票未知、两槽USD0.01全部unknown，未独立计数或验证课程/审核，不把直接指令伪记独立逐哈希审阅，T038仍blocked。",
+        "2026-10-27：按用户新增每场景sol审核范围，准备ADR0033及双供应商设计r01（16份SHA）；原34槽原样，最多48场景审核+20探针=68sol，DeepSeek最多182，共250HTTP/4,976,000输入/1,216,000输出；公开参考USD15.2464/本地USD20仅提案。15新增离线正负例passed0skip，准确stage/Schema/来源SHA与引用/未决/标签隔离/预算验证通过，非PG-Mock或真实审核通过；无出站/凭据读取，不将bounded_output_verified伪置true，准确设计批准及输入/输出边界证据仍缺。"
       ],
       "started_at": "2026-10-24T12:25:09",
       "completed_at": null,
-      "blocker": "DeepSeek官方Flash两例最小合成观察通过，但独立输入计数、上游日期快照及实际费用未证；完整课程契约/质量/性能尚未验证，sol审核仅12样例实验候选。需另准备准确新生成+审核诊断契约及预算，旧失败/unknown不改，T039–T042仍依赖T038。",
+      "blocker": "新双供应课程诊断设计已冻结，待具体场景审核来源外传/新意见契约/路由方案批准后离线实施；尚无可靠独立输入界证明，AIAPI sol输出限制有历史不符且未重新建立、当前Key分组费率未知；不能置SendPolicy验证标志为true或直接执行250次提案。完整课程/审核/质量/性能尚未验证，T038 blocked、T039–T042未领取。",
       "commit_lookup": "Task-Completed: PHASE-1.5-T038",
-      "execution_gate": "用户直接执行的DeepSeek官方Flash合成r01已结束，两例成功仅作协议观察；准确单次授权已消费，无真实课程/审核续发或生产接线授权。后续可准备新课程诊断契约和预算，T038保持blocked，旧门禁/unknown/catalog_only不改。",
+      "execution_gate": "当前只完成ADR0033和逐场景审核设计、15项离线证明；候选/额度与两次合成授权不继承为整批。新增最多250次及USD20本地额度未授权，未来准确执行前需完成隔离实现/实际上界证据/新包与预算，不改原教学阈值、旧失败或生产模式。",
       "scoped_observations": [
         {
           "batch_id": "p15-aiapi-minimal-r01",
