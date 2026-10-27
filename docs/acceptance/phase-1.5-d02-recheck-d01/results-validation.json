@@ -1,0 +1,19 @@
+{
+  "tests": 17,
+  "errors": 0,
+  "failures": 0,
+  "skipped": 0,
+  "xml": "/tmp/edumind-d02-d01-results.xml",
+  "xml_sha256": "c3aa2945af2b9c42497257b5df1879ec3d0760b1e471c1292d840739e5f14323",
+  "real_requests_after_stop": 0,
+  "container_final_state": "exited",
+  "commands": [
+    "backend/.venv/bin/python -m pytest scripts/tests/test_p15_d02_d01_results.py -q --junitxml=/tmp/edumind-d02-d01-results.xml",
+    "backend/.venv/bin/python scripts/check_p15_d02_d01_results.py --check (expected exit 2)",
+    "backend/.venv/bin/ruff check scripts/check_p15_d02_d01_results.py scripts/tests/test_p15_d02_d01_results.py",
+    "python3 scripts/check_catalog_workflow.py",
+    "git diff --check"
+  ],
+  "self_review": "completed; not independent human review",
+  "initial_read_only_check": "System Python lacked httpx; reran using pinned backend venv; no model request or source change"
+}

@@ -2463,7 +2463,8 @@
         "backend/.venv/bin/python scripts/run_p15_full_diagnostic_r04.py --check；完整新包离线450SHA核对；--step在pending批准时实际预期退出2，--assessment只读核对固定分母/证据与性能观察，不隐式出站。",
         "backend/.venv/bin/python scripts/run_p15_full_diagnostic_r05.py --check；新完整包461源码/材料SHA，--step在准确新批准前退出2，--assessment只读重新核对原始观测证据。",
         "backend/.venv/bin/python scripts/check_p15_full_r05_results.py --check；预期退出2，只读核对r05停止/unknown、准确来源、真实用量与独立盲核，不发请求。",
-        "backend/.venv/bin/python scripts/run_p15_d02_recheck_d01.py --check；独立D02-known两场景d01包，--step在准确新批准前退出2，--assessment只读源重算/协议与局部结论，不能完成T038。"
+        "backend/.venv/bin/python scripts/run_p15_d02_recheck_d01.py --check；独立D02-known两场景d01包，--step在准确新批准前退出2，--assessment只读源重算/协议与局部结论，不能完成T038。",
+        "backend/.venv/bin/python scripts/check_p15_d02_d01_results.py --check；预期退出2，只读复验准确d01停止事实与来源/原始协议/unknown，不发请求。"
       ],
       "verification_results": [
         "真实批准登记docs/acceptance/phase-1.5-development-diagnostic-r02/execution-approval.json；严格绑定原7d3fef3/r02 manifest 4d987857ab227a366c8b506f4ed365c8360b778017aa9418425493a212527f44，329源码材料SHA不变",
@@ -2512,13 +2513,14 @@
         "2026-10-27T22:00:50：r05接线已批准的T060观察规则与T061生成v3，原34槽字节不变；126离线+2实际PG/HTTPX Mock共128 passed0skip，Ruff/工作流/diff通过；461SHA 2896fc5f9c02bcce67a2c32a2a1773f106a3d49ebae42ca199335db8a9371723，pending --step在Key/PG/输出前拒绝。初次PG启动竞态2setup错误后确认就绪/创建offline库重跑通过，归档脚本加入就绪/标签保护；容器exited、原r04原件及unknown ledger SHA不变、新真实0。准备包docs/acceptance/phase-1.5-full-diagnostic-r05；未获本新窗口/准确包/外发预算费用例外执行批准，不完成T038。",
         "2026-10-27T22:27:47：r05准确授权登记call_4c391511662944b7a9c6aa25f9d701dd后执行10HTTP均200，7生成/3审核、7首次Schema均通过；D01两槽逐块/8题/画像对照实际入账。D02生成2场景ready，但首场景审核报告50推理token无reasoning项，REASONING_ITEM_MISSING触发unknown停止，非HTTP不通。D02助手先于模型独立发现局部head传值说明错误、q1忽略返回值却判3,2,1的可靠评分键缺陷，保留1自然严重问题，标准slot_output缺失不伪造。报告33184入10317出，可信29750/9891，unknown3434/426保留，旧14后24/115074/25275，真实费unknown；其余31未运行。只读PG三操作succeeded/4ready、2正式助手报告和另存盲核/模型对照、原始文件SHA保存，20结果回归passed0skip/结果checker预期2/Ruff/工作流/diff通过，PG已exited，停止后新真实0；证据docs/acceptance/phase-1.5-full-diagnostic-r05/RESULTS.md。不完成T038。",
         "2026-10-27T23:17:35：用户点名D02第二场景并要求按原标准直接发/不用核对，独立1HTTP审核，无恢复r05/预检试发/重试。AIAPI gpt-6.1-sol low HTTP200/23.822秒，协议与最终Schema/source引用通过，5826入725总出，revise3项major：局部head传值误解、调用未接收返回值与参考键不一致、练习不足以检验计划的独立实现目标。前两项命中既有盲核关注；未自动核定第三项或采纳修改，不代表全套审核能力验收。相关累计25/120900/26000报告用量、费用unknown。原r05 unknown/31未运行不变，T038仍blocked；按用户要求未额外测试，证据docs/acceptance/phase-1.5-d02-scene2-review-once-p01/RESULTS.md。",
-        "2026-10-28：按用户“好，开始”完成D02小范围准备，生成v4/机械v3/私有一致性v1、原sol审核标准；77离线+1实际隔离PG/HTTPX Mock共78 passed0skip，Ruff/工作流/diff通过，476 SHA准确包 6a624547335704f4d0da489f71d7e02230adc8b554e57f390641def904bcef6a。独立15 HTTP/1800秒及合成外发/token金额不限例外仍待本包授权，approved=false；pending实际退出2、真实0、PG exited，不解锁T038或重启旧批次。"
+        "2026-10-28：按用户“好，开始”完成D02小范围准备，生成v4/机械v3/私有一致性v1、原sol审核标准；77离线+1实际隔离PG/HTTPX Mock共78 passed0skip，Ruff/工作流/diff通过，476 SHA准确包 6a624547335704f4d0da489f71d7e02230adc8b554e57f390641def904bcef6a。独立15 HTTP/1800秒及合成外发/token金额不限例外仍待本包授权，approved=false；pending实际退出2、真实0、PG exited，不解锁T038或重启旧批次。",
+        "2026-10-28T00:35:39+08:00：用户准确批准5eda387/6a624547后单次step实际4HTTP200，3生成首次Schema全过/两场景ready，sol首场景返回额外reasoning元数据触发NONEMPTY_OR_UNKNOWN_REASONING_ITEM，3complete/1unknown，0接受审核/1审核未运行。报告15524入4410总出；可信11842/4221，unknown3682/189保留；旧25后29/136424/30410，费unknown。助手先于sol最终意见盲核11块4题，原传值/接回两错未重现，但q3自环被判有限2，1可靠答案严重错误；4本地提示均为误报，未命中新错误。无标准slot_output不伪造导入，17结果回归通过/只读checker预期2/Ruff/工作流/diff通过，PG exited、停止后新真实0；证据docs/acceptance/phase-1.5-d02-recheck-d01/RESULTS.md，T038仍blocked。"
       ],
       "started_at": "2026-10-24T12:25:09",
       "completed_at": null,
-      "blocker": "r05在D02-known首场景审核HTTP200后触发REASONING_ITEM_MISSING：报告50推理token但output无reasoning项，原严格门禁拒绝并保留unknown。实际助手盲核另确认第二场景局部head传值解释错误、q1未接收返回值却给出3,2,1精确键，质量亦失败；旧停止批次不重启。",
+      "blocker": "D02 d01真实4HTTP后因sol reasoning项额外metadata/internal_chat_message_metadata_passthrough触发NONEMPTY_OR_UNKNOWN_REASONING_ITEM，1unknown；助手独立盲核另发现q3把自环遍历误作有限序列2，答案不可靠。两原错误本样本未重现不等于稳定修好；禁止本批重启或补发。",
       "commit_lookup": "Task-Completed: PHASE-1.5-T038",
-      "execution_gate": "r05已停止UNKNOWN_SEND；新10HTTP均200(7生成/3审核)，已完成两槽实际复核，第3槽仅独立盲核/未完成标准入账，其余31槽未运行。reported33184入10317总出、可信结算29750入9891出；unknown3434/426不退款。旧14后累计24/115074报告入/25275报告总出。停止后仅零调用取证/交接，不延长窗口或自动新批。",
+      "execution_gate": "d01已stopped/UNKNOWN_SEND，4HTTP/3complete1unknown，剩余预算不作为重启许可；本次仅零调用取证和交接。其余33槽/新探测/契约修改/完整T038未授权。",
       "scoped_observations": [
         {
           "batch_id": "p15-aiapi-minimal-r01",
