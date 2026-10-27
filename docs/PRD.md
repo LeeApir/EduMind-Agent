@@ -138,6 +138,8 @@ AI生成草稿可供学生学习，不以独立人工签核或普通语义审核
 
 2026-10-27 T059修复：草稿新准入使用free-scene-hard-gate-v2区分Markdown代码与普通文本，保留C方括号/反斜线/比较符及准确私有答案，HTML/链接/图片仍为惰性数据。原v1事实、原始候选和既有场景不改写；仅追加新规则事实，不新增HTML渲染/执行或运行开放。103项离线/实际隔离PG/jsdom测试通过，见[清洗修复交接](acceptance/phase-1.5-markdown-cleaning-t059/README.md)；旧r03内容失败及T038真实诊断阻塞保持，新诊断须新准确包和授权。
 
+2026-10-27 T060/T061：用户批准[ADR0038 A—B](ADR/0038-approval-20261027.json)，隔离审核新增缺回显未知及有界摘要隔离，生产网关不继承；场景生成Prompt v3要求每题明确状态、有限唯一答案域与输入格式，解释保留在讲解/解析。原输出Schema、教学门槛、私有答案和评分/掌握度权限不变，格式不证明正确。离线/隔离PG-Mock分别109和158项通过，见[审核交接](acceptance/phase-1.5-review-observability-t060/README.md)及[答案交接](acceptance/phase-1.5-answer-contract-t061/README.md)。真实调用0，旧r04仍停止/unknown，T038尚未完成；新真实诊断须新准确包与授权。
+
 ## 目录
 
 1. [项目概览](#一项目概览)

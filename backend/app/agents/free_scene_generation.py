@@ -22,7 +22,7 @@ from app.services.provider_gateway import (
     TextRequest,
 )
 
-PROMPT_VERSION = "free-scene-generation-v2"
+PROMPT_VERSION = "free-scene-generation-v3"
 SCHEMA_VERSION = "free-scene-candidate-v1"
 SCHEMA = json.loads(Path(__file__).with_suffix(".schema.json").read_text())
 INSTRUCTION = """Generate exactly the assigned scene of a data-structures learning course.
@@ -38,7 +38,20 @@ required forms and original teaching requirements. Never repair by changing the 
 Combine only this scene's required forms in this ONE scene;
 do not force three scenes or claim all scenes have been generated. Keep the shared example intact.
 Exercises are private 2–4 short-text questions per group, with unique question_id keys, answer_key
-and solution. exercise_key is local, never a server UUID; no scores or qualification claims.
+and solution. Each question must state its initial state or exact execution point, any mutations
+already applied, its finite answer domain, and the precise input format in the question text itself.
+Require one uniquely checkable number, identifier from an explicit list, or fixed choice label.
+For numbers state a finite range and one canonical spelling;
+for choices list every label and option.
+Request only that token, without units, prose, multiple answers
+or alternate spellings in answer_key.
+Do not use an open-ended explanation, justification or arbitrary sentence as an exact answer key.
+Keep reasoning and explanation in the lesson and solution; test understanding with explicit
+alternatives or a determinate trace, preserving the assigned objectives and difficulty.
+Candidate keys remain unverified: neither token shape nor a model pass proves scoring reliability.
+Each block must contain only fields allowed by its own kind's Schema. Never add markdown to a code
+block, including an empty string; do not copy other block kinds' fields as placeholders.
+exercise_key is local, never a server UUID; no scores or qualification claims.
 Use only non-executable array/linked_list/stack/queue visualization JSON with text alternatives,
 at most 50 steps and 32 elements per step. Actions reference anchors in this candidate only.
 Never execute code, call tools, fetch media, output HTML/JS or start Manim. Return only blocks
@@ -94,6 +107,25 @@ def build_request(inputs: dict[str, Any]) -> StructuredRequest:
             "forbidden_block_kinds": sorted(
                 {"text", "code", "exercise", "visualization"} - allowed
             ),
+            "fields_by_block_kind": {
+                kind: sorted(definition["properties"])
+                for definition in SCHEMA["$defs"].values()
+                if (kind := definition.get("properties", {}).get("kind", {}).get("const"))
+                in allowed
+            },
+            "exercise_answers": {
+                "state_in_each_question": (
+                    "initial state or exact execution point and prior mutations"
+                ),
+                "domain_in_each_question": (
+                    "explicit finite range, identifier list or choice labels"
+                ),
+                "format_in_each_question": "one canonical token; no prose, units or alternatives",
+                "unique_reference": "one deterministically checkable value in the stated domain",
+                "explanations": "lesson and solution; never an open sentence as the exact key",
+                "scoring_reliability": "unverified; requires actual per-question source review",
+                "question_count": "unchanged: 2-4 short_text questions per group",
+            },
             "format_repair": {
                 "unexpected_block_kind": "remove the block and actions targeting its anchor",
                 "missing_required_kind": "supply that required kind; never change the plan",
