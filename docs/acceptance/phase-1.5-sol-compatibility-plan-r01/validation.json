@@ -1,0 +1,52 @@
+{
+  "final_distinct_tests": 42,
+  "proposal_rule_tests": 34,
+  "r02_result_tests": 8,
+  "skipped": 0,
+  "xml": "/tmp/edumind-p15-sol-proposal-unit-final.xml",
+  "xml_sha256": "9b4fdbd1df47fdd55259b19ed4156c0bdd58ae671b01f389d94657730100b4f2",
+  "command": "backend/.venv/bin/python -m pytest scripts/tests/test_p15_sol_compatibility_proposal.py scripts/tests/test_p15_r02_results.py -q --junitxml=/tmp/edumind-p15-sol-proposal-unit-final.xml",
+  "initial_run": "40 passed/1 failed; invalid pointer correctly raised jsonschema.ValidationError rather than uniform ValueError; wrapped schema failure, retained rejection assertion",
+  "new_real_requests_during_preparation": 0,
+  "old_r02_request_count": 3,
+  "shared_workflow_request_count": 6,
+  "live_adapter_implemented": false,
+  "production_changed": false,
+  "final_checks": [
+    {
+      "command": "backend/.venv/bin/python scripts/check_p15_sol_compatibility_proposal.py --check",
+      "exit_code": 0,
+      "expected": true
+    },
+    {
+      "command": "backend/.venv/bin/python scripts/check_p15_sol_compatibility_proposal.py --execute",
+      "exit_code": 2,
+      "expected": true
+    },
+    {
+      "command": "backend/.venv/bin/python scripts/check_p15_split_exploration_r02_results.py --check",
+      "exit_code": 2,
+      "expected": true
+    },
+    {
+      "command": "backend/.venv/bin/python scripts/run_p15_split_exploration_r02.py --check",
+      "exit_code": 0,
+      "expected": true
+    },
+    {
+      "command": "backend/.venv/bin/python scripts/check_catalog_workflow.py",
+      "exit_code": 0,
+      "expected": true
+    },
+    {
+      "command": "Ruff (five new Python files)",
+      "exit_code": 0,
+      "expected": true
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "expected": true
+    }
+  ]
+}

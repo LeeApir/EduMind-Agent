@@ -98,3 +98,5 @@
 2026-10-27：[ADR-0034](0034-user-directed-unbounded-exploration.md)登记用户“不考虑上界与费用，先完成项目”的直接指令；新隔离实验不要求token/金额上界，保留请求数、时间、教学与真人检查，生产SendPolicy仍false，旧冻结材料不改。
 
 2026-10-27：[ADR-0035](0035-delegated-development-review.md)登记用户委托助手复核与T058修复后的新r02；旧3次+剩247次、共用原截止，助手事件与human来源隔离，非独立质量验收或生产开放。
+
+2026-10-27：[ADR-0036](0036-sol-known-difference-proposal.md)按用户保留sol方向准备窄兼容提案；准确37字符后缀/显式low与推理元数据/引用根v2，42项离线通过，无新增真实调用或生产接线，r02停止/T038 blocked保持。
