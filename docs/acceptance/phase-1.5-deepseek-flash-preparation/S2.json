@@ -1,0 +1,62 @@
+{
+  "model": "deepseek-flash",
+  "instructions": "Synthetic compatibility probe only. Output the requested JSON. Do not infer learner facts. No tools, files, network or external actions.",
+  "input": [
+    {
+      "role": "user",
+      "content": "Return JSON: objective_source user_requirement, scene_forms [text, exercise] in that order, learner_level null."
+    }
+  ],
+  "reasoning": {
+    "effort": "none"
+  },
+  "stream": true,
+  "max_output_tokens": 512,
+  "text": {
+    "format": {
+      "type": "json_schema",
+      "name": "synthetic_compatibility_s2",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "objective_source": {
+            "type": "string",
+            "enum": [
+              "user_requirement",
+              "planner_suggestion"
+            ]
+          },
+          "scene_forms": {
+            "type": "array",
+            "prefixItems": [
+              {
+                "type": "string",
+                "enum": [
+                  "text"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "exercise"
+                ]
+              }
+            ],
+            "minItems": 2,
+            "maxItems": 2,
+            "items": false
+          },
+          "learner_level": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "objective_source",
+          "scene_forms",
+          "learner_level"
+        ],
+        "additionalProperties": false
+      }
+    }
+  }
+}
