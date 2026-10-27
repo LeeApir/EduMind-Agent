@@ -2428,7 +2428,8 @@
       "priority": "P0",
       "depends_on": [
         "PHASE-1.5-T037",
-        "PHASE-1.5-T050"
+        "PHASE-1.5-T050",
+        "PHASE-1.5-T058"
       ],
       "scope": [
         "scripts/",
@@ -2697,6 +2698,44 @@
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T042",
       "execution_gate": "本次只规划；等待明确执行授权，依赖全部完成后串行领取。"
+    },
+    {
+      "id": "PHASE-1.5-T058",
+      "phase": "Phase 1.5",
+      "title": "明确场景形式约束并保持严格准入",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T010",
+        "PHASE-1.5-T011"
+      ],
+      "scope": [
+        "backend/app/agents/free_scene_generation.py",
+        "backend/tests/",
+        "docs/acceptance/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5；T010/T011；用户先完成项目及委托助手复核；r01真实额外visualization失败",
+      "acceptance_criteria": [
+        "当前场景forms派生准确允许/必需/禁止块类型，版本化请求明确不得添加未计划形式，结构修复仍遵守该约束。",
+        "保留原完整Schema、forms集合准入及安全校验，不自动删除/改写原始候选或放宽教学要求。",
+        "离线及实际隔离PG-Mock证明只要求text/code/exercise时成功生成没有visualization的场景，违反形式仍被拒绝；不把Mock当真实模型修复通过。"
+      ],
+      "verification": [
+        "backend/.venv/bin/python -m pytest backend/tests/test_free_scene_form_contract.py -q",
+        "实际隔离PG-Mock测试场景forms契约与持久化准入",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [
+        "新10单元+1实际PG-Mock、旧生成54/机械40/调度39共144 passed0skip；首次专用DB前缀不符133 setup错误已按原保护要求分组重跑，不改断言；Ruff/工作流/diff通过。证据docs/acceptance/phase-1.5-scene-form-contract-t058；新增真实0，旧466a015归档源码离线重验准确包和真实失败均符合预期。"
+      ],
+      "started_at": "2026-10-27T10:38:20",
+      "completed_at": "2026-10-27T10:47:34",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T058",
+      "execution_gate": "用户持续完成项目授权下修复r01具体工程缺陷；只开发及离线/隔离PG-Mock，不恢复旧停止批次。生产/真实新批次另按准确新配置验证。"
     }
   ],
   "planning_inputs": {

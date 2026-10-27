@@ -22,7 +22,7 @@ from app.services.provider_gateway import (
     TextRequest,
 )
 
-PROMPT_VERSION = "free-scene-generation-v1"
+PROMPT_VERSION = "free-scene-generation-v2"
 SCHEMA_VERSION = "free-scene-candidate-v1"
 SCHEMA = json.loads(Path(__file__).with_suffix(".schema.json").read_text())
 INSTRUCTION = """Generate exactly the assigned scene of a data-structures learning course.
@@ -30,7 +30,12 @@ Follow its purpose and forms, the original request sources and evidence, all ass
 the shared example, terminology and conventions. Use actual supplied necessary upstream content;
 Do not fabricate missing dependencies or learner facts. Unknown learner fields remain unknown.
 Teach in zh-CN; code, when requested, is C source text only. Every scene contains complete nonblank
-Markdown teaching text. Combine required text/code/exercise/visualization forms in this ONE scene;
+Markdown teaching text. The response_contract contains the complete allowed block kinds for this
+assigned scene. Include all required kinds, and do not add any forbidden kind. In particular, do
+not add visualization unless this scene requests visualization, even if it might help teaching.
+On structural repair, remove unplanned blocks and actions targeting their anchors; keep all
+required forms and original teaching requirements. Never repair by changing the plan's forms.
+Combine only this scene's required forms in this ONE scene;
 do not force three scenes or claim all scenes have been generated. Keep the shared example intact.
 Exercises are private 2–4 short-text questions per group, with unique question_id keys, answer_key
 and solution. exercise_key is local, never a server UUID; no scores or qualification claims.
@@ -78,16 +83,31 @@ def snapshot_input(value: dict[str, Any]) -> dict[str, Any]:
 
 def build_request(inputs: dict[str, Any]) -> StructuredRequest:
     snapshot = snapshot_input(inputs)
+    scene = next(s for s in snapshot["plan"]["scenes"] if s["scene_id"] == snapshot["scene_id"])
+    allowed = set(scene["forms"]) | {"text"}
+    payload = {
+        "prompt_version": PROMPT_VERSION,
+        **snapshot,
+        "response_contract": {
+            "required_block_kinds": sorted(allowed),
+            "allowed_block_kinds": sorted(allowed),
+            "forbidden_block_kinds": sorted(
+                {"text", "code", "exercise", "visualization"} - allowed
+            ),
+            "format_repair": {
+                "unexpected_block_kind": "remove the block and actions targeting its anchor",
+                "missing_required_kind": "supply that required kind; never change the plan",
+            },
+        },
+    }
     # Byte safety bound only. T014 must count the actual prompt/schema tokens and reserve fees.
-    if len(canonical(snapshot)) > 128000:
+    if len(canonical(payload)) > 128000:
         raise SnapshotError("SCENE_INPUT_TOO_LARGE")
     return StructuredRequest(
         prompt=TextRequest(
             messages=(
                 ChatMessage("system", INSTRUCTION),
-                ChatMessage(
-                    "user", canonical({"prompt_version": PROMPT_VERSION, **snapshot}).decode()
-                ),
+                ChatMessage("user", canonical(payload).decode()),
             ),
             task_profile=TaskProfile.QUALITY,
             max_output_tokens=8000,
