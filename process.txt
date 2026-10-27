@@ -2286,3 +2286,9 @@ T089完成1b2b89d后冻结本批唯一开发验证，准备8份跨数组/栈/链
 
 [2026-10-26T23:59:26] [PHASE-1.5-T038] BLOCKED | executor=Lee
 改动摘要：单独S2准确一次已执行，HTTP200/流正常结束但生产规划Schema失败；请求输出512，报告802，终态关键字段缺失 | 验证结果：1HTTP/1生成，JSON可解析/增量正文一致，10项Schema错误含派生分支；reported1291输入802输出2093总量；结果docs/acceptance/phase-1.5-aiapi-s2-once | 遗留问题：复杂结构不合格、报告输出超限，USD0.035整槽unknown/实际扣费未核实，catalog_only/旧阻塞保持 | 下一步：离线核对/治理提交后停止，不改Prompt或Schema追通过，不自动重试/补发/课程/push/merge/部署
+
+[2026-10-27T08:23:23] [PHASE-1.5-T038] RESUME | executor=Lee | branch=codex/phase-1.5-t001
+改动摘要：按用户要求新编写审核建议模型探针12样例/6错6对，1次gpt-6.1-sol/Responses，gold不外传；与旧课程验收隔离 | 验证结果：计分器6离线回归passed0skip及Ruff通过，准确请求/标准答案/本地USD0.05留额/停止规则冻结 | 遗留问题：单批相关小样本和助手标签不等同人工独立验收；服务输出上限/真实收费仍未知，catalog_only保持 | 下一步：准确一次请求后逐条核对误报/漏报/证据，不重试/补发/自动发布
+
+[2026-10-27T08:24:49] [PHASE-1.5-T038] BLOCKED | executor=Lee
+改动摘要：单独审核建议合成探针执行1次完成，6错全检出/6对无误报，JSON/引用/理由核对通过，但不作为生产或课程准入 | 验证结果：1HTTP/1生成，reported876输入620输出；6离线计分回归passed0skip，准确结果docs/acceptance/phase-1.5-aiapi-review-probe-r01 | 遗留问题：单批成对明显例/助手gold无独立人类标签，上限null/实际收费未知，USD0.05unknown留额保持，主任务blocked/catalog_only | 下一步：只读核对与治理提交后停止，不自动扩样/接线发布或push/merge/部署
