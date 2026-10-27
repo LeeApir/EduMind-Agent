@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "r02准确获批后实际2DeepSeek+1sol共3HTTP，生成操作成功/1ready，sol报告low/89推理及37字符额外instruction而按原契约停止；两批累计6。用户选择保留sol仅准备兼容方案，ADR0036及42离线测试完成，新真实0，T038 blocked，不恢复批次或推进独立验收。",
+    "phase_gate": "用户执行指令下sol已知差异p01单次纯合成兼容通过：1HTTP/834入203出，错误句检出/正确对照无误报，low回显/准确37字符后缀/路径根v2通过；累计7次。非完整课程准入，T038 blocked待新课程准确包与授权，r02不恢复，生产不开放。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -2494,13 +2494,14 @@
         "2026-10-27：按用户“不考虑上界与费用，先完成项目”建立ADR0034独立实验入口；10离线+1实际隔离PG-Mock passed0skip，保留原生产拒绝且上界标志false，实际用量超占位/请求值仍如实记录，当前无新增真实调用；准确包docs/acceptance/phase-1.5-split-exploration-r01，准备从D01-known真实执行。",
         "2026-10-27：用户明确授权9183ba4b合成外发后执行新r01，实际3HTTP/3DeepSeek均200，规划+primary场景+format_repair；input10455/output5465，sol0次。首槽场景两次额外visualization违反计划forms，JSON Schema0错但上下文校验拒绝，0ready；批次stopped/threshold_unreachable，其余33槽未运行。新增只读checker纠正旧CLI误报human_review_required并预期退出2，5结果回归+10执行器离线+1实际隔离PG-Mock共16 passed0skip；助手按用户委托复核，非human标签，准确证据docs/acceptance/phase-1.5-split-exploration-r01。",
         "2026-10-27：T058完成31ca187后新r02助手复核/原预算共用/CLI终态修正已准备；7离线+1实际隔离PG-Mock共8 passed0skip，准确包cf5ee9e9bfada7f5816cd27b58ef22daa28063b1279d6fb8bd60b06f2e1a447a。自动审批认为原r01准确外发批准不涵盖新r02并拒绝，实际0新进程/PG/HTTP；已询问新准确外发许可，空evidence_ref门禁实际退出2。状态docs/acceptance/phase-1.5-split-exploration-r02/STATUS.md，不伪造任务完成。",
-        "2026-10-27：r02准确获准执行3HTTP均200（2DeepSeek+1sol）；规划/场景primary均通过，PGsucceeded/1ready/code-text-exercise，原forms缺陷修复真实有效。sol none->low/89推理、728->765指令回显追加37字符、revise3minor但/source路径不符；原契约UNEXPECTED_REASONING即停/unknown，未重发。全部响应报告8066入2638出，旧r01合计18521入8103出/6请求；费unknown。助手先看课再看意见另存来源，不写human；结果checker预期2。按用户选择保留sol仅准备ADR0036及原型34+结果8共42离线passed0skip，新真实0；证据sol-compatibility-plan-r01与split-exploration-r02，未宣称T038完成。"
+        "2026-10-27：r02准确获准执行3HTTP均200（2DeepSeek+1sol）；规划/场景primary均通过，PGsucceeded/1ready/code-text-exercise，原forms缺陷修复真实有效。sol none->low/89推理、728->765指令回显追加37字符、revise3minor但/source路径不符；原契约UNEXPECTED_REASONING即停/unknown，未重发。全部响应报告8066入2638出，旧r01合计18521入8103出/6请求；费unknown。助手先看课再看意见另存来源，不写human；结果checker预期2。按用户选择保留sol仅准备ADR0036及原型34+结果8共42离线passed0skip，新真实0；证据sol-compatibility-plan-r01与split-exploration-r02，未宣称T038完成。",
+        "2026-10-27：用户在ADR0036最小提案后明确“执行”；新p01包479937db6b8d5b75d494efb699f4916fed4dc23e746d3af242dc4c224dc0d67e按直接指令一次纯合成sol审核，1HTTP200/5.009秒/834入203出；low回显、准确37字符后缀、v2路径源摘要引用通过，检出错误句、正确对照无误报，revise1major。推理报告0，非零路径本次未见；没有课程/PG调用或恢复r02。44离线+3结果回归共47 passed0skip，结果checker退出0；累计7请求/19355入8306出/实际费unknown。证据phase-1.5-sol-compatibility-once-p01；T038未完成，后续准确课程包及授权另准备。"
       ],
       "started_at": "2026-10-24T12:25:09",
       "completed_at": null,
-      "blocker": "r02生成真实成功，但AIAPI sol回显reasoning low/推理89、额外37字符编码助手instruction及/source路径均与原契约不符；批次stopped/UNKNOWN_SEND，不能自动恢复。用户已选保留sol仅准备，ADR0036窄兼容/路径根v2方案及42离线测试完成，待具体契约决定及未来准确最小验证授权；不以费用/上界或用户填写复核材料阻塞。",
+      "blocker": "sol窄兼容p01一次合成已通过，但尚未有采用新规则的准确完整课程诊断包与该范围授权；本次只一错一对/推理报告0，不代表非零推理实测、20probe审核质量或T038完成。需准备新包，不恢复r02；不以token/费用或用户填写复核材料阻塞。",
       "commit_lookup": "Task-Completed: PHASE-1.5-T038",
-      "execution_gate": "r02 cf5ee9e9准确批准已消费3请求后停止，旧r01另3累计6；新ADR0036仅方案/离线，无新真实授权。下一最小验证提案1次sol需准确包独立批准，原截止不延长，当前不启动r03/课程/PG，不改生产或教学阈值。",
+      "execution_gate": "p01准确479937db单次直接执行已消费1HTTP，原累计7，独占目录不重启。新课程/完整诊断不在本次授权内，原13:21:21绝对截止不延长，生产/教学门槛保持。",
       "scoped_observations": [
         {
           "batch_id": "p15-aiapi-minimal-r01",

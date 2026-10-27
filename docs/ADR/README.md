@@ -100,3 +100,5 @@
 2026-10-27：[ADR-0035](0035-delegated-development-review.md)登记用户委托助手复核与T058修复后的新r02；旧3次+剩247次、共用原截止，助手事件与human来源隔离，非独立质量验收或生产开放。
 
 2026-10-27：[ADR-0036](0036-sol-known-difference-proposal.md)按用户保留sol方向准备窄兼容提案；准确37字符后缀/显式low与推理元数据/引用根v2，42项离线通过，无新增真实调用或生产接线，r02停止/T038 blocked保持。
+
+2026-10-27：ADR-0036窄兼容规则按用户“执行”限[一次纯合成p01](../acceptance/phase-1.5-sol-compatibility-once-p01/RESULTS.md)实际验证通过；1HTTP/正确引用/错误检出，对照无误报，非课程或独立质量准入，生产保持。
