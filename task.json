@@ -2434,7 +2434,8 @@
         "PHASE-1.5-T060",
         "PHASE-1.5-T061",
         "PHASE-1.5-T063",
-        "PHASE-1.5-T064"
+        "PHASE-1.5-T064",
+        "PHASE-1.5-T065"
       ],
       "scope": [
         "scripts/",
@@ -2525,7 +2526,7 @@
       "completed_at": null,
       "blocker": "最终d02首次规划HTTP200/JSON Schema通过，但obj_two_scenes未被任何场景引用，原本地覆盖校验拒绝SCHEMA_INVALID；按批准的一次性规则1请求后停止。场景v5及sol未执行，不能推断其质量；本路线按用户要求转方案重评，不再补Prompt或重试。",
       "commit_lookup": "Task-Completed: PHASE-1.5-T038",
-      "execution_gate": "最终d02已stopped/threshold_unreachable，1complete/0unknown；剩余4请求不构成重启或修复许可。仅零调用收尾与方案重评，新的方案/契约/真实测试须另获具体授权；不自动继续其余33槽。",
+      "execution_gate": "最终d02已stopped/threshold_unreachable，1complete/0unknown；剩余4请求不构成重启或修复许可。仅零调用收尾与方案重评，新的方案/契约/真实测试须另获具体授权；不自动继续其余33槽。 用户最新确认先完成T065这一规划补丁，再以新准确包正式测试后重评；旧批次仍停止。",
       "scoped_observations": [
         {
           "batch_id": "p15-aiapi-minimal-r01",
@@ -3011,6 +3012,47 @@
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T064",
       "execution_gate": "仅本轮最后一次离线语义修复；不放宽审核协议、不真实调用或重启旧批次，不调整教学阈值。后续冻结真实复测出现新实质错误则停止补丁并重新评估方案。"
+    },
+    {
+      "id": "PHASE-1.5-T065",
+      "phase": "Phase 1.5",
+      "title": "为规划生成分离编排约束与学习目标并明确覆盖约定",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T064"
+      ],
+      "scope": [
+        "backend/app/agents/",
+        "backend/tests/",
+        "docs/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5；用户明确确认继续修复规划目标/编排约束混杂与漏引用，完成一次正式调用测试后再重评",
+      "acceptance_criteria": [
+        "规划请求v2明确学习目标与场景数/语言/形式等编排约束的区别，约束通过原场景结构/约定表达，完整保留用户要求与未知学情。",
+        "所有学习目标仍须真实被场景覆盖，原Schema/来源/依赖/覆盖验证器不变；不自动补引用、删除真实学习目标或修写旧失败。",
+        "离线回归原d02拒绝及正确反例，实际PG验证历史v1/新v2请求与审计共存/owner/幂等及私有权限保持；准备独立正式测试包，真实执行另需准确预算/窗口授权。"
+      ],
+      "verification": [
+        "cd backend && .venv/bin/python -m pytest tests/test_free_plan_objective_contract.py -q --junitxml=/tmp/edumind-t065-unit.xml",
+        "python3 docs/acceptance/phase-1.5-planning-objectives-t065/run_pg_offline.py",
+        "cd backend && .venv/bin/mypy app/agents/free_course_planning.py",
+        "backend/.venv/bin/ruff check backend/app/agents/free_course_planning.py backend/tests/test_free_plan_objective_contract.py backend/tests/test_free_plan_objective_contract_pg.py",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [
+        "181 passed / 0skip: new unit9 + actual PG new1/old59 + generation54 + availability19 + scheduler39; no real Provider.",
+        "Original validator body and output Schema bytes unchanged vs434fcb5; original d02 eight private evidence hashes unchanged. History v1 failed audit, terminal fence, explicit new operation and v2 audit coexist; owner/idempotency/immutability/head remain enforced.",
+        "mypy1 source/Ruff/workflow/diff passed. Initial PG fixture precondition/cleanup failures corrected using original POLICY and no capacity lease, fresh DB group rerun without assertion weakening. Dedicated PG retained only for next offline package tests; no actual execution authorized by completion. Evidence docs/acceptance/phase-1.5-planning-objectives-t065/README.md."
+      ],
+      "started_at": "2026-10-28T10:03:32+08:00",
+      "completed_at": "2026-10-28T10:26:18+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T065",
+      "execution_gate": "用户最新明确授权这一个规划补丁，并要求正式测试后再重评；不改变场景v5/审核标准，不重启d02或继承旧窗口，未授权任意结构/语义自动修复。"
     }
   ],
   "planning_inputs": {

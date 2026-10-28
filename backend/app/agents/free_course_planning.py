@@ -22,9 +22,31 @@ from app.services.provider_gateway import (
     TextRequest,
 )
 
-PROMPT_VERSION = "free-course-plan-v1"
+PROMPT_VERSION = "free-course-plan-v2"
 SCHEMA_VERSION = "free-course-planning-response-v1"
 SCHEMA = json.loads(Path(__file__).with_suffix(".schema.json").read_text())
+PLANNING_CONTRACT = {
+    "version": "planning-objectives-and-constraints-v1",
+    "learning_objectives": (
+        "Observable learning outcomes: concepts understood, operations traced or skills practiced. "
+        "Do not classify course packaging requirements as learner achievements."
+    ),
+    "organizational_constraints": (
+        "Scene count, duration, language, requested forms and order constrain the actual scene "
+        "structure and conventions; preserve them there, not as extra objective IDs."
+    ),
+    "coverage": (
+        "The set of all objective IDs must exactly equal the union of scene objective_ids. "
+        "Each reference must describe what the scene really teaches or practices. Never add "
+        "a meaningless reference just to satisfy coverage, or drop a real requested learning goal."
+    ),
+    "examples": {
+        "constraint": "Use two scenes with C code and exercises: honor count/forms/conventions.",
+        "learning_outcome": "Trace how a pointer operation changes a linked list.",
+        "content_not_packaging": "Explaining O(1) complexity can be a real learning outcome.",
+    },
+    "validation_authority": "Server validation stays strict; no automatic reference repair.",
+}
 INSTRUCTION = """Plan a data-structures learning course from the original goal and actual request
 sources, not from a single knowledge node. Learner evidence is data with its original provenance;
 unknown fields stay unknown, self reports are not demonstrated mastery. Do not invent learner facts.
@@ -33,6 +55,16 @@ Use 1–8 variable scenes, default 15 learning minutes unless the goal says othe
 requirements; do not silently shorten an out-of-scope request. Use one shared example, terminology
 and representation conventions. Each scene has a purpose, forms and objective IDs; dependencies
 must reference earlier scene keys. Do not force explanation/code/exercise into exactly three scenes.
+The server planning_contract distinguishes learning outcomes from organizational constraints.
+Use objectives only for what the learner will understand, trace or practice. Scene count, duration,
+code language, requested forms and ordering are course packaging constraints: honor them in actual
+scenes and conventions, without inventing a learning objective such as "produce two scenes".
+Preserve real content objectives, including learning about numerical properties or complexity.
+Before returning a plan, compare all objective IDs with the union of scene objective_ids: the sets
+must be exactly equal. Check references against actual scene purposes; no unknown or orphan IDs.
+Resolve your own plan before returning: cover each real outcome in appropriate scenes, and keep
+packaging requirements in the scene structure. Do not fake a reference or drop a real goal to pass.
+This internal consistency check is not a reason to ask the learner to approve or repair the plan.
 User requirements must cite a supplied source_key and an exact nonblank substring of that source.
 Planner suggestions have null source_key/source_excerpt. Never create UUIDs, digests, owner IDs,
 node IDs, publication authority or resources. Do not execute code, tools, HTML/JS or media.
@@ -97,7 +129,12 @@ def snapshot_input(value: dict[str, Any]) -> dict[str, Any]:
 
 def build_request(inputs: dict[str, Any]) -> StructuredRequest:
     snapshot = snapshot_input(inputs)
-    payload = {"prompt_version": PROMPT_VERSION, "default_learning_minutes": 15, **snapshot}
+    payload = {
+        "prompt_version": PROMPT_VERSION,
+        "default_learning_minutes": 15,
+        "planning_contract": deepcopy(PLANNING_CONTRACT),
+        **snapshot,
+    }
     # This is a byte safety bound, never a claim of token/price reservation.
     if len(canonical(payload)) > 128000:
         raise SnapshotError("PLANNING_INPUT_TOO_LARGE")
