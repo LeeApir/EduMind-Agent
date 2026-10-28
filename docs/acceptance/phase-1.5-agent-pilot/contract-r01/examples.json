@@ -1,0 +1,216 @@
+{
+  "version": "pilot-contract-examples-v1",
+  "purpose": "已见开发手算种子，禁止作为独立评估样本",
+  "cases": [
+    {
+      "id": "dev-normal",
+      "spec": {
+        "version": "head-insertion-spec-v1",
+        "initial_values": [],
+        "insert_values": [
+          1,
+          2,
+          3
+        ],
+        "variant": "normal",
+        "allocation_success": [
+          true,
+          true,
+          true
+        ]
+      },
+      "expected": {
+        "caller_head": "t2",
+        "reachable_prefix": [
+          3,
+          2,
+          1
+        ],
+        "traversal_status": "terminated",
+        "cycle_entry": null,
+        "allocation_failures": 0,
+        "unreachable_allocated_ids": []
+      },
+      "oracle_source": "手工按固定模板逐语句推导；助手设计草案，非人工独立签核"
+    },
+    {
+      "id": "dev-cycle",
+      "spec": {
+        "version": "head-insertion-spec-v1",
+        "initial_values": [
+          9
+        ],
+        "insert_values": [
+          4
+        ],
+        "variant": "reversed_assignment",
+        "allocation_success": [
+          true
+        ]
+      },
+      "expected": {
+        "caller_head": "t0",
+        "reachable_prefix": [
+          4
+        ],
+        "traversal_status": "cycle",
+        "cycle_entry": "t0",
+        "allocation_failures": 0,
+        "unreachable_allocated_ids": [
+          "i0"
+        ]
+      },
+      "oracle_source": "手工按固定模板逐语句推导；助手设计草案，非人工独立签核"
+    },
+    {
+      "id": "dev-discard",
+      "spec": {
+        "version": "head-insertion-spec-v1",
+        "initial_values": [
+          9
+        ],
+        "insert_values": [
+          1,
+          2
+        ],
+        "variant": "discard_return",
+        "allocation_success": [
+          true,
+          true
+        ]
+      },
+      "expected": {
+        "caller_head": "i0",
+        "reachable_prefix": [
+          9
+        ],
+        "traversal_status": "terminated",
+        "cycle_entry": null,
+        "allocation_failures": 0,
+        "unreachable_allocated_ids": [
+          "t0",
+          "t1"
+        ]
+      },
+      "oracle_source": "手工按固定模板逐语句推导；助手设计草案，非人工独立签核"
+    },
+    {
+      "id": "dev-indeterminate",
+      "spec": {
+        "version": "head-insertion-spec-v1",
+        "initial_values": [],
+        "insert_values": [
+          1
+        ],
+        "variant": "uninitialized_next",
+        "allocation_success": [
+          true
+        ]
+      },
+      "expected": {
+        "caller_head": "t0",
+        "reachable_prefix": [
+          1
+        ],
+        "traversal_status": "indeterminate",
+        "cycle_entry": null,
+        "allocation_failures": 0,
+        "unreachable_allocated_ids": []
+      },
+      "oracle_source": "手工按固定模板逐语句推导；助手设计草案，非人工独立签核"
+    },
+    {
+      "id": "dev-mixed-failure",
+      "spec": {
+        "version": "head-insertion-spec-v1",
+        "initial_values": [
+          9
+        ],
+        "insert_values": [
+          1,
+          2,
+          3
+        ],
+        "variant": "normal",
+        "allocation_success": [
+          true,
+          false,
+          true
+        ]
+      },
+      "expected": {
+        "caller_head": "t2",
+        "reachable_prefix": [
+          3,
+          1,
+          9
+        ],
+        "traversal_status": "terminated",
+        "cycle_entry": null,
+        "allocation_failures": 1,
+        "unreachable_allocated_ids": []
+      },
+      "oracle_source": "手工按固定模板逐语句推导；助手设计草案，非人工独立签核"
+    },
+    {
+      "id": "dev-all-failure",
+      "spec": {
+        "version": "head-insertion-spec-v1",
+        "initial_values": [
+          9
+        ],
+        "insert_values": [
+          1,
+          2
+        ],
+        "variant": "reversed_assignment",
+        "allocation_success": [
+          false,
+          false
+        ]
+      },
+      "expected": {
+        "caller_head": "i0",
+        "reachable_prefix": [
+          9
+        ],
+        "traversal_status": "terminated",
+        "cycle_entry": null,
+        "allocation_failures": 2,
+        "unreachable_allocated_ids": []
+      },
+      "oracle_source": "手工按固定模板逐语句推导；助手设计草案，非人工独立签核"
+    }
+  ],
+  "rejections": [
+    {
+      "id": "unknown-variant",
+      "change": {
+        "variant": "arbitrary"
+      }
+    },
+    {
+      "id": "too-many-insertions",
+      "change": {
+        "insert_values": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      }
+    },
+    {
+      "id": "arbitrary-code",
+      "change": {
+        "code": "custom C source"
+      }
+    },
+    {
+      "id": "unsupported-question",
+      "question": "在uninitialized_next成功分配后给出精确完整遍历输出",
+      "expected": "unsupported_question"
+    }
+  ]
+}
