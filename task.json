@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "T076 p02最小对照完成：S1带type严格通过、S2仅删type得到匹配400，批次终止。下一步仅离线相关角色等价Schema适配和最小准入包准备，未有新真实额度/课程授权，T038/catalog_only/H保持。",
+    "phase_gate": "T076完成最小enum拒绝观察，T077完成离线等价类型及三角色准确包；T078待ADR0045/准确新3HTTP批准，尚未角色准入/课程，无新模型调用，旧账本/教学标准不变。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -3628,6 +3628,93 @@
       "started_at": "2026-10-28T20:47:46+08:00",
       "completed_at": "2026-10-28T21:12:16+08:00",
       "execution_gate": "准确批准下新p02两请求合规终止，S1带type 200/严格通过、S2仅删type得到匹配400；最小enum拒绝已观察，原完整Schema/角色/课程未准入，禁止续批。"
+    },
+    {
+      "id": "PHASE-1.5-T077",
+      "phase": "Phase 1.5",
+      "title": "离线冻结C链角色Schema等价适配及三请求协议准入包",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T076"
+      ],
+      "scope": [
+        "scripts/",
+        "docs/acceptance/phase-1.5-schema-compatibility/",
+        "docs/ADR/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5；用户要求准确Schema/端点兼容后先产出一份可评课程，T076最小enum-only拒绝已观察",
+      "acceptance_criteria": [
+        "只对相关C规划/内容/审核Schema的字符串enum/const增加逻辑蕴含的type:string，保留所有原约束和完整本地Schema验证，不删未知支持关键字、改变教学Prompt或放宽标准。",
+        "冻结三个手写纯合成协议echo fixture，各满足原Schema与适配Schema；保持DeepSeek生成/AIAPI sol审核实际角色模型/参数、已知phase/审核元数据有限处理，0真实课程或私有真值。",
+        "准备一次性最多3HTTP（每实际角色Schema各1）的新准入入口，逐角色完整响应/准确JSON/原Schema通过才推进，任何异常终止；准确外发/窗口/占额/货币边界新批准前不读Key/出站。",
+        "离线验证等价变换反例、所有角色fixture、授权/时钟/来源/预算/停止/证据原件及字段兼容，旧p01/p02和账本/源码不变；交准确执行包与未满足课程准入清单。"
+      ],
+      "verification": [
+        "PYTHONPATH=backend:. backend/.venv/bin/python -m pytest scripts/tests/test_p15_role_schema_contract.py scripts/tests/test_p15_role_schema_probe.py scripts/tests/test_p15_schema_probe_p02.py scripts/tests/test_p15_schema_probe.py scripts/tests/test_p15_schema_audit.py scripts/tests/test_p15_pilot_wire_execution.py -q --tb=short --junitxml=/private/tmp/edumind-p15-t077-full.xml",
+        "MYPYPATH=backend:. backend/.venv/bin/mypy --strict --explicit-package-bases --follow-imports=silent scripts/isolated_diagnostics/p15_role_schema_contract.py scripts/isolated_diagnostics/p15_role_schema_probe.py scripts/run_p15_role_schema_probe.py",
+        "backend/.venv/bin/ruff check scripts/isolated_diagnostics/p15_role_schema_contract.py scripts/isolated_diagnostics/p15_role_schema_probe.py scripts/run_p15_role_schema_probe.py scripts/tests/test_p15_role_schema_contract.py scripts/tests/test_p15_role_schema_probe.py",
+        "PYTHONPATH=backend:. backend/.venv/bin/python scripts/run_p15_role_schema_probe.py --check",
+        "pending --run credential trap: exit2 before credential/output; old p01/p02 frozen hashes",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [
+        {
+          "date": "2026-10-28T22:11:24+08:00",
+          "commands": [
+            "PYTHONPATH=backend:. backend/.venv/bin/python -m pytest scripts/tests/test_p15_role_schema_contract.py scripts/tests/test_p15_role_schema_probe.py scripts/tests/test_p15_schema_probe_p02.py scripts/tests/test_p15_schema_probe.py scripts/tests/test_p15_schema_audit.py scripts/tests/test_p15_pilot_wire_execution.py -q --tb=short --junitxml=/private/tmp/edumind-p15-t077-full.xml",
+            "MYPYPATH=backend:. backend/.venv/bin/mypy --strict --explicit-package-bases --follow-imports=silent scripts/isolated_diagnostics/p15_role_schema_contract.py scripts/isolated_diagnostics/p15_role_schema_probe.py scripts/run_p15_role_schema_probe.py",
+            "backend/.venv/bin/ruff check scripts/isolated_diagnostics/p15_role_schema_contract.py scripts/isolated_diagnostics/p15_role_schema_probe.py scripts/run_p15_role_schema_probe.py scripts/tests/test_p15_role_schema_contract.py scripts/tests/test_p15_role_schema_probe.py",
+            "PYTHONPATH=backend:. backend/.venv/bin/python scripts/run_p15_role_schema_probe.py --check",
+            "pending --run credential trap: exit2 before credential/output; old p01/p02 frozen hashes",
+            "python3 scripts/check_catalog_workflow.py",
+            "git diff --check"
+          ],
+          "result": "404 passed0skip（新51等价/fixture+97执行/安全+既有256）；严格mypy3源/Ruff/预检/pending门禁/旧冻结与工作流通过。62文件manifest 12168a9918f234b467cf94800b2fd5177f4ac4a47ca8d637642d12e0307f8e02；仅逻辑等价type显式化5/1/4处，原教学Prompt/所有约束保留，新增模型调用0，真实角色输出目录未创建、Key未读。",
+          "evidence": "docs/acceptance/phase-1.5-schema-compatibility/role-probe-r01/README.md"
+        }
+      ],
+      "started_at": "2026-10-28T21:16:05+08:00",
+      "completed_at": "2026-10-28T22:11:24+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T077",
+      "execution_gate": "离线准备完成；ADR0045 A—C和62文件manifest 12168a9918f234b467cf94800b2fd5177f4ac4a47ca8d637642d12e0307f8e02待准确批准，T078新3HTTP/300秒/两服务合成外发/金额例外未获准；角色完整准入后才准备课程，旧批不续。"
+    },
+    {
+      "id": "PHASE-1.5-T078",
+      "phase": "Phase 1.5",
+      "title": "按准确三角色合成包验证课程前置协议准入",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T077"
+      ],
+      "scope": [
+        "docs/acceptance/phase-1.5-schema-compatibility/",
+        "docs/ADR/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5；用户要求兼容通过后再准备可评课程",
+      "acceptance_criteria": [
+        "准确包/两服务合成外发/新窗口及预算与费用边界获准后才登记唯一新批，不恢复旧批。",
+        "每角色最多1HTTP，逐个完整协议/原Schema/准确fixture通过才推进，失败保留原件和未运行，不重试/修Schema补发/回退。",
+        "只读复核完整请求/响应/事件/用量与来源，分别报告各角色兼容及缺失；全部通过后才准备单份课程可行性，不将fixture算教学质量或T038分子。"
+      ],
+      "verification": [
+        "待实际执行：新角色准入run/check-results，仅准确批准后",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T078",
+      "execution_gate": "T077准确62文件manifest 12168a9918f234b467cf94800b2fd5177f4ac4a47ca8d637642d12e0307f8e02就绪；待ADR0045 A—C及新3HTTP/300秒/两服务合成外发/费用例外批准，不领取，无课程调用授权。"
     }
   ],
   "planning_inputs": {

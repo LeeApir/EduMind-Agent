@@ -1,0 +1,49 @@
+{
+  "scope": "PHASE-1.5-T078",
+  "version": "role-schema-protocol-v1",
+  "limits": {
+    "requests": 3,
+    "input_reservation": 24576,
+    "output_reservation": 8192,
+    "fee_cap": null,
+    "wall_seconds": 300,
+    "per_request_seconds": 90,
+    "dns_seconds": 9,
+    "request_bytes": 16384,
+    "response_bytes": 65536
+  },
+  "requests": [
+    {
+      "name": "S1",
+      "stage": "C_plan",
+      "role": "generation",
+      "url": "https://api.deepseek.com/responses",
+      "model": "deepseek-flash",
+      "reasoning": "none",
+      "input_reservation": 8192,
+      "max_output_tokens": 2048
+    },
+    {
+      "name": "S2",
+      "stage": "C_content",
+      "role": "generation",
+      "url": "https://api.deepseek.com/responses",
+      "model": "deepseek-flash",
+      "reasoning": "none",
+      "input_reservation": 8192,
+      "max_output_tokens": 2048
+    },
+    {
+      "name": "S3",
+      "stage": "B_C_review",
+      "role": "review",
+      "url": "https://aiapi.world/v1/responses",
+      "model": "gpt-6.1-sol",
+      "reasoning": "low",
+      "input_reservation": 8192,
+      "max_output_tokens": 4096
+    }
+  ],
+  "production": false,
+  "course_calls": false
+}
