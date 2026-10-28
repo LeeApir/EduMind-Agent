@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "T078完成受控证据采集但三角色协议未准入：DeepSeek规划通过、内容Schema400、AIAPI审核未发；批次终止。课程前置阻塞；只可先离线具体兼容方案，新真实调用须另批。T038/catalog_only/H及原教学标准保持。",
+    "phase_gate": "T079离线联合类型等价提案及450项回归完成，ADR0046未批准采用，远端anyOf支持未证；无新真实额度/入口。T078已终止、课程前置仍阻塞；先另备准确最小包并批准后才能探测，T038/catalog_only/H保持。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -3730,6 +3730,60 @@
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T078",
       "execution_gate": "准确包已一次性终止：规划准入1/3，内容Schema400拒绝，审核未运行；只完成受控验证任务，不等于协议准入。课程前置阻塞，不继承未用额度或窗口，后续兼容变更/真实探测须另案。"
+    },
+    {
+      "id": "PHASE-1.5-T079",
+      "phase": "Phase 1.5",
+      "title": "离线提出保持接受集合的联合类型兼容方案及反例",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T078"
+      ],
+      "scope": [
+        "scripts/isolated_diagnostics/",
+        "scripts/tests/",
+        "docs/ADR/",
+        "docs/acceptance/phase-1.5-schema-compatibility/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5；用户认可先离线设计等价兼容方案，T078内容Schema拒绝后禁止补发",
+      "acceptance_criteria": [
+        "准确对照T078已接受规划与被拒内容Schema，仅把类型联合列为候选解释，不猜唯一拒绝字段。",
+        "交付type数组到anyOf的隔离纯离线提案，保持全部类型及原长度/结构/事实引用约束；证明改写接受集合等价并用手写正反例验证，原教学链/源码/Prompt与旧冻结不变。",
+        "提出最多两请求的等价表示最小对照及解释/停止矩阵，不建立真实调用入口、不读取Key/续旧批或准备课程；明确协议与教学门禁仍未解除。"
+      ],
+      "verification": [
+        "PYTHONPATH=backend:. backend/.venv/bin/python -m pytest scripts/tests/test_p15_union_schema_proposal.py scripts/tests/test_p15_role_schema_contract.py scripts/tests/test_p15_role_schema_probe.py scripts/tests/test_p15_schema_probe_p02.py scripts/tests/test_p15_schema_probe.py scripts/tests/test_p15_schema_audit.py scripts/tests/test_p15_pilot_wire_execution.py -q --tb=short --junitxml=/private/tmp/edumind-p15-t079.xml",
+        "MYPYPATH=backend:. backend/.venv/bin/mypy --strict --explicit-package-bases --follow-imports=silent scripts/isolated_diagnostics/p15_union_schema_proposal.py",
+        "backend/.venv/bin/ruff check scripts/isolated_diagnostics/p15_union_schema_proposal.py scripts/tests/test_p15_union_schema_proposal.py",
+        "PYTHONPATH=backend:. backend/.venv/bin/python scripts/run_p15_role_schema_probe.py --check",
+        "old p01/p02/role-probe-r01 all frozen file hashes unchanged",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [
+        {
+          "date": "2026-10-28T22:36:40+08:00",
+          "commands": [
+            "PYTHONPATH=backend:. backend/.venv/bin/python -m pytest scripts/tests/test_p15_union_schema_proposal.py scripts/tests/test_p15_role_schema_contract.py scripts/tests/test_p15_role_schema_probe.py scripts/tests/test_p15_schema_probe_p02.py scripts/tests/test_p15_schema_probe.py scripts/tests/test_p15_schema_audit.py scripts/tests/test_p15_pilot_wire_execution.py -q --tb=short --junitxml=/private/tmp/edumind-p15-t079.xml",
+            "MYPYPATH=backend:. backend/.venv/bin/mypy --strict --explicit-package-bases --follow-imports=silent scripts/isolated_diagnostics/p15_union_schema_proposal.py",
+            "backend/.venv/bin/ruff check scripts/isolated_diagnostics/p15_union_schema_proposal.py scripts/tests/test_p15_union_schema_proposal.py",
+            "PYTHONPATH=backend:. backend/.venv/bin/python scripts/run_p15_role_schema_probe.py --check",
+            "old p01/p02/role-probe-r01 all frozen file hashes unchanged",
+            "python3 scripts/check_catalog_workflow.py",
+            "git diff --check"
+          ],
+          "result": "450 passed0skip（新46+既有404）、mypy1源/Ruff/工作流/旧冻结通过；类型联合改anyOf的原约束完整反向还原及手写正反例通过，规划0/内容2/审核1处。首轮共享引用漏记路径失败已保留断言修复，后新增number/integer重叠用例通过。69文件离线提案manifest 58ce182ab773c3e0c0a145ea6408c3a867f087c26e8a6b64f1a8e7e3a7b8db7c；无HTTP入口/Key读取/真实调用，原教学链不变。",
+          "evidence": "docs/acceptance/phase-1.5-schema-compatibility/union-proposal-r01/README.md"
+        }
+      ],
+      "started_at": "2026-10-28T22:28:15+08:00",
+      "completed_at": "2026-10-28T22:36:40+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T079",
+      "execution_gate": "ADR0046 A—C及69文件离线提案已交付，未采用/执行；未来最小两请求仍需完整独立执行包、价格与金额预算及准确批准；相关角色/课程前置未解除，不续旧批。"
     }
   ],
   "planning_inputs": {
