@@ -3163,7 +3163,7 @@
       "id": "PHASE-1.5-T068",
       "phase": "Phase 1.5",
       "title": "实现共享示例驱动的多Agent隔离协作原型",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1.5-T067"
@@ -3187,12 +3187,24 @@
         "python3 scripts/check_catalog_workflow.py",
         "git diff --check"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "date": "2026-10-28T11:55:21+08:00",
+          "commands": [
+            "PYTHONPATH=backend:. backend/.venv/bin/python -m pytest scripts/tests/test_p15_agent_pilot.py scripts/tests/test_p15_head_insertion_engine.py -q --junitxml=/tmp/edumind-p15-t068.xml",
+            "MYPYPATH=backend:. backend/.venv/bin/mypy --strict --explicit-package-bases --follow-imports=silent scripts/isolated_diagnostics/p15_agent_pilot.py scripts/isolated_diagnostics/p15_agent_pilot_mock.py scripts/run_p15_agent_pilot_mock.py",
+            "backend/.venv/bin/python scripts/run_p15_agent_pilot_mock.py --output /private/tmp/edumind-p15-t068-development-r01",
+            "Ruff / workflow / git diff --check"
+          ],
+          "result": "协作42+引擎50=92 passed0skip，3逻辑Mock演示、类型3源及其他检查通过，真实0；初始类型包名和输出链接拒绝见交接",
+          "evidence": "docs/acceptance/phase-1.5-agent-pilot/t068/README.md"
+        }
+      ],
+      "started_at": "2026-10-28T11:50:42+08:00",
+      "completed_at": "2026-10-28T11:55:21+08:00",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T068",
-      "execution_gate": "本次仅任务规划，不领取或执行。用户另向开发助手下达执行指令；T066具体契约须批准，T069真实调用须准确包与预算批准；T070留给指定评估助手。"
+      "execution_gate": "ADR0041已批准，T067完成58169ed；仅Mock Gateway隔离协作与故障测试，无真实配置入口。"
     },
     {
       "id": "PHASE-1.5-T069",
