@@ -71,7 +71,7 @@ def test_advisory_is_private_bound_append_only_and_never_confirms_a_quality_deci
                 )
                 assert (
                     second["state"] == "accepted"
-                    and second["rule_version"] == "free-scene-hard-gate-v3"
+                    and second["rule_version"] == "free-scene-hard-gate-v4"
                 )
                 assert first["validation_id"] != second["validation_id"]
                 with pytest.raises(SnapshotError, match="NOT_FOUND"):
@@ -86,7 +86,7 @@ def test_advisory_is_private_bound_append_only_and_never_confirms_a_quality_deci
                 ).all()
                 assert len(rows) == 2
                 previous = next(r for r in rows if r.rule_version == "free-scene-hard-gate-v2")
-                current = next(r for r in rows if r.rule_version == "free-scene-hard-gate-v3")
+                current = next(r for r in rows if r.rule_version == "free-scene-hard-gate-v4")
                 assert previous.findings == []
                 assert previous.raw_digest == current.raw_digest
                 assert previous.cleaned_digest == current.cleaned_digest

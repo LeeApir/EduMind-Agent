@@ -49,7 +49,7 @@ def test_rule_upgrade_keeps_old_facts_and_original_code_without_publishing(
                 second = await validation.validate_candidate(db, owner, cid, fence, result_id=rid)
                 replay = await validation.validate_candidate(db, owner, cid, fence, result_id=rid)
                 assert second == replay and first["validation_id"] != second["validation_id"]
-                assert second["rule_version"] == "free-scene-hard-gate-v3"
+                assert second["rule_version"] == "free-scene-hard-gate-v4"
                 cleaned = second["cleaned"]["content"]["blocks"][0]["markdown"]
                 assert "int scores[6];" in cleaned and "#include <stdio.h>" in cleaned
                 assert r'printf("%d\n", scores[3]);' in cleaned
@@ -66,7 +66,7 @@ def test_rule_upgrade_keeps_old_facts_and_original_code_without_publishing(
                 ).all()
                 assert len(rows) == 2 and {r.rule_version for r in rows} == {
                     "free-scene-hard-gate-v1",
-                    "free-scene-hard-gate-v3",
+                    "free-scene-hard-gate-v4",
                 }
                 previous = next(r for r in rows if r.rule_version == "free-scene-hard-gate-v1")
                 assert (

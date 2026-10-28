@@ -24,7 +24,7 @@ from app.services.free_scene_consistency import check_consistency
 from app.services.free_scene_generation import load_inputs
 from app.services.free_scene_markdown import clean_code_markdown
 
-RULE_VERSION = "free-scene-hard-gate-v3"
+RULE_VERSION = "free-scene-hard-gate-v4"
 
 
 def clean_markdown(value: str) -> str:

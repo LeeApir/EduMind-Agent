@@ -2521,7 +2521,7 @@
       "completed_at": null,
       "blocker": "D02 d01真实4HTTP后因sol reasoning项额外metadata/internal_chat_message_metadata_passthrough触发NONEMPTY_OR_UNKNOWN_REASONING_ITEM，1unknown；助手独立盲核另发现q3把自环遍历误作有限序列2，答案不可靠。两原错误本样本未重现不等于稳定修好；禁止本批重启或补发。",
       "commit_lookup": "Task-Completed: PHASE-1.5-T038",
-      "execution_gate": "d01已stopped/UNKNOWN_SEND，4HTTP/3complete1unknown，剩余预算不作为重启许可；本次仅零调用取证和交接。其余33槽/新探测/契约修改/完整T038未授权。",
+      "execution_gate": "d01已stopped/UNKNOWN_SEND，4HTTP/3complete1unknown，剩余预算不作为重启许可；本次仅零调用取证和交接。其余33槽/新探测/契约修改/完整T038未授权。 T064离线修复不代表新真实质量通过；用户指定后续冻结复测若出现新实质错误，停止补丁并重新评估方案。",
       "scoped_observations": [
         {
           "batch_id": "p15-aiapi-minimal-r01",
@@ -2969,7 +2969,7 @@
       "id": "PHASE-1.5-T064",
       "phase": "Phase 1.5",
       "title": "对齐链表状态题的代码变体、结果范围与环语义观察",
-      "status": "in_progress",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1.5-T062",
@@ -2990,11 +2990,20 @@
         "冻结开发用例矩阵后实现，原d01/r05、改名/正确/受限遍历/未知语法及PG版本共存回归必须通过；任一新增实质性失败则记录并停止追加修补，真实复测待独立准确授权，不重启旧包。"
       ],
       "verification": [
-        "实现并执行对应单元/隔离PG-Mock、mypy/Ruff、工作流和diff检查"
+        "cd backend && .venv/bin/python -m pytest tests/test_free_scene_last_repair.py tests/test_free_scene_consistency.py tests/test_free_scene_markdown.py tests/test_free_scene_semantics.py tests/test_free_scene_answer_contract.py tests/test_free_scene_form_contract.py -q --junitxml=/tmp/edumind-t064-unit.xml",
+        "python3 docs/acceptance/phase-1.5-last-semantic-repair-t064/run_pg_offline.py",
+        "cd backend && .venv/bin/mypy app/services/free_scene_pointer_trace.py app/services/free_scene_question_scope.py app/services/free_scene_consistency.py app/services/free_scene_semantics.py app/agents/free_scene_generation.py app/services/free_scene_validation.py",
+        "Ruff on all changed backend sources/tests; see README",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
       ],
-      "verification_results": [],
+      "verification_results": [
+        "302 passed / 0skip: unit133 (new34 + old99); actual isolated PG-Mock6 + generation54 + validation40 + availability19 + scheduler39 + feedback11.",
+        "Original d01 one cycle/finite-answer contradiction found, four returned-head false alarms removed; old r05 two finding classes (4 rows) retained, renamed/correct/bounded/unknown cases pass. Actual historical v3/v1 advice preserved, v4/v2 only appended; raw/cleaned answers, owner, idempotency and quality/head rights unchanged.",
+        "mypy6 sources/Ruff/workflow/diff passed; pinned historical d01 result checker expected exit2 confirms old stop. PG exited, real0; T038 still blocked. Evidence docs/acceptance/phase-1.5-last-semantic-repair-t064/README.md."
+      ],
       "started_at": "2026-10-28T00:43:38+08:00",
-      "completed_at": null,
+      "completed_at": "2026-10-28T08:19:19+08:00",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T064",
       "execution_gate": "仅本轮最后一次离线语义修复；不放宽审核协议、不真实调用或重启旧批次，不调整教学阈值。后续冻结真实复测出现新实质错误则停止补丁并重新评估方案。"

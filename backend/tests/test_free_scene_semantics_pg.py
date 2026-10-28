@@ -93,7 +93,7 @@ def test_v4_semantic_request_keeps_actual_v3_facts_immutable(tmp_path, monkeypat
             new_gateway = Gateway(closed_candidate())
             new_outcome = await agent.generate_once(new_gateway, data, authorize_send=authorize)
             payload = json.loads(new_gateway.requests[0].prompt.messages[-1].content)
-            assert payload["prompt_version"] == "free-scene-generation-v4"
+            assert payload["prompt_version"] == "free-scene-generation-v5"
             assert (
                 payload["response_contract"]["semantic_contract"]["semantic_correctness_verified"]
                 is False
@@ -140,7 +140,7 @@ def test_v4_semantic_request_keeps_actual_v3_facts_immutable(tmp_path, monkeypat
                 assert len(rows) == 2
                 assert {r.prompt_version for r in rows} == {
                     "free-scene-generation-v3",
-                    "free-scene-generation-v4",
+                    "free-scene-generation-v5",
                 }
                 previous = next(r for r in rows if r.id == UUID(old["result_id"]))
                 assert previous.response_json == old_raw and previous.response_digest == old_digest

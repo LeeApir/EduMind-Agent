@@ -7,7 +7,7 @@ from typing import Any
 
 from pycparser import c_ast, c_parser  # type: ignore[import-untyped]
 
-CONTRACT_VERSION = "free-course-c-semantics-v1"
+CONTRACT_VERSION = "free-course-c-semantics-v2"
 PRINCIPLES = [
     {
         "id": "c-value-parameters",
@@ -51,6 +51,50 @@ PRINCIPLES = [
         ),
     },
 ]
+PRINCIPLES.extend(
+    [
+        {
+            "id": "shown-program-variant",
+            "requirement": (
+                "A question that changes code must show the exact complete variant in a"
+                " dedicated C code "
+                "block with its own anchor, and name that anchor. Do not ask readers to execute an "
+                "unstated rewrite, omit operations, or silently reuse an incompatible "
+                "original program."
+            ),
+        },
+        {
+            "id": "observation-scope-and-termination",
+            "requirement": (
+                "Distinguish function-local checkpoints, caller-final state, first k "
+                "traversal steps, "
+                "distinct reachable nodes, and traversal until NULL. A cycle repeats "
+                "visits and has no "
+                "finite tail. A self-loop is not the finite one-element output "
+                "sequence. Never silently "
+                "deduplicate, truncate, assume termination, or confuse allocation "
+                "failure with success."
+            ),
+        },
+        {
+            "id": "answer-domain-audit",
+            "requirement": (
+                "For each code-state question, derive pointer links after each relevant"
+                " assignment, state "
+                "the allocation/input assumptions and stopping condition, and check the"
+                " reference key "
+                "against that outcome. Include nontermination, undefined behavior, or "
+                "indeterminacy when "
+                "applicable. For choice questions the genuine result must be present exactly once; "
+                "otherwise rewrite or omit the question instead of selecting an "
+                "incorrect finite option. "
+                "Deliberately discarded returns can be valid fault questions: judge the"
+                " stated outcome, "
+                "not merely the presence of a discarded call."
+            ),
+        },
+    ]
+)
 MAX_CODE_BYTES = 16384
 MAX_AST_NODES = 3000
 _COMMENT_OR_LITERAL = re.compile(r'"(?:\\.|[^"\\])*"|\'(?:\\.|[^\'\\])*\'|/\*.*?\*/|//[^\n]*', re.S)

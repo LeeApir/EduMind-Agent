@@ -113,8 +113,8 @@ def test_request_binds_exact_necessary_code_and_preserves_original_inputs_schema
     request = build_request(data)
     payload = json.loads(request.prompt.messages[-1].content)
     contract = payload["response_contract"]["semantic_contract"]
-    assert payload["prompt_version"] == "free-scene-generation-v4"
-    assert contract["version"] == "free-course-c-semantics-v1"
+    assert payload["prompt_version"] == "free-scene-generation-v5"
+    assert contract["version"] == "free-course-c-semantics-v2"
     assert contract["semantic_correctness_verified"] is False
     assert contract["execution_performed"] is False
     assert contract["necessary_upstream_interfaces"][0]["scene_version_id"] == "v-1"
@@ -125,6 +125,9 @@ def test_request_binds_exact_necessary_code_and_preserves_original_inputs_schema
         "c-returned-head",
         "c-initialization",
         "exercise-source-consistency",
+        "shown-program-variant",
+        "observation-scope-and-termination",
+        "answer-domain-audit",
     }
     for key in data:
         assert payload[key] == data[key]

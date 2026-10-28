@@ -49,7 +49,7 @@ def test_no_visualization_plan_and_repair_keep_original_rejected_candidate(tmp_p
             else:
                 payload = json.loads(body["input"][1]["content"])
                 contract = payload["response_contract"]
-                assert payload["prompt_version"] == "free-scene-generation-v4"
+                assert payload["prompt_version"] == "free-scene-generation-v5"
                 assert contract["allowed_block_kinds"] == ["code", "exercise", "text"]
                 assert contract["forbidden_block_kinds"] == ["visualization"]
                 scene_calls.append(body)

@@ -30,7 +30,7 @@ def test_actual_request_has_exact_forms_not_generic_all_four(forms):
     payload = json.loads(request.prompt.messages[-1].content)
     expected = set(forms) | {"text"}
     contract = payload["response_contract"]
-    assert payload["prompt_version"] == "free-scene-generation-v4"
+    assert payload["prompt_version"] == "free-scene-generation-v5"
     assert set(contract["allowed_block_kinds"]) == expected
     assert set(contract["required_block_kinds"]) == expected
     assert (

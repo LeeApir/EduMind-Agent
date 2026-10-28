@@ -7,9 +7,16 @@ from typing import Any
 from pycparser import c_ast, c_parser  # type: ignore[import-untyped]
 
 from app.services.free_course_snapshots import canonical, digest
+from app.services.free_scene_pointer_trace import trace_c
+from app.services.free_scene_question_scope import (
+    finite_answer,
+    modifies_program,
+    question_scope,
+    solution_claims_cycle,
+)
 from app.services.free_scene_semantics import _without_comments, inspect_c
 
-VERSION = "free-scene-consistency-v1"
+VERSION = "free-scene-consistency-v2"
 MAX_UNITS = 16
 MAX_FINDINGS = 24
 MAX_FUNCTIONS = 64
@@ -96,12 +103,14 @@ def _statement_calls(code: str) -> list[tuple[str, str]]:
 
 def _question_calls(text: str, name: str) -> tuple[list[str], bool]:
     """Parse candidate C-call fragments as expressions, rather than matching arbitrary names."""
-    if re.search(
-        r"错误(?:写法|调用)|错误地|故意|仅作反例|忽略返回值|不接收返回值|丢弃返回值|incorrect|discard|ignore.*return",
-        text,
-        re.I,
+    scope = question_scope(text)
+    if scope in (
+        "local_checkpoint",
+        "deliberate_discard_or_fault",
+        "bounded_or_distinct_observation",
+        "unspecified",
     ):
-        return [], True  # Deliberate examples need semantic review, not a defect assertion.
+        return [], bool(re.search(r"\b" + re.escape(name) + r"\s*\(", text))
     calls = []
     unassessed = False
     for match in re.finditer(r"(?<![A-Za-z0-9_])" + re.escape(name) + r"\s*\(", text):
@@ -150,13 +159,21 @@ def check_consistency(raw: dict[str, Any], inputs: dict[str, Any]) -> dict[str, 
         disposition="advisory_only",
         findings=[],
         reference_answer_checks=[],
+        question_scope_checks=[],
+        pointer_relation_observations=[],
         coverage=dict(
             complete=False,
             parsed_units=0,
             unassessed_units=[],
             unassessed_texts=[],
+            unassessed_pointer_paths=[],
             limits_reached=False,
-            supported_rules=["returned-head-call", "local-pointer-claim", "interface-conflict"],
+            supported_rules=[
+                "returned-head-call",
+                "local-pointer-claim",
+                "interface-conflict",
+                "cycle-finite-answer-conflict",
+            ],
         ),
     )
     coverage, findings = report["coverage"], report["findings"]
@@ -180,7 +197,12 @@ def check_consistency(raw: dict[str, Any], inputs: dict[str, Any]) -> dict[str, 
             functions[fn["name"]].append((fn, unit))
 
     def add(
-        code: str, pointer: str, quote: str, message: str, related: list[dict[str, Any]]
+        code: str,
+        pointer: str,
+        quote: str,
+        message: str,
+        related: list[dict[str, Any]],
+        supporting: list[dict[str, Any]] | None = None,
     ) -> None:
         if len(findings) >= MAX_FINDINGS:
             coverage["limits_reached"] = True
@@ -194,6 +216,7 @@ def check_consistency(raw: dict[str, Any], inputs: dict[str, Any]) -> dict[str, 
             message=message,
             related_code=related[:2],
             confirmed=False,
+            supporting_evidence=supporting or [],
         )
         if row not in findings:
             findings.append(row)
@@ -247,6 +270,84 @@ def check_consistency(raw: dict[str, Any], inputs: dict[str, Any]) -> dict[str, 
                     [_reference(usable[name][1])],
                 )
 
+    cyclic_functions: list[tuple[dict[str, Any], dict[str, Any]]] = []
+    for unit in units[:MAX_UNITS]:
+        if unit.get("inspection", {}).get("status") != "parsed" or unit["upstream"]:
+            continue
+        observation = trace_c(unit["code"])
+        report["pointer_relation_observations"].append(
+            dict(**_reference(unit), observation=observation)
+        )
+        for fn in observation["functions"]:
+            if fn["status"] == "not_assessed":
+                coverage["unassessed_pointer_paths"].append(
+                    dict(
+                        source_pointer=unit["pointer"], function=fn["function"], reason=fn["reason"]
+                    )
+                )
+        cyclic_functions.extend(
+            (f, unit) for f in observation["functions"] if f["status"] == "cycle_on_supported_path"
+        )
+    for i, block in enumerate(raw["blocks"]):
+        if block["kind"] != "exercise":
+            continue
+        for j, question in enumerate(block["items"]):
+            root = f"/candidate/blocks/{i}/items/{j}"
+            text = question["question"]
+            scope = question_scope(text)
+            mutation = modifies_program(text)
+            if len(report["question_scope_checks"]) >= 16:
+                coverage["limits_reached"] = True
+            else:
+                report["question_scope_checks"].append(
+                    dict(
+                        source_pointer=root + "/question",
+                        scope=scope,
+                        program_variant_in_prose=mutation,
+                        semantic_verified=False,
+                    )
+                )
+            if mutation:
+                coverage["unassessed_texts"].append(
+                    dict(
+                        source_pointer=root + "/question",
+                        reason="prose_program_mutation_not_executed",
+                    )
+                )
+            answer = finite_answer(question)
+            if scope != "full_traversal" or answer is None:
+                continue
+            cycle_claim = solution_claims_cycle(question["solution"])
+            traced = [
+                (fn, unit)
+                for fn, unit in cyclic_functions
+                if not mutation
+                and re.search(r"(?<![=<>!])=(?!=)\s*" + re.escape(fn["function"]) + r"\s*\(", text)
+            ]
+            if cycle_claim or traced:
+                supporting = [
+                    dict(
+                        source_pointer=root + "/answer_key",
+                        evidence_quote=question["answer_key"],
+                        role="candidate_key_not_truth",
+                    )
+                ]
+                if cycle_claim:
+                    supporting.append(
+                        dict(
+                            source_pointer=root + "/solution",
+                            evidence_quote=question["solution"][:240],
+                            role="solution_asserts_cycle_not_execution_proof",
+                        )
+                    )
+                add(
+                    "CYCLE_FINITE_SEQUENCE_CONFLICT",
+                    root + "/question",
+                    text,
+                    "题目要求完整遍历到表尾，但所选答案是有限序列；解析声称有环或受限指针关系观察到环。请核对终止条件、实际代码变体与选项，不能把自环截为一个元素。",
+                    [_reference(unit) for _, unit in traced],
+                    supporting,
+                )
     for pointer, text, kind in _texts(raw):
         if kind == "question":
             for name, (fn, unit) in usable.items():
@@ -320,6 +421,7 @@ def check_consistency(raw: dict[str, Any], inputs: dict[str, Any]) -> dict[str, 
         and coverage["parsed_units"]
         and not coverage["unassessed_units"]
         and not coverage["unassessed_texts"]
+        and not coverage["unassessed_pointer_paths"]
         and not coverage["limits_reached"]
     ):
         report["status"] = "no_conflict_detected_in_supported_rules"

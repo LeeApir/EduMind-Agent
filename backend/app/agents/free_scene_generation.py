@@ -23,7 +23,7 @@ from app.services.provider_gateway import (
     TextRequest,
 )
 
-PROMPT_VERSION = "free-scene-generation-v4"
+PROMPT_VERSION = "free-scene-generation-v5"
 SCHEMA_VERSION = "free-scene-candidate-v1"
 SCHEMA = json.loads(Path(__file__).with_suffix(".schema.json").read_text())
 INSTRUCTION = """Generate exactly the assigned scene of a data-structures learning course.
@@ -57,6 +57,15 @@ Never silently repair a question by inventing a missing caller assignment. Deriv
 from explicitly stated operations using the actual supplied interface.
 Keep allocation initialization,
 execution assumptions and complexity preconditions consistent across prose/code/diagrams/exercises.
+A question that changes code must show the complete exact C variant in a dedicated code block
+and name its anchor; do not hide a rewrite inside a hypothetical sentence.
+Distinguish a local checkpoint, caller-final state, first k visits, distinct reachable nodes and
+full traversal until NULL. A cycle is not a finite list output;
+never silently truncate or deduplicate.
+Trace the relevant next assignments and stopping condition in the solution. A choice question must
+contain the genuine result exactly once, including nontermination or indeterminacy when applicable.
+Rewrite or omit a question whose stated assumptions cannot support one correct answer.
+Deliberately missing a return assignment may be valid fault teaching; evaluate its stated result.
 Upstream syntax hints are not proof of correctness.
 Unsupported semantics require review, not guessing.
 Each block must contain only fields allowed by its own kind's Schema. Never add markdown to a code
