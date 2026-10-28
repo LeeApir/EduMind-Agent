@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "用户授权批次T066–T070及限定前置T071均验收完成；T070独立建议停止当前准确路线/暂不采用，完成提交后停止。真实累计1HTTP/1unknown，T038 blocked/catalog_only/H保持；无新调用/修Schema/跨阶段授权。",
+    "phase_gate": "T072离线审计验收完成；旧p01保持stopped，新增模型0。下一步准备独立最小两请求兼容包，真实须准确另批，相关角色兼容通过后再准备一份可评课程。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -3389,6 +3389,53 @@
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T071",
       "execution_gate": "限定离线任务验收通过，完成提交后恢复T069准备；不授真实调用或T070/生产资格。"
+    },
+    {
+      "id": "PHASE-1.5-T072",
+      "phase": "Phase 1.5",
+      "title": "离线定位准确生成请求的Schema兼容差异",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T070"
+      ],
+      "scope": [
+        "scripts/",
+        "docs/acceptance/phase-1.5-schema-compatibility/",
+        "docs/ADR/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5；2026-10-28用户要求先离线核对准确请求和端点约束，兼容通过后再验证一份可评课程",
+      "acceptance_criteria": [
+        "绑定T069唯一原始请求/响应与冻结源码摘要，逐Schema节点按官方公开约束和标准校验，区分事实、确定差异、推断与未验证。",
+        "以独立手写正反例验证零调用审计入口，输出准确JSON Pointer和请求参数对照，不只凭400猜字段；不读取独立参考真值或密钥，不修改旧冻结/样本/原件。",
+        "交付具体等价适配或差异方案与离线证据；契约变化先形成可审查方案，不直接改变教学链路或放宽Schema/教学验收。",
+        "若须真实确认，仅提出独立最小兼容包的必要性/请求边界/停止条件；本任务不授权真实调用、费用或旧批重启。"
+      ],
+      "verification": [
+        "待建立：零调用准确Schema审计CLI及手写回归测试",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [
+        {
+          "date": "2026-10-28T19:30:46+08:00",
+          "commands": [
+            "PYTHONPATH=backend:. backend/.venv/bin/python -m pytest scripts/tests/test_p15_schema_audit.py -q --tb=short --junitxml=/private/tmp/edumind-p15-t072.xml",
+            "backend/.venv/bin/python scripts/check_p15_schema_compatibility.py --output /private/tmp/edumind-p15-schema-audit-r02",
+            "MYPYPATH=backend:. backend/.venv/bin/mypy --strict --explicit-package-bases --follow-imports=silent scripts/isolated_diagnostics/p15_schema_audit.py scripts/check_p15_schema_compatibility.py",
+            "Ruff / python3 scripts/check_catalog_workflow.py / git diff --check"
+          ],
+          "result": "34 passed0skip，mypy2源/Ruff/工作流/diff通过；准确原件及41旧冻结一致。标准Schema有效，2个enum-only路径与其他潜在差异有精确清单；等价增加type仅为离线副本，服务具体首因未证实。新增Provider0，未读Key/私有真值，不改Prompt/教学链路。",
+          "evidence": "docs/acceptance/phase-1.5-schema-compatibility/audit-r01/README.md"
+        }
+      ],
+      "started_at": "2026-10-28T16:58:32+08:00",
+      "completed_at": "2026-10-28T19:30:46+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T072",
+      "execution_gate": "离线审计完成；两请求独立合成对照用于验证窄假设，尚未执行或授权。相关角色准确wire Schema兼容通过后才准备一份C链课程，不恢复p01或T038。"
     }
   ],
   "planning_inputs": {

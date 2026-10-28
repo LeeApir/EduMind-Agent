@@ -1,0 +1,33 @@
+{
+  "observed_at": "2026-10-28T19:28:53+08:00",
+  "sources": [
+    {
+      "url": "https://api-docs.deepseek.com/guides/responses_api/",
+      "scope": "DeepSeek Responses endpoint",
+      "facts": [
+        "官方列出 deepseek-flash、input消息列表/字符串、reasoning.effort 和 max_output_tokens。",
+        "text.format 标为支持；store不支持且响应固定false。",
+        "未在该页找到逐关键字Schema子集或本次错误的具体子路径。"
+      ]
+    },
+    {
+      "url": "https://api-docs.deepseek.com/guides/tool_calls/",
+      "scope": "Beta function tools strict mode; cross-interface reference only",
+      "facts": [
+        "函数strict文档要求对象字段全部required、additionalProperties=false。",
+        "该页列出字符串minLength/maxLength、数组minItems/maxItems不支持。",
+        "这份规则属于函数tools/Beta，不能直接断言Responses同样拒绝这些关键字，更不能套用AIAPI。"
+      ]
+    },
+    {
+      "url": "https://json-schema.org/understanding-json-schema/reference/enum",
+      "scope": "Standard JSON Schema enum semantics",
+      "facts": [
+        "enum可不带type，也可跨多种JSON类型。",
+        "本次两个枚举值全部是字符串，补type:string不会改变各节点接受集合。"
+      ]
+    }
+  ],
+  "model_calls": 0,
+  "public_document_reads_only": true
+}
