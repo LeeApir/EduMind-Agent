@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "T080准确联合表示最小包已完成离线568项/78文件冻结，T081待准确2HTTP/新90秒/外发/费用例外批准；ADR0046离线方案批准不等于真实执行批准，角色/课程仍未准入，T038/catalog_only/H保持。",
+    "phase_gate": "T081受控采集已完成但S1 anyOf控制Schema400 missing items，S2未发，批次终止。类型联合对照未形成、完整角色/课程仍阻塞；无新真实授权，不自动补字段或收窄JSON，不续旧批；T038/catalog_only/H保持。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -3841,12 +3841,25 @@
     {
       "phase": "Phase 1.5",
       "priority": "P0",
-      "verification_results": [],
-      "completed_at": null,
+      "verification_results": [
+        {
+          "date": "2026-10-28T22:52:38+08:00",
+          "commands": [
+            "PYTHONPATH=backend:. backend/.venv/bin/python scripts/run_p15_union_schema_probe.py --run",
+            "PYTHONPATH=backend:. backend/.venv/bin/python scripts/run_p15_union_schema_probe.py --check-results",
+            "exact S1 anyOf/raw error/type branches/receipt inspection; S2 no files",
+            "python3 scripts/check_catalog_workflow.py",
+            "git diff --check"
+          ],
+          "result": "受控证据采集完成但对照不确定：1 real HTTP，S1 anyOf控制400 missing field items，207字节无usage/unknown1；S2未预约未发送，未用1不继承。run/check-results exit2，原件/公网来源/记录时钟/终态只读通过。服务无分支路径，不推断anyOf普遍不支持或补items足够；无完整角色/课程/sol准入，费用未知。",
+          "evidence": "docs/acceptance/phase-1.5-schema-compatibility/results-union-p01/RESULTS.md"
+        }
+      ],
+      "completed_at": "2026-10-28T22:52:38+08:00",
       "blocker": null,
       "id": "PHASE-1.5-T081",
       "title": "按准确独立最小包采集联合类型表示对照",
-      "status": "todo",
+      "status": "done",
       "depends_on": [
         "PHASE-1.5-T080"
       ],
@@ -3863,13 +3876,15 @@
         "只读重算请求/响应/控制/来源/窗口/终态，按矩阵解释最小形式，不当作完整内容/审核角色或课程准入。"
       ],
       "verification": [
-        "待准确批准后实际运行新最小包及只读验真",
+        "PYTHONPATH=backend:. backend/.venv/bin/python scripts/run_p15_union_schema_probe.py --run",
+        "PYTHONPATH=backend:. backend/.venv/bin/python scripts/run_p15_union_schema_probe.py --check-results",
+        "exact S1 anyOf/raw error/type branches/receipt inspection; S2 no files",
         "python3 scripts/check_catalog_workflow.py",
         "git diff --check"
       ],
-      "started_at": null,
+      "started_at": "2026-10-28T22:50:57+08:00",
       "commit_lookup": "Task-Completed: PHASE-1.5-T081",
-      "execution_gate": "待准确78文件manifest 5a62cb5f128719d2583efaeee8c1fc163f480d86f5ab1a4bb316ebaa94de96cf及独立2HTTP/90秒/合成外发/本批费用风险例外批准，不领取；旧批准不能执行本包，无课程授权。"
+      "execution_gate": "独立准确包控制S1失败后终止，仅完成受控证据任务，未形成两请求对照/兼容准入；S2未发，不续旧窗口/未用请求。后续须先评估开放JSON等价表示的新具体方案，未授权自动补丁/新真实或课程。"
     }
   ],
   "planning_inputs": {
