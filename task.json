@@ -3116,7 +3116,7 @@
       "id": "PHASE-1.5-T067",
       "phase": "Phase 1.5",
       "title": "实现头插法受限示例与答案轨迹引擎",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1.5-T066"
@@ -3139,12 +3139,25 @@
         "python3 scripts/check_catalog_workflow.py",
         "git diff --check"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "date": "2026-10-28T11:48:23+08:00",
+          "commands": [
+            "backend/.venv/bin/python -m pytest scripts/tests/test_p15_head_insertion_engine.py -q --junitxml=/tmp/edumind-p15-t067.xml",
+            "backend/.venv/bin/mypy --strict scripts/isolated_diagnostics/p15_head_insertion_engine.py",
+            "backend/.venv/bin/ruff check scripts/isolated_diagnostics/p15_head_insertion_engine.py scripts/tests/test_p15_head_insertion_engine.py",
+            "python3 scripts/check_catalog_workflow.py",
+            "git diff --check"
+          ],
+          "result": "50 passed/0skip，类型/Ruff/工作流/diff通过；HTTP0/C执行0",
+          "evidence": "docs/acceptance/phase-1.5-agent-pilot/t067/README.md"
+        }
+      ],
+      "started_at": "2026-10-28T11:47:25+08:00",
+      "completed_at": "2026-10-28T11:48:23+08:00",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T067",
-      "execution_gate": "本次仅任务规划，不领取或执行。用户另向开发助手下达执行指令；T066具体契约须批准，T069真实调用须准确包与预算批准；T070留给指定评估助手。"
+      "execution_gate": "ADR0041已准确批准，按用户连续授权实施隔离引擎，仅零Provider/零C执行。"
     },
     {
       "id": "PHASE-1.5-T068",

@@ -1,0 +1,616 @@
+{
+  "example": {
+    "schema_version": "head-insertion-example-v1",
+    "spec": {
+      "version": "head-insertion-spec-v1",
+      "initial_values": [],
+      "insert_values": [
+        1,
+        2,
+        3
+      ],
+      "variant": "normal",
+      "allocation_success": [
+        true,
+        true,
+        true
+      ]
+    },
+    "spec_digest": "763dd8a8f37be0fd32809dbf0a6c017f851959329a0541f9c015aa6b54c08dbe",
+    "engine_version": "head-insertion-engine-v1",
+    "template_version": "head-insertion-c-v1",
+    "code": {
+      "version": "head-insertion-c-v1",
+      "language": "C",
+      "source": "#include <stdlib.h>\ntypedef struct Node { int data; struct Node *next; } Node;\nNode *insert(Node *head, int value, int allocation_success) {\n    Node *p = allocation_success ? malloc(sizeof *p) : NULL;\n    if (p == NULL) return head;\n    p->data = value;\n    p->next = head;\n    return p;\n}\nint main(void) {\n    Node *caller_head = NULL;\n    caller_head = insert(caller_head, 1, 1);\n    caller_head = insert(caller_head, 2, 1);\n    caller_head = insert(caller_head, 3, 1);\n    (void)caller_head;\n    return 0;\n}\n",
+      "line_anchors": {
+        "allocate": 4,
+        "allocation_failed": 5,
+        "data": 6,
+        "link": 7,
+        "return": 8,
+        "call_0": 12,
+        "call_1": 13,
+        "call_2": 14
+      },
+      "executed": false,
+      "limitations": "Abstract allocation mask; no arbitrary C or memory-safety proof."
+    },
+    "trace": {
+      "steps": [
+        {
+          "phase": "initial",
+          "attempt": null,
+          "caller_head": null,
+          "local_head": null,
+          "p": null,
+          "returned": null,
+          "nodes": {},
+          "code_line": null
+        },
+        {
+          "phase": "allocate",
+          "attempt": 0,
+          "caller_head": null,
+          "local_head": null,
+          "p": "t0",
+          "returned": null,
+          "nodes": {
+            "t0": {
+              "data": "indeterminate",
+              "next": "indeterminate"
+            }
+          },
+          "code_line": 4
+        },
+        {
+          "phase": "data",
+          "attempt": 0,
+          "caller_head": null,
+          "local_head": null,
+          "p": "t0",
+          "returned": null,
+          "nodes": {
+            "t0": {
+              "data": 1,
+              "next": "indeterminate"
+            }
+          },
+          "code_line": 6
+        },
+        {
+          "phase": "link",
+          "attempt": 0,
+          "caller_head": null,
+          "local_head": null,
+          "p": "t0",
+          "returned": null,
+          "nodes": {
+            "t0": {
+              "data": 1,
+              "next": null
+            }
+          },
+          "code_line": 7
+        },
+        {
+          "phase": "return",
+          "attempt": 0,
+          "caller_head": null,
+          "local_head": null,
+          "p": "t0",
+          "returned": "t0",
+          "nodes": {
+            "t0": {
+              "data": 1,
+              "next": null
+            }
+          },
+          "code_line": 8
+        },
+        {
+          "phase": "caller",
+          "attempt": 0,
+          "caller_head": "t0",
+          "local_head": null,
+          "p": "t0",
+          "returned": "t0",
+          "nodes": {
+            "t0": {
+              "data": 1,
+              "next": null
+            }
+          },
+          "code_line": 12
+        },
+        {
+          "phase": "allocate",
+          "attempt": 1,
+          "caller_head": "t0",
+          "local_head": "t0",
+          "p": "t1",
+          "returned": null,
+          "nodes": {
+            "t0": {
+              "data": 1,
+              "next": null
+            },
+            "t1": {
+              "data": "indeterminate",
+              "next": "indeterminate"
+            }
+          },
+          "code_line": 4
+        },
+        {
+          "phase": "data",
+          "attempt": 1,
+          "caller_head": "t0",
+          "local_head": "t0",
+          "p": "t1",
+          "returned": null,
+          "nodes": {
+            "t0": {
+              "data": 1,
+              "next": null
+            },
+            "t1": {
+              "data": 2,
+              "next": "indeterminate"
+            }
+          },
+          "code_line": 6
+        },
+        {
+          "phase": "link",
+          "attempt": 1,
+          "caller_head": "t0",
+          "local_head": "t0",
+          "p": "t1",
+          "returned": null,
+          "nodes": {
+            "t0": {
+              "data": 1,
+              "next": null
+            },
+            "t1": {
+              "data": 2,
+              "next": "t0"
+            }
+          },
+          "code_line": 7
+        },
+        {
+          "phase": "return",
+          "attempt": 1,
+          "caller_head": "t0",
+          "local_head": "t0",
+          "p": "t1",
+          "returned": "t1",
+          "nodes": {
+            "t0": {
+              "data": 1,
+              "next": null
+            },
+            "t1": {
+              "data": 2,
+              "next": "t0"
+            }
+          },
+          "code_line": 8
+        },
+        {
+          "phase": "caller",
+          "attempt": 1,
+          "caller_head": "t1",
+          "local_head": "t0",
+          "p": "t1",
+          "returned": "t1",
+          "nodes": {
+            "t0": {
+              "data": 1,
+              "next": null
+            },
+            "t1": {
+              "data": 2,
+              "next": "t0"
+            }
+          },
+          "code_line": 13
+        },
+        {
+          "phase": "allocate",
+          "attempt": 2,
+          "caller_head": "t1",
+          "local_head": "t1",
+          "p": "t2",
+          "returned": null,
+          "nodes": {
+            "t0": {
+              "data": 1,
+              "next": null
+            },
+            "t1": {
+              "data": 2,
+              "next": "t0"
+            },
+            "t2": {
+              "data": "indeterminate",
+              "next": "indeterminate"
+            }
+          },
+          "code_line": 4
+        },
+        {
+          "phase": "data",
+          "attempt": 2,
+          "caller_head": "t1",
+          "local_head": "t1",
+          "p": "t2",
+          "returned": null,
+          "nodes": {
+            "t0": {
+              "data": 1,
+              "next": null
+            },
+            "t1": {
+              "data": 2,
+              "next": "t0"
+            },
+            "t2": {
+              "data": 3,
+              "next": "indeterminate"
+            }
+          },
+          "code_line": 6
+        },
+        {
+          "phase": "link",
+          "attempt": 2,
+          "caller_head": "t1",
+          "local_head": "t1",
+          "p": "t2",
+          "returned": null,
+          "nodes": {
+            "t0": {
+              "data": 1,
+              "next": null
+            },
+            "t1": {
+              "data": 2,
+              "next": "t0"
+            },
+            "t2": {
+              "data": 3,
+              "next": "t1"
+            }
+          },
+          "code_line": 7
+        },
+        {
+          "phase": "return",
+          "attempt": 2,
+          "caller_head": "t1",
+          "local_head": "t1",
+          "p": "t2",
+          "returned": "t2",
+          "nodes": {
+            "t0": {
+              "data": 1,
+              "next": null
+            },
+            "t1": {
+              "data": 2,
+              "next": "t0"
+            },
+            "t2": {
+              "data": 3,
+              "next": "t1"
+            }
+          },
+          "code_line": 8
+        },
+        {
+          "phase": "caller",
+          "attempt": 2,
+          "caller_head": "t2",
+          "local_head": "t1",
+          "p": "t2",
+          "returned": "t2",
+          "nodes": {
+            "t0": {
+              "data": 1,
+              "next": null
+            },
+            "t1": {
+              "data": 2,
+              "next": "t0"
+            },
+            "t2": {
+              "data": 3,
+              "next": "t1"
+            }
+          },
+          "code_line": 14
+        }
+      ]
+    },
+    "observation": {
+      "caller_head": "t2",
+      "reachable_prefix": [
+        3,
+        2,
+        1
+      ],
+      "traversal_status": "terminated",
+      "cycle_entry": null,
+      "allocation_failures": 0,
+      "unreachable_allocated_ids": []
+    },
+    "payload_digest": "c705d55c951536bc9edb7b06bd4d2404cf791c161968d05e7f382f3b52593769"
+  },
+  "actions": [
+    {
+      "kind": "show_state",
+      "anchor": "dev:code",
+      "step": 0,
+      "state_digest": "7a5f472326cedca7ed9ce7946f595c6c45db6a95dddd941d9b29d2d0fdd10fc1"
+    },
+    {
+      "kind": "advance_step",
+      "anchor": "dev:code",
+      "step": 1
+    },
+    {
+      "kind": "show_state",
+      "anchor": "dev:code",
+      "step": 1,
+      "state_digest": "4e47c87d6b366d72fccb6778ee96f6781eee1526987b84e73a95d0462dd581cb"
+    },
+    {
+      "kind": "highlight_code",
+      "anchor": "dev:code",
+      "line": 4,
+      "step": 1
+    },
+    {
+      "kind": "advance_step",
+      "anchor": "dev:code",
+      "step": 2
+    },
+    {
+      "kind": "show_state",
+      "anchor": "dev:code",
+      "step": 2,
+      "state_digest": "19b149cc0fe8fd170b25af972a9cd02c954e4fe1012c58e48e61612f41e4d414"
+    },
+    {
+      "kind": "highlight_code",
+      "anchor": "dev:code",
+      "line": 6,
+      "step": 2
+    },
+    {
+      "kind": "advance_step",
+      "anchor": "dev:code",
+      "step": 3
+    },
+    {
+      "kind": "show_state",
+      "anchor": "dev:code",
+      "step": 3,
+      "state_digest": "e9777aa8557a7bfb79139f5376f4630356e78f1b84be4b50408e84becaa6153f"
+    },
+    {
+      "kind": "highlight_code",
+      "anchor": "dev:code",
+      "line": 7,
+      "step": 3
+    },
+    {
+      "kind": "advance_step",
+      "anchor": "dev:code",
+      "step": 4
+    },
+    {
+      "kind": "show_state",
+      "anchor": "dev:code",
+      "step": 4,
+      "state_digest": "a93709619c2729b46ca4b9b675739d93955ba80d4f5fe3711af0c653f132c7d8"
+    },
+    {
+      "kind": "highlight_code",
+      "anchor": "dev:code",
+      "line": 8,
+      "step": 4
+    },
+    {
+      "kind": "advance_step",
+      "anchor": "dev:code",
+      "step": 5
+    },
+    {
+      "kind": "show_state",
+      "anchor": "dev:code",
+      "step": 5,
+      "state_digest": "4bef4527e9a12c0e02dc03392231995279873628877999985b7ff06afb4ad6d7"
+    },
+    {
+      "kind": "highlight_code",
+      "anchor": "dev:code",
+      "line": 12,
+      "step": 5
+    },
+    {
+      "kind": "advance_step",
+      "anchor": "dev:code",
+      "step": 6
+    },
+    {
+      "kind": "show_state",
+      "anchor": "dev:code",
+      "step": 6,
+      "state_digest": "173cc9c04f245009783811d686bc97dba3e4caee48dc6575af61caac9635dcdc"
+    },
+    {
+      "kind": "highlight_code",
+      "anchor": "dev:code",
+      "line": 4,
+      "step": 6
+    },
+    {
+      "kind": "advance_step",
+      "anchor": "dev:code",
+      "step": 7
+    },
+    {
+      "kind": "show_state",
+      "anchor": "dev:code",
+      "step": 7,
+      "state_digest": "ec400d185464f3ae5794ef08e85521bb08e5c51e3f792ebb5f2eaba65799fee3"
+    },
+    {
+      "kind": "highlight_code",
+      "anchor": "dev:code",
+      "line": 6,
+      "step": 7
+    },
+    {
+      "kind": "advance_step",
+      "anchor": "dev:code",
+      "step": 8
+    },
+    {
+      "kind": "show_state",
+      "anchor": "dev:code",
+      "step": 8,
+      "state_digest": "0506ed3fb4bbcfe5f9288d580771ce0185da2fa3d81d2c7c77851c6c12a0511d"
+    },
+    {
+      "kind": "highlight_code",
+      "anchor": "dev:code",
+      "line": 7,
+      "step": 8
+    },
+    {
+      "kind": "advance_step",
+      "anchor": "dev:code",
+      "step": 9
+    },
+    {
+      "kind": "show_state",
+      "anchor": "dev:code",
+      "step": 9,
+      "state_digest": "7a30c68742f36971811f6787a22f854ac310842d5dd225486733d19dc436e0de"
+    },
+    {
+      "kind": "highlight_code",
+      "anchor": "dev:code",
+      "line": 8,
+      "step": 9
+    },
+    {
+      "kind": "advance_step",
+      "anchor": "dev:code",
+      "step": 10
+    },
+    {
+      "kind": "show_state",
+      "anchor": "dev:code",
+      "step": 10,
+      "state_digest": "7a3823872507711e5a35de6ae434e1b4fb374c63a79b99fdab23e212e054fc1d"
+    },
+    {
+      "kind": "highlight_code",
+      "anchor": "dev:code",
+      "line": 13,
+      "step": 10
+    },
+    {
+      "kind": "advance_step",
+      "anchor": "dev:code",
+      "step": 11
+    },
+    {
+      "kind": "show_state",
+      "anchor": "dev:code",
+      "step": 11,
+      "state_digest": "2657220e665919f5b6237533bda1e134f16583482c180061522f7b2a8d823899"
+    },
+    {
+      "kind": "highlight_code",
+      "anchor": "dev:code",
+      "line": 4,
+      "step": 11
+    },
+    {
+      "kind": "advance_step",
+      "anchor": "dev:code",
+      "step": 12
+    },
+    {
+      "kind": "show_state",
+      "anchor": "dev:code",
+      "step": 12,
+      "state_digest": "48ab1b6d5cccb9360fc3d849ee7f3f87e61c5e6e1c0855bb1cd1e65641824dab"
+    },
+    {
+      "kind": "highlight_code",
+      "anchor": "dev:code",
+      "line": 6,
+      "step": 12
+    },
+    {
+      "kind": "advance_step",
+      "anchor": "dev:code",
+      "step": 13
+    },
+    {
+      "kind": "show_state",
+      "anchor": "dev:code",
+      "step": 13,
+      "state_digest": "b3c07d2d70a21a9f748ed5652e2caf1668b99567688b38f68023039594b8c3e3"
+    },
+    {
+      "kind": "highlight_code",
+      "anchor": "dev:code",
+      "line": 7,
+      "step": 13
+    },
+    {
+      "kind": "advance_step",
+      "anchor": "dev:code",
+      "step": 14
+    },
+    {
+      "kind": "show_state",
+      "anchor": "dev:code",
+      "step": 14,
+      "state_digest": "74f9d4dc857986ad8853935b4406c874d806fb387394732b52964093b4a54eb0"
+    },
+    {
+      "kind": "highlight_code",
+      "anchor": "dev:code",
+      "line": 8,
+      "step": 14
+    },
+    {
+      "kind": "advance_step",
+      "anchor": "dev:code",
+      "step": 15
+    },
+    {
+      "kind": "show_state",
+      "anchor": "dev:code",
+      "step": 15,
+      "state_digest": "5d79283294d973357599a72e8bf525b8b070b08154370b08af12d4ac8296d72e"
+    },
+    {
+      "kind": "highlight_code",
+      "anchor": "dev:code",
+      "line": 14,
+      "step": 15
+    }
+  ],
+  "purpose": "已见开发示例，无独立评估资格"
+}
