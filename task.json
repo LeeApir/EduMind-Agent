@@ -2468,7 +2468,8 @@
         "backend/.venv/bin/python scripts/run_p15_d02_recheck_d01.py --check；独立D02-known两场景d01包，--step在准确新批准前退出2，--assessment只读源重算/协议与局部结论，不能完成T038。",
         "backend/.venv/bin/python scripts/check_p15_d02_d01_results.py --check；预期退出2，只读复验准确d01停止事实与来源/原始协议/unknown，不发请求。",
         "backend/.venv/bin/python scripts/run_p15_d02_recheck_d02.py --check；ADR0040最终5请求新包离线SHA；pending --step准确退出2，不读Key/PG/DNS或输出。",
-        "backend/.venv/bin/python scripts/check_p15_d02_d02_results.py --check；预期退出2，只读区分JSON有效与目标覆盖拒绝、v5/sol未运行及准确实际用量，不修复/重发。"
+        "backend/.venv/bin/python scripts/check_p15_d02_d02_results.py --check；预期退出2，只读区分JSON有效与目标覆盖拒绝、v5/sol未运行及准确实际用量，不修复/重发。",
+        "backend/.venv/bin/python scripts/run_p15_d02_formal_d03.py --check；规划补丁后新正式包510SHA及版本绑定，pending --step准确退出2，不创建真实输出。"
       ],
       "verification_results": [
         "真实批准登记docs/acceptance/phase-1.5-development-diagnostic-r02/execution-approval.json；严格绑定原7d3fef3/r02 manifest 4d987857ab227a366c8b506f4ed365c8360b778017aa9418425493a212527f44，329源码材料SHA不变",
@@ -2520,13 +2521,14 @@
         "2026-10-28：按用户“好，开始”完成D02小范围准备，生成v4/机械v3/私有一致性v1、原sol审核标准；77离线+1实际隔离PG/HTTPX Mock共78 passed0skip，Ruff/工作流/diff通过，476 SHA准确包 6a624547335704f4d0da489f71d7e02230adc8b554e57f390641def904bcef6a。独立15 HTTP/1800秒及合成外发/token金额不限例外仍待本包授权，approved=false；pending实际退出2、真实0、PG exited，不解锁T038或重启旧批次。",
         "2026-10-28T00:35:39+08:00：用户准确批准5eda387/6a624547后单次step实际4HTTP200，3生成首次Schema全过/两场景ready，sol首场景返回额外reasoning元数据触发NONEMPTY_OR_UNKNOWN_REASONING_ITEM，3complete/1unknown，0接受审核/1审核未运行。报告15524入4410总出；可信11842/4221，unknown3682/189保留；旧25后29/136424/30410，费unknown。助手先于sol最终意见盲核11块4题，原传值/接回两错未重现，但q3自环被判有限2，1可靠答案严重错误；4本地提示均为误报，未命中新错误。无标准slot_output不伪造导入，17结果回归通过/只读checker预期2/Ruff/工作流/diff通过，PG exited、停止后新真实0；证据docs/acceptance/phase-1.5-d02-recheck-d01/RESULTS.md，T038仍blocked。",
         "2026-10-28：继续测试指令后准备最终d02单次，生成v5/语义v2保持8b0cb8a，ADR0040仅对reasoning两项规范相同UUID元数据做隔离提案；旧d01原始字节回放工程兼容但不改原unknown。66离线+2实际隔离PG/HTTPX Mock共68 passed0skip，首次Schema失败只有1调用，正常Mock5调用、原生产拒绝保持；Ruff/工作流/diff通过，497SHA 53583b1fdd975d1c50772c2e6047436a86134af623d151436b669f9afda7496f，pending实际退出2且无输出，PG exited，真实0。A-C及新5HTTP/30分钟/合成外发/token金额例外待准确批准，不因继续测试自动修改审核契约或出站。",
-        "2026-10-28T09:49:44+08:00：用户准确批准c4fd24e/53583b1f与ADR0040 A-C后单次step实际1HTTP200，规划v1返回JSON符合Schema，但4目标只覆盖3个，obj_two_scenes(组织2场景)被遗漏引用，本地SCHEMA_INVALID/首次校验false即stopped threshold_unreachable。1complete/0unknown，报告可信1966入665总出、费用unknown；旧29后30/138390/31075。无plan/scene/sol调用/标准报告，v5及新兼容未真实验证。只读PG记录1attempt1settlement，原操作running/待format_repair标记保持但无第二次出站，诊断进程无残留/PG exited；17结果回归passed0skip、checker预期2/Ruff/工作流/diff通过，停止后新真实0。结果和方案重评见docs/acceptance/phase-1.5-d02-recheck-d02/RESULTS.md及REASSESSMENT.md；T038仍blocked，未实施新方案。"
+        "2026-10-28T09:49:44+08:00：用户准确批准c4fd24e/53583b1f与ADR0040 A-C后单次step实际1HTTP200，规划v1返回JSON符合Schema，但4目标只覆盖3个，obj_two_scenes(组织2场景)被遗漏引用，本地SCHEMA_INVALID/首次校验false即stopped threshold_unreachable。1complete/0unknown，报告可信1966入665总出、费用unknown；旧29后30/138390/31075。无plan/scene/sol调用/标准报告，v5及新兼容未真实验证。只读PG记录1attempt1settlement，原操作running/待format_repair标记保持但无第二次出站，诊断进程无残留/PG exited；17结果回归passed0skip、checker预期2/Ruff/工作流/diff通过，停止后新真实0。结果和方案重评见docs/acceptance/phase-1.5-d02-recheck-d02/RESULTS.md及REASSESSMENT.md；T038仍blocked，未实施新方案。",
+        "2026-10-28：T065 fc5cfc6规划v2补丁独立完成181项验证后，准备正式D02 d03两场景/3生成2审核一次性新包。68离线+2实际隔离PG/HTTPX Mock共70 passed0skip，真实wire Mock确认规划v2契约、场景v5、原sol及元数据隔离/原生产拒绝、首错一请求停止；Ruff/工作流/diff通过，510SHA c7b0d71dc98f4b1be53ea4578825f5f8dab9c1fa34cb359abada2791d594e6cc，pending实际退出2/无真实输出，PG exited，新真实0。准确新窗口、5HTTP/30分钟/合成外发/token金额例外与ADR0040 A-B范围延伸待确认，测试后再重评。"
       ],
       "started_at": "2026-10-24T12:25:09",
       "completed_at": null,
-      "blocker": "最终d02首次规划HTTP200/JSON Schema通过，但obj_two_scenes未被任何场景引用，原本地覆盖校验拒绝SCHEMA_INVALID；按批准的一次性规则1请求后停止。场景v5及sol未执行，不能推断其质量；本路线按用户要求转方案重评，不再补Prompt或重试。",
+      "blocker": "用户指定的T065规划补丁已完成fc5cfc6；正式D02 d03准备通过70项验证，等待准确新包/5请求/30分钟/外发费用例外及ADR0040 A-B本批范围确认。旧d02停止，不继承剩余额度；正式测试后再重评。",
       "commit_lookup": "Task-Completed: PHASE-1.5-T038",
-      "execution_gate": "最终d02已stopped/threshold_unreachable，1complete/0unknown；剩余4请求不构成重启或修复许可。仅零调用收尾与方案重评，新的方案/契约/真实测试须另获具体授权；不自动继续其余33槽。 用户最新确认先完成T065这一规划补丁，再以新准确包正式测试后重评；旧批次仍停止。",
+      "execution_gate": "仅准备d03正式调用包，规划v2+场景v5+原sol；新准确批准前不得Key/PG/DNS/出站，禁止旧d02重启或自动修复。用户最新要求正式测试后再重评，不实施新模板/IR架构。",
       "scoped_observations": [
         {
           "batch_id": "p15-aiapi-minimal-r01",
