@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "T071完成393b9f1；T069准确p01准备就绪、等待ADR0042与真实包/新预算批准，当前真实0；T070未领取，T038/catalog_only/H保持。",
+    "phase_gate": "T069 p01受控采集合规验收通过（首请求400全批停止，质量未测），完成提交后才领取独立T070；不追加调用，T038/catalog_only/H保持。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -3210,7 +3210,7 @@
       "id": "PHASE-1.5-T069",
       "phase": "Phase 1.5",
       "title": "按冻结方案采集小型协作原型受控实验完整证据",
-      "status": "blocked",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1.5-T068",
@@ -3270,13 +3270,28 @@
           ],
           "result": "全链36文件冻结后独立e03核定10支持+4拒绝；准确41文件包预检通过，未批准入口均拒绝且不触达Key/建库，无真实输出；Provider0。238离线/Mock结果见T071，不冒充T069真实完成。",
           "evidence": "docs/acceptance/phase-1.5-agent-pilot/execution-p01/PREPARATION.md"
+        },
+        {
+          "date": "2026-10-28T16:25:25+08:00",
+          "commands": [
+            "backend/.venv/bin/python scripts/run_p15_agent_pilot.py --start",
+            "backend/.venv/bin/python scripts/run_p15_agent_pilot.py --step",
+            "backend/.venv/bin/python scripts/run_p15_agent_pilot.py --assessment",
+            "stopped --step forbidden-key trap: expected BATCH_NOT_ACTIVE/exit2/unchanged ledger",
+            "independent evaluator read-only --assessment and full evidence review",
+            "python3 scripts/check_catalog_workflow.py",
+            "git diff --check"
+          ],
+          "result": "已批准真实1HTTP，首B DeepSeek400/HTTP_STATUS即停止；1unknown/0pending/27未运行，无内容/审核/修复；权威pins/全批/窗口/evidence通过。独立助手采集合规复核通过，用量/费用未知；不是质量通过。",
+          "evidence": "docs/acceptance/phase-1.5-agent-pilot/results-p01/RESULTS.md",
+          "independent_review": "docs/acceptance/phase-1.5-agent-pilot/t069-preparation/EXECUTION-EVIDENCE-REVIEW.md"
         }
       ],
       "started_at": "2026-10-28T11:58:27+08:00",
-      "completed_at": null,
-      "blocker": "准确execution-p01待ADR0042 A—C及合成外发/90HTTP/新3小时/token金额无上限例外批准；T071缺口已解除，本批未授权真实调用。",
+      "completed_at": "2026-10-28T16:25:25+08:00",
+      "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T069",
-      "execution_gate": "准确manifest 295bc335af529b6906a51a61c5e22586b414d4e6c9986068534703b7b0aebe0d，候选冻结后独立e03完成；--check通过、pending start/step拒绝且未到Key；批准前保持真实0，不重启旧批次。"
+      "execution_gate": "准确批准后采集1真实HTTP/1unknown，DeepSeek400即全批停止；27臂槽未运行，独立采集合规复核通过，不表示Schema兼容或教学质量通过。完成提交后转T070，无继续调用许可。"
     },
     {
       "id": "PHASE-1.5-T070",
