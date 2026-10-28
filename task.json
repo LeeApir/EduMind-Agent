@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "T076完成最小enum拒绝观察，T077完成离线等价类型及三角色准确包；T078待ADR0045/准确新3HTTP批准，尚未角色准入/课程，无新模型调用，旧账本/教学标准不变。",
+    "phase_gate": "T078完成受控证据采集但三角色协议未准入：DeepSeek规划通过、内容Schema400、AIAPI审核未发；批次终止。课程前置阻塞；只可先离线具体兼容方案，新真实调用须另批。T038/catalog_only/H及原教学标准保持。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -3687,7 +3687,7 @@
       "id": "PHASE-1.5-T078",
       "phase": "Phase 1.5",
       "title": "按准确三角色合成包验证课程前置协议准入",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1.5-T077"
@@ -3705,16 +3705,31 @@
         "只读复核完整请求/响应/事件/用量与来源，分别报告各角色兼容及缺失；全部通过后才准备单份课程可行性，不将fixture算教学质量或T038分子。"
       ],
       "verification": [
-        "待实际执行：新角色准入run/check-results，仅准确批准后",
+        "PYTHONPATH=backend:. backend/.venv/bin/python scripts/run_p15_role_schema_probe.py --run",
+        "PYTHONPATH=backend:. backend/.venv/bin/python scripts/run_p15_role_schema_probe.py --check-results",
+        "exact frozen S1/S2/status/error/type inventory/event receipts inspection",
         "python3 scripts/check_catalog_workflow.py",
         "git diff --check"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "date": "2026-10-28T22:23:49+08:00",
+          "commands": [
+            "PYTHONPATH=backend:. backend/.venv/bin/python scripts/run_p15_role_schema_probe.py --run",
+            "PYTHONPATH=backend:. backend/.venv/bin/python scripts/run_p15_role_schema_probe.py --check-results",
+            "exact frozen S1/S2/status/error/type inventory/event receipts inspection",
+            "python3 scripts/check_catalog_workflow.py",
+            "git diff --check"
+          ],
+          "result": "受控采集完成、协议未准入：2 real HTTP；S1规划200及准确fixture/原Schema/phase/用量通过，输入614/输出119；S2内容400 unknown variant array，无usage保留unknown1；S3未运行。只读来源/原件/窗口/终态通过，run/check-results exit2按异常停止；实际账单/币种未知。错误无字段路径，联合类型为候选解释非单变量证明，无课程生成或AIAPI调用。",
+          "evidence": "docs/acceptance/phase-1.5-schema-compatibility/results-role-r01/RESULTS.md"
+        }
+      ],
+      "started_at": "2026-10-28T22:21:14+08:00",
+      "completed_at": "2026-10-28T22:23:49+08:00",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T078",
-      "execution_gate": "T077准确62文件manifest 12168a9918f234b467cf94800b2fd5177f4ac4a47ca8d637642d12e0307f8e02就绪；待ADR0045 A—C及新3HTTP/300秒/两服务合成外发/费用例外批准，不领取，无课程调用授权。"
+      "execution_gate": "准确包已一次性终止：规划准入1/3，内容Schema400拒绝，审核未运行；只完成受控验证任务，不等于协议准入。课程前置阻塞，不继承未用额度或窗口，后续兼容变更/真实探测须另案。"
     }
   ],
   "planning_inputs": {
