@@ -1,0 +1,25 @@
+{
+  "scope": "PHASE-1.5-T081",
+  "url": "https://api.deepseek.com/responses",
+  "model": "deepseek-flash",
+  "credential_env": "EDUMIND_DEEPSEEK_COMPAT_API_KEY",
+  "limits": {
+    "requests": 2,
+    "input_reservation": 8192,
+    "output_reservation": 64,
+    "fee_cap": null,
+    "wall_seconds": 90,
+    "per_request_seconds": 25,
+    "dns_seconds": 9,
+    "max_output_tokens": 32,
+    "request_bytes": 1024,
+    "response_bytes": 65536
+  },
+  "order": [
+    "S1",
+    "S2_if_S1_valid"
+  ],
+  "production": false,
+  "course_calls": false,
+  "envelope_policy": "union-final-phase-v1"
+}

@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "T079离线联合类型等价提案及450项回归完成，ADR0046未批准采用，远端anyOf支持未证；无新真实额度/入口。T078已终止、课程前置仍阻塞；先另备准确最小包并批准后才能探测，T038/catalog_only/H保持。",
+    "phase_gate": "T080准确联合表示最小包已完成离线568项/78文件冻结，T081待准确2HTTP/新90秒/外发/费用例外批准；ADR0046离线方案批准不等于真实执行批准，角色/课程仍未准入，T038/catalog_only/H保持。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -3784,6 +3784,92 @@
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T079",
       "execution_gate": "ADR0046 A—C及69文件离线提案已交付，未采用/执行；未来最小两请求仍需完整独立执行包、价格与金额预算及准确批准；相关角色/课程前置未解除，不续旧批。"
+    },
+    {
+      "phase": "Phase 1.5",
+      "priority": "P0",
+      "verification_results": [
+        {
+          "date": "2026-10-28T22:48:06+08:00",
+          "commands": [
+            "PYTHONPATH=backend:. backend/.venv/bin/python -m pytest scripts/tests/test_p15_union_schema_probe.py scripts/tests/test_p15_union_schema_proposal.py scripts/tests/test_p15_role_schema_contract.py scripts/tests/test_p15_role_schema_probe.py scripts/tests/test_p15_schema_probe_p02.py scripts/tests/test_p15_schema_probe.py scripts/tests/test_p15_schema_audit.py scripts/tests/test_p15_pilot_wire_execution.py -q --tb=short --junitxml=/private/tmp/edumind-p15-t080.xml",
+            "MYPYPATH=backend:. backend/.venv/bin/mypy --strict --explicit-package-bases --follow-imports=silent scripts/isolated_diagnostics/p15_union_schema_probe.py scripts/run_p15_union_schema_probe.py",
+            "backend/.venv/bin/ruff check scripts/isolated_diagnostics/p15_union_schema_probe.py scripts/run_p15_union_schema_probe.py scripts/tests/test_p15_union_schema_probe.py",
+            "PYTHONPATH=backend:. backend/.venv/bin/python scripts/run_p15_union_schema_probe.py --check",
+            "pending --run credential/output trap: exit2 before credential; original p01/p02/role-r01/union-proposal-r01 frozen hashes",
+            "python3 scripts/check_catalog_workflow.py",
+            "git diff --check"
+          ],
+          "result": "568 passed0skip（新118+既有450）、严格mypy2源/Ruff/工作流/准确预检/pending先于Key拒绝通过；新78文件manifest 5a62cb5f128719d2583efaeee8c1fc163f480d86f5ab1a4bb316ebaa94de96cf。S1 anyOf619字节/S2原type联合564字节，唯一等价表示差异。当前费率峰时占额参考$0.0025344非账单硬上限，准确真实授权待批；新真实0/Key未读/输出未建，旧冻结不变。",
+          "evidence": "docs/acceptance/phase-1.5-schema-compatibility/union-probe-p01/README.md"
+        }
+      ],
+      "completed_at": "2026-10-28T22:48:06+08:00",
+      "blocker": null,
+      "id": "PHASE-1.5-T080",
+      "title": "冻结联合类型等价表示的独立最小执行包",
+      "status": "done",
+      "depends_on": [
+        "PHASE-1.5-T079"
+      ],
+      "scope": [
+        "scripts/",
+        "docs/ADR/",
+        "docs/acceptance/phase-1.5-schema-compatibility/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5；用户批准ADR0046离线方案并准备准确最小包",
+      "acceptance_criteria": [
+        "登记ADR0046具体离线方案批准，保持原文件及所有旧批终止状态；仅固定anyOf控制与原type联合两请求，其他字节相等。",
+        "新独立入口先核准准确包/有限新窗口/费用风险后才读Key；S1完整通过才S2，任意异常停止，无重试/回退/重启。",
+        "离线覆盖等价/授权/时钟/来源/响应协议/准确Schema回显/停止及原件验真；冻结请求、当前价格、token与货币边界，给出可直接批准的执行包，不真实调用。"
+      ],
+      "verification": [
+        "PYTHONPATH=backend:. backend/.venv/bin/python -m pytest scripts/tests/test_p15_union_schema_probe.py scripts/tests/test_p15_union_schema_proposal.py scripts/tests/test_p15_role_schema_contract.py scripts/tests/test_p15_role_schema_probe.py scripts/tests/test_p15_schema_probe_p02.py scripts/tests/test_p15_schema_probe.py scripts/tests/test_p15_schema_audit.py scripts/tests/test_p15_pilot_wire_execution.py -q --tb=short --junitxml=/private/tmp/edumind-p15-t080.xml",
+        "MYPYPATH=backend:. backend/.venv/bin/mypy --strict --explicit-package-bases --follow-imports=silent scripts/isolated_diagnostics/p15_union_schema_probe.py scripts/run_p15_union_schema_probe.py",
+        "backend/.venv/bin/ruff check scripts/isolated_diagnostics/p15_union_schema_probe.py scripts/run_p15_union_schema_probe.py scripts/tests/test_p15_union_schema_probe.py",
+        "PYTHONPATH=backend:. backend/.venv/bin/python scripts/run_p15_union_schema_probe.py --check",
+        "pending --run credential/output trap: exit2 before credential; original p01/p02/role-r01/union-proposal-r01 frozen hashes",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "started_at": "2026-10-28T22:42:20+08:00",
+      "commit_lookup": "Task-Completed: PHASE-1.5-T080",
+      "execution_gate": "准确78文件包已冻结 5a62cb5f128719d2583efaeee8c1fc163f480d86f5ab1a4bb316ebaa94de96cf；ADR0046离线方案已批准，T081具体执行/2HTTP/新90秒/合成外发/费用例外尚待批准；旧批不续，无课程授权。"
+    },
+    {
+      "phase": "Phase 1.5",
+      "priority": "P0",
+      "verification_results": [],
+      "completed_at": null,
+      "blocker": null,
+      "id": "PHASE-1.5-T081",
+      "title": "按准确独立最小包采集联合类型表示对照",
+      "status": "todo",
+      "depends_on": [
+        "PHASE-1.5-T080"
+      ],
+      "scope": [
+        "docs/ADR/",
+        "docs/acceptance/phase-1.5-schema-compatibility/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5；ADR0046最小真实确认需准确包独立批准",
+      "acceptance_criteria": [
+        "准确包、合成外发、新90秒/最多2HTTP及费用边界获准后才登记新一次性执行。",
+        "anyOf S1完整通过后才发送原联合S2，S2任何结果终止；保留异常/unknown/未运行，不重试或续旧批。",
+        "只读重算请求/响应/控制/来源/窗口/终态，按矩阵解释最小形式，不当作完整内容/审核角色或课程准入。"
+      ],
+      "verification": [
+        "待准确批准后实际运行新最小包及只读验真",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "started_at": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T081",
+      "execution_gate": "待准确78文件manifest 5a62cb5f128719d2583efaeee8c1fc163f480d86f5ab1a4bb316ebaa94de96cf及独立2HTTP/90秒/合成外发/本批费用风险例外批准，不领取；旧批准不能执行本包，无课程授权。"
     }
   ],
   "planning_inputs": {
