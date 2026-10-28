@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "T072离线审计完成e84ab53，T073最小2HTTP包验收完成；T074待ADR0043准确包及新预算/费用例外批准。新增模型0，旧p01 stopped，相关角色兼容通过后才准备一份可评课程。",
+    "phase_gate": "T074最小观察已采集合规终止：1HTTP/200，因本项目响应phase字段兼容缺口停，S2未发；不继承剩余额度。下一步仅离线已知phase兼容与准确新包准备，相关角色兼容前不生成课程。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -3490,7 +3490,7 @@
       "id": "PHASE-1.5-T074",
       "phase": "Phase 1.5",
       "title": "按独立最小包采集Schema单变量兼容观察",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1.5-T073"
@@ -3513,12 +3513,25 @@
         "python3 scripts/check_catalog_workflow.py",
         "git diff --check"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "date": "2026-10-28T20:30:27+08:00",
+          "commands": [
+            "backend/.venv/bin/python scripts/run_p15_schema_probe.py --run",
+            "backend/.venv/bin/python scripts/run_p15_schema_probe.py --check-results",
+            "offline exact wire.validate plus Draft202012Validator on captured S1",
+            "python3 scripts/check_catalog_workflow.py",
+            "git diff --check"
+          ],
+          "result": "实际1 real HTTP，S1 200/completed/JSON符合Schema/用量服务报95输入6输出；旧严格校验因message.phase=final_answer报WIRE_MESSAGE，故S2未预约/发送、terminal inconclusive。只读证据/窗口通过且CLI按不确定返回2，unknown协议占额1，实际费用未知。没有继续/修复旧包或发送课程。",
+          "evidence": "docs/acceptance/phase-1.5-schema-compatibility/results-p01/RESULTS.md"
+        }
+      ],
+      "started_at": "2026-10-28T20:03:36+08:00",
+      "completed_at": "2026-10-28T20:30:27+08:00",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T074",
-      "execution_gate": "T073准备完成后等待准确ADR0043 A—C及manifest 0e3abcedfdfc5fa513fbbcb612ff4236d9453d11b21e4a19ea6ae0353842f59b的2HTTP/90秒/合成外发/本批金额例外批准；无旧授权继承，不自动进入课程。"
+      "execution_gate": "准确新批准下1HTTP后终止：S1收到200和符合Schema的JSON，但message.phase=final_answer触发旧WIRE_MESSAGE，S2未运行；窄enum假设不确定，不是真实兼容通过，旧结果不重写/不续批。"
     }
   ],
   "planning_inputs": {
