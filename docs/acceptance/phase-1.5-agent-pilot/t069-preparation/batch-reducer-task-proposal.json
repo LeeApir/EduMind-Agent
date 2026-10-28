@@ -1,0 +1,36 @@
+{
+  "id": "PHASE-1.5-T071",
+  "title": "验证协作试验全批生命周期与真实时钟证据",
+  "activation": "proposed_only_requires_user_decision_not_in_active_ledger",
+  "phase": "Phase 1.5",
+  "priority": "P0",
+  "depends_on": [
+    "PHASE-1.5-T068"
+  ],
+  "before": [
+    "PHASE-1.5-T069"
+  ],
+  "scope": [
+    "scripts/isolated_diagnostics/",
+    "scripts/tests/",
+    "scripts/check_p15_pilot_execution.py",
+    "docs/acceptance/phase-1.5-agent-pilot/",
+    "task.json",
+    "process.txt"
+  ],
+  "acceptance_criteria": [
+    "纯BatchReducer覆盖单批事件的当前槽/臂、唯一dispatch、独立检查点及不可逆停止；发送端和只读核验共享规则且最终批状态一致。",
+    "以真实receipt epoch核验出站/可信结算/推进位于准确[start,deadline)；迟到证据不推进或冒充成功；窗口不延长。",
+    "独立手写正反轨迹及篡改/重排测试覆盖跨槽、stop后推进、accept前出站、晚到、重复/遗漏及超窗；保留所有既有逐槽回归，不改原始证据或独立真值。",
+    "仅一次限定离线实现及独立复审；仍失败即blocked求助。通过后才新冻结/选e03，不宣称T069/T070或真实质量通过。"
+  ],
+  "verification": [
+    "待建立并实际执行全批Reducer单元/对抗/集成测试并记录命令与XML",
+    "重新运行现有wire/账本/逐槽重演回归与严格类型/Ruff",
+    "独立助手复审全批状态与真实时钟围栏",
+    "python3 scripts/check_catalog_workflow.py",
+    "git diff --check"
+  ],
+  "provider_requests_authorized": 0,
+  "production_admission": false
+}

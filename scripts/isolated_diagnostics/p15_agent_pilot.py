@@ -35,7 +35,7 @@ from scripts.isolated_diagnostics.p15_head_insertion_engine import (
     validate_spec,
 )
 
-PROMPT_VERSION = "agent-pilot-v1"
+PROMPT_VERSION = "agent-pilot-v2"
 GOALS = dict(
     trace_head="caller_head",
     trace_termination="traversal_status",
@@ -61,8 +61,22 @@ INSTRUCTIONS = {
     + "\nPilot envelope: use source_digest for the supplied candidate. "
     "Use pass/revise/unknown; unknown corresponds to insufficient evidence. Check "
     "all paragraphs, code, private reference answers and actions, including free prose. "
-    "Do not change standards. A pass is advisory, never publication or scoring.",
+    "Do not change standards. A pass is advisory, never publication or scoring. "
+    "Envelope mapping: source is the complete current candidate, not a nested scene; "
+    "reference is the exact finite engine reference; review_context supplies original_goal, "
+    "plan_constraints and upstream. The pilot Schema governs field names: source_digest "
+    "replaces historical source_sha256 and unknown replaces uncertain. Keep all original "
+    "fact, answer, code-safety, difficulty and misconception standards.",
 }
+
+
+def review_context(example: dict[str, Any]) -> dict[str, Any]:
+    return dict(
+        version="pilot-review-context-v1",
+        original_goal="追踪固定头插模板的调用者头、遍历终止分类、可知值前缀及分配失败次数。",
+        plan_constraints=deepcopy(example["spec"]),
+        upstream=[],
+    )
 
 
 def obj(properties: dict[str, Any]) -> dict[str, Any]:
@@ -592,7 +606,10 @@ class Pilot:
                 opinion = await self.call(
                     "review",
                     dict(
-                        source=source, source_digest=digest(source), reference=example
+                        source=source,
+                        source_digest=digest(source),
+                        reference=example,
+                        review_context=review_context(example),
                     ),
                     REVIEW_SCHEMA,
                     identity,

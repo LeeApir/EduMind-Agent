@@ -154,6 +154,8 @@ AI生成草稿可供学生学习，不以独立人工签核或普通语义审核
 
 2026-10-28 T066：用户授权从T066按依赖推进至T070，现领取具体职责/受限示例与对照协议设计。[ADR0041](ADR/0041-head-insertion-agent-pilot.md) A—D及[准确附件](acceptance/phase-1.5-agent-pilot/contract-r01/README.md)待批准；批准前不实施T067，真实实验仍须T069准确包独立授权。T070开发/独立评估身份分离，不自签独立结论；T038、生产catalog_only及原教学门槛保持。
 
+2026-10-28 T066–T069后续：用户准确批准[ADR0041](ADR/0041-approval-20261028.json)，T066职责设计、T067受限示例引擎及T068隔离协作已完成本地验收提交；这不证明真实模型质量。用户改由独立助手核定全部内容。T069当前在[独立证据预审](acceptance/phase-1.5-agent-pilot/t069-preparation/BLOCKED-DECISION.md)两轮修复后仍因全批停止/真实时钟因果未闭合而blocked；[ADR0042](ADR/0042-pilot-controlled-execution.md)及执行包仍为未就绪提案，本轮真实0。T071仅限定离线前置任务提案，未入活动账本；T070未领取，不解除T038/catalog_only/H或原教学门槛。
+
 ## 目录
 
 1. [项目概览](#一项目概览)
