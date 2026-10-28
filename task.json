@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "T074最小观察已采集合规终止：1HTTP/200，因本项目响应phase字段兼容缺口停，S2未发；不继承剩余额度。下一步仅离线已知phase兼容与准确新包准备，相关角色兼容前不生成课程。",
+    "phase_gate": "T074完成b78c598，S1返回200因项目phase字段兼容缺口停；T075离线新隔离兼容/256回归通过，T076独立p02待准确新批准。新真实0，旧p01不可续，相关角色兼容前不生成课程。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -3532,6 +3532,89 @@
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T074",
       "execution_gate": "准确新批准下1HTTP后终止：S1收到200和符合Schema的JSON，但message.phase=final_answer触发旧WIRE_MESSAGE，S2未运行；窄enum假设不确定，不是真实兼容通过，旧结果不重写/不续批。"
+    },
+    {
+      "id": "PHASE-1.5-T075",
+      "phase": "Phase 1.5",
+      "title": "离线隔离已知最终回答phase兼容并冻结独立p02最小包",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T074"
+      ],
+      "scope": [
+        "scripts/",
+        "docs/acceptance/phase-1.5-schema-compatibility/",
+        "docs/ADR/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5；用户持续要求单独定位兼容、兼容后才一份课程；T074捕获项目message.phase兼容缺口",
+      "acceptance_criteria": [
+        "新版本只认可生成message.phase缺省或准确final_answer，原始响应保留、仅私有校验副本处理；commentary/null/未知值及其他字段/工具/身份/用量/Schema门禁不放宽。",
+        "原p01源码/46文件/原始证据/失败结果保持原字节，不回填control或补发S2；准确S1离线重放与独立手写负例证明新处理的有限差异，不把离线重放当新真实通过。",
+        "冻结独立p02相同请求字节/模型/90秒/2HTTP/本批费用边界及准确入口，旧未用1请求不继承，真实须新包另批。",
+        "执行新版本完整Mock/停止/权威绑定/窗口/SSRF与phase反例回归；课程/sol/教学Prompt/标准不变，相关角色准入前不生成课程。"
+      ],
+      "verification": [
+        "待建立：p02离线/原件重放/phase回归、准确--check及pending拒绝",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [
+        {
+          "date": "2026-10-28T20:43:12+08:00",
+          "commands": [
+            "PYTHONPATH=backend:. backend/.venv/bin/python -m pytest scripts/tests/test_p15_schema_probe_p02.py scripts/tests/test_p15_schema_probe.py scripts/tests/test_p15_schema_audit.py scripts/tests/test_p15_pilot_wire_execution.py -q --tb=short --junitxml=/private/tmp/edumind-p15-t075.xml",
+            "MYPYPATH=backend:. backend/.venv/bin/mypy --strict --explicit-package-bases --follow-imports=silent scripts/isolated_diagnostics/p15_schema_probe_p02.py scripts/run_p15_schema_probe_p02.py",
+            "backend/.venv/bin/python scripts/run_p15_schema_probe_p02.py --check",
+            "pending p02 --run forbidden credential trap: exit2/no output",
+            "old p01 all46 file hashes and captured S1 unchanged; exact narrow source diff review",
+            "Ruff / python3 scripts/check_catalog_workflow.py / git diff --check"
+          ],
+          "result": "256 passed0skip（p02 87+旧p01 71+审计34+wire64）；mypy2源/Ruff/准确包预检与pending拒绝通过。仅新隔离校验视图分离message.phase=final_answer，其他门禁保留；原S1在新规则离线通过95/6，旧规则仍WIRE_MESSAGE且原结果不改，无新真实调用/Key读取。47文件manifest c40aa91a6bbbb6f0c21c7c61d8f66459800826c674ce5080327bf89759718cf4。",
+          "evidence": "docs/acceptance/phase-1.5-schema-compatibility/probe-p02/README.md"
+        }
+      ],
+      "started_at": "2026-10-28T20:34:41+08:00",
+      "completed_at": "2026-10-28T20:43:12+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T075",
+      "execution_gate": "仅离线新隔离phase=final_answer兼容和原S1重放通过；独立p02 manifest c40aa91a6bbbb6f0c21c7c61d8f66459800826c674ce5080327bf89759718cf4 待ADR0044 A—C及新2HTTP/90秒/外发/费用例外批准，旧p01不改不续，课程未准入。"
+    },
+    {
+      "id": "PHASE-1.5-T076",
+      "phase": "Phase 1.5",
+      "title": "按独立p02最小包采集已知phase兼容后的Schema对照",
+      "status": "todo",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T075"
+      ],
+      "scope": [
+        "docs/acceptance/phase-1.5-schema-compatibility/",
+        "docs/ADR/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5；用户要求确需真实确认时独立最小包",
+      "acceptance_criteria": [
+        "取得T075准确包/外发/新预算及费用边界独立批准后才登记新一次性批次；准确端点/模型/字节不变。",
+        "最多2HTTP按S1控制→条件S2执行，所有结果终止，不补样/重试/复用旧窗口；保留原始证据、unknown/未运行和时钟预算事实。",
+        "只读复核并按预注册矩阵解释，不把单字段成功当成完整角色Schema/教学质量通过；未满足控制时结论不确定。",
+        "交接下一阶段课程可行性的未满足准入项，不自动改课程Prompt、契约或发课程诊断。"
+      ],
+      "verification": [
+        "待实际执行：独立最小包run/check-results，仅准确批准后",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T076",
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "execution_gate": "T075独立p02准备完成；等待准确ADR0044 A—C及manifest c40aa91a6bbbb6f0c21c7c61d8f66459800826c674ce5080327bf89759718cf4 的新2HTTP/90秒/合成外发/硬界风险与本批金额例外批准。p01不可恢复，旧未用1不继承，课程仍未准入。"
     }
   ],
   "planning_inputs": {
