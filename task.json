@@ -3060,7 +3060,7 @@
       "id": "PHASE-1.5-T066",
       "phase": "Phase 1.5",
       "title": "冻结头插法协作原型职责契约与对照评估方案",
-      "status": "blocked",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1.5-T065"
@@ -3094,13 +3094,23 @@
           ],
           "result": "设计自查通过，六份文件/六手算开发种子/四拒绝要求；非独立真值核定或引擎测试，HTTP0",
           "evidence": "docs/acceptance/phase-1.5-agent-pilot/contract-r01/preparation-validation.json"
+        },
+        {
+          "date": "2026-10-28T11:45:28+08:00",
+          "commands": [
+            "recompute manifest and all six file SHA256",
+            "python3 scripts/check_catalog_workflow.py",
+            "git diff --check"
+          ],
+          "result": "批准摘要及文件字节一致，设计验收完成；真实0",
+          "evidence": "docs/ADR/0041-approval-20261028.json"
         }
       ],
       "started_at": "2026-10-28T11:36:28",
-      "completed_at": null,
-      "blocker": "ADR0041 A—D与manifest绑定6份准确设计文件已准备；具体职责/受限IR/评估契约待用户准确批准，未实施T067或真实调用。",
+      "completed_at": "2026-10-28T11:45:28+08:00",
+      "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T066",
-      "execution_gate": "用户授权从T066串行推进至T070；当前领取T066设计，具体契约批准后才实施T067，T069须准确执行包批准，T070独立评估者须与开发者分离。"
+      "execution_gate": "ADR0041 A-D及准确附件已批准；仅准隔离实施，T069准确执行包/人工独立真值和T070指定独立评估仍须满足。"
     },
     {
       "id": "PHASE-1.5-T067",
