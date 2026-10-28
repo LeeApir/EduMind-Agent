@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "T074完成b78c598，S1返回200因项目phase字段兼容缺口停；T075离线新隔离兼容/256回归通过，T076独立p02待准确新批准。新真实0，旧p01不可续，相关角色兼容前不生成课程。",
+    "phase_gate": "T076 p02最小对照完成：S1带type严格通过、S2仅删type得到匹配400，批次终止。下一步仅离线相关角色等价Schema适配和最小准入包准备，未有新真实额度/课程授权，T038/catalog_only/H保持。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -3586,7 +3586,7 @@
       "id": "PHASE-1.5-T076",
       "phase": "Phase 1.5",
       "title": "按独立p02最小包采集已知phase兼容后的Schema对照",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1.5-T075"
@@ -3611,10 +3611,23 @@
       ],
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T076",
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
-      "execution_gate": "T075独立p02准备完成；等待准确ADR0044 A—C及manifest c40aa91a6bbbb6f0c21c7c61d8f66459800826c674ce5080327bf89759718cf4 的新2HTTP/90秒/合成外发/硬界风险与本批金额例外批准。p01不可恢复，旧未用1不继承，课程仍未准入。"
+      "verification_results": [
+        {
+          "date": "2026-10-28T20:54:42+08:00",
+          "commands": [
+            "backend/.venv/bin/python scripts/run_p15_schema_probe_p02.py --run",
+            "backend/.venv/bin/python scripts/run_p15_schema_probe_p02.py --check-results",
+            "exact S1/S2 body single-variable/status/error/receipt inspection",
+            "python3 scripts/check_catalog_workflow.py",
+            "git diff --check"
+          ],
+          "result": "2 real HTTP，新S1 200/completed且严格校验通过/95输入6输出，S2匹配缺type/anyOf/$ref的400；evidence/window/控制/同IP/终态通过，CLI exit0表示窄观察完成。S2无usage保留unknown1，实际币种/费用未知；不证明原完整Schema唯一根因或任何课程质量，无新课程/sol。",
+          "evidence": "docs/acceptance/phase-1.5-schema-compatibility/results-p02/RESULTS.md"
+        }
+      ],
+      "started_at": "2026-10-28T20:47:46+08:00",
+      "completed_at": "2026-10-28T21:12:16+08:00",
+      "execution_gate": "准确批准下新p02两请求合规终止，S1带type 200/严格通过、S2仅删type得到匹配400；最小enum拒绝已观察，原完整Schema/角色/课程未准入，禁止续批。"
     }
   ],
   "planning_inputs": {
