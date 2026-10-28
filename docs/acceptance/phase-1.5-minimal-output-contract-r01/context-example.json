@@ -1,0 +1,75 @@
+{
+  "spec_id": "dev_empty_insert_7",
+  "spec": {
+    "version": "head-insertion-spec-v1",
+    "initial_values": [],
+    "insert_values": [
+      7
+    ],
+    "variant": "normal",
+    "allocation_success": [
+      true
+    ]
+  },
+  "fact_catalog": {
+    "obs_caller_head": {
+      "kind": "node_pointer",
+      "value": "t0"
+    },
+    "obs_traversal_status": {
+      "kind": "termination_class",
+      "value": "terminated"
+    },
+    "obs_reachable_prefix": {
+      "kind": "integer_list",
+      "value": [
+        7
+      ]
+    },
+    "obs_allocation_failures": {
+      "kind": "integer_count",
+      "value": 0
+    },
+    "trace_step_00": {
+      "kind": "trace_state",
+      "value": {
+        "caller_head": "none",
+        "local_head": "none",
+        "p": "none",
+        "nodes": []
+      }
+    }
+  },
+  "question_fact_ids": {
+    "caller_head": "obs_caller_head",
+    "traversal_status": "obs_traversal_status",
+    "reachable_prefix": "obs_reachable_prefix",
+    "allocation_failures": "obs_allocation_failures"
+  },
+  "candidate_id": "dev_candidate_r0",
+  "review_targets": {
+    "text_p0": "新节点成为调用者的头，链表从 7 遍历到空指针。",
+    "answer_head": "\"t0\"",
+    "answer_values": "[7]",
+    "action_s0": "{\"caller_head\":\"none\",\"nodes\":[]}"
+  },
+  "independent_truth_status": "handwritten_development_only_not_independent",
+  "baseline_generation_allowed": [
+    "spec_id",
+    "spec",
+    "goal_ids",
+    "question_definitions",
+    "node_id_conventions",
+    "output_contract"
+  ],
+  "baseline_generation_forbidden": [
+    "fact_catalog",
+    "question_fact_ids",
+    "review_targets",
+    "independent_truth",
+    "engine_example",
+    "engine_code",
+    "engine_actions",
+    "expected_answers"
+  ]
+}

@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "T081受控采集已完成但S1 anyOf控制Schema400 missing items，S2未发，批次终止。类型联合对照未形成、完整角色/课程仍阻塞；无新真实授权，不自动补字段或收窄JSON，不续旧批；T038/catalog_only/H保持。",
+    "phase_gate": "T082最小输出设计已交付，ADR0047 A—D及准确附件待外部评估/用户决定；未实施、无新真实授权，旧批终止且完整角色/课程未准入。按用户要求设计提交后停止；T038/catalog_only/H及教学阈值保持。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -3885,6 +3885,55 @@
       "started_at": "2026-10-28T22:50:57+08:00",
       "commit_lookup": "Task-Completed: PHASE-1.5-T081",
       "execution_gate": "独立准确包控制S1失败后终止，仅完成受控证据任务，未形成两请求对照/兼容准入；S2未发，不续旧窗口/未用请求。后续须先评估开放JSON等价表示的新具体方案，未授权自动补丁/新真实或课程。"
+    },
+    {
+      "id": "PHASE-1.5-T082",
+      "phase": "Phase 1.5",
+      "priority": "P0",
+      "title": "设计头插实验各角色最小输出契约与整体兼容准入方案",
+      "status": "done",
+      "depends_on": [
+        "PHASE-1.5-T081"
+      ],
+      "scope": [
+        "docs/ADR/",
+        "docs/acceptance/phase-1.5-minimal-output-contract-r01/",
+        "docs/PRD.md",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD§0.5；用户明确要求只做离线完整审查/契约设计，完成本地提交后停止",
+      "acceptance_criteria": [
+        "审查基线/协作规划/内容/审核及共享修复完整Schema，交付全量原Schema快照/准确路径风险清单，区分实际证据与未验证假设。",
+        "提出按程序事实ID、有限题型、自然语言教学审核及基线独立计算划分的完整最小输出契约，交付离线正反例及可复现设计检查。",
+        "具体ADR区分等价转换和实验契约变化，披露可比性/指标/职责影响，保持旧失败/冻结/教学阈值；提案待评估与批准，不接线实施。",
+        "提出全角色先准入后课程的有界兼容验证方案与停止条件；本轮真实额度0，提交本地设计成果后停止。"
+      ],
+      "verification": [
+        "PYTHONPATH=backend:. backend/.venv/bin/python docs/acceptance/phase-1.5-minimal-output-contract-r01/check_design.py",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [
+        {
+          "date": "2026-10-29T00:13:51+08:00",
+          "commands": [
+            "PYTHONPATH=backend:. backend/.venv/bin/python docs/acceptance/phase-1.5-minimal-output-contract-r01/check_design.py",
+            "backend/.venv/bin/ruff check docs/acceptance/phase-1.5-minimal-output-contract-r01/check_design.py",
+            "inline guarded runpy: forbid .env/API_KEY/DNS/socket access",
+            "python3 scripts/check_catalog_workflow.py",
+            "git diff --check"
+          ],
+          "result": "设计自查通过：4原Schema/93位置、4最小Schema/6阶段7上下文、51例(10结构接受/38拒绝/3语义待核查)+7协议fixture；旧302摘要不变，13附件/20来源/34链接通过，Ruff与禁止凭据/网络护栏通过。真实0/未实施/非独立评估或教学通过；初次证据链接及3条格式告警修正见verification.txt。",
+          "evidence": "docs/acceptance/phase-1.5-minimal-output-contract-r01/verification.txt",
+          "manifest_sha256": "763c4d6e714f4d7b340d9ea3c152f5b3a1a1e1152ff74c139e50e499d8116334"
+        }
+      ],
+      "started_at": "2026-10-28T23:57:25+08:00",
+      "completed_at": "2026-10-29T00:13:51+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T082",
+      "execution_gate": "T082仅离线设计交付完成，ADR0047 A—D/准确13附件待外部评估与用户决定。未实施/无新Provider额度；本地完成提交后停止，不领取下一任务，不重启旧批或准备课程执行。"
     }
   ],
   "planning_inputs": {

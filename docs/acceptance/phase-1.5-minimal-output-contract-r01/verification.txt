@@ -1,0 +1,27 @@
+T082 offline design verification — 2026-10-29 Asia/Shanghai
+Executor: Codex. Developer self-review only; not independent evaluation or approval.
+
+First check_design.py run: exit1, MISSING_LINK_verification.txt. Schema/case/budget/old-manifest checks had completed, but the README linked this evidence file before it existed. Created this evidence file; no assertion relaxed or old frozen file modified. Final check results recorded below after actual execution.
+
+No .env/key reads, DNS/network/Provider calls, C execution, database changes or runtime adapters. Synthetic fixtures are not courses. Semantic edge cases are deliberately accepted structurally and left for teaching/independent review.
+
+Final commands actually executed:
+1. PYTHONPATH=backend:. backend/.venv/bin/python docs/acceptance/phase-1.5-minimal-output-contract-r01/check_design.py
+   passed_design_only: 4 complete native schemas / 93 schema positions; 4 proposed schemas; 6 logical model stages / 7 protocol contexts; 51 cases = 10 structural accepts + 38 expected rejects + 2 accepts requiring teaching review + 1 accept requiring independent truth. Seven protocol fixtures also structurally/local-rule valid. Not a semantic correctness pass.
+   302 old manifest file entries unchanged (46+47+62+69+78); 13 design attachments / 20 source pins / 34 relative links verified.
+2. backend/.venv/bin/ruff check docs/acceptance/phase-1.5-minimal-output-contract-r01/check_design.py
+   Initial run: 3 E702 multiple-statements-on-one-line style findings. Split those statements and ran ruff format; final Ruff passed. No constraints weakened.
+3. Inline guarded runpy of check_design.py with .env file reads and API_KEY environment lookup forbidden, socket.getaddrinfo/create_connection/socket.connect forced to fail.
+   Same complete design check passed; no .env/API_KEY access, DNS or socket connections. No Provider executor invoked. This is an offline guard, not a live sandbox/SSRF proof.
+4. python3 scripts/check_catalog_workflow.py
+   Passed: active Phase 1.5 dependencies and max-one-in-progress valid; catalog archive valid; T033 blocked.
+5. git diff --check
+   Passed. All proposal JSON files parsed. No runtime source or existing frozen file changed.
+
+Developer self-review completed: scopes and six output stages mapped; all nested old Schema keywords included; primitive B answers remain model-authored; three deliberate semantic boundary cases retained; local range/uniqueness hard gates specified; new experiment-contract changes separated from equivalence; seven-request budget sums verified; no old quality score/allowance inherited. Independent evaluation and decision are pending.
+
+Scope limitations: static design checking only. No runtime adapter implemented, full cross-variant codec/replay validation not implemented, new Prompt envelope not applied, Provider compatibility not verified, no curriculum generation or teaching success. No regression test suite run against unchanged runtime source; immutable source/old manifest checks used instead.
+
+Handoff: give README.md and manifest to evaluation assistant. ADR0047 A-D requires review/user decision before implementation. Any later real test requires a new exact frozen package, verified or explicitly accepted account-fee boundary and independent window. T038/catalog_only/H and original acceptance thresholds unchanged. Stop after local design completion commit; no push/merge/next-task claim.
+
+Manifest SHA256: 763c4d6e714f4d7b340d9ea3c152f5b3a1a1e1152ff74c139e50e499d8116334

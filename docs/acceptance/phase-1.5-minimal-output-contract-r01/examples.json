@@ -1,0 +1,2261 @@
+{
+  "development_only": true,
+  "cases": [
+    {
+      "id": "positive_C_plan",
+      "role": "C_plan",
+      "payload": {
+        "spec_id": "dev_empty_insert_7",
+        "objective_ids": [
+          "trace_head",
+          "trace_termination",
+          "trace_values",
+          "trace_failures"
+        ]
+      },
+      "expected": "accept",
+      "layer": "structural",
+      "reason": ""
+    },
+    {
+      "id": "positive_C_content",
+      "role": "C_content",
+      "payload": {
+        "paragraphs": [
+          {
+            "key": "p0",
+            "text": "新节点成为调用者的头，链表从 7 遍历到空指针。",
+            "fact_ids": [
+              "obs_caller_head",
+              "obs_traversal_status"
+            ]
+          }
+        ],
+        "questions": {
+          "caller_head": {
+            "stem": "最终调用者头节点是哪一个？",
+            "explanation": "调用者接收 insert 返回的新节点 t0。",
+            "fact_ids": [
+              "obs_caller_head"
+            ]
+          },
+          "traversal_status": {
+            "stem": "遍历如何结束？",
+            "explanation": "新节点 next 指向原空链。",
+            "fact_ids": [
+              "obs_traversal_status"
+            ]
+          },
+          "reachable_prefix": {
+            "stem": "从调用者头可知的值前缀是什么？",
+            "explanation": "节点数据是 7，下一指针为空。",
+            "fact_ids": [
+              "obs_reachable_prefix"
+            ]
+          },
+          "allocation_failures": {
+            "stem": "本次分配失败几次？",
+            "explanation": "本次分配成功，因此失败次数是 0。",
+            "fact_ids": [
+              "obs_allocation_failures"
+            ]
+          }
+        }
+      },
+      "expected": "accept",
+      "layer": "structural",
+      "reason": ""
+    },
+    {
+      "id": "positive_C_repair",
+      "role": "C_repair",
+      "payload": {
+        "paragraphs": [
+          {
+            "key": "p0",
+            "text": "新节点成为调用者的头，链表从 7 遍历到空指针。",
+            "fact_ids": [
+              "obs_caller_head",
+              "obs_traversal_status"
+            ]
+          }
+        ],
+        "questions": {
+          "caller_head": {
+            "stem": "最终调用者头节点是哪一个？",
+            "explanation": "调用者接收 insert 返回的新节点 t0。",
+            "fact_ids": [
+              "obs_caller_head"
+            ]
+          },
+          "traversal_status": {
+            "stem": "遍历如何结束？",
+            "explanation": "新节点 next 指向原空链。",
+            "fact_ids": [
+              "obs_traversal_status"
+            ]
+          },
+          "reachable_prefix": {
+            "stem": "从调用者头可知的值前缀是什么？",
+            "explanation": "节点数据是 7，下一指针为空。",
+            "fact_ids": [
+              "obs_reachable_prefix"
+            ]
+          },
+          "allocation_failures": {
+            "stem": "本次分配失败几次？",
+            "explanation": "本次分配成功，因此失败次数是 0。",
+            "fact_ids": [
+              "obs_allocation_failures"
+            ]
+          }
+        }
+      },
+      "expected": "accept",
+      "layer": "structural",
+      "reason": ""
+    },
+    {
+      "id": "positive_B_generate",
+      "role": "B_generate",
+      "payload": {
+        "paragraphs": [
+          {
+            "key": "p0",
+            "text": "Synthetic wire fixture. Not a course."
+          }
+        ],
+        "code": "Synthetic wire fixture only; not executable C.",
+        "questions": {
+          "caller_head": {
+            "stem": "Synthetic caller_head",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          },
+          "traversal_status": {
+            "stem": "Synthetic traversal_status",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          },
+          "reachable_prefix": {
+            "stem": "Synthetic reachable_prefix",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          },
+          "allocation_failures": {
+            "stem": "Synthetic allocation_failures",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          }
+        },
+        "answers": {
+          "caller_head": "t0",
+          "traversal_status": "terminated",
+          "reachable_prefix": [
+            7
+          ],
+          "allocation_failures": 0
+        },
+        "actions": {
+          "states": [
+            {
+              "order": 0,
+              "step": 0,
+              "caller_head": "none",
+              "local_head": "none",
+              "p": "none",
+              "nodes": []
+            }
+          ],
+          "highlights": [
+            {
+              "order": 1,
+              "step": 0,
+              "line": 1
+            }
+          ],
+          "advances": [
+            {
+              "order": 2,
+              "step": 0
+            }
+          ]
+        }
+      },
+      "expected": "accept",
+      "layer": "structural",
+      "reason": ""
+    },
+    {
+      "id": "positive_B_repair",
+      "role": "B_repair",
+      "payload": {
+        "paragraphs": [
+          {
+            "key": "p0",
+            "text": "Synthetic wire fixture. Not a course."
+          }
+        ],
+        "code": "Synthetic wire fixture only; not executable C.",
+        "questions": {
+          "caller_head": {
+            "stem": "Synthetic caller_head",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          },
+          "traversal_status": {
+            "stem": "Synthetic traversal_status",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          },
+          "reachable_prefix": {
+            "stem": "Synthetic reachable_prefix",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          },
+          "allocation_failures": {
+            "stem": "Synthetic allocation_failures",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          }
+        },
+        "answers": {
+          "caller_head": "t0",
+          "traversal_status": "terminated",
+          "reachable_prefix": [
+            7
+          ],
+          "allocation_failures": 0
+        },
+        "actions": {
+          "states": [
+            {
+              "order": 0,
+              "step": 0,
+              "caller_head": "none",
+              "local_head": "none",
+              "p": "none",
+              "nodes": []
+            }
+          ],
+          "highlights": [
+            {
+              "order": 1,
+              "step": 0,
+              "line": 1
+            }
+          ],
+          "advances": [
+            {
+              "order": 2,
+              "step": 0
+            }
+          ]
+        }
+      },
+      "expected": "accept",
+      "layer": "structural",
+      "reason": ""
+    },
+    {
+      "id": "positive_review_B",
+      "role": "review_B",
+      "payload": {
+        "candidate_id": "dev_candidate_r0",
+        "verdict": "pass",
+        "uncertainty": "",
+        "issues": []
+      },
+      "expected": "accept",
+      "layer": "structural",
+      "reason": ""
+    },
+    {
+      "id": "positive_review_C",
+      "role": "review_C",
+      "payload": {
+        "candidate_id": "dev_candidate_r0",
+        "verdict": "pass",
+        "uncertainty": "",
+        "issues": []
+      },
+      "expected": "accept",
+      "layer": "structural",
+      "reason": ""
+    },
+    {
+      "id": "plan_unknown_spec",
+      "role": "C_plan",
+      "payload": {
+        "spec_id": "foreign",
+        "objective_ids": [
+          "trace_head",
+          "trace_termination",
+          "trace_values",
+          "trace_failures"
+        ]
+      },
+      "expected": "reject",
+      "layer": "local",
+      "reason": ""
+    },
+    {
+      "id": "plan_wrong_mapping_goal",
+      "role": "C_plan",
+      "payload": {
+        "spec_id": "dev_empty_insert_7",
+        "objective_ids": [
+          "scene_count",
+          "trace_termination",
+          "trace_values",
+          "trace_failures"
+        ]
+      },
+      "expected": "reject",
+      "layer": "schema",
+      "reason": ""
+    },
+    {
+      "id": "plan_duplicate_goal",
+      "role": "C_plan",
+      "payload": {
+        "spec_id": "dev_empty_insert_7",
+        "objective_ids": [
+          "trace_values",
+          "trace_termination",
+          "trace_values",
+          "trace_failures"
+        ]
+      },
+      "expected": "reject",
+      "layer": "local",
+      "reason": ""
+    },
+    {
+      "id": "plan_missing_goal",
+      "role": "C_plan",
+      "payload": {
+        "spec_id": "dev_empty_insert_7",
+        "objective_ids": [
+          "trace_head",
+          "trace_termination",
+          "trace_values"
+        ]
+      },
+      "expected": "reject",
+      "layer": "local",
+      "reason": ""
+    },
+    {
+      "id": "plan_extra_spec_values",
+      "role": "C_plan",
+      "payload": {
+        "spec_id": "dev_empty_insert_7",
+        "objective_ids": [
+          "trace_head",
+          "trace_termination",
+          "trace_values",
+          "trace_failures"
+        ],
+        "spec": {}
+      },
+      "expected": "reject",
+      "layer": "schema",
+      "reason": ""
+    },
+    {
+      "id": "content_value_injection",
+      "role": "C_content",
+      "payload": {
+        "paragraphs": [
+          {
+            "key": "p0",
+            "text": "新节点成为调用者的头，链表从 7 遍历到空指针。",
+            "fact_ids": [
+              "obs_caller_head",
+              "obs_traversal_status"
+            ],
+            "value": 7
+          }
+        ],
+        "questions": {
+          "caller_head": {
+            "stem": "最终调用者头节点是哪一个？",
+            "explanation": "调用者接收 insert 返回的新节点 t0。",
+            "fact_ids": [
+              "obs_caller_head"
+            ]
+          },
+          "traversal_status": {
+            "stem": "遍历如何结束？",
+            "explanation": "新节点 next 指向原空链。",
+            "fact_ids": [
+              "obs_traversal_status"
+            ]
+          },
+          "reachable_prefix": {
+            "stem": "从调用者头可知的值前缀是什么？",
+            "explanation": "节点数据是 7，下一指针为空。",
+            "fact_ids": [
+              "obs_reachable_prefix"
+            ]
+          },
+          "allocation_failures": {
+            "stem": "本次分配失败几次？",
+            "explanation": "本次分配成功，因此失败次数是 0。",
+            "fact_ids": [
+              "obs_allocation_failures"
+            ]
+          }
+        }
+      },
+      "expected": "reject",
+      "layer": "schema",
+      "reason": ""
+    },
+    {
+      "id": "content_unknown_fact",
+      "role": "C_content",
+      "payload": {
+        "paragraphs": [
+          {
+            "key": "p0",
+            "text": "新节点成为调用者的头，链表从 7 遍历到空指针。",
+            "fact_ids": [
+              "obs_caller_head",
+              "obs_traversal_status",
+              "trace_step_63"
+            ]
+          }
+        ],
+        "questions": {
+          "caller_head": {
+            "stem": "最终调用者头节点是哪一个？",
+            "explanation": "调用者接收 insert 返回的新节点 t0。",
+            "fact_ids": [
+              "obs_caller_head"
+            ]
+          },
+          "traversal_status": {
+            "stem": "遍历如何结束？",
+            "explanation": "新节点 next 指向原空链。",
+            "fact_ids": [
+              "obs_traversal_status"
+            ]
+          },
+          "reachable_prefix": {
+            "stem": "从调用者头可知的值前缀是什么？",
+            "explanation": "节点数据是 7，下一指针为空。",
+            "fact_ids": [
+              "obs_reachable_prefix"
+            ]
+          },
+          "allocation_failures": {
+            "stem": "本次分配失败几次？",
+            "explanation": "本次分配成功，因此失败次数是 0。",
+            "fact_ids": [
+              "obs_allocation_failures"
+            ]
+          }
+        }
+      },
+      "expected": "reject",
+      "layer": "local",
+      "reason": ""
+    },
+    {
+      "id": "content_duplicate_fact",
+      "role": "C_content",
+      "payload": {
+        "paragraphs": [
+          {
+            "key": "p0",
+            "text": "新节点成为调用者的头，链表从 7 遍历到空指针。",
+            "fact_ids": [
+              "obs_caller_head",
+              "obs_traversal_status",
+              "obs_caller_head"
+            ]
+          }
+        ],
+        "questions": {
+          "caller_head": {
+            "stem": "最终调用者头节点是哪一个？",
+            "explanation": "调用者接收 insert 返回的新节点 t0。",
+            "fact_ids": [
+              "obs_caller_head"
+            ]
+          },
+          "traversal_status": {
+            "stem": "遍历如何结束？",
+            "explanation": "新节点 next 指向原空链。",
+            "fact_ids": [
+              "obs_traversal_status"
+            ]
+          },
+          "reachable_prefix": {
+            "stem": "从调用者头可知的值前缀是什么？",
+            "explanation": "节点数据是 7，下一指针为空。",
+            "fact_ids": [
+              "obs_reachable_prefix"
+            ]
+          },
+          "allocation_failures": {
+            "stem": "本次分配失败几次？",
+            "explanation": "本次分配成功，因此失败次数是 0。",
+            "fact_ids": [
+              "obs_allocation_failures"
+            ]
+          }
+        }
+      },
+      "expected": "reject",
+      "layer": "local",
+      "reason": ""
+    },
+    {
+      "id": "content_empty_fact",
+      "role": "C_content",
+      "payload": {
+        "paragraphs": [
+          {
+            "key": "p0",
+            "text": "新节点成为调用者的头，链表从 7 遍历到空指针。",
+            "fact_ids": []
+          }
+        ],
+        "questions": {
+          "caller_head": {
+            "stem": "最终调用者头节点是哪一个？",
+            "explanation": "调用者接收 insert 返回的新节点 t0。",
+            "fact_ids": [
+              "obs_caller_head"
+            ]
+          },
+          "traversal_status": {
+            "stem": "遍历如何结束？",
+            "explanation": "新节点 next 指向原空链。",
+            "fact_ids": [
+              "obs_traversal_status"
+            ]
+          },
+          "reachable_prefix": {
+            "stem": "从调用者头可知的值前缀是什么？",
+            "explanation": "节点数据是 7，下一指针为空。",
+            "fact_ids": [
+              "obs_reachable_prefix"
+            ]
+          },
+          "allocation_failures": {
+            "stem": "本次分配失败几次？",
+            "explanation": "本次分配成功，因此失败次数是 0。",
+            "fact_ids": [
+              "obs_allocation_failures"
+            ]
+          }
+        }
+      },
+      "expected": "reject",
+      "layer": "local",
+      "reason": ""
+    },
+    {
+      "id": "content_wrong_question_fact",
+      "role": "C_content",
+      "payload": {
+        "paragraphs": [
+          {
+            "key": "p0",
+            "text": "新节点成为调用者的头，链表从 7 遍历到空指针。",
+            "fact_ids": [
+              "obs_caller_head",
+              "obs_traversal_status"
+            ]
+          }
+        ],
+        "questions": {
+          "caller_head": {
+            "stem": "最终调用者头节点是哪一个？",
+            "explanation": "调用者接收 insert 返回的新节点 t0。",
+            "fact_ids": [
+              "obs_reachable_prefix"
+            ]
+          },
+          "traversal_status": {
+            "stem": "遍历如何结束？",
+            "explanation": "新节点 next 指向原空链。",
+            "fact_ids": [
+              "obs_traversal_status"
+            ]
+          },
+          "reachable_prefix": {
+            "stem": "从调用者头可知的值前缀是什么？",
+            "explanation": "节点数据是 7，下一指针为空。",
+            "fact_ids": [
+              "obs_reachable_prefix"
+            ]
+          },
+          "allocation_failures": {
+            "stem": "本次分配失败几次？",
+            "explanation": "本次分配成功，因此失败次数是 0。",
+            "fact_ids": [
+              "obs_allocation_failures"
+            ]
+          }
+        }
+      },
+      "expected": "reject",
+      "layer": "local",
+      "reason": ""
+    },
+    {
+      "id": "content_missing_question",
+      "role": "C_content",
+      "payload": {
+        "paragraphs": [
+          {
+            "key": "p0",
+            "text": "新节点成为调用者的头，链表从 7 遍历到空指针。",
+            "fact_ids": [
+              "obs_caller_head",
+              "obs_traversal_status"
+            ]
+          }
+        ],
+        "questions": {
+          "traversal_status": {
+            "stem": "遍历如何结束？",
+            "explanation": "新节点 next 指向原空链。",
+            "fact_ids": [
+              "obs_traversal_status"
+            ]
+          },
+          "reachable_prefix": {
+            "stem": "从调用者头可知的值前缀是什么？",
+            "explanation": "节点数据是 7，下一指针为空。",
+            "fact_ids": [
+              "obs_reachable_prefix"
+            ]
+          },
+          "allocation_failures": {
+            "stem": "本次分配失败几次？",
+            "explanation": "本次分配成功，因此失败次数是 0。",
+            "fact_ids": [
+              "obs_allocation_failures"
+            ]
+          }
+        }
+      },
+      "expected": "reject",
+      "layer": "schema",
+      "reason": ""
+    },
+    {
+      "id": "content_duplicate_key",
+      "role": "C_content",
+      "payload": {
+        "paragraphs": [
+          {
+            "key": "p0",
+            "text": "新节点成为调用者的头，链表从 7 遍历到空指针。",
+            "fact_ids": [
+              "obs_caller_head",
+              "obs_traversal_status"
+            ]
+          },
+          {
+            "key": "p0",
+            "text": "新节点成为调用者的头，链表从 7 遍历到空指针。",
+            "fact_ids": [
+              "obs_caller_head",
+              "obs_traversal_status"
+            ]
+          }
+        ],
+        "questions": {
+          "caller_head": {
+            "stem": "最终调用者头节点是哪一个？",
+            "explanation": "调用者接收 insert 返回的新节点 t0。",
+            "fact_ids": [
+              "obs_caller_head"
+            ]
+          },
+          "traversal_status": {
+            "stem": "遍历如何结束？",
+            "explanation": "新节点 next 指向原空链。",
+            "fact_ids": [
+              "obs_traversal_status"
+            ]
+          },
+          "reachable_prefix": {
+            "stem": "从调用者头可知的值前缀是什么？",
+            "explanation": "节点数据是 7，下一指针为空。",
+            "fact_ids": [
+              "obs_reachable_prefix"
+            ]
+          },
+          "allocation_failures": {
+            "stem": "本次分配失败几次？",
+            "explanation": "本次分配成功，因此失败次数是 0。",
+            "fact_ids": [
+              "obs_allocation_failures"
+            ]
+          }
+        }
+      },
+      "expected": "reject",
+      "layer": "local",
+      "reason": ""
+    },
+    {
+      "id": "content_reserved_key",
+      "role": "C_content",
+      "payload": {
+        "paragraphs": [
+          {
+            "key": "code",
+            "text": "新节点成为调用者的头，链表从 7 遍历到空指针。",
+            "fact_ids": [
+              "obs_caller_head",
+              "obs_traversal_status"
+            ]
+          }
+        ],
+        "questions": {
+          "caller_head": {
+            "stem": "最终调用者头节点是哪一个？",
+            "explanation": "调用者接收 insert 返回的新节点 t0。",
+            "fact_ids": [
+              "obs_caller_head"
+            ]
+          },
+          "traversal_status": {
+            "stem": "遍历如何结束？",
+            "explanation": "新节点 next 指向原空链。",
+            "fact_ids": [
+              "obs_traversal_status"
+            ]
+          },
+          "reachable_prefix": {
+            "stem": "从调用者头可知的值前缀是什么？",
+            "explanation": "节点数据是 7，下一指针为空。",
+            "fact_ids": [
+              "obs_reachable_prefix"
+            ]
+          },
+          "allocation_failures": {
+            "stem": "本次分配失败几次？",
+            "explanation": "本次分配成功，因此失败次数是 0。",
+            "fact_ids": [
+              "obs_allocation_failures"
+            ]
+          }
+        }
+      },
+      "expected": "reject",
+      "layer": "local",
+      "reason": ""
+    },
+    {
+      "id": "content_overlong_text",
+      "role": "C_content",
+      "payload": {
+        "paragraphs": [
+          {
+            "key": "p0",
+            "text": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "fact_ids": [
+              "obs_caller_head",
+              "obs_traversal_status"
+            ]
+          }
+        ],
+        "questions": {
+          "caller_head": {
+            "stem": "最终调用者头节点是哪一个？",
+            "explanation": "调用者接收 insert 返回的新节点 t0。",
+            "fact_ids": [
+              "obs_caller_head"
+            ]
+          },
+          "traversal_status": {
+            "stem": "遍历如何结束？",
+            "explanation": "新节点 next 指向原空链。",
+            "fact_ids": [
+              "obs_traversal_status"
+            ]
+          },
+          "reachable_prefix": {
+            "stem": "从调用者头可知的值前缀是什么？",
+            "explanation": "节点数据是 7，下一指针为空。",
+            "fact_ids": [
+              "obs_reachable_prefix"
+            ]
+          },
+          "allocation_failures": {
+            "stem": "本次分配失败几次？",
+            "explanation": "本次分配成功，因此失败次数是 0。",
+            "fact_ids": [
+              "obs_allocation_failures"
+            ]
+          }
+        }
+      },
+      "expected": "reject",
+      "layer": "local",
+      "reason": ""
+    },
+    {
+      "id": "content_empty_stem",
+      "role": "C_content",
+      "payload": {
+        "paragraphs": [
+          {
+            "key": "p0",
+            "text": "新节点成为调用者的头，链表从 7 遍历到空指针。",
+            "fact_ids": [
+              "obs_caller_head",
+              "obs_traversal_status"
+            ]
+          }
+        ],
+        "questions": {
+          "caller_head": {
+            "stem": "",
+            "explanation": "调用者接收 insert 返回的新节点 t0。",
+            "fact_ids": [
+              "obs_caller_head"
+            ]
+          },
+          "traversal_status": {
+            "stem": "遍历如何结束？",
+            "explanation": "新节点 next 指向原空链。",
+            "fact_ids": [
+              "obs_traversal_status"
+            ]
+          },
+          "reachable_prefix": {
+            "stem": "从调用者头可知的值前缀是什么？",
+            "explanation": "节点数据是 7，下一指针为空。",
+            "fact_ids": [
+              "obs_reachable_prefix"
+            ]
+          },
+          "allocation_failures": {
+            "stem": "本次分配失败几次？",
+            "explanation": "本次分配成功，因此失败次数是 0。",
+            "fact_ids": [
+              "obs_allocation_failures"
+            ]
+          }
+        }
+      },
+      "expected": "reject",
+      "layer": "local",
+      "reason": ""
+    },
+    {
+      "id": "content_answer_filled_by_model",
+      "role": "C_content",
+      "payload": {
+        "paragraphs": [
+          {
+            "key": "p0",
+            "text": "新节点成为调用者的头，链表从 7 遍历到空指针。",
+            "fact_ids": [
+              "obs_caller_head",
+              "obs_traversal_status"
+            ]
+          }
+        ],
+        "questions": {
+          "caller_head": {
+            "stem": "最终调用者头节点是哪一个？",
+            "explanation": "调用者接收 insert 返回的新节点 t0。",
+            "fact_ids": [
+              "obs_caller_head"
+            ]
+          },
+          "traversal_status": {
+            "stem": "遍历如何结束？",
+            "explanation": "新节点 next 指向原空链。",
+            "fact_ids": [
+              "obs_traversal_status"
+            ]
+          },
+          "reachable_prefix": {
+            "stem": "从调用者头可知的值前缀是什么？",
+            "explanation": "节点数据是 7，下一指针为空。",
+            "fact_ids": [
+              "obs_reachable_prefix"
+            ]
+          },
+          "allocation_failures": {
+            "stem": "本次分配失败几次？",
+            "explanation": "本次分配成功，因此失败次数是 0。",
+            "fact_ids": [
+              "obs_allocation_failures"
+            ]
+          }
+        },
+        "answers": {
+          "caller_head": "t0",
+          "traversal_status": "terminated",
+          "reachable_prefix": [
+            7
+          ],
+          "allocation_failures": 0
+        }
+      },
+      "expected": "reject",
+      "layer": "schema",
+      "reason": ""
+    },
+    {
+      "id": "baseline_missing_model_answer",
+      "role": "B_generate",
+      "payload": {
+        "paragraphs": [
+          {
+            "key": "p0",
+            "text": "Synthetic wire fixture. Not a course."
+          }
+        ],
+        "code": "Synthetic wire fixture only; not executable C.",
+        "questions": {
+          "caller_head": {
+            "stem": "Synthetic caller_head",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          },
+          "traversal_status": {
+            "stem": "Synthetic traversal_status",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          },
+          "reachable_prefix": {
+            "stem": "Synthetic reachable_prefix",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          },
+          "allocation_failures": {
+            "stem": "Synthetic allocation_failures",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          }
+        },
+        "answers": {
+          "traversal_status": "terminated",
+          "reachable_prefix": [
+            7
+          ],
+          "allocation_failures": 0
+        },
+        "actions": {
+          "states": [
+            {
+              "order": 0,
+              "step": 0,
+              "caller_head": "none",
+              "local_head": "none",
+              "p": "none",
+              "nodes": []
+            }
+          ],
+          "highlights": [
+            {
+              "order": 1,
+              "step": 0,
+              "line": 1
+            }
+          ],
+          "advances": [
+            {
+              "order": 2,
+              "step": 0
+            }
+          ]
+        }
+      },
+      "expected": "reject",
+      "layer": "schema",
+      "reason": "Must reject, never fill from engine"
+    },
+    {
+      "id": "baseline_nested_answer",
+      "role": "B_generate",
+      "payload": {
+        "paragraphs": [
+          {
+            "key": "p0",
+            "text": "Synthetic wire fixture. Not a course."
+          }
+        ],
+        "code": "Synthetic wire fixture only; not executable C.",
+        "questions": {
+          "caller_head": {
+            "stem": "Synthetic caller_head",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          },
+          "traversal_status": {
+            "stem": "Synthetic traversal_status",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          },
+          "reachable_prefix": {
+            "stem": "Synthetic reachable_prefix",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          },
+          "allocation_failures": {
+            "stem": "Synthetic allocation_failures",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          }
+        },
+        "answers": {
+          "caller_head": "t0",
+          "traversal_status": "terminated",
+          "reachable_prefix": [
+            [
+              7
+            ]
+          ],
+          "allocation_failures": 0
+        },
+        "actions": {
+          "states": [
+            {
+              "order": 0,
+              "step": 0,
+              "caller_head": "none",
+              "local_head": "none",
+              "p": "none",
+              "nodes": []
+            }
+          ],
+          "highlights": [
+            {
+              "order": 1,
+              "step": 0,
+              "line": 1
+            }
+          ],
+          "advances": [
+            {
+              "order": 2,
+              "step": 0
+            }
+          ]
+        }
+      },
+      "expected": "reject",
+      "layer": "schema",
+      "reason": ""
+    },
+    {
+      "id": "baseline_bool_count",
+      "role": "B_generate",
+      "payload": {
+        "paragraphs": [
+          {
+            "key": "p0",
+            "text": "Synthetic wire fixture. Not a course."
+          }
+        ],
+        "code": "Synthetic wire fixture only; not executable C.",
+        "questions": {
+          "caller_head": {
+            "stem": "Synthetic caller_head",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          },
+          "traversal_status": {
+            "stem": "Synthetic traversal_status",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          },
+          "reachable_prefix": {
+            "stem": "Synthetic reachable_prefix",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          },
+          "allocation_failures": {
+            "stem": "Synthetic allocation_failures",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          }
+        },
+        "answers": {
+          "caller_head": "t0",
+          "traversal_status": "terminated",
+          "reachable_prefix": [
+            7
+          ],
+          "allocation_failures": true
+        },
+        "actions": {
+          "states": [
+            {
+              "order": 0,
+              "step": 0,
+              "caller_head": "none",
+              "local_head": "none",
+              "p": "none",
+              "nodes": []
+            }
+          ],
+          "highlights": [
+            {
+              "order": 1,
+              "step": 0,
+              "line": 1
+            }
+          ],
+          "advances": [
+            {
+              "order": 2,
+              "step": 0
+            }
+          ]
+        }
+      },
+      "expected": "reject",
+      "layer": "schema",
+      "reason": ""
+    },
+    {
+      "id": "baseline_null_head",
+      "role": "B_generate",
+      "payload": {
+        "paragraphs": [
+          {
+            "key": "p0",
+            "text": "Synthetic wire fixture. Not a course."
+          }
+        ],
+        "code": "Synthetic wire fixture only; not executable C.",
+        "questions": {
+          "caller_head": {
+            "stem": "Synthetic caller_head",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          },
+          "traversal_status": {
+            "stem": "Synthetic traversal_status",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          },
+          "reachable_prefix": {
+            "stem": "Synthetic reachable_prefix",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          },
+          "allocation_failures": {
+            "stem": "Synthetic allocation_failures",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          }
+        },
+        "answers": {
+          "caller_head": null,
+          "traversal_status": "terminated",
+          "reachable_prefix": [
+            7
+          ],
+          "allocation_failures": 0
+        },
+        "actions": {
+          "states": [
+            {
+              "order": 0,
+              "step": 0,
+              "caller_head": "none",
+              "local_head": "none",
+              "p": "none",
+              "nodes": []
+            }
+          ],
+          "highlights": [
+            {
+              "order": 1,
+              "step": 0,
+              "line": 1
+            }
+          ],
+          "advances": [
+            {
+              "order": 2,
+              "step": 0
+            }
+          ]
+        }
+      },
+      "expected": "reject",
+      "layer": "schema",
+      "reason": ""
+    },
+    {
+      "id": "baseline_dynamic_nodes",
+      "role": "B_generate",
+      "payload": {
+        "paragraphs": [
+          {
+            "key": "p0",
+            "text": "Synthetic wire fixture. Not a course."
+          }
+        ],
+        "code": "Synthetic wire fixture only; not executable C.",
+        "questions": {
+          "caller_head": {
+            "stem": "Synthetic caller_head",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          },
+          "traversal_status": {
+            "stem": "Synthetic traversal_status",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          },
+          "reachable_prefix": {
+            "stem": "Synthetic reachable_prefix",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          },
+          "allocation_failures": {
+            "stem": "Synthetic allocation_failures",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          }
+        },
+        "answers": {
+          "caller_head": "t0",
+          "traversal_status": "terminated",
+          "reachable_prefix": [
+            7
+          ],
+          "allocation_failures": 0
+        },
+        "actions": {
+          "states": [
+            {
+              "order": 0,
+              "step": 0,
+              "caller_head": "none",
+              "local_head": "none",
+              "p": "none",
+              "nodes": {
+                "t0": {
+                  "data": 7,
+                  "next": "none"
+                }
+              }
+            }
+          ],
+          "highlights": [
+            {
+              "order": 1,
+              "step": 0,
+              "line": 1
+            }
+          ],
+          "advances": [
+            {
+              "order": 2,
+              "step": 0
+            }
+          ]
+        }
+      },
+      "expected": "reject",
+      "layer": "schema",
+      "reason": ""
+    },
+    {
+      "id": "baseline_count_bound",
+      "role": "B_generate",
+      "payload": {
+        "paragraphs": [
+          {
+            "key": "p0",
+            "text": "Synthetic wire fixture. Not a course."
+          }
+        ],
+        "code": "Synthetic wire fixture only; not executable C.",
+        "questions": {
+          "caller_head": {
+            "stem": "Synthetic caller_head",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          },
+          "traversal_status": {
+            "stem": "Synthetic traversal_status",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          },
+          "reachable_prefix": {
+            "stem": "Synthetic reachable_prefix",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          },
+          "allocation_failures": {
+            "stem": "Synthetic allocation_failures",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          }
+        },
+        "answers": {
+          "caller_head": "t0",
+          "traversal_status": "terminated",
+          "reachable_prefix": [
+            7
+          ],
+          "allocation_failures": 5
+        },
+        "actions": {
+          "states": [
+            {
+              "order": 0,
+              "step": 0,
+              "caller_head": "none",
+              "local_head": "none",
+              "p": "none",
+              "nodes": []
+            }
+          ],
+          "highlights": [
+            {
+              "order": 1,
+              "step": 0,
+              "line": 1
+            }
+          ],
+          "advances": [
+            {
+              "order": 2,
+              "step": 0
+            }
+          ]
+        }
+      },
+      "expected": "reject",
+      "layer": "local",
+      "reason": ""
+    },
+    {
+      "id": "baseline_value_bound",
+      "role": "B_generate",
+      "payload": {
+        "paragraphs": [
+          {
+            "key": "p0",
+            "text": "Synthetic wire fixture. Not a course."
+          }
+        ],
+        "code": "Synthetic wire fixture only; not executable C.",
+        "questions": {
+          "caller_head": {
+            "stem": "Synthetic caller_head",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          },
+          "traversal_status": {
+            "stem": "Synthetic traversal_status",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          },
+          "reachable_prefix": {
+            "stem": "Synthetic reachable_prefix",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          },
+          "allocation_failures": {
+            "stem": "Synthetic allocation_failures",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          }
+        },
+        "answers": {
+          "caller_head": "t0",
+          "traversal_status": "terminated",
+          "reachable_prefix": [
+            100
+          ],
+          "allocation_failures": 0
+        },
+        "actions": {
+          "states": [
+            {
+              "order": 0,
+              "step": 0,
+              "caller_head": "none",
+              "local_head": "none",
+              "p": "none",
+              "nodes": []
+            }
+          ],
+          "highlights": [
+            {
+              "order": 1,
+              "step": 0,
+              "line": 1
+            }
+          ],
+          "advances": [
+            {
+              "order": 2,
+              "step": 0
+            }
+          ]
+        }
+      },
+      "expected": "reject",
+      "layer": "local",
+      "reason": ""
+    },
+    {
+      "id": "baseline_duplicate_order",
+      "role": "B_generate",
+      "payload": {
+        "paragraphs": [
+          {
+            "key": "p0",
+            "text": "Synthetic wire fixture. Not a course."
+          }
+        ],
+        "code": "Synthetic wire fixture only; not executable C.",
+        "questions": {
+          "caller_head": {
+            "stem": "Synthetic caller_head",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          },
+          "traversal_status": {
+            "stem": "Synthetic traversal_status",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          },
+          "reachable_prefix": {
+            "stem": "Synthetic reachable_prefix",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          },
+          "allocation_failures": {
+            "stem": "Synthetic allocation_failures",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          }
+        },
+        "answers": {
+          "caller_head": "t0",
+          "traversal_status": "terminated",
+          "reachable_prefix": [
+            7
+          ],
+          "allocation_failures": 0
+        },
+        "actions": {
+          "states": [
+            {
+              "order": 0,
+              "step": 0,
+              "caller_head": "none",
+              "local_head": "none",
+              "p": "none",
+              "nodes": []
+            }
+          ],
+          "highlights": [
+            {
+              "order": 1,
+              "step": 0,
+              "line": 1
+            }
+          ],
+          "advances": [
+            {
+              "order": 1,
+              "step": 0
+            }
+          ]
+        }
+      },
+      "expected": "reject",
+      "layer": "local",
+      "reason": ""
+    },
+    {
+      "id": "baseline_missing_state",
+      "role": "B_generate",
+      "payload": {
+        "paragraphs": [
+          {
+            "key": "p0",
+            "text": "Synthetic wire fixture. Not a course."
+          }
+        ],
+        "code": "Synthetic wire fixture only; not executable C.",
+        "questions": {
+          "caller_head": {
+            "stem": "Synthetic caller_head",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          },
+          "traversal_status": {
+            "stem": "Synthetic traversal_status",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          },
+          "reachable_prefix": {
+            "stem": "Synthetic reachable_prefix",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          },
+          "allocation_failures": {
+            "stem": "Synthetic allocation_failures",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          }
+        },
+        "answers": {
+          "caller_head": "t0",
+          "traversal_status": "terminated",
+          "reachable_prefix": [
+            7
+          ],
+          "allocation_failures": 0
+        },
+        "actions": {
+          "states": [
+            {
+              "order": 0,
+              "step": 0,
+              "caller_head": "none",
+              "local_head": "none",
+              "p": "none",
+              "nodes": []
+            }
+          ],
+          "highlights": [
+            {
+              "order": 1,
+              "step": 0,
+              "line": 1
+            }
+          ],
+          "advances": [
+            {
+              "order": 2,
+              "step": 5
+            }
+          ]
+        }
+      },
+      "expected": "reject",
+      "layer": "local",
+      "reason": ""
+    },
+    {
+      "id": "baseline_nonexistent_line",
+      "role": "B_generate",
+      "payload": {
+        "paragraphs": [
+          {
+            "key": "p0",
+            "text": "Synthetic wire fixture. Not a course."
+          }
+        ],
+        "code": "Synthetic wire fixture only; not executable C.",
+        "questions": {
+          "caller_head": {
+            "stem": "Synthetic caller_head",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          },
+          "traversal_status": {
+            "stem": "Synthetic traversal_status",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          },
+          "reachable_prefix": {
+            "stem": "Synthetic reachable_prefix",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          },
+          "allocation_failures": {
+            "stem": "Synthetic allocation_failures",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          }
+        },
+        "answers": {
+          "caller_head": "t0",
+          "traversal_status": "terminated",
+          "reachable_prefix": [
+            7
+          ],
+          "allocation_failures": 0
+        },
+        "actions": {
+          "states": [
+            {
+              "order": 0,
+              "step": 0,
+              "caller_head": "none",
+              "local_head": "none",
+              "p": "none",
+              "nodes": []
+            }
+          ],
+          "highlights": [
+            {
+              "order": 1,
+              "step": 0,
+              "line": 2
+            }
+          ],
+          "advances": [
+            {
+              "order": 2,
+              "step": 0
+            }
+          ]
+        }
+      },
+      "expected": "reject",
+      "layer": "local",
+      "reason": ""
+    },
+    {
+      "id": "baseline_inactive_data_sentinel",
+      "role": "B_generate",
+      "payload": {
+        "paragraphs": [
+          {
+            "key": "p0",
+            "text": "Synthetic wire fixture. Not a course."
+          }
+        ],
+        "code": "Synthetic wire fixture only; not executable C.",
+        "questions": {
+          "caller_head": {
+            "stem": "Synthetic caller_head",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          },
+          "traversal_status": {
+            "stem": "Synthetic traversal_status",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          },
+          "reachable_prefix": {
+            "stem": "Synthetic reachable_prefix",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          },
+          "allocation_failures": {
+            "stem": "Synthetic allocation_failures",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          }
+        },
+        "answers": {
+          "caller_head": "t0",
+          "traversal_status": "terminated",
+          "reachable_prefix": [
+            7
+          ],
+          "allocation_failures": 0
+        },
+        "actions": {
+          "states": [
+            {
+              "order": 0,
+              "step": 0,
+              "caller_head": "none",
+              "local_head": "none",
+              "p": "none",
+              "nodes": [
+                {
+                  "id": "t0",
+                  "data_status": "indeterminate",
+                  "data": 7,
+                  "next": "none"
+                }
+              ]
+            }
+          ],
+          "highlights": [
+            {
+              "order": 1,
+              "step": 0,
+              "line": 1
+            }
+          ],
+          "advances": [
+            {
+              "order": 2,
+              "step": 0
+            }
+          ]
+        }
+      },
+      "expected": "reject",
+      "layer": "local",
+      "reason": ""
+    },
+    {
+      "id": "baseline_uninitialized_state",
+      "role": "B_generate",
+      "payload": {
+        "paragraphs": [
+          {
+            "key": "p0",
+            "text": "Synthetic wire fixture. Not a course."
+          }
+        ],
+        "code": "Synthetic wire fixture only; not executable C.",
+        "questions": {
+          "caller_head": {
+            "stem": "Synthetic caller_head",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          },
+          "traversal_status": {
+            "stem": "Synthetic traversal_status",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          },
+          "reachable_prefix": {
+            "stem": "Synthetic reachable_prefix",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          },
+          "allocation_failures": {
+            "stem": "Synthetic allocation_failures",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          }
+        },
+        "answers": {
+          "caller_head": "t0",
+          "traversal_status": "terminated",
+          "reachable_prefix": [
+            7
+          ],
+          "allocation_failures": 0
+        },
+        "actions": {
+          "states": [
+            {
+              "order": 0,
+              "step": 0,
+              "caller_head": "none",
+              "local_head": "none",
+              "p": "none",
+              "nodes": [
+                {
+                  "id": "t0",
+                  "data_status": "indeterminate",
+                  "data": 0,
+                  "next": "indeterminate"
+                }
+              ]
+            }
+          ],
+          "highlights": [
+            {
+              "order": 1,
+              "step": 0,
+              "line": 1
+            }
+          ],
+          "advances": [
+            {
+              "order": 2,
+              "step": 0
+            }
+          ]
+        }
+      },
+      "expected": "accept",
+      "layer": "structural",
+      "reason": ""
+    },
+    {
+      "id": "baseline_duplicate_node",
+      "role": "B_generate",
+      "payload": {
+        "paragraphs": [
+          {
+            "key": "p0",
+            "text": "Synthetic wire fixture. Not a course."
+          }
+        ],
+        "code": "Synthetic wire fixture only; not executable C.",
+        "questions": {
+          "caller_head": {
+            "stem": "Synthetic caller_head",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          },
+          "traversal_status": {
+            "stem": "Synthetic traversal_status",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          },
+          "reachable_prefix": {
+            "stem": "Synthetic reachable_prefix",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          },
+          "allocation_failures": {
+            "stem": "Synthetic allocation_failures",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          }
+        },
+        "answers": {
+          "caller_head": "t0",
+          "traversal_status": "terminated",
+          "reachable_prefix": [
+            7
+          ],
+          "allocation_failures": 0
+        },
+        "actions": {
+          "states": [
+            {
+              "order": 0,
+              "step": 0,
+              "caller_head": "none",
+              "local_head": "none",
+              "p": "none",
+              "nodes": [
+                {
+                  "id": "t0",
+                  "data_status": "indeterminate",
+                  "data": 0,
+                  "next": "indeterminate"
+                },
+                {
+                  "id": "t0",
+                  "data_status": "indeterminate",
+                  "data": 0,
+                  "next": "indeterminate"
+                }
+              ]
+            }
+          ],
+          "highlights": [
+            {
+              "order": 1,
+              "step": 0,
+              "line": 1
+            }
+          ],
+          "advances": [
+            {
+              "order": 2,
+              "step": 0
+            }
+          ]
+        }
+      },
+      "expected": "reject",
+      "layer": "local",
+      "reason": ""
+    },
+    {
+      "id": "baseline_unknown_node_pointer",
+      "role": "B_generate",
+      "payload": {
+        "paragraphs": [
+          {
+            "key": "p0",
+            "text": "Synthetic wire fixture. Not a course."
+          }
+        ],
+        "code": "Synthetic wire fixture only; not executable C.",
+        "questions": {
+          "caller_head": {
+            "stem": "Synthetic caller_head",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          },
+          "traversal_status": {
+            "stem": "Synthetic traversal_status",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          },
+          "reachable_prefix": {
+            "stem": "Synthetic reachable_prefix",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          },
+          "allocation_failures": {
+            "stem": "Synthetic allocation_failures",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          }
+        },
+        "answers": {
+          "caller_head": "t0",
+          "traversal_status": "terminated",
+          "reachable_prefix": [
+            7
+          ],
+          "allocation_failures": 0
+        },
+        "actions": {
+          "states": [
+            {
+              "order": 0,
+              "step": 0,
+              "caller_head": "t0",
+              "local_head": "none",
+              "p": "none",
+              "nodes": []
+            }
+          ],
+          "highlights": [
+            {
+              "order": 1,
+              "step": 0,
+              "line": 1
+            }
+          ],
+          "advances": [
+            {
+              "order": 2,
+              "step": 0
+            }
+          ]
+        }
+      },
+      "expected": "reject",
+      "layer": "local",
+      "reason": ""
+    },
+    {
+      "id": "baseline_actions_empty",
+      "role": "B_generate",
+      "payload": {
+        "paragraphs": [
+          {
+            "key": "p0",
+            "text": "Synthetic wire fixture. Not a course."
+          }
+        ],
+        "code": "Synthetic wire fixture only; not executable C.",
+        "questions": {
+          "caller_head": {
+            "stem": "Synthetic caller_head",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          },
+          "traversal_status": {
+            "stem": "Synthetic traversal_status",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          },
+          "reachable_prefix": {
+            "stem": "Synthetic reachable_prefix",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          },
+          "allocation_failures": {
+            "stem": "Synthetic allocation_failures",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          }
+        },
+        "answers": {
+          "caller_head": "t0",
+          "traversal_status": "terminated",
+          "reachable_prefix": [
+            7
+          ],
+          "allocation_failures": 0
+        },
+        "actions": {
+          "states": [],
+          "highlights": [],
+          "advances": []
+        }
+      },
+      "expected": "reject",
+      "layer": "local",
+      "reason": ""
+    },
+    {
+      "id": "review_wrong_candidate",
+      "role": "review_B",
+      "payload": {
+        "candidate_id": "old_candidate",
+        "verdict": "pass",
+        "uncertainty": "",
+        "issues": []
+      },
+      "expected": "reject",
+      "layer": "local",
+      "reason": ""
+    },
+    {
+      "id": "review_pass_has_issue",
+      "role": "review_C",
+      "payload": {
+        "candidate_id": "dev_candidate_r0",
+        "verdict": "pass",
+        "uncertainty": "",
+        "issues": [
+          {
+            "severity": "minor",
+            "area": "difficulty",
+            "target_id": "text_p0",
+            "evidence_quote": "新节点",
+            "reason": "示例"
+          }
+        ]
+      },
+      "expected": "reject",
+      "layer": "local",
+      "reason": ""
+    },
+    {
+      "id": "review_unknown_empty",
+      "role": "review_B",
+      "payload": {
+        "candidate_id": "dev_candidate_r0",
+        "verdict": "unknown",
+        "uncertainty": "",
+        "issues": []
+      },
+      "expected": "reject",
+      "layer": "local",
+      "reason": ""
+    },
+    {
+      "id": "review_unknown",
+      "role": "review_C",
+      "payload": {
+        "candidate_id": "dev_candidate_r0",
+        "verdict": "unknown",
+        "uncertainty": "缺少完整候选，不能完成审核。",
+        "issues": []
+      },
+      "expected": "accept",
+      "layer": "structural",
+      "reason": ""
+    },
+    {
+      "id": "review_revise",
+      "role": "review_B",
+      "payload": {
+        "candidate_id": "dev_candidate_r0",
+        "verdict": "revise",
+        "uncertainty": "",
+        "issues": [
+          {
+            "severity": "major",
+            "area": "misconception",
+            "target_id": "text_p0",
+            "evidence_quote": "新节点",
+            "reason": "需要区分局部和调用者头。"
+          }
+        ]
+      },
+      "expected": "accept",
+      "layer": "structural",
+      "reason": ""
+    },
+    {
+      "id": "review_unbound_target",
+      "role": "review_B",
+      "payload": {
+        "candidate_id": "dev_candidate_r0",
+        "verdict": "revise",
+        "uncertainty": "",
+        "issues": [
+          {
+            "severity": "major",
+            "area": "misconception",
+            "target_id": "outside",
+            "evidence_quote": "新节点",
+            "reason": "需要区分局部和调用者头。"
+          }
+        ]
+      },
+      "expected": "reject",
+      "layer": "local",
+      "reason": ""
+    },
+    {
+      "id": "review_fake_quote",
+      "role": "review_C",
+      "payload": {
+        "candidate_id": "dev_candidate_r0",
+        "verdict": "revise",
+        "uncertainty": "",
+        "issues": [
+          {
+            "severity": "major",
+            "area": "misconception",
+            "target_id": "text_p0",
+            "evidence_quote": "这句话没有出现",
+            "reason": "需要区分局部和调用者头。"
+          }
+        ]
+      },
+      "expected": "reject",
+      "layer": "local",
+      "reason": ""
+    },
+    {
+      "id": "review_empty_quote",
+      "role": "review_C",
+      "payload": {
+        "candidate_id": "dev_candidate_r0",
+        "verdict": "revise",
+        "uncertainty": "",
+        "issues": [
+          {
+            "severity": "major",
+            "area": "misconception",
+            "target_id": "text_p0",
+            "evidence_quote": "",
+            "reason": "需要区分局部和调用者头。"
+          }
+        ]
+      },
+      "expected": "reject",
+      "layer": "local",
+      "reason": ""
+    },
+    {
+      "id": "review_known_with_uncertainty",
+      "role": "review_C",
+      "payload": {
+        "candidate_id": "dev_candidate_r0",
+        "verdict": "pass",
+        "uncertainty": "uncertain",
+        "issues": []
+      },
+      "expected": "reject",
+      "layer": "local",
+      "reason": ""
+    },
+    {
+      "id": "review_null_uncertainty",
+      "role": "review_C",
+      "payload": {
+        "candidate_id": "dev_candidate_r0",
+        "verdict": "pass",
+        "uncertainty": null,
+        "issues": []
+      },
+      "expected": "reject",
+      "layer": "schema",
+      "reason": ""
+    },
+    {
+      "id": "correct_refs_wrong_prose",
+      "role": "C_content",
+      "payload": {
+        "paragraphs": [
+          {
+            "key": "p0",
+            "text": "头插成功后调用者头仍为空，遍历没有任何值。",
+            "fact_ids": [
+              "obs_caller_head",
+              "obs_traversal_status"
+            ]
+          }
+        ],
+        "questions": {
+          "caller_head": {
+            "stem": "最终调用者头节点是哪一个？",
+            "explanation": "调用者接收 insert 返回的新节点 t0。",
+            "fact_ids": [
+              "obs_caller_head"
+            ]
+          },
+          "traversal_status": {
+            "stem": "遍历如何结束？",
+            "explanation": "新节点 next 指向原空链。",
+            "fact_ids": [
+              "obs_traversal_status"
+            ]
+          },
+          "reachable_prefix": {
+            "stem": "从调用者头可知的值前缀是什么？",
+            "explanation": "节点数据是 7，下一指针为空。",
+            "fact_ids": [
+              "obs_reachable_prefix"
+            ]
+          },
+          "allocation_failures": {
+            "stem": "本次分配失败几次？",
+            "explanation": "本次分配成功，因此失败次数是 0。",
+            "fact_ids": [
+              "obs_allocation_failures"
+            ]
+          }
+        }
+      },
+      "expected": "accept_requires_teaching_review",
+      "layer": "semantic",
+      "reason": "Correct IDs do not prove prose true"
+    },
+    {
+      "id": "baseline_wrong_answer_preserved",
+      "role": "B_generate",
+      "payload": {
+        "paragraphs": [
+          {
+            "key": "p0",
+            "text": "Synthetic wire fixture. Not a course."
+          }
+        ],
+        "code": "Synthetic wire fixture only; not executable C.",
+        "questions": {
+          "caller_head": {
+            "stem": "Synthetic caller_head",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          },
+          "traversal_status": {
+            "stem": "Synthetic traversal_status",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          },
+          "reachable_prefix": {
+            "stem": "Synthetic reachable_prefix",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          },
+          "allocation_failures": {
+            "stem": "Synthetic allocation_failures",
+            "explanation": "Synthetic independent answer field; not teaching evidence."
+          }
+        },
+        "answers": {
+          "caller_head": "none",
+          "traversal_status": "terminated",
+          "reachable_prefix": [
+            7
+          ],
+          "allocation_failures": 0
+        },
+        "actions": {
+          "states": [
+            {
+              "order": 0,
+              "step": 0,
+              "caller_head": "none",
+              "local_head": "none",
+              "p": "none",
+              "nodes": []
+            }
+          ],
+          "highlights": [
+            {
+              "order": 1,
+              "step": 0,
+              "line": 1
+            }
+          ],
+          "advances": [
+            {
+              "order": 2,
+              "step": 0
+            }
+          ]
+        }
+      },
+      "expected": "accept_requires_independent_truth",
+      "layer": "semantic",
+      "reason": "Preserve wrong model answer; no correction/fill by program"
+    },
+    {
+      "id": "question_type_semantics_not_proven",
+      "role": "C_content",
+      "payload": {
+        "paragraphs": [
+          {
+            "key": "p0",
+            "text": "新节点成为调用者的头，链表从 7 遍历到空指针。",
+            "fact_ids": [
+              "obs_caller_head",
+              "obs_traversal_status"
+            ]
+          }
+        ],
+        "questions": {
+          "caller_head": {
+            "stem": "最终调用者头节点是哪一个？",
+            "explanation": "调用者接收 insert 返回的新节点 t0。",
+            "fact_ids": [
+              "obs_caller_head"
+            ]
+          },
+          "traversal_status": {
+            "stem": "遍历如何结束？",
+            "explanation": "新节点 next 指向原空链。",
+            "fact_ids": [
+              "obs_traversal_status"
+            ]
+          },
+          "reachable_prefix": {
+            "stem": "程序一定输出哪些完整值？",
+            "explanation": "节点数据是 7，下一指针为空。",
+            "fact_ids": [
+              "obs_reachable_prefix"
+            ]
+          },
+          "allocation_failures": {
+            "stem": "本次分配失败几次？",
+            "explanation": "本次分配成功，因此失败次数是 0。",
+            "fact_ids": [
+              "obs_allocation_failures"
+            ]
+          }
+        }
+      },
+      "expected": "accept_requires_teaching_review",
+      "layer": "semantic",
+      "reason": "Typed field does not establish stem/answer alignment for every variant"
+    }
+  ],
+  "positive_fixture_note": "B fixture is synthetic protocol data, deliberately not a complete or correct course; no engine-derived baseline fill"
+}
