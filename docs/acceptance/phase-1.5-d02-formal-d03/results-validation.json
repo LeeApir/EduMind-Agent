@@ -1,0 +1,19 @@
+{
+  "tests": 5,
+  "errors": 0,
+  "failures": 0,
+  "skipped": 0,
+  "xml": "/tmp/edumind-formal-d03-results.xml",
+  "xml_sha256": "9cd27e3c6f671c6e873e1d9df3aa52453342a52fba77af9bc3dced4b8836b526",
+  "real_calls_after_stop": 0,
+  "container_final_state": "exited",
+  "exact_diagnostic_python_processes_running": [],
+  "self_review": "completed; assistant diagnostic reading, not independent human review or standard slot report",
+  "commands": [
+    "backend/.venv/bin/python -m pytest scripts/tests/test_p15_formal_d03_results.py -q --junitxml=/tmp/edumind-formal-d03-results.xml",
+    "backend/.venv/bin/python scripts/check_p15_formal_d03_results.py --check (expected exit 2; observed 2)",
+    "backend/.venv/bin/ruff check scripts/check_p15_formal_d03_results.py scripts/tests/test_p15_formal_d03_results.py",
+    "python3 scripts/check_catalog_workflow.py",
+    "git diff --check"
+  ]
+}
