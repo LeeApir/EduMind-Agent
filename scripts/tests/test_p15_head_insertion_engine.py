@@ -119,7 +119,7 @@ def test_indeterminate_is_not_a_finite_exact_traversal_answer():
     e = build_example(spec([], [4, 5], "uninitialized_next"))
     assert e["observation"]["traversal_status"] == "indeterminate"
     assert e["observation"]["reachable_prefix"] == [5]
-    assert e["observation"]["unreachable_allocated_ids"] == ["t0"]
+    assert e["observation"]["unreachable_allocated_ids"] is None
     with pytest.raises(SpecError, match="unsupported_question"):
         answer(e, "exact_traversal")
     assert answer(e, "traversal_status") == "indeterminate"
@@ -205,3 +205,33 @@ def test_derived_outputs_refuse_tampering(field):
         answer(e, "caller_head")
     with pytest.raises(SpecError, match="EXAMPLE_BINDING"):
         build_actions(e, "code")
+
+
+@pytest.mark.parametrize(
+    "initial,values,mask",
+    [
+        ([8], [2], [True]),
+        ([], [4, 5], [True, True]),
+        ([8, 9], [1, 2], [True, False]),
+        ([8], [1, 2, 3], [True, False, True]),
+    ],
+)
+def test_unknown_next_never_claims_unvisited_nodes_are_unreachable(
+    initial, values, mask
+):
+    # Independent evaluator e01: lack of a known edge is not proof of absence of that edge.
+    e = build_example(spec(initial, values, "uninitialized_next", mask))
+    assert e["observation"]["traversal_status"] == "indeterminate"
+    assert e["observation"]["unreachable_allocated_ids"] is None
+
+
+def test_unknown_pointer_with_no_other_allocated_node_has_known_empty_unreachable_set():
+    e = build_example(spec([], [2], "uninitialized_next"))
+    assert e["observation"]["traversal_status"] == "indeterminate"
+    assert e["observation"]["unreachable_allocated_ids"] == []
+
+
+def test_failed_allocation_does_not_turn_unknown_reachability_into_empty_set():
+    e = build_example(spec([8], [1, 2], "uninitialized_next", [True, False]))
+    assert e["observation"]["caller_head"] == "t0"
+    assert e["observation"]["unreachable_allocated_ids"] is None

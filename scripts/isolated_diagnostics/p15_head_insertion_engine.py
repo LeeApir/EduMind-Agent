@@ -5,7 +5,7 @@ import hashlib
 import json
 from typing import Any
 
-ENGINE_VERSION = "head-insertion-engine-v1"
+ENGINE_VERSION = "head-insertion-engine-v2"
 TEMPLATE_VERSION = "head-insertion-c-v1"
 SPEC_VERSION = "head-insertion-spec-v1"
 VARIANTS = ("normal", "reversed_assignment", "discard_return", "uninitialized_next")
@@ -196,7 +196,13 @@ def build_example(value: Any) -> dict[str, Any]:
         "traversal_status": status,
         "cycle_entry": cycle,
         "allocation_failures": failures,
-        "unreachable_allocated_ids": sorted(set(nodes) - set(seen)),
+        # An unknown next may still reach any previously unseen allocated node.
+        # Only a fully observed chain/cycle permits a definite unreachable set.
+        "unreachable_allocated_ids": (
+            None
+            if status == INDETERMINATE and set(nodes) - set(seen)
+            else sorted(set(nodes) - set(seen))
+        ),
     }
     example = {
         "schema_version": "head-insertion-example-v1",

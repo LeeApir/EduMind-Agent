@@ -3210,7 +3210,7 @@
       "id": "PHASE-1.5-T069",
       "phase": "Phase 1.5",
       "title": "按冻结方案采集小型协作原型受控实验完整证据",
-      "status": "todo",
+      "status": "in_progress",
       "priority": "P0",
       "depends_on": [
         "PHASE-1.5-T068"
@@ -3234,12 +3234,25 @@
         "python3 scripts/check_catalog_workflow.py",
         "git diff --check"
       ],
-      "verification_results": [],
-      "started_at": null,
+      "verification_results": [
+        {
+          "date": "2026-10-28T12:12:07+08:00",
+          "commands": [
+            "PYTHONPATH=backend:. backend/.venv/bin/python -m pytest scripts/tests/test_p15_agent_pilot_evidence.py scripts/tests/test_p15_agent_pilot.py scripts/tests/test_p15_head_insertion_engine.py -q --junitxml=/tmp/edumind-p15-t069-prep.xml",
+            "MYPYPATH=backend:. backend/.venv/bin/mypy --strict --explicit-package-bases --follow-imports=silent scripts/check_p15_agent_pilot_evidence.py scripts/prepare_p15_agent_pilot.py scripts/isolated_diagnostics/p15_head_insertion_engine.py",
+            "backend/.venv/bin/python scripts/run_p15_agent_pilot_mock.py --output /private/tmp/edumind-p15-t069-development-r02",
+            "backend/.venv/bin/python scripts/check_p15_agent_pilot_evidence.py --directory /private/tmp/edumind-p15-t069-development-r02",
+            "backend/.venv/bin/python scripts/prepare_p15_agent_pilot.py --check"
+          ],
+          "result": "115 passed0skip，类型3源/Ruff/工作流/diff与v2 Mock演示/只读核验通过；准备门禁预期exit2，真实0；独立e01发现旧unknown可达性断言错误后按原未知规则修正并冻结v2，独立e02未签核",
+          "evidence": "docs/acceptance/phase-1.5-agent-pilot/t069-preparation/README.md"
+        }
+      ],
+      "started_at": "2026-10-28T11:58:27+08:00",
       "completed_at": null,
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T069",
-      "execution_gate": "本次仅任务规划，不领取或执行。用户另向开发助手下达执行指令；T066具体契约须批准，T069真实调用须准确包与预算批准；T070留给指定评估助手。"
+      "execution_gate": "T068完成4a69022，当前仅零调用准备；用户指定助手核定全部内容，不冒充human；独立评估安排与准确新执行包仍待满足。"
     },
     {
       "id": "PHASE-1.5-T070",
