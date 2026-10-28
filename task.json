@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "T071限定离线验收通过，完成提交后恢复T069零调用准备；独立e03及准确真实包尚未就绪/获批，T070未领取，T038/catalog_only/H保持。",
+    "phase_gate": "T071完成393b9f1；T069准确p01准备就绪、等待ADR0042与真实包/新预算批准，当前真实0；T070未领取，T038/catalog_only/H保持。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -3259,13 +3259,24 @@
           ],
           "result": "188 passed/1 failed/0skip；旧development-freeze因C审核context改字节拒绝，不改历史冻结制造通过。mypy8源/Ruff/工作流/diff通过，未完整执行包的start拒绝2，真实0/无输出目录。独立最终预审未通过，不是T069或T070完成。",
           "evidence": "docs/acceptance/phase-1.5-agent-pilot/t069-preparation/BLOCKED-DECISION.md"
+        },
+        {
+          "date": "2026-10-28T16:15:11+08:00",
+          "commands": [
+            "backend/.venv/bin/python scripts/run_p15_agent_pilot.py --check",
+            "pending main --start/--step with load_keys/Journal.start forbidden traps: expected exit2",
+            "python3 scripts/check_catalog_workflow.py",
+            "git diff --check"
+          ],
+          "result": "全链36文件冻结后独立e03核定10支持+4拒绝；准确41文件包预检通过，未批准入口均拒绝且不触达Key/建库，无真实输出；Provider0。238离线/Mock结果见T071，不冒充T069真实完成。",
+          "evidence": "docs/acceptance/phase-1.5-agent-pilot/execution-p01/PREPARATION.md"
         }
       ],
       "started_at": "2026-10-28T11:58:27+08:00",
       "completed_at": null,
-      "blocker": "T071限定离线前置任务已获准确批准并实施中，证据全批/真实窗口缺口尚未验收解除；无真实调用授权。",
+      "blocker": "准确execution-p01待ADR0042 A—C及合成外发/90HTTP/新3小时/token金额无上限例外批准；T071缺口已解除，本批未授权真实调用。",
       "commit_lookup": "Task-Completed: PHASE-1.5-T069",
-      "execution_gate": "保留当前失败候选与三轮复审，不继续修补/选样/真实调用；T071仅提案未入活动账本。用户决定后才能处理依赖工作，真实执行另需完整准确包批准，T070仍待T069完成。"
+      "execution_gate": "准确manifest 295bc335af529b6906a51a61c5e22586b414d4e6c9986068534703b7b0aebe0d，候选冻结后独立e03完成；--check通过、pending start/step拒绝且未到Key；批准前保持真实0，不重启旧批次。"
     },
     {
       "id": "PHASE-1.5-T070",
@@ -3301,7 +3312,7 @@
       "completed_at": null,
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T070",
-      "execution_gate": "本次仅任务规划，不领取或执行。用户另向开发助手下达执行指令；T066具体契约须批准，T069真实调用须准确包与预算批准；T070留给指定评估助手。"
+      "execution_gate": "用户已授权独立子助手评估全部内容；T069按准确授权采集并完成后再领取T070，不能把开发自查、模型pass或Mock当作独立真实评估。"
     },
     {
       "id": "PHASE-1.5-T071",
