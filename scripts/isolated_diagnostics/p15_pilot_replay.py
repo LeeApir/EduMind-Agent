@@ -30,7 +30,7 @@ async def replay(
         (
             row["epoch"]
             for row in events
-            if row["kind"] == "slot_result"
+            if row["kind"] in ("slot_result", "late_slot_result")
             and wire.strict_json(row["payload"])["slot_id"] == slot["slot_id"]
             and wire.strict_json(row["payload"])["arm"] == arm
         ),
@@ -104,7 +104,12 @@ async def replay(
                     raise c.PilotError("LATE_REPLY")
             state["unverified_reason"] = True
             reason = result.get("reason")
-            if reason in ("SECRET_ECHO_REFUSED", "RESPONSE_TOO_LARGE", "BATCH_WINDOW", "DISPATCH_WINDOW_OR_STATE"):
+            if reason in (
+                "SECRET_ECHO_REFUSED",
+                "RESPONSE_TOO_LARGE",
+                "BATCH_WINDOW",
+                "DISPATCH_WINDOW_OR_STATE",
+            ):
                 raise c.PilotError(reason)
             raise TimeoutError(
                 "Unknown transport outcome, not independently reconstructible"

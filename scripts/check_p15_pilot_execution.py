@@ -21,6 +21,11 @@ from scripts.isolated_diagnostics import p15_agent_pilot as c  # noqa: E402
 from scripts.isolated_diagnostics import p15_pilot_baseline as b  # noqa: E402
 from scripts.isolated_diagnostics import p15_pilot_wire as wire  # noqa: E402
 from scripts.isolated_diagnostics.p15_pilot_execution import validate_assistant_report  # noqa: E402
+from scripts.isolated_diagnostics.p15_pilot_batch import (  # noqa: E402
+    VERSION,
+    initial_batch,
+    reduce_batch,
+)
 from scripts.isolated_diagnostics.p15_pilot_replay import replay  # noqa: E402
 from scripts.isolated_diagnostics.p15_head_insertion_engine import (  # noqa: E402
     canonical,
@@ -130,12 +135,37 @@ def verify(
             )
             parent = row["digest"]
             kinds[row["kind"]] += 1
-            if row["kind"] == "slot_result":
-                result_rows.append(payload)
+            if row["kind"] in ("slot_result", "late_slot_result"):
+                result_rows.append(dict(payload, receipt_kind=row["kind"]))
             if row["kind"] == "assistant_review":
                 assistant_reviews.append(payload)
         require(bool(events) and events[0]["kind"] == "started", "START_RECEIPT")
         calls = db.execute("SELECT * FROM calls ORDER BY rowid").fetchall()
+        protocol = reduce_batch(
+            initial_batch(grant, inputs, package),
+            [
+                dict(
+                    kind=e["kind"],
+                    payload=wire.strict_json(e["payload"]),
+                    epoch=e["epoch"],
+                )
+                for e in events
+            ],
+        )
+        require(protocol.batch == batch, "BATCH_PROJECTION_MISMATCH")
+        expected_calls = [
+            dict(
+                row,
+                usage=canonical(row["usage"]).decode()
+                if row["usage"] is not None
+                else None,
+            )
+            for row in protocol.calls.values()
+        ]
+        require(
+            expected_calls == [dict(row) for row in calls], "CALL_PROJECTION_MISMATCH"
+        )
+
         require(len(calls) <= 90 and kinds["reserved"] == len(calls), "CALL_COUNT")
         require(
             kinds["sent"]
@@ -295,10 +325,13 @@ def verify(
                         ),
                         "EXACT_REFUSAL_REASON",
                     )
-                refused[row["arm"]] += 1
+                if row["receipt_kind"] == "slot_result":
+                    refused[row["arm"]] += 1
                 continue
-            if result["versions"] and not result["versions"][0]["payload"].get(
-                "degraded"
+            if (
+                row["receipt_kind"] == "slot_result"
+                and result["versions"]
+                and not result["versions"][0]["payload"].get("degraded")
             ):
                 initial_structure[row["arm"]] += 1
             actual_slot = next(
@@ -579,6 +612,10 @@ def verify(
             )
         return dict(
             evidence_verified=True,
+            batch_protocol_version=VERSION,
+            recorded_window_verified=True,
+            clock_source_independently_attested=False,
+            late_slot_observations=protocol.late_slot_observations,
             authority_pins_verified=expected_grant_digest is not None
             and expected_inputs_sha256 is not None,
             batch_state=batch["status"],

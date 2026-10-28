@@ -20,6 +20,7 @@ from scripts.isolated_diagnostics import p15_pilot_wire as w
 from scripts import check_p15_pilot_execution as check
 from scripts import run_p15_agent_pilot as run
 from scripts.isolated_diagnostics.p15_head_insertion_engine import digest
+from scripts.isolated_diagnostics.p15_pilot_batch import BatchError
 from scripts.tests.test_p15_agent_pilot import SPEC, content, opinion
 from scripts.tests.test_p15_pilot_baseline import full_payload
 
@@ -491,7 +492,7 @@ def test_checker_revalidates_report_even_if_receipt_chain_is_rehashed(journal):
             (parent, sha, row["seq"]),
         )
         parent = sha
-    with pytest.raises(c.PilotError, match="INDEPENDENT_ASSISTANT_REPORT"):
+    with pytest.raises(BatchError, match="BATCH_ASSISTANT_BINDING"):
         check.verify(j.output, "a" * 64)
 
 
@@ -731,9 +732,20 @@ def test_ratification_identity_time_candidate_and_digest_are_required(
         run.validate_materials(materials)
 
 
-def test_no_refund_or_new_request_after_timeout(journal):
-    j, inputs = journal
-    j.update(deadline_epoch=100.01)
+def test_no_refund_or_new_request_after_timeout(tmp_path):
+    inputs = dict(
+        version="pilot-inputs-v1",
+        slots=[
+            dict(slot_id="slot", kind="supported", spec=deepcopy(SPEC), question=None)
+        ],
+    )
+    j = e.Journal.start(
+        tmp_path / "short_window",
+        "a" * 64,
+        dict(window_started_epoch=0, deadline_epoch=100.01),
+        inputs,
+        clock=lambda: 100,
+    )
 
     async def slow(req):
         await asyncio.sleep(1)
