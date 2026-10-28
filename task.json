@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "T069 p01受控采集合规验收通过（首请求400全批停止，质量未测），完成提交后才领取独立T070；不追加调用，T038/catalog_only/H保持。",
+    "phase_gate": "用户授权批次T066–T070及限定前置T071均验收完成；T070独立建议停止当前准确路线/暂不采用，完成提交后停止。真实累计1HTTP/1unknown，T038 blocked/catalog_only/H保持；无新调用/修Schema/跨阶段授权。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -3297,7 +3297,7 @@
       "id": "PHASE-1.5-T070",
       "phase": "Phase 1.5",
       "title": "独立评估小型多Agent协作方案的效果与采用建议",
-      "status": "todo",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1.5-T069"
@@ -3322,12 +3322,28 @@
         "python3 scripts/check_catalog_workflow.py",
         "git diff --check"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "date": "2026-10-28T16:41:51+08:00",
+          "commands": [
+            "independent evaluator: PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=backend:. backend/.venv/bin/python scripts/run_p15_agent_pilot.py --assessment",
+            "independent read-only SQLite/JSON/JUnit recomputation of all28 arm-slots and frozen metrics",
+            "main document consistency/hash/reference/JSON/28 coverage cross-check",
+            "python3 scripts/check_catalog_workflow.py",
+            "git diff --check"
+          ],
+          "result": "独立assistant全量评估交付并由主助手核对文档/证据一致性：首B400，固定首次/最终B0/10 C0/10但无20次教学失败观察；其他角色/严重错误/召回误报/修复收益N/A，token费用未知，无可比成功对照或因果结论。建议停止当前准确执行路线/暂不采用，新增请求0。历史assessment/冻结候选/原件未改。",
+          "evidence": "docs/acceptance/phase-1.5-agent-pilot/EVALUATION.md",
+          "independent_metrics": "docs/acceptance/phase-1.5-agent-pilot/results-p01/independent-metrics.json",
+          "report_sha256": "a384fbe75696af0d8817a63fe4791a8f6a9789b42444a7e412b7ee345f97ae8e",
+          "metrics_sha256": "da752163c7c49f6f52eef9bfa22ee1e619c3e28dcaabec9e4c5a1da38a0ce495"
+        }
+      ],
+      "started_at": "2026-10-28T16:26:32+08:00",
+      "completed_at": "2026-10-28T16:41:51+08:00",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T070",
-      "execution_gate": "用户已授权独立子助手评估全部内容；T069按准确授权采集并完成后再领取T070，不能把开发自查、模型pass或Mock当作独立真实评估。"
+      "execution_gate": "独立assistant已完成全量现有内容/缺失及指标评估，建议停止当前准确路线、暂不采用；不代表方案/教学/正式验收通过。完成提交后按用户范围停止，无新调用/修Schema/跨阶段授权。"
     },
     {
       "id": "PHASE-1.5-T071",
