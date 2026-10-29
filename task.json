@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "T086离线提案与441项回归已交付，待评估助手审查后才另备/申请新验证包。当前Schema/严格校验/T085冻结和停止保持，本轮Provider0；新矩阵未授权执行，旧余量/费用不继承，T038/catalog_only/H保持。",
+    "phase_gate": "T087准确包/175文件冻结及598项离线回归已完成，待独立审查；T088 todo未领取，真实调用/新窗口/费用均未批准。Schema/严格校验/顺序/停止规则及T085保持；R0机械合格仅pending独立语义复核，不能自动修复成功；Provider0/catalog_only/T038/H保持。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -4131,6 +4131,94 @@
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T086",
       "execution_gate": "离线三任务拆分/原始错误回归交付完成，ADR0048和准确材料待评估助手审查。无新Provider额度/窗口/费用或执行器，不重启T085，不自动申请或启动后续验证包；本地完成提交后停止。"
+    },
+    {
+      "id": "PHASE-1.5-T087",
+      "phase": "Phase 1.5",
+      "priority": "P0",
+      "title": "冻结分离任务准确验证包并验证控制器后置判据",
+      "status": "done",
+      "depends_on": [
+        "PHASE-1.5-T086"
+      ],
+      "scope": [
+        "scripts/isolated_diagnostics/p15_separated_probe*.py",
+        "scripts/run_p15_separated_probe.py",
+        "scripts/tests/test_p15_separated_probe.py",
+        "docs/acceptance/phase-1.5-separated-validation-r01/",
+        "docs/ADR/0048-approval-20261029.json",
+        "docs/PRD.md",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "用户接受ADR0048 A—D，要求保持Schema/严格校验/顺序/停止规则，准备新准确包供审查但不真实调用",
+      "acceptance_criteria": [
+        "准确登记ADR0048 A—D及20规范附件批准；原七份提案请求逐字节复用，所有旧Schema/严格校验/冻结及T085停止不变。",
+        "实现独立受控控制器，P/W精确回显、R0仅允许一段文字改动；R0机械通过终止为待独立语义复核，summary/只读复核不得自动记修复或诊断成功。",
+        "实际控制器Mock回归覆盖两种R改写/错误讲解待复核/未改/越界/非法JSON/返回Schema、固定顺序/每槽早停/预算/来源/时钟/不可重启及篡改拒绝；保持旧回归和断言。",
+        "冻结源码闭包/请求字节/运行时/预算/当前公开费率及未知账户费用边界；pending执行门禁先于Key/DNS/真实目录，完成本地提交后交审查，Provider0不启动窗口。"
+      ],
+      "verification": [
+        "PYTHONPATH=backend:. backend/.venv/bin/python -m pytest scripts/tests/test_p15_separated_probe.py scripts/tests/test_p15_protocol_task_separation.py scripts/tests/test_p15_minimal_probe.py scripts/tests/test_p15_minimal_contract.py scripts/tests/test_p15_minimal_pilot.py scripts/tests/test_p15_head_insertion_engine.py scripts/tests/test_p15_agent_pilot.py scripts/tests/test_p15_pilot_baseline.py -q --tb=short --junitxml=/private/tmp/edumind-p15-t087.xml",
+        "PYTHONPATH=backend:. backend/.venv/bin/python docs/acceptance/phase-1.5-separated-validation-r01/check_preparation.py",
+        "MYPYPATH=backend:. backend/.venv/bin/mypy scripts/isolated_diagnostics/p15_separated_probe_contract.py scripts/isolated_diagnostics/p15_separated_probe.py scripts/run_p15_separated_probe.py --strict --explicit-package-bases --follow-imports=silent",
+        "backend/.venv/bin/ruff check scripts/isolated_diagnostics/p15_separated_probe_contract.py scripts/isolated_diagnostics/p15_separated_probe.py scripts/run_p15_separated_probe.py scripts/tests/test_p15_separated_probe.py docs/acceptance/phase-1.5-separated-validation-r01/check_preparation.py",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [
+        {
+          "date": "2026-10-29T14:40:07+08:00",
+          "commands": [
+            "PYTHONPATH=backend:. backend/.venv/bin/python -m pytest scripts/tests/test_p15_separated_probe.py scripts/tests/test_p15_protocol_task_separation.py scripts/tests/test_p15_minimal_probe.py scripts/tests/test_p15_minimal_contract.py scripts/tests/test_p15_minimal_pilot.py scripts/tests/test_p15_head_insertion_engine.py scripts/tests/test_p15_agent_pilot.py scripts/tests/test_p15_pilot_baseline.py -q --tb=short --junitxml=/private/tmp/edumind-p15-t087.xml",
+            "PYTHONPATH=backend:. backend/.venv/bin/python docs/acceptance/phase-1.5-separated-validation-r01/check_preparation.py",
+            "MYPYPATH=backend:. backend/.venv/bin/mypy scripts/isolated_diagnostics/p15_separated_probe_contract.py scripts/isolated_diagnostics/p15_separated_probe.py scripts/run_p15_separated_probe.py --strict --explicit-package-bases --follow-imports=silent",
+            "backend/.venv/bin/ruff check scripts/isolated_diagnostics/p15_separated_probe_contract.py scripts/isolated_diagnostics/p15_separated_probe.py scripts/run_p15_separated_probe.py scripts/tests/test_p15_separated_probe.py docs/acceptance/phase-1.5-separated-validation-r01/check_preparation.py",
+            "python3 scripts/check_catalog_workflow.py",
+            "git diff --check"
+          ],
+          "result": "598 passed0skip（157新控制器+441旧）；mypy3源/Ruff5文件/175冻结/七准确字节/8组48Mock原件只读/禁凭据网络pending0,2,2/旧129冻结及工作流diff通过。R0只记pending，Provider0，无窗口/费用授权，开发自查完成，待独立审查。",
+          "evidence": "docs/acceptance/phase-1.5-separated-validation-r01/verification.txt",
+          "manifest_sha256": "0c74b3751bdfd1dfffe7cfc3aa56bd30257e4ec850f18d80041b78bea401a1e3"
+        }
+      ],
+      "started_at": "2026-10-29T14:15:58+08:00",
+      "completed_at": "2026-10-29T14:40:07+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T087",
+      "execution_gate": "T087适配/离线回归/准确包冻结已完成待本地完成提交与独立审查；真实调用/窗口/费用未批准，T088 todo不自动领取，R0机械合格仅待独立语义复核，不重启T085。"
+    },
+    {
+      "id": "PHASE-1.5-T088",
+      "phase": "Phase 1.5",
+      "priority": "P0",
+      "title": "获准后采集分离协议与修复诊断新包证据",
+      "status": "todo",
+      "depends_on": [
+        "PHASE-1.5-T087"
+      ],
+      "scope": [
+        "docs/acceptance/phase-1.5-separated-validation-r01/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "ADR0048 D；为新准确包预留执行scope，尚无真实执行授权",
+      "acceptance_criteria": [
+        "T087已完成提交、准确包/新费用风险和独立900秒窗口获明确批准后才领取出站，不沿用旧许可或余额。",
+        "固定P0/W0–W4/R0，任一异常全批停，无重试/补样/旧批重启；保留完整原件和未运行。",
+        "R0机械通过只记待独立语义复核，网络采集完成不算修复/诊断成功或角色/课程准入；只读复核及证据提交。"
+      ],
+      "verification": [
+        "待准确批准后：新入口--run及--check-results；原件/状态/窗口只读重算",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T088",
+      "execution_gate": "未批准真实执行/窗口/费用；仅预留包scope，T087准备完成不自动领取。"
     }
   ],
   "planning_inputs": {
