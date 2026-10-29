@@ -1,0 +1,21 @@
+PHASE-1.5-T092 离线验证（2026-10-29，Asia/Shanghai）
+
+PYTHONPATH=backend:. backend/.venv/bin/python -m pytest scripts/tests/test_p15_bound_pilot.py scripts/tests/test_p15_clean_pilot_prompts.py scripts/tests/test_p15_minimal_contract.py scripts/tests/test_p15_minimal_pilot.py scripts/tests/test_p15_head_insertion_engine.py -q --tb=short
+结果：272 passed，0 failed，0 skipped；其中新版29项覆盖两臂首轮及一次修复完整路径、实际发送消息/Schema、版本/摘要/实际指令篡改、重新计算摘要后的假身份、跨run/跨臂、错误parent、旧审核、错误修复输入、unknown/事实/严重及重复修复停止；其他为既有离线回归。测试中的 B 应答由测试工厂合成，不代表模型自行求解。
+
+backend/.venv/bin/ruff check scripts/isolated_diagnostics/p15_bound_pilot.py scripts/tests/test_p15_bound_pilot.py
+结果：All checks passed。
+
+MYPYPATH=backend:. backend/.venv/bin/mypy scripts/isolated_diagnostics/p15_bound_pilot.py --strict --explicit-package-bases --follow-imports=silent
+结果：Success: no issues found in 1 source file。
+
+PYTHONPATH=backend:. backend/.venv/bin/python scripts/run_p15_r0_once.py --check
+结果：旧 200 文件包 78f02e8b065c95537bdd361249e34715d68f070587f177a7914306bbe2b3f4c0 核对通过，新增 Provider 请求 0。
+
+python3 scripts/check_catalog_workflow.py
+结果：Active Phase 1.5 dependencies valid; catalog ledger valid; T033 blocked。
+
+git diff --check
+结果：通过。
+
+独立审查发现事件链/资格标记未验和 B 审核自由文本可能泄漏答案；已增加完整事件重放、资格标记及 B 反馈核对门与回归，具体语义判断仍依赖可信核对人。首次 mypy 对旧类继承的网关类型提出错误；改为隔离独立类并重跑通过。未运行真实 Provider、独立教学评估或交互播放。输入输出及摘要链由本地控制器记录，可追溯性不是远端身份真实性证明。

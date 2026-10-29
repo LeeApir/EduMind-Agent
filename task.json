@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "T090独立R0已唯一1 real HTTP并机械合格，网络终态pending独立语义复核/repair_success=false；全量证据待独立评估，未授后续调用/课程。原T088 W4失败及旧额度失效保持，T038 blocked/catalog_only/H/正式教学标准不变。",
+    "phase_gate": "用户授权T092–T094离线准备和T095准确包获准后真实验证；先角色准入再课程，交用户评估。旧批停止和R0待独立语义核定保持，不继承预算。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -4411,6 +4411,156 @@
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T091",
       "execution_gate": "独立新版提示词仅候选，复用已批准引擎/契约不改原冻结；identity固定旧版本，实际接线需新版本与指令摘要/父版本/审核绑定及独立审查。R0语义待独立复核，T088失败、T038 blocked/catalog_only/H保持，不继承旧额度。"
+    },
+    {
+      "id": "PHASE-1.5-T092",
+      "phase": "Phase 1.5",
+      "priority": "P0",
+      "title": "接入新版提示词与请求响应版本绑定",
+      "status": "done",
+      "depends_on": [
+        "PHASE-1.5-T091"
+      ],
+      "scope": [
+        "scripts/isolated_diagnostics/p15_bound_pilot.py",
+        "scripts/tests/test_p15_bound_pilot.py",
+        "docs/acceptance/phase-1.5-bound-pilot-t092/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "用户限定四项：新版绑定、离线双臂、完整样例、准确包与获准真实验证；ADR0047/0048及正式标准保持",
+      "acceptance_criteria": [
+        "隔离接入新版提示词，复用现有引擎和Schema，绑定实际请求内容、版本与摘要、响应及候选。",
+        "修复绑定准确父候选和当前审核，审核绑定准确候选；错版本、错摘要、旧审核、跨臂混入拒绝。",
+        "运行完整B/C生成、审核及最多一次修复离线流程，检查实际请求，保持旧冻结包原样。"
+      ],
+      "verification": [
+        "PYTHONPATH=backend:. backend/.venv/bin/python -m pytest scripts/tests/test_p15_bound_pilot.py scripts/tests/test_p15_clean_pilot_prompts.py scripts/tests/test_p15_minimal_contract.py scripts/tests/test_p15_minimal_pilot.py scripts/tests/test_p15_head_insertion_engine.py -q --tb=short",
+        "backend/.venv/bin/ruff check scripts/isolated_diagnostics/p15_bound_pilot.py scripts/tests/test_p15_bound_pilot.py",
+        "MYPYPATH=backend:. backend/.venv/bin/mypy scripts/isolated_diagnostics/p15_bound_pilot.py --strict --explicit-package-bases --follow-imports=silent",
+        "PYTHONPATH=backend:. backend/.venv/bin/python scripts/run_p15_r0_once.py --check",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [
+        {
+          "date": "2026-10-29T20:40:51+08:00",
+          "commands": [
+            "PYTHONPATH=backend:. backend/.venv/bin/python -m pytest scripts/tests/test_p15_bound_pilot.py scripts/tests/test_p15_clean_pilot_prompts.py scripts/tests/test_p15_minimal_contract.py scripts/tests/test_p15_minimal_pilot.py scripts/tests/test_p15_head_insertion_engine.py -q --tb=short",
+            "backend/.venv/bin/ruff check scripts/isolated_diagnostics/p15_bound_pilot.py scripts/tests/test_p15_bound_pilot.py",
+            "MYPYPATH=backend:. backend/.venv/bin/mypy scripts/isolated_diagnostics/p15_bound_pilot.py --strict --explicit-package-bases --follow-imports=silent",
+            "PYTHONPATH=backend:. backend/.venv/bin/python scripts/run_p15_r0_once.py --check",
+            "python3 scripts/check_catalog_workflow.py",
+            "git diff --check"
+          ],
+          "result": "272 passed 0 skipped，Ruff/mypy/旧200冻结与工作流/diff通过；双臂Mock全链、绑定/反馈/事件及结果标记反例通过，新增真实0；反馈语义仍须可信核对。",
+          "evidence": "docs/acceptance/phase-1.5-bound-pilot-t092/verification.txt"
+        }
+      ],
+      "started_at": "2026-10-29T20:31:53+08:00",
+      "completed_at": "2026-10-29T20:40:51+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T092",
+      "execution_gate": "新版仅Mock运行。B修复的普通意见须先经明确可信核对，测试核对仅Mock；完成提交后领取离线完整样例，真实角色和课程仍待准确授权。"
+    },
+    {
+      "id": "PHASE-1.5-T093",
+      "phase": "Phase 1.5",
+      "priority": "P0",
+      "title": "交付可检查的完整头插法课程离线样例",
+      "status": "todo",
+      "depends_on": [
+        "PHASE-1.5-T092"
+      ],
+      "scope": [
+        "scripts/isolated_diagnostics/",
+        "scripts/tests/",
+        "docs/acceptance/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "用户限定四项：新版绑定、离线双臂、完整样例、准确包与获准真实验证；ADR0047/0048及正式标准保持",
+      "acceptance_criteria": [
+        "交付讲解、代码、四题、答案、完整状态轨迹及动作映射的清楚样例和目标→内容→证据映射。",
+        "说明样例来源与语义验证范围；若声称交互可用必须实际检查播放、步进和重置。"
+      ],
+      "verification": [
+        "按任务交接记录实际离线测试与证据；真实执行须另经准确包授权",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T093",
+      "execution_gate": "新版隔离流程及样例零真实调用；新准确包获授权后才真实出站，先角色准入再课程。"
+    },
+    {
+      "id": "PHASE-1.5-T094",
+      "phase": "Phase 1.5",
+      "priority": "P0",
+      "title": "冻结角色准入及课程实验准确执行方案",
+      "status": "todo",
+      "depends_on": [
+        "PHASE-1.5-T093"
+      ],
+      "scope": [
+        "scripts/isolated_diagnostics/",
+        "scripts/tests/",
+        "docs/acceptance/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "用户限定四项：新版绑定、离线双臂、完整样例、准确包与获准真实验证；ADR0047/0048及正式标准保持",
+      "acceptance_criteria": [
+        "准备角色接口准入及随后课程实验的请求生成、模型配置、预算、停止规则和评估方法，保留来源和依赖。",
+        "只在准确包获授权后调用；先全部角色准入，再执行课程；旧停止和余额不继承。"
+      ],
+      "verification": [
+        "按任务交接记录实际离线测试与证据；真实执行须另经准确包授权",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T094",
+      "execution_gate": "新版隔离流程及样例零真实调用；新准确包获授权后才真实出站，先角色准入再课程。"
+    },
+    {
+      "id": "PHASE-1.5-T095",
+      "phase": "Phase 1.5",
+      "priority": "P0",
+      "title": "获准后采集角色准入和课程全链证据",
+      "status": "todo",
+      "depends_on": [
+        "PHASE-1.5-T094"
+      ],
+      "scope": [
+        "scripts/isolated_diagnostics/",
+        "scripts/tests/",
+        "docs/acceptance/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "用户限定四项：新版绑定、离线双臂、完整样例、准确包与获准真实验证；ADR0047/0048及正式标准保持",
+      "acceptance_criteria": [
+        "仅准确包获授权后按门禁一次执行，角色准入失败即停止不生成课程。",
+        "完整交回所有输出和失败由用户评估，不代签教学质量。"
+      ],
+      "verification": [
+        "按任务交接记录实际离线测试与证据；真实执行须另经准确包授权",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T095",
+      "execution_gate": "新版隔离流程及样例零真实调用；新准确包获授权后才真实出站，先角色准入再课程。"
     }
   ],
   "planning_inputs": {
