@@ -1,0 +1,30 @@
+PHASE-1.5-T091 离线验证（2026-10-29，Asia/Shanghai）
+
+PYTHONPATH=backend:. backend/.venv/bin/python -m pytest scripts/tests/test_p15_clean_pilot_prompts.py scripts/tests/test_p15_minimal_contract.py scripts/tests/test_p15_minimal_pilot.py scripts/tests/test_p15_head_insertion_engine.py -q --tb=short
+结果：243 passed，0 failed，0 skipped；Mock/离线。新增测试检查旧提示词快照保持、版本固定、旧审核字段不进入新候选、有效引用的错误正文不被当作语义通过、B 错答保留/缺答拒绝、审核引文绑定。其余为原契约/引擎/隔离流程回归。
+
+backend/.venv/bin/ruff check scripts/isolated_diagnostics/p15_clean_pilot_prompts.py scripts/tests/test_p15_clean_pilot_prompts.py docs/acceptance/phase-1.5-pilot-candidate-cleanup-r01/check_inventory.py
+结果：All checks passed。
+
+MYPYPATH=backend:. backend/.venv/bin/mypy scripts/isolated_diagnostics/p15_clean_pilot_prompts.py --strict --explicit-package-bases --follow-imports=silent
+结果：Success: no issues found in 1 source file。
+
+PYTHONPATH=backend:. backend/.venv/bin/python docs/acceptance/phase-1.5-pilot-candidate-cleanup-r01/check_inventory.py
+结果：54 叶字段、4 Schema、7 阶段映射与链接核对通过。清单验证覆盖与非空描述，不证明字段解释完整或模型遵从。
+
+PYTHONPATH=backend:. backend/.venv/bin/python scripts/run_p15_r0_once.py --check
+结果：旧 200 文件准确包 SHA 78f02e8b065c95537bdd361249e34715d68f070587f177a7914306bbe2b3f4c0 预检通过；请求 11034 字节；新增调用 0。
+
+PYTHONPATH=backend:. backend/.venv/bin/python docs/acceptance/phase-1.5-r0-once-r01/results/check_evidence.py
+结果：12 原件、7 事件、历史 1 HTTP 核对通过；语义仍 pending，repair_success=false；新增调用 0。
+
+PYTHONPATH=backend:. backend/.venv/bin/python docs/acceptance/phase-1.5-separated-validation-r01/results/check_evidence.py
+结果：51 原件、31 事件、历史 6 HTTP 核对通过；旧 R0 未发送，W4 失败不变；新增调用 0。
+
+python3 scripts/check_catalog_workflow.py
+结果：Active Phase 1.5 dependencies valid; catalog ledger valid; T033 blocked。
+
+git diff --check
+结果：通过。
+
+首次运行 check_inventory.py 时因验证记录尚未创建，链接检查预期报缺失；已创建本文件，复跑结果如上。新提示词未接线，无 Provider、真实教学、接口准入或独立评估结果。本次不更改原冻结包、正式教学标准或三处无关用户修改。

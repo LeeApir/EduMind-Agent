@@ -4357,6 +4357,60 @@
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T090",
       "execution_gate": "本次独立R0网络阶段已结束：1HTTP/机械合格/pending独立语义复核，全部请求额度已用，不重试/重启/继承；无自动修复/角色/课程准入。交全量证据后停止，独立语义复核尚未进行。"
+    },
+    {
+      "id": "PHASE-1.5-T091",
+      "phase": "Phase 1.5",
+      "priority": "P0",
+      "title": "整理头插隔离候选提示词与字段责任",
+      "status": "done",
+      "depends_on": [
+        "PHASE-1.5-T083",
+        "PHASE-1.5-T090"
+      ],
+      "scope": [
+        "scripts/isolated_diagnostics/p15_clean_pilot_prompts.py",
+        "scripts/tests/test_p15_clean_pilot_prompts.py",
+        "docs/acceptance/phase-1.5-pilot-candidate-cleanup-r01/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "用户要求复用现有引擎和契约，清理提示词中的历史覆盖关系，明确字段所有者与验证方法；ADR0047及原教学标准保持",
+      "acceptance_criteria": [
+        "核对B/C各阶段与审核实际候选装配和历史提示词冲突，提供独立新版本提示词候选，不覆盖原冻结文件或正式链路。",
+        "逐字段列出程序/模型所有者、已有机械验证及仍需语义判断，保留B自主答案、C引擎事实、审核定位与公平性边界。",
+        "离线验证覆盖完整Schema字段、六阶段提示词与关键正反例，复查原包和历史证据不变；不进行真实调用或自动声称兼容、课程通过。"
+      ],
+      "verification": [
+        "PYTHONPATH=backend:. backend/.venv/bin/python -m pytest scripts/tests/test_p15_clean_pilot_prompts.py scripts/tests/test_p15_minimal_contract.py scripts/tests/test_p15_minimal_pilot.py scripts/tests/test_p15_head_insertion_engine.py -q --tb=short",
+        "backend/.venv/bin/ruff check scripts/isolated_diagnostics/p15_clean_pilot_prompts.py scripts/tests/test_p15_clean_pilot_prompts.py docs/acceptance/phase-1.5-pilot-candidate-cleanup-r01/check_inventory.py",
+        "PYTHONPATH=backend:. backend/.venv/bin/python docs/acceptance/phase-1.5-pilot-candidate-cleanup-r01/check_inventory.py",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [
+        {
+          "date": "2026-10-29T20:25:29+08:00",
+          "commands": [
+            "PYTHONPATH=backend:. backend/.venv/bin/python -m pytest scripts/tests/test_p15_clean_pilot_prompts.py scripts/tests/test_p15_minimal_contract.py scripts/tests/test_p15_minimal_pilot.py scripts/tests/test_p15_head_insertion_engine.py -q --tb=short",
+            "backend/.venv/bin/ruff check scripts/isolated_diagnostics/p15_clean_pilot_prompts.py scripts/tests/test_p15_clean_pilot_prompts.py docs/acceptance/phase-1.5-pilot-candidate-cleanup-r01/check_inventory.py",
+            "PYTHONPATH=backend:. backend/.venv/bin/python docs/acceptance/phase-1.5-pilot-candidate-cleanup-r01/check_inventory.py",
+            "python3 scripts/check_catalog_workflow.py",
+            "git diff --check",
+            "MYPYPATH=backend:. backend/.venv/bin/mypy scripts/isolated_diagnostics/p15_clean_pilot_prompts.py --strict --explicit-package-bases --follow-imports=silent",
+            "PYTHONPATH=backend:. backend/.venv/bin/python scripts/run_p15_r0_once.py --check",
+            "PYTHONPATH=backend:. backend/.venv/bin/python docs/acceptance/phase-1.5-r0-once-r01/results/check_evidence.py",
+            "PYTHONPATH=backend:. backend/.venv/bin/python docs/acceptance/phase-1.5-separated-validation-r01/results/check_evidence.py"
+          ],
+          "result": "243 passed 0 skipped；Ruff/mypy、54叶字段/4 Schema/7阶段、链接、旧200文件与历史原件只读核对、工作流及diff通过；新版为未接线候选，Provider新增0。",
+          "evidence": "docs/acceptance/phase-1.5-pilot-candidate-cleanup-r01/verification.txt"
+        }
+      ],
+      "started_at": "2026-10-29T20:19:44+08:00",
+      "completed_at": "2026-10-29T20:25:29+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T091",
+      "execution_gate": "独立新版提示词仅候选，复用已批准引擎/契约不改原冻结；identity固定旧版本，实际接线需新版本与指令摘要/父版本/审核绑定及独立审查。R0语义待独立复核，T088失败、T038 blocked/catalog_only/H保持，不继承旧额度。"
     }
   ],
   "planning_inputs": {

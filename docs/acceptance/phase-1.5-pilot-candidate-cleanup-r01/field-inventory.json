@@ -1,0 +1,393 @@
+{
+  "schema_source": "docs/acceptance/phase-1.5-minimal-output-contract-r01/schemas.json",
+  "schema_sha256": "d45e59648e5ef574674fe24ed85ac55b206eb36cbc2dc900179ad008fa52d8be",
+  "stages": {
+    "C_plan": "C_plan",
+    "C_content": "C_content",
+    "C_repair": "C_content",
+    "B_generate": "B_generate",
+    "B_repair": "B_generate",
+    "review_B": "review",
+    "review_C": "review"
+  },
+  "fields": [
+    {
+      "schema": "C_plan",
+      "path": "/spec_id",
+      "output_owner": "模型输出；程序限定格式与上下文",
+      "mechanical": "spec_id须等于当前目录ID；verify_catalog重建绑定",
+      "semantic": "规划次序和教学效果待独立复核"
+    },
+    {
+      "schema": "C_plan",
+      "path": "/objective_ids/*",
+      "output_owner": "模型输出；程序限定格式与上下文",
+      "mechanical": "四个目标ID各一次；validate检查覆盖和唯一性",
+      "semantic": "规划次序和教学效果待独立复核"
+    },
+    {
+      "schema": "C_content",
+      "path": "/paragraphs/*/key",
+      "output_owner": "模型输出；程序限定格式与上下文",
+      "mechanical": "正则、唯一、锚点冲突检查；程序装配anchor",
+      "semantic": "key不证明内容正确"
+    },
+    {
+      "schema": "C_content",
+      "path": "/paragraphs/*/text",
+      "output_owner": "模型输出；程序限定格式与上下文",
+      "mechanical": "Schema字符串及1–4000字符；保留原文并清洗展示",
+      "semantic": "完整讲解、题干和解释需审核与独立复核"
+    },
+    {
+      "schema": "C_content",
+      "path": "/paragraphs/*/fact_ids/*",
+      "output_owner": "模型输出；程序限定格式与上下文",
+      "mechanical": "当前目录存在、无重复、数量上限；题目必须含相应obs；目录重建绑定",
+      "semantic": "引用可解析不证明文字或题目正确"
+    },
+    {
+      "schema": "C_content",
+      "path": "/questions/caller_head/stem",
+      "output_owner": "模型输出；程序限定格式与上下文",
+      "mechanical": "Schema字符串及1–4000字符；保留原文并清洗展示",
+      "semantic": "完整讲解、题干和解释需审核与独立复核"
+    },
+    {
+      "schema": "C_content",
+      "path": "/questions/caller_head/explanation",
+      "output_owner": "模型输出；程序限定格式与上下文",
+      "mechanical": "Schema字符串及1–4000字符；保留原文并清洗展示",
+      "semantic": "完整讲解、题干和解释需审核与独立复核"
+    },
+    {
+      "schema": "C_content",
+      "path": "/questions/caller_head/fact_ids/*",
+      "output_owner": "模型输出；程序限定格式与上下文",
+      "mechanical": "当前目录存在、无重复、数量上限；题目必须含相应obs；目录重建绑定",
+      "semantic": "引用可解析不证明文字或题目正确"
+    },
+    {
+      "schema": "C_content",
+      "path": "/questions/traversal_status/stem",
+      "output_owner": "模型输出；程序限定格式与上下文",
+      "mechanical": "Schema字符串及1–4000字符；保留原文并清洗展示",
+      "semantic": "完整讲解、题干和解释需审核与独立复核"
+    },
+    {
+      "schema": "C_content",
+      "path": "/questions/traversal_status/explanation",
+      "output_owner": "模型输出；程序限定格式与上下文",
+      "mechanical": "Schema字符串及1–4000字符；保留原文并清洗展示",
+      "semantic": "完整讲解、题干和解释需审核与独立复核"
+    },
+    {
+      "schema": "C_content",
+      "path": "/questions/traversal_status/fact_ids/*",
+      "output_owner": "模型输出；程序限定格式与上下文",
+      "mechanical": "当前目录存在、无重复、数量上限；题目必须含相应obs；目录重建绑定",
+      "semantic": "引用可解析不证明文字或题目正确"
+    },
+    {
+      "schema": "C_content",
+      "path": "/questions/reachable_prefix/stem",
+      "output_owner": "模型输出；程序限定格式与上下文",
+      "mechanical": "Schema字符串及1–4000字符；保留原文并清洗展示",
+      "semantic": "完整讲解、题干和解释需审核与独立复核"
+    },
+    {
+      "schema": "C_content",
+      "path": "/questions/reachable_prefix/explanation",
+      "output_owner": "模型输出；程序限定格式与上下文",
+      "mechanical": "Schema字符串及1–4000字符；保留原文并清洗展示",
+      "semantic": "完整讲解、题干和解释需审核与独立复核"
+    },
+    {
+      "schema": "C_content",
+      "path": "/questions/reachable_prefix/fact_ids/*",
+      "output_owner": "模型输出；程序限定格式与上下文",
+      "mechanical": "当前目录存在、无重复、数量上限；题目必须含相应obs；目录重建绑定",
+      "semantic": "引用可解析不证明文字或题目正确"
+    },
+    {
+      "schema": "C_content",
+      "path": "/questions/allocation_failures/stem",
+      "output_owner": "模型输出；程序限定格式与上下文",
+      "mechanical": "Schema字符串及1–4000字符；保留原文并清洗展示",
+      "semantic": "完整讲解、题干和解释需审核与独立复核"
+    },
+    {
+      "schema": "C_content",
+      "path": "/questions/allocation_failures/explanation",
+      "output_owner": "模型输出；程序限定格式与上下文",
+      "mechanical": "Schema字符串及1–4000字符；保留原文并清洗展示",
+      "semantic": "完整讲解、题干和解释需审核与独立复核"
+    },
+    {
+      "schema": "C_content",
+      "path": "/questions/allocation_failures/fact_ids/*",
+      "output_owner": "模型输出；程序限定格式与上下文",
+      "mechanical": "当前目录存在、无重复、数量上限；题目必须含相应obs；目录重建绑定",
+      "semantic": "引用可解析不证明文字或题目正确"
+    },
+    {
+      "schema": "B_generate",
+      "path": "/paragraphs/*/key",
+      "output_owner": "模型输出；程序限定格式与上下文",
+      "mechanical": "正则、唯一、锚点冲突检查；程序装配anchor",
+      "semantic": "key不证明内容正确"
+    },
+    {
+      "schema": "B_generate",
+      "path": "/paragraphs/*/text",
+      "output_owner": "模型输出；程序限定格式与上下文",
+      "mechanical": "Schema字符串及1–4000字符；保留原文并清洗展示",
+      "semantic": "完整讲解、题干和解释需审核与独立复核"
+    },
+    {
+      "schema": "B_generate",
+      "path": "/code",
+      "output_owner": "基线模型独立生成；程序不得代填",
+      "mechanical": "非空及长度；动作高亮行数按此代码检查",
+      "semantic": "代码语义/安全和与状态一致性需审核及独立复核"
+    },
+    {
+      "schema": "B_generate",
+      "path": "/questions/caller_head/stem",
+      "output_owner": "模型输出；程序限定格式与上下文",
+      "mechanical": "Schema字符串及1–4000字符；保留原文并清洗展示",
+      "semantic": "完整讲解、题干和解释需审核与独立复核"
+    },
+    {
+      "schema": "B_generate",
+      "path": "/questions/caller_head/explanation",
+      "output_owner": "模型输出；程序限定格式与上下文",
+      "mechanical": "Schema字符串及1–4000字符；保留原文并清洗展示",
+      "semantic": "完整讲解、题干和解释需审核与独立复核"
+    },
+    {
+      "schema": "B_generate",
+      "path": "/questions/traversal_status/stem",
+      "output_owner": "模型输出；程序限定格式与上下文",
+      "mechanical": "Schema字符串及1–4000字符；保留原文并清洗展示",
+      "semantic": "完整讲解、题干和解释需审核与独立复核"
+    },
+    {
+      "schema": "B_generate",
+      "path": "/questions/traversal_status/explanation",
+      "output_owner": "模型输出；程序限定格式与上下文",
+      "mechanical": "Schema字符串及1–4000字符；保留原文并清洗展示",
+      "semantic": "完整讲解、题干和解释需审核与独立复核"
+    },
+    {
+      "schema": "B_generate",
+      "path": "/questions/reachable_prefix/stem",
+      "output_owner": "模型输出；程序限定格式与上下文",
+      "mechanical": "Schema字符串及1–4000字符；保留原文并清洗展示",
+      "semantic": "完整讲解、题干和解释需审核与独立复核"
+    },
+    {
+      "schema": "B_generate",
+      "path": "/questions/reachable_prefix/explanation",
+      "output_owner": "模型输出；程序限定格式与上下文",
+      "mechanical": "Schema字符串及1–4000字符；保留原文并清洗展示",
+      "semantic": "完整讲解、题干和解释需审核与独立复核"
+    },
+    {
+      "schema": "B_generate",
+      "path": "/questions/allocation_failures/stem",
+      "output_owner": "模型输出；程序限定格式与上下文",
+      "mechanical": "Schema字符串及1–4000字符；保留原文并清洗展示",
+      "semantic": "完整讲解、题干和解释需审核与独立复核"
+    },
+    {
+      "schema": "B_generate",
+      "path": "/questions/allocation_failures/explanation",
+      "output_owner": "模型输出；程序限定格式与上下文",
+      "mechanical": "Schema字符串及1–4000字符；保留原文并清洗展示",
+      "semantic": "完整讲解、题干和解释需审核与独立复核"
+    },
+    {
+      "schema": "B_generate",
+      "path": "/answers/caller_head",
+      "output_owner": "基线模型独立计算；程序只解码表示，不代填",
+      "mechanical": "Schema枚举/整数/数组；前缀与失败次数的范围检查",
+      "semantic": "错误答案保留，须参考引擎及独立复核逐题判断"
+    },
+    {
+      "schema": "B_generate",
+      "path": "/answers/traversal_status",
+      "output_owner": "基线模型独立计算；程序只解码表示，不代填",
+      "mechanical": "Schema枚举/整数/数组；前缀与失败次数的范围检查",
+      "semantic": "错误答案保留，须参考引擎及独立复核逐题判断"
+    },
+    {
+      "schema": "B_generate",
+      "path": "/answers/reachable_prefix/*",
+      "output_owner": "基线模型独立计算；程序只解码表示，不代填",
+      "mechanical": "Schema枚举/整数/数组；前缀与失败次数的范围检查",
+      "semantic": "错误答案保留，须参考引擎及独立复核逐题判断"
+    },
+    {
+      "schema": "B_generate",
+      "path": "/answers/allocation_failures",
+      "output_owner": "基线模型独立计算；程序只解码表示，不代填",
+      "mechanical": "Schema枚举/整数/数组；前缀与失败次数的范围检查",
+      "semantic": "错误答案保留，须参考引擎及独立复核逐题判断"
+    },
+    {
+      "schema": "B_generate",
+      "path": "/actions/states/*/order",
+      "output_owner": "基线模型独立生成；程序只解码与合并顺序",
+      "mechanical": "枚举、数值/节点/步骤/行号、引用、唯一性及全局order检查",
+      "semantic": "状态、动作顺序与代码事实一致性需独立复核"
+    },
+    {
+      "schema": "B_generate",
+      "path": "/actions/states/*/step",
+      "output_owner": "基线模型独立生成；程序只解码与合并顺序",
+      "mechanical": "枚举、数值/节点/步骤/行号、引用、唯一性及全局order检查",
+      "semantic": "状态、动作顺序与代码事实一致性需独立复核"
+    },
+    {
+      "schema": "B_generate",
+      "path": "/actions/states/*/caller_head",
+      "output_owner": "基线模型独立生成；程序只解码与合并顺序",
+      "mechanical": "枚举、数值/节点/步骤/行号、引用、唯一性及全局order检查",
+      "semantic": "状态、动作顺序与代码事实一致性需独立复核"
+    },
+    {
+      "schema": "B_generate",
+      "path": "/actions/states/*/local_head",
+      "output_owner": "基线模型独立生成；程序只解码与合并顺序",
+      "mechanical": "枚举、数值/节点/步骤/行号、引用、唯一性及全局order检查",
+      "semantic": "状态、动作顺序与代码事实一致性需独立复核"
+    },
+    {
+      "schema": "B_generate",
+      "path": "/actions/states/*/p",
+      "output_owner": "基线模型独立生成；程序只解码与合并顺序",
+      "mechanical": "枚举、数值/节点/步骤/行号、引用、唯一性及全局order检查",
+      "semantic": "状态、动作顺序与代码事实一致性需独立复核"
+    },
+    {
+      "schema": "B_generate",
+      "path": "/actions/states/*/nodes/*/id",
+      "output_owner": "基线模型独立生成；程序只解码与合并顺序",
+      "mechanical": "枚举、数值/节点/步骤/行号、引用、唯一性及全局order检查",
+      "semantic": "状态、动作顺序与代码事实一致性需独立复核"
+    },
+    {
+      "schema": "B_generate",
+      "path": "/actions/states/*/nodes/*/data_status",
+      "output_owner": "基线模型独立生成；程序只解码与合并顺序",
+      "mechanical": "枚举、数值/节点/步骤/行号、引用、唯一性及全局order检查",
+      "semantic": "状态、动作顺序与代码事实一致性需独立复核"
+    },
+    {
+      "schema": "B_generate",
+      "path": "/actions/states/*/nodes/*/data",
+      "output_owner": "基线模型独立生成；程序只解码与合并顺序",
+      "mechanical": "枚举、数值/节点/步骤/行号、引用、唯一性及全局order检查",
+      "semantic": "状态、动作顺序与代码事实一致性需独立复核"
+    },
+    {
+      "schema": "B_generate",
+      "path": "/actions/states/*/nodes/*/next",
+      "output_owner": "基线模型独立生成；程序只解码与合并顺序",
+      "mechanical": "枚举、数值/节点/步骤/行号、引用、唯一性及全局order检查",
+      "semantic": "状态、动作顺序与代码事实一致性需独立复核"
+    },
+    {
+      "schema": "B_generate",
+      "path": "/actions/highlights/*/order",
+      "output_owner": "基线模型独立生成；程序只解码与合并顺序",
+      "mechanical": "枚举、数值/节点/步骤/行号、引用、唯一性及全局order检查",
+      "semantic": "状态、动作顺序与代码事实一致性需独立复核"
+    },
+    {
+      "schema": "B_generate",
+      "path": "/actions/highlights/*/step",
+      "output_owner": "基线模型独立生成；程序只解码与合并顺序",
+      "mechanical": "枚举、数值/节点/步骤/行号、引用、唯一性及全局order检查",
+      "semantic": "状态、动作顺序与代码事实一致性需独立复核"
+    },
+    {
+      "schema": "B_generate",
+      "path": "/actions/highlights/*/line",
+      "output_owner": "基线模型独立生成；程序只解码与合并顺序",
+      "mechanical": "枚举、数值/节点/步骤/行号、引用、唯一性及全局order检查",
+      "semantic": "状态、动作顺序与代码事实一致性需独立复核"
+    },
+    {
+      "schema": "B_generate",
+      "path": "/actions/advances/*/order",
+      "output_owner": "基线模型独立生成；程序只解码与合并顺序",
+      "mechanical": "枚举、数值/节点/步骤/行号、引用、唯一性及全局order检查",
+      "semantic": "状态、动作顺序与代码事实一致性需独立复核"
+    },
+    {
+      "schema": "B_generate",
+      "path": "/actions/advances/*/step",
+      "output_owner": "基线模型独立生成；程序只解码与合并顺序",
+      "mechanical": "枚举、数值/节点/步骤/行号、引用、唯一性及全局order检查",
+      "semantic": "状态、动作顺序与代码事实一致性需独立复核"
+    },
+    {
+      "schema": "review",
+      "path": "/candidate_id",
+      "output_owner": "审核模型回显程序生成的当前ID",
+      "mechanical": "与当前绑定、完整产物摘要及臂核对",
+      "semantic": "绑定不证明审核正确"
+    },
+    {
+      "schema": "review",
+      "path": "/verdict",
+      "output_owner": "审核模型建议",
+      "mechanical": "Schema枚举及pass/revise与issues关系；未知停止",
+      "semantic": "建议不代替独立裁决或发布"
+    },
+    {
+      "schema": "review",
+      "path": "/uncertainty",
+      "output_owner": "审核模型说明",
+      "mechanical": "长度≤4000；unknown当且仅当非空",
+      "semantic": "信息不足须停止；不证明判断充分"
+    },
+    {
+      "schema": "review",
+      "path": "/issues/*/severity",
+      "output_owner": "审核模型分类建议",
+      "mechanical": "Schema枚举、issues数量上限；事实/安全或severe触发停止",
+      "semantic": "分类及事实结论需独立裁决"
+    },
+    {
+      "schema": "review",
+      "path": "/issues/*/area",
+      "output_owner": "审核模型分类建议",
+      "mechanical": "Schema枚举、issues数量上限；事实/安全或severe触发停止",
+      "semantic": "分类及事实结论需独立裁决"
+    },
+    {
+      "schema": "review",
+      "path": "/issues/*/target_id",
+      "output_owner": "审核模型选取程序建立的目标ID",
+      "mechanical": "当前目标目录存在并重建绑定",
+      "semantic": "定位不证明问题真实"
+    },
+    {
+      "schema": "review",
+      "path": "/issues/*/evidence_quote",
+      "output_owner": "审核模型引用目标原文或规范投影",
+      "mechanical": "非空长度限制，必须为对应目标文本的精确子串",
+      "semantic": "引文存在不证明推理或事实正确"
+    },
+    {
+      "schema": "review",
+      "path": "/issues/*/reason",
+      "output_owner": "审核模型解释",
+      "mechanical": "非空长度限制",
+      "semantic": "需独立复核理由和严重度"
+    }
+  ]
+}
