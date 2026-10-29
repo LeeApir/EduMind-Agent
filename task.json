@@ -4468,14 +4468,13 @@
       "phase": "Phase 1.5",
       "priority": "P0",
       "title": "交付可检查的完整头插法课程离线样例",
-      "status": "todo",
+      "status": "done",
       "depends_on": [
         "PHASE-1.5-T092"
       ],
       "scope": [
-        "scripts/isolated_diagnostics/",
-        "scripts/tests/",
-        "docs/acceptance/",
+        "scripts/isolated_diagnostics/generate_p15_bound_sample.py",
+        "docs/acceptance/phase-1.5-bound-course-sample-t093/",
         "task.json",
         "process.txt"
       ],
@@ -4485,16 +4484,29 @@
         "说明样例来源与语义验证范围；若声称交互可用必须实际检查播放、步进和重置。"
       ],
       "verification": [
-        "按任务交接记录实际离线测试与证据；真实执行须另经准确包授权",
+        "PYTHONPATH=backend:. backend/.venv/bin/python docs/acceptance/phase-1.5-bound-course-sample-t093/check_sample.py",
+        "backend/.venv/bin/ruff check scripts/isolated_diagnostics/generate_p15_bound_sample.py docs/acceptance/phase-1.5-bound-course-sample-t093/check_sample.py",
         "python3 scripts/check_catalog_workflow.py",
         "git diff --check"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "date": "2026-10-29T20:43:31+08:00",
+          "commands": [
+            "PYTHONPATH=backend:. backend/.venv/bin/python docs/acceptance/phase-1.5-bound-course-sample-t093/check_sample.py",
+            "backend/.venv/bin/ruff check scripts/isolated_diagnostics/generate_p15_bound_sample.py docs/acceptance/phase-1.5-bound-course-sample-t093/check_sample.py",
+            "python3 scripts/check_catalog_workflow.py",
+            "git diff --check"
+          ],
+          "result": "固定引擎11状态/31动作/四答案与生成文件一致；真实Chromium逐动作状态/高亮、播放/暂停/后退/重置及四题展开通过，0外部请求；Ruff/工作流/diff通过，Provider0。",
+          "evidence": "docs/acceptance/phase-1.5-bound-course-sample-t093/README.md"
+        }
+      ],
+      "started_at": "2026-10-29T20:41:23+08:00",
+      "completed_at": "2026-10-29T20:43:31+08:00",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T093",
-      "execution_gate": "新版隔离流程及样例零真实调用；新准确包获授权后才真实出站，先角色准入再课程。"
+      "execution_gate": "离线手写课程/引擎样例与独立本地播放器已实测，不是模型课或正式验收；完成提交后准备准确执行方案。"
     },
     {
       "id": "PHASE-1.5-T094",
