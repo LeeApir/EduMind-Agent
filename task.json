@@ -4708,14 +4708,13 @@
       "phase": "Phase 1.5",
       "priority": "P0",
       "title": "将真实候选接入播放器并核对交互",
-      "status": "todo",
+      "status": "done",
       "depends_on": [
         "PHASE-1.5-T097"
       ],
       "scope": [
-        "scripts/isolated_diagnostics/",
-        "scripts/tests/",
-        "docs/acceptance/",
+        "scripts/isolated_diagnostics/generate_p15_real_candidate_player.py",
+        "docs/acceptance/phase-1.5-real-candidate-player-t098/",
         "task.json",
         "process.txt"
       ],
@@ -4725,16 +4724,29 @@
         "实际浏览器核对全动作及播放、步进、重置和代码高亮，保存结果。"
       ],
       "verification": [
-        "相关离线测试及交接记录实际命令与结果",
+        "PYTHONPATH=backend:. backend/.venv/bin/python docs/acceptance/phase-1.5-real-candidate-player-t098/check_player.py",
+        "backend/.venv/bin/ruff check scripts/isolated_diagnostics/generate_p15_real_candidate_player.py docs/acceptance/phase-1.5-real-candidate-player-t098/check_player.py",
         "python3 scripts/check_catalog_workflow.py",
         "git diff --check"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "date": "2026-10-29T23:37:36+08:00",
+          "commands": [
+            "PYTHONPATH=backend:. backend/.venv/bin/python docs/acceptance/phase-1.5-real-candidate-player-t098/check_player.py",
+            "backend/.venv/bin/ruff check scripts/isolated_diagnostics/generate_p15_real_candidate_player.py docs/acceptance/phase-1.5-real-candidate-player-t098/check_player.py",
+            "python3 scripts/check_catalog_workflow.py",
+            "git diff --check"
+          ],
+          "result": "真实候选4段/4题、11状态/31动作、播放暂停、逐步后退、重置及代码高亮真实Chromium通过；0外部请求和JS错误；Ruff/工作流/diff通过，Provider0。",
+          "evidence": "docs/acceptance/phase-1.5-real-candidate-player-t098/README.md"
+        }
+      ],
+      "started_at": "2026-10-29T23:34:55+08:00",
+      "completed_at": "2026-10-29T23:37:36+08:00",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T098",
-      "execution_gate": "仅离线修复与评估，不调用真实Provider，不重启或改写旧停止批次。"
+      "execution_gate": "真实候选仅隔离离线播放器通过，不是正式产品播放器接线或课程签核；完成提交后进入独立评估。"
     },
     {
       "id": "PHASE-1.5-T099",
