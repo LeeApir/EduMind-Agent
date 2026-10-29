@@ -1,0 +1,168 @@
+{
+  "slots": [
+    {
+      "slot": "S1",
+      "stage": "C_plan",
+      "role": "generation",
+      "sent": true,
+      "admitted": true,
+      "http_status": 200,
+      "response_sha256": "a0a67583639fadbb2d6dab0f8ca71431db8d1bab3be94611306e057848375742",
+      "response_bytes": 1629,
+      "reported_usage": {
+        "input_tokens": 354,
+        "input_tokens_details": {
+          "cached_tokens": 0
+        },
+        "output_tokens": 52,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 406
+      },
+      "request_sha256": "8a7bf5f8e2a69a05e81b49fc69aced21ed278a2da1b76bc4fa7616f1371e51f9"
+    },
+    {
+      "slot": "S2",
+      "stage": "C_content",
+      "role": "generation",
+      "sent": true,
+      "admitted": true,
+      "http_status": 200,
+      "response_sha256": "10e327e8b5b20c40772b692ac1513a9ada7e35b960ced56df805a678852e1ed6",
+      "response_bytes": 3441,
+      "reported_usage": {
+        "input_tokens": 2514,
+        "input_tokens_details": {
+          "cached_tokens": 0
+        },
+        "output_tokens": 178,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 2692
+      },
+      "request_sha256": "828dd8e525a738f706add226d2766c61b99f809a6c294e911d2eb2d141044442"
+    },
+    {
+      "slot": "S3",
+      "stage": "C_repair",
+      "role": "generation",
+      "sent": true,
+      "admitted": true,
+      "http_status": 200,
+      "response_sha256": "153fdc1dd3da12367ae8cd42394ddf9c4dfbcfa36a3ddc3cc7b8af08831ea810",
+      "response_bytes": 3443,
+      "reported_usage": {
+        "input_tokens": 2824,
+        "input_tokens_details": {
+          "cached_tokens": 512
+        },
+        "output_tokens": 178,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 3002
+      },
+      "request_sha256": "aa60a4b9853e7ea608ed148a8a9a4b0a0f6b88b49ca7bc007a8dde421a6d98d3"
+    },
+    {
+      "slot": "S4",
+      "stage": "B_generate",
+      "role": "generation",
+      "sent": true,
+      "admitted": true,
+      "http_status": 200,
+      "response_sha256": "82c5a4b1b784eaeaa76e606662772203bf5309884a995904281f4a9fefe72edf",
+      "response_bytes": 5389,
+      "reported_usage": {
+        "input_tokens": 2248,
+        "input_tokens_details": {
+          "cached_tokens": 0
+        },
+        "output_tokens": 265,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 2513
+      },
+      "request_sha256": "18942e5b0942b8b59bc893508745d494e815de4ab83cd7eb222210997d172d4e"
+    },
+    {
+      "slot": "S5",
+      "stage": "B_repair",
+      "role": "generation",
+      "sent": true,
+      "admitted": false,
+      "http_status": 200,
+      "response_sha256": "23e31386e8ef1c49068a2992539f5f1c354742e85357c2620510d8804ee7a2ba",
+      "response_bytes": 8116,
+      "reported_usage": {
+        "input_tokens": 2637,
+        "input_tokens_details": {
+          "cached_tokens": 1152
+        },
+        "output_tokens": 1031,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 3668
+      },
+      "request_sha256": "e90a7957054967e2df329a72503a2149485e8fab6489beeec56e4610090267dc"
+    },
+    {
+      "slot": "S6",
+      "stage": "review_B",
+      "role": "review",
+      "sent": false,
+      "admitted": false,
+      "http_status": null
+    },
+    {
+      "slot": "S7",
+      "stage": "review_C",
+      "role": "review",
+      "sent": false,
+      "admitted": false,
+      "http_status": null
+    }
+  ],
+  "analysis": {
+    "exact_readonly_error": {
+      "type": "JSONDecodeError",
+      "message": "Extra data: line 1 column 3288 (char 3287)"
+    },
+    "message_text_chars": 3306,
+    "message_text_sha256": "fb558f5f285d786a539462fdeaa36697e83a3be9792dbc62bb69c7e07e023156",
+    "first_parsed_object_keys": [
+      "additionalProperties",
+      "properties",
+      "required"
+    ],
+    "first_object_matches_requested_schema_without_root_type": true,
+    "first_object_end_char": 3287,
+    "invalid_tail": ", \"type\": \"object\"}",
+    "expected_instance_matches": false,
+    "S4_S5_output_schemas_identical": true,
+    "S4_S5_expected_instance_identical": true,
+    "S5_outer_schema_echo_matches": true,
+    "incomplete_details": null,
+    "outer_status": "completed",
+    "output_token_cap": 4096,
+    "reported_output_tokens": 1031,
+    "no_salvage_or_retry": true,
+    "causal_limit": "One observation; cannot attribute malformed/schema-like output uniquely to model vs provider processing or repair context, and cannot infer teaching quality."
+  },
+  "events": 26,
+  "run_elapsed_seconds": 21.43825100013055,
+  "first_event_at": "2026-10-29T13:14:22.644674+08:00",
+  "terminal_at": "2026-10-29T13:14:44.076830+08:00",
+  "window_started_at": "2026-10-29T13:13:27.473640+08:00",
+  "deadline_at": "2026-10-29T13:28:27.473640+08:00",
+  "reported_admitted_input_tokens": 7940,
+  "reported_admitted_output_tokens": 673,
+  "reported_all_outer_input_tokens": 10577,
+  "reported_all_outer_output_tokens": 1704,
+  "actual_invoice": null,
+  "unused_requests_invalidated": 2
+}

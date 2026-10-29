@@ -84,6 +84,8 @@ T040保持blocked；T041标记blocked，旧链性能验收暂缓，新链性能�
 
 2026-10-29 T083实现记录：用户批准ADR0047 A—D作为隔离实现依据，登记[准确批准](ADR/0047-approval-20261029.json)，冻结提案字节保持。新最小契约适配与双臂Mock离线回归交付见[审查交接](acceptance/phase-1.5-minimal-output-adapter-r01/README.md)；基线答案不代填、程序事实ID解析、完整候选审核及一次普通教学修复仅在新隔离模块实施，不接线生产。七HTTP合成兼容及900秒窗口范围已一并批准，但按用户要求先完成离线工作交回审查，未启动窗口/读取凭据/真实调用；USD1实际账户费用上限尚未核实且未获新金额例外。未解除完整角色/课程门禁、T038 blocked、catalog_only或H封存。
 
+2026-10-29 T085受控结果：用户批准原七槽真实合成兼容、900秒窗口并明确接受本批费用风险例外后，执行5次DeepSeek HTTP200，S1–S4严格通过、S5返回Schema片段及非法JSON尾部而停止，AIAPI S6/S7未发；[结果及原件摘要](acceptance/phase-1.5-minimal-live-r01/results/RESULTS.md)。整套兼容未准入，不能开始课程实验；未用2请求失效，不重试/重启/逐字段补Schema，T038 blocked、catalog_only、H封存与原教学阈值保持。
+
 用户已确认[需求说明](PRD-phase-1.5-draft.md)的A—F取舍，特别明确“AI生成草稿允许学生直接学习，仿照OM”。[ADR-0023](ADR/0023-free-course-learning-and-ui-direction.md)记录产品方向；具体API、数据模型、运行状态和验收阈值尚待设计。已同步文档与[信息架构初稿](design/phase-1.5-information-architecture.md)。随后用户确认三页原型并要求准备任务，根[task.json](../task.json)已细化42项todo，安排见[任务规划说明](phase-1.5-task-plan.md)；本次不领取、不开发，具体契约批准与真实验证授权仍按任务门槛执行。
 
 新自由课程以原始目标及有据画像驱动，不先强制选择唯一知识节点。图谱与路径作为可选关联和建议；课程可关联零个或多个节点。场景不再固定三块，采用有上限的可变大纲，默认自动继续，用户可主动调整；首个完整可学场景就绪后进入课程，后续持续追加并支持恢复及局部修订。

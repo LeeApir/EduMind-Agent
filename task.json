@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "T084受控入口准备完成412项通过；用户已接受本批费用例外，完成提交后依赖串行领取T085注册新900秒并执行原七槽。不得重启旧批或发送课程，T038/catalog_only/H保持。",
+    "phase_gate": "T085完成受控证据交付但七槽协议未准入：S1–S4通过，S5 HTTP200输出Schema片段/非法JSON，S6/S7未发；已终止且未用2失效。无课程/新批授权，不自动修Schema或Prompt。T038/catalog_only/H及教学阈值保持。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -4038,7 +4038,7 @@
       "phase": "Phase 1.5",
       "priority": "P0",
       "title": "执行已批准七槽合成兼容并只读复核",
-      "status": "todo",
+      "status": "done",
       "depends_on": [
         "PHASE-1.5-T084"
       ],
@@ -4059,12 +4059,27 @@
         "python3 scripts/check_catalog_workflow.py",
         "git diff --check"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "date": "2026-10-29T13:20:13+08:00",
+          "commands": [
+            "PYTHONPATH=backend:. backend/.venv/bin/python scripts/run_p15_minimal_probe.py --run",
+            "PYTHONPATH=backend:. backend/.venv/bin/python scripts/run_p15_minimal_probe.py --check-results",
+            "read-only S5 observe/JSON raw_decode and S4/S5 exact schema/fixture comparison",
+            "post-terminal CLI forbidden-credential trap expected exit2/unchanged private hashes",
+            "python3 scripts/check_catalog_workflow.py",
+            "git diff --check"
+          ],
+          "result": "受控采集完成但兼容未通过：5 real HTTP/均200，S1–S4通过，S5 message.text返回请求Schema片段+非法尾部（JSONDecodeError Extra data），S6/S7未预约未发；26事件/43私有原件/来源/窗口/终态只读通过。run/check-results exit2如约停止；unused2失效，unknown协议占额1；报告输入10577/输出1704，账单未知。未发AIAPI/课程，无教学或原质量通过。",
+          "evidence": "docs/acceptance/phase-1.5-minimal-live-r01/results/RESULTS.md",
+          "result_manifest_sha256": "5cc6a2af01e38ca7183080b47eb10827f8afe70a5f11fb61faf02a020f5b2820"
+        }
+      ],
+      "started_at": "2026-10-29T13:13:27+08:00",
+      "completed_at": "2026-10-29T13:20:13+08:00",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T085",
-      "execution_gate": "七HTTP/900秒范围及用户当前明确“接受本批费用例外并执行”均已批准；依赖T084完成提交后登记一次窗口，仅原七合成请求，任一异常即停。"
+      "execution_gate": "准确七槽批次已于S5非法且非实例输出时不可逆终止；仅完成受控证据任务，非兼容通过。S6/S7及未用2请求失效，不重试/重启/续窗口/改Schema补发或准备课程。"
     }
   ],
   "planning_inputs": {
