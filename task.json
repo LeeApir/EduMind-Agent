@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "T082最小输出设计已交付，ADR0047 A—D及准确附件待外部评估/用户决定；未实施、无新真实授权，旧批终止且完整角色/课程未准入。按用户要求设计提交后停止；T038/catalog_only/H及教学阈值保持。",
+    "phase_gate": "T083隔离适配与290项离线回归已交付，待审查；七HTTP合成兼容/900秒范围已获批准，未激活窗口或出站，USD1实际收费门禁未核实且无新费用例外。按用户要求本地提交后交回审查；课程/旧批/T038/catalog_only/H边界保持。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -3934,6 +3934,58 @@
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T082",
       "execution_gate": "T082仅离线设计交付完成，ADR0047 A—D/准确13附件待外部评估与用户决定。未实施/无新Provider额度；本地完成提交后停止，不领取下一任务，不重启旧批或准备课程执行。"
+    },
+    {
+      "id": "PHASE-1.5-T083",
+      "phase": "Phase 1.5",
+      "priority": "P0",
+      "title": "适配最小输出契约并完成隔离双臂离线回归",
+      "status": "done",
+      "depends_on": [
+        "PHASE-1.5-T082"
+      ],
+      "scope": [
+        "scripts/isolated_diagnostics/p15_minimal_*.py",
+        "scripts/tests/test_p15_minimal_*.py",
+        "docs/acceptance/phase-1.5-minimal-output-adapter-r01/",
+        "docs/ADR/0047-approval-20261029.json",
+        "docs/PRD.md",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "用户批准ADR0047 A—D作为隔离实现依据，要求适配与离线回归后交回审查；并批准七次真实兼容调用范围",
+      "acceptance_criteria": [
+        "准确登记ADR0047 A—D及13文件manifest批准；实现新版本纯隔离适配，不改旧冻结或生产教学链路。",
+        "完整执行本地结构/边界/ID与版本绑定、事实解析、基线无代填、动作有限编码及全候选审核定位；保留自然语言语义责任。",
+        "双臂Mock端到端覆盖四变体/分配失败、未知拒绝、一次普通教学修复、事实/安全/unknown/超时停止；手写反例及旧回归实际通过，类型/lint及旧冻结核验通过。",
+        "交付七次合成准入的准确候选请求和离线材料、证据与待审限制；本任务只离线，按用户要求交回审查。七次调用授权登记但不越过审查或未核实费用门禁。"
+      ],
+      "verification": [
+        "待建立并实际执行：scripts/tests/test_p15_minimal_contract.py 与 test_p15_minimal_pilot.py",
+        "PYTHONPATH=backend:. backend/.venv/bin/python docs/acceptance/phase-1.5-minimal-output-contract-r01/check_design.py",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [
+        {
+          "date": "2026-10-29T10:38:32+08:00",
+          "commands": [
+            "PYTHONPATH=backend:. backend/.venv/bin/python -m pytest scripts/tests/test_p15_minimal_contract.py scripts/tests/test_p15_minimal_pilot.py scripts/tests/test_p15_head_insertion_engine.py scripts/tests/test_p15_agent_pilot.py scripts/tests/test_p15_pilot_baseline.py -q --tb=short --junitxml=/private/tmp/edumind-p15-t083-regression.xml",
+            "MYPYPATH=backend:. backend/.venv/bin/mypy --strict --explicit-package-bases --follow-imports=silent scripts/isolated_diagnostics/p15_minimal_contract.py scripts/isolated_diagnostics/p15_minimal_pilot.py",
+            "Ruff five files; check_preparation.py/check_design.py under .env/API_KEY/DNS/socket forbidden guards",
+            "python3 scripts/check_catalog_workflow.py",
+            "git diff --check"
+          ],
+          "result": "290 passed0skip（新182+旧108），严格类型2源/Ruff通过；16 Mock组39模拟调用完整原件/版本/事件核对；七准确请求/17文件/97来源/旧302摘要通过。真实0/未读Key，非独立评估/教学或真实兼容通过；初次fixture、最大输入投影及类型/门禁诊断次序修正见验证记录。",
+          "evidence": "docs/acceptance/phase-1.5-minimal-output-adapter-r01/verification.txt",
+          "manifest_sha256": "b959c3cc3cd5e52f367c4659821313544413036e4f65495d40019640bc638416"
+        }
+      ],
+      "started_at": "2026-10-29T08:22:03+08:00",
+      "completed_at": "2026-10-29T10:38:32+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T083",
+      "execution_gate": "隔离适配/离线回归交付后按用户要求交回审查，七HTTP/900秒范围已登记批准但未启动或读取Key；USD1实际账户支出未核实、无新费用例外。无课程调用，旧批停止/原教学阈值/T038/catalog_only/H保持；完成提交后停止。"
     }
   ],
   "planning_inputs": {

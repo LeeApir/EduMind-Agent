@@ -1,0 +1,32 @@
+T083 isolated adaptation verification — 2026-10-29 Asia/Shanghai
+Executor: Codex. Developer self-review, not independent evaluation.
+
+Initial new test run: 169 passed / 1 failed. The catalog_digest-only tamper fixture accidentally recomputed the original valid digest before asserting rejection. Kept the rejection assertion and corrected the injected case to leave the tampered checksum; semantic-fact mutations still recompute the outer digest and must be rejected. Follow-up 170 new tests passed. Initial mypy 6 annotation/narrowing/export errors corrected; no Schema assertion weakened.
+
+Boundary self-check: maximum B reversed_assignment spec (3 initial nodes / 4 successful attempts) exceeded the existing 128000-byte review-input limit because the target catalog repeated metadata for individual action fields. Changed projection to one full canonical JSON target per action row; all raw/rendered artifact fields stay present and target leaf/ancestor coverage remains checked. Added 8 maximum-spec B/C regressions, preserving size bounds and verifying each action target exactly. Added protocol repair/binding wrapper, inert markup and cancellation regressions.
+
+Final check evidence is appended below after execution. All network-dependent validations are NOT RUN. No credentials or .env were read, no DNS/Provider/C/database execution, no production changes. Synthetic protocol answers and engine-derived Mock replies are explicitly excluded from baseline/teaching effect evidence.
+
+Additional self-review: explicitly reject review_C with a valid matching B candidate_id/binding (and vice versa by arm rule). Added a dedicated negative case. Initial new gate order returned REVIEW_ARM before the existing stale-ID regression's expected CANDIDATE_ID; preserved both assertions and ordered stale-ID checking first, followed by the arm gate. Final result below. The document preflight initially had one unused-import Ruff finding; removed that import and reran Ruff successfully.
+
+Final actual commands/results:
+- PYTHONPATH=backend:. backend/.venv/bin/python -m pytest scripts/tests/test_p15_minimal_contract.py scripts/tests/test_p15_minimal_pilot.py scripts/tests/test_p15_head_insertion_engine.py scripts/tests/test_p15_agent_pilot.py scripts/tests/test_p15_pilot_baseline.py -q --tb=short --junitxml=/private/tmp/edumind-p15-t083-regression.xml
+  290 passed / 0 failed / 0 skipped in 1.54s (182 new + 108 existing). JUnit path above is actual output, not a frozen independent evaluation.
+- MYPYPATH=backend:. backend/.venv/bin/mypy --strict --explicit-package-bases --follow-imports=silent scripts/isolated_diagnostics/p15_minimal_contract.py scripts/isolated_diagnostics/p15_minimal_pilot.py
+  Success, two source files.
+- backend/.venv/bin/ruff check scripts/isolated_diagnostics/p15_minimal_contract.py scripts/isolated_diagnostics/p15_minimal_pilot.py scripts/tests/test_p15_minimal_contract.py scripts/tests/test_p15_minimal_pilot.py docs/acceptance/phase-1.5-minimal-output-adapter-r01/check_preparation.py
+  Passed.
+- PYTHONPATH=backend:. backend/.venv/bin/python docs/acceptance/phase-1.5-minimal-output-adapter-r01/check_preparation.py
+  Passed: 17 candidate files, 97 source pins, 11 relative links, seven exact bodies/approved scope, actual real HTTP0; 16 Mock scenarios/39 Mock calls and full raw/versions/event binding verified. Fee cap not verified; review pending.
+- PYTHONPATH=backend:. backend/.venv/bin/python docs/acceptance/phase-1.5-minimal-output-contract-r01/check_design.py
+  Passed unchanged 4 complete native schemas/93 locations/51 cases/7 fixtures and all 302 prior frozen file entries.
+- Inline final guarded runpy of both preflight scripts: forbid .env reads, API_KEY environment lookups, DNS/socket connections.
+  Both passed with all guards active; FINAL_GUARDED_CHECKS_PASSED. No live executor invoked.
+- python3 scripts/check_catalog_workflow.py / git diff --check
+  Passed. Only authorized new implementation/tests/docs/approval/governance changed; the three existing unrelated user changes preserved.
+
+Developer review complete: checked raw-output retention, explicit C program provenance, absent baseline reference argument, wrong/missing B answer behavior, full target coverage and arm/revision binding, unchanged teaching-standard prefix, one repair and no post-terminal dispatch, exact seven-body/cap consistency. This is developer self-review only. Independent reviewer decision and real fee/compatibility evidence remain absent.
+
+Handoff: README, manifest, two new source modules/two test modules, prompt snapshot, seven body files and all 16 controlled Mock originals. User has already authorized the seven-call scope and 900-second window; this task stops at the requested review handoff. No window registered and no Key read. No assumption of a new unlimited-money exception; USD1 account-charge feasibility remains unverified. No old batch restart, real course, production publication, push or merge.
+
+Implementation manifest SHA256: b959c3cc3cd5e52f367c4659821313544413036e4f65495d40019640bc638416
