@@ -1,0 +1,52 @@
+{
+  "scope": "PHASE-1.5-T088",
+  "failed_case": "W4",
+  "terminal_reason": "STRICT_JSON_INVALID",
+  "output_chars": 3306,
+  "output_bytes": 3306,
+  "output_sha256": "313427b759a5a21a57b31e909a7d77592631fcdbd37d57866f61b0b3f4a68e5b",
+  "strict_json_error": {
+    "type": "JSONDecodeError",
+    "message": "Extra data",
+    "line": 1,
+    "column": 3306,
+    "position": 3305
+  },
+  "analysis_only_raw_decode": {
+    "prefix_end": 3305,
+    "prefix_equal_complete_request_schema": true,
+    "trailing_text": "}",
+    "prefix_equal_expected_instance": false,
+    "used_for_admission": false
+  },
+  "schema_echo_equal": true,
+  "root_schema_unchanged": true,
+  "transport_or_truncation_not_shown": {
+    "http_status": 200,
+    "status": "completed",
+    "error": null,
+    "incomplete_details": null,
+    "reported_output": 1031,
+    "requested_output_limit": 4096
+  },
+  "single_variable_comparison": {
+    "control": "W0",
+    "case": "W4",
+    "only_added_pointer": "/role_input/original_input",
+    "observed_control": "exact_echo",
+    "observed_case": "schema_plus_extra_closing_brace",
+    "replicates_each": 1,
+    "length_and_content_confound_remains": true,
+    "causal_attribution_established": false
+  },
+  "old_T085_comparison": {
+    "same_failure_category": "Schema returned instead of instance; malformed JSON",
+    "same_bytes": false,
+    "old_prefix": "request Schema without root type",
+    "current_prefix": "complete request Schema",
+    "old_trailing_text": ", \"type\": \"object\"}",
+    "current_trailing_text": "}"
+  },
+  "R0": "not_reserved_not_sent_no_semantic_review",
+  "no_fix_no_reparse_admission_no_retry": true
+}

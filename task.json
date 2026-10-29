@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "T087准确包/175文件冻结及598项离线回归已完成，待独立审查；T088 todo未领取，真实调用/新窗口/费用均未批准。Schema/严格校验/顺序/停止规则及T085保持；R0机械合格仅pending独立语义复核，不能自动修复成功；Provider0/catalog_only/T038/H保持。",
+    "phase_gate": "T088已按准确批准执行6HTTP并因W4非法Schema输出停止，5槽回显合格/R0未运行；全量证据待独立评估，非诊断或修复成功。旧/本批余量和费用不继承，无后续调用/课程批准；T038 blocked/catalog_only/H/原教学标准保持。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -4193,7 +4193,7 @@
       "phase": "Phase 1.5",
       "priority": "P0",
       "title": "获准后采集分离协议与修复诊断新包证据",
-      "status": "todo",
+      "status": "done",
       "depends_on": [
         "PHASE-1.5-T087"
       ],
@@ -4202,23 +4202,48 @@
         "task.json",
         "process.txt"
       ],
-      "prd_source": "ADR0048 D；为新准确包预留执行scope，尚无真实执行授权",
+      "prd_source": "ADR0048 D；用户本轮明确批准T088准确包、独立900秒窗口及当前费用风险例外",
       "acceptance_criteria": [
         "T087已完成提交、准确包/新费用风险和独立900秒窗口获明确批准后才领取出站，不沿用旧许可或余额。",
         "固定P0/W0–W4/R0，任一异常全批停，无重试/补样/旧批重启；保留完整原件和未运行。",
         "R0机械通过只记待独立语义复核，网络采集完成不算修复/诊断成功或角色/课程准入；只读复核及证据提交。"
       ],
       "verification": [
-        "待准确批准后：新入口--run及--check-results；原件/状态/窗口只读重算",
+        "PYTHONPATH=backend:. backend/.venv/bin/python scripts/run_p15_separated_probe.py --check",
+        "PYTHONPATH=backend:. backend/.venv/bin/python scripts/run_p15_separated_probe.py --run",
+        "PYTHONPATH=backend:. backend/.venv/bin/python scripts/run_p15_separated_probe.py --check-results",
+        "PYTHONPATH=backend:. backend/.venv/bin/python docs/acceptance/phase-1.5-separated-validation-r01/results/check_evidence.py",
+        "backend/.venv/bin/ruff check docs/acceptance/phase-1.5-separated-validation-r01/results/check_evidence.py",
         "python3 scripts/check_catalog_workflow.py",
         "git diff --check"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "date": "2026-10-29T14:50:02+08:00",
+          "commands": [
+            "PYTHONPATH=backend:. backend/.venv/bin/python scripts/run_p15_separated_probe.py --check",
+            "PYTHONPATH=backend:. backend/.venv/bin/python scripts/run_p15_separated_probe.py --run",
+            "PYTHONPATH=backend:. backend/.venv/bin/python scripts/run_p15_separated_probe.py --check-results",
+            "PYTHONPATH=backend:. backend/.venv/bin/python docs/acceptance/phase-1.5-separated-validation-r01/results/check_evidence.py",
+            "backend/.venv/bin/ruff check docs/acceptance/phase-1.5-separated-validation-r01/results/check_evidence.py",
+            "python3 scripts/check_catalog_workflow.py",
+            "git diff --check"
+          ],
+          "result": "一次真实执行6HTTP200，P0/W0–W3共5槽严格回显通过，W4返回完整Schema+多余闭括号，JSON Extra data@3305，全批停止；R0未预约未发。run/check-results exit2、51原件31事件/175冻结/用量与所有原文只读核对通过，防重启先于Key/DNS且原件摘要不变。仅完成获准证据采集，不是协议/教学/修复成功，无独立语义结论。",
+          "evidence": "docs/acceptance/phase-1.5-separated-validation-r01/results/RESULTS.md",
+          "manifest_sha256": "0c74b3751bdfd1dfffe7cfc3aa56bd30257e4ec850f18d80041b78bea401a1e3",
+          "result_manifest_sha256": "9a180566c6069bbc0e96502d09624f1f1a84f8ea3909f986d9a86ee368091277",
+          "real_http": 6,
+          "validated_samples": 5,
+          "R0_status": "not_run",
+          "repair_success": false
+        }
+      ],
+      "started_at": "2026-10-29T14:44:12.903292+08:00",
+      "completed_at": "2026-10-29T14:50:02+08:00",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T088",
-      "execution_gate": "未批准真实执行/窗口/费用；仅预留包scope，T087准备完成不自动领取。"
+      "execution_gate": "本次唯一批准批次已终止：6真实HTTP，W4失败，R0未运行；未用1请求/剩余窗口失效，不重启/重试/补样/继承。证据交独立评估助手/用户审查；不自动修Schema/Prompt或开始课程/新批。"
     }
   ],
   "planning_inputs": {
