@@ -1,0 +1,32 @@
+T089 verification — 2026-10-29T15:03:34+08:00
+Executor Codex; developer self-review only. No independent semantic review or real execution.
+Manifest SHA256 78f02e8b065c95537bdd361249e34715d68f070587f177a7914306bbe2b3f4c0;200 pinned files (includes old175 closure + stoppedT088 results/grant + independent new sources/config/request).
+R0 exact11034 bytes SHA256 2eb90f9ee23738f3311eb14ae44231be5d1d102b3122d1b7e90676dc0b00c29d, unchanged from T087/T086. Existing full Schema/strict/R0 observer reused as direct function reference; old ORDER/grants/limits untouched.
+
+Actual commands:
+
+PYTHONPATH=backend:. backend/.venv/bin/python -m pytest scripts/tests/test_p15_r0_once.py scripts/tests/test_p15_separated_probe.py scripts/tests/test_p15_protocol_task_separation.py scripts/tests/test_p15_minimal_probe.py scripts/tests/test_p15_minimal_contract.py scripts/tests/test_p15_minimal_pilot.py scripts/tests/test_p15_head_insertion_engine.py scripts/tests/test_p15_agent_pilot.py scripts/tests/test_p15_pilot_baseline.py -q --tb=short --junitxml=/private/tmp/edumind-p15-t089.xml
+
+MYPYPATH=backend:. backend/.venv/bin/mypy scripts/isolated_diagnostics/p15_r0_once.py scripts/isolated_diagnostics/p15_r0_once_contract.py scripts/run_p15_r0_once.py --strict --explicit-package-bases --follow-imports=silent
+
+backend/.venv/bin/ruff check scripts/isolated_diagnostics/p15_r0_once.py scripts/isolated_diagnostics/p15_r0_once_contract.py scripts/run_p15_r0_once.py scripts/tests/test_p15_r0_once.py
+
+PYTHONPATH=backend:. backend/.venv/bin/python scripts/run_p15_r0_once.py --check
+
+PYTHONPATH=backend:. backend/.venv/bin/python docs/acceptance/phase-1.5-separated-validation-r01/results/check_evidence.py
+
+python3 scripts/check_catalog_workflow.py
+
+git diff --check
+
+Results:
+-641 passed,0skip,10.17seconds;43 new single-R0 actual-controller Mock tests + unchanged598 previous tests; JUnit /private/tmp/edumind-p15-t089.xml.
+- Two different good wordings and deliberately false but mechanically valid prose all return only pending_independent_semantic_review/exit3. repair_success/diagnostic_success=false. R0 no expected_output and no program answer filling.
+- Unchanged/unauthorized candidate, malformed JSON/Schema-as-answer/extra or duplicate fields, HTTP/timeout/redirect, source/model/reasoning/phase, usage/token, secret echo all fail with max1 send. Late/oldscope/old900s/new fee flags/pending/rehashed success promotion/summary tamper/post-terminal/restart cases rejected. Mock cannot be read as real.
+- Strict mypy3 runtime sources pass. Ruff4 new files pass after four test-only semicolon style fixes; no assertion weakened. Initial41 new tests passed; final43 includes CLI readonly exit3 and summary/window checks.
+- Guarded in-process actual CLI --check/--run/--check-results returned0/2/2 with credential/DNS/socket hooks forbidden. Pending grant rejected before key/.env/live output. New output directory absent; new real HTTP0, no window started, no fee exception accepted.
+- Old T088 evidence checker passed under same no-network hooks:51 originals/31events/6real historical HTTP/5validated/R0notrun. Old175 closure, all14 result files+grant/resultmanifest unchanged. New source pins closure200 passes.
+- All README relative links pass. Workflow dependencies/catalog and diff whitespace pass. No runtime teaching chain or original Prompt edits, no old batch restart.
+- Planned standalone only1HTTP/new120s/HTTP60s/DNS9s/input8192/output4096/request65536/response262144. Reference at frozen public peak prices$0.0073728; actual account fee/currency/upstream hard bounds unverified, cancellation may continue charging. Actual monetary hard cap unverified/None, new package-specific explicit risk acceptance remains required; old T088 exception not inherited.
+
+Handoff: README.md/manifest.json/policy.json/pricing.json/R0.json + pending execution-approval.json. User requested R0; exact new execution/window/fee acceptance pending. T090 blocked until this gap is resolved. Local preparation completion commit only; no Provider before explicit new approval. R0 mechanical acceptance must remain pending independent semantic review.

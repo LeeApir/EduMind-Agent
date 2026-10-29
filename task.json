@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "T088已按准确批准执行6HTTP并因W4非法Schema输出停止，5槽回显合格/R0未运行；全量证据待独立评估，非诊断或修复成功。旧/本批余量和费用不继承，无后续调用/课程批准；T038 blocked/catalog_only/H/原教学标准保持。",
+    "phase_gate": "T089独立R0单次包/200冻结与641离线回归完成；T090 blocked待本包120秒窗口及未核实费用风险例外准确确认。旧T088停止/余量失效不继承；R0机械合格仅pending，新增真实0/catalog_only/T038/H保持。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -4244,6 +4244,92 @@
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T088",
       "execution_gate": "本次唯一批准批次已终止：6真实HTTP，W4失败，R0未运行；未用1请求/剩余窗口失效，不重启/重试/补样/继承。证据交独立评估助手/用户审查；不自动修Schema/Prompt或开始课程/新批。"
+    },
+    {
+      "id": "PHASE-1.5-T089",
+      "phase": "Phase 1.5",
+      "priority": "P0",
+      "title": "准备独立R0单次准确包与离线门禁",
+      "status": "done",
+      "depends_on": [
+        "PHASE-1.5-T088"
+      ],
+      "scope": [
+        "scripts/isolated_diagnostics/p15_r0_once*.py",
+        "scripts/run_p15_r0_once.py",
+        "scripts/tests/test_p15_r0_once.py",
+        "docs/acceptance/phase-1.5-r0-once-r01/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "用户要求发送R0查看结果；新建独立单次，不续T088或沿用其费用例外，ADR0048原严格与语义边界保持",
+      "acceptance_criteria": [
+        "原R0请求11034字节逐字节复用，现有Schema/严格校验/R0仅改paragraphs[0].text保持；旧T085/T088包和结果不变。",
+        "独立单次入口最多1HTTP/新120秒/单HTTP60秒/DNS9秒，无重试回退补样；机械通过只记待独立语义复核，固定repair_success=false。",
+        "真实入口/只读重算Mock回归覆盖合格不同改写、错误讲解pending、越界/未改/非法JSON/返回Schema、来源/时钟/费用/旧scope/不可重启；冻结源码/准确请求/预算/费用边界，提交后再确认新准确执行/费用例外。"
+      ],
+      "verification": [
+        "PYTHONPATH=backend:. backend/.venv/bin/python -m pytest scripts/tests/test_p15_r0_once.py scripts/tests/test_p15_separated_probe.py scripts/tests/test_p15_protocol_task_separation.py scripts/tests/test_p15_minimal_probe.py scripts/tests/test_p15_minimal_contract.py scripts/tests/test_p15_minimal_pilot.py scripts/tests/test_p15_head_insertion_engine.py scripts/tests/test_p15_agent_pilot.py scripts/tests/test_p15_pilot_baseline.py -q --tb=short --junitxml=/private/tmp/edumind-p15-t089.xml",
+        "MYPYPATH=backend:. backend/.venv/bin/mypy scripts/isolated_diagnostics/p15_r0_once.py scripts/isolated_diagnostics/p15_r0_once_contract.py scripts/run_p15_r0_once.py --strict --explicit-package-bases --follow-imports=silent",
+        "backend/.venv/bin/ruff check scripts/isolated_diagnostics/p15_r0_once.py scripts/isolated_diagnostics/p15_r0_once_contract.py scripts/run_p15_r0_once.py scripts/tests/test_p15_r0_once.py",
+        "PYTHONPATH=backend:. backend/.venv/bin/python scripts/run_p15_r0_once.py --check",
+        "PYTHONPATH=backend:. backend/.venv/bin/python docs/acceptance/phase-1.5-separated-validation-r01/results/check_evidence.py",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [
+        {
+          "date": "2026-10-29T15:03:34+08:00",
+          "commands": [
+            "PYTHONPATH=backend:. backend/.venv/bin/python -m pytest scripts/tests/test_p15_r0_once.py scripts/tests/test_p15_separated_probe.py scripts/tests/test_p15_protocol_task_separation.py scripts/tests/test_p15_minimal_probe.py scripts/tests/test_p15_minimal_contract.py scripts/tests/test_p15_minimal_pilot.py scripts/tests/test_p15_head_insertion_engine.py scripts/tests/test_p15_agent_pilot.py scripts/tests/test_p15_pilot_baseline.py -q --tb=short --junitxml=/private/tmp/edumind-p15-t089.xml",
+            "MYPYPATH=backend:. backend/.venv/bin/mypy scripts/isolated_diagnostics/p15_r0_once.py scripts/isolated_diagnostics/p15_r0_once_contract.py scripts/run_p15_r0_once.py --strict --explicit-package-bases --follow-imports=silent",
+            "backend/.venv/bin/ruff check scripts/isolated_diagnostics/p15_r0_once.py scripts/isolated_diagnostics/p15_r0_once_contract.py scripts/run_p15_r0_once.py scripts/tests/test_p15_r0_once.py",
+            "PYTHONPATH=backend:. backend/.venv/bin/python scripts/run_p15_r0_once.py --check",
+            "PYTHONPATH=backend:. backend/.venv/bin/python docs/acceptance/phase-1.5-separated-validation-r01/results/check_evidence.py",
+            "python3 scripts/check_catalog_workflow.py",
+            "git diff --check"
+          ],
+          "result": "641 passed0skip（43新单次控制器+598旧），mypy3源/Ruff4文件/200冻结/原R0准确字节/禁凭据网络pending0,2,2/旧51原件和全部结果摘要不变/链接/工作流diff通过；R0机械合格只pending，新增真实0无窗口/费用例外。",
+          "evidence": "docs/acceptance/phase-1.5-r0-once-r01/verification.txt",
+          "manifest_sha256": "78f02e8b065c95537bdd361249e34715d68f070587f177a7914306bbe2b3f4c0"
+        }
+      ],
+      "started_at": "2026-10-29T14:56:34+08:00",
+      "completed_at": "2026-10-29T15:03:34+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T089",
+      "execution_gate": "独立R0单次入口/准确包准备完成，本地提交后请求本新包费用风险例外与120秒窗口；不继承T088，不发真实请求，R0仅pending独立语义复核。"
+    },
+    {
+      "id": "PHASE-1.5-T090",
+      "phase": "Phase 1.5",
+      "priority": "P0",
+      "title": "获准后发送独立R0一次并交回结果",
+      "status": "blocked",
+      "depends_on": [
+        "PHASE-1.5-T089"
+      ],
+      "scope": [
+        "docs/acceptance/phase-1.5-r0-once-r01/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "用户发送R0指令；须新准确包/窗口及本包未核实费用例外，原T088不续",
+      "acceptance_criteria": [
+        "T089完成提交、独立准确执行包与新120秒窗口/本包费用风险例外齐备后只发送R0一次，不恢复旧矩阵。",
+        "保留完整原件并只读核对，异常即停，无重试补样；机械通过只记pending独立语义复核，不自动成功或课程准入。"
+      ],
+      "verification": [
+        "待准确批准后执行新CLI --run/--check-results及原件核对",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": "新单次准确包的120秒窗口及实际费用/上游限额未核实风险例外待明确批准；T088停止且其费用例外/余量不能继承。",
+      "commit_lookup": "Task-Completed: PHASE-1.5-T090",
+      "execution_gate": "准确执行范围已准备，但本批新窗口/费用风险例外待答复，当前禁止Key/DNS/出站；批准解除后才恢复领取。"
     }
   ],
   "planning_inputs": {
