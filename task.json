@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "T096已单独一次发送：HTTP200/模型pass但非空encrypted_content违反协议且输入自报超本地预约，保留原件，T096/T095 blocked；无补发或自动修复，T038 blocked。",
+    "phase_gate": "用户授权T097–T099集中离线工程修复、真实候选播放及独立评估；不重启旧批，不自动真实出站。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -4653,6 +4653,121 @@
       "blocker": "一次HTTP200，模型文本pass/空issues及候选绑定通过，但非空encrypted_content违反既有wire门禁，输入自报32786超过32768本地预约，完整协议未通过。",
       "commit_lookup": "Task-Completed: PHASE-1.5-T096",
       "execution_gate": "本次单独一次审核已结束，不重试、不自动修复；原响应保留交用户，T095和T038仍blocked。"
+    },
+    {
+      "id": "PHASE-1.5-T097",
+      "phase": "Phase 1.5",
+      "priority": "P0",
+      "title": "统一隔离审核预算、精简真实请求并修复结果重放",
+      "status": "done",
+      "depends_on": [
+        "PHASE-1.5-T096"
+      ],
+      "scope": [
+        "scripts/isolated_diagnostics/p15_review_engineering.py",
+        "scripts/tests/test_p15_review_engineering.py",
+        "docs/acceptance/phase-1.5-review-engineering-t097/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "用户要求集中离线工程修复、真实候选播放器及独立评估；旧批次和已批准标准不追认",
+      "acceptance_criteria": [
+        "在新隔离实现中统一请求大小、预约、响应校验配置，不改原批次冻结字节。",
+        "保留全部课程内容及定位能力，使用真实候选预演请求并验证正反例；对已知加密推理字段做有界隔离，不解密、不转发或追认旧结果。",
+        "修复失败终态汇总的只读重放，测试已停止批次的超限场景与原件保持。"
+      ],
+      "verification": [
+        "PYTHONPATH=backend:. backend/.venv/bin/python -m pytest scripts/tests/test_p15_review_engineering.py scripts/tests/test_p15_combined_candidate_contract.py scripts/tests/test_p15_bound_pilot.py scripts/tests/test_p15_minimal_contract.py -q --tb=short",
+        "backend/.venv/bin/ruff check scripts/isolated_diagnostics/p15_review_engineering.py scripts/tests/test_p15_review_engineering.py",
+        "MYPYPATH=backend:. backend/.venv/bin/mypy scripts/isolated_diagnostics/p15_review_engineering.py --strict --explicit-package-bases --follow-imports=silent",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [
+        {
+          "date": "2026-10-29T23:33:32+08:00",
+          "commands": [
+            "PYTHONPATH=backend:. backend/.venv/bin/python -m pytest scripts/tests/test_p15_review_engineering.py scripts/tests/test_p15_combined_candidate_contract.py scripts/tests/test_p15_bound_pilot.py scripts/tests/test_p15_minimal_contract.py -q --tb=short",
+            "backend/.venv/bin/ruff check scripts/isolated_diagnostics/p15_review_engineering.py scripts/tests/test_p15_review_engineering.py",
+            "MYPYPATH=backend:. backend/.venv/bin/mypy scripts/isolated_diagnostics/p15_review_engineering.py --strict --explicit-package-bases --follow-imports=silent",
+            "python3 scripts/check_catalog_workflow.py",
+            "git diff --check"
+          ],
+          "result": "159 passed 0 skipped；真实候选59507字节/181目标完整引用，统一预算、加密字段有界隔离、旧终态重放/篡改及未绑定反例通过；Ruff/mypy/工作流/diff通过，Provider0。",
+          "evidence": "docs/acceptance/phase-1.5-review-engineering-t097/README.md"
+        }
+      ],
+      "started_at": "2026-10-29T23:28:31+08:00",
+      "completed_at": "2026-10-29T23:33:32+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T097",
+      "execution_gate": "新适配器仅隔离离线；不追认T095/T096结果或开放生产/真实调用；完成后继续真实候选播放器。"
+    },
+    {
+      "id": "PHASE-1.5-T098",
+      "phase": "Phase 1.5",
+      "priority": "P0",
+      "title": "将真实候选接入播放器并核对交互",
+      "status": "todo",
+      "depends_on": [
+        "PHASE-1.5-T097"
+      ],
+      "scope": [
+        "scripts/isolated_diagnostics/",
+        "scripts/tests/",
+        "docs/acceptance/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "用户要求集中离线工程修复、真实候选播放器及独立评估；旧批次和已批准标准不追认",
+      "acceptance_criteria": [
+        "真实候选逐块原文、代码、答案、状态和动作可查看。",
+        "实际浏览器核对全动作及播放、步进、重置和代码高亮，保存结果。"
+      ],
+      "verification": [
+        "相关离线测试及交接记录实际命令与结果",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T098",
+      "execution_gate": "仅离线修复与评估，不调用真实Provider，不重启或改写旧停止批次。"
+    },
+    {
+      "id": "PHASE-1.5-T099",
+      "phase": "Phase 1.5",
+      "priority": "P0",
+      "title": "独立评估真实课程候选",
+      "status": "todo",
+      "depends_on": [
+        "PHASE-1.5-T098"
+      ],
+      "scope": [
+        "scripts/isolated_diagnostics/",
+        "scripts/tests/",
+        "docs/acceptance/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "用户要求集中离线工程修复、真实候选播放器及独立评估；旧批次和已批准标准不追认",
+      "acceptance_criteria": [
+        "独立评估者逐段、逐题、代码与动作审查，保留依据和不确定；不得以模型pass代替。",
+        "提供独立评估结论与可复核证据，不追认原批次通过。"
+      ],
+      "verification": [
+        "相关离线测试及交接记录实际命令与结果",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T099",
+      "execution_gate": "仅离线修复与评估，不调用真实Provider，不重启或改写旧停止批次。"
     }
   ],
   "planning_inputs": {
