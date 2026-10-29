@@ -1,0 +1,1351 @@
+{
+  "origin": "handwritten synthetic development input; not baseline generation or independent truth",
+  "original_artifact": {
+    "identity": {
+      "contract_version": "pilot-minimal-output-adapter-v1",
+      "prompt_version": "minimal-pilot-prompt-v1",
+      "run_id": "design_only",
+      "slot_id": "repair_example",
+      "arm": "B",
+      "revision": 0,
+      "parent_digest": null,
+      "spec_digest": "9c9f7b1bda19ba0d25fa2f4ba18ddc57f0457c5afb4da6f3b6a936348ddeb57f"
+    },
+    "raw_output": {
+      "paragraphs": [
+        {
+          "key": "intro",
+          "text": "p 接旧 head，调用者接回 p。"
+        }
+      ],
+      "code": "#include <stdlib.h>\ntypedef struct Node { int data; struct Node *next; } Node;\nNode *insert(Node *head, int value, int allocation_success) {\n    Node *p = allocation_success ? malloc(sizeof *p) : NULL;\n    if (p == NULL) return head;\n    p->data = value;\n    p->next = head;\n    return p;\n}\nint main(void) {\n    Node *caller_head = NULL;\n    caller_head = insert(caller_head, 7, 1);\n    (void)caller_head;\n    return 0;\n}\n",
+      "questions": {
+        "caller_head": {
+          "stem": "最后调用者保存的头指针 caller_head 指向哪个节点？",
+          "explanation": "调用者接回返回的 p，所以最终指向 t0。"
+        },
+        "traversal_status": {
+          "stem": "从 caller_head 开始的遍历如何结束？",
+          "explanation": "新节点的 next 为空，所以遍历到空指针结束。"
+        },
+        "reachable_prefix": {
+          "stem": "从调用者头开始，首次重复或不确定指针前的可知值前缀是什么？",
+          "explanation": "唯一可达节点的数据为 7，之后到达空指针。"
+        },
+        "allocation_failures": {
+          "stem": "这个合成分配掩码下，分配失败几次？",
+          "explanation": "唯一一次分配被给定为成功，所以失败次数为 0。"
+        }
+      },
+      "answers": {
+        "caller_head": "t0",
+        "traversal_status": "terminated",
+        "reachable_prefix": [
+          7
+        ],
+        "allocation_failures": 0
+      },
+      "actions": {
+        "states": [
+          {
+            "order": 0,
+            "step": 0,
+            "caller_head": "none",
+            "local_head": "none",
+            "p": "none",
+            "nodes": []
+          },
+          {
+            "order": 2,
+            "step": 1,
+            "caller_head": "none",
+            "local_head": "none",
+            "p": "t0",
+            "nodes": [
+              {
+                "id": "t0",
+                "data_status": "indeterminate",
+                "data": 0,
+                "next": "indeterminate"
+              }
+            ]
+          },
+          {
+            "order": 5,
+            "step": 2,
+            "caller_head": "none",
+            "local_head": "none",
+            "p": "t0",
+            "nodes": [
+              {
+                "id": "t0",
+                "data_status": "known",
+                "data": 7,
+                "next": "indeterminate"
+              }
+            ]
+          },
+          {
+            "order": 8,
+            "step": 3,
+            "caller_head": "none",
+            "local_head": "none",
+            "p": "t0",
+            "nodes": [
+              {
+                "id": "t0",
+                "data_status": "known",
+                "data": 7,
+                "next": "none"
+              }
+            ]
+          },
+          {
+            "order": 11,
+            "step": 4,
+            "caller_head": "none",
+            "local_head": "none",
+            "p": "t0",
+            "nodes": [
+              {
+                "id": "t0",
+                "data_status": "known",
+                "data": 7,
+                "next": "none"
+              }
+            ]
+          },
+          {
+            "order": 14,
+            "step": 5,
+            "caller_head": "t0",
+            "local_head": "none",
+            "p": "t0",
+            "nodes": [
+              {
+                "id": "t0",
+                "data_status": "known",
+                "data": 7,
+                "next": "none"
+              }
+            ]
+          }
+        ],
+        "highlights": [
+          {
+            "order": 3,
+            "step": 1,
+            "line": 4
+          },
+          {
+            "order": 6,
+            "step": 2,
+            "line": 6
+          },
+          {
+            "order": 9,
+            "step": 3,
+            "line": 7
+          },
+          {
+            "order": 12,
+            "step": 4,
+            "line": 8
+          },
+          {
+            "order": 15,
+            "step": 5,
+            "line": 12
+          }
+        ],
+        "advances": [
+          {
+            "order": 1,
+            "step": 1
+          },
+          {
+            "order": 4,
+            "step": 2
+          },
+          {
+            "order": 7,
+            "step": 3
+          },
+          {
+            "order": 10,
+            "step": 4
+          },
+          {
+            "order": 13,
+            "step": 5
+          }
+        ]
+      }
+    },
+    "source": {
+      "blocks": [
+        {
+          "kind": "text",
+          "anchor": "repair_example:intro",
+          "markdown": "p 接旧 head，调用者接回 p。"
+        },
+        {
+          "kind": "code",
+          "anchor": "repair_example:code",
+          "text": "#include <stdlib.h>\ntypedef struct Node { int data; struct Node *next; } Node;\nNode *insert(Node *head, int value, int allocation_success) {\n    Node *p = allocation_success ? malloc(sizeof *p) : NULL;\n    if (p == NULL) return head;\n    p->data = value;\n    p->next = head;\n    return p;\n}\nint main(void) {\n    Node *caller_head = NULL;\n    caller_head = insert(caller_head, 7, 1);\n    (void)caller_head;\n    return 0;\n}\n"
+        },
+        {
+          "kind": "question",
+          "anchor": "repair_example:q_caller_head",
+          "stem": "最后调用者保存的头指针 caller_head 指向哪个节点？",
+          "explanation": "调用者接回返回的 p，所以最终指向 t0。",
+          "answer_key": "t0",
+          "observation_key": "caller_head"
+        },
+        {
+          "kind": "question",
+          "anchor": "repair_example:q_traversal_status",
+          "stem": "从 caller_head 开始的遍历如何结束？",
+          "explanation": "新节点的 next 为空，所以遍历到空指针结束。",
+          "answer_key": "terminated",
+          "observation_key": "traversal_status"
+        },
+        {
+          "kind": "question",
+          "anchor": "repair_example:q_reachable_prefix",
+          "stem": "从调用者头开始，首次重复或不确定指针前的可知值前缀是什么？",
+          "explanation": "唯一可达节点的数据为 7，之后到达空指针。",
+          "answer_key": [
+            7
+          ],
+          "observation_key": "reachable_prefix"
+        },
+        {
+          "kind": "question",
+          "anchor": "repair_example:q_allocation_failures",
+          "stem": "这个合成分配掩码下，分配失败几次？",
+          "explanation": "唯一一次分配被给定为成功，所以失败次数为 0。",
+          "answer_key": 0,
+          "observation_key": "allocation_failures"
+        }
+      ],
+      "actions": [
+        {
+          "kind": "show_state",
+          "anchor": "repair_example:code",
+          "step": 0,
+          "state": {
+            "caller_head": null,
+            "local_head": null,
+            "p": null,
+            "nodes": {}
+          }
+        },
+        {
+          "kind": "advance_step",
+          "anchor": "repair_example:code",
+          "step": 1
+        },
+        {
+          "kind": "show_state",
+          "anchor": "repair_example:code",
+          "step": 1,
+          "state": {
+            "caller_head": null,
+            "local_head": null,
+            "p": "t0",
+            "nodes": {
+              "t0": {
+                "data": "indeterminate",
+                "next": "indeterminate"
+              }
+            }
+          }
+        },
+        {
+          "kind": "highlight_code",
+          "anchor": "repair_example:code",
+          "step": 1,
+          "line": 4
+        },
+        {
+          "kind": "advance_step",
+          "anchor": "repair_example:code",
+          "step": 2
+        },
+        {
+          "kind": "show_state",
+          "anchor": "repair_example:code",
+          "step": 2,
+          "state": {
+            "caller_head": null,
+            "local_head": null,
+            "p": "t0",
+            "nodes": {
+              "t0": {
+                "data": 7,
+                "next": "indeterminate"
+              }
+            }
+          }
+        },
+        {
+          "kind": "highlight_code",
+          "anchor": "repair_example:code",
+          "step": 2,
+          "line": 6
+        },
+        {
+          "kind": "advance_step",
+          "anchor": "repair_example:code",
+          "step": 3
+        },
+        {
+          "kind": "show_state",
+          "anchor": "repair_example:code",
+          "step": 3,
+          "state": {
+            "caller_head": null,
+            "local_head": null,
+            "p": "t0",
+            "nodes": {
+              "t0": {
+                "data": 7,
+                "next": null
+              }
+            }
+          }
+        },
+        {
+          "kind": "highlight_code",
+          "anchor": "repair_example:code",
+          "step": 3,
+          "line": 7
+        },
+        {
+          "kind": "advance_step",
+          "anchor": "repair_example:code",
+          "step": 4
+        },
+        {
+          "kind": "show_state",
+          "anchor": "repair_example:code",
+          "step": 4,
+          "state": {
+            "caller_head": null,
+            "local_head": null,
+            "p": "t0",
+            "nodes": {
+              "t0": {
+                "data": 7,
+                "next": null
+              }
+            }
+          }
+        },
+        {
+          "kind": "highlight_code",
+          "anchor": "repair_example:code",
+          "step": 4,
+          "line": 8
+        },
+        {
+          "kind": "advance_step",
+          "anchor": "repair_example:code",
+          "step": 5
+        },
+        {
+          "kind": "show_state",
+          "anchor": "repair_example:code",
+          "step": 5,
+          "state": {
+            "caller_head": "t0",
+            "local_head": null,
+            "p": "t0",
+            "nodes": {
+              "t0": {
+                "data": 7,
+                "next": null
+              }
+            }
+          }
+        },
+        {
+          "kind": "highlight_code",
+          "anchor": "repair_example:code",
+          "step": 5,
+          "line": 12
+        }
+      ],
+      "provenance": {
+        "code": "model",
+        "answers": "model",
+        "actions": "model",
+        "content": "model"
+      },
+      "degraded": false,
+      "production_scoring": false
+    },
+    "artifact_digest": "2b93ba4d446ad8a85f25baa1ae8619f125440d6f16affeafd96ac687b5b05bd8"
+  },
+  "binding": {
+    "version": "pilot-minimal-output-adapter-v1",
+    "candidate_id": "candidate_2b93ba4d446ad8a85f25baa1",
+    "candidate_digest": "2b93ba4d446ad8a85f25baa1ae8619f125440d6f16affeafd96ac687b5b05bd8",
+    "artifact": {
+      "identity": {
+        "contract_version": "pilot-minimal-output-adapter-v1",
+        "prompt_version": "minimal-pilot-prompt-v1",
+        "run_id": "design_only",
+        "slot_id": "repair_example",
+        "arm": "B",
+        "revision": 0,
+        "parent_digest": null,
+        "spec_digest": "9c9f7b1bda19ba0d25fa2f4ba18ddc57f0457c5afb4da6f3b6a936348ddeb57f"
+      },
+      "raw_output": {
+        "paragraphs": [
+          {
+            "key": "intro",
+            "text": "p 接旧 head，调用者接回 p。"
+          }
+        ],
+        "code": "#include <stdlib.h>\ntypedef struct Node { int data; struct Node *next; } Node;\nNode *insert(Node *head, int value, int allocation_success) {\n    Node *p = allocation_success ? malloc(sizeof *p) : NULL;\n    if (p == NULL) return head;\n    p->data = value;\n    p->next = head;\n    return p;\n}\nint main(void) {\n    Node *caller_head = NULL;\n    caller_head = insert(caller_head, 7, 1);\n    (void)caller_head;\n    return 0;\n}\n",
+        "questions": {
+          "caller_head": {
+            "stem": "最后调用者保存的头指针 caller_head 指向哪个节点？",
+            "explanation": "调用者接回返回的 p，所以最终指向 t0。"
+          },
+          "traversal_status": {
+            "stem": "从 caller_head 开始的遍历如何结束？",
+            "explanation": "新节点的 next 为空，所以遍历到空指针结束。"
+          },
+          "reachable_prefix": {
+            "stem": "从调用者头开始，首次重复或不确定指针前的可知值前缀是什么？",
+            "explanation": "唯一可达节点的数据为 7，之后到达空指针。"
+          },
+          "allocation_failures": {
+            "stem": "这个合成分配掩码下，分配失败几次？",
+            "explanation": "唯一一次分配被给定为成功，所以失败次数为 0。"
+          }
+        },
+        "answers": {
+          "caller_head": "t0",
+          "traversal_status": "terminated",
+          "reachable_prefix": [
+            7
+          ],
+          "allocation_failures": 0
+        },
+        "actions": {
+          "states": [
+            {
+              "order": 0,
+              "step": 0,
+              "caller_head": "none",
+              "local_head": "none",
+              "p": "none",
+              "nodes": []
+            },
+            {
+              "order": 2,
+              "step": 1,
+              "caller_head": "none",
+              "local_head": "none",
+              "p": "t0",
+              "nodes": [
+                {
+                  "id": "t0",
+                  "data_status": "indeterminate",
+                  "data": 0,
+                  "next": "indeterminate"
+                }
+              ]
+            },
+            {
+              "order": 5,
+              "step": 2,
+              "caller_head": "none",
+              "local_head": "none",
+              "p": "t0",
+              "nodes": [
+                {
+                  "id": "t0",
+                  "data_status": "known",
+                  "data": 7,
+                  "next": "indeterminate"
+                }
+              ]
+            },
+            {
+              "order": 8,
+              "step": 3,
+              "caller_head": "none",
+              "local_head": "none",
+              "p": "t0",
+              "nodes": [
+                {
+                  "id": "t0",
+                  "data_status": "known",
+                  "data": 7,
+                  "next": "none"
+                }
+              ]
+            },
+            {
+              "order": 11,
+              "step": 4,
+              "caller_head": "none",
+              "local_head": "none",
+              "p": "t0",
+              "nodes": [
+                {
+                  "id": "t0",
+                  "data_status": "known",
+                  "data": 7,
+                  "next": "none"
+                }
+              ]
+            },
+            {
+              "order": 14,
+              "step": 5,
+              "caller_head": "t0",
+              "local_head": "none",
+              "p": "t0",
+              "nodes": [
+                {
+                  "id": "t0",
+                  "data_status": "known",
+                  "data": 7,
+                  "next": "none"
+                }
+              ]
+            }
+          ],
+          "highlights": [
+            {
+              "order": 3,
+              "step": 1,
+              "line": 4
+            },
+            {
+              "order": 6,
+              "step": 2,
+              "line": 6
+            },
+            {
+              "order": 9,
+              "step": 3,
+              "line": 7
+            },
+            {
+              "order": 12,
+              "step": 4,
+              "line": 8
+            },
+            {
+              "order": 15,
+              "step": 5,
+              "line": 12
+            }
+          ],
+          "advances": [
+            {
+              "order": 1,
+              "step": 1
+            },
+            {
+              "order": 4,
+              "step": 2
+            },
+            {
+              "order": 7,
+              "step": 3
+            },
+            {
+              "order": 10,
+              "step": 4
+            },
+            {
+              "order": 13,
+              "step": 5
+            }
+          ]
+        }
+      },
+      "source": {
+        "blocks": [
+          {
+            "kind": "text",
+            "anchor": "repair_example:intro",
+            "markdown": "p 接旧 head，调用者接回 p。"
+          },
+          {
+            "kind": "code",
+            "anchor": "repair_example:code",
+            "text": "#include <stdlib.h>\ntypedef struct Node { int data; struct Node *next; } Node;\nNode *insert(Node *head, int value, int allocation_success) {\n    Node *p = allocation_success ? malloc(sizeof *p) : NULL;\n    if (p == NULL) return head;\n    p->data = value;\n    p->next = head;\n    return p;\n}\nint main(void) {\n    Node *caller_head = NULL;\n    caller_head = insert(caller_head, 7, 1);\n    (void)caller_head;\n    return 0;\n}\n"
+          },
+          {
+            "kind": "question",
+            "anchor": "repair_example:q_caller_head",
+            "stem": "最后调用者保存的头指针 caller_head 指向哪个节点？",
+            "explanation": "调用者接回返回的 p，所以最终指向 t0。",
+            "answer_key": "t0",
+            "observation_key": "caller_head"
+          },
+          {
+            "kind": "question",
+            "anchor": "repair_example:q_traversal_status",
+            "stem": "从 caller_head 开始的遍历如何结束？",
+            "explanation": "新节点的 next 为空，所以遍历到空指针结束。",
+            "answer_key": "terminated",
+            "observation_key": "traversal_status"
+          },
+          {
+            "kind": "question",
+            "anchor": "repair_example:q_reachable_prefix",
+            "stem": "从调用者头开始，首次重复或不确定指针前的可知值前缀是什么？",
+            "explanation": "唯一可达节点的数据为 7，之后到达空指针。",
+            "answer_key": [
+              7
+            ],
+            "observation_key": "reachable_prefix"
+          },
+          {
+            "kind": "question",
+            "anchor": "repair_example:q_allocation_failures",
+            "stem": "这个合成分配掩码下，分配失败几次？",
+            "explanation": "唯一一次分配被给定为成功，所以失败次数为 0。",
+            "answer_key": 0,
+            "observation_key": "allocation_failures"
+          }
+        ],
+        "actions": [
+          {
+            "kind": "show_state",
+            "anchor": "repair_example:code",
+            "step": 0,
+            "state": {
+              "caller_head": null,
+              "local_head": null,
+              "p": null,
+              "nodes": {}
+            }
+          },
+          {
+            "kind": "advance_step",
+            "anchor": "repair_example:code",
+            "step": 1
+          },
+          {
+            "kind": "show_state",
+            "anchor": "repair_example:code",
+            "step": 1,
+            "state": {
+              "caller_head": null,
+              "local_head": null,
+              "p": "t0",
+              "nodes": {
+                "t0": {
+                  "data": "indeterminate",
+                  "next": "indeterminate"
+                }
+              }
+            }
+          },
+          {
+            "kind": "highlight_code",
+            "anchor": "repair_example:code",
+            "step": 1,
+            "line": 4
+          },
+          {
+            "kind": "advance_step",
+            "anchor": "repair_example:code",
+            "step": 2
+          },
+          {
+            "kind": "show_state",
+            "anchor": "repair_example:code",
+            "step": 2,
+            "state": {
+              "caller_head": null,
+              "local_head": null,
+              "p": "t0",
+              "nodes": {
+                "t0": {
+                  "data": 7,
+                  "next": "indeterminate"
+                }
+              }
+            }
+          },
+          {
+            "kind": "highlight_code",
+            "anchor": "repair_example:code",
+            "step": 2,
+            "line": 6
+          },
+          {
+            "kind": "advance_step",
+            "anchor": "repair_example:code",
+            "step": 3
+          },
+          {
+            "kind": "show_state",
+            "anchor": "repair_example:code",
+            "step": 3,
+            "state": {
+              "caller_head": null,
+              "local_head": null,
+              "p": "t0",
+              "nodes": {
+                "t0": {
+                  "data": 7,
+                  "next": null
+                }
+              }
+            }
+          },
+          {
+            "kind": "highlight_code",
+            "anchor": "repair_example:code",
+            "step": 3,
+            "line": 7
+          },
+          {
+            "kind": "advance_step",
+            "anchor": "repair_example:code",
+            "step": 4
+          },
+          {
+            "kind": "show_state",
+            "anchor": "repair_example:code",
+            "step": 4,
+            "state": {
+              "caller_head": null,
+              "local_head": null,
+              "p": "t0",
+              "nodes": {
+                "t0": {
+                  "data": 7,
+                  "next": null
+                }
+              }
+            }
+          },
+          {
+            "kind": "highlight_code",
+            "anchor": "repair_example:code",
+            "step": 4,
+            "line": 8
+          },
+          {
+            "kind": "advance_step",
+            "anchor": "repair_example:code",
+            "step": 5
+          },
+          {
+            "kind": "show_state",
+            "anchor": "repair_example:code",
+            "step": 5,
+            "state": {
+              "caller_head": "t0",
+              "local_head": null,
+              "p": "t0",
+              "nodes": {
+                "t0": {
+                  "data": 7,
+                  "next": null
+                }
+              }
+            }
+          },
+          {
+            "kind": "highlight_code",
+            "anchor": "repair_example:code",
+            "step": 5,
+            "line": 12
+          }
+        ],
+        "provenance": {
+          "code": "model",
+          "answers": "model",
+          "actions": "model",
+          "content": "model"
+        },
+        "degraded": false,
+        "production_scoring": false
+      },
+      "artifact_digest": "2b93ba4d446ad8a85f25baa1ae8619f125440d6f16affeafd96ac687b5b05bd8"
+    },
+    "targets": {
+      "target_dba2f0e55f4f97a0312b0d5d": {
+        "path": "/artifact_digest",
+        "text": "2b93ba4d446ad8a85f25baa1ae8619f125440d6f16affeafd96ac687b5b05bd8",
+        "value_digest": "9e4851ed8fb45d9c256318d75ae26f7d25d255bb663a02e7816da5d2db7f570e",
+        "value_type": "str"
+      },
+      "target_71ed737ba2eb6f07e1d4ac21": {
+        "path": "/identity/arm",
+        "text": "B",
+        "value_digest": "955cca1ceba45052d85984d3a2565f4ce25b7488602c60a165598bf80b26e472",
+        "value_type": "str"
+      },
+      "target_ca2de12b570bda4b24332817": {
+        "path": "/identity/contract_version",
+        "text": "pilot-minimal-output-adapter-v1",
+        "value_digest": "54162b8095b2aefbd779fb6b1023c366dc5e48295e122e4b05c4b2c4bfb5912e",
+        "value_type": "str"
+      },
+      "target_28959e5dac13dd36361d53de": {
+        "path": "/identity/parent_digest",
+        "text": "null",
+        "value_digest": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+        "value_type": "NoneType"
+      },
+      "target_7ddf7c8eaebcec86ebd0538b": {
+        "path": "/identity/prompt_version",
+        "text": "minimal-pilot-prompt-v1",
+        "value_digest": "546b4b4da20667ced318f4213ad44e8d8260933c6a10fc9d9130daec0dc393d0",
+        "value_type": "str"
+      },
+      "target_5191ed542f3b0d08a00e9141": {
+        "path": "/identity/revision",
+        "text": "0",
+        "value_digest": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+        "value_type": "int"
+      },
+      "target_5f09f2ad206226056d99e3eb": {
+        "path": "/identity/run_id",
+        "text": "design_only",
+        "value_digest": "de27be494d38afda65711c30bb40d2a2ed8e7e432e23e1da57e5bb232a5073e3",
+        "value_type": "str"
+      },
+      "target_4295677700eb9c7b73272c88": {
+        "path": "/identity/slot_id",
+        "text": "repair_example",
+        "value_digest": "a2ed7f22c533900d93330f5b61699bbad1c7383973a5c11bdb50f1fb242348b5",
+        "value_type": "str"
+      },
+      "target_6a5385d8ae0dbce4ef73ee5d": {
+        "path": "/identity/spec_digest",
+        "text": "9c9f7b1bda19ba0d25fa2f4ba18ddc57f0457c5afb4da6f3b6a936348ddeb57f",
+        "value_digest": "1347936384e4334ae6b56db72e6ecf18b91530f35db6efc5db794a5d5da7707a",
+        "value_type": "str"
+      },
+      "target_03d23e94af35d43c592d7f29": {
+        "path": "/raw_output/actions/advances/0",
+        "text": "{\"order\":1,\"step\":1}",
+        "value_digest": "a1fb050e9cacecb03dc8f9d41ac9f2908232a302607dc2d78bf2f97d06474e87",
+        "value_type": "dict"
+      },
+      "target_ae8c811f3047040c58949771": {
+        "path": "/raw_output/actions/advances/1",
+        "text": "{\"order\":4,\"step\":2}",
+        "value_digest": "dfab064f5520b76a14e2b7853a31e2795e9f67f9d2a47e28e6df03953b63a15a",
+        "value_type": "dict"
+      },
+      "target_866cd56eeb399ecf4944334d": {
+        "path": "/raw_output/actions/advances/2",
+        "text": "{\"order\":7,\"step\":3}",
+        "value_digest": "fe1815222aba50ef59f19b6f8323f7bee6650656d801c027985a8404d44dc4dc",
+        "value_type": "dict"
+      },
+      "target_69780c0aa424eef62942cbdf": {
+        "path": "/raw_output/actions/advances/3",
+        "text": "{\"order\":10,\"step\":4}",
+        "value_digest": "03155ca5baad02a989128e025a39401a0ac75ad09152b1b5776305746a59fab1",
+        "value_type": "dict"
+      },
+      "target_e0240b90e1bb8eb424e02deb": {
+        "path": "/raw_output/actions/advances/4",
+        "text": "{\"order\":13,\"step\":5}",
+        "value_digest": "a0b766f514e45be21f5d71f691fbd46c4d6bc3d2888b68c735ee08016b44b0f2",
+        "value_type": "dict"
+      },
+      "target_f9427a7ec28adc544b838756": {
+        "path": "/raw_output/actions/highlights/0",
+        "text": "{\"line\":4,\"order\":3,\"step\":1}",
+        "value_digest": "e68822a2ea33f77cf7f54c542d4bc5ee318ec0012e2556aa0737309c0c031dfb",
+        "value_type": "dict"
+      },
+      "target_9b2cf73cd2ce358b8dadb02a": {
+        "path": "/raw_output/actions/highlights/1",
+        "text": "{\"line\":6,\"order\":6,\"step\":2}",
+        "value_digest": "1a928363109b45505f88debbb855bc75d032cbe34a461ac42d43530a2c432232",
+        "value_type": "dict"
+      },
+      "target_8067fe05cd61c11570cda9b1": {
+        "path": "/raw_output/actions/highlights/2",
+        "text": "{\"line\":7,\"order\":9,\"step\":3}",
+        "value_digest": "d022942505db5e06d88b84756fba71aaace4ebc4d3e655149dec6c8b08365297",
+        "value_type": "dict"
+      },
+      "target_aa102f273f86685f47e11bf9": {
+        "path": "/raw_output/actions/highlights/3",
+        "text": "{\"line\":8,\"order\":12,\"step\":4}",
+        "value_digest": "3d5a7cdf2af47f0a355a9e7528002b316d226cd1e5c94371ee98bf3edfe3c48a",
+        "value_type": "dict"
+      },
+      "target_521ef3eb8f02ad14bc6108ef": {
+        "path": "/raw_output/actions/highlights/4",
+        "text": "{\"line\":12,\"order\":15,\"step\":5}",
+        "value_digest": "fc91533f73472e45dc9130b75d03e2fcb86ac1088973b4ab521a946ac428f82e",
+        "value_type": "dict"
+      },
+      "target_fa8220438e745979121b74d1": {
+        "path": "/raw_output/actions/states/0",
+        "text": "{\"caller_head\":\"none\",\"local_head\":\"none\",\"nodes\":[],\"order\":0,\"p\":\"none\",\"step\":0}",
+        "value_digest": "57fe722178bd2ef3e56ec513b5fb6db4182940d724e9d34477f4a293e3a5f1d0",
+        "value_type": "dict"
+      },
+      "target_3e9c669b0b966a0245aced23": {
+        "path": "/raw_output/actions/states/1",
+        "text": "{\"caller_head\":\"none\",\"local_head\":\"none\",\"nodes\":[{\"data\":0,\"data_status\":\"indeterminate\",\"id\":\"t0\",\"next\":\"indeterminate\"}],\"order\":2,\"p\":\"t0\",\"step\":1}",
+        "value_digest": "36ee25312a25ecf01fce409319a6434a2566bcec146ae7529d278f10fc683a98",
+        "value_type": "dict"
+      },
+      "target_b13c5c4dcfb473798e9d4fef": {
+        "path": "/raw_output/actions/states/2",
+        "text": "{\"caller_head\":\"none\",\"local_head\":\"none\",\"nodes\":[{\"data\":7,\"data_status\":\"known\",\"id\":\"t0\",\"next\":\"indeterminate\"}],\"order\":5,\"p\":\"t0\",\"step\":2}",
+        "value_digest": "f7a79817e2245e61d89baa9b4e5278a0bff6fba825e7fdf7a9d77b95f9c06673",
+        "value_type": "dict"
+      },
+      "target_5369884315f3b789e98c1b99": {
+        "path": "/raw_output/actions/states/3",
+        "text": "{\"caller_head\":\"none\",\"local_head\":\"none\",\"nodes\":[{\"data\":7,\"data_status\":\"known\",\"id\":\"t0\",\"next\":\"none\"}],\"order\":8,\"p\":\"t0\",\"step\":3}",
+        "value_digest": "e1e3be3cd18e61867e95c6ee1689d09d517705cd865c93f5783d7c98b0a20cc2",
+        "value_type": "dict"
+      },
+      "target_1799c8d20690590cd292dd25": {
+        "path": "/raw_output/actions/states/4",
+        "text": "{\"caller_head\":\"none\",\"local_head\":\"none\",\"nodes\":[{\"data\":7,\"data_status\":\"known\",\"id\":\"t0\",\"next\":\"none\"}],\"order\":11,\"p\":\"t0\",\"step\":4}",
+        "value_digest": "5836689e2136383935f36946a3955c62944ce3a447d252033db22ea2149fd1f4",
+        "value_type": "dict"
+      },
+      "target_3c7c2ce87c0a8d498c414721": {
+        "path": "/raw_output/actions/states/5",
+        "text": "{\"caller_head\":\"t0\",\"local_head\":\"none\",\"nodes\":[{\"data\":7,\"data_status\":\"known\",\"id\":\"t0\",\"next\":\"none\"}],\"order\":14,\"p\":\"t0\",\"step\":5}",
+        "value_digest": "869a3d081a8a2bc2f2ecdf8d26b844622239ebbb086337f46daa7d168f51ec19",
+        "value_type": "dict"
+      },
+      "target_4bc46e72587b60ba53a41413": {
+        "path": "/raw_output/answers/allocation_failures",
+        "text": "0",
+        "value_digest": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+        "value_type": "int"
+      },
+      "target_84f7bb25f6c9b0af6d6deae3": {
+        "path": "/raw_output/answers/caller_head",
+        "text": "t0",
+        "value_digest": "21cc3d69c8bc2ab77d3236201b5dec810636d69a936e581c570688b741f105e2",
+        "value_type": "str"
+      },
+      "target_1de24df87270bac5032495d9": {
+        "path": "/raw_output/answers/reachable_prefix/0",
+        "text": "7",
+        "value_digest": "7902699be42c8a8e46fbbb4501726517e86b22c56a189f7625a6da49081b2451",
+        "value_type": "int"
+      },
+      "target_9954f4d4f44912d6f97dd4f4": {
+        "path": "/raw_output/answers/traversal_status",
+        "text": "terminated",
+        "value_digest": "1855e0f8a4e6f2ace4006c9a48625df5cce6c3c810b31b36399073d219f28b0a",
+        "value_type": "str"
+      },
+      "target_cf680b706e631a2ca4d6d252": {
+        "path": "/raw_output/code",
+        "text": "#include <stdlib.h>\ntypedef struct Node { int data; struct Node *next; } Node;\nNode *insert(Node *head, int value, int allocation_success) {\n    Node *p = allocation_success ? malloc(sizeof *p) : NULL;\n    if (p == NULL) return head;\n    p->data = value;\n    p->next = head;\n    return p;\n}\nint main(void) {\n    Node *caller_head = NULL;\n    caller_head = insert(caller_head, 7, 1);\n    (void)caller_head;\n    return 0;\n}\n",
+        "value_digest": "02d23d57d9a7e8985a9a6ccacb6603578b8d72de407325b124207963dda3316c",
+        "value_type": "str"
+      },
+      "target_3e63e7dc533eb8838a509710": {
+        "path": "/raw_output/paragraphs/0/key",
+        "text": "intro",
+        "value_digest": "0da0723ec8802822112fbda6ced95cd4d2f24406958cabfecf300d894d6b5e45",
+        "value_type": "str"
+      },
+      "target_4339d0132c88ab16f204b54c": {
+        "path": "/raw_output/paragraphs/0/text",
+        "text": "p 接旧 head，调用者接回 p。",
+        "value_digest": "84f448825657b9b077394def9f0957990e397bb2595672efc8e07b7790b46c71",
+        "value_type": "str"
+      },
+      "target_543f228e3c03a0a3ccedf77c": {
+        "path": "/raw_output/questions/allocation_failures/explanation",
+        "text": "唯一一次分配被给定为成功，所以失败次数为 0。",
+        "value_digest": "c8f5dde54e77886f537eb4151392c43bf2b9cf49ad795935ca9eb38e25b0b7b2",
+        "value_type": "str"
+      },
+      "target_658b02d2dc1de27a5e9e9a39": {
+        "path": "/raw_output/questions/allocation_failures/stem",
+        "text": "这个合成分配掩码下，分配失败几次？",
+        "value_digest": "08d2ed8c3041c2b28cd6a7ccc6146e026e7ae446aa3b0a4965f2ddaf34055ee1",
+        "value_type": "str"
+      },
+      "target_8e639ac1a9529bbbad5e4d31": {
+        "path": "/raw_output/questions/caller_head/explanation",
+        "text": "调用者接回返回的 p，所以最终指向 t0。",
+        "value_digest": "ba042ca208f8de8fc0f45572073fa29ba270be5feeb84a00a414c358251035f0",
+        "value_type": "str"
+      },
+      "target_6a4078af5cc57c161f238934": {
+        "path": "/raw_output/questions/caller_head/stem",
+        "text": "最后调用者保存的头指针 caller_head 指向哪个节点？",
+        "value_digest": "eafd3d0d7858313772fdc637923b9cf51e959bf731236eb8b9b6bbd42c45d7ce",
+        "value_type": "str"
+      },
+      "target_9fc06bd63e9bd13619b75761": {
+        "path": "/raw_output/questions/reachable_prefix/explanation",
+        "text": "唯一可达节点的数据为 7，之后到达空指针。",
+        "value_digest": "3d31b213600cdd02b7da377aa513ebaa2fd37249ae3df2a901a774a02324feae",
+        "value_type": "str"
+      },
+      "target_47035428f79755cf3efd32dc": {
+        "path": "/raw_output/questions/reachable_prefix/stem",
+        "text": "从调用者头开始，首次重复或不确定指针前的可知值前缀是什么？",
+        "value_digest": "def941a1ecaf871fa85689e6c7062e836d037e1bb2b681598fd57f45bc1d0c08",
+        "value_type": "str"
+      },
+      "target_8220f543e17af401c7bc5f8c": {
+        "path": "/raw_output/questions/traversal_status/explanation",
+        "text": "新节点的 next 为空，所以遍历到空指针结束。",
+        "value_digest": "28fbfacfcf75a134b392cf1184f23dff198ef0b1f764d97ca84fce5634a89006",
+        "value_type": "str"
+      },
+      "target_f623097b0e3cf40fd517ff1c": {
+        "path": "/raw_output/questions/traversal_status/stem",
+        "text": "从 caller_head 开始的遍历如何结束？",
+        "value_digest": "da94c6f49244e45af6d8124fec00f4f8d18d180c0a3e051bc8690d732f97e813",
+        "value_type": "str"
+      },
+      "target_94f6ff52290c297ff049f1ce": {
+        "path": "/source/actions/0",
+        "text": "{\"anchor\":\"repair_example:code\",\"kind\":\"show_state\",\"state\":{\"caller_head\":null,\"local_head\":null,\"nodes\":{},\"p\":null},\"step\":0}",
+        "value_digest": "2c16b007d83209dbfa80a0cd79e1e20ddbe663079e8cbc5f0aa2bea18237ac91",
+        "value_type": "dict"
+      },
+      "target_d84de6394496014b72550159": {
+        "path": "/source/actions/1",
+        "text": "{\"anchor\":\"repair_example:code\",\"kind\":\"advance_step\",\"step\":1}",
+        "value_digest": "517b97c642b8aadeb12c8980c9278868e36720fd24dba9d0d4f640673379a7cb",
+        "value_type": "dict"
+      },
+      "target_97b9b33227fbca5fa90ff78a": {
+        "path": "/source/actions/2",
+        "text": "{\"anchor\":\"repair_example:code\",\"kind\":\"show_state\",\"state\":{\"caller_head\":null,\"local_head\":null,\"nodes\":{\"t0\":{\"data\":\"indeterminate\",\"next\":\"indeterminate\"}},\"p\":\"t0\"},\"step\":1}",
+        "value_digest": "680d53b0944e0f7085e29946b6eabfd508226d3552903af246a0479c5defd8d5",
+        "value_type": "dict"
+      },
+      "target_45f0dac52e89020096152168": {
+        "path": "/source/actions/3",
+        "text": "{\"anchor\":\"repair_example:code\",\"kind\":\"highlight_code\",\"line\":4,\"step\":1}",
+        "value_digest": "3a028f5ca8abaa726c5ebaaa66b643b39272050a0b3bcb4f822edb66dbc8c2f2",
+        "value_type": "dict"
+      },
+      "target_e05d16da08fe6cd455c72cea": {
+        "path": "/source/actions/4",
+        "text": "{\"anchor\":\"repair_example:code\",\"kind\":\"advance_step\",\"step\":2}",
+        "value_digest": "3f60be5b03bf8da3d90209fb0f7c26209def4909c2f6a0d9302c13c1e5b88e8a",
+        "value_type": "dict"
+      },
+      "target_da78585b358ca7e0b05075d0": {
+        "path": "/source/actions/5",
+        "text": "{\"anchor\":\"repair_example:code\",\"kind\":\"show_state\",\"state\":{\"caller_head\":null,\"local_head\":null,\"nodes\":{\"t0\":{\"data\":7,\"next\":\"indeterminate\"}},\"p\":\"t0\"},\"step\":2}",
+        "value_digest": "24c6d61e3ac796a3a0406074f50063a5ee4328b5851706a595e9a55aa538a3cc",
+        "value_type": "dict"
+      },
+      "target_e4a876a8f58791c88d4d302c": {
+        "path": "/source/actions/6",
+        "text": "{\"anchor\":\"repair_example:code\",\"kind\":\"highlight_code\",\"line\":6,\"step\":2}",
+        "value_digest": "3833691708f8b62867157ab32219239c8f8c9180e826ff5442abd9031daf2cb2",
+        "value_type": "dict"
+      },
+      "target_52bd1dbdf5ab9385686e3d67": {
+        "path": "/source/actions/7",
+        "text": "{\"anchor\":\"repair_example:code\",\"kind\":\"advance_step\",\"step\":3}",
+        "value_digest": "00f0abbcd36da43ec72f6da2d2b66348330181203d181da40638cea23d4e51ef",
+        "value_type": "dict"
+      },
+      "target_b6af364fa3ac8f4fe5411f73": {
+        "path": "/source/actions/8",
+        "text": "{\"anchor\":\"repair_example:code\",\"kind\":\"show_state\",\"state\":{\"caller_head\":null,\"local_head\":null,\"nodes\":{\"t0\":{\"data\":7,\"next\":null}},\"p\":\"t0\"},\"step\":3}",
+        "value_digest": "84c7e6b9763ae1e19e06d96062506b494294c89f2f567fcc713f5ca59ef8c855",
+        "value_type": "dict"
+      },
+      "target_10f4dab1417390c4bc3cb917": {
+        "path": "/source/actions/9",
+        "text": "{\"anchor\":\"repair_example:code\",\"kind\":\"highlight_code\",\"line\":7,\"step\":3}",
+        "value_digest": "40bb10396708f8695c208f6557651da430032f67c6c77b20c55a76998e097e97",
+        "value_type": "dict"
+      },
+      "target_01b2aadc9d94165ebf024150": {
+        "path": "/source/actions/10",
+        "text": "{\"anchor\":\"repair_example:code\",\"kind\":\"advance_step\",\"step\":4}",
+        "value_digest": "c690d861392ea109315e532af641fd5a3ef23dba88a22f95ddbb3eb88e1bfefc",
+        "value_type": "dict"
+      },
+      "target_7d8360954301d591c273aec3": {
+        "path": "/source/actions/11",
+        "text": "{\"anchor\":\"repair_example:code\",\"kind\":\"show_state\",\"state\":{\"caller_head\":null,\"local_head\":null,\"nodes\":{\"t0\":{\"data\":7,\"next\":null}},\"p\":\"t0\"},\"step\":4}",
+        "value_digest": "b896c8b1afb75bf2e492b4da4c0f8daa40168f59437014c47a4ba0d14e9206cc",
+        "value_type": "dict"
+      },
+      "target_243020d673ea6a862c166fe4": {
+        "path": "/source/actions/12",
+        "text": "{\"anchor\":\"repair_example:code\",\"kind\":\"highlight_code\",\"line\":8,\"step\":4}",
+        "value_digest": "1de7fb032fe034fe000060b9c64f5ff9221fee48119405136009b292765c672e",
+        "value_type": "dict"
+      },
+      "target_72754b99036f74d6d165d897": {
+        "path": "/source/actions/13",
+        "text": "{\"anchor\":\"repair_example:code\",\"kind\":\"advance_step\",\"step\":5}",
+        "value_digest": "d42c6f4f08572832797b372c20fbc1362a8e9a33ae906ea4889dee2a56f10e0d",
+        "value_type": "dict"
+      },
+      "target_15454526445c1d3d55e18ab0": {
+        "path": "/source/actions/14",
+        "text": "{\"anchor\":\"repair_example:code\",\"kind\":\"show_state\",\"state\":{\"caller_head\":\"t0\",\"local_head\":null,\"nodes\":{\"t0\":{\"data\":7,\"next\":null}},\"p\":\"t0\"},\"step\":5}",
+        "value_digest": "127e0a33cc368bfe1f307f4d79d82c8b9b67f1d2547b39e0a08350f678e66d58",
+        "value_type": "dict"
+      },
+      "target_7132b331748fa981f75e488f": {
+        "path": "/source/actions/15",
+        "text": "{\"anchor\":\"repair_example:code\",\"kind\":\"highlight_code\",\"line\":12,\"step\":5}",
+        "value_digest": "724be9b0b7f79097a177d6019d0900158143bcebc9381d40f58368d350c02196",
+        "value_type": "dict"
+      },
+      "target_035fea1b7cc4c38a4ee27405": {
+        "path": "/source/blocks/0/anchor",
+        "text": "repair_example:intro",
+        "value_digest": "ddcd67e9a0048b92b2421b7fcfbbdfd5a31da732ed7c466c89289ba48f4ece49",
+        "value_type": "str"
+      },
+      "target_2a41b55b0ffd11254cbeed5a": {
+        "path": "/source/blocks/0/kind",
+        "text": "text",
+        "value_digest": "1e1d0f251d3a76fa2b1bfc81164078572623403887db02988b504b0492e9f076",
+        "value_type": "str"
+      },
+      "target_64e849eb369b047bfe3d65ed": {
+        "path": "/source/blocks/0/markdown",
+        "text": "p 接旧 head，调用者接回 p。",
+        "value_digest": "84f448825657b9b077394def9f0957990e397bb2595672efc8e07b7790b46c71",
+        "value_type": "str"
+      },
+      "target_7165d65fbaa47ed3c489dfaf": {
+        "path": "/source/blocks/1/anchor",
+        "text": "repair_example:code",
+        "value_digest": "18b6c6152d7eef99b687849df22fdb59fa3887d52cfc20d843965351678b1a38",
+        "value_type": "str"
+      },
+      "target_35108c154ef6b16f884099d9": {
+        "path": "/source/blocks/1/kind",
+        "text": "code",
+        "value_digest": "4a1933b06cf695fcff4acaba1fdbaa7f10ce109d3c7f57bbf62f6bb572658de8",
+        "value_type": "str"
+      },
+      "target_867adfe3bd32fcb3ebd72787": {
+        "path": "/source/blocks/1/text",
+        "text": "#include <stdlib.h>\ntypedef struct Node { int data; struct Node *next; } Node;\nNode *insert(Node *head, int value, int allocation_success) {\n    Node *p = allocation_success ? malloc(sizeof *p) : NULL;\n    if (p == NULL) return head;\n    p->data = value;\n    p->next = head;\n    return p;\n}\nint main(void) {\n    Node *caller_head = NULL;\n    caller_head = insert(caller_head, 7, 1);\n    (void)caller_head;\n    return 0;\n}\n",
+        "value_digest": "02d23d57d9a7e8985a9a6ccacb6603578b8d72de407325b124207963dda3316c",
+        "value_type": "str"
+      },
+      "target_5dce6cec2be55b40abf4891f": {
+        "path": "/source/blocks/2/anchor",
+        "text": "repair_example:q_caller_head",
+        "value_digest": "4abf05a63f77955e36bfcb66f80f2a31c00439ab1a6b6977dfe0681672bef532",
+        "value_type": "str"
+      },
+      "target_aad48d6b002fb2ed20a6cc8a": {
+        "path": "/source/blocks/2/answer_key",
+        "text": "t0",
+        "value_digest": "21cc3d69c8bc2ab77d3236201b5dec810636d69a936e581c570688b741f105e2",
+        "value_type": "str"
+      },
+      "target_e957b9880b29c2e84c80456f": {
+        "path": "/source/blocks/2/explanation",
+        "text": "调用者接回返回的 p，所以最终指向 t0。",
+        "value_digest": "ba042ca208f8de8fc0f45572073fa29ba270be5feeb84a00a414c358251035f0",
+        "value_type": "str"
+      },
+      "target_ad9a9dcbf2c4388d54e810e9": {
+        "path": "/source/blocks/2/kind",
+        "text": "question",
+        "value_digest": "6d6ca52ed3519c9caf99237c1b77d7a63cca5a5ef32b7131d6fe85a86f91a979",
+        "value_type": "str"
+      },
+      "target_8e241215a05c0c021e86ab8c": {
+        "path": "/source/blocks/2/observation_key",
+        "text": "caller_head",
+        "value_digest": "5fbbea9ecd26a763cefc84fa23af5919a97c39914601b769701a9969d0606f64",
+        "value_type": "str"
+      },
+      "target_654cce7840712c57b3b4ad31": {
+        "path": "/source/blocks/2/stem",
+        "text": "最后调用者保存的头指针 caller_head 指向哪个节点？",
+        "value_digest": "eafd3d0d7858313772fdc637923b9cf51e959bf731236eb8b9b6bbd42c45d7ce",
+        "value_type": "str"
+      },
+      "target_235c48c076071ffe830e5721": {
+        "path": "/source/blocks/3/anchor",
+        "text": "repair_example:q_traversal_status",
+        "value_digest": "48e12663d36f0e506c89b3eaca08b3c4fdee03ede58275c2f7f8a3f1f4a22228",
+        "value_type": "str"
+      },
+      "target_172c11a2ef23127a9b6191e5": {
+        "path": "/source/blocks/3/answer_key",
+        "text": "terminated",
+        "value_digest": "1855e0f8a4e6f2ace4006c9a48625df5cce6c3c810b31b36399073d219f28b0a",
+        "value_type": "str"
+      },
+      "target_7b4b88893414e28a383275ac": {
+        "path": "/source/blocks/3/explanation",
+        "text": "新节点的 next 为空，所以遍历到空指针结束。",
+        "value_digest": "28fbfacfcf75a134b392cf1184f23dff198ef0b1f764d97ca84fce5634a89006",
+        "value_type": "str"
+      },
+      "target_d35df1d2a22bb61c029bc033": {
+        "path": "/source/blocks/3/kind",
+        "text": "question",
+        "value_digest": "6d6ca52ed3519c9caf99237c1b77d7a63cca5a5ef32b7131d6fe85a86f91a979",
+        "value_type": "str"
+      },
+      "target_93b3a85b0ce5dd691c7cb688": {
+        "path": "/source/blocks/3/observation_key",
+        "text": "traversal_status",
+        "value_digest": "9c880356c9391738989f83bb2d746dbac9690df27bcb020578493b624d753aa9",
+        "value_type": "str"
+      },
+      "target_34a93e86b449a032170e8167": {
+        "path": "/source/blocks/3/stem",
+        "text": "从 caller_head 开始的遍历如何结束？",
+        "value_digest": "da94c6f49244e45af6d8124fec00f4f8d18d180c0a3e051bc8690d732f97e813",
+        "value_type": "str"
+      },
+      "target_836f5c75420870b1de9cad59": {
+        "path": "/source/blocks/4/anchor",
+        "text": "repair_example:q_reachable_prefix",
+        "value_digest": "5596799cd7b70ba6ebce3cb37a765efe25f710872cc0b8cfcdf86e553553b5dc",
+        "value_type": "str"
+      },
+      "target_2da748731e73914f8c52e761": {
+        "path": "/source/blocks/4/answer_key",
+        "text": "[7]",
+        "value_digest": "589ffd3acf522ae81192579f297589e93b0c41f748b224d1b4bb5c857a2f70cb",
+        "value_type": "list"
+      },
+      "target_a92593267d7485133d0e3dcd": {
+        "path": "/source/blocks/4/explanation",
+        "text": "唯一可达节点的数据为 7，之后到达空指针。",
+        "value_digest": "3d31b213600cdd02b7da377aa513ebaa2fd37249ae3df2a901a774a02324feae",
+        "value_type": "str"
+      },
+      "target_40f2680124ce46521678e754": {
+        "path": "/source/blocks/4/kind",
+        "text": "question",
+        "value_digest": "6d6ca52ed3519c9caf99237c1b77d7a63cca5a5ef32b7131d6fe85a86f91a979",
+        "value_type": "str"
+      },
+      "target_a43f6f593ff9a34d7f262b7b": {
+        "path": "/source/blocks/4/observation_key",
+        "text": "reachable_prefix",
+        "value_digest": "2043b5015b75b1c208c98445b2a8c06b4ba88be0960aec5a010391788f5b4cbf",
+        "value_type": "str"
+      },
+      "target_87c3b5f1add388a8410f5dbb": {
+        "path": "/source/blocks/4/stem",
+        "text": "从调用者头开始，首次重复或不确定指针前的可知值前缀是什么？",
+        "value_digest": "def941a1ecaf871fa85689e6c7062e836d037e1bb2b681598fd57f45bc1d0c08",
+        "value_type": "str"
+      },
+      "target_e08d3f53ed6212d2605858e5": {
+        "path": "/source/blocks/5/anchor",
+        "text": "repair_example:q_allocation_failures",
+        "value_digest": "a769d7a37bf3e1e2b8d8de00c74229e088b5a69c2841c5c0e416b4634b2f51b4",
+        "value_type": "str"
+      },
+      "target_878db91af022d664c91c1953": {
+        "path": "/source/blocks/5/answer_key",
+        "text": "0",
+        "value_digest": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+        "value_type": "int"
+      },
+      "target_73a8778cc313127fa2284baa": {
+        "path": "/source/blocks/5/explanation",
+        "text": "唯一一次分配被给定为成功，所以失败次数为 0。",
+        "value_digest": "c8f5dde54e77886f537eb4151392c43bf2b9cf49ad795935ca9eb38e25b0b7b2",
+        "value_type": "str"
+      },
+      "target_b6c91a26be79cca710b6a03e": {
+        "path": "/source/blocks/5/kind",
+        "text": "question",
+        "value_digest": "6d6ca52ed3519c9caf99237c1b77d7a63cca5a5ef32b7131d6fe85a86f91a979",
+        "value_type": "str"
+      },
+      "target_16e7217c2a66e70e462e8a9c": {
+        "path": "/source/blocks/5/observation_key",
+        "text": "allocation_failures",
+        "value_digest": "79f92b64aea571b9e9134fa040625c3625b20f8e142580286777bef41d2015e6",
+        "value_type": "str"
+      },
+      "target_25d7985161917c0b04d29c74": {
+        "path": "/source/blocks/5/stem",
+        "text": "这个合成分配掩码下，分配失败几次？",
+        "value_digest": "08d2ed8c3041c2b28cd6a7ccc6146e026e7ae446aa3b0a4965f2ddaf34055ee1",
+        "value_type": "str"
+      },
+      "target_d4b628356e8068ab649ca8e4": {
+        "path": "/source/degraded",
+        "text": "false",
+        "value_digest": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa",
+        "value_type": "bool"
+      },
+      "target_0e7c0c41e3dccd71842ee98e": {
+        "path": "/source/production_scoring",
+        "text": "false",
+        "value_digest": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa",
+        "value_type": "bool"
+      },
+      "target_b1ae95bdd5448531e7e01ded": {
+        "path": "/source/provenance/actions",
+        "text": "model",
+        "value_digest": "18fb9fa0b971b807a1312d3702d18747a3b1b39a129df8c5d1a8f68d512bd1fd",
+        "value_type": "str"
+      },
+      "target_766f3ffa414bbef7cbc804a0": {
+        "path": "/source/provenance/answers",
+        "text": "model",
+        "value_digest": "18fb9fa0b971b807a1312d3702d18747a3b1b39a129df8c5d1a8f68d512bd1fd",
+        "value_type": "str"
+      },
+      "target_8ca19e33400861a038ef48b0": {
+        "path": "/source/provenance/code",
+        "text": "model",
+        "value_digest": "18fb9fa0b971b807a1312d3702d18747a3b1b39a129df8c5d1a8f68d512bd1fd",
+        "value_type": "str"
+      },
+      "target_f7b4769ebefbff85a3065088": {
+        "path": "/source/provenance/content",
+        "text": "model",
+        "value_digest": "18fb9fa0b971b807a1312d3702d18747a3b1b39a129df8c5d1a8f68d512bd1fd",
+        "value_type": "str"
+      }
+    },
+    "binding_digest": "607d083d85235a5a774504c8ab986f7496414ff4b5caa63ad6e5630ea3c4c17a"
+  },
+  "allowed_change": "/paragraphs/0/text",
+  "spec": {
+    "version": "head-insertion-spec-v1",
+    "initial_values": [],
+    "insert_values": [
+      7
+    ],
+    "variant": "normal",
+    "allocation_success": [
+      true
+    ]
+  }
+}

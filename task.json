@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "T085完成受控证据交付但七槽协议未准入：S1–S4通过，S5 HTTP200输出Schema片段/非法JSON，S6/S7未发；已终止且未用2失效。无课程/新批授权，不自动修Schema或Prompt。T038/catalog_only/H及教学阈值保持。",
+    "phase_gate": "T086离线提案与441项回归已交付，待评估助手审查后才另备/申请新验证包。当前Schema/严格校验/T085冻结和停止保持，本轮Provider0；新矩阵未授权执行，旧余量/费用不继承，T038/catalog_only/H保持。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -4080,6 +4080,57 @@
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T085",
       "execution_gate": "准确七槽批次已于S5非法且非实例输出时不可逆终止；仅完成受控证据任务，非兼容通过。S6/S7及未用2请求失效，不重试/重启/续窗口/改Schema补发或准备课程。"
+    },
+    {
+      "id": "PHASE-1.5-T086",
+      "phase": "Phase 1.5",
+      "priority": "P0",
+      "title": "离线拆分协议回显/实际修复/单变量包装诊断并回归原始失败",
+      "status": "done",
+      "depends_on": [
+        "PHASE-1.5-T085"
+      ],
+      "scope": [
+        "docs/ADR/0048-separated-protocol-repair-diagnostics.md",
+        "docs/acceptance/phase-1.5-separated-protocol-repair-r01/",
+        "scripts/tests/test_p15_protocol_task_separation.py",
+        "docs/PRD.md",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "用户要求先离线拆分三类诊断，保持当前Schema/严格校验，审查后再申请新验证包；T085保持终止",
+      "acceptance_criteria": [
+        "提供三类任务准确输入示例/可判定成功条件、有限单变量对照矩阵/差异指针与停止规则；实际修复输入不夹带预期答案回显指令，作用范围和语义审核责任明确。",
+        "当前四Schema、严格解析/协议/语义局部校验及T085冻结包逐字节不变；新任务成功判据与纯回显分开，契约/Prompt提案只供审查不接入真实入口。",
+        "新增独立测试文件，原始S5非法JSON文本可追溯复现；合法JSON但返回Schema、截取前缀、拼接/额外字段等继续拒绝，不通过修改旧断言/宽松解析取巧。",
+        "执行设计核查/相关回归/冻结/类型或lint/工作流检查，提交本地交接后停止；Provider0、不读Key、不重启T085或继承旧余额/费用例外，待评估助手审查后再准备新包。"
+      ],
+      "verification": [
+        "待建立并执行：docs/acceptance/phase-1.5-separated-protocol-repair-r01/check_design.py",
+        "PYTHONPATH=backend:. backend/.venv/bin/python -m pytest scripts/tests/test_p15_protocol_task_separation.py -q",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [
+        {
+          "date": "2026-10-29T14:06:55+08:00",
+          "commands": [
+            "PYTHONPATH=backend:. backend/.venv/bin/python -m pytest scripts/tests/test_p15_protocol_task_separation.py scripts/tests/test_p15_minimal_probe.py scripts/tests/test_p15_minimal_contract.py scripts/tests/test_p15_minimal_pilot.py scripts/tests/test_p15_head_insertion_engine.py scripts/tests/test_p15_agent_pilot.py scripts/tests/test_p15_pilot_baseline.py -q --tb=short --junitxml=/private/tmp/edumind-p15-t086.xml",
+            "PYTHONPATH=backend:. backend/.venv/bin/python docs/acceptance/phase-1.5-separated-protocol-repair-r01/check_design.py",
+            "strict mypy design checker; Ruff new checker/test; forbidden .env/API_KEY/DNS/socket runpy",
+            "python3 scripts/check_catalog_workflow.py",
+            "git diff --check"
+          ],
+          "result": "441 passed0skip（29新增+412旧）；七准确示例/五单因素配对/五修复输出例/3306原始文本通过，20规范附件/136来源/原129执行冻结与原结果grant/38链接通过；类型/Ruff及禁凭据网络护栏通过。Schema/严格校验/旧断言/T085不变，Provider0，未实施新live入口或代签独立语义审核。",
+          "evidence": "docs/acceptance/phase-1.5-separated-protocol-repair-r01/verification.txt",
+          "manifest_sha256": "abe3f498b662c526f6a85c569fbfbbb63f448af2b30689168cb050e03984ebea"
+        }
+      ],
+      "started_at": "2026-10-29T13:44:01+08:00",
+      "completed_at": "2026-10-29T14:06:55+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T086",
+      "execution_gate": "离线三任务拆分/原始错误回归交付完成，ADR0048和准确材料待评估助手审查。无新Provider额度/窗口/费用或执行器，不重启T085，不自动申请或启动后续验证包；本地完成提交后停止。"
     }
   ],
   "planning_inputs": {
