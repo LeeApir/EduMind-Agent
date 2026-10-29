@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "T083隔离适配与290项离线回归已交付，待审查；七HTTP合成兼容/900秒范围已获批准，未激活窗口或出站，USD1实际收费门禁未核实且无新费用例外。按用户要求本地提交后交回审查；课程/旧批/T038/catalog_only/H边界保持。",
+    "phase_gate": "T084受控入口准备完成412项通过；用户已接受本批费用例外，完成提交后依赖串行领取T085注册新900秒并执行原七槽。不得重启旧批或发送课程，T038/catalog_only/H保持。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -3986,6 +3986,85 @@
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T083",
       "execution_gate": "隔离适配/离线回归交付后按用户要求交回审查，七HTTP/900秒范围已登记批准但未启动或读取Key；USD1实际账户支出未核实、无新费用例外。无课程调用，旧批停止/原教学阈值/T038/catalog_only/H保持；完成提交后停止。"
+    },
+    {
+      "id": "PHASE-1.5-T084",
+      "phase": "Phase 1.5",
+      "priority": "P0",
+      "title": "冻结七槽真实兼容入口与预算门禁",
+      "status": "done",
+      "depends_on": [
+        "PHASE-1.5-T083"
+      ],
+      "scope": [
+        "scripts/",
+        "docs/acceptance/phase-1.5-minimal-live-r01/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "用户已批准ADR0047 A—D及七HTTP范围，最新明确开始真实调用；不继承费用例外",
+      "acceptance_criteria": [
+        "原七请求字节不变，构建一次性真实入口/来源固定/60秒单请求/900秒窗口/预算/失败停止/只读原件验真，旧冻结和运行入口不改。",
+        "离线正反例覆盖七槽顺序、严格响应、用量/来源/窗口/停止后拒绝及未批准费用门禁；本轮公开费率与未知账户收费分别登记。",
+        "完成准确闭包与本地提交后才可领取T085；原七次许可不重复索要，尚未核实USD1只能有本批明确例外才出站。"
+      ],
+      "verification": [
+        "待建立并实际执行：准确入口离线预检/回归及只读结果检查",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [
+        {
+          "date": "2026-10-29T12:58:45+08:00",
+          "commands": [
+            "PYTHONPATH=backend:. backend/.venv/bin/python -m pytest scripts/tests/test_p15_minimal_probe.py scripts/tests/test_p15_minimal_contract.py scripts/tests/test_p15_minimal_pilot.py scripts/tests/test_p15_head_insertion_engine.py scripts/tests/test_p15_agent_pilot.py scripts/tests/test_p15_pilot_baseline.py -q --tb=short --junitxml=/private/tmp/edumind-p15-t084.xml",
+            "mypy strict three sources; Ruff four files",
+            "scripts/run_p15_minimal_probe.py --check; pending --run expected exit2 before keys/output",
+            "prior preparation/design checks; workflow; diff"
+          ],
+          "result": "412 passed0skip（新122+既有290），类型/Ruff/129文件准确预检/原七字节及旧302冻结通过；pending真实入口拒绝2如约，真实0/Key未读/目录未建。用户已明确本批费用例外，待完成提交后注册T085。",
+          "evidence": "docs/acceptance/phase-1.5-minimal-live-r01/verification.txt",
+          "manifest_sha256": "0312764b635f62310f36513683c9fdd98653186224471e024601fcff5658df79"
+        }
+      ],
+      "started_at": "2026-10-29T12:50:45+08:00",
+      "completed_at": "2026-10-29T12:58:45+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T084",
+      "execution_gate": "七HTTP/900秒范围及本批明确费用例外已获准。T084只准备；完成提交后才T085注册，未真实调用。"
+    },
+    {
+      "id": "PHASE-1.5-T085",
+      "phase": "Phase 1.5",
+      "priority": "P0",
+      "title": "执行已批准七槽合成兼容并只读复核",
+      "status": "todo",
+      "depends_on": [
+        "PHASE-1.5-T084"
+      ],
+      "scope": [
+        "scripts/",
+        "docs/acceptance/phase-1.5-minimal-live-r01/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "用户已批准ADR0047 A—D及七HTTP范围，最新明确开始真实调用；不继承费用例外",
+      "acceptance_criteria": [
+        "预算/准确范围及费用条件满足后才读取Key并注册新900秒窗口，前槽完整通过才后槽，最多7HTTP且任一异常终止，不续旧批。",
+        "原始请求/响应/来源/事件/用量未知和未运行完整保存，独立只读重算；固定echo不计课程或教学通过。",
+        "交付真实结果与本地完成提交；不再课程生成、不解除T038、catalog_only/H保持。"
+      ],
+      "verification": [
+        "待建立并实际执行：准确入口离线预检/回归及只读结果检查",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T085",
+      "execution_gate": "七HTTP/900秒范围及用户当前明确“接受本批费用例外并执行”均已批准；依赖T084完成提交后登记一次窗口，仅原七合成请求，任一异常即停。"
     }
   ],
   "planning_inputs": {

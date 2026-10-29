@@ -1,0 +1,16 @@
+T084 2026-10-29 — developer self-review, not independent evaluation.
+
+Actual validation:
+PYTHONPATH=backend:. backend/.venv/bin/python -m pytest scripts/tests/test_p15_minimal_probe.py scripts/tests/test_p15_minimal_contract.py scripts/tests/test_p15_minimal_pilot.py scripts/tests/test_p15_head_insertion_engine.py scripts/tests/test_p15_agent_pilot.py scripts/tests/test_p15_pilot_baseline.py -q --tb=short --junitxml=/private/tmp/edumind-p15-t084.xml
+412 passed / 0 failed / 0 skipped (122 new live-entry Mock regressions + 290 prior).
+MYPYPATH=backend:. backend/.venv/bin/mypy --strict --explicit-package-bases --follow-imports=silent scripts/isolated_diagnostics/p15_minimal_probe_contract.py scripts/isolated_diagnostics/p15_minimal_probe.py scripts/run_p15_minimal_probe.py
+Success, three sources. Ruff four files passed.
+PYTHONPATH=backend:. backend/.venv/bin/python scripts/run_p15_minimal_probe.py --check
+Passed: 129-file closure; exact original seven bodies with byte sizes 1616/8731/9967/8445/10063/15678/12008, no body or Schema changes.
+PYTHONPATH=backend:. backend/.venv/bin/python scripts/run_p15_minimal_probe.py --run
+Pending accepted:false and no registered window: expected exit2 EXACT_NEW_ROLE_APPROVAL_REQUIRED before credentials/DNS/output. Not a real test or a failed model call. Test trap independently confirms no credential loader reached before fee/authority gate.
+Prior check_preparation.py and check_design.py passed; 17/97 adaptation closure plus old302 frozen entries unchanged. Workflow/diff passed.
+
+Public rates reread from primary DeepSeek and AIAPI docs; all-reservation reference $0.130048, no account/invoice/upper-limit proof. User explicitly replied to scoped risk question: 接受本批费用例外并执行. This authorizes only these seven bodies/new900 seconds with actual money cap waived, not old batches/courses. No keys/DNS/real output yet; grant accepted:false until T084 completion commit and T085 registration.
+
+Reviewed sequence and durable reserve-before-send/check-before-next gates, pinned public DNS/TLS identity, byte/token/time limits, one terminal/no restart, unknown occupancy, all seven required, strict Schema echo/no inferred enforcement, precise bounded existing metadata policy, Mock-vs-real rejection, tamper/read-only recomputation, parent source closure and original byte identity. No weakening assertion, new permissive Schema or production behavior. Real protocol/teaching/model quality remains unverified.
