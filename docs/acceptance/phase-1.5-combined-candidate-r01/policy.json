@@ -1,0 +1,140 @@
+{
+  "version": "combined-candidate-v1",
+  "scope": "PHASE-1.5-T095",
+  "limits": {
+    "requests": 12,
+    "generation": 8,
+    "review": 4,
+    "input_reservation": 98304,
+    "output_reservation": 56896,
+    "per_request_input": 8192,
+    "wall_seconds": 1800,
+    "per_request_seconds": 60,
+    "dns_seconds": 9,
+    "request_bytes": 65536,
+    "response_bytes": 262144,
+    "fee_cap": null
+  },
+  "roles": [
+    {
+      "slot": "S1",
+      "stage": "C_plan",
+      "role": "generation",
+      "url": "https://api.deepseek.com/responses",
+      "model": "deepseek-flash",
+      "reasoning": "none",
+      "input_reservation": 8192,
+      "max_output_tokens": 512
+    },
+    {
+      "slot": "S2",
+      "stage": "C_content",
+      "role": "generation",
+      "url": "https://api.deepseek.com/responses",
+      "model": "deepseek-flash",
+      "reasoning": "none",
+      "input_reservation": 8192,
+      "max_output_tokens": 2048
+    },
+    {
+      "slot": "S3",
+      "stage": "C_repair",
+      "role": "generation",
+      "url": "https://api.deepseek.com/responses",
+      "model": "deepseek-flash",
+      "reasoning": "none",
+      "input_reservation": 8192,
+      "max_output_tokens": 2048
+    },
+    {
+      "slot": "S4",
+      "stage": "B_generate",
+      "role": "generation",
+      "url": "https://api.deepseek.com/responses",
+      "model": "deepseek-flash",
+      "reasoning": "none",
+      "input_reservation": 8192,
+      "max_output_tokens": 4096
+    },
+    {
+      "slot": "S5",
+      "stage": "B_repair",
+      "role": "generation",
+      "url": "https://api.deepseek.com/responses",
+      "model": "deepseek-flash",
+      "reasoning": "none",
+      "input_reservation": 8192,
+      "max_output_tokens": 4096
+    },
+    {
+      "slot": "S6",
+      "stage": "review_B",
+      "role": "review",
+      "url": "https://aiapi.world/v1/responses",
+      "model": "gpt-6.1-sol",
+      "reasoning": "low",
+      "input_reservation": 8192,
+      "max_output_tokens": 2048
+    },
+    {
+      "slot": "S7",
+      "stage": "review_C",
+      "role": "review",
+      "url": "https://aiapi.world/v1/responses",
+      "model": "gpt-6.1-sol",
+      "reasoning": "low",
+      "input_reservation": 8192,
+      "max_output_tokens": 2048
+    }
+  ],
+  "course": {
+    "arm": "C",
+    "spec": {
+      "version": "head-insertion-spec-v1",
+      "initial_values": [
+        9
+      ],
+      "insert_values": [
+        1,
+        2
+      ],
+      "variant": "normal",
+      "allocation_success": [
+        true,
+        true
+      ]
+    },
+    "stages": [
+      "course_plan",
+      "course_content",
+      "course_review_0",
+      "course_repair",
+      "course_review_1"
+    ],
+    "generation_url": "https://api.deepseek.com/responses",
+    "generation_model": "deepseek-flash",
+    "generation_reasoning": "none",
+    "review_url": "https://aiapi.world/v1/responses",
+    "review_model": "gpt-6.1-sol",
+    "review_reasoning": "low",
+    "max_output_tokens": 8000,
+    "input_reservation": 8192
+  },
+  "response_policy": {
+    "schema_echo_required": true,
+    "phase": [
+      "absent",
+      "final_answer"
+    ],
+    "instruction_echo_missing": "unknown",
+    "review_known_suffix": "\n\nYou are a helpful coding assistant.",
+    "provider_enforcement_verified": false
+  },
+  "no_retry": true,
+  "no_redirect": true,
+  "no_fallback": true,
+  "no_restart": true,
+  "no_course_before_seven": true,
+  "teaching_evaluation": "user_pending",
+  "production": false
+}

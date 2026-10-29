@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "用户授权T092–T094离线准备和T095准确包获准后真实验证；先角色准入再课程，交用户评估。旧批停止和R0待独立语义核定保持，不继承预算。",
+    "phase_gate": "T092/T093已完成、T094准确包交审；T095待用户批准组合准入与课程、新窗口及费用例外。旧T088失败及T090语义待复核保持，T038 blocked/catalog_only/H保持。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -4513,14 +4513,17 @@
       "phase": "Phase 1.5",
       "priority": "P0",
       "title": "冻结角色准入及课程实验准确执行方案",
-      "status": "todo",
+      "status": "done",
       "depends_on": [
         "PHASE-1.5-T093"
       ],
       "scope": [
-        "scripts/isolated_diagnostics/",
-        "scripts/tests/",
-        "docs/acceptance/",
+        "scripts/isolated_diagnostics/p15_combined_candidate_contract.py",
+        "scripts/isolated_diagnostics/p15_combined_candidate_runner.py",
+        "scripts/run_p15_combined_candidate.py",
+        "scripts/tests/test_p15_combined_candidate_contract.py",
+        "scripts/tests/test_p15_combined_candidate_runner.py",
+        "docs/acceptance/phase-1.5-combined-candidate-r01/",
         "task.json",
         "process.txt"
       ],
@@ -4530,23 +4533,41 @@
         "只在准确包获授权后调用；先全部角色准入，再执行课程；旧停止和余额不继承。"
       ],
       "verification": [
-        "按任务交接记录实际离线测试与证据；真实执行须另经准确包授权",
+        "PYTHONPATH=backend:. backend/.venv/bin/python -m pytest scripts/tests/test_p15_combined_candidate_runner.py scripts/tests/test_p15_combined_candidate_contract.py scripts/tests/test_p15_bound_pilot.py scripts/tests/test_p15_clean_pilot_prompts.py scripts/tests/test_p15_minimal_contract.py scripts/tests/test_p15_minimal_pilot.py scripts/tests/test_p15_head_insertion_engine.py -q --tb=short",
+        "backend/.venv/bin/ruff check scripts/isolated_diagnostics/p15_combined_candidate_contract.py scripts/isolated_diagnostics/p15_combined_candidate_runner.py scripts/run_p15_combined_candidate.py scripts/tests/test_p15_combined_candidate_contract.py scripts/tests/test_p15_combined_candidate_runner.py",
+        "MYPYPATH=backend:. backend/.venv/bin/mypy scripts/isolated_diagnostics/p15_combined_candidate_contract.py scripts/isolated_diagnostics/p15_combined_candidate_runner.py scripts/run_p15_combined_candidate.py --strict --explicit-package-bases --follow-imports=silent",
+        "PYTHONPATH=backend:. backend/.venv/bin/python scripts/run_p15_combined_candidate.py --check",
         "python3 scripts/check_catalog_workflow.py",
         "git diff --check"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "date": "2026-10-29T22:43:49+08:00",
+          "commands": [
+            "PYTHONPATH=backend:. backend/.venv/bin/python -m pytest scripts/tests/test_p15_combined_candidate_runner.py scripts/tests/test_p15_combined_candidate_contract.py scripts/tests/test_p15_bound_pilot.py scripts/tests/test_p15_clean_pilot_prompts.py scripts/tests/test_p15_minimal_contract.py scripts/tests/test_p15_minimal_pilot.py scripts/tests/test_p15_head_insertion_engine.py -q --tb=short",
+            "backend/.venv/bin/ruff check scripts/isolated_diagnostics/p15_combined_candidate_contract.py scripts/isolated_diagnostics/p15_combined_candidate_runner.py scripts/run_p15_combined_candidate.py scripts/tests/test_p15_combined_candidate_contract.py scripts/tests/test_p15_combined_candidate_runner.py",
+            "MYPYPATH=backend:. backend/.venv/bin/mypy scripts/isolated_diagnostics/p15_combined_candidate_contract.py scripts/isolated_diagnostics/p15_combined_candidate_runner.py scripts/run_p15_combined_candidate.py --strict --explicit-package-bases --follow-imports=silent",
+            "PYTHONPATH=backend:. backend/.venv/bin/python scripts/run_p15_combined_candidate.py --check",
+            "python3 scripts/check_catalog_workflow.py",
+            "git diff --check"
+          ],
+          "result": "347 passed 0 skipped；Ruff/mypy/222文件冻结和七请求/原件只读/授权前0调用拒绝/工作流及diff通过；独立审查4项修复并复审，真实0。",
+          "evidence": "docs/acceptance/phase-1.5-combined-candidate-r01/verification.txt",
+          "manifest_sha256": "c3930015cebfb974e2acd82d5b80b283156074fc066b99dd1e02f9ed44be341d"
+        }
+      ],
+      "started_at": "2026-10-29T20:44:12+08:00",
+      "completed_at": "2026-10-29T22:43:49+08:00",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T094",
-      "execution_gate": "新版隔离流程及样例零真实调用；新准确包获授权后才真实出站，先角色准入再课程。"
+      "execution_gate": "准确包已冻结，合并准入和条件课程会改变ADR0047 D原先另备课程环节，须用户准确批准本包及当批费用例外，新窗口后方可T095。"
     },
     {
       "id": "PHASE-1.5-T095",
       "phase": "Phase 1.5",
       "priority": "P0",
       "title": "获准后采集角色准入和课程全链证据",
-      "status": "todo",
+      "status": "blocked",
       "depends_on": [
         "PHASE-1.5-T094"
       ],
@@ -4570,9 +4591,9 @@
       "verification_results": [],
       "started_at": null,
       "completed_at": null,
-      "blocker": null,
+      "blocker": "新合并真实包、准入后同窗课程的ADR0047 D例外、合成外发与未核实费用/上游限额风险须用户准确授权",
       "commit_lookup": "Task-Completed: PHASE-1.5-T095",
-      "execution_gate": "新版隔离流程及样例零真实调用；新准确包获授权后才真实出站，先角色准入再课程。"
+      "execution_gate": "T094完成并交回manifest c3930015cebfb974e2acd82d5b80b283156074fc066b99dd1e02f9ed44be341d，获准确包、同窗课程、外发、最多12HTTP/1800秒和本批费用例外批准才恢复；先7槽后课程、用户评估。"
     }
   ],
   "planning_inputs": {
