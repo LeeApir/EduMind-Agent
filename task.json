@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "T092/T093已完成、T094准确包交审；T095待用户批准组合准入与课程、新窗口及费用例外。旧T088失败及T090语义待复核保持，T038 blocked/catalog_only/H保持。",
+    "phase_gate": "T095批次已停止，7角色协议合格、课程规划正文合格但审核请求超65536字节未发送，结果检查器有终止后超限重建缺陷；用户评估候选，真实课程链未完成；T038 blocked/catalog_only/H保持。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -4588,12 +4588,24 @@
         "python3 scripts/check_catalog_workflow.py",
         "git diff --check"
       ],
-      "verification_results": [],
-      "started_at": null,
+      "verification_results": [
+        {
+          "date": "2026-10-29T22:48:58+08:00",
+          "commands": [
+            "PYTHONPATH=backend:. backend/.venv/bin/python scripts/run_p15_combined_candidate.py --run",
+            "PYTHONPATH=backend:. backend/.venv/bin/python scripts/run_p15_combined_candidate.py --check-results",
+            "PYTHONPATH=backend:. backend/.venv/bin/python docs/acceptance/phase-1.5-combined-candidate-r01/results/check_evidence.py"
+          ],
+          "result": "9 real HTTP200/9机械验证；7角色全通过，课程规划与正文通过，审核请求79305>65536发前停止；run/check-results exit2，结果检查器重构超限请求失败；47事件和75原件只读重放通过，课程未审核未验收。",
+          "evidence": "docs/acceptance/phase-1.5-combined-candidate-r01/results/RESULTS.md",
+          "result_manifest_sha256": "4733134327dada8cb9fde8c6afe5e115b621165fd8ecfa081c4609449b819556"
+        }
+      ],
+      "started_at": "2026-10-29T22:45:55+08:00",
       "completed_at": null,
-      "blocker": "新合并真实包、准入后同窗课程的ADR0047 D例外、合成外发与未核实费用/上游限额风险须用户准确授权",
+      "blocker": "七个角色通过、规划正文机械通过，审核请求79305字节超过65536上限，审核未发送；只读结果检查器重复构造超限请求而失败，课程全链未完成。",
       "commit_lookup": "Task-Completed: PHASE-1.5-T095",
-      "execution_gate": "T094完成并交回manifest c3930015cebfb974e2acd82d5b80b283156074fc066b99dd1e02f9ed44be341d，获准确包、同窗课程、外发、最多12HTTP/1800秒和本批费用例外批准才恢复；先7槽后课程、用户评估。"
+      "execution_gate": "本批已停止，不重启或继承余额；须另行审视审核输入大小与结果检查器并获用户决定，不冒充课程通过。结果交用户评估。"
     }
   ],
   "planning_inputs": {
