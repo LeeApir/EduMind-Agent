@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "用户授权T097–T099集中离线工程修复、真实候选播放及独立评估；不重启旧批，不自动真实出站。",
+    "phase_gate": "T097–T099集中离线修复、真实候选播放器和独立助手评估完成；T095/T096旧失败保留，T038 blocked，真实调用未授权。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -4753,14 +4753,12 @@
       "phase": "Phase 1.5",
       "priority": "P0",
       "title": "独立评估真实课程候选",
-      "status": "todo",
+      "status": "done",
       "depends_on": [
         "PHASE-1.5-T098"
       ],
       "scope": [
-        "scripts/isolated_diagnostics/",
-        "scripts/tests/",
-        "docs/acceptance/",
+        "docs/acceptance/phase-1.5-real-course-independent-t099/",
         "task.json",
         "process.txt"
       ],
@@ -4770,16 +4768,29 @@
         "提供独立评估结论与可复核证据，不追认原批次通过。"
       ],
       "verification": [
-        "相关离线测试及交接记录实际命令与结果",
+        "独立子助手逐段、逐题、代码、状态、动作手算和静态复核",
+        "核验评估文档本地链接、证据SHA256及4题/31动作",
         "python3 scripts/check_catalog_workflow.py",
         "git diff --check"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
+      "verification_results": [
+        {
+          "date": "2026-10-29T23:40:51+08:00",
+          "commands": [
+            "独立子助手逐段、逐题、代码、状态、动作手算和静态复核",
+            "核验评估文档本地链接、证据SHA256及4题/31动作",
+            "python3 scripts/check_catalog_workflow.py",
+            "git diff --check"
+          ],
+          "result": "独立助手手算两次分配成功时四题正确；指出英文、范围表述、作用域、缺判空高亮及资源生命周期问题；5链接/3摘要/31动作与4题核对通过；不冒称人工签核或正式验收。",
+          "evidence": "docs/acceptance/phase-1.5-real-course-independent-t099/ASSESSMENT.md"
+        }
+      ],
+      "started_at": "2026-10-29T23:38:36+08:00",
+      "completed_at": "2026-10-29T23:40:51+08:00",
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T099",
-      "execution_gate": "仅离线修复与评估，不调用真实Provider，不重启或改写旧停止批次。"
+      "execution_gate": "独立助手完成单份候选评估；报告需修订问题，未改变模型输出、旧批次或正式验收。"
     }
   ],
   "planning_inputs": {
