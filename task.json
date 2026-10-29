@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "T095批次已停止，7角色协议合格、课程规划正文合格但审核请求超65536字节未发送，结果检查器有终止后超限重建缺陷；用户评估候选，真实课程链未完成；T038 blocked/catalog_only/H保持。",
+    "phase_gate": "T096已单独一次发送：HTTP200/模型pass但非空encrypted_content违反协议且输入自报超本地预约，保留原件，T096/T095 blocked；无补发或自动修复，T038 blocked。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -4606,6 +4606,53 @@
       "blocker": "七个角色通过、规划正文机械通过，审核请求79305字节超过65536上限，审核未发送；只读结果检查器重复构造超限请求而失败，课程全链未完成。",
       "commit_lookup": "Task-Completed: PHASE-1.5-T095",
       "execution_gate": "本批已停止，不重启或继承余额；须另行审视审核输入大小与结果检查器并获用户决定，不冒充课程通过。结果交用户评估。"
+    },
+    {
+      "id": "PHASE-1.5-T096",
+      "phase": "Phase 1.5",
+      "priority": "P0",
+      "title": "单次发送已生成课程的准确审核请求",
+      "status": "blocked",
+      "depends_on": [
+        "PHASE-1.5-T094"
+      ],
+      "scope": [
+        "scripts/isolated_diagnostics/p15_single_course_review.py",
+        "docs/acceptance/phase-1.5-course-review-once-r01/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "用户明确要求先发送上次未发的审核请求查看是否符合要求；不恢复T095批次",
+      "acceptance_criteria": [
+        "仅向AIAPI gpt-6.1-sol发送T095原79,305字节审核请求一次，绑定完整候选及原Schema；不继承旧额度或重启旧批。",
+        "保留请求响应和停止证据，严格校验来源、Schema及候选引用；审核意见为建议，交用户查看，不自动修复或认定质量通过。"
+      ],
+      "verification": [
+        "PYTHONPATH=backend:. backend/.venv/bin/python scripts/isolated_diagnostics/p15_single_course_review.py --check",
+        "PYTHONPATH=backend:. backend/.venv/bin/python scripts/isolated_diagnostics/p15_single_course_review.py --run",
+        "人工核对只读原件、审核输出与绑定",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [
+        {
+          "date": "2026-10-29T23:08:42+08:00",
+          "commands": [
+            "PYTHONPATH=backend:. backend/.venv/bin/python scripts/isolated_diagnostics/p15_single_course_review.py --check",
+            "PYTHONPATH=backend:. backend/.venv/bin/python scripts/isolated_diagnostics/p15_single_course_review.py --run",
+            "只读对比原始响应、Schema与候选绑定",
+            "python3 scripts/check_catalog_workflow.py",
+            "git diff --check"
+          ],
+          "result": "1真实HTTP200，模型pass/issues空，Schema/候选绑定单独检查通过；完整wire拒绝非空encrypted_content且自报输入32786>32768；不记协议或教学通过。",
+          "evidence": "docs/acceptance/phase-1.5-course-review-once-r01/RESULTS.md"
+        }
+      ],
+      "started_at": "2026-10-29T23:02:12+08:00",
+      "completed_at": null,
+      "blocker": "一次HTTP200，模型文本pass/空issues及候选绑定通过，但非空encrypted_content违反既有wire门禁，输入自报32786超过32768本地预约，完整协议未通过。",
+      "commit_lookup": "Task-Completed: PHASE-1.5-T096",
+      "execution_gate": "本次单独一次审核已结束，不重试、不自动修复；原响应保留交用户，T095和T038仍blocked。"
     }
   ],
   "planning_inputs": {
