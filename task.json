@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "T089独立R0单次包/200冻结与641离线回归完成；T090 blocked待本包120秒窗口及未核实费用风险例外准确确认。旧T088停止/余量失效不继承；R0机械合格仅pending，新增真实0/catalog_only/T038/H保持。",
+    "phase_gate": "T090独立R0已唯一1 real HTTP并机械合格，网络终态pending独立语义复核/repair_success=false；全量证据待独立评估，未授后续调用/课程。原T088 W4失败及旧额度失效保持，T038 blocked/catalog_only/H/正式教学标准不变。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -4305,7 +4305,7 @@
       "phase": "Phase 1.5",
       "priority": "P0",
       "title": "获准后发送独立R0一次并交回结果",
-      "status": "blocked",
+      "status": "done",
       "depends_on": [
         "PHASE-1.5-T089"
       ],
@@ -4320,16 +4320,43 @@
         "保留完整原件并只读核对，异常即停，无重试补样；机械通过只记pending独立语义复核，不自动成功或课程准入。"
       ],
       "verification": [
-        "待准确批准后执行新CLI --run/--check-results及原件核对",
+        "PYTHONPATH=backend:. backend/.venv/bin/python scripts/run_p15_r0_once.py --check",
+        "PYTHONPATH=backend:. backend/.venv/bin/python scripts/run_p15_r0_once.py --run",
+        "PYTHONPATH=backend:. backend/.venv/bin/python scripts/run_p15_r0_once.py --check-results",
+        "PYTHONPATH=backend:. backend/.venv/bin/python docs/acceptance/phase-1.5-r0-once-r01/results/check_evidence.py",
+        "PYTHONPATH=backend:. backend/.venv/bin/python docs/acceptance/phase-1.5-separated-validation-r01/results/check_evidence.py",
+        "backend/.venv/bin/ruff check docs/acceptance/phase-1.5-r0-once-r01/results/check_evidence.py",
         "python3 scripts/check_catalog_workflow.py",
         "git diff --check"
       ],
-      "verification_results": [],
-      "started_at": null,
-      "completed_at": null,
-      "blocker": "新单次准确包的120秒窗口及实际费用/上游限额未核实风险例外待明确批准；T088停止且其费用例外/余量不能继承。",
+      "verification_results": [
+        {
+          "date": "2026-10-29T15:14:35+08:00",
+          "commands": [
+            "PYTHONPATH=backend:. backend/.venv/bin/python scripts/run_p15_r0_once.py --check",
+            "PYTHONPATH=backend:. backend/.venv/bin/python scripts/run_p15_r0_once.py --run",
+            "PYTHONPATH=backend:. backend/.venv/bin/python scripts/run_p15_r0_once.py --check-results",
+            "PYTHONPATH=backend:. backend/.venv/bin/python docs/acceptance/phase-1.5-r0-once-r01/results/check_evidence.py",
+            "PYTHONPATH=backend:. backend/.venv/bin/python docs/acceptance/phase-1.5-separated-validation-r01/results/check_evidence.py",
+            "backend/.venv/bin/ruff check docs/acceptance/phase-1.5-r0-once-r01/results/check_evidence.py",
+            "python3 scripts/check_catalog_workflow.py",
+            "git diff --check"
+          ],
+          "result": "唯一1 real HTTP200，R0严格wire/JSON/完整Schema/局部及唯一改动路径通过；run/check-results exit3待独立语义复核，repair_success=false。12原件7事件/200冻结/原文及完整派生候选只读核对通过；防重启在Key/DNS前拒绝2且原件哈希不变；旧T08851原件与停止保持。无重试补样、新语义签核或课程。",
+          "evidence": "docs/acceptance/phase-1.5-r0-once-r01/results/RESULTS.md",
+          "manifest_sha256": "78f02e8b065c95537bdd361249e34715d68f070587f177a7914306bbe2b3f4c0",
+          "result_manifest_sha256": "812140056e384fc343ce1af245d1d6a74f22891e41b25d284b33ebc3068e75a0",
+          "real_http": 1,
+          "mechanically_validated": 1,
+          "repair_success": false,
+          "independent_semantic_review_pending": true
+        }
+      ],
+      "started_at": "2026-10-29T15:09:32.736554+08:00",
+      "completed_at": "2026-10-29T15:14:35+08:00",
+      "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T090",
-      "execution_gate": "准确执行范围已准备，但本批新窗口/费用风险例外待答复，当前禁止Key/DNS/出站；批准解除后才恢复领取。"
+      "execution_gate": "本次独立R0网络阶段已结束：1HTTP/机械合格/pending独立语义复核，全部请求额度已用，不重试/重启/继承；无自动修复/角色/课程准入。交全量证据后停止，独立语义复核尚未进行。"
     }
   ],
   "planning_inputs": {
