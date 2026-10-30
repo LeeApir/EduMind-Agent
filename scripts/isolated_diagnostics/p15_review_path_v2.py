@@ -76,18 +76,9 @@ def verify_targets(
         )
 
 
-def review_body(
-    artifact: dict[str, Any], catalog: dict[str, Any], policy: Policy = POLICY
-) -> tuple[bytes, dict[str, Any]]:
-    c.verify_artifact(artifact)
-    c.verify_catalog(catalog)
-    c.require(
-        artifact["identity"]["spec_digest"] == catalog["spec_digest"],
-        "REVIEW_SPEC_BINDING",
-    )
-    arm = artifact["identity"]["arm"]
+def verify_identity(ident: dict[str, Any], catalog: dict[str, Any]) -> None:
+    arm = ident["arm"]
     c.require(arm in ("B", "C"), "REVIEW_ARM")
-    ident = artifact["identity"]
     base = c.identity(
         ident["run_id"],
         ident["slot_id"],
@@ -119,13 +110,12 @@ def review_body(
             and ident["binding_version"] == "bound-teaching-pilot-v3",
             "IDENTITY_VERSION",
         )
-        c.require(
-            ident["stage"]
-            in (
-                {"C_content", "C_repair"} if arm == "C" else {"B_generate", "B_repair"}
-            ),
-            "IDENTITY_STAGE",
+        expected_stage = (
+            ("C_content" if ident["revision"] == 0 else "C_repair")
+            if arm == "C"
+            else ("B_generate" if ident["revision"] == 0 else "B_repair")
         )
+        c.require(ident["stage"] == expected_stage, "IDENTITY_STAGE")
         for name in expanded - {"binding_version", "stage"}:
             value = ident[name]
             optional = name in {"plan_receipt_digest", "parent_review_receipt_digest"}
@@ -137,6 +127,27 @@ def review_body(
                 ),
                 "IDENTITY_DIGEST",
             )
+        c.require(
+            (ident["plan_receipt_digest"] is not None) == (arm == "C"), "IDENTITY_PLAN"
+        )
+        c.require(
+            (ident["parent_review_receipt_digest"] is not None)
+            == (ident["revision"] == 1),
+            "IDENTITY_REVIEW_PARENT",
+        )
+
+
+def review_body(
+    artifact: dict[str, Any], catalog: dict[str, Any], policy: Policy = POLICY
+) -> tuple[bytes, dict[str, Any]]:
+    c.verify_artifact(artifact)
+    c.verify_catalog(catalog)
+    c.require(
+        artifact["identity"]["spec_digest"] == catalog["spec_digest"],
+        "REVIEW_SPEC_BINDING",
+    )
+    arm = artifact["identity"]["arm"]
+    verify_identity(artifact["identity"], catalog)
     c.require(
         c.assemble(
             artifact["raw_output"],
