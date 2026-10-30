@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "T097–T099集中离线修复、真实候选播放器和独立助手评估完成；T095/T096旧失败保留，T038 blocked，真实调用未授权。",
+    "phase_gate": "用户授权T100–T102一次有限教学修订、候选冻结和既定小型实验准备；真实新批次需准确授权，旧批次和真实原件保留。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -4791,6 +4791,127 @@
       "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T099",
       "execution_gate": "独立助手完成单份候选评估；报告需修订问题，未改变模型输出、旧批次或正式验收。"
+    },
+    {
+      "id": "PHASE-1.5-T100",
+      "phase": "Phase 1.5",
+      "priority": "P0",
+      "title": "有限教学规则修订及隔离回归",
+      "status": "done",
+      "depends_on": [
+        "PHASE-1.5-T099"
+      ],
+      "scope": [
+        "scripts/isolated_diagnostics/p15_teaching_revision.py",
+        "scripts/isolated_diagnostics/p15_teaching_pilot.py",
+        "scripts/isolated_diagnostics/p15_teaching_draft.py",
+        "scripts/tests/test_p15_teaching_revision.py",
+        "scripts/tests/test_p15_teaching_pilot.py",
+        "docs/acceptance/phase-1.5-teaching-revision-t100/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "用户要求一次有限教学修订后冻结，准备既定10支持+4拒绝双臂小型实验；ADR0041/0047及原阈值保持",
+      "acceptance_criteria": [
+        "在B/C生成及修复、审核中落实中文、遍历适用条件、演示范围及资源生命周期通用规则。",
+        "不改历史原件；若调整共享引擎、轨迹或代码，重验全部答案、动作及播放器；离线验证正常/失败/拒绝和公平性。"
+      ],
+      "verification": [
+        "PYTHONPATH=backend:. backend/.venv/bin/python -m pytest scripts/tests/test_p15_teaching_revision.py scripts/tests/test_p15_teaching_pilot.py scripts/tests/test_p15_review_engineering.py scripts/tests/test_p15_bound_pilot.py scripts/tests/test_p15_head_insertion_engine.py scripts/tests/test_p15_minimal_contract.py -q --tb=short",
+        "backend/.venv/bin/ruff check scripts/isolated_diagnostics/p15_teaching_revision.py scripts/isolated_diagnostics/p15_teaching_pilot.py scripts/isolated_diagnostics/p15_teaching_draft.py scripts/tests/test_p15_teaching_revision.py scripts/tests/test_p15_teaching_pilot.py",
+        "MYPYPATH=backend:. backend/.venv/bin/mypy scripts/isolated_diagnostics/p15_teaching_revision.py scripts/isolated_diagnostics/p15_teaching_pilot.py scripts/isolated_diagnostics/p15_teaching_draft.py --strict --explicit-package-bases --follow-imports=silent",
+        "PYTHONPATH=backend:. backend/.venv/bin/python docs/acceptance/phase-1.5-combined-candidate-r01/results/check_evidence.py",
+        "PYTHONPATH=backend:. backend/.venv/bin/python scripts/run_p15_r0_once.py --check",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [
+        {
+          "date": "2026-10-30T11:19:00+08:00",
+          "commands": [
+            "PYTHONPATH=backend:. backend/.venv/bin/python -m pytest scripts/tests/test_p15_teaching_revision.py scripts/tests/test_p15_teaching_pilot.py scripts/tests/test_p15_review_engineering.py scripts/tests/test_p15_bound_pilot.py scripts/tests/test_p15_head_insertion_engine.py scripts/tests/test_p15_minimal_contract.py -q --tb=short",
+            "backend/.venv/bin/ruff check scripts/isolated_diagnostics/p15_teaching_revision.py scripts/isolated_diagnostics/p15_teaching_pilot.py scripts/isolated_diagnostics/p15_teaching_draft.py scripts/tests/test_p15_teaching_revision.py scripts/tests/test_p15_teaching_pilot.py",
+            "MYPYPATH=backend:. backend/.venv/bin/mypy scripts/isolated_diagnostics/p15_teaching_revision.py scripts/isolated_diagnostics/p15_teaching_pilot.py scripts/isolated_diagnostics/p15_teaching_draft.py --strict --explicit-package-bases --follow-imports=silent",
+            "PYTHONPATH=backend:. backend/.venv/bin/python docs/acceptance/phase-1.5-combined-candidate-r01/results/check_evidence.py",
+            "PYTHONPATH=backend:. backend/.venv/bin/python scripts/run_p15_r0_once.py --check",
+            "python3 scripts/check_catalog_workflow.py",
+            "git diff --check"
+          ],
+          "result": "266 passed 0 skip；新版B/C/修复Mock、正常失败拒绝、完整目标/旧父版及错误规格反例、代码答案动作不变、独立草稿/绑定复审、Ruff/mypy/旧冻结/工作流diff通过。Provider0；真实接口未验。",
+          "evidence": "docs/acceptance/phase-1.5-teaching-revision-t100/README.md"
+        }
+      ],
+      "started_at": "2026-10-29T23:51:09+08:00",
+      "completed_at": "2026-10-30T11:19:00+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T100",
+      "execution_gate": "教学v3有限修订及助手派生草稿完成，保留原件；完成提交后冻结候选，真实响应链未验。"
+    },
+    {
+      "id": "PHASE-1.5-T101",
+      "phase": "Phase 1.5",
+      "priority": "P0",
+      "title": "冻结修订后的隔离实验候选",
+      "status": "todo",
+      "depends_on": [
+        "PHASE-1.5-T100"
+      ],
+      "scope": [
+        "scripts/isolated_diagnostics/",
+        "scripts/tests/",
+        "docs/acceptance/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "用户要求一次有限教学修订后冻结，准备既定10支持+4拒绝双臂小型实验；ADR0041/0047及原阈值保持",
+      "acceptance_criteria": [
+        "冻结代码/Prompt/Schema/审核适配与依赖摘要；标明原候选为旧版本且不被替代。",
+        "记录绑定/离线回归与实验范围，不宣称真实教学/接口已通过。"
+      ],
+      "verification": [
+        "实际离线测试与冻结校验见交接记录",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T101",
+      "execution_gate": "仅有限离线修订、冻结及实验准备；不重启旧批、不调用真实Provider，原始候选不改写。"
+    },
+    {
+      "id": "PHASE-1.5-T102",
+      "phase": "Phase 1.5",
+      "priority": "P0",
+      "title": "准备独立样本及小型实验准确方案",
+      "status": "todo",
+      "depends_on": [
+        "PHASE-1.5-T101"
+      ],
+      "scope": [
+        "scripts/isolated_diagnostics/",
+        "scripts/tests/",
+        "docs/acceptance/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "用户要求一次有限教学修订后冻结，准备既定10支持+4拒绝双臂小型实验；ADR0041/0047及原阈值保持",
+      "acceptance_criteria": [
+        "候选冻结后独立评估者按既定两臂10支持+4拒绝选样与核对；不读取旧独立真值调优、不外发真值。",
+        "准备下一批新审核链路验证及实验顺序、预算、停止与独立评估材料，真实验证须准确包和授权。"
+      ],
+      "verification": [
+        "实际离线测试与冻结校验见交接记录",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "verification_results": [],
+      "started_at": null,
+      "completed_at": null,
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T102",
+      "execution_gate": "仅有限离线修订、冻结及实验准备；不重启旧批、不调用真实Provider，原始候选不改写。"
     }
   ],
   "planning_inputs": {
