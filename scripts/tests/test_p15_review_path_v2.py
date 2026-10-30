@@ -94,6 +94,90 @@ def test_self_consistent_but_forged_source_is_rejected(arm):
 
 
 @pytest.mark.parametrize("arm", ["B", "C"])
+def test_unbounded_extra_identity_is_rejected_even_if_reassembled(arm):
+    artifact, catalog = case(arm)
+    ident = deepcopy(artifact["identity"])
+    ident["unbounded_extra"] = "x" * 100_000
+    artifact = c.assemble(
+        artifact["raw_output"], ident, catalog if arm == "C" else None
+    )
+    with pytest.raises(c.ContractError, match="IDENTITY_FIELDS"):
+        v2.review_body(artifact, catalog)
+
+
+@pytest.mark.parametrize("arm", ["B", "C"])
+def test_review_revise_requires_actual_target_and_evidence_quote(arm):
+    artifact, catalog = case(arm)
+    body, binding = v2.review_body(artifact, catalog)
+    target_id, target = next(
+        (key, row)
+        for key, row in binding["targets"].items()
+        if row["path"] == "/raw_output/paragraphs/0/text"
+    )
+    issue = dict(
+        severity="minor",
+        area="difficulty",
+        target_id=target_id,
+        evidence_quote=target["text"][:4],
+        reason="讲解需要更多解释。",
+    )
+    opinion = dict(
+        candidate_id=binding["candidate_id"],
+        verdict="revise",
+        uncertainty="",
+        issues=[issue],
+    )
+    result, _ = v2.observe_review(
+        body, response(body, opinion), binding, v2.reservation(body)
+    )
+    assert c.review_disposition(result) == "ordinary_revise"
+    repaired = deepcopy(artifact["raw_output"])
+    repaired["paragraphs"][0]["text"] += "补充解释。"
+    parent = artifact["artifact_digest"]
+    ident = c.identity("dev", "slot", arm, 1, SPEC, parent)
+    new_artifact = c.assemble(repaired, ident, catalog if arm == "C" else None)
+    next_body, next_binding = v2.review_body(new_artifact, catalog)
+    assert new_artifact["identity"]["parent_digest"] == parent
+    with pytest.raises(c.ContractError, match="CANDIDATE_ID"):
+        v2.observe_review(
+            next_body,
+            response(next_body, opinion),
+            next_binding,
+            v2.reservation(next_body),
+        )
+    final = dict(
+        candidate_id=next_binding["candidate_id"],
+        verdict="pass",
+        uncertainty="",
+        issues=[],
+    )
+    final_result, _ = v2.observe_review(
+        next_body, response(next_body, final), next_binding, v2.reservation(next_body)
+    )
+    assert c.review_disposition(final_result) == "advisory_pass"
+    opinion["issues"][0]["evidence_quote"] = "不存在的引用"
+    with pytest.raises(c.ContractError, match="QUOTE_BINDING"):
+        v2.observe_review(body, response(body, opinion), binding, v2.reservation(body))
+
+
+def test_markdown_reference_expansion_exceeds_current_development_policy():
+    from scripts.isolated_diagnostics.p15_head_insertion_engine import canonical
+
+    text = "`a` " + ("[x][a] " * 240) + "\n\n[a]: https://a.test/" + "x" * 2000
+    value = content()
+    template = value["paragraphs"][0]
+    value["paragraphs"] = [dict(template, key=f"p{i}", text=text) for i in range(8)]
+    value["questions"]["caller_head"]["stem"] = text
+    catalog = c.make_catalog(SPEC)
+    c.validate("C_content", value, catalog=catalog)
+    artifact = c.assemble(value, c.identity("dev", "max", "C", 0, SPEC, None), catalog)
+    assert len(canonical(value)) == 34735
+    assert len(canonical(artifact)) > v2.POLICY.request_bytes
+    with pytest.raises(c.ContractError, match="REVIEW_REQUEST_SIZE"):
+        v2.review_body(artifact, catalog)
+
+
+@pytest.mark.parametrize("arm", ["B", "C"])
 def test_long_fields_actions_and_repair_parent_fit_new_policy(arm):
     catalog = c.make_catalog(SPEC)
     value = content() if arm == "C" else b_fixture(SPEC)

@@ -5,6 +5,7 @@ No network or credentials. This is a new development version, not an execution g
 
 from copy import deepcopy
 from dataclasses import dataclass
+import re
 from typing import Any
 
 from scripts.isolated_diagnostics import p15_minimal_contract as c
@@ -86,6 +87,56 @@ def review_body(
     )
     arm = artifact["identity"]["arm"]
     c.require(arm in ("B", "C"), "REVIEW_ARM")
+    ident = artifact["identity"]
+    base = c.identity(
+        ident["run_id"],
+        ident["slot_id"],
+        arm,
+        ident["revision"],
+        catalog["example"]["spec"],
+        ident["parent_digest"],
+    )
+    expanded = {
+        "binding_version",
+        "stage",
+        "instruction_digest",
+        "request_digest",
+        "response_digest",
+        "receipt_digest",
+        "plan_receipt_digest",
+        "parent_review_receipt_digest",
+    }
+    c.require(set(ident) in (set(base), set(base) | expanded), "IDENTITY_FIELDS")
+    for name in set(base) - {"prompt_version"}:
+        c.require(ident[name] == base[name], "IDENTITY_VALUE")
+    c.require(
+        ident["prompt_version"] in (base["prompt_version"], teaching.PROMPT_VERSION),
+        "IDENTITY_PROMPT",
+    )
+    if set(ident) != set(base):
+        c.require(
+            ident["prompt_version"] == teaching.PROMPT_VERSION
+            and ident["binding_version"] == "bound-teaching-pilot-v3",
+            "IDENTITY_VERSION",
+        )
+        c.require(
+            ident["stage"]
+            in (
+                {"C_content", "C_repair"} if arm == "C" else {"B_generate", "B_repair"}
+            ),
+            "IDENTITY_STAGE",
+        )
+        for name in expanded - {"binding_version", "stage"}:
+            value = ident[name]
+            optional = name in {"plan_receipt_digest", "parent_review_receipt_digest"}
+            c.require(
+                (optional and value is None)
+                or (
+                    type(value) is str
+                    and re.fullmatch(r"[0-9a-f]{64}", value) is not None
+                ),
+                "IDENTITY_DIGEST",
+            )
     c.require(
         c.assemble(
             artifact["raw_output"],
