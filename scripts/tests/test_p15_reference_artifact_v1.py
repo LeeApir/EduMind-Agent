@@ -61,7 +61,7 @@ def test_literal_template_markers_remain_content():
     assert "__QUESTIONS__ __PAYLOAD__ __DIGEST__" in rendered
 
 
-def test_preview_states_are_bound_to_actual_catalog_and_refuses_b():
+def test_preview_c_uses_catalog_and_b_uses_model_states():
     import json
     import re
 
@@ -73,6 +73,8 @@ def test_preview_states_are_bound_to_actual_catalog_and_refuses_b():
         content(), c.identity("dev", "slot", "C", 0, spec, None), catalog
     )
     page = build(course, catalog)
+    assert "两次 malloc 的实际成功是本例假设" not in page
+    assert "分配成功或失败由本例抽象测试掩码指定" in page
     data = json.loads(
         re.search(
             r'<script id="sample-data" type="application/json">(.*?)</script>', page
@@ -80,8 +82,18 @@ def test_preview_states_are_bound_to_actual_catalog_and_refuses_b():
     )
     assert data["states"] == catalog["example"]["trace"]["steps"]
     assert data["actions"] == course["source"]["actions"]
-    baseline = a.assemble(
-        b_fixture(spec), c.identity("dev", "slot", "B", 0, spec, None), None
+    value = b_fixture(spec)
+    value["actions"]["states"][0]["nodes"][0]["data"] = 77
+    value["answers"]["allocation_failures"] = 4
+    baseline = a.assemble(value, c.identity("dev", "slot", "B", 0, spec, None), None)
+    baseline_page = build(baseline, catalog)
+    baseline_data = json.loads(
+        re.search(
+            r'<script id="sample-data" type="application/json">(.*?)</script>',
+            baseline_page,
+        ).group(1)
     )
-    with pytest.raises(c.ContractError, match="PREVIEW_C_ONLY"):
-        build(baseline, catalog)
+    assert baseline_data["states"]["0"] == baseline["source"]["actions"][0]["state"]
+    assert baseline_data["states"]["0"]["nodes"]["i0"]["data"] == 77
+    assert baseline_data["states"]["0"] != catalog["example"]["trace"]["steps"][0]
+    assert "模型原始答案" in baseline_page
