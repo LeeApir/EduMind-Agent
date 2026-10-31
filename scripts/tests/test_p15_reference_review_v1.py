@@ -171,3 +171,29 @@ def test_repeated_nested_references_across_all_16_fields(arm):
     assert sum(len(row["occurrences"]) for row in docs["documents"].values()) == 3840
     assert len(body) <= policy.POLICY.request_bytes
     print(f"{arm}: {len(body)} bytes, {len(binding['targets'])} targets")
+
+
+def test_dense_short_references_expose_unsupported_capacity():
+    from scripts.isolated_diagnostics.p15_head_insertion_engine import canonical
+
+    text = "`a` " + ("[a] " * 985) + "\n\n[a]: https://a.test/"
+    value = content()
+    template = value["paragraphs"][0]
+    value["paragraphs"] = [dict(template, key=f"p{i}", text=text) for i in range(8)]
+    for question in value["questions"].values():
+        question.update(stem=text, explanation=text)
+    catalog = c.make_catalog(SPEC)
+    course = artifact.assemble(
+        value, c.identity("dev", "dense", "C", 0, SPEC, None), catalog
+    )
+    assert len(canonical(value)) < c.MAX_PAYLOAD
+    assert (
+        sum(
+            len(row["occurrences"])
+            for row in course["source"]["documents"]["documents"].values()
+        )
+        == 15760
+    )
+    assert len(canonical(course)) > policy.POLICY.request_bytes
+    with pytest.raises(c.ContractError, match="REVIEW_REQUEST_SIZE"):
+        review.review_body(course, catalog)
