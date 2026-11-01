@@ -12,8 +12,9 @@ from pathlib import Path
 import re
 import sqlite3
 import stat
+import threading
 import time
-from typing import Any, Callable, cast
+from typing import Any, Callable, TypeVar, cast
 
 import httpx
 
@@ -21,6 +22,7 @@ from scripts.isolated_diagnostics import p15_minimal_contract as c
 from scripts.isolated_diagnostics import p15_bounded_json_v1 as bounded
 from scripts.isolated_diagnostics import p15_minimal_pilot as old
 from scripts.isolated_diagnostics import p15_pilot_wire as wire
+from scripts.isolated_diagnostics import p15_pinned_transport_v1 as pinned
 from scripts.isolated_diagnostics import p15_teaching_pilot as teaching
 from scripts.isolated_diagnostics import p15_teaching_revision as prompts
 from scripts.isolated_diagnostics import p15_visible_request_budget_v1 as budget
@@ -34,8 +36,43 @@ from scripts.isolated_diagnostics.p15_head_insertion_engine import (
     validate_spec,
 )
 
-VERSION = "controlled-mock-responses-batch-v2"
+VERSION = "controlled-mock-responses-batch-v3"
 MAX_RESPONSE = 2 * 1024 * 1024
+HTTP_WALL_SECONDS = 60.0
+T = TypeVar("T")
+
+
+async def _daemon_call(function: Callable[..., T], *args: Any) -> T:
+    """Do not let an unresponsive development callback hold asyncio.run open.
+
+    The thread cannot dispatch or mutate the ledger; on stop its eventual
+    result is discarded. Resource-intensive parsing is separately isolated in
+    a monitored child process.
+    """
+    loop = asyncio.get_running_loop()
+    future: asyncio.Future[T] = loop.create_future()
+
+    def deliver(value: T | None, error: BaseException | None) -> None:
+        if future.done():
+            return
+        if error is not None:
+            future.set_exception(error)
+        else:
+            future.set_result(cast(T, value))
+
+    def invoke() -> None:
+        try:
+            value, error = function(*args), None
+        except BaseException as exc:
+            value, error = None, exc
+        try:
+            loop.call_soon_threadsafe(deliver, value, error)
+        except RuntimeError:
+            # The caller may have closed its loop after a recorded stop.
+            pass
+
+    threading.Thread(target=invoke, daemon=True).start()
+    return await future
 
 
 def read_anchor(path: Path, frozen: bytes) -> str | None:
@@ -149,7 +186,10 @@ def runtime_contract() -> dict[str, Any]:
             "schema_sha256": hashlib.sha256(canonical(c.schema_for(stage))).hexdigest(),
         }
     routes = {
-        role: {key: route[key] for key in ("url", "model", "reasoning")}
+        role: {
+            key: route[key]
+            for key in ("url", "model", "reasoning", "credential_env")
+        }
         for role, route in wire.ROUTES.items()
     }
     return dict(
@@ -158,6 +198,8 @@ def runtime_contract() -> dict[str, Any]:
         routes=routes,
         response_bytes=MAX_RESPONSE,
         output_tokens=8000,
+        http_wall_seconds=HTTP_WALL_SECONDS,
+        pinned_adapter_version=pinned.VERSION,
     )
 
 
@@ -311,11 +353,18 @@ class Controller:
         self,
         path: Path,
         grant: dict[str, Any],
-        transport: httpx.MockTransport,
+        transport: httpx.MockTransport | pinned.PinnedResponsesTransport,
         *,
         selected: tuple[str, str] | None = None,
     ):
-        c.require(type(transport) is httpx.MockTransport, "MOCK_TRANSPORT_REQUIRED")
+        c.require(
+            type(transport) is httpx.MockTransport
+            or (
+                type(transport) is pinned.PinnedResponsesTransport
+                and transport.offline_only is True
+            ),
+            "MOCK_TRANSPORT_REQUIRED",
+        )
         package = normalized_package(path, grant)
         allowed = {(row["slot"], row["arm"]) for row in package["slots"]}
         c.require(
@@ -429,6 +478,8 @@ class Controller:
                     recovered = False
                     if self.db.execute(
                         "SELECT 1 FROM attempts WHERE state IN ('reserved','sent','unknown','cancelled','late')"
+                    ).fetchone() or self.db.execute(
+                        "SELECT 1 FROM slots WHERE status='started'"
                     ).fetchone():
                         c.require(
                             row["status"] != "complete", "MOCK_TERMINAL_INTEGRITY"
@@ -438,6 +489,9 @@ class Controller:
                         )
                         self.db.execute(
                             "UPDATE batch SET status='stopped' WHERE status='active'"
+                        )
+                        self.db.execute(
+                            "UPDATE slots SET status='failed' WHERE status='started'"
                         )
                         recovered = True
                     self.db.execute("COMMIT")
@@ -452,8 +506,19 @@ class Controller:
             os.close(self._lock_fd)
             raise
         self.transport = transport
+        self._send_fence = pinned.DispatchFence()
+        try:
+            if type(self.transport) is pinned.PinnedResponsesTransport:
+                self.transport.bind_stop_fence(self._send_fence)
+        except BaseException:
+            self.db.close()
+            os.close(self._lock_fd)
+            raise
         self._gate = asyncio.Lock()
         self._running = False
+        self._abandoned = False
+        self._late_tasks: set[asyncio.Task[Any]] = set()
+        self._execution_task: asyncio.Task[Any] | None = None
         self._verified_complete: set[tuple[str, str]] = set()
         self._ordinal = 0
         self._previous: str | None = None
@@ -466,8 +531,90 @@ class Controller:
     def close(self) -> None:
         import os
 
+        c.require(not self._running and not self._late_tasks, "MOCK_PENDING_CLEANUP")
         self.db.close()
         os.close(self._lock_fd)
+
+    def abandon_pending(self) -> None:
+        """Close a stopped controller without waiting for an unresponsive daemon.
+
+        Its sent reservations remain unknown; any later bytes are discarded.
+        This cannot stop a remote provider or terminate an arbitrary Python thread.
+        """
+        c.require(not self._abandoned and self.batch_status() == "stopped", "MOCK_NOT_STOPPED")
+        self._verify_seal()
+        self._abandoned = True
+        if self._execution_task is not None and not self._execution_task.done():
+            self._execution_task.cancel()
+        for task in self._late_tasks:
+            task.cancel()
+        self.db.close()
+        os.close(self._lock_fd)
+
+    async def drain_late(self, timeout: float) -> bool:
+        """Wait at most timeout for retained late responses, without retrying."""
+        c.require(type(timeout) in (float, int) and timeout >= 0, "MOCK_DRAIN_TIMEOUT")
+        pending = set(self._late_tasks)
+        if self._execution_task is not None and not self._execution_task.done():
+            pending.add(self._execution_task)
+        if pending:
+            await asyncio.wait(pending, timeout=float(timeout))
+        return not self._late_tasks and not self._running
+
+    def _retain_late(
+        self, task: asyncio.Task[tuple[int, bytes, bool]], scope: tuple[str, str, int]
+    ) -> None:
+        async def retain() -> None:
+            try:
+                status, raw, overflow = await task
+            except BaseException:
+                return
+            if self._abandoned:
+                return
+            async with self._gate:
+                if self._abandoned:
+                    return
+                self._verify_seal()
+                row = self.db.execute(
+                    "SELECT state FROM attempts WHERE slot=? AND arm=? AND ordinal=?",
+                    scope,
+                ).fetchone()
+                c.require(
+                    row is not None
+                    and row["state"] == "unknown"
+                    and self.batch_status() == "stopped"
+                    and self._selected == scope[:2],
+                    "MOCK_LATE_BINDING",
+                )
+                self.db.execute(
+                    "UPDATE attempts SET state=?,response=?,http_status=?,response_sha=? "
+                    "WHERE slot=? AND arm=? AND ordinal=?",
+                    (
+                        "unknown" if overflow else "late",
+                        raw,
+                        status,
+                        hashlib.sha256(raw).hexdigest(),
+                        *scope,
+                    ),
+                )
+                self._seal()
+                if not overflow:
+                    try:
+                        self._record_usage(scope[2], raw)
+                    except Exception:
+                        # Unknown usage retains the entire reservation.
+                        pass
+
+        background = asyncio.create_task(retain())
+        self._late_tasks.add(background)
+
+        def finished(done: asyncio.Task[Any]) -> None:
+            self._late_tasks.discard(done)
+            if not done.cancelled():
+                # Retrieve any exception; the stopped ledger remains authoritative.
+                done.exception()
+
+        background.add_done_callback(finished)
 
     def _seal(self) -> None:
         c.require(
@@ -507,7 +654,7 @@ class Controller:
             "SELECT status FROM slots WHERE slot=? AND arm=?", self._selected
         ).fetchone()
         c.require(row is not None, "MOCK_SELECTED_SLOT")
-        return str(row[0])
+        return "active" if row[0] == "started" else str(row[0])
 
     def batch_status(self) -> str:
         return str(self.db.execute("SELECT status FROM batch").fetchone()[0])
@@ -604,7 +751,12 @@ class Controller:
         }
 
     async def stop(self) -> None:
+        if self._abandoned:
+            return
+        self._send_fence.stop()
         async with self._gate:
+            if self._abandoned:
+                return
             self._verify_seal()
             if self.batch_status() == "complete":
                 return
@@ -625,6 +777,57 @@ class Controller:
                 raise
             self._seal()
 
+    async def _mark_failed(self) -> None:
+        """Record the attempted slot even when failure happened before dispatch."""
+        if self._abandoned:
+            return
+        async with self._gate:
+            if self._abandoned:
+                return
+            self._verify_seal()
+            current = self.db.execute(
+                "SELECT status FROM slots WHERE slot=? AND arm=?", self._selected
+            ).fetchone()
+            c.require(current is not None, "MOCK_SELECTED_SLOT")
+            if current[0] in ("active", "started"):
+                self.db.execute(
+                    "UPDATE slots SET status='failed' WHERE slot=? AND arm=?",
+                    self._selected,
+                )
+                self._seal()
+
+    def fixed_denominator_summary(self) -> dict[str, Any]:
+        """Summarize every frozen arm/slot; completion is not a quality pass."""
+        self._verify_seal()
+        rows = []
+        for item in self.package["slots"]:
+            pair = (item["slot"], item["arm"])
+            state = self.db.execute(
+                "SELECT status FROM slots WHERE slot=? AND arm=?", pair
+            ).fetchone()[0]
+            attempts = self.db.execute(
+                "SELECT COUNT(*) FROM attempts WHERE slot=? AND arm=?", pair
+            ).fetchone()[0]
+            if state == "complete":
+                outcome = (
+                    "local_refused" if item["kind"] == "refusal" else "mechanical_complete"
+                )
+            elif state == "started" and self.batch_status() == "active":
+                outcome = "in_progress"
+            elif state in ("failed", "started") or attempts:
+                outcome = "failed_or_unknown"
+            else:
+                outcome = "not_run"
+            rows.append(
+                dict(slot=pair[0], arm=pair[1], kind=item["kind"], outcome=outcome)
+            )
+        return dict(
+            batch_status=self.batch_status(),
+            denominator=len(rows),
+            slots=rows,
+            semantic_quality_evaluated=False,
+        )
+
     async def _exchange(
         self, stage: str, payload: dict[str, Any]
     ) -> tuple[dict[str, Any], dict[str, Any]]:
@@ -633,11 +836,15 @@ class Controller:
         policy = budget.DevelopmentPolicy(
             self.grant["request_bytes"], self.grant["input"], 8000
         )
-        body, measurement = await asyncio.to_thread(
+        body, measurement = await _daemon_call(
             budget.build, stage, payload, policy
         )
         self._verify_seal()
         self._ensure_window()
+        if type(self.transport) is pinned.PinnedResponsesTransport:
+            await _daemon_call(self.transport.ensure_request_safe, body)
+            self._verify_seal()
+            self._ensure_window()
         runtime = self.package["runtime_contract"]
         c.require(runtime == runtime_contract(), "MOCK_RUNTIME_BINDING")
         role = "review" if stage.startswith("review_") else "generation"
@@ -697,9 +904,11 @@ class Controller:
                 )
                 self._seal()
                 started = asyncio.Event()
+                owner_loop = asyncio.get_running_loop()
 
                 async def begin(request: httpx.Request) -> httpx.Response:
-                    started.set()
+                    c.require(not self._send_fence.is_set(), "MOCK_STOPPED")
+                    owner_loop.call_soon_threadsafe(started.set)
                     return await self.transport.handle_async_request(request)
 
                 async def send() -> tuple[int, bytes, bool]:
@@ -732,12 +941,23 @@ class Controller:
                                     return response.status_code, bytes(chunks), True
                             return response.status_code, bytes(chunks), False
 
-                task = asyncio.create_task(send())
+                # Keep even a synchronous or cancellation-suppressing transport
+                # off the caller's event loop and its default executor. The
+                # daemon's late result is evidence only after the batch stops.
+                task = asyncio.create_task(_daemon_call(lambda: asyncio.run(send())))
                 waiter = asyncio.create_task(started.wait())
-                done, _ = await asyncio.wait(
-                    (task, waiter), return_when=asyncio.FIRST_COMPLETED
+                request_started = time.monotonic()
+                request_timeout = min(
+                    HTTP_WALL_SECONDS,
+                    max(0.0, self.grant["deadline"] - time.time()),
                 )
-                if task in done and not started.is_set():
+                done, _ = await asyncio.wait(
+                    (task, waiter),
+                    timeout=request_timeout,
+                    return_when=asyncio.FIRST_COMPLETED,
+                )
+                if not started.is_set():
+                    self._send_fence.stop()
                     waiter.cancel()
                     self.db.execute("BEGIN IMMEDIATE")
                     try:
@@ -751,12 +971,24 @@ class Controller:
                         self.db.execute("ROLLBACK")
                         raise
                     self._seal()
+                    if not task.done():
+                        self._retain_late(task, scope)
+                    elif not task.cancelled():
+                        task.exception()
                     raise c.ContractError("MOCK_SEND_UNKNOWN")
                 waiter.cancel()
             try:
-                http_status, raw, overflow = await task
+                left = max(0.0, request_timeout - (time.monotonic() - request_started))
+                done, _ = await asyncio.wait((task,), timeout=left)
+                if not done:
+                    await self.stop()
+                    self._retain_late(task, scope)
+                    raise c.ContractError("MOCK_HTTP_TIMEOUT")
+                http_status, raw, overflow = task.result()
             except BaseException:
                 await self.stop()
+                if not task.done() and not self._late_tasks:
+                    self._retain_late(task, scope)
                 raise
             async with self._gate:
                 self._verify_seal()
@@ -896,20 +1128,55 @@ class Controller:
             await self.stop()
             raise c.ContractError("MOCK_CONCURRENT_RUN")
         self._running = True
+
+        async def execute() -> dict[str, Any]:
+            try:
+                self._verify_seal()
+                c.require(self.status() in ("active", "complete"), "MOCK_NOT_ACTIVE")
+                if self.status() == "active":
+                    self.db.execute(
+                        "UPDATE slots SET status='started' WHERE slot=? AND arm=? AND status='active'",
+                        self._selected,
+                    )
+                    self._seal()
+                if self.status() == "complete":
+                    self._ordinal, self._previous = 0, None
+                await self._verify_completed_prefix()
+                result = await self._run(attest)
+                self._verified_complete.add(self._selected)
+                return result
+            except BaseException:
+                await self._mark_failed()
+                await self.stop()
+                raise
+            finally:
+                self._running = False
+
+        task = asyncio.create_task(execute())
+        self._execution_task = task
+
+        def consume(done: asyncio.Task[Any]) -> None:
+            if not done.cancelled():
+                done.exception()
+
         try:
-            self._verify_seal()
-            c.require(self.status() in ("active", "complete"), "MOCK_NOT_ACTIVE")
-            if self.status() == "complete":
-                self._ordinal, self._previous = 0, None
-            await self._verify_completed_prefix()
-            result = await self._run(attest)
-            self._verified_complete.add(self._selected)
-            return result
-        except BaseException:
+            timeout = (
+                max(0.0, self.grant["deadline"] - time.time())
+                if self.status() != "complete"
+                else 120.0
+            )
+            done, _ = await asyncio.wait((task,), timeout=timeout)
+            if done:
+                return task.result()
+            await self._mark_failed()
             await self.stop()
+            task.add_done_callback(consume)
+            raise c.ContractError("MOCK_DEADLINE_TIMEOUT")
+        except asyncio.CancelledError:
+            await self._mark_failed()
+            await self.stop()
+            task.add_done_callback(consume)
             raise
-        finally:
-            self._running = False
 
     async def _verify_completed_prefix(self) -> None:
         original, ordinal, previous = self._selected, self._ordinal, self._previous
@@ -1024,7 +1291,7 @@ class Controller:
                 if previous_review
                 else None,
             )
-            expanded = await asyncio.to_thread(worker.expand, value, ident, catalog)
+            expanded = await _daemon_call(worker.expand, value, ident, catalog)
             self._ensure_window()
             candidate, view, binding = (
                 expanded["artifact"],
@@ -1037,7 +1304,7 @@ class Controller:
                 (*self._selected, self._ordinal - 1),
             ).fetchone()[0]
             sent_view = json.loads(bytes(sent))["input"][1]["content"].encode("utf-8")
-            await asyncio.to_thread(
+            await _daemon_call(
                 worker.validate_review, opinion, sent_view, candidate, catalog, binding
             )
             self._ensure_window()
@@ -1069,7 +1336,7 @@ class Controller:
                     json.loads(bytes(saved[0]))
                     if saved
                     else (
-                        await asyncio.to_thread(
+                        await _daemon_call(
                             attest, candidate, opinion, review_receipt
                         )
                         if attest

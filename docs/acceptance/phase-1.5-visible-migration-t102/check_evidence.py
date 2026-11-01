@@ -79,7 +79,7 @@ def check_flow(arm):
         system_sha = hashlib.sha256(body["input"][0]["content"].encode()).hexdigest()
         assert runtime["instruction_sha256"] == system_sha
         core = dict(
-            version=control.VERSION,
+            version=package["runtime_contract"]["version"],
             package_digest=package_sha,
             batch=package["batch"],
             slot=attempt["slot"],

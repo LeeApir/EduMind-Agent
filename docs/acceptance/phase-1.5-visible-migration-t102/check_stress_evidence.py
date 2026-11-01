@@ -90,7 +90,7 @@ def main() -> None:
             == runtime["schema_sha256"]
         )
         receipt = dict(
-            version=control.VERSION,
+            version=package["runtime_contract"]["version"],
             package_digest=package_sha,
             batch=package["batch"],
             slot=row["slot"],

@@ -192,13 +192,13 @@ def test_unknown_or_over_reserved_usage_stops_and_preserves_raw(tmp_path, fault)
 
 def test_stop_while_http_in_flight_keeps_late_response_without_advancing(tmp_path):
     async def exercise():
-        started, release = asyncio.Event(), asyncio.Event()
+        started, release = threading.Event(), threading.Event()
         seen = []
         sync_handler = handler_for("B", seen)
 
-        async def handler(request):
+        def handler(request):
             started.set()
-            await release.wait()
+            assert release.wait(3)
             return sync_handler(request)
 
         instance = controller.Controller(
@@ -207,7 +207,7 @@ def test_stop_while_http_in_flight_keeps_late_response_without_advancing(tmp_pat
             httpx.MockTransport(handler),
         )
         task = asyncio.create_task(instance.run(attest))
-        await started.wait()
+        assert await asyncio.to_thread(started.wait, 3)
         await instance.stop()
         release.set()
         with pytest.raises(c.ContractError, match="MOCK_LATE_RESPONSE"):
@@ -406,13 +406,13 @@ def test_mismatched_replay_request_stops_before_any_new_http(tmp_path):
 
 def test_simultaneous_run_cannot_dispatch_twice(tmp_path):
     async def exercise():
-        started, release = asyncio.Event(), asyncio.Event()
+        started, release = threading.Event(), threading.Event()
         seen = []
         handler = handler_for("B", seen)
 
-        async def delayed(request):
+        def delayed(request):
             started.set()
-            await release.wait()
+            assert release.wait(3)
             return handler(request)
 
         instance = controller.Controller(
@@ -421,7 +421,7 @@ def test_simultaneous_run_cannot_dispatch_twice(tmp_path):
             httpx.MockTransport(delayed),
         )
         first = asyncio.create_task(instance.run(attest))
-        await started.wait()
+        assert await asyncio.to_thread(started.wait, 3)
         with pytest.raises(c.ContractError):
             await instance.run(attest)
         release.set()
@@ -629,13 +629,13 @@ def test_shared_batch_token_reservations_cannot_reset_between_arms(tmp_path, kin
 def test_shared_stop_during_one_arm_blocks_every_other_arm(tmp_path):
     async def exercise():
         path = tmp_path / "package.db"
-        started, release = asyncio.Event(), asyncio.Event()
+        started, release = threading.Event(), threading.Event()
         seen = []
         handler = handler_for("B", seen)
 
-        async def waiting(request):
+        def waiting(request):
             started.set()
-            await release.wait()
+            assert release.wait(3)
             return handler(request)
 
         package = package_grant(path)
@@ -643,7 +643,7 @@ def test_shared_stop_during_one_arm_blocks_every_other_arm(tmp_path):
             path, package, httpx.MockTransport(waiting), selected=("slot", "B")
         )
         task = asyncio.create_task(instance.run(attest))
-        await started.wait()
+        assert await asyncio.to_thread(started.wait, 3)
         with pytest.raises(c.ContractError, match="MOCK_SLOT_SWITCH"):
             instance.select_slot("slot", "C")
         await instance.stop()

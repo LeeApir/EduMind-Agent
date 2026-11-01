@@ -6,6 +6,7 @@ import errno
 import os
 from pathlib import Path
 import resource
+import signal
 import subprocess
 import sys
 import threading
@@ -22,6 +23,8 @@ MAX_RESULT_BYTES = 32 * 1024 * 1024
 MEMORY_BYTES = 1024 * 1024 * 1024
 CPU_SECONDS = 25
 WALL_SECONDS = 35
+REAP_SECONDS = 0.5
+MONITOR_JOIN_SECONDS = 0.5
 
 
 def _resident_bytes(pid: int) -> int:
@@ -51,6 +54,20 @@ def _reaped_after_missing(process: subprocess.Popen[bytes]) -> bool:
         return True
     except subprocess.TimeoutExpired:
         return False
+
+
+def _kill_worker_group(process: subprocess.Popen[bytes]) -> None:
+    """Best-effort termination of the dedicated worker session and descendants."""
+    try:
+        os.killpg(process.pid, signal.SIGKILL)
+    except ProcessLookupError:
+        pass
+    except OSError:
+        # Even if the group cannot be killed, stop waiting and report unknown.
+        try:
+            process.kill()
+        except OSError:
+            pass
 
 
 def expand(
@@ -119,6 +136,7 @@ def _execute(data: dict[str, Any]) -> dict[str, Any]:
             stderr=subprocess.DEVNULL,
             env=env,
             cwd=ROOT,
+            start_new_session=True,
         )
         reason: list[str] = []
 
@@ -132,7 +150,7 @@ def _execute(data: dict[str, Any]) -> dict[str, Any]:
                         return
                     if resident > MEMORY_BYTES:
                         reason.append("memory")
-                        process.kill()
+                        _kill_worker_group(process)
                         return
                 except OSError as exc:
                     if process.poll() is not None:
@@ -142,13 +160,13 @@ def _execute(data: dict[str, Any]) -> dict[str, Any]:
                         # reaping before classifying this as monitoring failure.
                         return
                     reason.append("monitor_unknown")
-                    process.kill()
+                    _kill_worker_group(process)
                     return
                 except (ValueError, StopIteration):
                     if process.poll() is not None:
                         return
                     reason.append("monitor_unknown")
-                    process.kill()
+                    _kill_worker_group(process)
                     return
                 time.sleep(0.1)
 
@@ -157,11 +175,17 @@ def _execute(data: dict[str, Any]) -> dict[str, Any]:
         try:
             stdout, _ = process.communicate(input=job, timeout=WALL_SECONDS)
         except subprocess.TimeoutExpired:
-            process.kill()
-            process.communicate()
+            # Killing a child does not guarantee that inherited pipes close or
+            # that the OS can promptly reap it. Never turn the timeout into an
+            # unbounded second communicate().
+            _kill_worker_group(process)
+            try:
+                process.communicate(timeout=REAP_SECONDS)
+            except (subprocess.TimeoutExpired, OSError):
+                pass
             raise
         finally:
-            thread.join(timeout=3)
+            thread.join(timeout=MONITOR_JOIN_SECONDS)
     except (OSError, subprocess.TimeoutExpired) as exc:
         raise c.ContractError("EXPANSION_RESOURCE_UNKNOWN") from exc
     if reason:
