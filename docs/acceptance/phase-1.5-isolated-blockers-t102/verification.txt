@@ -1,0 +1,28 @@
+T102 limited offline repair; independent review pending
+
+Command:
+PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=backend:. backend/.venv/bin/python -m pytest scripts/tests/test_p15_{isolated_blockers_t102,supervised_encrypted_v2_t102,supervised_encrypted_t102,controlled_mock_v1,pinned_transport_v1,timeout_t102,visible_resource_v1,visible_migration_v1,visible_review_view_v1,reference_artifact_v1,reference_document_v1,reference_review_v1,reservation_v2,teaching_revision,teaching_capacity_t102,teaching_pilot,bound_pilot,clean_pilot_prompts,minimal_pilot,minimal_contract,head_insertion_engine,pilot_wire_execution,compact_documents_v1,compact_targets_v1,compact_review_v1}.py -q --tb=short
+Result: 687 passed in 119.10s. All requests and keys are synthetic.
+
+PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=backend:. backend/.venv/bin/python scripts/isolated_diagnostics/generate_p15_isolated_v2_evidence.py
+Result: B/C 9 supervised synthetic HTTP attempts; 9 encrypted responses verified; Provider 0.
+
+PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=backend:. backend/.venv/bin/python docs/acceptance/phase-1.5-isolated-blockers-t102/check_evidence.py
+Result: 9 synthetic requests, visible quotes, receipts, AAD, and ledger replayed. The archived AES key is deliberately not exported, so archived ciphertext is digest-checked rather than decrypted on replay.
+
+PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=backend:. backend/.venv/bin/python docs/acceptance/phase-1.5-teaching-frozen-r01/check_freeze.py
+Result: previous 238-file candidate freeze matches.
+
+PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=backend:. backend/.venv/bin/python scripts/isolated_diagnostics/p15_supervised_audit_manifest.py --check
+Result: previous 29-file review snapshot matches.
+
+backend/.venv/bin/ruff check scripts/isolated_diagnostics/p15_{controlled_mock_v2,encrypted_controller_v2,supervised_mock_v2,visible_worker_v2,synthetic_guard_v2,spawn_isolation_v2}.py scripts/isolated_diagnostics/generate_p15_isolated_v2_evidence.py scripts/tests/test_p15_{isolated_blockers,supervised_encrypted_v2}_t102.py docs/acceptance/phase-1.5-isolated-blockers-t102/{check_evidence,check_audit_manifest}.py
+Result: all checks passed.
+
+MYPYPATH=backend:. backend/.venv/bin/mypy scripts/isolated_diagnostics/p15_{controlled_mock_v2,encrypted_controller_v2,supervised_mock_v2,visible_worker_v2,synthetic_guard_v2,spawn_isolation_v2}.py --strict --explicit-package-bases --follow-imports=silent
+Result: success, 6 source files.
+
+python3 scripts/check_catalog_workflow.py
+Result: active Phase 1.5 dependencies and catalog ledger valid; T033 remains blocked.
+
+The first attempt to export attestations for both arms found that the existing contract only saves a separate feedback attestation for B; C keeps its review and repair receipts. The exporter was corrected to preserve that contract and rerun successfully. No independent teaching review or provider compatibility is claimed.
