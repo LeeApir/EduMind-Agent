@@ -23,6 +23,9 @@ from scripts.isolated_diagnostics import p15_bounded_json_v1 as bounded
 from scripts.isolated_diagnostics import p15_minimal_pilot as old
 from scripts.isolated_diagnostics import p15_pilot_wire as wire
 from scripts.isolated_diagnostics import p15_pinned_transport_v1 as pinned
+from scripts.isolated_diagnostics import p15_supervised_mock_v1 as supervised
+from scripts.isolated_diagnostics import p15_synthetic_guard_v1 as synthetic_guard
+from scripts.isolated_diagnostics import p15_synthetic_vault_v1 as synthetic_vault
 from scripts.isolated_diagnostics import p15_teaching_pilot as teaching
 from scripts.isolated_diagnostics import p15_teaching_revision as prompts
 from scripts.isolated_diagnostics import p15_visible_request_budget_v1 as budget
@@ -36,7 +39,7 @@ from scripts.isolated_diagnostics.p15_head_insertion_engine import (
     validate_spec,
 )
 
-VERSION = "controlled-mock-responses-batch-v3"
+VERSION = "controlled-mock-responses-batch-v4"
 MAX_RESPONSE = 2 * 1024 * 1024
 HTTP_WALL_SECONDS = 60.0
 T = TypeVar("T")
@@ -109,7 +112,8 @@ def ledger_state(db: sqlite3.Connection) -> dict[str, Any]:
         "local_refusals": "slot,arm",
     }
     for table, order in ordering.items():
-        cursor = db.execute(f"SELECT * FROM {table} ORDER BY {order}")
+        projection = "rowid AS nonce_counter,*" if table == "attempts" else "*"
+        cursor = db.execute(f"SELECT {projection} FROM {table} ORDER BY {order}")
         columns = [item[0] for item in cursor.description]
         rows = []
         for row in cursor:
@@ -173,7 +177,7 @@ def open_package_ledger(
     return db, created, last_state
 
 
-def runtime_contract() -> dict[str, Any]:
+def runtime_contract(transport: Any = None) -> dict[str, Any]:
     """Snapshot the exact role instructions, schemas and target identities."""
     stages = {}
     for stage in c.STAGES:
@@ -192,7 +196,7 @@ def runtime_contract() -> dict[str, Any]:
         }
         for role, route in wire.ROUTES.items()
     }
-    return dict(
+    result = dict(
         version=VERSION,
         stages=stages,
         routes=routes,
@@ -200,10 +204,16 @@ def runtime_contract() -> dict[str, Any]:
         output_tokens=8000,
         http_wall_seconds=HTTP_WALL_SECONDS,
         pinned_adapter_version=pinned.VERSION,
+        supervised_adapter_version=supervised.VERSION,
+        synthetic_guard_version=synthetic_guard.VERSION,
+        synthetic_vault_version=synthetic_vault.VERSION,
     )
+    if type(transport) is supervised.SupervisedMockTransport:
+        result["supervisor_policy"] = transport.policy()
+    return result
 
 
-def normalized_package(path: Path, supplied: dict[str, Any]) -> dict[str, Any]:
+def normalized_package(path: Path, supplied: dict[str, Any], transport: Any = None) -> dict[str, Any]:
     """Bind every slot and the shared budgets to one designated ledger path."""
     limits = {"batch", "calls", "input", "output", "request_bytes", "deadline"}
     if set(supplied) == limits | {"slot", "arm", "spec", "ledger_path"}:
@@ -289,7 +299,7 @@ def normalized_package(path: Path, supplied: dict[str, Any]) -> dict[str, Any]:
                 "MOCK_PAIR_ORDER",
             )
     c.require(package["calls"] <= maximum_calls, "MOCK_GRANT")
-    current_runtime = runtime_contract()
+    current_runtime = runtime_contract(transport)
     c.require(
         "runtime_contract" not in package
         or package["runtime_contract"] == current_runtime,
@@ -349,11 +359,13 @@ def response_for_validation(body: bytes, raw: bytes, role: str) -> tuple[bytes, 
 class Controller:
     """One shared package ledger and one owner for all authorized arm/slot pairs."""
 
+    _encrypted_supervisor = False
+
     def __init__(
         self,
         path: Path,
         grant: dict[str, Any],
-        transport: httpx.MockTransport | pinned.PinnedResponsesTransport,
+        transport: httpx.MockTransport | pinned.PinnedResponsesTransport | supervised.SupervisedMockTransport,
         *,
         selected: tuple[str, str] | None = None,
     ):
@@ -362,10 +374,17 @@ class Controller:
             or (
                 type(transport) is pinned.PinnedResponsesTransport
                 and transport.offline_only is True
-            ),
+            )
+            or type(transport) is supervised.SupervisedMockTransport,
             "MOCK_TRANSPORT_REQUIRED",
         )
-        package = normalized_package(path, grant)
+        c.require(
+            type(transport) is not supervised.SupervisedMockTransport or self._encrypted_supervisor,
+            "ENCRYPTED_CONTROLLER_REQUIRED",
+        )
+        package = normalized_package(path, grant, transport)
+        if type(transport) is supervised.SupervisedMockTransport:
+            transport.bind_policy(package["runtime_contract"]["supervisor_policy"])
         allowed = {(row["slot"], row["arm"]) for row in package["slots"]}
         c.require(
             selected in allowed if selected is not None else len(allowed) == 1,
@@ -488,7 +507,12 @@ class Controller:
                             "UPDATE attempts SET state='unknown' WHERE state IN ('reserved','sent')"
                         )
                         self.db.execute(
-                            "UPDATE batch SET status='stopped' WHERE status='active'"
+                            "UPDATE batch SET status=? WHERE status='active'",
+                            (
+                                "stop_unconfirmed"
+                                if type(transport) is supervised.SupervisedMockTransport
+                                else "stopped",
+                            ),
                         )
                         self.db.execute(
                             "UPDATE slots SET status='failed' WHERE status='started'"
@@ -517,6 +541,7 @@ class Controller:
         self._gate = asyncio.Lock()
         self._running = False
         self._abandoned = False
+        self._stop_unconfirmed = self.batch_status() == "stop_unconfirmed"
         self._late_tasks: set[asyncio.Task[Any]] = set()
         self._execution_task: asyncio.Task[Any] | None = None
         self._verified_complete: set[tuple[str, str]] = set()
@@ -541,7 +566,10 @@ class Controller:
         Its sent reservations remain unknown; any later bytes are discarded.
         This cannot stop a remote provider or terminate an arbitrary Python thread.
         """
-        c.require(not self._abandoned and self.batch_status() == "stopped", "MOCK_NOT_STOPPED")
+        c.require(
+            not self._abandoned and self.batch_status() in ("stopped", "stop_unconfirmed"),
+            "MOCK_NOT_STOPPED",
+        )
         self._verify_seal()
         self._abandoned = True
         if self._execution_task is not None and not self._execution_task.done():
@@ -582,16 +610,17 @@ class Controller:
                 c.require(
                     row is not None
                     and row["state"] == "unknown"
-                    and self.batch_status() == "stopped"
+                    and self.batch_status() in ("stopped", "stop_unconfirmed")
                     and self._selected == scope[:2],
                     "MOCK_LATE_BINDING",
                 )
+                protected = self._protect_response(scope, raw, status)
                 self.db.execute(
                     "UPDATE attempts SET state=?,response=?,http_status=?,response_sha=? "
                     "WHERE slot=? AND arm=? AND ordinal=?",
                     (
                         "unknown" if overflow else "late",
-                        raw,
+                        protected,
                         status,
                         hashlib.sha256(raw).hexdigest(),
                         *scope,
@@ -615,6 +644,15 @@ class Controller:
                 done.exception()
 
         background.add_done_callback(finished)
+
+    def _protect_response(self, scope: tuple[str, str, int], raw: bytes, http_status: int) -> bytes:
+        return raw
+
+    def _restore_response(self, row: sqlite3.Row) -> bytes:
+        return bytes(row["response"])
+
+    def _check_response_material(self, raw: bytes) -> None:
+        return None
 
     def _seal(self) -> None:
         c.require(
@@ -648,8 +686,8 @@ class Controller:
 
     def status(self) -> str:
         overall = self.batch_status()
-        if overall == "stopped":
-            return "stopped"
+        if overall in ("stopped", "stop_unconfirmed"):
+            return overall
         row = self.db.execute(
             "SELECT status FROM slots WHERE slot=? AND arm=?", self._selected
         ).fetchone()
@@ -754,6 +792,9 @@ class Controller:
         if self._abandoned:
             return
         self._send_fence.stop()
+        if type(self.transport) is supervised.SupervisedMockTransport:
+            confirmed = await _daemon_call(self.transport.stop_and_confirm, supervised.STOP_GRACE)
+            self._stop_unconfirmed |= not confirmed
         async with self._gate:
             if self._abandoned:
                 return
@@ -763,7 +804,8 @@ class Controller:
             self.db.execute("BEGIN IMMEDIATE")
             try:
                 self.db.execute(
-                    "UPDATE batch SET status='stopped' WHERE status='active'"
+                    "UPDATE batch SET status=? WHERE status IN ('active','stopped','stop_unconfirmed')",
+                    ("stop_unconfirmed" if self._stop_unconfirmed else "stopped",),
                 )
                 self.db.execute(
                     "UPDATE attempts SET state='unknown' WHERE state='sent'"
@@ -776,6 +818,8 @@ class Controller:
                 self.db.execute("ROLLBACK")
                 raise
             self._seal()
+        if self._stop_unconfirmed:
+            raise c.ContractError("STOP_UNCONFIRMED")
 
     async def _mark_failed(self) -> None:
         """Record the attempted slot even when failure happened before dispatch."""
@@ -841,12 +885,13 @@ class Controller:
         )
         self._verify_seal()
         self._ensure_window()
-        if type(self.transport) is pinned.PinnedResponsesTransport:
-            await _daemon_call(self.transport.ensure_request_safe, body)
+        if type(self.transport) in (pinned.PinnedResponsesTransport, supervised.SupervisedMockTransport):
+            safe_transport = cast(pinned.PinnedResponsesTransport | supervised.SupervisedMockTransport, self.transport)
+            await _daemon_call(safe_transport.ensure_request_safe, body)
             self._verify_seal()
             self._ensure_window()
         runtime = self.package["runtime_contract"]
-        c.require(runtime == runtime_contract(), "MOCK_RUNTIME_BINDING")
+        c.require(runtime == runtime_contract(self.transport), "MOCK_RUNTIME_BINDING")
         role = "review" if stage.startswith("review_") else "generation"
         target_url = runtime["routes"][role]["url"]
         ordinal = self._ordinal
@@ -908,6 +953,9 @@ class Controller:
 
                 async def begin(request: httpx.Request) -> httpx.Response:
                     c.require(not self._send_fence.is_set(), "MOCK_STOPPED")
+                    request.extensions["edumind_stage"] = stage
+                    request.extensions["edumind_ordinal"] = ordinal
+                    request.extensions["edumind_arm"] = arm
                     owner_loop.call_soon_threadsafe(started.set)
                     return await self.transport.handle_async_request(request)
 
@@ -951,6 +999,8 @@ class Controller:
                     HTTP_WALL_SECONDS,
                     max(0.0, self.grant["deadline"] - time.time()),
                 )
+                if type(self.transport) is supervised.SupervisedMockTransport:
+                    request_timeout = max(0.0, request_timeout - supervised.STOP_GRACE)
                 done, _ = await asyncio.wait(
                     (task, waiter),
                     timeout=request_timeout,
@@ -965,7 +1015,14 @@ class Controller:
                             "UPDATE attempts SET state='unknown' WHERE slot=? AND arm=? AND ordinal=?",
                             scope,
                         )
-                        self.db.execute("UPDATE batch SET status='stopped'")
+                        self.db.execute(
+                            "UPDATE batch SET status=?",
+                            (
+                                "stop_unconfirmed"
+                                if type(self.transport) is supervised.SupervisedMockTransport
+                                else "stopped",
+                            ),
+                        )
                         self.db.execute("COMMIT")
                     except BaseException:
                         self.db.execute("ROLLBACK")
@@ -996,6 +1053,7 @@ class Controller:
                 expired = time.time() >= self.grant["deadline"]
                 if expired:
                     state = "stopped"
+                protected = self._protect_response(scope, raw, http_status)
                 self.db.execute("BEGIN IMMEDIATE")
                 try:
                     if expired or overflow:
@@ -1010,7 +1068,7 @@ class Controller:
                             else "responded"
                             if state == "active"
                             else "late",
-                            raw,
+                            protected,
                             http_status,
                             hashlib.sha256(raw).hexdigest(),
                             *scope,
@@ -1038,13 +1096,15 @@ class Controller:
             and row["previous_receipt"] == self._previous,
             "MOCK_REPLAY_BINDING",
         )
-        raw = bytes(row["response"])
+        raw = self._restore_response(row)
         c.require(
             hashlib.sha256(body).hexdigest() == row["request_sha"]
             and hashlib.sha256(raw).hexdigest() == row["response_sha"],
             "MOCK_RECEIPT_DIGEST",
         )
         try:
+            await _daemon_call(self._check_response_material, raw)
+            self._ensure_window()
             self._record_usage(ordinal, raw)
             row = self.db.execute(
                 "SELECT * FROM attempts WHERE slot=? AND arm=? AND ordinal=?", scope
@@ -1165,6 +1225,8 @@ class Controller:
                 if self.status() != "complete"
                 else 120.0
             )
+            if type(self.transport) is supervised.SupervisedMockTransport:
+                timeout = max(0.0, timeout - supervised.STOP_GRACE)
             done, _ = await asyncio.wait((task,), timeout=timeout)
             if done:
                 return task.result()
@@ -1353,6 +1415,8 @@ class Controller:
                     and record["approved"] is True,
                     "MOCK_B_FEEDBACK_ATTESTATION",
                 )
+                await _daemon_call(self._check_response_material, canonical(record))
+                self._ensure_window()
                 if saved is None:
                     self.db.execute(
                         "INSERT INTO attestation VALUES (?,?,?)",
