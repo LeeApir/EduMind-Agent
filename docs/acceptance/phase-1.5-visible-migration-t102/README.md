@@ -12,11 +12,13 @@
 
 ## 边界与预约
 
-[预演记录](capacity-evidence.json)覆盖最长 3+4 规格、B/C 16 个长文本字段、密集引用、转义字符、首次及修复后审核；B 另覆盖结构上允许的 20,000 行代码、64 状态和 180 动作。这些是结构压力样例，不是教学合格样本。完整外层请求实测最大的初次/重审为 B 臂 **4,525,213／4,525,309 字节**；包含 Prompt、Schema、外层 JSON 和二次转义，超过旧 4 MiB。计算方法、开发门限、已知空白和下一步见[容量说明](CAPACITY.md)。
+[预演记录](capacity-evidence.json)覆盖最长 3+4 规格、B/C 16 个长文本字段、重复和不同定义的密集引用、转义字符、首次及修复后审核；B 另覆盖结构上允许的 20,000 行代码、64 状态和 180 动作。这些是结构压力样例，不是教学合格样本。9,693 个不同定义的 B 臂样例，完整外层初次/重审分别为 **7,680,483／7,680,579 字节**；包含 Prompt、Schema、外层 JSON 和二次转义，超过旧 4 MiB。计算方法、开发门限、已知空白和下一步见[容量说明](CAPACITY.md)。
 
 ## 完整 Mock 链
 
 [B 原件及收据](b-mock-flow.json)和[C 原件及收据](c-mock-flow.json)来自同一本隔离批次账本：B 为 4 次 Mock HTTP，C 为 5 次；各自走过生成、包含非空问题及真实可见目标/引文的审核、一次修复和重审，C 另有规划。记录包含完整请求体、原始回包、预约、使用量、候选版本及摘要。模拟审核通过不等于教学质量通过；B 反馈核定人是测试夹具，不是独立评估结论。
+
+相同控制器另以每臂 9,693 个不同引用定义的大规模样例走完完整 9 次 Mock HTTP。完整请求、原始响应、候选、问题和共享账本快照保存在[压缩证据](stress-mock-flow.json.gz)；压缩只用于本地存档，模型在 Mock 请求中收到的是完整可见视图。其报告的 token 用量是夹具数值，不是服务商实际用量。
 
 [控制器](../../../scripts/isolated_diagnostics/p15_controlled_mock_v1.py)仅接受 `httpx.MockTransport`，不会读取密钥或发起真实网络请求。它把包、固定账本路径、槽位顺序、B/C 同槽规格、Prompt/Schema/路由摘要和预算绑定；记录请求/原始响应并从响应解析用量。未知或超预约停止并保留预约；停止后的迟到响应只留证和结算，不推进。新增的本地拒绝回归覆盖未知变体、超长、任意代码和未知精确结果，两臂均为零 HTTP，尚未纳入独立实验分子。
 
@@ -28,7 +30,9 @@
 PYTHONPATH=backend:. backend/.venv/bin/python scripts/isolated_diagnostics/generate_p15_visible_migration_report.py
 PYTHONPATH=backend:. backend/.venv/bin/python scripts/isolated_diagnostics/generate_p15_mock_flow_evidence.py
 PYTHONPATH=backend:. backend/.venv/bin/python scripts/isolated_diagnostics/generate_p15_visible_capacity_evidence.py
+PYTHONPATH=backend:. backend/.venv/bin/python scripts/isolated_diagnostics/generate_p15_stress_mock_evidence.py
 PYTHONPATH=backend:. backend/.venv/bin/python docs/acceptance/phase-1.5-visible-migration-t102/check_evidence.py
+PYTHONPATH=backend:. backend/.venv/bin/python docs/acceptance/phase-1.5-visible-migration-t102/check_stress_evidence.py
 ```
 
 Mock 记录中的临时账本路径会随复现改变，相关包和收据摘要也会改变；原始阶段、字段和校验方式可以重新检查。

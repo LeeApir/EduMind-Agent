@@ -7,6 +7,7 @@ from copy import deepcopy
 from pathlib import Path
 
 from scripts.isolated_diagnostics import p15_minimal_contract as c
+from scripts.isolated_diagnostics import p15_bounded_json_v1 as bounded
 from scripts.isolated_diagnostics import p15_minimal_pilot as old
 from scripts.isolated_diagnostics import p15_teaching_pilot as teaching
 from scripts.isolated_diagnostics import p15_visible_request_budget_v1 as budget
@@ -36,6 +37,34 @@ def payload(arm: str, scenario: str) -> dict:
     for question in value["questions"].values():
         question["stem"] = text
         question["explanation"] = text
+    if scenario == "distinct_refs":
+        alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+
+        def encode(number: int) -> str:
+            out = ""
+            while True:
+                number, remainder = divmod(number, len(alphabet))
+                out = alphabet[remainder] + out
+                if not number:
+                    return out
+
+        fields = []
+        number = 0
+        for _ in range(16):
+            parts = []
+            length = 0
+            while True:
+                item = "[](" + encode(number) + ")"
+                if length + len(item) > 3998:  # Leave room for the repair.
+                    break
+                parts.append(item)
+                length += len(item)
+                number += 1
+            fields.append("".join(parts))
+        for i, paragraph in enumerate(value["paragraphs"]):
+            paragraph["text"] = fields[i]
+        for i, question in enumerate(value["questions"].values()):
+            question["stem"], question["explanation"] = fields[8 + 2 * i : 10 + 2 * i]
     if arm == "B" and scenario != "escaping":
         # Deliberately non-teaching data at the allowed character/line boundary.
         value["code"] = "\n" * 20000
@@ -88,6 +117,8 @@ def main() -> None:
         ("escaping", "B"),
         ("escaping", "C"),
         ("max_actions", "B"),
+        ("distinct_refs", "B"),
+        ("distinct_refs", "C"),
     ]
     for scenario, arm in cases:
         value = payload(arm, scenario)
@@ -120,14 +151,26 @@ def main() -> None:
                     severity="minor",
                     area="difficulty",
                     target_id=cell["id"],
-                    evidence_quote="[x]",
+                    evidence_quote="[](" if scenario == "distinct_refs" else "[x]",
                     reason="补充说明。",
                 )
             ],
         )
+        sent_view = canonical(first["view"])
+        review_job = dict(
+            mode="review",
+            value=opinion,
+            sent_view=sent_view.decode("utf-8"),
+            artifact=first["artifact"],
+            catalog=catalog,
+            binding=first["binding"],
+        )
+        review_job_bytes = len(
+            bounded.encode(review_job, worker.MAX_JOB_BYTES, "WORKER_INPUT_LIMIT")
+        )
         worker.validate_review(
             opinion,
-            canonical(first["view"]),
+            sent_view,
             first["artifact"],
             catalog,
             first["binding"],
@@ -170,6 +213,11 @@ def main() -> None:
                     "documents"
                 ].values()
             ),
+            "distinct_definitions": len(
+                first["artifact"]["source"]["documents"]["references"]
+            ),
+            "worker_result_bytes": len(canonical(first)),
+            "review_worker_job_bytes": review_job_bytes,
             "stages": stages,
             "sum_local_input_reservations": sum(
                 stage["local_input_reservation"] for stage in stages

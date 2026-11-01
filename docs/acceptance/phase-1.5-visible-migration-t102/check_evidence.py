@@ -140,6 +140,10 @@ def main():
     capacity = read("capacity-evidence.json")
     assert capacity["real_provider_calls"] == 0
     assert capacity["scenarios"]["dense_B"]["stages"][1]["body_bytes"] > 4 * 1024 * 1024
+    distinct = capacity["scenarios"]["distinct_refs_B"]
+    assert distinct["reference_occurrences"] == distinct["distinct_definitions"] == 9693
+    assert distinct["stages"][1]["body_bytes"] == 7680483
+    assert distinct["worker_result_bytes"] < 32 * 1024 * 1024
     assert capacity["scenarios"]["max_actions_B"]["visible_states"] == 64
     assert capacity["scenarios"]["max_actions_B"]["visible_actions"] == 180
     print(
