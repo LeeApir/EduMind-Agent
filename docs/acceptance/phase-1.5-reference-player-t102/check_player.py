@@ -79,10 +79,20 @@ def main():
                 .get_attribute("data-target-id")
                 == target_ids[f"/source/documents/references/{ref}"]
             )
-            assert (
-                page.locator("#references .reference").nth(i).text_content()
-                == visible_text[target_ids[f"/source/documents/references/{ref}"]]
-            )
+            row = page.locator("#references .reference").nth(i)
+            for selector, path in (
+                (".reference-summary", f"/source/documents/references/{ref}"),
+                (".reference-url", f"/source/documents/references/{ref}/url"),
+                (".reference-title", f"/source/documents/references/{ref}/title"),
+            ):
+                assert (
+                    row.locator(selector).get_attribute("data-target-id")
+                    == target_ids[path]
+                )
+                assert (
+                    row.locator(selector).text_content()
+                    == visible_text[target_ids[path]]
+                )
         assert page.locator("#occurrences .occurrence").count() == sum(
             len(row["occurrences"]) for row in documents["documents"].values()
         )

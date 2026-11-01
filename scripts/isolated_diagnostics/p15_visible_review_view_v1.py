@@ -40,6 +40,7 @@ def build(
     reference_ids = {
         ref: f"r{index}" for index, ref in enumerate(sorted(docs["references"]))
     }
+    split_cache: dict[tuple[str, str], list[str]] = {}
 
     def add(
         kind: str,
@@ -62,7 +63,10 @@ def build(
                 key: item for key, item in original.items() if key != "text"
             }
         elif operation == "splitline_text_v1":
-            reconstructed = original.splitlines()[rule["index"]]
+            cache_key = (root, path)
+            if cache_key not in split_cache:
+                split_cache[cache_key] = original.splitlines()
+            reconstructed = split_cache[cache_key][rule["index"]]
         elif operation == "reference_declarations":
             reconstructed = {
                 "document": rule["document"],
@@ -127,6 +131,14 @@ def build(
         "representation",
     )
     add("degraded", source["degraded"], "/source/degraded", "representation")
+    for field, value in sorted(source["provenance"].items()):
+        add(
+            "provenance_field",
+            value,
+            f"/source/provenance/{field}",
+            "representation",
+            plain=True,
+        )
     for index, block in enumerate(source["blocks"]):
         metadata = {key: value for key, value in block.items() if key != "text"}
         add(
@@ -136,12 +148,28 @@ def build(
             "representation",
             projection={"type": "block_metadata"},
         )
+        for field, value in sorted(block.items()):
+            if field not in ("text", "answer_key"):
+                add(
+                    "block_field",
+                    value,
+                    f"/source/blocks/{index}/{field}",
+                    "representation",
+                    plain=type(value) is str,
+                )
 
     for index, paragraph in enumerate(raw["paragraphs"]):
         add(
             "paragraph",
             paragraph["text"],
             f"/raw_output/paragraphs/{index}/text",
+            "model",
+            plain=True,
+        )
+        add(
+            "paragraph_key",
+            paragraph["key"],
+            f"/raw_output/paragraphs/{index}/key",
             "model",
             plain=True,
         )
@@ -197,13 +225,21 @@ def build(
             else f"/raw_output/answers/{key}",
             source["provenance"]["answers"],
         )
-        if arm == "B" and answer != block["answer_key"]:
+        if arm == "B":
             add(
                 "display_answer",
                 block["answer_key"],
                 f"/source/blocks/{block_index}/answer_key",
                 "representation",
             )
+            if key == "reachable_prefix":
+                for item_index, item in enumerate(answer):
+                    add(
+                        "answer_item",
+                        item,
+                        f"/raw_output/answers/{key}/{item_index}",
+                        "model",
+                    )
         add(
             "question_explanation",
             question["explanation"],
@@ -231,16 +267,28 @@ def build(
     else:
         for index, action in enumerate(source["actions"]):
             if action["kind"] == "show_state":
-                add("state", action["state"], f"/source/actions/{index}/state", "model")
+                add(
+                    "state",
+                    action["state"],
+                    f"/source/actions/{index}/state",
+                    "model_projection",
+                )
     for index, action in enumerate(source["actions"]):
         add(
             "action",
             action,
             f"/source/actions/{index}",
-            source["provenance"]["actions"],
+            "model_projection" if arm == "B" else source["provenance"]["actions"],
         )
     if arm == "B":
         for group in ("states", "highlights", "advances"):
+            if not raw["actions"][group]:
+                add(
+                    "model_raw_" + group + "_empty",
+                    [],
+                    f"/raw_output/actions/{group}",
+                    "model",
+                )
             for index, action in enumerate(raw["actions"][group]):
                 add(
                     "model_raw_" + group,
@@ -255,6 +303,22 @@ def build(
             "/source/resolved_facts",
             "deterministic",
         )
+        for ref, fact in sorted(source["resolved_facts"].items()):
+            token = ref.replace("~", "~0").replace("/", "~1")
+            add(
+                "resolved_fact_value",
+                fact["value"],
+                f"/source/resolved_facts/{token}/value",
+                "deterministic",
+            )
+            for field in ("path", "origin"):
+                add(
+                    "resolved_fact_provenance",
+                    fact[field],
+                    f"/source/resolved_facts/{token}/{field}",
+                    "deterministic",
+                    plain=True,
+                )
 
     for key in sorted(docs["documents"]):
         doc = docs["documents"][key]
@@ -298,6 +362,20 @@ def build(
             f"/source/documents/references/{ref}",
             "parser",
             projection={"type": "reference_definition", "reference_id": ref},
+        )
+        add(
+            "reference_url",
+            definition["url"],
+            f"/source/documents/references/{ref}/url",
+            "parser",
+            plain=True,
+        )
+        add(
+            "reference_title",
+            definition["title"],
+            f"/source/documents/references/{ref}/title",
+            "parser",
+            plain=type(definition["title"]) is str,
         )
 
     # The original reference is sent in full and independently addressable.

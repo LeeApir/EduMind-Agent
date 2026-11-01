@@ -283,4 +283,52 @@ def test_structurally_valid_b_combined_code_and_reference_capacity_gap():
         len([cell for cell in view["cells"] if cell["kind"] == "code_line"]) == 20_000
     )
     assert len(canonical(view)) > 4 * 1024 * 1024
-    print(f"B combined capacity: raw={len(canonical(value))} view={len(canonical(view))}")
+    print(
+        f"B combined capacity: raw={len(canonical(value))} view={len(canonical(view))}"
+    )
+
+
+@pytest.mark.parametrize("arm", ["B", "C"])
+def test_definition_url_and_title_are_exact_visible_targets(arm):
+    catalog = c.make_catalog(SPEC)
+    value = content() if arm == "C" else b_fixture(SPEC)
+    value["paragraphs"][0]["text"] = (
+        "`c` [标签][a]\n\n[a]: https://example.test/a '甲\"乙'"
+    )
+    course = artifact.assemble(
+        value,
+        c.identity("dev", "slot", arm, 0, SPEC, None),
+        catalog if arm == "C" else None,
+    )
+    view, binding = visible.build(course, catalog)
+    url = next(cell for cell in view["cells"] if cell["kind"] == "reference_url")
+    title = next(cell for cell in view["cells"] if cell["kind"] == "reference_title")
+    assert url["text"] == "https://example.test/a" and title["text"] == '甲"乙'
+    visible.validate_review(
+        issue(view, url, "example.test"), canonical(view), course, catalog, binding
+    )
+    visible.validate_review(
+        issue(view, title, '甲"乙'), canonical(view), course, catalog, binding
+    )
+    assert binding["paths"][url["id"]]["pointer"].endswith("/url")
+    assert binding["paths"][title["id"]]["pointer"].endswith("/title")
+
+
+def test_empty_markdown_title_remains_in_raw_text_even_if_parser_normalizes_it():
+    catalog = c.make_catalog(SPEC)
+    value = content()
+    text = '[x](https://example.test "")'
+    value["paragraphs"][0]["text"] = text
+    course = artifact.assemble(
+        value, c.identity("dev", "slot", "C", 0, SPEC, None), catalog
+    )
+    view, binding = visible.build(course, catalog)
+    paragraph = next(cell for cell in view["cells"] if cell["kind"] == "paragraph")
+    title = next(cell for cell in view["cells"] if cell["kind"] == "reference_title")
+    assert paragraph["text"] == text
+    assert title["text"] == "null" and binding["paths"][title["id"]][
+        "pointer"
+    ].endswith("/title")
+    visible.validate_review(
+        issue(view, paragraph, '""'), canonical(view), course, catalog, binding
+    )

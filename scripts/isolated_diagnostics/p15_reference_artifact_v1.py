@@ -34,7 +34,6 @@ def assemble(
     for key in c.QUESTION_KEYS:
         docs[f"question:{key}:stem"] = value["questions"][key]["stem"]
         docs[f"question:{key}:explanation"] = value["questions"][key]["explanation"]
-    representation = document.build(docs)
     blocks = [
         dict(kind="text", anchor=f"{slot}:{p['key']}", document=f"paragraph:{p['key']}")
         for p in value["paragraphs"]
@@ -98,6 +97,8 @@ def assemble(
             )
         )
     c.require(len({b["anchor"] for b in blocks}) == len(blocks), "DUPLICATE_ANCHOR")
+    # Parse Markdown only after all inexpensive role, source and fact checks pass.
+    representation = document.build(docs)
     source: dict[str, Any] = dict(
         version=VERSION,
         documents=representation,

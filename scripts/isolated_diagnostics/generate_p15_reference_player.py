@@ -90,8 +90,13 @@ def build(course=None, catalog=None):
         + esc(key)
         + '" data-target-id="'
         + esc(target_ids[f"/source/documents/references/{key}"])
-        + '">'
-        + "</li>"
+        + '"><code class="reference-summary" data-target-id="'
+        + esc(target_ids[f"/source/documents/references/{key}"])
+        + '"></code><span class="reference-url" data-target-id="'
+        + esc(target_ids[f"/source/documents/references/{key}/url"])
+        + '"></span><span class="reference-title" data-target-id="'
+        + esc(target_ids[f"/source/documents/references/{key}/title"])
+        + '"></span></li>'
         for key, value in docs["references"].items()
     )
     occurrences = "".join(
@@ -202,7 +207,7 @@ def build(course=None, catalog=None):
     assert template.count("function render()") == 1
     template = template.replace(
         "function render()",
-        "document.querySelectorAll('.model-paragraph,.question summary,.question code,.question .explanation,.reference').forEach(el=>{el.textContent=data.visible_cells[el.dataset.targetId].text});document.querySelectorAll('.occurrence').forEach(el=>{const c=data.visible_cells[el.dataset.targetId];el.querySelector('.occurrence-label').textContent=c.reference_kind+'：'+c.label+'（文档 '+c.document+'，解析树位置 '+el.dataset.path+'，定义 '+c.reference_id+'）';el.querySelector('.evidence-target').textContent=c.text});function render()",
+        "document.querySelectorAll('.model-paragraph,.question summary,.question code,.question .explanation,.reference-summary,.reference-url,.reference-title').forEach(el=>{el.textContent=data.visible_cells[el.dataset.targetId].text});document.querySelectorAll('.occurrence').forEach(el=>{const c=data.visible_cells[el.dataset.targetId];el.querySelector('.occurrence-label').textContent=c.reference_kind+'：'+c.label+'（文档 '+c.document+'，解析树位置 '+el.dataset.path+'，定义 '+c.reference_id+'）';el.querySelector('.evidence-target').textContent=c.text});function render()",
     )
     template = template.replace(
         "let state=null,line=null;", "let state=null,line=null,stateTarget=null;"
