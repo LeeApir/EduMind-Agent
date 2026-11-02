@@ -4921,7 +4921,7 @@
       "verification_results": [],
       "started_at": "2026-10-30T11:27:05+08:00",
       "completed_at": null,
-      "blocker": "用户已确认单组探索A、B、D和C2；不研究内核绝对截止、不以金额硬封顶为前置。新离线原型独立复审未通过：两轮不同停止检查后，stop_unconfirmed返回后合成子进程仍可收到任务并执行；非法JSON在保存前解析失败导致原件丢失，迟到后收据原型仍可登记下一阶段，另有目录替换、臂阶段绑定和崩溃恢复缺口。可信祖先凭据隔离亦未证明。按同一问题两轮修复失败规则停止追加修复；T102仍blocked，不冻结、不选样、不调用Provider，详见docs/acceptance/phase-1.5-manual-bc-offline-t102/BLOCKED.md。",
+      "blocker": "用户已确认单组探索A、B、D和C2，并授权一次限定离线重设计；不研究内核绝对截止、不以金额硬封顶为前置。旧原型的停止后投递及非法JSON原件丢失反例仍可复现。新设计的独立初审发现：承诺后、创建进程前暂停，stop_unconfirmed返回后仍可能创建进程；不能靠重命名意图记录解决。新设计未实施，原件先封存、目录身份、臂阶段、恢复及可信祖先凭据隔离均未完成验证。T102仍blocked，不冻结、不选样、不调用Provider；见docs/acceptance/phase-1.5-manual-bc-redesign-t102/DESIGN.md及旧BLOCKED.md。",
       "commit_lookup": "Task-Completed: PHASE-1.5-T102",
       "execution_gate": "仅有限离线修订、冻结及实验准备；不重启旧批、不调用真实Provider，原始候选不改写。"
     }
