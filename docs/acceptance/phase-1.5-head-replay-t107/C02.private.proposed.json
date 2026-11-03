@@ -1,0 +1,258 @@
+{
+  "status": "proposal_not_imported",
+  "replay_source": {
+    "mapping_version": "head-replay-map-v1",
+    "origin": "existing_real_candidate_replay",
+    "batch": "PHASE-1.5-T106",
+    "slot": "C02",
+    "candidate_digest": "94b98e3411cdffdce46a77387aac92d3333731e5bae340e2e886cad82596dea0",
+    "candidate_file_sha256": "3debbde81a2ba81ff672c0b53b4e393528ceaec4888eb33897de982329b10619",
+    "parent_digest": "11733f29cba774f7273429bc20326f40eae9b38e02f727f9ebf6435df9573a51",
+    "model": "deepseek-flash",
+    "prompt_version": "limited-c-full-course-r01"
+  },
+  "original_candidate_utf8": "{\"artifact_digest\":\"94b98e3411cdffdce46a77387aac92d3333731e5bae340e2e886cad82596dea0\",\"base_artifact\":{\"artifact_digest\":\"4dfe281293ec7347db7772bd5f4d12fa639c9f742c27e2472c2928f775f60064\",\"identity\":{\"arm\":\"C\",\"contract_version\":\"pilot-minimal-output-adapter-v1\",\"parent_digest\":\"11733f29cba774f7273429bc20326f40eae9b38e02f727f9ebf6435df9573a51\",\"prompt_version\":\"limited-c-full-course-r01\",\"revision\":1,\"run_id\":\"limited_c_r01\",\"slot_id\":\"C02\",\"spec_digest\":\"e67c0ab3e7f0a248162c7e43515b682e9fba758f8b208bd0496efc63eeb73ad0\"},\"raw_output\":{\"paragraphs\":[{\"fact_ids\":[\"trace_step_00\"],\"key\":\"initial_list\",\"text\":\"本例的 variant 是 normal，初始链表为空：main 中的 caller_head 初始为 NULL，没有任何初始节点。两次插入的值依次为 -3 和 5，对应的分配成功掩码依次为 false 和 true。这里的分配掩码只是抽象测试假设，并不保证真实 malloc 一定成功。\"},{\"fact_ids\":[\"trace_step_01\",\"trace_step_02\",\"trace_step_03\"],\"key\":\"attempt_0\",\"text\":\"第一次调用 insert 时 allocation_success 为 0，因此第 4 行的条件表达式不调用 malloc，局部指针 p 得到 NULL。随后第 5 行的 NULL 检查成立，函数直接返回传入的 head，也就是 NULL；这次调用没有创建节点，也没有修改调用者的头指针。\"},{\"fact_ids\":[\"trace_step_04\",\"trace_step_05\",\"trace_step_06\",\"trace_step_07\"],\"key\":\"attempt_1\",\"text\":\"第二次调用 insert 时 allocation_success 为 1，第 4 行按抽象假设成功分配节点 t1，局部指针 p 指向 t1；此时 t1 的 data 和 next 仍是未初始化数据，不能读取。第 5 行的 NULL 检查不成立，继续执行第 6 行把 data 写为 5，第 7 行把 next 链接到传入的 head（NULL），第 8 行返回 t1。\"},{\"fact_ids\":[\"trace_step_08\"],\"key\":\"caller_result\",\"text\":\"第二次调用返回后，main 在第 13 行把返回值赋给 caller_head，因此 caller_head 指向 t1。注意 p 是 insert 的局部指针，调用返回后它只是返回时的快照，并不是 main 中仍可使用的变量；main 使用的是 caller_head。\"},{\"fact_ids\":[\"obs_caller_head\",\"obs_reachable_prefix\",\"obs_traversal_status\",\"obs_allocation_failures\"],\"key\":\"final_observation\",\"text\":\"从 caller_head 出发观察，可达前缀为 [5]，t1 的 next 为 NULL，遍历状态为 terminated，因此对这个指定示例而言，观察到的值就是完整遍历结果。本例共发生 1 次失败的合成分配尝试。t1 是动态分配节点，成功分配后应在不再需要时安全释放；但本示例没有提供清理代码或清理动画，所以不能声称清理已经执行。初始链表为空，没有栈节点需要释放，也不应释放未分配或未知指针。\"}],\"questions\":{\"allocation_failures\":{\"explanation\":\"第一次插入的分配成功掩码为 false，对应 1 次失败尝试；第二次为 true。因此失败次数为 1。\",\"fact_ids\":[\"obs_allocation_failures\",\"trace_step_02\"],\"stem\":\"本例中失败的合成分配尝试次数是多少？请回答一个整数。\"},\"caller_head\":{\"explanation\":\"第 13 行把 insert 的返回值赋给 caller_head，返回值为 t1，因此最终 caller_head 是 t1。\",\"fact_ids\":[\"obs_caller_head\",\"trace_step_08\"],\"stem\":\"第二次 insert 返回后，main 中的 caller_head 最终指向哪个节点 ID？若为空请回答 none。请使用观察中的节点 ID 原样作答。\"},\"reachable_prefix\":{\"explanation\":\"可达前缀为 [5]；由于 next 到达 NULL 且没有未知或重复，这个指定示例的观察值就是完整遍历。\",\"fact_ids\":[\"obs_reachable_prefix\",\"obs_traversal_status\"],\"stem\":\"从最终 caller_head 出发，已知的整数可达前缀是什么？请只回答一个 JSON 整数数组，例如 [1,2]；不要附加文字说明。\"},\"traversal_status\":{\"explanation\":\"t1 的 next 为 NULL，观察在 NULL 处终止，因此状态为 terminated。\",\"fact_ids\":[\"obs_traversal_status\",\"trace_step_06\"],\"stem\":\"从最终 caller_head 出发观察，遍历状态是什么？请从固定枚举 token 中选择：terminated（在 NULL 处终止）、cycle（成环）、indeterminate（到达不确定指针）。\"}}},\"source\":{\"actions\":[{\"anchor\":\"C02:code\",\"kind\":\"show_state\",\"state_digest\":\"7a5f472326cedca7ed9ce7946f595c6c45db6a95dddd941d9b29d2d0fdd10fc1\",\"step\":0},{\"anchor\":\"C02:code\",\"kind\":\"advance_step\",\"step\":1},{\"anchor\":\"C02:code\",\"kind\":\"show_state\",\"state_digest\":\"9cd472e61a9231cdbd07a2b2b76a68a5a4fc44de330c11d61b3b3d34a80ba41c\",\"step\":1},{\"anchor\":\"C02:code\",\"kind\":\"highlight_code\",\"line\":4,\"step\":1},{\"anchor\":\"C02:code\",\"kind\":\"advance_step\",\"step\":2},{\"anchor\":\"C02:code\",\"kind\":\"show_state\",\"state_digest\":\"3218fca3d79eebf6a9632457da4d0cccc1d35aa52a17a483b6134814f805cae5\",\"step\":2},{\"anchor\":\"C02:code\",\"kind\":\"highlight_code\",\"line\":5,\"step\":2},{\"anchor\":\"C02:code\",\"kind\":\"advance_step\",\"step\":3},{\"anchor\":\"C02:code\",\"kind\":\"show_state\",\"state_digest\":\"cbf7571899a78ebb51100c751266769e7db2b8ff1e372f983d0a847c5fb2c7ab\",\"step\":3},{\"anchor\":\"C02:code\",\"kind\":\"highlight_code\",\"line\":12,\"step\":3},{\"anchor\":\"C02:code\",\"kind\":\"advance_step\",\"step\":4},{\"anchor\":\"C02:code\",\"kind\":\"show_state\",\"state_digest\":\"c54d8e21c8d39e4c627cc19b9e08dee6ea6a8130eb26254977e8d364a42cfcf3\",\"step\":4},{\"anchor\":\"C02:code\",\"kind\":\"highlight_code\",\"line\":4,\"step\":4},{\"anchor\":\"C02:code\",\"kind\":\"advance_step\",\"step\":5},{\"anchor\":\"C02:code\",\"kind\":\"show_state\",\"state_digest\":\"441f4a2296bc75d15d7a27595bcaf293a93afe055fb6eb742cd6d19fe9779d74\",\"step\":5},{\"anchor\":\"C02:code\",\"kind\":\"highlight_code\",\"line\":6,\"step\":5},{\"anchor\":\"C02:code\",\"kind\":\"advance_step\",\"step\":6},{\"anchor\":\"C02:code\",\"kind\":\"show_state\",\"state_digest\":\"10484dc6e1552d5625b33cd05d7b5ca5ca40f0d347408f89bf88fb27fdc72833\",\"step\":6},{\"anchor\":\"C02:code\",\"kind\":\"highlight_code\",\"line\":7,\"step\":6},{\"anchor\":\"C02:code\",\"kind\":\"advance_step\",\"step\":7},{\"anchor\":\"C02:code\",\"kind\":\"show_state\",\"state_digest\":\"17bdb85bfb4ea150926ff49ef81f72d83854d801377ebc931cf4517009e841f7\",\"step\":7},{\"anchor\":\"C02:code\",\"kind\":\"highlight_code\",\"line\":8,\"step\":7},{\"anchor\":\"C02:code\",\"kind\":\"advance_step\",\"step\":8},{\"anchor\":\"C02:code\",\"kind\":\"show_state\",\"state_digest\":\"58b05fb32cbbe8933f945fdc3af9392652a05452d99568cb4935a3c05d01d23c\",\"step\":8},{\"anchor\":\"C02:code\",\"kind\":\"highlight_code\",\"line\":13,\"step\":8}],\"blocks\":[{\"anchor\":\"C02:initial_list\",\"kind\":\"text\",\"markdown\":\"本例的 variant 是 normal，初始链表为空：main 中的 caller_head 初始为 NULL，没有任何初始节点。两次插入的值依次为 -3 和 5，对应的分配成功掩码依次为 false 和 true。这里的分配掩码只是抽象测试假设，并不保证真实 malloc 一定成功。\"},{\"anchor\":\"C02:attempt_0\",\"kind\":\"text\",\"markdown\":\"第一次调用 insert 时 allocation_success 为 0，因此第 4 行的条件表达式不调用 malloc，局部指针 p 得到 NULL。随后第 5 行的 NULL 检查成立，函数直接返回传入的 head，也就是 NULL；这次调用没有创建节点，也没有修改调用者的头指针。\"},{\"anchor\":\"C02:attempt_1\",\"kind\":\"text\",\"markdown\":\"第二次调用 insert 时 allocation_success 为 1，第 4 行按抽象假设成功分配节点 t1，局部指针 p 指向 t1；此时 t1 的 data 和 next 仍是未初始化数据，不能读取。第 5 行的 NULL 检查不成立，继续执行第 6 行把 data 写为 5，第 7 行把 next 链接到传入的 head（NULL），第 8 行返回 t1。\"},{\"anchor\":\"C02:caller_result\",\"kind\":\"text\",\"markdown\":\"第二次调用返回后，main 在第 13 行把返回值赋给 caller_head，因此 caller_head 指向 t1。注意 p 是 insert 的局部指针，调用返回后它只是返回时的快照，并不是 main 中仍可使用的变量；main 使用的是 caller_head。\"},{\"anchor\":\"C02:final_observation\",\"kind\":\"text\",\"markdown\":\"从 caller_head 出发观察，可达前缀为 \\\\[5\\\\]，t1 的 next 为 NULL，遍历状态为 terminated，因此对这个指定示例而言，观察到的值就是完整遍历结果。本例共发生 1 次失败的合成分配尝试。t1 是动态分配节点，成功分配后应在不再需要时安全释放；但本示例没有提供清理代码或清理动画，所以不能声称清理已经执行。初始链表为空，没有栈节点需要释放，也不应释放未分配或未知指针。\"},{\"anchor\":\"C02:code\",\"kind\":\"code\",\"text\":\"#include <stdlib.h>\\ntypedef struct Node { int data; struct Node *next; } Node;\\nNode *insert(Node *head, int value, int allocation_success) {\\n    Node *p = allocation_success ? malloc(sizeof *p) : NULL;\\n    if (p == NULL) return head;\\n    p->data = value;\\n    p->next = head;\\n    return p;\\n}\\nint main(void) {\\n    Node *caller_head = NULL;\\n    caller_head = insert(caller_head, -3, 0);\\n    caller_head = insert(caller_head, 5, 1);\\n    (void)caller_head;\\n    return 0;\\n}\\n\"},{\"anchor\":\"C02:q_caller_head\",\"answer_key\":\"t1\",\"explanation\":\"第 13 行把 insert 的返回值赋给 caller_head，返回值为 t1，因此最终 caller_head 是 t1。\",\"kind\":\"question\",\"observation_key\":\"caller_head\",\"stem\":\"第二次 insert 返回后，main 中的 caller_head 最终指向哪个节点 ID？若为空请回答 none。请使用观察中的节点 ID 原样作答。\"},{\"anchor\":\"C02:q_traversal_status\",\"answer_key\":\"terminated\",\"explanation\":\"t1 的 next 为 NULL，观察在 NULL 处终止，因此状态为 terminated。\",\"kind\":\"question\",\"observation_key\":\"traversal_status\",\"stem\":\"从最终 caller_head 出发观察，遍历状态是什么？请从固定枚举 token 中选择：terminated（在 NULL 处终止）、cycle（成环）、indeterminate（到达不确定指针）。\"},{\"anchor\":\"C02:q_reachable_prefix\",\"answer_key\":[5],\"explanation\":\"可达前缀为 \\\\[5\\\\]；由于 next 到达 NULL 且没有未知或重复，这个指定示例的观察值就是完整遍历。\",\"kind\":\"question\",\"observation_key\":\"reachable_prefix\",\"stem\":\"从最终 caller_head 出发，已知的整数可达前缀是什么？请只回答一个 JSON 整数数组，例如 \\\\[1,2\\\\]；不要附加文字说明。\"},{\"anchor\":\"C02:q_allocation_failures\",\"answer_key\":1,\"explanation\":\"第一次插入的分配成功掩码为 false，对应 1 次失败尝试；第二次为 true。因此失败次数为 1。\",\"kind\":\"question\",\"observation_key\":\"allocation_failures\",\"stem\":\"本例中失败的合成分配尝试次数是多少？请回答一个整数。\"}],\"degraded\":false,\"engine_version\":\"head-insertion-engine-v2\",\"example_digest\":\"fe90bc6705217dd78b606e3f85994e884c085db5bb877bc26fdfa58f1e9e26ae\",\"parent_digest\":\"11733f29cba774f7273429bc20326f40eae9b38e02f727f9ebf6435df9573a51\",\"production_scoring\":false,\"provenance\":{\"actions\":\"deterministic\",\"answers\":\"deterministic\",\"code\":\"deterministic\",\"content\":\"model\"},\"resolved_facts\":{\"obs_allocation_failures\":{\"example_digest\":\"fe90bc6705217dd78b606e3f85994e884c085db5bb877bc26fdfa58f1e9e26ae\",\"origin\":\"deterministic\",\"path\":\"observation.allocation_failures\",\"value\":1},\"obs_caller_head\":{\"example_digest\":\"fe90bc6705217dd78b606e3f85994e884c085db5bb877bc26fdfa58f1e9e26ae\",\"origin\":\"deterministic\",\"path\":\"observation.caller_head\",\"value\":\"t1\"},\"obs_reachable_prefix\":{\"example_digest\":\"fe90bc6705217dd78b606e3f85994e884c085db5bb877bc26fdfa58f1e9e26ae\",\"origin\":\"deterministic\",\"path\":\"observation.reachable_prefix\",\"value\":[5]},\"obs_traversal_status\":{\"example_digest\":\"fe90bc6705217dd78b606e3f85994e884c085db5bb877bc26fdfa58f1e9e26ae\",\"origin\":\"deterministic\",\"path\":\"observation.traversal_status\",\"value\":\"terminated\"},\"trace_step_00\":{\"example_digest\":\"fe90bc6705217dd78b606e3f85994e884c085db5bb877bc26fdfa58f1e9e26ae\",\"origin\":\"deterministic\",\"path\":\"trace.steps[0]\",\"value\":{\"attempt\":null,\"caller_head\":null,\"code_line\":null,\"local_head\":null,\"nodes\":{},\"p\":null,\"phase\":\"initial\",\"returned\":null}},\"trace_step_01\":{\"example_digest\":\"fe90bc6705217dd78b606e3f85994e884c085db5bb877bc26fdfa58f1e9e26ae\",\"origin\":\"deterministic\",\"path\":\"trace.steps[1]\",\"value\":{\"attempt\":0,\"caller_head\":null,\"code_line\":4,\"local_head\":null,\"nodes\":{},\"p\":null,\"phase\":\"allocate\",\"returned\":null}},\"trace_step_02\":{\"example_digest\":\"fe90bc6705217dd78b606e3f85994e884c085db5bb877bc26fdfa58f1e9e26ae\",\"origin\":\"deterministic\",\"path\":\"trace.steps[2]\",\"value\":{\"attempt\":0,\"caller_head\":null,\"code_line\":5,\"local_head\":null,\"nodes\":{},\"p\":null,\"phase\":\"allocation_failed\",\"returned\":null}},\"trace_step_03\":{\"example_digest\":\"fe90bc6705217dd78b606e3f85994e884c085db5bb877bc26fdfa58f1e9e26ae\",\"origin\":\"deterministic\",\"path\":\"trace.steps[3]\",\"value\":{\"attempt\":0,\"caller_head\":null,\"code_line\":12,\"local_head\":null,\"nodes\":{},\"p\":null,\"phase\":\"caller\",\"returned\":null}},\"trace_step_04\":{\"example_digest\":\"fe90bc6705217dd78b606e3f85994e884c085db5bb877bc26fdfa58f1e9e26ae\",\"origin\":\"deterministic\",\"path\":\"trace.steps[4]\",\"value\":{\"attempt\":1,\"caller_head\":null,\"code_line\":4,\"local_head\":null,\"nodes\":{\"t1\":{\"data\":\"indeterminate\",\"next\":\"indeterminate\"}},\"p\":\"t1\",\"phase\":\"allocate\",\"returned\":null}},\"trace_step_05\":{\"example_digest\":\"fe90bc6705217dd78b606e3f85994e884c085db5bb877bc26fdfa58f1e9e26ae\",\"origin\":\"deterministic\",\"path\":\"trace.steps[5]\",\"value\":{\"attempt\":1,\"caller_head\":null,\"code_line\":6,\"local_head\":null,\"nodes\":{\"t1\":{\"data\":5,\"next\":\"indeterminate\"}},\"p\":\"t1\",\"phase\":\"data\",\"returned\":null}},\"trace_step_06\":{\"example_digest\":\"fe90bc6705217dd78b606e3f85994e884c085db5bb877bc26fdfa58f1e9e26ae\",\"origin\":\"deterministic\",\"path\":\"trace.steps[6]\",\"value\":{\"attempt\":1,\"caller_head\":null,\"code_line\":7,\"local_head\":null,\"nodes\":{\"t1\":{\"data\":5,\"next\":null}},\"p\":\"t1\",\"phase\":\"link\",\"returned\":null}},\"trace_step_07\":{\"example_digest\":\"fe90bc6705217dd78b606e3f85994e884c085db5bb877bc26fdfa58f1e9e26ae\",\"origin\":\"deterministic\",\"path\":\"trace.steps[7]\",\"value\":{\"attempt\":1,\"caller_head\":null,\"code_line\":8,\"local_head\":null,\"nodes\":{\"t1\":{\"data\":5,\"next\":null}},\"p\":\"t1\",\"phase\":\"return\",\"returned\":\"t1\"}},\"trace_step_08\":{\"example_digest\":\"fe90bc6705217dd78b606e3f85994e884c085db5bb877bc26fdfa58f1e9e26ae\",\"origin\":\"deterministic\",\"path\":\"trace.steps[8]\",\"value\":{\"attempt\":1,\"caller_head\":\"t1\",\"code_line\":13,\"local_head\":null,\"nodes\":{\"t1\":{\"data\":5,\"next\":null}},\"p\":\"t1\",\"phase\":\"caller\",\"returned\":\"t1\"}}},\"revision\":1,\"template_version\":\"head-insertion-c-v1\"}},\"parent_digest\":\"11733f29cba774f7273429bc20326f40eae9b38e02f727f9ebf6435df9573a51\",\"raw_output\":{\"failure_scope\":\"第一次插入因分配成功掩码为 false 而未调用 malloc，p 为 NULL，NULL 检查成立并返回原 head（NULL），调用者头指针不变。本例只展示这一失败路径和一次成功插入，不证明其他分支或真实 malloc 行为。\",\"learning_summary\":\"通过这个固定示例学习头插法中局部指针 p 与调用者 caller_head 的区别，理解分配成功掩码只是抽象假设，并区分失败返回与成功插入后的完整遍历和资源生命周期。\",\"lifecycle\":\"本例初始链表为空，没有栈节点。第二次插入按抽象假设成功分配动态节点 t1，写入 data 和 next 后返回给调用者。成功分配的 t1 应在不再需要时安全释放，但本示例没有提供清理代码或清理动画，因此不能声称清理已经执行；也不应释放未分配或未知指针。\",\"paragraphs\":[{\"fact_ids\":[\"trace_step_00\"],\"key\":\"initial_list\",\"text\":\"本例的 variant 是 normal，初始链表为空：main 中的 caller_head 初始为 NULL，没有任何初始节点。两次插入的值依次为 -3 和 5，对应的分配成功掩码依次为 false 和 true。这里的分配掩码只是抽象测试假设，并不保证真实 malloc 一定成功。\"},{\"fact_ids\":[\"trace_step_01\",\"trace_step_02\",\"trace_step_03\"],\"key\":\"attempt_0\",\"text\":\"第一次调用 insert 时 allocation_success 为 0，因此第 4 行的条件表达式不调用 malloc，局部指针 p 得到 NULL。随后第 5 行的 NULL 检查成立，函数直接返回传入的 head，也就是 NULL；这次调用没有创建节点，也没有修改调用者的头指针。\"},{\"fact_ids\":[\"trace_step_04\",\"trace_step_05\",\"trace_step_06\",\"trace_step_07\"],\"key\":\"attempt_1\",\"text\":\"第二次调用 insert 时 allocation_success 为 1，第 4 行按抽象假设成功分配节点 t1，局部指针 p 指向 t1；此时 t1 的 data 和 next 仍是未初始化数据，不能读取。第 5 行的 NULL 检查不成立，继续执行第 6 行把 data 写为 5，第 7 行把 next 链接到传入的 head（NULL），第 8 行返回 t1。\"},{\"fact_ids\":[\"trace_step_08\"],\"key\":\"caller_result\",\"text\":\"第二次调用返回后，main 在第 13 行把返回值赋给 caller_head，因此 caller_head 指向 t1。注意 p 是 insert 的局部指针，调用返回后它只是返回时的快照，并不是 main 中仍可使用的变量；main 使用的是 caller_head。\"},{\"fact_ids\":[\"obs_caller_head\",\"obs_reachable_prefix\",\"obs_traversal_status\",\"obs_allocation_failures\"],\"key\":\"final_observation\",\"text\":\"从 caller_head 出发观察，可达前缀为 [5]，t1 的 next 为 NULL，遍历状态为 terminated，因此对这个指定示例而言，观察到的值就是完整遍历结果。本例共发生 1 次失败的合成分配尝试。t1 是动态分配节点，成功分配后应在不再需要时安全释放；但本示例没有提供清理代码或清理动画，所以不能声称清理已经执行。初始链表为空，没有栈节点需要释放，也不应释放未分配或未知指针。\"}],\"prerequisites\":\"需要掌握 C 指针、struct、NULL 和函数返回值的基本含义；本课不假设其他学习历史。\",\"questions\":{\"allocation_failures\":{\"explanation\":\"第一次插入的分配成功掩码为 false，对应 1 次失败尝试；第二次为 true。因此失败次数为 1。\",\"fact_ids\":[\"obs_allocation_failures\",\"trace_step_02\"],\"stem\":\"本例中失败的合成分配尝试次数是多少？请回答一个整数。\"},\"caller_head\":{\"explanation\":\"第 13 行把 insert 的返回值赋给 caller_head，返回值为 t1，因此最终 caller_head 是 t1。\",\"fact_ids\":[\"obs_caller_head\",\"trace_step_08\"],\"stem\":\"第二次 insert 返回后，main 中的 caller_head 最终指向哪个节点 ID？若为空请回答 none。请使用观察中的节点 ID 原样作答。\"},\"reachable_prefix\":{\"explanation\":\"可达前缀为 [5]；由于 next 到达 NULL 且没有未知或重复，这个指定示例的观察值就是完整遍历。\",\"fact_ids\":[\"obs_reachable_prefix\",\"obs_traversal_status\"],\"stem\":\"从最终 caller_head 出发，已知的整数可达前缀是什么？请只回答一个 JSON 整数数组，例如 [1,2]；不要附加文字说明。\"},\"traversal_status\":{\"explanation\":\"t1 的 next 为 NULL，观察在 NULL 处终止，因此状态为 terminated。\",\"fact_ids\":[\"obs_traversal_status\",\"trace_step_06\"],\"stem\":\"从最终 caller_head 出发观察，遍历状态是什么？请从固定枚举 token 中选择：terminated（在 NULL 处终止）、cycle（成环）、indeterminate（到达不确定指针）。\"}},\"step_notes\":[{\"frame_id\":\"f00\",\"note\":\"main 中 caller_head 初始为 NULL，链表为空；尚未调用 insert，也没有节点。\",\"title\":\"初始状态：空链表\"},{\"frame_id\":\"f01\",\"note\":\"allocation_success 为 0，第 4 行的条件表达式使 p 为 NULL，没有调用 malloc，也没有创建节点。\",\"title\":\"第一次尝试：第 4 行不分配\"},{\"frame_id\":\"f02\",\"note\":\"第 5 行 p == NULL 成立，函数返回传入的 head，即 NULL；调用者头指针未被修改。\",\"title\":\"第一次尝试：NULL 检查成立\"},{\"frame_id\":\"f03\",\"note\":\"第 12 行把返回值 NULL 赋给 caller_head，链表仍为空；这次失败尝试没有产生动态节点。\",\"title\":\"第一次调用返回后：caller_head 仍为 NULL\"},{\"frame_id\":\"f04\",\"note\":\"allocation_success 为 1，按抽象假设成功分配节点 t1，p 指向 t1；此时 t1 的 data 和 next 仍是未初始化数据，不能读取。\",\"title\":\"第二次尝试：第 4 行成功分配 t1\"},{\"frame_id\":\"f05\",\"note\":\"第 5 行 p == NULL 不成立，因为 p 指向 t1，于是继续执行后续写入和链接。\",\"title\":\"第二次尝试：NULL 检查不成立\"},{\"frame_id\":\"f06\",\"note\":\"第 6 行把 value 5 写入 t1 的 data；t1 的 next 此时仍为未初始化数据。\",\"title\":\"写入数据：t1->data 为 5\"},{\"frame_id\":\"f07\",\"note\":\"第 7 行把 t1 的 next 设为传入的 head，即 NULL；此时 t1 成为唯一节点。\",\"title\":\"链接：t1->next 指向 NULL\"},{\"frame_id\":\"f08\",\"note\":\"第 8 行返回局部指针 p 的值 t1；p 是局部指针，返回后只是快照，不是 main 中仍可使用的变量。\",\"title\":\"返回：insert 返回 t1\"},{\"frame_id\":\"f09\",\"note\":\"第 13 行把返回值 t1 赋给 caller_head；从 caller_head 出发可达前缀为 [5]，next 为 NULL，遍历状态为 terminated。t1 是动态分配节点，应在不再需要时安全释放，但本示例没有展示清理执行。\",\"title\":\"第二次调用返回后：caller_head 指向 t1\"}]},\"slot\":\"C02\",\"version\":\"limited-c-full-course-r01\"}",
+  "exercise": {
+    "exercise_key": "head-questions",
+    "items": [
+      {
+        "question_id": "allocation_failures",
+        "question": "本例中失败的合成分配尝试次数是多少？请回答一个整数。",
+        "input_type": "integer",
+        "answer_key": "1",
+        "solution": "第一次插入的分配成功掩码为 false，对应 1 次失败尝试；第二次为 true。因此失败次数为 1。"
+      },
+      {
+        "question_id": "caller_head",
+        "question": "第二次 insert 返回后，main 中的 caller_head 最终指向哪个节点 ID？若为空请回答 none。请使用观察中的节点 ID 原样作答。",
+        "input_type": "short_text",
+        "answer_key": "t1",
+        "solution": "第 13 行把 insert 的返回值赋给 caller_head，返回值为 t1，因此最终 caller_head 是 t1。"
+      },
+      {
+        "question_id": "reachable_prefix",
+        "question": "从最终 caller_head 出发，已知的整数可达前缀是什么？请只回答一个 JSON 整数数组，例如 [1,2]；不要附加文字说明。",
+        "input_type": "json_integer_array",
+        "answer_key": "[5]",
+        "solution": "可达前缀为 [5]；由于 next 到达 NULL 且没有未知或重复，这个指定示例的观察值就是完整遍历。"
+      },
+      {
+        "question_id": "traversal_status",
+        "question": "从最终 caller_head 出发观察，遍历状态是什么？请从固定枚举 token 中选择：terminated（在 NULL 处终止）、cycle（成环）、indeterminate（到达不确定指针）。",
+        "input_type": "short_text",
+        "answer_key": "terminated",
+        "solution": "t1 的 next 为 NULL，观察在 NULL 处终止，因此状态为 terminated。"
+      }
+    ]
+  },
+  "model_field_links": [
+    {
+      "source": "/raw_output/prerequisites",
+      "target": "/blocks/0/markdown"
+    },
+    {
+      "source": "/raw_output/paragraphs/0/text",
+      "target": "/blocks/1/markdown"
+    },
+    {
+      "source": "/raw_output/paragraphs/1/text",
+      "target": "/blocks/2/markdown"
+    },
+    {
+      "source": "/raw_output/paragraphs/2/text",
+      "target": "/blocks/3/markdown"
+    },
+    {
+      "source": "/raw_output/paragraphs/3/text",
+      "target": "/blocks/4/markdown"
+    },
+    {
+      "source": "/raw_output/paragraphs/4/text",
+      "target": "/blocks/5/markdown"
+    },
+    {
+      "source": "/raw_output/step_notes/0/title",
+      "target": "/blocks/7/steps/0/head_frame/title"
+    },
+    {
+      "source": "/raw_output/step_notes/0/note",
+      "target": "/blocks/7/steps/0/head_frame/note"
+    },
+    {
+      "source": "/raw_output/step_notes/1/title",
+      "target": "/blocks/7/steps/1/head_frame/title"
+    },
+    {
+      "source": "/raw_output/step_notes/1/note",
+      "target": "/blocks/7/steps/1/head_frame/note"
+    },
+    {
+      "source": "/raw_output/step_notes/2/title",
+      "target": "/blocks/7/steps/2/head_frame/title"
+    },
+    {
+      "source": "/raw_output/step_notes/2/note",
+      "target": "/blocks/7/steps/2/head_frame/note"
+    },
+    {
+      "source": "/raw_output/step_notes/3/title",
+      "target": "/blocks/7/steps/3/head_frame/title"
+    },
+    {
+      "source": "/raw_output/step_notes/3/note",
+      "target": "/blocks/7/steps/3/head_frame/note"
+    },
+    {
+      "source": "/raw_output/step_notes/4/title",
+      "target": "/blocks/7/steps/4/head_frame/title"
+    },
+    {
+      "source": "/raw_output/step_notes/4/note",
+      "target": "/blocks/7/steps/4/head_frame/note"
+    },
+    {
+      "source": "/raw_output/step_notes/5/title",
+      "target": "/blocks/7/steps/5/head_frame/title"
+    },
+    {
+      "source": "/raw_output/step_notes/5/note",
+      "target": "/blocks/7/steps/5/head_frame/note"
+    },
+    {
+      "source": "/raw_output/step_notes/6/title",
+      "target": "/blocks/7/steps/6/head_frame/title"
+    },
+    {
+      "source": "/raw_output/step_notes/6/note",
+      "target": "/blocks/7/steps/6/head_frame/note"
+    },
+    {
+      "source": "/raw_output/step_notes/7/title",
+      "target": "/blocks/7/steps/7/head_frame/title"
+    },
+    {
+      "source": "/raw_output/step_notes/7/note",
+      "target": "/blocks/7/steps/7/head_frame/note"
+    },
+    {
+      "source": "/raw_output/step_notes/8/title",
+      "target": "/blocks/7/steps/8/head_frame/title"
+    },
+    {
+      "source": "/raw_output/step_notes/8/note",
+      "target": "/blocks/7/steps/8/head_frame/note"
+    },
+    {
+      "source": "/raw_output/step_notes/9/title",
+      "target": "/blocks/7/steps/9/head_frame/title"
+    },
+    {
+      "source": "/raw_output/step_notes/9/note",
+      "target": "/blocks/7/steps/9/head_frame/note"
+    },
+    {
+      "source": "/raw_output/failure_scope",
+      "target": "/blocks/8/markdown"
+    },
+    {
+      "source": "/raw_output/lifecycle",
+      "target": "/blocks/9/markdown"
+    },
+    {
+      "source": "/raw_output/learning_summary",
+      "target": "/blocks/10/markdown"
+    },
+    {
+      "source": "/raw_output/questions/allocation_failures/stem",
+      "target": "/blocks/11/items/0/question"
+    },
+    {
+      "source": "/raw_output/questions/allocation_failures/explanation",
+      "private_target": "/exercise/items/0/solution"
+    },
+    {
+      "source": "/raw_output/questions/caller_head/stem",
+      "target": "/blocks/11/items/1/question"
+    },
+    {
+      "source": "/raw_output/questions/caller_head/explanation",
+      "private_target": "/exercise/items/1/solution"
+    },
+    {
+      "source": "/raw_output/questions/reachable_prefix/stem",
+      "target": "/blocks/11/items/2/question"
+    },
+    {
+      "source": "/raw_output/questions/reachable_prefix/explanation",
+      "private_target": "/exercise/items/2/solution"
+    },
+    {
+      "source": "/raw_output/questions/traversal_status/stem",
+      "target": "/blocks/11/items/3/question"
+    },
+    {
+      "source": "/raw_output/questions/traversal_status/explanation",
+      "private_target": "/exercise/items/3/solution"
+    }
+  ],
+  "original_fact_bindings": {
+    "paragraphs": [
+      {
+        "key": "initial_list",
+        "fact_ids": [
+          "trace_step_00"
+        ]
+      },
+      {
+        "key": "attempt_0",
+        "fact_ids": [
+          "trace_step_01",
+          "trace_step_02",
+          "trace_step_03"
+        ]
+      },
+      {
+        "key": "attempt_1",
+        "fact_ids": [
+          "trace_step_04",
+          "trace_step_05",
+          "trace_step_06",
+          "trace_step_07"
+        ]
+      },
+      {
+        "key": "caller_result",
+        "fact_ids": [
+          "trace_step_08"
+        ]
+      },
+      {
+        "key": "final_observation",
+        "fact_ids": [
+          "obs_caller_head",
+          "obs_reachable_prefix",
+          "obs_traversal_status",
+          "obs_allocation_failures"
+        ]
+      }
+    ],
+    "questions": {
+      "allocation_failures": [
+        "obs_allocation_failures",
+        "trace_step_02"
+      ],
+      "caller_head": [
+        "obs_caller_head",
+        "trace_step_08"
+      ],
+      "reachable_prefix": [
+        "obs_reachable_prefix",
+        "obs_traversal_status"
+      ],
+      "traversal_status": [
+        "obs_traversal_status",
+        "trace_step_06"
+      ]
+    }
+  }
+}

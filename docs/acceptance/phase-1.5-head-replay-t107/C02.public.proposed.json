@@ -1,0 +1,429 @@
+{
+  "course_id": "f88bc0dd-acf6-58d8-9757-9459a78c6e6f",
+  "course_version": 1,
+  "scene_id": "d96f4c58-144a-5d3c-b8ba-f76259f04e99",
+  "scene_version_id": "12434ee1-f8c1-5b5a-936a-caeef33a8cf0",
+  "replay_source": {
+    "mapping_version": "head-replay-map-v1",
+    "origin": "existing_real_candidate_replay",
+    "batch": "PHASE-1.5-T106",
+    "slot": "C02",
+    "candidate_digest": "94b98e3411cdffdce46a77387aac92d3333731e5bae340e2e886cad82596dea0",
+    "candidate_file_sha256": "3debbde81a2ba81ff672c0b53b4e393528ceaec4888eb33897de982329b10619",
+    "parent_digest": "11733f29cba774f7273429bc20326f40eae9b38e02f727f9ebf6435df9573a51",
+    "model": "deepseek-flash",
+    "prompt_version": "limited-c-full-course-r01"
+  },
+  "blocks": [
+    {
+      "kind": "text",
+      "anchor_id": "text-0",
+      "markdown": "需要掌握 C 指针、struct、NULL 和函数返回值的基本含义；本课不假设其他学习历史。"
+    },
+    {
+      "kind": "text",
+      "anchor_id": "text-1",
+      "markdown": "本例的 variant 是 normal，初始链表为空：main 中的 caller_head 初始为 NULL，没有任何初始节点。两次插入的值依次为 -3 和 5，对应的分配成功掩码依次为 false 和 true。这里的分配掩码只是抽象测试假设，并不保证真实 malloc 一定成功。"
+    },
+    {
+      "kind": "text",
+      "anchor_id": "text-2",
+      "markdown": "第一次调用 insert 时 allocation_success 为 0，因此第 4 行的条件表达式不调用 malloc，局部指针 p 得到 NULL。随后第 5 行的 NULL 检查成立，函数直接返回传入的 head，也就是 NULL；这次调用没有创建节点，也没有修改调用者的头指针。"
+    },
+    {
+      "kind": "text",
+      "anchor_id": "text-3",
+      "markdown": "第二次调用 insert 时 allocation_success 为 1，第 4 行按抽象假设成功分配节点 t1，局部指针 p 指向 t1；此时 t1 的 data 和 next 仍是未初始化数据，不能读取。第 5 行的 NULL 检查不成立，继续执行第 6 行把 data 写为 5，第 7 行把 next 链接到传入的 head（NULL），第 8 行返回 t1。"
+    },
+    {
+      "kind": "text",
+      "anchor_id": "text-4",
+      "markdown": "第二次调用返回后，main 在第 13 行把返回值赋给 caller_head，因此 caller_head 指向 t1。注意 p 是 insert 的局部指针，调用返回后它只是返回时的快照，并不是 main 中仍可使用的变量；main 使用的是 caller_head。"
+    },
+    {
+      "kind": "text",
+      "anchor_id": "text-5",
+      "markdown": "从 caller_head 出发观察，可达前缀为 [5]，t1 的 next 为 NULL，遍历状态为 terminated，因此对这个指定示例而言，观察到的值就是完整遍历结果。本例共发生 1 次失败的合成分配尝试。t1 是动态分配节点，成功分配后应在不再需要时安全释放；但本示例没有提供清理代码或清理动画，所以不能声称清理已经执行。初始链表为空，没有栈节点需要释放，也不应释放未分配或未知指针。"
+    },
+    {
+      "kind": "code",
+      "anchor_id": "head-code",
+      "language": "c",
+      "source": "#include <stdlib.h>\ntypedef struct Node { int data; struct Node *next; } Node;\nNode *insert(Node *head, int value, int allocation_success) {\n    Node *p = allocation_success ? malloc(sizeof *p) : NULL;\n    if (p == NULL) return head;\n    p->data = value;\n    p->next = head;\n    return p;\n}\nint main(void) {\n    Node *caller_head = NULL;\n    caller_head = insert(caller_head, -3, 0);\n    caller_head = insert(caller_head, 5, 1);\n    (void)caller_head;\n    return 0;\n}\n"
+    },
+    {
+      "kind": "visualization",
+      "anchor_id": "head-state",
+      "visualization_type": "head_insertion_replay_v1",
+      "text_alternative": "通过这个固定示例学习头插法中局部指针 p 与调用者 caller_head 的区别，理解分配成功掩码只是抽象假设，并区分失败返回与成功插入后的完整遍历和资源生命周期。",
+      "steps": [
+        {
+          "caption": "初始状态：空链表",
+          "head_frame": {
+            "frame_id": "f00",
+            "state_index": 0,
+            "line": null,
+            "kind": "initial",
+            "fact_id": "trace_step_00",
+            "title": "初始状态：空链表",
+            "note": "main 中 caller_head 初始为 NULL，链表为空；尚未调用 insert，也没有节点。",
+            "code_anchor": "head-code",
+            "locals_scope": "inactive",
+            "state": {
+              "phase": "initial",
+              "attempt": null,
+              "caller_head": null,
+              "local_head": null,
+              "p": null,
+              "returned": null,
+              "nodes": {},
+              "code_line": null
+            }
+          }
+        },
+        {
+          "caption": "第一次尝试：第 4 行不分配",
+          "head_frame": {
+            "frame_id": "f01",
+            "state_index": 1,
+            "line": 4,
+            "kind": "allocate",
+            "fact_id": "trace_step_01",
+            "title": "第一次尝试：第 4 行不分配",
+            "note": "allocation_success 为 0，第 4 行的条件表达式使 p 为 NULL，没有调用 malloc，也没有创建节点。",
+            "code_anchor": "head-code",
+            "locals_scope": "active",
+            "state": {
+              "phase": "allocate",
+              "attempt": 0,
+              "caller_head": null,
+              "local_head": null,
+              "p": null,
+              "returned": null,
+              "nodes": {},
+              "code_line": 4
+            }
+          }
+        },
+        {
+          "caption": "第一次尝试：NULL 检查成立",
+          "head_frame": {
+            "frame_id": "f02",
+            "state_index": 2,
+            "line": 5,
+            "kind": "allocation_failed",
+            "fact_id": "trace_step_02",
+            "title": "第一次尝试：NULL 检查成立",
+            "note": "第 5 行 p == NULL 成立，函数返回传入的 head，即 NULL；调用者头指针未被修改。",
+            "code_anchor": "head-code",
+            "locals_scope": "active",
+            "state": {
+              "phase": "allocation_failed",
+              "attempt": 0,
+              "caller_head": null,
+              "local_head": null,
+              "p": null,
+              "returned": null,
+              "nodes": {},
+              "code_line": 5
+            }
+          }
+        },
+        {
+          "caption": "第一次调用返回后：caller_head 仍为 NULL",
+          "head_frame": {
+            "frame_id": "f03",
+            "state_index": 3,
+            "line": 12,
+            "kind": "caller",
+            "fact_id": "trace_step_03",
+            "title": "第一次调用返回后：caller_head 仍为 NULL",
+            "note": "第 12 行把返回值 NULL 赋给 caller_head，链表仍为空；这次失败尝试没有产生动态节点。",
+            "code_anchor": "head-code",
+            "locals_scope": "inactive",
+            "state": {
+              "phase": "caller",
+              "attempt": 0,
+              "caller_head": null,
+              "local_head": null,
+              "p": null,
+              "returned": null,
+              "nodes": {},
+              "code_line": 12
+            }
+          }
+        },
+        {
+          "caption": "第二次尝试：第 4 行成功分配 t1",
+          "head_frame": {
+            "frame_id": "f04",
+            "state_index": 4,
+            "line": 4,
+            "kind": "allocate",
+            "fact_id": "trace_step_04",
+            "title": "第二次尝试：第 4 行成功分配 t1",
+            "note": "allocation_success 为 1，按抽象假设成功分配节点 t1，p 指向 t1；此时 t1 的 data 和 next 仍是未初始化数据，不能读取。",
+            "code_anchor": "head-code",
+            "locals_scope": "active",
+            "state": {
+              "phase": "allocate",
+              "attempt": 1,
+              "caller_head": null,
+              "local_head": null,
+              "p": "t1",
+              "returned": null,
+              "nodes": {
+                "t1": {
+                  "data": "indeterminate",
+                  "next": "indeterminate"
+                }
+              },
+              "code_line": 4
+            }
+          }
+        },
+        {
+          "caption": "第二次尝试：NULL 检查不成立",
+          "head_frame": {
+            "frame_id": "f05",
+            "state_index": 4,
+            "line": 5,
+            "kind": "success_null_check",
+            "fact_id": "trace_step_04",
+            "title": "第二次尝试：NULL 检查不成立",
+            "note": "第 5 行 p == NULL 不成立，因为 p 指向 t1，于是继续执行后续写入和链接。",
+            "code_anchor": "head-code",
+            "locals_scope": "active",
+            "state": {
+              "phase": "allocate",
+              "attempt": 1,
+              "caller_head": null,
+              "local_head": null,
+              "p": "t1",
+              "returned": null,
+              "nodes": {
+                "t1": {
+                  "data": "indeterminate",
+                  "next": "indeterminate"
+                }
+              },
+              "code_line": 4
+            }
+          }
+        },
+        {
+          "caption": "写入数据：t1->data 为 5",
+          "head_frame": {
+            "frame_id": "f06",
+            "state_index": 5,
+            "line": 6,
+            "kind": "data",
+            "fact_id": "trace_step_05",
+            "title": "写入数据：t1->data 为 5",
+            "note": "第 6 行把 value 5 写入 t1 的 data；t1 的 next 此时仍为未初始化数据。",
+            "code_anchor": "head-code",
+            "locals_scope": "active",
+            "state": {
+              "phase": "data",
+              "attempt": 1,
+              "caller_head": null,
+              "local_head": null,
+              "p": "t1",
+              "returned": null,
+              "nodes": {
+                "t1": {
+                  "data": 5,
+                  "next": "indeterminate"
+                }
+              },
+              "code_line": 6
+            }
+          }
+        },
+        {
+          "caption": "链接：t1->next 指向 NULL",
+          "head_frame": {
+            "frame_id": "f07",
+            "state_index": 6,
+            "line": 7,
+            "kind": "link",
+            "fact_id": "trace_step_06",
+            "title": "链接：t1->next 指向 NULL",
+            "note": "第 7 行把 t1 的 next 设为传入的 head，即 NULL；此时 t1 成为唯一节点。",
+            "code_anchor": "head-code",
+            "locals_scope": "active",
+            "state": {
+              "phase": "link",
+              "attempt": 1,
+              "caller_head": null,
+              "local_head": null,
+              "p": "t1",
+              "returned": null,
+              "nodes": {
+                "t1": {
+                  "data": 5,
+                  "next": null
+                }
+              },
+              "code_line": 7
+            }
+          }
+        },
+        {
+          "caption": "返回：insert 返回 t1",
+          "head_frame": {
+            "frame_id": "f08",
+            "state_index": 7,
+            "line": 8,
+            "kind": "return",
+            "fact_id": "trace_step_07",
+            "title": "返回：insert 返回 t1",
+            "note": "第 8 行返回局部指针 p 的值 t1；p 是局部指针，返回后只是快照，不是 main 中仍可使用的变量。",
+            "code_anchor": "head-code",
+            "locals_scope": "active",
+            "state": {
+              "phase": "return",
+              "attempt": 1,
+              "caller_head": null,
+              "local_head": null,
+              "p": "t1",
+              "returned": "t1",
+              "nodes": {
+                "t1": {
+                  "data": 5,
+                  "next": null
+                }
+              },
+              "code_line": 8
+            }
+          }
+        },
+        {
+          "caption": "第二次调用返回后：caller_head 指向 t1",
+          "head_frame": {
+            "frame_id": "f09",
+            "state_index": 8,
+            "line": 13,
+            "kind": "caller",
+            "fact_id": "trace_step_08",
+            "title": "第二次调用返回后：caller_head 指向 t1",
+            "note": "第 13 行把返回值 t1 赋给 caller_head；从 caller_head 出发可达前缀为 [5]，next 为 NULL，遍历状态为 terminated。t1 是动态分配节点，应在不再需要时安全释放，但本示例没有展示清理执行。",
+            "code_anchor": "head-code",
+            "locals_scope": "inactive",
+            "state": {
+              "phase": "caller",
+              "attempt": 1,
+              "caller_head": "t1",
+              "local_head": null,
+              "p": "t1",
+              "returned": "t1",
+              "nodes": {
+                "t1": {
+                  "data": 5,
+                  "next": null
+                }
+              },
+              "code_line": 13
+            }
+          }
+        }
+      ]
+    },
+    {
+      "kind": "text",
+      "anchor_id": "text-8",
+      "markdown": "第一次插入因分配成功掩码为 false 而未调用 malloc，p 为 NULL，NULL 检查成立并返回原 head（NULL），调用者头指针不变。本例只展示这一失败路径和一次成功插入，不证明其他分支或真实 malloc 行为。"
+    },
+    {
+      "kind": "text",
+      "anchor_id": "text-9",
+      "markdown": "本例初始链表为空，没有栈节点。第二次插入按抽象假设成功分配动态节点 t1，写入 data 和 next 后返回给调用者。成功分配的 t1 应在不再需要时安全释放，但本示例没有提供清理代码或清理动画，因此不能声称清理已经执行；也不应释放未分配或未知指针。"
+    },
+    {
+      "kind": "text",
+      "anchor_id": "text-10",
+      "markdown": "通过这个固定示例学习头插法中局部指针 p 与调用者 caller_head 的区别，理解分配成功掩码只是抽象假设，并区分失败返回与成功插入后的完整遍历和资源生命周期。"
+    },
+    {
+      "kind": "exercise",
+      "anchor_id": "head-questions",
+      "exercise_id": "7929bd64-9f58-5976-8cdf-7ba031beb3fa",
+      "exercise_version_id": "9087a752-f1a9-55f4-aa33-6d5e49772c3f",
+      "question": "随堂练习",
+      "items": [
+        {
+          "question_id": "allocation_failures",
+          "question": "本例中失败的合成分配尝试次数是多少？请回答一个整数。",
+          "input_type": "integer"
+        },
+        {
+          "question_id": "caller_head",
+          "question": "第二次 insert 返回后，main 中的 caller_head 最终指向哪个节点 ID？若为空请回答 none。请使用观察中的节点 ID 原样作答。",
+          "input_type": "short_text"
+        },
+        {
+          "question_id": "reachable_prefix",
+          "question": "从最终 caller_head 出发，已知的整数可达前缀是什么？请只回答一个 JSON 整数数组，例如 [1,2]；不要附加文字说明。",
+          "input_type": "json_integer_array"
+        },
+        {
+          "question_id": "traversal_status",
+          "question": "从最终 caller_head 出发观察，遍历状态是什么？请从固定枚举 token 中选择：terminated（在 NULL 处终止）、cycle（成环）、indeterminate（到达不确定指针）。",
+          "input_type": "short_text"
+        }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "type": "show_step",
+      "anchor_id": "head-state",
+      "step_index": 0
+    },
+    {
+      "type": "show_step",
+      "anchor_id": "head-state",
+      "step_index": 1
+    },
+    {
+      "type": "show_step",
+      "anchor_id": "head-state",
+      "step_index": 2
+    },
+    {
+      "type": "show_step",
+      "anchor_id": "head-state",
+      "step_index": 3
+    },
+    {
+      "type": "show_step",
+      "anchor_id": "head-state",
+      "step_index": 4
+    },
+    {
+      "type": "show_step",
+      "anchor_id": "head-state",
+      "step_index": 5
+    },
+    {
+      "type": "show_step",
+      "anchor_id": "head-state",
+      "step_index": 6
+    },
+    {
+      "type": "show_step",
+      "anchor_id": "head-state",
+      "step_index": 7
+    },
+    {
+      "type": "show_step",
+      "anchor_id": "head-state",
+      "step_index": 8
+    },
+    {
+      "type": "show_step",
+      "anchor_id": "head-state",
+      "step_index": 9
+    }
+  ]
+}

@@ -1,0 +1,725 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/SceneProjection",
+  "$defs": {
+    "SceneProjection": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "course_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "course_version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "scene_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "scene_version_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "blocks": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 32,
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/TextBlock"
+              },
+              {
+                "$ref": "#/$defs/CodeBlock"
+              },
+              {
+                "$ref": "#/$defs/ExerciseBlock"
+              },
+              {
+                "$ref": "#/$defs/VisualizationBlock"
+              },
+              {
+                "$ref": "#/$defs/DisabledExerciseBlock"
+              },
+              {
+                "$ref": "#/$defs/HeadReplayVisualization"
+              }
+            ]
+          },
+          "contains": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "const": "text"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "minContains": 1
+        },
+        "actions": {
+          "type": "array",
+          "maxItems": 100,
+          "items": {
+            "$ref": "#/$defs/Action"
+          }
+        },
+        "replay_source": {
+          "$ref": "#/$defs/ReplaySource"
+        }
+      },
+      "required": [
+        "course_id",
+        "course_version",
+        "scene_id",
+        "scene_version_id",
+        "blocks",
+        "actions"
+      ],
+      "description": "Public additive projection for T001 readFreeCourseScene. Local checks require non-whitespace markdown, same-version anchors, actual step bounds and per-step element reference integrity."
+    },
+    "TextBlock": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "text"
+        },
+        "anchor_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "markdown": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "kind",
+        "anchor_id",
+        "markdown"
+      ]
+    },
+    "CodeBlock": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "code"
+        },
+        "anchor_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "language": {
+          "const": "c"
+        },
+        "source": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "anchor_id",
+        "language",
+        "source"
+      ]
+    },
+    "ExerciseBlock": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "exercise"
+        },
+        "anchor_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "exercise_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "exercise_version_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "question": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "items": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 4,
+          "items": {
+            "$ref": "#/$defs/Question"
+          }
+        }
+      },
+      "required": [
+        "kind",
+        "anchor_id",
+        "exercise_id",
+        "exercise_version_id",
+        "question",
+        "items"
+      ]
+    },
+    "Question": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "question_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "question": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "input_type": {
+          "enum": [
+            "short_text",
+            "json_integer_array",
+            "integer"
+          ]
+        }
+      },
+      "required": [
+        "question_id",
+        "question",
+        "input_type"
+      ]
+    },
+    "VisualizationBlock": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "visualization"
+        },
+        "anchor_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "visualization_type": {
+          "enum": [
+            "array",
+            "linked_list",
+            "stack",
+            "queue"
+          ]
+        },
+        "text_alternative": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "steps": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 50,
+          "items": {
+            "$ref": "#/$defs/VisualStep"
+          }
+        }
+      },
+      "required": [
+        "kind",
+        "anchor_id",
+        "visualization_type",
+        "text_alternative",
+        "steps"
+      ]
+    },
+    "VisualStep": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "caption": {
+          "type": "string",
+          "maxLength": 1000
+        },
+        "elements": {
+          "type": "array",
+          "maxItems": 32,
+          "items": {
+            "$ref": "#/$defs/VisualElement"
+          }
+        },
+        "highlight_ids": {
+          "type": "array",
+          "maxItems": 32,
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "caption",
+        "elements",
+        "highlight_ids"
+      ]
+    },
+    "VisualElement": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "label": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "next_id": {
+          "maxLength": 64,
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "label",
+        "next_id"
+      ]
+    },
+    "DisabledExerciseBlock": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "exercise_unavailable"
+        },
+        "anchor_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "exercise_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "exercise_version_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "reason_code": {
+          "const": "EXERCISE_UNAVAILABLE"
+        }
+      },
+      "required": [
+        "kind",
+        "anchor_id",
+        "exercise_id",
+        "exercise_version_id",
+        "reason_code"
+      ]
+    },
+    "HeadReplayVisualization": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "visualization"
+        },
+        "anchor_id": {
+          "const": "head-state"
+        },
+        "visualization_type": {
+          "const": "head_insertion_replay_v1"
+        },
+        "text_alternative": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "steps": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 13,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "caption": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "head_frame": {
+                "$ref": "#/$defs/HeadReplayFrame"
+              }
+            },
+            "required": [
+              "caption",
+              "head_frame"
+            ]
+          }
+        }
+      },
+      "required": [
+        "kind",
+        "anchor_id",
+        "visualization_type",
+        "text_alternative",
+        "steps"
+      ]
+    },
+    "HeadReplayFrame": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "frame_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "state_index": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 49
+        },
+        "fact_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "kind": {
+          "enum": [
+            "initial",
+            "allocate",
+            "allocation_failed",
+            "data",
+            "link",
+            "return",
+            "caller",
+            "success_null_check"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "note": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "code_anchor": {
+          "const": "head-code"
+        },
+        "line": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "locals_scope": {
+          "enum": [
+            "active",
+            "inactive"
+          ]
+        },
+        "state": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "phase": {
+              "enum": [
+                "initial",
+                "allocate",
+                "allocation_failed",
+                "data",
+                "link",
+                "return",
+                "caller"
+              ]
+            },
+            "attempt": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "caller_head": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "local_head": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "p": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "returned": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "nodes": {
+              "type": "object",
+              "maxProperties": 3,
+              "additionalProperties": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "data": {
+                    "anyOf": [
+                      {
+                        "type": "integer",
+                        "minimum": -99,
+                        "maximum": 99
+                      },
+                      {
+                        "const": "indeterminate"
+                      }
+                    ]
+                  },
+                  "next": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 64
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "data",
+                  "next"
+                ]
+              }
+            },
+            "code_line": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 100
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "phase",
+            "attempt",
+            "caller_head",
+            "local_head",
+            "p",
+            "returned",
+            "nodes",
+            "code_line"
+          ]
+        }
+      },
+      "required": [
+        "frame_id",
+        "state_index",
+        "fact_id",
+        "kind",
+        "title",
+        "note",
+        "code_anchor",
+        "line",
+        "locals_scope",
+        "state"
+      ]
+    },
+    "Action": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "enum": [
+            "highlight_block",
+            "show_step",
+            "pause"
+          ]
+        },
+        "anchor_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "step_index": {
+          "minimum": 0,
+          "maximum": 49,
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "type",
+        "anchor_id",
+        "step_index"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "show_step"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "step_index": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 49
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "step_index": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "ReplaySource": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "mapping_version": {
+          "const": "head-replay-map-v1"
+        },
+        "origin": {
+          "const": "existing_real_candidate_replay"
+        },
+        "batch": {
+          "const": "PHASE-1.5-T106"
+        },
+        "slot": {
+          "enum": [
+            "C01",
+            "C02"
+          ]
+        },
+        "candidate_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "candidate_file_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "parent_digest": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "model": {
+          "const": "deepseek-flash"
+        },
+        "prompt_version": {
+          "const": "limited-c-full-course-r01"
+        }
+      },
+      "required": [
+        "mapping_version",
+        "origin",
+        "batch",
+        "slot",
+        "candidate_digest",
+        "candidate_file_sha256",
+        "parent_digest",
+        "model",
+        "prompt_version"
+      ]
+    }
+  }
+}
