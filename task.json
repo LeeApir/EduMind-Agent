@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "用户授权T104有限C真实生成验证的最小执行准备；只交待审查执行包，不批准条款差异或真实调用；T102保持blocked，不扩建监督器/迁移框架。",
+    "phase_gate": "用户仅授权T105本批Responses消息phase兼容修正及离线入口回归；不调用Provider，完成后进入准确执行授权决策；T102保持blocked。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -5027,6 +5027,58 @@
           "result": "10 passed；准确请求重建/运行时与依赖摘要/clean-env -I inspect通过；实际Chromium两套合成13/10帧及四题交互/键盘/移动通过，HTTP0/pageerror0。Ruff/工作流/diff/链接及103旧Task对象不变/日志只追加通过。同实际入口离线复现STOP/截止后Mock发送风险，不声称原停止保证通过。真实Provider0，ADR0050 A-D及本批C2/窗口未批准。",
           "evidence": "docs/acceptance/phase-1.5-limited-c-preparation-t104/CHECKS.md",
           "manifest_sha256": "1f2da5aba5531ce173c3279e07335bf3845e6c490e4c011e19d0e8f22c659c8c"
+        }
+      ]
+    },
+    {
+      "id": "PHASE-1.5-T105",
+      "phase": "Phase 1.5",
+      "priority": "P0",
+      "title": "限定适配本批Responses最终消息phase",
+      "status": "done",
+      "depends_on": [
+        "PHASE-1.5-T104"
+      ],
+      "scope": [
+        "docs/acceptance/phase-1.5-limited-c-preparation-t104/",
+        "docs/ADR/0050-limited-c-course-feasibility.md",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "用户对T104审查的限定修正：只接受缺省或final_answer消息phase，不改教学Schema/历史冻结/真实探测/T102",
+      "acceptance_criteria": [
+        "仅本批适配消息phase缺省与final_answer，其他值和未知字段拒绝；共享历史wire校验器保持原样。",
+        "完整原始响应先封存不变，当前入口与历史原件重放使用同一有版本适配。",
+        "实际入口成功/拒绝、修复父链/原件回读回归通过；初始请求和教学Schema字节不变。",
+        "保留旧准确包摘要，更新本批manifest与必要契约说明；完成后只进入准确执行授权决策，不真实调用。"
+      ],
+      "verification": [
+        "PYTHONPATH=backend:. backend/.venv/bin/python docs/acceptance/phase-1.5-limited-c-preparation-t104/prepare.py --check",
+        "PYTHONPATH=backend:. backend/.venv/bin/python -m pytest docs/acceptance/phase-1.5-limited-c-preparation-t104/test_preparation.py -q",
+        "env -i PATH=/usr/bin:/bin /Users/apir/Code/EduMind_Agent/backend/.venv/bin/python -I /Users/apir/Code/EduMind_Agent/docs/acceptance/phase-1.5-limited-c-preparation-t104/execute_once.py --inspect",
+        "backend/.venv/bin/ruff check docs/acceptance/phase-1.5-limited-c-preparation-t104/*.py",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "started_at": "2026-11-03T11:28:10+08:00",
+      "completed_at": "2026-11-03T11:30:05+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T105",
+      "execution_gate": "仅有限phase兼容修正；ADR0050范围/费用/窗口及真实执行待准确授权；T102 blocked/Provider0保持。",
+      "verification_results": [
+        {
+          "date": "2026-11-03T11:30:05+08:00",
+          "commands": [
+            "PYTHONPATH=backend:. backend/.venv/bin/python docs/acceptance/phase-1.5-limited-c-preparation-t104/prepare.py --check",
+            "PYTHONPATH=backend:. backend/.venv/bin/python -m pytest docs/acceptance/phase-1.5-limited-c-preparation-t104/test_preparation.py -q",
+            "env -i PATH=/usr/bin:/bin /Users/apir/Code/EduMind_Agent/backend/.venv/bin/python -I /Users/apir/Code/EduMind_Agent/docs/acceptance/phase-1.5-limited-c-preparation-t104/execute_once.py --inspect",
+            "backend/.venv/bin/ruff check docs/acceptance/phase-1.5-limited-c-preparation-t104/*.py",
+            "python3 scripts/check_catalog_workflow.py",
+            "git diff --check"
+          ],
+          "result": "24 passed；本批实际入口phase缺省/final_answer成功、其他阶段/类型及未知字段拒绝，成功/拒绝原件逐字节保留，父稿重放和修复通过；Ruff/包重建/clean-env inspect/工作流/diff及链接通过。初始body/教学Schema/HTML/共享wire未改、旧manifest保留，104旧Task对象保持。Provider0，T102 blocked；仅进入准确授权决策。",
+          "evidence": "docs/acceptance/phase-1.5-limited-c-preparation-t104/PHASE-COMPATIBILITY-T105.md",
+          "manifest_sha256": "b686eedd986990806f01160750507f77d0a822f049c6060c4356c90f85fd284d"
         }
       ]
     }

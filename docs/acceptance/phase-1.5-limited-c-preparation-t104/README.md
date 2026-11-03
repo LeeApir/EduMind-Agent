@@ -2,6 +2,8 @@
 
 **状态：可审查的拟议包，不是执行授权。真实调用 0。** 本任务只完成执行准备；[ADR0050 A–D](../../ADR/0050-limited-c-course-feasibility.md)及[条款差异](CONTRACT-DIFF.md)待准确采纳，实际请求待绑定本包 manifest 的明确授权。T102 blocked，不追加修补，不迁移框架。
 
+本批响应兼容修正见 [T105限定说明](PHASE-COMPATIBILITY-T105.md)：消息phase只接受缺省或准确final_answer，其他值/未知字段继续拒绝，原始响应完整保留；旧摘要见 [原manifest](manifest-before-t105.json)。当前manifest为修正后的待审包，旧授权不继承。
+
 ## 下一项核心成果
 
 获得本批**未经助手补写的真实完整中文课程及独立教学评估**，连同失败/未运行及必要修复版本。不是更多通用执行器测试或Schema试错。当前没有新课程生成成功证据。T103 的模型/程序/助手来源逐项见 [所有权审计](T103-OWNERSHIP.md)。

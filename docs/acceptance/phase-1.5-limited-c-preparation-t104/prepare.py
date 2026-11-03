@@ -259,6 +259,7 @@ def generate():
         canonical(
             dict(
                 version=VERSION,
+                response_adapter="limited-c-message-phase-v1",
                 samples=SPECS,
                 route=wire.ROUTES["generation"],
                 http_limit=4,
@@ -351,6 +352,8 @@ def manifest(outputs):
         "README.md",
         "T103-OWNERSHIP.md",
         "CONTRACT-DIFF.md",
+        "PHASE-COMPATIBILITY-T105.md",
+        "manifest-before-t105.json",
     ]
     paths = {
         p: hashlib.sha256((ROOT / p).read_bytes()).hexdigest() for p in sorted(deps)

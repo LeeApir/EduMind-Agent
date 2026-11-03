@@ -137,7 +137,8 @@ def test_complete_raw_before_invalid_json_parse(tmp_path):
     assert not (v / "C01-generate.candidate.json").exists()
 
 
-def test_success_parent_repair_and_no_third_call(tmp_path):
+@pytest.mark.parametrize("phase", ["absent", "final_answer"])
+def test_success_parent_repair_and_no_third_call(tmp_path, phase):
     v = vault(tmp_path)
     sent = []
 
@@ -148,7 +149,12 @@ def test_success_parent_repair_and_no_third_call(tmp_path):
         )
         assert req.extensions["sni_hostname"] == "api.deepseek.com"
         sent.append(json.loads(req.content))
-        return httpx.Response(200, stream=httpx.ByteStream(envelope("C01")))
+        return httpx.Response(
+            200,
+            stream=httpx.ByteStream(
+                phased_envelope("C01", {} if phase == "absent" else {"phase": phase})
+            ),
+        )
 
     transport = httpx.MockTransport(respond)
     first = e.run("C01", v, approval(), transport, key="synthetic-only-key")
@@ -305,3 +311,86 @@ def test_render_preserves_model_strings_and_escapes_script():
     page = p.render("C01", value)
     assert "<script>alert(1)</script>" not in page
     assert "\\u003c/script\\u003e" in page
+
+
+def phased_envelope(slot, fields):
+    value = json.loads(envelope(slot))
+    value["output"][0].update(fields)
+    # Noncanonical whitespace proves that stored originals are not normalization output.
+    return b" \n" + json.dumps(value, ensure_ascii=False, indent=2).encode() + b"\n"
+
+
+@pytest.mark.parametrize(
+    "fields", [{}, {"phase": "final_answer"}], ids=["absent", "final_answer"]
+)
+def test_actual_entry_phase_success_preserves_original_and_replays(tmp_path, fields):
+    v = vault(tmp_path)
+    raw = phased_envelope("C01", fields)
+    cipher = Fernet((v / "raw.key").read_bytes())
+    candidate = e.run(
+        "C01",
+        v,
+        approval(),
+        httpx.MockTransport(
+            lambda req: httpx.Response(200, stream=httpx.ByteStream(raw))
+        ),
+        key="synthetic-only-key",
+    )
+    assert e.decrypt(v / "C01-generate.raw.enc", cipher) == raw
+    receipt = json.loads((v / "C01-generate.body.json").read_text())
+    assert receipt["raw_bytes"] == len(raw)
+    assert receipt["raw_sha256"] == e.hashlib.sha256(raw).hexdigest()
+    assert e.verify_saved(v, "C01-generate", cipher) == candidate
+    observation = json.loads((v / "C01-generate.result.json").read_text())[
+        "observation"
+    ]
+    assert observation["message_phase"] == fields.get("phase", "absent")
+    assert observation["phase_adapter_version"] == e.PHASE_ADAPTER_VERSION
+    assert not (v / "STOP").exists() and not (v / "ACTIVE").exists()
+    if fields:
+        # The historical validator must continue rejecting this field outside this batch.
+        with pytest.raises(p.wire.PilotError, match="^WIRE_MESSAGE$"):
+            p.wire.validate(p.body("C01"), raw, "generation")
+
+
+@pytest.mark.parametrize(
+    "fields,code",
+    [
+        *[
+            ({"phase": phase}, "WIRE_MESSAGE_PHASE")
+            for phase in [
+                "analysis",
+                "commentary",
+                "final",
+                "final_answer ",
+                "",
+                None,
+                0,
+                False,
+                [],
+                {},
+            ]
+        ],
+        ({"phase": "final_answer", "unexpected_metadata": True}, "WIRE_MESSAGE"),
+    ],
+)
+def test_actual_entry_rejects_other_phases_and_unknown_fields(tmp_path, fields, code):
+    v = vault(tmp_path)
+    raw = phased_envelope("C01", fields)
+    with pytest.raises(p.wire.PilotError, match="^" + code + "$"):
+        e.run(
+            "C01",
+            v,
+            approval(),
+            httpx.MockTransport(
+                lambda req: httpx.Response(200, stream=httpx.ByteStream(raw))
+            ),
+            key="synthetic-only-key",
+        )
+    assert (
+        e.decrypt(v / "C01-generate.raw.enc", Fernet((v / "raw.key").read_bytes()))
+        == raw
+    )
+    assert (v / "STOP").exists() and (v / "ACTIVE").exists()
+    assert not (v / "C01-generate.candidate.json").exists()
+    assert not (v / "C01-generate.course.html").exists()

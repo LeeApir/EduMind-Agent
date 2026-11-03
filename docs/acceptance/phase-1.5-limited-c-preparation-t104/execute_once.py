@@ -76,6 +76,39 @@ def decrypt(path, cipher):
     return bytes(raw)
 
 
+PHASE_ADAPTER_VERSION = "limited-c-message-phase-v1"
+
+
+def observe_generation(request, raw):
+    """Only this batch accepts an absent/final_answer message phase.
+
+    The encrypted original is never rewritten. All other envelope checks remain
+    with the unchanged shared wire validator, including unknown-field rejection.
+    """
+    if len(raw) > 2097152:
+        raise wire.PilotError("WIRE_RESPONSE_SIZE_OR_ROLE")
+    view = wire.strict_json(raw)
+    observed = []
+    if type(view) is dict and type(view.get("output")) is list:
+        for item in view["output"]:
+            if type(item) is dict and item.get("type") == "message":
+                if "phase" in item:
+                    if (
+                        type(item["phase"]) is not str
+                        or item["phase"] != "final_answer"
+                    ):
+                        raise wire.PilotError("WIRE_MESSAGE_PHASE")
+                    observed.append(item.pop("phase"))
+                else:
+                    observed.append("absent")
+    result, observation = wire.validate(request, canonical(view), "generation")
+    return result, {
+        **observation,
+        "phase_adapter_version": PHASE_ADAPTER_VERSION,
+        "message_phase": observed[0],
+    }
+
+
 def verify_saved(vault, prefix, cipher):
     request = json.loads((vault / f"{prefix}.request.json").read_text())
     raw = decrypt(vault / f"{prefix}.raw.enc", cipher)
@@ -103,7 +136,7 @@ def verify_saved(vault, prefix, cipher):
     attempt = json.loads((vault / f"{prefix}.attempt.json").read_text())
     assert attempt["slot"] == slot and attempt["phase"] == phase
     assert attempt["request_sha256"] == hashlib.sha256(canonical(request)).hexdigest()
-    value, _ = wire.validate(request, raw, "generation")
+    value, _ = observe_generation(request, raw)
     assert candidate == artifact(slot, dict(value.value), candidate["parent_digest"]), (
         "CANDIDATE_CHANGED"
     )
@@ -261,7 +294,7 @@ def run(slot, vault, approval, transport=None, key=None):
             raise IncompleteEvidence("LATE_BODY_PRESERVED_STOP")
         assert status == 200, "HTTP_FAILED"
         assert encoding == "identity", "UNEXPECTED_ENCODING_RAW_PRESERVED"
-        result, observation = wire.validate(request, raw, "generation")
+        result, observation = observe_generation(request, raw)
         assert observation["reported_input_tokens"] <= 139264, (
             "INPUT_RESERVATION_EXCEEDED"
         )
