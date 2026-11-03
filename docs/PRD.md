@@ -78,6 +78,8 @@ T040保持blocked；T041标记blocked，旧链性能验收暂缓，新链性能�
 
 ### 0.5 P1.5自由课程学习与界面重构（2026-10-21，方向已确认）
 
+2026-11-03 T108真实停止记录：用户已批准4b9782e的[ADR0052 A—D及本批C2](ADR/0052-approval-20261103.json)，新窗口600秒/最多3请求。实际从应用输入准确新目标后，首个规划请求HTTP400，未产规划或完整课程，按包STOP、剩余2失效；[失败与原件交接](acceptance/phase-1.5-head-goal-live-r01/RESULTS.md)及独立停止核对保留。T108最终目标未达成仍blocked，不把旧回放/夹具计成功，不追加协议修复/探测/重试；T102 blocked、T038及生产catalog_only不变。
+
 2026-11-03 T108：用户确认T107独立评估通过，授权限定头插新目标的主链接线和准确新执行准备，最终对象为真实新生成的完整私有草稿。[ADR0052 A—D](ADR/0052-limited-head-goal-mainline.md)及[准确执行包](acceptance/phase-1.5-head-goal-t108/README.md)集中说明支持域/规划、新模型教学Schema/程序事实答案、新来源与前台有限执行差异。当前仅零调用开发准备，具体契约与真实预算/费用风险待准确批准，离线夹具不计模型成功；保留T107/T106原件与评估、T102 blocked、T038及生产catalog_only。最终真实课程与独立教学评估前T108不得done，完成该课后停止。
 
 2026-11-03 T107开发主链接入：用户限定复用T106的C01首版/C02模型修复版接入既有私有草稿与课程组件，新增Provider0。现有产品协议无法无损承载完整逐帧讲解、指针作用域/未初始化值、代码行定位及JSON整数数组比较；[ADR0051 A—D](ADR/0051-head-course-development-replay.md)与[准确映射提案](acceptance/phase-1.5-head-replay-t107/README.md)集中提出最小教学投影、私有来源审计与开发实例边界变更，待准确批准，不视为已接线。任务仍须实际PG/应用浏览器刷新学习流程验收后交评估；不修改T106原件、不复活其批次或T102、不扩通用执行器，生产catalog_only保持。 后续用户已批准d26f237的A—D及准确附件，见[批准登记](ADR/0051-approval-20261103.json)；现有候选开发回放的实施与检查交接见[接入交付](acceptance/phase-1.5-head-replay-t107/IMPLEMENTATION.md)。批准不扩大到新生成或生产开放。

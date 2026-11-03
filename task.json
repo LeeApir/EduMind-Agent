@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "T108限定头插新目标主链接线与准确执行包已准备，待具体ADR0052 A—D/manifest及本批3HTTP/600秒/C2准确授权；真实新课程前不done。T102 blocked/T106 STOP/生产catalog_only保持。",
+    "phase_gate": "T108真实head-goal-r01已因首规划HTTP400停止：1请求/0规划/0新课程，剩余2失效。任务blocked，按包不重试/修Schema/探测；待用户决定新准确范围，T102继续blocked，不扩主题或启动T038。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -73,7 +73,7 @@
     "active_provider_batch_id": null,
     "last_stopped_provider_batch_id": "p15-direct-relay-once-d01",
     "current_candidate_real_calls": "stopped_after_explicit_direct_single_call",
-    "current_authorization_note": "T108只完成零调用接线与准确准备，新真实批次尚未授权，不继承旧预算/费用风险例外。",
+    "current_authorization_note": "T108 head-goal-r01按批准停止规则结束：实际规划1HTTP400、没有规划/新课程；剩余2请求失效，继续项目指令不视为新包或重试授权。",
     "pending_approved_provider_batch_id": null,
     "head_replay_t107": {
       "authorization": "用户限定现有真实C01首版/C02修复版零Provider主链接入；不可无损部分集中具体契约变更",
@@ -85,7 +85,13 @@
       "authorization": "2026-11-03用户明确限定头插支持域的新课程主链生成；先完成可审查接线与准确执行包，真实调用待另行准确授权。",
       "provider_requests_authorized": 0,
       "goal": "我已了解 C 指针、struct、NULL 和函数返回值，希望通过头插示例，理解新节点如何连接旧链表，以及为什么调用者需要接收函数返回值。",
-      "status": "prepared_awaiting_exact_execution_authorization"
+      "status": "stopped_after_planning_http400",
+      "approval_record": "docs/ADR/0052-approval-20261103.json",
+      "approved_http_limit": 3,
+      "provider_requests_attempted": 1,
+      "unused_requests_invalidated": 2,
+      "complete_real_courses": 0,
+      "results": "docs/acceptance/phase-1.5-head-goal-live-r01/RESULTS.md"
     }
   },
   "archive_transition": {
@@ -5264,14 +5270,27 @@
       ],
       "started_at": "2026-11-03T20:47:56+08:00",
       "completed_at": null,
-      "blocker": "接线与零调用检查完成；待准确批准本提交ADR0052 A—D、manifest及本批C2/最多3HTTP/600秒新窗口。真实新课程/独立教学评估未执行，不能done；T102不恢复。",
+      "blocker": "按ADR0052停止：本批唯一规划HTTP400，Schema被接口拒绝，完整加密原件保留；没有模型规划或新课程，剩余2次失效。待用户决定新的兼容范围/准确包，不能沿用本批重试或标done。",
       "commit_lookup": "Task-Completed: PHASE-1.5-T108",
-      "execution_gate": "零调用接线与准确包已交付，真实新课程仍缺；待批准ADR0052 A—D/manifest及本批C2/3HTTP/600秒，不继承旧预算。未获准不创建真实窗口、不取得Key、不出站。",
+      "execution_gate": "head-goal-r01已STOP：1/3HTTP、0规划、0课程；未用2请求失效，无后续出站许可。T102 blocked/T038门禁及生产catalog_only保持。",
       "verification_results": [
         {
           "date": "2026-11-03T21:28:21+08:00",
           "result": "新主链14、旧规划59、T107回放18及前端15项通过；实际Chromium新目标两示例桌面/390px夹具流程、13帧/控制/四题反馈/刷新通过；原始目标与自述来源保留，夹具明确不计模型成功；空库0050往返/有审计拒绝降级、构建/类型/ESLint/Ruff/mypy/工作流与准确包检查通过。真实Provider0，最终新课程与独立教学效果未验收。",
           "evidence": "docs/acceptance/phase-1.5-head-goal-t108/CHECKS.md"
+        },
+        {
+          "date": "2026-11-03T23:29:28+08:00",
+          "commands": [
+            "实际应用目标输入→冻结CLI --prepare；用户终端getpass执行唯一 --send plan",
+            "backend/.venv/bin/python docs/acceptance/phase-1.5-head-goal-live-r01/check_results.py",
+            "冻结CLI --inspect；prepare_head_course_goal_package.py --check",
+            "实际PG精确课程行/原规划0候选0检查、既有终态服务失败收尾及实际浏览器只读刷新",
+            "独立评估助手只读停止/未运行核对",
+            "python3 scripts/check_catalog_workflow.py；git diff --check"
+          ],
+          "result": "真实1HTTP400/invalid_request_error，原206字节body完整加密保存并解密回读核验；无模型规划/选例/候选/课程，Schema与冻结代码未改。窗口23:03:41–23:13:41，23:07:05本地STOP，剩余2失效，usage/金额未知。实际草稿原目标保留、head=null、操作failed/PROVIDER_REJECTED；独立核对确认停批，非教学评估；最终验收未达成。",
+          "evidence": "docs/acceptance/phase-1.5-head-goal-live-r01/RESULTS.md"
         }
       ]
     }
