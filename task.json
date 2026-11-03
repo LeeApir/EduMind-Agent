@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "用户授权T100–T102一次有限教学修订、候选冻结和既定小型实验准备；真实新批次需准确授权，旧批次和真实原件保留。",
+    "phase_gate": "用户授权T103统一中文可学头插课程及独立效果评估；T102保持blocked，不追加执行器修复、不变更B/C契约、不调用真实Provider；完成后停止，下一批有限C另行决定。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -4924,6 +4924,56 @@
       "blocker": "用户已确认单组探索A、B、D和C2，并授权一次限定离线重设计；不研究内核绝对截止、不以金额硬封顶为前置。旧原型的停止后投递及非法JSON原件丢失反例仍可复现。新设计的独立初审发现：承诺后、创建进程前暂停，stop_unconfirmed返回后仍可能创建进程；不能靠重命名意图记录解决。新设计未实施，原件先封存、目录身份、臂阶段、恢复及可信祖先凭据隔离均未完成验证。T102仍blocked，不冻结、不选样、不调用Provider；见docs/acceptance/phase-1.5-manual-bc-redesign-t102/DESIGN.md及旧BLOCKED.md。",
       "commit_lookup": "Task-Completed: PHASE-1.5-T102",
       "execution_gate": "仅有限离线修订、冻结及实验准备；不重启旧批、不调用真实Provider，原始候选不改写。"
+    },
+    {
+      "id": "PHASE-1.5-T103",
+      "phase": "Phase 1.5",
+      "priority": "P0",
+      "title": "交付统一中文可学头插课程",
+      "status": "done",
+      "depends_on": [
+        "PHASE-1.5-T098",
+        "PHASE-1.5-T099",
+        "PHASE-1.5-T100"
+      ],
+      "scope": [
+        "docs/acceptance/phase-1.5-unified-head-course-t103/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "docs/phase-1.5-course-generation-direction.md §4第一步；本次用户准确授权",
+      "acceptance_criteria": [
+        "中文讲解、同版代码和链表变化、播放暂停前后步重置、作答答案解析可连贯完成。",
+        "处理T099遍历范围、作用域、判空展示、生命周期，明确未演示失败路径，不扩建通用执行引擎。",
+        "保留T095/T098/T100原件及来源映射，助手修订不算模型生成成功。",
+        "提供页面入口、问题逐项结果及实际浏览器流程记录，交独立评估助手。"
+      ],
+      "verification": [
+        "PYTHONPATH=backend:. backend/.venv/bin/python docs/acceptance/phase-1.5-unified-head-course-t103/build_course.py",
+        "PYTHONPATH=backend:. backend/.venv/bin/python docs/acceptance/phase-1.5-unified-head-course-t103/check_course.py",
+        "backend/.venv/bin/ruff check docs/acceptance/phase-1.5-unified-head-course-t103/*.py",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "started_at": "2026-11-03T10:22:38+08:00",
+      "completed_at": "2026-11-03T10:32:29+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T103",
+      "execution_gate": "仅离线样例交付；Provider0/catalog_only/H封存/T102 blocked保持；不推进有限C真实批次。",
+      "verification_results": [
+        {
+          "date": "2026-11-03T10:32:29+08:00",
+          "commands": [
+            "PYTHONPATH=backend:. backend/.venv/bin/python docs/acceptance/phase-1.5-unified-head-course-t103/build_course.py",
+            "PYTHONPATH=backend:. backend/.venv/bin/python docs/acceptance/phase-1.5-unified-head-course-t103/check_course.py",
+            "backend/.venv/bin/ruff check docs/acceptance/phase-1.5-unified-head-course-t103/*.py",
+            "python3 scripts/check_catalog_workflow.py",
+            "git diff --check"
+          ],
+          "result": "构建/来源及原代码答案轨迹绑定通过；实际Chromium 13步/四题/控制/键盘/390px移动端通过，HTTP0/pageerror0；Ruff/工作流/diff/链接/manifest通过。独立评估另行手算与浏览器通过，无交付阻塞；不是学生效果实验或新模型成功。",
+          "evidence": "docs/acceptance/phase-1.5-unified-head-course-t103/README.md"
+        }
+      ]
     }
   ],
   "planning_inputs": {

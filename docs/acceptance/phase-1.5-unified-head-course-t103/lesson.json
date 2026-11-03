@@ -1,0 +1,666 @@
+{
+  "candidate_digest": "c96ed09ae5884a61a8acd5bf1934dea59f13d5dcb9d7f4ae6a6af101b633765d",
+  "code": "#include <stdlib.h>\ntypedef struct Node { int data; struct Node *next; } Node;\nNode *insert(Node *head, int value, int allocation_success) {\n    Node *p = allocation_success ? malloc(sizeof *p) : NULL;\n    if (p == NULL) return head;\n    p->data = value;\n    p->next = head;\n    return p;\n}\nint main(void) {\n    Node i0;\n    i0.data = 9;\n    i0.next = NULL;\n    Node *caller_head = &i0;\n    caller_head = insert(caller_head, 1, 1);\n    caller_head = insert(caller_head, 2, 1);\n    (void)caller_head;\n    return 0;\n}\n",
+  "states": [
+    {
+      "phase": "initial",
+      "attempt": null,
+      "caller_head": "i0",
+      "local_head": null,
+      "p": null,
+      "returned": null,
+      "nodes": {
+        "i0": {
+          "data": 9,
+          "next": null
+        }
+      },
+      "code_line": null
+    },
+    {
+      "phase": "allocate",
+      "attempt": 0,
+      "caller_head": "i0",
+      "local_head": "i0",
+      "p": "t0",
+      "returned": null,
+      "nodes": {
+        "i0": {
+          "data": 9,
+          "next": null
+        },
+        "t0": {
+          "data": "indeterminate",
+          "next": "indeterminate"
+        }
+      },
+      "code_line": 4
+    },
+    {
+      "phase": "data",
+      "attempt": 0,
+      "caller_head": "i0",
+      "local_head": "i0",
+      "p": "t0",
+      "returned": null,
+      "nodes": {
+        "i0": {
+          "data": 9,
+          "next": null
+        },
+        "t0": {
+          "data": 1,
+          "next": "indeterminate"
+        }
+      },
+      "code_line": 6
+    },
+    {
+      "phase": "link",
+      "attempt": 0,
+      "caller_head": "i0",
+      "local_head": "i0",
+      "p": "t0",
+      "returned": null,
+      "nodes": {
+        "i0": {
+          "data": 9,
+          "next": null
+        },
+        "t0": {
+          "data": 1,
+          "next": "i0"
+        }
+      },
+      "code_line": 7
+    },
+    {
+      "phase": "return",
+      "attempt": 0,
+      "caller_head": "i0",
+      "local_head": "i0",
+      "p": "t0",
+      "returned": "t0",
+      "nodes": {
+        "i0": {
+          "data": 9,
+          "next": null
+        },
+        "t0": {
+          "data": 1,
+          "next": "i0"
+        }
+      },
+      "code_line": 8
+    },
+    {
+      "phase": "caller",
+      "attempt": 0,
+      "caller_head": "t0",
+      "local_head": "i0",
+      "p": "t0",
+      "returned": "t0",
+      "nodes": {
+        "i0": {
+          "data": 9,
+          "next": null
+        },
+        "t0": {
+          "data": 1,
+          "next": "i0"
+        }
+      },
+      "code_line": 15
+    },
+    {
+      "phase": "allocate",
+      "attempt": 1,
+      "caller_head": "t0",
+      "local_head": "t0",
+      "p": "t1",
+      "returned": null,
+      "nodes": {
+        "i0": {
+          "data": 9,
+          "next": null
+        },
+        "t0": {
+          "data": 1,
+          "next": "i0"
+        },
+        "t1": {
+          "data": "indeterminate",
+          "next": "indeterminate"
+        }
+      },
+      "code_line": 4
+    },
+    {
+      "phase": "data",
+      "attempt": 1,
+      "caller_head": "t0",
+      "local_head": "t0",
+      "p": "t1",
+      "returned": null,
+      "nodes": {
+        "i0": {
+          "data": 9,
+          "next": null
+        },
+        "t0": {
+          "data": 1,
+          "next": "i0"
+        },
+        "t1": {
+          "data": 2,
+          "next": "indeterminate"
+        }
+      },
+      "code_line": 6
+    },
+    {
+      "phase": "link",
+      "attempt": 1,
+      "caller_head": "t0",
+      "local_head": "t0",
+      "p": "t1",
+      "returned": null,
+      "nodes": {
+        "i0": {
+          "data": 9,
+          "next": null
+        },
+        "t0": {
+          "data": 1,
+          "next": "i0"
+        },
+        "t1": {
+          "data": 2,
+          "next": "t0"
+        }
+      },
+      "code_line": 7
+    },
+    {
+      "phase": "return",
+      "attempt": 1,
+      "caller_head": "t0",
+      "local_head": "t0",
+      "p": "t1",
+      "returned": "t1",
+      "nodes": {
+        "i0": {
+          "data": 9,
+          "next": null
+        },
+        "t0": {
+          "data": 1,
+          "next": "i0"
+        },
+        "t1": {
+          "data": 2,
+          "next": "t0"
+        }
+      },
+      "code_line": 8
+    },
+    {
+      "phase": "caller",
+      "attempt": 1,
+      "caller_head": "t1",
+      "local_head": "t0",
+      "p": "t1",
+      "returned": "t1",
+      "nodes": {
+        "i0": {
+          "data": 9,
+          "next": null
+        },
+        "t0": {
+          "data": 1,
+          "next": "i0"
+        },
+        "t1": {
+          "data": 2,
+          "next": "t0"
+        }
+      },
+      "code_line": 16
+    }
+  ],
+  "actions": [
+    {
+      "kind": "show_state",
+      "anchor": "synthetic_course_01:code",
+      "step": 0,
+      "state_digest": "9d5ca144cddfbaeaaf28ab650a62206010b20c17c327f2c828438440184b8fd5"
+    },
+    {
+      "kind": "advance_step",
+      "anchor": "synthetic_course_01:code",
+      "step": 1
+    },
+    {
+      "kind": "show_state",
+      "anchor": "synthetic_course_01:code",
+      "step": 1,
+      "state_digest": "cb4aaa25b80be4eb8f355eba3d5e4b46962363381856576d0f95b11029ca79f8"
+    },
+    {
+      "kind": "highlight_code",
+      "anchor": "synthetic_course_01:code",
+      "line": 4,
+      "step": 1
+    },
+    {
+      "kind": "advance_step",
+      "anchor": "synthetic_course_01:code",
+      "step": 2
+    },
+    {
+      "kind": "show_state",
+      "anchor": "synthetic_course_01:code",
+      "step": 2,
+      "state_digest": "e6b6e068ac168af55f424e68ec49c27db179aec68f9a54082f8041b943afc451"
+    },
+    {
+      "kind": "highlight_code",
+      "anchor": "synthetic_course_01:code",
+      "line": 6,
+      "step": 2
+    },
+    {
+      "kind": "advance_step",
+      "anchor": "synthetic_course_01:code",
+      "step": 3
+    },
+    {
+      "kind": "show_state",
+      "anchor": "synthetic_course_01:code",
+      "step": 3,
+      "state_digest": "6b8bc57d1adc94950b57181fa6a805428d549cbed7f460e770f7904929749985"
+    },
+    {
+      "kind": "highlight_code",
+      "anchor": "synthetic_course_01:code",
+      "line": 7,
+      "step": 3
+    },
+    {
+      "kind": "advance_step",
+      "anchor": "synthetic_course_01:code",
+      "step": 4
+    },
+    {
+      "kind": "show_state",
+      "anchor": "synthetic_course_01:code",
+      "step": 4,
+      "state_digest": "0423fc420d91314369508b0c055a55c9752a13d935f629cd6ed1392ec950a218"
+    },
+    {
+      "kind": "highlight_code",
+      "anchor": "synthetic_course_01:code",
+      "line": 8,
+      "step": 4
+    },
+    {
+      "kind": "advance_step",
+      "anchor": "synthetic_course_01:code",
+      "step": 5
+    },
+    {
+      "kind": "show_state",
+      "anchor": "synthetic_course_01:code",
+      "step": 5,
+      "state_digest": "c632f9f33fd55bb529ff227d0138f7fac60f8ef8b4cc7c58bfb11d0014561993"
+    },
+    {
+      "kind": "highlight_code",
+      "anchor": "synthetic_course_01:code",
+      "line": 15,
+      "step": 5
+    },
+    {
+      "kind": "advance_step",
+      "anchor": "synthetic_course_01:code",
+      "step": 6
+    },
+    {
+      "kind": "show_state",
+      "anchor": "synthetic_course_01:code",
+      "step": 6,
+      "state_digest": "6f11e45360b6bffd34444a4c0cb45f6bc96ccebb319be83c74952592c91ad4a9"
+    },
+    {
+      "kind": "highlight_code",
+      "anchor": "synthetic_course_01:code",
+      "line": 4,
+      "step": 6
+    },
+    {
+      "kind": "advance_step",
+      "anchor": "synthetic_course_01:code",
+      "step": 7
+    },
+    {
+      "kind": "show_state",
+      "anchor": "synthetic_course_01:code",
+      "step": 7,
+      "state_digest": "1ad3d6fb4d8f2bc379156078446b169c06927841908c5604ed43fb13c4819cda"
+    },
+    {
+      "kind": "highlight_code",
+      "anchor": "synthetic_course_01:code",
+      "line": 6,
+      "step": 7
+    },
+    {
+      "kind": "advance_step",
+      "anchor": "synthetic_course_01:code",
+      "step": 8
+    },
+    {
+      "kind": "show_state",
+      "anchor": "synthetic_course_01:code",
+      "step": 8,
+      "state_digest": "9f2b204da5a584ddeab673c8c7f1df9e1d744213f9fc59bcdfb44c5b1288b56a"
+    },
+    {
+      "kind": "highlight_code",
+      "anchor": "synthetic_course_01:code",
+      "line": 7,
+      "step": 8
+    },
+    {
+      "kind": "advance_step",
+      "anchor": "synthetic_course_01:code",
+      "step": 9
+    },
+    {
+      "kind": "show_state",
+      "anchor": "synthetic_course_01:code",
+      "step": 9,
+      "state_digest": "62b384884fc6618e9c10fa218b16e7f75d70019dc8b0010558f8bce3f9a421c8"
+    },
+    {
+      "kind": "highlight_code",
+      "anchor": "synthetic_course_01:code",
+      "line": 8,
+      "step": 9
+    },
+    {
+      "kind": "advance_step",
+      "anchor": "synthetic_course_01:code",
+      "step": 10
+    },
+    {
+      "kind": "show_state",
+      "anchor": "synthetic_course_01:code",
+      "step": 10,
+      "state_digest": "4ce96a00abc4ed5c7f3774bc0d4d26e16960a96a3b02e38ce9efff59e4699f19"
+    },
+    {
+      "kind": "highlight_code",
+      "anchor": "synthetic_course_01:code",
+      "line": 16,
+      "step": 10
+    }
+  ],
+  "version": "unified-head-zh-v1",
+  "paragraphs": [
+    {
+      "key": "overview",
+      "text": "本例演示单链表头插：初始结点 i0 的值为 9，依次插入 1 和 2。这里假定两次实际分配都成功；规格中的成功标记只允许调用 malloc，并不保证真实分配成功。i0 是初始的栈上结点，t0、t1 是两次新结点的轨迹标签，并不是代码中的变量名。",
+      "fact_ids": [
+        "trace_step_00"
+      ]
+    },
+    {
+      "key": "first_insertion",
+      "text": "第一次调用先分配 t0；其 data 和 next 在写入前未知。随后把 data 设为 1，再令 p->next 指向原头 i0。函数返回 p，调用者接回后链表为 t0 → i0 → NULL。函数返回后，其局部变量已离开作用域。",
+      "fact_ids": [
+        "trace_step_01",
+        "trace_step_02",
+        "trace_step_03",
+        "trace_step_04",
+        "trace_step_05"
+      ]
+    },
+    {
+      "key": "second_insertion",
+      "text": "第二次调用在成功分配 t1 后，将 data 设为 2，令 p->next 指向当前头 t0，再返回 p。调用者接回返回值，因此头变为 t1，链表为 t1 → t0 → i0 → NULL。",
+      "fact_ids": [
+        "trace_step_06",
+        "trace_step_07",
+        "trace_step_08",
+        "trace_step_09",
+        "trace_step_10"
+      ]
+    },
+    {
+      "key": "final_observation",
+      "text": "从调用者头出发依次得到 2、1、9，观察到 NULL 后终止，因此本例的可知前缀也是完整遍历结果，且两次合成分配失败数为 0。若遇到环或未知 next，只能报告重复或未知之前的可知前缀，不能声称有限的完整遍历。原轨迹只展示两次成功路径；本页补入两次成功判空展示，未演示分配失败或释放内存。动态结点不再使用时应安全释放；栈上的 i0 不可 free。对环或未知链接不能未经验证地套用释放过程。",
+      "fact_ids": [
+        "obs_caller_head",
+        "obs_reachable_prefix",
+        "obs_traversal_status",
+        "obs_allocation_failures"
+      ]
+    }
+  ],
+  "questions": [
+    {
+      "kind": "question",
+      "anchor": "synthetic_course_01:q_caller_head",
+      "stem": "两次插入后，调用者头指向哪个轨迹结点 ID？空指针用 none 表示。",
+      "explanation": "第二次成功调用返回新结点，调用者接回该返回值，因此为 t1。",
+      "answer_key": "t1",
+      "observation_key": "caller_head"
+    },
+    {
+      "kind": "question",
+      "anchor": "synthetic_course_01:q_traversal_status",
+      "stem": "从最终调用者头开始遍历属于哪类？请使用 terminated（终止）、cycle（成环）或 indeterminate（未知）回答。",
+      "explanation": "依次经过 t1、t0 和 i0 后到达 NULL，因此为 terminated。",
+      "answer_key": "terminated",
+      "observation_key": "traversal_status"
+    },
+    {
+      "kind": "question",
+      "anchor": "synthetic_course_01:q_reachable_prefix",
+      "stem": "从最终调用者头开始，在重复或未知指针之前可知的整数值前缀是什么？",
+      "explanation": "依次是 2、1、9。本例继续观察到 NULL，因此这一前缀同时是本例完整遍历结果。",
+      "answer_key": [
+        2,
+        1,
+        9
+      ],
+      "observation_key": "reachable_prefix"
+    },
+    {
+      "kind": "question",
+      "anchor": "synthetic_course_01:q_allocation_failures",
+      "stem": "这份合成规格中有几次分配失败？",
+      "explanation": "本例假定两次分配都成功，因此合成分配失败次数为 0；真实 malloc 仍可能失败。",
+      "answer_key": 0,
+      "observation_key": "allocation_failures"
+    }
+  ],
+  "frames": [
+    {
+      "state_index": 0,
+      "line": null,
+      "title": "初始链表",
+      "note": "从 caller_head 出发，初始只有 i0(9)。函数尚未调用，局部 head 和 p 不在作用域。",
+      "origin": "program_projection",
+      "source_actions": [
+        0
+      ]
+    },
+    {
+      "state_index": 1,
+      "line": 4,
+      "title": "分配结点",
+      "note": "分配新结点，p 指向它。data 和 next 尚未初始化，不能读取其值。调用者的头尚未改变。",
+      "origin": "program_projection",
+      "source_actions": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "state_index": 1,
+      "line": 5,
+      "title": "检查分配结果",
+      "note": "本例假定 p 非空，p == NULL 为假，继续执行第 6 行。这里复用分配后的状态，不改变任何指针。失败分支未回放。",
+      "origin": "assistant_success_check",
+      "source_actions": []
+    },
+    {
+      "state_index": 2,
+      "line": 6,
+      "title": "写入数据",
+      "note": "判空成功后，写入新结点的 data。此时 next 仍未知，还没有接上旧链表。",
+      "origin": "program_projection",
+      "source_actions": [
+        4,
+        5,
+        6
+      ]
+    },
+    {
+      "state_index": 3,
+      "line": 7,
+      "title": "连接旧头",
+      "note": "令 p->next = head，把新结点接到旧头之前；caller_head 此刻仍指向旧头。",
+      "origin": "program_projection",
+      "source_actions": [
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "state_index": 4,
+      "line": 8,
+      "title": "返回新头",
+      "note": "return p 把新结点地址交回调用者。这里显示返回前的函数状态，调用者尚未接收。",
+      "origin": "program_projection",
+      "source_actions": [
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "state_index": 5,
+      "line": 15,
+      "title": "调用者接回",
+      "note": "调用者接收返回值，更新 caller_head。局部 head 和 p 已离开作用域，动态结点仍然存活。",
+      "origin": "program_projection",
+      "source_actions": [
+        13,
+        14,
+        15
+      ]
+    },
+    {
+      "state_index": 6,
+      "line": 4,
+      "title": "分配结点",
+      "note": "分配新结点，p 指向它。data 和 next 尚未初始化，不能读取其值。调用者的头尚未改变。",
+      "origin": "program_projection",
+      "source_actions": [
+        16,
+        17,
+        18
+      ]
+    },
+    {
+      "state_index": 6,
+      "line": 5,
+      "title": "检查分配结果",
+      "note": "本例假定 p 非空，p == NULL 为假，继续执行第 6 行。这里复用分配后的状态，不改变任何指针。失败分支未回放。",
+      "origin": "assistant_success_check",
+      "source_actions": []
+    },
+    {
+      "state_index": 7,
+      "line": 6,
+      "title": "写入数据",
+      "note": "判空成功后，写入新结点的 data。此时 next 仍未知，还没有接上旧链表。",
+      "origin": "program_projection",
+      "source_actions": [
+        19,
+        20,
+        21
+      ]
+    },
+    {
+      "state_index": 8,
+      "line": 7,
+      "title": "连接旧头",
+      "note": "令 p->next = head，把新结点接到旧头之前；caller_head 此刻仍指向旧头。",
+      "origin": "program_projection",
+      "source_actions": [
+        22,
+        23,
+        24
+      ]
+    },
+    {
+      "state_index": 9,
+      "line": 8,
+      "title": "返回新头",
+      "note": "return p 把新结点地址交回调用者。这里显示返回前的函数状态，调用者尚未接收。",
+      "origin": "program_projection",
+      "source_actions": [
+        25,
+        26,
+        27
+      ]
+    },
+    {
+      "state_index": 10,
+      "line": 16,
+      "title": "调用者接回",
+      "note": "调用者接收返回值，更新 caller_head。局部 head 和 p 已离开作用域，动态结点仍然存活。",
+      "origin": "program_projection",
+      "source_actions": [
+        28,
+        29,
+        30
+      ]
+    }
+  ],
+  "provenance": {
+    "sources": {
+      "model_candidate": {
+        "path": "docs/acceptance/phase-1.5-combined-candidate-r01/results/candidate.json",
+        "sha256": "3ae6a9b365c6893094b279fb07bc2db9a1253707bed88da2bec7d9c2124751a3"
+      },
+      "original_player": {
+        "path": "docs/acceptance/phase-1.5-real-candidate-player-t098/course.html",
+        "sha256": "89823dc20b3382560b8b49e0185f6c35dfcd703863aee711bdd9eb808ee6f277"
+      },
+      "chinese_revision": {
+        "path": "docs/acceptance/phase-1.5-teaching-revision-t100/assistant-revision.json",
+        "sha256": "e51959940903c4533d8452e7576bf37587fe9808392d1cb78871eb9e39b20858"
+      },
+      "assessment": {
+        "path": "docs/acceptance/phase-1.5-real-course-independent-t099/ASSESSMENT.md",
+        "sha256": "0d5a2dd86bcf2718b873f5559b6cd1c5cf0d04a5d4112e0059fadf05098de69c"
+      }
+    },
+    "model_digest": "c96ed09ae5884a61a8acd5bf1934dea59f13d5dcb9d7f4ae6a6af101b633765d",
+    "revision_digest": "df3b940fede2354a0b8c765f72395e195f63f5821ead953dde040420abf58f26",
+    "example_digest": "68c132c70a07fb537fa4a5d96fe82cb968eb30c0d10e7a6450a5222174eb8d1d",
+    "engine": "head-insertion-engine-v2",
+    "template": "head-insertion-c-v1",
+    "text_mapping": "paragraphs[*].key → T100 raw_output.paragraphs; questions[*].anchor/observation_key → T100 source.blocks → T095 source.blocks (order/answer unchanged). final_observation contains T103 coverage wording update.",
+    "frame_mapping": "frames[*].state_index → T098 states; source_actions → original 31 actions; two assistant_success_check frames reuse states 1/6 and highlight code line 5. All frame notes and titles are assistant authored.",
+    "production_scoring": false,
+    "new_model_requests": 0
+  }
+}
