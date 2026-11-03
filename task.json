@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "用户授权T103统一中文可学头插课程及独立效果评估；T102保持blocked，不追加执行器修复、不变更B/C契约、不调用真实Provider；完成后停止，下一批有限C另行决定。",
+    "phase_gate": "用户授权T104有限C真实生成验证的最小执行准备；只交待审查执行包，不批准条款差异或真实调用；T102保持blocked，不扩建监督器/迁移框架。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -4972,6 +4972,61 @@
           ],
           "result": "构建/来源及原代码答案轨迹绑定通过；实际Chromium 13步/四题/控制/键盘/390px移动端通过，HTTP0/pageerror0；Ruff/工作流/diff/链接/manifest通过。独立评估另行手算与浏览器通过，无交付阻塞；不是学生效果实验或新模型成功。",
           "evidence": "docs/acceptance/phase-1.5-unified-head-course-t103/README.md"
+        }
+      ]
+    },
+    {
+      "id": "PHASE-1.5-T104",
+      "phase": "Phase 1.5",
+      "priority": "P0",
+      "title": "准备有限C完整课程真实生成最小执行包",
+      "status": "done",
+      "depends_on": [
+        "PHASE-1.5-T103"
+      ],
+      "scope": [
+        "docs/acceptance/phase-1.5-limited-c-preparation-t104/",
+        "docs/ADR/0050-limited-c-course-feasibility.md",
+        "docs/PRD.md",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "用户复核T103后明确授权下一步仅执行准备；docs/phase-1.5-course-generation-direction.md §4第二步",
+      "acceptance_criteria": [
+        "逐项区分T103模型/程序/助手来源，新课程教学文字不得由助手补写。",
+        "冻结有限样例、候选代码/Prompt/Schema、准确初始输入与条件修复规则及实际单请求入口。",
+        "明确调用/token/时间/费用预算、停止和原件保管，以及T102已知反例的适用性，不声称解除。",
+        "集中列出相对ADR0041/0047/0049及T102条款差异，提供必要离线证据和下一次真实完整课程/独立评估交接。"
+      ],
+      "verification": [
+        "PYTHONPATH=backend:. backend/.venv/bin/python docs/acceptance/phase-1.5-limited-c-preparation-t104/prepare.py --check",
+        "PYTHONPATH=backend:. backend/.venv/bin/python -m pytest docs/acceptance/phase-1.5-limited-c-preparation-t104/test_preparation.py -q",
+        "env -i PATH=/usr/bin:/bin /Users/apir/Code/EduMind_Agent/backend/.venv/bin/python -I /Users/apir/Code/EduMind_Agent/docs/acceptance/phase-1.5-limited-c-preparation-t104/execute_once.py --inspect",
+        "PYTHONPATH=backend:. backend/.venv/bin/python docs/acceptance/phase-1.5-limited-c-preparation-t104/check_player.py",
+        "backend/.venv/bin/ruff check docs/acceptance/phase-1.5-limited-c-preparation-t104/*.py",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "started_at": "2026-11-03T10:42:10+08:00",
+      "completed_at": "2026-11-03T11:02:00+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T104",
+      "execution_gate": "仅准备可审查包；条款采纳、当批C2费用例外和准确真实执行授权另行决定；真实Provider0，不自动领取真实任务。",
+      "verification_results": [
+        {
+          "date": "2026-11-03T11:02:00+08:00",
+          "commands": [
+            "PYTHONPATH=backend:. backend/.venv/bin/python docs/acceptance/phase-1.5-limited-c-preparation-t104/prepare.py --check",
+            "PYTHONPATH=backend:. backend/.venv/bin/python -m pytest docs/acceptance/phase-1.5-limited-c-preparation-t104/test_preparation.py -q",
+            "env -i PATH=/usr/bin:/bin /Users/apir/Code/EduMind_Agent/backend/.venv/bin/python -I /Users/apir/Code/EduMind_Agent/docs/acceptance/phase-1.5-limited-c-preparation-t104/execute_once.py --inspect",
+            "PYTHONPATH=backend:. backend/.venv/bin/python docs/acceptance/phase-1.5-limited-c-preparation-t104/check_player.py",
+            "backend/.venv/bin/ruff check docs/acceptance/phase-1.5-limited-c-preparation-t104/*.py",
+            "python3 scripts/check_catalog_workflow.py",
+            "git diff --check"
+          ],
+          "result": "10 passed；准确请求重建/运行时与依赖摘要/clean-env -I inspect通过；实际Chromium两套合成13/10帧及四题交互/键盘/移动通过，HTTP0/pageerror0。Ruff/工作流/diff/链接及103旧Task对象不变/日志只追加通过。同实际入口离线复现STOP/截止后Mock发送风险，不声称原停止保证通过。真实Provider0，ADR0050 A-D及本批C2/窗口未批准。",
+          "evidence": "docs/acceptance/phase-1.5-limited-c-preparation-t104/CHECKS.md",
+          "manifest_sha256": "1f2da5aba5531ce173c3279e07335bf3845e6c490e4c011e19d0e8f22c659c8c"
         }
       ]
     }
