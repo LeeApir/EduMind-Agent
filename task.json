@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "用户仅授权T105本批Responses消息phase兼容修正及离线入口回归；不调用Provider，完成后进入准确执行授权决策；T102保持blocked。",
+    "phase_gate": "T106准确有限C批已结束：3HTTP，C01首版pass/C02一次模型措辞修复后pass，原件与首版缺陷保留，STOP且剩余额度失效；无后续调用或任务授权，T102 blocked。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -5079,6 +5079,60 @@
           "result": "24 passed；本批实际入口phase缺省/final_answer成功、其他阶段/类型及未知字段拒绝，成功/拒绝原件逐字节保留，父稿重放和修复通过；Ruff/包重建/clean-env inspect/工作流/diff及链接通过。初始body/教学Schema/HTML/共享wire未改、旧manifest保留，104旧Task对象保持。Provider0，T102 blocked；仅进入准确授权决策。",
           "evidence": "docs/acceptance/phase-1.5-limited-c-preparation-t104/PHASE-COMPATIBILITY-T105.md",
           "manifest_sha256": "b686eedd986990806f01160750507f77d0a822f049c6060c4356c90f85fd284d"
+        }
+      ]
+    },
+    {
+      "id": "PHASE-1.5-T106",
+      "phase": "Phase 1.5",
+      "priority": "P0",
+      "title": "执行有限C真实完整课程批次并独立评估",
+      "status": "done",
+      "depends_on": [
+        "PHASE-1.5-T105"
+      ],
+      "scope": [
+        "docs/acceptance/phase-1.5-limited-c-live-r01/",
+        "docs/ADR/0050-approval-20261103.json",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "用户准确批准16f2be1/ADR0050 A-D及当批C2和4HTTP/30分钟窗口；登记docs/ADR/0050-approval-20261103.json",
+      "acceptance_criteria": [
+        "按准确包真实生成未经助手补写的完整课程，所有原件/失败/修复版本保留，独立核对来源。",
+        "先C01及独立教学评估，通过后才C02；每例最多一次普通措辞修复，协议/事实/安全/unknown即全批停止。",
+        "实际浏览器学习流程、独立手算逐段逐题逐步评估准确版本；结构通过不替代教学通过。",
+        "记录实际窗口、调用次数/用量与金额未知，完成本批后停止，不恢复T102或开放生产。"
+      ],
+      "verification": [
+        "env -i PATH=/usr/bin:/bin /Users/apir/Code/EduMind_Agent/backend/.venv/bin/python -I /Users/apir/Code/EduMind_Agent/docs/acceptance/phase-1.5-limited-c-preparation-t104/execute_once.py --inspect",
+        "实际单前台CLI：C01首版、C02首版、C02唯一措辞修复；请求原件/收据/用量见交付目录",
+        "backend/.venv/bin/python docs/acceptance/phase-1.5-limited-c-live-r01/check_results.py",
+        "独立手算及实际Chromium：C01/C02首版报告、C02修复版完整重评（报告中准确命令）",
+        "backend/.venv/bin/ruff check docs/acceptance/phase-1.5-limited-c-live-r01/*.py",
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check"
+      ],
+      "started_at": "2026-11-03T11:39:44+08:00",
+      "completed_at": "2026-11-03T12:19:47+08:00",
+      "blocker": null,
+      "commit_lookup": "Task-Completed: PHASE-1.5-T106",
+      "execution_gate": "本批已完成并STOP：3/4HTTP，C01首版及C02唯一修复版独立评估通过，剩余额度失效；停止后续工作，由用户决定下一批；T102 blocked/catalog_only/H封存保持。",
+      "verification_results": [
+        {
+          "date": "2026-11-03T12:19:47+08:00",
+          "commands": [
+            "env -i PATH=/usr/bin:/bin /Users/apir/Code/EduMind_Agent/backend/.venv/bin/python -I /Users/apir/Code/EduMind_Agent/docs/acceptance/phase-1.5-limited-c-preparation-t104/execute_once.py --inspect",
+            "实际单前台CLI：C01首版、C02首版、C02唯一措辞修复；请求原件/收据/用量见交付目录",
+            "backend/.venv/bin/python docs/acceptance/phase-1.5-limited-c-live-r01/check_results.py",
+            "独立手算及实际Chromium：C01/C02首版报告、C02修复版完整重评（报告中准确命令）",
+            "backend/.venv/bin/ruff check docs/acceptance/phase-1.5-limited-c-live-r01/*.py",
+            "python3 scripts/check_catalog_workflow.py",
+            "git diff --check"
+          ],
+          "result": "批准准确包未改；实际3HTTP200，全部phase final_answer；原件先封存/重放与逐字节导出/父稿/报告绑定通过。C01首版独立pass；C02首版minor difficulty保留，模型唯一修复后独立完整重评pass；13/10帧四题/控制/移动/键盘实际Chromium通过。自报输入14532/输出5598，账单未知。STOP/无ACTIVE，剩1请求失效；最终只读评估可晚于窗口，无续窗。Ruff/工作流/diff/链接/105旧Task不变/日志只追加通过。",
+          "evidence": "docs/acceptance/phase-1.5-limited-c-live-r01/README.md",
+          "package_manifest_sha256": "b686eedd986990806f01160750507f77d0a822f049c6060c4356c90f85fd284d"
         }
       ]
     }
