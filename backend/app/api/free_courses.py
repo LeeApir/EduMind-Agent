@@ -5,6 +5,7 @@ import json
 import re
 from collections.abc import AsyncIterator
 from datetime import datetime, timezone
+from os import getenv
 from threading import BoundedSemaphore
 from typing import Annotated, Any
 from uuid import UUID
@@ -89,6 +90,12 @@ async def create(
     enabled()
     validate("CreateCourse", body)
     code = body.get("code_language", "c")
+    if getenv("EDUMIND_HEAD_GOAL_DEVELOPMENT") == "1":
+        from app.services.head_course_generation import development_enabled, enqueue
+
+        if development_enabled():
+            result = await enqueue(sessions, current.user.id, body, idempotency_key)
+            return reply("CreatedCourse", result, 201)
     result = await Scheduler(sessions).enqueue(
         current.user.id,
         body["goal"],

@@ -11,7 +11,7 @@ let timer: ReturnType<typeof setTimeout>|undefined;let media: MediaQueryList|und
 const visuals = computed(()=>props.scene.blocks.filter((b):b is Visual=>b.kind==='visualization'));
 const replay = computed(()=>visuals.value.find(b=>b.visualization_type==='head_insertion_replay_v1'));
 function validVisual(block: Visual): boolean {
-  if(block.visualization_type==='head_insertion_replay_v1')return Boolean(props.scene.replay_source)&&Array.isArray(block.steps)&&block.steps.length>0&&block.steps.length<=13&&block.steps.every((s,i)=>{
+  if(block.visualization_type==='head_insertion_replay_v1')return Boolean(props.scene.replay_source || props.scene.generation_source?.origin === 'head_goal_model_generation')&&Array.isArray(block.steps)&&block.steps.length>0&&block.steps.length<=13&&block.steps.every((s,i)=>{
     const f=s.head_frame;const code=props.scene.blocks.find(b=>b.anchor_id===f?.code_anchor&&b.kind==='code');
     return f&&f.frame_id===`f${String(i).padStart(2,'0')}`&&typeof f.title==='string'&&typeof f.note==='string'&&f.state&&typeof f.state.nodes==='object'&&code?.kind==='code'&&(f.line===null||Number.isInteger(f.line)&&f.line>0&&f.line<=code.source.trimEnd().split('\n').length)&&['active','inactive'].includes(f.locals_scope);
   });

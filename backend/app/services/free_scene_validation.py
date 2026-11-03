@@ -162,6 +162,10 @@ async def validate_candidate(
             from app.services.head_course_replay import validate_replay
 
             checked = validate_replay(row, actual)
+        elif row.origin_type == "head_goal_model_generation":
+            from app.services.head_course_generation import validate_generation
+
+            checked = validate_generation(row, actual)
         elif row.origin_type == "model_generation":
             fingerprint = digest(
                 "scene-generation-outcome",

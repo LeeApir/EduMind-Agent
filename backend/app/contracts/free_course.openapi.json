@@ -2845,11 +2845,21 @@
             }
           },
           "budget": {
-            "$ref": "#/components/schemas/Budget"
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Budget"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "request_id": {
             "type": "string",
             "format": "uuid"
+          },
+          "execution_mode": {
+            "const": "finite_head_foreground"
           }
         },
         "required": [
@@ -2866,6 +2876,29 @@
           "steps",
           "budget",
           "request_id"
+        ],
+        "allOf": [
+          {
+            "if": {
+              "required": [
+                "execution_mode"
+              ]
+            },
+            "then": {
+              "properties": {
+                "budget": {
+                  "type": "null"
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "budget": {
+                  "$ref": "#/components/schemas/Budget"
+                }
+              }
+            }
+          }
         ]
       },
       "AcceptedOperation": {
@@ -3318,6 +3351,9 @@
           },
           "replay_source": {
             "$ref": "#/components/schemas/ReplaySource"
+          },
+          "generation_source": {
+            "$ref": "#/components/schemas/HeadGenerationSource"
           }
         },
         "required": [
@@ -3328,7 +3364,13 @@
           "blocks",
           "actions"
         ],
-        "description": "Public additive projection for T001 readFreeCourseScene. Local checks require non-whitespace markdown, same-version anchors, actual step bounds and per-step element reference integrity."
+        "description": "Public additive projection for T001 readFreeCourseScene. Local checks require non-whitespace markdown, same-version anchors, actual step bounds and per-step element reference integrity.",
+        "not": {
+          "required": [
+            "replay_source",
+            "generation_source"
+          ]
+        }
       },
       "Event": {
         "type": "object",
@@ -5616,6 +5658,64 @@
           "parent_digest",
           "model",
           "prompt_version"
+        ]
+      },
+      "HeadGenerationSource": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "origin": {
+            "const": "head_goal_model_generation"
+          },
+          "batch": {
+            "const": "PHASE-1.5-T108"
+          },
+          "candidate_digest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "parent_digest": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "model": {
+            "type": "string"
+          },
+          "prompt_version": {
+            "const": "head-goal-course-v1"
+          },
+          "plan_digest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "materials_digest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "evidence_kind": {
+            "enum": [
+              "actual_provider_response",
+              "offline_fixture"
+            ]
+          }
+        },
+        "required": [
+          "origin",
+          "batch",
+          "candidate_digest",
+          "parent_digest",
+          "model",
+          "prompt_version",
+          "plan_digest",
+          "materials_digest",
+          "evidence_kind"
         ]
       }
     },

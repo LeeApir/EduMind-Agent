@@ -75,6 +75,11 @@ async def load_inputs(
         )
         if row is None:
             raise SnapshotError("SNAPSHOT_CORRUPT")
+    capability = {}
+    if current["nonsecret_config_snapshot"].get("prompt_version") == "head-goal-course-v1":
+        from app.services.head_course_materials import SUPPORT
+
+        capability = dict(head_support=SUPPORT)
     return snapshot_input(
         dict(
             course_id=str(course_id),
@@ -87,6 +92,7 @@ async def load_inputs(
             learner_evidence=current["evidence_snapshot"],
             profile_id=current["profile_id"],
             profile_version=current["profile_version"],
+            **capability,
         )
     )
 
@@ -185,7 +191,7 @@ async def persist_outcome(
             input_digest=identity,
             request_digest=call_digest,
             response_digest=fingerprint,
-            prompt_version=PROMPT_VERSION,
+            prompt_version="head-goal-plan-v1" if "head_support" in snapshot else PROMPT_VERSION,
             schema_version=SCHEMA_VERSION,
             state=outcome.state,
             reason_code=outcome.reason_code,

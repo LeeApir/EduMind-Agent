@@ -364,7 +364,14 @@ class Recovery:
                 )
                 for s in steps
             ],
-            budget=dict(
+            **(
+                {"execution_mode": "finite_head_foreground"}
+                if op.config_snapshot.get("prompt_version") == "head-goal-course-v1"
+                else {}
+            ),
+            budget=None
+            if op.config_snapshot.get("prompt_version") == "head-goal-course-v1"
+            else dict(
                 attempts_used=b["operation_attempts"],
                 attempts_remaining=max(
                     0, (1 if op.kind == "tutor_turn" else 13) - b["operation_attempts"]

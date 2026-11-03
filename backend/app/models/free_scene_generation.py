@@ -70,7 +70,8 @@ class FreeSceneGenerationResult(Identity, Base):
             initially="DEFERRED",
         ),
         CheckConstraint(
-            "(origin_type='model_generation' AND sent_attempts=1) OR "
+            "(origin_type IN ('model_generation','head_goal_model_generation') "
+            "AND sent_attempts=1) OR "
             "(origin_type='existing_real_candidate_replay' AND sent_attempts=0 "
             "AND usage_json IS NULL)",
             name="ck_fc_scene_gen_sent",

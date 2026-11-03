@@ -264,6 +264,21 @@ onBeforeUnmount(()=>{save();epoch+=1;manifestEpoch+=1;versionsEpoch+=1;controlle
             class="scene-content"
           >
             <aside
+              v-if="scene.generation_source"
+              class="replay-source"
+              aria-label="新课程来源"
+            >
+              <strong>{{ scene.generation_source.evidence_kind === 'offline_fixture' ? '离线接线夹具 · 非真实生成' : '新目标真实生成 · 头插支持域' }} · 未签核</strong>
+              <p>{{ scene.generation_source.model }} · {{ scene.generation_source.prompt_version }} · {{ scene.generation_source.batch }}</p>
+              <p>候选 {{ scene.generation_source.candidate_digest }}</p>
+              <p v-if="scene.generation_source.parent_digest">
+                父稿 {{ scene.generation_source.parent_digest }}
+              </p>
+              <p>规划 {{ scene.generation_source.plan_digest }} · 共享材料 {{ scene.generation_source.materials_digest }}</p>
+              <small v-if="scene.generation_source.evidence_kind === 'offline_fixture'">本页教学文字为离线接线夹具，未调用模型；代码、事实、轨迹和参考答案由程序派生。</small>
+              <small v-else>教学文字由模型生成；代码、事实、轨迹和参考答案由程序派生，自述先备知识不代表已测掌握。</small>
+            </aside>
+            <aside
               v-if="scene.replay_source"
               class="replay-source"
               aria-label="课程来源"
@@ -287,7 +302,7 @@ onBeforeUnmount(()=>{save();epoch+=1;manifestEpoch+=1;versionsEpoch+=1;controlle
                 {{ block.markdown }}
               </div>
               <section
-                v-else-if="block.kind === 'code' && !scene.replay_source"
+                v-else-if="block.kind === 'code' && !(scene.replay_source || scene.generation_source)"
                 class="code-reading"
                 :class="{'presentation-highlight': highlightedAnchor === block.anchor_id}"
               >
@@ -299,7 +314,7 @@ onBeforeUnmount(()=>{save();epoch+=1;manifestEpoch+=1;versionsEpoch+=1;controlle
               </section>
               <span v-else-if="block.kind === 'code'" />
               <CoursePresentation
-                v-else-if="block.kind === 'visualization' && scene.replay_source"
+                v-else-if="block.kind === 'visualization' && (scene.replay_source || scene.generation_source)"
                 :scene="scene"
                 :active="active"
               />
@@ -324,7 +339,7 @@ onBeforeUnmount(()=>{save();epoch+=1;manifestEpoch+=1;versionsEpoch+=1;controlle
               />
             </template>
             <CoursePresentation
-              v-if="!scene.replay_source"
+              v-if="!(scene.replay_source || scene.generation_source)"
               :scene="scene"
               :active="active"
               @highlight="highlightedAnchor = $event"
@@ -341,6 +356,7 @@ onBeforeUnmount(()=>{save();epoch+=1;manifestEpoch+=1;versionsEpoch+=1;controlle
               @confirmed="loadScene()"
             />
             <CourseRevision
+              v-if="operation?.execution_mode !== 'finite_head_foreground'"
               :key="`revision:${version}:${selected.scene_version_id}`"
               :course-id="courseId"
               :course-version="version"
@@ -356,7 +372,10 @@ onBeforeUnmount(()=>{save();epoch+=1;manifestEpoch+=1;versionsEpoch+=1;controlle
               @outline="$emit('outline')"
             />
           </template>
-          <div class="tutor-area">
+          <div
+            v-if="operation?.execution_mode !== 'finite_head_foreground'"
+            class="tutor-area"
+          >
             <button
               ref="tutorTrigger"
               class="secondary"

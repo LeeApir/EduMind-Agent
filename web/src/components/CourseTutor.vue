@@ -13,7 +13,7 @@ const pending=ref<Pending>();const history=ref<TutorReceipt[]>([]);
 const opId=computed(()=>receipt.value?.operation_id??'');const observing=computed(()=>props.active&&Boolean(receipt.value));
 const {operation,error:feedError,reload,inaccessible}=useCourseFeed(toRef(props,'courseId'),opId,observing);
 const opActive=computed(()=>Boolean(receipt.value)&&(!operation.value||!terminalOperation(operation.value.state)));
-const unresolved=computed(()=>Boolean(operation.value?.budget.usage_unknown||operation.value?.reason_code?.includes('UNKNOWN')));
+const unresolved=computed(()=>Boolean(operation.value?.budget?.usage_unknown||operation.value?.reason_code?.includes('UNKNOWN')));
 const stale=computed(()=>props.headVersion!==props.courseVersion);
 const canSend=computed(()=>!loading.value&&!busy.value&&!pending.value&&!receipt.value&&props.active&&props.mode==='dynamic'&&!props.generationActive&&!stale.value&&acknowledged.value&&question.value.trim().length>0&&question.value.trim().length<=2000);
 let alive=true;let epoch=0;let controller:AbortController|undefined;

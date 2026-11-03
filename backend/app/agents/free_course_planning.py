@@ -104,7 +104,7 @@ def snapshot_input(value: dict[str, Any]) -> dict[str, Any]:
         "profile_version",
     }
     if (
-        set(value) != required
+        set(value) not in (required, required | {"head_support"})
         or value["teaching_language"] != "zh-CN"
         or value["code_language"] not in ("C", None)
     ):
@@ -124,13 +124,18 @@ def snapshot_input(value: dict[str, Any]) -> dict[str, Any]:
             or not source["text"].strip()
         ):
             raise SnapshotError("PLANNING_INPUT_INVALID")
+    if "head_support" in value:
+        from app.services.head_course_materials import GOAL, SUPPORT
+
+        if value["head_support"] != SUPPORT or value["original_goal"] != GOAL:
+            raise SnapshotError("HEAD_PLANNING_SCOPE_INVALID")
     return deepcopy(value)
 
 
 def build_request(inputs: dict[str, Any]) -> StructuredRequest:
     snapshot = snapshot_input(inputs)
     payload = {
-        "prompt_version": PROMPT_VERSION,
+        "prompt_version": "head-goal-plan-v1" if "head_support" in snapshot else PROMPT_VERSION,
         "default_learning_minutes": 15,
         "planning_contract": deepcopy(PLANNING_CONTRACT),
         **snapshot,
@@ -138,10 +143,21 @@ def build_request(inputs: dict[str, Any]) -> StructuredRequest:
     # This is a byte safety bound, never a claim of token/price reservation.
     if len(canonical(payload)) > 128000:
         raise SnapshotError("PLANNING_INPUT_TOO_LARGE")
+    instruction = INSTRUCTION
+    if "head_support" in snapshot:
+        instruction += (
+            "\n[FINITE HEAD SUPPORT] Obey head_support as server capability. "
+            "Choose one listed ID exactly for shared_example and exactly one "
+            "complete scene with all required_forms. The two real learning "
+            "objectives are linking to the old list and receiving return at "
+            "the caller. Preserve self-reported prerequisites as evidence "
+            "only. No invented learner mastery or fabricated outline outside "
+            "scope."
+        )
     return StructuredRequest(
         prompt=TextRequest(
             messages=(
-                ChatMessage("system", INSTRUCTION),
+                ChatMessage("system", instruction),
                 ChatMessage("user", canonical(payload).decode()),
             ),
             task_profile=TaskProfile.QUALITY,
@@ -215,6 +231,10 @@ def validate_response(raw: Any, inputs: dict[str, Any]) -> dict[str, Any]:
             seen.add(scene["scene_key"])
         if covered != set(ids):
             raise ValueError()
+        if "head_support" in inputs:
+            from app.services.head_course_materials import selected
+
+            selected(plan)
         return cast(dict[str, Any], value)
     except Exception:
         raise SnapshotError("SCHEMA_INVALID") from None

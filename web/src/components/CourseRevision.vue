@@ -11,7 +11,7 @@ interface Pending {key:string;body:{kind:'revise_scene';expected_head_version:nu
 const pending=ref<Pending>();
 const observing=computed(()=>Boolean(receipt.value));const {operation,error:feedError,reload}=useCourseFeed(toRef(props,'courseId'),receipt,observing);
 const active=computed(()=>Boolean(receipt.value)&&(!operation.value||!terminalOperation(operation.value.state)));
-const unknown=computed(()=>Boolean(operation.value?.budget.usage_unknown||operation.value?.reason_code?.includes('UNKNOWN')));
+const unknown=computed(()=>Boolean(operation.value?.budget?.usage_unknown||operation.value?.reason_code?.includes('UNKNOWN')));
 const stale=computed(()=>props.headVersion!==props.courseVersion);
 const key=()=>`edumind:free:revision:${owner.value}:${props.courseId}:${props.courseVersion}:${props.sceneVersionId}`;
 function persist():void{if(owner.value)writeStored(key(),{editing:editing.value,instruction:instruction.value,pending:pending.value,receipt:receipt.value});}

@@ -294,7 +294,7 @@ onMounted(()=>initialize());onBeforeUnmount(()=>{alive=false;listEpoch+=1;course
             v-else-if="detail?.kind==='operation'"
             aria-label="原操作记录"
           >
-            <h3>{{ detail.value.kind==='revise_scene'?'局部修订':detail.value.kind==='adjust_outline'?'大纲调整':detail.value.kind==='tutor_turn'?'导师操作':'课程生成操作' }} · {{ labels[detail.value.state]??'状态待核对' }}</h3><p>原基线 {{ detail.value.base_head_version===null?'无':`v${detail.value.base_head_version}` }}；当前 head {{ detail.value.head_version===null?'无':`v${detail.value.head_version}` }}。当前 head 不作为本次操作发布版本。</p><p v-if="detail.value.budget.usage_unknown">
+            <h3>{{ detail.value.kind==='revise_scene'?'局部修订':detail.value.kind==='adjust_outline'?'大纲调整':detail.value.kind==='tutor_turn'?'导师操作':'课程生成操作' }} · {{ labels[detail.value.state]??'状态待核对' }}</h3><p>原基线 {{ detail.value.base_head_version===null?'无':`v${detail.value.base_head_version}` }}；当前 head {{ detail.value.head_version===null?'无':`v${detail.value.head_version}` }}。当前 head 不作为本次操作发布版本。</p><p v-if="detail.value.budget?.usage_unknown">
               用量或发送结果待可靠确认，不自动补发。
             </p><ul>
               <li
