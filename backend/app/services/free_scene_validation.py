@@ -158,36 +158,43 @@ async def validate_candidate(
             scene_id=row.scene_id,
             expected_head=row.expected_head,
         )
-        fingerprint = digest(
-            "scene-generation-outcome",
-            input_digest=row.input_digest,
-            request_digest=row.request_digest,
-            state=row.state,
-            reason_code=row.reason_code,
-            response=row.response_json,
-            usage=row.usage_json,
-            sent_attempts=row.sent_attempts,
-        )
-        if (
-            row.input_digest != digest("scene-generation-input", snapshot=actual)
-            or row.input_snapshot != actual
-            or row.request_id != UUID(actual["request"]["request_id"])
-            or row.request_digest != request_digest(build_request(actual))
-            or row.response_digest != fingerprint
-        ):
-            raise SnapshotError("SNAPSHOT_CORRUPT")
-        checked = (
-            check_scene(row.response_json, actual)
-            if row.state == "candidate"
-            else dict(
-                state="rejected",
-                reason_code="GENERATION_FAILED",
-                findings=[
-                    dict(rule_id=f"{RULE_VERSION}:GENERATION_FAILED", code="GENERATION_FAILED")
-                ],
-                cleaned=None,
+        if row.origin_type == "existing_real_candidate_replay":
+            from app.services.head_course_replay import validate_replay
+
+            checked = validate_replay(row, actual)
+        elif row.origin_type == "model_generation":
+            fingerprint = digest(
+                "scene-generation-outcome",
+                input_digest=row.input_digest,
+                request_digest=row.request_digest,
+                state=row.state,
+                reason_code=row.reason_code,
+                response=row.response_json,
+                usage=row.usage_json,
+                sent_attempts=row.sent_attempts,
             )
-        )
+            if (
+                row.input_digest != digest("scene-generation-input", snapshot=actual)
+                or row.input_snapshot != actual
+                or row.request_id != UUID(actual["request"]["request_id"])
+                or row.request_digest != request_digest(build_request(actual))
+                or row.response_digest != fingerprint
+            ):
+                raise SnapshotError("SNAPSHOT_CORRUPT")
+            checked = (
+                check_scene(row.response_json, actual)
+                if row.state == "candidate"
+                else dict(
+                    state="rejected",
+                    reason_code="GENERATION_FAILED",
+                    findings=[
+                        dict(rule_id=f"{RULE_VERSION}:GENERATION_FAILED", code="GENERATION_FAILED")
+                    ],
+                    cleaned=None,
+                )
+            )
+        else:
+            raise SnapshotError("REPLAY_SOURCE_INVALID")
         raw_digest = digest("scene-validation-raw", response=row.response_json)
         cleaned_digest = (
             digest("scene-validation-cleaned", payload=checked["cleaned"])

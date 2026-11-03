@@ -71,7 +71,7 @@ onMounted(initialize);onBeforeUnmount(()=>{alive=false;controller.abort();persis
         :key="item.question_id"
         class="exercise-question"
       >
-        <label :for="`answer-${block.exercise_version_id}-${i}`">{{ i+1 }}. {{ item.question }}</label><textarea
+        <label :for="`answer-${block.exercise_version_id}-${i}`">{{ i+1 }}. {{ item.question }}</label><small v-if="item.input_type!=='short_text'">{{ item.input_type==='integer'?'输入一个 JSON 整数':'输入 JSON 整数数组，例如 [1,2]，不附加文字' }}</small><textarea
           :id="`answer-${block.exercise_version_id}-${i}`"
           v-model="answers[item.question_id]"
           rows="2"

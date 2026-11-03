@@ -69,7 +69,12 @@ class FreeSceneGenerationResult(Identity, Base):
             deferrable=True,
             initially="DEFERRED",
         ),
-        CheckConstraint("sent_attempts=1", name="ck_fc_scene_gen_sent"),
+        CheckConstraint(
+            "(origin_type='model_generation' AND sent_attempts=1) OR "
+            "(origin_type='existing_real_candidate_replay' AND sent_attempts=0 "
+            "AND usage_json IS NULL)",
+            name="ck_fc_scene_gen_sent",
+        ),
         CheckConstraint("state IN ('candidate','failed')", name="ck_fc_scene_gen_state"),
         CheckConstraint(
             "(state='candidate' AND reason_code IS NULL) OR "
@@ -96,4 +101,7 @@ class FreeSceneGenerationResult(Identity, Base):
     plan_id: Mapped[UUID] = mapped_column(PGUUID(as_uuid=True), nullable=False)
     scene_id: Mapped[UUID] = mapped_column(PGUUID(as_uuid=True), nullable=False)
     sent_attempts: Mapped[int] = mapped_column(Integer, nullable=False)
-    usage_json: Mapped[dict[str, int | None] | None] = mapped_column(JSONB)
+    origin_type: Mapped[str] = mapped_column(
+        String(40), nullable=False, server_default="model_generation"
+    )
+    usage_json: Mapped[dict[str, int | None] | None] = mapped_column(JSONB(none_as_null=True))

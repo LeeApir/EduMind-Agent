@@ -1,5 +1,6 @@
 """Exact-version deterministic provisional practice, without model grading or mastery claims."""
 
+import json
 from copy import deepcopy
 from typing import Any
 from uuid import UUID, uuid4
@@ -23,6 +24,42 @@ from app.services.free_course_quality import (
 )
 from app.services.free_course_snapshots import SnapshotError, SnapshotRepository, digest
 from app.services.quiz_scoring import QUIZ_SCORING_RULE_VERSION, _canonical_answer
+
+TYPED_RULE = "free-course-typed-json-v1"
+
+
+def comparison_rule(block: dict[str, Any]) -> str:
+    return (
+        TYPED_RULE
+        if any(q["input_type"] != "short_text" for q in block["items"])
+        else QUIZ_SCORING_RULE_VERSION
+    )
+
+
+def compare_answer(question: dict[str, Any], answer: str) -> tuple[bool, str]:
+    kind = question["input_type"]
+    if kind == "short_text":
+        return _canonical_answer(answer) == _canonical_answer(question["answer_key"]), question[
+            "solution"
+        ]
+    try:
+        value = json.loads(answer)
+        if kind == "integer":
+            valid = type(value) is int
+        elif kind == "json_integer_array":
+            valid = type(value) is list and len(value) <= 32 and all(type(v) is int for v in value)
+        else:
+            valid = False
+        if not valid:
+            raise ValueError()
+        return value == json.loads(question["answer_key"]), question["solution"]
+    except (ValueError, TypeError, RecursionError):
+        hint = (
+            "请输入一个 JSON 整数数组，不附加文字。"
+            if kind == "json_integer_array"
+            else "请输入一个 JSON 整数，不附加文字。"
+        )
+        return False, hint + "\n" + question["solution"]
 
 
 def exercise_digests(block: dict[str, Any]) -> tuple[str, str]:
@@ -56,7 +93,7 @@ async def ensure_exercise(
         exercise_id=UUID(eid),
         anchor_id=block["anchor_id"],
         content_json=deepcopy(block),
-        content_digest=digest("exercise-content-v1", block=block, rule=QUIZ_SCORING_RULE_VERSION),
+        content_digest=digest("exercise-content-v1", block=block, rule=comparison_rule(block)),
         context_digest=digest(
             "exercise-context-v1",
             content=raw["content"],
@@ -65,7 +102,7 @@ async def ensure_exercise(
         ),
         assessment_digest=assessment,
         question_stem_digest=stems,
-        rule_version=QUIZ_SCORING_RULE_VERSION,
+        rule_version=comparison_rule(block),
     )
     db.add(row)
     await db.flush()
@@ -132,9 +169,8 @@ def provisional(
         results = [
             dict(
                 question_id=q["question_id"],
-                matches_reference=_canonical_answer(submitted[q["question_id"]])
-                == _canonical_answer(q["answer_key"]),
-                explanation=q["solution"],
+                matches_reference=compare_answer(q, submitted[q["question_id"]])[0],
+                explanation=compare_answer(q, submitted[q["question_id"]])[1],
             )
             for q in items
         ]

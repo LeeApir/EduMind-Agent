@@ -52,6 +52,8 @@ def compile_presentation(
         animation_executed=False,
         description="状态步骤演示；代码仅作文本，未执行代码或渲染媒体。",
     )
+    if "replay_source" in cleaned["content"]:
+        payload["replay_source"] = deepcopy(cleaned["content"]["replay_source"])
     if len(canonical(payload)) > 65536:
         raise SnapshotError("PRESENTATION_TOO_LARGE")
     return {**payload, "digest": digest("scene-presentation", payload=payload)}

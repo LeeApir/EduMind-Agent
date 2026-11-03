@@ -475,6 +475,11 @@ async def read_ready_scene(
         scene_id=str(scene_id),
         scene_version_id=binding["scene_version_id"],
         blocks=blocks,
+        **(
+            {"replay_source": deepcopy(row.presentation_json["replay_source"])}
+            if "replay_source" in row.presentation_json
+            else {}
+        ),
         actions=deepcopy(row.presentation_json["timeline"]),
         diagnostics=deepcopy(row.presentation_json["diagnostics"]),
     )

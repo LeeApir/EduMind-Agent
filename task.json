@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "T107零调用开发主链接入已领取，现有协议不能无损表示准确课程；ADR0051 A-D及准确附件待批准而blocked，未交付应用接线；T106原件/STOP、T102 blocked、生产catalog_only保持。",
+    "phase_gate": "T107已有真实课程开发主链接入完成，零新增Provider，实际本机应用/PG/浏览器验收通过；交独立评估后由用户决定后续，不自动生成/扩样/开放生产，T102 blocked/T106 STOP保持。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -77,7 +77,7 @@
     "pending_approved_provider_batch_id": null,
     "head_replay_t107": {
       "authorization": "用户限定现有真实C01首版/C02修复版零Provider主链接入；不可无损部分集中具体契约变更",
-      "status": "awaiting_ADR0051_accurate_approval",
+      "status": "implementation_verified_pending_independent_evaluation",
       "provider_requests": 0,
       "production_mode_changed": false
     }
@@ -5147,7 +5147,7 @@
       "phase": "Phase 1.5",
       "priority": "P0",
       "title": "头插真实候选在开发环境的最小主链接入",
-      "status": "blocked",
+      "status": "done",
       "depends_on": [
         "PHASE-1.5-T106"
       ],
@@ -5161,7 +5161,9 @@
         "docs/ADR/0051-head-course-development-replay.md",
         "task.json",
         "process.txt",
-        "docs/PRD.md"
+        "docs/PRD.md",
+        "backend/alembic/versions/0049_head_course_replay.py",
+        "docs/ADR/0051-approval-20261103.json"
       ],
       "prd_source": "PRD§0.5；用户2026-11-03限定现有真实候选开发主链接入，不新增Provider调用；重大契约差异集中提案",
       "acceptance_criteria": [
@@ -5171,17 +5173,19 @@
         "交付实际访问入口、完整浏览器学习流程记录与剩余差异后交评估；T106原件/T102 blocked保持，无Provider/新播放器或调度框架。"
       ],
       "verification": [
-        "待建立：backend/.venv/bin/python docs/acceptance/phase-1.5-head-replay-t107/prepare_mapping.py --check",
-        "待批准并建立：真实PG保存/读取/owner隔离/版本绑定与服务端答案回归",
-        "待批准并建立：实际开发应用浏览器全流程与刷新读取检查",
+        "backend/.venv/bin/python scripts/run_head_course_replay_dev.py --test",
+        "backend/.venv/bin/python scripts/run_head_course_replay_dev.py --check-migration",
+        "pnpm --dir web exec vitest run tests/course-visualization.spec.ts tests/responsive-accessibility.spec.ts",
+        "pnpm --dir web build",
+        "相关改动文件 Ruff/ESLint；六个变更后端源文件 mypy --follow-imports=silent",
         "python3 scripts/check_catalog_workflow.py",
         "git diff --check"
       ],
       "started_at": "2026-11-03T15:17:18+08:00",
-      "completed_at": null,
-      "blocker": "ADR0051 A-D及准确manifest待批准：现有产品协议不能无损表达逐帧讲解/作用域/未知next/行高亮/类型化答案；回放须新增明确origin与0调用审计约束。尚无应用接线/PG或浏览器验收，不记完成。",
+      "completed_at": "2026-11-03T16:43:51+08:00",
+      "blocker": null,
       "commit_lookup": "Task-Completed: PHASE-1.5-T107",
-      "execution_gate": "批准ADR0051 A-D及docs/acceptance/phase-1.5-head-replay-t107/manifest.json后恢复同一T107；仅零Provider开发实例，不恢复T102/T106。",
+      "execution_gate": "ADR0051 A-D准确批准后已完成两份已有真实候选零调用开发主链接入与必要实际验收；当前交独立评估，等待用户后续决定，不自动扩样/生成/开放生产。",
       "verification_results": [
         {
           "date": "2026-11-03T15:25:45+08:00",
@@ -5193,6 +5197,20 @@
           ],
           "result": "离线映射C01 13帧45处/C02 10帧37处模型文本逐字对应，原候选文件SHA/语义digest/父稿复算通过；提案Schema接受，当前契约拒绝，数组等价格式旧比较误判复现；12种篡改拒绝；无DB/实际应用浏览器/Provider，不构成任务验收。",
           "evidence": "docs/acceptance/phase-1.5-head-replay-t107/README.md"
+        },
+        {
+          "date": "2026-11-03T16:43:51+08:00",
+          "commands": [
+            "backend/.venv/bin/python scripts/run_head_course_replay_dev.py --test",
+            "backend/.venv/bin/python scripts/run_head_course_replay_dev.py --check-migration",
+            "pnpm --dir web exec vitest run tests/course-visualization.spec.ts tests/responsive-accessibility.spec.ts",
+            "pnpm --dir web build",
+            "相关改动文件 Ruff/ESLint；六个变更后端源文件 mypy --follow-imports=silent",
+            "python3 scripts/check_catalog_workflow.py",
+            "git diff --check"
+          ],
+          "result": "18项实际PG/API及类型/来源/审计回归通过；14项原展示/可访问性回归通过；实际Chromium两例×1440/390px四流程，全部13/10帧原文/状态/行/作用域、播放控制、四题错误/正确反馈、刷新原v2/反馈且无重复attempt；pageerror0/API mock0/Provider0。空库0049升降再升、有回放审计拒绝降级且行摘要不变。构建/类型/mypy/Ruff/ESLint/工作流/diff/批准包和T106冻结检查通过；当前IAB实际私有身份已导入并打开C02。独立课程效果评估未执行，交接待评估；T102 blocked/生产catalog_only保持。",
+          "evidence": "docs/acceptance/phase-1.5-head-replay-t107/IMPLEMENTATION.md"
         }
       ]
     }

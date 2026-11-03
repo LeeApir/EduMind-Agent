@@ -263,6 +263,18 @@ onBeforeUnmount(()=>{save();epoch+=1;manifestEpoch+=1;versionsEpoch+=1;controlle
             v-if="scene"
             class="scene-content"
           >
+            <aside
+              v-if="scene.replay_source"
+              class="replay-source"
+              aria-label="课程来源"
+            >
+              <strong>既有真实候选回放 · {{ scene.replay_source.slot }} · 未签核</strong>
+              <p>{{ scene.replay_source.model }} · {{ scene.replay_source.prompt_version }} · {{ scene.replay_source.batch }}</p>
+              <p>候选 {{ scene.replay_source.candidate_digest }}</p><p v-if="scene.replay_source.parent_digest">
+                父稿 {{ scene.replay_source.parent_digest }}
+              </p>
+              <small>模型原文保留；代码、状态与参考答案由程序派生。本次接入没有新的模型调用。</small>
+            </aside>
             <template
               v-for="block in scene.blocks"
               :key="block.anchor_id"
@@ -275,7 +287,7 @@ onBeforeUnmount(()=>{save();epoch+=1;manifestEpoch+=1;versionsEpoch+=1;controlle
                 {{ block.markdown }}
               </div>
               <section
-                v-else-if="block.kind === 'code'"
+                v-else-if="block.kind === 'code' && !scene.replay_source"
                 class="code-reading"
                 :class="{'presentation-highlight': highlightedAnchor === block.anchor_id}"
               >
@@ -285,6 +297,12 @@ onBeforeUnmount(()=>{save();epoch+=1;manifestEpoch+=1;versionsEpoch+=1;controlle
                   aria-label="C 语言代码，可横向滚动"
                 ><code>{{ block.source }}</code></pre><small>代码仅供阅读，没有执行。</small>
               </section>
+              <span v-else-if="block.kind === 'code'" />
+              <CoursePresentation
+                v-else-if="block.kind === 'visualization' && scene.replay_source"
+                :scene="scene"
+                :active="active"
+              />
               <span v-else-if="block.kind === 'visualization'" />
               <CourseExercise
                 v-else-if="block.kind === 'exercise'"
@@ -306,6 +324,7 @@ onBeforeUnmount(()=>{save();epoch+=1;manifestEpoch+=1;versionsEpoch+=1;controlle
               />
             </template>
             <CoursePresentation
+              v-if="!scene.replay_source"
               :scene="scene"
               :active="active"
               @highlight="highlightedAnchor = $event"
