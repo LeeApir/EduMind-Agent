@@ -47,6 +47,8 @@ async def enqueue(sessions, owner: UUID, body: dict[str, Any], key: str) -> dict
 
 
 async def generation_context(db: AsyncSession, owner: UUID, cid: UUID, oid: UUID) -> dict[str, Any]:
+    from app.agents import head_course_planning_wire
+    from app.agents.free_course_planning import request_digest
     from app.services.free_course_planning import load_inputs
 
     repo = SnapshotRepository(db, owner)
@@ -65,7 +67,13 @@ async def generation_context(db: AsyncSession, owner: UUID, cid: UUID, oid: UUID
             FreeCoursePlanningResult.plan_id == UUID(version["plan_id"]),
         )
     )
-    if row is None or row.state != "ready" or row.input_snapshot != request:
+    if (
+        row is None
+        or row.state != "ready"
+        or row.input_snapshot != request
+        or row.prompt_version != head_course_planning_wire.PROMPT_VERSION
+        or row.request_digest != request_digest(head_course_planning_wire.build_request(request))
+    ):
         raise SnapshotError("HEAD_PLANNING_BINDING")
     if row.response_json is None or not isinstance(row.response_json.get("plan"), dict):
         raise SnapshotError("HEAD_PLANNING_BINDING")
@@ -196,6 +204,7 @@ async def publish(
         review.get("candidate_digest") != final["candidate_digest"]
         or review.get("verdict") != "pass"
         or not review.get("independent_evaluator")
+        or review.get("planning_basis_binding") != context["payload"]["planning_basis"]["binding"]
     ):
         raise SnapshotError("HEAD_REVIEW_REQUIRED")
     if records[0]["candidate"]["parent_digest"] is not None or (

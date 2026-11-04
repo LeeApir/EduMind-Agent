@@ -158,7 +158,7 @@ def test_all_three_actual_builders_use_explicit_protocols():
     prompt = request["input"][0]["content"]
     assert "null source_key/source_excerpt" not in prompt
     assert wire.VERSION in prompt
-    assert json.loads(request["input"][1]["content"])["prompt_version"] == wire.VERSION
+    assert json.loads(request["input"][1]["content"])["prompt_version"] == wire.PROMPT_VERSION
     payload = m.content_payload(inputs(), fixture.plan()["plan"])
     parent = fixture.record(payload)["candidate"]
     issues = [dict(path=["lifecycle"], quote="离线夹具", severity="minor", area="difficulty")]
@@ -216,8 +216,9 @@ def test_simplified_plan_rejection_saves_original_and_stops(tmp_path, monkeypatc
     approval = dict(
         package_sha256="a" * 64,
         version=m.VERSION,
-        accept_ADR0052_R02_and_batch_C2=True,
+        accept_ADR0052_R03_and_batch_C2=True,
         planning_wire_version=wire.VERSION,
+        planning_prompt_version=wire.PROMPT_VERSION,
         explicit_user_authorization=True,
         starts_epoch=int(time.time()),
         expires_epoch=int(time.time()) + 600,

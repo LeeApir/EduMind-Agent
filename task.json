@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "r02规划1HTTP200及wire/local机械校验通过，但独立规划语义不通过：head作用域步骤和忽略返回值后果与固定示例不一致。按包STOP，未用2次失效，正文/修复/完整课程0；原稿未改。待用户决定规划策略及必要新包，不自动字段补丁/规划修复/调用或换Provider。",
+    "phase_gate": "r03同版规划依据/职责及传播绑定准备已通过独立审查，33单元+3定向PG/API/Mock通过；新真实调用及授权0，最终新完整课程未交付。待用户另行准确批准新包/批次，不重开r01/r02、不继承余额或C2。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -73,7 +73,7 @@
     "active_provider_batch_id": null,
     "last_stopped_provider_batch_id": "head-goal-r02",
     "current_candidate_real_calls": "stopped_after_explicit_direct_single_call",
-    "current_authorization_note": "r02规划1HTTP200及wire/local机械校验通过，但独立规划语义不通过：head作用域步骤和忽略返回值后果与固定示例不一致。按包STOP，未用2次失效，正文/修复/完整课程0；原稿未改。待用户决定规划策略及必要新包，不自动字段补丁/规划修复/调用或换Provider。",
+    "current_authorization_note": "r03同版规划依据/职责及传播绑定准备已通过独立审查，33单元+3定向PG/API/Mock通过；新真实调用及授权0，最终新完整课程未交付。待用户另行准确批准新包/批次，不重开r01/r02、不继承余额或C2。",
     "pending_approved_provider_batch_id": null,
     "head_replay_t107": {
       "authorization": "用户限定现有真实C01首版/C02修复版零Provider主链接入；不可无损部分集中具体契约变更",
@@ -85,7 +85,7 @@
       "authorization": "2026-11-03用户明确限定头插支持域的新课程主链生成；先完成可审查接线与准确执行包，真实调用待另行准确授权。",
       "provider_requests_authorized": 0,
       "goal": "我已了解 C 指针、struct、NULL 和函数返回值，希望通过头插示例，理解新节点如何连接旧链表，以及为什么调用者需要接收函数返回值。",
-      "status": "r02_stopped_independent_planning_nonpass",
+      "status": "r03_preparation_review_passed_not_authorized",
       "approval_record": "docs/ADR/0052-approval-20261103.json",
       "approved_http_limit": 3,
       "provider_requests_attempted": 2,
@@ -116,6 +116,18 @@
         "results": "docs/acceptance/phase-1.5-head-goal-live-r02/RESULTS.md",
         "plan_digest": "bcd627a2010322abd0d27d1342c6546ff46f3d0b9232e2a602629784941bc61f",
         "independent_assessment": "docs/acceptance/phase-1.5-head-goal-live-r02/PLAN-ASSESSMENT.md"
+      },
+      "r03_preparation": {
+        "package": "docs/acceptance/phase-1.5-head-goal-t108-r03/",
+        "manifest_sha256": "43ec5edb6eb741cad8c324aae4c8037fe90bc0fb65bd70cd623d81b75b5f0850",
+        "planning_prompt_version": "head-goal-plan-grounded-v3",
+        "planning_wire_version": "head-goal-planning-wire-v2",
+        "planning_basis_digest": "dbfa7a38e73cf8cb36df518485019556bce56a23fc7d25dd1f18fbe0f3a28899",
+        "status": "independent_preparation_review_passed_not_authorized",
+        "real_calls_authorized": 0,
+        "real_calls": 0,
+        "inherited_allowance": 0,
+        "independent_review": "docs/acceptance/phase-1.5-head-goal-t108-r03-review.md"
       }
     }
   },
@@ -5271,7 +5283,8 @@
         "docs/PRD.md",
         "task.json",
         "process.txt",
-        "限定规划远端基础类型Schema与本地完整Schema分离、版本化无补写转换；新r02执行包/定向检查（旧包与原件不改）"
+        "限定规划远端基础类型Schema与本地完整Schema分离、版本化无补写转换；新r02执行包/定向检查（旧包与原件不改）",
+        "r03限定规划示例依据/职责、规划→正文→评估同版摘要绑定及准确新请求准备；无Provider调用"
       ],
       "prd_source": "PRD §0.5；课程生成方向文档；T107独立评估；2026-11-03用户本次指令",
       "acceptance_criteria": [
@@ -5281,21 +5294,20 @@
         "真实前交付接线、提示词/Schema/模型/调用上限/审核修复停止及契约差异准确包，另获新授权；实际应用新课程通过完整学习/不泄题/刷新验收后交独立评估停止。"
       ],
       "verification": [
-        "PYTHONPATH=backend:. backend/.venv/bin/python -m pytest -q backend/tests/test_head_course_planning_wire.py",
-        "专用T108 PG：backend/.venv/bin/python -m pytest -q tests/test_head_course_goal.py::test_goal_plan_private_course_and_feedback[head-new-A] tests/test_head_course_goal.py::test_exact_entry_mock_transport_and_raw_failures（backend，最小测试库环境）",
-        "backend/.venv/bin/python scripts/prepare_head_course_goal_wire_package.py --check",
-        "backend/.venv/bin/python -I scripts/head_course_goal.py --inspect",
-        "变更Python源/测试的Ruff；head_course_planning_wire.py与free_course_planning.py的mypy --follow-imports=silent",
-        "git diff --exit-code 221ae7a -- 旧T108准备/停止包与原ADR批准、T104/T106/T107目录；其他Task相等/T102 blocked/process前缀检查",
-        "python3 scripts/check_catalog_workflow.py；git diff --check",
-        "本轮准确包独立评估后另申请新真实批次授权，不继承旧余额",
-        "获准后：实际应用输入目标→真实规划及独立核对→真实正文/允许修复→私有草稿；实际完整阅读/演示/作答/反馈/刷新及独立教学评估；简化规划再被拒准确保存并停止交用户决定Provider路线"
+        "PYTHONPATH=backend:. backend/.venv/bin/python -m pytest -q backend/tests/test_head_course_planning_basis.py backend/tests/test_head_course_planning_wire.py",
+        "专用T108 PG：test_head_course_goal.py::test_goal_plan_private_course_and_feedback[head-new-A]、::test_exact_entry_mock_transport_and_raw_failures[phase]、::test_grounded_review_binding_and_planning_version_refuse_drift",
+        "backend/.venv/bin/python scripts/prepare_head_course_goal_grounded_package.py --check；backend/.venv/bin/python -I scripts/head_course_goal.py --inspect",
+        "五个变更后端源的mypy --follow-imports=silent；相关Python的Ruff",
+        "项目venv核对两候选完整materials与r02相同、wire/local/teaching Schema不变；旧包/失败/引擎/其他Task及process前缀核对",
+        "python3 scripts/check_catalog_workflow.py；git diff --check；新文档链接检查",
+        "本轮准确请求与同版依据独立准备评估；新真实批次另批，不继承旧余额",
+        "获准后：实际应用新目标→真实规划及同版独立核对→真实正文/唯一允许措辞修复→原私有草稿；完整阅读/演示/作答/反馈/刷新及独立教学评估，失败按包停止"
       ],
       "started_at": "2026-11-03T20:47:56+08:00",
       "completed_at": null,
-      "blocker": "r02规划1HTTP200及wire/local机械校验通过，但独立规划语义不通过：head作用域步骤和忽略返回值后果与固定示例不一致。按包STOP，未用2次失效，正文/修复/完整课程0；原稿未改。待用户决定规划策略及必要新包，不自动字段补丁/规划修复/调用或换Provider。",
+      "blocker": "r03同版规划依据/职责及传播绑定准备已通过独立审查，33单元+3定向PG/API/Mock通过；新真实调用及授权0，最终新完整课程未交付。待用户另行准确批准新包/批次，不重开r01/r02、不继承余额或C2。",
       "commit_lookup": "Task-Completed: PHASE-1.5-T108",
-      "execution_gate": "r02规划1HTTP200及wire/local机械校验通过，但独立规划语义不通过：head作用域步骤和忽略返回值后果与固定示例不一致。按包STOP，未用2次失效，正文/修复/完整课程0；原稿未改。待用户决定规划策略及必要新包，不自动字段补丁/规划修复/调用或换Provider。",
+      "execution_gate": "r03同版规划依据/职责及传播绑定准备已通过独立审查，33单元+3定向PG/API/Mock通过；新真实调用及授权0，最终新完整课程未交付。待用户另行准确批准新包/批次，不重开r01/r02、不继承余额或C2。",
       "verification_results": [
         {
           "date": "2026-11-03T21:28:21+08:00",
@@ -5341,6 +5353,19 @@
           ],
           "result": "1 HTTP200，6312字节完整原件解密SHA/长度和原wire→local mapping复核通过；新schema接口接受，选新head-new-A，1规划/v1大纲。独立语义核验stop_planning_consistency，原稿未改；STOP/余2失效，0正文/修复/完整课程。应用failed/PLANNING_REVIEW_FAILED，head_version=1保留；自报2327输入/580输出token，金额未知。",
           "evidence": "docs/acceptance/phase-1.5-head-goal-live-r02/RESULTS.md"
+        },
+        {
+          "date": "2026-11-04T10:02:09+08:00",
+          "commands": [
+            "PYTHONPATH=backend:. backend/.venv/bin/python -m pytest -q backend/tests/test_head_course_planning_basis.py backend/tests/test_head_course_planning_wire.py",
+            "专用T108 PG：test_head_course_goal.py::test_goal_plan_private_course_and_feedback[head-new-A]、::test_exact_entry_mock_transport_and_raw_failures[phase]、::test_grounded_review_binding_and_planning_version_refuse_drift",
+            "backend/.venv/bin/python scripts/prepare_head_course_goal_grounded_package.py --check；backend/.venv/bin/python -I scripts/head_course_goal.py --inspect",
+            "五个变更后端源的mypy --follow-imports=silent；相关Python的Ruff",
+            "项目venv核对两候选完整materials与r02相同、wire/local/teaching Schema不变；旧包/失败/引擎/其他Task及process前缀核对",
+            "python3 scripts/check_catalog_workflow.py；git diff --check；新文档链接检查"
+          ],
+          "result": "33定向单元+3实际PG/API/MockTransport、5源mypy/Ruff、实际请求/依据逐字节重建、原materials及wire/local/teaching Schema不变通过。独立评估助手独立33单元/427项文件摘要、实际构造/代码作用域/闭式返回对照与同版评估门禁核验pass；其未重跑PG。无新真实请求、规划或完整课程，不以准备完成T108。",
+          "evidence": "docs/acceptance/phase-1.5-head-goal-t108-r03-review.md"
         }
       ]
     }

@@ -116,7 +116,7 @@ async def persist_outcome(
         from app.agents import head_course_planning_wire
 
         request = head_course_planning_wire.build_request(snapshot)
-        prompt_version = head_course_planning_wire.VERSION
+        prompt_version = head_course_planning_wire.PROMPT_VERSION
     else:
         request = build_request(snapshot)
         prompt_version = PROMPT_VERSION

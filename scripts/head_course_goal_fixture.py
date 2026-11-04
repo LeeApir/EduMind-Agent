@@ -164,6 +164,7 @@ async def populate(owner, cid, oid, key):
                 candidate_digest=rec["candidate"]["candidate_digest"],
                 verdict="pass",
                 independent_evaluator="offline_fixture_only",
+                planning_basis_binding=context["payload"]["planning_basis"]["binding"],
             ),
         )
 

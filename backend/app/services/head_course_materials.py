@@ -165,7 +165,12 @@ def selected(plan: dict[str, Any]) -> str:
 
 
 def materials(plan: dict[str, Any]) -> dict[str, Any]:
-    key = selected(plan)
+    return materials_for_example(selected(plan))
+
+
+def materials_for_example(key: str) -> dict[str, Any]:
+    if key not in SPECS:
+        raise SnapshotError("HEAD_PLAN_UNSUPPORTED")
     catalog = contract.make_catalog(SPECS[key])
     # New transfer materials; no answer-bearing formatting examples are sent to the learner.
     spec = dict(
@@ -214,6 +219,9 @@ def materials(plan: dict[str, Any]) -> dict[str, Any]:
 
 
 def content_payload(inputs: dict[str, Any], plan: dict[str, Any]) -> dict[str, Any]:
+    from app.services.head_course_planning_basis import selected_basis
+
+    mat = materials(plan)
     return dict(
         original_goal=inputs["original_goal"],
         source_binding={key: inputs[key] for key in ("course_id", "operation_id", "request_id")},
@@ -224,7 +232,8 @@ def content_payload(inputs: dict[str, Any], plan: dict[str, Any]) -> dict[str, A
             demonstrated_mastery=None,
         ),
         plan=plan,
-        materials=materials(plan),
+        materials=mat,
+        planning_basis=selected_basis(mat),
         unknown_learner_fields="all others",
     )
 

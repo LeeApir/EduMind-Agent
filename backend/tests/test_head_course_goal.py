@@ -90,7 +90,7 @@ def test_goal_plan_private_course_and_feedback(key):
         version, actual_digest, local_value = run(planning_row)
         from app.agents.free_course_planning import request_digest
 
-        assert version == entry.plan_wire.VERSION
+        assert version == entry.plan_wire.PROMPT_VERSION
         assert actual_digest == request_digest(
             entry.plan_wire.build_request(context["planning_inputs"])
         )
@@ -256,8 +256,9 @@ def test_exact_entry_mock_transport_and_raw_failures(tmp_path, monkeypatch, bad_
             package_sha256="a" * 64,
             version=m.VERSION,
             explicit_user_authorization=True,
-            accept_ADR0052_R02_and_batch_C2=True,
+            accept_ADR0052_R03_and_batch_C2=True,
             planning_wire_version=entry.plan_wire.VERSION,
+            planning_prompt_version=entry.plan_wire.PROMPT_VERSION,
             starts_epoch=int(time.time()) - 1,
             expires_epoch=int(time.time()) - 1 + 600,
         )
@@ -270,6 +271,17 @@ def test_exact_entry_mock_transport_and_raw_failures(tmp_path, monkeypatch, bad_
                 entry.plan_wire.SCHEMA if len(count) == 1 else m.SCHEMA
             )
             payload = json.loads(body["input"][1]["content"])
+            if len(count) == 1:
+                from app.services.head_course_planning_basis import build_basis
+
+                assert payload["planning_example_basis"] == build_basis()
+            else:
+                assert (
+                    payload["planning_basis"]
+                    == m.content_payload(context["planning_inputs"], fixture.plan()["plan"])[
+                        "planning_basis"
+                    ]
+                )
             value = fixture.wire_plan() if len(count) == 1 else fixture.content(payload)
             return httpx.Response(200, stream=httpx.ByteStream(fixture.envelope(value)))
 
@@ -281,6 +293,9 @@ def test_exact_entry_mock_transport_and_raw_failures(tmp_path, monkeypatch, bad_
                     plan_digest=entry.digest("head-plan", plan=fixture.plan()["plan"]),
                     verdict="pass",
                     independent_evaluator="offline_fixture",
+                    planning_basis_binding=m.content_payload(
+                        context["planning_inputs"], fixture.plan()["plan"]
+                    )["planning_basis"]["binding"],
                 )
             )
         )
@@ -306,7 +321,12 @@ def test_exact_entry_mock_transport_and_raw_failures(tmp_path, monkeypatch, bad_
         )
 
         def refused_repair(request):
-            assert json.loads(request.content)["text"]["format"]["schema"] == m.SCHEMA
+            body = json.loads(request.content)
+            assert body["text"]["format"]["schema"] == m.SCHEMA
+            assert (
+                json.loads(body["input"][1]["content"])["original_input"]["planning_basis"]
+                == (rec["candidate"]["payload"]["planning_basis"])
+            )
             return httpx.Response(200, stream=httpx.ByteStream(bad))
 
         with pytest.raises(Exception):
@@ -333,3 +353,32 @@ def test_wrong_goal_refused_no_provider():
         h = {"X-CSRF-Token": auth["csrf_token"], "Idempotency-Key": str(uuid4())}
         r = client.post("/api/free-courses", json={"goal": "排序", "code_language": "c"}, headers=h)
         assert r.status_code in (400, 409, 422), r.text
+
+
+def test_grounded_review_binding_and_planning_version_refuse_drift(monkeypatch):
+    with TestClient(app, base_url="https://testserver") as client:
+        owner, created, _ = create(client)
+        cid, oid = UUID(created["course_id"]), UUID(created["operation_id"])
+        context = asyncio.run(entry.prepare(owner, cid, oid))
+        asyncio.run(entry.save_plan(context, fixture.wire_plan()))
+
+        async def check(db):
+            saved = await g.generation_context(db, owner, cid, oid)
+            record = fixture.record(saved["payload"])
+            review = dict(
+                candidate_digest=record["candidate"]["candidate_digest"],
+                verdict="pass",
+                independent_evaluator="offline_fixture",
+            )
+            for bad in (None, {"materials_digest": "different"}):
+                with pytest.raises(SnapshotError, match="HEAD_REVIEW_REQUIRED"):
+                    await g.publish(
+                        db, owner, cid, oid, [record], dict(review, planning_basis_binding=bad)
+                    )
+            with monkeypatch.context() as changed:
+                changed.setattr(entry.plan_wire, "PROMPT_VERSION", "different-planning-version")
+                with pytest.raises(SnapshotError, match="HEAD_PLANNING_BINDING"):
+                    await g.generation_context(db, owner, cid, oid)
+            assert (await g.generation_context(db, owner, cid, oid))["payload"] == saved["payload"]
+
+        run(check)

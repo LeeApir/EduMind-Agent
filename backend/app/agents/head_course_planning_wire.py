@@ -12,6 +12,7 @@ from app.services.free_course_snapshots import SnapshotError, canonical, digest
 from app.services.provider_gateway import ChatMessage, StructuredRequest, TextRequest
 
 VERSION = "head-goal-planning-wire-v2"
+PROMPT_VERSION = "head-goal-plan-grounded-v3"
 SCHEMA = json.loads(Path(__file__).with_suffix(".schema.json").read_text())
 INSTRUCTION = """[WIRE FORMAT head-goal-planning-wire-v2]
 Return protocol_version exactly head-goal-planning-wire-v2. All fields are required.
@@ -25,23 +26,38 @@ Objective planner_suggestion: source_key="" and source_excerpt=""; no invented e
 These empty strings/empty plans are wire markers only. Do not omit fields or use null.
 All original coverage, source, reference, support and clarification rules still apply.
 Return only the supplied wire schema, without commentary or code fences."""
+RESPONSIBILITY = """[PLANNING RESPONSIBILITY]
+Plan learning objectives, choose one supplied example ID, and organize teaching order.
+planning_example_basis is program-owned evidence from the exact shared code/trace version.
+Use its function interface, variable names/scopes and receive/ignore-return state differences.
+Do not design another implementation, invent algorithm steps, rename pointers, or add head=p.
+If you mention operations or outcomes in objectives/conventions/purposes, they must agree with
+the selected evidence. The local parameter head and main's caller_head are distinct variables.
+Ignoring a returned new head preserves the old list entry in this nonempty example; explain
+new allocated nodes' unreachability without claiming the old entry disappears.
+Program supplies code, states and answers. You still generate the actual plan; these facts
+are not an outline or teaching prose. Do not ask the learner to approve an internal plan.
+Independent review checks semantic consistency; do not invent references or facts to pass."""
 
 
 def build_request(inputs: dict[str, Any]) -> StructuredRequest:
     if "head_support" not in inputs:
         raise SnapshotError("HEAD_PLANNING_SCOPE_INVALID")
     original = local.build_request(inputs)
+    from app.services.head_course_planning_basis import build_basis
+
     instruction = original.prompt.messages[0].content.replace(
         "Planner suggestions have null source_key/source_excerpt.",
         "Planner suggestions have empty-string source_key/source_excerpt on this wire.",
     )
     payload = json.loads(original.prompt.messages[1].content)
-    payload["prompt_version"] = VERSION
+    payload["prompt_version"] = PROMPT_VERSION
     payload["wire_protocol"] = VERSION
+    payload["planning_example_basis"] = build_basis()
     return StructuredRequest(
         prompt=TextRequest(
             messages=(
-                ChatMessage("system", instruction + "\n" + INSTRUCTION),
+                ChatMessage("system", instruction + "\n" + INSTRUCTION + "\n" + RESPONSIBILITY),
                 ChatMessage("user", canonical(payload).decode()),
             ),
             task_profile=original.prompt.task_profile,
@@ -92,9 +108,13 @@ def to_local(raw: Any, inputs: dict[str, Any]) -> dict[str, Any]:
 
 
 def mapping_record(raw: Any, inputs: dict[str, Any]) -> dict[str, Any]:
+    from app.services.head_course_planning_basis import build_basis
+
     value = to_local(raw, inputs)
     return dict(
         wire_version=VERSION,
+        planning_prompt_version=PROMPT_VERSION,
+        planning_basis_digest=build_basis()["basis_digest"],
         local_schema_version=local.SCHEMA_VERSION,
         wire_digest=digest("head-plan-wire", value=raw),
         local_digest=digest("head-plan-local", value=value),

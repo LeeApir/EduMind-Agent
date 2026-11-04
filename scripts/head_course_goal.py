@@ -20,7 +20,7 @@ from app.services import head_course_materials as m  # noqa: E402
 from app.agents import head_course_planning_wire as plan_wire  # noqa: E402
 from app.services.free_course_snapshots import SnapshotError, canonical, digest  # noqa: E402
 
-PACKAGE = ROOT / "docs/acceptance/phase-1.5-head-goal-t108-r02"
+PACKAGE = ROOT / "docs/acceptance/phase-1.5-head-goal-t108-r03"
 OLD = ROOT / "docs/acceptance/phase-1.5-limited-c-preparation-t104/execute_once.py"
 spec = importlib.util.spec_from_file_location("head_goal_raw_transport", OLD)
 raw_io = importlib.util.module_from_spec(spec)
@@ -256,8 +256,9 @@ def approval_check(vault, approval):
     if (
         approval.get("package_sha256") != sha
         or approval.get("version") != m.VERSION
-        or approval.get("accept_ADR0052_R02_and_batch_C2") is not True
+        or approval.get("accept_ADR0052_R03_and_batch_C2") is not True
         or approval.get("planning_wire_version") != plan_wire.VERSION
+        or approval.get("planning_prompt_version") != plan_wire.PROMPT_VERSION
         or approval.get("explicit_user_authorization") is not True
         or not approval["starts_epoch"] <= time.time() < approval["expires_epoch"]
         or approval["expires_epoch"] - approval["starts_epoch"] != 600
@@ -299,11 +300,14 @@ def send(stage, vault, approval, *, transport=None, key=None):
             request = planning_body(context["planning_inputs"])
         else:
             plan = verify_saved(vault, "plan", cipher)["plan"]
+            payload = m.content_payload(context["planning_inputs"], plan)
             review = read(vault / "plan-review.json")
             if (
                 review.get("plan_digest") != digest("head-plan", plan=plan)
                 or review.get("verdict") != "pass"
                 or not review.get("independent_evaluator")
+                or review.get("planning_basis_binding")
+                != payload["planning_basis"]["binding"]
             ):
                 raise SnapshotError("HEAD_PLAN_REVIEW_REQUIRED")
             if stage == "generate" and (vault / "repair.attempt.json").exists():
@@ -311,7 +315,6 @@ def send(stage, vault, approval, *, transport=None, key=None):
             if stage == "repair":
                 parent = verify_saved(vault, "generate", cipher)["candidate"]
                 issues = repair_issues(vault, parent)
-            payload = m.content_payload(context["planning_inputs"], plan)
             request = m.body(payload, parent, issues)
         raw_request = canonical(request)
         if len(raw_request) > 131072:
