@@ -5668,7 +5668,10 @@
             "const": "head_goal_model_generation"
           },
           "batch": {
-            "const": "PHASE-1.5-T108"
+            "enum": [
+              "PHASE-1.5-T108",
+              "head-goal-r03-derived"
+            ]
           },
           "candidate_digest": {
             "type": "string",
@@ -5702,7 +5705,123 @@
           "evidence_kind": {
             "enum": [
               "actual_provider_response",
-              "offline_fixture"
+              "offline_fixture",
+              "program_format_recovery"
+            ]
+          },
+          "format_recovery": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "rule_version": {
+                "const": "head-questions-identical-duplicate-v1"
+              },
+              "source_batch": {
+                "const": "head-goal-r03"
+              },
+              "original_raw_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "original_text_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "derived_output_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "original_request_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "new_provider_calls": {
+                "const": 0
+              },
+              "model_first_structure_pass": {
+                "const": false
+              },
+              "assistant_text_edits": {
+                "const": 0
+              },
+              "duplicates": {
+                "type": "array",
+                "maxItems": 4,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "path": {
+                      "type": "array",
+                      "prefixItems": [
+                        {
+                          "const": "questions"
+                        },
+                        {
+                          "enum": [
+                            "link_target",
+                            "normal_values",
+                            "discarded_values",
+                            "unreachable_count"
+                          ]
+                        }
+                      ],
+                      "minItems": 2,
+                      "maxItems": 2
+                    },
+                    "removed_member_index": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "occurrence": {
+                      "const": 2
+                    },
+                    "value_sha256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    }
+                  },
+                  "required": [
+                    "path",
+                    "removed_member_index",
+                    "occurrence",
+                    "value_sha256"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "rule_version",
+              "source_batch",
+              "original_raw_sha256",
+              "original_text_sha256",
+              "derived_output_sha256",
+              "original_request_sha256",
+              "new_provider_calls",
+              "model_first_structure_pass",
+              "assistant_text_edits",
+              "duplicates"
+            ]
+          },
+          "teaching_review": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "verdict": {
+                "enum": [
+                  "pending",
+                  "pass",
+                  "needs_revision"
+                ]
+              },
+              "independent_evaluator": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "verdict",
+              "independent_evaluator"
             ]
           }
         },
@@ -5716,6 +5835,49 @@
           "plan_digest",
           "materials_digest",
           "evidence_kind"
+        ],
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "evidence_kind": {
+                  "const": "program_format_recovery"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "format_recovery",
+                "teaching_review"
+              ],
+              "properties": {
+                "batch": {
+                  "const": "head-goal-r03-derived"
+                }
+              }
+            },
+            "else": {
+              "not": {
+                "anyOf": [
+                  {
+                    "required": [
+                      "format_recovery"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "teaching_review"
+                    ]
+                  }
+                ]
+              },
+              "properties": {
+                "batch": {
+                  "const": "PHASE-1.5-T108"
+                }
+              }
+            }
+          }
         ]
       }
     },

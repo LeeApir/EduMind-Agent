@@ -78,6 +78,8 @@ T040保持blocked；T041标记blocked，旧链性能验收暂缓，新链性能�
 
 ### 0.5 P1.5自由课程学习与界面重构（2026-10-21，方向已确认）
 
+2026-11-04 T108 r03本地派生恢复：用户明确授权仅对四题相同重复成员做确定性删除，保留严格解析器、原稿/失败/STOP；[契约差异](ADR/0052-identical-duplicate-recovery.md)和[完整私有审查预览](acceptance/phase-1.5-head-goal-r03-recovery/RESULTS.md)区分程序格式恢复与模型首次结构成功。新增Provider0，13帧/四题/反馈/刷新可用；独立教学评估因必要初始化顺序及NULL检查表述错误为needs_revision，页面明确警示，T108继续blocked，不自动改写或新调用。
+
 2026-11-04 T108 r03真实停止：用户明确批准4986af7准确包/ADR0052 r03差异及本批C2，新窗口10:24:46—10:34:46。实际规划HTTP200且独立语义pass；正文HTTP200但四题JSON键各重复2次，严格入口DUPLICATE_JSON_KEY，2请求后STOP、余1失效。规划/v1及全部原件保留，0合格正文候选/0完整课程，T108仍blocked；[真实结果与独立核对](acceptance/phase-1.5-head-goal-live-r03/RESULTS.md)保留。不自动取舍重复值、修JSON、重试或追加实验，T102 blocked。
 
 2026-11-04 T108 r03限定准备：用户授权让规划读取同版程序示例依据并明确目标/选例/教学顺序职责；[新准确请求及依据](acceptance/phase-1.5-head-goal-t108-r03/README.md)与[集中契约差异](ADR/0052-planning-basis-r03.md)供评估。保持已验证wire v2及本地完整校验，模型仍生成真实规划，程序绑定规划/正文/评估材料；旧r01/r02停止、原稿和失效额度不改，本轮新真实调用及授权0。最终仍以实际应用新完整私有课程验收，不以准备或Mock完成T108，T102 blocked。

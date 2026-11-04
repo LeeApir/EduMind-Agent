@@ -128,6 +128,10 @@ def fingerprint(row: FreeSceneGenerationResult) -> str:
 
 def validate_generation(row: FreeSceneGenerationResult, actual: dict[str, Any]) -> dict[str, Any]:
     snapshot = row.input_snapshot
+    if row.schema_version == "head-questions-identical-duplicate-v1":
+        from app.services.head_course_derivation import validate_derivation
+
+        return validate_derivation(row, actual)
     record = cast(dict[str, Any], snapshot["generation"])
     c = record["candidate"]
     expected_payload = m.content_payload(actual["request"], actual["plan"]["candidate"])

@@ -1,0 +1,118 @@
+{
+  "evaluator": "/root/head_goal_independent",
+  "new_provider_calls": 0,
+  "teaching_verdict": "needs_revision",
+  "steps": [],
+  "owner": "a611a420-1fa0-4154-978a-ce726cca630f",
+  "local_import": {
+    "course_id": "58a08c03-64dc-4217-b52c-8bc491c26ff2",
+    "operation_id": "fb0aca2c-fc8a-4456-939a-b73890eb95c5",
+    "version": 2,
+    "scene_id": "95c4076b-5312-45ec-809a-e181480cc725",
+    "candidate_digest": "7fde0859549aef0e0e64415880ed67e541dbf3f0d302e7eeae6faf76090b0779",
+    "imported": true
+  },
+  "warning": "教学评估未通过 · 仅供审查预览：原文存在字段初始化顺序的错误因果，以及 NULL 检查的歧义。请勿据此学习这两项结论；原文保留供逐项复核。",
+  "frames": [
+    {
+      "frame": "f00",
+      "highlight_line": null,
+      "scope": "inactive",
+      "note": "main 中 i0.data=12、i0.next=NULL，caller_head 指向 i0。insert 尚未调用，局部 head 与 p 都不存在，作用域仅在 main。",
+      "visible_state": "i0 · 栈节点 · data: 12 · next: NULL"
+    },
+    {
+      "frame": "f01",
+      "highlight_line": 4,
+      "scope": "active",
+      "note": "allocation_success 为 1，malloc 返回新动态节点 t0，局部 p 指向 t0。t0 的 data 与 next 仍是未初始化字段，不能读取。head 副本仍为 i0。",
+      "visible_state": "i0 · 栈节点 · data: 12 · next: NULL\nt0 · 动态节点 · data: 未知（未初始化） · next: 未知（未初始化）"
+    },
+    {
+      "frame": "f02",
+      "highlight_line": 5,
+      "scope": "active",
+      "note": "p 不为 NULL，if (p == NULL) return head 不成立，不提前返回。此帧只表示检查通过，不表示发生过分配失败。",
+      "visible_state": "i0 · 栈节点 · data: 12 · next: NULL\nt0 · 动态节点 · data: 未知（未初始化） · next: 未知（未初始化）"
+    },
+    {
+      "frame": "f03",
+      "highlight_line": 6,
+      "scope": "active",
+      "note": "p->data = value 把 4 写入 t0.data。t0.next 仍不确定，节点还不能安全遍历。caller_head 与 head 都仍指向 i0。",
+      "visible_state": "i0 · 栈节点 · data: 12 · next: NULL\nt0 · 动态节点 · data: 4 · next: 未知（未初始化）"
+    },
+    {
+      "frame": "f04",
+      "highlight_line": 7,
+      "scope": "active",
+      "note": "p->next = head 把旧头指针 i0 存入 t0.next，新节点接到旧链表前面。i0 与 caller_head 都未被修改。",
+      "visible_state": "i0 · 栈节点 · data: 12 · next: NULL\nt0 · 动态节点 · data: 4 · next: i0"
+    },
+    {
+      "frame": "f05",
+      "highlight_line": 8,
+      "scope": "active",
+      "note": "return p 返回 t0 的地址。insert 即将结束，局部 head 与 p 的作用域随之结束，但 t0 是动态存储，仍然存在。",
+      "visible_state": "i0 · 栈节点 · data: 12 · next: NULL\nt0 · 动态节点 · data: 4 · next: i0"
+    },
+    {
+      "frame": "f06",
+      "highlight_line": 15,
+      "scope": "inactive",
+      "note": "caller_head = insert(...) 把 t0 存回 caller_head，链表头从 i0 变为 t0。若丢弃返回值，caller_head 仍为 i0，t0 将不可达。",
+      "visible_state": "i0 · 栈节点 · data: 12 · next: NULL\nt0 · 动态节点 · data: 4 · next: i0"
+    },
+    {
+      "frame": "f07",
+      "highlight_line": 4,
+      "scope": "active",
+      "note": "传入的 head 副本为 t0，malloc 返回 t1，局部 p 指向 t1。t1 的 data 与 next 未初始化，head 仍为 t0。",
+      "visible_state": "i0 · 栈节点 · data: 12 · next: NULL\nt0 · 动态节点 · data: 4 · next: i0\nt1 · 动态节点 · data: 未知（未初始化） · next: 未知（未初始化）"
+    },
+    {
+      "frame": "f08",
+      "highlight_line": 5,
+      "scope": "active",
+      "note": "p 不为 NULL，不提前返回 head。此帧同样只表示成功路径上的检查通过。",
+      "visible_state": "i0 · 栈节点 · data: 12 · next: NULL\nt0 · 动态节点 · data: 4 · next: i0\nt1 · 动态节点 · data: 未知（未初始化） · next: 未知（未初始化）"
+    },
+    {
+      "frame": "f09",
+      "highlight_line": 6,
+      "scope": "active",
+      "note": "p->data = value 把 7 写入 t1.data。t1.next 仍不确定，尚未接入链表。",
+      "visible_state": "i0 · 栈节点 · data: 12 · next: NULL\nt0 · 动态节点 · data: 4 · next: i0\nt1 · 动态节点 · data: 7 · next: 未知（未初始化）"
+    },
+    {
+      "frame": "f10",
+      "highlight_line": 7,
+      "scope": "active",
+      "note": "p->next = head 把当前旧头 t0 存入 t1.next，t1 接到 t0 前面。caller_head 此刻仍为 t0，尚未更新。",
+      "visible_state": "i0 · 栈节点 · data: 12 · next: NULL\nt0 · 动态节点 · data: 4 · next: i0\nt1 · 动态节点 · data: 7 · next: t0"
+    },
+    {
+      "frame": "f11",
+      "highlight_line": 8,
+      "scope": "active",
+      "note": "return p 返回 t1。insert 结束，局部 head 与 p 失效；t1 是动态节点，继续存在。",
+      "visible_state": "i0 · 栈节点 · data: 12 · next: NULL\nt0 · 动态节点 · data: 4 · next: i0\nt1 · 动态节点 · data: 7 · next: t0"
+    },
+    {
+      "frame": "f12",
+      "highlight_line": 16,
+      "scope": "inactive",
+      "note": "caller_head = insert(...) 把 t1 存回 caller_head，最终可达顺序 t1→t0→i0，数据 7、4、12，遍历在 NULL 处终止。",
+      "visible_state": "i0 · 栈节点 · data: 12 · next: NULL\nt0 · 动态节点 · data: 4 · next: i0\nt1 · 动态节点 · data: 7 · next: t0"
+    }
+  ],
+  "play_pause_stable_frame": "f02",
+  "wrong_feedback": "随堂练习\n\n迁移练习\n\n题组版本 3975da8c-bb7c-59c4-8295-3181135b3d8e · 课程 v2\n\n1. 考虑如下 C 代码：\n\n#include <stdlib.h>\ntypedef struct Node { int data; struct Node *next; } Node;\nNode *insert(Node *head, int value, int allocation_success) {\n    Node *p = allocation_success ? malloc(sizeof *p) : NULL;\n    if (p == NULL) return head;\n    p->data = value;\n    p->next = head;\n    return p;\n}\nint main(void) {\n    Node i0;\n    Node i1;\n    i0.data = 30;\n    i0.next = &i1;\n    i1.data = 40;\n    i1.next = NULL;\n    Node *caller_head = &i0;\n    caller_head = insert(caller_head, 11, 1);\n    (void)caller_head;\n    return 0;\n}\n\n在正常代码路径下，insert 执行到 p->next = head 时，p->next 第一次被赋成的目标节点是哪一个？请只填写该初始节点的 C 变量名（不要加 & 或说明文字）。\n2. 考虑如下 C 代码：\n\n#include <stdlib.h>\ntypedef struct Node { int data; struct Node *next; } Node;\nNode *insert(Node *head, int value, int allocation_success) {\n    Node *p = allocation_success ? malloc(sizeof *p) : NULL;\n    if (p == NULL) return head;\n    p->data = value;\n    p->next = head;\n    return p;\n}\nint main(void) {\n    Node i0;\n    Node i1;\n    i0.data = 30;\n    i0.next = &i1;\n    i1.data = 40;\n    i1.next = NULL;\n    Node *caller_head = &i0;\n    caller_head = insert(caller_head, 11, 1);\n    (void)caller_head;\n    return 0;\n}\n\n在正常代码路径下，从 main 的 caller_head 出发沿 next 遍历直到 NULL，依次读到的 data 值是什么？请用一个 JSON 整数数组作答。\n输入 JSON 整数数组，不附加文字\n3. 考虑如下 C 代码：\n\n#include <stdlib.h>\ntypedef struct Node { int data; struct Node *next; } Node;\nNode *insert(Node *head, int value, int allocation_success) {\n    Node *p = allocation_success ? malloc(sizeof *p) : NULL;\n    if (p == NULL) return head;\n    p->data = value;\n    p->next = head;\n    return p;\n}\nint main(void) {\n    Node i0;\n    Node i1;\n    i0.data = 30;\n    i0.next = &i1;\n    i1.data = 40;\n    i1.next = NULL;\n    Node *caller_head = &i0;\n    insert(caller_head, 11, 1);\n    (void)caller_head;\n    return 0;\n}\n\n若调用处丢弃返回值（如上写 insert(caller_head, 11, 1); 而不赋值），从 main 的 caller_head 出发沿 next 遍历直到 NULL，依次读到的 data 值是什么？请用一个 JSON 整数数组作答。\n输入 JSON 整数数组，不附加文字\n4. 考虑如下 C 代码：\n\n#include <stdlib.h>\ntypedef struct Node { int data; struct Node *next; } Node;\nNode *insert(Node *head, int value, int allocation_success) {\n    Node *p = allocation_success ? malloc(sizeof *p) : NULL;\n    if (p == NULL) return head;\n    p->data = value;\n    p->next = head;\n    return p;\n}\nint main(void) {\n    Node i0;\n    Node i1;\n    i0.data = 30;\n    i0.next = &i1;\n    i1.data = 40;\n    i1.next = NULL;\n    Node *caller_head = &i0;\n    insert(caller_head, 11, 1);\n    (void)caller_head;\n    return 0;\n}\n\n若调用处丢弃返回值（如上写 insert(caller_head, 11, 1); 而不赋值），从 main 的 caller_head 出发，有多少个动态分配的节点不可达？请用一个 JSON 整数作答。\n输入一个 JSON 整数\n可先保存部分作答；全部作答后才显示比较。暂定结果不直接更新掌握度。\n提交本次作答\n继续完善或新作答\n原始作答记录\n选择已有记录\n第1次 · 课程 v2 · 题组 3975da8c-bb7c-59c4-8295-3181135b3d8e\n刷新这份反馈\n暂定比较 · 答案尚未可靠核定\n\n作答对应课程 v2，场景版本 21b47403-5187-4f91-a0cb-14f5b0012d8f，题组版本 3975da8c-bb7c-59c4-8295-3181135b3d8e。\n\n你的原始作答\nlink_target：i1\nnormal_values：[0]\ndiscarded_values：[0]\nunreachable_count：0\n\n仅保留课程内表现，未更新正式掌握度。\n\n与暂定参考的匹配比例：0%\n\nlink_target：与参考不同。调用时 head 副本保存的是 caller_head 的当前值 &i0，所以 p->next = head 让新节点 t0 的 next 指向 i0。i1 是 i0 的后继，不是这一步的直接目标。\nnormal_values：与参考不同。caller_head 被赋值为返回的新节点 t0，t0.data=11、t0.next=i0，i0.data=30、i0.next=&i1，i1.data=40、i1.next=NULL，因此顺序为 11、30、40。\ndiscarded_values：与参考不同。返回值被丢弃，caller_head 仍为 &i0，因此从 i0 出发只能读到 30、40；新分配的 t0 虽然存在且 t0.next=i0，但从 caller_head 不可达。\nunreachable_count：与参考不同。本次调用只分配了一个动态节点 t0；返回值被丢弃后 caller_head 仍为 &i0，t0 不在从 caller_head 出发的可达链上，因此不可达的动态节点数为 1。i0 与 i1 是自动存储节点，不计入动态分配节点。",
+  "correct_feedback": "随堂练习\n\n迁移练习\n\n题组版本 3975da8c-bb7c-59c4-8295-3181135b3d8e · 课程 v2\n\n1. 考虑如下 C 代码：\n\n#include <stdlib.h>\ntypedef struct Node { int data; struct Node *next; } Node;\nNode *insert(Node *head, int value, int allocation_success) {\n    Node *p = allocation_success ? malloc(sizeof *p) : NULL;\n    if (p == NULL) return head;\n    p->data = value;\n    p->next = head;\n    return p;\n}\nint main(void) {\n    Node i0;\n    Node i1;\n    i0.data = 30;\n    i0.next = &i1;\n    i1.data = 40;\n    i1.next = NULL;\n    Node *caller_head = &i0;\n    caller_head = insert(caller_head, 11, 1);\n    (void)caller_head;\n    return 0;\n}\n\n在正常代码路径下，insert 执行到 p->next = head 时，p->next 第一次被赋成的目标节点是哪一个？请只填写该初始节点的 C 变量名（不要加 & 或说明文字）。\n2. 考虑如下 C 代码：\n\n#include <stdlib.h>\ntypedef struct Node { int data; struct Node *next; } Node;\nNode *insert(Node *head, int value, int allocation_success) {\n    Node *p = allocation_success ? malloc(sizeof *p) : NULL;\n    if (p == NULL) return head;\n    p->data = value;\n    p->next = head;\n    return p;\n}\nint main(void) {\n    Node i0;\n    Node i1;\n    i0.data = 30;\n    i0.next = &i1;\n    i1.data = 40;\n    i1.next = NULL;\n    Node *caller_head = &i0;\n    caller_head = insert(caller_head, 11, 1);\n    (void)caller_head;\n    return 0;\n}\n\n在正常代码路径下，从 main 的 caller_head 出发沿 next 遍历直到 NULL，依次读到的 data 值是什么？请用一个 JSON 整数数组作答。\n输入 JSON 整数数组，不附加文字\n3. 考虑如下 C 代码：\n\n#include <stdlib.h>\ntypedef struct Node { int data; struct Node *next; } Node;\nNode *insert(Node *head, int value, int allocation_success) {\n    Node *p = allocation_success ? malloc(sizeof *p) : NULL;\n    if (p == NULL) return head;\n    p->data = value;\n    p->next = head;\n    return p;\n}\nint main(void) {\n    Node i0;\n    Node i1;\n    i0.data = 30;\n    i0.next = &i1;\n    i1.data = 40;\n    i1.next = NULL;\n    Node *caller_head = &i0;\n    insert(caller_head, 11, 1);\n    (void)caller_head;\n    return 0;\n}\n\n若调用处丢弃返回值（如上写 insert(caller_head, 11, 1); 而不赋值），从 main 的 caller_head 出发沿 next 遍历直到 NULL，依次读到的 data 值是什么？请用一个 JSON 整数数组作答。\n输入 JSON 整数数组，不附加文字\n4. 考虑如下 C 代码：\n\n#include <stdlib.h>\ntypedef struct Node { int data; struct Node *next; } Node;\nNode *insert(Node *head, int value, int allocation_success) {\n    Node *p = allocation_success ? malloc(sizeof *p) : NULL;\n    if (p == NULL) return head;\n    p->data = value;\n    p->next = head;\n    return p;\n}\nint main(void) {\n    Node i0;\n    Node i1;\n    i0.data = 30;\n    i0.next = &i1;\n    i1.data = 40;\n    i1.next = NULL;\n    Node *caller_head = &i0;\n    insert(caller_head, 11, 1);\n    (void)caller_head;\n    return 0;\n}\n\n若调用处丢弃返回值（如上写 insert(caller_head, 11, 1); 而不赋值），从 main 的 caller_head 出发，有多少个动态分配的节点不可达？请用一个 JSON 整数作答。\n输入一个 JSON 整数\n可先保存部分作答；全部作答后才显示比较。暂定结果不直接更新掌握度。\n提交本次作答\n继续完善或新作答\n原始作答记录\n选择已有记录\n第1次 · 课程 v2 · 题组 3975da8c-bb7c-59c4-8295-3181135b3d8e\n第2次 · 课程 v2 · 题组 3975da8c-bb7c-59c4-8295-3181135b3d8e\n刷新这份反馈\n暂定比较 · 答案尚未可靠核定\n\n作答对应课程 v2，场景版本 21b47403-5187-4f91-a0cb-14f5b0012d8f，题组版本 3975da8c-bb7c-59c4-8295-3181135b3d8e。\n\n你的原始作答\nlink_target：i0\nnormal_values：[11, 30, 40]\ndiscarded_values：[\n30,40\n]\nunreachable_count：1\n\n仅保留课程内表现，未更新正式掌握度。\n\n与暂定参考的匹配比例：100%\n\nlink_target：匹配参考。调用时 head 副本保存的是 caller_head 的当前值 &i0，所以 p->next = head 让新节点 t0 的 next 指向 i0。i1 是 i0 的后继，不是这一步的直接目标。\nnormal_values：匹配参考。caller_head 被赋值为返回的新节点 t0，t0.data=11、t0.next=i0，i0.data=30、i0.next=&i1，i1.data=40、i1.next=NULL，因此顺序为 11、30、40。\ndiscarded_values：匹配参考。返回值被丢弃，caller_head 仍为 &i0，因此从 i0 出发只能读到 30、40；新分配的 t0 虽然存在且 t0.next=i0，但从 caller_head 不可达。\nunreachable_count：匹配参考。本次调用只分配了一个动态节点 t0；返回值被丢弃后 caller_head 仍为 &i0，t0 不在从 caller_head 出发的可达链上，因此不可达的动态节点数为 1。i0 与 i1 是自动存储节点，不计入动态分配节点。",
+  "before_refresh": "随堂练习\n\n迁移练习\n\n题组版本 3975da8c-bb7c-59c4-8295-3181135b3d8e · 课程 v2\n\n1. 考虑如下 C 代码：\n\n#include <stdlib.h>\ntypedef struct Node { int data; struct Node *next; } Node;\nNode *insert(Node *head, int value, int allocation_success) {\n    Node *p = allocation_success ? malloc(sizeof *p) : NULL;\n    if (p == NULL) return head;\n    p->data = value;\n    p->next = head;\n    return p;\n}\nint main(void) {\n    Node i0;\n    Node i1;\n    i0.data = 30;\n    i0.next = &i1;\n    i1.data = 40;\n    i1.next = NULL;\n    Node *caller_head = &i0;\n    caller_head = insert(caller_head, 11, 1);\n    (void)caller_head;\n    return 0;\n}\n\n在正常代码路径下，insert 执行到 p->next = head 时，p->next 第一次被赋成的目标节点是哪一个？请只填写该初始节点的 C 变量名（不要加 & 或说明文字）。\n2. 考虑如下 C 代码：\n\n#include <stdlib.h>\ntypedef struct Node { int data; struct Node *next; } Node;\nNode *insert(Node *head, int value, int allocation_success) {\n    Node *p = allocation_success ? malloc(sizeof *p) : NULL;\n    if (p == NULL) return head;\n    p->data = value;\n    p->next = head;\n    return p;\n}\nint main(void) {\n    Node i0;\n    Node i1;\n    i0.data = 30;\n    i0.next = &i1;\n    i1.data = 40;\n    i1.next = NULL;\n    Node *caller_head = &i0;\n    caller_head = insert(caller_head, 11, 1);\n    (void)caller_head;\n    return 0;\n}\n\n在正常代码路径下，从 main 的 caller_head 出发沿 next 遍历直到 NULL，依次读到的 data 值是什么？请用一个 JSON 整数数组作答。\n输入 JSON 整数数组，不附加文字\n3. 考虑如下 C 代码：\n\n#include <stdlib.h>\ntypedef struct Node { int data; struct Node *next; } Node;\nNode *insert(Node *head, int value, int allocation_success) {\n    Node *p = allocation_success ? malloc(sizeof *p) : NULL;\n    if (p == NULL) return head;\n    p->data = value;\n    p->next = head;\n    return p;\n}\nint main(void) {\n    Node i0;\n    Node i1;\n    i0.data = 30;\n    i0.next = &i1;\n    i1.data = 40;\n    i1.next = NULL;\n    Node *caller_head = &i0;\n    insert(caller_head, 11, 1);\n    (void)caller_head;\n    return 0;\n}\n\n若调用处丢弃返回值（如上写 insert(caller_head, 11, 1); 而不赋值），从 main 的 caller_head 出发沿 next 遍历直到 NULL，依次读到的 data 值是什么？请用一个 JSON 整数数组作答。\n输入 JSON 整数数组，不附加文字\n4. 考虑如下 C 代码：\n\n#include <stdlib.h>\ntypedef struct Node { int data; struct Node *next; } Node;\nNode *insert(Node *head, int value, int allocation_success) {\n    Node *p = allocation_success ? malloc(sizeof *p) : NULL;\n    if (p == NULL) return head;\n    p->data = value;\n    p->next = head;\n    return p;\n}\nint main(void) {\n    Node i0;\n    Node i1;\n    i0.data = 30;\n    i0.next = &i1;\n    i1.data = 40;\n    i1.next = NULL;\n    Node *caller_head = &i0;\n    insert(caller_head, 11, 1);\n    (void)caller_head;\n    return 0;\n}\n\n若调用处丢弃返回值（如上写 insert(caller_head, 11, 1); 而不赋值），从 main 的 caller_head 出发，有多少个动态分配的节点不可达？请用一个 JSON 整数作答。\n输入一个 JSON 整数\n可先保存部分作答；全部作答后才显示比较。暂定结果不直接更新掌握度。\n提交本次作答\n继续完善或新作答\n原始作答记录\n选择已有记录\n第1次 · 课程 v2 · 题组 3975da8c-bb7c-59c4-8295-3181135b3d8e\n第2次 · 课程 v2 · 题组 3975da8c-bb7c-59c4-8295-3181135b3d8e\n刷新这份反馈\n暂定比较 · 答案尚未可靠核定\n\n作答对应课程 v2，场景版本 21b47403-5187-4f91-a0cb-14f5b0012d8f，题组版本 3975da8c-bb7c-59c4-8295-3181135b3d8e。\n\n你的原始作答\nlink_target：i0\nnormal_values：[11, 30, 40]\ndiscarded_values：[\n30,40\n]\nunreachable_count：1\n\n仅保留课程内表现，未更新正式掌握度。\n\n与暂定参考的匹配比例：100%\n\nlink_target：匹配参考。调用时 head 副本保存的是 caller_head 的当前值 &i0，所以 p->next = head 让新节点 t0 的 next 指向 i0。i1 是 i0 的后继，不是这一步的直接目标。\nnormal_values：匹配参考。caller_head 被赋值为返回的新节点 t0，t0.data=11、t0.next=i0，i0.data=30、i0.next=&i1，i1.data=40、i1.next=NULL，因此顺序为 11、30、40。\ndiscarded_values：匹配参考。返回值被丢弃，caller_head 仍为 &i0，因此从 i0 出发只能读到 30、40；新分配的 t0 虽然存在且 t0.next=i0，但从 caller_head 不可达。\nunreachable_count：匹配参考。本次调用只分配了一个动态节点 t0；返回值被丢弃后 caller_head 仍为 &i0，t0 不在从 caller_head 出发的可达链上，因此不可达的动态节点数为 1。i0 与 i1 是自动存储节点，不计入动态分配节点。",
+  "after_refresh": "随堂练习\n\n迁移练习\n\n题组版本 3975da8c-bb7c-59c4-8295-3181135b3d8e · 课程 v2\n\n1. 考虑如下 C 代码：\n\n#include <stdlib.h>\ntypedef struct Node { int data; struct Node *next; } Node;\nNode *insert(Node *head, int value, int allocation_success) {\n    Node *p = allocation_success ? malloc(sizeof *p) : NULL;\n    if (p == NULL) return head;\n    p->data = value;\n    p->next = head;\n    return p;\n}\nint main(void) {\n    Node i0;\n    Node i1;\n    i0.data = 30;\n    i0.next = &i1;\n    i1.data = 40;\n    i1.next = NULL;\n    Node *caller_head = &i0;\n    caller_head = insert(caller_head, 11, 1);\n    (void)caller_head;\n    return 0;\n}\n\n在正常代码路径下，insert 执行到 p->next = head 时，p->next 第一次被赋成的目标节点是哪一个？请只填写该初始节点的 C 变量名（不要加 & 或说明文字）。\n2. 考虑如下 C 代码：\n\n#include <stdlib.h>\ntypedef struct Node { int data; struct Node *next; } Node;\nNode *insert(Node *head, int value, int allocation_success) {\n    Node *p = allocation_success ? malloc(sizeof *p) : NULL;\n    if (p == NULL) return head;\n    p->data = value;\n    p->next = head;\n    return p;\n}\nint main(void) {\n    Node i0;\n    Node i1;\n    i0.data = 30;\n    i0.next = &i1;\n    i1.data = 40;\n    i1.next = NULL;\n    Node *caller_head = &i0;\n    caller_head = insert(caller_head, 11, 1);\n    (void)caller_head;\n    return 0;\n}\n\n在正常代码路径下，从 main 的 caller_head 出发沿 next 遍历直到 NULL，依次读到的 data 值是什么？请用一个 JSON 整数数组作答。\n输入 JSON 整数数组，不附加文字\n3. 考虑如下 C 代码：\n\n#include <stdlib.h>\ntypedef struct Node { int data; struct Node *next; } Node;\nNode *insert(Node *head, int value, int allocation_success) {\n    Node *p = allocation_success ? malloc(sizeof *p) : NULL;\n    if (p == NULL) return head;\n    p->data = value;\n    p->next = head;\n    return p;\n}\nint main(void) {\n    Node i0;\n    Node i1;\n    i0.data = 30;\n    i0.next = &i1;\n    i1.data = 40;\n    i1.next = NULL;\n    Node *caller_head = &i0;\n    insert(caller_head, 11, 1);\n    (void)caller_head;\n    return 0;\n}\n\n若调用处丢弃返回值（如上写 insert(caller_head, 11, 1); 而不赋值），从 main 的 caller_head 出发沿 next 遍历直到 NULL，依次读到的 data 值是什么？请用一个 JSON 整数数组作答。\n输入 JSON 整数数组，不附加文字\n4. 考虑如下 C 代码：\n\n#include <stdlib.h>\ntypedef struct Node { int data; struct Node *next; } Node;\nNode *insert(Node *head, int value, int allocation_success) {\n    Node *p = allocation_success ? malloc(sizeof *p) : NULL;\n    if (p == NULL) return head;\n    p->data = value;\n    p->next = head;\n    return p;\n}\nint main(void) {\n    Node i0;\n    Node i1;\n    i0.data = 30;\n    i0.next = &i1;\n    i1.data = 40;\n    i1.next = NULL;\n    Node *caller_head = &i0;\n    insert(caller_head, 11, 1);\n    (void)caller_head;\n    return 0;\n}\n\n若调用处丢弃返回值（如上写 insert(caller_head, 11, 1); 而不赋值），从 main 的 caller_head 出发，有多少个动态分配的节点不可达？请用一个 JSON 整数作答。\n输入一个 JSON 整数\n可先保存部分作答；全部作答后才显示比较。暂定结果不直接更新掌握度。\n提交本次作答\n原始作答记录\n选择已有记录\n第1次 · 课程 v2 · 题组 3975da8c-bb7c-59c4-8295-3181135b3d8e\n第2次 · 课程 v2 · 题组 3975da8c-bb7c-59c4-8295-3181135b3d8e\n刷新这份反馈\n暂定比较 · 答案尚未可靠核定\n\n作答对应课程 v2，场景版本 21b47403-5187-4f91-a0cb-14f5b0012d8f，题组版本 3975da8c-bb7c-59c4-8295-3181135b3d8e。\n\n你的原始作答\nlink_target：i0\nnormal_values：[11, 30, 40]\ndiscarded_values：[\n30,40\n]\nunreachable_count：1\n\n仅保留课程内表现，未更新正式掌握度。\n\n与暂定参考的匹配比例：100%\n\nlink_target：匹配参考。调用时 head 副本保存的是 caller_head 的当前值 &i0，所以 p->next = head 让新节点 t0 的 next 指向 i0。i1 是 i0 的后继，不是这一步的直接目标。\nnormal_values：匹配参考。caller_head 被赋值为返回的新节点 t0，t0.data=11、t0.next=i0，i0.data=30、i0.next=&i1，i1.data=40、i1.next=NULL，因此顺序为 11、30、40。\ndiscarded_values：匹配参考。返回值被丢弃，caller_head 仍为 &i0，因此从 i0 出发只能读到 30、40；新分配的 t0 虽然存在且 t0.next=i0，但从 caller_head 不可达。\nunreachable_count：匹配参考。本次调用只分配了一个动态节点 t0；返回值被丢弃后 caller_head 仍为 &i0，t0 不在从 caller_head 出发的可达链上，因此不可达的动态节点数为 1。i0 与 i1 是自动存储节点，不计入动态分配节点。",
+  "failure": {
+    "class": "AssertionError",
+    "message": ""
+  }
+}

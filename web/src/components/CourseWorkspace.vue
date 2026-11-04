@@ -268,7 +268,13 @@ onBeforeUnmount(()=>{save();epoch+=1;manifestEpoch+=1;versionsEpoch+=1;controlle
               class="replay-source"
               aria-label="新课程来源"
             >
-              <strong>{{ scene.generation_source.evidence_kind === 'offline_fixture' ? '离线接线夹具 · 非真实生成' : '新目标真实生成 · 头插支持域' }} · 未签核</strong>
+              <strong>{{ scene.generation_source.evidence_kind === 'program_format_recovery' ? '程序格式恢复 · r03 派生课程' : scene.generation_source.evidence_kind === 'offline_fixture' ? '离线接线夹具 · 非真实生成' : '新目标真实生成 · 头插支持域' }} · 未签核</strong>
+              <p
+                v-if="scene.generation_source.teaching_review?.verdict !== 'pass' && scene.generation_source.evidence_kind === 'program_format_recovery'"
+                role="alert"
+              >
+                <strong>教学评估未通过 · 仅供审查预览</strong>：原文存在字段初始化顺序的错误因果，以及 NULL 检查的歧义。请勿据此学习这两项结论；原文保留供逐项复核。
+              </p>
               <p>{{ scene.generation_source.model }} · {{ scene.generation_source.prompt_version }} · {{ scene.generation_source.batch }}</p>
               <p>候选 {{ scene.generation_source.candidate_digest }}</p>
               <p v-if="scene.generation_source.parent_digest">
@@ -276,6 +282,7 @@ onBeforeUnmount(()=>{save();epoch+=1;manifestEpoch+=1;versionsEpoch+=1;controlle
               </p>
               <p>规划 {{ scene.generation_source.plan_digest }} · 共享材料 {{ scene.generation_source.materials_digest }}</p>
               <small v-if="scene.generation_source.evidence_kind === 'offline_fixture'">本页教学文字为离线接线夹具，未调用模型；代码、事实、轨迹和参考答案由程序派生。</small>
+              <small v-else-if="scene.generation_source.evidence_kind === 'program_format_recovery'">教学文字沿用 r03 模型原稿，仅删除四题完全相同的重复成员，未补写或改写。首稿结构不合格记录保留；代码、状态和答案由程序派生。新增模型调用为 0。</small>
               <small v-else>教学文字由模型生成；代码、事实、轨迹和参考答案由程序派生，自述先备知识不代表已测掌握。</small>
             </aside>
             <aside

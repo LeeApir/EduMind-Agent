@@ -1,0 +1,49 @@
+{
+  "candidate_digest": "7fde0859549aef0e0e64415880ed67e541dbf3f0d302e7eeae6faf76090b0779",
+  "verdict": "needs_revision",
+  "independent_evaluator": "/root/head_goal_independent",
+  "planning_basis_binding": {
+    "basis_digest": "dbfa7a38e73cf8cb36df518485019556bce56a23fc7d25dd1f18fbe0f3a28899",
+    "example_basis_digest": "2f64acc2c78f3793b085c2756b1de75124bfc38d0fb5c2c3d907cef4ad15638a",
+    "materials_digest": "a3fc33abf64a99528d9d2a94a66f9b0721e226e48084d18b384a788a8cf7ce1e",
+    "selected_example": "head-new-A",
+    "version": "head-planning-example-basis-v1"
+  },
+  "evaluated_at": "2026-11-04T15:25:09+08:00",
+  "scope": "offline_exact_derived_candidate_and_recovery_rules; not_browser_or_learning_outcome_pass",
+  "teaching_pass": false,
+  "ordinary_wording_repair_eligible": false,
+  "new_provider_calls": 0,
+  "findings": [
+    {
+      "id": "F01",
+      "category": "fact",
+      "severity": "blocking",
+      "path": "candidate.raw_output.paragraphs[6].text",
+      "assembled_paths": [
+        "blocks[text-2].markdown",
+        "blocks[text-7].markdown",
+        "blocks[text-12].markdown",
+        "blocks[head-state].text_alternative"
+      ],
+      "quote": "必须先写 data 再写 next，才能安全遍历。",
+      "related_quotes": [
+        "只有先写 data，再写 next，节点才处于可遍历的完整状态。",
+        "未初始化字段必须先写 data 再写 next 才能安全遍历。"
+      ],
+      "impact": "把本例代码顺序误说成 C 语义的必要条件。对有效已分配节点，先 p->next=head 再 p->data=value，同样可在两字段就绪后安全读取；仅沿 next 遍历而不读 data 时，也不要求先写 data。实际轨迹顺序正确不证明该必要性陈述。"
+    },
+    {
+      "id": "F02",
+      "category": "step_consistency",
+      "severity": "blocking",
+      "path": "candidate.raw_output.learning_summary",
+      "assembled_paths": [
+        "blocks[text-12].markdown",
+        "blocks[head-state].text_alternative"
+      ],
+      "quote": "NULL 检查在成功路径上被跳过",
+      "impact": "第5行条件在成功路径实际被求值且为假，跳过的是 return head 提前返回分支；f02/f08明确显示检查通过。总结和替代文本给出相反的步骤说法。paragraphs[5]末尾的正确澄清未消除总结中错误。"
+    }
+  ]
+}
