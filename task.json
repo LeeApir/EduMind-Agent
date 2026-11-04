@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "r03同版规划依据/职责及传播绑定准备已通过独立审查，33单元+3定向PG/API/Mock通过；新真实调用及授权0，最终新完整课程未交付。待用户另行准确批准新包/批次，不重开r01/r02、不继承余额或C2。",
+    "phase_gate": "r03规划语义pass；正文HTTP200但模型output_text.questions四题键各重复2次，严格入口DUPLICATE_JSON_KEY拒绝，2HTTP后STOP，余1失效。0合格正文候选/0完整课程，保留全部原稿和规划pass；待用户决定后续，不自动修JSON/重试/追加实验。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -71,9 +71,9 @@
     "provider_requests_attempted": 8,
     "real_model_requests_attempted": 4,
     "active_provider_batch_id": null,
-    "last_stopped_provider_batch_id": "head-goal-r02",
+    "last_stopped_provider_batch_id": "head-goal-r03",
     "current_candidate_real_calls": "stopped_after_explicit_direct_single_call",
-    "current_authorization_note": "r03同版规划依据/职责及传播绑定准备已通过独立审查，33单元+3定向PG/API/Mock通过；新真实调用及授权0，最终新完整课程未交付。待用户另行准确批准新包/批次，不重开r01/r02、不继承余额或C2。",
+    "current_authorization_note": "r03规划语义pass；正文HTTP200但模型output_text.questions四题键各重复2次，严格入口DUPLICATE_JSON_KEY拒绝，2HTTP后STOP，余1失效。0合格正文候选/0完整课程，保留全部原稿和规划pass；待用户决定后续，不自动修JSON/重试/追加实验。",
     "pending_approved_provider_batch_id": null,
     "head_replay_t107": {
       "authorization": "用户限定现有真实C01首版/C02修复版零Provider主链接入；不可无损部分集中具体契约变更",
@@ -85,10 +85,10 @@
       "authorization": "2026-11-03用户明确限定头插支持域的新课程主链生成；先完成可审查接线与准确执行包，真实调用待另行准确授权。",
       "provider_requests_authorized": 0,
       "goal": "我已了解 C 指针、struct、NULL 和函数返回值，希望通过头插示例，理解新节点如何连接旧链表，以及为什么调用者需要接收函数返回值。",
-      "status": "r03_preparation_review_passed_not_authorized",
+      "status": "r03_stopped_teaching_duplicate_json_key",
       "approval_record": "docs/ADR/0052-approval-20261103.json",
       "approved_http_limit": 3,
-      "provider_requests_attempted": 2,
+      "provider_requests_attempted": 4,
       "unused_requests_invalidated": 2,
       "complete_real_courses": 0,
       "results": "docs/acceptance/phase-1.5-head-goal-live-r01/RESULTS.md",
@@ -123,11 +123,28 @@
         "planning_prompt_version": "head-goal-plan-grounded-v3",
         "planning_wire_version": "head-goal-planning-wire-v2",
         "planning_basis_digest": "dbfa7a38e73cf8cb36df518485019556bce56a23fc7d25dd1f18fbe0f3a28899",
-        "status": "independent_preparation_review_passed_not_authorized",
+        "status": "approved_execution_stopped",
         "real_calls_authorized": 0,
         "real_calls": 0,
         "inherited_allowance": 0,
-        "independent_review": "docs/acceptance/phase-1.5-head-goal-t108-r03-review.md"
+        "independent_review": "docs/acceptance/phase-1.5-head-goal-t108-r03-review.md",
+        "approval_record": "docs/ADR/0052-r03-approval-20261104.json"
+      },
+      "r03_execution": {
+        "actual_http_requests": 2,
+        "http_statuses": [
+          200,
+          200
+        ],
+        "generated_plans": 1,
+        "independently_accepted_plans": 1,
+        "accepted_teaching_candidates": 0,
+        "complete_real_courses": 0,
+        "unused_requests_invalidated": 1,
+        "results": "docs/acceptance/phase-1.5-head-goal-live-r03/RESULTS.md",
+        "plan_digest": "b6cc3d5304b87673c343a9cf31f11ae2cf8b44d4f12a07e852795ac71d4e4991",
+        "independent_plan_assessment": "docs/acceptance/phase-1.5-head-goal-live-r03/PLAN-ASSESSMENT.md",
+        "independent_stop_assessment": "docs/acceptance/phase-1.5-head-goal-live-r03/INDEPENDENT-STOP-ASSESSMENT.md"
       }
     }
   },
@@ -5305,9 +5322,9 @@
       ],
       "started_at": "2026-11-03T20:47:56+08:00",
       "completed_at": null,
-      "blocker": "r03同版规划依据/职责及传播绑定准备已通过独立审查，33单元+3定向PG/API/Mock通过；新真实调用及授权0，最终新完整课程未交付。待用户另行准确批准新包/批次，不重开r01/r02、不继承余额或C2。",
+      "blocker": "r03规划语义pass；正文HTTP200但模型output_text.questions四题键各重复2次，严格入口DUPLICATE_JSON_KEY拒绝，2HTTP后STOP，余1失效。0合格正文候选/0完整课程，保留全部原稿和规划pass；待用户决定后续，不自动修JSON/重试/追加实验。",
       "commit_lookup": "Task-Completed: PHASE-1.5-T108",
-      "execution_gate": "r03同版规划依据/职责及传播绑定准备已通过独立审查，33单元+3定向PG/API/Mock通过；新真实调用及授权0，最终新完整课程未交付。待用户另行准确批准新包/批次，不重开r01/r02、不继承余额或C2。",
+      "execution_gate": "r03规划语义pass；正文HTTP200但模型output_text.questions四题键各重复2次，严格入口DUPLICATE_JSON_KEY拒绝，2HTTP后STOP，余1失效。0合格正文候选/0完整课程，保留全部原稿和规划pass；待用户决定后续，不自动修JSON/重试/追加实验。",
       "verification_results": [
         {
           "date": "2026-11-03T21:28:21+08:00",
@@ -5366,6 +5383,19 @@
           ],
           "result": "33定向单元+3实际PG/API/MockTransport、5源mypy/Ruff、实际请求/依据逐字节重建、原materials及wire/local/teaching Schema不变通过。独立评估助手独立33单元/427项文件摘要、实际构造/代码作用域/闭式返回对照与同版评估门禁核验pass；其未重跑PG。无新真实请求、规划或完整课程，不以准备完成T108。",
           "evidence": "docs/acceptance/phase-1.5-head-goal-t108-r03-review.md"
+        },
+        {
+          "date": "2026-11-04T10:42:42+08:00",
+          "commands": [
+            "实际应用新目标表单POST201→冻结CLI prepare/终端getpass --send plan",
+            "独立规划语义pass及准确basis binding归档→终端getpass --send generate",
+            "backend/.venv/bin/python docs/acceptance/phase-1.5-head-goal-live-r03/check_results.py",
+            "backend/.venv/bin/python scripts/prepare_head_course_goal_grounded_package.py --check；冻结CLI --inspect",
+            "实际PG既有终态收尾及浏览器只读刷新",
+            "独立停止核对、结果核对器Ruff/工作流/diff/旧包及其他Task不变"
+          ],
+          "result": "2HTTP200；规划6762字节原件/格式/语义pass，正文19720字节完整原件但DUPLICATE_JSON_KEY，questions四题键各2次；两body解密长度SHA/请求/同版绑定与失败复现通过。STOP/ACTIVE保留、余1失效，未修复/发布，0完整课程。实际应用1规划/v1、failed/SCHEMA_INVALID；到期后既有报告收尾不申请新租约或延期。独立停止报告不作正文教学pass，实际金额未知。",
+          "evidence": "docs/acceptance/phase-1.5-head-goal-live-r03/RESULTS.md"
         }
       ]
     }
