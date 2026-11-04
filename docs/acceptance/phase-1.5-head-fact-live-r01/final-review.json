@@ -1,0 +1,52 @@
+{
+  "candidate_digest": "4db6214e41291b7aa07f852914eccb56455a6c722a5d976e38764a283b936c8a",
+  "parent_digest": "7fde0859549aef0e0e64415880ed67e541dbf3f0d302e7eeae6faf76090b0779",
+  "verdict": "pass",
+  "independent_evaluator": "/root/head_goal_independent",
+  "planning_basis_binding": {
+    "basis_digest": "dbfa7a38e73cf8cb36df518485019556bce56a23fc7d25dd1f18fbe0f3a28899",
+    "example_basis_digest": "2f64acc2c78f3793b085c2756b1de75124bfc38d0fb5c2c3d907cef4ad15638a",
+    "materials_digest": "a3fc33abf64a99528d9d2a94a66f9b0721e226e48084d18b384a788a8cf7ce1e",
+    "selected_example": "head-new-A",
+    "version": "head-planning-example-basis-v1"
+  },
+  "evaluated_at": "2026-11-04T23:21:01+08:00",
+  "scope": "complete_exact_merged_course_static_teaching_review; application_browser_checks_pending",
+  "teaching_pass": true,
+  "blocking_findings": [],
+  "resolved_findings": [
+    "F01",
+    "F02"
+  ],
+  "new_provider_calls_by_evaluator": 0,
+  "findings": [
+    {
+      "id": "Q01",
+      "category": "teaching_expression",
+      "severity": "minor",
+      "blocking": false,
+      "paths": [
+        "raw_output.paragraphs[1].text",
+        "raw_output.paragraphs[5].text"
+      ],
+      "quotes": [
+        "先固定示例中的身份：main 里声明了自动存储的节点 i0",
+        "第二次调用时，传入的 head 副本是 t0"
+      ],
+      "observation": "两处替换分别逐字重复paragraphs[0]和paragraphs[4]，未在各替换段落中保留原先分配/初始化/判空组织，修复指令遵循不完整，连续阅读冗余。",
+      "impact": "完整课程中的f01/f03/f07/f09、f02/f08、完整代码和新summary仍清楚覆盖分配、未初始化字段及成功判空，连接旧头和接收返回值也有独立讲解，未产生新事实错误或关键教学缺失。本次不以此阻断，但不应宣称修订质量完善。"
+    },
+    {
+      "id": "Q02",
+      "category": "evidence_granularity",
+      "severity": "minor",
+      "blocking": false,
+      "paths": [
+        "raw_output.paragraphs[5].fact_ids",
+        "raw_output.paragraphs[6].fact_ids"
+      ],
+      "observation": "固定引用随四文本合并保持不变；替换后段落5谈完整第二次插入而引用只有两个分配状态，段落6谈判空而引用仍为第一次分配/data/link状态。",
+      "impact": "引用仍属于准确同版示例，但不充分逐句支撑新段落全部内容；全课准确代码/独立帧和basis中可核这些正确陈述，页面也未把段落引用当逐句证明。建议后续在另获授权的契约内改善引用粒度，本次不改引用或冒称已由ID验证语义。"
+    }
+  ]
+}

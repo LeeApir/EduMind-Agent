@@ -128,6 +128,10 @@ def fingerprint(row: FreeSceneGenerationResult) -> str:
 
 def validate_generation(row: FreeSceneGenerationResult, actual: dict[str, Any]) -> dict[str, Any]:
     snapshot = row.input_snapshot
+    if row.schema_version == "head-f01-f02-four-text-v1":
+        from app.services.head_course_fact_publication import validate_publication
+
+        return validate_publication(row, actual)
     if row.schema_version == "head-questions-identical-duplicate-v1":
         from app.services.head_course_derivation import validate_derivation
 

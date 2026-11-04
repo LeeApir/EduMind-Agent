@@ -78,6 +78,8 @@ T040保持blocked；T041标记blocked，旧链性能验收暂缓，新链性能�
 
 ### 0.5 P1.5自由课程学习与界面重构（2026-10-21，方向已确认）
 
+2026-11-04 T108限定新课完成：经批准的新1HTTP四字段事实修订，F01/F02解决，完整课程独立重评和实际应用13步/四题/反馈/刷新验收通过；[交付与原件](acceptance/phase-1.5-head-fact-live-r01/RESULTS.md)保留全部失败、恢复父稿及两项非阻断质量意见。原首稿结构失败不追认通过，不代表T038或学生效果；本批STOP，T102 blocked/生产catalog_only保持，完成后停止。
+
 2026-11-04 T108 F01/F02准备：用户要求以当前恢复候选为父，仅修四文本字段，准备[准确请求和最小检查](acceptance/phase-1.5-head-fact-revision-r01/README.md)与[事实修订契约提案](ADR/0052-four-field-fact-revision.md)。拟新1HTTP/600秒及本批C2，当前未批准或启动；原文/失败/STOP保持，独立重评后才实际页面验收，不重跑规划/全文，不自动追加调用。
 
 2026-11-04 T108 r03本地派生恢复：用户明确授权仅对四题相同重复成员做确定性删除，保留严格解析器、原稿/失败/STOP；[契约差异](ADR/0052-identical-duplicate-recovery.md)和[完整私有审查预览](acceptance/phase-1.5-head-goal-r03-recovery/RESULTS.md)区分程序格式恢复与模型首次结构成功。新增Provider0，13帧/四题/反馈/刷新可用；独立教学评估因必要初始化顺序及NULL检查表述错误为needs_revision，页面明确警示，T108继续blocked，不自动改写或新调用。

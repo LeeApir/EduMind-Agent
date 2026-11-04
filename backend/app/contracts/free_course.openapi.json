@@ -5670,7 +5670,8 @@
           "batch": {
             "enum": [
               "PHASE-1.5-T108",
-              "head-goal-r03-derived"
+              "head-goal-r03-derived",
+              "head-goal-fact-r01"
             ]
           },
           "candidate_digest": {
@@ -5692,7 +5693,10 @@
             "type": "string"
           },
           "prompt_version": {
-            "const": "head-goal-course-v1"
+            "enum": [
+              "head-goal-course-v1",
+              "head-f01-f02-four-text-v1"
+            ]
           },
           "plan_digest": {
             "type": "string",
@@ -5706,7 +5710,8 @@
             "enum": [
               "actual_provider_response",
               "offline_fixture",
-              "program_format_recovery"
+              "program_format_recovery",
+              "targeted_fact_revision"
             ]
           },
           "format_recovery": {
@@ -5853,27 +5858,70 @@
               "properties": {
                 "batch": {
                   "const": "head-goal-r03-derived"
+                },
+                "prompt_version": {
+                  "const": "head-goal-course-v1"
                 }
               }
             },
             "else": {
-              "not": {
-                "anyOf": [
-                  {
-                    "required": [
-                      "format_recovery"
-                    ]
-                  },
-                  {
-                    "required": [
-                      "teaching_review"
-                    ]
+              "if": {
+                "properties": {
+                  "evidence_kind": {
+                    "const": "targeted_fact_revision"
                   }
-                ]
+                }
               },
-              "properties": {
-                "batch": {
-                  "const": "PHASE-1.5-T108"
+              "then": {
+                "required": [
+                  "teaching_review"
+                ],
+                "properties": {
+                  "batch": {
+                    "const": "head-goal-fact-r01"
+                  },
+                  "prompt_version": {
+                    "const": "head-f01-f02-four-text-v1"
+                  },
+                  "parent_digest": {
+                    "const": "7fde0859549aef0e0e64415880ed67e541dbf3f0d302e7eeae6faf76090b0779"
+                  },
+                  "teaching_review": {
+                    "properties": {
+                      "verdict": {
+                        "const": "pass"
+                      }
+                    }
+                  }
+                },
+                "not": {
+                  "required": [
+                    "format_recovery"
+                  ]
+                }
+              },
+              "else": {
+                "not": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "format_recovery"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "teaching_review"
+                      ]
+                    }
+                  ]
+                },
+                "properties": {
+                  "batch": {
+                    "const": "PHASE-1.5-T108"
+                  },
+                  "prompt_version": {
+                    "const": "head-goal-course-v1"
+                  }
                 }
               }
             }
