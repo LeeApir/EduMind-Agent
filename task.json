@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "r02限定规划接口边界修复与独立准备审查通过，但没有新真实调用授权或新完整课程；待用户准确批准新提交/manifest/ADR0052补充及本批C2/3HTTP/600秒。旧r01 STOP与2失效保持；简化规划再拒即停交用户决定Provider路线。",
+    "phase_gate": "用户批准e8de5f8的r02 manifest/ADR0052补充及本批C2，最多3HTTP/新600秒；待终端隐藏输入就绪后登记窗口，新实际HTTP0；旧r01 STOP/失效余量及T102 blocked保持。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -73,8 +73,8 @@
     "active_provider_batch_id": null,
     "last_stopped_provider_batch_id": "p15-direct-relay-once-d01",
     "current_candidate_real_calls": "stopped_after_explicit_direct_single_call",
-    "current_authorization_note": "r02限定规划接口边界修复与独立准备审查通过，但没有新真实调用授权或新完整课程；待用户准确批准新提交/manifest/ADR0052补充及本批C2/3HTTP/600秒。旧r01 STOP与2失效保持；简化规划再拒即停交用户决定Provider路线。",
-    "pending_approved_provider_batch_id": null,
+    "current_authorization_note": "用户批准e8de5f8的r02 manifest/ADR0052补充及本批C2，最多3HTTP/新600秒；待终端隐藏输入就绪后登记窗口，新实际HTTP0；旧r01 STOP/失效余量及T102 blocked保持。",
+    "pending_approved_provider_batch_id": "head-goal-r02",
     "head_replay_t107": {
       "authorization": "用户限定现有真实C01首版/C02修复版零Provider主链接入；不可无损部分集中具体契约变更",
       "status": "independent_evaluation_passed",
@@ -83,9 +83,9 @@
     },
     "head_goal_t108": {
       "authorization": "2026-11-03用户明确限定头插支持域的新课程主链生成；先完成可审查接线与准确执行包，真实调用待另行准确授权。",
-      "provider_requests_authorized": 0,
+      "provider_requests_authorized": 3,
       "goal": "我已了解 C 指针、struct、NULL 和函数返回值，希望通过头插示例，理解新节点如何连接旧链表，以及为什么调用者需要接收函数返回值。",
-      "status": "r02_preparation_review_passed_waiting_fresh_authorization",
+      "status": "r02_authorized_waiting_terminal_ready",
       "approval_record": "docs/ADR/0052-approval-20261103.json",
       "approved_http_limit": 3,
       "provider_requests_attempted": 1,
@@ -97,13 +97,14 @@
       "r02_preparation": {
         "package": "docs/acceptance/phase-1.5-head-goal-t108-r02/",
         "wire_version": "head-goal-planning-wire-v2",
-        "real_calls_authorized": 0,
+        "real_calls_authorized": 3,
         "proposed_http_limit": 3,
         "proposed_window_seconds": 600,
         "inherited_allowance": 0,
-        "status": "independent_preparation_review_passed_not_authorized",
+        "status": "approved_pending_window",
         "manifest_sha256": "41d0bb3aec551b3ad08fa63e711476710c44d43483d41477fb5eb077b72cbc6a",
-        "independent_review": "docs/acceptance/phase-1.5-head-goal-t108-r02-review.md"
+        "independent_review": "docs/acceptance/phase-1.5-head-goal-t108-r02-review.md",
+        "approval_record": "docs/ADR/0052-r02-approval-20261104.json"
       }
     }
   },
@@ -5281,9 +5282,9 @@
       ],
       "started_at": "2026-11-03T20:47:56+08:00",
       "completed_at": null,
-      "blocker": "r02限定规划接口边界修复与独立准备审查通过，但没有新真实调用授权或新完整课程；待用户准确批准新提交/manifest/ADR0052补充及本批C2/3HTTP/600秒。旧r01 STOP与2失效保持；简化规划再拒即停交用户决定Provider路线。",
+      "blocker": "r02准确真实批次已获用户批准，等待用户确认本机终端隐藏输入就绪；新窗口未开始、未提交新目标操作、新HTTP0。不读取.env或环境中的Provider Key，旧r01保持STOP。",
       "commit_lookup": "Task-Completed: PHASE-1.5-T108",
-      "execution_gate": "r02限定规划接口边界修复与独立准备审查通过，但没有新真实调用授权或新完整课程；待用户准确批准新提交/manifest/ADR0052补充及本批C2/3HTTP/600秒。旧r01 STOP与2失效保持；简化规划再拒即停交用户决定Provider路线。",
+      "execution_gate": "用户批准e8de5f8的r02 manifest/ADR0052补充及本批C2，最多3HTTP/新600秒；待终端隐藏输入就绪后登记窗口，新实际HTTP0；旧r01 STOP/失效余量及T102 blocked保持。",
       "verification_results": [
         {
           "date": "2026-11-03T21:28:21+08:00",
