@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "r03同值重复字段程序格式恢复完成，完整私有审查预览可读/演示/作答/刷新；独立教学needs_revision：错误强制data先于next初始化及成功路径跳过NULL检查。原文未改，无新Provider，旧批STOP保持；T108最终教学验收未完成，不自动改稿或调用。",
+    "phase_gate": "F01/F02四字段事实修订请求/严格合并/统一装配及11项定向检查已准备；拟新1HTTP/600秒及本批C2待准确批准。旧批停止，当前新调用0，尚无模型事实修订或合格新课程，T108未完成。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -157,6 +157,15 @@
         "teaching_verdict": "needs_revision",
         "results": "docs/acceptance/phase-1.5-head-goal-r03-recovery/RESULTS.md",
         "contract": "docs/ADR/0052-identical-duplicate-recovery.md"
+      },
+      "fact_revision_preparation": {
+        "protocol": "head-f01-f02-four-text-v1",
+        "parent_digest": "7fde0859549aef0e0e64415880ed67e541dbf3f0d302e7eeae6faf76090b0779",
+        "proposed_http_limit": 1,
+        "proposed_window_seconds": 600,
+        "real_calls_authorized": 0,
+        "real_calls": 0,
+        "package": "docs/acceptance/phase-1.5-head-fact-revision-r01/"
       }
     }
   },
@@ -5314,7 +5323,8 @@
         "process.txt",
         "限定规划远端基础类型Schema与本地完整Schema分离、版本化无补写转换；新r02执行包/定向检查（旧包与原件不改）",
         "r03限定规划示例依据/职责、规划→正文→评估同版摘要绑定及准确新请求准备；无Provider调用",
-        "r03相同重复字段恢复v1：仅questions四题最多2次且类型/成员/题干/解析完全相同；独立派生候选/本地课程/评估，原件失败STOP不变"
+        "r03相同重复字段恢复v1：仅questions四题最多2次且类型/成员/题干/解析完全相同；独立派生候选/本地课程/评估，原件失败STOP不变",
+        "F01/F02准确恢复父稿四字段替换协议、严格合并重装配及1HTTP新批准备，不真实调用"
       ],
       "prd_source": "PRD §0.5；课程生成方向文档；T107独立评估；2026-11-03用户本次指令",
       "acceptance_criteria": [
@@ -5335,13 +5345,15 @@
         "PYTHONPATH=backend:. backend/.venv/bin/python -m pytest -q backend/tests/test_head_course_duplicate_recovery.py",
         "backend/.venv/bin/python scripts/prepare_head_course_recovery.py --check",
         "专用T108开发库：scripts/check_head_course_recovery_db.py（事务回滚）；本地scripts/import_head_course_recovery.py --import-preview",
-        "实际Chromium完整派生课程13步/高亮/作用域/控制/四题反馈/刷新及独立逐段逐题逐步评估"
+        "实际Chromium完整派生课程13步/高亮/作用域/控制/四题反馈/刷新及独立逐段逐题逐步评估",
+        "PYTHONPATH=backend:. backend/.venv/bin/python -m pytest -q backend/tests/test_head_course_fact_revision.py",
+        "backend/.venv/bin/python scripts/prepare_head_course_fact_revision.py --check；backend/.venv/bin/python -I scripts/head_course_fact_revision.py --inspect"
       ],
       "started_at": "2026-11-03T20:47:56+08:00",
       "completed_at": null,
-      "blocker": "r03同值重复字段程序格式恢复完成，完整私有审查预览可读/演示/作答/刷新；独立教学needs_revision：错误强制data先于next初始化及成功路径跳过NULL检查。原文未改，无新Provider，旧批STOP保持；T108最终教学验收未完成，不自动改稿或调用。",
+      "blocker": "F01/F02四字段事实修订请求/严格合并/统一装配及11项定向检查已准备；拟新1HTTP/600秒及本批C2待准确批准。旧批停止，当前新调用0，尚无模型事实修订或合格新课程，T108未完成。",
       "commit_lookup": "Task-Completed: PHASE-1.5-T108",
-      "execution_gate": "r03同值重复字段程序格式恢复完成，完整私有审查预览可读/演示/作答/刷新；独立教学needs_revision：错误强制data先于next初始化及成功路径跳过NULL检查。原文未改，无新Provider，旧批STOP保持；T108最终教学验收未完成，不自动改稿或调用。",
+      "execution_gate": "F01/F02四字段事实修订请求/严格合并/统一装配及11项定向检查已准备；拟新1HTTP/600秒及本批C2待准确批准。旧批停止，当前新调用0，尚无模型事实修订或合格新课程，T108未完成。",
       "verification_results": [
         {
           "date": "2026-11-03T21:28:21+08:00",
@@ -5426,6 +5438,11 @@
           ],
           "result": "完整Schema/事实/场景/轨迹通过，原模型正文未改；新来源程序格式恢复，原首稿结构仍不合格。完整私有预览交互通过，独立教学因F01必要初始化顺序及F02判空矛盾needs_revision，保持blocked；新增Provider0，旧原件失败STOP/ACTIVE及未用额度失效保持。 独立浏览器交互复核通过，仅继续作答按钮刷新后消失，原失败/差异保留；不是教学pass。",
           "evidence": "docs/acceptance/phase-1.5-head-goal-r03-recovery/RESULTS.md"
+        },
+        {
+          "date": "2026-11-04T23:11:07+08:00",
+          "result": "11定向检查（含实际单次入口MockTransport）、新服务mypy、四文件Ruff/准确包重建和inspect通过；无新真实调用/DB/页面改动，事实纠错及重评未发生，保持blocked待准确新授权。",
+          "evidence": "docs/acceptance/phase-1.5-head-fact-revision-r01/README.md"
         }
       ]
     }
