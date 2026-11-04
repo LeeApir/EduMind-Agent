@@ -112,7 +112,15 @@ async def persist_outcome(
     repo = SnapshotRepository(db, owner_id)
     snapshot = snapshot_input(inputs)
     identity = digest("planning-input", snapshot=snapshot)
-    call_digest = request_digest(build_request(snapshot))
+    if "head_support" in snapshot:
+        from app.agents import head_course_planning_wire
+
+        request = head_course_planning_wire.build_request(snapshot)
+        prompt_version = head_course_planning_wire.VERSION
+    else:
+        request = build_request(snapshot)
+        prompt_version = PROMPT_VERSION
+    call_digest = request_digest(request)
     if outcome.input_digest != identity or outcome.request_digest != call_digest:
         raise SnapshotError("PLANNING_INPUT_MISMATCH")
     if outcome.state not in {"ready", "needs_clarification", "failed"}:
@@ -191,7 +199,7 @@ async def persist_outcome(
             input_digest=identity,
             request_digest=call_digest,
             response_digest=fingerprint,
-            prompt_version="head-goal-plan-v1" if "head_support" in snapshot else PROMPT_VERSION,
+            prompt_version=prompt_version,
             schema_version=SCHEMA_VERSION,
             state=outcome.state,
             reason_code=outcome.reason_code,

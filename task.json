@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "T108真实head-goal-r01已因首规划HTTP400停止：1请求/0规划/0新课程，剩余2失效。任务blocked，按包不重试/修Schema/探测；待用户决定新准确范围，T102继续blocked，不扩主题或启动T038。",
+    "phase_gate": "r02限定规划接口边界修复与独立准备审查通过，但没有新真实调用授权或新完整课程；待用户准确批准新提交/manifest/ADR0052补充及本批C2/3HTTP/600秒。旧r01 STOP与2失效保持；简化规划再拒即停交用户决定Provider路线。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -73,7 +73,7 @@
     "active_provider_batch_id": null,
     "last_stopped_provider_batch_id": "p15-direct-relay-once-d01",
     "current_candidate_real_calls": "stopped_after_explicit_direct_single_call",
-    "current_authorization_note": "T108 head-goal-r01按批准停止规则结束：实际规划1HTTP400、没有规划/新课程；剩余2请求失效，继续项目指令不视为新包或重试授权。",
+    "current_authorization_note": "r02限定规划接口边界修复与独立准备审查通过，但没有新真实调用授权或新完整课程；待用户准确批准新提交/manifest/ADR0052补充及本批C2/3HTTP/600秒。旧r01 STOP与2失效保持；简化规划再拒即停交用户决定Provider路线。",
     "pending_approved_provider_batch_id": null,
     "head_replay_t107": {
       "authorization": "用户限定现有真实C01首版/C02修复版零Provider主链接入；不可无损部分集中具体契约变更",
@@ -85,13 +85,26 @@
       "authorization": "2026-11-03用户明确限定头插支持域的新课程主链生成；先完成可审查接线与准确执行包，真实调用待另行准确授权。",
       "provider_requests_authorized": 0,
       "goal": "我已了解 C 指针、struct、NULL 和函数返回值，希望通过头插示例，理解新节点如何连接旧链表，以及为什么调用者需要接收函数返回值。",
-      "status": "stopped_after_planning_http400",
+      "status": "r02_preparation_review_passed_waiting_fresh_authorization",
       "approval_record": "docs/ADR/0052-approval-20261103.json",
       "approved_http_limit": 3,
       "provider_requests_attempted": 1,
       "unused_requests_invalidated": 2,
       "complete_real_courses": 0,
-      "results": "docs/acceptance/phase-1.5-head-goal-live-r01/RESULTS.md"
+      "results": "docs/acceptance/phase-1.5-head-goal-live-r01/RESULTS.md",
+      "repair_authorization": "2026-11-04用户明确授权仅模型接口边界修复；新批次待评估及准确授权，旧余额不继承。",
+      "stopped_batch": "head-goal-r01: 1HTTP400/0规划/0课程/unused2invalidated; STOP与全部失败原件保持",
+      "r02_preparation": {
+        "package": "docs/acceptance/phase-1.5-head-goal-t108-r02/",
+        "wire_version": "head-goal-planning-wire-v2",
+        "real_calls_authorized": 0,
+        "proposed_http_limit": 3,
+        "proposed_window_seconds": 600,
+        "inherited_allowance": 0,
+        "status": "independent_preparation_review_passed_not_authorized",
+        "manifest_sha256": "41d0bb3aec551b3ad08fa63e711476710c44d43483d41477fb5eb077b72cbc6a",
+        "independent_review": "docs/acceptance/phase-1.5-head-goal-t108-r02-review.md"
+      }
     }
   },
   "archive_transition": {
@@ -5245,7 +5258,8 @@
         "docs/acceptance/phase-1.5-head-goal-t108/",
         "docs/PRD.md",
         "task.json",
-        "process.txt"
+        "process.txt",
+        "限定规划远端基础类型Schema与本地完整Schema分离、版本化无补写转换；新r02执行包/定向检查（旧包与原件不改）"
       ],
       "prd_source": "PRD §0.5；课程生成方向文档；T107独立评估；2026-11-03用户本次指令",
       "acceptance_criteria": [
@@ -5255,24 +5269,21 @@
         "真实前交付接线、提示词/Schema/模型/调用上限/审核修复停止及契约差异准确包，另获新授权；实际应用新课程通过完整学习/不泄题/刷新验收后交独立评估停止。"
       ],
       "verification": [
-        "backend/.venv/bin/python scripts/run_head_course_goal_dev.py --test",
-        "backend/.venv/bin/python -m pytest -q tests/test_free_course_planning.py（backend，专用t008_t108_regression库）",
-        "backend/.venv/bin/python -m pytest -q tests/test_head_course_replay.py（backend，专用T107库）",
-        "backend/.venv/bin/python scripts/check_head_course_goal_browser.py（专用T108环境）",
-        "backend/.venv/bin/python scripts/run_head_course_goal_dev.py --check-migration",
-        "pnpm --dir web exec vitest run tests/course-visualization.spec.ts tests/responsive-accessibility.spec.ts",
-        "pnpm --dir web build；变更TS/Vue的ESLint；相关Python的Ruff与六个后端源文件mypy --follow-imports=silent",
-        "backend/.venv/bin/python scripts/prepare_head_course_goal_package.py --check",
-        "env -i PATH=/usr/bin:/bin /Users/apir/Code/EduMind_Agent/backend/.venv/bin/python -I /Users/apir/Code/EduMind_Agent/scripts/head_course_goal.py --inspect",
-        "python3 scripts/check_catalog_workflow.py",
-        "git diff --check",
-        "待准确真实授权后：真实规划/正文/允许修复原件与实际应用新课程完整学习、刷新与独立教学评估"
+        "PYTHONPATH=backend:. backend/.venv/bin/python -m pytest -q backend/tests/test_head_course_planning_wire.py",
+        "专用T108 PG：backend/.venv/bin/python -m pytest -q tests/test_head_course_goal.py::test_goal_plan_private_course_and_feedback[head-new-A] tests/test_head_course_goal.py::test_exact_entry_mock_transport_and_raw_failures（backend，最小测试库环境）",
+        "backend/.venv/bin/python scripts/prepare_head_course_goal_wire_package.py --check",
+        "backend/.venv/bin/python -I scripts/head_course_goal.py --inspect",
+        "变更Python源/测试的Ruff；head_course_planning_wire.py与free_course_planning.py的mypy --follow-imports=silent",
+        "git diff --exit-code 221ae7a -- 旧T108准备/停止包与原ADR批准、T104/T106/T107目录；其他Task相等/T102 blocked/process前缀检查",
+        "python3 scripts/check_catalog_workflow.py；git diff --check",
+        "本轮准确包独立评估后另申请新真实批次授权，不继承旧余额",
+        "获准后：实际应用输入目标→真实规划及独立核对→真实正文/允许修复→私有草稿；实际完整阅读/演示/作答/反馈/刷新及独立教学评估；简化规划再被拒准确保存并停止交用户决定Provider路线"
       ],
       "started_at": "2026-11-03T20:47:56+08:00",
       "completed_at": null,
-      "blocker": "按ADR0052停止：本批唯一规划HTTP400，Schema被接口拒绝，完整加密原件保留；没有模型规划或新课程，剩余2次失效。待用户决定新的兼容范围/准确包，不能沿用本批重试或标done。",
+      "blocker": "r02限定规划接口边界修复与独立准备审查通过，但没有新真实调用授权或新完整课程；待用户准确批准新提交/manifest/ADR0052补充及本批C2/3HTTP/600秒。旧r01 STOP与2失效保持；简化规划再拒即停交用户决定Provider路线。",
       "commit_lookup": "Task-Completed: PHASE-1.5-T108",
-      "execution_gate": "head-goal-r01已STOP：1/3HTTP、0规划、0课程；未用2请求失效，无后续出站许可。T102 blocked/T038门禁及生产catalog_only保持。",
+      "execution_gate": "r02限定规划接口边界修复与独立准备审查通过，但没有新真实调用授权或新完整课程；待用户准确批准新提交/manifest/ADR0052补充及本批C2/3HTTP/600秒。旧r01 STOP与2失效保持；简化规划再拒即停交用户决定Provider路线。",
       "verification_results": [
         {
           "date": "2026-11-03T21:28:21+08:00",
@@ -5291,6 +5302,20 @@
           ],
           "result": "真实1HTTP400/invalid_request_error，原206字节body完整加密保存并解密回读核验；无模型规划/选例/候选/课程，Schema与冻结代码未改。窗口23:03:41–23:13:41，23:07:05本地STOP，剩余2失效，usage/金额未知。实际草稿原目标保留、head=null、操作failed/PROVIDER_REJECTED；独立核对确认停批，非教学评估；最终验收未达成。",
           "evidence": "docs/acceptance/phase-1.5-head-goal-live-r01/RESULTS.md"
+        },
+        {
+          "date": "2026-11-04T09:00:34+08:00",
+          "commands": [
+            "PYTHONPATH=backend:. backend/.venv/bin/python -m pytest -q backend/tests/test_head_course_planning_wire.py",
+            "专用T108 PG：backend/.venv/bin/python -m pytest -q tests/test_head_course_goal.py::test_goal_plan_private_course_and_feedback[head-new-A] tests/test_head_course_goal.py::test_exact_entry_mock_transport_and_raw_failures（backend，最小测试库环境）",
+            "backend/.venv/bin/python scripts/prepare_head_course_goal_wire_package.py --check",
+            "backend/.venv/bin/python -I scripts/head_course_goal.py --inspect",
+            "变更Python源/测试的Ruff；head_course_planning_wire.py与free_course_planning.py的mypy --follow-imports=silent",
+            "git diff --exit-code 221ae7a -- 旧T108准备/停止包与原ADR批准、T104/T106/T107目录；其他Task相等/T102 blocked/process前缀检查",
+            "python3 scripts/check_catalog_workflow.py；git diff --check"
+          ],
+          "result": "本轮真实调用0/新授权0；21边界单元及3定向实际PG/API/MockTransport通过（首次PG沙箱权限拒绝后同组重跑通过），Ruff/两源mypy/工作流/diff/旧包与其他Task不变核对通过。独立评估助手复核404项摘要、实际构造/原稿映射/请求入库摘要，独立21单元及新包check/CLIinspect通过；准备审查pass不代表Provider兼容或课程教学通过。",
+          "evidence": "docs/acceptance/phase-1.5-head-goal-t108-r02-review.md"
         }
       ]
     }

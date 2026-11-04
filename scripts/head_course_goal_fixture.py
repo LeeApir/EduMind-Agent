@@ -93,6 +93,21 @@ def content(payload):
     )
 
 
+def wire_plan(key="head-new-A"):
+    """Explicit test fixture for the new wire, never a planning fallback."""
+    from app.agents.head_course_planning_wire import VERSION
+
+    value = plan(key)
+    return dict(
+        protocol_version=VERSION,
+        needs_clarification=False,
+        plans=[value["plan"]],
+        questions=[],
+        reason="",
+        source_keys=[],
+    )
+
+
 def record(payload, raw=None, parent=None):
     raw = raw or content(payload)
     return dict(
@@ -134,7 +149,7 @@ def envelope(value, phase="final_answer"):
 
 async def populate(owner, cid, oid, key):
     context = await entry.prepare(owner, cid, oid)
-    await entry.save_plan(context, plan(key))
+    await entry.save_plan(context, wire_plan(key))
 
     async def action(db):
         context = await g.generation_context(db, owner, cid, oid)

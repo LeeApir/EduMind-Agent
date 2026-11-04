@@ -79,6 +79,22 @@ def test_goal_plan_private_course_and_feedback(key):
             == created
         )
         result = asyncio.run(fixture.populate(owner, cid, oid, key))
+        from app.models.free_course_planning import FreeCoursePlanningResult
+
+        async def planning_row(db):
+            row = await db.scalar(
+                select(FreeCoursePlanningResult).where(FreeCoursePlanningResult.course_id == cid)
+            )
+            return row.prompt_version, row.request_digest, row.response_json
+
+        version, actual_digest, local_value = run(planning_row)
+        from app.agents.free_course_planning import request_digest
+
+        assert version == entry.plan_wire.VERSION
+        assert actual_digest == request_digest(
+            entry.plan_wire.build_request(context["planning_inputs"])
+        )
+        assert local_value == fixture.plan(key)
         route = f"/api/free-courses/{cid}/versions/2/scenes/{result['scene_id']}"
         response = client.get(route)
         assert response.status_code == 200, response.text
@@ -240,7 +256,8 @@ def test_exact_entry_mock_transport_and_raw_failures(tmp_path, monkeypatch, bad_
             package_sha256="a" * 64,
             version=m.VERSION,
             explicit_user_authorization=True,
-            accept_ADR0052_A_D_and_batch_C2=True,
+            accept_ADR0052_R02_and_batch_C2=True,
+            planning_wire_version=entry.plan_wire.VERSION,
             starts_epoch=int(time.time()) - 1,
             expires_epoch=int(time.time()) - 1 + 600,
         )
@@ -249,8 +266,11 @@ def test_exact_entry_mock_transport_and_raw_failures(tmp_path, monkeypatch, bad_
         def transport(request):
             count.append(1)
             body = json.loads(request.content)
+            assert body["text"]["format"]["schema"] == (
+                entry.plan_wire.SCHEMA if len(count) == 1 else m.SCHEMA
+            )
             payload = json.loads(body["input"][1]["content"])
-            value = fixture.plan() if len(count) == 1 else fixture.content(payload)
+            value = fixture.wire_plan() if len(count) == 1 else fixture.content(payload)
             return httpx.Response(200, stream=httpx.ByteStream(fixture.envelope(value)))
 
         mock = httpx.MockTransport(transport)
@@ -284,14 +304,17 @@ def test_exact_entry_mock_transport_and_raw_failures(tmp_path, monkeypatch, bad_
             if bad_kind == "phase"
             else b'{"bad":'
         )
+
+        def refused_repair(request):
+            assert json.loads(request.content)["text"]["format"]["schema"] == m.SCHEMA
+            return httpx.Response(200, stream=httpx.ByteStream(bad))
+
         with pytest.raises(Exception):
             entry.send(
                 "repair",
                 vault,
                 approval,
-                transport=httpx.MockTransport(
-                    lambda request: httpx.Response(200, stream=httpx.ByteStream(bad))
-                ),
+                transport=httpx.MockTransport(refused_repair),
                 key="fake-not-a-key",
             )
         assert (

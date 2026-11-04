@@ -17,9 +17,10 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(ROOT / "backend"), str(ROOT)]
 from app.services import head_course_generation as generation  # noqa: E402
 from app.services import head_course_materials as m  # noqa: E402
+from app.agents import head_course_planning_wire as plan_wire  # noqa: E402
 from app.services.free_course_snapshots import SnapshotError, canonical, digest  # noqa: E402
 
-PACKAGE = ROOT / "docs/acceptance/phase-1.5-head-goal-t108"
+PACKAGE = ROOT / "docs/acceptance/phase-1.5-head-goal-t108-r02"
 OLD = ROOT / "docs/acceptance/phase-1.5-limited-c-preparation-t104/execute_once.py"
 spec = importlib.util.spec_from_file_location("head_goal_raw_transport", OLD)
 raw_io = importlib.util.module_from_spec(spec)
@@ -35,9 +36,7 @@ def package_digest():
 
 
 def planning_body(inputs):
-    from app.agents.free_course_planning import build_request
-
-    request = build_request(inputs)
+    request = plan_wire.build_request(inputs)
     return dict(
         model="deepseek-flash",
         stream=False,
@@ -103,21 +102,19 @@ async def prepare(owner, cid, oid):
 async def save_plan(context, value):
     from app.agents.free_course_planning import (
         PlanningOutcome,
-        build_request,
         request_digest,
-        validate_response,
     )
     from app.services.free_course_planning import persist_outcome
     from app.services.free_course_snapshots import SnapshotRepository
     from app.services.free_scene_availability import commit_outline
 
     inputs = context["planning_inputs"]
-    value = validate_response(value, inputs)
+    value = plan_wire.to_local(value, inputs)
     outcome = PlanningOutcome(
         "needs_clarification" if value["needs_clarification"] else "ready",
         None,
         digest("planning-input", snapshot=inputs),
-        request_digest(build_request(inputs)),
+        request_digest(plan_wire.build_request(inputs)),
         value,
     )
 
@@ -188,7 +185,12 @@ def verify_saved(vault, stage, cipher):
             vault / "plan.output.json"
         ) != dict(result.value):
             raise SnapshotError("HEAD_PLAN_CHANGED")
-        return dict(result.value)
+        mapping = plan_wire.mapping_record(
+            dict(result.value), context["planning_inputs"]
+        )
+        if read(vault / "plan.mapping.json") != mapping:
+            raise SnapshotError("HEAD_PLAN_CHANGED")
+        return mapping["value"]
     plan = verify_saved(vault, "plan", cipher)["plan"]
     payload = m.content_payload(context["planning_inputs"], plan)
     parent = (
@@ -254,7 +256,8 @@ def approval_check(vault, approval):
     if (
         approval.get("package_sha256") != sha
         or approval.get("version") != m.VERSION
-        or approval.get("accept_ADR0052_A_D_and_batch_C2") is not True
+        or approval.get("accept_ADR0052_R02_and_batch_C2") is not True
+        or approval.get("planning_wire_version") != plan_wire.VERSION
         or approval.get("explicit_user_authorization") is not True
         or not approval["starts_epoch"] <= time.time() < approval["expires_epoch"]
         or approval["expires_epoch"] - approval["starts_epoch"] != 600
@@ -392,6 +395,10 @@ def send(stage, vault, approval, *, transport=None, key=None):
         value = dict(result.value)
         if stage == "plan":
             raw_io.exclusive(vault / "plan.output.json", canonical(value))
+            raw_io.exclusive(
+                vault / "plan.mapping.json",
+                canonical(plan_wire.mapping_record(value, context["planning_inputs"])),
+            )
             saved = asyncio.run(save_plan(context, value))
             raw_io.exclusive(vault / "plan.binding.json", canonical(saved))
         else:
