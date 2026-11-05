@@ -20,6 +20,18 @@ PACKAGE = ROOT / "docs/acceptance/phase-1.5-head-fact-revision-r01"
 VAULT = Path("/Users/apir/.local/share/edumind/head-goal-fact-r01")
 
 
+def select_profile(profile):
+    global f, PACKAGE, VAULT
+    if profile == "evidence":
+        from app.services import head_course_evidence_revision
+
+        f = head_course_evidence_revision
+        PACKAGE = f.PACKAGE
+        VAULT = Path(
+            "/Users/apir/.local/share/edumind/head-reuse-evidence-revision-r01"
+        )
+
+
 def package_digest():
     data = (PACKAGE / "manifest.json").read_bytes()
     for name, h in json.loads(data)["files"].items():
@@ -32,11 +44,26 @@ def package_digest():
 
 def gate(vault, approval):
     sha = package_digest()
+    data = f.inputs()
+    evidence_mode = "teaching_evidence" in data
     if (
         approval.get("manifest_sha256") != sha
-        or approval.get("parent_digest") != f.PARENT
+        or approval.get("parent_digest") != data["parent_candidate"]["candidate_digest"]
         or approval.get("explicit_user_authorization") is not True
-        or approval.get("accept_fact_revision_and_batch_C2") is not True
+        or approval.get(
+            "accept_ADR0054_scope_and_batch_C2"
+            if evidence_mode
+            else "accept_fact_revision_and_batch_C2"
+        )
+        is not True
+        or (
+            evidence_mode
+            and (
+                approval.get("evidence_digest")
+                != data["teaching_evidence"]["evidence_digest"]
+                or approval.get("protocol_version") != f.VERSION
+            )
+        )
         or type(approval.get("max_http_requests")) is not int
         or approval.get("max_http_requests") != 1
         or type(approval.get("starts_epoch")) is not int
@@ -95,7 +122,7 @@ def send(vault, approval, *, transport=None, key=None):
                 dict(
                     stage="fact_revision",
                     manifest_sha256=sha,
-                    parent_digest=f.PARENT,
+                    parent_digest=f.inputs()["parent_candidate"]["candidate_digest"],
                     request_sha256=hashlib.sha256(body).hexdigest(),
                     evidence_kind="offline_fixture"
                     if transport is not None
@@ -153,7 +180,7 @@ def send(vault, approval, *, transport=None, key=None):
         parent = f.inputs()["parent_candidate"]
         candidate = f.merge(parent, replacements)
         differences = []
-        for key, path in f.PATHS.items():
+        for key, path in f.inputs()["allowed_paths"].items():
             before = parent["raw_output"]
             for part in path:
                 before = before[part]
@@ -196,11 +223,95 @@ def send(vault, approval, *, transport=None, key=None):
         raise
 
 
+def read_saved(vault):
+    """Read-only receipt/output replay after STOP; never reopens the send window."""
+    from cryptography.fernet import Fernet
+
+    sha = package_digest()
+    request = old.read(vault / "revision.request.json")
+    raw = old.raw_io.decrypt(
+        vault / "revision.raw.enc", Fernet((vault / "raw.key").read_bytes())
+    )
+    receipt = old.read(vault / "revision.body.json")
+    attempt = old.read(vault / "revision.attempt.json")
+    approval = old.read(vault / "approval.json")
+    if (
+        request != f.body()
+        or receipt
+        != dict(
+            http_status=200,
+            raw_bytes=len(raw),
+            raw_sha256=hashlib.sha256(raw).hexdigest(),
+            body_complete=True,
+        )
+        or attempt["manifest_sha256"] != sha
+        or approval["manifest_sha256"] != sha
+        or approval.get("explicit_user_authorization") is not True
+        or attempt["parent_digest"]
+        != f.inputs()["parent_candidate"]["candidate_digest"]
+        or attempt["request_sha256"] != hashlib.sha256(canonical(request)).hexdigest()
+        or not (vault / "STOP").exists()
+        or (vault / "ACTIVE").exists()
+        or (vault / "revision.failure.json").exists()
+        or len(list(vault.glob("*.attempt.json"))) != 1
+    ):
+        raise SnapshotError("FACT_SAVED_BINDING")
+    result, obs = old.raw_io.observe_generation(request, raw)
+    if (
+        result.usage.input_tokens > 139264
+        or result.usage.output_tokens > request["max_output_tokens"]
+    ):
+        raise SnapshotError("FACT_SAVED_USAGE")
+    candidate = f.merge(f.inputs()["parent_candidate"], dict(result.value))
+    differences = []
+    for key, path in f.inputs()["allowed_paths"].items():
+        before = f.inputs()["parent_candidate"]["raw_output"]
+        for part in path:
+            before = before[part]
+        differences.append(
+            dict(
+                path=list(path),
+                before=before,
+                after=dict(result.value)[key],
+                changed=before != dict(result.value)[key],
+            )
+        )
+    if (
+        old.read(vault / "revision.output.json") != dict(result.value)
+        or old.read(vault / "revision.candidate.json") != candidate
+        or old.read(vault / "revision.assembled.private.json") != f.assemble(candidate)
+        or old.read(vault / "revision.observation.json") != obs
+        or old.read(vault / "revision.diff.json") != differences
+    ):
+        raise SnapshotError("FACT_SAVED_CANDIDATE")
+    return dict(
+        protocol_version=f.VERSION,
+        approval=approval,
+        input=f.inputs(),
+        request=request,
+        raw_response=raw.decode(),
+        receipt=receipt,
+        attempt=attempt,
+        output=dict(result.value),
+        candidate=candidate,
+        model=result.model_id,
+        usage=dict(
+            input_tokens=result.usage.input_tokens,
+            output_tokens=result.usage.output_tokens,
+        ),
+    )
+
+
 if __name__ == "__main__":
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--inspect", action="store_true")
-    p.add_argument("--send", action="store_true")
+    p.add_argument("--profile", choices=["fact", "evidence"], default="fact")
+    group = p.add_mutually_exclusive_group(required=True)
+    group.add_argument("--inspect", action="store_true")
+    group.add_argument("--send", action="store_true")
+    group.add_argument("--publish", action="store_true")
+    p.add_argument("--owner")
     a = p.parse_args()
+    select_profile(a.profile)
     if a.inspect:
         print(
             json.dumps(
@@ -224,5 +335,23 @@ if __name__ == "__main__":
         except BaseException:
             print("STOPPED: preserve originals and failures; no next request.")
             sys.exit(2)
-    else:
-        p.error("Choose --inspect or --send")
+    elif a.publish:
+        if a.profile != "evidence" or not a.owner:
+            p.error("--publish requires evidence profile and actual owner")
+        import asyncio
+        from uuid import UUID
+        from app.services.head_course_evidence_publication import import_course
+
+        record = read_saved(VAULT)
+        review = old.read(VAULT / "final-review.json")
+
+        async def publish(db):
+            return await import_course(db, UUID(a.owner), record, review)
+
+        result = asyncio.run(old.database(publish))
+        if (VAULT / "published.json").exists():
+            if old.read(VAULT / "published.json") != result:
+                raise SnapshotError("FACT_PUBLICATION_CHANGED")
+        else:
+            old.raw_io.exclusive(VAULT / "published.json", canonical(result))
+        print(json.dumps(result))

@@ -5870,6 +5870,84 @@
                 }
               }
             ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "origin": {
+                "const": "head_goal_model_generation"
+              },
+              "batch": {
+                "const": "head-reuse-evidence-revision-r01"
+              },
+              "candidate_digest": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "parent_digest": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "model": {
+                "type": "string"
+              },
+              "prompt_version": {
+                "const": "head-evidence-local-revision-v1"
+              },
+              "plan_digest": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "materials_digest": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "evidence_kind": {
+                "enum": [
+                  "evidence_bound_local_revision",
+                  "offline_fixture"
+                ]
+              },
+              "teaching_review": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "verdict": {
+                    "const": "pass"
+                  },
+                  "independent_evaluator": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "verdict",
+                  "independent_evaluator"
+                ]
+              },
+              "teaching_evidence_version": {
+                "const": "head-teaching-evidence-v1"
+              },
+              "teaching_evidence_digest": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            },
+            "required": [
+              "origin",
+              "batch",
+              "candidate_digest",
+              "parent_digest",
+              "model",
+              "prompt_version",
+              "plan_digest",
+              "materials_digest",
+              "evidence_kind",
+              "teaching_review",
+              "teaching_evidence_version",
+              "teaching_evidence_digest"
+            ]
           }
         ]
       },

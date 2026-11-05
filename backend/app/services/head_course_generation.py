@@ -129,6 +129,10 @@ def fingerprint(row: FreeSceneGenerationResult) -> str:
 
 def validate_generation(row: FreeSceneGenerationResult, actual: dict[str, Any]) -> dict[str, Any]:
     snapshot = row.input_snapshot
+    if row.schema_version == "head-evidence-local-revision-v1":
+        from app.services.head_course_evidence_publication import validate_publication
+
+        return validate_publication(row, actual)
     if row.schema_version == m.REUSE_VERSION:
         from app.services.head_course_reuse import validate_publication
 
