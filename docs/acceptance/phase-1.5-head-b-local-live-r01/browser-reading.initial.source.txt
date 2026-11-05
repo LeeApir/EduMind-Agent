@@ -1,0 +1,58 @@
+async (page) => {
+ const cid='eabc1bbb-1d5a-4b0c-9e8d-78ca3157b9ce',sid='bdd02733-7376-4929-a29a-d7199752220c';
+ await page.getByLabel('新课程来源',{exact:true}).waitFor({state:'visible'});
+ await page.waitForLoadState('networkidle');
+ const route='http://127.0.0.1:5198/api/free-courses/'+cid+'/versions/2/scenes/'+sid;
+ const reply=await page.request.get(route), scene=await reply.json();
+ if(reply.status()!==200)throw new Error('Scene unavailable');
+ const source=scene.generation_source;
+ if(source.candidate_digest!=='560ae12dd987b2718f7f82c2f971177e9a79e7bb6595a9f87e3c663f17172ff0'||source.parent_digest!=='63323703659f109f164752680e95ca20870cda31dbe720f63aa32d7dcc05b3dd'||source.teaching_evidence_digest!=='3d7bbd32b2ca6895fc62ce46dc1f1396488e6edd78b4dd21fac09eb4c0a8c754'||source.evidence_kind!=='evidence_bound_local_revision')throw new Error('Wrong source');
+ if(JSON.stringify(scene).includes('answer_key')||JSON.stringify(scene).includes('solution'))throw new Error('Private answer leaked');
+ const sourceText=await page.getByLabel('新课程来源',{exact:true}).innerText();
+ if(!sourceText.includes('模型局部修订')||!sourceText.includes('程序证据补充')||!sourceText.includes(source.teaching_evidence_digest))throw new Error('Source not rendered');
+ const paragraphs=await page.locator('.scene-prose').allTextContents();
+ const expected=scene.blocks.filter(b=>b.kind==='text').map(b=>b.markdown);
+ if(JSON.stringify(paragraphs.map(s=>s.trim()))!==JSON.stringify(expected))throw new Error('Teaching text mismatch');
+ const visual=scene.blocks.find(b=>b.kind==='visualization');
+ const panel=page.getByRole('region',{name:'过程演示与代码对照',exact:true});
+ const code=scene.blocks.find(b=>b.kind==='code').source.trimEnd();
+ const renderedCode=(await panel.locator('.course-code-line').allTextContents()).map(s=>s.replace(/^\d+  /,'')).join('\n');
+ if(renderedCode!==code)throw new Error('Rendered code changed');
+ const frames=[];
+ for(let i=0;i<visual.steps.length;i++){
+  const frame=visual.steps[i].head_frame;
+  await page.waitForFunction(id=>document.querySelector('.head-replay-frame')?.getAttribute('data-frame')===id,frame.frame_id);
+  const shown=JSON.parse(await panel.locator('details pre').textContent());
+  if(JSON.stringify(shown)!==JSON.stringify(frame))throw new Error('Frame snapshot drift '+frame.frame_id);
+  const note=(await panel.locator('.head-step-note').innerText()).trim();
+  if(note!==frame.note)throw new Error('Step text mismatch '+frame.frame_id);
+  const active=panel.locator('.active-code-line');
+  if(frame.line===null?await active.count()!==0:await active.getAttribute('data-line')!==String(frame.line))throw new Error('Highlight mismatch '+frame.frame_id);
+  const pointers=await panel.locator('.head-pointer-state').evaluateAll(dls=>Object.fromEntries(dls.flatMap(dl=>{const c=Array.from(dl.children);const a=[];for(let j=0;j<c.length;j+=2)a.push([c[j].textContent.trim(),c[j+1].textContent.trim()]);return a;})));
+  const pointer=v=>v===null?'NULL':String(v);
+  if(pointers.caller_head!==pointer(frame.state.caller_head))throw new Error('Caller pointer mismatch');
+  if(frame.locals_scope==='inactive'){
+   if('head' in pointers||'p' in pointers||!(await panel.innerText()).includes('不在作用域'))throw new Error('Local scope leak');
+  }else if(pointers.head!==pointer(frame.state.local_head)||pointers.p!==pointer(frame.state.p))throw new Error('Local pointer mismatch');
+  const nodes=await panel.locator('.head-nodes li').allTextContents();
+  for(const [id,node] of Object.entries(frame.state.nodes)){
+   const target=id+' · '+(id.startsWith('i')?'栈节点':'动态节点')+' · data: '+(node.data==='indeterminate'?'未知（未初始化）':String(node.data))+' · next: '+pointer(node.next);
+   if(!nodes.some(s=>s.trim()===target))throw new Error('Node rendering mismatch '+frame.frame_id+' '+id);
+  }
+  frames.push({frame:frame.frame_id,line:frame.line,scope:frame.locals_scope,pointers,nodes:nodes.map(s=>s.trim()),note});
+  if(i<visual.steps.length-1)await panel.getByRole('button',{name:'下一步',exact:true}).click();
+ }
+ await panel.getByRole('button',{name:'上一步',exact:true}).click();
+ await page.waitForFunction(()=>document.querySelector('.head-replay-frame')?.getAttribute('data-frame')==='f11');
+ await panel.getByRole('button',{name:'重置',exact:true}).click();
+ await page.waitForFunction(()=>document.querySelector('.head-replay-frame')?.getAttribute('data-frame')==='f00');
+ await panel.getByRole('button',{name:'播放',exact:true}).click();
+ await panel.getByRole('button',{name:'暂停',exact:true}).click();
+ const paused=await panel.locator('.head-replay-frame').getAttribute('data-frame');
+ await page.waitForTimeout(1400);
+ if(await panel.locator('.head-replay-frame').getAttribute('data-frame')!==paused)throw new Error('Pause failed');
+ await panel.getByRole('button',{name:'重置',exact:true}).click();
+ const operation=await (await page.request.get('http://127.0.0.1:5198/api/free-courses/'+cid+'/operations/0b37f12f-3e00-4d66-9ea5-08701da579c5')).json();
+ if(operation.execution_mode!=='finite_head_foreground'||operation.budget!==null)throw new Error('E01 regression');
+ return {scene,sourceText,paragraphs:paragraphs.map(s=>s.trim()),renderedCode,frames,controls:{next:true,previous:true,reset:true,play:true,pause:true,paused_frame:paused},operation,provider_calls_in_check:0};
+}
