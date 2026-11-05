@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "T109零调用接线/准确包/独立准备评估通过；blocked等待新准确执行批准，真实0；实际完整新课程仍未生成。旧批停止，T102 blocked。",
+    "phase_gate": "head-reuse-r01已停止：2/3HTTP，首稿strict通过/无格式恢复/无模型修订；独立教学有越出修订范围阻断，实际完整新课程未交付。旧额度/本批余量均不继承，不改运行源码或再调用。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -43,7 +43,7 @@
     }
   ],
   "stage_scope": {
-    "authorization": "2026-10-21用户确认A—F与三页原型并要求“可以，准备task”；仅授权细化当前阶段任务，不领取或开发。 2026-10-21用户后续要求“领取T01”，授权领取PHASE-1.5-T001；不扩大为整阶段执行授权。 用户随后要求“开始开发”，本次执行T001契约设计；具体契约批准仍待准确方案确认。 用户随后回复“批准”，接受d9bd7a6的ADR0024 A—D及准确附件；不自动授权后续任务。 用户在T001完成后要求“继续”，授权执行下一项T002具体设计。 用户随后回复“批准”，接受8f9f21f中ADR0025 A—E及准确附件，不自动授权后续任务或真实调用。 用户在T002完成后要求“继续”，授权领取并执行T003设计。 2026-10-22用户在中断后要求继续，恢复T003设计；具体契约仍待准确批准。 用户随后回复“批准”，接受78c95ce中ADR0026 A—E及准确附件，不自动授权后续任务或真实调用。 用户在T003完成后要求“继续”，授权领取并执行T004静态主要页面设计与浏览器验证。 用户随后回复“确认”，接受13b5dd7七页主要页面设计与准确附件，仅解除T004设计确认门禁。 用户在T004完成后要求“继续”，授权领取并执行T005独立验收口径设计，具体阈值待准确批准。 用户随后回复“批准”，接受3102c15中ADR0027 A—E及manifest绑定的5份规范文件，包含T038/T040验收对象澄清，不授予真实执行或后续任务授权。 用户在T005完成后要求“继续”，授权领取并执行T006版本化数据模型与迁移验证。 用户在T006完成后要求“继续”，授权领取并执行T007快照仓储与事务验证。 用户在T007完成后要求“继续”，授权领取并执行T008自由目标课程规划及零真实Provider验证。 用户在T008完成后要求“继续”，授权领取并执行T009非阻塞知识点关联。 用户在T009完成后要求“继续”，授权领取并执行T010按大纲生成场景内容。 用户在T010完成后要求“继续”，授权领取并执行T011确定性准入检查。 用户在T011完成后要求“继续”，授权领取并执行T012受约束授课动作与状态演示。 用户在T012完成后要求“继续”，授权领取并执行T013首场景与后续场景增量可见。 用户明确要求“继续T14”，授权PHASE-1.5-T014实现与零真实Provider验证。 用户在T014完成后要求“继续”，授权PHASE-1.5-T015取消与断点恢复。 2026-10-23用户要求“持续工作，知道完成T20”（按直到完成T020理解），授权T016–T020串行实现及零真实Provider验证，无需逐项再确认。 用户随后要求“继续T21”，授权PHASE-1.5-T021新旧课程及安全边界兼容验证与必要修复，不自动推进T022或真实调用。 2026-10-23用户要求“持续工作，直到完成T25”，授权T022–T025串行开发、验收与独立本地提交，完成T025后停止。 2026-10-23用户明确持续完成Pause 1.5（按当前Phase 1.5理解）依赖满足的任务，逐项验证/本地提交直至阶段验收或需决策阻塞/额度耗尽；不push/merge。真实Provider仍须准确执行包与预算另行批准。 用户最新要求“完成后停止”：完成当前T037准确准备包及本地提交后停止，不领取或执行T038；价格无上限仅本次单批次提案例外，不是准确包的真实执行批准。 2026-10-24用户明确答复“批准该准确包执行 T038”，接受7d3fef3的r02 manifest 4d987857ab227a366c8b506f4ed365c8360b778017aa9418425493a212527f44、单批次准确请求/token/时钟/货币例外及停止规则；登记docs/acceptance/phase-1.5-development-diagnostic-r02/execution-approval.json。 用户在T038 r02真实Schema拒绝后要求“继续”，本次只完成T050零调用兼容修复及新r03准备；不推定新预算/费用例外或新真实执行已获批准。 2026-10-24用户明确答复“批准该准确 r03 包执行 T038”，接受bd477dd manifest a734e125e8ea1d6aef8eb8223fbc773b55fdf495f6e5098dddd8b921e38ae857及准确新预算/费用例外/人工检查点/停发边界；独立登记r03/execution-approval.json，不继承或重启r02。 2026-10-24用户要求建立指定候选最小兼容入口、离线测试及可审批准确包，并明确确认官方https://api.openai.com/v1/gpt-6-luna；仅授权T056准备，不真实调用或修改教学链路，通过接口兼容后才准备课程诊断。 2026-10-24用户在d336e33准确执行包交付后直接回复“批准”，登记ADR0030 A—C及manifest 7689138e71165ef06fa474bb66107a4ea2b61354d18fadb4d50c585d8d9f0f21的官方最小单次兼容执行授权；预检因独立凭据缺失阻塞，尚无实际请求。 用户随后明确改用当前.env的新cbbb供应，先复查原故障，仍失败即停止使用该中转，并答复没有实际价格资料。T057已完成准确单对复测入口/离线准备；新实际收费及上游硬界未知风险仍须独立批准，方向指令不登记为对此未知风险接受。 用户随后在8fce9e7准确新env复测包及未知收费风险交付后明确“批准”，独立登记ADR0031 A—C及准确manifest；仅一次执行在计数HTTP404后立即停止，实际1HTTP/0生成，按用户规则弃用当前供应，所有剩余请求失效。 用户随后明确更换Key并“直接调用一次”，授权在同一端点用此前原S1/输出16直接生成一次并跳过计数；新d01仅1HTTP/1生成，HTTP200固定OK但相同额外指令后缀及上限null仍在，已终止无重试。新manifest只用于执行前追溯，未伪造用户逐哈希独立审批。 2026-10-28用户要求将小型多Agent协作方案验证加入任务列表，由开发助手执行、当前评估助手评估；新增T066–T070仅规划，不领取，不授权真实调用或生产改造。 2026-10-28用户要求“从T066开始完成T70”，授权按依赖推进T066–T070；不替代任务中明确要求的准确契约与真实实验批准，也不自签独立评估。 2026-10-28用户准确批准b424da4的ADR0041 A-D及6份附件；后续明确“助手评估所有内容”“授权独立子助手评估全部内容”，按assistant登记并保留开发/评估分离。T066–T068已提交；T069两轮证据修复后仍未通过独立预审，按既有规则blocked，T071仅限定离线提案待决定，未获新真实执行授权。 用户随后准确批准T071限定离线前置任务，仅一次实现和独立复审，完成后恢复T069/T070；不授权真实调用或生产开放。 2026-11-04用户仅授权T108正文相同重复字段恢复：直接r03原件确定性派生、同版完整校验/课程预览/独立逐段逐题逐步评估；新增Provider0，不重启旧批，若有内容问题准确报告不补写。 用户新增T109“限定头插流程复用验证”，仅授权零调用接线/必要定向检查/最小准确包交评估；拟3HTTP（规划1/正文1/条件修订1）及新600秒/C2须准确另批，旧额度不继承。",
+    "authorization": "2026-10-21用户确认A—F与三页原型并要求“可以，准备task”；仅授权细化当前阶段任务，不领取或开发。 2026-10-21用户后续要求“领取T01”，授权领取PHASE-1.5-T001；不扩大为整阶段执行授权。 用户随后要求“开始开发”，本次执行T001契约设计；具体契约批准仍待准确方案确认。 用户随后回复“批准”，接受d9bd7a6的ADR0024 A—D及准确附件；不自动授权后续任务。 用户在T001完成后要求“继续”，授权执行下一项T002具体设计。 用户随后回复“批准”，接受8f9f21f中ADR0025 A—E及准确附件，不自动授权后续任务或真实调用。 用户在T002完成后要求“继续”，授权领取并执行T003设计。 2026-10-22用户在中断后要求继续，恢复T003设计；具体契约仍待准确批准。 用户随后回复“批准”，接受78c95ce中ADR0026 A—E及准确附件，不自动授权后续任务或真实调用。 用户在T003完成后要求“继续”，授权领取并执行T004静态主要页面设计与浏览器验证。 用户随后回复“确认”，接受13b5dd7七页主要页面设计与准确附件，仅解除T004设计确认门禁。 用户在T004完成后要求“继续”，授权领取并执行T005独立验收口径设计，具体阈值待准确批准。 用户随后回复“批准”，接受3102c15中ADR0027 A—E及manifest绑定的5份规范文件，包含T038/T040验收对象澄清，不授予真实执行或后续任务授权。 用户在T005完成后要求“继续”，授权领取并执行T006版本化数据模型与迁移验证。 用户在T006完成后要求“继续”，授权领取并执行T007快照仓储与事务验证。 用户在T007完成后要求“继续”，授权领取并执行T008自由目标课程规划及零真实Provider验证。 用户在T008完成后要求“继续”，授权领取并执行T009非阻塞知识点关联。 用户在T009完成后要求“继续”，授权领取并执行T010按大纲生成场景内容。 用户在T010完成后要求“继续”，授权领取并执行T011确定性准入检查。 用户在T011完成后要求“继续”，授权领取并执行T012受约束授课动作与状态演示。 用户在T012完成后要求“继续”，授权领取并执行T013首场景与后续场景增量可见。 用户明确要求“继续T14”，授权PHASE-1.5-T014实现与零真实Provider验证。 用户在T014完成后要求“继续”，授权PHASE-1.5-T015取消与断点恢复。 2026-10-23用户要求“持续工作，知道完成T20”（按直到完成T020理解），授权T016–T020串行实现及零真实Provider验证，无需逐项再确认。 用户随后要求“继续T21”，授权PHASE-1.5-T021新旧课程及安全边界兼容验证与必要修复，不自动推进T022或真实调用。 2026-10-23用户要求“持续工作，直到完成T25”，授权T022–T025串行开发、验收与独立本地提交，完成T025后停止。 2026-10-23用户明确持续完成Pause 1.5（按当前Phase 1.5理解）依赖满足的任务，逐项验证/本地提交直至阶段验收或需决策阻塞/额度耗尽；不push/merge。真实Provider仍须准确执行包与预算另行批准。 用户最新要求“完成后停止”：完成当前T037准确准备包及本地提交后停止，不领取或执行T038；价格无上限仅本次单批次提案例外，不是准确包的真实执行批准。 2026-10-24用户明确答复“批准该准确包执行 T038”，接受7d3fef3的r02 manifest 4d987857ab227a366c8b506f4ed365c8360b778017aa9418425493a212527f44、单批次准确请求/token/时钟/货币例外及停止规则；登记docs/acceptance/phase-1.5-development-diagnostic-r02/execution-approval.json。 用户在T038 r02真实Schema拒绝后要求“继续”，本次只完成T050零调用兼容修复及新r03准备；不推定新预算/费用例外或新真实执行已获批准。 2026-10-24用户明确答复“批准该准确 r03 包执行 T038”，接受bd477dd manifest a734e125e8ea1d6aef8eb8223fbc773b55fdf495f6e5098dddd8b921e38ae857及准确新预算/费用例外/人工检查点/停发边界；独立登记r03/execution-approval.json，不继承或重启r02。 2026-10-24用户要求建立指定候选最小兼容入口、离线测试及可审批准确包，并明确确认官方https://api.openai.com/v1/gpt-6-luna；仅授权T056准备，不真实调用或修改教学链路，通过接口兼容后才准备课程诊断。 2026-10-24用户在d336e33准确执行包交付后直接回复“批准”，登记ADR0030 A—C及manifest 7689138e71165ef06fa474bb66107a4ea2b61354d18fadb4d50c585d8d9f0f21的官方最小单次兼容执行授权；预检因独立凭据缺失阻塞，尚无实际请求。 用户随后明确改用当前.env的新cbbb供应，先复查原故障，仍失败即停止使用该中转，并答复没有实际价格资料。T057已完成准确单对复测入口/离线准备；新实际收费及上游硬界未知风险仍须独立批准，方向指令不登记为对此未知风险接受。 用户随后在8fce9e7准确新env复测包及未知收费风险交付后明确“批准”，独立登记ADR0031 A—C及准确manifest；仅一次执行在计数HTTP404后立即停止，实际1HTTP/0生成，按用户规则弃用当前供应，所有剩余请求失效。 用户随后明确更换Key并“直接调用一次”，授权在同一端点用此前原S1/输出16直接生成一次并跳过计数；新d01仅1HTTP/1生成，HTTP200固定OK但相同额外指令后缀及上限null仍在，已终止无重试。新manifest只用于执行前追溯，未伪造用户逐哈希独立审批。 2026-10-28用户要求将小型多Agent协作方案验证加入任务列表，由开发助手执行、当前评估助手评估；新增T066–T070仅规划，不领取，不授权真实调用或生产改造。 2026-10-28用户要求“从T066开始完成T70”，授权按依赖推进T066–T070；不替代任务中明确要求的准确契约与真实实验批准，也不自签独立评估。 2026-10-28用户准确批准b424da4的ADR0041 A-D及6份附件；后续明确“助手评估所有内容”“授权独立子助手评估全部内容”，按assistant登记并保留开发/评估分离。T066–T068已提交；T069两轮证据修复后仍未通过独立预审，按既有规则blocked，T071仅限定离线提案待决定，未获新真实执行授权。 用户随后准确批准T071限定离线前置任务，仅一次实现和独立复审，完成后恢复T069/T070；不授权真实调用或生产开放。 2026-11-04用户仅授权T108正文相同重复字段恢复：直接r03原件确定性派生、同版完整校验/课程预览/独立逐段逐题逐步评估；新增Provider0，不重启旧批，若有内容问题准确报告不补写。 用户新增T109“限定头插流程复用验证”，仅授权零调用接线/必要定向检查/最小准确包交评估；拟3HTTP（规划1/正文1/条件修订1）及新600秒/C2须准确另批，旧额度不继承。 用户随后回复“批准”，接受674fc06准确manifest f4c98c1a24d2943dd7f38350095932f1e933a46757eee3896156439d05bd239b的ADR0053 A—D、新批C2及最多3HTTP/600秒；登记0053-approval-20261105.json，终端就绪后才开始窗口。",
     "product_mode": "catalog_only",
     "formal_product": "已有签核课程",
     "dynamic_scope": "已确认学生可直接学习AI生成草稿；普通语义审核不阻断整课。实际运行开放须新契约实现与独立验收后批准，既有签核课程语义不变。",
@@ -68,12 +68,12 @@
       "通用编辑器/PBL/PDF研究/TTS必交付/iOS/导出",
       "未经批准的真实调用、生产开放、部署、push/merge"
     ],
-    "provider_requests_attempted": 9,
-    "real_model_requests_attempted": 5,
+    "provider_requests_attempted": 11,
+    "real_model_requests_attempted": 7,
     "active_provider_batch_id": null,
-    "last_stopped_provider_batch_id": "head-goal-fact-r01",
-    "current_candidate_real_calls": "stopped_after_single_targeted_fact_revision",
-    "current_authorization_note": "r03规划语义pass；正文HTTP200但模型output_text.questions四题键各重复2次，严格入口DUPLICATE_JSON_KEY拒绝，2HTTP后STOP，余1失效。0合格正文候选/0完整课程，保留全部原稿和规划pass；待用户决定后续，不自动修JSON/重试/追加实验。",
+    "last_stopped_provider_batch_id": "head-reuse-r01",
+    "current_candidate_real_calls": "head-reuse-r01 STOP; actual2HTTP, unused1invalidated; no full course published",
+    "current_authorization_note": "T109本批已STOP，剩余1失效；后续真实授权0，不自动修订failure_scope或续窗。",
     "pending_approved_provider_batch_id": null,
     "head_replay_t107": {
       "authorization": "用户限定现有真实C01首版/C02修复版零Provider主链接入；不可无损部分集中具体契约变更",
@@ -186,20 +186,78 @@
       }
     },
     "head_reuse_t109": {
-      "status": "prepared_independent_review_pass_pending_exact_authorization",
+      "status": "stopped_teaching_and_integration_failures",
       "original_goal": "我已了解 C 指针、struct、NULL 和函数返回值，希望通过头插示例，理解新节点如何连接旧链表，以及为什么调用者需要接收函数返回值。 本次明确使用 head-new-B：初始链表 [-8]，依次插入 6、0。",
       "selected_example": "head-new-B",
       "freely_selected_example_claim": false,
       "proposed_batch": "head-reuse-r01",
       "proposed_http_limit": 3,
       "proposed_window_seconds": 600,
-      "provider_calls_attempted": 0,
+      "provider_calls_attempted": 2,
       "provider_calls_authorized": 0,
-      "window_started": false,
+      "window_started": true,
       "prior_allowance_inherited": 0,
       "full_real_course_delivered": false,
       "package": "docs/acceptance/phase-1.5-head-reuse-t109/manifest.json",
-      "package_manifest_sha256": "f4c98c1a24d2943dd7f38350095932f1e933a46757eee3896156439d05bd239b"
+      "package_manifest_sha256": "f4c98c1a24d2943dd7f38350095932f1e933a46757eee3896156439d05bd239b",
+      "approval_record": "docs/ADR/0053-approval-20261105.json",
+      "execution_window": {
+        "batch": "head-reuse-r01",
+        "starts_epoch": 1793838609,
+        "expires_epoch": 1793839209,
+        "starts_at": "2026-11-05T08:30:09+08:00",
+        "expires_at": "2026-11-05T08:40:09+08:00",
+        "max_http_requests": 3,
+        "provider_calls_attempted": 2,
+        "prior_allowance_inherited": 0,
+        "stopped_at": "2026-11-05T08:38:48+08:00",
+        "actual_http_requests": 2,
+        "unused_requests_invalidated": 1,
+        "stopped": true,
+        "stop_reason": "independent_teaching_finding_outside_revision_scope",
+        "first_structure_pass": true,
+        "format_recovery_used": false,
+        "model_revision_used": false,
+        "assistant_teaching_edits": 0
+      },
+      "actual_app": {
+        "owner": "0b1b71df-9b00-470e-abc4-ae41aeb20cf9",
+        "course_id": "6be90c82-adfd-408d-82b6-32125db0dcbf",
+        "operation_id": "ecb65468-da85-4772-8a5d-b7f1bb5e8fa1"
+      },
+      "plan_receipt": {
+        "body_complete": true,
+        "http_status": 200,
+        "raw_bytes": 7290,
+        "raw_sha256": "31f6111a4cc8ce891674fc2053ffd0dd39a65314e68c9105e2e9cfe376d52e50"
+      },
+      "plan_usage": {
+        "input_tokens": 4867,
+        "output_tokens": 839
+      },
+      "planning_review": "docs/acceptance/phase-1.5-head-reuse-live-r01/plan-review.json",
+      "first_structure_pass": true,
+      "format_recovery_used": false,
+      "model_revision_used": false,
+      "first_candidate_digest": "63323703659f109f164752680e95ca20870cda31dbe720f63aa32d7dcc05b3dd",
+      "teaching_receipt": {
+        "body_complete": true,
+        "http_status": 200,
+        "raw_bytes": 17052,
+        "raw_sha256": "b5acad36fceae43082f8facc2c0c14990f98d15715b9610f7da8cca554d9fa95"
+      },
+      "unused_requests_invalidated": 1,
+      "stopped": true,
+      "assistant_teaching_edits": 0,
+      "teaching_review_pass": false,
+      "model_full_teaching_generated": true,
+      "published": false,
+      "full_learning_flow_run": false,
+      "runtime_source_changed_after_approval": false,
+      "complete_real_courses": 0,
+      "result": "docs/acceptance/phase-1.5-head-reuse-live-r01/RESULTS.md",
+      "independent_teaching_review": "docs/acceptance/phase-1.5-head-reuse-live-r01/final-review.json",
+      "engineering_issue": "E01 operation budget/resume projection misses new protocol"
     }
   },
   "archive_transition": {
@@ -5525,9 +5583,9 @@
       ],
       "started_at": "2026-11-04T23:54:18+08:00",
       "completed_at": null,
-      "blocker": "独立准备评估通过；待准确manifest/ADR0053 A—D/新3HTTP与600秒/C2批准后，才可启动真实新批。最终实际新课程尚未产生，T109未完成。",
+      "blocker": "head-reuse-r01已STOP：独立S01 failure_scope声称未展示分支，超出允许修订范围；C01段落5引用不支撑忽略返回分支；实际应用另发现E01新协议漏接操作预算/恢复投影。2HTTP/余1失效，0发布课程，未做完整学习验收。需用户决定，不能自动补源码或扩修。",
       "commit_lookup": "Task-Completed: PHASE-1.5-T109",
-      "execution_gate": "仅T109零调用准备获准且真实请求0；新准确批次未授权、窗口未启动。T108完成/原件可复核，T102 blocked，旧额度0继承。",
+      "execution_gate": "head-reuse-r01已停止：2/3HTTP，首稿strict通过/无格式恢复/无模型修订；独立教学有越出修订范围阻断，实际完整新课程未交付。旧额度/本批余量均不继承，不改运行源码或再调用。",
       "verification_results": [
         {
           "date": "2026-11-05T08:21:46+08:00",
@@ -5560,6 +5618,19 @@
           "result": "最终纯导出格式修正已由独立评估反向重建核验：准确还原前版6ad，其余408项摘要不变；新版prepare/check/CLI inspect均f4c/410项/Provider0，准备评估pass不代表课程。",
           "package_manifest_sha256": "f4c98c1a24d2943dd7f38350095932f1e933a46757eee3896156439d05bd239b",
           "evidence": "docs/acceptance/phase-1.5-head-reuse-t109/PREPARATION-REVIEW.md"
+        },
+        {
+          "date": "2026-11-05T08:48:02+08:00",
+          "commands": [
+            "实际首页准确目标→冻结reuse prepare→用户终端隐藏输入plan；独立规划pass后generate",
+            "独立完整首稿教学评估stop（S01/C01）及实际应用停止投影独立核对E01",
+            "backend/.venv/bin/python docs/acceptance/phase-1.5-head-reuse-live-r01/check_results.py",
+            "backend/.venv/bin/python scripts/prepare_head_course_reuse.py --check；backend/.venv/bin/python -I scripts/head_course_goal.py --profile reuse --inspect",
+            "只读核对器Ruff；工作流/diff/链接；旧108Task与源码/冻结包不变、process只追加检查"
+          ],
+          "result": "实际2HTTP200，规划7290/正文17052字节完整原件重放/准确请求及候选通过；真实规划独立pass、正文首次结构pass；未恢复/修订/助手补写。独立教学S01不可修范围问题及C01引用不足，08:38:48STOP/余1失效。现有锁内终态收尾保留1规划/v1、0正文准入；实际API200/页面生成未完成但E01错误显示0/13预算/通用恢复入口，独立确认且未补源码。无完整应用课程或阅读/演示/四题/整页刷新学习验收，不done。",
+          "evidence": "docs/acceptance/phase-1.5-head-reuse-live-r01/RESULTS.md",
+          "package_manifest_sha256": "f4c98c1a24d2943dd7f38350095932f1e933a46757eee3896156439d05bd239b"
         }
       ]
     }
