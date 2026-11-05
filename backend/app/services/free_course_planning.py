@@ -76,10 +76,13 @@ async def load_inputs(
         if row is None:
             raise SnapshotError("SNAPSHOT_CORRUPT")
     capability = {}
-    if current["nonsecret_config_snapshot"].get("prompt_version") == "head-goal-course-v1":
-        from app.services.head_course_materials import SUPPORT
+    if current["nonsecret_config_snapshot"].get("prompt_version") in (
+        "head-goal-course-v1",
+        "head-reuse-course-v1",
+    ):
+        from app.services.head_course_materials import support_for_goal
 
-        capability = dict(head_support=SUPPORT)
+        capability = dict(head_support=support_for_goal(course["original_goal"]))
     return snapshot_input(
         dict(
             course_id=str(course_id),

@@ -5661,6 +5661,219 @@
         ]
       },
       "HeadGenerationSource": {
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/HeadGenerationSourceLegacy"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "origin": {
+                "const": "head_goal_model_generation"
+              },
+              "batch": {
+                "const": "head-reuse-r01"
+              },
+              "candidate_digest": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "parent_digest": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "model": {
+                "type": "string"
+              },
+              "prompt_version": {
+                "const": "head-reuse-course-v1"
+              },
+              "plan_digest": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "materials_digest": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "evidence_kind": {
+                "enum": [
+                  "actual_provider_response",
+                  "offline_fixture",
+                  "program_format_recovery",
+                  "reviewed_paragraph_revision"
+                ]
+              },
+              "format_recovery": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "rule_version": {
+                    "const": "head-questions-identical-duplicate-v1"
+                  },
+                  "source_batch": {
+                    "const": "head-reuse-r01"
+                  },
+                  "original_raw_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "original_text_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "derived_output_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "original_request_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "new_provider_calls": {
+                    "const": 0
+                  },
+                  "model_first_structure_pass": {
+                    "const": false
+                  },
+                  "assistant_text_edits": {
+                    "const": 0
+                  },
+                  "duplicates": {
+                    "type": "array",
+                    "maxItems": 4,
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "path": {
+                          "type": "array",
+                          "prefixItems": [
+                            {
+                              "const": "questions"
+                            },
+                            {
+                              "enum": [
+                                "link_target",
+                                "normal_values",
+                                "discarded_values",
+                                "unreachable_count"
+                              ]
+                            }
+                          ],
+                          "minItems": 2,
+                          "maxItems": 2
+                        },
+                        "removed_member_index": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "occurrence": {
+                          "const": 2
+                        },
+                        "value_sha256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        }
+                      },
+                      "required": [
+                        "path",
+                        "removed_member_index",
+                        "occurrence",
+                        "value_sha256"
+                      ]
+                    },
+                    "minItems": 1
+                  }
+                },
+                "required": [
+                  "rule_version",
+                  "source_batch",
+                  "original_raw_sha256",
+                  "original_text_sha256",
+                  "derived_output_sha256",
+                  "original_request_sha256",
+                  "new_provider_calls",
+                  "model_first_structure_pass",
+                  "assistant_text_edits",
+                  "duplicates"
+                ]
+              },
+              "teaching_review": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "verdict": {
+                    "const": "pass"
+                  },
+                  "independent_evaluator": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "verdict",
+                  "independent_evaluator"
+                ]
+              }
+            },
+            "required": [
+              "origin",
+              "batch",
+              "candidate_digest",
+              "parent_digest",
+              "model",
+              "prompt_version",
+              "plan_digest",
+              "materials_digest",
+              "evidence_kind",
+              "teaching_review"
+            ],
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "evidence_kind": {
+                      "const": "program_format_recovery"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "format_recovery"
+                  ]
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "evidence_kind": {
+                      "const": "reviewed_paragraph_revision"
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "parent_digest": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "HeadGenerationSourceLegacy": {
         "type": "object",
         "additionalProperties": false,
         "properties": {

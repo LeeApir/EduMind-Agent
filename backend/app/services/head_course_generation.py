@@ -36,12 +36,13 @@ def development_enabled() -> bool:
 
 async def enqueue(sessions, owner: UUID, body: dict[str, Any], key: str) -> dict[str, Any]:
     require_development_database()
-    if body["goal"] != m.GOAL or body.get("code_language", "c") != "c":
+    support = m.support_for_goal(body["goal"])
+    if body.get("code_language", "c") != "c":
         raise SnapshotError("HEAD_GOAL_UNSUPPORTED")
     async with sessions() as db, db.begin():
         repo = SnapshotRepository(db, owner)
         result = await repo.create_course(
-            body["goal"], key=key, config={"prompt_version": m.VERSION}
+            body["goal"], key=key, config={"prompt_version": support["version"]}
         )
         return result
 
@@ -53,7 +54,7 @@ async def generation_context(db: AsyncSession, owner: UUID, cid: UUID, oid: UUID
 
     repo = SnapshotRepository(db, owner)
     request = await load_inputs(db, owner, cid, oid)
-    if request.get("head_support") != m.SUPPORT:
+    if request.get("head_support") != m.support_for_goal(request["original_goal"]):
         raise SnapshotError("HEAD_REQUEST_MISMATCH")
     course = await repo.get_course(cid)
     if course["head_version"] != 1:
@@ -128,6 +129,10 @@ def fingerprint(row: FreeSceneGenerationResult) -> str:
 
 def validate_generation(row: FreeSceneGenerationResult, actual: dict[str, Any]) -> dict[str, Any]:
     snapshot = row.input_snapshot
+    if row.schema_version == m.REUSE_VERSION:
+        from app.services.head_course_reuse import validate_publication
+
+        return validate_publication(row, actual)
     if row.schema_version == "head-f01-f02-four-text-v1":
         from app.services.head_course_fact_publication import validate_publication
 

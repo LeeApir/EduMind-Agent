@@ -21,6 +21,7 @@ from app.agents import head_course_planning_wire as plan_wire  # noqa: E402
 from app.services.free_course_snapshots import SnapshotError, canonical, digest  # noqa: E402
 
 PACKAGE = ROOT / "docs/acceptance/phase-1.5-head-goal-t108-r03"
+REUSE_PACKAGE = ROOT / "docs/acceptance/phase-1.5-head-reuse-t109"
 OLD = ROOT / "docs/acceptance/phase-1.5-limited-c-preparation-t104/execute_once.py"
 spec = importlib.util.spec_from_file_location("head_goal_raw_transport", OLD)
 raw_io = importlib.util.module_from_spec(spec)
@@ -87,7 +88,7 @@ async def prepare(owner, cid, oid):
         ):
             raise SnapshotError("HEAD_OPERATION_STOPPED")
         inputs = await load_inputs(db, owner, cid, oid)
-        if inputs.get("head_support") != m.SUPPORT:
+        if inputs.get("head_support") != m.support_for_goal(inputs["original_goal"]):
             raise SnapshotError("HEAD_REQUEST_MISMATCH")
         return dict(
             owner=str(owner),
@@ -178,8 +179,37 @@ def verify_saved(vault, stage, cipher):
         or attempt["request_sha256"] != hashlib.sha256(canonical(request)).hexdigest()
     ):
         raise SnapshotError("HEAD_REQUEST_CHANGED")
-    result, observation = raw_io.observe_generation(request, raw)
     context = read(vault / "context.json")
+    if context["planning_inputs"]["original_goal"] == m.REUSE_GOAL and stage != "plan":
+        from app.services import head_course_reuse as reuse
+
+        plan = verify_saved(vault, "plan", cipher)["plan"]
+        payload = m.content_payload(context["planning_inputs"], plan)
+        parent = (
+            None
+            if stage == "generate"
+            else verify_saved(vault, "generate", cipher)["candidate"]
+        )
+        review = None if parent is None else read(vault / "repair-review.json")
+        expected = reuse.record(
+            payload,
+            request,
+            raw,
+            raw_io,
+            evidence_kind=attempt["evidence_kind"],
+            parent=parent,
+            review=review,
+        )
+        if read(vault / f"{stage}.record.json") != expected:
+            raise SnapshotError("HEAD_CANDIDATE_CHANGED")
+        if (
+            expected["strict_failure"] is not None
+            and read(vault / "generate.strict-failure.json")
+            != expected["strict_failure"]
+        ):
+            raise SnapshotError("HEAD_RECOVERY_FAILURE_CHANGED")
+        return expected
+    result, observation = raw_io.observe_generation(request, raw)
     if stage == "plan":
         if request != planning_body(context["planning_inputs"]) or read(
             vault / "plan.output.json"
@@ -253,10 +283,23 @@ def repair_issues(vault, parent):
 
 def approval_check(vault, approval):
     sha = package_digest()
+    reuse = PACKAGE == REUSE_PACKAGE
     if (
         approval.get("package_sha256") != sha
-        or approval.get("version") != m.VERSION
-        or approval.get("accept_ADR0052_R03_and_batch_C2") is not True
+        or approval.get("version") != (m.REUSE_VERSION if reuse else m.VERSION)
+        or approval.get(
+            "accept_ADR0053_and_batch_C2"
+            if reuse
+            else "accept_ADR0052_R03_and_batch_C2"
+        )
+        is not True
+        or (
+            reuse
+            and (
+                type(approval.get("max_http_requests")) is not int
+                or approval["max_http_requests"] != 3
+            )
+        )
         or approval.get("planning_wire_version") != plan_wire.VERSION
         or approval.get("planning_prompt_version") != plan_wire.PROMPT_VERSION
         or approval.get("explicit_user_authorization") is not True
@@ -288,6 +331,9 @@ def send(stage, vault, approval, *, transport=None, key=None):
             raise SnapshotError("HEAD_RAW_KEY_UNSAFE")
         cipher = Fernet(rawkey.read_bytes())
         context = read(vault / "context.json")
+        reuse_mode = context["planning_inputs"]["original_goal"] == m.REUSE_GOAL
+        if reuse_mode != (PACKAGE == REUSE_PACKAGE):
+            raise SnapshotError("HEAD_PACKAGE_PROFILE_MISMATCH")
         if (
             len(list(vault.glob("*.attempt.json"))) >= 3
             or (vault / f"{stage}.attempt.json").exists()
@@ -314,8 +360,15 @@ def send(stage, vault, approval, *, transport=None, key=None):
                 raise SnapshotError("HEAD_ORDER")
             if stage == "repair":
                 parent = verify_saved(vault, "generate", cipher)["candidate"]
-                issues = repair_issues(vault, parent)
-            request = m.body(payload, parent, issues)
+                if reuse_mode:
+                    from app.services.head_course_reuse import revision_body
+
+                    issues = read(vault / "repair-review.json")
+                    request = revision_body(parent, issues)
+                else:
+                    issues = repair_issues(vault, parent)
+            if stage != "repair" or not reuse_mode:
+                request = m.body(payload, parent, issues)
         raw_request = canonical(request)
         if len(raw_request) > 131072:
             raise SnapshotError("HEAD_REQUEST_SIZE")
@@ -352,7 +405,7 @@ def send(stage, vault, approval, *, transport=None, key=None):
                     if isinstance(transport, httpx.MockTransport)
                     else "actual_provider_response",
                     local_input_reservation=139264,
-                    output_reservation=8000,
+                    output_reservation=request["max_output_tokens"],
                 )
             ),
         )
@@ -388,6 +441,34 @@ def send(stage, vault, approval, *, transport=None, key=None):
         approval_check(vault, approval)
         if status != 200 or encoding != "identity":
             raise SnapshotError("HEAD_HTTP_OR_ENCODING")
+        if reuse_mode and stage != "plan":
+            from app.services import head_course_reuse as reuse
+
+            record = reuse.record(
+                payload,
+                request,
+                raw,
+                raw_io,
+                evidence_kind="offline_fixture"
+                if isinstance(transport, httpx.MockTransport)
+                else "actual_provider_response",
+                parent=parent,
+                review=issues,
+            )
+            if (
+                key in raw.decode(errors="replace")
+                or key in canonical(record["output"]).decode()
+            ):
+                raise SnapshotError("HEAD_USAGE_OR_CREDENTIAL_ECHO")
+            if record["strict_failure"] is not None:
+                raw_io.exclusive(
+                    vault / "generate.strict-failure.json",
+                    canonical(record["strict_failure"]),
+                )
+            raw_io.exclusive(vault / f"{stage}.record.json", canonical(record))
+            verify_saved(vault, stage, cipher)
+            lock.unlink()
+            return
         result, observation = raw_io.observe_generation(request, raw)
         if (
             observation["reported_input_tokens"] > 139264
@@ -438,7 +519,13 @@ def send(stage, vault, approval, *, transport=None, key=None):
                         stage=stage,
                         state="failed_or_unknown",
                         error_type=type(error).__name__,
-                        code=getattr(error, "code", None),
+                        code=getattr(
+                            error,
+                            "code",
+                            str(error)
+                            if isinstance(error, raw_io.wire.PilotError)
+                            else None,
+                        ),
                     )
                 ),
             )
@@ -498,7 +585,9 @@ def raw_io_audit(event, args):
 
 
 def main():
+    global PACKAGE
     p = argparse.ArgumentParser(description=__doc__)
+    p.add_argument("--profile", choices=["t108", "reuse"], default="t108")
     group = p.add_mutually_exclusive_group(required=True)
     group.add_argument("--inspect", action="store_true")
     group.add_argument("--serve", action="store_true")
@@ -511,6 +600,8 @@ def main():
     p.add_argument("--course", type=UUID)
     p.add_argument("--operation", type=UUID)
     args = p.parse_args()
+    if args.profile == "reuse":
+        PACKAGE = REUSE_PACKAGE
     if args.inspect:
         print(
             json.dumps(
@@ -573,7 +664,31 @@ def main():
                     review,
                 )
 
-            result = asyncio.run(database(publish))
+            if PACKAGE == REUSE_PACKAGE:
+                from app.services import head_course_reuse as reuse
+
+                plan_raw = raw_io.decrypt(args.vault / "plan.raw.enc", cipher)
+                chain = dict(
+                    context=context,
+                    plan_request=read(args.vault / "plan.request.json"),
+                    plan_raw_response=plan_raw.decode(),
+                    plan_review=read(args.vault / "plan-review.json"),
+                    records=records,
+                    final_review=review,
+                )
+
+                async def publish_reuse(db):
+                    return await reuse.publish(
+                        db,
+                        UUID(context["owner"]),
+                        UUID(context["course_id"]),
+                        UUID(context["operation_id"]),
+                        chain,
+                    )
+
+                result = asyncio.run(database(publish_reuse))
+            else:
+                result = asyncio.run(database(publish))
             raw_io.exclusive(args.vault / "published.json", canonical(result))
             raw_io.exclusive(
                 args.vault / "STOP", b"completed; unused requests expired\n"

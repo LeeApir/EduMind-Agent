@@ -125,9 +125,9 @@ def snapshot_input(value: dict[str, Any]) -> dict[str, Any]:
         ):
             raise SnapshotError("PLANNING_INPUT_INVALID")
     if "head_support" in value:
-        from app.services.head_course_materials import GOAL, SUPPORT
+        from app.services.head_course_materials import support_for_goal
 
-        if value["head_support"] != SUPPORT or value["original_goal"] != GOAL:
+        if value["head_support"] != support_for_goal(value["original_goal"]):
             raise SnapshotError("HEAD_PLANNING_SCOPE_INVALID")
     return deepcopy(value)
 
@@ -235,6 +235,8 @@ def validate_response(raw: Any, inputs: dict[str, Any]) -> dict[str, Any]:
             from app.services.head_course_materials import selected
 
             selected(plan)
+            if plan["shared_example"] not in inputs["head_support"]["examples"]:
+                raise ValueError()
         return cast(dict[str, Any], value)
     except Exception:
         raise SnapshotError("SCHEMA_INVALID") from None

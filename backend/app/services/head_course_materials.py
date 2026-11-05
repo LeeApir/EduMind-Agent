@@ -17,6 +17,8 @@ GOAL = (
     "理解新节点如何连接旧链表，以及为什么调用者需要接收函数返回值。"
 )
 KNOWN = ["C 指针", "struct", "NULL", "函数返回值"]
+REUSE_VERSION = "head-reuse-course-v1"
+REUSE_GOAL = GOAL + " 本次明确使用 head-new-B：初始链表 [-8]，依次插入 6、0。"
 SPECS: dict[str, dict[str, Any]] = {
     "head-new-A": dict(
         version="head-insertion-spec-v1",
@@ -46,6 +48,18 @@ SUPPORT: dict[str, Any] = dict(
     ),
 )
 QKEYS = ("link_target", "normal_values", "discarded_values", "unreachable_count")
+
+
+def support_for_goal(goal: str) -> dict[str, Any]:
+    if goal == GOAL:
+        return deepcopy(SUPPORT)
+    if goal == REUSE_GOAL:
+        return dict(
+            **{k: deepcopy(v) for k, v in SUPPORT.items() if k not in ("version", "examples")},
+            version=REUSE_VERSION,
+            examples={"head-new-B": deepcopy(SPECS["head-new-B"])},
+        )
+    raise SnapshotError("HEAD_GOAL_UNSUPPORTED")
 
 
 def closed(props: dict[str, Any]) -> dict[str, Any]:

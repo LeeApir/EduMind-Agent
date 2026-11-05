@@ -268,7 +268,7 @@ onBeforeUnmount(()=>{save();epoch+=1;manifestEpoch+=1;versionsEpoch+=1;controlle
               class="replay-source"
               aria-label="新课程来源"
             >
-              <strong>{{ scene.generation_source.evidence_kind === 'targeted_fact_revision' ? '模型四字段事实修订' : scene.generation_source.evidence_kind === 'program_format_recovery' ? '程序格式恢复 · r03 派生课程' : scene.generation_source.evidence_kind === 'offline_fixture' ? '离线接线夹具 · 非真实生成' : '新目标真实生成 · 头插支持域' }} · 未签核</strong>
+              <strong>{{ scene.generation_source.prompt_version === 'head-reuse-course-v1' ? '限定头插流程复用 · 新目标课程' : scene.generation_source.evidence_kind === 'targeted_fact_revision' ? '模型四字段事实修订' : scene.generation_source.evidence_kind === 'program_format_recovery' ? '程序格式恢复 · r03 派生课程' : scene.generation_source.evidence_kind === 'offline_fixture' ? '离线接线夹具 · 非真实生成' : '新目标真实生成 · 头插支持域' }} · 未签核</strong>
               <p
                 v-if="scene.generation_source.teaching_review?.verdict !== 'pass' && scene.generation_source.evidence_kind === 'program_format_recovery'"
                 role="alert"
@@ -281,7 +281,13 @@ onBeforeUnmount(()=>{save();epoch+=1;manifestEpoch+=1;versionsEpoch+=1;controlle
                 父稿 {{ scene.generation_source.parent_digest }}
               </p>
               <p>规划 {{ scene.generation_source.plan_digest }} · 共享材料 {{ scene.generation_source.materials_digest }}</p>
-              <small v-if="scene.generation_source.evidence_kind === 'offline_fixture'">本页教学文字为离线接线夹具，未调用模型；代码、事实、轨迹和参考答案由程序派生。</small>
+              <small v-if="scene.generation_source.prompt_version === 'head-reuse-course-v1'">
+                <template v-if="scene.generation_source.evidence_kind === 'offline_fixture'">本页为离线接线夹具，未调用模型，不计真实生成或教学成果。</template>
+                <template v-else>讲解、题干和解析来自本批模型；代码、状态和参考答案由程序提供。独立教学审核通过。</template>
+                <span v-if="scene.generation_source.format_recovery">首稿结构失败保留，仅按既定规则恢复相同重复题目成员。</span>
+                <span v-if="scene.generation_source.evidence_kind === 'reviewed_paragraph_revision'">已按审核意见完成一次模型局部修订，保留父稿；未改题目、代码、轨迹和答案。</span>
+              </small>
+              <small v-else-if="scene.generation_source.evidence_kind === 'offline_fixture'">本页教学文字为离线接线夹具，未调用模型；代码、事实、轨迹和参考答案由程序派生。</small>
               <small v-else-if="scene.generation_source.evidence_kind === 'program_format_recovery'">教学文字沿用 r03 模型原稿，仅删除四题完全相同的重复成员，未补写或改写。首稿结构不合格记录保留；代码、状态和答案由程序派生。新增模型调用为 0。</small>
               <small v-else-if="scene.generation_source.evidence_kind === 'targeted_fact_revision'">沿用 r03 模型正文，仅四处文字由本批一次真实模型请求修订；程序重装配代码、状态和答案。独立教学重评通过，保留段落重复和引用粒度的非阻断意见；原首稿结构失败及父版保留。</small>
               <small v-else>教学文字由模型生成；代码、事实、轨迹和参考答案由程序派生，自述先备知识不代表已测掌握。</small>
