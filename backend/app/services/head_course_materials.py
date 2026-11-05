@@ -255,6 +255,21 @@ def content_payload(inputs: dict[str, Any], plan: dict[str, Any]) -> dict[str, A
 def body(
     payload: dict[str, Any], parent: dict[str, Any] | None = None, issues: list | None = None
 ) -> dict[str, Any]:
+    instruction = INSTRUCTION if parent is None else REPAIR_INSTRUCTION
+    if "teaching_evidence" in payload:
+        from app.services.head_course_teaching_evidence import INSTRUCTION as EVIDENCE_INSTRUCTION
+        from app.services.head_course_teaching_evidence import validate
+
+        validate(payload, payload["teaching_evidence"])
+        instruction = (
+            instruction.replace(
+                "paragraphs cite existing main fact IDs.",
+                "paragraphs cite existing IDs in materials.catalog.facts "
+                "or teaching_evidence.facts.",
+            )
+            + "\n"
+            + EVIDENCE_INSTRUCTION
+        )
     return dict(
         model="deepseek-flash",
         stream=False,
@@ -263,7 +278,7 @@ def body(
         max_output_tokens=8000,
         temperature=0.2,
         input=[
-            dict(role="system", content=INSTRUCTION if parent is None else REPAIR_INSTRUCTION),
+            dict(role="system", content=instruction),
             dict(
                 role="user",
                 content=canonical(
@@ -290,6 +305,11 @@ def validate_content(payload: dict[str, Any], value: dict[str, Any]) -> None:
         if isinstance(payload["materials"]["catalog"]["facts"], list)
         else set(payload["materials"]["catalog"]["facts"])
     )
+    if "teaching_evidence" in payload:
+        from app.services.head_course_teaching_evidence import validate
+
+        validate(payload, payload["teaching_evidence"])
+        facts |= set(payload["teaching_evidence"]["facts"])
     if any(not set(p["fact_ids"]) <= facts for p in value["paragraphs"]):
         raise SnapshotError("HEAD_FACT_REFERENCE")
     if [s["frame_id"] for s in value["step_notes"]] != [

@@ -22,6 +22,8 @@ from app.services.free_course_snapshots import (
 )
 from app.services.free_scene_availability import read_availability
 
+FINITE_HEAD_PROMPT_VERSIONS = frozenset({"head-goal-course-v1", "head-reuse-course-v1"})
+
 
 class Recovery:
     """Private service facade. HTTP owner/CSRF/mode controllers remain T020, not opened here."""
@@ -323,6 +325,7 @@ class Recovery:
                 .order_by(FreeCourseStep.created_at, FreeCourseStep.step_key)
             )
         ).all()
+        finite_head = op.config_snapshot.get("prompt_version") in FINITE_HEAD_PROMPT_VERSIONS
         b = await self.scheduler.budget(db, cid, oid)
         unknown = await db.scalar(
             select(FreeCourseAttempt.id)
@@ -364,13 +367,9 @@ class Recovery:
                 )
                 for s in steps
             ],
-            **(
-                {"execution_mode": "finite_head_foreground"}
-                if op.config_snapshot.get("prompt_version") == "head-goal-course-v1"
-                else {}
-            ),
+            **({"execution_mode": "finite_head_foreground"} if finite_head else {}),
             budget=None
-            if op.config_snapshot.get("prompt_version") == "head-goal-course-v1"
+            if finite_head
             else dict(
                 attempts_used=b["operation_attempts"],
                 attempts_remaining=max(

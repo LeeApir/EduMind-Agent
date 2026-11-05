@@ -14,6 +14,7 @@ const running = computed(() => operation.value && !terminalOperation(operation.v
 const unknown = computed(() => Boolean(operation.value?.budget?.usage_unknown || operation.value?.reason_code?.includes('UNKNOWN')));
 const firstReady = computed(() => course.value?.head?.scenes.find(s => s.scene_version_id !== null));
 const labels: Record<string,string> = { queued:'等待生成',running:'正在生成',cancel_requested:'正在停止，等待可靠收尾',succeeded:'生成已完成',partially_succeeded:'部分内容就绪',awaiting_clarification:'需要补充目标',failed:'生成未完成',cancelled:'已停止',timed_out:'本次操作已超时',pending:'等待生成',blocked_dependency:'等待前置场景',ready:'可学习',invalidated:'已失效' };
+const operationLabel = computed(() => operation.value?.execution_mode === 'finite_head_foreground' && operation.value.state === 'failed' ? '生成已停止' : operation.value ? labels[operation.value.state] : '只读恢复，未发现本机操作记录');
 watch(owner, id => {
   if (!id) return;
   const saved = readStored<{editing:boolean;instruction:string}>(`edumind:free:outline-edit:${id}:${props.courseId}`);
@@ -153,7 +154,7 @@ function clarify(): void { if (supplement.value.trim() && operation.value?.state
         <aside class="surface">
           <h2>这次学习的起点</h2><blockquote>{{ course.original_goal }}</blockquote><p>原始目标由你提供；未提供的学情保持未知。图谱未关联不会阻止课程。</p>
           <p role="status">
-            {{ operation ? labels[operation.state] : '只读恢复，未发现本机操作记录' }}
+            {{ operationLabel }}
           </p>
           <p
             v-if="unknown"
