@@ -45,8 +45,8 @@ def sha(value: bytes) -> str:
     return hashlib.sha256(value).hexdigest()
 
 
-def candidate(payload, raw, *, parent=None, recovery=None):
-    m.validate_content(payload, raw)
+def candidate(payload, raw, *, parent=None, recovery=None, allow_terminal_lf=False):
+    m.validate_content(payload, raw, allow_terminal_lf=allow_terminal_lf)
     data = dict(
         payload=deepcopy(payload),
         raw_output=deepcopy(raw),
@@ -56,16 +56,20 @@ def candidate(payload, raw, *, parent=None, recovery=None):
     return dict(**data, candidate_digest=digest("head-reuse-candidate", **data))
 
 
-def validate_candidate(c):
+def validate_candidate(c, *, allow_terminal_lf=False):
     if c != candidate(
-        c["payload"], c["raw_output"], parent=c["parent_digest"], recovery=c["recovery"]
+        c["payload"],
+        c["raw_output"],
+        parent=c["parent_digest"],
+        recovery=c["recovery"],
+        allow_terminal_lf=allow_terminal_lf,
     ):
         raise SnapshotError("REUSE_CANDIDATE_CHANGED")
     return c
 
 
-def review_binding(review, c, verdict):
-    validate_candidate(c)
+def review_binding(review, c, verdict, *, allow_terminal_lf=False):
+    validate_candidate(c, allow_terminal_lf=allow_terminal_lf)
     if (
         review.get("candidate_digest") != c["candidate_digest"]
         or review.get("parent_digest") != c["parent_digest"]
@@ -321,7 +325,11 @@ def validate_final(records, review, payload, adapter):
         if records[1]["evidence_kind"] != first["evidence_kind"]:
             raise SnapshotError("REUSE_ORIGIN")
     c = records[-1]["candidate"]
-    review_binding(review, c, "pass")
+    return require_full_review(review, c)
+
+
+def require_full_review(review, c, *, allow_terminal_lf=False):
+    review_binding(review, c, "pass", allow_terminal_lf=allow_terminal_lf)
     # A sign-off must explicitly cover scope, citations, duties, leakage and all fixed materials.
     required = (
         "full_lesson",
@@ -332,7 +340,7 @@ def validate_final(records, review, payload, adapter):
         "code_trace_answers",
         "no_answer_hints",
     )
-    if payload["original_goal"] == m.FIXED_GOAL:
+    if c["payload"]["original_goal"] == m.FIXED_GOAL:
         required += FIXED_REVIEW_CHECKS
     if review.get("blocking_findings") != [] or any(
         review.get("checks", {}).get(k) is not True for k in required
@@ -342,6 +350,8 @@ def validate_final(records, review, payload, adapter):
 
 
 def assembled(records, review, adapter=None):
+    from app.services import head_course_aiapi_content as aiapi
+
     rec = records[-1]
     c = rec["candidate"]
     source = dict(
@@ -376,13 +386,22 @@ def assembled(records, review, adapter=None):
             teaching_evidence_version=evidence["version"],
             teaching_evidence_digest=evidence["evidence_digest"],
         )
-    return m.assemble(c["payload"], c["raw_output"], source)
+    if adapter is aiapi:
+        source["unknown_echoes"] = [
+            field
+            for field in aiapi.ECHO_FIELDS
+            if rec["observation"]["reported"].get(field) is None
+        ]
+    return m.assemble(c["payload"], c["raw_output"], source, allow_terminal_lf=adapter is aiapi)
 
 
 def validate_chain(chain, inputs, plan, adapter):
     from app.agents import head_course_planning_wire as wire
+    from app.services import head_course_aiapi_content as aiapi
     from scripts.head_course_goal import planning_body
 
+    if adapter is aiapi:
+        return aiapi.validate_chain(chain, inputs, plan)
     context = chain["context"]
     if (
         context["planning_inputs"] != inputs
@@ -412,9 +431,14 @@ def validate_chain(chain, inputs, plan, adapter):
 
 
 def publication_adapter(chain, operation):
+    from app.services import head_course_aiapi_content as aiapi
     from scripts import head_course_deepseek_wire as direct
     from scripts.head_course_goal import raw_io
 
+    if operation is not None and operation.config_snapshot.get("policy_version") == aiapi.BATCH:
+        if chain["context"].get("execution_window") != aiapi.operation_window(operation):
+            raise SnapshotError("HEAD_AIAPI_WINDOW_BINDING")
+        return aiapi
     window = direct.operation_window(operation) if operation is not None else {}
     if "execution_window" in chain["context"] or window:
         if not window or chain["context"].get("execution_window") != window["execution_window"]:
@@ -464,23 +488,30 @@ def validate_publication(row, actual, operation=None):
 
 async def publish(db, owner, cid, oid, chain):
     from app.models.free_scene_generation import FreeSceneGenerationResult
+    from app.services import head_course_aiapi_content as aiapi
     from app.services.free_scene_availability import commit_scene
     from app.services.free_scene_generation import load_inputs
     from app.services.free_scene_validation import validate_candidate as admit
     from scripts import head_course_deepseek_wire as direct
 
     g.require_development_database(db.bind.url.render_as_string(hide_password=False))
-    context = await g.generation_context(db, owner, cid, oid)
     repo = SnapshotRepository(db, owner)
     fence = await repo.acquire_write_fence(cid, oid)
     op = await repo._fence(cid, fence)
     adapter = publication_adapter(chain, op)
+    if adapter is aiapi:
+        aiapi.require_database(db)
+        context = await aiapi.outline(repo, cid)
+        window = {"execution_window": aiapi.operation_window(op)}
+    else:
+        context = await g.generation_context(db, owner, cid, oid)
+        window = direct.operation_window(op)
     if chain["context"] != dict(
         owner=str(owner),
         course_id=str(cid),
         operation_id=str(oid),
         planning_inputs=chain["context"]["planning_inputs"],
-        **direct.operation_window(op),
+        **window,
     ):
         raise SnapshotError("REUSE_OWNER_BINDING")
     actual = await load_inputs(

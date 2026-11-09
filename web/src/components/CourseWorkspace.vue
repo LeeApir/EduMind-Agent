@@ -285,7 +285,13 @@ onBeforeUnmount(()=>{save();epoch+=1;manifestEpoch+=1;versionsEpoch+=1;controlle
               >
                 <strong>教学评估未通过 · 仅供审查预览</strong>：原文存在字段初始化顺序的错误因果，以及 NULL 检查的歧义。请勿据此学习这两项结论；原文保留供逐项复核。
               </p>
-              <p>{{ scene.generation_source.model }} · {{ scene.generation_source.prompt_version }} · {{ scene.generation_source.batch }}</p>
+              <template v-if="scene.generation_source.batch === 'head-fixed-aiapi-content-r01'">
+                <p>AIAPI 有限试验 · 请求模型 {{ scene.generation_source.model }} · 实际模型未确认</p>
+                <p v-if="scene.generation_source.unknown_echoes?.length">
+                  未确认的回显字段 {{ scene.generation_source.unknown_echoes.join('、') }}
+                </p>
+              </template>
+              <p v-else>{{ scene.generation_source.model }} · {{ scene.generation_source.prompt_version }} · {{ scene.generation_source.batch }}</p>
               <p>候选 {{ scene.generation_source.candidate_digest }}</p>
               <p v-if="scene.generation_source.parent_digest">
                 父稿 {{ scene.generation_source.parent_digest }}

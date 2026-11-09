@@ -47,7 +47,9 @@ def main():
     global WORK
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument(
-        "--profile", choices=["t108", "fixed", "archive", "direct"], default="t108"
+        "--profile",
+        choices=["t108", "fixed", "archive", "direct", "aiapi"],
+        default="t108",
     )
     p.add_argument("--prepare", action="store_true")
     p.add_argument("--start", action="store_true")
@@ -73,6 +75,15 @@ def main():
             p.error("Use the T114 checks listed in its execution package")
         WORK = Path("/tmp/edumind-t114")
         database_name, api_port, web_port = "edumind_catalog_p15_t108_t114", 8184, 5204
+    elif a.profile == "aiapi":
+        if a.check_migration or a.test:
+            p.error("Use the targeted AIAPI batch checks")
+        WORK = Path("/tmp/edumind-head-aiapi-content-r01")
+        database_name, api_port, web_port = (
+            "edumind_catalog_p15_t108_aiapi_content",
+            8186,
+            5206,
+        )
     env = environment(database_name, api_port)
     if a.profile == "direct":
         env["EDUMIND_HEAD_DEEPSEEK_DEVELOPMENT"] = "1"

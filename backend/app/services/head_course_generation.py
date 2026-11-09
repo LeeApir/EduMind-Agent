@@ -144,7 +144,7 @@ def validate_generation(
         from app.services.head_course_evidence_publication import validate_publication
 
         return validate_publication(row, actual)
-    if row.schema_version in (m.REUSE_VERSION, m.FIXED_VERSION):
+    if row.schema_version in (m.REUSE_VERSION, m.FIXED_VERSION, "head-aiapi-content-responses-v1"):
         from app.services.head_course_reuse import validate_publication
 
         return validate_publication(row, actual, operation)

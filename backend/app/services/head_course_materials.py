@@ -334,7 +334,20 @@ def body(
     )
 
 
-def validate_content(payload: dict[str, Any], value: dict[str, Any]) -> None:
+def scenario_matches(stem: str, source: str) -> bool:
+    marker = "#include <stdlib.h>"
+    offset = stem.find(marker)
+    return (
+        source.startswith(marker)
+        and source.endswith("\n")
+        and offset >= 0
+        and stem[offset:] in (source, source[:-1])
+    )
+
+
+def validate_content(
+    payload: dict[str, Any], value: dict[str, Any], *, allow_terminal_lf: bool = False
+) -> None:
     Draft202012Validator(SCHEMA).validate(value)
     if len(canonical(value)) > 48000:
         raise SnapshotError("HEAD_CONTENT_TOO_LARGE")
@@ -360,14 +373,20 @@ def validate_content(payload: dict[str, Any], value: dict[str, Any]) -> None:
         code = payload["materials"]["transfer"][
             "discarded" if k in ("discarded_values", "unreachable_count") else "normal"
         ]["code"]["source"]
-        if code not in value["questions"][k]["stem"]:
+        stem = value["questions"][k]["stem"]
+        matches = scenario_matches(stem, code) if allow_terminal_lf else code in stem
+        if not matches:
             raise SnapshotError("HEAD_QUESTION_SCENARIO")
 
 
 def assemble(
-    payload: dict[str, Any], raw: dict[str, Any], source: dict[str, Any]
+    payload: dict[str, Any],
+    raw: dict[str, Any],
+    source: dict[str, Any],
+    *,
+    allow_terminal_lf: bool = False,
 ) -> dict[str, Any]:
-    validate_content(payload, raw)
+    validate_content(payload, raw, allow_terminal_lf=allow_terminal_lf)
     mat = payload["materials"]
     blocks: list[dict[str, Any]] = []
 

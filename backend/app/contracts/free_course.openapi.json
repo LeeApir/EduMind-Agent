@@ -5957,7 +5957,7 @@
                 "const": "head_goal_model_generation"
               },
               "batch": {
-                "enum": ["head-fixed-r01", "head-fixed-deepseek-r01"]
+                "enum": ["head-fixed-r01", "head-fixed-deepseek-r01", "head-fixed-aiapi-content-r01"]
               },
               "candidate_digest": {
                 "type": "string",
@@ -5995,6 +5995,13 @@
                   "program_format_recovery",
                   "reviewed_paragraph_revision"
                 ]
+              },
+              "unknown_echoes": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": {
+                  "enum": ["model", "store", "temperature", "max_output_tokens", "reasoning", "instructions"]
+                }
               },
               "format_recovery": {
                 "type": "object",
@@ -6131,6 +6138,25 @@
               "teaching_evidence_digest"
             ],
             "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "batch": {"const": "head-fixed-aiapi-content-r01"}
+                  }
+                },
+                "then": {
+                  "required": ["unknown_echoes"],
+                  "properties": {
+                    "model": {"const": "gpt-6.1-sol"},
+                    "parent_digest": {"type": "null"},
+                    "evidence_kind": {"enum": ["actual_provider_response", "offline_fixture"]},
+                    "format_recovery": false
+                  }
+                },
+                "else": {
+                  "properties": {"unknown_echoes": false}
+                }
+              },
               {
                 "if": {
                   "properties": {
