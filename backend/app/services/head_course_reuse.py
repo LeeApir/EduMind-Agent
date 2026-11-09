@@ -78,7 +78,7 @@ def review_binding(review, c, verdict, *, allow_terminal_lf=False):
         or not isinstance(review.get("independent_evaluator"), str)
         or not review["independent_evaluator"].strip()
         or (
-            c["payload"]["original_goal"] == m.FIXED_GOAL
+            c["payload"]["original_goal"] in m.FIXED_EXAMPLES
             and review.get("evidence_digest")
             != c["payload"]["teaching_evidence"]["evidence_digest"]
         )
@@ -90,6 +90,8 @@ def revision_contract(parent, review):
     """Derive a closed response schema from exact quoted findings, never F01/F02 constants."""
     review_binding(review, parent, "needs_revision")
     findings = review.get("findings", [])
+    if parent["payload"]["original_goal"] == m.EMPTY_GOAL:
+        raise SnapshotError("HEAD_EMPTY_REVISION_FORBIDDEN")
     fixed = parent["payload"]["original_goal"] == m.FIXED_GOAL
     if fixed and (
         review.get("blocking_findings") != findings
@@ -253,12 +255,12 @@ def record(payload, request, raw, adapter, *, evidence_kind, parent=None, review
     expected = m.body(payload) if parent is None else revision_body(parent, review)
     if request != expected or (parent is not None and parent["payload"] != payload):
         raise SnapshotError("REUSE_REQUEST_BINDING")
-    fixed = payload["original_goal"] == m.FIXED_GOAL
+    fixed = payload["original_goal"] in m.FIXED_EXAMPLES
     result, observation, recovery, failure = observe(
         request,
         raw,
         adapter,
-        allow_recovery=parent is None,
+        allow_recovery=parent is None and payload["original_goal"] != m.EMPTY_GOAL,
         source_batch=getattr(adapter, "BATCH", FIXED_BATCH) if fixed else BATCH,
     )
     if (
@@ -311,7 +313,8 @@ def validate_record(rec, payload, adapter, *, parent=None, review=None):
 
 
 def validate_final(records, review, payload, adapter):
-    if not 1 <= len(records) <= 2:
+    limit = 1 if payload["original_goal"] == m.EMPTY_GOAL else 2
+    if not 1 <= len(records) <= limit:
         raise SnapshotError("REUSE_REVISION_LIMIT")
     first = validate_record(records[0], payload, adapter)
     if len(records) == 2:
@@ -340,8 +343,10 @@ def require_full_review(review, c, *, allow_terminal_lf=False):
         "code_trace_answers",
         "no_answer_hints",
     )
-    if c["payload"]["original_goal"] == m.FIXED_GOAL:
+    if c["payload"]["original_goal"] in m.FIXED_EXAMPLES:
         required += FIXED_REVIEW_CHECKS
+    if c["payload"]["original_goal"] == m.EMPTY_GOAL:
+        required += ("empty_first_and_second_links", "question_conditions_and_unique_answers")
     if review.get("blocking_findings") != [] or any(
         review.get("checks", {}).get(k) is not True for k in required
     ):
@@ -351,19 +356,24 @@ def require_full_review(review, c, *, allow_terminal_lf=False):
 
 def assembled(records, review, adapter=None):
     from app.services import head_course_aiapi_content as aiapi
+    from scripts import head_course_deepseek_wire as direct
 
     rec = records[-1]
     c = rec["candidate"]
     source = dict(
         origin=m.ORIGIN,
-        batch=getattr(adapter, "BATCH", FIXED_BATCH)
-        if c["payload"]["original_goal"] == m.FIXED_GOAL
-        else BATCH,
+        batch=direct.EMPTY_BATCH
+        if c["payload"]["original_goal"] == m.EMPTY_GOAL
+        else (
+            getattr(adapter, "BATCH", FIXED_BATCH)
+            if c["payload"]["original_goal"] == m.FIXED_GOAL
+            else BATCH
+        ),
         candidate_digest=c["candidate_digest"],
         parent_digest=c["parent_digest"],
         model=rec["model"],
         prompt_version=m.FIXED_VERSION
-        if c["payload"]["original_goal"] == m.FIXED_GOAL
+        if c["payload"]["original_goal"] in m.FIXED_EXAMPLES
         else VERSION,
         plan_digest=digest("head-plan", plan=c["payload"]["plan"]),
         materials_digest=c["payload"]["materials"]["materials_digest"],
@@ -380,7 +390,7 @@ def assembled(records, review, adapter=None):
     )
     if c["recovery"]:
         source["format_recovery"] = deepcopy(c["recovery"])
-    if c["payload"]["original_goal"] == m.FIXED_GOAL:
+    if c["payload"]["original_goal"] in m.FIXED_EXAMPLES:
         evidence = c["payload"]["teaching_evidence"]
         source.update(
             teaching_evidence_version=evidence["version"],
@@ -395,6 +405,26 @@ def assembled(records, review, adapter=None):
     return m.assemble(c["payload"], c["raw_output"], source, allow_terminal_lf=adapter is aiapi)
 
 
+def validate_plan_review(review, payload):
+    if (
+        review.get("plan_digest") != digest("head-plan", plan=payload["plan"])
+        or review.get("verdict") != "pass"
+        or not review.get("independent_evaluator")
+        or review.get("planning_basis_binding") != payload["planning_basis"]["binding"]
+        or (
+            payload["original_goal"] == m.EMPTY_GOAL
+            and (
+                not isinstance(review["independent_evaluator"], str)
+                or not review["independent_evaluator"].strip()
+                or review.get("blocking_findings") != []
+                or review.get("checks", {}).get("empty_goal_and_sequence") is not True
+                or review.get("checks", {}).get("same_example_and_caller_comparison") is not True
+            )
+        )
+    ):
+        raise SnapshotError("REUSE_PLAN_REVIEW")
+
+
 def validate_chain(chain, inputs, plan, adapter):
     from app.agents import head_course_planning_wire as wire
     from app.services import head_course_aiapi_content as aiapi
@@ -405,28 +435,21 @@ def validate_chain(chain, inputs, plan, adapter):
     context = chain["context"]
     if (
         context["planning_inputs"] != inputs
-        or inputs["original_goal"] not in (m.REUSE_GOAL, m.FIXED_GOAL)
+        or inputs["original_goal"] not in (m.REUSE_GOAL, *m.FIXED_EXAMPLES)
         or chain["plan_request"] != planning_body(inputs)
     ):
         raise SnapshotError("REUSE_PLAN_BINDING")
     result, _ = adapter.observe_generation(
         chain["plan_request"], chain["plan_raw_response"].encode()
     )
-    if inputs["original_goal"] == m.FIXED_GOAL and (
+    if inputs["original_goal"] in m.FIXED_EXAMPLES and (
         result.usage.input_tokens > 139264 or result.usage.output_tokens > 8000
     ):
         raise SnapshotError("REUSE_USAGE")
     if wire.to_local(dict(result.value), inputs)["plan"] != plan:
         raise SnapshotError("REUSE_PLAN_BINDING")
     payload = m.content_payload(inputs, plan)
-    p_review = chain["plan_review"]
-    if (
-        p_review.get("plan_digest") != digest("head-plan", plan=plan)
-        or p_review.get("verdict") != "pass"
-        or not p_review.get("independent_evaluator")
-        or p_review.get("planning_basis_binding") != payload["planning_basis"]["binding"]
-    ):
-        raise SnapshotError("REUSE_PLAN_REVIEW")
+    validate_plan_review(chain["plan_review"], payload)
     return validate_final(chain["records"], chain["final_review"], payload, adapter)
 
 
@@ -435,6 +458,10 @@ def publication_adapter(chain, operation):
     from scripts import head_course_deepseek_wire as direct
     from scripts.head_course_goal import raw_io
 
+    policy = operation.config_snapshot.get("policy_version") if operation is not None else None
+    empty = chain["context"]["planning_inputs"]["original_goal"] == m.EMPTY_GOAL
+    if empty != (policy == direct.EMPTY_BATCH):
+        raise SnapshotError("HEAD_EMPTY_BATCH_BINDING")
     if operation is not None and operation.config_snapshot.get("policy_version") == aiapi.BATCH:
         if chain["context"].get("execution_window") != aiapi.operation_window(operation):
             raise SnapshotError("HEAD_AIAPI_WINDOW_BINDING")
@@ -504,6 +531,11 @@ async def publish(db, owner, cid, oid, chain):
         context = await aiapi.outline(repo, cid)
         window = {"execution_window": aiapi.operation_window(op)}
     else:
+        if op.config_snapshot.get("policy_version") == direct.EMPTY_BATCH:
+            from sqlalchemy.engine import make_url
+
+            if make_url(db.bind.url).database != direct.EMPTY_DATABASE:
+                raise SnapshotError("HEAD_EMPTY_BATCH_BINDING")
         context = await g.generation_context(db, owner, cid, oid)
         window = direct.operation_window(op)
     if chain["context"] != dict(

@@ -6,8 +6,10 @@ from app.services.free_course_snapshots import SnapshotError, canonical
 from scripts.isolated_diagnostics import p15_pilot_wire as wire
 
 BATCH = "head-fixed-deepseek-r01"
+EMPTY_BATCH = "head-empty-deepseek-r01"
 VERSION = "head-deepseek-responses-v1"
 DATABASE = "edumind_catalog_p15_t108_t114"
+EMPTY_DATABASE = "edumind_catalog_p15_t108_t118"
 ENDPOINT = "https://api.deepseek.com/responses"
 WINDOW_SECONDS = 1800
 IO_TIMEOUT = 90
@@ -40,7 +42,7 @@ OPTIONAL_DEFAULTS = {
 
 
 def operation_window(op):
-    if op.config_snapshot.get("policy_version") != BATCH:
+    if op.config_snapshot.get("policy_version") not in (BATCH, EMPTY_BATCH):
         return {}
     if op.deadline_at - op.created_at != timedelta(seconds=WINDOW_SECONDS):
         raise SnapshotError("HEAD_DIRECT_WINDOW_MISMATCH")

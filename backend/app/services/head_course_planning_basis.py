@@ -64,23 +64,29 @@ def _example(key: str) -> dict[str, Any]:
         raise SnapshotError("HEAD_PLANNING_BASIS_MISMATCH")
     expected = list(reversed(spec["insert_values"])) + spec["initial_values"]
     # Closed-form expectations independent of the engine's computed observation.
+    initial = spec["initial_values"]
     if not (
         example["observation"]["reachable_prefix"] == expected
-        and ignored["observation"]["caller_head"] == "i0"
-        and ignored["observation"]["reachable_prefix"] == spec["initial_values"]
+        and ignored["observation"]["caller_head"] == ("i0" if initial else None)
+        and ignored["observation"]["reachable_prefix"] == initial
         and ignored["observation"]["unreachable_allocated_ids"] == ["t0", "t1"]
         and example["observation"]["unreachable_allocated_ids"] == []
     ):
         raise SnapshotError("HEAD_PLANNING_BASIS_MISMATCH")
     caller_decl = next(line.strip() for line in lines if "Node *caller_head = " in line)
-    initial_decl = next(line.strip() for line in lines if line.strip() == "Node i0;")
-    initial = spec["initial_values"]
-    if len(initial) != 1 or lines[end + 1 :] != [
+    initial_lines = (
+        [
+            "    Node i0;",
+            f"    i0.data = {initial[0]};",
+            "    i0.next = NULL;",
+            "    Node *caller_head = &i0;",
+        ]
+        if initial
+        else ["    Node *caller_head = NULL;"]
+    )
+    if len(initial) > 1 or lines[end + 1 :] != [
         "int main(void) {",
-        "    Node i0;",
-        f"    i0.data = {initial[0]};",
-        "    i0.next = NULL;",
-        "    Node *caller_head = &i0;",
+        *initial_lines,
         *[f"    caller_head = insert(caller_head, {value}, 1);" for value in spec["insert_values"]],
         "    (void)caller_head;",
         "    return 0;",
@@ -132,7 +138,11 @@ def _example(key: str) -> dict[str, Any]:
                 active_after_return=False,
             ),
             dict(name="caller_head", scope="main.local", declaration=caller_decl),
-            dict(name="i0", scope="main.local", declaration=initial_decl, storage="automatic"),
+            *(
+                [dict(name="i0", scope="main.local", declaration="Node i0;", storage="automatic")]
+                if initial
+                else []
+            ),
         ],
         key_code=[
             dict(
@@ -159,14 +169,17 @@ def _example(key: str) -> dict[str, Any]:
     return dict(**data, example_basis_digest=digest("head-planning-example-basis", data=data))
 
 
-def build_basis(*, fixed: bool = False) -> dict[str, Any]:
-    keys = (m.FIXED_EXAMPLE,) if fixed else m.SPECS
+def build_basis(*, fixed: bool = False, empty: bool = False) -> dict[str, Any]:
+    keys = (m.EMPTY_EXAMPLE,) if empty else (m.FIXED_EXAMPLE,) if fixed else m.SPECS
     data = dict(version=VERSION, examples={key: _example(key) for key in keys})
     return dict(**data, basis_digest=digest("head-planning-basis", data=data))
 
 
 def selected_basis(materials: dict[str, Any]) -> dict[str, Any]:
-    basis = build_basis(fixed=materials["selected_example"] == m.FIXED_EXAMPLE)
+    basis = build_basis(
+        fixed=materials["selected_example"] == m.FIXED_EXAMPLE,
+        empty=materials["selected_example"] == m.EMPTY_EXAMPLE,
+    )
     evidence = basis["examples"][materials["selected_example"]]
     if evidence["materials_digest"] != materials["materials_digest"] or evidence[
         "code_digest"

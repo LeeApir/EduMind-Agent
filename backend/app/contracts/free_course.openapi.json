@@ -5957,7 +5957,7 @@
                 "const": "head_goal_model_generation"
               },
               "batch": {
-                "enum": ["head-fixed-r01", "head-fixed-deepseek-r01", "head-fixed-aiapi-content-r01"]
+                "enum": ["head-fixed-r01", "head-fixed-deepseek-r01", "head-fixed-aiapi-content-r01", "head-empty-deepseek-r01"]
               },
               "candidate_digest": {
                 "type": "string",
@@ -6138,6 +6138,19 @@
               "teaching_evidence_digest"
             ],
             "allOf": [
+              {
+                "if": {
+                  "properties": {"batch": {"const": "head-empty-deepseek-r01"}}
+                },
+                "then": {
+                  "properties": {
+                    "model": {"const": "deepseek-flash"},
+                    "parent_digest": {"type": "null"},
+                    "evidence_kind": {"enum": ["actual_provider_response", "offline_fixture"]},
+                    "format_recovery": false
+                  }
+                }
+              },
               {
                 "if": {
                   "properties": {

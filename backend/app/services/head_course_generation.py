@@ -44,10 +44,16 @@ async def enqueue(sessions, owner: UUID, body: dict[str, Any], key: str) -> dict
     if os.environ.get("EDUMIND_HEAD_DEEPSEEK_DEVELOPMENT") == "1":
         from scripts import head_course_deepseek_wire as direct
 
-        if make_url(get_database_url()).database != direct.DATABASE or body["goal"] != m.FIXED_GOAL:
+        db_name = make_url(get_database_url()).database
+        if (db_name, body["goal"]) == (direct.DATABASE, m.FIXED_GOAL):
+            config["policy_version"] = direct.BATCH
+        elif (db_name, body["goal"]) == (direct.EMPTY_DATABASE, m.EMPTY_GOAL):
+            config["policy_version"] = direct.EMPTY_BATCH
+        else:
             raise SnapshotError("HEAD_DIRECT_OPERATION_REQUIRED")
-        config["policy_version"] = direct.BATCH
         window_seconds = direct.WINDOW_SECONDS
+    elif body["goal"] == m.EMPTY_GOAL:
+        raise SnapshotError("HEAD_DIRECT_OPERATION_REQUIRED")
     async with sessions() as db, db.begin():
         repo = SnapshotRepository(db, owner)
         result = await repo.create_course(

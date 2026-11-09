@@ -78,12 +78,13 @@ def build(payload: dict[str, Any]) -> dict[str, Any]:
     # The existing finite engine computes a distinct trace; it is not a displayed main trace.
     contrast = build_example(dict(example["spec"], variant="discard_return"))
     initial = example["spec"]["initial_values"]
+    initial_head = "i0" if initial else None
     expected_ids = [f"t{i}" for i in range(attempts)]
     observation = contrast["observation"]
     basis = payload["planning_basis"]["evidence"]["ignore_return"]
     if (
         observation["reachable_prefix"] != initial
-        or observation["caller_head"] != "i0"
+        or observation["caller_head"] != initial_head
         or observation["unreachable_allocated_ids"] != expected_ids
         or observation["allocation_failures"] != 0
         or observation["traversal_status"] != "terminated"
@@ -139,8 +140,10 @@ def build(payload: dict[str, Any]) -> dict[str, Any]:
                 source_code=contrast["code"]["source"],
                 value=dict(calls=deepcopy(basis["calls"]), observation=deepcopy(observation)),
                 independent_reference=dict(
-                    method="unchanged_caller_entry_nonempty_head_insertion_closed_form",
-                    expected_caller_head="i0",
+                    method="unchanged_caller_entry_nonempty_head_insertion_closed_form"
+                    if initial
+                    else "unchanged_null_caller_entry_closed_form",
+                    expected_caller_head=initial_head,
                     expected_reachable_values=deepcopy(initial),
                     expected_unreachable_allocated_ids=expected_ids,
                 ),

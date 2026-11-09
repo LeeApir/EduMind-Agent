@@ -6281,6 +6281,44 @@
           "evidence": "docs/acceptance/phase-1.5-archived-head-import-t117/README.md"
         }
       ]
+    },
+    {
+      "id": "PHASE-1.5-T118",
+      "phase": "Phase 1.5",
+      "title": "空链表头插课程交付",
+      "status": "blocked",
+      "depends_on": [
+        "PHASE-1.5-T114",
+        "PHASE-1.5-T117"
+      ],
+      "scope": [
+        "复用现有引擎与私有课程主链，限定 head=NULL 后插入 4、7、两次分配成功。程序提供代码、轨迹、事实、题目情境代码与私有答案；模型独立生成规划及教学正文。",
+        "准备阶段 Provider 0；真实请求须另获准确授权，不继承旧额度。"
+      ],
+      "prd_source": "PRD §0.5；课程生成方向；ADR0058 的 T118 限定补充提案",
+      "acceptance_criteria": [
+        "准确解释首次链接到 NULL、第二次链接到首节点、调用者接收和忽略返回值的差异。",
+        "独立核对程序材料，四题条件充分、答案唯一，真实正文通过完整独立教学审核。",
+        "实际应用阅读、13 帧与高亮、播放控制、四题服务端反馈、答案隔离及刷新恢复通过。",
+        "交付课程入口和统一结果记录；失败时保留原件和停止状态，无助手补写。"
+      ],
+      "verification": [
+        "独立逐帧和状态断言、旧材料和旧请求回归。",
+        "同一前台入口离线重放；真实批次需独立规划、全文教学审核与浏览器学习证据。"
+      ],
+      "started_at": "2026-11-09T23:44:47+08:00",
+      "block_reason": "零调用接线与准确包已验证；等待批准本批 ADR0058 补充、DeepSeek 请求预算与时限及 C2 例外。尚无真实课程。",
+      "verification_results": [
+        {
+          "date": "2026-11-09T23:52:36+08:00",
+          "commands": [
+            "T118 隔离 PG 与 MockTransport；pytest 定向 22 项；clang 程序 C 语法检查",
+            "T118 冻结清单 --check、实际入口 --inspect；Ruff、pnpm typecheck、工作流和 Git 差异检查"
+          ],
+          "result": "独立核对 13 帧、程序材料与答案；离线私有 v2 成功、四题反馈及版本回读通过，重复正文封存并拒绝继续。Provider 0；真实生成、审核及浏览器课程验收待授权。",
+          "evidence": "docs/acceptance/phase-1.5-head-empty-t118/RESULTS.md"
+        }
+      ]
     }
   ],
   "planning_inputs": {

@@ -22,6 +22,12 @@ REUSE_GOAL = GOAL + " 本次明确使用 head-new-B：初始链表 [-8]，依次
 FIXED_VERSION = "head-fixed-course-v1"
 FIXED_EXAMPLE = "head-new-C"
 FIXED_GOAL = GOAL + " 本次使用初始链表 [5]，依次插入 -2、9，两次分配均假设成功。"
+EMPTY_EXAMPLE = "head-new-empty"
+EMPTY_GOAL = (
+    "初始 head=NULL，依次插入 4、7，假设分配成功，"
+    "理解首次插入如何形成链表，以及调用者接收、忽略返回值的区别。"
+)
+FIXED_EXAMPLES = {FIXED_GOAL: FIXED_EXAMPLE, EMPTY_GOAL: EMPTY_EXAMPLE}
 FIXED_SPEC = dict(
     version="head-insertion-spec-v1",
     variant="normal",
@@ -29,6 +35,7 @@ FIXED_SPEC = dict(
     insert_values=[-2, 9],
     allocation_success=[True, True],
 )
+EMPTY_SPEC = dict(FIXED_SPEC, initial_values=[], insert_values=[4, 7])
 SPECS: dict[str, dict[str, Any]] = {
     "head-new-A": dict(
         version="head-insertion-spec-v1",
@@ -69,11 +76,12 @@ def support_for_goal(goal: str) -> dict[str, Any]:
             version=REUSE_VERSION,
             examples={"head-new-B": deepcopy(SPECS["head-new-B"])},
         )
-    if goal == FIXED_GOAL:
+    if goal in FIXED_EXAMPLES:
+        example = FIXED_EXAMPLES[goal]
         return dict(
             **{k: deepcopy(v) for k, v in SUPPORT.items() if k not in ("version", "examples")},
             version=FIXED_VERSION,
-            examples={FIXED_EXAMPLE: deepcopy(FIXED_SPEC)},
+            examples={example: deepcopy(example_spec(example))},
         )
     raise SnapshotError("HEAD_GOAL_UNSUPPORTED")
 
@@ -81,6 +89,8 @@ def support_for_goal(goal: str) -> dict[str, Any]:
 def example_spec(key: str) -> dict[str, Any]:
     if key == FIXED_EXAMPLE:
         return FIXED_SPEC
+    if key == EMPTY_EXAMPLE:
+        return EMPTY_SPEC
     if key not in SPECS:
         raise SnapshotError("HEAD_PLAN_UNSUPPORTED")
     return SPECS[key]
@@ -163,6 +173,37 @@ REPAIR_INSTRUCTION = INSTRUCTION + (
     "output structure are immutable. Preserve parent identity through "
     "the server, never invent it."
 )
+EMPTY_INSTRUCTION = (
+    INSTRUCTION.replace(
+        "Learner prerequisites are self reports, not demonstrated\nmastery.",
+        "Prerequisites are unknown. State what concepts the reader needs, and do not claim\n"
+        "that the learner reported, knows, or has mastered them.",
+    )
+    .replace(
+        "Initial i nodes have automatic storage, t nodes are dynamically allocated. "
+        "Explain lifetime,\n"
+        "free only dynamic nodes, save next before free, "
+        "do not read freed nodes or free stack nodes.",
+        "There are no initial nodes; caller_head starts NULL. The first p->next is NULL; the\n"
+        "second points to the first new node when the caller receives the return. If both returns\n"
+        "are ignored, caller_head stays NULL and neither new node is reachable from it. They\n"
+        "are not automatically freed. Distinguish local pointer lifetime from allocated node\n"
+        "lifetime; save next before freeing a reachable node and do not read freed storage.",
+    )
+    .replace(
+        "Each stem must include its exact scenario code and the task in natural Chinese;\n"
+        "keep node IDs from scenario.",
+        "Each stem is one line of Chinese prose only; program appends the exact scenario code.\n"
+        "Do not reproduce code, add fences, invent nodes, or ask the student to change the code.\n"
+        "Each stem must state that both allocations succeed. Caller questions ask after both\n"
+        "calls and before main returns. The first-link question asks about the first call\n"
+        "immediately after the link statement in insert, before returning.",
+    )
+    .replace(
+        "the targeted initial node's C variable name only (no & or prose)",
+        "one C pointer value (no prose or example in the stem)",
+    )
+)
 
 
 def frames(example: dict[str, Any]) -> list[dict[str, Any]]:
@@ -194,7 +235,7 @@ def selected(plan: dict[str, Any]) -> str:
     key = plan.get("shared_example")
     scenes = plan.get("scenes", [])
     if (
-        (key not in SPECS and key != FIXED_EXAMPLE)
+        (key not in SPECS and key not in FIXED_EXAMPLES.values())
         or len(scenes) != 1
         or set(scenes[0]["forms"]) != set(SUPPORT["required_forms"])
     ):
@@ -217,6 +258,9 @@ def materials_for_example(key: str) -> dict[str, Any]:
         insert_values=[11],
         allocation_success=[True],
     )
+    empty = key == EMPTY_EXAMPLE
+    if empty:
+        spec = dict(EMPTY_SPEC, insert_values=[6, 8])
     normal = build_example(spec)
     discarded = build_example(dict(spec, variant="discard_return"))
     # Independent, closed-form expectations; never take the engine as its own oracle.
@@ -224,9 +268,11 @@ def materials_for_example(key: str) -> dict[str, Any]:
         catalog["example"]["observation"]["reachable_prefix"]
         == list(reversed(main_spec["insert_values"])) + main_spec["initial_values"]
     )
-    assert normal["observation"]["reachable_prefix"] == [11, 30, 40]
-    assert discarded["observation"]["reachable_prefix"] == [30, 40]
-    assert discarded["observation"]["unreachable_allocated_ids"] == ["t0"]
+    assert normal["observation"]["reachable_prefix"] == ([8, 6] if empty else [11, 30, 40])
+    assert discarded["observation"]["reachable_prefix"] == ([] if empty else [30, 40])
+    assert discarded["observation"]["unreachable_allocated_ids"] == (
+        ["t0", "t1"] if empty else ["t0"]
+    )
     data = dict(
         version=VERSION,
         selected_example=key,
@@ -236,7 +282,8 @@ def materials_for_example(key: str) -> dict[str, Any]:
         answers=dict(
             link_target=next(s for s in normal["trace"]["steps"] if s["phase"] == "link")["nodes"][
                 "t0"
-            ]["next"],
+            ]["next"]
+            or "NULL",
             normal_values=json.dumps(
                 normal["observation"]["reachable_prefix"], separators=(",", ":")
             ),
@@ -247,10 +294,10 @@ def materials_for_example(key: str) -> dict[str, Any]:
         ),
     )
     assert data["answers"] == dict(
-        link_target="i0",
-        normal_values="[11,30,40]",
-        discarded_values="[30,40]",
-        unreachable_count="1",
+        link_target="NULL" if empty else "i0",
+        normal_values="[8,6]" if empty else "[11,30,40]",
+        discarded_values="[]" if empty else "[30,40]",
+        unreachable_count="2" if empty else "1",
     )
     return dict(**data, materials_digest=digest("head-materials", data=data))
 
@@ -259,16 +306,17 @@ def content_payload(inputs: dict[str, Any], plan: dict[str, Any]) -> dict[str, A
     from app.services.head_course_planning_basis import selected_basis
 
     mat = materials(plan)
-    fixed = inputs["original_goal"] == FIXED_GOAL
-    if fixed != (mat["selected_example"] == FIXED_EXAMPLE):
+    fixed_example = FIXED_EXAMPLES.get(inputs["original_goal"])
+    key = mat["selected_example"]
+    if (fixed_example or None) != (key if key in FIXED_EXAMPLES.values() else None):
         raise SnapshotError("HEAD_PLAN_UNSUPPORTED")
     payload = dict(
         original_goal=inputs["original_goal"],
         source_binding={key: inputs[key] for key in ("course_id", "operation_id", "request_id")},
         prerequisite_evidence=dict(
-            source="request_1",
-            excerpt="我已了解 C 指针、struct、NULL 和函数返回值",
-            self_reported=KNOWN,
+            source=None if key == EMPTY_EXAMPLE else "request_1",
+            excerpt=None if key == EMPTY_EXAMPLE else "我已了解 C 指针、struct、NULL 和函数返回值",
+            self_reported=[] if key == EMPTY_EXAMPLE else KNOWN,
             demonstrated_mastery=None,
         ),
         plan=plan,
@@ -276,7 +324,7 @@ def content_payload(inputs: dict[str, Any], plan: dict[str, Any]) -> dict[str, A
         planning_basis=selected_basis(mat),
         unknown_learner_fields="all others",
     )
-    if fixed:
+    if fixed_example:
         from app.services.head_course_teaching_evidence import with_evidence
 
         return with_evidence(payload)
@@ -287,12 +335,16 @@ def body(
     payload: dict[str, Any], parent: dict[str, Any] | None = None, issues: list | None = None
 ) -> dict[str, Any]:
     instruction = INSTRUCTION if parent is None else REPAIR_INSTRUCTION
+    if payload["original_goal"] == EMPTY_GOAL:
+        if parent is not None or issues is not None:
+            raise SnapshotError("HEAD_EMPTY_REVISION_FORBIDDEN")
+        instruction = EMPTY_INSTRUCTION
     if "teaching_evidence" in payload:
         from app.services.head_course_teaching_evidence import INSTRUCTION as EVIDENCE_INSTRUCTION
         from app.services.head_course_teaching_evidence import validate
 
         validate(payload, payload["teaching_evidence"])
-        if payload["original_goal"] == FIXED_GOAL:
+        if payload["original_goal"] in FIXED_EXAMPLES:
             instruction = instruction.replace(
                 "allocation, but actual malloc failure is not animated here; "
                 "explain return of old head.",
@@ -345,6 +397,11 @@ def scenario_matches(stem: str, source: str) -> bool:
     )
 
 
+def scenario_code(mat: dict[str, Any], key: str) -> str:
+    variant = "discarded" if key in ("discarded_values", "unreachable_count") else "normal"
+    return mat["transfer"][variant]["code"]["source"]
+
+
 def validate_content(
     payload: dict[str, Any], value: dict[str, Any], *, allow_terminal_lf: bool = False
 ) -> None:
@@ -356,7 +413,7 @@ def validate_content(
         if isinstance(payload["materials"]["catalog"]["facts"], list)
         else set(payload["materials"]["catalog"]["facts"])
     )
-    if payload["original_goal"] == FIXED_GOAL and "teaching_evidence" not in payload:
+    if payload["original_goal"] in FIXED_EXAMPLES and "teaching_evidence" not in payload:
         raise SnapshotError("HEAD_TEACHING_EVIDENCE_BINDING")
     if "teaching_evidence" in payload:
         from app.services.head_course_teaching_evidence import validate
@@ -370,10 +427,16 @@ def validate_content(
     ]:
         raise SnapshotError("HEAD_FRAME_BINDING")
     for k in QKEYS:
-        code = payload["materials"]["transfer"][
-            "discarded" if k in ("discarded_values", "unreachable_count") else "normal"
-        ]["code"]["source"]
         stem = value["questions"][k]["stem"]
+        if payload["original_goal"] == EMPTY_GOAL:
+            if (
+                not stem.strip()
+                or stem.splitlines() != [stem]
+                or any(marker in stem for marker in ("#include", "```", "~~~", "{", "}", ";"))
+            ):
+                raise SnapshotError("HEAD_QUESTION_PROSE_REQUIRED")
+            continue
+        code = scenario_code(payload["materials"], k)
         matches = scenario_matches(stem, code) if allow_terminal_lf else code in stem
         if not matches:
             raise SnapshotError("HEAD_QUESTION_SCENARIO")
@@ -442,7 +505,12 @@ def assemble(
             items=[
                 dict(
                     question_id=k,
-                    question=raw["questions"][k]["stem"],
+                    question=raw["questions"][k]["stem"]
+                    + (
+                        "\n\n" + scenario_code(mat, k)
+                        if payload["original_goal"] == EMPTY_GOAL
+                        else ""
+                    ),
                     input_type="short_text"
                     if k == "link_target"
                     else "integer"

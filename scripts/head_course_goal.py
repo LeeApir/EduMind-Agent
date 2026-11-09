@@ -26,7 +26,11 @@ PACKAGE = ROOT / "docs/acceptance/phase-1.5-head-goal-t108-r03"
 REUSE_PACKAGE = ROOT / "docs/acceptance/phase-1.5-head-reuse-t109"
 FIXED_PACKAGE = ROOT / "docs/acceptance/phase-1.5-head-fixed-t111"
 DIRECT_PACKAGE = ROOT / "docs/acceptance/phase-1.5-head-deepseek-t114"
+EMPTY_PACKAGE = ROOT / "docs/acceptance/phase-1.5-head-empty-t118"
+DIRECT_PACKAGES = (DIRECT_PACKAGE, EMPTY_PACKAGE)
+FIXED_PACKAGES = (FIXED_PACKAGE, *DIRECT_PACKAGES)
 DIRECT_VAULT = Path.home() / ".local/share/edumind" / direct.BATCH
+EMPTY_VAULT = DIRECT_VAULT.with_name(direct.EMPTY_BATCH)
 FIXED_VAULT = Path.home() / ".local/share/edumind/head-fixed-r01"
 OLD = ROOT / "docs/acceptance/phase-1.5-limited-c-preparation-t104/execute_once.py"
 spec = importlib.util.spec_from_file_location("head_goal_raw_transport", OLD)
@@ -43,11 +47,21 @@ def package_digest():
 
 
 def profile_goal():
-    if PACKAGE in (FIXED_PACKAGE, DIRECT_PACKAGE):
+    if PACKAGE == EMPTY_PACKAGE:
+        return m.EMPTY_GOAL
+    if PACKAGE in FIXED_PACKAGES:
         return m.FIXED_GOAL
     if PACKAGE == REUSE_PACKAGE:
         return m.REUSE_GOAL
     return m.GOAL
+
+
+def profile_vault():
+    return (
+        EMPTY_VAULT
+        if PACKAGE == EMPTY_PACKAGE
+        else (DIRECT_VAULT if PACKAGE in DIRECT_PACKAGES else FIXED_VAULT)
+    )
 
 
 def planning_body(inputs):
@@ -105,13 +119,21 @@ async def prepare(owner, cid, oid):
         if inputs.get("head_support") != m.support_for_goal(inputs["original_goal"]):
             raise SnapshotError("HEAD_REQUEST_MISMATCH")
         window = direct.operation_window(op)
-        if bool(window) != (PACKAGE == DIRECT_PACKAGE):
+        if bool(window) != (PACKAGE in DIRECT_PACKAGES):
             raise SnapshotError("HEAD_DIRECT_WINDOW_MISMATCH")
         if window:
             from sqlalchemy.engine import make_url
             from app.core.database import get_database_url
 
-            if make_url(get_database_url()).database != direct.DATABASE:
+            expected = (
+                (direct.EMPTY_DATABASE, direct.EMPTY_BATCH)
+                if PACKAGE == EMPTY_PACKAGE
+                else (direct.DATABASE, direct.BATCH)
+            )
+            if (
+                make_url(get_database_url()).database,
+                op.config_snapshot.get("policy_version"),
+            ) != expected:
                 raise SnapshotError("HEAD_DIRECT_OPERATION_REQUIRED")
         return dict(
             owner=str(owner),
@@ -186,6 +208,25 @@ def read(path):
     return raw_io.wire.strict_json(path.read_bytes())
 
 
+def verify_empty_request(stage, request, inputs, plan=None):
+    """Bind only the runtime fields allowed by the T118 request templates."""
+    name = {"plan": "planning", "generate": "teaching"}[stage]
+    expected = read(EMPTY_PACKAGE / f"{name}-request.template.json")
+    body = json.loads(expected["input"][1]["content"])
+    ids = {
+        field: str(UUID(inputs[field]))
+        for field in ("course_id", "operation_id", "request_id")
+    }
+    if stage == "plan":
+        body.update(ids)
+        body["request_sources"]["request_1"]["request_id"] = ids["request_id"]
+    else:
+        body.update(source_binding=ids, plan=plan)
+    expected["input"][1]["content"] = canonical(body).decode()
+    if canonical(request) != canonical(expected):
+        raise SnapshotError("HEAD_REQUEST_CHANGED")
+
+
 def verify_saved(vault, stage, cipher):
     request = read(vault / f"{stage}.request.json")
     raw = raw_io.decrypt(vault / f"{stage}.raw.enc", cipher)
@@ -205,8 +246,8 @@ def verify_saved(vault, stage, cipher):
         raise SnapshotError("HEAD_REQUEST_CHANGED")
     context = read(vault / "context.json")
     goal = context["planning_inputs"]["original_goal"]
-    adapter = direct if PACKAGE == DIRECT_PACKAGE else raw_io
-    if goal == m.FIXED_GOAL and (
+    adapter = direct if PACKAGE in DIRECT_PACKAGES else raw_io
+    if goal in m.FIXED_EXAMPLES and (
         attempt["stage"] != stage
         or attempt["approval_sha256"]
         != hashlib.sha256((vault / "approval.bound.json").read_bytes()).hexdigest()
@@ -214,7 +255,7 @@ def verify_saved(vault, stage, cipher):
         not in ("actual_provider_response", "offline_fixture")
     ):
         raise SnapshotError("HEAD_ATTEMPT_BINDING")
-    if goal in (m.REUSE_GOAL, m.FIXED_GOAL) and stage != "plan":
+    if goal in (m.REUSE_GOAL, *m.FIXED_EXAMPLES) and stage != "plan":
         from app.services import head_course_reuse as reuse
 
         plan = verify_saved(vault, "plan", cipher)["plan"]
@@ -245,7 +286,7 @@ def verify_saved(vault, stage, cipher):
         return expected
     result, observation = adapter.observe_generation(request, raw)
     if stage == "plan":
-        if goal == m.FIXED_GOAL and (
+        if goal in m.FIXED_EXAMPLES and (
             result.usage.input_tokens > 139264 or result.usage.output_tokens > 8000
         ):
             raise SnapshotError("HEAD_USAGE_OR_CREDENTIAL_ECHO")
@@ -323,9 +364,9 @@ def approval_check(vault, approval):
     sha = package_digest()
     reuse = PACKAGE == REUSE_PACKAGE
     fixed = PACKAGE == FIXED_PACKAGE
-    if PACKAGE == DIRECT_PACKAGE:
+    if PACKAGE in DIRECT_PACKAGES:
         if (
-            vault != DIRECT_VAULT
+            vault != profile_vault()
             or vault.is_symlink()
             or not vault.is_dir()
             or vault.stat().st_mode & 0o077
@@ -338,15 +379,19 @@ def approval_check(vault, approval):
         expected = dict(
             package_sha256=sha,
             version=m.FIXED_VERSION,
-            batch=direct.BATCH,
+            batch=direct.EMPTY_BATCH if PACKAGE == EMPTY_PACKAGE else direct.BATCH,
             context_sha256=hashlib.sha256(context_bytes).hexdigest(),
             explicit_user_authorization=True,
-            accept_ADR0058_and_batch_C2=True,
-            max_http_requests=3,
+            max_http_requests=2 if PACKAGE == EMPTY_PACKAGE else 3,
             execution_window=window,
             planning_wire_version=plan_wire.VERSION,
             planning_prompt_version=plan_wire.PROMPT_VERSION,
         )
+        expected[
+            "accept_T118_and_batch_C2"
+            if PACKAGE == EMPTY_PACKAGE
+            else "accept_ADR0058_and_batch_C2"
+        ] = True
         bound = vault / "approval.bound.json"
         if canonical(approval) != canonical(expected) or (
             bound.exists() and bound.read_bytes() != canonical(approval)
@@ -416,7 +461,7 @@ def send(stage, vault, approval, *, transport=None, key=None):
     from app.core.provider_target import TargetPolicy, approve_target
 
     sha = approval_check(vault, approval)
-    adapter = direct if PACKAGE == DIRECT_PACKAGE else raw_io
+    adapter = direct if PACKAGE in DIRECT_PACKAGES else raw_io
 
     def send_window():
         if adapter is direct and (
@@ -438,12 +483,14 @@ def send(stage, vault, approval, *, transport=None, key=None):
         cipher = Fernet(rawkey.read_bytes())
         context = read(vault / "context.json")
         goal = context["planning_inputs"]["original_goal"]
-        reuse_mode = goal in (m.REUSE_GOAL, m.FIXED_GOAL)
-        fixed = goal == m.FIXED_GOAL
+        reuse_mode = goal in (m.REUSE_GOAL, *m.FIXED_EXAMPLES)
+        fixed = goal in m.FIXED_EXAMPLES
         if goal != profile_goal():
             raise SnapshotError("HEAD_PACKAGE_PROFILE_MISMATCH")
         if (
-            len(list(vault.glob("*.attempt.json"))) >= 3
+            (PACKAGE == EMPTY_PACKAGE and stage not in ("plan", "generate"))
+            or len(list(vault.glob("*.attempt.json")))
+            >= (2 if PACKAGE == EMPTY_PACKAGE else 3)
             or (vault / f"{stage}.attempt.json").exists()
         ):
             raise SnapshotError("HEAD_REQUEST_LIMIT")
@@ -468,6 +515,10 @@ def send(stage, vault, approval, *, transport=None, key=None):
                 != payload["planning_basis"]["binding"]
             ):
                 raise SnapshotError("HEAD_PLAN_REVIEW_REQUIRED")
+            if PACKAGE == EMPTY_PACKAGE:
+                from app.services.head_course_reuse import validate_plan_review
+
+                validate_plan_review(review, payload)
             if stage == "generate" and (vault / "repair.attempt.json").exists():
                 raise SnapshotError("HEAD_ORDER")
             if stage == "repair":
@@ -484,6 +535,13 @@ def send(stage, vault, approval, *, transport=None, key=None):
             if stage != "repair" or not reuse_mode:
                 request = m.body(payload, parent, issues)
         raw_request = canonical(request)
+        if PACKAGE == EMPTY_PACKAGE:
+            verify_empty_request(
+                stage,
+                request,
+                context["planning_inputs"],
+                plan if stage == "generate" else None,
+            )
         if len(raw_request) > 131072:
             raise SnapshotError("HEAD_REQUEST_SIZE")
         target = approve_target(
@@ -727,7 +785,7 @@ def publish_saved(vault, approval):
     approval_check(vault, approval)
     if (vault / "ACTIVE").exists():
         raise SnapshotError("HEAD_ACTIVE_UNKNOWN")
-    if PACKAGE == DIRECT_PACKAGE:
+    if PACKAGE in DIRECT_PACKAGES:
         lock = vault / "ACTIVE"
         raw_io.exclusive(lock, b"single foreground publication\n")
         result = publish_chain(vault, approval)
@@ -740,7 +798,7 @@ def publish_chain(vault, approval):
     from cryptography.fernet import Fernet
 
     rawkey = vault / "raw.key"
-    if PACKAGE in (FIXED_PACKAGE, DIRECT_PACKAGE) and (
+    if PACKAGE in FIXED_PACKAGES and (
         rawkey.is_symlink() or rawkey.stat().st_mode & 0o077
     ):
         raise SnapshotError("HEAD_RAW_KEY_UNSAFE")
@@ -748,7 +806,7 @@ def publish_chain(vault, approval):
     records = [verify_saved(vault, "generate", cipher)]
     if (vault / "repair.attempt.json").exists():
         records.append(verify_saved(vault, "repair", cipher))
-    if PACKAGE in (FIXED_PACKAGE, DIRECT_PACKAGE):
+    if PACKAGE in FIXED_PACKAGES:
         plan_attempt = read(vault / "plan.attempt.json")
         if any(
             record["evidence_kind"] != plan_attempt["evidence_kind"]
@@ -768,7 +826,7 @@ def publish_chain(vault, approval):
             review,
         )
 
-    if PACKAGE in (REUSE_PACKAGE, FIXED_PACKAGE, DIRECT_PACKAGE):
+    if PACKAGE in (REUSE_PACKAGE, *FIXED_PACKAGES):
         from app.services import head_course_reuse as reuse
 
         plan_raw = raw_io.decrypt(vault / "plan.raw.enc", cipher)
@@ -790,7 +848,7 @@ def publish_chain(vault, approval):
                 chain,
             )
 
-        if PACKAGE == DIRECT_PACKAGE:
+        if PACKAGE in DIRECT_PACKAGES:
             approval_check(vault, approval)
         result = asyncio.run(database(publish_reuse))
     else:
@@ -804,7 +862,9 @@ def main():
     global PACKAGE
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument(
-        "--profile", choices=["t108", "reuse", "fixed", "direct"], default="t108"
+        "--profile",
+        choices=["t108", "reuse", "fixed", "direct", "empty"],
+        default="t108",
     )
     group = p.add_mutually_exclusive_group(required=True)
     group.add_argument("--inspect", action="store_true")
@@ -824,6 +884,8 @@ def main():
         PACKAGE = FIXED_PACKAGE
     if args.profile == "direct":
         PACKAGE = DIRECT_PACKAGE
+    if args.profile == "empty":
+        PACKAGE = EMPTY_PACKAGE
     if args.inspect:
         print(
             json.dumps(
@@ -845,28 +907,31 @@ def main():
         return
     if args.vault is None:
         p.error("--vault required")
-    if PACKAGE in (FIXED_PACKAGE, DIRECT_PACKAGE) and (
-        args.vault != (DIRECT_VAULT if PACKAGE == DIRECT_PACKAGE else FIXED_VAULT)
+    if PACKAGE in FIXED_PACKAGES and (
+        args.vault != profile_vault()
         or args.vault.is_symlink()
         or not args.vault.is_dir()
         or args.vault.stat().st_mode & 0o077
     ):
         p.error("Use the new dedicated fixed-batch vault with mode 0700")
     if args.prepare:
-        if PACKAGE == DIRECT_PACKAGE:
+        if PACKAGE in DIRECT_PACKAGES:
             package_digest()
         if not all((args.owner, args.course, args.operation)):
             p.error("Actual existing owner/course/operation required")
         context = asyncio.run(prepare(args.owner, args.course, args.operation))
-        if PACKAGE in (FIXED_PACKAGE, DIRECT_PACKAGE) and (
+        if PACKAGE in FIXED_PACKAGES and (
             (args.vault / "STOP").exists()
-            or context["planning_inputs"]["original_goal"] != m.FIXED_GOAL
+            or context["planning_inputs"]["original_goal"] != profile_goal()
         ):
             raise SnapshotError("HEAD_PACKAGE_PROFILE_MISMATCH")
+        prepared = planning_body(context["planning_inputs"])
+        if PACKAGE == EMPTY_PACKAGE:
+            verify_empty_request("plan", prepared, context["planning_inputs"])
         raw_io.exclusive(args.vault / "context.json", canonical(context))
         raw_io.exclusive(
             args.vault / "plan.prepared-request.json",
-            canonical(planning_body(context["planning_inputs"])),
+            canonical(prepared),
         )
         print(
             "Actual app goal snapshotted. No Provider call; authorization still required."
@@ -882,7 +947,7 @@ def main():
             publish_saved(args.vault, approval)
     except BaseException as error:
         if not (args.vault / "STOP").exists():
-            if PACKAGE in (FIXED_PACKAGE, DIRECT_PACKAGE):
+            if PACKAGE in FIXED_PACKAGES:
                 raw_io.exclusive(
                     args.vault / "terminal.failure.json",
                     canonical(

@@ -9,7 +9,7 @@ from jsonschema import Draft202012Validator  # type: ignore[import-untyped]
 
 from app.agents import free_course_planning as local
 from app.services.free_course_snapshots import SnapshotError, canonical, digest
-from app.services.head_course_materials import FIXED_VERSION
+from app.services.head_course_materials import EMPTY_GOAL, FIXED_VERSION
 from app.services.provider_gateway import ChatMessage, StructuredRequest, TextRequest
 
 VERSION = "head-goal-planning-wire-v2"
@@ -61,11 +61,23 @@ def build_request(inputs: dict[str, Any]) -> StructuredRequest:
     payload = json.loads(original.prompt.messages[1].content)
     payload["prompt_version"] = PROMPT_VERSION
     payload["wire_protocol"] = VERSION
-    payload["planning_example_basis"] = build_basis(fixed=fixed)
+    empty = inputs["original_goal"] == EMPTY_GOAL
+    payload["planning_example_basis"] = build_basis(fixed=fixed, empty=empty)
+    responsibility = RESPONSIBILITY
+    if empty:
+        responsibility = responsibility.replace(
+            "Ignoring a returned new head preserves the old list entry in this nonempty example; "
+            "explain\n"
+            "new allocated nodes' unreachability without claiming the old entry disappears.",
+            "The only supported example starts with caller_head=NULL and no initial node. Cover\n"
+            "the first link to NULL, the second link to the first new node when returns are\n"
+            "received, and the unchanged NULL caller entry when both returns are ignored.\n"
+            "Do not describe lost references as automatic deallocation.",
+        )
     return StructuredRequest(
         prompt=TextRequest(
             messages=(
-                ChatMessage("system", instruction + "\n" + INSTRUCTION + "\n" + RESPONSIBILITY),
+                ChatMessage("system", instruction + "\n" + INSTRUCTION + "\n" + responsibility),
                 ChatMessage("user", canonical(payload).decode()),
             ),
             task_profile=original.prompt.task_profile,
@@ -122,9 +134,10 @@ def mapping_record(raw: Any, inputs: dict[str, Any]) -> dict[str, Any]:
     return dict(
         wire_version=VERSION,
         planning_prompt_version=PROMPT_VERSION,
-        planning_basis_digest=build_basis(fixed=inputs["head_support"]["version"] == FIXED_VERSION)[
-            "basis_digest"
-        ],
+        planning_basis_digest=build_basis(
+            fixed=inputs["head_support"]["version"] == FIXED_VERSION,
+            empty=inputs["original_goal"] == EMPTY_GOAL,
+        )["basis_digest"],
         local_schema_version=local.SCHEMA_VERSION,
         wire_digest=digest("head-plan-wire", value=raw),
         local_digest=digest("head-plan-local", value=value),
