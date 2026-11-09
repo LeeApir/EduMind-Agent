@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "T111零调用准备及独立准确包评估通过，待用户确认新批3次HTTP/600秒及ADR0055与C2。",
+    "phase_gate": "T111 r01已STOP，唯一规划HTTP200及v1保存，独立规划pass晚于两期限。正文/修订0，余2失效；未交付完整课程，后续授权0。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -68,12 +68,12 @@
       "通用编辑器/PBL/PDF研究/TTS必交付/iOS/导出",
       "未经批准的真实调用、生产开放、部署、push/merge"
     ],
-    "provider_requests_attempted": 12,
-    "real_model_requests_attempted": 8,
+    "provider_requests_attempted": 13,
+    "real_model_requests_attempted": 9,
     "active_provider_batch_id": null,
-    "last_stopped_provider_batch_id": "head-reuse-evidence-revision-r01",
-    "current_candidate_real_calls": "head-reuse-evidence-revision-r01:1/1HTTP200, STOP; independent full teaching and actual private course/13frames/four feedback/refresh pass; no further allowance",
-    "current_authorization_note": "T111零调用准备及独立准确包评估通过，待用户确认新批3次HTTP/600秒及ADR0055与C2。",
+    "last_stopped_provider_batch_id": "head-fixed-r01",
+    "current_candidate_real_calls": "head-fixed-r01 STOP after 1/3 planning HTTP200; expired before draft; 2 invalidated; no real completed course",
+    "current_authorization_note": "T111 r01已STOP，唯一规划HTTP200及v1保存，独立规划pass晚于两期限。正文/修订0，余2失效；未交付完整课程，后续授权0。",
     "pending_approved_provider_batch_id": null,
     "head_replay_t107": {
       "authorization": "用户限定现有真实C01首版/C02修复版零Provider主链接入；不可无损部分集中具体契约变更",
@@ -343,7 +343,7 @@
       "future_revision_authorized": false
     },
     "head_fixed_t111": {
-      "status": "prepared_independent_review_pass_pending_exact_authorization",
+      "status": "stopped_application_deadline_elapsed_before_draft_send",
       "batch": "head-fixed-r01",
       "selected_example": "head-new-C",
       "initial_values": [
@@ -361,11 +361,55 @@
       "manifest_sha256": "41d2eeb692834b1eacc15327d2f5f0e75e15e9773d8990e6ce48921268bb6de3",
       "proposed_http_limit": 3,
       "proposed_window_seconds": 600,
-      "actual_http": 0,
+      "actual_http": 1,
       "provider_calls_authorized": 0,
-      "window_started": false,
+      "window_started": true,
       "old_allowance_inherited": 0,
-      "full_real_course_delivered": false
+      "full_real_course_delivered": false,
+      "approval_record": "docs/ADR/0055-head-fixed-approval-20261109.json",
+      "execution_window": {
+        "batch": "head-fixed-r01",
+        "starts_epoch": 1794187834,
+        "expires_epoch": 1794188434,
+        "starts_at": "2026-11-09T09:30:34+08:00",
+        "expires_at": "2026-11-09T09:40:34+08:00",
+        "app_deadline": "2026-11-09T09:39:43.760542+08:00",
+        "actual_http": 1,
+        "max_http_requests": 3,
+        "prior_allowance_inherited": 0,
+        "stopped": true,
+        "stopped_at": "2026-11-09T09:42:09+08:00",
+        "stop_reason": "application_deadline_elapsed_before_draft_send",
+        "remaining_invalidated": 2,
+        "planning_http": 1,
+        "first_draft_http": 0,
+        "repair_http": 0,
+        "active_at_stop": false
+      },
+      "actual_app": {
+        "owner": "12a7436f-8634-4685-a829-f555246f7309",
+        "course_id": "729b528b-1d77-4d63-88d0-879c76153188",
+        "operation_id": "72bef6dd-3cee-416c-83d4-a6504f251b91"
+      },
+      "plan_receipt": {
+        "body_complete": true,
+        "http_status": 200,
+        "raw_bytes": 6994,
+        "raw_sha256": "064a0fbc56d5f90bb2ac9a024f8e9cc7606d49b21731f0bd0a6c3b08422e1534"
+      },
+      "plan_digest": "0997615bbdb35b96df95904d4d4d1730d08a94a2f797091c04a48e484a6452ee",
+      "stopped": true,
+      "plan_review": "docs/acceptance/phase-1.5-head-fixed-live-r01/plan-review.json",
+      "independent_plan_semantics": "pass_after_deadlines",
+      "first_draft_calls": 0,
+      "repair_calls": 0,
+      "actual_application_state": "timed_out",
+      "head_version": 1,
+      "reported_usage": {
+        "input_tokens": 3711,
+        "output_tokens": 736
+      },
+      "result": "docs/acceptance/phase-1.5-head-fixed-live-r01/RESULTS.md"
     }
   },
   "archive_transition": {
@@ -5877,13 +5921,27 @@
           "result": "15项定向后端通过（含实际专用PG/API/MockTransport直接与修订准入、恢复、协议STOP、旧B直达），9项播放器组件与静态检查通过。独立准备评估pass，独立重建410项与2项离线检查。真实Provider 0，实际课程与浏览器验收未运行。",
           "evidence": "docs/acceptance/phase-1.5-head-fixed-t111/CHECKS.md",
           "manifest_sha256": "41d2eeb692834b1eacc15327d2f5f0e75e15e9773d8990e6ce48921268bb6de3"
+        },
+        {
+          "date": "2026-11-09T09:47:39+08:00",
+          "commands": [
+            "实际应用新访客表单POST与目标快照",
+            "冻结 --profile fixed --send plan，前台隐藏输入",
+            "冻结 verify_saved 及完整原件SHA复核",
+            "独立规划语义评估",
+            "既有 Scheduler.reconcile、实际浏览器GET与超时页读取",
+            "冻结 --inspect、历史树、工作流与diff检查"
+          ],
+          "result": "真实1HTTP200，6994字节，规划严格结构和映射通过，独立语义pass完成于09:41:59，晚于两期限。实际应用v1保留、timed_out/DEADLINE_EXCEEDED，场景未就绪。STOP无ACTIVE，余2失效，正文/修订0，学习验收未运行。",
+          "evidence": "docs/acceptance/phase-1.5-head-fixed-live-r01/RESULTS.md",
+          "manifest_sha256": "41d2eeb692834b1eacc15327d2f5f0e75e15e9773d8990e6ce48921268bb6de3"
         }
       ],
       "started_at": "2026-11-09T08:59:46+08:00",
       "completed_at": null,
-      "blocker": "零调用接线及独立准确执行包评估已通过。待用户确认准确manifest、ADR0055 A–D、新最多3次HTTP、600秒及C2费用与停止条件；实际完整课程与学习流程未运行。",
+      "blocker": "应用09:39:43和批次09:40:34截止，独立规划评估09:41:59通过，已STOP，剩余2次失效。正文及可学课程未生成；后续需另批授权。",
       "commit_lookup": "Task-Completed: PHASE-1.5-T111",
-      "execution_gate": "仅已完成准备，真实授权0，窗口未启动。确认准确包后才可登记新批及真实执行。"
+      "execution_gate": "T111 r01已STOP，唯一规划HTTP200及v1保存，独立规划pass晚于两期限。正文/修订0，余2失效；未交付完整课程，后续授权0。"
     }
   ],
   "planning_inputs": {

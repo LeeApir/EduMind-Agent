@@ -1,0 +1,20 @@
+{
+  "verdict": "pass",
+  "plan_digest": "0997615bbdb35b96df95904d4d4d1730d08a94a2f797091c04a48e484a6452ee",
+  "planning_basis_binding": {
+    "version": "head-planning-example-basis-v1",
+    "basis_digest": "9dda78410bc3d515b7ff01c5de471aed74d92db305846cc88995082d72802775",
+    "selected_example": "head-new-C",
+    "example_basis_digest": "26735013a933ede26bf38bbcc620ec634b024ec7be9e7cbce0d53494a74d701d",
+    "materials_digest": "854939ffc212c5eafe2c20529e46152d4023d56f521d3cc57ed068be59087e5b"
+  },
+  "independent_evaluator": "/root/head_goal_independent",
+  "evaluated_at": "2026-11-09T09:41:59+08:00",
+  "scope": "planning_semantics",
+  "basis_notes": [
+    "原目标两个逐字引文与自述先备绑定，单场景四形式及组织顺序符合目标。",
+    "唯一 head-new-C 初始[5]，依次插-2、9，两次成功为示例假设。head按值复制，p->next=head保存旧首地址，return p交回新首，只有调用者赋值才更新caller_head。",
+    "手算接收时t0{-2,i0}、t1{9,t0}，caller=t1，遍历[9,-2,5]。忽略时两次head均i0，t0/t1各next=i0且不可达，caller仍i0，遍历[5]。",
+    "场景可用展示状态和独立计算对照讲解差异。后续全文须核忽略返回对照未在主13帧播放，规划pass仅覆盖本规划。"
+  ]
+}
