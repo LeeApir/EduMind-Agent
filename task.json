@@ -6168,6 +6168,41 @@
           "evidence": "docs/acceptance/phase-1.5-head-deepseek-t114/CHECKS.md"
         }
       ]
+    },
+    {
+      "id": "PHASE-1.5-T115",
+      "phase": "Phase 1.5",
+      "title": "DeepSeek 官方直连真实课程验收",
+      "status": "blocked",
+      "depends_on": [
+        "PHASE-1.5-T114"
+      ],
+      "scope": [
+        "执行经批准的 head-fixed-deepseek-r01，严格遵守批准预算与 STOP"
+      ],
+      "prd_source": "PRD §0.5；ADR0058；0058-approval-20261109.json",
+      "acceptance_criteria": [
+        "封存准确真实规划、正文与可选修订原件，按门禁作独立教学评估",
+        "独立审核通过后完成私有课程及浏览器学习验收，或准确记录失败与停止"
+      ],
+      "verification": [
+        "T114 冻结入口与回执重放",
+        "真实浏览器 13 帧、四题反馈及刷新恢复"
+      ],
+      "started_at": "2026-11-09T18:35:43+08:00",
+      "block_reason": "本批正文通过 HTTP、回执及结构校验，四题均缺程序情境末尾 LF，冻结内容校验触发 HEAD_QUESTION_SCENARIO 与 STOP。现有条件修订不能修改题干情境。",
+      "verification_results": [
+        {
+          "date": "2026-11-09T19:43:05+08:00",
+          "commands": [
+            "冻结清单重算；加密原件回读；精确请求、收据、独立规划复核；HEAD_QUESTION_SCENARIO 重放",
+            "隔离 PG 中本次操作以现有终结路径关闭并回读 v1",
+            "python3 scripts/check_catalog_workflow.py；git diff --check"
+          ],
+          "result": "真实 HTTP 200 两次，独立规划通过。正文题目情境绑定失败，修订 0，应用 v1 大纲保留且操作 failed。独立正文与浏览器学习未验收。",
+          "evidence": "docs/acceptance/phase-1.5-head-deepseek-live-r01/RESULTS.md"
+        }
+      ]
     }
   ],
   "planning_inputs": {
