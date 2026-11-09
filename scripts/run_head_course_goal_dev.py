@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 WORK = Path("/tmp/edumind-t108")
 
 
-def environment(database_name="edumind_catalog_p15_t108_dev"):
+def environment(database_name="edumind_catalog_p15_t108_dev", api_port=8178):
     import run_catalog_db_tests as database
 
     database.CONTAINER = "edumind-phase1-t037-pg"
@@ -33,7 +33,7 @@ def environment(database_name="edumind_catalog_p15_t108_dev"):
         PYTHONPATH=str(ROOT / "backend") + ":" + str(ROOT),
         EDUMIND_PRODUCT_MODE="dynamic",
         EDUMIND_HEAD_GOAL_DEVELOPMENT="1",
-        EDUMIND_API_PROXY_TARGET="http://127.0.0.1:8178",
+        EDUMIND_API_PROXY_TARGET=f"http://127.0.0.1:{api_port}",
     )
     WORK.mkdir(exist_ok=True)
     WORK.chmod(0o700)
@@ -46,7 +46,7 @@ def environment(database_name="edumind_catalog_p15_t108_dev"):
 def main():
     global WORK
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--profile", choices=["t108", "fixed"], default="t108")
+    p.add_argument("--profile", choices=["t108", "fixed", "archive"], default="t108")
     p.add_argument("--prepare", action="store_true")
     p.add_argument("--start", action="store_true")
     p.add_argument("--test", action="store_true")
@@ -58,11 +58,15 @@ def main():
         if a.check_migration or a.test:
             p.error("Use the T111 checks listed in its execution package")
         WORK = Path("/tmp/edumind-t111-live")
-    env = environment(
-        "edumind_catalog_p15_t108_t111_live"
-        if a.profile == "fixed"
-        else "edumind_catalog_p15_t108_dev"
-    )
+    database_name, api_port, web_port = "edumind_catalog_p15_t108_dev", 8178, 5198
+    if a.profile == "fixed":
+        database_name = "edumind_catalog_p15_t108_t111_live"
+    elif a.profile == "archive":
+        if a.check_migration or a.test:
+            p.error("Use the T112 checks listed in its delivery record")
+        WORK = Path("/tmp/edumind-t112")
+        database_name, api_port, web_port = "edumind_catalog_p15_t108_t112", 8182, 5202
+    env = environment(database_name, api_port)
     python = str(ROOT / "backend/.venv/bin/python")
     if a.prepare:
         subprocess.run(
@@ -72,14 +76,18 @@ def main():
             check=True,
         )
     if a.start:
-        for port in (8178, 5198):
+        for port in (api_port, web_port):
             with socket.socket() as probe:
                 if probe.connect_ex(("127.0.0.1", port)) == 0:
                     p.error(f"Port {port} already in use")
         for name, cmd, cwd in [
             (
                 "api",
-                [python, str(ROOT / "scripts/head_course_goal.py"), "--serve"],
+                [
+                    python,
+                    "-c",
+                    f"from scripts.head_course_goal import serve; serve({api_port})",
+                ],
                 ROOT,
             ),
             (
@@ -90,7 +98,7 @@ def main():
                     "--host",
                     "127.0.0.1",
                     "--port",
-                    "5198",
+                    str(web_port),
                     "--strictPort",
                 ],
                 ROOT / "web",
@@ -107,7 +115,7 @@ def main():
                 )
             (WORK / f"{name}.pid").write_text(str(proc.pid))
         print(
-            f"{a.profile} development entry http://127.0.0.1:5198; API8178; zero Provider/worker"
+            f"{a.profile} development entry http://127.0.0.1:{web_port}; API{api_port}; zero Provider/worker"
         )
     if a.check_migration:
         import run_catalog_db_tests as database

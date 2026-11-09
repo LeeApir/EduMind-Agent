@@ -6163,6 +6163,9 @@
                 }
               }
             ]
+          },
+          {
+            "$ref": "#/components/schemas/HeadArchivedResponseSource"
           }
         ]
       },
@@ -6432,6 +6435,95 @@
               }
             }
           }
+        ]
+      },
+      "HeadArchivedResponseSource": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "origin": {
+            "const": "reviewed_archived_response_import"
+          },
+          "evidence_kind": {
+            "const": "reviewed_archived_response_import"
+          },
+          "batch": {
+            "const": "head-fixed-aiapi-r05"
+          },
+          "prompt_version": {
+            "const": "head-fixed-course-v1"
+          },
+          "candidate_digest": {
+            "const": "b7759b9d5d7b7f0cf2fb96445e776d1fec3592dd97c1d741f1ee655a5fedcdc9"
+          },
+          "parent_digest": {
+            "type": "null"
+          },
+          "plan_digest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "materials_digest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "teaching_evidence_version": {
+            "const": "head-teaching-evidence-v1"
+          },
+          "teaching_evidence_digest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "requested_model": {
+            "const": "gpt-6.1-sol"
+          },
+          "reported_model": {
+            "type": "null"
+          },
+          "reported_store": {
+            "type": "null"
+          },
+          "strict_wire_verdict": {
+            "const": "AIAPI_ENVELOPE"
+          },
+          "new_provider_calls": {
+            "const": 0
+          },
+          "teaching_review": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "verdict": {
+                "const": "pass"
+              },
+              "independent_evaluator": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "verdict",
+              "independent_evaluator"
+            ]
+          }
+        },
+        "required": [
+          "origin",
+          "evidence_kind",
+          "batch",
+          "prompt_version",
+          "candidate_digest",
+          "parent_digest",
+          "plan_digest",
+          "materials_digest",
+          "teaching_evidence_version",
+          "teaching_evidence_digest",
+          "requested_model",
+          "reported_model",
+          "reported_store",
+          "strict_wire_verdict",
+          "new_provider_calls",
+          "teaching_review"
         ]
       }
     },

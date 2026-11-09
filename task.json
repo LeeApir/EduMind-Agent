@@ -6052,6 +6052,46 @@
       "blocker": "累计3次真实请求已完成。第2次正文事实引用被拒。第3次独立教学审核因C字段写入顺序错误及不可达计数题前提缺失停止，未交付完整课程。 AIAPI复测规划通过，首份正文请求等待响应头超时，末项未发。 AIAPI r05完整正文的独立教学诊断通过，响应外层缺model/store触发AIAPI_ENVELOPE，未获应用准入。",
       "commit_lookup": "Task-Completed: PHASE-1.5-T111",
       "execution_gate": "AIAPI r05同正文1HTTP200，外层缺model/store，AIAPI_ENVELOPE封存。提取原文独立教学pass，仅诊断，无准入或浏览器验收，后续调用授权0。"
+    },
+    {
+      "id": "PHASE-1.5-T112",
+      "phase": "Phase 1.5",
+      "priority": "P0",
+      "title": "封存正文限定导入与学习交付",
+      "status": "done",
+      "depends_on": [
+        "PHASE-1.5-T107",
+        "PHASE-1.5-T110"
+      ],
+      "scope": [
+        "ADR0057 限定 AIAPI r05 私有课程导入，真实调用 0"
+      ],
+      "prd_source": "PRD §0.5；ADR0057；2026-11-09 用户批准",
+      "acceptance_criteria": [
+        "从准确加密原件提取原文并核对材料和独立审核，保留原失败与来源未知字段。",
+        "现有私有权限、版本、服务端练习反馈及答案隔离有效，重复导入幂等、失败回滚。",
+        "实际应用通过全文、13 帧高亮、播放控制、四题反馈及刷新。"
+      ],
+      "verification": [
+        "实际隔离 PG 私有导入和浏览器验收",
+        "定向负例、静态检查与历史记录核对"
+      ],
+      "started_at": "2026-11-09T14:44:42+08:00",
+      "completed_at": "2026-11-09T14:57:02+08:00",
+      "commit_lookup": "Task-Completed: PHASE-1.5-T112",
+      "verification_results": [
+        {
+          "date": "2026-11-09T14:57:02+08:00",
+          "commands": [
+            "backend/.venv/bin/python scripts/run_head_course_goal_dev.py --profile archive --prepare --start",
+            "backend/.venv/bin/python scripts/check_head_course_archive_browser.py",
+            "Ruff、pnpm typecheck、定向 ESLint、python3 scripts/check_catalog_workflow.py、git diff --check",
+            "加密原件绑定及拒绝重放，来源投影伪造负例，93456b2 复算冻结包 410 项"
+          ],
+          "result": "实际隔离 PG 与 Vue 私有 v2 完整通过。重复导入幂等、写入后失败原子回滚、跨身份 404、答案隔离、13 帧与高亮、播放控制、四题 0%/100% 服务端反馈、刷新恢复均通过。Provider 0。T111 原协议拒绝及 STOP 保留。",
+          "evidence": "docs/acceptance/phase-1.5-archived-head-import-t112/README.md"
+        }
+      ]
     }
   ],
   "planning_inputs": {

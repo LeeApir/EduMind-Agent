@@ -158,7 +158,12 @@ async def validate_candidate(
             scene_id=row.scene_id,
             expected_head=row.expected_head,
         )
-        if row.origin_type == "existing_real_candidate_replay":
+        if row.schema_version == "head-reviewed-archived-import-v1":
+            from app.services.head_course_archived_import import require_database, validate_import
+
+            require_database(db)
+            checked = validate_import(row, actual)
+        elif row.origin_type == "existing_real_candidate_replay":
             from app.services.head_course_replay import validate_replay
 
             checked = validate_replay(row, actual)

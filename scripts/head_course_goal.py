@@ -600,7 +600,7 @@ def forbidden(*args, **kwargs):
     raise RuntimeError("HEAD_GOAL_NO_BACKGROUND_PROVIDER")
 
 
-def serve():
+def serve(port=8178):
     import uvicorn
     from app.core import provider_factory
     from fastapi.responses import JSONResponse
@@ -624,7 +624,7 @@ def serve():
             )
         return await call_next(request)
 
-    uvicorn.run(app, host="127.0.0.1", port=8178, access_log=False)
+    uvicorn.run(app, host="127.0.0.1", port=port, access_log=False)
 
 
 def raw_io_audit(event, args):
