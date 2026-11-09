@@ -19,6 +19,16 @@ GOAL = (
 KNOWN = ["C 指针", "struct", "NULL", "函数返回值"]
 REUSE_VERSION = "head-reuse-course-v1"
 REUSE_GOAL = GOAL + " 本次明确使用 head-new-B：初始链表 [-8]，依次插入 6、0。"
+FIXED_VERSION = "head-fixed-course-v1"
+FIXED_EXAMPLE = "head-new-C"
+FIXED_GOAL = GOAL + " 本次使用初始链表 [5]，依次插入 -2、9，两次分配均假设成功。"
+FIXED_SPEC = dict(
+    version="head-insertion-spec-v1",
+    variant="normal",
+    initial_values=[5],
+    insert_values=[-2, 9],
+    allocation_success=[True, True],
+)
 SPECS: dict[str, dict[str, Any]] = {
     "head-new-A": dict(
         version="head-insertion-spec-v1",
@@ -59,7 +69,21 @@ def support_for_goal(goal: str) -> dict[str, Any]:
             version=REUSE_VERSION,
             examples={"head-new-B": deepcopy(SPECS["head-new-B"])},
         )
+    if goal == FIXED_GOAL:
+        return dict(
+            **{k: deepcopy(v) for k, v in SUPPORT.items() if k not in ("version", "examples")},
+            version=FIXED_VERSION,
+            examples={FIXED_EXAMPLE: deepcopy(FIXED_SPEC)},
+        )
     raise SnapshotError("HEAD_GOAL_UNSUPPORTED")
+
+
+def example_spec(key: str) -> dict[str, Any]:
+    if key == FIXED_EXAMPLE:
+        return FIXED_SPEC
+    if key not in SPECS:
+        raise SnapshotError("HEAD_PLAN_UNSUPPORTED")
+    return SPECS[key]
 
 
 def closed(props: dict[str, Any]) -> dict[str, Any]:
@@ -170,7 +194,7 @@ def selected(plan: dict[str, Any]) -> str:
     key = plan.get("shared_example")
     scenes = plan.get("scenes", [])
     if (
-        key not in SPECS
+        (key not in SPECS and key != FIXED_EXAMPLE)
         or len(scenes) != 1
         or set(scenes[0]["forms"]) != set(SUPPORT["required_forms"])
     ):
@@ -183,9 +207,8 @@ def materials(plan: dict[str, Any]) -> dict[str, Any]:
 
 
 def materials_for_example(key: str) -> dict[str, Any]:
-    if key not in SPECS:
-        raise SnapshotError("HEAD_PLAN_UNSUPPORTED")
-    catalog = contract.make_catalog(SPECS[key])
+    main_spec = example_spec(key)
+    catalog = contract.make_catalog(main_spec)
     # New transfer materials; no answer-bearing formatting examples are sent to the learner.
     spec = dict(
         version="head-insertion-spec-v1",
@@ -199,7 +222,7 @@ def materials_for_example(key: str) -> dict[str, Any]:
     # Independent, closed-form expectations; never take the engine as its own oracle.
     assert (
         catalog["example"]["observation"]["reachable_prefix"]
-        == list(reversed(SPECS[key]["insert_values"])) + SPECS[key]["initial_values"]
+        == list(reversed(main_spec["insert_values"])) + main_spec["initial_values"]
     )
     assert normal["observation"]["reachable_prefix"] == [11, 30, 40]
     assert discarded["observation"]["reachable_prefix"] == [30, 40]
@@ -236,7 +259,10 @@ def content_payload(inputs: dict[str, Any], plan: dict[str, Any]) -> dict[str, A
     from app.services.head_course_planning_basis import selected_basis
 
     mat = materials(plan)
-    return dict(
+    fixed = inputs["original_goal"] == FIXED_GOAL
+    if fixed != (mat["selected_example"] == FIXED_EXAMPLE):
+        raise SnapshotError("HEAD_PLAN_UNSUPPORTED")
+    payload = dict(
         original_goal=inputs["original_goal"],
         source_binding={key: inputs[key] for key in ("course_id", "operation_id", "request_id")},
         prerequisite_evidence=dict(
@@ -250,6 +276,11 @@ def content_payload(inputs: dict[str, Any], plan: dict[str, Any]) -> dict[str, A
         planning_basis=selected_basis(mat),
         unknown_learner_fields="all others",
     )
+    if fixed:
+        from app.services.head_course_teaching_evidence import with_evidence
+
+        return with_evidence(payload)
+    return payload
 
 
 def body(
@@ -261,6 +292,13 @@ def body(
         from app.services.head_course_teaching_evidence import validate
 
         validate(payload, payload["teaching_evidence"])
+        if payload["original_goal"] == FIXED_GOAL:
+            instruction = instruction.replace(
+                "allocation, but actual malloc failure is not animated here; "
+                "explain return of old head.",
+                "allocation. Neither that path nor actual malloc failure is animated here; "
+                "explain the return of old head when p is NULL.",
+            )
         instruction = (
             instruction.replace(
                 "paragraphs cite existing main fact IDs.",
@@ -305,6 +343,8 @@ def validate_content(payload: dict[str, Any], value: dict[str, Any]) -> None:
         if isinstance(payload["materials"]["catalog"]["facts"], list)
         else set(payload["materials"]["catalog"]["facts"])
     )
+    if payload["original_goal"] == FIXED_GOAL and "teaching_evidence" not in payload:
+        raise SnapshotError("HEAD_TEACHING_EVIDENCE_BINDING")
     if "teaching_evidence" in payload:
         from app.services.head_course_teaching_evidence import validate
 

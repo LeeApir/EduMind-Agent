@@ -268,7 +268,7 @@ onBeforeUnmount(()=>{save();epoch+=1;manifestEpoch+=1;versionsEpoch+=1;controlle
               class="replay-source"
               aria-label="新课程来源"
             >
-              <strong>{{ scene.generation_source.prompt_version === 'head-evidence-local-revision-v1' ? '模型局部修订 · 程序证据补充' : scene.generation_source.prompt_version === 'head-reuse-course-v1' ? '限定头插流程复用 · 新目标课程' : scene.generation_source.evidence_kind === 'targeted_fact_revision' ? '模型四字段事实修订' : scene.generation_source.evidence_kind === 'program_format_recovery' ? '程序格式恢复 · r03 派生课程' : scene.generation_source.evidence_kind === 'offline_fixture' ? '离线接线夹具 · 非真实生成' : '新目标真实生成 · 头插支持域' }} · 未签核</strong>
+              <strong>{{ scene.generation_source.prompt_version === 'head-evidence-local-revision-v1' ? '模型局部修订 · 程序证据补充' : scene.generation_source.prompt_version === 'head-fixed-course-v1' ? '固定头插方案 · 新输入验证' : scene.generation_source.prompt_version === 'head-reuse-course-v1' ? '限定头插流程复用 · 新目标课程' : scene.generation_source.evidence_kind === 'targeted_fact_revision' ? '模型四字段事实修订' : scene.generation_source.evidence_kind === 'program_format_recovery' ? '程序格式恢复 · r03 派生课程' : scene.generation_source.evidence_kind === 'offline_fixture' ? '离线接线夹具 · 非真实生成' : '新目标真实生成 · 头插支持域' }} · 未签核</strong>
               <p
                 v-if="scene.generation_source.teaching_review?.verdict !== 'pass' && scene.generation_source.evidence_kind === 'program_format_recovery'"
                 role="alert"
@@ -288,7 +288,7 @@ onBeforeUnmount(()=>{save();epoch+=1;manifestEpoch+=1;versionsEpoch+=1;controlle
                 <template v-if="scene.generation_source.evidence_kind === 'offline_fixture'">离线接线夹具，未新增真实模型调用，不计教学成果。</template>
                 <template v-else>沿用 r01 真实正文，仅已审核的范围说明和指定段落由本批单次模型请求修订。代码、轨迹与答案保持原版；新增引用来自程序计算的独立对照。完整教学重评已通过，原 r01 首稿与停止记录保留。</template>
               </small>
-              <small v-else-if="scene.generation_source.prompt_version === 'head-reuse-course-v1'">
+              <small v-else-if="['head-reuse-course-v1', 'head-fixed-course-v1'].includes(scene.generation_source.prompt_version)">
                 <template v-if="scene.generation_source.evidence_kind === 'offline_fixture'">本页为离线接线夹具，未调用模型，不计真实生成或教学成果。</template>
                 <template v-else>讲解、题干和解析来自本批模型；代码、状态和参考答案由程序提供。独立教学审核通过。</template>
                 <span v-if="scene.generation_source.format_recovery">首稿结构失败保留，仅按既定规则恢复相同重复题目成员。</span>

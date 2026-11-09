@@ -13,7 +13,10 @@ from app.services.free_course_snapshots import SnapshotError, SnapshotRepository
 
 VERSION = m.REUSE_VERSION
 BATCH = "head-reuse-r01"
+FIXED_BATCH = "head-fixed-r01"
 REVISION_VERSION = "head-reviewed-paragraph-revision-v1"
+FIXED_REVISION_VERSION = "head-reviewed-local-revision-v2"
+FIXED_REVIEW_CHECKS = ("display_scope", "return_contrast", "whole_lesson_consistency")
 REVISION_INSTRUCTION = """[ROLE] Revise only independently identified passages of the exact parent.
 [OUTPUT] Return replacements under exactly the supplied Schema keys. A paragraph replacement
 contains complete text AND fact_ids; summary is a complete string. No other fields or full lesson.
@@ -25,6 +28,17 @@ correct useful content. Do not copy adjacent paragraphs, remove an explanation t
 introduce transfer answers/hints or replace a paragraph with a summary. No invented facts, tools,
 links, Markdown fences or assistant fallback. Independent full-lesson review follows merging.
 """
+FIXED_REVISION_INSTRUCTION = REVISION_INSTRUCTION.replace(
+    "summary is a complete string",
+    "learning_summary and failure_scope are complete strings",
+).replace(
+    "lifetime/failure sections, plan and payload are immutable. Only review-identified paragraphs\n"
+    "and learning_summary may change.",
+    "lifetime, plan and payload are immutable. Only review-identified paragraphs,\n"
+    "learning_summary and failure_scope may change. Respect the program evidence: the main "
+    "frames show two successful allocations and both false NULL conditions. Use the separate "
+    "discard-return fact for claims about the unchanged caller entry and unreachable nodes.",
+)
 
 
 def sha(value: bytes) -> str:
@@ -59,6 +73,11 @@ def review_binding(review, c, verdict):
         or review.get("verdict") != verdict
         or not isinstance(review.get("independent_evaluator"), str)
         or not review["independent_evaluator"].strip()
+        or (
+            c["payload"]["original_goal"] == m.FIXED_GOAL
+            and review.get("evidence_digest")
+            != c["payload"]["teaching_evidence"]["evidence_digest"]
+        )
     ):
         raise SnapshotError("REUSE_REVIEW_BINDING")
 
@@ -67,6 +86,12 @@ def revision_contract(parent, review):
     """Derive a closed response schema from exact quoted findings, never F01/F02 constants."""
     review_binding(review, parent, "needs_revision")
     findings = review.get("findings", [])
+    fixed = parent["payload"]["original_goal"] == m.FIXED_GOAL
+    if fixed and (
+        review.get("blocking_findings") != findings
+        or review.get("checks", {}).get("full_lesson") is not True
+    ):
+        raise SnapshotError("REUSE_REVISION_SCOPE")
     if not 1 <= len(findings) <= 8 or len({f["id"] for f in findings}) != len(findings):
         raise SnapshotError("REUSE_REVISION_SCOPE")
     props, targets, responsibilities = {}, {}, {}
@@ -79,8 +104,9 @@ def revision_contract(parent, review):
         ):
             raise SnapshotError("REUSE_REVISION_SCOPE")
         path = finding.get("path")
-        if path == ["learning_summary"]:
-            key, old = "learning_summary", parent["raw_output"]["learning_summary"]
+        if path == ["learning_summary"] or (fixed and path == ["failure_scope"]):
+            key = path[0]
+            old = parent["raw_output"][key]
             schema = deepcopy(m.TEXT)
         elif (
             isinstance(path, list)
@@ -105,7 +131,7 @@ def revision_contract(parent, review):
         props[key], targets[key] = schema, path
         responsibilities[key] = finding["teaching_responsibility"]
     return dict(
-        version=REVISION_VERSION,
+        version=FIXED_REVISION_VERSION if fixed else REVISION_VERSION,
         parent_digest=parent["candidate_digest"],
         review_digest=digest("head-reuse-review", review=review),
         targets=targets,
@@ -116,22 +142,24 @@ def revision_contract(parent, review):
 
 def revision_body(parent, review):
     contract = revision_contract(parent, review)
+    fixed = contract["version"] == FIXED_REVISION_VERSION
     request = m.body(parent["payload"])
+    revision_input = dict(parent_candidate=parent, review=review, revision_contract=contract)
+    if not fixed:
+        revision_input.update(
+            same_version_basis=parent["payload"]["planning_basis"],
+            same_version_materials=parent["payload"]["materials"],
+        )
     request.update(
         max_output_tokens=4000,
         input=[
-            dict(role="system", content=REVISION_INSTRUCTION),
+            dict(
+                role="system",
+                content=FIXED_REVISION_INSTRUCTION if fixed else REVISION_INSTRUCTION,
+            ),
             dict(
                 role="user",
-                content=canonical(
-                    dict(
-                        parent_candidate=parent,
-                        review=review,
-                        revision_contract=contract,
-                        same_version_basis=parent["payload"]["planning_basis"],
-                        same_version_materials=parent["payload"]["materials"],
-                    )
-                ).decode(),
+                content=canonical(revision_input).decode(),
             ),
         ],
     )
@@ -146,8 +174,8 @@ def merge(parent, review, replacements):
     m.Draft202012Validator(contract["schema"]).validate(replacements)
     raw = deepcopy(parent["raw_output"])
     for key, path in contract["targets"].items():
-        if path == ["learning_summary"]:
-            raw["learning_summary"] = replacements[key]
+        if len(path) == 1:
+            raw[path[0]] = replacements[key]
         else:
             i = path[1]
             raw["paragraphs"][i] = deepcopy(replacements[key])
@@ -160,12 +188,23 @@ def merge(parent, review, replacements):
             ]
             if text in adjacent:
                 raise SnapshotError("REUSE_COPIED_NEIGHBOUR")
+    if contract["version"] == FIXED_REVISION_VERSION:
+        paragraphs = raw["paragraphs"]
+        for path in contract["targets"].values():
+            if path[0] == "paragraphs":
+                i = path[1]
+                if any(
+                    paragraphs[i]["text"].strip() == paragraphs[j]["text"].strip()
+                    for j in (i - 1, i + 1)
+                    if 0 <= j < len(paragraphs)
+                ):
+                    raise SnapshotError("REUSE_COPIED_NEIGHBOUR")
     return candidate(
         parent["payload"], raw, parent=parent["candidate_digest"], recovery=parent["recovery"]
     )
 
 
-def observe(request, raw, adapter, *, allow_recovery=False):
+def observe(request, raw, adapter, *, allow_recovery=False, source_batch=BATCH):
     """Strict first; only an inner teaching-JSON duplicate can enter the existing recovery."""
     from app.services.head_course_duplicate_recovery import VERSION as RULE
     from app.services.head_course_duplicate_recovery import recover
@@ -193,7 +232,7 @@ def observe(request, raw, adapter, *, allow_recovery=False):
     result, observation = adapter.observe_generation(request, canonical(view))
     recovery = dict(
         rule_version=RULE,
-        source_batch=BATCH,
+        source_batch=source_batch,
         original_raw_sha256=sha(raw),
         original_text_sha256=sha(text.encode()),
         derived_output_sha256=sha(canonical(recovered)),
@@ -210,8 +249,13 @@ def record(payload, request, raw, adapter, *, evidence_kind, parent=None, review
     expected = m.body(payload) if parent is None else revision_body(parent, review)
     if request != expected or (parent is not None and parent["payload"] != payload):
         raise SnapshotError("REUSE_REQUEST_BINDING")
+    fixed = payload["original_goal"] == m.FIXED_GOAL
     result, observation, recovery, failure = observe(
-        request, raw, adapter, allow_recovery=parent is None
+        request,
+        raw,
+        adapter,
+        allow_recovery=parent is None,
+        source_batch=FIXED_BATCH if fixed else BATCH,
     )
     if (
         result.usage.input_tokens > 139264
@@ -225,7 +269,7 @@ def record(payload, request, raw, adapter, *, evidence_kind, parent=None, review
         else merge(parent, review, value)
     )
     return dict(
-        protocol_version=VERSION,
+        protocol_version=m.FIXED_VERSION if fixed else VERSION,
         request=deepcopy(request),
         raw_response=raw.decode(),
         raw_sha256=sha(raw),
@@ -288,6 +332,8 @@ def validate_final(records, review, payload, adapter):
         "code_trace_answers",
         "no_answer_hints",
     )
+    if payload["original_goal"] == m.FIXED_GOAL:
+        required += FIXED_REVIEW_CHECKS
     if review.get("blocking_findings") != [] or any(
         review.get("checks", {}).get(k) is not True for k in required
     ):
@@ -300,11 +346,13 @@ def assembled(records, review):
     c = rec["candidate"]
     source = dict(
         origin=m.ORIGIN,
-        batch=BATCH,
+        batch=FIXED_BATCH if c["payload"]["original_goal"] == m.FIXED_GOAL else BATCH,
         candidate_digest=c["candidate_digest"],
         parent_digest=c["parent_digest"],
         model=rec["model"],
-        prompt_version=VERSION,
+        prompt_version=m.FIXED_VERSION
+        if c["payload"]["original_goal"] == m.FIXED_GOAL
+        else VERSION,
         plan_digest=digest("head-plan", plan=c["payload"]["plan"]),
         materials_digest=c["payload"]["materials"]["materials_digest"],
         evidence_kind="offline_fixture"
@@ -320,6 +368,12 @@ def assembled(records, review):
     )
     if c["recovery"]:
         source["format_recovery"] = deepcopy(c["recovery"])
+    if c["payload"]["original_goal"] == m.FIXED_GOAL:
+        evidence = c["payload"]["teaching_evidence"]
+        source.update(
+            teaching_evidence_version=evidence["version"],
+            teaching_evidence_digest=evidence["evidence_digest"],
+        )
     return m.assemble(c["payload"], c["raw_output"], source)
 
 
@@ -330,13 +384,17 @@ def validate_chain(chain, inputs, plan, adapter):
     context = chain["context"]
     if (
         context["planning_inputs"] != inputs
-        or inputs["original_goal"] != m.REUSE_GOAL
+        or inputs["original_goal"] not in (m.REUSE_GOAL, m.FIXED_GOAL)
         or chain["plan_request"] != planning_body(inputs)
     ):
         raise SnapshotError("REUSE_PLAN_BINDING")
     result, _ = adapter.observe_generation(
         chain["plan_request"], chain["plan_raw_response"].encode()
     )
+    if inputs["original_goal"] == m.FIXED_GOAL and (
+        result.usage.input_tokens > 139264 or result.usage.output_tokens > 8000
+    ):
+        raise SnapshotError("REUSE_USAGE")
     if wire.to_local(dict(result.value), inputs)["plan"] != plan:
         raise SnapshotError("REUSE_PLAN_BINDING")
     payload = m.content_payload(inputs, plan)
@@ -365,8 +423,8 @@ def validate_publication(row, actual):
         or row.state != "candidate"
         or row.reason_code is not None
         or row.sent_attempts != 1
-        or row.schema_version != VERSION
-        or row.prompt_version != VERSION
+        or row.schema_version != final["protocol_version"]
+        or row.prompt_version != final["protocol_version"]
         or str(row.request_id) != actual["request"]["request_id"]
         or row.input_digest != digest("head-reuse-input", snapshot=snapshot)
         or row.request_digest != digest("head-http-request", body=final["request"])
@@ -433,8 +491,8 @@ async def publish(db, owner, cid, oid, chain):
         input_digest=digest("head-reuse-input", snapshot=snapshot),
         request_digest=digest("head-http-request", body=final["request"]),
         response_json=assembled(records, chain["final_review"]),
-        prompt_version=VERSION,
-        schema_version=VERSION,
+        prompt_version=final["protocol_version"],
+        schema_version=final["protocol_version"],
         state="candidate",
         reason_code=None,
         plan_id=UUID(context["plan_id"]),

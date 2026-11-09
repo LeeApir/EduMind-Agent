@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "T109已按另行批准ADR0054局部修订交付新私有子课程v2，独立全文及实际学习/13帧/四题/刷新通过；本批1/1HTTP并STOP，后续授权0。原r01失败/STOP/首次结果保留，T102 blocked；不自动启动后续。",
+    "phase_gate": "T111零调用准备及独立准确包评估通过，待用户确认新批3次HTTP/600秒及ADR0055与C2。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -73,7 +73,7 @@
     "active_provider_batch_id": null,
     "last_stopped_provider_batch_id": "head-reuse-evidence-revision-r01",
     "current_candidate_real_calls": "head-reuse-evidence-revision-r01:1/1HTTP200, STOP; independent full teaching and actual private course/13frames/four feedback/refresh pass; no further allowance",
-    "current_authorization_note": "T109已按另行批准ADR0054局部修订交付新私有子课程v2，独立全文及实际学习/13帧/四题/刷新通过；本批1/1HTTP并STOP，后续授权0。原r01失败/STOP/首次结果保留，T102 blocked；不自动启动后续。",
+    "current_authorization_note": "T111零调用准备及独立准确包评估通过，待用户确认新批3次HTTP/600秒及ADR0055与C2。",
     "pending_approved_provider_batch_id": null,
     "head_replay_t107": {
       "authorization": "用户限定现有真实C01首版/C02修复版零Provider主链接入；不可无损部分集中具体契约变更",
@@ -341,6 +341,31 @@
       "original_teaching_modified": false,
       "course_published": false,
       "future_revision_authorized": false
+    },
+    "head_fixed_t111": {
+      "status": "prepared_independent_review_pass_pending_exact_authorization",
+      "batch": "head-fixed-r01",
+      "selected_example": "head-new-C",
+      "initial_values": [
+        5
+      ],
+      "insert_values": [
+        -2,
+        9
+      ],
+      "allocation_success": [
+        true,
+        true
+      ],
+      "package": "docs/acceptance/phase-1.5-head-fixed-t111/manifest.json",
+      "manifest_sha256": "41d2eeb692834b1eacc15327d2f5f0e75e15e9773d8990e6ce48921268bb6de3",
+      "proposed_http_limit": 3,
+      "proposed_window_seconds": 600,
+      "actual_http": 0,
+      "provider_calls_authorized": 0,
+      "window_started": false,
+      "old_allowance_inherited": 0,
+      "full_real_course_delivered": false
     }
   },
   "archive_transition": {
@@ -5810,6 +5835,55 @@
           "evidence": "docs/acceptance/phase-1.5-head-evidence-t110/README.md"
         }
       ]
+    },
+    {
+      "id": "PHASE-1.5-T111",
+      "phase": "Phase 1.5",
+      "priority": "P0",
+      "title": "固定头插方案的新输入端到端验证",
+      "status": "blocked",
+      "depends_on": [
+        "PHASE-1.5-T108",
+        "PHASE-1.5-T109",
+        "PHASE-1.5-T110"
+      ],
+      "scope": [
+        "固定头插新目标、同版首稿证据、独立审核和一次有限修订、现有私有课程准入",
+        "backend/app/",
+        "backend/tests/",
+        "web/src/",
+        "scripts/",
+        "docs/ADR/0055-fixed-head-course-validation.md",
+        "docs/acceptance/phase-1.5-head-fixed-t111/",
+        "task.json",
+        "process.txt"
+      ],
+      "prd_source": "PRD §0.5；课程生成目标与推进约束；用户限定新输入与零调用准备授权",
+      "acceptance_criteria": [
+        "实际输入固定初始[5]、依次插入-2、9，两次假定分配成功。独立核对接收[9,-2,5]、忽略[5]且t0/t1不可达。",
+        "冻结首稿同版证据、运行源码、提示词、Schema、模型与审核标准。零调用覆盖直接和条件修订两条真实接线。",
+        "最多规划1/首稿1/条件修订1次真实HTTP，另经评估与准确授权。修订只触及审核定位的段落全文及fact_ids、总结、失败范围；其余阻断或复评不通过停止。",
+        "实际应用交付新私有课程，独立全文评估、13帧与高亮、播放控制、四题反馈、答案隔离、整页刷新和版本来源通过。各阶段分别记账并保留原件。模型输出后如需改冻结运行范围即验证失败。"
+      ],
+      "verification": [
+        "专用T111检查库：backend/.venv/bin/python -m pytest -q backend/tests/test_head_course_fixed.py backend/tests/test_head_course_teaching_evidence.py backend/tests/test_head_course_reuse.py::test_actual_entry_and_private_application[direct]",
+        "backend/.venv/bin/python scripts/prepare_head_course_fixed.py --check；backend/.venv/bin/python -I scripts/head_course_goal.py --profile fixed --inspect",
+        "变更Python Ruff/mypy；Vue类型、播放器组件、ESLint；workflow/diff及旧原件检查",
+        "获新批准确批准后：真实规划与独立评估、首稿／可选修订、全文审核、实际应用及浏览器验收"
+      ],
+      "verification_results": [
+        {
+          "date": "2026-11-09T09:14:50+08:00",
+          "result": "15项定向后端通过（含实际专用PG/API/MockTransport直接与修订准入、恢复、协议STOP、旧B直达），9项播放器组件与静态检查通过。独立准备评估pass，独立重建410项与2项离线检查。真实Provider 0，实际课程与浏览器验收未运行。",
+          "evidence": "docs/acceptance/phase-1.5-head-fixed-t111/CHECKS.md",
+          "manifest_sha256": "41d2eeb692834b1eacc15327d2f5f0e75e15e9773d8990e6ce48921268bb6de3"
+        }
+      ],
+      "started_at": "2026-11-09T08:59:46+08:00",
+      "completed_at": null,
+      "blocker": "零调用接线及独立准确执行包评估已通过。待用户确认准确manifest、ADR0055 A–D、新最多3次HTTP、600秒及C2费用与停止条件；实际完整课程与学习流程未运行。",
+      "commit_lookup": "Task-Completed: PHASE-1.5-T111",
+      "execution_gate": "仅已完成准备，真实授权0，窗口未启动。确认准确包后才可登记新批及真实执行。"
     }
   ],
   "planning_inputs": {

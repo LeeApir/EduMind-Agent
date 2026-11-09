@@ -11,11 +11,11 @@ ROOT = Path(__file__).resolve().parents[1]
 WORK = Path("/tmp/edumind-t108")
 
 
-def environment():
+def environment(database_name="edumind_catalog_p15_t108_dev"):
     import run_catalog_db_tests as database
 
     database.CONTAINER = "edumind-phase1-t037-pg"
-    raw = database.test_environment("edumind_catalog_p15_t108_dev")
+    raw = database.test_environment(database_name)
     env = {
         k: raw[k]
         for k in (
@@ -44,7 +44,9 @@ def environment():
 
 
 def main():
+    global WORK
     p = argparse.ArgumentParser(description=__doc__)
+    p.add_argument("--profile", choices=["t108", "fixed"], default="t108")
     p.add_argument("--prepare", action="store_true")
     p.add_argument("--start", action="store_true")
     p.add_argument("--test", action="store_true")
@@ -52,7 +54,15 @@ def main():
     a = p.parse_args()
     if not any((a.prepare, a.start, a.test, a.check_migration)):
         p.error("Choose action")
-    env = environment()
+    if a.profile == "fixed":
+        if a.check_migration or a.test:
+            p.error("Use the T111 checks listed in its execution package")
+        WORK = Path("/tmp/edumind-t111-live")
+    env = environment(
+        "edumind_catalog_p15_t108_t111_live"
+        if a.profile == "fixed"
+        else "edumind_catalog_p15_t108_dev"
+    )
     python = str(ROOT / "backend/.venv/bin/python")
     if a.prepare:
         subprocess.run(
@@ -97,7 +107,7 @@ def main():
                 )
             (WORK / f"{name}.pid").write_text(str(proc.pid))
         print(
-            "T108 development entry http://127.0.0.1:5198; API8178; zero Provider/worker"
+            f"{a.profile} development entry http://127.0.0.1:5198; API8178; zero Provider/worker"
         )
     if a.check_migration:
         import run_catalog_db_tests as database

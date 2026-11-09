@@ -22,6 +22,8 @@ from app.services.free_course_snapshots import SnapshotError, canonical, digest 
 
 PACKAGE = ROOT / "docs/acceptance/phase-1.5-head-goal-t108-r03"
 REUSE_PACKAGE = ROOT / "docs/acceptance/phase-1.5-head-reuse-t109"
+FIXED_PACKAGE = ROOT / "docs/acceptance/phase-1.5-head-fixed-t111"
+FIXED_VAULT = Path.home() / ".local/share/edumind/head-fixed-r01"
 OLD = ROOT / "docs/acceptance/phase-1.5-limited-c-preparation-t104/execute_once.py"
 spec = importlib.util.spec_from_file_location("head_goal_raw_transport", OLD)
 raw_io = importlib.util.module_from_spec(spec)
@@ -34,6 +36,14 @@ def package_digest():
         if hashlib.sha256((ROOT / path).read_bytes()).hexdigest() != sha:
             raise SnapshotError("HEAD_PACKAGE_CHANGED")
     return hashlib.sha256((PACKAGE / "manifest.json").read_bytes()).hexdigest()
+
+
+def profile_goal():
+    if PACKAGE == FIXED_PACKAGE:
+        return m.FIXED_GOAL
+    if PACKAGE == REUSE_PACKAGE:
+        return m.REUSE_GOAL
+    return m.GOAL
 
 
 def planning_body(inputs):
@@ -180,7 +190,16 @@ def verify_saved(vault, stage, cipher):
     ):
         raise SnapshotError("HEAD_REQUEST_CHANGED")
     context = read(vault / "context.json")
-    if context["planning_inputs"]["original_goal"] == m.REUSE_GOAL and stage != "plan":
+    goal = context["planning_inputs"]["original_goal"]
+    if goal == m.FIXED_GOAL and (
+        attempt["stage"] != stage
+        or attempt["approval_sha256"]
+        != hashlib.sha256((vault / "approval.bound.json").read_bytes()).hexdigest()
+        or attempt["evidence_kind"]
+        not in ("actual_provider_response", "offline_fixture")
+    ):
+        raise SnapshotError("HEAD_ATTEMPT_BINDING")
+    if goal in (m.REUSE_GOAL, m.FIXED_GOAL) and stage != "plan":
         from app.services import head_course_reuse as reuse
 
         plan = verify_saved(vault, "plan", cipher)["plan"]
@@ -211,6 +230,10 @@ def verify_saved(vault, stage, cipher):
         return expected
     result, observation = raw_io.observe_generation(request, raw)
     if stage == "plan":
+        if goal == m.FIXED_GOAL and (
+            result.usage.input_tokens > 139264 or result.usage.output_tokens > 8000
+        ):
+            raise SnapshotError("HEAD_USAGE_OR_CREDENTIAL_ECHO")
         if request != planning_body(context["planning_inputs"]) or read(
             vault / "plan.output.json"
         ) != dict(result.value):
@@ -284,17 +307,30 @@ def repair_issues(vault, parent):
 def approval_check(vault, approval):
     sha = package_digest()
     reuse = PACKAGE == REUSE_PACKAGE
+    fixed = PACKAGE == FIXED_PACKAGE
+    if fixed and (
+        vault != FIXED_VAULT
+        or type(approval.get("starts_epoch")) is not int
+        or type(approval.get("expires_epoch")) is not int
+        or approval.get("accept_ADR0055_and_batch_C2") is not True
+        or approval.get("batch") != "head-fixed-r01"
+    ):
+        raise SnapshotError("HEAD_EXACT_AUTHORIZATION_REQUIRED")
     if (
         approval.get("package_sha256") != sha
-        or approval.get("version") != (m.REUSE_VERSION if reuse else m.VERSION)
-        or approval.get(
-            "accept_ADR0053_and_batch_C2"
-            if reuse
-            else "accept_ADR0052_R03_and_batch_C2"
-        )
-        is not True
+        or approval.get("version")
+        != (m.FIXED_VERSION if fixed else m.REUSE_VERSION if reuse else m.VERSION)
         or (
-            reuse
+            not fixed
+            and approval.get(
+                "accept_ADR0053_and_batch_C2"
+                if reuse
+                else "accept_ADR0052_R03_and_batch_C2"
+            )
+            is not True
+        )
+        or (
+            (reuse or fixed)
             and (
                 type(approval.get("max_http_requests")) is not int
                 or approval["max_http_requests"] != 3
@@ -314,6 +350,12 @@ def approval_check(vault, approval):
         or (vault / "STOP").exists()
     ):
         raise SnapshotError("HEAD_VAULT_STOPPED_OR_UNSAFE")
+    if fixed:
+        bound = vault / "approval.bound.json"
+        if approval.get("context_sha256") != hashlib.sha256(
+            (vault / "context.json").read_bytes()
+        ).hexdigest() or (bound.exists() and bound.read_bytes() != canonical(approval)):
+            raise SnapshotError("HEAD_EXACT_AUTHORIZATION_REQUIRED")
     return sha
 
 
@@ -331,8 +373,10 @@ def send(stage, vault, approval, *, transport=None, key=None):
             raise SnapshotError("HEAD_RAW_KEY_UNSAFE")
         cipher = Fernet(rawkey.read_bytes())
         context = read(vault / "context.json")
-        reuse_mode = context["planning_inputs"]["original_goal"] == m.REUSE_GOAL
-        if reuse_mode != (PACKAGE == REUSE_PACKAGE):
+        goal = context["planning_inputs"]["original_goal"]
+        reuse_mode = goal in (m.REUSE_GOAL, m.FIXED_GOAL)
+        fixed = goal == m.FIXED_GOAL
+        if goal != profile_goal():
             raise SnapshotError("HEAD_PACKAGE_PROFILE_MISMATCH")
         if (
             len(list(vault.glob("*.attempt.json"))) >= 3
@@ -344,6 +388,10 @@ def send(stage, vault, approval, *, transport=None, key=None):
             if list(vault.glob("*.attempt.json")):
                 raise SnapshotError("HEAD_ORDER")
             request = planning_body(context["planning_inputs"])
+            if fixed and (
+                vault / "plan.prepared-request.json"
+            ).read_bytes() != canonical(request):
+                raise SnapshotError("HEAD_REQUEST_CHANGED")
         else:
             plan = verify_saved(vault, "plan", cipher)["plan"]
             payload = m.content_payload(context["planning_inputs"], plan)
@@ -359,6 +407,8 @@ def send(stage, vault, approval, *, transport=None, key=None):
             if stage == "generate" and (vault / "repair.attempt.json").exists():
                 raise SnapshotError("HEAD_ORDER")
             if stage == "repair":
+                if fixed and (vault / "final-review.json").exists():
+                    raise SnapshotError("HEAD_FINAL_REVIEW_ALREADY_RECORDED")
                 parent = verify_saved(vault, "generate", cipher)["candidate"]
                 if reuse_mode:
                     from app.services.head_course_reuse import revision_body
@@ -393,6 +443,14 @@ def send(stage, vault, approval, *, transport=None, key=None):
         )
         if current != context:
             raise SnapshotError("HEAD_REQUEST_CHANGED")
+        approval_binding = {}
+        if fixed:
+            approval_check(vault, approval)
+            if stage == "plan":
+                raw_io.exclusive(vault / "approval.bound.json", canonical(approval))
+            approval_binding = dict(
+                approval_sha256=hashlib.sha256(canonical(approval)).hexdigest()
+            )
         raw_io.exclusive(
             vault / f"{stage}.attempt.json",
             canonical(
@@ -406,6 +464,7 @@ def send(stage, vault, approval, *, transport=None, key=None):
                     else "actual_provider_response",
                     local_input_reservation=139264,
                     output_reservation=request["max_output_tokens"],
+                    **approval_binding,
                 )
             ),
         )
@@ -472,6 +531,7 @@ def send(stage, vault, approval, *, transport=None, key=None):
         result, observation = raw_io.observe_generation(request, raw)
         if (
             observation["reported_input_tokens"] > 139264
+            or (fixed and result.usage.output_tokens > request["max_output_tokens"])
             or key in raw.decode(errors="replace")
             or key in canonical(dict(result.value)).decode()
         ):
@@ -584,10 +644,75 @@ def raw_io_audit(event, args):
             raise RuntimeError("HEAD_GOAL_SERVER_EXTERNAL_NETWORK_FORBIDDEN")
 
 
+def publish_saved(vault, approval):
+    from cryptography.fernet import Fernet
+
+    approval_check(vault, approval)
+    if (vault / "ACTIVE").exists():
+        raise SnapshotError("HEAD_ACTIVE_UNKNOWN")
+    rawkey = vault / "raw.key"
+    if PACKAGE == FIXED_PACKAGE and (
+        rawkey.is_symlink() or rawkey.stat().st_mode & 0o077
+    ):
+        raise SnapshotError("HEAD_RAW_KEY_UNSAFE")
+    cipher = Fernet(rawkey.read_bytes())
+    records = [verify_saved(vault, "generate", cipher)]
+    if (vault / "repair.attempt.json").exists():
+        records.append(verify_saved(vault, "repair", cipher))
+    if PACKAGE == FIXED_PACKAGE:
+        plan_attempt = read(vault / "plan.attempt.json")
+        if any(
+            record["evidence_kind"] != plan_attempt["evidence_kind"]
+            for record in records
+        ):
+            raise SnapshotError("HEAD_ATTEMPT_BINDING")
+    context = read(vault / "context.json")
+    review = read(vault / "final-review.json")
+
+    async def publish(db):
+        return await generation.publish(
+            db,
+            UUID(context["owner"]),
+            UUID(context["course_id"]),
+            UUID(context["operation_id"]),
+            records,
+            review,
+        )
+
+    if PACKAGE in (REUSE_PACKAGE, FIXED_PACKAGE):
+        from app.services import head_course_reuse as reuse
+
+        plan_raw = raw_io.decrypt(vault / "plan.raw.enc", cipher)
+        chain = dict(
+            context=context,
+            plan_request=read(vault / "plan.request.json"),
+            plan_raw_response=plan_raw.decode(),
+            plan_review=read(vault / "plan-review.json"),
+            records=records,
+            final_review=review,
+        )
+
+        async def publish_reuse(db):
+            return await reuse.publish(
+                db,
+                UUID(context["owner"]),
+                UUID(context["course_id"]),
+                UUID(context["operation_id"]),
+                chain,
+            )
+
+        result = asyncio.run(database(publish_reuse))
+    else:
+        result = asyncio.run(database(publish))
+    raw_io.exclusive(vault / "published.json", canonical(result))
+    raw_io.exclusive(vault / "STOP", b"completed; unused requests expired\n")
+    return result
+
+
 def main():
     global PACKAGE
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--profile", choices=["t108", "reuse"], default="t108")
+    p.add_argument("--profile", choices=["t108", "reuse", "fixed"], default="t108")
     group = p.add_mutually_exclusive_group(required=True)
     group.add_argument("--inspect", action="store_true")
     group.add_argument("--serve", action="store_true")
@@ -602,6 +727,8 @@ def main():
     args = p.parse_args()
     if args.profile == "reuse":
         PACKAGE = REUSE_PACKAGE
+    if args.profile == "fixed":
+        PACKAGE = FIXED_PACKAGE
     if args.inspect:
         print(
             json.dumps(
@@ -614,7 +741,8 @@ def main():
         )
         return
     if any(
-        k.startswith(("EDUMIND_PROVIDER", "EDUMIND_CREDENTIAL")) for k in os.environ
+        k.startswith(("EDUMIND_PROVIDER", "EDUMIND_CREDENTIAL", "DEEPSEEK", "OPENAI"))
+        for k in os.environ
     ):
         p.error("Use clean environment; no Provider credentials or .env")
     if args.serve:
@@ -622,10 +750,22 @@ def main():
         return
     if args.vault is None:
         p.error("--vault required")
+    if PACKAGE == FIXED_PACKAGE and (
+        args.vault != FIXED_VAULT
+        or args.vault.is_symlink()
+        or not args.vault.is_dir()
+        or args.vault.stat().st_mode & 0o077
+    ):
+        p.error("Use the new dedicated fixed-batch vault with mode 0700")
     if args.prepare:
         if not all((args.owner, args.course, args.operation)):
             p.error("Actual existing owner/course/operation required")
         context = asyncio.run(prepare(args.owner, args.course, args.operation))
+        if PACKAGE == FIXED_PACKAGE and (
+            (args.vault / "STOP").exists()
+            or context["planning_inputs"]["original_goal"] != m.FIXED_GOAL
+        ):
+            raise SnapshotError("HEAD_PACKAGE_PROFILE_MISMATCH")
         raw_io.exclusive(args.vault / "context.json", canonical(context))
         raw_io.exclusive(
             args.vault / "plan.prepared-request.json",
@@ -642,59 +782,20 @@ def main():
         if args.send:
             send(args.send, args.vault, approval)
         else:
-            from cryptography.fernet import Fernet
-
-            approval_check(args.vault, approval)
-            if (args.vault / "ACTIVE").exists():
-                raise SnapshotError("HEAD_ACTIVE_UNKNOWN")
-            cipher = Fernet((args.vault / "raw.key").read_bytes())
-            records = [verify_saved(args.vault, "generate", cipher)]
-            if (args.vault / "repair.attempt.json").exists():
-                records.append(verify_saved(args.vault, "repair", cipher))
-            context = read(args.vault / "context.json")
-            review = read(args.vault / "final-review.json")
-
-            async def publish(db):
-                return await generation.publish(
-                    db,
-                    UUID(context["owner"]),
-                    UUID(context["course_id"]),
-                    UUID(context["operation_id"]),
-                    records,
-                    review,
-                )
-
-            if PACKAGE == REUSE_PACKAGE:
-                from app.services import head_course_reuse as reuse
-
-                plan_raw = raw_io.decrypt(args.vault / "plan.raw.enc", cipher)
-                chain = dict(
-                    context=context,
-                    plan_request=read(args.vault / "plan.request.json"),
-                    plan_raw_response=plan_raw.decode(),
-                    plan_review=read(args.vault / "plan-review.json"),
-                    records=records,
-                    final_review=review,
-                )
-
-                async def publish_reuse(db):
-                    return await reuse.publish(
-                        db,
-                        UUID(context["owner"]),
-                        UUID(context["course_id"]),
-                        UUID(context["operation_id"]),
-                        chain,
-                    )
-
-                result = asyncio.run(database(publish_reuse))
-            else:
-                result = asyncio.run(database(publish))
-            raw_io.exclusive(args.vault / "published.json", canonical(result))
-            raw_io.exclusive(
-                args.vault / "STOP", b"completed; unused requests expired\n"
-            )
-    except BaseException:
+            publish_saved(args.vault, approval)
+    except BaseException as error:
         if not (args.vault / "STOP").exists():
+            if PACKAGE == FIXED_PACKAGE:
+                raw_io.exclusive(
+                    args.vault / "terminal.failure.json",
+                    canonical(
+                        dict(
+                            stage=args.send or "publish",
+                            error_type=type(error).__name__,
+                            code=getattr(error, "code", None),
+                        )
+                    ),
+                )
             raw_io.exclusive(args.vault / "STOP", b"failed/unknown; no retry\n")
         print(
             "STOPPED: preserve originals and failures; no next request.",

@@ -133,7 +133,7 @@ def validate_generation(row: FreeSceneGenerationResult, actual: dict[str, Any]) 
         from app.services.head_course_evidence_publication import validate_publication
 
         return validate_publication(row, actual)
-    if row.schema_version == m.REUSE_VERSION:
+    if row.schema_version in (m.REUSE_VERSION, m.FIXED_VERSION):
         from app.services.head_course_reuse import validate_publication
 
         return validate_publication(row, actual)

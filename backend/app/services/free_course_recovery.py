@@ -22,7 +22,9 @@ from app.services.free_course_snapshots import (
 )
 from app.services.free_scene_availability import read_availability
 
-FINITE_HEAD_PROMPT_VERSIONS = frozenset({"head-goal-course-v1", "head-reuse-course-v1"})
+FINITE_HEAD_PROMPT_VERSIONS = frozenset(
+    {"head-goal-course-v1", "head-reuse-course-v1", "head-fixed-course-v1"}
+)
 
 
 class Recovery:

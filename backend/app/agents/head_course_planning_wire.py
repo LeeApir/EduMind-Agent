@@ -1,4 +1,4 @@
-"""T108-only, explicit wire v2 -> unchanged business plan v1; never repair content."""
+"""Finite head planning with explicit wire v2 to business plan v1 mapping."""
 
 import json
 from copy import deepcopy
@@ -9,6 +9,7 @@ from jsonschema import Draft202012Validator  # type: ignore[import-untyped]
 
 from app.agents import free_course_planning as local
 from app.services.free_course_snapshots import SnapshotError, canonical, digest
+from app.services.head_course_materials import FIXED_VERSION
 from app.services.provider_gateway import ChatMessage, StructuredRequest, TextRequest
 
 VERSION = "head-goal-planning-wire-v2"
@@ -44,6 +45,13 @@ def build_request(inputs: dict[str, Any]) -> StructuredRequest:
     if "head_support" not in inputs:
         raise SnapshotError("HEAD_PLANNING_SCOPE_INVALID")
     original = local.build_request(inputs)
+    fixed = inputs["head_support"]["version"] == FIXED_VERSION
+    if fixed and (
+        inputs["learner_evidence"]
+        or inputs["profile_id"] is not None
+        or inputs["profile_version"] is not None
+    ):
+        raise SnapshotError("HEAD_FIXED_PROFILE_NOT_EMPTY")
     from app.services.head_course_planning_basis import build_basis
 
     instruction = original.prompt.messages[0].content.replace(
@@ -53,7 +61,7 @@ def build_request(inputs: dict[str, Any]) -> StructuredRequest:
     payload = json.loads(original.prompt.messages[1].content)
     payload["prompt_version"] = PROMPT_VERSION
     payload["wire_protocol"] = VERSION
-    payload["planning_example_basis"] = build_basis()
+    payload["planning_example_basis"] = build_basis(fixed=fixed)
     return StructuredRequest(
         prompt=TextRequest(
             messages=(
@@ -114,7 +122,9 @@ def mapping_record(raw: Any, inputs: dict[str, Any]) -> dict[str, Any]:
     return dict(
         wire_version=VERSION,
         planning_prompt_version=PROMPT_VERSION,
-        planning_basis_digest=build_basis()["basis_digest"],
+        planning_basis_digest=build_basis(fixed=inputs["head_support"]["version"] == FIXED_VERSION)[
+            "basis_digest"
+        ],
         local_schema_version=local.SCHEMA_VERSION,
         wire_digest=digest("head-plan-wire", value=raw),
         local_digest=digest("head-plan-local", value=value),

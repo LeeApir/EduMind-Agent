@@ -1,4 +1,4 @@
-"""Program facts for T108's two fixed examples; no planner, C execution or prose fallback."""
+"""Program planning evidence for the finite head insertion examples."""
 
 from typing import Any
 
@@ -43,9 +43,10 @@ def _calls(example: dict[str, Any]) -> list[dict[str, Any]]:
 
 
 def _example(key: str) -> dict[str, Any]:
+    spec = m.example_spec(key)
     mat = m.materials_for_example(key)
     example = mat["catalog"]["example"]
-    ignored = build_example(dict(m.SPECS[key], variant="discard_return"))
+    ignored = build_example(dict(spec, variant="discard_return"))
     code = example["code"]
     lines = code["source"].splitlines()
     end = lines.index("}")
@@ -61,36 +62,33 @@ def _example(key: str) -> dict[str, Any]:
         "}",
     ]:
         raise SnapshotError("HEAD_PLANNING_BASIS_MISMATCH")
-    expected = list(reversed(m.SPECS[key]["insert_values"])) + m.SPECS[key]["initial_values"]
+    expected = list(reversed(spec["insert_values"])) + spec["initial_values"]
     # Closed-form expectations independent of the engine's computed observation.
     if not (
         example["observation"]["reachable_prefix"] == expected
         and ignored["observation"]["caller_head"] == "i0"
-        and ignored["observation"]["reachable_prefix"] == m.SPECS[key]["initial_values"]
+        and ignored["observation"]["reachable_prefix"] == spec["initial_values"]
         and ignored["observation"]["unreachable_allocated_ids"] == ["t0", "t1"]
         and example["observation"]["unreachable_allocated_ids"] == []
     ):
         raise SnapshotError("HEAD_PLANNING_BASIS_MISMATCH")
     caller_decl = next(line.strip() for line in lines if "Node *caller_head = " in line)
     initial_decl = next(line.strip() for line in lines if line.strip() == "Node i0;")
-    initial = m.SPECS[key]["initial_values"]
+    initial = spec["initial_values"]
     if len(initial) != 1 or lines[end + 1 :] != [
         "int main(void) {",
         "    Node i0;",
         f"    i0.data = {initial[0]};",
         "    i0.next = NULL;",
         "    Node *caller_head = &i0;",
-        *[
-            f"    caller_head = insert(caller_head, {value}, 1);"
-            for value in m.SPECS[key]["insert_values"]
-        ],
+        *[f"    caller_head = insert(caller_head, {value}, 1);" for value in spec["insert_values"]],
         "    (void)caller_head;",
         "    return 0;",
         "}",
     ]:
         raise SnapshotError("HEAD_PLANNING_BASIS_MISMATCH")
     ignored_lines = list(lines)
-    for i in range(len(m.SPECS[key]["insert_values"])):
+    for i in range(len(spec["insert_values"])):
         line = code["line_anchors"][f"call_{i}"] - 1
         ignored_lines[line] = ignored_lines[line].replace("caller_head = insert(", "insert(")
     if ignored["code"]["source"] != "\n".join(ignored_lines) + "\n":
@@ -151,7 +149,7 @@ def _example(key: str) -> dict[str, Any]:
             example_digest=ignored["payload_digest"],
         ),
         assumptions=dict(
-            allocation_success=m.SPECS[key]["allocation_success"],
+            allocation_success=spec["allocation_success"],
             actual_malloc_assumed_success=True,
             actual_malloc_failure_animated=False,
             c_executed=False,
@@ -161,13 +159,14 @@ def _example(key: str) -> dict[str, Any]:
     return dict(**data, example_basis_digest=digest("head-planning-example-basis", data=data))
 
 
-def build_basis() -> dict[str, Any]:
-    data = dict(version=VERSION, examples={key: _example(key) for key in m.SPECS})
+def build_basis(*, fixed: bool = False) -> dict[str, Any]:
+    keys = (m.FIXED_EXAMPLE,) if fixed else m.SPECS
+    data = dict(version=VERSION, examples={key: _example(key) for key in keys})
     return dict(**data, basis_digest=digest("head-planning-basis", data=data))
 
 
 def selected_basis(materials: dict[str, Any]) -> dict[str, Any]:
-    basis = build_basis()
+    basis = build_basis(fixed=materials["selected_example"] == m.FIXED_EXAMPLE)
     evidence = basis["examples"][materials["selected_example"]]
     if evidence["materials_digest"] != materials["materials_digest"] or evidence[
         "code_digest"

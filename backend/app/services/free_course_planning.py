@@ -79,6 +79,7 @@ async def load_inputs(
     if current["nonsecret_config_snapshot"].get("prompt_version") in (
         "head-goal-course-v1",
         "head-reuse-course-v1",
+        "head-fixed-course-v1",
     ):
         from app.services.head_course_materials import support_for_goal
 
