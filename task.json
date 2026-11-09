@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "DeepSeek原批共3次HTTP200，r02引用无效，r03独立教学stop。AIAPI r04规划通过；首份正文ReadTimeout后STOP，末项未发。无课程准入，后续调用授权0。",
+    "phase_gate": "AIAPI r05同正文1HTTP200，外层缺model/store，AIAPI_ENVELOPE封存。提取原文独立教学pass，仅诊断，无准入或浏览器验收，后续调用授权0。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -68,12 +68,12 @@
       "通用编辑器/PBL/PDF研究/TTS必交付/iOS/导出",
       "未经批准的真实调用、生产开放、部署、push/merge"
     ],
-    "provider_requests_attempted": 17,
-    "real_model_requests_attempted": 13,
+    "provider_requests_attempted": 18,
+    "real_model_requests_attempted": 14,
     "active_provider_batch_id": null,
-    "last_stopped_provider_batch_id": "head-fixed-aiapi-r04",
-    "current_candidate_real_calls": "T111 AIAPI r04: 2 dispatch attempts, 1 planning HTTP200 and independent pass, 1 draft ReadTimeout/unknown, 1 not sent",
-    "current_authorization_note": "DeepSeek原批共3次HTTP200，r02引用无效，r03独立教学stop。AIAPI r04规划通过；首份正文ReadTimeout后STOP，末项未发。无课程准入，后续调用授权0。",
+    "last_stopped_provider_batch_id": "head-fixed-aiapi-r05",
+    "current_candidate_real_calls": "T111 AIAPI r05: 1 HTTP200 after 92s; envelope missing model/store; text-only independent pass; admission false",
+    "current_authorization_note": "AIAPI r05同正文1HTTP200，外层缺model/store，AIAPI_ENVELOPE封存。提取原文独立教学pass，仅诊断，无准入或浏览器验收，后续调用授权0。",
     "pending_approved_provider_batch_id": null,
     "head_replay_t107": {
       "authorization": "用户限定现有真实C01首版/C02修复版零Provider主链接入；不可无损部分集中具体契约变更",
@@ -464,6 +464,25 @@
         "independent_plan_semantics": "pass",
         "stopped_at": "2026-11-09T14:00:38+08:00",
         "result": "docs/acceptance/phase-1.5-head-fixed-aiapi-r04/RESULTS.md"
+      },
+      "aiapi_r05": {
+        "batch": "head-fixed-aiapi-r05",
+        "status": "stopped_wire_rejected_text_diagnostic_pass",
+        "approval_record": "docs/acceptance/phase-1.5-head-fixed-aiapi-r05/approval.json",
+        "approved_http_limit": 1,
+        "additional_http_authorized": 0,
+        "read_timeout_seconds": 300,
+        "dispatch_attempts": 1,
+        "old_allowance_inherited": 0,
+        "complete_http_responses": 1,
+        "strict_wire_verdict": "AIAPI_ENVELOPE",
+        "response_model_confirmed": false,
+        "response_store_confirmed": false,
+        "independent_text_teaching": "pass",
+        "admission_eligible": false,
+        "full_real_course_delivered": false,
+        "stopped_at": "2026-11-09T14:09:57+08:00",
+        "result": "docs/acceptance/phase-1.5-head-fixed-aiapi-r05/RESULTS.md"
       }
     }
   },
@@ -6013,13 +6032,26 @@
           ],
           "result": "AIAPI gpt-6.1-sol复测2次出站尝试。规划HTTP200、结构和独立语义pass；回显low、1.0、输出上限null及指令后缀。首份正文ReadTimeout、无响应头、结果未知；第二份正文未发。无课程准入及学习验收。",
           "evidence": "docs/acceptance/phase-1.5-head-fixed-aiapi-r04/RESULTS.md"
+        },
+        {
+          "date": "2026-11-09T14:14:59+08:00",
+          "commands": [
+            "backend/.venv/bin/python -I scripts/head_course_fixed_aiapi_draft.py inspect",
+            "sh /tmp/edumind-t111-aiapi-r05/draft.sh",
+            "MockTransport成功/超时、加密原件回读及严格拒绝重放、原文诊断和独立教学评估",
+            "backend/.venv/bin/ruff check scripts/head_course_fixed_aiapi_draft.py",
+            "python3 scripts/check_catalog_workflow.py",
+            "git diff --check"
+          ],
+          "result": "约92秒取得HTTP200完整27627字节，唯一请求结束。严格响应外层缺model/store拒绝。提取原文JSON/Schema/事实与材料校验通过，独立逐段/13帧/四题pass，F01/Q01未复现。仅诊断，未获准入，未运行浏览器。",
+          "evidence": "docs/acceptance/phase-1.5-head-fixed-aiapi-r05/RESULTS.md"
         }
       ],
       "started_at": "2026-11-09T08:59:46+08:00",
       "completed_at": null,
-      "blocker": "累计3次真实请求已完成。第2次正文事实引用被拒。第3次独立教学审核因C字段写入顺序错误及不可达计数题前提缺失停止，未交付完整课程。 AIAPI复测规划通过，首份正文请求等待响应头超时，末项未发。",
+      "blocker": "累计3次真实请求已完成。第2次正文事实引用被拒。第3次独立教学审核因C字段写入顺序错误及不可达计数题前提缺失停止，未交付完整课程。 AIAPI复测规划通过，首份正文请求等待响应头超时，末项未发。 AIAPI r05完整正文的独立教学诊断通过，响应外层缺model/store触发AIAPI_ENVELOPE，未获应用准入。",
       "commit_lookup": "Task-Completed: PHASE-1.5-T111",
-      "execution_gate": "DeepSeek原批共3次HTTP200，r02引用无效，r03独立教学stop。AIAPI r04规划通过；首份正文ReadTimeout后STOP，末项未发。无课程准入，后续调用授权0。"
+      "execution_gate": "AIAPI r05同正文1HTTP200，外层缺model/store，AIAPI_ENVELOPE封存。提取原文独立教学pass，仅诊断，无准入或浏览器验收，后续调用授权0。"
     }
   ],
   "planning_inputs": {
