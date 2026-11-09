@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "T111共3次真实HTTP200，r02引用无效，r03结构和引用通过但独立教学stop。无课程准入，后续调用授权0。",
+    "phase_gate": "DeepSeek原批共3次HTTP200，r02引用无效，r03独立教学stop。AIAPI r04规划通过；首份正文ReadTimeout后STOP，末项未发。无课程准入，后续调用授权0。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -68,12 +68,12 @@
       "通用编辑器/PBL/PDF研究/TTS必交付/iOS/导出",
       "未经批准的真实调用、生产开放、部署、push/merge"
     ],
-    "provider_requests_attempted": 15,
-    "real_model_requests_attempted": 11,
+    "provider_requests_attempted": 17,
+    "real_model_requests_attempted": 13,
     "active_provider_batch_id": null,
-    "last_stopped_provider_batch_id": "head-fixed-repeat-r03",
-    "current_candidate_real_calls": "T111 3/3 actual HTTP200: plan pass; r02 HEAD_FACT_REFERENCE; r03 strict pass, independent teaching stop",
-    "current_authorization_note": "T111共3次真实HTTP200，r02引用无效，r03结构和引用通过但独立教学stop。无课程准入，后续调用授权0。",
+    "last_stopped_provider_batch_id": "head-fixed-aiapi-r04",
+    "current_candidate_real_calls": "T111 AIAPI r04: 2 dispatch attempts, 1 planning HTTP200 and independent pass, 1 draft ReadTimeout/unknown, 1 not sent",
+    "current_authorization_note": "DeepSeek原批共3次HTTP200，r02引用无效，r03独立教学stop。AIAPI r04规划通过；首份正文ReadTimeout后STOP，末项未发。无课程准入，后续调用授权0。",
     "pending_approved_provider_batch_id": null,
     "head_replay_t107": {
       "authorization": "用户限定现有真实C01首版/C02修复版零Provider主链接入；不可无损部分集中具体契约变更",
@@ -446,6 +446,24 @@
         "review": "docs/acceptance/phase-1.5-head-fixed-repeat-r03/independent-review.json",
         "result": "docs/acceptance/phase-1.5-head-fixed-repeat-r03/RESULTS.md",
         "full_real_course_delivered": false
+      },
+      "aiapi_r04": {
+        "batch": "head-fixed-aiapi-r04",
+        "status": "stopped_first_draft_read_timeout",
+        "approval_record": "docs/acceptance/phase-1.5-head-fixed-aiapi-r04/approval.json",
+        "provider": "https://aiapi.world/v1/responses",
+        "model": "gpt-6.1-sol",
+        "additional_http_authorized": 0,
+        "old_allowance_inherited": 0,
+        "full_real_course_delivered": false,
+        "approved_http_limit": 3,
+        "dispatch_attempts": 2,
+        "complete_http_responses": 1,
+        "unknown_results": 1,
+        "not_sent": 1,
+        "independent_plan_semantics": "pass",
+        "stopped_at": "2026-11-09T14:00:38+08:00",
+        "result": "docs/acceptance/phase-1.5-head-fixed-aiapi-r04/RESULTS.md"
       }
     }
   },
@@ -5982,13 +6000,26 @@
           ],
           "result": "累计3次HTTP200。第2次HEAD_FACT_REFERENCE（trace_step_11、trace_step_12）；第3次同请求严格结构和引用通过，无恢复。独立教学stop，F01 C写入顺序、Q01题面缺分配成功前提。原件及STOP齐全，无可学课程、无浏览器学习验收。",
           "evidence": "docs/acceptance/phase-1.5-head-fixed-repeat-r03/RESULTS.md"
+        },
+        {
+          "date": "2026-11-09T14:01:16+08:00",
+          "commands": [
+            "backend/.venv/bin/python -I scripts/head_course_fixed_aiapi.py inspect",
+            "sh /tmp/edumind-t111-aiapi-r04/run.sh",
+            "离线MockTransport顺序与停止检查、真实原件回读及独立规划语义审核",
+            "backend/.venv/bin/ruff check scripts/head_course_fixed_aiapi.py",
+            "python3 scripts/check_catalog_workflow.py",
+            "git diff --check"
+          ],
+          "result": "AIAPI gpt-6.1-sol复测2次出站尝试。规划HTTP200、结构和独立语义pass；回显low、1.0、输出上限null及指令后缀。首份正文ReadTimeout、无响应头、结果未知；第二份正文未发。无课程准入及学习验收。",
+          "evidence": "docs/acceptance/phase-1.5-head-fixed-aiapi-r04/RESULTS.md"
         }
       ],
       "started_at": "2026-11-09T08:59:46+08:00",
       "completed_at": null,
-      "blocker": "累计3次真实请求已完成。第2次正文事实引用被拒。第3次独立教学审核因C字段写入顺序错误及不可达计数题前提缺失停止，未交付完整课程。",
+      "blocker": "累计3次真实请求已完成。第2次正文事实引用被拒。第3次独立教学审核因C字段写入顺序错误及不可达计数题前提缺失停止，未交付完整课程。 AIAPI复测规划通过，首份正文请求等待响应头超时，末项未发。",
       "commit_lookup": "Task-Completed: PHASE-1.5-T111",
-      "execution_gate": "T111共3次真实HTTP200，r02引用无效，r03结构和引用通过但独立教学stop。无课程准入，后续调用授权0。"
+      "execution_gate": "DeepSeek原批共3次HTTP200，r02引用无效，r03独立教学stop。AIAPI r04规划通过；首份正文ReadTimeout后STOP，末项未发。无课程准入，后续调用授权0。"
     }
   ],
   "planning_inputs": {

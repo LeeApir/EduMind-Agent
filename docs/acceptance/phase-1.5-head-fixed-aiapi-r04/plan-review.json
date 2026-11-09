@@ -1,0 +1,33 @@
+{
+  "verdict": "pass",
+  "plan_digest": "5b4e0125cab7a54c334947b52347bc59fdc408e4fc2d204832d193d828d6b15d",
+  "planning_basis_binding": {
+    "basis_digest": "9dda78410bc3d515b7ff01c5de471aed74d92db305846cc88995082d72802775",
+    "example_basis_digest": "26735013a933ede26bf38bbcc620ec634b024ec7be9e7cbce0d53494a74d701d",
+    "materials_digest": "854939ffc212c5eafe2c20529e46152d4023d56f521d3cc57ed068be59087e5b",
+    "selected_example": "head-new-C",
+    "version": "head-planning-example-basis-v1"
+  },
+  "independent_evaluator": "/root/head_goal_independent",
+  "evaluated_at": "2026-11-09T14:01:16+08:00",
+  "scope": "r04_planning_semantics_only",
+  "source_result_sha256": "4302fb29dee3cb71e9468c2c2f2a03a489303e7b2ae0338c38d499bdc3cdb89d",
+  "blocking_findings": [],
+  "basis_notes": [
+    "两项目标的原文引文、只保留自述先备、单场景四形式及先连接后返回对照再练习均正确。",
+    "head-new-C 初始i0=5，依次插-2、9，两次分配成功是本例假设。局部head按值复制，p->next=head链接当次旧头，return p返回新头，caller_head保留在main。静态代码第5行p为NULL返回旧头，两次成功判空为假后继续，规划各步与之相容。",
+    "接收两次后t0{-2,i0}、t1{9,t0}，caller=t1，遍历[9,-2,5]。丢弃两次时t0/t1均next=i0，caller=i0，遍历[5]，两个动态节点不可达。",
+    "r04 两份正文仍绑定历史已审计划，本规划评估只覆盖该新规划样本。"
+  ],
+  "observed_provider_metadata": {
+    "input_tokens": 2975,
+    "instruction_echo": "known_suffix",
+    "max_output_tokens_echo": null,
+    "message_phase": "final_answer",
+    "output_tokens": 565,
+    "reasoning_echo": "low",
+    "reasoning_tokens": 0,
+    "reported_model": "gpt-6.1-sol",
+    "temperature_echo": 1.0
+  }
+}
