@@ -158,7 +158,10 @@ async def validate_candidate(
             scene_id=row.scene_id,
             expected_head=row.expected_head,
         )
-        if row.schema_version == "head-reviewed-archived-import-v1":
+        if row.schema_version in (
+            "head-reviewed-archived-import-v1",
+            "head-reviewed-archived-aiapi-content-r01-v1",
+        ):
             from app.services.head_course_archived_import import require_database, validate_import
 
             require_database(db)

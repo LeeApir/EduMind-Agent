@@ -6241,6 +6241,46 @@
           "evidence": "docs/acceptance/phase-1.5-head-deepseek-diagnostic-t116/RESULTS.md"
         }
       ]
+    },
+        {
+      "id": "PHASE-1.5-T117",
+      "phase": "Phase 1.5",
+      "title": "AIAPI content r01 已审封存正文私有导入与学习验收",
+      "status": "done",
+      "depends_on": [
+        "PHASE-1.5-T112"
+      ],
+      "scope": [
+        "只导入候选 633091fd1c05ab83212c0f0256024bb7422021ef2d044e890e88ad72f9cc2412。复用现有封存导入实现，Provider 调用 0。"
+      ],
+      "prd_source": "PRD §0.5；docs/ADR/0057-aiapi-content-r01-import-supplement.md",
+      "execution_gate": "用户已批准限定导入。私有 v2 已交付，实际浏览器验收通过，Provider 0。",
+      "acceptance_criteria": [
+        "核对封存响应、原发请求、原稿、已审规划、程序材料与独立全文审核，保持原生成失败和 STOP。",
+        "沿用现有导入事务和访客隔离，保存原样正文和明确的封存导入来源。",
+        "实际浏览器通过完整阅读、13 帧高亮、播放控制、四题错误及正确反馈、答案隔离和刷新恢复。",
+        "交付课程入口、版本与候选绑定、持久化验收记录和本地完成提交。"
+      ],
+      "verification": [
+        "复核封存索引和候选绑定，检查拒绝错源、重复导入与旧来源兼容。",
+        "沿用 scripts/check_head_course_archive_browser.py 的学习验收路径，核对原生成操作终态。",
+        "python3 scripts/check_catalog_workflow.py；git diff --check"
+      ],
+      "started_at": "2026-11-09T22:36:48+08:00",
+      "commit_lookup": "Task-Completed: PHASE-1.5-T117",
+      "completed_at": "2026-11-09T22:47:21+08:00",
+      "verification_results": [
+        {
+          "date": "2026-11-09T22:47:21+08:00",
+          "commands": [
+            "backend/.venv/bin/python scripts/check_head_course_archive_browser.py --source head-fixed-aiapi-content-r01 --artifacts /tmp/edumind-t117-checks",
+            "两种封存来源及四种伪造投影校验；559fbdd 上冻结源码复核；原操作 PostgreSQL 只读回查",
+            "Ruff；pnpm typecheck；python3 scripts/check_catalog_workflow.py；git diff --check"
+          ],
+          "result": "Chromium 学习流程、13 帧、四题错误及正确反馈、刷新恢复与权限隔离均通过。原样候选导入私有 v2，重复导入幂等，故障回滚通过。原生成仍为 failed / HEAD_AIAPI_ENVELOPE，仅有 v1，Provider 0。",
+          "evidence": "docs/acceptance/phase-1.5-archived-head-import-t117/README.md"
+        }
+      ]
     }
   ],
   "planning_inputs": {

@@ -6474,13 +6474,13 @@
             "const": "reviewed_archived_response_import"
           },
           "batch": {
-            "const": "head-fixed-aiapi-r05"
+            "enum": ["head-fixed-aiapi-r05", "head-fixed-aiapi-content-r01"]
           },
           "prompt_version": {
             "const": "head-fixed-course-v1"
           },
           "candidate_digest": {
-            "const": "b7759b9d5d7b7f0cf2fb96445e776d1fec3592dd97c1d741f1ee655a5fedcdc9"
+            "type": "string"
           },
           "parent_digest": {
             "type": "null"
@@ -6504,13 +6504,13 @@
             "const": "gpt-6.1-sol"
           },
           "reported_model": {
-            "type": "null"
+            "enum": [null, "gpt-6.1-sol"]
           },
           "reported_store": {
-            "type": "null"
+            "enum": [null, false]
           },
           "strict_wire_verdict": {
-            "const": "AIAPI_ENVELOPE"
+            "enum": ["AIAPI_ENVELOPE", "HEAD_AIAPI_ENVELOPE"]
           },
           "new_provider_calls": {
             "const": 0
@@ -6533,6 +6533,29 @@
             ]
           }
         },
+        "oneOf": [
+          {
+            "properties": {
+              "batch": {"const": "head-fixed-aiapi-r05"},
+              "candidate_digest": {"const": "b7759b9d5d7b7f0cf2fb96445e776d1fec3592dd97c1d741f1ee655a5fedcdc9"},
+              "reported_model": {"type": "null"},
+              "reported_store": {"type": "null"},
+              "strict_wire_verdict": {"const": "AIAPI_ENVELOPE"}
+            }
+          },
+          {
+            "properties": {
+              "batch": {"const": "head-fixed-aiapi-content-r01"},
+              "candidate_digest": {"const": "633091fd1c05ab83212c0f0256024bb7422021ef2d044e890e88ad72f9cc2412"},
+              "plan_digest": {"const": "0997615bbdb35b96df95904d4d4d1730d08a94a2f797091c04a48e484a6452ee"},
+              "materials_digest": {"const": "854939ffc212c5eafe2c20529e46152d4023d56f521d3cc57ed068be59087e5b"},
+              "teaching_evidence_digest": {"const": "8a4c8b44ac01d0f72660c222ff849c45a014ee8157b3725031ad34f18a3d5553"},
+              "reported_model": {"const": "gpt-6.1-sol"},
+              "reported_store": {"const": false},
+              "strict_wire_verdict": {"const": "HEAD_AIAPI_ENVELOPE"}
+            }
+          }
+        ],
         "required": [
           "origin",
           "evidence_kind",

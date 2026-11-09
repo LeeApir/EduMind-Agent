@@ -268,10 +268,11 @@ onBeforeUnmount(()=>{save();epoch+=1;manifestEpoch+=1;versionsEpoch+=1;controlle
               class="replay-source"
               aria-label="新课程来源"
             >
-              <strong>从已封存响应提取的正文，独立教学评估通过</strong>
-              <p>请求模型 {{ scene.generation_source.requested_model }}。实际模型与存储状态未确认。</p>
+              <strong v-if="scene.generation_source.batch === 'head-fixed-aiapi-content-r01'">AIAPI content r01 封存正文导入，独立教学审核通过</strong>
+              <strong v-else>从已封存响应提取的正文，独立教学评估通过</strong>
+              <p>请求模型 {{ scene.generation_source.requested_model }}。<template v-if="scene.generation_source.reported_model">响应标签 {{ scene.generation_source.reported_model }}，回报 store={{ scene.generation_source.reported_store }}。</template>实际模型与存储状态未确认。</p>
               <p>候选 {{ scene.generation_source.candidate_digest }}</p>
-              <small>AIAPI r05 原响应 {{ scene.generation_source.strict_wire_verdict }}。本次导入新增模型调用 {{ scene.generation_source.new_provider_calls }}。</small>
+              <small>{{ scene.generation_source.batch === 'head-fixed-aiapi-content-r01' ? 'AIAPI content r01' : 'AIAPI r05' }} 原响应 {{ scene.generation_source.strict_wire_verdict }}。本次导入新增模型调用 {{ scene.generation_source.new_provider_calls }}。</small>
             </aside>
             <aside
               v-else-if="scene.generation_source"

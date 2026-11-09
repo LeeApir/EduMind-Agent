@@ -74,9 +74,9 @@ export interface ArchivedResponseSource extends Omit<GenerationSource, "origin" 
   origin: "reviewed_archived_response_import"
   evidence_kind: "reviewed_archived_response_import"
   requested_model: "gpt-6.1-sol"
-  reported_model: null
-  reported_store: null
-  strict_wire_verdict: "AIAPI_ENVELOPE"
+  reported_model: null | "gpt-6.1-sol"
+  reported_store: null | false
+  strict_wire_verdict: "AIAPI_ENVELOPE" | "HEAD_AIAPI_ENVELOPE"
   new_provider_calls: 0
 }
 export interface SceneProjection {course_id:string;course_version:number;scene_id:string;scene_version_id:string;blocks:SceneBlock[];actions:unknown[];replay_source?:ReplaySource;generation_source?:GenerationSource | ArchivedResponseSource}

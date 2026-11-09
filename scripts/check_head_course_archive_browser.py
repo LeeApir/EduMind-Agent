@@ -1,5 +1,6 @@
-"""Verify the approved archived course through the real private application."""
+"""Verify an approved archived course through the real private application."""
 
+import argparse
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 import json
@@ -31,7 +32,7 @@ URL = "http://127.0.0.1:5202"
 CLI = [sys.executable, str(ROOT / "scripts/import_head_course_archive.py")]
 
 
-async def verify_rollback(db, owner):
+async def verify_rollback(db, owner, source):
     async def counts():
         models = (
             FreeCourse,
@@ -57,7 +58,7 @@ async def verify_rollback(db, owner):
 
     with patch.object(availability, "commit_scene", fail_after_ready):
         try:
-            await archive.import_course(db, owner)
+            await archive.import_course(db, owner, source_batch=source)
         except SnapshotError as error:
             assert str(error) == "TEST_ROLLBACK_AFTER_READY"
         else:
@@ -134,8 +135,18 @@ def check_frames(page, visual, code):
 
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--source", choices=tuple(archive.IMPORT_RULES), default=archive.BATCH
+    )
+    parser.add_argument("--artifacts", type=Path, default=WORK)
+    args = parser.parse_args()
+    if args.source != archive.BATCH and args.artifacts == WORK:
+        parser.error("Choose a separate artifacts directory")
+    args.artifacts.mkdir(mode=0o700, parents=True, exist_ok=True)
     os.environ.update(json.loads((WORK / "env.json").read_text()))
-    original, assembled = archive.mapping()
+    original, assembled = archive.mapping(args.source)
+    content_r01 = args.source == archive.CONTENT_BATCH
     for slot in ("C01", "C02"):
         legacy_mapping(slot)
     try:
@@ -171,11 +182,14 @@ def main():
         status, session = read(page, "/api/auth/session")
         assert status == 200, status
         owner = session["user"]["id"]
-        run_db(lambda db: verify_rollback(db, UUID(owner)))
+        run_db(lambda db: verify_rollback(db, UUID(owner), args.source))
 
         def load():
             result = subprocess.run(
-                [*CLI, "--owner", owner], check=True, capture_output=True, text=True
+                [*CLI, "--owner", owner, "--source", args.source],
+                check=True,
+                capture_output=True,
+                text=True,
             )
             return json.loads(result.stdout)
 
@@ -188,10 +202,16 @@ def main():
         page.get_by_role("button", name="重新读取", exact=True).click()
         page.get_by_role("button", name="继续学习 →", exact=True).click()
         source = page.get_by_label("新课程来源", exact=True)
-        expect(source).to_contain_text("从已封存响应提取的正文，独立教学评估通过")
-        expect(source).to_contain_text(
-            "请求模型 gpt-6.1-sol。实际模型与存储状态未确认。"
-        )
+        if content_r01:
+            expect(source).to_contain_text(
+                "AIAPI content r01 封存正文导入，独立教学审核通过"
+            )
+            expect(source).to_contain_text("响应标签 gpt-6.1-sol，回报 store=false")
+            expect(source).to_contain_text("HEAD_AIAPI_ENVELOPE")
+        else:
+            expect(source).to_contain_text("从已封存响应提取的正文，独立教学评估通过")
+            expect(source).to_contain_text("AIAPI r05 原响应 AIAPI_ENVELOPE")
+        expect(source).to_contain_text("实际模型与存储状态未确认。")
         page.wait_for_load_state("networkidle")
         status, scene = read(page, scene_route)
         assert status == 200
@@ -269,10 +289,10 @@ def main():
         ] == answers
         assert posts.count(route + "/attempts") == before == 2
         assert not errors, errors
-        page.screenshot(path=str(WORK / "browser.png"), full_page=True)
+        page.screenshot(path=str(args.artifacts / "browser.png"), full_page=True)
         browser.close()
     result = dict(
-        candidate_digest=archive.CANDIDATE,
+        candidate_digest=original["candidate"]["candidate_digest"],
         version=2,
         paragraphs=len(paragraphs),
         frames=frames,
@@ -286,7 +306,13 @@ def main():
         rollback_after_ready=True,
         provider_calls=0,
     )
-    (WORK / "browser-results.json").write_text(json.dumps(result, indent=2) + "\n")
+    if content_r01:
+        result["binding"] = first
+        result["batch"] = args.source
+        result["entry"] = URL + "/"
+    (args.artifacts / "browser-results.json").write_text(
+        json.dumps(result, indent=2) + "\n"
+    )
     print(
         "PASS: private import, idempotency, rollback, 13 frames, feedback, and refresh"
     )
