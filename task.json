@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "T111 r01已STOP，唯一规划HTTP200及v1保存，独立规划pass晚于两期限。正文/修订0，余2失效；未交付完整课程，后续授权0。",
+    "phase_gate": "T111共3次真实HTTP200，r02引用无效，r03结构和引用通过但独立教学stop。无课程准入，后续调用授权0。",
     "completion_rule": "每任务实际验收、记录证据并独立Task-Completed提交后才done；真实质量/性能未达门槛必须blocked，不以完成执行冒充通过。",
     "verification_note": "verification内标注待建立的测试/检查器是工程接口要求，不是已有或已通过。完成任务前须建立并真实执行；PG/E2E不允许以环境缺失skip代替通过。"
   },
@@ -68,12 +68,12 @@
       "通用编辑器/PBL/PDF研究/TTS必交付/iOS/导出",
       "未经批准的真实调用、生产开放、部署、push/merge"
     ],
-    "provider_requests_attempted": 13,
-    "real_model_requests_attempted": 9,
+    "provider_requests_attempted": 15,
+    "real_model_requests_attempted": 11,
     "active_provider_batch_id": null,
-    "last_stopped_provider_batch_id": "head-fixed-r01",
-    "current_candidate_real_calls": "head-fixed-r01 STOP after 1/3 planning HTTP200; expired before draft; 2 invalidated; no real completed course",
-    "current_authorization_note": "T111 r01已STOP，唯一规划HTTP200及v1保存，独立规划pass晚于两期限。正文/修订0，余2失效；未交付完整课程，后续授权0。",
+    "last_stopped_provider_batch_id": "head-fixed-repeat-r03",
+    "current_candidate_real_calls": "T111 3/3 actual HTTP200: plan pass; r02 HEAD_FACT_REFERENCE; r03 strict pass, independent teaching stop",
+    "current_authorization_note": "T111共3次真实HTTP200，r02引用无效，r03结构和引用通过但独立教学stop。无课程准入，后续调用授权0。",
     "pending_approved_provider_batch_id": null,
     "head_replay_t107": {
       "authorization": "用户限定现有真实C01首版/C02修复版零Provider主链接入；不可无损部分集中具体契约变更",
@@ -409,7 +409,44 @@
         "input_tokens": 3711,
         "output_tokens": 736
       },
-      "result": "docs/acceptance/phase-1.5-head-fixed-live-r01/RESULTS.md"
+      "result": "docs/acceptance/phase-1.5-head-fixed-live-r01/RESULTS.md",
+      "continuation_r02": {
+        "batch": "head-fixed-continuation-r02",
+        "status": "stopped_invalid_fact_reference",
+        "approval_record": "docs/acceptance/phase-1.5-head-fixed-continuation-r02/approval.json",
+        "original_plan_digest": "0997615bbdb35b96df95904d4d4d1730d08a94a2f797091c04a48e484a6452ee",
+        "historical_http": 1,
+        "additional_http_authorized": 0,
+        "actual_http": 1,
+        "wall_clock_deadline": null,
+        "result": "docs/acceptance/phase-1.5-head-fixed-continuation-r02/result.json",
+        "stopped": true
+      },
+      "repeat_r03": {
+        "batch": "head-fixed-repeat-r03",
+        "status": "stopped_teaching_rejected",
+        "historical_http": 2,
+        "additional_http_authorized": 0,
+        "actual_http": 1,
+        "approval_record": "docs/acceptance/phase-1.5-head-fixed-repeat-r03/approval.json",
+        "request_sha256": "fccba92a41527dbcd9da34ceefca77ca1ee1edaa33c83a49e1ffbc3940e1c92d",
+        "stopped": true,
+        "candidate_digest": "c0206d4673b9277b4f80e2ed5308dd782d948c15de863439e307ca9a73e86324",
+        "receipt": {
+          "body_complete": true,
+          "http_status": 200,
+          "raw_bytes": 15821,
+          "raw_sha256": "649c77b00ca1935ddbbc63eafe4f6a8008e74809dd416d88eb79253a7985f4d1"
+        },
+        "reported_usage": {
+          "input_tokens": 10591,
+          "output_tokens": 3464
+        },
+        "independent_teaching_verdict": "stop",
+        "review": "docs/acceptance/phase-1.5-head-fixed-repeat-r03/independent-review.json",
+        "result": "docs/acceptance/phase-1.5-head-fixed-repeat-r03/RESULTS.md",
+        "full_real_course_delivered": false
+      }
     }
   },
   "archive_transition": {
@@ -5935,13 +5972,23 @@
           "result": "真实1HTTP200，6994字节，规划严格结构和映射通过，独立语义pass完成于09:41:59，晚于两期限。实际应用v1保留、timed_out/DEADLINE_EXCEEDED，场景未就绪。STOP无ACTIVE，余2失效，正文/修订0，学习验收未运行。",
           "evidence": "docs/acceptance/phase-1.5-head-fixed-live-r01/RESULTS.md",
           "manifest_sha256": "41d2eeb692834b1eacc15327d2f5f0e75e15e9773d8990e6ce48921268bb6de3"
+        },
+        {
+          "date": "2026-11-09T13:40:08+08:00",
+          "commands": [
+            "续测前台 draft 与 repeat，各1次",
+            "独立逐段/逐帧/逐题审核",
+            "原件回读SHA和三次计数、MockTransport、Ruff、工作流及diff检查"
+          ],
+          "result": "累计3次HTTP200。第2次HEAD_FACT_REFERENCE（trace_step_11、trace_step_12）；第3次同请求严格结构和引用通过，无恢复。独立教学stop，F01 C写入顺序、Q01题面缺分配成功前提。原件及STOP齐全，无可学课程、无浏览器学习验收。",
+          "evidence": "docs/acceptance/phase-1.5-head-fixed-repeat-r03/RESULTS.md"
         }
       ],
       "started_at": "2026-11-09T08:59:46+08:00",
       "completed_at": null,
-      "blocker": "应用09:39:43和批次09:40:34截止，独立规划评估09:41:59通过，已STOP，剩余2次失效。正文及可学课程未生成；后续需另批授权。",
+      "blocker": "累计3次真实请求已完成。第2次正文事实引用被拒。第3次独立教学审核因C字段写入顺序错误及不可达计数题前提缺失停止，未交付完整课程。",
       "commit_lookup": "Task-Completed: PHASE-1.5-T111",
-      "execution_gate": "T111 r01已STOP，唯一规划HTTP200及v1保存，独立规划pass晚于两期限。正文/修订0，余2失效；未交付完整课程，后续授权0。"
+      "execution_gate": "T111共3次真实HTTP200，r02引用无效，r03结构和引用通过但独立教学stop。无课程准入，后续调用授权0。"
     }
   ],
   "planning_inputs": {
