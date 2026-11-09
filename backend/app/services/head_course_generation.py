@@ -39,10 +39,19 @@ async def enqueue(sessions, owner: UUID, body: dict[str, Any], key: str) -> dict
     support = m.support_for_goal(body["goal"])
     if body.get("code_language", "c") != "c":
         raise SnapshotError("HEAD_GOAL_UNSUPPORTED")
+    config = {"prompt_version": support["version"]}
+    window_seconds = None
+    if os.environ.get("EDUMIND_HEAD_DEEPSEEK_DEVELOPMENT") == "1":
+        from scripts import head_course_deepseek_wire as direct
+
+        if make_url(get_database_url()).database != direct.DATABASE or body["goal"] != m.FIXED_GOAL:
+            raise SnapshotError("HEAD_DIRECT_OPERATION_REQUIRED")
+        config["policy_version"] = direct.BATCH
+        window_seconds = direct.WINDOW_SECONDS
     async with sessions() as db, db.begin():
         repo = SnapshotRepository(db, owner)
         result = await repo.create_course(
-            body["goal"], key=key, config={"prompt_version": support["version"]}
+            body["goal"], key=key, config=config, operation_window_seconds=window_seconds
         )
         return result
 
@@ -127,7 +136,9 @@ def fingerprint(row: FreeSceneGenerationResult) -> str:
     )
 
 
-def validate_generation(row: FreeSceneGenerationResult, actual: dict[str, Any]) -> dict[str, Any]:
+def validate_generation(
+    row: FreeSceneGenerationResult, actual: dict[str, Any], operation=None
+) -> dict[str, Any]:
     snapshot = row.input_snapshot
     if row.schema_version == "head-evidence-local-revision-v1":
         from app.services.head_course_evidence_publication import validate_publication
@@ -136,7 +147,7 @@ def validate_generation(row: FreeSceneGenerationResult, actual: dict[str, Any]) 
     if row.schema_version in (m.REUSE_VERSION, m.FIXED_VERSION):
         from app.services.head_course_reuse import validate_publication
 
-        return validate_publication(row, actual)
+        return validate_publication(row, actual, operation)
     if row.schema_version == "head-f01-f02-four-text-v1":
         from app.services.head_course_fact_publication import validate_publication
 

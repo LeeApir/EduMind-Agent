@@ -6129,6 +6129,45 @@
           "evidence": "docs/acceptance/phase-1.5-fixed-provider-t113/README.md"
         }
       ]
+    },
+    {
+      "id": "PHASE-1.5-T114",
+      "phase": "Phase 1.5",
+      "title": "DeepSeek 官方直连固定课程执行包",
+      "status": "done",
+      "depends_on": [
+        "PHASE-1.5-T113"
+      ],
+      "scope": [
+        "准备独立 DeepSeek 直连批次与零调用验收",
+        "真实调用须另批授权"
+      ],
+      "prd_source": "PRD §0.5；T113 替代方案；用户确认改用 DeepSeek",
+      "acceptance_criteria": [
+        "冻结独立批次、固定输入、角色请求构造、准确契约和审核规则",
+        "核对封存回显与必要拒绝边界，验证应用与发送共用 30 分钟窗口",
+        "通过实际私有应用直接准入和条件修订离线检查，记录批准前 Provider 调用 0"
+      ],
+      "verification": [
+        "冻结包校验、封存回执重放、隔离 PostgreSQL 与接口定向测试",
+        "Ruff、工作流和 Git 差异检查"
+      ],
+      "started_at": "2026-11-09T15:24:47+08:00",
+      "completed_at": "2026-11-09T15:35:45+08:00",
+      "commit_lookup": "Task-Completed: PHASE-1.5-T114",
+      "verification_results": [
+        {
+          "date": "2026-11-09T15:35:45+08:00",
+          "commands": [
+            "backend/.venv/bin/python scripts/run_head_course_goal_dev.py --profile direct --prepare",
+            "PYTHONPATH=backend:. backend/.venv/bin/python -m pytest -q backend/tests/test_head_course_deepseek_wire.py",
+            "隔离测试环境 pytest backend/tests/test_head_course_fixed.py -k \"deepseek or exact_first_request or scoped_merge\"",
+            "prepare_head_course_deepseek --check；head_course_goal --profile direct --inspect；T113 封存重放；Ruff、前端 typecheck/ESLint、工作流和 diff"
+          ],
+          "result": "17 项回执及 8 项固定链检查通过。实际隔离 PG/API 通过直通、修订、恢复、停止和窗口边界。416 项 manifest 重算一致，真实 Provider 0，等待准确执行批准。",
+          "evidence": "docs/acceptance/phase-1.5-head-deepseek-t114/CHECKS.md"
+        }
+      ]
     }
   ],
   "planning_inputs": {

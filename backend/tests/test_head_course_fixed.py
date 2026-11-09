@@ -5,6 +5,7 @@ import json
 import os
 import time
 from copy import deepcopy
+from datetime import datetime, timedelta
 from uuid import UUID, uuid4
 
 import httpx
@@ -19,6 +20,7 @@ from app.services import head_course_materials as materials
 from app.services import head_course_reuse as reuse
 from app.services.free_course_snapshots import SnapshotError, canonical, digest
 from app.services.head_course_teaching_evidence import DISCARDED, DISPLAYED
+from scripts import head_course_deepseek_wire as direct
 from scripts import head_course_goal as entry
 from scripts import head_course_goal_fixture as fixture
 
@@ -152,13 +154,49 @@ def test_scoped_merge_refuses_wrong_evidence_unknown_targets_and_missing_recheck
         reuse.validate_final([first], incomplete, payload, entry.raw_io)
 
 
-@pytest.mark.parametrize("mode", ["direct", "revised", "recovered", "protocol_stop"])
-def test_actual_fixed_entry_and_application(tmp_path, monkeypatch, mode):
+def with_direct_echo(request, raw):
+    response = json.loads(raw)
+    response.update(
+        object="response",
+        id="offline-response",
+        created_at=0,
+        reasoning={"effort": "none"},
+        temperature=0.2,
+        max_output_tokens=request["max_output_tokens"],
+        text=request["text"],
+    )
+    response["usage"]["output_tokens_details"] = {"reasoning_tokens": 0}
+    return canonical(response)
+
+
+@pytest.mark.parametrize(
+    ("profile", "mode"),
+    [
+        ("fixed", "direct"),
+        ("fixed", "revised"),
+        ("fixed", "recovered"),
+        ("fixed", "protocol_stop"),
+        ("deepseek", "direct"),
+        ("deepseek", "revised"),
+        ("deepseek", "recovered"),
+        ("deepseek", "protocol_stop"),
+        ("deepseek", "cutoff"),
+        ("deepseek", "late"),
+    ],
+)
+def test_actual_fixed_entry_and_application(tmp_path, monkeypatch, profile, mode):
+    official = profile == "deepseek"
     monkeypatch.setenv("EDUMIND_DATABASE_URL", os.environ["EDUMIND_TEST_DATABASE_URL"])
     monkeypatch.setenv("EDUMIND_PRODUCT_MODE", "dynamic")
     monkeypatch.setenv("EDUMIND_HEAD_GOAL_DEVELOPMENT", "1")
-    monkeypatch.setattr(entry, "PACKAGE", entry.FIXED_PACKAGE)
-    monkeypatch.setattr(entry, "FIXED_VAULT", tmp_path)
+    monkeypatch.delenv("EDUMIND_HEAD_DEEPSEEK_DEVELOPMENT", raising=False)
+    if official:
+        monkeypatch.setenv("EDUMIND_HEAD_DEEPSEEK_DEVELOPMENT", "1")
+        monkeypatch.setattr(entry, "PACKAGE", entry.DIRECT_PACKAGE)
+        monkeypatch.setattr(entry, "DIRECT_VAULT", tmp_path)
+    else:
+        monkeypatch.setattr(entry, "PACKAGE", entry.FIXED_PACKAGE)
+        monkeypatch.setattr(entry, "FIXED_VAULT", tmp_path)
     monkeypatch.setattr(
         "app.core.provider_factory.build_default_provider_gateway",
         lambda *a, **kw: pytest.fail("Provider forbidden"),
@@ -196,16 +234,39 @@ def test_actual_fixed_entry_and_application(tmp_path, monkeypatch, mode):
             planning_wire_version=wire.VERSION,
             planning_prompt_version=wire.PROMPT_VERSION,
         )
+        if official:
+            for field in ("accept_ADR0055_and_batch_C2", "starts_epoch", "expires_epoch"):
+                approval.pop(field)
+            approval.update(
+                batch=direct.BATCH,
+                accept_ADR0058_and_batch_C2=True,
+                execution_window=context["execution_window"],
+            )
+            window = context["execution_window"]
+            expires = datetime.fromisoformat(window["expires_at"])
+            assert expires - datetime.fromisoformat(window["starts_at"]) == timedelta(minutes=30)
+            status = client.get(f"/api/free-courses/{cid}/operations/{oid}").json()
+            assert status["deadline_at"] == window["expires_at"]
+            with monkeypatch.context() as legacy:
+                legacy.setattr(entry, "PACKAGE", entry.FIXED_PACKAGE)
+                with pytest.raises(SnapshotError, match="HEAD_DIRECT_WINDOW_MISMATCH"):
+                    asyncio.run(entry.prepare(UUID(auth["user"]["id"]), cid, oid))
         with pytest.raises(SnapshotError, match="HEAD_EXACT_AUTHORIZATION_REQUIRED"):
             entry.approval_check(tmp_path, {**approval, "explicit_user_authorization": False})
         with pytest.raises(SnapshotError, match="HEAD_EXACT_AUTHORIZATION_REQUIRED"):
             entry.approval_check(tmp_path, {**approval, "context_sha256": "0" * 64})
-        sent = []
+        sent, received = [], []
 
         def send(stage, body):
             def transport(req):
                 sent.append(json.loads(req.content))
-                return httpx.Response(200, stream=httpx.ByteStream(body))
+                assert req.headers["Host"] == "api.deepseek.com"
+                assert req.url.path == "/responses" and req.url.scheme == "https"
+                raw_response = with_direct_echo(sent[-1], body) if official else body
+                received.append(raw_response)
+                if mode == "late":
+                    monkeypatch.setattr(entry.time, "time", lambda: expires.timestamp() + 1)
+                return httpx.Response(200, stream=httpx.ByteStream(raw_response))
 
             entry.send(
                 stage,
@@ -215,7 +276,22 @@ def test_actual_fixed_entry_and_application(tmp_path, monkeypatch, mode):
                 key="fixture-key-only",
             )
 
-        send("plan", fixture.envelope(fixture.wire_plan(materials.FIXED_EXAMPLE)))
+        plan_fixture = fixture.envelope(fixture.wire_plan(materials.FIXED_EXAMPLE))
+        if mode in ("cutoff", "late"):
+            if mode == "cutoff":
+                monkeypatch.setattr(entry.time, "time", lambda: expires.timestamp() - 89)
+            code = (
+                "HEAD_DIRECT_WINDOW_TOO_SHORT" if mode == "cutoff" else "HEAD_DIRECT_WINDOW_CLOSED"
+            )
+            with pytest.raises(SnapshotError, match=code):
+                send("plan", plan_fixture)
+            assert (tmp_path / "STOP").exists()
+            assert not (tmp_path / "plan.binding.json").exists()
+            assert len(sent) == (1 if mode == "late" else 0)
+            if mode == "late":
+                assert entry.raw_io.decrypt(tmp_path / "plan.raw.enc", cipher) == received[0]
+            return
+        send("plan", plan_fixture)
         with pytest.raises(SnapshotError, match="HEAD_EXACT_AUTHORIZATION_REQUIRED"):
             entry.approval_check(
                 tmp_path, {**approval, "starts_epoch": start + 1, "expires_epoch": start + 601}
@@ -240,7 +316,7 @@ def test_actual_fixed_entry_and_application(tmp_path, monkeypatch, mode):
             bad = fixture.envelope(raw, phase="analysis")
             with pytest.raises(entry.raw_io.wire.PilotError, match="WIRE_MESSAGE_PHASE"):
                 send("generate", bad)
-            assert entry.raw_io.decrypt(tmp_path / "generate.raw.enc", cipher) == bad
+            assert entry.raw_io.decrypt(tmp_path / "generate.raw.enc", cipher) == received[-1]
             assert (tmp_path / "STOP").exists()
             assert entry.read(tmp_path / "generate.failure.json")["code"] == "WIRE_MESSAGE_PHASE"
             with pytest.raises(SnapshotError, match="HEAD_VAULT_STOPPED_OR_UNSAFE"):
@@ -272,12 +348,12 @@ def test_actual_fixed_entry_and_application(tmp_path, monkeypatch, mode):
         assert "answer_key" not in scene.text and "solution" not in scene.text
         view = scene.json()
         source = view["generation_source"]
-        assert source["batch"] == reuse.FIXED_BATCH and source["evidence_kind"] == "offline_fixture"
+        assert source["batch"] == approval["batch"] and source["evidence_kind"] == "offline_fixture"
         assert source["teaching_evidence_digest"] == payload["teaching_evidence"]["evidence_digest"]
         assert source["candidate_digest"] == c["candidate_digest"]
         if mode == "recovered":
             assert source["format_recovery"]["model_first_structure_pass"] is False
-            assert source["format_recovery"]["source_batch"] == reuse.FIXED_BATCH
+            assert source["format_recovery"]["source_batch"] == approval["batch"]
         program = payload["materials"]
         code = next(b for b in view["blocks"] if b["kind"] == "code")
         assert code["source"] == program["catalog"]["example"]["code"]["source"]

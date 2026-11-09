@@ -46,7 +46,9 @@ def environment(database_name="edumind_catalog_p15_t108_dev", api_port=8178):
 def main():
     global WORK
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--profile", choices=["t108", "fixed", "archive"], default="t108")
+    p.add_argument(
+        "--profile", choices=["t108", "fixed", "archive", "direct"], default="t108"
+    )
     p.add_argument("--prepare", action="store_true")
     p.add_argument("--start", action="store_true")
     p.add_argument("--test", action="store_true")
@@ -66,7 +68,15 @@ def main():
             p.error("Use the T112 checks listed in its delivery record")
         WORK = Path("/tmp/edumind-t112")
         database_name, api_port, web_port = "edumind_catalog_p15_t108_t112", 8182, 5202
+    elif a.profile == "direct":
+        if a.check_migration or a.test:
+            p.error("Use the T114 checks listed in its execution package")
+        WORK = Path("/tmp/edumind-t114")
+        database_name, api_port, web_port = "edumind_catalog_p15_t108_t114", 8184, 5204
     env = environment(database_name, api_port)
+    if a.profile == "direct":
+        env["EDUMIND_HEAD_DEEPSEEK_DEVELOPMENT"] = "1"
+        (WORK / "env.json").write_text(json.dumps(env))
     python = str(ROOT / "backend/.venv/bin/python")
     if a.prepare:
         subprocess.run(

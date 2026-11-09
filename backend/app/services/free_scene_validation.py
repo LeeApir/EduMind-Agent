@@ -133,7 +133,7 @@ async def validate_candidate(
     async with db.begin_nested():
         await repo._owner_lock()
         course = await repo._course(course_id, lock=True)
-        await repo._fence(course_id, fence)
+        operation = await repo._fence(course_id, fence)
         row = await db.scalar(
             select(FreeSceneGenerationResult)
             .where(
@@ -170,7 +170,7 @@ async def validate_candidate(
         elif row.origin_type == "head_goal_model_generation":
             from app.services.head_course_generation import validate_generation
 
-            checked = validate_generation(row, actual)
+            checked = validate_generation(row, actual, operation)
         elif row.origin_type == "model_generation":
             fingerprint = digest(
                 "scene-generation-outcome",

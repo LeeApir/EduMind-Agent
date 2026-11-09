@@ -255,7 +255,7 @@ def record(payload, request, raw, adapter, *, evidence_kind, parent=None, review
         raw,
         adapter,
         allow_recovery=parent is None,
-        source_batch=FIXED_BATCH if fixed else BATCH,
+        source_batch=getattr(adapter, "BATCH", FIXED_BATCH) if fixed else BATCH,
     )
     if (
         result.usage.input_tokens > 139264
@@ -341,12 +341,14 @@ def validate_final(records, review, payload, adapter):
     return c
 
 
-def assembled(records, review):
+def assembled(records, review, adapter=None):
     rec = records[-1]
     c = rec["candidate"]
     source = dict(
         origin=m.ORIGIN,
-        batch=FIXED_BATCH if c["payload"]["original_goal"] == m.FIXED_GOAL else BATCH,
+        batch=getattr(adapter, "BATCH", FIXED_BATCH)
+        if c["payload"]["original_goal"] == m.FIXED_GOAL
+        else BATCH,
         candidate_digest=c["candidate_digest"],
         parent_digest=c["parent_digest"],
         model=rec["model"],
@@ -409,14 +411,25 @@ def validate_chain(chain, inputs, plan, adapter):
     return validate_final(chain["records"], chain["final_review"], payload, adapter)
 
 
-def validate_publication(row, actual):
+def publication_adapter(chain, operation):
+    from scripts import head_course_deepseek_wire as direct
     from scripts.head_course_goal import raw_io
 
+    window = direct.operation_window(operation) if operation is not None else {}
+    if "execution_window" in chain["context"] or window:
+        if not window or chain["context"].get("execution_window") != window["execution_window"]:
+            raise SnapshotError("HEAD_DIRECT_WINDOW_MISMATCH")
+        return direct
+    return raw_io
+
+
+def validate_publication(row, actual, operation=None):
     chain = row.input_snapshot["reuse_chain"]
-    c = validate_chain(chain, actual["request"], actual["plan"]["candidate"], raw_io)
+    adapter = publication_adapter(chain, operation)
+    c = validate_chain(chain, actual["request"], actual["plan"]["candidate"], adapter)
     snapshot = dict(inputs=actual, reuse_chain=chain)
     final = chain["records"][-1]
-    expected = assembled(chain["records"], chain["final_review"])
+    expected = assembled(chain["records"], chain["final_review"], adapter)
     if (
         row.input_snapshot != snapshot
         or row.origin_type != m.ORIGIN
@@ -454,19 +467,22 @@ async def publish(db, owner, cid, oid, chain):
     from app.services.free_scene_availability import commit_scene
     from app.services.free_scene_generation import load_inputs
     from app.services.free_scene_validation import validate_candidate as admit
-    from scripts.head_course_goal import raw_io
+    from scripts import head_course_deepseek_wire as direct
 
     g.require_development_database(db.bind.url.render_as_string(hide_password=False))
     context = await g.generation_context(db, owner, cid, oid)
+    repo = SnapshotRepository(db, owner)
+    fence = await repo.acquire_write_fence(cid, oid)
+    op = await repo._fence(cid, fence)
+    adapter = publication_adapter(chain, op)
     if chain["context"] != dict(
         owner=str(owner),
         course_id=str(cid),
         operation_id=str(oid),
         planning_inputs=chain["context"]["planning_inputs"],
+        **direct.operation_window(op),
     ):
         raise SnapshotError("REUSE_OWNER_BINDING")
-    repo = SnapshotRepository(db, owner)
-    fence = await repo.acquire_write_fence(cid, oid)
     actual = await load_inputs(
         db,
         owner,
@@ -476,7 +492,7 @@ async def publish(db, owner, cid, oid, chain):
         scene_id=UUID(context["scene_id"]),
         expected_head=1,
     )
-    c = validate_chain(chain, actual["request"], actual["plan"]["candidate"], raw_io)
+    c = validate_chain(chain, actual["request"], actual["plan"]["candidate"], adapter)
     records, final = chain["records"], chain["records"][-1]
     snapshot = dict(inputs=actual, reuse_chain=chain)
     row = FreeSceneGenerationResult(
@@ -490,7 +506,7 @@ async def publish(db, owner, cid, oid, chain):
         input_snapshot=snapshot,
         input_digest=digest("head-reuse-input", snapshot=snapshot),
         request_digest=digest("head-http-request", body=final["request"]),
-        response_json=assembled(records, chain["final_review"]),
+        response_json=assembled(records, chain["final_review"], adapter),
         prompt_version=final["protocol_version"],
         schema_version=final["protocol_version"],
         state="candidate",

@@ -2,6 +2,7 @@
 
 import argparse
 import asyncio
+from datetime import datetime
 import getpass
 import hashlib
 import importlib.util
@@ -19,10 +20,13 @@ from app.services import head_course_generation as generation  # noqa: E402
 from app.services import head_course_materials as m  # noqa: E402
 from app.agents import head_course_planning_wire as plan_wire  # noqa: E402
 from app.services.free_course_snapshots import SnapshotError, canonical, digest  # noqa: E402
+from scripts import head_course_deepseek_wire as direct  # noqa: E402
 
 PACKAGE = ROOT / "docs/acceptance/phase-1.5-head-goal-t108-r03"
 REUSE_PACKAGE = ROOT / "docs/acceptance/phase-1.5-head-reuse-t109"
 FIXED_PACKAGE = ROOT / "docs/acceptance/phase-1.5-head-fixed-t111"
+DIRECT_PACKAGE = ROOT / "docs/acceptance/phase-1.5-head-deepseek-t114"
+DIRECT_VAULT = Path.home() / ".local/share/edumind" / direct.BATCH
 FIXED_VAULT = Path.home() / ".local/share/edumind/head-fixed-r01"
 OLD = ROOT / "docs/acceptance/phase-1.5-limited-c-preparation-t104/execute_once.py"
 spec = importlib.util.spec_from_file_location("head_goal_raw_transport", OLD)
@@ -39,7 +43,7 @@ def package_digest():
 
 
 def profile_goal():
-    if PACKAGE == FIXED_PACKAGE:
+    if PACKAGE in (FIXED_PACKAGE, DIRECT_PACKAGE):
         return m.FIXED_GOAL
     if PACKAGE == REUSE_PACKAGE:
         return m.REUSE_GOAL
@@ -100,11 +104,21 @@ async def prepare(owner, cid, oid):
         inputs = await load_inputs(db, owner, cid, oid)
         if inputs.get("head_support") != m.support_for_goal(inputs["original_goal"]):
             raise SnapshotError("HEAD_REQUEST_MISMATCH")
+        window = direct.operation_window(op)
+        if bool(window) != (PACKAGE == DIRECT_PACKAGE):
+            raise SnapshotError("HEAD_DIRECT_WINDOW_MISMATCH")
+        if window:
+            from sqlalchemy.engine import make_url
+            from app.core.database import get_database_url
+
+            if make_url(get_database_url()).database != direct.DATABASE:
+                raise SnapshotError("HEAD_DIRECT_OPERATION_REQUIRED")
         return dict(
             owner=str(owner),
             course_id=str(cid),
             operation_id=str(oid),
             planning_inputs=inputs,
+            **window,
         )
 
     return await database(load)
@@ -191,6 +205,7 @@ def verify_saved(vault, stage, cipher):
         raise SnapshotError("HEAD_REQUEST_CHANGED")
     context = read(vault / "context.json")
     goal = context["planning_inputs"]["original_goal"]
+    adapter = direct if PACKAGE == DIRECT_PACKAGE else raw_io
     if goal == m.FIXED_GOAL and (
         attempt["stage"] != stage
         or attempt["approval_sha256"]
@@ -214,7 +229,7 @@ def verify_saved(vault, stage, cipher):
             payload,
             request,
             raw,
-            raw_io,
+            adapter,
             evidence_kind=attempt["evidence_kind"],
             parent=parent,
             review=review,
@@ -228,7 +243,7 @@ def verify_saved(vault, stage, cipher):
         ):
             raise SnapshotError("HEAD_RECOVERY_FAILURE_CHANGED")
         return expected
-    result, observation = raw_io.observe_generation(request, raw)
+    result, observation = adapter.observe_generation(request, raw)
     if stage == "plan":
         if goal == m.FIXED_GOAL and (
             result.usage.input_tokens > 139264 or result.usage.output_tokens > 8000
@@ -308,6 +323,42 @@ def approval_check(vault, approval):
     sha = package_digest()
     reuse = PACKAGE == REUSE_PACKAGE
     fixed = PACKAGE == FIXED_PACKAGE
+    if PACKAGE == DIRECT_PACKAGE:
+        if (
+            vault != DIRECT_VAULT
+            or vault.is_symlink()
+            or not vault.is_dir()
+            or vault.stat().st_mode & 0o077
+        ):
+            raise SnapshotError("HEAD_VAULT_STOPPED_OR_UNSAFE")
+        if (vault / "STOP").exists():
+            raise SnapshotError("HEAD_VAULT_STOPPED_OR_UNSAFE")
+        context_bytes = (vault / "context.json").read_bytes()
+        window = raw_io.wire.strict_json(context_bytes)["execution_window"]
+        expected = dict(
+            package_sha256=sha,
+            version=m.FIXED_VERSION,
+            batch=direct.BATCH,
+            context_sha256=hashlib.sha256(context_bytes).hexdigest(),
+            explicit_user_authorization=True,
+            accept_ADR0058_and_batch_C2=True,
+            max_http_requests=3,
+            execution_window=window,
+            planning_wire_version=plan_wire.VERSION,
+            planning_prompt_version=plan_wire.PROMPT_VERSION,
+        )
+        bound = vault / "approval.bound.json"
+        if canonical(approval) != canonical(expected) or (
+            bound.exists() and bound.read_bytes() != canonical(approval)
+        ):
+            raise SnapshotError("HEAD_EXACT_AUTHORIZATION_REQUIRED")
+        start, end = (
+            datetime.fromisoformat(window[key]).timestamp()
+            for key in ("starts_at", "expires_at")
+        )
+        if end - start != direct.WINDOW_SECONDS or not start <= time.time() < end:
+            raise SnapshotError("HEAD_DIRECT_WINDOW_CLOSED")
+        return sha
     if fixed and (
         vault != FIXED_VAULT
         or type(approval.get("starts_epoch")) is not int
@@ -365,9 +416,22 @@ def send(stage, vault, approval, *, transport=None, key=None):
     from app.core.provider_target import TargetPolicy, approve_target
 
     sha = approval_check(vault, approval)
+    adapter = direct if PACKAGE == DIRECT_PACKAGE else raw_io
+
+    def send_window():
+        if adapter is direct and (
+            datetime.fromisoformat(
+                approval["execution_window"]["expires_at"]
+            ).timestamp()
+            - time.time()
+            < direct.IO_TIMEOUT
+        ):
+            raise SnapshotError("HEAD_DIRECT_WINDOW_TOO_SHORT")
+
     lock = vault / "ACTIVE"
     raw_io.exclusive(lock, b"one foreground request; stale means unknown/stop\n")
     try:
+        send_window()
         rawkey = vault / "raw.key"
         if rawkey.is_symlink() or rawkey.stat().st_mode & 0o077:
             raise SnapshotError("HEAD_RAW_KEY_UNSAFE")
@@ -423,7 +487,7 @@ def send(stage, vault, approval, *, transport=None, key=None):
         if len(raw_request) > 131072:
             raise SnapshotError("HEAD_REQUEST_SIZE")
         target = approve_target(
-            "https://api.deepseek.com/responses",
+            direct.ENDPOINT,
             policy=TargetPolicy(),
             **(
                 {"resolver": lambda host, port: ["93.184.216.34"]}
@@ -434,6 +498,8 @@ def send(stage, vault, approval, *, transport=None, key=None):
         ip = ipaddress.ip_address(target.connect_ip)
         host = f"[{ip}]" if ip.version == 6 else str(ip)
         if key is None:
+            if adapter is direct and not sys.stdin.isatty():
+                raise SnapshotError("HEAD_DIRECT_TTY_REQUIRED")
             key = getpass.getpass("Current DeepSeek API key (not saved): ")
         if not key or "\n" in key or "\r" in key:
             raise SnapshotError("HEAD_KEY_INVALID")
@@ -451,6 +517,7 @@ def send(stage, vault, approval, *, transport=None, key=None):
             approval_binding = dict(
                 approval_sha256=hashlib.sha256(canonical(approval)).hexdigest()
             )
+        send_window()
         raw_io.exclusive(
             vault / f"{stage}.attempt.json",
             canonical(
@@ -469,9 +536,15 @@ def send(stage, vault, approval, *, transport=None, key=None):
             ),
         )
         raw_io.exclusive(vault / f"{stage}.request.json", raw_request)
+        if adapter is direct:
+            approval_check(vault, approval)
+            send_window()
         # Explicitly still susceptible to pause/late-send after this check. No T102 fix claimed.
         with httpx.Client(
-            transport=transport, timeout=90, trust_env=False, follow_redirects=False
+            transport=transport,
+            timeout=direct.IO_TIMEOUT,
+            trust_env=False,
+            follow_redirects=False,
         ) as client:
             with client.stream(
                 "POST",
@@ -507,7 +580,7 @@ def send(stage, vault, approval, *, transport=None, key=None):
                 payload,
                 request,
                 raw,
-                raw_io,
+                adapter,
                 evidence_kind="offline_fixture"
                 if isinstance(transport, httpx.MockTransport)
                 else "actual_provider_response",
@@ -528,7 +601,7 @@ def send(stage, vault, approval, *, transport=None, key=None):
             verify_saved(vault, stage, cipher)
             lock.unlink()
             return
-        result, observation = raw_io.observe_generation(request, raw)
+        result, observation = adapter.observe_generation(request, raw)
         if (
             observation["reported_input_tokens"] > 139264
             or (fixed and result.usage.output_tokens > request["max_output_tokens"])
@@ -538,6 +611,12 @@ def send(stage, vault, approval, *, transport=None, key=None):
             raise SnapshotError("HEAD_USAGE_OR_CREDENTIAL_ECHO")
         value = dict(result.value)
         if stage == "plan":
+            if (
+                adapter is direct
+                and plan_wire.to_local(value, context["planning_inputs"])["plan"]
+                is None
+            ):
+                raise SnapshotError("HEAD_DIRECT_PLAN_NOT_READY")
             raw_io.exclusive(vault / "plan.output.json", canonical(value))
             raw_io.exclusive(
                 vault / "plan.mapping.json",
@@ -645,13 +724,23 @@ def raw_io_audit(event, args):
 
 
 def publish_saved(vault, approval):
-    from cryptography.fernet import Fernet
-
     approval_check(vault, approval)
     if (vault / "ACTIVE").exists():
         raise SnapshotError("HEAD_ACTIVE_UNKNOWN")
+    if PACKAGE == DIRECT_PACKAGE:
+        lock = vault / "ACTIVE"
+        raw_io.exclusive(lock, b"single foreground publication\n")
+        result = publish_chain(vault, approval)
+        lock.unlink()
+        return result
+    return publish_chain(vault, approval)
+
+
+def publish_chain(vault, approval):
+    from cryptography.fernet import Fernet
+
     rawkey = vault / "raw.key"
-    if PACKAGE == FIXED_PACKAGE and (
+    if PACKAGE in (FIXED_PACKAGE, DIRECT_PACKAGE) and (
         rawkey.is_symlink() or rawkey.stat().st_mode & 0o077
     ):
         raise SnapshotError("HEAD_RAW_KEY_UNSAFE")
@@ -659,7 +748,7 @@ def publish_saved(vault, approval):
     records = [verify_saved(vault, "generate", cipher)]
     if (vault / "repair.attempt.json").exists():
         records.append(verify_saved(vault, "repair", cipher))
-    if PACKAGE == FIXED_PACKAGE:
+    if PACKAGE in (FIXED_PACKAGE, DIRECT_PACKAGE):
         plan_attempt = read(vault / "plan.attempt.json")
         if any(
             record["evidence_kind"] != plan_attempt["evidence_kind"]
@@ -679,7 +768,7 @@ def publish_saved(vault, approval):
             review,
         )
 
-    if PACKAGE in (REUSE_PACKAGE, FIXED_PACKAGE):
+    if PACKAGE in (REUSE_PACKAGE, FIXED_PACKAGE, DIRECT_PACKAGE):
         from app.services import head_course_reuse as reuse
 
         plan_raw = raw_io.decrypt(vault / "plan.raw.enc", cipher)
@@ -701,6 +790,8 @@ def publish_saved(vault, approval):
                 chain,
             )
 
+        if PACKAGE == DIRECT_PACKAGE:
+            approval_check(vault, approval)
         result = asyncio.run(database(publish_reuse))
     else:
         result = asyncio.run(database(publish))
@@ -712,7 +803,9 @@ def publish_saved(vault, approval):
 def main():
     global PACKAGE
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--profile", choices=["t108", "reuse", "fixed"], default="t108")
+    p.add_argument(
+        "--profile", choices=["t108", "reuse", "fixed", "direct"], default="t108"
+    )
     group = p.add_mutually_exclusive_group(required=True)
     group.add_argument("--inspect", action="store_true")
     group.add_argument("--serve", action="store_true")
@@ -729,6 +822,8 @@ def main():
         PACKAGE = REUSE_PACKAGE
     if args.profile == "fixed":
         PACKAGE = FIXED_PACKAGE
+    if args.profile == "direct":
+        PACKAGE = DIRECT_PACKAGE
     if args.inspect:
         print(
             json.dumps(
@@ -750,18 +845,20 @@ def main():
         return
     if args.vault is None:
         p.error("--vault required")
-    if PACKAGE == FIXED_PACKAGE and (
-        args.vault != FIXED_VAULT
+    if PACKAGE in (FIXED_PACKAGE, DIRECT_PACKAGE) and (
+        args.vault != (DIRECT_VAULT if PACKAGE == DIRECT_PACKAGE else FIXED_VAULT)
         or args.vault.is_symlink()
         or not args.vault.is_dir()
         or args.vault.stat().st_mode & 0o077
     ):
         p.error("Use the new dedicated fixed-batch vault with mode 0700")
     if args.prepare:
+        if PACKAGE == DIRECT_PACKAGE:
+            package_digest()
         if not all((args.owner, args.course, args.operation)):
             p.error("Actual existing owner/course/operation required")
         context = asyncio.run(prepare(args.owner, args.course, args.operation))
-        if PACKAGE == FIXED_PACKAGE and (
+        if PACKAGE in (FIXED_PACKAGE, DIRECT_PACKAGE) and (
             (args.vault / "STOP").exists()
             or context["planning_inputs"]["original_goal"] != m.FIXED_GOAL
         ):
@@ -785,7 +882,7 @@ def main():
             publish_saved(args.vault, approval)
     except BaseException as error:
         if not (args.vault / "STOP").exists():
-            if PACKAGE == FIXED_PACKAGE:
+            if PACKAGE in (FIXED_PACKAGE, DIRECT_PACKAGE):
                 raw_io.exclusive(
                     args.vault / "terminal.failure.json",
                     canonical(

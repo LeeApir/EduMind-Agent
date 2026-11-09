@@ -278,7 +278,7 @@ onBeforeUnmount(()=>{save();epoch+=1;manifestEpoch+=1;versionsEpoch+=1;controlle
               class="replay-source"
               aria-label="新课程来源"
             >
-              <strong>{{ scene.generation_source.prompt_version === 'head-evidence-local-revision-v1' ? '模型局部修订 · 程序证据补充' : scene.generation_source.prompt_version === 'head-fixed-course-v1' ? '固定头插方案 · 新输入验证' : scene.generation_source.prompt_version === 'head-reuse-course-v1' ? '限定头插流程复用 · 新目标课程' : scene.generation_source.evidence_kind === 'targeted_fact_revision' ? '模型四字段事实修订' : scene.generation_source.evidence_kind === 'program_format_recovery' ? '程序格式恢复 · r03 派生课程' : scene.generation_source.evidence_kind === 'offline_fixture' ? '离线接线夹具 · 非真实生成' : '新目标真实生成 · 头插支持域' }} · 未签核</strong>
+              <strong>{{ scene.generation_source.prompt_version === 'head-evidence-local-revision-v1' ? '模型局部修订 · 程序证据补充' : scene.generation_source.batch === 'head-fixed-deepseek-r01' ? '固定头插方案 · DeepSeek 官方直连验证' : scene.generation_source.prompt_version === 'head-fixed-course-v1' ? '固定头插方案 · 新输入验证' : scene.generation_source.prompt_version === 'head-reuse-course-v1' ? '限定头插流程复用 · 新目标课程' : scene.generation_source.evidence_kind === 'targeted_fact_revision' ? '模型四字段事实修订' : scene.generation_source.evidence_kind === 'program_format_recovery' ? '程序格式恢复 · r03 派生课程' : scene.generation_source.evidence_kind === 'offline_fixture' ? '离线接线夹具 · 非真实生成' : '新目标真实生成 · 头插支持域' }} · 未签核</strong>
               <p
                 v-if="scene.generation_source.teaching_review?.verdict !== 'pass' && scene.generation_source.evidence_kind === 'program_format_recovery'"
                 role="alert"

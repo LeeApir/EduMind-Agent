@@ -207,6 +207,7 @@ class SnapshotRepository:
         code_language: str | None = "C",
         config: dict[str, Any] | None = None,
         policy_snapshot: dict[str, Any] | None = None,
+        operation_window_seconds: int | None = None,
     ) -> dict[str, Any]:
         config = deepcopy(config or {})
         policy_snapshot = deepcopy(policy_snapshot or {})
@@ -218,6 +219,10 @@ class SnapshotRepository:
             or teaching_language != "zh-CN"
             or code_language not in ("C", None)
             or not config.keys() <= CONFIG_KEYS
+            or (
+                operation_window_seconds is not None
+                and (type(operation_window_seconds) is not int or operation_window_seconds <= 0)
+            )
         ):
             raise SnapshotError()
         if any(
@@ -233,6 +238,11 @@ class SnapshotRepository:
             profile_id=str(profile_id) if profile_id else None,
             config=config,
             **({"policy_snapshot": policy_snapshot} if policy_snapshot else {}),
+            **(
+                {"operation_window_seconds": operation_window_seconds}
+                if operation_window_seconds is not None
+                else {}
+            ),
         )
         route = "/api/free-courses"
         async with self.db.begin_nested():
@@ -292,6 +302,13 @@ class SnapshotRepository:
             )
             self.db.add(req)
             await self.db.flush()
+            window = {}
+            if operation_window_seconds is not None:
+                created_at = await self._now()
+                window = dict(
+                    created_at=created_at,
+                    deadline_at=created_at + timedelta(seconds=operation_window_seconds),
+                )
             operation = FreeCourseOperation(
                 user_id=self.owner,
                 course_id=course.id,
@@ -299,6 +316,7 @@ class SnapshotRepository:
                 kind="create",
                 config_snapshot=config,
                 policy_snapshot=policy_snapshot,
+                **window,
             )
             self.db.add(operation)
             await self.db.flush()
