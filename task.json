@@ -6203,6 +6203,44 @@
           "evidence": "docs/acceptance/phase-1.5-head-deepseek-live-r01/RESULTS.md"
         }
       ]
+    },
+    {
+      "id": "PHASE-1.5-T116",
+      "phase": "Phase 1.5",
+      "title": "T115 封存正文离线诊断与独立教学评估",
+      "status": "done",
+      "depends_on": [
+        "PHASE-1.5-T114"
+      ],
+      "scope": [
+        "只读使用 T115 封存响应。只在派生诊断接受准确程序代码缺末尾一个 LF。Provider 0，不写应用或恢复 T115 操作。"
+      ],
+      "prd_source": "PRD §0.5；ADR0058；用户限定离线诊断",
+      "acceptance_criteria": [
+        "冻结原始校验失败可重现，原始与诊断摘要、四个字节差异可复核",
+        "复跑其余内容校验，独立逐段逐帧逐题评估并列出剩余问题",
+        "仅全文通过时提出最小封存导入差异"
+      ],
+      "verification": [
+        "T115 诊断脚本复跑和狭窄 LF 边界验证",
+        "独立全文评估与准确候选绑定",
+        "Ruff、工作流和 Git 差异检查"
+      ],
+      "started_at": "2026-11-09T19:54:32+08:00",
+      "completed_at": "2026-11-09T19:58:29+08:00",
+      "commit_lookup": "Task-Completed: PHASE-1.5-T116",
+      "verification_results": [
+        {
+          "date": "2026-11-09T19:58:29+08:00",
+          "commands": [
+            "PYTHONPATH=backend:. backend/.venv/bin/python -m scripts.diagnose_head_course_t115 --output /tmp/edumind-t115-diagnostic/review-copy.json",
+            "PYTHONPATH=backend:. backend/.venv/bin/python -m pytest -q scripts/tests/test_diagnose_head_course_t115.py",
+            "独立全文评估与摘要回读；T114 416 文件冻结校验；Ruff；工作流；git diff --check"
+          ],
+          "result": "四题各补一个 LF 的派生稿通过原机械校验。9 项边界测试通过，独立全文 stop，有 4 项阻断与 4 项非阻断。Provider 0，应用写入 0，T115 原始状态保留。",
+          "evidence": "docs/acceptance/phase-1.5-head-deepseek-diagnostic-t116/RESULTS.md"
+        }
+      ]
     }
   ],
   "planning_inputs": {
