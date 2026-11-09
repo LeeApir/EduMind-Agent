@@ -8,6 +8,8 @@
 
 课程生成相关工作继续前，读取 [Phase 1.5 课程生成目标与推进约束](docs/phase-1.5-course-generation-direction.md)。保留 DeepTutor 提示词组织＋MAIC-UI 交互要求＋程序共享代码/轨迹方向，优先可学课程与真实教学证据，暂不移植 DeepTutor 完整运行框架；T102 保持 blocked，不自动追加执行器修补。该文档不替代根账本、已批准契约或真实调用授权。
 
+2026-11-09 后续路线图调整：新 Phase 2 专门承接三标签学习界面与 OpenMAIC 基础演示课堂迁移，先完成迁移设计；原 Phase 2／Phase 3 合并为新 Phase 3。见 [PRD §9.1](docs/PRD.md) 与 [ADR0056](docs/ADR/0056-phase-2-learning-ui-and-phase-3-consolidation.md)。当前活动阶段仍为 P1.5，不将新界面追加为当前任务的完成前置；历史文档中的旧阶段编号按此映射理解，不改冻结原件。P0/P1/P2 优先级标签与 Phase 编号分别解释。
+
 ## 产品主线
 
 EduMind 将学生画像、知识图谱、学习单元、多角色互动课堂和学习评估连接成闭环：
@@ -31,7 +33,7 @@ EduMind 将学生画像、知识图谱、学习单元、多角色互动课堂和
 | 模型 | Provider Gateway；P0 仅接一个服务端 OpenAI-compatible Provider |
 | P1 Provider | Ollama、BYOK、Anthropic、Google Gemini、讯飞星火、TTS/ASR |
 | 视频 | P0 预渲染/参数化 Manim 模板；P1 动画 DSL + 隔离 Worker + 可选 TTS |
-| iOS | SwiftUI（P2，可选，不阻塞 Web MVP） |
+| iOS | SwiftUI（Phase 3，可选，不阻塞 Web MVP） |
 | 部署 | Docker + docker-compose |
 | 包管理 | pnpm（前端） |
 
@@ -55,7 +57,7 @@ EduMind-Agent/
 │   ├── alembic/
 │   └── pyproject.toml
 ├── web/                     # Vue 3 Web 客户端
-├── ios/                     # P2 SwiftUI 客户端
+├── ios/                     # Phase 3 可选 SwiftUI 客户端
 ├── data/
 │   ├── knowledge_graph.yaml # P0 8-10 节点种子结构
 │   └── videos/cache/        # 预渲染动画（不提交生成媒体）
@@ -81,8 +83,9 @@ EduMind-Agent/
 | MVP 0.2 | 8-10 节点知识结构、渐进画像、掌握度与下一步推荐、正式资源审核 |
 | MVP 0.3 | 2-3 个 Manim 模板、专注/互动模式、一个多视角演示、Markdown 笔记 |
 | Phase 1 | Ollama/BYOK、多 Provider、完整 Manim DSL、持久化队列、扩展图谱 |
-| Phase 2 | 真并行辩论、更多角色策略、RAG、学习报告、更多课程 |
-| Phase 3 | iOS、PPTX/离线 HTML、更多课程、模板市场；由真实使用数据决定 |
+| Phase 1.5 | 当前活动阶段：自由课程生成、课程主链及质量／性能验收；状态见根账本 |
+| Phase 2 | 新规划：三标签学习页（演示课堂／讲解详解／随堂练习）与 OpenMAIC 基础演示迁移；先设计后实施 |
+| Phase 3 | 原 P2/P3 合并：画像增强与动态分级练习优先细化；辩论、角色策略、RAG、学习报告、更多课程、教师创作、iOS、高级导出及模板市场；扩展项按真实需求分批 |
 
 阶段由 `docs/PRD.md` 的退出标准驱动，不绑定固定比赛日期。
 

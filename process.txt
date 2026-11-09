@@ -3016,3 +3016,9 @@ T089完成1b2b89d后冻结本批唯一开发验证，准备8份跨数组/栈/链
 
 [2026-11-09T14:14:59] [PHASE-1.5-T111] BLOCKED | executor=Codex
 改动摘要：AIAPI r05同请求单次正文约92秒HTTP200后封存 | 验证结果：27627字节原件回读；严格外层缺model/store拒绝；原文诊断结构与材料校验通过，独立全文/13帧/四题pass，F01/Q01未复现 | 遗留问题：实际模型及存储状态未知，无应用准入或浏览器证据 | 下一步：归档原件、诊断与独立审核，本批额度用完
+
+[2026-11-09T14:25:58] [WORKFLOW] START | executor=Codex-Review | branch=codex/phase-1.5-t001
+改动摘要：按用户决定同步新P2三标签学习界面与OM迁移设计、原P2/P3合并到新P3，新增ADR0056与PRD/AGENTS/未来阶段摘要 | 验证结果：已读当前账本/最近日志/Git及路线图，未领取业务任务；历史无关改动保留 | 遗留问题：文档一致性、账本差异与只读审查待完成；具体迁移架构未设计 | 下一步：完成限定文档检查后治理提交，不改运行源码或调用Provider
+
+[2026-11-09T14:28:19] [WORKFLOW] VERIFIED | executor=Codex-Review
+改动摘要：完成ADR0056、PRD路线图与相关阶段归属、AGENTS入口、根账本未来阶段摘要和索引同步；新P2先做OM迁移设计，原P2/P3合并到新P3 | 验证结果：python3 scripts/check_catalog_workflow.py及git diff --check通过；本地Python逐值比较111Task/执行策略/授权/活动阶段不变，JSON仅三处路线图说明变化；旧需求/任务规划SHA一致、日志只追加、映射和链接通过；自查diff完成 | 遗留问题：具体迁移架构和实现验收待P2设计；独立文档复读工具额度不足未完成，不记独立通过；旧blocked/STOP保持 | 下一步：仅chore(workflow)本地治理提交并交接，不写Task-Completed，不启动P2/P3或Provider、不push/merge

@@ -2,6 +2,10 @@
 
 本索引汇总已有批准记录，不新增批准。产品范围以 [PRD](../PRD.md) 为准；现行接口见 [OpenAPI](../api/openapi.yaml)，实现与限制摘要见 [架构说明](../ARCHITECTURE.md)。
 
+## 2026-11-09：后续阶段重排
+
+[ADR0056](0056-phase-2-learning-ui-and-phase-3-consolidation.md)记录用户确认的新 P2 三标签学习界面与 OpenMAIC 基础演示迁移，以及原 P2/P3 合并为新 P3。先完成 OM 迁移设计，具体技术契约尚未确定；当前 P1.5 任务、验收与授权保持，本次仅规划。
+
 ## 当前新提案：OM式生成与混合审核
 
 2026-10-15用户选择参照OM重构生成、保留自动审核，并将无法可靠判断的内容交人工。[ADR-0015](0015-shared-plan-and-hybrid-review.md) A–D及[准确附件](../acceptance/phase-1-om-redesign/proposal-manifest.json)已按本次用户要求补齐契约/兼容并获A–D批准：共享计划/三个场景/受约束动作，语义审核及人工路由，计划与案件持久化/维护CLI/原子发布/API状态，以及分层验收和仅新链路的诊断补充。T043只交付设计，T044–T054按依赖零调用实施；准确批准见[登记](0015-approval-20261015.json)，真实预算0、catalog_only保持，T040旧路线及历史失败不恢复。
