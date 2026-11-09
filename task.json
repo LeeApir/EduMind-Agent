@@ -6092,6 +6092,43 @@
           "evidence": "docs/acceptance/phase-1.5-archived-head-import-t112/README.md"
         }
       ]
+    },
+    {
+      "id": "PHASE-1.5-T113",
+      "phase": "Phase 1.5",
+      "title": "固定 Provider 接入规则评估与下一轮方案",
+      "status": "done",
+      "depends_on": [
+        "PHASE-1.5-T112"
+      ],
+      "scope": [
+        "仅根据封存原件作固定来源准入决定。AIAPI 不满足必需条件则停止适配并提出直连方案，新增真实调用 0。"
+      ],
+      "prd_source": "PRD §0.5；ADR0055、ADR0057；用户本轮授权",
+      "acceptance_criteria": [
+        "复核 AIAPI r04/r05 加密原件，覆盖全部响应差异及可适配、未知和拒绝边界。",
+        "明确是否可作为下一轮固定 Provider；保留历史拒绝、停止与额度记录。",
+        "给出可审查的替代验证方案，列出规则、预算、时限、停止条件和正常准入验收。"
+      ],
+      "verification": [
+        "PYTHONPATH=backend backend/.venv/bin/python -m scripts.check_head_course_provider_review",
+        "定向固定请求检查、工作流检查、历史目录和运行源码差异检查"
+      ],
+      "started_at": "2026-11-09T15:13:01+08:00",
+      "completed_at": "2026-11-09T15:16:33+08:00",
+      "commit_lookup": "Task-Completed: PHASE-1.5-T113",
+      "verification_results": [
+        {
+          "date": "2026-11-09T15:16:33+08:00",
+          "commands": [
+            "PYTHONPATH=backend backend/.venv/bin/python -m scripts.check_head_course_provider_review",
+            "PYTHONPATH=backend backend/.venv/bin/python -m pytest -q backend/tests/test_head_course_fixed.py -k 'exact_first_request or scoped_merge'",
+            "Ruff check/format、python3 scripts/check_catalog_workflow.py、git diff --check 和冻结目录差异检查"
+          ],
+          "result": "r04/r05 加密原件、收据与 STOP 重放一致；r05 原接口拒绝，独立教学诊断仍通过；固定材料/合并两项离线检查通过。当前 AIAPI 不具固定来源资格，交官方直连提案，新增 Provider 调用 0。",
+          "evidence": "docs/acceptance/phase-1.5-fixed-provider-t113/README.md"
+        }
+      ]
     }
   ],
   "planning_inputs": {
