@@ -6286,7 +6286,7 @@
       "id": "PHASE-1.5-T118",
       "phase": "Phase 1.5",
       "title": "空链表头插课程交付",
-      "status": "blocked",
+      "status": "done",
       "depends_on": [
         "PHASE-1.5-T114",
         "PHASE-1.5-T117"
@@ -6347,10 +6347,21 @@
           ],
           "result": "唯一引用叶合并和越界拒绝通过，完整审核绑定、私有子课程 v2 及答案隔离通过，旧 STOP 和 v1 回读一致。Provider 0，真实执行待授权。",
           "evidence": "docs/acceptance/phase-1.5-head-empty-t118/RESULTS.md"
+        },
+        {
+          "date": "2026-11-10T09:14:07+08:00",
+          "commands": [
+            "--profile citation --inspect / --send / read_saved / --publish；准确包 --check",
+            "独立全文重评 12 项；Chromium check-browser.py；专用 PostgreSQL 旧/新操作回读",
+            "python3 scripts/check_catalog_workflow.py；git diff --check"
+          ],
+          "result": "修订 HTTP 200 一次，唯一引用列表叶，输入 1419/输出 28 tokens。独立全文 12 项通过，私有 v2 实际阅读 13 块、13 帧、四题反馈、答案隔离及刷新恢复通过。r02 停在 v1 与 STOP。",
+          "evidence": "docs/acceptance/phase-1.5-head-empty-t118/RESULTS.md"
         }
       ],
-      "execution_gate": "r01 与 r02 已封存。C01 单次引用修订准确包准备完成，新调用与 C2 待授权。",
-      "block_reason": "r02 原首稿缺独立对照引用，未获准入。独立新批仅拟修第 5 段 fact_ids，实际发送、教学重评和学习验收待执行。"
+      "execution_gate": "准确批准的新批完成 1 次引用修订，独立全文重评和新私有 v2 浏览器学习验收通过。原 r02 停止与首稿未交付保留。",
+      "completed_at": "2026-11-10T09:14:07+08:00",
+      "commit_lookup": "Task-Completed: PHASE-1.5-T118"
     }
   ],
   "planning_inputs": {
