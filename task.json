@@ -6412,6 +6412,48 @@
         }
       ],
       "completed_at": "2026-11-10T16:52:12+08:00"
+    },
+    {
+      "id": "PHASE-1.5-T120",
+      "phase": "Phase 1.5",
+      "title": "收敛头插与栈的共用课程生成入口",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T118",
+        "PHASE-1.5-T119"
+      ],
+      "scope": [
+        "抽取共用前台传输和封存，复用既有主题材料、封存读取器、主题审核和私有课程仓储。",
+        "同入口选择 T118 或 T119 离线回放。Provider 0，按原提交核对历史冻结，保留原版和失败记录。"
+      ],
+      "prd_source": "PRD §0.5；用户指定头插和栈的共用入口及零调用双主题验收",
+      "acceptance_criteria": [
+        "按主题选用准确材料及规则，使用共用请求传输、证据和准入链路。",
+        "核对两个主题原始提示词、Schema、材料、答案与历史记录，明确模型规划与固定提纲来源。",
+        "两份实际封存响应通过离线重放与隔离准入，拒绝跨主题、错候选审核及未授权修订，回放计零次调用。",
+        "同一开发应用完成阅读、演示、反馈和刷新恢复，提交统一结果及第三主题接入说明。"
+      ],
+      "verification": [
+        "原冻结入口与原件摘要、定向 MockTransport 和隔离 PostgreSQL 正反例。",
+        "同一访客 Chromium 两课阅读、帧播放、答题反馈和版本刷新验收。"
+      ],
+      "started_at": "2026-11-10T17:02:52+08:00",
+      "execution_gate": "双主题按各自原冻结提交完成严格回放、隔离库准入及同一访客实际浏览器验收。Provider 0，回放不计新模型成功。",
+      "commit_lookup": "Task-Completed: PHASE-1.5-T120",
+      "completed_at": "2026-11-10T17:12:02+08:00",
+      "verification_results": [
+        {
+          "date": "2026-11-10T17:12:02+08:00",
+          "commands": [
+            "scripts.course_trial replay --topic head|stack；scripts.check_course_trial_replay 双主题 publish、隔离数据库及 Chromium",
+            "pytest 共享传输、DeepSeek 严格回执、栈材料及引用边界 32 项；Vitest 课程展示和来源 12 项",
+            "pnpm typecheck、定向 Ruff/ESLint、任务工作流及 Git 差异核对"
+          ],
+          "result": "同一访客回放两份私有 v2，头插 13 帧、栈 5 帧；四题反馈、版本刷新和隔离通过。7 项拒绝不新增课程，43 个封存文件摘要一致，幂等和数据库零尝试通过。",
+          "evidence": "docs/acceptance/phase-1.5-course-trial-replay-t120/RESULTS.md"
+        }
+      ]
     }
   ],
   "planning_inputs": {

@@ -5,7 +5,6 @@ import asyncio
 from datetime import datetime
 import getpass
 import hashlib
-import ipaddress
 from pathlib import Path
 import sys
 import time
@@ -16,10 +15,10 @@ from cryptography.fernet import Fernet
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import create_database_engine
-from app.core.provider_target import TargetPolicy, approve_target
 from app.services import stack_course_materials as m
 from app.services import stack_course_publication as publication
 from app.services.free_course_snapshots import SnapshotError, canonical
+from scripts import course_trial_transport as transport_io
 from scripts import head_course_deepseek_wire as direct
 from scripts.head_course_goal import ROOT, raw_io
 
@@ -193,13 +192,7 @@ def send(vault, *, transport=None, key=None):
             key = getpass.getpass("Current DeepSeek API key (not saved): ")
         if not key or "\n" in key or "\r" in key:
             raise SnapshotError("STACK_KEY")
-        target = approve_target(
-            direct.ENDPOINT,
-            policy=TargetPolicy(),
-            **({"resolver": lambda h, p: ["93.184.216.34"]} if fixture else {}),
-        )
-        ip = ipaddress.ip_address(target.connect_ip)
-        host = f"[{ip}]" if ip.version == 6 else str(ip)
+        target = transport_io.resolve_target(transport)
         check_context(ctx, fixture=fixture, minimum=direct.IO_TIMEOUT)
         if (vault / "STOP").exists() or (vault / "HALT").exists():
             raise SnapshotError("STACK_BATCH_STOPPED")
@@ -214,34 +207,10 @@ def send(vault, *, transport=None, key=None):
                 evidence_kind=ctx["evidence_kind"],
             ),
         )
-        with (
-            httpx.Client(
-                transport=transport,
-                timeout=direct.IO_TIMEOUT,
-                trust_env=False,
-                follow_redirects=False,
-            ) as client,
-            client.stream(
-                "POST",
-                f"https://{host}:443/responses",
-                content=req,
-                extensions={"sni_hostname": target.hostname},
-                headers={
-                    "Host": target.hostname,
-                    "Authorization": "Bearer " + key,
-                    "Content-Type": "application/json",
-                    "Accept-Encoding": "identity",
-                },
-            ) as response,
-        ):
-            status = response.status_code
-            encoding = response.headers.get("content-encoding", "identity")
-            save(
-                vault,
-                "generate.headers.json",
-                dict(http_status=status, encoding=encoding),
-            )
-            raw = raw_io.collect(response, vault / "generate.raw.enc", cipher)
+        status, encoding, raw = transport_io.send_and_seal(
+            target, key, req, vault / "generate.raw.enc", cipher,
+            transport=transport, headers_path=vault / "generate.headers.json",
+        )
         body_receipt = dict(
             http_status=status,
             encoding=encoding,

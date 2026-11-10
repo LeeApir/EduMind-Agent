@@ -3,7 +3,6 @@
 import argparse
 import getpass
 import hashlib
-import ipaddress
 import json
 import os
 from pathlib import Path
@@ -97,9 +96,8 @@ def gate(vault, approval):
 
 
 def send(vault, approval, *, transport=None, key=None):
-    import httpx
     from cryptography.fernet import Fernet
-    from app.core.provider_target import TargetPolicy, approve_target
+    from scripts import course_trial_transport as transport_io
 
     sha = gate(vault, approval)
     old.raw_io.exclusive(
@@ -116,17 +114,7 @@ def send(vault, approval, *, transport=None, key=None):
         body = canonical(request)
         if len(body) > 131072:
             raise SnapshotError("FACT_REQUEST_SIZE")
-        target = approve_target(
-            "https://api.deepseek.com/responses",
-            policy=TargetPolicy(),
-            **(
-                {"resolver": lambda h, p: ["93.184.216.34"]}
-                if isinstance(transport, httpx.MockTransport)
-                else {}
-            ),
-        )
-        ip = ipaddress.ip_address(target.connect_ip)
-        host = f"[{ip}]" if ip.version == 6 else str(ip)
+        target = transport_io.resolve_target(transport)
         if key is None:
             if citation_mode() and not sys.stdin.isatty():
                 raise SnapshotError("FACT_TTY_REQUIRED")
@@ -162,24 +150,9 @@ def send(vault, approval, *, transport=None, key=None):
             ),
         )
         # Same accepted best-effort pause/late-send risk as prior foreground entry, not a T102 fix.
-        with httpx.Client(
-            transport=transport, timeout=90, trust_env=False, follow_redirects=False
-        ) as client:
-            with client.stream(
-                "POST",
-                f"https://{host}:443/responses",
-                content=body,
-                extensions={"sni_hostname": target.hostname},
-                headers={
-                    "Host": target.hostname,
-                    "Authorization": "Bearer " + key,
-                    "Content-Type": "application/json",
-                    "Accept-Encoding": "identity",
-                },
-            ) as response:
-                status = response.status_code
-                encoding = response.headers.get("content-encoding", "identity")
-                raw = old.raw_io.collect(response, vault / "revision.raw.enc", cipher)
+        status, encoding, raw = transport_io.send_and_seal(
+            target, key, body, vault / "revision.raw.enc", cipher, transport=transport
+        )
         if old.raw_io.decrypt(vault / "revision.raw.enc", cipher) != raw:
             raise SnapshotError("FACT_RAW_MISMATCH")
         old.raw_io.exclusive(

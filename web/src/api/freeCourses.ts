@@ -69,6 +69,15 @@ export interface HeadReplayFrame {frame_id:string;state_index:number;fact_id:str
 export interface StackCourseFrame {frame_id:string;code_anchor:string;line:number;popped:number|null;note:string}
 export interface VisualStep {caption:string;elements?:unknown[];highlight_ids?:string[];head_frame?:HeadReplayFrame;stack_frame?:StackCourseFrame}
 export interface ReplaySource {mapping_version:string;origin:'existing_real_candidate_replay';batch:string;slot:string;candidate_digest:string;candidate_file_sha256:string;parent_digest:string|null;model:string;prompt_version:string}
+export interface TrialReplaySource extends Omit<ReplaySource, "slot" | "candidate_file_sha256"> {
+  mapping_version: "sealed-course-trial-replay-v1"
+  topic: "head" | "stack"
+  plan_source: "model_planned" | "fixed_outline"
+  historical_stage: "authorized_citation_revision" | "first_draft"
+  new_provider_calls: 0
+  plan_digest: string
+  materials_digest: string
+}
 export type SceneBlock = {kind:'text';anchor_id:string;markdown:string} | {kind:'code';anchor_id:string;language:'c';source:string} | {kind:'exercise';anchor_id:string;exercise_id:string;exercise_version_id:string;question:string;items:{question_id:string;question:string;input_type:'short_text'|'json_integer_array'|'integer'}[]} | {kind:'exercise_unavailable';anchor_id:string;exercise_id:string;exercise_version_id:string;reason_code:string} | {kind:'visualization';anchor_id:string;text_alternative:string;visualization_type:string;steps:VisualStep[]};
 export interface GenerationSource {unknown_echoes?:string[];origin:"head_goal_model_generation";batch:string;candidate_digest:string;parent_digest:string|null;model:string;prompt_version:string;plan_digest:string;materials_digest:string;evidence_kind:"actual_provider_response"|"offline_fixture"|"program_format_recovery"|"targeted_fact_revision"|"reviewed_paragraph_revision"|"evidence_bound_local_revision";teaching_evidence_version?:string;teaching_evidence_digest?:string;teaching_review?:{verdict:"pending"|"pass"|"needs_revision";independent_evaluator:string};format_recovery?:{rule_version:string;source_batch:string;original_raw_sha256:string;original_text_sha256:string;derived_output_sha256:string;original_request_sha256:string;duplicates:Array<{path:string[];removed_member_index:number;occurrence:number;value_sha256:string}>;new_provider_calls:0;model_first_structure_pass:false;assistant_text_edits:0}}
 export interface StackCourseSource extends Omit<GenerationSource, "origin" | "evidence_kind"> {
@@ -84,7 +93,7 @@ export interface ArchivedResponseSource extends Omit<GenerationSource, "origin" 
   strict_wire_verdict: "AIAPI_ENVELOPE" | "HEAD_AIAPI_ENVELOPE"
   new_provider_calls: 0
 }
-export interface SceneProjection {course_id:string;course_version:number;scene_id:string;scene_version_id:string;blocks:SceneBlock[];actions:unknown[];replay_source?:ReplaySource;generation_source?:GenerationSource | ArchivedResponseSource | StackCourseSource}
+export interface SceneProjection {course_id:string;course_version:number;scene_id:string;scene_version_id:string;blocks:SceneBlock[];actions:unknown[];replay_source?:ReplaySource | TrialReplaySource;generation_source?:GenerationSource | ArchivedResponseSource | StackCourseSource}
 export async function readScene(course: string, version: number, scene: string, signal?: AbortSignal): Promise<SceneProjection> {
   const value = await courseRequest<SceneProjection>(`${coursePath(course)}/versions/${version}/scenes/${encodeURIComponent(scene)}`,{signal});
   if (!value || value.course_id !== course || value.course_version !== version || value.scene_id !== scene || typeof value.scene_version_id !== 'string' || !Array.isArray(value.actions) || !Array.isArray(value.blocks) || !value.blocks.every(b => typeof b.anchor_id === 'string' && ['text','code','exercise','exercise_unavailable','visualization'].includes(b.kind))) throw new FreeCourseError(502,'INVALID_RESPONSE');

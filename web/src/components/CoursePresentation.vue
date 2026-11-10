@@ -9,7 +9,11 @@ interface Action {type:'highlight_block'|'show_step'|'pause';anchor_id:string;st
 const index = ref(-1);const playing = ref(false);const reduced = ref(false);const frames = ref<Record<string,number>>({});const highlighted = ref('');
 let timer: ReturnType<typeof setTimeout>|undefined;let media: MediaQueryList|undefined;
 const visuals = computed(()=>props.scene.blocks.filter((b):b is Visual=>b.kind==='visualization'));
-const stackCourse = computed(()=>props.scene.generation_source?.origin==='stack_lifo_model_generation');
+const stackCourse = computed(() => {
+  const replay = props.scene.replay_source;
+  return props.scene.generation_source?.origin === 'stack_lifo_model_generation'
+    || (replay && 'topic' in replay && replay.topic === 'stack');
+});
 const guided = computed(()=>visuals.value.find(b=>b.visualization_type==='head_insertion_replay_v1'||stackCourse.value&&b.visualization_type==='stack'));
 function validVisual(block: Visual): boolean {
   const origin = props.scene.generation_source?.origin;

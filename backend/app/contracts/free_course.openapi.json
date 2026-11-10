@@ -3353,7 +3353,10 @@
             }
           },
           "replay_source": {
-            "$ref": "#/components/schemas/ReplaySource"
+            "oneOf": [
+              {"$ref": "#/components/schemas/ReplaySource"},
+              {"$ref": "#/components/schemas/TrialReplaySource"}
+            ]
           },
           "generation_source": {
             "oneOf": [
@@ -5607,6 +5610,89 @@
           "visualization_type",
           "text_alternative",
           "steps"
+        ]
+      },
+      "TrialReplaySource": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "mapping_version": {
+            "const": "sealed-course-trial-replay-v1"
+          },
+          "origin": {
+            "const": "existing_real_candidate_replay"
+          },
+          "topic": {
+            "enum": [
+              "head",
+              "stack"
+            ]
+          },
+          "batch": {
+            "type": "string",
+            "minLength": 1
+          },
+          "plan_source": {
+            "enum": [
+              "model_planned",
+              "fixed_outline"
+            ]
+          },
+          "historical_stage": {
+            "enum": [
+              "authorized_citation_revision",
+              "first_draft"
+            ]
+          },
+          "new_provider_calls": {
+            "const": 0
+          },
+          "candidate_digest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "parent_digest": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "model": {
+            "type": "string",
+            "minLength": 1
+          },
+          "prompt_version": {
+            "type": "string",
+            "minLength": 1
+          },
+          "plan_digest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "materials_digest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        },
+        "required": [
+          "mapping_version",
+          "origin",
+          "topic",
+          "batch",
+          "plan_source",
+          "historical_stage",
+          "new_provider_calls",
+          "candidate_digest",
+          "parent_digest",
+          "model",
+          "prompt_version",
+          "plan_digest",
+          "materials_digest"
         ]
       },
       "ReplaySource": {

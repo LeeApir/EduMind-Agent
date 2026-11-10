@@ -466,7 +466,7 @@ def approval_check(vault, approval):
 def send(stage, vault, approval, *, transport=None, key=None):
     import httpx
     from cryptography.fernet import Fernet
-    from app.core.provider_target import TargetPolicy, approve_target
+    from scripts import course_trial_transport as transport_io
 
     sha = approval_check(vault, approval)
     adapter = direct if PACKAGE in DIRECT_PACKAGES else raw_io
@@ -552,17 +552,7 @@ def send(stage, vault, approval, *, transport=None, key=None):
             )
         if len(raw_request) > 131072:
             raise SnapshotError("HEAD_REQUEST_SIZE")
-        target = approve_target(
-            direct.ENDPOINT,
-            policy=TargetPolicy(),
-            **(
-                {"resolver": lambda host, port: ["93.184.216.34"]}
-                if isinstance(transport, httpx.MockTransport)
-                else {}
-            ),
-        )
-        ip = ipaddress.ip_address(target.connect_ip)
-        host = f"[{ip}]" if ip.version == 6 else str(ip)
+        target = transport_io.resolve_target(transport)
         if key is None:
             if adapter is direct and not sys.stdin.isatty():
                 raise SnapshotError("HEAD_DIRECT_TTY_REQUIRED")
@@ -606,27 +596,9 @@ def send(stage, vault, approval, *, transport=None, key=None):
             approval_check(vault, approval)
             send_window()
         # Explicitly still susceptible to pause/late-send after this check. No T102 fix claimed.
-        with httpx.Client(
-            transport=transport,
-            timeout=direct.IO_TIMEOUT,
-            trust_env=False,
-            follow_redirects=False,
-        ) as client:
-            with client.stream(
-                "POST",
-                f"https://{host}:443/responses",
-                content=raw_request,
-                extensions={"sni_hostname": target.hostname},
-                headers={
-                    "Host": target.hostname,
-                    "Authorization": "Bearer " + key,
-                    "Content-Type": "application/json",
-                    "Accept-Encoding": "identity",
-                },
-            ) as response:
-                status = response.status_code
-                encoding = response.headers.get("content-encoding", "identity")
-                raw = raw_io.collect(response, vault / f"{stage}.raw.enc", cipher)
+        status, encoding, raw = transport_io.send_and_seal(
+            target, key, raw_request, vault / f"{stage}.raw.enc", cipher, transport=transport
+        )
         if raw_io.decrypt(vault / f"{stage}.raw.enc", cipher) != raw:
             raise SnapshotError("HEAD_EVIDENCE_INCOMPLETE")
         receipt = dict(
@@ -745,13 +717,17 @@ def forbidden(*args, **kwargs):
     raise RuntimeError("HEAD_GOAL_NO_BACKGROUND_PROVIDER")
 
 
-def serve(port=8178, *, stack_only=False):
+def serve(port=8178, *, stack_only=False, replay_only=False):
     import uvicorn
     from app.core import provider_factory
     from fastapi.responses import JSONResponse
     from app.main import app
 
-    if stack_only:
+    if replay_only:
+        from app.services.course_trial_replay import require_database
+
+        require_database()
+    elif stack_only:
         from app.services.stack_course_publication import require_database
 
         require_database()
@@ -769,7 +745,7 @@ def serve(port=8178, *, stack_only=False):
         path = request.url.path.rstrip("/")
         if request.method == "POST" and (
             path.endswith(("/operations", "/tutor-turns"))
-            or (stack_only and path.endswith("/free-courses"))
+            or ((stack_only or replay_only) and path.endswith("/free-courses"))
         ):
             return JSONResponse(
                 {"code": "HEAD_GOAL_EXTRA_OPERATION_DISABLED"}, status_code=409

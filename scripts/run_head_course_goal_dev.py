@@ -48,7 +48,7 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument(
         "--profile",
-        choices=["t108", "fixed", "archive", "direct", "aiapi", "empty", "empty-r02", "stack"],
+        choices=["t108", "fixed", "archive", "direct", "aiapi", "empty", "empty-r02", "stack", "trial-replay"],
         default="t108",
     )
     p.add_argument("--prepare", action="store_true")
@@ -96,6 +96,13 @@ def main():
 
         WORK = Path("/tmp/edumind-t119")
         database_name, api_port, web_port = DATABASE, 8192, 5212
+    elif a.profile == "trial-replay":
+        if a.check_migration or a.test:
+            p.error("Use the targeted T120 checks")
+        from app.services.course_trial_replay import DATABASE
+
+        WORK = Path("/tmp/edumind-t120")
+        database_name, api_port, web_port = DATABASE, 8193, 5213
     elif a.profile == "aiapi":
         if a.check_migration or a.test:
             p.error("Use the targeted AIAPI batch checks")
@@ -130,7 +137,8 @@ def main():
                     "-c",
                     (
                         "from scripts.head_course_goal import serve; "
-                        f"serve({api_port}, stack_only={a.profile == 'stack'})"
+                        f"serve({api_port}, stack_only={a.profile == 'stack'}, "
+                        f"replay_only={a.profile == 'trial-replay'})"
                     ),
                 ],
                 ROOT,

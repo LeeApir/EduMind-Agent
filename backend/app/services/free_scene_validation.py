@@ -166,6 +166,10 @@ async def validate_candidate(
 
             require_database(db)
             checked = validate_import(row, actual)
+        elif row.schema_version == "sealed-course-trial-replay-v1":
+            from app.services.course_trial_replay import validate_replay
+
+            checked = validate_replay(db, row, actual)
         elif row.origin_type == "existing_real_candidate_replay":
             from app.services.head_course_replay import validate_replay
 

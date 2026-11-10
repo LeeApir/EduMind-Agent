@@ -328,7 +328,11 @@ onBeforeUnmount(()=>{save();epoch+=1;manifestEpoch+=1;versionsEpoch+=1;controlle
               class="replay-source"
               aria-label="课程来源"
             >
-              <strong>既有真实候选回放 · {{ scene.replay_source.slot }} · 未签核</strong>
+              <template v-if="'topic' in scene.replay_source">
+                <strong>历史封存回放 · {{ scene.replay_source.topic === 'head' ? '空链表头插' : '栈' }} · 未签核</strong>
+                <p>{{ scene.replay_source.plan_source === 'model_planned' ? '模型规划' : '固定提纲' }} · {{ scene.replay_source.historical_stage === 'authorized_citation_revision' ? '原授权引用修订' : '原首稿' }} · 本次 Provider 调用 {{ scene.replay_source.new_provider_calls }}</p>
+              </template>
+              <strong v-else>既有真实候选回放 · {{ scene.replay_source.slot }} · 未签核</strong>
               <p>{{ scene.replay_source.model }} · {{ scene.replay_source.prompt_version }} · {{ scene.replay_source.batch }}</p>
               <p>候选 {{ scene.replay_source.candidate_digest }}</p><p v-if="scene.replay_source.parent_digest">
                 父稿 {{ scene.replay_source.parent_digest }}
