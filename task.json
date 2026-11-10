@@ -6525,6 +6525,46 @@
         }
       ],
       "completed_at": "2026-11-10T21:18:11+08:00"
+    },
+    {
+      "id": "PHASE-1.5-T122",
+      "phase": "Phase 1.5",
+      "title": "固定二分查找第四主题接入与课程交付",
+      "status": "blocked",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T121"
+      ],
+      "scope": [
+        "固定升序数组 [2,5,8,12,16] 查找 5，零基下标和闭区间。程序提供 C 代码、状态轨迹、事实、迁移情境和私有答案，模型生成教学文字。",
+        "复用共用生成入口、传输、封存、审核、准入和播放器，只补区间与指针展示。准备阶段 Provider 0，真实首稿另获授权。"
+      ],
+      "prd_source": "PRD §0.5；用户指定第四主题二分查找及共用入口",
+      "acceptance_criteria": [
+        "讲清升序前提、闭区间、mid、两种终止及重复值边界。",
+        "独立预期核对逐轮状态、比较、区间更新及代码高亮。",
+        "四道迁移题覆盖左右区间更新、命中与未命中，私有答案唯一。",
+        "准确授权后真实候选经独立全文审核和实际浏览器阅读、播放、反馈、答案隔离及刷新恢复。"
+      ],
+      "verification": [
+        "独立 C 断言与材料校验、MockTransport 隔离库准入及浏览器验收；冻结准确请求和审核规则。"
+      ],
+      "started_at": "2026-11-10T22:32:44+08:00",
+      "commit_lookup": "Task-Completed: PHASE-1.5-T122",
+      "execution_gate": "准确请求与清单已冻结，离线材料、隔离准入和浏览器验证通过。Provider 0。拟 1 首稿、0 规划和 0 修订，待新窗口和本批 C2 准确授权。",
+      "blocker": "真实调用须经用户准确批准。真实首稿、独立教学和实际课程验收待执行。",
+      "verification_results": [
+        {
+          "date": "2026-11-10T22:47:52+08:00",
+          "commands": [
+            "隔离 PostgreSQL alembic upgrade head；pytest -q backend/tests/test_binary_search_course_trial.py backend/tests/test_course_trial_transport.py",
+            "pnpm typecheck；pnpm exec vitest run tests/course-visualization.spec.ts tests/head-course-status.spec.ts",
+            "隔离 Chromium 夹具浏览器验收；共用 CLI replay --topic head/stack/queue/queue-revision 及 inspect --topic binary-search；Ruff 与工作流检查"
+          ],
+          "result": "5 项后端、14 项前端通过，Clang 独立预期及隔离 Chromium 六帧、四题反馈、答案隔离与刷新通过。四份历史候选严格重放通过。Provider 0。",
+          "evidence": "docs/acceptance/phase-1.5-binary-search-t122/RESULTS.md"
+        }
+      ]
     }
   ],
   "planning_inputs": {

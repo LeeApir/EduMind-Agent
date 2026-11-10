@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
-import type { SceneProjection, SceneBlock, HeadReplayFrame, StackCourseFrame, QueueCourseFrame } from '../api/freeCourses';
+import type { SceneProjection, SceneBlock, HeadReplayFrame, StackCourseFrame, QueueCourseFrame, BinarySearchFrame } from '../api/freeCourses';
 const props = withDefaults(defineProps<{scene: SceneProjection; active?: boolean}>(),{active:true});
 const emit = defineEmits<{highlight:[anchor:string]}>();
 type OrderedFrame = StackCourseFrame | QueueCourseFrame;
+type LineFrame = HeadReplayFrame | OrderedFrame | BinarySearchFrame;
 type Visual = Extract<SceneBlock,{kind:'visualization'}>;
 interface Element {id:string;label:string;next_id:string|null}
 interface Action {type:'highlight_block'|'show_step'|'pause';anchor_id:string;step_index:number|null}
@@ -17,14 +18,37 @@ const orderedCourse = computed(() => {
   if (origin === 'stack_lifo_model_generation' || (replay && 'topic' in replay && replay.topic === 'stack')) return 'stack';
   return undefined;
 });
-const guided = computed(()=>visuals.value.find(b=>b.visualization_type==='head_insertion_replay_v1'||b.visualization_type===orderedCourse.value));
+const searchCourse = computed(() => props.scene.generation_source?.origin === 'binary_search_model_generation');
+const guided = computed(()=>visuals.value.find(b=>b.visualization_type==='head_insertion_replay_v1'||b.visualization_type===orderedCourse.value||
+  searchCourse.value && b.visualization_type==='binary-search'));
+const comparisons = {less: '<', equal: '=', greater: '>'} as const;
+
+function validSearchFrame(frame: BinarySearchFrame | undefined, index: number, elements: Element[]): boolean {
+  if (!frame || frame.frame_id !== `f${index}` || typeof frame.note !== 'string') return false;
+  const code = props.scene.blocks.find(b => b.anchor_id === frame.code_anchor);
+  const { left, right, mid, target, phase, comparison, line } = frame;
+  if (code?.kind !== 'code' || !Number.isInteger(line) || line < 1 || line > code.source.trimEnd().split('\n').length ||
+      !Number.isInteger(left) || !Number.isInteger(right) || left < 0 || left > right || right >= elements.length ||
+      !Number.isInteger(target)) return false;
+  if (phase === 'initial') return index === 0 && mid === null && comparison === null;
+  if (mid === null || !Number.isInteger(mid) || mid < 0 || mid >= elements.length) return false;
+  const value = Number(elements[mid]!.label);
+  if (!Number.isInteger(value)) return false;
+  if (phase === 'found') return index === 5 && mid >= left && mid <= right && comparison === 'equal' && value === target;
+  if (comparison !== (value < target ? 'less' : value > target ? 'greater' : 'equal') || comparison === 'equal') return false;
+  return phase === 'compare' ? mid === left + Math.floor((right - left) / 2) :
+    phase === 'narrowed' && (comparison === 'less' ? left === mid + 1 : right === mid - 1);
+}
+
 function validVisual(block: Visual): boolean {
   const origin = props.scene.generation_source?.origin;
   if(block.visualization_type==='head_insertion_replay_v1')return Boolean(props.scene.replay_source || origin === 'head_goal_model_generation' || origin === 'reviewed_archived_response_import')&&Array.isArray(block.steps)&&block.steps.length>0&&block.steps.length<=13&&block.steps.every((s,i)=>{
     const f=s.head_frame;const code=props.scene.blocks.find(b=>b.anchor_id===f?.code_anchor&&b.kind==='code');
     return f&&f.frame_id===`f${String(i).padStart(2,'0')}`&&typeof f.title==='string'&&typeof f.note==='string'&&f.state&&typeof f.state.nodes==='object'&&code?.kind==='code'&&(f.line===null||Number.isInteger(f.line)&&f.line>0&&f.line<=code.source.trimEnd().split('\n').length)&&['active','inactive'].includes(f.locals_scope);
   });
-  if(!['array','linked_list','stack','queue'].includes(block.visualization_type)||!Array.isArray(block.steps)||!block.steps.length||block.steps.length>50)return false;
+  const binarySearch = block.visualization_type === 'binary-search';
+  if(!['array','linked_list','stack','queue','binary-search'].includes(block.visualization_type)||!Array.isArray(block.steps)||!block.steps.length||block.steps.length>50)return false;
+  if (binarySearch !== searchCourse.value || (binarySearch && block.steps.length !== 6)) return false;
   if(orderedCourse.value && (block.visualization_type!==orderedCourse.value||block.steps.length!==5))return false;
   return block.steps.every((s,i)=>{
     const f=orderedCourse.value==='queue'?s.queue_frame:s.stack_frame;
@@ -38,6 +62,12 @@ function validVisual(block: Visual): boolean {
     if(typeof s.caption!=='string'||!Array.isArray(s.elements)||s.elements.length>32||!Array.isArray(s.highlight_ids))return false;
     const elements=s.elements as Element[];
     if(!elements.every(e=>e&&typeof e.id==='string'&&typeof e.label==='string'&&(e.next_id===null||typeof e.next_id==='string')))return false;
+    if (binarySearch) {
+      if (elements.length !== 5 || !validSearchFrame(s.binary_search_frame, i, elements)) return false;
+      const mid = s.binary_search_frame!.mid;
+      if (mid === null ? s.highlight_ids.length !== 0 :
+          s.highlight_ids.length !== 1 || s.highlight_ids[0] !== elements[mid]!.id) return false;
+    } else if (s.binary_search_frame) return false;
     const ids=new Set(elements.map(e=>e.id));return ids.size===elements.length&&elements.every(e=>e.next_id===null||ids.has(e.next_id))&&s.highlight_ids.every(id=>typeof id==='string'&&ids.has(id));
   });
 }
@@ -83,13 +113,16 @@ function orderedFrame(block:Visual):OrderedFrame|undefined {
   const step=block.steps[frames.value[block.anchor_id]??0];
   return step?.queue_frame??step?.stack_frame;
 }
-function lineFrame(block:Visual):HeadReplayFrame|OrderedFrame|undefined{return headFrame(block)??orderedFrame(block);}
-function replayCode(frame:HeadReplayFrame|OrderedFrame):string{const code=props.scene.blocks.find(b=>b.kind==='code'&&b.anchor_id===frame.code_anchor);return code?.kind==='code'?code.source:'';}
+function searchFrame(block: Visual): BinarySearchFrame | undefined {
+  return validVisual(block) ? block.steps[frames.value[block.anchor_id] ?? 0]?.binary_search_frame : undefined;
+}
+function lineFrame(block:Visual):LineFrame|undefined{return headFrame(block)??orderedFrame(block)??searchFrame(block);}
+function replayCode(frame:LineFrame):string{const code=props.scene.blocks.find(b=>b.kind==='code'&&b.anchor_id===frame.code_anchor);return code?.kind==='code'?code.source:'';}
 function pointer(value:string|null|undefined):string{return value===null?'NULL':value==='indeterminate'?'未知（未初始化）':value??'';}
 function chain(frame:HeadReplayFrame):string{let id=frame.state.caller_head;const parts:string[]=[];const seen=new Set<string>();while(id!==null){if(id==='indeterminate'||seen.has(id)||!frame.state.nodes[id]){parts.push('未知或重复');return parts.join(' → ');}seen.add(id);parts.push(`${id}(${frame.state.nodes[id]!.data})`);id=frame.state.nodes[id]!.next;}parts.push('NULL');return parts.join(' → ');}
 function elements(block:Visual): Element[] {return validVisual(block)?block.steps[frames.value[block.anchor_id]??0]!.elements as Element[]:[];}
 function highlightedElement(block:Visual,id:string):boolean{return validVisual(block)&&block.steps[frames.value[block.anchor_id]??0]!.highlight_ids?.includes(id)===true;}
-function label(block:Visual):string{return ({array:'数组',linked_list:'链表',stack:'栈',queue:'队列',head_insertion_replay_v1:'链表'} as Record<string,string>)[block.visualization_type]??'状态';}
+function label(block:Visual):string{return ({array:'数组',linked_list:'链表',stack:'栈',queue:'队列','binary-search':'二分查找',head_insertion_replay_v1:'链表'} as Record<string,string>)[block.visualization_type]??'状态';}
 function motionChanged():void{reduced.value=media?.matches??false;if(reduced.value)stop();}
 function visibilityChanged():void{if(document.hidden)stop();}
 watch(()=>props.scene,()=>{stop();index.value=guided.value?0:-1;frames.value={};highlighted.value='';emit('highlight','');},{immediate:true});
@@ -216,6 +249,33 @@ onBeforeUnmount(()=>{stop();media?.removeEventListener('change',motionChanged);d
                 </li>
               </ul>
               <details><summary>准确状态与原步骤</summary><pre>{{ JSON.stringify(headFrame(block),null,2) }}</pre></details>
+            </div>
+            <div v-else-if="searchFrame(block)">
+              <p>{{ searchFrame(block)!.note }}</p>
+              <dl class="head-pointer-state">
+                <dt>left</dt><dd>{{ searchFrame(block)!.left }}</dd>
+                <dt>right</dt><dd>{{ searchFrame(block)!.right }}</dd>
+                <dt>mid</dt><dd>{{ searchFrame(block)!.mid ?? '未计算' }}</dd>
+                <dt>target</dt><dd>{{ searchFrame(block)!.target }}</dd>
+              </dl>
+              <p v-if="searchFrame(block)!.comparison">
+                {{ searchFrame(block)!.phase === 'narrowed' ? '刚完成的比较' : '本轮比较' }}：
+                {{ elements(block)[searchFrame(block)!.mid!]!.label }}
+                {{ comparisons[searchFrame(block)!.comparison!] }}
+                {{ searchFrame(block)!.target }}
+              </p>
+              <p v-if="searchFrame(block)!.phase === 'found'">返回下标 {{ searchFrame(block)!.mid }}</p>
+              <ol class="visual-elements" aria-label="数组（从下标 0 开始）">
+                <li
+                  v-for="(element,i) in elements(block)"
+                  :key="element.id"
+                  :class="{'element-highlight':highlightedElement(block,element.id)}"
+                >
+                  <small>下标 {{ i }}{{ i === searchFrame(block)!.left ? ' · left' : '' }}{{ i === searchFrame(block)!.right ? ' · right' : '' }}{{ i === searchFrame(block)!.mid ? ' · mid' : '' }}</small>
+                  <strong>{{ element.label }}</strong>
+                  <small>{{ i >= searchFrame(block)!.left && i <= searchFrame(block)!.right ? '区间内' : '已排除' }}</small>
+                </li>
+              </ol>
             </div>
             <div v-else-if="orderedFrame(block)">
               <p>{{ orderedFrame(block)!.note }}</p>

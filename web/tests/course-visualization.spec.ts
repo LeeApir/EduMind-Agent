@@ -1,7 +1,7 @@
 import { mount } from '@vue/test-utils';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import Presentation from '../src/components/CoursePresentation.vue';
-import type { SceneProjection } from '../src/api/freeCourses';
+import type { BinarySearchFrame, SceneProjection } from '../src/api/freeCourses';
 function scene(kind='linked_list'):SceneProjection{return{course_id:'c',course_version:1,scene_id:'s',scene_version_id:'sv',blocks:[{kind:'code',anchor_id:'code',language:'c',source:'head=n;'},{kind:'visualization',anchor_id:'vis',visualization_type:kind,text_alternative:'先连接，再更新head。',steps:[{caption:'初始',elements:[{id:'old',label:'3',next_id:null}],highlight_ids:[]},{caption:'新结点连接原链表',elements:[{id:'new',label:'8',next_id:'old'},{id:'old',label:'3',next_id:null}],highlight_ids:['new']}]}],actions:[{type:'highlight_block',anchor_id:'code',step_index:null},{type:'show_step',anchor_id:'vis',step_index:1},{type:'pause',anchor_id:'vis',step_index:null}]};}
 afterEach(()=>{vi.useRealTimers();vi.restoreAllMocks();vi.unstubAllGlobals();});
 async function button(w:ReturnType<typeof mount>,name:string){await w.findAll('button').find(b=>b.text()===name)!.trigger('click');}
@@ -97,6 +97,58 @@ describe('bounded scene presentation',()=>{
     expect(w.text()).toContain('本步出队结果：3');
     await button(w,'重置');
     expect(w.find('.active-code-line').attributes('data-line')).toBe('24');
+    w.unmount();
+  });
+  it('shows the updated binary-search interval and keeps the just-used midpoint distinct', async () => {
+    const tuples = [
+      ['initial', 4, 0, 4, null, null], ['compare', 10, 0, 4, 2, 'greater'],
+      ['narrowed', 13, 0, 1, 2, 'greater'], ['compare', 10, 0, 1, 0, 'less'],
+      ['narrowed', 11, 1, 1, 0, 'less'], ['found', 8, 1, 1, 1, 'equal'],
+    ] as const;
+    const steps = tuples.map(([phase, line, left, right, mid, comparison], i) => {
+      const frame: BinarySearchFrame = {
+        frame_id: `f${i}`, code_anchor: 'binary-search-code', note: `帧 ${i}`,
+        phase, line, left, right, mid, comparison, target: 5,
+      };
+      return {
+        caption: `帧 ${i}`, binary_search_frame: frame,
+        elements: [2, 5, 8, 12, 16].map((n, j) => ({ id: `index-${j}`, label: String(n), next_id: null })),
+        highlight_ids: mid === null ? [] : [`index-${mid}`],
+      };
+    });
+    const data: SceneProjection = {
+      ...scene(), generation_source: {
+        origin: 'binary_search_model_generation', batch: 'binary-search-deepseek-r01',
+        candidate_digest: 'a'.repeat(64), parent_digest: null, model: 'deepseek-flash',
+        prompt_version: 'binary-search-course-v1', plan_digest: 'b'.repeat(64),
+        materials_digest: 'c'.repeat(64), evidence_kind: 'offline_fixture',
+      },
+      blocks: [
+        { kind: 'code', anchor_id: 'binary-search-code', language: 'c', source: Array(17).fill('C').join('\n') },
+        { kind: 'visualization', anchor_id: 'binary-search-state', visualization_type: 'binary-search',
+          text_alternative: '固定闭区间', steps },
+      ],
+      actions: steps.map((_, i) => ({ type: 'show_step', anchor_id: 'binary-search-state', step_index: i })),
+    };
+    const w = mount(Presentation, { props: { scene: data } });
+    expect(w.text()).toContain('未计算');
+    for (const [i, [, line, left, right, mid]] of tuples.entries()) {
+      expect(w.get('.active-code-line').attributes('data-line')).toBe(String(line));
+      const cells = w.findAll('.visual-elements li');
+      expect(cells[left]!.text()).toContain('left');
+      expect(cells[right]!.text()).toContain('right');
+      if (mid !== null) {
+        expect(cells[mid]!.classes()).toContain('element-highlight');
+        expect(cells[mid]!.text()).toContain(mid >= left && mid <= right ? '区间内' : '已排除');
+      }
+      if (i < 5) await button(w, '下一步');
+    }
+    expect(w.text()).toContain('返回下标 1');
+    const wrong = structuredClone(data);
+    const visual = wrong.blocks[1];
+    if (visual?.kind === 'visualization') visual.steps[2]!.binary_search_frame!.right = 4;
+    await w.setProps({ scene: wrong });
+    expect(w.text()).toContain('状态表示不可用');
     w.unmount();
   });
   it('uses actual anchors for block highlight and pauses at explicit pause/last action',async()=>{

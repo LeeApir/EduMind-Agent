@@ -14,7 +14,7 @@ from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import create_database_engine
-from app.services.course_trial_publication import QUEUE, QUEUE_REVISION
+from app.services.course_trial_publication import BINARY_SEARCH, QUEUE
 from app.services.course_trial_replay import import_course, projection, require_database
 from app.services.course_trial_sources import ARCHIVES
 from scripts import course_trial_generation as generation
@@ -29,11 +29,13 @@ import sys
 sys.path[:0] = [str(Path.cwd() / "backend"), str(Path.cwd())]
 from scripts.head_course_goal import raw_io_audit
 sys.addaudithook(raw_io_audit)
-if sys.argv[1] == "queue":
+if sys.argv[1] in ("queue", "queue-revision"):
     from scripts import course_trial_generation as trial
-    from app.services.course_trial_publication import QUEUE
-    record = trial.replay(trial.vault_path(QUEUE), profile=QUEUE)
-    review = trial.read(trial.vault_path(QUEUE) / "review.json")
+    from app.services import course_trial_publication as publication
+    profile = publication.QUEUE if sys.argv[1] == "queue" else publication.QUEUE_REVISION
+    vault = trial.vault_path(profile)
+    record = trial.replay(vault, profile=profile)
+    review = trial.read(vault / "review.json")
 elif sys.argv[1] == "head":
     from scripts import head_course_fact_revision as trial
     trial.select_profile("citation")
@@ -47,12 +49,14 @@ print(json.dumps([record, review], ensure_ascii=False))
 """
 
 
+QUEUE_ARCHIVES = {
+    QUEUE.topic: "898bbe4aedbc6f23e770997098737de645e905b5",
+    "queue-revision": "f227dce7f30a92917bb8d176838e454202b5ff14",
+}
+
+
 def read_frozen(topic):
-    commit = (
-        "898bbe4aedbc6f23e770997098737de645e905b5"
-        if topic == QUEUE.topic
-        else ARCHIVES[topic].frozen_commit
-    )
+    commit = QUEUE_ARCHIVES[topic] if topic in QUEUE_ARCHIVES else ARCHIVES[topic].frozen_commit
     with TemporaryDirectory(prefix="edumind-trial-replay-") as tmp:
         checkout = Path(tmp)
         tar = checkout / "frozen.tar"
@@ -96,31 +100,31 @@ def main():
         "action", choices=("inspect", "prepare", "send", "replay", "publish", "stop")
     )
     parser.add_argument(
-        "--topic", required=True, choices=(*ARCHIVES, QUEUE.topic, "queue-revision")
+        "--topic", required=True, choices=(*ARCHIVES, *QUEUE_ARCHIVES, BINARY_SEARCH.topic)
     )
     parser.add_argument("--owner", type=UUID)
     parser.add_argument("--approval", type=Path)
     args = parser.parse_args()
     if args.action != "send":
         sys.addaudithook(raw_io_audit)
-    if args.topic == QUEUE.topic:
+    if args.topic in QUEUE_ARCHIVES:
         if (
             args.action != "replay"
             or args.owner is not None
             or args.approval is not None
         ):
-            parser.error("the stopped queue first draft supports replay only")
+            parser.error("sealed queue batches support replay only")
         record, _ = read_frozen(args.topic)
         print(record["candidate_digest"])
         return 0
-    if args.topic == "queue-revision":
+    if args.topic == BINARY_SEARCH.topic:
         if args.action != "prepare" and (
             args.owner is not None or args.approval is not None
         ):
             parser.error(
-                "queue-revision --owner and --approval are only used by prepare"
+                "binary-search --owner and --approval are only used by prepare"
             )
-        return generation.run(parser, args, QUEUE_REVISION)
+        return generation.run(parser, args, BINARY_SEARCH)
     if args.action not in {"replay", "publish"} or args.approval is not None:
         parser.error("archived topics support replay and publish")
     if (args.action == "publish") != (args.owner is not None):

@@ -42,7 +42,7 @@ export async function readCourse(id: string, signal?: AbortSignal): Promise<Cour
 export function readStored<T>(key: string): T | null { try { const value = sessionStorage.getItem(key); return value ? JSON.parse(value) as T : null; } catch { return null; } }
 export function writeStored(key: string, value: unknown): void { try { sessionStorage.setItem(key, JSON.stringify(value)); } catch { /* Reading remains available without browser storage. */ } }
 export interface OperationStep { step_key: string; scene_id: string | null; state: 'pending' | 'blocked_dependency' | 'running' | 'ready' | 'failed' | 'invalidated' | 'cancelled'; reason_code: string | null }
-export interface Operation { course_id: string; operation_id: string; kind: string; state: string; base_head_version: number | null; head_version: number | null; last_event_id: number; deadline_at: string; reason_code: string | null; clarification_questions: string[]; steps: OperationStep[]; budget: { max_attempts: number; max_seconds: number; [key: string]: unknown } | null; execution_mode?:"finite_head_foreground"|"finite_stack_foreground"|"finite_queue_foreground"; request_id: string }
+export interface Operation { course_id: string; operation_id: string; kind: string; state: string; base_head_version: number | null; head_version: number | null; last_event_id: number; deadline_at: string; reason_code: string | null; clarification_questions: string[]; steps: OperationStep[]; budget: { max_attempts: number; max_seconds: number; [key: string]: unknown } | null; execution_mode?:"finite_head_foreground"|"finite_stack_foreground"|"finite_queue_foreground"|"finite_binary_search_foreground"; request_id: string }
 export interface Impact { course_id: string; base_head_version: number | null; kind: 'adjust_outline' | 'revise_scene'; affected_scene_ids: string[]; requires_outline_adjustment: boolean; max_attempts: number; max_seconds: number; impact_digest: string }
 export type OperationRequest = { kind: 'resume'; expected_head_version: number | null; source_operation_id: string } | { kind: 'clarify'; expected_head_version: number | null; source_operation_id: string; supplement: string } | { kind: 'adjust_outline'; expected_head_version: number | null; instruction: string; impact_digest: string } | { kind:'revise_scene';expected_head_version:number;scene_id:string;instruction:string;impact_digest:string };
 export function coursePath(id: string): string { return `/${encodeURIComponent(id)}`; }
@@ -68,7 +68,15 @@ export async function cancelOperation(course: string, id: string, csrf: string, 
 export interface HeadReplayFrame {frame_id:string;state_index:number;fact_id:string;kind:string;title:string;note:string;code_anchor:string;line:number|null;locals_scope:'active'|'inactive';state:{phase:string;attempt:number|null;caller_head:string|null;local_head:string|null;p:string|null;returned:string|null;code_line:number|null;nodes:Record<string,{data:number|'indeterminate';next:string|null}>}}
 export interface StackCourseFrame {frame_id:string;code_anchor:string;line:number;popped:number|null;note:string}
 export interface QueueCourseFrame extends Omit<StackCourseFrame, 'popped'> {dequeued:number|null}
-export interface VisualStep {caption:string;elements?:unknown[];highlight_ids?:string[];head_frame?:HeadReplayFrame;stack_frame?:StackCourseFrame;queue_frame?:QueueCourseFrame}
+export interface BinarySearchFrame extends Omit<StackCourseFrame, 'popped'> {
+  phase: 'initial' | 'compare' | 'narrowed' | 'found'
+  left: number
+  right: number
+  mid: number | null
+  target: number
+  comparison: 'less' | 'equal' | 'greater' | null
+}
+export interface VisualStep {caption:string;elements?:unknown[];highlight_ids?:string[];head_frame?:HeadReplayFrame;stack_frame?:StackCourseFrame;queue_frame?:QueueCourseFrame;binary_search_frame?:BinarySearchFrame}
 export interface ReplaySource {mapping_version:string;origin:'existing_real_candidate_replay';batch:string;slot:string;candidate_digest:string;candidate_file_sha256:string;parent_digest:string|null;model:string;prompt_version:string}
 export interface TrialReplaySource extends Omit<ReplaySource, "slot" | "candidate_file_sha256"> {
   mapping_version: "sealed-course-trial-replay-v1"
@@ -82,7 +90,7 @@ export interface TrialReplaySource extends Omit<ReplaySource, "slot" | "candidat
 export type SceneBlock = {kind:'text';anchor_id:string;markdown:string} | {kind:'code';anchor_id:string;language:'c';source:string} | {kind:'exercise';anchor_id:string;exercise_id:string;exercise_version_id:string;question:string;items:{question_id:string;question:string;input_type:'short_text'|'json_integer_array'|'integer'}[]} | {kind:'exercise_unavailable';anchor_id:string;exercise_id:string;exercise_version_id:string;reason_code:string} | {kind:'visualization';anchor_id:string;text_alternative:string;visualization_type:string;steps:VisualStep[]};
 export interface GenerationSource {unknown_echoes?:string[];origin:"head_goal_model_generation";batch:string;candidate_digest:string;parent_digest:string|null;model:string;prompt_version:string;plan_digest:string;materials_digest:string;evidence_kind:"actual_provider_response"|"offline_fixture"|"program_format_recovery"|"targeted_fact_revision"|"reviewed_paragraph_revision"|"evidence_bound_local_revision";teaching_evidence_version?:string;teaching_evidence_digest?:string;teaching_review?:{verdict:"pending"|"pass"|"needs_revision";independent_evaluator:string};format_recovery?:{rule_version:string;source_batch:string;original_raw_sha256:string;original_text_sha256:string;derived_output_sha256:string;original_request_sha256:string;duplicates:Array<{path:string[];removed_member_index:number;occurrence:number;value_sha256:string}>;new_provider_calls:0;model_first_structure_pass:false;assistant_text_edits:0}}
 export interface FixedCourseSource extends Omit<GenerationSource, "origin" | "evidence_kind"> {
-  origin: "stack_lifo_model_generation" | "queue_fifo_model_generation"
+  origin: "stack_lifo_model_generation" | "queue_fifo_model_generation" | "binary_search_model_generation"
   evidence_kind: "actual_provider_response" | "evidence_bound_local_revision" | "offline_fixture"
 }
 export interface ArchivedResponseSource extends Omit<GenerationSource, "origin" | "model" | "evidence_kind"> {

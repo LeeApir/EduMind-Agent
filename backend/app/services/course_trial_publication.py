@@ -10,7 +10,12 @@ from sqlalchemy.ext.asyncio import AsyncConnection, AsyncEngine, AsyncSession
 
 from app.core.database import get_database_url
 from app.models.free_scene_generation import FreeSceneGenerationResult
-from app.services import queue_course_materials, queue_course_revision, stack_course_materials
+from app.services import (
+    binary_search_course_materials,
+    queue_course_materials,
+    queue_course_revision,
+    stack_course_materials,
+)
 from app.services.free_course_snapshots import SnapshotError, SnapshotRepository, digest
 
 WINDOW_SECONDS = 1800
@@ -64,7 +69,19 @@ QUEUE_REVISION = FixedCourse(
     "accept_T121_Q01_scope_and_batch_C2",
     QUEUE.checks,
 )
-PROFILES = {profile.materials.VERSION: profile for profile in (STACK, QUEUE, QUEUE_REVISION)}
+BINARY_SEARCH = FixedCourse(
+    "binary-search",
+    binary_search_course_materials,
+    "edumind_catalog_p15_t122_binary_search",
+    "phase-1.5-binary-search-t122",
+    "accept_T122_scope_and_batch_C2",
+    (REVIEW_CHECKS - {"all_five_frames_and_highlights"})
+    | {"all_six_frames_and_highlights", "closed_interval_and_comparisons",
+       "termination_and_duplicates"},
+)
+PROFILES = {
+    profile.materials.VERSION: profile for profile in (STACK, QUEUE, QUEUE_REVISION, BINARY_SEARCH)
+}
 
 
 def require_database(
