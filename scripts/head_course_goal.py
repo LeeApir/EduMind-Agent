@@ -27,10 +27,13 @@ REUSE_PACKAGE = ROOT / "docs/acceptance/phase-1.5-head-reuse-t109"
 FIXED_PACKAGE = ROOT / "docs/acceptance/phase-1.5-head-fixed-t111"
 DIRECT_PACKAGE = ROOT / "docs/acceptance/phase-1.5-head-deepseek-t114"
 EMPTY_PACKAGE = ROOT / "docs/acceptance/phase-1.5-head-empty-t118"
-DIRECT_PACKAGES = (DIRECT_PACKAGE, EMPTY_PACKAGE)
+EMPTY_R02_PACKAGE = EMPTY_PACKAGE.with_name("phase-1.5-head-empty-t118-r02")
+EMPTY_PACKAGES = (EMPTY_PACKAGE, EMPTY_R02_PACKAGE)
+DIRECT_PACKAGES = (DIRECT_PACKAGE, *EMPTY_PACKAGES)
 FIXED_PACKAGES = (FIXED_PACKAGE, *DIRECT_PACKAGES)
 DIRECT_VAULT = Path.home() / ".local/share/edumind" / direct.BATCH
 EMPTY_VAULT = DIRECT_VAULT.with_name(direct.EMPTY_BATCH)
+EMPTY_R02_VAULT = DIRECT_VAULT.with_name(direct.EMPTY_R02_BATCH)
 FIXED_VAULT = Path.home() / ".local/share/edumind/head-fixed-r01"
 OLD = ROOT / "docs/acceptance/phase-1.5-limited-c-preparation-t104/execute_once.py"
 spec = importlib.util.spec_from_file_location("head_goal_raw_transport", OLD)
@@ -47,7 +50,7 @@ def package_digest():
 
 
 def profile_goal():
-    if PACKAGE == EMPTY_PACKAGE:
+    if PACKAGE in EMPTY_PACKAGES:
         return m.EMPTY_GOAL
     if PACKAGE in FIXED_PACKAGES:
         return m.FIXED_GOAL
@@ -57,11 +60,21 @@ def profile_goal():
 
 
 def profile_vault():
+    if PACKAGE == EMPTY_R02_PACKAGE:
+        return EMPTY_R02_VAULT
     return (
         EMPTY_VAULT
-        if PACKAGE == EMPTY_PACKAGE
+        if PACKAGE in EMPTY_PACKAGES
         else (DIRECT_VAULT if PACKAGE in DIRECT_PACKAGES else FIXED_VAULT)
     )
+
+
+def direct_profile():
+    if PACKAGE == EMPTY_R02_PACKAGE:
+        return direct.EMPTY_R02_DATABASE, direct.EMPTY_R02_BATCH
+    if PACKAGE == EMPTY_PACKAGE:
+        return direct.EMPTY_DATABASE, direct.EMPTY_BATCH
+    return direct.DATABASE, direct.BATCH
 
 
 def planning_body(inputs):
@@ -125,15 +138,10 @@ async def prepare(owner, cid, oid):
             from sqlalchemy.engine import make_url
             from app.core.database import get_database_url
 
-            expected = (
-                (direct.EMPTY_DATABASE, direct.EMPTY_BATCH)
-                if PACKAGE == EMPTY_PACKAGE
-                else (direct.DATABASE, direct.BATCH)
-            )
             if (
                 make_url(get_database_url()).database,
                 op.config_snapshot.get("policy_version"),
-            ) != expected:
+            ) != direct_profile():
                 raise SnapshotError("HEAD_DIRECT_OPERATION_REQUIRED")
         return dict(
             owner=str(owner),
@@ -211,7 +219,7 @@ def read(path):
 def verify_empty_request(stage, request, inputs, plan=None):
     """Bind only the runtime fields allowed by the T118 request templates."""
     name = {"plan": "planning", "generate": "teaching"}[stage]
-    expected = read(EMPTY_PACKAGE / f"{name}-request.template.json")
+    expected = read(PACKAGE / f"{name}-request.template.json")
     body = json.loads(expected["input"][1]["content"])
     ids = {
         field: str(UUID(inputs[field]))
@@ -379,17 +387,17 @@ def approval_check(vault, approval):
         expected = dict(
             package_sha256=sha,
             version=m.FIXED_VERSION,
-            batch=direct.EMPTY_BATCH if PACKAGE == EMPTY_PACKAGE else direct.BATCH,
+            batch=direct_profile()[1],
             context_sha256=hashlib.sha256(context_bytes).hexdigest(),
             explicit_user_authorization=True,
-            max_http_requests=2 if PACKAGE == EMPTY_PACKAGE else 3,
+            max_http_requests=2 if PACKAGE in EMPTY_PACKAGES else 3,
             execution_window=window,
             planning_wire_version=plan_wire.VERSION,
             planning_prompt_version=plan_wire.PROMPT_VERSION,
         )
         expected[
             "accept_T118_and_batch_C2"
-            if PACKAGE == EMPTY_PACKAGE
+            if PACKAGE in EMPTY_PACKAGES
             else "accept_ADR0058_and_batch_C2"
         ] = True
         bound = vault / "approval.bound.json"
@@ -488,9 +496,9 @@ def send(stage, vault, approval, *, transport=None, key=None):
         if goal != profile_goal():
             raise SnapshotError("HEAD_PACKAGE_PROFILE_MISMATCH")
         if (
-            (PACKAGE == EMPTY_PACKAGE and stage not in ("plan", "generate"))
+            (PACKAGE in EMPTY_PACKAGES and stage not in ("plan", "generate"))
             or len(list(vault.glob("*.attempt.json")))
-            >= (2 if PACKAGE == EMPTY_PACKAGE else 3)
+            >= (2 if PACKAGE in EMPTY_PACKAGES else 3)
             or (vault / f"{stage}.attempt.json").exists()
         ):
             raise SnapshotError("HEAD_REQUEST_LIMIT")
@@ -515,7 +523,7 @@ def send(stage, vault, approval, *, transport=None, key=None):
                 != payload["planning_basis"]["binding"]
             ):
                 raise SnapshotError("HEAD_PLAN_REVIEW_REQUIRED")
-            if PACKAGE == EMPTY_PACKAGE:
+            if PACKAGE in EMPTY_PACKAGES:
                 from app.services.head_course_reuse import validate_plan_review
 
                 validate_plan_review(review, payload)
@@ -535,7 +543,7 @@ def send(stage, vault, approval, *, transport=None, key=None):
             if stage != "repair" or not reuse_mode:
                 request = m.body(payload, parent, issues)
         raw_request = canonical(request)
-        if PACKAGE == EMPTY_PACKAGE:
+        if PACKAGE in EMPTY_PACKAGES:
             verify_empty_request(
                 stage,
                 request,
@@ -863,7 +871,7 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument(
         "--profile",
-        choices=["t108", "reuse", "fixed", "direct", "empty"],
+        choices=["t108", "reuse", "fixed", "direct", "empty", "empty-r02"],
         default="t108",
     )
     group = p.add_mutually_exclusive_group(required=True)
@@ -886,6 +894,8 @@ def main():
         PACKAGE = DIRECT_PACKAGE
     if args.profile == "empty":
         PACKAGE = EMPTY_PACKAGE
+    if args.profile == "empty-r02":
+        PACKAGE = EMPTY_R02_PACKAGE
     if args.inspect:
         print(
             json.dumps(
@@ -926,7 +936,7 @@ def main():
         ):
             raise SnapshotError("HEAD_PACKAGE_PROFILE_MISMATCH")
         prepared = planning_body(context["planning_inputs"])
-        if PACKAGE == EMPTY_PACKAGE:
+        if PACKAGE in EMPTY_PACKAGES:
             verify_empty_request("plan", prepared, context["planning_inputs"])
         raw_io.exclusive(args.vault / "context.json", canonical(context))
         raw_io.exclusive(

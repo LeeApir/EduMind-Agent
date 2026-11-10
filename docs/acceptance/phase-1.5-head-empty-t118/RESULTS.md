@@ -18,3 +18,11 @@
 - 修改文件的 Ruff、`pnpm typecheck`（`web/`）、`python3 scripts/check_catalog_workflow.py`、`git diff --check` 通过。
 
 真实批次用本记录续写：独立规划审核、请求次数与用量、原件/失败索引、首稿结构及教学、课程版本/场景/练习绑定、实际浏览器结果。离线通过只证明接线，不代替这些验收。
+
+## r01 已停止
+
+用户批准 `194086a` 及本批 C2 例外后，于北京时间 2026-11-10 08:23:02 创建应用操作，原截止为 08:53:02。准确授权、课程和操作 ID 见 [批准登记](../../ADR/0058-t118-approval-20261110.json)。
+
+本机前台在密钥输入阶段收到 `KeyboardInterrupt`。原件目录 `~/.local/share/edumind/head-empty-deepseek-r01` 保留 `plan.prepared-request.json`、`plan.failure.json`、`ACTIVE` 和 `STOP`。没有 `*.attempt.json`、HTTP 收据或原始响应。实际 HTTP 尝试 0，规划、正文和修订均为 0，无可报告的 Provider 用量。使用现有取消服务对该绑定操作发出取消请求，回读为 `cancel_requested`、`finite_head_foreground`，`head_version=null`。浏览器原标签页已不可用，因此这一步通过本机后端取消服务执行。
+
+用户要求另开独立批次。[r02 执行包](../phase-1.5-head-empty-t118-r02/README.md)复用完全相同的请求模板与独立参考，分离批标、库、原件及授权。隔离 PostgreSQL 上的 22 项离线检查通过，包括跨批操作和批准拒绝、准入来源、四题反馈及 STOP。原 `194086a` 归档清单 409 项全部复核；新清单 410 项、Ruff、前端类型检查与工作流校验通过。r02 的实际操作及窗口待另行授权。

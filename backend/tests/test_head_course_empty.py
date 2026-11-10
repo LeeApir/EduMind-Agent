@@ -179,13 +179,17 @@ def test_exact_new_requests_and_closed_content():
 
 @pytest.mark.parametrize("mode", ["ready", "duplicate_stop"])
 def test_actual_empty_entry_and_private_application(monkeypatch, tmp_path, mode):
-    assert direct.EMPTY_DATABASE in os.environ["EDUMIND_TEST_DATABASE_URL"]
-    monkeypatch.setenv("EDUMIND_DATABASE_URL", os.environ["EDUMIND_TEST_DATABASE_URL"])
+    url = os.environ["EDUMIND_TEST_DATABASE_URL"]
+    from sqlalchemy.engine import make_url
+
+    batch = direct.EMPTY_BATCH_BY_DATABASE[make_url(url).database]
+    r02 = batch == direct.EMPTY_R02_BATCH
+    monkeypatch.setenv("EDUMIND_DATABASE_URL", url)
     monkeypatch.setenv("EDUMIND_PRODUCT_MODE", "dynamic")
     monkeypatch.setenv("EDUMIND_HEAD_GOAL_DEVELOPMENT", "1")
     monkeypatch.setenv("EDUMIND_HEAD_DEEPSEEK_DEVELOPMENT", "1")
-    monkeypatch.setattr(entry, "PACKAGE", entry.EMPTY_PACKAGE)
-    monkeypatch.setattr(entry, "EMPTY_VAULT", tmp_path)
+    monkeypatch.setattr(entry, "PACKAGE", entry.EMPTY_R02_PACKAGE if r02 else entry.EMPTY_PACKAGE)
+    monkeypatch.setattr(entry, "EMPTY_R02_VAULT" if r02 else "EMPTY_VAULT", tmp_path)
     monkeypatch.setattr(
         "app.core.provider_factory.build_default_provider_gateway",
         lambda *a, **kw: pytest.fail("Provider forbidden"),
@@ -196,7 +200,12 @@ def test_actual_empty_entry_and_private_application(monkeypatch, tmp_path, mode)
         result = client.post("/api/free-courses", json={"goal": m.EMPTY_GOAL}, headers=headers)
         assert result.status_code == 201, result.text
         cid, oid = (UUID(result.json()[k]) for k in ("course_id", "operation_id"))
-        context = asyncio.run(entry.prepare(UUID(auth["user"]["id"]), cid, oid))
+        owner = UUID(auth["user"]["id"])
+        with monkeypatch.context() as other:
+            other.setattr(entry, "PACKAGE", entry.EMPTY_PACKAGE if r02 else entry.EMPTY_R02_PACKAGE)
+            with pytest.raises(SnapshotError, match="HEAD_DIRECT_OPERATION_REQUIRED"):
+                asyncio.run(entry.prepare(owner, cid, oid))
+        context = asyncio.run(entry.prepare(owner, cid, oid))
         context_raw = canonical(context)
         prepared = entry.planning_body(context["planning_inputs"])
         for name, data in {
@@ -209,7 +218,7 @@ def test_actual_empty_entry_and_private_application(monkeypatch, tmp_path, mode)
         approval = dict(
             package_sha256=entry.package_digest(),
             version=m.FIXED_VERSION,
-            batch=direct.EMPTY_BATCH,
+            batch=batch,
             context_sha256=reuse.sha(context_raw),
             explicit_user_authorization=True,
             accept_T118_and_batch_C2=True,
@@ -237,6 +246,11 @@ def test_actual_empty_entry_and_private_application(monkeypatch, tmp_path, mode)
 
         with pytest.raises(SnapshotError, match="HEAD_EXACT_AUTHORIZATION_REQUIRED"):
             entry.approval_check(tmp_path, {**approval, "max_http_requests": 3})
+        with pytest.raises(SnapshotError, match="HEAD_EXACT_AUTHORIZATION_REQUIRED"):
+            entry.approval_check(
+                tmp_path,
+                {**approval, "batch": direct.EMPTY_BATCH if r02 else direct.EMPTY_R02_BATCH},
+            )
         with pytest.raises(SnapshotError, match="HEAD_REQUEST_CHANGED"):
             entry.verify_empty_request(
                 "plan", {**prepared, "temperature": 0.3}, context["planning_inputs"]
@@ -300,7 +314,7 @@ def test_actual_empty_entry_and_private_application(monkeypatch, tmp_path, mode)
         assert scene.status_code == 200, scene.text
         assert "answer_key" not in scene.text and "solution" not in scene.text
         view = scene.json()
-        assert view["generation_source"]["batch"] == direct.EMPTY_BATCH
+        assert view["generation_source"]["batch"] == batch
         assert view["generation_source"]["evidence_kind"] == "offline_fixture"
         assert view["generation_source"]["candidate_digest"] == c["candidate_digest"]
         assert view["generation_source"]["teaching_evidence_digest"] == review["evidence_digest"]

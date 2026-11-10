@@ -47,8 +47,8 @@ async def enqueue(sessions, owner: UUID, body: dict[str, Any], key: str) -> dict
         db_name = make_url(get_database_url()).database
         if (db_name, body["goal"]) == (direct.DATABASE, m.FIXED_GOAL):
             config["policy_version"] = direct.BATCH
-        elif (db_name, body["goal"]) == (direct.EMPTY_DATABASE, m.EMPTY_GOAL):
-            config["policy_version"] = direct.EMPTY_BATCH
+        elif db_name in direct.EMPTY_BATCH_BY_DATABASE and body["goal"] == m.EMPTY_GOAL:
+            config["policy_version"] = direct.EMPTY_BATCH_BY_DATABASE[db_name]
         else:
             raise SnapshotError("HEAD_DIRECT_OPERATION_REQUIRED")
         window_seconds = direct.WINDOW_SECONDS

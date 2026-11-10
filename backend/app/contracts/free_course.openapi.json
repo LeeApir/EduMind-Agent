@@ -5957,7 +5957,7 @@
                 "const": "head_goal_model_generation"
               },
               "batch": {
-                "enum": ["head-fixed-r01", "head-fixed-deepseek-r01", "head-fixed-aiapi-content-r01", "head-empty-deepseek-r01"]
+                "enum": ["head-fixed-r01", "head-fixed-deepseek-r01", "head-fixed-aiapi-content-r01", "head-empty-deepseek-r01", "head-empty-deepseek-r02"]
               },
               "candidate_digest": {
                 "type": "string",
@@ -6140,7 +6140,7 @@
             "allOf": [
               {
                 "if": {
-                  "properties": {"batch": {"const": "head-empty-deepseek-r01"}}
+                  "properties": {"batch": {"enum": ["head-empty-deepseek-r01", "head-empty-deepseek-r02"]}}
                 },
                 "then": {
                   "properties": {

@@ -35,7 +35,7 @@ def inputs():
     )
 
 
-def outputs():
+def outputs(*, batch=direct.EMPTY_BATCH, database=direct.EMPTY_DATABASE):
     # Only the example and forms are needed to derive materials. No model plan exists yet.
     payload = m.content_payload(
         inputs(),
@@ -51,10 +51,10 @@ def outputs():
         "teaching-request.template.json": teaching,
         "planning-local.schema.json": wire.local.SCHEMA,
         "candidate-config.json": dict(
-            batch=direct.EMPTY_BATCH,
+            batch=batch,
             endpoint=direct.ENDPOINT,
             response_contract=direct.VERSION,
-            development_database=direct.EMPTY_DATABASE,
+            development_database=database,
             planning_wire=wire.VERSION,
             planning_prompt=wire.PROMPT_VERSION,
             model=teaching["model"],
@@ -85,7 +85,7 @@ def outputs():
         "approval.template.json": dict(
             package_sha256="<APPROVED_MANIFEST_SHA256>",
             version=m.FIXED_VERSION,
-            batch=direct.EMPTY_BATCH,
+            batch=batch,
             context_sha256="<ACTUAL_CONTEXT_FILE_SHA256>",
             explicit_user_authorization=False,
             accept_T118_and_batch_C2=False,
@@ -110,8 +110,12 @@ def sha(raw):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--check", action="store_true")
+    parser.add_argument("--r02", action="store_true")
     args = parser.parse_args()
-    generated = outputs()
+    here = entry.EMPTY_R02_PACKAGE if args.r02 else HERE
+    batch = direct.EMPTY_R02_BATCH if args.r02 else direct.EMPTY_BATCH
+    database = direct.EMPTY_R02_DATABASE if args.r02 else direct.EMPTY_DATABASE
+    generated = outputs(batch=batch, database=database)
 
     def write_or_check(path, raw):
         if args.check:
@@ -121,7 +125,7 @@ def main():
             path.write_bytes(raw)
 
     for name, raw in generated.items():
-        write_or_check(HERE / name, raw)
+        write_or_check(here / name, raw)
     paths = set(base.paths()) | {
         "scripts/head_course_deepseek_wire.py",
         "scripts/prepare_head_course_empty.py",
@@ -131,14 +135,16 @@ def main():
         "docs/ADR/0058-t118-empty-head-supplement.md",
     }
     paths.update(
-        str((HERE / name).relative_to(entry.ROOT))
+        str((here / name).relative_to(entry.ROOT))
         for name in (*generated, "README.md", "independent-reference.json")
     )
+    if args.r02:
+        paths.add(str((HERE / "manifest.json").relative_to(entry.ROOT)))
     manifest = (
         entry.canonical(
             dict(
                 version=direct.VERSION,
-                batch=direct.EMPTY_BATCH,
+                batch=batch,
                 status="prepared_not_authorized",
                 files={
                     path: sha((entry.ROOT / path).read_bytes())
@@ -148,7 +154,7 @@ def main():
         )
         + b"\n"
     )
-    write_or_check(HERE / "manifest.json", manifest)
+    write_or_check(here / "manifest.json", manifest)
     print(
         json.dumps(
             dict(files=len(paths), manifest_sha256=sha(manifest), provider_calls=0)

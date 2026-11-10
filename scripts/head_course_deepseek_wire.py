@@ -10,6 +10,12 @@ EMPTY_BATCH = "head-empty-deepseek-r01"
 VERSION = "head-deepseek-responses-v1"
 DATABASE = "edumind_catalog_p15_t108_t114"
 EMPTY_DATABASE = "edumind_catalog_p15_t108_t118"
+EMPTY_R02_BATCH = "head-empty-deepseek-r02"
+EMPTY_R02_DATABASE = "edumind_catalog_p15_t108_t118_r02"
+EMPTY_BATCH_BY_DATABASE = {
+    EMPTY_DATABASE: EMPTY_BATCH,
+    EMPTY_R02_DATABASE: EMPTY_R02_BATCH,
+}
 ENDPOINT = "https://api.deepseek.com/responses"
 WINDOW_SECONDS = 1800
 IO_TIMEOUT = 90
@@ -42,7 +48,10 @@ OPTIONAL_DEFAULTS = {
 
 
 def operation_window(op):
-    if op.config_snapshot.get("policy_version") not in (BATCH, EMPTY_BATCH):
+    if op.config_snapshot.get("policy_version") not in (
+        BATCH,
+        *EMPTY_BATCH_BY_DATABASE.values(),
+    ):
         return {}
     if op.deadline_at - op.created_at != timedelta(seconds=WINDOW_SECONDS):
         raise SnapshotError("HEAD_DIRECT_WINDOW_MISMATCH")

@@ -354,7 +354,7 @@ def require_full_review(review, c, *, allow_terminal_lf=False):
     return c
 
 
-def assembled(records, review, adapter=None):
+def assembled(records, review, adapter=None, *, operation_policy=None):
     from app.services import head_course_aiapi_content as aiapi
     from scripts import head_course_deepseek_wire as direct
 
@@ -362,7 +362,7 @@ def assembled(records, review, adapter=None):
     c = rec["candidate"]
     source = dict(
         origin=m.ORIGIN,
-        batch=direct.EMPTY_BATCH
+        batch=operation_policy or direct.EMPTY_BATCH
         if c["payload"]["original_goal"] == m.EMPTY_GOAL
         else (
             getattr(adapter, "BATCH", FIXED_BATCH)
@@ -460,7 +460,7 @@ def publication_adapter(chain, operation):
 
     policy = operation.config_snapshot.get("policy_version") if operation is not None else None
     empty = chain["context"]["planning_inputs"]["original_goal"] == m.EMPTY_GOAL
-    if empty != (policy == direct.EMPTY_BATCH):
+    if empty != (policy in direct.EMPTY_BATCH_BY_DATABASE.values()):
         raise SnapshotError("HEAD_EMPTY_BATCH_BINDING")
     if operation is not None and operation.config_snapshot.get("policy_version") == aiapi.BATCH:
         if chain["context"].get("execution_window") != aiapi.operation_window(operation):
@@ -480,7 +480,12 @@ def validate_publication(row, actual, operation=None):
     c = validate_chain(chain, actual["request"], actual["plan"]["candidate"], adapter)
     snapshot = dict(inputs=actual, reuse_chain=chain)
     final = chain["records"][-1]
-    expected = assembled(chain["records"], chain["final_review"], adapter)
+    expected = assembled(
+        chain["records"],
+        chain["final_review"],
+        adapter,
+        operation_policy=operation.config_snapshot.get("policy_version") if operation else None,
+    )
     if (
         row.input_snapshot != snapshot
         or row.origin_type != m.ORIGIN
@@ -531,10 +536,11 @@ async def publish(db, owner, cid, oid, chain):
         context = await aiapi.outline(repo, cid)
         window = {"execution_window": aiapi.operation_window(op)}
     else:
-        if op.config_snapshot.get("policy_version") == direct.EMPTY_BATCH:
+        policy = op.config_snapshot.get("policy_version")
+        if policy in direct.EMPTY_BATCH_BY_DATABASE.values():
             from sqlalchemy.engine import make_url
 
-            if make_url(db.bind.url).database != direct.EMPTY_DATABASE:
+            if direct.EMPTY_BATCH_BY_DATABASE.get(make_url(db.bind.url).database) != policy:
                 raise SnapshotError("HEAD_EMPTY_BATCH_BINDING")
         context = await g.generation_context(db, owner, cid, oid)
         window = direct.operation_window(op)
@@ -569,7 +575,12 @@ async def publish(db, owner, cid, oid, chain):
         input_snapshot=snapshot,
         input_digest=digest("head-reuse-input", snapshot=snapshot),
         request_digest=digest("head-http-request", body=final["request"]),
-        response_json=assembled(records, chain["final_review"], adapter),
+        response_json=assembled(
+            records,
+            chain["final_review"],
+            adapter,
+            operation_policy=op.config_snapshot.get("policy_version"),
+        ),
         prompt_version=final["protocol_version"],
         schema_version=final["protocol_version"],
         state="candidate",
