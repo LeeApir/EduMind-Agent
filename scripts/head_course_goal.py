@@ -745,15 +745,20 @@ def forbidden(*args, **kwargs):
     raise RuntimeError("HEAD_GOAL_NO_BACKGROUND_PROVIDER")
 
 
-def serve(port=8178):
+def serve(port=8178, *, stack_only=False):
     import uvicorn
     from app.core import provider_factory
     from fastapi.responses import JSONResponse
     from app.main import app
 
-    generation.require_development_database()
-    if not generation.development_enabled():
-        raise SnapshotError("HEAD_DEVELOPMENT_REQUIRED")
+    if stack_only:
+        from app.services.stack_course_publication import require_database
+
+        require_database()
+    else:
+        generation.require_development_database()
+        if not generation.development_enabled():
+            raise SnapshotError("HEAD_DEVELOPMENT_REQUIRED")
     provider_factory.build_default_provider_gateway = forbidden
     provider_factory.build_server_provider_gateway = forbidden
     # Reuse the previous explicit loopback-only network guard, never inherit its fixed import route.
@@ -761,8 +766,10 @@ def serve(port=8178):
 
     @app.middleware("http")
     async def no_extra_operations(request, call_next):
-        if request.method == "POST" and request.url.path.endswith(
-            ("/operations", "/tutor-turns")
+        path = request.url.path.rstrip("/")
+        if request.method == "POST" and (
+            path.endswith(("/operations", "/tutor-turns"))
+            or (stack_only and path.endswith("/free-courses"))
         ):
             return JSONResponse(
                 {"code": "HEAD_GOAL_EXTRA_OPERATION_DISABLED"}, status_code=409

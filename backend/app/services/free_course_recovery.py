@@ -327,7 +327,12 @@ class Recovery:
                 .order_by(FreeCourseStep.created_at, FreeCourseStep.step_key)
             )
         ).all()
-        finite_head = op.config_snapshot.get("prompt_version") in FINITE_HEAD_PROMPT_VERSIONS
+        prompt_version = op.config_snapshot.get("prompt_version")
+        execution_mode = None
+        if prompt_version in FINITE_HEAD_PROMPT_VERSIONS:
+            execution_mode = "finite_head_foreground"
+        elif prompt_version == "stack-lifo-course-v1":
+            execution_mode = "finite_stack_foreground"
         b = await self.scheduler.budget(db, cid, oid)
         unknown = await db.scalar(
             select(FreeCourseAttempt.id)
@@ -369,9 +374,9 @@ class Recovery:
                 )
                 for s in steps
             ],
-            **({"execution_mode": "finite_head_foreground"} if finite_head else {}),
+            **({"execution_mode": execution_mode} if execution_mode else {}),
             budget=None
-            if finite_head
+            if execution_mode
             else dict(
                 attempts_used=b["operation_attempts"],
                 attempts_remaining=max(

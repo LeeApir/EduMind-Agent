@@ -48,7 +48,7 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument(
         "--profile",
-        choices=["t108", "fixed", "archive", "direct", "aiapi", "empty", "empty-r02"],
+        choices=["t108", "fixed", "archive", "direct", "aiapi", "empty", "empty-r02", "stack"],
         default="t108",
     )
     p.add_argument("--prepare", action="store_true")
@@ -89,6 +89,13 @@ def main():
             8190,
             5210,
         )
+    elif a.profile == "stack":
+        if a.check_migration or a.test:
+            p.error("Use the targeted T119 checks")
+        from app.services.stack_course_publication import DATABASE
+
+        WORK = Path("/tmp/edumind-t119")
+        database_name, api_port, web_port = DATABASE, 8192, 5212
     elif a.profile == "aiapi":
         if a.check_migration or a.test:
             p.error("Use the targeted AIAPI batch checks")
@@ -121,7 +128,10 @@ def main():
                 [
                     python,
                     "-c",
-                    f"from scripts.head_course_goal import serve; serve({api_port})",
+                    (
+                        "from scripts.head_course_goal import serve; "
+                        f"serve({api_port}, stack_only={a.profile == 'stack'})"
+                    ),
                 ],
                 ROOT,
             ),

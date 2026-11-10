@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
-import type { SceneProjection, SceneBlock, HeadReplayFrame } from '../api/freeCourses';
+import type { SceneProjection, SceneBlock, HeadReplayFrame, StackCourseFrame } from '../api/freeCourses';
 const props = withDefaults(defineProps<{scene: SceneProjection; active?: boolean}>(),{active:true});
 const emit = defineEmits<{highlight:[anchor:string]}>();
 type Visual = Extract<SceneBlock,{kind:'visualization'}>;
@@ -9,7 +9,8 @@ interface Action {type:'highlight_block'|'show_step'|'pause';anchor_id:string;st
 const index = ref(-1);const playing = ref(false);const reduced = ref(false);const frames = ref<Record<string,number>>({});const highlighted = ref('');
 let timer: ReturnType<typeof setTimeout>|undefined;let media: MediaQueryList|undefined;
 const visuals = computed(()=>props.scene.blocks.filter((b):b is Visual=>b.kind==='visualization'));
-const replay = computed(()=>visuals.value.find(b=>b.visualization_type==='head_insertion_replay_v1'));
+const stackCourse = computed(()=>props.scene.generation_source?.origin==='stack_lifo_model_generation');
+const guided = computed(()=>visuals.value.find(b=>b.visualization_type==='head_insertion_replay_v1'||stackCourse.value&&b.visualization_type==='stack'));
 function validVisual(block: Visual): boolean {
   const origin = props.scene.generation_source?.origin;
   if(block.visualization_type==='head_insertion_replay_v1')return Boolean(props.scene.replay_source || origin === 'head_goal_model_generation' || origin === 'reviewed_archived_response_import')&&Array.isArray(block.steps)&&block.steps.length>0&&block.steps.length<=13&&block.steps.every((s,i)=>{
@@ -17,7 +18,15 @@ function validVisual(block: Visual): boolean {
     return f&&f.frame_id===`f${String(i).padStart(2,'0')}`&&typeof f.title==='string'&&typeof f.note==='string'&&f.state&&typeof f.state.nodes==='object'&&code?.kind==='code'&&(f.line===null||Number.isInteger(f.line)&&f.line>0&&f.line<=code.source.trimEnd().split('\n').length)&&['active','inactive'].includes(f.locals_scope);
   });
   if(!['array','linked_list','stack','queue'].includes(block.visualization_type)||!Array.isArray(block.steps)||!block.steps.length||block.steps.length>50)return false;
-  return block.steps.every(s=>{
+  if(stackCourse.value && (block.visualization_type!=='stack'||block.steps.length!==5))return false;
+  return block.steps.every((s,i)=>{
+    const f=s.stack_frame;
+    if(stackCourse.value){
+      const code=props.scene.blocks.find(b=>b.anchor_id===f?.code_anchor);
+      if(!f||f.frame_id!==`f${i}`||typeof f.note!=='string'||code?.kind!=='code'||
+        !Number.isInteger(f.line)||f.line<1||f.line>code.source.trimEnd().split('\n').length||
+        (f.popped!==null&&!Number.isInteger(f.popped)))return false;
+    }else if(f)return false;
     if(typeof s.caption!=='string'||!Array.isArray(s.elements)||s.elements.length>32||!Array.isArray(s.highlight_ids))return false;
     const elements=s.elements as Element[];
     if(!elements.every(e=>e&&typeof e.id==='string'&&typeof e.label==='string'&&(e.next_id===null||typeof e.next_id==='string')))return false;
@@ -38,7 +47,7 @@ const activePlayback = computed(()=>props.active!==false);
 function stop():void {playing.value=false;clearTimeout(timer);}
 function apply(target:number):void {
   stop();if(!validActions.value)return;
-  index.value=Math.max(replay.value?0:-1,Math.min(target,actions.value.length-1));frames.value={};highlighted.value='';
+  index.value=Math.max(guided.value?0:-1,Math.min(target,actions.value.length-1));frames.value={};highlighted.value='';
   for(const action of actions.value.slice(0,index.value+1)){
     if(action.type==='show_step')frames.value[action.anchor_id]=action.step_index!;
     if(action.type==='highlight_block')highlighted.value=action.anchor_id;
@@ -56,7 +65,9 @@ function tick():void {
 function play():void {if(!actions.value.length||reduced.value||!activePlayback.value)return;if(index.value>=actions.value.length-1)apply(-1);playing.value=true;tick();}
 function chooseFrame(block:Visual,delta:number):void {stop();if(!validVisual(block))return;frames.value={...frames.value,[block.anchor_id]:Math.max(0,Math.min(block.steps.length-1,(frames.value[block.anchor_id]??0)+delta))};}
 function headFrame(block:Visual):HeadReplayFrame|undefined{return validVisual(block)?block.steps[frames.value[block.anchor_id]??0]?.head_frame:undefined;}
-function replayCode(frame:HeadReplayFrame):string{const code=props.scene.blocks.find(b=>b.kind==='code'&&b.anchor_id===frame.code_anchor);return code?.kind==='code'?code.source:'';}
+function stackFrame(block:Visual):StackCourseFrame|undefined{return validVisual(block)?block.steps[frames.value[block.anchor_id]??0]?.stack_frame:undefined;}
+function lineFrame(block:Visual):HeadReplayFrame|StackCourseFrame|undefined{return headFrame(block)??stackFrame(block);}
+function replayCode(frame:HeadReplayFrame|StackCourseFrame):string{const code=props.scene.blocks.find(b=>b.kind==='code'&&b.anchor_id===frame.code_anchor);return code?.kind==='code'?code.source:'';}
 function pointer(value:string|null|undefined):string{return value===null?'NULL':value==='indeterminate'?'未知（未初始化）':value??'';}
 function chain(frame:HeadReplayFrame):string{let id=frame.state.caller_head;const parts:string[]=[];const seen=new Set<string>();while(id!==null){if(id==='indeterminate'||seen.has(id)||!frame.state.nodes[id]){parts.push('未知或重复');return parts.join(' → ');}seen.add(id);parts.push(`${id}(${frame.state.nodes[id]!.data})`);id=frame.state.nodes[id]!.next;}parts.push('NULL');return parts.join(' → ');}
 function elements(block:Visual): Element[] {return validVisual(block)?block.steps[frames.value[block.anchor_id]??0]!.elements as Element[]:[];}
@@ -64,7 +75,7 @@ function highlightedElement(block:Visual,id:string):boolean{return validVisual(b
 function label(block:Visual):string{return ({array:'数组',linked_list:'链表',stack:'栈',queue:'队列',head_insertion_replay_v1:'链表'} as Record<string,string>)[block.visualization_type]??'状态';}
 function motionChanged():void{reduced.value=media?.matches??false;if(reduced.value)stop();}
 function visibilityChanged():void{if(document.hidden)stop();}
-watch(()=>props.scene,()=>{stop();index.value=replay.value?0:-1;frames.value={};highlighted.value='';emit('highlight','');},{immediate:true});
+watch(()=>props.scene,()=>{stop();index.value=guided.value?0:-1;frames.value={};highlighted.value='';emit('highlight','');},{immediate:true});
 watch(activePlayback,value=>{if(!value)stop();});
 onMounted(()=>{media=window.matchMedia?.('(prefers-reduced-motion: reduce)');motionChanged();media?.addEventListener('change',motionChanged);document.addEventListener('visibilitychange',visibilityChanged);});
 onBeforeUnmount(()=>{stop();media?.removeEventListener('change',motionChanged);document.removeEventListener('visibilitychange',visibilityChanged);});
@@ -100,36 +111,36 @@ onBeforeUnmount(()=>{stop();media?.removeEventListener('change',motionChanged);d
         :disabled="reduced || playing"
         @click="play"
       >
-        {{ replay ? '播放':'播放动作' }}
+        {{ guided ? '播放':'播放动作' }}
       </button><button
         class="secondary"
         type="button"
         :disabled="!playing"
         @click="stop"
       >
-        {{ replay ? '暂停':'暂停动作' }}
+        {{ guided ? '暂停':'暂停动作' }}
       </button><button
         class="secondary"
         type="button"
-        :disabled="replay ? index <= 0 : index < 0"
+        :disabled="guided ? index <= 0 : index < 0"
         @click="apply(index-1)"
       >
-        {{ replay ? '上一步':'上一动作' }}
+        {{ guided ? '上一步':'上一动作' }}
       </button><button
         class="secondary"
         type="button"
         :disabled="index >= actions.length-1"
         @click="apply(index+1)"
       >
-        {{ replay ? '下一步':'下一动作' }}
+        {{ guided ? '下一步':'下一动作' }}
       </button><button
-        v-if="replay"
+        v-if="guided"
         type="button"
         class="secondary"
         @click="apply(0)"
       >
         重置
-      </button><span role="status">{{ replay ? '步骤':'动作' }} {{ index+1 }} / {{ actions.length }}</span>
+      </button><span role="status">{{ guided ? '步骤':'动作' }} {{ index+1 }} / {{ actions.length }}</span>
     </div>
     <section
       v-for="block in visuals"
@@ -147,9 +158,9 @@ onBeforeUnmount(()=>{stop();media?.removeEventListener('change',motionChanged);d
           步骤 {{ (frames[block.anchor_id]??0)+1 }} / {{ block.steps.length }}：{{ block.steps[frames[block.anchor_id]??0]?.caption }}
         </p>
         <div
-          v-if="headFrame(block)"
+          v-if="lineFrame(block)"
           class="head-replay-frame"
-          :data-frame="headFrame(block)!.frame_id"
+          :data-frame="lineFrame(block)!.frame_id"
         >
           <div class="head-replay-grid">
             <pre
@@ -157,12 +168,12 @@ onBeforeUnmount(()=>{stop();media?.removeEventListener('change',motionChanged);d
               tabindex="0"
               aria-label="逐行 C 语言代码"
             ><code><span
-              v-for="(line,i) in replayCode(headFrame(block)!).trimEnd().split('\n')"
+              v-for="(line,i) in replayCode(lineFrame(block)!).trimEnd().split('\n')"
               :key="i"
               class="course-code-line"
-              :class="{'active-code-line':headFrame(block)!.line===i+1}"
+              :class="{'active-code-line':lineFrame(block)!.line===i+1}"
               :data-line="i+1"
-            >{{ i+1 }}  {{ line }}</span></code></pre><div>
+            >{{ i+1 }}  {{ line }}</span></code></pre><div v-if="headFrame(block)">
               <h4>{{ headFrame(block)!.title }}</h4><p class="head-step-note">
                 {{ headFrame(block)!.note }}
               </p>
@@ -189,6 +200,27 @@ onBeforeUnmount(()=>{stop();media?.removeEventListener('change',motionChanged);d
               </ul>
               <details><summary>准确状态与原步骤</summary><pre>{{ JSON.stringify(headFrame(block),null,2) }}</pre></details>
             </div>
+            <div v-else-if="stackFrame(block)">
+              <p>{{ stackFrame(block)!.note }}</p>
+              <p>本步出栈结果：{{ stackFrame(block)!.popped ?? '无' }}</p>
+              <p v-if="!elements(block).length">
+                栈为空，没有栈顶。
+              </p>
+              <ol
+                v-else
+                class="visual-elements structure-stack"
+                aria-label="栈内容（从栈底到栈顶）"
+              >
+                <li
+                  v-for="(element,i) in elements(block)"
+                  :key="element.id"
+                  :class="{'element-highlight':highlightedElement(block,element.id)}"
+                >
+                  <small>下标 {{ i }}<template v-if="highlightedElement(block,element.id)"> · 栈顶</template></small>
+                  <strong>{{ element.label }}</strong>
+                </li>
+              </ol>
+            </div>
           </div>
         </div>
         <ol
@@ -205,11 +237,11 @@ onBeforeUnmount(()=>{stop();media?.removeEventListener('change',motionChanged);d
             <small>{{ block.visualization_type==='array' ? `下标 ${i}` : `结点 ${element.id}` }}</small><strong>{{ element.label }}</strong><span v-if="block.visualization_type==='linked_list'">next → {{ element.next_id ?? 'NULL' }}</span><span v-if="highlightedElement(block,element.id)">当前关注</span>
           </li>
         </ol>
-        <p v-if="!headFrame(block) && !elements(block).length">
+        <p v-if="!lineFrame(block) && !elements(block).length">
           当前结构为空。
         </p>
         <div
-          v-if="!replay"
+          v-if="!guided"
           class="action-row"
         >
           <button

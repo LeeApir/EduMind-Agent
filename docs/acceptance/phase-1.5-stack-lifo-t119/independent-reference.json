@@ -1,0 +1,17 @@
+{
+  "logical_order": "bottom_to_top",
+  "main": [
+    {"frame_id":"f0","operation":"初始化空栈","line":22,"values":[],"top":null,"popped":null},
+    {"frame_id":"f1","operation":"push(3)","line":24,"values":[3],"top":3,"popped":null},
+    {"frame_id":"f2","operation":"push(8)","line":25,"values":[3,8],"top":8,"popped":null},
+    {"frame_id":"f3","operation":"pop()","line":26,"values":[3],"top":3,"popped":8},
+    {"frame_id":"f4","operation":"push(5)","line":27,"values":[3,5],"top":5,"popped":null}
+  ],
+  "transfer": {
+    "values": [[],[-4],[-4,6],[-4,6,2],[-4,6],[-4,6,9],[-4,6],[-4]],
+    "top": [null,-4,6,2,6,9,6,-4],
+    "popped": [null,null,null,null,2,null,9,6],
+    "answers": {"first_pop":2,"after_push":[-4,6,9],"pop_order":[2,9,6],"final_top":-4}
+  },
+  "boundary": {"capacity":3,"overflow_preserves_contents":true,"underflow_preserves_out_parameter":true}
+}

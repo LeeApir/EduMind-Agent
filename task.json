@@ -6242,7 +6242,7 @@
         }
       ]
     },
-        {
+    {
       "id": "PHASE-1.5-T117",
       "phase": "Phase 1.5",
       "title": "AIAPI content r01 已审封存正文私有导入与学习验收",
@@ -6362,6 +6362,47 @@
       "execution_gate": "准确批准的新批完成 1 次引用修订，独立全文重评和新私有 v2 浏览器学习验收通过。原 r02 停止与首稿未交付保留。",
       "completed_at": "2026-11-10T09:14:07+08:00",
       "commit_lookup": "Task-Completed: PHASE-1.5-T118"
+    },
+    {
+      "id": "PHASE-1.5-T119",
+      "phase": "Phase 1.5",
+      "title": "固定栈主题的第二主题迁移与课程交付",
+      "status": "blocked",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T118"
+      ],
+      "scope": [
+        "只支持固定容量 C 栈：空栈 → push(3) → push(8) → pop() → push(5)。程序持有代码、事实、状态轨迹和私有答案；模型生成讲解、题干和解析。",
+        "复用现有私有快照、审核绑定、版本、播放器和服务端练习。先零调用准备；真实执行与费用边界另获准确授权。"
+      ],
+      "prd_source": "PRD §0.5；Phase 1.5 课程生成方向；用户指定第二主题栈",
+      "acceptance_criteria": [
+        "准确说明栈顶、后进先出和实现边界；逐步栈内容、栈顶、出栈结果、代码、高亮与讲解相符。",
+        "使用不同于主例的数据作迁移练习，条件充分且答案唯一，参考答案留在服务端。",
+        "完整独立教学审核通过；实际私有课程阅读、播放控制、作答反馈、刷新恢复通过。",
+        "统一结果记录提供实际课程入口、原件与审核绑定，区分首稿、修订及失败。"
+      ],
+      "verification": [
+        "独立预期核对程序轨迹与参考答案；编译并执行固定程序 C；严格结构、事实、审核与准入反例。",
+        "隔离 PostgreSQL/API 与前端验证；真实课程须完成独立全文审核及浏览器学习验收。"
+      ],
+      "started_at": "2026-11-10T15:11:26+08:00",
+      "execution_gate": "零调用准备和定向验证通过，等待准确首稿批次、1 次请求、30 分钟和 C2 例外批准。尚未生成或交付实际课程。",
+      "commit_lookup": "Task-Completed: PHASE-1.5-T119",
+      "blocker": "真实执行待用户另行授权。首稿、独立教学审核及真实浏览器课程验收尚未运行。",
+      "verification_results": [
+        {
+          "date": "2026-11-10T15:26:31+08:00",
+          "commands": [
+            "隔离 PostgreSQL 专用测试库 alembic upgrade head；pytest tests/test_stack_course_trial.py tests/test_head_course_status_projection.py",
+            "pnpm exec vitest run tests/course-visualization.spec.ts tests/head-course-status.spec.ts；pnpm typecheck；定向 ESLint/Ruff",
+            "本机 stack 开发入口及 localhost 健康/页面/普通生成拒绝；冻结 inspect、工作流及 Git 差异检查"
+          ],
+          "result": "后端 12 项、前端 12 项通过。程序 C 独立核对五帧、四题、满空边界，MockTransport 封存及拒绝，私有 v2、服务端四题反馈、答案隔离及版本回读通过。Provider 0，未启动真实窗口。",
+          "evidence": "docs/acceptance/phase-1.5-stack-lifo-t119/RESULTS.md"
+        }
+      ]
     }
   ],
   "planning_inputs": {

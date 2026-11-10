@@ -15,6 +15,48 @@ describe('bounded scene presentation',()=>{
     const value:SceneProjection={course_id:'c',course_version:2,scene_id:'s',scene_version_id:'sv',generation_source:{origin:'head_goal_model_generation',batch:'PHASE-1.5-T108',candidate_digest:'a'.repeat(64),parent_digest:null,model:'deepseek-flash',prompt_version:'head-goal-course-v1',plan_digest:'b'.repeat(64),materials_digest:'c'.repeat(64),evidence_kind:'offline_fixture'},blocks:[{kind:'code',anchor_id:'code',language:'c',source:'line one\nline two'},{kind:'visualization',anchor_id:'vis',visualization_type:'head_insertion_replay_v1',text_alternative:'text',steps:[0,1].map(i=>({caption:'frame',head_frame:{frame_id:`f0${i}`,state_index:i,line:i+1,kind:'caller',fact_id:`trace_step_0${i}`,title:'frame',note:'<script>bad()</script>',code_anchor:'code',locals_scope:'inactive',state:{phase:'caller',attempt:0,caller_head:null,local_head:null,p:null,returned:null,nodes:{},code_line:i+1}}}))}],actions:[0,1].map(i=>({type:'show_step',anchor_id:'vis',step_index:i}))};
     const w=mount(Presentation,{props:{scene:value}});expect(w.find('.head-replay-frame').attributes('data-frame')).toBe('f00');expect(w.find('script').exists()).toBe(false);expect(w.text()).toContain('<script>bad()</script>');await button(w,'下一步');expect(w.find('.active-code-line').attributes('data-line')).toBe('2');await w.setProps({scene:{...value,generation_source:undefined}});expect(w.text()).toContain('状态表示不可用');w.unmount();
   });
+  it('shows the fixed stack top and current pop result at each highlighted line',async()=>{
+    vi.useFakeTimers();
+    const values=[[],[3],[3,8],[3],[3,5]];
+    const lines=[22,24,25,26,27];
+    const code=Array.from({length:28},(_,i)=>`C line ${i+1}`).join('\n');
+    const data:SceneProjection={
+      ...scene(),generation_source:{origin:'stack_lifo_model_generation',batch:'stack-lifo-deepseek-r01',
+        candidate_digest:'a'.repeat(64),parent_digest:null,model:'deepseek-flash',
+        prompt_version:'stack-lifo-course-v1',plan_digest:'b'.repeat(64),
+        materials_digest:'c'.repeat(64),evidence_kind:'offline_fixture'},
+      blocks:[
+        {kind:'code',anchor_id:'stack-code',language:'c',source:code},
+        {kind:'visualization',anchor_id:'vis',visualization_type:'stack',
+          text_alternative:'栈底到栈顶',steps:values.map((stack,i)=>({
+            caption:`操作 ${i}`,
+            elements:stack.map((value,j)=>({id:`slot-${j}`,label:String(value),next_id:null})),
+            highlight_ids:stack.length?[`slot-${stack.length-1}`]:[],
+            stack_frame:{frame_id:`f${i}`,code_anchor:'stack-code',line:lines[i]!,popped:i===3?8:null,note:`讲解 ${i}`},
+          }))},
+      ],
+      actions:values.map((_,i)=>({type:'show_step',anchor_id:'vis',step_index:i})),
+    };
+    const w=mount(Presentation,{props:{scene:data}});
+    for(const [i,stack] of values.entries()){
+      expect(w.find('.active-code-line').attributes('data-line')).toBe(String(lines[i]));
+      expect(w.findAll('.visual-elements strong').map(x=>Number(x.text()))).toEqual(stack);
+      expect(w.text()).toContain(`本步出栈结果：${i===3?8:'无'}`);
+      expect(w.find('.element-highlight strong').exists()?Number(w.find('.element-highlight strong').text()):null)
+        .toBe(stack.at(-1)??null);
+      if(i<4)await button(w,'下一步');
+    }
+    await button(w,'上一步');
+    expect(w.text()).toContain('本步出栈结果：8');
+    await button(w,'重置');
+    expect(w.text()).toContain('栈为空，没有栈顶');
+    await button(w,'播放');await button(w,'暂停');
+    await vi.advanceTimersByTimeAsync(2400);
+    expect(w.find('.active-code-line').attributes('data-line')).toBe('24');
+    await w.setProps({scene:{...data,generation_source:undefined}});
+    expect(w.text()).toContain('状态表示不可用');
+    w.unmount();
+  });
   it('uses actual anchors for block highlight and pauses at explicit pause/last action',async()=>{
     vi.useFakeTimers();const w=mount(Presentation,{props:{scene:scene()}});await button(w,'播放动作');expect(w.emitted('highlight')?.at(-1)).toEqual(['code']);await vi.advanceTimersByTimeAsync(1200);expect(w.text()).toContain('步骤 2 / 2');await vi.advanceTimersByTimeAsync(1200);expect(w.text()).toContain('动作 3 / 3');expect(w.findAll('button').find(b=>b.text()==='暂停动作')!.attributes('disabled')).toBeDefined();expect(vi.getTimerCount()).toBe(0);w.unmount();
   });

@@ -279,7 +279,10 @@ onBeforeUnmount(()=>{save();epoch+=1;manifestEpoch+=1;versionsEpoch+=1;controlle
               class="replay-source"
               aria-label="新课程来源"
             >
-              <strong>{{ scene.generation_source.prompt_version === 'head-empty-citation-revision-v1' ? (scene.generation_source.evidence_kind === 'offline_fixture' ? '空链表头插 · 离线接线夹具' : '空链表头插 · 模型引用修订') : scene.generation_source.prompt_version === 'head-evidence-local-revision-v1' ? '模型局部修订 · 程序证据补充' : ['head-empty-deepseek-r01', 'head-empty-deepseek-r02'].includes(scene.generation_source.batch) ? (scene.generation_source.evidence_kind === 'offline_fixture' ? '空链表头插 · 离线接线夹具' : '空链表头插 · DeepSeek 生成') : scene.generation_source.batch === 'head-fixed-deepseek-r01' ? '固定头插方案 · DeepSeek 官方直连验证' : scene.generation_source.prompt_version === 'head-fixed-course-v1' ? '固定头插方案 · 新输入验证' : scene.generation_source.prompt_version === 'head-reuse-course-v1' ? '限定头插流程复用 · 新目标课程' : scene.generation_source.evidence_kind === 'targeted_fact_revision' ? '模型四字段事实修订' : scene.generation_source.evidence_kind === 'program_format_recovery' ? '程序格式恢复 · r03 派生课程' : scene.generation_source.evidence_kind === 'offline_fixture' ? '离线接线夹具 · 非真实生成' : '新目标真实生成 · 头插支持域' }} · 未签核</strong>
+              <strong v-if="scene.generation_source.origin === 'stack_lifo_model_generation'">
+                栈 · {{ scene.generation_source.evidence_kind === 'offline_fixture' ? '离线接线夹具' : 'DeepSeek 生成 · 独立教学审核通过' }} · 未签核
+              </strong>
+              <strong v-else>{{ scene.generation_source.prompt_version === 'head-empty-citation-revision-v1' ? (scene.generation_source.evidence_kind === 'offline_fixture' ? '空链表头插 · 离线接线夹具' : '空链表头插 · 模型引用修订') : scene.generation_source.prompt_version === 'head-evidence-local-revision-v1' ? '模型局部修订 · 程序证据补充' : ['head-empty-deepseek-r01', 'head-empty-deepseek-r02'].includes(scene.generation_source.batch) ? (scene.generation_source.evidence_kind === 'offline_fixture' ? '空链表头插 · 离线接线夹具' : '空链表头插 · DeepSeek 生成') : scene.generation_source.batch === 'head-fixed-deepseek-r01' ? '固定头插方案 · DeepSeek 官方直连验证' : scene.generation_source.prompt_version === 'head-fixed-course-v1' ? '固定头插方案 · 新输入验证' : scene.generation_source.prompt_version === 'head-reuse-course-v1' ? '限定头插流程复用 · 新目标课程' : scene.generation_source.evidence_kind === 'targeted_fact_revision' ? '模型四字段事实修订' : scene.generation_source.evidence_kind === 'program_format_recovery' ? '程序格式恢复 · r03 派生课程' : scene.generation_source.evidence_kind === 'offline_fixture' ? '离线接线夹具 · 非真实生成' : '新目标真实生成 · 头插支持域' }} · 未签核</strong>
               <p
                 v-if="scene.generation_source.teaching_review?.verdict !== 'pass' && scene.generation_source.evidence_kind === 'program_format_recovery'"
                 role="alert"
@@ -398,7 +401,7 @@ onBeforeUnmount(()=>{save();epoch+=1;manifestEpoch+=1;versionsEpoch+=1;controlle
               @confirmed="loadScene()"
             />
             <CourseRevision
-              v-if="operation?.execution_mode !== 'finite_head_foreground'"
+              v-if="!operation?.execution_mode"
               :key="`revision:${version}:${selected.scene_version_id}`"
               :course-id="courseId"
               :course-version="version"
@@ -415,7 +418,7 @@ onBeforeUnmount(()=>{save();epoch+=1;manifestEpoch+=1;versionsEpoch+=1;controlle
             />
           </template>
           <div
-            v-if="operation?.execution_mode !== 'finite_head_foreground'"
+            v-if="!operation?.execution_mode"
             class="tutor-area"
           >
             <button

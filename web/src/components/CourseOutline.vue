@@ -14,7 +14,7 @@ const running = computed(() => operation.value && !terminalOperation(operation.v
 const unknown = computed(() => Boolean(operation.value?.budget?.usage_unknown || operation.value?.reason_code?.includes('UNKNOWN')));
 const firstReady = computed(() => course.value?.head?.scenes.find(s => s.scene_version_id !== null));
 const labels: Record<string,string> = { queued:'等待生成',running:'正在生成',cancel_requested:'正在停止，等待可靠收尾',succeeded:'生成已完成',partially_succeeded:'部分内容就绪',awaiting_clarification:'需要补充目标',failed:'生成未完成',cancelled:'已停止',timed_out:'本次操作已超时',pending:'等待生成',blocked_dependency:'等待前置场景',ready:'可学习',invalidated:'已失效' };
-const operationLabel = computed(() => operation.value?.execution_mode === 'finite_head_foreground' && operation.value.state === 'failed' ? '生成已停止' : operation.value ? labels[operation.value.state] : '只读恢复，未发现本机操作记录');
+const operationLabel = computed(() => operation.value?.execution_mode && operation.value.state === 'failed' ? '生成已停止' : operation.value ? labels[operation.value.state] : '只读恢复，未发现本机操作记录');
 watch(owner, id => {
   if (!id) return;
   const saved = readStored<{editing:boolean;instruction:string}>(`edumind:free:outline-edit:${id}:${props.courseId}`);
@@ -89,7 +89,7 @@ function clarify(): void { if (supplement.value.trim() && operation.value?.state
             <h2>你的课程大纲</h2><button
               class="secondary"
               type="button"
-              :disabled="busy || operation?.execution_mode === 'finite_head_foreground'"
+              :disabled="busy || !!operation?.execution_mode"
               @click="inspectImpact"
             >
               调整大纲
@@ -165,7 +165,7 @@ function clarify(): void { if (supplement.value.trim() && operation.value?.state
           <p v-if="operation?.budget">
             尝试已用 {{ operation.budget.attempts_used ?? '未知' }} · 剩余 {{ operation.budget.attempts_remaining ?? '未知' }}
           </p>
-          <p v-if="operation?.execution_mode === 'finite_head_foreground'">
+          <p v-if="operation?.execution_mode">
             本次开发课程由独立授权的前台步骤生成，不自动调用模型。停止页面操作只阻止课程写入；在途前台请求仍需单独停止。
           </p>
           <p v-if="mode === 'catalog_only'">
@@ -197,7 +197,7 @@ function clarify(): void { if (supplement.value.trim() && operation.value?.state
             </button>
           </div>
           <form
-            v-if="operation?.execution_mode !== 'finite_head_foreground' && operation?.state === 'awaiting_clarification' && operation.clarification_questions.length"
+            v-if="!operation?.execution_mode && operation?.state === 'awaiting_clarification' && operation.clarification_questions.length"
             @submit.prevent="clarify"
           >
             <h3>请补充目标</h3><ul>
@@ -219,7 +219,7 @@ function clarify(): void { if (supplement.value.trim() && operation.value?.state
               补充并继续
             </button>
           </form>
-          <div v-else-if="operation && operation.execution_mode !== 'finite_head_foreground' && !running && operation.state !== 'succeeded' && mode === 'dynamic' && !unknown">
+          <div v-else-if="operation && !operation.execution_mode && !running && operation.state !== 'succeeded' && mode === 'dynamic' && !unknown">
             <label><input
               v-model="resumeConfirm"
               type="checkbox"
