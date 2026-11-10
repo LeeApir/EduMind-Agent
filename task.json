@@ -6326,10 +6326,20 @@
           ],
           "result": "r01 密钥阶段中断且未发出 HTTP，应用取消已请求，无课程版本。r02 独立绑定、私有准入和停止离线检查通过，真实调用仍为 0。",
           "evidence": "docs/acceptance/phase-1.5-head-empty-t118/RESULTS.md"
+        },
+        {
+          "date": "2026-11-10T08:42:46+08:00",
+          "commands": [
+            "T118 r02 冻结入口 --inspect、前台 plan/generate、两个封存响应 verify_saved 重放",
+            "独立规划审核、独立全文审核与 review_binding；STOP 门禁与专用 PG 取消回读",
+            "python3 scripts/check_catalog_workflow.py；git diff --check"
+          ],
+          "result": "真实 DeepSeek HTTP 200 两次，输入 14145、输出 3773。规划独立通过，正文首稿机械通过，独立全文 C01 阻断，修订 0，无可学课程。应用 cancel_requested，保留 v1。",
+          "evidence": "docs/acceptance/phase-1.5-head-empty-t118/RESULTS.md"
         }
       ],
-      "execution_gate": "r01 准确授权与窗口已登记，隐藏输入中断，已停止。r02 独立执行包已准备，等待本批准确授权。",
-      "block_reason": "r01 密钥输入阶段 KeyboardInterrupt，HTTP 0，已封存 STOP 并发出应用取消。用户要求另开新批；r02 预算与窗口须按准确包另行确认。"
+      "execution_gate": "r01 与 r02 已封存；r02 实际预算已用尽，独立全文审核拒绝，禁止追加调用及准入。",
+      "block_reason": "r02 正文严格结构通过，但独立全文审核 C01 阻断：第 5 段未引用忽略返回值的反事实证据。无修订额度；应用取消已请求，只保留 v1 大纲。"
     }
   ],
   "planning_inputs": {
