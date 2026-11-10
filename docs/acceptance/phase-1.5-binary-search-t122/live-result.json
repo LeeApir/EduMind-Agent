@@ -1,0 +1,185 @@
+{
+  "task_id": "PHASE-1.5-T122",
+  "approved_commit": "955c15b",
+  "batch": "binary-search-deepseek-r01",
+  "manifest_sha256": "98f008aa94403b03c85fbd384eaf3e9903c7d4671b15422c145f802a2f7baaee",
+  "context_sha256": "ccf455f0d4dc51ff349f446cea950fba5df87d5b51d479b8dd240b994b73d1d3",
+  "execution_window": {
+    "starts": "2026-11-10T22:50:13.950141+08:00",
+    "expires": "2026-11-10T23:20:13.950141+08:00"
+  },
+  "counts": {
+    "planning": 0,
+    "first_draft": 1,
+    "revision": 0,
+    "retries": 0,
+    "fallback": 0,
+    "total": 1
+  },
+  "evidence_kind": "actual_provider_response",
+  "first_draft": {
+    "request_sha256": "8600a1eac246169447fb6fa233da960931595b361aa6ea9c36531105f9c93ad4",
+    "receipt": {
+      "complete": true,
+      "encoding": "identity",
+      "http_status": 200,
+      "raw_bytes": 6448,
+      "raw_sha256": "a083646c1a9109f04384dbaac2564699ec77092010fd7e8d3aee697eb7ea2409"
+    },
+    "failure": {
+      "attempted": true,
+      "code": "ROLE_SCHEMA",
+      "error_type": "PilotError"
+    },
+    "diagnosis": {
+      "emitted_keys": [
+        "paragraphs",
+        "questions",
+        "step_notes",
+        "summary"
+      ],
+      "model_label": "deepseek-flash",
+      "status": "completed",
+      "strict_replay_failure": "ROLE_SCHEMA",
+      "usage": {
+        "input_tokens": 2649,
+        "output_tokens": 982,
+        "total_tokens": 3631
+      },
+      "violations": [
+        {
+          "expected": [
+            "stem",
+            "explanation"
+          ],
+          "observed": {
+            "frame_ids": null,
+            "keys": [
+              "stem"
+            ],
+            "size": 1,
+            "type": "dict"
+          },
+          "path": [
+            "questions",
+            "decrease_right"
+          ],
+          "rule": "required"
+        },
+        {
+          "expected": [
+            "stem",
+            "explanation"
+          ],
+          "observed": {
+            "frame_ids": null,
+            "keys": [
+              "stem"
+            ],
+            "size": 1,
+            "type": "dict"
+          },
+          "path": [
+            "questions",
+            "found_index"
+          ],
+          "rule": "required"
+        },
+        {
+          "expected": [
+            "stem",
+            "explanation"
+          ],
+          "observed": {
+            "frame_ids": null,
+            "keys": [
+              "stem"
+            ],
+            "size": 1,
+            "type": "dict"
+          },
+          "path": [
+            "questions",
+            "increase_left"
+          ],
+          "rule": "required"
+        },
+        {
+          "expected": [
+            "stem",
+            "explanation"
+          ],
+          "observed": {
+            "frame_ids": null,
+            "keys": [
+              "stem"
+            ],
+            "size": 1,
+            "type": "dict"
+          },
+          "path": [
+            "questions",
+            "missing_result"
+          ],
+          "rule": "required"
+        }
+      ]
+    },
+    "teaching_review": "not_run_schema_failed"
+  },
+  "sealed_vault": "~/.local/share/edumind/binary-search-deepseek-r01",
+  "sealed_file_sha256": {
+    "ACTIVE": "99124a07d22035522b80fc3cb0e7254a65639c3f498d5cde6f74ee2abb0d5351",
+    "HALT": "087f828668f3f0c779d649d8d9f2c5ca8ece7b5ba654b931d5900d905100e499",
+    "STOP": "009cf6df1390b9988f6ffc6cd7b5f240b7fd20652ec1163d41baf2c3f7776875",
+    "approval.bound.json": "48dc2edd7b9bba758bb508cd9275a4213b64c14b2d95585ea4e05c9ca0837675",
+    "context.json": "ccf455f0d4dc51ff349f446cea950fba5df87d5b51d479b8dd240b994b73d1d3",
+    "generate.attempt.json": "b39b1017fa33fd74c33ebbccb68626ba8a096b16ef0071f32684d5b8e52a65c1",
+    "generate.body.json": "288537944c87262172e035bb6ad23dd7c7ed2ed78ec1d6244640937e71b6057d",
+    "generate.failure.json": "9e555f83b5b9d1aa03fe44f16d29548a8c5cab4918b9a98c0873209cb3128827",
+    "generate.headers.json": "e251f4259c3a41da19504772c36480465932dcfac91ce50bdc0ec6c8ae9f9818",
+    "generate.raw.enc": "04a7541d17305b6e8dc88e01cf81ff0d35284dfcb36607eb5ca80f3130f1ed4c",
+    "generate.request.json": "8600a1eac246169447fb6fa233da960931595b361aa6ea9c36531105f9c93ad4"
+  },
+  "stop": {
+    "STOP": "failed or unknown; preserve original; no retry",
+    "HALT": "operator stopped batch; block publication"
+  },
+  "application": {
+    "admission": "blocked_by_role_schema",
+    "course_delivered": false,
+    "learning_acceptance": "not_run_no_ready_scene",
+    "browser_stop_check": {
+      "entry": "http://127.0.0.1:5216/",
+      "operation": {
+        "operation_id": "b0b5b91a-ea34-4f76-ba3d-23d308624627",
+        "course_id": "56cf5991-9047-46c5-86e3-75ea74ff166d",
+        "kind": "create",
+        "state": "cancelled",
+        "base_head_version": null,
+        "head_version": 1,
+        "last_event_id": 3,
+        "deadline_at": "2026-11-10T15:20:13.950141+00:00",
+        "reason_code": "CANCELLED",
+        "clarification_questions": [],
+        "request_id": "a6178872-e8d6-4b81-8dae-dea65a260d37",
+        "steps": [
+          {
+            "step_key": "scene:binary_search",
+            "scene_id": "d6f792d3-a7c1-4a56-94a6-4eccb68365fd",
+            "state": "cancelled",
+            "reason_code": "CANCELLED"
+          }
+        ],
+        "execution_mode": "finite_binary_search_foreground",
+        "budget": null
+      },
+      "versions": [
+        1
+      ],
+      "ready_scenes": 0,
+      "scene_v2_http_status": 404
+    }
+  },
+  "verified_at": "2026-11-10T22:53:16+08:00"
+}

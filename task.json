@@ -6551,8 +6551,8 @@
       ],
       "started_at": "2026-11-10T22:32:44+08:00",
       "commit_lookup": "Task-Completed: PHASE-1.5-T122",
-      "execution_gate": "准确请求与清单已冻结，离线材料、隔离准入和浏览器验证通过。Provider 0。拟 1 首稿、0 规划和 0 修订，待新窗口和本批 C2 准确授权。",
-      "blocker": "真实调用须经用户准确批准。真实首稿、独立教学和实际课程验收待执行。",
+      "execution_gate": "用户批准 955c15b 准确首稿及 C2。北京时间 22:50:13–23:20:13，1 次 HTTP 200 已封存。ROLE_SCHEMA 阻断，停止且额度耗尽。",
+      "blocker": "真实首稿四题缺必填 explanation，严格 Schema 拒绝。已封存停止，仅提纲 v1。独立全文审核、真实课程准入及学习验收未执行。",
       "verification_results": [
         {
           "date": "2026-11-10T22:47:52+08:00",
@@ -6563,6 +6563,16 @@
           ],
           "result": "5 项后端、14 项前端通过，Clang 独立预期及隔离 Chromium 六帧、四题反馈、答案隔离与刷新通过。四份历史候选严格重放通过。Provider 0。",
           "evidence": "docs/acceptance/phase-1.5-binary-search-t122/RESULTS.md"
+        },
+        {
+          "date": "2026-11-10T22:53:16+08:00",
+          "commands": [
+            "本机终端 /tmp/edumind-t122/start.sh 及共用入口 stop --topic binary-search",
+            "加密原件只读重放及冻结 Schema 错误路径核对",
+            "backend/.venv/bin/python -I /tmp/edumind-t122/verify-stopped.py"
+          ],
+          "result": "真实首稿 1 次 HTTP 200，四题 explanation 缺失，ROLE_SCHEMA 可复现。已取消，应用仅提纲 v1、v2 404。真实课程未交付。",
+          "evidence": "docs/acceptance/phase-1.5-binary-search-t122/live-result.json"
         }
       ]
     }

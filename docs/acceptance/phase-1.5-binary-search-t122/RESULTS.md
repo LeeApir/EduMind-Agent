@@ -11,3 +11,11 @@
 | 本机入口、定向 Ruff、工作流、Git 差异与冻结核对 | 开发 Web 5216 和 API 8196 就绪，通用生成 POST 返回 409。`inspect --topic binary-search` 通过。请求 9,850 字节，SHA-256 `8600a1eac246169447fb6fa233da960931595b361aa6ea9c36531105f9c93ad4`，清单 SHA-256 `98f008aa94403b03c85fbd384eaf3e9903c7d4671b15422c145f802a2f7baaee` |
 
 本步 Provider 请求 **0**，真实操作及窗口尚未建立。拟批准新 30 分钟窗口和一次 DeepSeek 首稿，规划、修订、重试和回退均为 0。通过候选绑定的独立全文审核后，才进入 [实际本机课程入口](http://127.0.0.1:5216/) 完成真实课学习验收。本记录继续承接实际授权、原件摘要、审核与交付结果。[准确执行包](README.md)
+
+## 真实首稿和停止
+
+用户批准 `955c15b`、准确清单及本批 C2。本批北京时间 22:50:13–23:20:13。执行 1 次 DeepSeek 首稿，规划、修订、重试和回退均为 0。HTTP 200，服务端状态 `completed`，回报输入 2,649 tokens、输出 982 tokens。实际账单与服务端留存未独立核实。[批准登记](../../ADR/0062-t122-approval-20261110.json)
+
+从加密原件复现 `ROLE_SCHEMA`。四题 `increase_left`、`decrease_right`、`found_index`、`missing_result` 都只有 `stem`，缺少必填的 `explanation`。按准确请求中的 Schema 逐项诊断，四处均违反 `required`。响应为完整保全，结构错误阻断候选生成和独立全文审核。[原件索引与诊断](live-result.json)
+
+执行共用入口 `stop --topic binary-search` 并用现有恢复流程收尾。请求、加密响应、失败记录、STOP 与 HALT 封存。使用 `/tmp/edumind-t122/verify-stopped.py` 在原访客 Chromium 会话确认操作为 `cancelled`，仅提纲 v1、就绪场景 0，v2 场景返回 404。实际课程未交付，真实学习验收未执行，T122 保持 blocked。
