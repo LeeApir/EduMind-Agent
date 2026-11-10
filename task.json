@@ -6459,7 +6459,7 @@
       "id": "PHASE-1.5-T121",
       "phase": "Phase 1.5",
       "title": "固定队列课程接入共用生成入口及交付",
-      "status": "blocked",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1.5-T120"
@@ -6480,9 +6480,8 @@
         "共用入口严格重放 T118/T119、同应用浏览器回归及最终真实队列浏览器验收。"
       ],
       "started_at": "2026-11-10T17:26:58+08:00",
-      "execution_gate": "原首稿预算耗尽，审核拒绝及 STOP/HALT 保留。Q01 新批准备通过，当前 Provider 0，等待准确清单、新 30 分钟、1 次局部修订及 C2 批准。",
+      "execution_gate": "获准的 Q01 单次局部修订已完成。独立全文八项重评及新私有 v2 学习验收通过。原首稿失败、STOP/HALT 和取消记录保留。",
       "commit_lookup": "Task-Completed: PHASE-1.5-T121",
-      "blocker": "首稿 Q01 教学拒绝，原应用仅提纲 v1。新单段修订未获真实授权，仍待真实修订、独立全文重评及实际学习验收。",
       "verification_results": [
         {
           "date": "2026-11-10T17:36:19+08:00",
@@ -6513,8 +6512,19 @@
           ],
           "result": "隔离后端 14 项、前端 13 项通过。真实父稿从封存原件严格重放，单叶合并比对、越界拒绝及错审核拒绝通过。新增 Provider 0，未创建真实修订操作。",
           "evidence": "docs/acceptance/phase-1.5-queue-fifo-t121/RESULTS.md"
+        },
+        {
+          "date": "2026-11-10T21:18:11+08:00",
+          "commands": [
+            "本机终端 /tmp/edumind-t121-q01/start.sh 及共用入口 replay、publish",
+            "独立全文八项重评和实际父子单叶比对",
+            "backend/.venv/bin/python -I /tmp/edumind-t121-q01/check-browser.py"
+          ],
+          "result": "局部修订 1 次 HTTP 200，输入 1736 / 输出 183 tokens。严格重放、独立教学八项、新私有 v2 及 Chromium 六阅读块、五帧高亮、播放、四题正反反馈、答案和权限隔离、刷新通过。原 v1 取消状态已复核。",
+          "evidence": "docs/acceptance/phase-1.5-queue-fifo-t121/q01-revision-result.json"
         }
-      ]
+      ],
+      "completed_at": "2026-11-10T21:18:11+08:00"
     }
   ],
   "planning_inputs": {
