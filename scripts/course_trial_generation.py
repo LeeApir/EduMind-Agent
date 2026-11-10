@@ -16,6 +16,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import create_database_engine
 from app.services import course_trial_publication as publication
+from app.services import queue_course_revision
 from app.services.free_course_snapshots import canonical
 from scripts import course_trial_transport as transport_io
 from scripts import head_course_deepseek_wire as direct
@@ -187,7 +188,10 @@ def observe(ctx, raw, body_receipt, *, profile=STACK):
             output_tokens=result.usage.output_tokens,
         ),
     )
-    return publication.candidate(ctx, dict(result.value), receipt, profile=profile)
+    output = dict(result.value)
+    if profile is publication.QUEUE_REVISION:
+        output = queue_course_revision.merge(output)
+    return publication.candidate(ctx, output, receipt, profile=profile)
 
 
 def send(vault, *, transport=None, key=None, profile=STACK):

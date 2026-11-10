@@ -38,3 +38,16 @@ Provider 调用 **0**。下一步需批准准确执行包、30 分钟窗口、�
 核对依据为程序代码第 15–19 行及 `dequeue`、`order`。主例取出 3 后的新队头为 8，演示与练习正确。首稿的一般性解释仍未通过，审核以准确候选摘要存入原件目录。
 
 执行 `backend/.venv/bin/python -I /tmp/edumind-t121/entry.py replay` 和 `stop`。保留 `STOP`，追加 `HALT`，取消专用开发应用操作。以原访客的 Chromium 页面会话运行 `backend/.venv/bin/python -I /tmp/edumind-t121/check-stop.py`，确认操作为 `cancel_requested`、队列场景已取消、版本列表只有提纲 v1、就绪场景 0、v2 场景读取返回 404。此次仅通过停止状态检查。真实队列的阅读、播放、反馈与刷新验收因无就绪场景未执行，T121 保持 blocked。
+
+## Q01 单段修订准备
+
+以首稿 `39742e3ccc803c1afe313c7d90dc69fb778ea349227db248a09decd295c1cb97` 为准确父稿，绑定原请求、加密响应、首稿审核、固定提纲及程序材料。新 Schema 仅接受 `paragraph_2_text`，合并只替换 `raw_output.paragraphs[2].text`。原事实引用顺序、其他文字和全部程序材料逐项比对。新操作使用独立批次，原首稿拒绝、STOP、HALT 与取消记录按原摘要核对。[准确请求和执行包](q01-revision/README.md)
+
+| 本步实测 | 结果 |
+| --- | --- |
+| 隔离 PostgreSQL 与 MockTransport，`pytest -q backend/tests/test_queue_course_revision.py backend/tests/test_queue_course_trial.py backend/tests/test_course_trial_transport.py` | 14 项通过。验证唯一文本叶、原样及邻段拷贝拒绝、旧批准/旧审核拒绝、新操作与私有 v2、答案隔离、协议失败保全和第二次发送拒绝 |
+| `pnpm typecheck` 与 `pnpm exec vitest run tests/course-visualization.spec.ts tests/head-course-status.spec.ts` | 类型检查通过，13 项通过 |
+| 共用入口 `replay --topic queue/head/stack`（分别执行） | 三份封存候选严格重放通过，队列首稿使用历史冻结提交 `898bbe4`。真实队列父稿的本地占位合并逐项比对通过，未写入原件或准入 |
+| 共用入口 `inspect --topic queue-revision`、定向 Ruff、工作流及 Git 差异检查 | 通过。请求 6,453 字节，SHA-256 `173c99bfba7c4967a979455b10e06970dc37e45b92d8aff2805445f71b4da4af`。清单 SHA-256 `fe47c6b1650e4024178c991088e51a8b5e6a2975e6b916f5c141b85e75f7dd6b` |
+
+本步 Provider 调用为 **0**，没有创建修订批次原件目录或应用操作。拟新开 30 分钟窗口，规划 0、整课生成 0、Q01 修订 1，费用及停止语义见 [ADR0061 补充提案](../../ADR/0061-t121-q01-revision.md)。等待准确授权。真实修订、独立全文重评和实际学习验收仍待执行，T121 保持 blocked。

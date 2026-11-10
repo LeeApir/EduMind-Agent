@@ -333,7 +333,7 @@ class Recovery:
             execution_mode = "finite_head_foreground"
         elif prompt_version == "stack-lifo-course-v1":
             execution_mode = "finite_stack_foreground"
-        elif prompt_version == "queue-fifo-course-v1":
+        elif prompt_version in ("queue-fifo-course-v1", "queue-fifo-q01-revision-v1"):
             execution_mode = "finite_queue_foreground"
         b = await self.scheduler.budget(db, cid, oid)
         unknown = await db.scalar(

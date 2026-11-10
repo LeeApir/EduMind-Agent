@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncConnection, AsyncEngine, AsyncSession
 
 from app.core.database import get_database_url
 from app.models.free_scene_generation import FreeSceneGenerationResult
-from app.services import queue_course_materials, stack_course_materials
+from app.services import queue_course_materials, queue_course_revision, stack_course_materials
 from app.services.free_course_snapshots import SnapshotError, SnapshotRepository, digest
 
 WINDOW_SECONDS = 1800
@@ -56,7 +56,15 @@ QUEUE = FixedCourse(
     REVIEW_CHECKS
     | {"fifo_and_distinct_front_rear_vs_dequeue", "shift_cost_and_effective_elements"},
 )
-PROFILES = {profile.materials.VERSION: profile for profile in (STACK, QUEUE)}
+QUEUE_REVISION = FixedCourse(
+    QUEUE.topic,
+    queue_course_revision,
+    QUEUE.database,
+    "phase-1.5-queue-fifo-t121/q01-revision",
+    "accept_T121_Q01_scope_and_batch_C2",
+    QUEUE.checks,
+)
+PROFILES = {profile.materials.VERSION: profile for profile in (STACK, QUEUE, QUEUE_REVISION)}
 
 
 def require_database(
@@ -151,6 +159,15 @@ async def context(
     )
     if inputs["plan"]["candidate"] != profile.materials.outline():
         raise profile.error("PLAN_BINDING")
+    if profile is QUEUE_REVISION and not fixture:
+        parent, _, _ = queue_course_revision.sealed_parent()
+        original = parent["context"]
+        if (
+            str(owner) != original["owner"]
+            or str(cid) == original["course_id"]
+            or str(oid) == original["operation_id"]
+        ):
+            raise profile.error("REVISION_OPERATION_BINDING")
     # The foreground request binds to the outline across leases. Scene admission still
     # checks the current epoch against its own write fence and snapshot.
     del inputs["lease_epoch"]
@@ -184,6 +201,9 @@ def candidate(
         plan_digest=digest(f"{profile.topic}-plan", plan=profile.materials.outline()),
         materials_digest=mat["materials_digest"],
     )
+    if profile is QUEUE_REVISION:
+        queue_course_revision.validate_immutable(output)
+        data["parent_digest"] = queue_course_revision.PARENT
     return {**data, "candidate_digest": digest(f"{profile.topic}-course-candidate", data=data)}
 
 
@@ -201,13 +221,16 @@ def assembly(
         or any(type(v) is not bool for v in review["checks"].values())
     ):
         raise profile.error("REVIEW_REQUIRED")
+    evidence_kind = c["context"]["evidence_kind"]
+    if profile is QUEUE_REVISION and evidence_kind == "actual_provider_response":
+        evidence_kind = "evidence_bound_local_revision"
     source = dict(
         origin=profile.materials.ORIGIN,
         batch=profile.materials.BATCH,
         model=profile.materials.request()["model"],
         prompt_version=profile.materials.VERSION,
-        parent_digest=None,
-        evidence_kind=c["context"]["evidence_kind"],
+        parent_digest=c.get("parent_digest"),
+        evidence_kind=evidence_kind,
         candidate_digest=c["candidate_digest"],
         materials_digest=c["materials_digest"],
         plan_digest=c["plan_digest"],

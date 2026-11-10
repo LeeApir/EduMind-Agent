@@ -178,7 +178,9 @@ async def validate_candidate(
             from app.services.head_course_generation import validate_generation
 
             checked = validate_generation(row, actual, operation)
-        elif row.schema_version in ("stack-lifo-course-v1", "queue-fifo-course-v1"):
+        elif row.schema_version in (
+            "stack-lifo-course-v1", "queue-fifo-course-v1", "queue-fifo-q01-revision-v1"
+        ):
             from app.services.course_trial_publication import validate_publication
 
             checked = await validate_publication(db, row, actual, operation)

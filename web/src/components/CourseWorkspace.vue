@@ -280,7 +280,7 @@ onBeforeUnmount(()=>{save();epoch+=1;manifestEpoch+=1;versionsEpoch+=1;controlle
               aria-label="新课程来源"
             >
               <strong v-if="scene.generation_source.origin === 'stack_lifo_model_generation' || scene.generation_source.origin === 'queue_fifo_model_generation'">
-                {{ scene.generation_source.origin === 'queue_fifo_model_generation' ? '队列' : '栈' }} · {{ scene.generation_source.evidence_kind === 'offline_fixture' ? '离线接线夹具' : 'DeepSeek 生成 · 独立教学审核通过' }} · 未签核
+                {{ scene.generation_source.origin === 'queue_fifo_model_generation' ? '队列' : '栈' }} · {{ scene.generation_source.evidence_kind === 'offline_fixture' ? '离线接线夹具' : scene.generation_source.evidence_kind === 'evidence_bound_local_revision' ? 'DeepSeek 局部修订 · 独立教学重评通过' : 'DeepSeek 生成 · 独立教学审核通过' }} · 未签核
               </strong>
               <strong v-else>{{ scene.generation_source.prompt_version === 'head-empty-citation-revision-v1' ? (scene.generation_source.evidence_kind === 'offline_fixture' ? '空链表头插 · 离线接线夹具' : '空链表头插 · 模型引用修订') : scene.generation_source.prompt_version === 'head-evidence-local-revision-v1' ? '模型局部修订 · 程序证据补充' : ['head-empty-deepseek-r01', 'head-empty-deepseek-r02'].includes(scene.generation_source.batch) ? (scene.generation_source.evidence_kind === 'offline_fixture' ? '空链表头插 · 离线接线夹具' : '空链表头插 · DeepSeek 生成') : scene.generation_source.batch === 'head-fixed-deepseek-r01' ? '固定头插方案 · DeepSeek 官方直连验证' : scene.generation_source.prompt_version === 'head-fixed-course-v1' ? '固定头插方案 · 新输入验证' : scene.generation_source.prompt_version === 'head-reuse-course-v1' ? '限定头插流程复用 · 新目标课程' : scene.generation_source.evidence_kind === 'targeted_fact_revision' ? '模型四字段事实修订' : scene.generation_source.evidence_kind === 'program_format_recovery' ? '程序格式恢复 · r03 派生课程' : scene.generation_source.evidence_kind === 'offline_fixture' ? '离线接线夹具 · 非真实生成' : '新目标真实生成 · 头插支持域' }} · 未签核</strong>
               <p
@@ -319,6 +319,7 @@ onBeforeUnmount(()=>{save();epoch+=1;manifestEpoch+=1;versionsEpoch+=1;controlle
                 <span v-if="scene.generation_source.evidence_kind === 'reviewed_paragraph_revision'">已按审核意见完成一次模型局部修订，保留父稿；未改题目、代码、轨迹和答案。</span>
               </small>
               <small v-else-if="scene.generation_source.evidence_kind === 'offline_fixture'">本页教学文字为离线接线夹具，未调用模型；代码、事实、轨迹和参考答案由程序派生。</small>
+              <small v-else-if="scene.generation_source.origin === 'queue_fifo_model_generation' && scene.generation_source.evidence_kind === 'evidence_bound_local_revision'">沿用首稿，只替换第 3 段讲解。题目与解析沿用首稿；代码、事实、轨迹和参考答案由程序提供。首稿审核失败记录已保留。</small>
               <small v-else-if="scene.generation_source.evidence_kind === 'program_format_recovery'">教学文字沿用 r03 模型原稿，仅删除四题完全相同的重复成员，未补写或改写。首稿结构不合格记录保留；代码、状态和答案由程序派生。新增模型调用为 0。</small>
               <small v-else-if="scene.generation_source.evidence_kind === 'targeted_fact_revision'">沿用 r03 模型正文，仅四处文字由本批一次真实模型请求修订；程序重装配代码、状态和答案。独立教学重评通过，保留段落重复和引用粒度的非阻断意见；原首稿结构失败及父版保留。</small>
               <small v-else>教学文字由模型生成；代码、事实、轨迹和参考答案由程序派生，自述先备知识不代表已测掌握。</small>

@@ -83,7 +83,7 @@ export type SceneBlock = {kind:'text';anchor_id:string;markdown:string} | {kind:
 export interface GenerationSource {unknown_echoes?:string[];origin:"head_goal_model_generation";batch:string;candidate_digest:string;parent_digest:string|null;model:string;prompt_version:string;plan_digest:string;materials_digest:string;evidence_kind:"actual_provider_response"|"offline_fixture"|"program_format_recovery"|"targeted_fact_revision"|"reviewed_paragraph_revision"|"evidence_bound_local_revision";teaching_evidence_version?:string;teaching_evidence_digest?:string;teaching_review?:{verdict:"pending"|"pass"|"needs_revision";independent_evaluator:string};format_recovery?:{rule_version:string;source_batch:string;original_raw_sha256:string;original_text_sha256:string;derived_output_sha256:string;original_request_sha256:string;duplicates:Array<{path:string[];removed_member_index:number;occurrence:number;value_sha256:string}>;new_provider_calls:0;model_first_structure_pass:false;assistant_text_edits:0}}
 export interface FixedCourseSource extends Omit<GenerationSource, "origin" | "evidence_kind"> {
   origin: "stack_lifo_model_generation" | "queue_fifo_model_generation"
-  evidence_kind: "actual_provider_response" | "offline_fixture"
+  evidence_kind: "actual_provider_response" | "evidence_bound_local_revision" | "offline_fixture"
 }
 export interface ArchivedResponseSource extends Omit<GenerationSource, "origin" | "model" | "evidence_kind"> {
   origin: "reviewed_archived_response_import"

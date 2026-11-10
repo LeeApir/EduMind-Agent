@@ -102,6 +102,13 @@ def test_mechanical_validation_rejects_non_queue_fact_and_wrong_frame():
 def test_shared_queue_flow(monkeypatch, tmp_path, wrong_phase):
     monkeypatch.setenv("EDUMIND_DATABASE_URL", os.environ["EDUMIND_TEST_DATABASE_URL"])
     monkeypatch.setenv("EDUMIND_PRODUCT_MODE", "dynamic")
+    # The real first-draft manifest is replayed using its historical runtime.
+    # Here the current shared code runs only against an isolated fixture package.
+    package = tmp_path / "frozen-fixture"
+    package.mkdir()
+    (package / "request.json").write_bytes((PACKAGE / "request.json").read_bytes())
+    (package / "manifest.json").write_bytes(canonical(dict(files={})))
+    monkeypatch.setattr(generation, "package_path", lambda profile: package)
     with (
         TestClient(app, base_url="https://testserver") as client,
         TestClient(app, base_url="https://testserver") as other,

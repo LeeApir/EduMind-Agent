@@ -6466,7 +6466,8 @@
       ],
       "scope": [
         "固定容量 C 队列，空队列依次 enqueue(3)、enqueue(8)、dequeue()、enqueue(5)。程序提供代码、轨迹、事实和私有答案，模型提供讲解、题干和解析。",
-        "复用 T120 传输、封存、私有准入和两课封存回放。共用入口增加固定提纲生成动作，先零 Provider 离线验证，真实请求单独授权。"
+        "复用 T120 传输、封存、私有准入和两课封存回放。共用入口增加固定提纲生成动作，先零 Provider 离线验证，真实请求单独授权。",
+        "依用户要求准备独立 Q01 单段修订，只允许替换 raw_output.paragraphs[2].text。父稿、其余字段及程序材料保持绑定，真实调用另获授权。"
       ],
       "prd_source": "PRD §0.5；用户指定第三主题队列及共用入口",
       "acceptance_criteria": [
@@ -6479,9 +6480,9 @@
         "共用入口严格重放 T118/T119、同应用浏览器回归及最终真实队列浏览器验收。"
       ],
       "started_at": "2026-11-10T17:26:58+08:00",
-      "execution_gate": "用户批准 78e5c5c 准确首稿及 C2。北京时间 17:49:00–18:19:00，DeepSeek 仅 1 次正文，规划、修订、重试与回退均为 0。已按审核失败停止，本批额度耗尽。",
+      "execution_gate": "原首稿预算耗尽，审核拒绝及 STOP/HALT 保留。Q01 新批准备通过，当前 Provider 0，等待准确清单、新 30 分钟、1 次局部修订及 C2 批准。",
       "commit_lookup": "Task-Completed: PHASE-1.5-T121",
-      "blocker": "已授权的唯一正文请求已消耗。首稿机械通过，独立全文审核 Q01 阻断，STOP/HALT 保留。实际应用仅提纲 v1，无可学习课程。",
+      "blocker": "首稿 Q01 教学拒绝，原应用仅提纲 v1。新单段修订未获真实授权，仍待真实修订、独立全文重评及实际学习验收。",
       "verification_results": [
         {
           "date": "2026-11-10T17:36:19+08:00",
@@ -6502,6 +6503,16 @@
           ],
           "result": "真实请求 HTTP 200，输入 2817 / 输出 1263 tokens，严格重放通过。教学 6 项通过、2 项未通过，均定位第 3 段 Q01。场景取消、仅 v1，v2 场景 404。未准入课程，学习验收未执行。",
           "evidence": "docs/acceptance/phase-1.5-queue-fifo-t121/live-result.json"
+        },
+        {
+          "date": "2026-11-10T20:52:10+08:00",
+          "commands": [
+            "pytest -q backend/tests/test_queue_course_revision.py backend/tests/test_queue_course_trial.py backend/tests/test_course_trial_transport.py",
+            "pnpm typecheck；pnpm exec vitest run tests/course-visualization.spec.ts tests/head-course-status.spec.ts",
+            "共用 CLI 分别 replay --topic queue/head/stack；inspect --topic queue-revision；Ruff、Git 差异及工作流检查"
+          ],
+          "result": "隔离后端 14 项、前端 13 项通过。真实父稿从封存原件严格重放，单叶合并比对、越界拒绝及错审核拒绝通过。新增 Provider 0，未创建真实修订操作。",
+          "evidence": "docs/acceptance/phase-1.5-queue-fifo-t121/RESULTS.md"
         }
       ]
     }
