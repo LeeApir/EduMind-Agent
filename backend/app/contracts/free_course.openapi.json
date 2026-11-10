@@ -2859,7 +2859,7 @@
             "format": "uuid"
           },
           "execution_mode": {
-            "enum": ["finite_head_foreground", "finite_stack_foreground"]
+            "enum": ["finite_head_foreground", "finite_stack_foreground", "finite_queue_foreground"]
           }
         },
         "required": [
@@ -3329,6 +3329,9 @@
                 },
                 {
                   "$ref": "#/components/schemas/StackCourseVisualization"
+                },
+                {
+                  "$ref": "#/components/schemas/QueueCourseVisualization"
                 }
               ]
             },
@@ -3361,7 +3364,8 @@
           "generation_source": {
             "oneOf": [
               {"$ref": "#/components/schemas/HeadGenerationSource"},
-              {"$ref": "#/components/schemas/StackCourseSource"}
+              {"$ref": "#/components/schemas/StackCourseSource"},
+              {"$ref": "#/components/schemas/QueueCourseSource"}
             ]
           }
         },
@@ -5750,6 +5754,64 @@
           "parent_digest",
           "model",
           "prompt_version"
+        ]
+      },
+      "QueueCourseVisualization": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "kind": {"const": "visualization"},
+          "anchor_id": {"const": "queue-state"},
+          "visualization_type": {"const": "queue"},
+          "text_alternative": {"type": "string", "minLength": 1, "maxLength": 4000},
+          "steps": {
+            "type": "array",
+            "minItems": 5,
+            "maxItems": 5,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "caption": {"type": "string", "maxLength": 1000},
+                "elements": {"type": "array", "maxItems": 3, "items": {"$ref": "#/components/schemas/VisualElement"}},
+                "highlight_ids": {"type": "array", "maxItems": 2, "uniqueItems": true, "items": {"type": "string"}},
+                "queue_frame": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "frame_id": {"enum": ["f0", "f1", "f2", "f3", "f4"]},
+                    "code_anchor": {"const": "queue-code"},
+                    "line": {"type": "integer", "minimum": 1},
+                    "dequeued": {"type": ["integer", "null"]},
+                    "note": {"type": "string", "minLength": 1, "maxLength": 1200}
+                  },
+                  "required": ["frame_id", "code_anchor", "line", "dequeued", "note"]
+                }
+              },
+              "required": ["caption", "elements", "highlight_ids", "queue_frame"]
+            }
+          }
+        },
+        "required": ["kind", "anchor_id", "visualization_type", "text_alternative", "steps"]
+      },
+      "QueueCourseSource": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "origin": {"const": "queue_fifo_model_generation"},
+          "batch": {"const": "queue-fifo-deepseek-r01"},
+          "model": {"const": "deepseek-flash"},
+          "prompt_version": {"const": "queue-fifo-course-v1"},
+          "parent_digest": {"type": "null"},
+          "evidence_kind": {"enum": ["actual_provider_response", "offline_fixture"]},
+          "candidate_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "materials_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "plan_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "teaching_review": {"$ref": "#/components/schemas/StackCourseSource/properties/teaching_review"}
+        },
+        "required": [
+          "origin", "batch", "model", "prompt_version", "parent_digest", "evidence_kind",
+          "candidate_digest", "materials_digest", "plan_digest", "teaching_review"
         ]
       },
       "StackCourseVisualization": {

@@ -717,7 +717,7 @@ def forbidden(*args, **kwargs):
     raise RuntimeError("HEAD_GOAL_NO_BACKGROUND_PROVIDER")
 
 
-def serve(port=8178, *, stack_only=False, replay_only=False):
+def serve(port=8178, *, stack_only=False, replay_only=False, queue_only=False):
     import uvicorn
     from app.core import provider_factory
     from fastapi.responses import JSONResponse
@@ -727,10 +727,10 @@ def serve(port=8178, *, stack_only=False, replay_only=False):
         from app.services.course_trial_replay import require_database
 
         require_database()
-    elif stack_only:
-        from app.services.stack_course_publication import require_database
+    elif stack_only or queue_only:
+        from app.services.course_trial_publication import QUEUE, STACK, require_database
 
-        require_database()
+        require_database(profile=QUEUE if queue_only else STACK)
     else:
         generation.require_development_database()
         if not generation.development_enabled():
@@ -745,7 +745,7 @@ def serve(port=8178, *, stack_only=False, replay_only=False):
         path = request.url.path.rstrip("/")
         if request.method == "POST" and (
             path.endswith(("/operations", "/tutor-turns"))
-            or ((stack_only or replay_only) and path.endswith("/free-courses"))
+            or ((stack_only or queue_only or replay_only) and path.endswith("/free-courses"))
         ):
             return JSONResponse(
                 {"code": "HEAD_GOAL_EXTRA_OPERATION_DISABLED"}, status_code=409

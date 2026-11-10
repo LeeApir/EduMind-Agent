@@ -57,6 +57,48 @@ describe('bounded scene presentation',()=>{
     expect(w.text()).toContain('状态表示不可用');
     w.unmount();
   });
+  it('distinguishes the queue ends and removed value across all five frames',async()=>{
+    const values=[[],[3],[3,8],[8],[8,5]];
+    const lines=[24,26,27,28,29];
+    const data:SceneProjection={
+      ...scene(), generation_source:{
+        origin:'queue_fifo_model_generation', batch:'queue-fifo-deepseek-r01',
+        candidate_digest:'a'.repeat(64), parent_digest:null, model:'deepseek-flash',
+        prompt_version:'queue-fifo-course-v1', plan_digest:'b'.repeat(64),
+        materials_digest:'c'.repeat(64), evidence_kind:'offline_fixture',
+      },
+      blocks:[
+        {kind:'code',anchor_id:'queue-code',language:'c',source:Array(30).fill('C line').join('\n')},
+        {kind:'visualization',anchor_id:'queue-state',visualization_type:'queue',
+          text_alternative:'有效元素从队头到队尾',steps:values.map((active,i)=>({
+            caption:`操作 ${i}`,
+            elements:active.map((value,j)=>({id:`slot-${j}`,label:String(value),next_id:null})),
+            highlight_ids:active.map((_,j)=>`slot-${j}`),
+            queue_frame:{frame_id:`f${i}`,code_anchor:'queue-code',line:lines[i]!,dequeued:i===3?3:null,note:`讲解 ${i}`},
+          }))},
+      ],
+      actions:values.map((_,i)=>({type:'show_step',anchor_id:'queue-state',step_index:i})),
+    };
+    const w=mount(Presentation,{props:{scene:data}});
+    for(const [i,active] of values.entries()){
+      expect(w.find('.active-code-line').attributes('data-line')).toBe(String(lines[i]));
+      expect(w.text()).toContain(`本步出队结果：${i===3?3:'无'}`);
+      const items=w.findAll('.visual-elements li');
+      expect(items.map(item=>Number(item.get('strong').text()))).toEqual(active);
+      if(items.length){
+        expect(items[0]!.get('small').text()).toContain('队头');
+        expect(items.at(-1)!.get('small').text()).toContain('队尾');
+      }else{
+        expect(w.text()).toContain('队列为空，没有队头或队尾');
+      }
+      if(i<4)await button(w,'下一步');
+    }
+    await button(w,'上一步');
+    expect(w.text()).toContain('本步出队结果：3');
+    await button(w,'重置');
+    expect(w.find('.active-code-line').attributes('data-line')).toBe('24');
+    w.unmount();
+  });
   it('uses actual anchors for block highlight and pauses at explicit pause/last action',async()=>{
     vi.useFakeTimers();const w=mount(Presentation,{props:{scene:scene()}});await button(w,'播放动作');expect(w.emitted('highlight')?.at(-1)).toEqual(['code']);await vi.advanceTimersByTimeAsync(1200);expect(w.text()).toContain('步骤 2 / 2');await vi.advanceTimersByTimeAsync(1200);expect(w.text()).toContain('动作 3 / 3');expect(w.findAll('button').find(b=>b.text()==='暂停动作')!.attributes('disabled')).toBeDefined();expect(vi.getTimerCount()).toBe(0);w.unmount();
   });

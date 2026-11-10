@@ -1,4 +1,4 @@
-"""Select a sealed course trial by topic and replay or admit it without Provider traffic."""
+"""Run an approved fixed trial or replay a sealed historical course by topic."""
 
 import argparse
 import asyncio
@@ -14,8 +14,10 @@ from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import create_database_engine
+from app.services.course_trial_publication import QUEUE
 from app.services.course_trial_replay import import_course, projection, require_database
 from app.services.course_trial_sources import ARCHIVES
+from scripts import course_trial_generation as generation
 from scripts.head_course_goal import ROOT, raw_io_audit
 
 # Run each unchanged reader from its original commit. Its full manifest still validates even
@@ -81,13 +83,25 @@ async def publish(owner, topic, record, review):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=("replay", "publish"))
-    parser.add_argument("--topic", required=True, choices=ARCHIVES)
+    parser.add_argument(
+        "action", choices=("inspect", "prepare", "send", "replay", "publish", "stop")
+    )
+    parser.add_argument("--topic", required=True, choices=(*ARCHIVES, QUEUE.topic))
     parser.add_argument("--owner", type=UUID)
+    parser.add_argument("--approval", type=Path)
     args = parser.parse_args()
+    if args.action != "send":
+        sys.addaudithook(raw_io_audit)
+    if args.topic == QUEUE.topic:
+        if args.action != "prepare" and (
+            args.owner is not None or args.approval is not None
+        ):
+            parser.error("queue --owner and --approval are only used by prepare")
+        return generation.run(parser, args, QUEUE)
+    if args.action not in {"replay", "publish"} or args.approval is not None:
+        parser.error("archived topics support replay and publish")
     if (args.action == "publish") != (args.owner is not None):
         parser.error("publish requires --owner; replay does not accept --owner")
-    sys.addaudithook(raw_io_audit)
     record, review = read_frozen(args.topic)
     if args.action == "replay":
         _, _, assembled = projection(args.topic, record, review)
@@ -98,4 +112,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

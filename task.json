@@ -6454,6 +6454,46 @@
           "evidence": "docs/acceptance/phase-1.5-course-trial-replay-t120/RESULTS.md"
         }
       ]
+    },
+    {
+      "id": "PHASE-1.5-T121",
+      "phase": "Phase 1.5",
+      "title": "固定队列课程接入共用生成入口及交付",
+      "status": "blocked",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T120"
+      ],
+      "scope": [
+        "固定容量 C 队列，空队列依次 enqueue(3)、enqueue(8)、dequeue()、enqueue(5)。程序提供代码、轨迹、事实和私有答案，模型提供讲解、题干和解析。",
+        "复用 T120 传输、封存、私有准入和两课封存回放。共用入口增加固定提纲生成动作，先零 Provider 离线验证，真实请求单独授权。"
+      ],
+      "prd_source": "PRD §0.5；用户指定第三主题队列及共用入口",
+      "acceptance_criteria": [
+        "独立核对五帧队头、队尾、有效元素与出队值以及迁移练习答案。",
+        "共用入口按准确授权发送首稿并保存原件，候选须经主题独立审核及私有准入。",
+        "保留头插和栈封存回放回归；实际队列课程须通过阅读、播放、四题反馈及刷新验收。"
+      ],
+      "verification": [
+        "固定 C 主例与边界、MockTransport 隔离 PostgreSQL 正反例、教学与场景校验。",
+        "共用入口严格重放 T118/T119、同应用浏览器回归及最终真实队列浏览器验收。"
+      ],
+      "started_at": "2026-11-10T17:26:58+08:00",
+      "execution_gate": "准确请求冻结，队列夹具和双主题回放已通过，Provider 0。等待单次真实首稿、30 分钟窗口与 C2 批准。",
+      "commit_lookup": "Task-Completed: PHASE-1.5-T121",
+      "blocker": "按用户要求真实调用另获授权。真实首稿、独立教学审核与队列实际学习课程待交付。",
+      "verification_results": [
+        {
+          "date": "2026-11-10T17:36:19+08:00",
+          "commands": [
+            "隔离 PostgreSQL alembic upgrade head 及队列、共用传输、DeepSeek 严格回执定向 pytest",
+            "pnpm typecheck、课程展示与状态 Vitest、定向 ESLint/Ruff；共用 CLI inspect 和未批准 send 拒绝",
+            "当前代码下 scripts.check_course_trial_replay 与真实 Chromium；本机队列健康/页面/普通生成拦截"
+          ],
+          "result": "后端 23 项、前端 13 项通过。Clang 独立核对 FIFO 和边界，夹具通过封存、审核、私有准入、四题与答案隔离。头插和栈浏览器回放通过，43 个封存摘要一致，Provider 0。",
+          "evidence": "docs/acceptance/phase-1.5-queue-fifo-t121/RESULTS.md"
+        }
+      ]
     }
   ],
   "planning_inputs": {

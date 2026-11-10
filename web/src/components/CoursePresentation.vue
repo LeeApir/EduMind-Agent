@@ -1,20 +1,23 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
-import type { SceneProjection, SceneBlock, HeadReplayFrame, StackCourseFrame } from '../api/freeCourses';
+import type { SceneProjection, SceneBlock, HeadReplayFrame, StackCourseFrame, QueueCourseFrame } from '../api/freeCourses';
 const props = withDefaults(defineProps<{scene: SceneProjection; active?: boolean}>(),{active:true});
 const emit = defineEmits<{highlight:[anchor:string]}>();
+type OrderedFrame = StackCourseFrame | QueueCourseFrame;
 type Visual = Extract<SceneBlock,{kind:'visualization'}>;
 interface Element {id:string;label:string;next_id:string|null}
 interface Action {type:'highlight_block'|'show_step'|'pause';anchor_id:string;step_index:number|null}
 const index = ref(-1);const playing = ref(false);const reduced = ref(false);const frames = ref<Record<string,number>>({});const highlighted = ref('');
 let timer: ReturnType<typeof setTimeout>|undefined;let media: MediaQueryList|undefined;
 const visuals = computed(()=>props.scene.blocks.filter((b):b is Visual=>b.kind==='visualization'));
-const stackCourse = computed(() => {
+const orderedCourse = computed(() => {
   const replay = props.scene.replay_source;
-  return props.scene.generation_source?.origin === 'stack_lifo_model_generation'
-    || (replay && 'topic' in replay && replay.topic === 'stack');
+  const origin = props.scene.generation_source?.origin;
+  if (origin === 'queue_fifo_model_generation') return 'queue';
+  if (origin === 'stack_lifo_model_generation' || (replay && 'topic' in replay && replay.topic === 'stack')) return 'stack';
+  return undefined;
 });
-const guided = computed(()=>visuals.value.find(b=>b.visualization_type==='head_insertion_replay_v1'||stackCourse.value&&b.visualization_type==='stack'));
+const guided = computed(()=>visuals.value.find(b=>b.visualization_type==='head_insertion_replay_v1'||b.visualization_type===orderedCourse.value));
 function validVisual(block: Visual): boolean {
   const origin = props.scene.generation_source?.origin;
   if(block.visualization_type==='head_insertion_replay_v1')return Boolean(props.scene.replay_source || origin === 'head_goal_model_generation' || origin === 'reviewed_archived_response_import')&&Array.isArray(block.steps)&&block.steps.length>0&&block.steps.length<=13&&block.steps.every((s,i)=>{
@@ -22,15 +25,16 @@ function validVisual(block: Visual): boolean {
     return f&&f.frame_id===`f${String(i).padStart(2,'0')}`&&typeof f.title==='string'&&typeof f.note==='string'&&f.state&&typeof f.state.nodes==='object'&&code?.kind==='code'&&(f.line===null||Number.isInteger(f.line)&&f.line>0&&f.line<=code.source.trimEnd().split('\n').length)&&['active','inactive'].includes(f.locals_scope);
   });
   if(!['array','linked_list','stack','queue'].includes(block.visualization_type)||!Array.isArray(block.steps)||!block.steps.length||block.steps.length>50)return false;
-  if(stackCourse.value && (block.visualization_type!=='stack'||block.steps.length!==5))return false;
+  if(orderedCourse.value && (block.visualization_type!==orderedCourse.value||block.steps.length!==5))return false;
   return block.steps.every((s,i)=>{
-    const f=s.stack_frame;
-    if(stackCourse.value){
+    const f=orderedCourse.value==='queue'?s.queue_frame:s.stack_frame;
+    if(orderedCourse.value){
+      if (orderedCourse.value==='queue' ? s.stack_frame : s.queue_frame) return false;
       const code=props.scene.blocks.find(b=>b.anchor_id===f?.code_anchor);
       if(!f||f.frame_id!==`f${i}`||typeof f.note!=='string'||code?.kind!=='code'||
         !Number.isInteger(f.line)||f.line<1||f.line>code.source.trimEnd().split('\n').length||
-        (f.popped!==null&&!Number.isInteger(f.popped)))return false;
-    }else if(f)return false;
+        !validRemovedValue(f))return false;
+    }else if(s.stack_frame||s.queue_frame)return false;
     if(typeof s.caption!=='string'||!Array.isArray(s.elements)||s.elements.length>32||!Array.isArray(s.highlight_ids))return false;
     const elements=s.elements as Element[];
     if(!elements.every(e=>e&&typeof e.id==='string'&&typeof e.label==='string'&&(e.next_id===null||typeof e.next_id==='string')))return false;
@@ -68,10 +72,19 @@ function tick():void {
 }
 function play():void {if(!actions.value.length||reduced.value||!activePlayback.value)return;if(index.value>=actions.value.length-1)apply(-1);playing.value=true;tick();}
 function chooseFrame(block:Visual,delta:number):void {stop();if(!validVisual(block))return;frames.value={...frames.value,[block.anchor_id]:Math.max(0,Math.min(block.steps.length-1,(frames.value[block.anchor_id]??0)+delta))};}
+function removedValue(frame:OrderedFrame): number|null {return 'dequeued' in frame?frame.dequeued:frame.popped;}
+function validRemovedValue(frame:OrderedFrame): boolean {
+  const value=removedValue(frame);
+  return value===null||Number.isInteger(value);
+}
 function headFrame(block:Visual):HeadReplayFrame|undefined{return validVisual(block)?block.steps[frames.value[block.anchor_id]??0]?.head_frame:undefined;}
-function stackFrame(block:Visual):StackCourseFrame|undefined{return validVisual(block)?block.steps[frames.value[block.anchor_id]??0]?.stack_frame:undefined;}
-function lineFrame(block:Visual):HeadReplayFrame|StackCourseFrame|undefined{return headFrame(block)??stackFrame(block);}
-function replayCode(frame:HeadReplayFrame|StackCourseFrame):string{const code=props.scene.blocks.find(b=>b.kind==='code'&&b.anchor_id===frame.code_anchor);return code?.kind==='code'?code.source:'';}
+function orderedFrame(block:Visual):OrderedFrame|undefined {
+  if (!validVisual(block)) return undefined;
+  const step=block.steps[frames.value[block.anchor_id]??0];
+  return step?.queue_frame??step?.stack_frame;
+}
+function lineFrame(block:Visual):HeadReplayFrame|OrderedFrame|undefined{return headFrame(block)??orderedFrame(block);}
+function replayCode(frame:HeadReplayFrame|OrderedFrame):string{const code=props.scene.blocks.find(b=>b.kind==='code'&&b.anchor_id===frame.code_anchor);return code?.kind==='code'?code.source:'';}
 function pointer(value:string|null|undefined):string{return value===null?'NULL':value==='indeterminate'?'未知（未初始化）':value??'';}
 function chain(frame:HeadReplayFrame):string{let id=frame.state.caller_head;const parts:string[]=[];const seen=new Set<string>();while(id!==null){if(id==='indeterminate'||seen.has(id)||!frame.state.nodes[id]){parts.push('未知或重复');return parts.join(' → ');}seen.add(id);parts.push(`${id}(${frame.state.nodes[id]!.data})`);id=frame.state.nodes[id]!.next;}parts.push('NULL');return parts.join(' → ');}
 function elements(block:Visual): Element[] {return validVisual(block)?block.steps[frames.value[block.anchor_id]??0]!.elements as Element[]:[];}
@@ -204,23 +217,26 @@ onBeforeUnmount(()=>{stop();media?.removeEventListener('change',motionChanged);d
               </ul>
               <details><summary>准确状态与原步骤</summary><pre>{{ JSON.stringify(headFrame(block),null,2) }}</pre></details>
             </div>
-            <div v-else-if="stackFrame(block)">
-              <p>{{ stackFrame(block)!.note }}</p>
-              <p>本步出栈结果：{{ stackFrame(block)!.popped ?? '无' }}</p>
+            <div v-else-if="orderedFrame(block)">
+              <p>{{ orderedFrame(block)!.note }}</p>
+              <p>本步{{ orderedCourse === 'queue' ? '出队' : '出栈' }}结果：{{ removedValue(orderedFrame(block)!) ?? '无' }}</p>
               <p v-if="!elements(block).length">
-                栈为空，没有栈顶。
+                {{ orderedCourse === 'queue' ? '队列为空，没有队头或队尾。' : '栈为空，没有栈顶。' }}
               </p>
               <ol
                 v-else
-                class="visual-elements structure-stack"
-                aria-label="栈内容（从栈底到栈顶）"
+                class="visual-elements"
+                :class="`structure-${orderedCourse}`"
+                :aria-label="orderedCourse === 'queue' ? '有效元素（从队头到队尾）' : '栈内容（从栈底到栈顶）'"
               >
                 <li
                   v-for="(element,i) in elements(block)"
                   :key="element.id"
                   :class="{'element-highlight':highlightedElement(block,element.id)}"
                 >
-                  <small>下标 {{ i }}<template v-if="highlightedElement(block,element.id)"> · 栈顶</template></small>
+                  <small>下标 {{ i }}<template v-if="orderedCourse === 'queue'">
+                    {{ i === 0 ? ' · 队头' : '' }}{{ i === elements(block).length - 1 ? ' · 队尾' : '' }}
+                  </template><template v-else-if="highlightedElement(block,element.id)"> · 栈顶</template></small>
                   <strong>{{ element.label }}</strong>
                 </li>
               </ol>

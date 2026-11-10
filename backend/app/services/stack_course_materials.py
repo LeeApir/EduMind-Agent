@@ -224,6 +224,10 @@ def outline() -> dict[str, Any]:
 
 
 def request() -> dict[str, Any]:
+    return fixed_request(INSTRUCTION, GOAL, outline(), materials(), "edumind_stack_lifo_v1", SCHEMA)
+
+
+def fixed_request(instruction, goal, plan, material, schema_name, schema):
     return dict(
         model="deepseek-flash",
         stream=False,
@@ -232,34 +236,34 @@ def request() -> dict[str, Any]:
         max_output_tokens=4000,
         temperature=0.2,
         input=[
-            dict(role="system", content=INSTRUCTION),
+            dict(role="system", content=instruction),
             dict(
                 role="user",
-                content=canonical(dict(goal=GOAL, plan=outline(), materials=materials())).decode(),
+                content=canonical(dict(goal=goal, plan=plan, materials=material)).decode(),
             ),
         ],
-        text=dict(
-            format=dict(
-                type="json_schema", name="edumind_stack_lifo_v1", strict=True, schema=SCHEMA
-            )
-        ),
+        text=dict(format=dict(type="json_schema", name=schema_name, strict=True, schema=schema)),
     )
 
 
 def validate_content(raw: Any, mat: dict[str, Any]) -> None:
-    if not VALIDATOR.is_valid(raw):
-        raise SnapshotError("STACK_TEACHING_SCHEMA")
+    validate_fixed_content(raw, mat, VALIDATOR, "STACK")
+
+
+def validate_fixed_content(raw, mat, validator, prefix):
+    if not validator.is_valid(raw):
+        raise SnapshotError(f"{prefix}_TEACHING_SCHEMA")
     if any(
         not p["text"].strip() or not set(p["fact_ids"]) <= set(mat["facts"])
         for p in raw["paragraphs"]
     ):
-        raise SnapshotError("STACK_FACT_REFERENCE")
+        raise SnapshotError(f"{prefix}_FACT_REFERENCE")
     if (
         [n["frame_id"] for n in raw["step_notes"]] != [f["frame_id"] for f in mat["main"]["frames"]]
         or any(not n["note"].strip() for n in raw["step_notes"])
         or not raw["summary"].strip()
     ):
-        raise SnapshotError("STACK_FRAME_BINDING")
+        raise SnapshotError(f"{prefix}_FRAME_BINDING")
     for q in raw["questions"].values():
         stem = q["stem"]
         if (
@@ -268,19 +272,12 @@ def validate_content(raw: Any, mat: dict[str, Any]) -> None:
             or not q["explanation"].strip()
             or any(marker in stem for marker in ("#include", "```", "~~~", "{", "}", ";"))
         ):
-            raise SnapshotError("STACK_QUESTION_PROSE_REQUIRED")
+            raise SnapshotError(f"{prefix}_QUESTION_PROSE_REQUIRED")
 
 
 def assemble(raw: dict[str, Any], source: dict[str, Any]) -> dict[str, Any]:
     mat = materials()
     validate_content(raw, mat)
-    blocks = [
-        dict(kind="text", anchor_id=f"stack-text-{i}", markdown=p["text"])
-        for i, p in enumerate(raw["paragraphs"])
-    ]
-    blocks.append(
-        dict(kind="code", anchor_id="stack-code", language="c", source=mat["main"]["source"])
-    )
     steps = []
     for f, n in zip(mat["main"]["frames"], raw["step_notes"], strict=True):
         elements = [
@@ -300,21 +297,40 @@ def assemble(raw: dict[str, Any], source: dict[str, Any]) -> dict[str, Any]:
                 ),
             )
         )
+    return assemble_fixed_lesson(
+        "stack",
+        raw,
+        source,
+        mat,
+        steps,
+        "状态按栈底到栈顶列出；竖向图的栈顶在上方。",
+        "栈的迁移练习",
+    )
+
+
+def assemble_fixed_lesson(topic, raw, source, mat, steps, text_alternative, exercise_title):
+    blocks = [
+        dict(kind="text", anchor_id=f"{topic}-text-{i}", markdown=p["text"])
+        for i, p in enumerate(raw["paragraphs"])
+    ]
+    blocks.append(
+        dict(kind="code", anchor_id=f"{topic}-code", language="c", source=mat["main"]["source"])
+    )
     blocks.extend(
         [
             dict(
                 kind="visualization",
-                anchor_id="stack-state",
-                visualization_type="stack",
-                text_alternative="状态按栈底到栈顶列出；竖向图的栈顶在上方。",
+                anchor_id=f"{topic}-state",
+                visualization_type=topic,
+                text_alternative=text_alternative,
                 steps=steps,
             ),
-            dict(kind="text", anchor_id="stack-summary", markdown=raw["summary"]),
+            dict(kind="text", anchor_id=f"{topic}-summary", markdown=raw["summary"]),
             dict(
                 kind="exercise",
-                anchor_id="stack-questions",
-                exercise_key="stack-questions",
-                question="栈的迁移练习",
+                anchor_id=f"{topic}-questions",
+                exercise_key=f"{topic}-questions",
+                question=exercise_title,
                 items=[
                     dict(
                         question_id=key,
@@ -332,6 +348,7 @@ def assemble(raw: dict[str, Any], source: dict[str, Any]) -> dict[str, Any]:
         blocks=blocks,
         generation_source=source,
         actions=[
-            dict(type="show_step", anchor_id="stack-state", step_index=i) for i in range(len(steps))
+            dict(type="show_step", anchor_id=f"{topic}-state", step_index=i)
+            for i in range(len(steps))
         ],
     )
