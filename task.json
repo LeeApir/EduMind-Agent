@@ -6367,7 +6367,7 @@
       "id": "PHASE-1.5-T119",
       "phase": "Phase 1.5",
       "title": "固定栈主题的第二主题迁移与课程交付",
-      "status": "blocked",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1.5-T118"
@@ -6388,9 +6388,8 @@
         "隔离 PostgreSQL/API 与前端验证；真实课程须完成独立全文审核及浏览器学习验收。"
       ],
       "started_at": "2026-11-10T15:11:26+08:00",
-      "execution_gate": "零调用准备和定向验证通过，等待准确首稿批次、1 次请求、30 分钟和 C2 例外批准。尚未生成或交付实际课程。",
+      "execution_gate": "一次真实首稿严格重放和独立教学审核通过，首稿原文已准入本机私有 v2 并完成浏览器验收。批次封存 STOP。",
       "commit_lookup": "Task-Completed: PHASE-1.5-T119",
-      "blocker": "真实执行待用户另行授权。首稿、独立教学审核及真实浏览器课程验收尚未运行。",
       "verification_results": [
         {
           "date": "2026-11-10T15:26:31+08:00",
@@ -6401,8 +6400,18 @@
           ],
           "result": "后端 12 项、前端 12 项通过。程序 C 独立核对五帧、四题、满空边界，MockTransport 封存及拒绝，私有 v2、服务端四题反馈、答案隔离及版本回读通过。Provider 0，未启动真实窗口。",
           "evidence": "docs/acceptance/phase-1.5-stack-lifo-t119/RESULTS.md"
+        },
+        {
+          "date": "2026-11-10T16:52:12+08:00",
+          "commands": [
+            "T119 固定首稿 send、严格原件重放 replay、独立教学七项评审及本机 publish",
+            "实际 Chromium check-browser.py 核对五帧、播放、四题反馈、权限、刷新与原访客窗口交接"
+          ],
+          "result": "DeepSeek 1 次首稿 HTTP 200，回报输入 2582、输出 1246 tokens。独立审核七项通过。私有 v2 五段及总结、五帧与高亮、四题 0% / 100%、答案隔离和刷新无重复提交通过。",
+          "evidence": "docs/acceptance/phase-1.5-stack-lifo-t119/RESULTS.md"
         }
-      ]
+      ],
+      "completed_at": "2026-11-10T16:52:12+08:00"
     }
   ],
   "planning_inputs": {
