@@ -30,6 +30,16 @@ def select_profile(profile):
         VAULT = Path(
             "/Users/apir/.local/share/edumind/head-reuse-evidence-revision-r01"
         )
+    elif profile == "citation":
+        from app.services import head_course_citation_revision
+
+        f = head_course_citation_revision
+        PACKAGE = f.PACKAGE
+        VAULT = f.VAULT
+
+
+def citation_mode():
+    return f.VERSION == "head-empty-citation-revision-v1"
 
 
 def package_digest():
@@ -37,7 +47,10 @@ def package_digest():
     for name, h in json.loads(data)["files"].items():
         if hashlib.sha256((ROOT / name).read_bytes()).hexdigest() != h:
             raise SnapshotError("FACT_PACKAGE_CHANGED")
-    if old.read(PACKAGE / "request.json") != f.body():
+    path = PACKAGE / "request.json"
+    if old.read(path) != f.body() or (
+        citation_mode() and path.read_bytes() != canonical(f.body())
+    ):
         raise SnapshotError("FACT_REQUEST_CHANGED")
     return hashlib.sha256(data).hexdigest()
 
@@ -46,12 +59,16 @@ def gate(vault, approval):
     sha = package_digest()
     data = f.inputs()
     evidence_mode = "teaching_evidence" in data
+    if citation_mode():
+        f.validate_approval(approval)
     if (
         approval.get("manifest_sha256") != sha
         or approval.get("parent_digest") != data["parent_candidate"]["candidate_digest"]
         or approval.get("explicit_user_authorization") is not True
         or approval.get(
-            "accept_ADR0054_scope_and_batch_C2"
+            f.APPROVAL_KEY
+            if citation_mode()
+            else "accept_ADR0054_scope_and_batch_C2"
             if evidence_mode
             else "accept_fact_revision_and_batch_C2"
         )
@@ -111,6 +128,8 @@ def send(vault, approval, *, transport=None, key=None):
         ip = ipaddress.ip_address(target.connect_ip)
         host = f"[{ip}]" if ip.version == 6 else str(ip)
         if key is None:
+            if citation_mode() and not sys.stdin.isatty():
+                raise SnapshotError("FACT_TTY_REQUIRED")
             key = getpass.getpass("Current DeepSeek API key (not saved): ")
         if not key or "\n" in key or "\r" in key:
             raise SnapshotError("FACT_KEY")
@@ -130,6 +149,15 @@ def send(vault, approval, *, transport=None, key=None):
                     state="attempted_unknown",
                     input_reservation=139264,
                     output_reservation=4000,
+                    **(
+                        {
+                            "approval_sha256": hashlib.sha256(
+                                canonical(approval)
+                            ).hexdigest()
+                        }
+                        if citation_mode()
+                        else {}
+                    ),
                 )
             ),
         )
@@ -168,7 +196,9 @@ def send(vault, approval, *, transport=None, key=None):
         gate(vault, approval)
         if status != 200 or encoding != "identity":
             raise SnapshotError("FACT_HTTP_OR_ENCODING")
-        result, obs = old.raw_io.observe_generation(request, raw)
+        result, obs = getattr(f, "observe_generation", old.raw_io.observe_generation)(
+            request, raw
+        )
         if (
             obs["reported_input_tokens"] > 139264
             or result.usage.output_tokens > 4000
@@ -235,6 +265,13 @@ def read_saved(vault):
     receipt = old.read(vault / "revision.body.json")
     attempt = old.read(vault / "revision.attempt.json")
     approval = old.read(vault / "approval.json")
+    if citation_mode():
+        f.validate_approval(approval)
+        if (
+            attempt.get("approval_sha256")
+            != hashlib.sha256(canonical(approval)).hexdigest()
+        ):
+            raise SnapshotError("FACT_SAVED_APPROVAL")
     if (
         request != f.body()
         or receipt
@@ -256,7 +293,9 @@ def read_saved(vault):
         or len(list(vault.glob("*.attempt.json"))) != 1
     ):
         raise SnapshotError("FACT_SAVED_BINDING")
-    result, obs = old.raw_io.observe_generation(request, raw)
+    result, obs = getattr(f, "observe_generation", old.raw_io.observe_generation)(
+        request, raw
+    )
     if (
         result.usage.input_tokens > 139264
         or result.usage.output_tokens > request["max_output_tokens"]
@@ -304,7 +343,9 @@ def read_saved(vault):
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--profile", choices=["fact", "evidence"], default="fact")
+    p.add_argument(
+        "--profile", choices=["fact", "evidence", "citation"], default="fact"
+    )
     group = p.add_mutually_exclusive_group(required=True)
     group.add_argument("--inspect", action="store_true")
     group.add_argument("--send", action="store_true")
@@ -336,8 +377,8 @@ if __name__ == "__main__":
             print("STOPPED: preserve originals and failures; no next request.")
             sys.exit(2)
     elif a.publish:
-        if a.profile != "evidence" or not a.owner:
-            p.error("--publish requires evidence profile and actual owner")
+        if a.profile not in ("evidence", "citation") or not a.owner:
+            p.error("--publish requires evidence or citation profile and actual owner")
         import asyncio
         from uuid import UUID
         from app.services.head_course_evidence_publication import import_course

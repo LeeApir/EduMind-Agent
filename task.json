@@ -6293,7 +6293,8 @@
       ],
       "scope": [
         "复用现有引擎与私有课程主链，限定 head=NULL 后插入 4、7、两次分配成功。程序提供代码、轨迹、事实、题目情境代码与私有答案；模型独立生成规划及教学正文。",
-        "准备阶段 Provider 0；真实请求须另获准确授权，不继承旧额度。"
+        "准备阶段 Provider 0；真实请求须另获准确授权，不继承旧额度。",
+        "限定后续引用修订只允许修改 r02 原正文第 5 段 fact_ids。须新 1 次修订授权、全文重评和私有子课程学习验收。"
       ],
       "prd_source": "PRD §0.5；课程生成方向；ADR0058 的 T118 限定补充提案",
       "acceptance_criteria": [
@@ -6336,10 +6337,20 @@
           ],
           "result": "真实 DeepSeek HTTP 200 两次，输入 14145、输出 3773。规划独立通过，正文首稿机械通过，独立全文 C01 阻断，修订 0，无可学课程。应用 cancel_requested，保留 v1。",
           "evidence": "docs/acceptance/phase-1.5-head-empty-t118/RESULTS.md"
+        },
+        {
+          "date": "2026-11-10T08:59:12+08:00",
+          "commands": [
+            "封存 r02 规划、正文、两份审核重放；f4cd8ad 归档清单 410 项",
+            "pytest T118 引用修订 8 项和旧 B 局部修订 15 项，MockTransport / 隔离 PostgreSQL",
+            "引用修订 --check、--inspect；Ruff、pnpm typecheck、工作流、git diff --check"
+          ],
+          "result": "唯一引用叶合并和越界拒绝通过，完整审核绑定、私有子课程 v2 及答案隔离通过，旧 STOP 和 v1 回读一致。Provider 0，真实执行待授权。",
+          "evidence": "docs/acceptance/phase-1.5-head-empty-t118/RESULTS.md"
         }
       ],
-      "execution_gate": "r01 与 r02 已封存；r02 实际预算已用尽，独立全文审核拒绝，禁止追加调用及准入。",
-      "block_reason": "r02 正文严格结构通过，但独立全文审核 C01 阻断：第 5 段未引用忽略返回值的反事实证据。无修订额度；应用取消已请求，只保留 v1 大纲。"
+      "execution_gate": "r01 与 r02 已封存。C01 单次引用修订准确包准备完成，新调用与 C2 待授权。",
+      "block_reason": "r02 原首稿缺独立对照引用，未获准入。独立新批仅拟修第 5 段 fact_ids，实际发送、教学重评和学习验收待执行。"
     }
   ],
   "planning_inputs": {

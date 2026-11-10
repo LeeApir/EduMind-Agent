@@ -4,24 +4,44 @@ import hashlib
 from copy import deepcopy
 from uuid import UUID
 
-from app.services import head_course_evidence_revision as f
+from app.services import head_course_evidence_revision as evidence_revision
 from app.services import head_course_generation as g
 from app.services import head_course_materials as m
 from app.services.free_course_snapshots import SnapshotError, SnapshotRepository, canonical, digest
 
 
+def revision_profile(version):
+    if version == evidence_revision.VERSION:
+        return evidence_revision
+    from app.services import head_course_citation_revision
+
+    if version == head_course_citation_revision.VERSION:
+        return head_course_citation_revision
+    raise SnapshotError("EVIDENCE_PUBLICATION_PROTOCOL")
+
+
 def validate_record(record):
     from scripts.head_course_goal import raw_io
 
+    f = revision_profile(record["protocol_version"])
     data = f.inputs()
+    request = f.body()
     raw = record["raw_response"].encode()
-    result, _ = raw_io.observe_generation(f.body(), raw)
+    result, _ = getattr(f, "observe_generation", raw_io.observe_generation)(request, raw)
     expected = f.merge(data["parent_candidate"], dict(result.value))
     approval = record["approval"]
+    approval_key = getattr(f, "APPROVAL_KEY", "accept_ADR0054_scope_and_batch_C2")
+    if f is not evidence_revision:
+        f.validate_approval(approval)
+        if (
+            record["attempt"].get("approval_sha256")
+            != hashlib.sha256(canonical(approval)).hexdigest()
+        ):
+            raise SnapshotError("EVIDENCE_PUBLICATION_APPROVAL")
     if (
         record["protocol_version"] != f.VERSION
         or canonical(record["input"]) != canonical(data)
-        or record["request"] != f.body()
+        or record["request"] != request
         or record["output"] != dict(result.value)
         or canonical(record["candidate"]) != canonical(expected)
         or record["model"] != result.model_id
@@ -37,7 +57,7 @@ def validate_record(record):
             body_complete=True,
         )
         or approval.get("explicit_user_authorization") is not True
-        or approval.get("accept_ADR0054_scope_and_batch_C2") is not True
+        or approval.get(approval_key) is not True
         or approval.get("protocol_version") != f.VERSION
         or approval.get("parent_digest") != expected["parent_digest"]
         or approval.get("evidence_digest") != data["teaching_evidence"]["evidence_digest"]
@@ -50,7 +70,7 @@ def validate_record(record):
         or approval["expires_epoch"] - approval["starts_epoch"] != 600
         or record["attempt"]["manifest_sha256"] != approval["manifest_sha256"]
         or record["attempt"]["parent_digest"] != expected["parent_digest"]
-        or record["attempt"]["request_sha256"] != hashlib.sha256(canonical(f.body())).hexdigest()
+        or record["attempt"]["request_sha256"] != hashlib.sha256(canonical(request)).hexdigest()
         or record["attempt"]["evidence_kind"] not in ("offline_fixture", "actual_provider_response")
     ):
         raise SnapshotError("EVIDENCE_PUBLICATION_RECORD")
@@ -58,7 +78,10 @@ def validate_record(record):
 
 
 def validate_review(c, review):
-    r = f.r
+    r = evidence_revision.r
+    if c["payload"]["original_goal"] == m.EMPTY_GOAL:
+        r.require_full_review(review, c)
+        return
     r.review_binding(review, c, "pass")
     required = (
         "full_lesson",
@@ -80,6 +103,7 @@ def validate_review(c, review):
 
 
 def assembled(record, review):
+    f = revision_profile(record["protocol_version"])
     c = validate_record(record)
     validate_review(c, review)
     return m.assemble(
@@ -97,6 +121,11 @@ def assembled(record, review):
 def validate_publication(row, actual):
     stored = row.input_snapshot["evidence_revision"]
     record, review = stored["record"], stored["review"]
+    if record["protocol_version"] != row.schema_version:
+        raise SnapshotError("EVIDENCE_PUBLICATION_PROTOCOL")
+    f = revision_profile(row.schema_version)
+    if f is not evidence_revision:
+        f.validate_approval(record["approval"], row.user_id)
     projection = assembled(record, review)
     snapshot = dict(inputs=actual, evidence_revision=stored)
     if (
@@ -139,13 +168,20 @@ async def import_course(db, owner, record, review):
     from app.services.free_scene_validation import validate_candidate
 
     g.require_development_database(db.bind.url.render_as_string(hide_password=False))
+    f = revision_profile(record["protocol_version"])
+    config_version = m.REUSE_VERSION
+    if f is not evidence_revision:
+        if db.bind.url.database != f.direct.EMPTY_R02_DATABASE:
+            raise SnapshotError("CITATION_DATABASE")
+        f.validate_approval(record["approval"], owner)
+        config_version = m.FIXED_VERSION
     projection = assembled(record, review)
     c = record["candidate"]
     repo = SnapshotRepository(db, owner)
     created = await repo.create_course(
         c["payload"]["original_goal"],
         key="head-evidence-revision:" + c["candidate_digest"],
-        config={"prompt_version": m.REUSE_VERSION},
+        config={"prompt_version": config_version},
     )
     cid, oid = UUID(created["course_id"]), UUID(created["operation_id"])
     current = await repo.get_course(cid)

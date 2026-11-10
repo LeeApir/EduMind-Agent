@@ -146,7 +146,7 @@ def validate_generation(
     row: FreeSceneGenerationResult, actual: dict[str, Any], operation=None
 ) -> dict[str, Any]:
     snapshot = row.input_snapshot
-    if row.schema_version == "head-evidence-local-revision-v1":
+    if row.schema_version in ("head-evidence-local-revision-v1", "head-empty-citation-revision-v1"):
         from app.services.head_course_evidence_publication import validate_publication
 
         return validate_publication(row, actual)

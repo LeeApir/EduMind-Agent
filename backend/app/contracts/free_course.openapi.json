@@ -5879,7 +5879,7 @@
                 "const": "head_goal_model_generation"
               },
               "batch": {
-                "const": "head-reuse-evidence-revision-r01"
+                "enum": ["head-reuse-evidence-revision-r01", "head-empty-citation-revision-r01"]
               },
               "candidate_digest": {
                 "type": "string",
@@ -5893,7 +5893,7 @@
                 "type": "string"
               },
               "prompt_version": {
-                "const": "head-evidence-local-revision-v1"
+                "enum": ["head-evidence-local-revision-v1", "head-empty-citation-revision-v1"]
               },
               "plan_digest": {
                 "type": "string",
@@ -5947,7 +5947,19 @@
               "teaching_review",
               "teaching_evidence_version",
               "teaching_evidence_digest"
-            ]
+            ],
+            "if": {
+              "properties": {"batch": {"const": "head-empty-citation-revision-r01"}}
+            },
+            "then": {
+              "properties": {
+                "prompt_version": {"const": "head-empty-citation-revision-v1"},
+                "model": {"const": "deepseek-flash"}
+              }
+            },
+            "else": {
+              "properties": {"prompt_version": {"const": "head-evidence-local-revision-v1"}}
+            }
           },
           {
             "type": "object",

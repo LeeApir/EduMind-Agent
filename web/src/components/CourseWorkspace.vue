@@ -279,7 +279,7 @@ onBeforeUnmount(()=>{save();epoch+=1;manifestEpoch+=1;versionsEpoch+=1;controlle
               class="replay-source"
               aria-label="新课程来源"
             >
-              <strong>{{ scene.generation_source.prompt_version === 'head-evidence-local-revision-v1' ? '模型局部修订 · 程序证据补充' : ['head-empty-deepseek-r01', 'head-empty-deepseek-r02'].includes(scene.generation_source.batch) ? (scene.generation_source.evidence_kind === 'offline_fixture' ? '空链表头插 · 离线接线夹具' : '空链表头插 · DeepSeek 生成') : scene.generation_source.batch === 'head-fixed-deepseek-r01' ? '固定头插方案 · DeepSeek 官方直连验证' : scene.generation_source.prompt_version === 'head-fixed-course-v1' ? '固定头插方案 · 新输入验证' : scene.generation_source.prompt_version === 'head-reuse-course-v1' ? '限定头插流程复用 · 新目标课程' : scene.generation_source.evidence_kind === 'targeted_fact_revision' ? '模型四字段事实修订' : scene.generation_source.evidence_kind === 'program_format_recovery' ? '程序格式恢复 · r03 派生课程' : scene.generation_source.evidence_kind === 'offline_fixture' ? '离线接线夹具 · 非真实生成' : '新目标真实生成 · 头插支持域' }} · 未签核</strong>
+              <strong>{{ scene.generation_source.prompt_version === 'head-empty-citation-revision-v1' ? (scene.generation_source.evidence_kind === 'offline_fixture' ? '空链表头插 · 离线接线夹具' : '空链表头插 · 模型引用修订') : scene.generation_source.prompt_version === 'head-evidence-local-revision-v1' ? '模型局部修订 · 程序证据补充' : ['head-empty-deepseek-r01', 'head-empty-deepseek-r02'].includes(scene.generation_source.batch) ? (scene.generation_source.evidence_kind === 'offline_fixture' ? '空链表头插 · 离线接线夹具' : '空链表头插 · DeepSeek 生成') : scene.generation_source.batch === 'head-fixed-deepseek-r01' ? '固定头插方案 · DeepSeek 官方直连验证' : scene.generation_source.prompt_version === 'head-fixed-course-v1' ? '固定头插方案 · 新输入验证' : scene.generation_source.prompt_version === 'head-reuse-course-v1' ? '限定头插流程复用 · 新目标课程' : scene.generation_source.evidence_kind === 'targeted_fact_revision' ? '模型四字段事实修订' : scene.generation_source.evidence_kind === 'program_format_recovery' ? '程序格式恢复 · r03 派生课程' : scene.generation_source.evidence_kind === 'offline_fixture' ? '离线接线夹具 · 非真实生成' : '新目标真实生成 · 头插支持域' }} · 未签核</strong>
               <p
                 v-if="scene.generation_source.teaching_review?.verdict !== 'pass' && scene.generation_source.evidence_kind === 'program_format_recovery'"
                 role="alert"
@@ -301,7 +301,11 @@ onBeforeUnmount(()=>{save();epoch+=1;manifestEpoch+=1;versionsEpoch+=1;controlle
               <p v-if="scene.generation_source.teaching_evidence_digest">
                 独立程序证据 {{ scene.generation_source.teaching_evidence_version }} · {{ scene.generation_source.teaching_evidence_digest }}
               </p>
-              <small v-if="scene.generation_source.prompt_version === 'head-evidence-local-revision-v1'">
+              <small v-if="scene.generation_source.prompt_version === 'head-empty-citation-revision-v1'">
+                <template v-if="scene.generation_source.evidence_kind === 'offline_fixture'">离线接线夹具。</template>
+                <template v-else>沿用 r02 正文和程序材料。第 5 段的事实引用经单次模型修订，完整教学重评通过。</template>
+              </small>
+              <small v-else-if="scene.generation_source.prompt_version === 'head-evidence-local-revision-v1'">
                 <template v-if="scene.generation_source.evidence_kind === 'offline_fixture'">离线接线夹具，未新增真实模型调用，不计教学成果。</template>
                 <template v-else>沿用 r01 真实正文，仅已审核的范围说明和指定段落由本批单次模型请求修订。代码、轨迹与答案保持原版；新增引用来自程序计算的独立对照。完整教学重评已通过，原 r01 首稿与停止记录保留。</template>
               </small>

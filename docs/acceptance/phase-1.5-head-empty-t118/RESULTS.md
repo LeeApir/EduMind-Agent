@@ -52,3 +52,11 @@ r02 的 30 分钟窗口于北京时间 2026-11-10 08:33:36 登记，原截止为
 | 同版程序材料及补充教学证据 | `6521537455ce7e11d13c7e5b34f91826413057b93dafc2b63330c8c45653f0e1` / `2eb56295c35ebe2378dbe4032381a7beafcbf9880cb7247c1d47afd15e89f261` |
 
 原件目录 `~/.local/share/edumind/head-empty-deepseek-r02` 保留两组 `*.request.json`、`*.attempt.json`、`*.raw.enc` 和 `*.body.json`，以及 `context.json`、`approval.bound.json`、`plan.mapping.json`、`plan.binding.json`、`generate.record.json`、两份独立审核和 `STOP`。本机重放 `verify_saved`、`review_binding` 通过，停止门禁返回 `HEAD_VAULT_STOPPED_OR_UNSAFE`。通过现有本机取消服务回读 `cancel_requested`，只保留大纲 v1，没有准入、可学课程入口或浏览器学习验收。
+
+## 单次引用修订准备
+
+按 C01 准备独立引用修订批次。准确请求 4,978 字节，SHA-256 `0f7a1769b5cd745401562abb171ea365a303d03e4a9443f8e698ed58ef25563e`。模型只返回第 5 段引用列表，保留接收路径 `trace_step_05` 并增加忽略返回值的对照引用。合并后逐项核对其余正文、规划、代码、轨迹、答案和证据。见 [执行包](../phase-1.5-head-empty-citation-revision-r01/README.md) 和 [最小授权差异](../../ADR/0058-t118-citation-revision-supplement.md)。
+
+本机从加密原件重放 r02 两个已封存响应并绑定原独立审核。r02 检查点 `f4cd8ad` 的 410 项冻结文件按 Git 回读通过。新增 8 项离线检查验证唯一叶路径合并、错字段和错 ID 拒绝、共享前台一次请求限制、审核及访客绑定、私有子课程 v2 准入、13 帧和答案隔离。MockTransport 及隔离 PostgreSQL 下旧 B 局部修订的 15 项回归（含私有导入和四题反馈）通过。回读 r02 仍为 `cancel_requested`、大纲 v1，STOP 原字节相同。Ruff、前端类型、任务账本、Git 差异及准确包 `--check`/入口 `--inspect` 通过。
+
+本轮实际调用 0 次。新的修订发送窗口待授权，独立全文重评、真实课程和浏览器验收均未执行。
