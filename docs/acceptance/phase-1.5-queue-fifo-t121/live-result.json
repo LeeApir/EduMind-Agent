@@ -1,0 +1,174 @@
+{
+  "task_id": "PHASE-1.5-T121",
+  "approved_commit": "78e5c5c",
+  "batch": "queue-fifo-deepseek-r01",
+  "manifest_sha256": "42a5a1c36b60e490e45dc4e461fd292abee9722a7564fa8df085c6e7afe2f012",
+  "context_sha256": "0beba3cfd173e6a0b9a91b773fca6c72898897beb1db91d15a6f3debd3a136d0",
+  "execution_window": {
+    "starts": "2026-11-10T17:49:00.127719+08:00",
+    "expires": "2026-11-10T18:19:00.127719+08:00"
+  },
+  "evidence_kind": "actual_provider_response",
+  "counts": {
+    "planning": 0,
+    "first_draft": 1,
+    "revision": 0,
+    "retries": 0,
+    "fallback": 0,
+    "total": 1
+  },
+  "first_draft": {
+    "candidate_digest": "39742e3ccc803c1afe313c7d90dc69fb778ea349227db248a09decd295c1cb97",
+    "plan_digest": "85f07790e2e2d9d37a68066a24e33132fbdb51aad92d6e7bb7c6c831e76869f4",
+    "materials_digest": "89d1103c231b7c77923eb3a61775e5c3dcc08dc5645e80f8d523932aaf862ff2",
+    "receipt": {
+      "complete": true,
+      "encoding": "identity",
+      "http_status": 200,
+      "observation": {
+        "actual_invoice_verified": false,
+        "direct_response_contract": "head-deepseek-responses-v1",
+        "instruction_delivery_verified": false,
+        "instruction_echo": "unavailable",
+        "known_suffix_observed": false,
+        "message_phase": "final_answer",
+        "opaque_identity_verified": false,
+        "opaque_turn_metadata_quarantined": false,
+        "phase_adapter_version": "limited-c-message-phase-v1",
+        "policy": "pilot-responses-wire-v1",
+        "reported_input_tokens": 2817,
+        "reported_total_output_tokens": 1263,
+        "summary_quarantined": false,
+        "upstream_context_verified": false
+      },
+      "raw_bytes": 7546,
+      "raw_sha256": "025ed64ce2ab3f63413819a0b2a7dfae38c359408fee45f981a2d2981e081b35",
+      "request_sha256": "af6b98c06c2a462d695f445bc08d19d80dbc0ade639806a4c9ea2e740b57d741",
+      "usage": {
+        "input_tokens": 2817,
+        "output_tokens": 1263
+      }
+    },
+    "strict_replay": "pass",
+    "teaching_review": {
+      "blocking_findings": [
+        {
+          "cited_fact_ids": [
+            "dequeue",
+            "complexity",
+            "order"
+          ],
+          "clauses": [
+            "被移除的值和新的队头是两个不同的值",
+            "移动后新的队头是原来的第二个元素"
+          ],
+          "code_lines": [
+            15,
+            16,
+            17,
+            18,
+            19
+          ],
+          "counterexamples": [
+            {
+              "after": [
+                3
+              ],
+              "before": [
+                3,
+                3
+              ],
+              "new_front": 3,
+              "removed": 3
+            },
+            {
+              "after": [],
+              "before": [
+                3
+              ],
+              "new_front": null,
+              "removed": 3
+            }
+          ],
+          "id": "Q01",
+          "impact": "把出队元素和新队头的位置区别误写为数值必然不同，并假定成功出队后必有新队头。代码允许相同整数，出队单元素会清空队列。",
+          "path": "raw_output.paragraphs[2].text"
+        }
+      ],
+      "candidate_digest": "39742e3ccc803c1afe313c7d90dc69fb778ea349227db248a09decd295c1cb97",
+      "checks": {
+        "all_five_frames_and_highlights": true,
+        "answers_and_explanations": true,
+        "fifo_and_distinct_front_rear_vs_dequeue": false,
+        "four_transfer_questions_unique_no_hints": true,
+        "full_lesson_and_fact_citations": false,
+        "goal_and_beginner_level": true,
+        "implementation_and_display_boundary": true,
+        "shift_cost_and_effective_elements": true
+      },
+      "coverage": "逐段、总结、五帧及高亮、四题题意和答案解析均核对。独立队列推演确认五帧和四个迁移答案。其余段落、总结与引用均受材料支持。",
+      "independent_evaluator": "/root/queue_teaching_review",
+      "nonblocking_findings": [
+        "f0 的“出队值为空”表示初始化时没有出队，帧状态表达正确。"
+      ],
+      "verdict": "fail"
+    }
+  },
+  "format_recovery": "none",
+  "assistant_teaching_edits": false,
+  "sealed_vault": "~/.local/share/edumind/queue-fifo-deepseek-r01",
+  "sealed_file_sha256": {
+    "HALT": "087f828668f3f0c779d649d8d9f2c5ca8ece7b5ba654b931d5900d905100e499",
+    "STOP": "abf7ff3bdbc2bb4edcac87b26a3d0fbb8844df687b566c173bf3029c59196aee",
+    "approval.bound.json": "10a75a281e01949b27c0c204c930bd62d34e87838b96fb007a7f2c89f51e7a76",
+    "context.json": "0beba3cfd173e6a0b9a91b773fca6c72898897beb1db91d15a6f3debd3a136d0",
+    "generate.attempt.json": "5aea1b92443f6fc825f0603f2cfc61289369da14695aa44488d7beb5f4464b09",
+    "generate.body.json": "7b687008200dfe0458bb0f6d6eb5cdb06c87e48beaf453cdc3b869ab0ad11fcd",
+    "generate.candidate.json": "55e65af3e48f95b4ad4240f8463ae3a49fc2df432788cbbeaf93b970e0a8fc17",
+    "generate.headers.json": "e251f4259c3a41da19504772c36480465932dcfac91ce50bdc0ec6c8ae9f9818",
+    "generate.raw.enc": "f3c204c2614dccd84d74b62a6994d2ea483829c573096ae8f06f1b086b0f88b8",
+    "generate.request.json": "af6b98c06c2a462d695f445bc08d19d80dbc0ade639806a4c9ea2e740b57d741",
+    "review.json": "96c0fcf21bc694f45ea36f92ecba7c8cb158ea6b093e48520790b94e0f3c8648"
+  },
+  "stop": {
+    "STOP": "one request consumed; independently reviewed publication only",
+    "HALT": "operator stopped batch; block publication"
+  },
+  "application": {
+    "admission": "blocked_by_independent_teaching_review",
+    "course_delivered": false,
+    "learning_acceptance": "not_run_no_ready_scene",
+    "browser_stop_check": {
+      "entry": "http://127.0.0.1:5214/",
+      "operation": {
+        "operation_id": "1ecba589-d5e6-4d27-87d5-8306d76b49e6",
+        "course_id": "cae88d70-6fed-44e0-a25a-44e90502383e",
+        "kind": "create",
+        "state": "cancel_requested",
+        "base_head_version": null,
+        "head_version": 1,
+        "last_event_id": 2,
+        "deadline_at": "2026-11-10T10:19:00.127719+00:00",
+        "reason_code": null,
+        "clarification_questions": [],
+        "request_id": "ce3c576f-2e4f-49ba-a8c6-0e0c68eb9b8b",
+        "steps": [
+          {
+            "step_key": "scene:queue",
+            "scene_id": "fb2a91ea-30b1-4714-a39a-b4b2111e3ced",
+            "state": "cancelled",
+            "reason_code": "CANCELLED"
+          }
+        ],
+        "execution_mode": "finite_queue_foreground",
+        "budget": null
+      },
+      "versions": [
+        1
+      ],
+      "ready_scenes": 0,
+      "scene_v2_http_status": 404
+    }
+  },
+  "verified_at": "2026-11-10T17:57:13+08:00"
+}

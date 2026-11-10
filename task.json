@@ -6479,9 +6479,9 @@
         "共用入口严格重放 T118/T119、同应用浏览器回归及最终真实队列浏览器验收。"
       ],
       "started_at": "2026-11-10T17:26:58+08:00",
-      "execution_gate": "准确请求冻结，队列夹具和双主题回放已通过，Provider 0。等待单次真实首稿、30 分钟窗口与 C2 批准。",
+      "execution_gate": "用户批准 78e5c5c 准确首稿及 C2。北京时间 17:49:00–18:19:00，DeepSeek 仅 1 次正文，规划、修订、重试与回退均为 0。已按审核失败停止，本批额度耗尽。",
       "commit_lookup": "Task-Completed: PHASE-1.5-T121",
-      "blocker": "按用户要求真实调用另获授权。真实首稿、独立教学审核与队列实际学习课程待交付。",
+      "blocker": "已授权的唯一正文请求已消耗。首稿机械通过，独立全文审核 Q01 阻断，STOP/HALT 保留。实际应用仅提纲 v1，无可学习课程。",
       "verification_results": [
         {
           "date": "2026-11-10T17:36:19+08:00",
@@ -6492,6 +6492,16 @@
           ],
           "result": "后端 23 项、前端 13 项通过。Clang 独立核对 FIFO 和边界，夹具通过封存、审核、私有准入、四题与答案隔离。头插和栈浏览器回放通过，43 个封存摘要一致，Provider 0。",
           "evidence": "docs/acceptance/phase-1.5-queue-fifo-t121/RESULTS.md"
+        },
+        {
+          "date": "2026-11-10T17:57:13+08:00",
+          "commands": [
+            "单次终端 send 和本机入口 replay、stop",
+            "候选绑定的独立全文八项审核",
+            "Chromium 原访客页面 fetch 核对操作、版本列表、v1 提纲与 v2 场景"
+          ],
+          "result": "真实请求 HTTP 200，输入 2817 / 输出 1263 tokens，严格重放通过。教学 6 项通过、2 项未通过，均定位第 3 段 Q01。场景取消、仅 v1，v2 场景 404。未准入课程，学习验收未执行。",
+          "evidence": "docs/acceptance/phase-1.5-queue-fifo-t121/live-result.json"
         }
       ]
     }
