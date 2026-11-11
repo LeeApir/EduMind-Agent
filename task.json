@@ -6537,7 +6537,8 @@
       ],
       "scope": [
         "固定升序数组 [2,5,8,12,16] 查找 5，零基下标和闭区间。程序提供 C 代码、状态轨迹、事实、迁移情境和私有答案，模型生成教学文字。",
-        "复用共用生成入口、传输、封存、审核、准入和播放器，只补区间与指针展示。准备阶段 Provider 0，真实首稿另获授权。"
+        "复用共用生成入口、传输、封存、审核、准入和播放器，只补区间与指针展示。准备阶段 Provider 0，真实首稿另获授权。",
+        "按封存响应、原请求和材料绑定十字段限定修订。四个题干、四个解析及 f2/f4 说明纳入新批，真实调用另获授权。"
       ],
       "prd_source": "PRD §0.5；用户指定第四主题二分查找及共用入口",
       "acceptance_criteria": [
@@ -6551,8 +6552,8 @@
       ],
       "started_at": "2026-11-10T22:32:44+08:00",
       "commit_lookup": "Task-Completed: PHASE-1.5-T122",
-      "execution_gate": "用户批准 955c15b 准确首稿及 C2。北京时间 22:50:13–23:20:13，1 次 HTTP 200 已封存。ROLE_SCHEMA 阻断，停止且额度耗尽。",
-      "blocker": "真实首稿四题缺必填 explanation，严格 Schema 拒绝。已封存停止，仅提纲 v1。独立全文审核、真实课程准入及学习验收未执行。",
+      "execution_gate": "十字段修订准确请求已冻结。原批停止，准备阶段 Provider 0。拟 1 次局部修订、0 次规划及整课生成，待新窗口和本批 C2 准确授权。",
+      "blocker": "原首稿 ROLE_SCHEMA 拒绝并封存停止。修订未获真实授权，独立全文重评与实际学习验收待执行。",
       "verification_results": [
         {
           "date": "2026-11-10T22:47:52+08:00",
@@ -6573,6 +6574,15 @@
           ],
           "result": "真实首稿 1 次 HTTP 200，四题 explanation 缺失，ROLE_SCHEMA 可复现。已取消，应用仅提纲 v1、v2 404。真实课程未交付。",
           "evidence": "docs/acceptance/phase-1.5-binary-search-t122/live-result.json"
+        },
+        {
+          "date": "2026-11-11T08:52:38+08:00",
+          "commands": [
+            "隔离 PostgreSQL pytest -q backend/tests/test_binary_search_course_trial.py backend/tests/test_course_trial_transport.py",
+            "共用 CLI inspect --topic binary-search-revision；Ruff、工作流和 Git 差异检查"
+          ],
+          "result": "7 项通过。确认原封存摘要与十字段范围，定向验证合并、越界拒绝、完整校验、审核门禁和私有准入。Provider 0。",
+          "evidence": "docs/acceptance/phase-1.5-binary-search-t122/RESULTS.md"
         }
       ]
     }

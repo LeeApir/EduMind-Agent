@@ -3,6 +3,7 @@
 import asyncio
 import os
 import subprocess
+from copy import deepcopy
 from pathlib import Path
 from uuid import UUID, uuid4
 
@@ -13,7 +14,8 @@ from test_head_course_fixed import with_direct_echo
 
 from app.main import app
 from app.services import binary_search_course_materials as binary
-from app.services.course_trial_publication import BINARY_SEARCH
+from app.services import binary_search_course_revision as revision
+from app.services.course_trial_publication import BINARY_SEARCH, BINARY_SEARCH_REVISION
 from app.services.free_course_snapshots import SnapshotError, canonical
 from scripts import course_trial_generation as trial
 from scripts import head_course_goal_fixture as fixtures
@@ -133,7 +135,53 @@ def test_teaching_contract_requires_exact_frames_and_fact_ids():
         binary.validate_content(raw, binary.materials())
 
 
-def test_shared_binary_search_trial(monkeypatch, tmp_path):
+@pytest.fixture
+def revision_fixture(monkeypatch):
+    raw = teaching()
+    for question in raw["questions"].values():
+        question.pop("explanation")
+    monkeypatch.setattr(revision, "sealed_source", lambda: (raw, {}, "fixture"))
+    return dict(
+        questions={
+            key: dict(stem=stem, explanation="离线解析。") for key, stem in revision.STEMS.items()
+        },
+        frame_notes={key: "离线帧说明。" for key in revision.FRAME_INDICES},
+    )
+
+
+def test_revision_rejects_extra_and_changed_fields(revision_fixture):
+    for mutated in (
+        dict(revision_fixture, summary="越界"),
+        dict(revision_fixture, frame_notes=dict(revision_fixture["frame_notes"], f3="越界")),
+    ):
+        with pytest.raises(SnapshotError, match="REVISION_SCHEMA"):
+            revision.merge(mutated)
+    changed = deepcopy(revision_fixture)
+    changed["questions"]["increase_left"]["stem"] = revision.STEMS["decrease_right"]
+    with pytest.raises(SnapshotError, match="QUESTION_BINDING"):
+        revision.merge(changed)
+    changed = deepcopy(revision_fixture)
+    changed["frame_notes"]["f2"] = "上一轮的中点。"
+    with pytest.raises(SnapshotError, match="FRAME_ITERATION"):
+        revision.merge(changed)
+    candidate = revision.merge(revision_fixture)
+    candidate["summary"] = "越界"
+    with pytest.raises(SnapshotError, match="OUTSIDE_SCOPE"):
+        revision.validate_immutable(candidate)
+
+
+@pytest.mark.parametrize("revise", [False, True])
+def test_shared_binary_search_trial(monkeypatch, tmp_path, revise, revision_fixture):
+    profile = BINARY_SEARCH_REVISION if revise else BINARY_SEARCH
+    request = profile.materials.request()
+    request_bytes = canonical(request)
+    if not revise:
+        assert request_bytes == (PACKAGE / "request.json").read_bytes()
+    frozen = tmp_path / "package"
+    frozen.mkdir()
+    (frozen / "request.json").write_bytes(request_bytes)
+    (frozen / "manifest.json").write_bytes(canonical(dict(files={})))
+    monkeypatch.setattr(trial, "package_path", lambda _: frozen)
     monkeypatch.setenv("EDUMIND_DATABASE_URL", os.environ["EDUMIND_TEST_DATABASE_URL"])
     monkeypatch.setenv("EDUMIND_PRODUCT_MODE", "dynamic")
     with (
@@ -144,7 +192,7 @@ def test_shared_binary_search_trial(monkeypatch, tmp_path):
         other.post("/api/auth/guest")
         owner = UUID(auth["user"]["id"])
         vault = tmp_path / "binary-search"
-        approval = trial.approval_values(BINARY_SEARCH)
+        approval = trial.approval_values(profile)
         with pytest.raises(SnapshotError, match="EXACT_AUTHORIZATION_REQUIRED"):
             asyncio.run(
                 trial.prepare(
@@ -152,27 +200,27 @@ def test_shared_binary_search_trial(monkeypatch, tmp_path):
                     owner,
                     dict(approval, max_http_requests=2),
                     fixture=True,
-                    profile=BINARY_SEARCH,
+                    profile=profile,
                 )
             )
         assert not vault.exists()
-        ctx = asyncio.run(
-            trial.prepare(vault, owner, approval, fixture=True, profile=BINARY_SEARCH)
-        )
+        ctx = asyncio.run(trial.prepare(vault, owner, approval, fixture=True, profile=profile))
         route = f"/api/free-courses/{ctx['course_id']}"
         op = client.get(f"{route}/operations/{ctx['operation_id']}").json()
         assert op["execution_mode"] == "finite_binary_search_foreground" and op["budget"] is None
-        response = with_direct_echo(binary.request(), fixtures.envelope(teaching()))
+        response = with_direct_echo(
+            request, fixtures.envelope(revision_fixture if revise else teaching())
+        )
         calls = []
 
         def handle(request):
             calls.append(request.content)
-            assert request.content == (PACKAGE / "request.json").read_bytes()
+            assert request.content == request_bytes
             return httpx.Response(200, stream=httpx.ByteStream(response))
 
-        args = dict(transport=httpx.MockTransport(handle), key="fixture-key", profile=BINARY_SEARCH)
+        args = dict(transport=httpx.MockTransport(handle), key="fixture-key", profile=profile)
         child = trial.send(vault, **args)
-        assert trial.replay(vault, fixture=True, profile=BINARY_SEARCH) == child
+        assert trial.replay(vault, fixture=True, profile=profile) == child
         with pytest.raises(SnapshotError, match="BATCH_STOPPED"):
             trial.send(vault, **args)
         assert len(calls) == 1
@@ -181,21 +229,28 @@ def test_shared_binary_search_trial(monkeypatch, tmp_path):
             verdict="pass",
             independent_evaluator="fixture-only",
             blocking_findings=[],
-            checks=dict.fromkeys(BINARY_SEARCH.checks, True),
+            checks=dict.fromkeys(profile.checks, True),
         )
         (vault / "review.json").write_bytes(canonical(review))
         with pytest.raises(SnapshotError, match="REVIEW_REQUIRED"):
-            trial.publish(vault, fixture=True, profile=BINARY_SEARCH)
+            trial.publish(vault, fixture=True, profile=profile)
         assert client.get(route).json()["head"]["version"] == 1
         (vault / "review.json").write_bytes(
             canonical(dict(review, candidate_digest=child["candidate_digest"]))
         )
-        ready = trial.publish(vault, fixture=True, profile=BINARY_SEARCH)
+        ready = trial.publish(vault, fixture=True, profile=profile)
         scene_path = f"{route}/versions/2/scenes/{ctx['scene_id']}"
         scene = client.get(scene_path)
         assert scene.status_code == 200, scene.text
         assert other.get(scene_path).status_code == 404
         assert '"answer_key"' not in scene.text and '"solution"' not in scene.text
+        source = scene.json()["generation_source"]
+        assert source["parent_digest"] is None
+        if revise:
+            assert source["source_response_sha256"] == revision.SOURCE_RESPONSE
+            assert child["raw_output"] == revision.merge(revision_fixture)
+        else:
+            assert "source_response_sha256" not in source
         blocks = scene.json()["blocks"]
         exercise = blocks[-1]
         for values, score in (

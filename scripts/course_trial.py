@@ -14,7 +14,11 @@ from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import create_database_engine
-from app.services.course_trial_publication import BINARY_SEARCH, QUEUE
+from app.services.course_trial_publication import (
+    BINARY_SEARCH,
+    BINARY_SEARCH_REVISION,
+    QUEUE,
+)
 from app.services.course_trial_replay import import_course, projection, require_database
 from app.services.course_trial_sources import ARCHIVES
 from scripts import course_trial_generation as generation
@@ -56,7 +60,11 @@ QUEUE_ARCHIVES = {
 
 
 def read_frozen(topic):
-    commit = QUEUE_ARCHIVES[topic] if topic in QUEUE_ARCHIVES else ARCHIVES[topic].frozen_commit
+    commit = (
+        QUEUE_ARCHIVES[topic]
+        if topic in QUEUE_ARCHIVES
+        else ARCHIVES[topic].frozen_commit
+    )
     with TemporaryDirectory(prefix="edumind-trial-replay-") as tmp:
         checkout = Path(tmp)
         tar = checkout / "frozen.tar"
@@ -100,7 +108,14 @@ def main():
         "action", choices=("inspect", "prepare", "send", "replay", "publish", "stop")
     )
     parser.add_argument(
-        "--topic", required=True, choices=(*ARCHIVES, *QUEUE_ARCHIVES, BINARY_SEARCH.topic)
+        "--topic",
+        required=True,
+        choices=(
+            *ARCHIVES,
+            *QUEUE_ARCHIVES,
+            BINARY_SEARCH.topic,
+            "binary-search-revision",
+        ),
     )
     parser.add_argument("--owner", type=UUID)
     parser.add_argument("--approval", type=Path)
@@ -117,14 +132,19 @@ def main():
         record, _ = read_frozen(args.topic)
         print(record["candidate_digest"])
         return 0
-    if args.topic == BINARY_SEARCH.topic:
+    if args.topic in (BINARY_SEARCH.topic, "binary-search-revision"):
         if args.action != "prepare" and (
             args.owner is not None or args.approval is not None
         ):
             parser.error(
-                "binary-search --owner and --approval are only used by prepare"
+                "--owner and --approval are only used by prepare for binary-search trials"
             )
-        return generation.run(parser, args, BINARY_SEARCH)
+        profile = (
+            BINARY_SEARCH
+            if args.topic == BINARY_SEARCH.topic
+            else BINARY_SEARCH_REVISION
+        )
+        return generation.run(parser, args, profile)
     if args.action not in {"replay", "publish"} or args.approval is not None:
         parser.error("archived topics support replay and publish")
     if (args.action == "publish") != (args.owner is not None):

@@ -2,22 +2,21 @@
 
 import argparse
 import asyncio
-from datetime import datetime
 import getpass
 import hashlib
-from pathlib import Path
 import sys
 import time
+from datetime import datetime
+from pathlib import Path
 from uuid import UUID
 
 import httpx
+from app.core.database import create_database_engine
+from app.services import course_trial_publication as publication
+from app.services.free_course_snapshots import canonical
 from cryptography.fernet import Fernet
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.database import create_database_engine
-from app.services import course_trial_publication as publication
-from app.services import queue_course_revision
-from app.services.free_course_snapshots import canonical
 from scripts import course_trial_transport as transport_io
 from scripts import head_course_deepseek_wire as direct
 from scripts.head_course_goal import ROOT, raw_io
@@ -189,8 +188,8 @@ def observe(ctx, raw, body_receipt, *, profile=STACK):
         ),
     )
     output = dict(result.value)
-    if profile is publication.QUEUE_REVISION:
-        output = queue_course_revision.merge(output)
+    if profile in (publication.QUEUE_REVISION, publication.BINARY_SEARCH_REVISION):
+        output = profile.materials.merge(output)
     return publication.candidate(ctx, output, receipt, profile=profile)
 
 
@@ -326,9 +325,8 @@ def publish(vault, *, fixture=False, profile=STACK):
 
 
 async def stop(vault, *, profile=STACK):
-    from sqlalchemy.ext.asyncio import async_sessionmaker
-
     from app.services.free_course_recovery import Recovery
+    from sqlalchemy.ext.asyncio import async_sessionmaker
 
     ctx, _ = local_gate(vault, fixture=False, profile=profile)
     if not (vault / "HALT").exists():

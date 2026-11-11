@@ -19,3 +19,11 @@
 从加密原件复现 `ROLE_SCHEMA`。四题 `increase_left`、`decrease_right`、`found_index`、`missing_result` 都只有 `stem`，缺少必填的 `explanation`。按准确请求中的 Schema 逐项诊断，四处均违反 `required`。响应为完整保全，结构错误阻断候选生成和独立全文审核。[原件索引与诊断](live-result.json)
 
 执行共用入口 `stop --topic binary-search` 并用现有恢复流程收尾。请求、加密响应、失败记录、STOP 与 HALT 封存。使用 `/tmp/edumind-t122/verify-stopped.py` 在原访客 Chromium 会话确认操作为 `cancelled`，仅提纲 v1、就绪场景 0，v2 场景返回 404。实际课程未交付，真实学习验收未执行，T122 保持 blocked。
+
+## 十字段修订准备
+
+原稿只读核查确认四个缺失解析、四道带花括号的题干，以及 f2、f4 把本轮刚完成的比较称为「上一轮」。本次按用户指定范围冻结四个题干、四个解析和两条帧说明。题干使用程序指定的固定文本。模型负责四条解析和两条帧说明，并原样返回指定题干。原稿绑定原响应、原请求及同版材料摘要，新候选沿用原八项独立全文审核。[修订包](revision/README.md)
+
+隔离 PostgreSQL 与 MockTransport 定向测试 7 项通过。覆盖越界键、改动题义的题干、错误轮次、范围外原稿差异、完整合并、审核门禁、私有投影和答案隔离。Ruff、工作流、封存源摘要和准确请求检查通过。新增 Provider 调用 0。独立全文重评、真实准入和浏览器验收待获准后执行。
+
+请求 SHA-256 为 `9858b9a65751dde557de10908ec79179925025a431e10aa670d23c2e68404930`，清单 SHA-256 为 `31a46df3d46b0a8238b3e1fcbb0efdc81b160551b611a885bfc8c76f308b9ae2`。拟申请新窗口 30 分钟、1 次局部修订、0 次规划、0 次整课生成及本批 C2。原首稿拒绝、STOP、HALT 和已取消操作按原记录复核。

@@ -12,6 +12,7 @@ from app.core.database import get_database_url
 from app.models.free_scene_generation import FreeSceneGenerationResult
 from app.services import (
     binary_search_course_materials,
+    binary_search_course_revision,
     queue_course_materials,
     queue_course_revision,
     stack_course_materials,
@@ -76,11 +77,23 @@ BINARY_SEARCH = FixedCourse(
     "phase-1.5-binary-search-t122",
     "accept_T122_scope_and_batch_C2",
     (REVIEW_CHECKS - {"all_five_frames_and_highlights"})
-    | {"all_six_frames_and_highlights", "closed_interval_and_comparisons",
-       "termination_and_duplicates"},
+    | {
+        "all_six_frames_and_highlights",
+        "closed_interval_and_comparisons",
+        "termination_and_duplicates",
+    },
+)
+BINARY_SEARCH_REVISION = FixedCourse(
+    BINARY_SEARCH.topic,
+    binary_search_course_revision,
+    BINARY_SEARCH.database,
+    BINARY_SEARCH.package + "/revision",
+    "accept_T122_revision_scope_and_batch_C2",
+    BINARY_SEARCH.checks,
 )
 PROFILES = {
-    profile.materials.VERSION: profile for profile in (STACK, QUEUE, QUEUE_REVISION, BINARY_SEARCH)
+    profile.materials.VERSION: profile
+    for profile in (STACK, QUEUE, QUEUE_REVISION, BINARY_SEARCH, BINARY_SEARCH_REVISION)
 }
 
 
@@ -176,9 +189,12 @@ async def context(
     )
     if inputs["plan"]["candidate"] != profile.materials.outline():
         raise profile.error("PLAN_BINDING")
-    if profile is QUEUE_REVISION and not fixture:
-        parent, _, _ = queue_course_revision.sealed_parent()
-        original = parent["context"]
+    if profile in (QUEUE_REVISION, BINARY_SEARCH_REVISION) and not fixture:
+        if profile is QUEUE_REVISION:
+            parent, _, _ = queue_course_revision.sealed_parent()
+            original = parent["context"]
+        else:
+            _, original, _ = binary_search_course_revision.sealed_source()
         if (
             str(owner) != original["owner"]
             or str(cid) == original["course_id"]
@@ -221,6 +237,9 @@ def candidate(
     if profile is QUEUE_REVISION:
         queue_course_revision.validate_immutable(output)
         data["parent_digest"] = queue_course_revision.PARENT
+    elif profile is BINARY_SEARCH_REVISION:
+        binary_search_course_revision.validate_immutable(output)
+        data["source_response_sha256"] = binary_search_course_revision.SOURCE_RESPONSE
     return {**data, "candidate_digest": digest(f"{profile.topic}-course-candidate", data=data)}
 
 
@@ -239,7 +258,10 @@ def assembly(
     ):
         raise profile.error("REVIEW_REQUIRED")
     evidence_kind = c["context"]["evidence_kind"]
-    if profile is QUEUE_REVISION and evidence_kind == "actual_provider_response":
+    if (
+        profile in (QUEUE_REVISION, BINARY_SEARCH_REVISION)
+        and evidence_kind == "actual_provider_response"
+    ):
         evidence_kind = "evidence_bound_local_revision"
     source = dict(
         origin=profile.materials.ORIGIN,
@@ -253,6 +275,8 @@ def assembly(
         plan_digest=c["plan_digest"],
         teaching_review=dict(verdict="pass", independent_evaluator=evaluator),
     )
+    if profile is BINARY_SEARCH_REVISION:
+        source["source_response_sha256"] = c["source_response_sha256"]
     return profile.materials.assemble(c["raw_output"], source)
 
 
