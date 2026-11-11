@@ -6,6 +6,7 @@ from typing import Any
 
 from jsonschema import Draft202012Validator  # type: ignore[import-untyped]
 
+from app.services.course_question_stem import is_single_line_stem, with_stem_format
 from app.services.free_course_snapshots import SnapshotError, canonical, digest
 from scripts.isolated_diagnostics import p15_minimal_contract as contract
 from scripts.isolated_diagnostics.p15_head_insertion_engine import build_example
@@ -332,13 +333,19 @@ def content_payload(inputs: dict[str, Any], plan: dict[str, Any]) -> dict[str, A
 
 
 def body(
-    payload: dict[str, Any], parent: dict[str, Any] | None = None, issues: list | None = None
+    payload: dict[str, Any],
+    parent: dict[str, Any] | None = None,
+    issues: list | None = None,
+    *,
+    stem_prompt_version: str | None = None,
 ) -> dict[str, Any]:
     instruction = INSTRUCTION if parent is None else REPAIR_INSTRUCTION
     if payload["original_goal"] == EMPTY_GOAL:
         if parent is not None or issues is not None:
             raise SnapshotError("HEAD_EMPTY_REVISION_FORBIDDEN")
         instruction = EMPTY_INSTRUCTION
+    elif stem_prompt_version is not None:
+        raise SnapshotError("HEAD_STEM_PROMPT_REQUIRES_EMPTY_EXAMPLE")
     if "teaching_evidence" in payload:
         from app.services.head_course_teaching_evidence import INSTRUCTION as EVIDENCE_INSTRUCTION
         from app.services.head_course_teaching_evidence import validate
@@ -360,6 +367,7 @@ def body(
             + "\n"
             + EVIDENCE_INSTRUCTION
         )
+    instruction = with_stem_format(instruction, stem_prompt_version)
     return dict(
         model="deepseek-flash",
         stream=False,
@@ -429,11 +437,7 @@ def validate_content(
     for k in QKEYS:
         stem = value["questions"][k]["stem"]
         if payload["original_goal"] == EMPTY_GOAL:
-            if (
-                not stem.strip()
-                or stem.splitlines() != [stem]
-                or any(marker in stem for marker in ("#include", "```", "~~~", "{", "}", ";"))
-            ):
+            if not is_single_line_stem(stem):
                 raise SnapshotError("HEAD_QUESTION_PROSE_REQUIRED")
             continue
         code = scenario_code(payload["materials"], k)

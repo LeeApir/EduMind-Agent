@@ -6642,6 +6642,45 @@
           "evidence": "docs/acceptance/phase-1.5-t038-gap-review-t123/GAPS.md"
         }
       ]
+    },
+    {
+      "id": "PHASE-1.5-T124",
+      "phase": "Phase 1.5",
+      "title": "统一四主题题干格式约定",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T123"
+      ],
+      "scope": [
+        "空链表头插、栈、队列及二分查找的正文首稿请求构造与题干校验。",
+        "只做定向离线验证，真实 Provider 请求 0。"
+      ],
+      "prd_source": "PRD §0.5；课程生成方向 §3.3；T123 M03；用户本轮授权",
+      "acceptance_criteria": [
+        "新版本实际请求中的 system 消息明确写出单行、程序附加代码、回抄、围栏、花括号和分号规则。",
+        "复用现有 Schema 与题干校验语义，保留必填解析、事实引用、教学审核与原稿。",
+        "四主题请求和对应正反例离线通过，历史请求字节与冻结包保持一致。"
+      ],
+      "verification": [
+        "四主题请求构造与题干正反例 pytest",
+        "定向 Ruff、历史请求字节对照、工作流与 git diff --check"
+      ],
+      "started_at": "2026-11-11T09:37:39+08:00",
+      "commit_lookup": "Task-Completed: PHASE-1.5-T124",
+      "completed_at": "2026-11-11T09:41:22+08:00",
+      "verification_results": [
+        {
+          "command": "README 中列出的四主题定向 pytest 命令",
+          "result": "18 passed。四主题请求序列化及完整 Schema 对照、允许与拒绝用例、解析必填、事实引用回归与五份历史请求或模板字节对照通过。Provider 0。",
+          "evidence": "docs/acceptance/phase-1.5-question-stem-t124/README.md"
+        },
+        {
+          "command": "定向 Ruff；python3 scripts/check_catalog_workflow.py；git diff --check",
+          "result": "通过。原任务条目保持一致。",
+          "evidence": "docs/acceptance/phase-1.5-question-stem-t124/README.md"
+        }
+      ]
     }
   ],
   "planning_inputs": {

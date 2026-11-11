@@ -4,6 +4,7 @@ from typing import Any
 
 from jsonschema import Draft202012Validator  # type: ignore[import-untyped]
 
+from app.services.course_question_stem import is_single_line_stem, with_stem_format
 from app.services.free_course_snapshots import SnapshotError, canonical, digest
 
 GOAL = (
@@ -223,11 +224,28 @@ def outline() -> dict[str, Any]:
     )
 
 
-def request() -> dict[str, Any]:
-    return fixed_request(INSTRUCTION, GOAL, outline(), materials(), "edumind_stack_lifo_v1", SCHEMA)
+def request(*, stem_prompt_version: str | None = None) -> dict[str, Any]:
+    return fixed_request(
+        INSTRUCTION,
+        GOAL,
+        outline(),
+        materials(),
+        "edumind_stack_lifo_v1",
+        SCHEMA,
+        stem_prompt_version=stem_prompt_version,
+    )
 
 
-def fixed_request(instruction, goal, plan, material, schema_name, schema):
+def fixed_request(
+    instruction,
+    goal,
+    plan,
+    material,
+    schema_name,
+    schema,
+    *,
+    stem_prompt_version: str | None = None,
+):
     return dict(
         model="deepseek-flash",
         stream=False,
@@ -236,7 +254,7 @@ def fixed_request(instruction, goal, plan, material, schema_name, schema):
         max_output_tokens=4000,
         temperature=0.2,
         input=[
-            dict(role="system", content=instruction),
+            dict(role="system", content=with_stem_format(instruction, stem_prompt_version)),
             dict(
                 role="user",
                 content=canonical(dict(goal=goal, plan=plan, materials=material)).decode(),
@@ -265,13 +283,7 @@ def validate_fixed_content(raw, mat, validator, prefix):
     ):
         raise SnapshotError(f"{prefix}_FRAME_BINDING")
     for q in raw["questions"].values():
-        stem = q["stem"]
-        if (
-            not stem.strip()
-            or stem.splitlines() != [stem]
-            or not q["explanation"].strip()
-            or any(marker in stem for marker in ("#include", "```", "~~~", "{", "}", ";"))
-        ):
+        if not is_single_line_stem(q["stem"]) or not q["explanation"].strip():
             raise SnapshotError(f"{prefix}_QUESTION_PROSE_REQUIRED")
 
 

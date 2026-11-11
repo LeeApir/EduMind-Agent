@@ -209,9 +209,15 @@ def outline() -> dict[str, Any]:
     )
 
 
-def request() -> dict[str, Any]:
+def request(*, stem_prompt_version: str | None = None) -> dict[str, Any]:
     return fixed.fixed_request(
-        INSTRUCTION, GOAL, outline(), materials(), "edumind_binary_search_v1", SCHEMA
+        INSTRUCTION,
+        GOAL,
+        outline(),
+        materials(),
+        "edumind_binary_search_v1",
+        SCHEMA,
+        stem_prompt_version=stem_prompt_version,
     )
 
 
