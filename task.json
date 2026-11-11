@@ -6595,6 +6595,53 @@
         }
       ],
       "completed_at": "2026-11-11T08:59:19+08:00"
+    },
+    {
+      "id": "PHASE-1.5-T123",
+      "phase": "Phase 1.5",
+      "title": "盘点 T038 验收缺口并收敛下一批验证范围",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T005",
+        "PHASE-1.5-T118",
+        "PHASE-1.5-T119",
+        "PHASE-1.5-T120",
+        "PHASE-1.5-T121",
+        "PHASE-1.5-T122"
+      ],
+      "scope": [
+        "仅交付一份四部分缺口清单：证据对应、最小实现、样本审核、下一批最小验证建议。",
+        "读取契约、现有代码与实际记录；不改运行实现、不新增主题、不调用 Provider、不重跑无变化历史检查。"
+      ],
+      "prd_source": "PRD §0.5；ADR0027 及后续限定契约；用户本轮零调用缺口盘点授权",
+      "acceptance_criteria": [
+        "每项要求映射已有证据、适用范围、缺口、最小动作和完成判断；区分首稿与修订、程序指定与模型生成、固定提纲与模型规划。",
+        "只读核对四主题共用流程及 Prompt/Schema/本地校验，列出实际必要接点和阻塞验收。",
+        "按原课程槽、画像对、主题及审核对照口径判断旧证据资格，不改分母或独立性。",
+        "提出有前置顺序、冻结对象、样本、评估、预计请求及有限修订/停止条件的建议；T038/T102 保持 blocked，后续真实执行另审。"
+      ],
+      "verification": [
+        "python3 scripts/check_catalog_workflow.py",
+        "git diff --check",
+        "定向只读核对文档链接、引用来源、样本计数与源码位置；不运行历史测试或模型请求。"
+      ],
+      "started_at": "2026-11-11T09:16:37+08:00",
+      "commit_lookup": "Task-Completed: PHASE-1.5-T123",
+      "execution_gate": "Provider 0；仅文档盘点完成后停止，不实施建议或启动下一批。",
+      "completed_at": "2026-11-11T09:28:54+08:00",
+      "verification_results": [
+        {
+          "command": "定向只读对照 ADR0027、后续限定契约、T118–T122 实际记录及当前源码；文档本地链接/四部分/指标行/原分母与取整检查",
+          "result": "通过：42 个本地链接；Q01–Q13、M01–M08、V01–V07；原12课程/2负例/20探针与12/12、6/6门槛；仅新增T123，其他任务逐项未改。无历史检查重跑、无 Provider 请求。",
+          "evidence": "docs/acceptance/phase-1.5-t038-gap-review-t123/GAPS.md"
+        },
+        {
+          "command": "python3 scripts/check_catalog_workflow.py；git diff --check",
+          "result": "通过；本任务仅单份缺口文档及治理记录。",
+          "evidence": "docs/acceptance/phase-1.5-t038-gap-review-t123/GAPS.md"
+        }
+      ]
     }
   ],
   "planning_inputs": {
