@@ -6931,7 +6931,7 @@
       "id": "PHASE-1.5-T131",
       "phase": "Phase 1.5",
       "title": "二分查找程序帧说明版单次真实验证",
-      "status": "in_progress",
+      "status": "done",
       "priority": "P0",
       "depends_on": [
         "PHASE-1.5-T130"
@@ -6950,7 +6950,21 @@
         "严格封存回放与独立全文审核。",
         "在实际开发应用验收阅读、播放和四题反馈及刷新。"
       ],
-      "started_at": "2026-11-11T14:20:59+08:00"
+      "started_at": "2026-11-11T14:20:59+08:00",
+      "completed_at": "2026-11-11T14:26:36+08:00",
+      "commit_lookup": "Task-Completed: PHASE-1.5-T131",
+      "verification_results": [
+        {
+          "command": "单次真实正文请求，严格封存回放及独立全文审核",
+          "result": "1 HTTP；3013 输入、970 输出，结构通过；独立全文审核 9 项通过。无规划、修订、重试或回退。",
+          "evidence": "docs/acceptance/phase-1.5-binary-search-program-frames-t130/RESULTS.md"
+        },
+        {
+          "command": "共用 CLI 私有准入及 Chromium 实际开发应用验收",
+          "result": "窗口内 v2 准入；六帧高亮和播放控制、四题 0%/100% 反馈、答案隔离、刷新无重复提交通过。",
+          "evidence": "docs/acceptance/phase-1.5-binary-search-program-frames-t130/browser-verification.json"
+        }
+      ]
     }
   ],
   "planning_inputs": {
