@@ -45,6 +45,7 @@ class FixedCourse:
     offline_only: bool = False
     live_reuse: bool = False
     learner_case: str | None = None
+    learner_prompt_version: str = stack_course_profile_pair.VERSION
 
     @property
     def batch(self) -> str:
@@ -68,7 +69,7 @@ class FixedCourse:
     @property
     def prompt_version(self) -> str:
         if self.learner_case is not None:
-            return stack_course_profile_pair.VERSION
+            return self.learner_prompt_version
         return head_course_materials.FIXED_VERSION if self.model_planned else self.materials.VERSION
 
     @property
@@ -85,7 +86,9 @@ class FixedCourse:
                 or not ctx.get("profile_id")
             ):
                 raise self.error("PROFILE_BINDING")
-            return stack_course_profile_pair.request(self.learner_case)
+            return stack_course_profile_pair.request(
+                self.learner_case, prompt_version=self.learner_prompt_version
+            )
         if self.model_planned:
             return self.materials.body(ctx["head_payload"], stem_prompt_version=STEM_PROMPT_VERSION)
         if self.new_batch:

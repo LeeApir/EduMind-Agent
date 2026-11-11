@@ -7082,6 +7082,39 @@
           "evidence": "docs/acceptance/phase-1.5-stack-profile-pair-t132/RESULTS.md"
         }
       ]
+    },
+    {
+      "id": "PHASE-1.5-T135",
+      "phase": "Phase 1.5",
+      "title": "栈画像共用提示词 v2 准备",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T133"
+      ],
+      "scope": [
+        "用代码和事实依据明确共用讲解职责，保留原 Schema、材料和三项对照标准。",
+        "冻结两份只在画像证据上不同的新请求。零调用，不启用真实批次。"
+      ],
+      "prd_source": "PRD §0.5；T132 三项对照标准；T134 失败原稿只读诊断",
+      "acceptance_criteria": [
+        "两槽共用同版提示词，模型自行生成正文。",
+        "两份请求除画像证据完全一致，旧请求、材料及参考答案保持。",
+        "候选拒绝旧请求和交叉画像绑定，真实执行另行确定。"
+      ],
+      "verification": [
+        "定向请求差异与离线候选绑定、Ruff、工作流及差异检查。"
+      ],
+      "started_at": "2026-11-11T20:04:31+08:00",
+      "completed_at": "2026-11-11T20:04:31+08:00",
+      "commit_lookup": "Task-Completed: PHASE-1.5-T135",
+      "verification_results": [
+        {
+          "command": "pytest -q backend/tests/test_stack_course_profile_prompt_v2.py；Ruff；check_catalog_workflow.py；git diff --check",
+          "result": "3 项通过。确认 v2 两槽只变画像，v1 原字节一致，拒绝旧请求及交叉绑定；Provider 0。",
+          "evidence": "docs/acceptance/phase-1.5-stack-profile-pair-t132/RESULTS.md"
+        }
+      ]
     }
   ],
   "planning_inputs": {
