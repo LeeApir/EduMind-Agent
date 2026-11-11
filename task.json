@@ -6815,7 +6815,7 @@
       "id": "PHASE-1.5-T128",
       "phase": "Phase 1.5",
       "title": "四主题共用流程有限真实复用与课程交付",
-      "status": "in_progress",
+      "status": "blocked",
       "priority": "P0",
       "depends_on": [
         "PHASE-1.5-T127"
@@ -6834,7 +6834,20 @@
         "冻结清单核对和准确授权登记；实际封存回放及独立语义/全文审核。",
         "通过课程在实际开发应用浏览器验收；结果与治理文件自查。"
       ],
-      "started_at": "2026-11-11T11:25:00+08:00"
+      "started_at": "2026-11-11T11:25:00+08:00",
+      "block_reason": "二分查找首稿两条帧说明混淆同轮比较与区间更新，超出 ADR0063 已批准修订范围。整批已停止，四课交付三课。",
+      "verification_results": [
+        {
+          "command": "对六个封存阶段执行共用 CLI 严格回放，核对实际用量及 HALT 门禁",
+          "result": "六次真实请求，37039输入/7338输出。四份首稿机械通过，头插按范围修订后重评通过，栈和队列首稿直接通过，二分首稿因两帧说明被独立审核拒绝。",
+          "evidence": "docs/acceptance/phase-1.5-shared-live-reuse-t127/RESULTS.md"
+        },
+        {
+          "command": "原访客浏览器阅读、演示与高亮、两次四题反馈、跨访客读取和刷新验收",
+          "result": "头插、栈、队列私有v2验收通过。二分只保留v1提纲和失败首稿。整批HALT，后续执行门禁拒绝。",
+          "evidence": "docs/acceptance/phase-1.5-shared-live-reuse-t127/RESULTS.md"
+        }
+      ]
     }
   ],
   "planning_inputs": {

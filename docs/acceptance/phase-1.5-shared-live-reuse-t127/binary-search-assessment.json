@@ -1,0 +1,44 @@
+{
+  "review": {
+    "candidate_digest": "94ca8a296d685784ee1125d69e63f164154b5e712396f24d0e911d31ec9b1636",
+    "parent_digest": null,
+    "verdict": "fail",
+    "independent_evaluator": "t128_independent",
+    "full_lesson_reviewed": true,
+    "checks": {
+      "all_six_frames_and_highlights": false,
+      "answers_and_explanations": true,
+      "closed_interval_and_comparisons": true,
+      "four_transfer_questions_unique_no_hints": true,
+      "full_lesson_and_fact_citations": true,
+      "goal_and_beginner_level": true,
+      "implementation_and_display_boundary": true,
+      "termination_and_duplicates": true
+    },
+    "blocking_findings": [
+      {
+        "path": [
+          "step_notes",
+          2,
+          "note"
+        ],
+        "frame_id": "f2",
+        "quote": "因上一轮 mid=2 的值偏大",
+        "issue": "第 13 行更新与 f1 的 mid=2 比较同属第一轮。该帧说明混用了上一轮和本轮，破坏比较与端点更新的因果顺序。",
+        "repairable": false
+      },
+      {
+        "path": [
+          "step_notes",
+          4,
+          "note"
+        ],
+        "frame_id": "f4",
+        "quote": "因上一轮 mid=0 的值偏小",
+        "issue": "第 11 行更新与 f3 的 mid=0 比较同属第二轮。该帧说明混用了上一轮和本轮，破坏比较与端点更新的因果顺序。",
+        "repairable": false
+      }
+    ]
+  },
+  "summary": "五段正文、引用、终止和重复值边界正确。程序六帧状态及高亮与独立参考一致，高亮行依次为4、10、13、10、11、8。四题条件、答案和解析通过。f2 和 f4 的模型说明把本轮比较说成上一轮，属于冻结规则禁止修订的帧说明。"
+}
