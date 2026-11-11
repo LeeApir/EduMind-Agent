@@ -12,6 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncConnection, AsyncEngine, AsyncSession
 from app.core.database import get_database_url
 from app.models.free_scene_generation import FreeSceneGenerationResult
 from app.services import (
+    binary_search_course_frames,
     binary_search_course_materials,
     binary_search_course_revision,
     head_course_materials,
@@ -134,9 +135,19 @@ BINARY_SEARCH_REVISION = FixedCourse(
     "accept_T122_revision_scope_and_batch_C2",
     BINARY_SEARCH.checks,
 )
+BINARY_SEARCH_FRAMES = FixedCourse(
+    BINARY_SEARCH.topic,
+    binary_search_course_frames,
+    "edumind_catalog_p15_t127_reuse",
+    "phase-1.5-binary-search-program-frames-t130",
+    "accept_T130_scope_and_batch_C2",
+    BINARY_SEARCH.checks | {"lesson_prose_matches_program_iterations"},
+)
 PROFILES = {
     profile.materials.VERSION: profile
-    for profile in (STACK, QUEUE, QUEUE_REVISION, BINARY_SEARCH, BINARY_SEARCH_REVISION)
+    for profile in (
+        STACK, QUEUE, QUEUE_REVISION, BINARY_SEARCH, BINARY_SEARCH_REVISION, BINARY_SEARCH_FRAMES
+    )
 }
 NEW_BATCHES = {
     profile.topic: replace(
@@ -369,6 +380,9 @@ def candidate(
     elif profile is BINARY_SEARCH_REVISION:
         binary_search_course_revision.validate_immutable(output)
         data["source_response_sha256"] = binary_search_course_revision.SOURCE_RESPONSE
+    elif profile is BINARY_SEARCH_FRAMES:
+        if receipt.get("request_sha256") != revision.checksum(profile.request()):
+            raise profile.error("REQUEST_BINDING")
     return {**data, "candidate_digest": digest(f"{profile.topic}-course-candidate", data=data)}
 
 
@@ -387,7 +401,7 @@ def assembly(
         or (not profile.model_planned and checks != dict.fromkeys(profile.checks, True))
         or any(type(v) is not bool for v in checks.values())
         or (
-            (profile.live_reuse or "revision" in c)
+            (profile.live_reuse or profile is BINARY_SEARCH_FRAMES or "revision" in c)
             and (review.get("parent_digest") != c.get("parent_digest")
                  or review.get("full_lesson_reviewed") is not True)
         )
@@ -413,6 +427,12 @@ def assembly(
     )
     if profile is BINARY_SEARCH_REVISION:
         source["source_response_sha256"] = c["source_response_sha256"]
+    if profile is BINARY_SEARCH_FRAMES:
+        source.update(
+            source_request_sha256=c["receipt"]["request_sha256"],
+            source_response_sha256=c["receipt"]["raw_sha256"],
+            review_sha256=revision.checksum(review),
+        )
     if profile.new_batch:
         source.update(
             plan_source=c["context"]["plan_source"], stem_prompt_version=STEM_PROMPT_VERSION
@@ -457,6 +477,8 @@ def revised_candidate(ctx, replacements, receipt, source, *, profile):
 
 def verify_candidate(ctx, c, profile):
     if "revision" in c:
+        if profile is BINARY_SEARCH_FRAMES:
+            raise profile.error("PUBLICATION_BINDING")
         source = c["revision"]
         expected = revised_candidate(
             ctx, source["replacements"], c["receipt"], source, profile=profile

@@ -14,6 +14,7 @@ from uuid import UUID
 from app.core.database import create_database_engine
 from app.services.course_trial_publication import (
     BINARY_SEARCH,
+    BINARY_SEARCH_FRAMES,
     BINARY_SEARCH_REVISION,
     LIVE_REUSE,
     NEW_BATCHES,
@@ -65,6 +66,7 @@ BINARY_ARCHIVES = {
     "binary-search": "955c15ba50313b1fac8549dfece2bbfc5a908ada",
     "binary-search-revision": "9c74602db0fef0055efc0ff017af424968dcdfe1",
 }
+BINARY_FRAMES_TOPIC = "binary-search-program-frames"
 
 
 def read_frozen(topic):
@@ -121,6 +123,7 @@ def main():
             *ARCHIVES,
             *QUEUE_ARCHIVES,
             BINARY_SEARCH.topic,
+            BINARY_FRAMES_TOPIC,
             "binary-search-revision",
         ),
     )
@@ -154,6 +157,15 @@ def main():
         return 0
     if args.topic is None:
         parser.error("--topic is required for this action")
+    if args.topic == BINARY_FRAMES_TOPIC:
+        if any((
+            args.new_batch, args.live_reuse, args.offline_vault, args.stage,
+            args.record, args.mock_response,
+        )) or args.action not in {"inspect", "prepare", "send", "replay", "publish", "stop"}:
+            parser.error("the program-frames trial supports one generation stage only")
+        if args.action != "prepare" and any((args.owner, args.approval)):
+            parser.error("--owner and --approval are only used by prepare")
+        return generation.run(parser, args, BINARY_SEARCH_FRAMES)
     if args.live_reuse:
         profile = LIVE_REUSE.get(args.topic)
         if profile is None or any((args.owner, args.approval, args.mock_response)):

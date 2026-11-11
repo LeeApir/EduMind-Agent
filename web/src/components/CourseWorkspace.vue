@@ -279,7 +279,10 @@ onBeforeUnmount(()=>{save();epoch+=1;manifestEpoch+=1;versionsEpoch+=1;controlle
               class="replay-source"
               aria-label="新课程来源"
             >
-              <strong v-if="scene.generation_source.stem_prompt_version === 'course-question-stem-v2'">
+              <strong v-if="scene.generation_source.prompt_version === 'binary-search-program-frames-v1'">
+                二分查找 · {{ scene.generation_source.evidence_kind === 'offline_fixture' ? '离线接线夹具' : 'DeepSeek 新正文 · 独立教学审核通过' }} · 程序生成帧说明 · 未签核
+              </strong>
+              <strong v-else-if="scene.generation_source.stem_prompt_version === 'course-question-stem-v2'">
                 {{ scene.generation_source.plan_source === 'model_planned' ? '模型规划' : '固定提纲' }} · {{ scene.generation_source.evidence_kind === 'offline_fixture' ? '离线接线夹具' : 'DeepSeek 生成 · 独立教学审核通过' }} · 未签核
               </strong>
               <strong v-else-if="scene.generation_source.origin === 'stack_lifo_model_generation' || scene.generation_source.origin === 'queue_fifo_model_generation' || scene.generation_source.origin === 'binary_search_model_generation'">
@@ -307,7 +310,8 @@ onBeforeUnmount(()=>{save();epoch+=1;manifestEpoch+=1;versionsEpoch+=1;controlle
               <p v-if="scene.generation_source.teaching_evidence_digest">
                 独立程序证据 {{ scene.generation_source.teaching_evidence_version }} · {{ scene.generation_source.teaching_evidence_digest }}
               </p>
-              <small v-if="scene.generation_source.prompt_version === 'head-empty-citation-revision-v1'">
+              <small v-if="scene.generation_source.prompt_version === 'binary-search-program-frames-v1'">固定提纲。程序生成轨迹和帧说明，参考答案由服务端保存。</small>
+              <small v-else-if="scene.generation_source.prompt_version === 'head-empty-citation-revision-v1'">
                 <template v-if="scene.generation_source.evidence_kind === 'offline_fixture'">离线接线夹具。</template>
                 <template v-else>沿用 r02 正文和程序材料。第 5 段的事实引用经单次模型修订，完整教学重评通过。</template>
               </small>

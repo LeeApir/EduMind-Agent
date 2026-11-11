@@ -102,6 +102,13 @@ def approval_values(profile=STACK, *, fixture=False):
             explicit_user_authorization=not fixture,
             offline_fixture=fixture,
         )
+    if profile is publication.BINARY_SEARCH_FRAMES:
+        approval.update(
+            request_sha256=sha(canonical(profile.request())),
+            stage_budgets=dict(plan=0, generate=1, revise=0),
+            explicit_user_authorization=not fixture,
+            offline_fixture=fixture,
+        )
     return approval
 
 

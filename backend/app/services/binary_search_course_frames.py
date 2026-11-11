@@ -12,7 +12,9 @@ from app.services.course_question_stem import PROMPT_VERSION, is_single_line_ste
 from app.services.free_course_snapshots import SnapshotError, canonical, digest
 
 VERSION = "binary-search-program-frames-v1"
-BATCH = "four-topic-live-reuse-r01-binary-search"
+BATCH = "binary-search-program-frames-r01"
+ARCHIVE_BATCH = "four-topic-live-reuse-r01-binary-search"
+GOAL, ORIGIN, outline = original.GOAL, original.ORIGIN, original.outline
 PARENT = "94ca8a296d685784ee1125d69e63f164154b5e712396f24d0e911d31ec9b1636"
 REQUEST = "382b12c1ce2276dcaa9b16e1aee4c6a35adb858f11ffed267c08582517ec92eb"
 RESPONSE = "ce5f62776767b05f971a0e887c408a72d639319e7bee6cd69f9bf9a7835cc9f9"
@@ -113,6 +115,28 @@ def request() -> dict[str, Any]:
     )
 
 
+def validate_content(raw: Any, mat: dict[str, Any]) -> None:
+    if not VALIDATOR.is_valid(raw):
+        raise SnapshotError("BINARY_FRAMES_CONTENT")
+    if any(
+        not p["text"].strip() or not set(p["fact_ids"]) <= mat["facts"].keys()
+        for p in raw["paragraphs"]
+    ):
+        raise SnapshotError("BINARY_FRAMES_FACT_REFERENCE")
+    if not raw["summary"].strip() or any(
+        not is_single_line_stem(q["stem"]) or not q["explanation"].strip()
+        for q in raw["questions"].values()
+    ):
+        raise SnapshotError("BINARY_FRAMES_PROSE_REQUIRED")
+
+
+def program_notes(mat: dict[str, Any]) -> list[dict[str, str]]:
+    return [
+        dict(frame_id=frame["frame_id"], note=note(frame, original.MAIN))
+        for frame in mat["main"]["frames"]
+    ]
+
+
 def candidate(parent: dict[str, Any]) -> dict[str, Any]:
     from app.services.course_trial_publication import LIVE_REUSE
     from app.services.course_trial_publication import candidate as historical_candidate
@@ -131,12 +155,7 @@ def candidate(parent: dict[str, Any]) -> dict[str, Any]:
         raise SnapshotError("BINARY_FRAMES_ARCHIVE")
     mat = materials()
     content = {key: value for key, value in raw.items() if key != "step_notes"}
-    if (
-        not VALIDATOR.is_valid(content)
-        or any(not set(p["fact_ids"]) <= mat["facts"].keys() for p in content["paragraphs"])
-        or any(not is_single_line_stem(q["stem"]) for q in content["questions"].values())
-    ):
-        raise SnapshotError("BINARY_FRAMES_CONTENT")
+    validate_content(content, mat)
     data = dict(
         parent_digest=PARENT,
         source_request_sha256=REQUEST,
@@ -145,23 +164,20 @@ def candidate(parent: dict[str, Any]) -> dict[str, Any]:
         plan_digest=parent["plan_digest"],
         materials_digest=mat["materials_digest"],
         content=content,
-        step_notes=[
-            dict(frame_id=frame["frame_id"], note=note(frame, original.MAIN))
-            for frame in mat["main"]["frames"]
-        ],
+        step_notes=program_notes(mat),
     )
     return {**data, "candidate_digest": digest(VERSION, data=data)}
 
 
-def assembly(derived: dict[str, Any], source: dict[str, Any]) -> dict[str, Any]:
+def assemble(raw: dict[str, Any], source: dict[str, Any]) -> dict[str, Any]:
     mat = materials()
+    validate_content(raw, mat)
     # Reuse the original presentation and exercise assembly, then expose the enriched trace.
-    raw = dict(derived["content"], step_notes=derived["step_notes"])
-    assembled = original.assemble(raw, source)
+    assembled = original.assemble(dict(raw, step_notes=program_notes(mat)), source)
     visual = next(block for block in assembled["blocks"] if block["kind"] == "visualization")
     for step, frame in zip(visual["steps"], mat["main"]["frames"], strict=True):
         step["binary_search_frame"].update(deepcopy(frame))
-    return dict(blocks=assembled["blocks"], actions=assembled["actions"], replay_source=source)
+    return assembled
 
 
 def reviewed_projection(parent, review, *, origin):
@@ -183,7 +199,7 @@ def reviewed_projection(parent, review, *, origin):
         mapping_version=VERSION,
         origin=origin,
         topic="binary-search",
-        batch=BATCH,
+        batch=ARCHIVE_BATCH,
         model=original.request()["model"],
         prompt_version=original.VERSION,
         plan_source="fixed_outline",
@@ -195,4 +211,7 @@ def reviewed_projection(parent, review, *, origin):
             "original_materials_digest", "source_request_sha256", "source_response_sha256",
         )},
     )
-    return original.GOAL, original.outline(), assembly(derived, source)
+    assembled = assemble(derived["content"], source)
+    return GOAL, outline(), dict(
+        blocks=assembled["blocks"], actions=assembled["actions"], replay_source=source
+    )

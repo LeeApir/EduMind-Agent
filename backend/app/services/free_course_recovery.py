@@ -335,7 +335,11 @@ class Recovery:
             execution_mode = "finite_stack_foreground"
         elif prompt_version in ("queue-fifo-course-v1", "queue-fifo-q01-revision-v1"):
             execution_mode = "finite_queue_foreground"
-        elif prompt_version in ("binary-search-course-v1", "binary-search-revision-v1"):
+        elif prompt_version in (
+            "binary-search-course-v1",
+            "binary-search-revision-v1",
+            "binary-search-program-frames-v1",
+        ):
             execution_mode = "finite_binary_search_foreground"
         b = await self.scheduler.budget(db, cid, oid)
         unknown = await db.scalar(

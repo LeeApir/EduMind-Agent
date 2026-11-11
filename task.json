@@ -6887,6 +6887,45 @@
           "evidence": "docs/acceptance/phase-1.5-binary-search-frames-t129/browser-verification.json"
         }
       ]
+    },
+    {
+      "id": "PHASE-1.5-T130",
+      "phase": "Phase 1.5",
+      "title": "二分查找程序帧说明版单次新正文验证准备",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T129"
+      ],
+      "scope": [
+        "复用共用入口接通 T129 版本化请求和程序帧说明，冻结一次新正文准确执行包。",
+        "准备和定向验证 Provider 0；真实执行独立批准。"
+      ],
+      "prd_source": "PRD §0.5；ADR0064；用户限定 0 规划、1 正文、0 修订",
+      "acceptance_criteria": [
+        "新候选与当次操作、请求、原响应、材料及新全文审核绑定。",
+        "验证单次发送、失败封存、拒绝旧审核及私有准入。",
+        "交回准确请求、时间、费用和停止边界。"
+      ],
+      "verification": [
+        "隔离 PostgreSQL 与 MockTransport 验证共用入口。",
+        "核对冻结文件、旧封存回放、定向 lint 和前端类型。"
+      ],
+      "started_at": "2026-11-11T14:12:41+08:00",
+      "completed_at": "2026-11-11T14:15:50+08:00",
+      "commit_lookup": "Task-Completed: PHASE-1.5-T130",
+      "verification_results": [
+        {
+          "command": "禁外网 pytest -q backend/tests/test_binary_search_course_frames.py backend/tests/test_binary_search_program_frames_trial.py",
+          "result": "6 passed，0 skipped。验证一次正文、准确封存及重放、拒绝旧审核、私有 v2 和失败停止。",
+          "evidence": "docs/acceptance/phase-1.5-binary-search-program-frames-t130/RESULTS.md"
+        },
+        {
+          "command": "CLI inspect 与阶段拒绝；T129 封存只读派生；Ruff、Vue 类型、工作流、Git 差异",
+          "result": "通过。原派生候选摘要不变。Provider 0；真实窗口、教学及浏览器验收待准确批准。",
+          "evidence": "docs/acceptance/phase-1.5-binary-search-program-frames-t130/RESULTS.md"
+        }
+      ]
     }
   ],
   "planning_inputs": {
