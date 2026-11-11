@@ -3361,7 +3361,8 @@
           "replay_source": {
             "oneOf": [
               {"$ref": "#/components/schemas/ReplaySource"},
-              {"$ref": "#/components/schemas/TrialReplaySource"}
+              {"$ref": "#/components/schemas/TrialReplaySource"},
+              {"$ref": "#/components/schemas/BinarySearchFramesSource"}
             ]
           },
           "generation_source": {
@@ -5621,6 +5622,93 @@
           "steps"
         ]
       },
+      "BinarySearchFramesSource": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "mapping_version": {
+            "const": "binary-search-program-frames-v1"
+          },
+          "origin": {
+            "const": "existing_real_candidate_replay"
+          },
+          "topic": {
+            "const": "binary-search"
+          },
+          "batch": {
+            "type": "string",
+            "minLength": 1
+          },
+          "plan_source": {
+            "const": "fixed_outline"
+          },
+          "historical_stage": {
+            "const": "first_draft_teaching_failed"
+          },
+          "new_provider_calls": {
+            "const": 0
+          },
+          "candidate_digest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "parent_digest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "model": {
+            "type": "string",
+            "minLength": 1
+          },
+          "prompt_version": {
+            "type": "string",
+            "minLength": 1
+          },
+          "plan_digest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "materials_digest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "source_request_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "source_response_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "original_materials_digest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "review_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        },
+        "required": [
+          "mapping_version",
+          "origin",
+          "topic",
+          "batch",
+          "plan_source",
+          "historical_stage",
+          "new_provider_calls",
+          "candidate_digest",
+          "parent_digest",
+          "model",
+          "prompt_version",
+          "plan_digest",
+          "materials_digest",
+          "source_request_sha256",
+          "source_response_sha256",
+          "original_materials_digest",
+          "review_sha256"
+        ]
+      },
       "TrialReplaySource": {
         "type": "object",
         "additionalProperties": false,
@@ -5796,6 +5884,11 @@
                     "mid": {"type": ["integer", "null"], "minimum": 0, "maximum": 4},
                     "target": {"const": 5},
                     "comparison": {"enum": [null, "less", "equal", "greater"]},
+                    "iteration": {"type": ["integer", "null"], "minimum": 1},
+                    "comparison_frame_id": {"enum": [null, "f1", "f3", "f5"]},
+                    "recomputed_mid": {"type": "boolean"},
+                    "updated_endpoint": {"enum": [null, "left", "right"]},
+                    "returned": {"enum": [null, 1]},
                     "note": {"type": "string", "minLength": 1, "maxLength": 1200}
                   },
                   "required": ["frame_id", "code_anchor", "line", "phase", "left", "right", "mid", "target", "comparison", "note"]

@@ -332,7 +332,11 @@ onBeforeUnmount(()=>{save();epoch+=1;manifestEpoch+=1;versionsEpoch+=1;controlle
               class="replay-source"
               aria-label="课程来源"
             >
-              <template v-if="'topic' in scene.replay_source">
+              <template v-if="'topic' in scene.replay_source && scene.replay_source.topic === 'binary-search'">
+                <strong>二分查找 · 程序生成帧说明 · 全文教学重评通过 · 未签核</strong>
+                <p>固定提纲 · T128 封存正文 · 本次 Provider 调用 {{ scene.replay_source.new_provider_calls }}</p>
+              </template>
+              <template v-else-if="'topic' in scene.replay_source">
                 <strong>历史封存回放 · {{ scene.replay_source.topic === 'head' ? '空链表头插' : '栈' }} · 未签核</strong>
                 <p>{{ scene.replay_source.plan_source === 'model_planned' ? '模型规划' : '固定提纲' }} · {{ scene.replay_source.historical_stage === 'authorized_citation_revision' ? '原授权引用修订' : '原首稿' }} · 本次 Provider 调用 {{ scene.replay_source.new_provider_calls }}</p>
               </template>
@@ -341,7 +345,8 @@ onBeforeUnmount(()=>{save();epoch+=1;manifestEpoch+=1;versionsEpoch+=1;controlle
               <p>候选 {{ scene.replay_source.candidate_digest }}</p><p v-if="scene.replay_source.parent_digest">
                 父稿 {{ scene.replay_source.parent_digest }}
               </p>
-              <small>模型原文保留；代码、状态与参考答案由程序派生。本次接入没有新的模型调用。</small>
+              <small v-if="'topic' in scene.replay_source && scene.replay_source.topic === 'binary-search'">讲解、题干和解析沿用封存正文。原首稿教学未通过。</small>
+              <small v-else>模型原文保留；代码、状态与参考答案由程序派生。本次接入没有新的模型调用。</small>
             </aside>
             <template
               v-for="block in scene.blocks"

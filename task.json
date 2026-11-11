@@ -6848,6 +6848,45 @@
           "evidence": "docs/acceptance/phase-1.5-shared-live-reuse-t127/RESULTS.md"
         }
       ]
+    },
+    {
+      "id": "PHASE-1.5-T129",
+      "phase": "Phase 1.5",
+      "title": "二分查找帧与循环轮次绑定",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T127"
+      ],
+      "scope": [
+        "按程序轨迹记录轮次、比较与区间更新关系并生成帧说明。",
+        "仅从 T128 封存二分正文派生课程，独立审核后走既有私有准入。新增 Provider 0。"
+      ],
+      "prd_source": "PRD §0.5；课程生成方向 §3；用户明确限定派生",
+      "acceptance_criteria": [
+        "独立核对初始化、同轮比较更新、命中和未命中返回。",
+        "原候选、请求、材料、派生轨迹及新全文审核准确绑定。正文、题干和解析原样保留。",
+        "实际应用完成阅读、六帧、高亮及播放控制、四题反馈和刷新；T128 状态和停止证据保持。"
+      ],
+      "verification": [
+        "定向轨迹与请求测试，封存响应只读回放和派生绑定检查。",
+        "独立全文教学重评及实际应用浏览器验收。"
+      ],
+      "started_at": "2026-11-11T13:53:51+08:00",
+      "completed_at": "2026-11-11T14:04:09+08:00",
+      "commit_lookup": "Task-Completed: PHASE-1.5-T129",
+      "verification_results": [
+        {
+          "command": "pytest -q backend/tests/test_binary_search_course_frames.py；封存 derive 与专用库准入检查",
+          "result": "4 passed。初始化、同轮比较更新、命中与空区间边界、新请求及来源门禁通过。拒绝改写原稿和错候选审核；重复准入幂等。",
+          "evidence": "docs/acceptance/phase-1.5-binary-search-frames-t129/RESULTS.md"
+        },
+        {
+          "command": "独立全文重评；Playwright 实际开发应用；Ruff、ESLint、vue-tsc、工作流及 diff 检查",
+          "result": "全文通过，阅读六块、六帧高亮、控制、四题 0%/100%、答案隔离与刷新均通过。Provider 0，原批失败保持。",
+          "evidence": "docs/acceptance/phase-1.5-binary-search-frames-t129/browser-verification.json"
+        }
+      ]
     }
   ],
   "planning_inputs": {

@@ -18,7 +18,8 @@ const orderedCourse = computed(() => {
   if (origin === 'stack_lifo_model_generation' || (replay && 'topic' in replay && replay.topic === 'stack')) return 'stack';
   return undefined;
 });
-const searchCourse = computed(() => props.scene.generation_source?.origin === 'binary_search_model_generation');
+const searchCourse = computed(() => props.scene.generation_source?.origin === 'binary_search_model_generation' ||
+  props.scene.replay_source?.mapping_version === 'binary-search-program-frames-v1');
 const guided = computed(()=>visuals.value.find(b=>b.visualization_type==='head_insertion_replay_v1'||b.visualization_type===orderedCourse.value||
   searchCourse.value && b.visualization_type==='binary-search'));
 const comparisons = {less: '<', equal: '=', greater: '>'} as const;

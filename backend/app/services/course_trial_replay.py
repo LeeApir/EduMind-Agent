@@ -1,4 +1,4 @@
-"""Atomic, zero-attempt private admission for the two sealed T120 courses."""
+"""Atomic, zero-attempt private admission for explicitly authorized archives."""
 
 from uuid import UUID
 
@@ -7,35 +7,48 @@ from sqlalchemy.ext.asyncio import AsyncConnection, AsyncEngine
 
 from app.core.database import get_database_url
 from app.models.free_scene_generation import FreeSceneGenerationResult
+from app.services import binary_search_course_frames as binary_frames
 from app.services.course_trial_sources import ARCHIVES, verified_course
 from app.services.free_course_snapshots import SnapshotError, SnapshotRepository, digest
 from app.services.head_course_replay import ORIGIN, fingerprint
 
 RULE = "sealed-course-trial-replay-v1"
 DATABASE = "edumind_catalog_p15_t120_replay"
+BINARY_DATABASE = "edumind_catalog_p15_t127_reuse"
 
 
-def require_database(url=None):
+def require_database(url=None, *, topic=None):
     parsed = make_url(url or get_database_url())
     if (
         parsed.drivername != "postgresql+asyncpg"
         or parsed.host != "127.0.0.1"
         or parsed.port != 15437
-        or parsed.database != DATABASE
+        or parsed.database != (BINARY_DATABASE if topic == "binary-search" else DATABASE)
     ):
         raise SnapshotError("TRIAL_REPLAY_DATABASE")
 
 
-def require_session(db):
+def require_session(db, topic):
     bind = db.bind
     if isinstance(bind, AsyncConnection):
         bind = bind.engine
     if not isinstance(bind, AsyncEngine):
         raise SnapshotError("TRIAL_REPLAY_DATABASE")
-    require_database(bind.url.render_as_string(hide_password=False))
+    require_database(bind.url.render_as_string(hide_password=False), topic=topic)
+
+
+def request_sha256(topic):
+    return binary_frames.REQUEST if topic == "binary-search" else ARCHIVES[topic].request_sha256
+
+
+def require_archive_owner(topic, record, owner):
+    if topic == "binary-search" and record.get("context", {}).get("owner") != str(owner):
+        raise SnapshotError("BINARY_FRAMES_OWNER")
 
 
 def projection(topic, record, review):
+    if topic == "binary-search":
+        return binary_frames.reviewed_projection(record, review, origin=ORIGIN)
     goal, plan, assembled = verified_course(topic, record, review)
     archive = ARCHIVES[topic]
     original = assembled["generation_source"]
@@ -69,9 +82,10 @@ def projection(topic, record, review):
 
 
 def validate_replay(db, row, actual):
-    require_session(db)
     stored = row.input_snapshot["trial_replay"]
     topic = stored["topic"]
+    require_session(db, topic)
+    require_archive_owner(topic, stored["record"], row.user_id)
     goal, plan, expected = projection(topic, stored["record"], stored["review"])
     snapshot = dict(inputs=actual, trial_replay=stored)
     if (
@@ -83,7 +97,7 @@ def validate_replay(db, row, actual):
         or row.reason_code is not None
         or row.input_snapshot != snapshot
         or row.input_digest != digest(RULE, snapshot=snapshot)
-        or row.request_digest != ARCHIVES[topic].request_sha256
+        or row.request_digest != request_sha256(topic)
         or row.response_json != expected
         or row.response_digest != fingerprint(row)
         or str(row.request_id) != actual["request"]["request_id"]
@@ -109,7 +123,8 @@ async def import_course(db, owner: UUID, topic, record, review):
     from app.services.free_scene_generation import load_inputs
     from app.services.free_scene_validation import validate_candidate
 
-    require_session(db)
+    require_session(db, topic)
+    require_archive_owner(topic, record, owner)
     goal, plan, response = projection(topic, record, review)
     source = response["replay_source"]
     repo = SnapshotRepository(db, owner)
@@ -143,7 +158,7 @@ async def import_course(db, owner: UUID, topic, record, review):
             expected_head=outline["version"],
             input_snapshot=snapshot,
             input_digest=digest(RULE, snapshot=snapshot),
-            request_digest=ARCHIVES[topic].request_sha256,
+            request_digest=request_sha256(topic),
             response_json=response,
             prompt_version=source["prompt_version"],
             schema_version=RULE,
