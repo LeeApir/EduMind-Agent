@@ -93,3 +93,7 @@ backend/.venv/bin/python -m scripts.course_trial stop --topic "$SLOT"
 ### T133 定向验证
 
 专用回环 PostgreSQL `edumind_catalog_p15_t127_reuse_test` 执行 `alembic upgrade head`。使用上文相同的禁外网 pytest 入口运行 `backend/tests/test_stack_course_profile_live.py`，**1 项通过，0 跳过**。测试通过共用发送和封存回放逐字节核对两个请求，拒绝交叉授权、错总额度、真实路径读取夹具原件、重复发送、修订、错响应来源、交叉审核及缺少全文审核。两槽均验证深度不足仍可私有准入，跨访客读取返回 404，作答前响应不含答案。两份离线夹具及模拟审核只用于验证门禁。CLI 摘要、Ruff、Vue 类型、账本与 Git 差异检查通过。
+
+## T134 真实批次登记
+
+用户已批准提交 `a98e3e2` 对应共同清单、两份准确请求及 ADR0065 C2。登记 [A 槽授权](live/array-first.execution-approval.json) 与 [B 槽授权](live/operations-known.execution-approval.json)。授权各 1 次正文，规划及修订 0 次。登记时尚未创建操作窗口，Provider 0 次。
