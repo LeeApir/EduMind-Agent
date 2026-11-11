@@ -49,7 +49,8 @@ class FixedCourse:
     @property
     def batch(self) -> str:
         if self.learner_case is not None:
-            return f"stack-profile-{self.learner_case}-r01"
+            prefix = "stack-profile" if self.offline_only else "stack-profile-pair-live"
+            return f"{prefix}-{self.learner_case}-r01"
         if self.offline_only:
             return f"{self.topic}-revision-fixture-r01"
         if self.live_reuse:
@@ -171,6 +172,16 @@ STACK_PROFILE_CASES = {
     )
     for case in stack_course_profile_pair.CASES
 }
+STACK_PROFILE_LIVE = {
+    f"stack-profile-{case}": replace(
+        profile,
+        database="edumind_catalog_p15_t127_reuse",
+        package="phase-1.5-stack-profile-pair-t132/live",
+        approval_key="accept_T133_scope_and_batch_C2",
+        offline_only=False,
+    )
+    for case, profile in STACK_PROFILE_CASES.items()
+}
 PROFILES = {
     profile.materials.VERSION: profile
     for profile in (
@@ -214,7 +225,10 @@ LIVE_REUSE = {
 }
 FOREGROUND_BATCHES = {
     profile.batch: profile
-    for profile in (*NEW_BATCHES.values(), *REVISION_FIXTURES.values(), *LIVE_REUSE.values())
+    for profile in (
+        *NEW_BATCHES.values(), *REVISION_FIXTURES.values(), *LIVE_REUSE.values(),
+        *STACK_PROFILE_LIVE.values(),
+    )
 }
 
 
@@ -431,6 +445,11 @@ def assembly(
 ) -> dict[str, Any]:
     evaluator = review.get("independent_evaluator")
     checks = review.get("checks")
+    paired = profile.learner_case is not None and not profile.offline_only
+    required = dict.fromkeys(profile.checks, True)
+    if paired and isinstance(checks, dict):
+        # Record fit separately from factual correctness and individual course availability.
+        required["teaching_depth_matches_profile"] = checks.get("teaching_depth_matches_profile")
     if (
         review.get("candidate_digest") != c["candidate_digest"]
         or review.get("verdict") != "pass"
@@ -438,8 +457,9 @@ def assembly(
         or not evaluator.strip()
         or review.get("blocking_findings") != []
         or not isinstance(checks, dict)
-        or (not profile.model_planned and checks != dict.fromkeys(profile.checks, True))
+        or (not profile.model_planned and checks != required)
         or any(type(v) is not bool for v in checks.values())
+        or (paired and review.get("evidence_kind") != c["context"]["evidence_kind"])
         or (
             (
                 profile.live_reuse or profile is BINARY_SEARCH_FRAMES
@@ -470,11 +490,19 @@ def assembly(
     )
     if profile is BINARY_SEARCH_REVISION:
         source["source_response_sha256"] = c["source_response_sha256"]
-    if profile is BINARY_SEARCH_FRAMES:
+    if profile is BINARY_SEARCH_FRAMES or paired:
         source.update(
             source_request_sha256=c["receipt"]["request_sha256"],
             source_response_sha256=c["receipt"]["raw_sha256"],
             review_sha256=revision.checksum(review),
+        )
+    if paired:
+        source.update(
+            learner_case=profile.learner_case,
+            learner_evidence_digest=digest(
+                stack_course_profile_pair.VERSION, evidence=c["context"]["learner_evidence"]
+            ),
+            plan_source="fixed_outline",
         )
     if profile.new_batch:
         source.update(
@@ -520,7 +548,7 @@ def revised_candidate(ctx, replacements, receipt, source, *, profile):
 
 def verify_candidate(ctx, c, profile):
     if "revision" in c:
-        if profile is BINARY_SEARCH_FRAMES:
+        if profile is BINARY_SEARCH_FRAMES or profile.learner_case is not None:
             raise profile.error("PUBLICATION_BINDING")
         source = c["revision"]
         expected = revised_candidate(
@@ -604,7 +632,7 @@ async def publish(db, c, review, *, profile: FixedCourse = STACK) -> dict[str, A
     from app.services.free_scene_generation import load_inputs
     from app.services.free_scene_validation import validate_candidate
 
-    if profile.learner_case is not None:
+    if profile.learner_case is not None and profile.offline_only:
         raise profile.error("PROFILE_PREPARATION_ONLY")
     ctx = c["context"]
     owner, cid, oid, pid, sid = (

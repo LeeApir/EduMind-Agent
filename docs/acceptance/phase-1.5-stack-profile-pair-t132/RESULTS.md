@@ -50,3 +50,46 @@ sys.exit(pytest.main(sys.argv[1:]))
 ```
 
 实际 **2 项通过，0 跳过**。共用发送路径捕获两个 MockTransport 请求，逐字节匹配冻结原文；从加密封存严格回放。错画像、错请求摘要、交叉审核、不完整审核、真实发送及应用准入均被拒。两份模拟候选使用相同夹具正文，结果只证明绑定及审核门禁。Ruff、账本工作流和 Git 差异检查通过。真实课程、教学对照结论及页面验收待另行授权后写入本记录。
+
+## T133 真实批次准备与待授权范围
+
+接线及离线验证完成，真实 Provider **0 次**，尚未建立真实窗口。拟批准 **0 次规划、2 次正文、0 次修订**，每槽一条正文，无重试、回退或探测。
+
+| 执行项 | 冻结值 |
+| --- | --- |
+| [共同清单](live/manifest.json) SHA-256 | `e6265ed240d70f9e9eb58b3bce5b66d6c00a9660693a1b2b64944d7677174f94` |
+| 槽 A | `--topic stack-profile-array-first` · [原请求](array-first/request.json) · [批准模板](live/array-first.approval.template.json) |
+| 槽 B | `--topic stack-profile-operations-known` · [原请求](operations-known/request.json) · [批准模板](live/operations-known.approval.template.json) |
+| 模型和参数 | 两槽使用 T132 原始字节及 DeepSeek 官方 `POST /responses`，`deepseek-flash`，`temperature=0.2`，`reasoning.effort=none`，`stream=false`，`store=false`，`max_output_tokens=4000` |
+| 时间 | 建议先 A 后 B。每槽创建操作时起算 1,800 秒，发送前预留 90 秒 I/O 限制，准入在各槽有效窗口内完成。两槽窗口合计最多 60 分钟，间隔按实际登记。浏览器验收可随后完成 |
+| 费用和原件 | 最多 2 次 HTTP，参数合计最多 8,000 输出 token；严格校验每槽输入回报 ≤139,264、输出回报 ≤4,000。回报校验不能约束服务端收费。实际金额未知，无可验证费用硬上限；尽力停止后仍可能迟发或计费，本机原件无独立抗回滚保障，服务端留存未独立确认 |
+
+[ADR0065](../../ADR/0065-stack-profile-pair-live.md) 集中记录本批范围与 C2 边界。两份模板的真实授权及 C2 确认为 `false`，只能在获准后登记为真实批准。冻结文件继续使用 T132 的准确输入、请求和上文三项教学标准。
+
+### 实际入口与记录
+
+使用专用回环开发库 `edumind_catalog_p15_t127_reuse` 及现有开发应用。获准后先重载开发 API。各槽建立独立合成访客，用现有 `persist_profile_version` 持久化 `stack_course_profile_pair.profile_snapshot(case)`，取得 `OWNER` 和 `PROFILE_ID`；读取实际画像快照时核对所属者、版本及证据。两槽的私有课程用各自访客会话验收。无需模型生成画像。
+
+```sh
+export PYTHONPATH=backend:.
+# SLOT 为 stack-profile-array-first 或 stack-profile-operations-known
+backend/.venv/bin/python -m scripts.course_trial inspect --topic "$SLOT"
+# 仅在批准后运行，prepare 回执登记本槽 starts_at / expires_at
+backend/.venv/bin/python -m scripts.course_trial prepare --topic "$SLOT" --owner "$OWNER" --profile-id "$PROFILE_ID" --approval "$APPROVAL"
+backend/.venv/bin/python -m scripts.course_trial send --topic "$SLOT"
+backend/.venv/bin/python -m scripts.course_trial replay --topic "$SLOT"
+# 准确的本次独立全文审核落盘后，在窗口内准入
+backend/.venv/bin/python -m scripts.course_trial publish --topic "$SLOT"
+# 遇到结构失败、教学阻断、准入失败或未知结果，停止该槽
+backend/.venv/bin/python -m scripts.course_trial stop --topic "$SLOT"
+```
+
+发送凭据仅在本机终端隐藏提示输入。两个固定原件目录分别为 `~/.local/share/edumind/stack-profile-pair-live-array-first-r01/` 和 `~/.local/share/edumind/stack-profile-pair-live-operations-known-r01/`。各保留请求、尝试、加密响应、收据、候选、审核和准入或失败记录。每槽一次性 STOP 禁止再次发送；显式停止产生 HALT 并阻止准入。另槽依照各自批准执行。
+
+每课 `review.json` 要求准确候选摘要、`parent_digest=null`、`full_lesson_reviewed=true`、独立评估人、阻断项、既有栈审核项及 `evidence_kind=actual_provider_response`。分别记录 `learner_evidence_respected` 和 `teaching_depth_matches_profile`。前者须通过；后者须如实填写，允许正确且可学的课程在深度不足时仍交付。页面显示 A/B 来源，私有快照与版本绑定请求、响应、画像证据和审核摘要。
+
+每课完成实际阅读、五帧高亮、播放控制、四题反馈及刷新恢复，核对答案隔离。两课验收后，按原表的术语铺垫、过程详略、边界与实现逐项引用 A/B 的段落或帧及事实 ID。三项均有充分且符合画像的差异才记对照通过。两课正确而差异不足时，保留两课，记录对照未通过。将实际窗口、用量、独立审核、学习入口、浏览器证据及对照判定追加到本记录。
+
+### T133 定向验证
+
+专用回环 PostgreSQL `edumind_catalog_p15_t127_reuse_test` 执行 `alembic upgrade head`。使用上文相同的禁外网 pytest 入口运行 `backend/tests/test_stack_course_profile_live.py`，**1 项通过，0 跳过**。测试通过共用发送和封存回放逐字节核对两个请求，拒绝交叉授权、错总额度、真实路径读取夹具原件、重复发送、修订、错响应来源、交叉审核及缺少全文审核。两槽均验证深度不足仍可私有准入，跨访客读取返回 404，作答前响应不含答案。两份离线夹具及模拟审核只用于验证门禁。CLI 摘要、Ruff、Vue 类型、账本与 Git 差异检查通过。

@@ -30,6 +30,12 @@ def package_path(profile):
     return ROOT / "docs/acceptance" / profile.package
 
 
+def request_path(profile):
+    if profile.learner_case is not None and not profile.offline_only:
+        profile = publication.STACK_PROFILE_CASES[profile.learner_case]
+    return package_path(profile) / "request.json"
+
+
 def vault_path(profile):
     if profile.live_reuse:
         return live.root() / profile.topic
@@ -77,7 +83,7 @@ def package_digest(profile=STACK) -> str:
         )
         if document["topics"].get(profile.topic) != expected:
             raise profile.error("PACKAGE_CHANGED")
-    elif (package / "request.json").read_bytes() != canonical(profile.request()):
+    elif request_path(profile).read_bytes() != canonical(profile.request()):
         raise profile.error("PACKAGE_CHANGED")
     return sha(manifest.read_bytes())
 
@@ -109,6 +115,8 @@ def approval_values(profile=STACK, *, fixture=False):
             explicit_user_authorization=not fixture,
             offline_fixture=fixture,
         )
+    if profile.learner_case is not None and not profile.offline_only:
+        approval.update(pair_max_http_requests=2, learner_case=profile.learner_case)
     return approval
 
 
@@ -374,7 +382,7 @@ def send(vault, *, transport=None, key=None, profile=STACK, stage="generate"):
         )
         req = (
             canonical(request_for(ctx, profile, stage, source)) if profile.new_batch
-            else (package_path(profile) / "request.json").read_bytes()
+            else request_path(profile).read_bytes()
         )
         if len(req) > 131072:
             raise profile.error("REQUEST_SIZE")
@@ -614,7 +622,7 @@ def run(parser, args, profile):
                 canonical(
                     asyncio.run(
                         prepare(vault, args.owner, read(args.approval) if args.approval else None,
-                                **options)
+                                profile_id=getattr(args, "profile_id", None), **options)
                     )
                 ).decode()
             )

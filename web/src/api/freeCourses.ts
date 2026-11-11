@@ -108,6 +108,7 @@ export interface GenerationSource {unknown_echoes?:string[];origin:"head_goal_mo
 export interface FixedCourseSource extends Omit<GenerationSource, "origin" | "evidence_kind"> {
   origin: "stack_lifo_model_generation" | "queue_fifo_model_generation" | "binary_search_model_generation"
   evidence_kind: "actual_provider_response" | "evidence_bound_local_revision" | "offline_fixture"
+  learner_case?: "array-first" | "operations-known"
 }
 export interface ArchivedResponseSource extends Omit<GenerationSource, "origin" | "model" | "evidence_kind"> {
   origin: "reviewed_archived_response_import"

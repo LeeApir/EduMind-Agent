@@ -20,6 +20,7 @@ from app.services.course_trial_publication import (
     NEW_BATCHES,
     QUEUE,
     REVISION_FIXTURES,
+    STACK_PROFILE_LIVE,
 )
 from app.services.course_trial_replay import import_course, projection, require_database
 from app.services.course_trial_sources import ARCHIVES
@@ -124,10 +125,12 @@ def main():
             *QUEUE_ARCHIVES,
             BINARY_SEARCH.topic,
             BINARY_FRAMES_TOPIC,
+            *STACK_PROFILE_LIVE,
             "binary-search-revision",
         ),
     )
     parser.add_argument("--owner", type=UUID)
+    parser.add_argument("--profile-id", type=UUID)
     parser.add_argument("--approval", type=Path)
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument(
@@ -139,6 +142,9 @@ def main():
     parser.add_argument("--record", type=Path, help="exact revision approval record")
     parser.add_argument("--mock-response", type=Path, help="complete fixture Responses envelope")
     args = parser.parse_args()
+    paired = STACK_PROFILE_LIVE.get(args.topic)
+    if (args.profile_id is not None) != (paired is not None and args.action == "prepare"):
+        parser.error("--profile-id is required only for stack profile trial preparation")
     if args.action != "send" or args.offline_vault:
         sys.addaudithook(raw_io_audit)
     if args.action == "start-batch":
@@ -157,15 +163,15 @@ def main():
         return 0
     if args.topic is None:
         parser.error("--topic is required for this action")
-    if args.topic == BINARY_FRAMES_TOPIC:
+    if args.topic == BINARY_FRAMES_TOPIC or paired:
         if any((
             args.new_batch, args.live_reuse, args.offline_vault, args.stage,
             args.record, args.mock_response,
         )) or args.action not in {"inspect", "prepare", "send", "replay", "publish", "stop"}:
-            parser.error("the program-frames trial supports one generation stage only")
+            parser.error("the selected trial supports one generation stage only")
         if args.action != "prepare" and any((args.owner, args.approval)):
             parser.error("--owner and --approval are only used by prepare")
-        return generation.run(parser, args, BINARY_SEARCH_FRAMES)
+        return generation.run(parser, args, paired or BINARY_SEARCH_FRAMES)
     if args.live_reuse:
         profile = LIVE_REUSE.get(args.topic)
         if profile is None or any((args.owner, args.approval, args.mock_response)):

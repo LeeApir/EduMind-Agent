@@ -7005,6 +7005,45 @@
           "evidence": "docs/acceptance/phase-1.5-stack-profile-pair-t132/RESULTS.md"
         }
       ]
+    },
+    {
+      "id": "PHASE-1.5-T133",
+      "phase": "Phase 1.5",
+      "title": "栈课程双画像真实发送和私有准入准备",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T132"
+      ],
+      "scope": [
+        "沿用 T132 两份准确请求接通共用入口的一次性发送与私有准入。",
+        "冻结两槽执行包、审核及比较记录；准备期间 Provider 0。"
+      ],
+      "prd_source": "PRD §0.5；T132 统一记录；ADR0065",
+      "acceptance_criteria": [
+        "新槽候选绑定准确画像、请求响应和本次全文审核，隔离夹具。",
+        "两个槽各一条正文且拒绝交叉授权、重复发送及错审核。",
+        "保留正确课程与画像差异判定的独立结论，提交准确包待批准。"
+      ],
+      "verification": [
+        "禁外网隔离 PostgreSQL 及共用 MockTransport 检查。",
+        "CLI 摘要及门禁、前端类型、后端 lint、工作流与差异检查。"
+      ],
+      "started_at": "2026-11-11T15:02:21+08:00",
+      "completed_at": "2026-11-11T15:04:08+08:00",
+      "commit_lookup": "Task-Completed: PHASE-1.5-T133",
+      "verification_results": [
+        {
+          "command": "隔离库禁外网 pytest -q backend/tests/test_stack_course_profile_live.py",
+          "result": "1 passed，0 skipped，覆盖两槽、准确封存、拒绝交叉审核及独立私有准入。",
+          "evidence": "docs/acceptance/phase-1.5-stack-profile-pair-t132/RESULTS.md"
+        },
+        {
+          "command": "共用 CLI inspect、阶段拒绝、Ruff、Vue 类型、工作流及 diff 检查",
+          "result": "通过。两份 T132 请求原字节，Provider 0，真实窗口未启动。",
+          "evidence": "docs/acceptance/phase-1.5-stack-profile-pair-t132/RESULTS.md"
+        }
+      ]
     }
   ],
   "planning_inputs": {

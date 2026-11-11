@@ -285,6 +285,9 @@ onBeforeUnmount(()=>{save();epoch+=1;manifestEpoch+=1;versionsEpoch+=1;controlle
               <strong v-else-if="scene.generation_source.stem_prompt_version === 'course-question-stem-v2'">
                 {{ scene.generation_source.plan_source === 'model_planned' ? '模型规划' : '固定提纲' }} · {{ scene.generation_source.evidence_kind === 'offline_fixture' ? '离线接线夹具' : 'DeepSeek 生成 · 独立教学审核通过' }} · 未签核
               </strong>
+              <strong v-else-if="scene.generation_source.origin === 'stack_lifo_model_generation' && 'learner_case' in scene.generation_source && scene.generation_source.learner_case">
+                栈课程画像 {{ scene.generation_source.learner_case === 'array-first' ? 'A' : 'B' }} · {{ scene.generation_source.evidence_kind === 'offline_fixture' ? '离线接线夹具' : '独立全文教学审核通过' }} · 未签核
+              </strong>
               <strong v-else-if="scene.generation_source.origin === 'stack_lifo_model_generation' || scene.generation_source.origin === 'queue_fifo_model_generation' || scene.generation_source.origin === 'binary_search_model_generation'">
                 {{ scene.generation_source.origin === 'binary_search_model_generation' ? '二分查找' : scene.generation_source.origin === 'queue_fifo_model_generation' ? '队列' : '栈' }} · {{ scene.generation_source.evidence_kind === 'offline_fixture' ? '离线接线夹具' : scene.generation_source.evidence_kind === 'evidence_bound_local_revision' ? 'DeepSeek 局部修订 · 独立教学重评通过' : 'DeepSeek 生成 · 独立教学审核通过' }} · 未签核
               </strong>
