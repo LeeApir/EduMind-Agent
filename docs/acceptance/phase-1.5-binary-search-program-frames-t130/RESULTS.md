@@ -48,3 +48,7 @@ backend/.venv/bin/python -m scripts.course_trial stop --topic binary-search-prog
 - 专用 PostgreSQL 测试库与 MockTransport 定向 **6 项通过，0 跳过**。拒绝错请求、错额度、真实与夹具授权混用、规划或修订阶段、重发、T129 旧审核及缺失本批全文检查的审核。实测新候选绑定当次请求、响应、材料及审核，六帧和程序说明出现在 v2 私有场景。场景答案隔离及跨访客 404 通过。
 - 模型额外返回 `step_notes` 的夹具按 `ROLE_SCHEMA` 拒绝，原响应可从封存精确解密，保留失败和 STOP。第一次执行测试时断言误用了 `SnapshotError`，调整为入口实际的 `PilotError` 后复验通过。
 - 定向命令为 `pytest -q backend/tests/test_binary_search_course_frames.py backend/tests/test_binary_search_program_frames_trial.py`。测试进程加装既有 `raw_io_audit`，Provider 流量只经过 MockTransport。另核对 CLI inspect、禁止的阶段选项、T129 原件只读派生、Ruff、Vue 类型及 Git 差异。
+
+## T131 真实执行登记
+
+用户已批准 `ca2cf5b` 对应准确请求、清单及 ADR0064 C2，授权 0 次规划、1 次正文、0 次修订。批准见 [执行记录](execution-approval.json)。本机一次性入口会在创建操作后显示北京时间窗口，再进入隐藏凭据提示。截至登记，窗口未启动，Provider 调用为 0。
