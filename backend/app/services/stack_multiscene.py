@@ -196,3 +196,114 @@ def assemble(raw: dict[str, Any], inputs: dict[str, Any]) -> dict[str, Any]:
     if checked["state"] != "accepted":
         raise SnapshotError(checked["reason_code"])
     return candidate
+
+
+PLAN_WIRE = "stack-boundaries-planning-wire-v1"
+SCENE_WIRE = "stack-boundaries-scene-wire-v1"
+
+
+def wire_plan_request(inputs: dict[str, Any]) -> StructuredRequest:
+    from copy import deepcopy
+
+    from app.agents.head_course_planning_wire import INSTRUCTION, SCHEMA, VERSION
+
+    if inputs.get("stack_boundaries") != basis.VERSION:
+        raise SnapshotError("STACK_PLAN_SCOPE")
+    request = planning_request(inputs)
+    schema = deepcopy(SCHEMA)
+    schema["properties"]["protocol_version"]["enum"] = [PLAN_WIRE]
+    system, user = request.prompt.messages
+    instruction = system.content.replace(
+        "Planner suggestions have null source_key/source_excerpt.",
+        "Only user_requirement objectives with exact evidence are supported here.",
+    )
+    return replace(request, json_schema=schema, prompt=replace(
+        request.prompt, messages=(
+            ChatMessage("system", instruction + "\n" + INSTRUCTION.replace(VERSION, PLAN_WIRE)),
+            user,
+        ),
+    ))
+
+
+def wire_plan_response(raw: dict[str, Any], inputs: dict[str, Any]) -> dict[str, Any]:
+    request = wire_plan_request(inputs)
+    if not Draft202012Validator(request.json_schema).is_valid(raw):
+        raise SnapshotError("STACK_PLAN_WIRE")
+    plans = raw["plans"]
+    if len(plans) != (0 if raw["needs_clarification"] else 1):
+        raise SnapshotError("STACK_PLAN_WIRE")
+    return validate_plan(dict(
+        needs_clarification=raw["needs_clarification"],
+        plan=plans[0] if plans else None,
+        questions=raw["questions"], reason=raw["reason"] or None,
+        source_keys=raw["source_keys"],
+    ), inputs)
+
+
+def bound_scene_request(inputs: dict[str, Any]) -> StructuredRequest:
+    """Only the transaction-local lease is omitted from the outbound snapshot."""
+    if inputs["request"].get("stack_boundaries") != basis.VERSION:
+        raise SnapshotError("STACK_SCENE_SCOPE")
+    request = scene_request(inputs)
+    system, user = request.prompt.messages
+    payload = json.loads(user.content)
+    payload.pop("lease_epoch")
+    payload["wire_protocol"] = SCENE_WIRE
+    return replace(request, prompt=replace(
+        request.prompt, messages=(system, ChatMessage("user", canonical(payload).decode())),
+    ))
+
+
+def checked_scene(value: dict[str, Any], inputs: dict[str, Any]) -> dict[str, Any]:
+    """Validate raw teaching and attach program-owned line metadata after the common gate."""
+    if not isinstance(value, dict) or set(value) != {"raw_output", "generation_source"}:
+        raise SnapshotError("STACK_SCENE_CONTENT")
+    request = bound_scene_request(inputs)
+    payload = json.loads(request.prompt.messages[1].content)
+    scene = next(s for s in inputs["plan"]["scenes"] if s["scene_id"] == inputs["scene_id"])
+    mat = payload["scene_material"]
+    source = value["generation_source"]
+    if (
+        not isinstance(source, dict)
+        or set(source) != {
+            "origin", "batch", "model", "prompt_version", "plan_source", "plan_digest",
+            "materials_digest", "candidate_digest", "review_sha256", "evidence_kind", "scene_key",
+            "parent_digest", "source_request_sha256", "source_response_sha256",
+        }
+        or source["origin"] != "stack_boundaries_model_generation"
+        or source["batch"] != basis.VERSION
+        or source["model"] != "deepseek-flash"
+        or source["prompt_version"] != SCENE_PROMPT
+        or source["plan_source"] != "model_planned"
+        or source["plan_digest"] != inputs["plan"]["digest"]
+        or source["materials_digest"] != payload["materials_digest"]
+        or source["scene_key"] != scene["scene_key"]
+        or source["parent_digest"] is not None
+        or source["evidence_kind"] not in ("offline_fixture", "actual_provider_response")
+        or any(not isinstance(source[k], str) or len(source[k]) != 64
+               or set(source[k]) - set("0123456789abcdef")
+               for k in ("candidate_digest", "review_sha256",
+                         "source_request_sha256", "source_response_sha256"))
+    ):
+        raise SnapshotError("STACK_SCENE_SCOPE")
+    assembled = assemble(value["raw_output"], inputs)
+    checked = check_scene(assembled, inputs)
+    if checked["state"] != "accepted":
+        raise SnapshotError(checked["reason_code"])
+    blocks = checked["cleaned"]["content"]["blocks"]
+    visual = next(block for block in blocks if block["kind"] == "visualization")
+    lines = mat["source"].splitlines()
+    for step, frame in zip(visual["steps"], mat["frames"], strict=True):
+        line = frame["guard_line"] if frame.get("rejection") else frame["line"]
+        if not 1 <= line <= len(lines):
+            raise SnapshotError("STACK_FRAME_LINE")
+        step["stack_frame"] = dict(
+            frame_id=frame["frame_id"], code_anchor="demo-code", line=line,
+            popped=frame["popped"],
+            note=(
+                "守卫成立，提前返回。保留调用者的旧 value，本步没有新出栈值。"
+                if frame.get("rejection") else ""
+            ),
+        )
+    checked["cleaned"]["content"]["generation_source"] = source
+    return checked

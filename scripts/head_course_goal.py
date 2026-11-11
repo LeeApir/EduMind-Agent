@@ -719,14 +719,19 @@ def forbidden(*args, **kwargs):
 
 def serve(
     port=8178, *, stack_only=False, replay_only=False, queue_only=False,
-    binary_search_only=False, live_reuse=False,
+    binary_search_only=False, live_reuse=False, stack_boundaries=False,
 ):
     import uvicorn
     from app.core import provider_factory
     from fastapi.responses import JSONResponse
     from app.main import app
 
-    if live_reuse:
+    if stack_boundaries:
+        from app.core.database import get_database_url
+        from scripts.stack_multiscene_trial import require_database
+
+        require_database(get_database_url(), fixture=False)
+    elif live_reuse:
         from app.services.course_trial_publication import LIVE_REUSE, require_database
 
         require_database(profile=LIVE_REUSE["head"])
@@ -754,7 +759,8 @@ def serve(
         if request.method == "POST" and (
             path.endswith(("/operations", "/tutor-turns"))
             or (
-                (stack_only or queue_only or binary_search_only or replay_only or live_reuse)
+                (stack_only or queue_only or binary_search_only or replay_only or live_reuse
+                 or stack_boundaries)
                 and path.endswith("/free-courses")
             )
         ):

@@ -279,7 +279,13 @@ onBeforeUnmount(()=>{save();epoch+=1;manifestEpoch+=1;versionsEpoch+=1;controlle
               class="replay-source"
               aria-label="新课程来源"
             >
-              <strong v-if="scene.generation_source.prompt_version === 'binary-search-program-frames-v1'">
+              <strong v-if="scene.generation_source.origin === 'stack_boundaries_model_generation'"
+              >
+                栈双场景 · {{ scene.generation_source.scene_key === 'normal' ? '正常操作' : '拒绝边界' }} · {{ scene.generation_source.evidence_kind === 'offline_fixture' ? '离线接线夹具' : '独立教学审核通过' }} · 未签核
+              </strong>
+              <strong
+                v-else-if="scene.generation_source.prompt_version === 'binary-search-program-frames-v1'"
+              >
                 二分查找 · {{ scene.generation_source.evidence_kind === 'offline_fixture' ? '离线接线夹具' : 'DeepSeek 新正文 · 独立教学审核通过' }} · 程序生成帧说明 · 未签核
               </strong>
               <strong v-else-if="scene.generation_source.stem_prompt_version === 'course-question-stem-v2'">
@@ -367,11 +373,14 @@ onBeforeUnmount(()=>{save();epoch+=1;manifestEpoch+=1;versionsEpoch+=1;controlle
                 {{ block.markdown }}
               </div>
               <section
-                v-else-if="block.kind === 'code' && !(scene.replay_source || scene.generation_source)"
+                v-else-if="block.kind === 'code' && (
+                  !(scene.replay_source || scene.generation_source) ||
+                  (scene.generation_source?.origin === 'stack_boundaries_model_generation' && block.anchor_id === 'practice-code')
+                )"
                 class="code-reading"
                 :class="{'presentation-highlight': highlightedAnchor === block.anchor_id}"
               >
-                <h3>C 语言代码</h3><pre
+                <h3>{{ block.anchor_id === 'practice-code' ? '练习代码（practice-code）' : 'C 语言代码' }}</h3><pre
                   tabindex="0"
                   role="region"
                   aria-label="C 语言代码，可横向滚动"

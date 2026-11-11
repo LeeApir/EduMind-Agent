@@ -104,7 +104,7 @@ def snapshot_input(value: dict[str, Any]) -> dict[str, Any]:
         "profile_version",
     }
     if (
-        set(value) not in (required, required | {"head_support"})
+        set(value) not in (required, required | {"head_support"}, required | {"stack_boundaries"})
         or value["teaching_language"] != "zh-CN"
         or value["code_language"] not in ("C", None)
     ):

@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import type { SceneProjection } from '../src/api/freeCourses';
 import { mount, flushPromises } from '@vue/test-utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import Workspace from '../src/components/CourseWorkspace.vue';
@@ -54,3 +56,67 @@ describe('progressive course workspace',()=>{
     fixture.head=2;const w=mount(Workspace,{props:{...props,initialVersion:2}});await flushPromises();fixture.unavailable=true;await click(w,'重新读取生成状态');expect(w.text()).not.toContain('旧版第一节讲解');await w.get('nav button:nth-child(2)').trigger('click');await flushPromises();expect(w.text()).toContain('此版本已不可用');expect(w.text()).not.toContain('第二节新增讲解');fixture.unavailable=false;await w.get('nav button:first-child').trigger('click');await flushPromises();expect(w.text()).toContain('旧版第一节讲解');w.unmount();
   });
 });
+
+
+const stackProjections = process.env.EDUMIND_T139_PLAYER_PROJECTIONS;
+if (stackProjections) {
+  it('keeps the private stack course and practice code on the selected scene after reload', async () => {
+    const [normal, rejections] = ['normal', 'rejections'].map(name =>
+      JSON.parse(readFileSync(`${stackProjections}/${name}.json`, 'utf8')) as SceneProjection,
+    ) as [SceneProjection, SceneProjection];
+    const v3 = {
+      course_id: normal.course_id, version: 3, plan_id: 'p', created_at: '',
+      complete: true, node_links: [], scenes: [normal, rejections].map((scene, i) => ({
+        scene_id: scene.scene_id, scene_version_id: scene.scene_version_id,
+        title: i === 0 ? '正常操作' : '拒绝边界',
+      })),
+    };
+    vi.stubGlobal('fetch', vi.fn(async (path: string, init: RequestInit = {}) => {
+      if (init.method === 'POST') fixture.posts += 1;
+      if (path.includes('/operations/')) return json({
+        course_id: normal.course_id, operation_id: 'op', state: 'succeeded', kind: 'create',
+        last_event_id: 4, clarification_questions: [], steps: [], budget: null,
+      });
+      for (const projection of [normal, rejections]) {
+        if (path.endsWith(`/versions/3/scenes/${projection.scene_id}`)) return json(projection);
+      }
+      if (path.endsWith('/versions/3')) return json(v3);
+      if (path.endsWith(normal.course_id)) return json({
+        course_id: normal.course_id, original_goal: '栈的正常操作和拒绝边界',
+        course_kind: 'ai_draft', endorsement: 'unendorsed', head: v3,
+      });
+      return json({code: 'NOT_FOUND'}, 404);
+    }));
+    const args = {
+      courseId: normal.course_id, operationId: 'op', initialVersion: 3, initialScene: normal.scene_id,
+    };
+    const first = mount(Workspace, {props: args});
+    try {
+      await flushPromises();
+      expect(first.text()).toContain('步骤 1 / 5');
+      expect(first.text()).toContain('练习代码（practice-code）');
+      await first.get('nav button:nth-child(2)').trigger('click');
+      await flushPromises();
+      expect(first.text()).toContain('步骤 1 / 9');
+      expect(first.text()).toContain('离线接线夹具');
+    } finally {
+      first.unmount();
+    }
+    // ProductApp reopens the workspace at the saved owner/course position.
+    const saved = JSON.parse(sessionStorage.getItem(`edumind:free:reading:owner:${normal.course_id}`)!);
+    expect(saved).toMatchObject({version: 3, scene: rejections.scene_id});
+    const refreshed = mount(Workspace, {
+      props: {...args, initialVersion: saved.version, initialScene: saved.scene},
+    });
+    try {
+      await flushPromises();
+      expect(refreshed.text()).toContain('阅读版本 v3');
+      expect(refreshed.get('nav button:nth-child(2)').attributes('aria-current')).toBe('step');
+      expect(refreshed.text()).toContain('步骤 1 / 9');
+      expect(refreshed.text()).toContain('练习代码（practice-code）');
+      expect(fixture.posts).toBe(0);
+    } finally {
+      refreshed.unmount();
+    }
+  });
+}

@@ -7220,6 +7220,39 @@
           "evidence": "docs/acceptance/phase-1.5-stack-boundaries-t138/RESULTS.md"
         }
       ]
+    },
+    {
+      "id": "PHASE-1.5-T139",
+      "phase": "Phase 1.5",
+      "title": "栈双场景有限真实执行准备",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T138"
+      ],
+      "scope": [
+        "复用规划、场景、封存与私有准入，接通双场景依赖和代码高亮。",
+        "冻结 1 规划、2 正文、0 修订的准确执行包；准备阶段 Provider 0。"
+      ],
+      "prd_source": "PRD §0.5；课程生成方向 §3；用户本轮明确范围",
+      "acceptance_criteria": [
+        "规划、正常场景、完整课程逐关审核；拒绝场景读取已审核的正常场景准确快照。",
+        "离线验证版本、拒绝守卫高亮、六题与私有准入；失败或未知停止。",
+        "执行包可审查，真实执行须另行授权。"
+      ],
+      "verification": [
+        "定向 MockTransport、隔离 PostgreSQL 和现有播放器组件检查。"
+      ],
+      "started_at": "2026-11-11T22:52:51+08:00",
+      "completed_at": "2026-11-11T23:10:17+08:00",
+      "commit_lookup": "Task-Completed: PHASE-1.5-T139",
+      "verification_results": [
+        {
+          "command": "隔离 PostgreSQL + 禁外网 MockTransport；T138 定向回归；Vitest、vue-tsc、Ruff 与工作流",
+          "result": "7 项端到端接线、5 项材料及回归、23 项组件测试通过。真实 Provider 0，真实批次未启动。",
+          "evidence": "docs/acceptance/phase-1.5-stack-boundaries-t138/RESULTS.md"
+        }
+      ]
     }
   ],
   "planning_inputs": {

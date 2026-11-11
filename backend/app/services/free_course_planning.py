@@ -26,6 +26,7 @@ from app.services.free_course_snapshots import (
     canonical,
     digest,
 )
+from app.services.stack_multiscene_materials import VERSION as STACK_BOUNDARIES
 
 
 async def load_inputs(
@@ -84,6 +85,8 @@ async def load_inputs(
         from app.services.head_course_materials import support_for_goal
 
         capability = dict(head_support=support_for_goal(course["original_goal"]))
+    if current["nonsecret_config_snapshot"].get("prompt_version") == STACK_BOUNDARIES:
+        capability = dict(stack_boundaries=STACK_BOUNDARIES)
     return snapshot_input(
         dict(
             course_id=str(course_id),
@@ -116,7 +119,15 @@ async def persist_outcome(
     repo = SnapshotRepository(db, owner_id)
     snapshot = snapshot_input(inputs)
     identity = digest("planning-input", snapshot=snapshot)
-    if "head_support" in snapshot:
+    schema_version = SCHEMA_VERSION
+    validate = validate_response
+    if "stack_boundaries" in snapshot:
+        from app.services import stack_multiscene as stack
+
+        request = stack.wire_plan_request(snapshot)
+        prompt_version, schema_version = stack.PLAN_PROMPT, stack.PLAN_WIRE
+        validate = stack.validate_plan
+    elif "head_support" in snapshot:
         from app.agents import head_course_planning_wire
 
         request = head_course_planning_wire.build_request(snapshot)
@@ -133,7 +144,7 @@ async def persist_outcome(
         if outcome.reason_code not in {"SCHEMA_INVALID", "PROVIDER_REJECTED", "OUTCOME_UNKNOWN"}:
             raise SnapshotError("PLANNING_RESULT_INVALID")
     else:
-        value = validate_response(outcome.response, snapshot)
+        value = validate(outcome.response, snapshot)
         if outcome.reason_code is not None or (
             value["needs_clarification"] != (outcome.state == "needs_clarification")
         ):
@@ -204,7 +215,7 @@ async def persist_outcome(
             request_digest=call_digest,
             response_digest=fingerprint,
             prompt_version=prompt_version,
-            schema_version=SCHEMA_VERSION,
+            schema_version=schema_version,
             state=outcome.state,
             reason_code=outcome.reason_code,
             input_snapshot=snapshot,

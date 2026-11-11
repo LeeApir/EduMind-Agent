@@ -9,7 +9,7 @@ from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.agents.free_course_planning import request_digest
-from app.agents.free_scene_generation import build_request, validate_response
+from app.agents.free_scene_generation import validate_response
 from app.models.free_course_writes import FreeCourseOperation
 from app.models.free_scene_generation import FreeSceneGenerationResult
 from app.models.free_scene_validation import FreeSceneValidation
@@ -21,7 +21,7 @@ from app.services.free_course_snapshots import (
     digest,
 )
 from app.services.free_scene_consistency import check_consistency
-from app.services.free_scene_generation import load_inputs
+from app.services.free_scene_generation import generation_contract, load_inputs
 from app.services.free_scene_markdown import clean_code_markdown
 
 RULE_VERSION = "free-scene-hard-gate-v4"
@@ -189,6 +189,7 @@ async def validate_candidate(
 
             checked = await validate_publication(db, row, actual, operation)
         elif row.origin_type == "model_generation":
+            request, _, prompt_version, schema_version = generation_contract(actual)
             fingerprint = digest(
                 "scene-generation-outcome",
                 input_digest=row.input_digest,
@@ -203,22 +204,34 @@ async def validate_candidate(
                 row.input_digest != digest("scene-generation-input", snapshot=actual)
                 or row.input_snapshot != actual
                 or row.request_id != UUID(actual["request"]["request_id"])
-                or row.request_digest != request_digest(build_request(actual))
+                or row.request_digest != request_digest(request)
+                or (
+                    "stack_boundaries" in actual["request"]
+                    and (row.prompt_version, row.schema_version) != (prompt_version, schema_version)
+                )
                 or row.response_digest != fingerprint
             ):
                 raise SnapshotError("SNAPSHOT_CORRUPT")
-            checked = (
-                check_scene(row.response_json, actual)
-                if row.state == "candidate"
-                else dict(
-                    state="rejected",
-                    reason_code="GENERATION_FAILED",
-                    findings=[
-                        dict(rule_id=f"{RULE_VERSION}:GENERATION_FAILED", code="GENERATION_FAILED")
-                    ],
-                    cleaned=None,
+            if row.state == "candidate" and "stack_boundaries" in actual["request"]:
+                from app.services.stack_multiscene import checked_scene
+
+                checked = checked_scene(row.response_json, actual)
+            else:
+                checked = (
+                    check_scene(row.response_json, actual)
+                    if row.state == "candidate"
+                    else dict(
+                        state="rejected",
+                        reason_code="GENERATION_FAILED",
+                        findings=[
+                            dict(
+                                rule_id=f"{RULE_VERSION}:GENERATION_FAILED",
+                                code="GENERATION_FAILED",
+                            )
+                        ],
+                        cleaned=None,
+                    )
                 )
-            )
         else:
             raise SnapshotError("REPLAY_SOURCE_INVALID")
         raw_digest = digest("scene-validation-raw", response=row.response_json)

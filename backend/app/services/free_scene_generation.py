@@ -133,6 +133,18 @@ async def load_inputs(
     )
 
 
+
+def generation_contract(snapshot):
+    if "stack_boundaries" in snapshot["request"]:
+        from app.services import stack_multiscene as stack
+
+        return (
+            stack.bound_scene_request(snapshot), stack.checked_scene,
+            stack.SCENE_PROMPT, stack.SCENE_WIRE,
+        )
+    return build_request(snapshot), validate_response, PROMPT_VERSION, SCHEMA_VERSION
+
+
 async def persist_outcome(
     db: AsyncSession,
     owner_id: UUID,
@@ -146,14 +158,13 @@ async def persist_outcome(
     """No ready scene, head switch, grading, event or operation success is emitted here."""
     snapshot = snapshot_input(inputs)
     identity = digest("scene-generation-input", snapshot=snapshot)
-    if outcome.input_digest != identity or outcome.request_digest != request_digest(
-        build_request(snapshot)
-    ):
+    request, validate, prompt_version, schema_version = generation_contract(snapshot)
+    if outcome.input_digest != identity or outcome.request_digest != request_digest(request):
         raise SnapshotError("SCENE_INPUT_MISMATCH")
     if outcome.sent_attempts != 1 or outcome.state not in {"candidate", "failed"}:
         raise SnapshotError("SCENE_RESULT_INVALID")
     if outcome.state == "candidate":
-        validate_response(outcome.response, snapshot)
+        validate(outcome.response, snapshot)
         if outcome.reason_code is not None:
             raise SnapshotError("SCENE_RESULT_INVALID")
     elif outcome.reason_code not in {"SCHEMA_INVALID", "PROVIDER_REJECTED", "OUTCOME_UNKNOWN"}:
@@ -219,8 +230,8 @@ async def persist_outcome(
             input_digest=identity,
             request_digest=outcome.request_digest,
             response_digest=fingerprint,
-            prompt_version=PROMPT_VERSION,
-            schema_version=SCHEMA_VERSION,
+            prompt_version=prompt_version,
+            schema_version=schema_version,
             state=outcome.state,
             reason_code=outcome.reason_code,
             input_snapshot=snapshot,

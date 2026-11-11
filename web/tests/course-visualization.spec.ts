@@ -50,6 +50,49 @@ if (sharedTrialProjections) {
   });
 }
 
+const stackBoundariesProjections = process.env.EDUMIND_T139_PLAYER_PROJECTIONS;
+if (stackBoundariesProjections) {
+  it('switches both admitted stack scenes and highlights every exact frame', async () => {
+    vi.useFakeTimers();
+    function load(key: string): SceneProjection {
+      return JSON.parse(readFileSync(`${stackBoundariesProjections}/${key}.json`, 'utf8'));
+    }
+    const normal = load('normal');
+    const rejections = load('rejections');
+    expect(normal.course_version).toBe(rejections.course_version);
+    const w = mount(Presentation, {props: {scene: normal}});
+    try {
+      for (const [data, count] of [[normal, 5], [rejections, 9]] as const) {
+        await w.setProps({scene: data});
+        const vis = data.blocks.find(b => b.kind === 'visualization');
+        expect(vis?.steps).toHaveLength(count);
+        for (const [i, step] of vis!.steps.entries()) {
+          if (i) await button(w, '下一步');
+          expect(w.get('[data-frame]').attributes('data-frame')).toBe(`f${i}`);
+          expect(w.get('.active-code-line').attributes('data-line')).toBe(String(step.stack_frame!.line));
+          if (data === rejections && (i === 4 || i === 8)) {
+            expect(w.get('.active-code-line').text()).toContain(i === 4 ? 'count == CAP' : 'count == 0');
+            expect(w.text()).toContain('返回 false');
+            expect(w.text()).toContain(i === 4 ? 'value=-99' : 'value=3');
+            expect(w.text()).toContain('本步出栈结果：无');
+          }
+        }
+        await button(w, '上一步');
+        expect(w.get('[data-frame]').attributes('data-frame')).toBe(`f${count - 2}`);
+        await button(w, '重置');
+        await button(w, '播放');
+        await button(w, '暂停');
+        await vi.advanceTimersByTimeAsync(2400);
+        expect(w.get('[data-frame]').attributes('data-frame')).toBe('f1');
+      }
+      await w.setProps({scene: normal});
+      expect(w.get('[data-frame]').attributes('data-frame')).toBe('f0');
+    } finally {
+      w.unmount();
+    }
+  });
+}
+
 describe('bounded scene presentation',()=>{
   it.each(['array','linked_list','stack','queue'])('renders real %s elements and bounded manual steps',async kind=>{
     const w=mount(Presentation,{props:{scene:scene(kind)}});expect(w.text()).toContain('先连接');expect(w.text()).toContain('非代码执行');

@@ -1,0 +1,87 @@
+{
+  "batch": "stack-boundaries-multiscene-v1",
+  "endpoint": "https://api.deepseek.com/responses",
+  "model": "deepseek-flash",
+  "source": "model_planned",
+  "stages": [
+    "plan",
+    "normal",
+    "rejections"
+  ],
+  "stage_budgets": {
+    "plan": 1,
+    "normal": 1,
+    "rejections": 1
+  },
+  "revision_budget": 0,
+  "window_seconds": 1800,
+  "timeout_seconds": 90,
+  "max_request_bytes": 131072,
+  "max_response_bytes": 2097152,
+  "max_output_tokens_per_request": 8000,
+  "temperature": 0.2,
+  "store": false,
+  "stream": false,
+  "reasoning_effort": "none",
+  "materials_digest": "fde1d650ce5e6267a9cc7b4c97ad66fe2414e7836705ccb02a612c34545eb0d8",
+  "schema_versions": [
+    "stack-boundaries-planning-wire-v1",
+    "stack-boundaries-scene-wire-v1"
+  ],
+  "checks": {
+    "plan": [
+      "goal_sources",
+      "scene_allocation",
+      "normal_before_rejections",
+      "grounded_plan"
+    ],
+    "normal": [
+      "normal_five_frames",
+      "lifo_explanation",
+      "two_exercises",
+      "fact_support"
+    ],
+    "rejections": [
+      "full_course_coherence",
+      "rejections_nine_frames",
+      "both_guards_and_returns",
+      "unchanged_logical_storage_and_output",
+      "old_output_is_not_new_pop",
+      "six_exercises_and_solutions",
+      "fact_support"
+    ]
+  },
+  "fixture_request_sha256": {
+    "plan": "126d4699de6ae8a3ac98a99ad7f3cb42c7532f931676bf0073a233c82e296ac6",
+    "normal": "0d108395ee1fe5aafe87301d485191c0849347bbc3720097744af363ab19b537",
+    "rejections": "e86e3459fde673072cec6ef321618a9a6220c2cb439f64926ac519a0fcb12185"
+  },
+  "files": {
+    "backend/app/agents/free_course_planning.py": "924991b75efb43b5f9ba33b7e1d7010c71f96abd65adf3efb0f0d22fa8dd1faf",
+    "backend/app/contracts/free_course.openapi.json": "e07e199b3bb668a91aa99336a53624ad44430d1e7c441223c30a1c365eff5841",
+    "backend/app/agents/free_course_planning.schema.json": "ac0f1954d1a1affd5ee31066520823657d808d75503f1cfbb432919e954579aa",
+    "backend/app/agents/head_course_planning_wire.py": "d494637d99e2d2a12e818087b379aa62049462f81a1711626bc46d1cdb4b77e7",
+    "backend/app/agents/head_course_planning_wire.schema.json": "5f3452267c50e1496a490a198cb56d1ba49c5e97c9380e78ada64a95a2d750dd",
+    "backend/app/agents/free_scene_generation.py": "4f0a59807d7ad53920c8541053448c835f28237292a581032d938690e93ff171",
+    "backend/app/agents/free_scene_generation.schema.json": "770731b9e93a3b22bf828579b14cceca0fbfc1d0f474965c3bc7301638a1fe2d",
+    "backend/app/services/free_course_planning.py": "88c64db8d2689808dffcbf55f2cd5a957be5a2a84ea7a60fa4e67a9a65291679",
+    "backend/app/services/free_course_recovery.py": "e6625781601b40c5ce9850b19b7f28f04c43e44b18d8d85f0b05b567eaa86c4c",
+    "backend/app/services/free_course_snapshots.py": "09852c19d2c45e8b40b70307deec4503239bad961e7dd03ad502938df19caf82",
+    "backend/app/services/free_scene_actions.py": "fced8a8e4a82d6539c3df4712ef1501bc6a2d4c66ed36f72cb78d93361b2660e",
+    "backend/app/services/free_scene_availability.py": "ee787ce6cb91c306204278ebff40d35306c08138f2390d39677e24c8294759bd",
+    "backend/app/services/free_scene_generation.py": "b32c4e1d0e7bdffdd6a157adde06040d61ff70213e026578a29b5e53c9498c1e",
+    "backend/app/services/free_scene_validation.py": "3aba51625ac5c5cfba0dbda0764efb41fab297276c47373b427c18a2a0c90606",
+    "backend/app/services/stack_course_materials.py": "72ec1bb3366ef377a0c3088cac112b39675deb51566ec338c11f27d9ec60638e",
+    "backend/app/services/stack_multiscene.py": "81164b977d1d0f1c06c736ce6ec495cfa633da5ddc938d98a883de7cbd1becef",
+    "backend/app/services/stack_multiscene_materials.py": "e6af60eb0978e3af6be63d68351b9dd36cff748dcb2e241b1a6b0bd2fb10abf3",
+    "docs/acceptance/phase-1.5-limited-c-preparation-t104/execute_once.py": "6c3672eefa35da22de1000611dead7e9e82503aa54add1c336dfb7a0234b02ea",
+    "scripts/course_trial_transport.py": "cc2102f297f14324945c95894c0fa57b0db3821dac01f18befb6300625878440",
+    "scripts/head_course_deepseek_wire.py": "90d005c0efd4e956499d05e08711f3f1393937a1d93607e4abeef26d8a85ad8a",
+    "scripts/head_course_goal.py": "38e2ca0522b24f0735b4fa258489ae67d0d8e8fdb8887ddafc9af6f58efd5d61",
+    "scripts/isolated_diagnostics/p15_pilot_wire.py": "7df1804195e7d20cb7fc2c4638257507210e8188ac4bcb28db68cc1d584d0dec",
+    "scripts/stack_multiscene_trial.py": "3e0de51b18e209a0acb0cecea4143aa476ded2d358a883b592e0f9bab4699309",
+    "web/src/api/freeCourses.ts": "d4058bef47b39d544a1b491a5ec8fab470de82f1a49222ea0f01b76da088c519",
+    "web/src/components/CoursePresentation.vue": "77914586e1c256661d6c65e703583dc98e01670d8b6c01e9c1bdf07aad6ba159",
+    "web/src/components/CourseWorkspace.vue": "261d42313f588a6a781e1a655e1dfcf1253718787f09ade2a55227a6fc133f20"
+  }
+}

@@ -110,6 +110,13 @@ export interface FixedCourseSource extends Omit<GenerationSource, "origin" | "ev
   evidence_kind: "actual_provider_response" | "evidence_bound_local_revision" | "offline_fixture"
   learner_case?: "array-first" | "operations-known"
 }
+export interface StackBoundariesSource extends Omit<FixedCourseSource, "origin"> {
+  origin: "stack_boundaries_model_generation"
+  scene_key: "normal" | "rejections"
+  review_sha256: string
+  source_request_sha256: string
+  source_response_sha256: string
+}
 export interface ArchivedResponseSource extends Omit<GenerationSource, "origin" | "model" | "evidence_kind"> {
   origin: "reviewed_archived_response_import"
   evidence_kind: "reviewed_archived_response_import"
@@ -119,7 +126,7 @@ export interface ArchivedResponseSource extends Omit<GenerationSource, "origin" 
   strict_wire_verdict: "AIAPI_ENVELOPE" | "HEAD_AIAPI_ENVELOPE"
   new_provider_calls: 0
 }
-export interface SceneProjection {course_id:string;course_version:number;scene_id:string;scene_version_id:string;blocks:SceneBlock[];actions:unknown[];replay_source?:ReplaySource | TrialReplaySource | BinaryFramesSource;generation_source?:GenerationSource | ArchivedResponseSource | FixedCourseSource}
+export interface SceneProjection {course_id:string;course_version:number;scene_id:string;scene_version_id:string;blocks:SceneBlock[];actions:unknown[];replay_source?:ReplaySource | TrialReplaySource | BinaryFramesSource;generation_source?:GenerationSource | ArchivedResponseSource | FixedCourseSource | StackBoundariesSource}
 export async function readScene(course: string, version: number, scene: string, signal?: AbortSignal): Promise<SceneProjection> {
   const value = await courseRequest<SceneProjection>(`${coursePath(course)}/versions/${version}/scenes/${encodeURIComponent(scene)}`,{signal});
   if (!value || value.course_id !== course || value.course_version !== version || value.scene_id !== scene || typeof value.scene_version_id !== 'string' || !Array.isArray(value.actions) || !Array.isArray(value.blocks) || !value.blocks.every(b => typeof b.anchor_id === 'string' && ['text','code','exercise','exercise_unavailable','visualization'].includes(b.kind))) throw new FreeCourseError(502,'INVALID_RESPONSE');

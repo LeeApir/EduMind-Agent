@@ -11,11 +11,15 @@ interface Action {type:'highlight_block'|'show_step'|'pause';anchor_id:string;st
 const index = ref(-1);const playing = ref(false);const reduced = ref(false);const frames = ref<Record<string,number>>({});const highlighted = ref('');
 let timer: ReturnType<typeof setTimeout>|undefined;let media: MediaQueryList|undefined;
 const visuals = computed(()=>props.scene.blocks.filter((b):b is Visual=>b.kind==='visualization'));
+const stackBoundaries = computed(() => {
+  const source = props.scene.generation_source;
+  return source?.origin === 'stack_boundaries_model_generation' ? source.scene_key : undefined;
+});
 const orderedCourse = computed(() => {
   const replay = props.scene.replay_source;
   const origin = props.scene.generation_source?.origin;
   if (origin === 'queue_fifo_model_generation') return 'queue';
-  if (origin === 'stack_lifo_model_generation' || (replay && 'topic' in replay && replay.topic === 'stack')) return 'stack';
+  if (stackBoundaries.value || origin === 'stack_lifo_model_generation' || (replay && 'topic' in replay && replay.topic === 'stack')) return 'stack';
   return undefined;
 });
 const searchCourse = computed(() => props.scene.generation_source?.origin === 'binary_search_model_generation' ||
@@ -50,7 +54,7 @@ function validVisual(block: Visual): boolean {
   const binarySearch = block.visualization_type === 'binary-search';
   if(!['array','linked_list','stack','queue','binary-search'].includes(block.visualization_type)||!Array.isArray(block.steps)||!block.steps.length||block.steps.length>50)return false;
   if (binarySearch !== searchCourse.value || (binarySearch && block.steps.length !== 6)) return false;
-  if(orderedCourse.value && (block.visualization_type!==orderedCourse.value||block.steps.length!==5))return false;
+  if(orderedCourse.value && (block.visualization_type!==orderedCourse.value||block.steps.length!==(stackBoundaries.value==='rejections'?9:5)))return false;
   return block.steps.every((s,i)=>{
     const f=orderedCourse.value==='queue'?s.queue_frame:s.stack_frame;
     if(orderedCourse.value){
@@ -279,7 +283,9 @@ onBeforeUnmount(()=>{stop();media?.removeEventListener('change',motionChanged);d
               </ol>
             </div>
             <div v-else-if="orderedFrame(block)">
-              <p>{{ orderedFrame(block)!.note }}</p>
+              <p v-if="orderedFrame(block)!.note">
+                {{ orderedFrame(block)!.note }}
+              </p>
               <p>本步{{ orderedCourse === 'queue' ? '出队' : '出栈' }}结果：{{ removedValue(orderedFrame(block)!) ?? '无' }}</p>
               <p v-if="!elements(block).length">
                 {{ orderedCourse === 'queue' ? '队列为空，没有队头或队尾。' : '栈为空，没有栈顶。' }}
