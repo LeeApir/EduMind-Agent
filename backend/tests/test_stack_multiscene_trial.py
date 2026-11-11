@@ -9,9 +9,11 @@ from uuid import UUID, uuid4
 import httpx
 import pytest
 from fastapi.testclient import TestClient
+from sqlalchemy import func, select
 from test_head_course_fixed import with_direct_echo
 
 from app.main import app
+from app.models.free_course_planning import FreeCoursePlanningResult
 from app.services import stack_multiscene as stack
 from app.services.free_course_snapshots import SnapshotError, SnapshotRepository, canonical
 from scripts import stack_multiscene_trial as trial
@@ -238,3 +240,91 @@ def test_stack_trial_stops_and_preserves_evidence(monkeypatch, tmp_path, failure
         assert trial.read(attempt)["request_sha256"] == trial.sha(calls[0])
     else:
         assert not attempt.exists()
+
+
+@pytest.mark.parametrize("finish", [True, False], ids=["two-scenes", "unreviewed-upstream"])
+def test_stack_trial_fixed_outline(monkeypatch, tmp_path, finish):
+    url = os.environ["EDUMIND_TEST_DATABASE_URL"]
+    monkeypatch.setenv("EDUMIND_DATABASE_URL", url)
+    monkeypatch.setenv("EDUMIND_PRODUCT_MODE", "dynamic")
+    calls = []
+
+    def mock(request):
+        stage = trial.FIXED_STAGES[len(calls)]
+        body = json.loads(request.content)
+        payload = json.loads(body["input"][1]["content"])
+        assert payload["plan_source"] == "fixed_outline"
+        assert payload["plan"]["id"] == checkpoint["plan_id"]
+        assert payload["plan"]["digest"] == checkpoint["plan_digest"]
+        assert payload["plan"]["candidate"] == stack.fixed_outline(payload["request"])
+        assert body["text"]["format"]["name"].endswith(stage)
+        if stage == "normal":
+            assert payload["upstream"] == []
+        else:
+            assert payload["upstream"] == [dict(scene_id=normal["scene_id"], **first_snapshot)]
+        calls.append(stage)
+        raw = with_direct_echo(body, envelope(output(stage, payload)))
+        return httpx.Response(200, stream=httpx.ByteStream(raw))
+
+    with TestClient(app, base_url="https://testserver") as client:
+        guest = client.post("/api/auth/guest").json()
+        owner = UUID(guest["user"]["id"])
+        run = trial.Trial(tmp_path / "fixed", url, transport=httpx.MockTransport(mock), fixed=True)
+        manifest = trial.manifest_sha(fixed=True)
+        with pytest.raises(SnapshotError, match="STACK_EXACT_AUTHORIZATION_REQUIRED"):
+            run.start(trial.approval_values(owner, manifest, fixture=True))
+        assert not run.vault.exists()
+        started = run.start(trial.approval_values(owner, manifest, fixture=True, fixed=True))
+        checkpoint = trial.read(run.vault / "plan.admitted.json")
+        assert checkpoint["version"] == 1
+        assert checkpoint["plan_source"] == "fixed_outline"
+        assert not calls and not (run.vault / "plan.attempt.json").exists()
+        root = f"/api/free-courses/{started['course_id']}"
+        v1 = client.get(f"{root}/versions/1")
+        assert v1.status_code == 200, v1.text
+        assert [s["scene_version_id"] for s in v1.json()["scenes"]] == [None, None]
+        with pytest.raises(SnapshotError, match="STACK_STAGE_NOT_AUTHORIZED"):
+            run.send("plan", key="fixture-secret")
+        d1 = run.send("normal", key="fixture-secret")
+        if not finish:
+            with pytest.raises(SnapshotError, match="STACK_STAGE_ORDER"):
+                run.send("rejections", key="fixture-secret")
+            assert calls == ["normal"] and (run.vault / "STOP").exists()
+            return
+
+        normal = run.review("normal", approval("normal", [d1]))
+
+        async def read_first(db):
+            assert await db.scalar(select(func.count()).select_from(
+                FreeCoursePlanningResult
+            ).where(FreeCoursePlanningResult.course_id == UUID(started["course_id"]))) == 0
+            return await SnapshotRepository(db, owner).get_scene_snapshot(
+                UUID(started["course_id"]), 2, UUID(normal["scene_id"]),
+            )
+
+        first_snapshot = run.db(read_first)
+        d2 = run.send("rejections", key="fixture-secret")
+        final = run.review("rejections", approval("rejections", [d1, d2]))
+        assert calls == ["normal", "rejections"]
+        assert final["version"] == 3 and (run.vault / "STOP").exists()
+        assert not (run.vault / "plan.attempt.json").exists()
+        for stage, saved, frames, questions in (
+            ("normal", normal, 5, 2), ("rejections", final, 9, 4),
+        ):
+            path = f"{root}/versions/3/scenes/{saved['scene_id']}"
+            response = client.get(path)
+            assert response.status_code == 200, response.text
+            scene = response.json()
+            assert scene["generation_source"]["batch"] == trial.basis.FIXED_BATCH
+            assert scene["generation_source"]["plan_source"] == "fixed_outline"
+            assert scene["generation_source"]["evidence_kind"] == "offline_fixture"
+            assert scene["scene_version_id"] == saved["scene_version_id"]
+            visual = next(b for b in scene["blocks"] if b["kind"] == "visualization")
+            exercise = next(b for b in scene["blocks"] if b["kind"] == "exercise")
+            assert (len(visual["steps"]), len(exercise["items"])) == (frames, questions)
+            assert "answer_key" not in response.text and '"solution"' not in response.text
+            assert client.get(path).json() == scene
+            if directory := os.getenv("EDUMIND_T139_PLAYER_PROJECTIONS"):
+                (Path(directory) / f"{stage}.json").write_text(
+                    json.dumps(scene, ensure_ascii=False)
+                )

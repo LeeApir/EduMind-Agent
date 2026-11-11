@@ -7285,6 +7285,39 @@
           "evidence": "docs/acceptance/phase-1.5-stack-boundaries-t138/RESULTS.md#t140-有限真实批次"
         }
       ]
+    },
+    {
+      "id": "PHASE-1.5-T141",
+      "phase": "Phase 1.5",
+      "title": "栈固定大纲双场景真实批次准备",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T139"
+      ],
+      "scope": [
+        "用程序按固定目标映射生成和校验大纲，保留 T140 失败与停止。",
+        "沿用现有场景流程准备 0 规划、2 场景正文、0 修订的准确包。"
+      ],
+      "prd_source": "PRD §0.5；T138／T139；用户本轮范围调整",
+      "acceptance_criteria": [
+        "固定大纲按原业务规划校验和版本机制持久化，来源明确为 fixed_outline。",
+        "正常场景独立审核后才发送第二场景，核对准确上游绑定及两场景私有投影。",
+        "本次真实 Provider 0，交付新批准确清单后等待授权。"
+      ],
+      "verification": [
+        "固定大纲事实／目标覆盖检查，受变更影响的隔离库及 MockTransport 验收。"
+      ],
+      "started_at": "2026-11-11T23:27:28+08:00",
+      "completed_at": "2026-11-11T23:35:57+08:00",
+      "commit_lookup": "Task-Completed: PHASE-1.5-T141",
+      "verification_results": [
+        {
+          "command": "pytest -k fixed_outline；隔离 PostgreSQL / 禁外网 MockTransport；Vitest 两项投影；vue-tsc、Ruff、清单和原件摘要",
+          "result": "1 项大纲核验、2 项隔离库和 2 项前端定向通过。Provider 0，真实批次未启动，旧证据保留。",
+          "evidence": "docs/acceptance/phase-1.5-stack-boundaries-t138/RESULTS.md#t141-程序固定大纲双场景准备"
+        }
+      ]
     }
   ],
   "planning_inputs": {

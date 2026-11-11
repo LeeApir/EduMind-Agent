@@ -6,6 +6,7 @@ from app.services import stack_course_materials as stack
 from app.services.free_course_snapshots import digest
 
 VERSION = "stack-boundaries-multiscene-v1"
+FIXED_BATCH = "stack-boundaries-fixed-outline-v1"
 NORMAL_GOAL = "追踪正常入栈和出栈，解释栈顶与后进先出"
 FULL_GOAL = "解释满栈为什么拒绝入栈"
 EMPTY_GOAL = "解释空栈为什么拒绝出栈，以及拒绝后哪些状态保持不变"

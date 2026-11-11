@@ -6206,15 +6206,19 @@
           "scene_key", "plan_source", "candidate_digest", "materials_digest", "plan_digest",
           "review_sha256", "source_request_sha256", "source_response_sha256"
         ],
+        "oneOf": [
+          {"properties": {"batch": {"const": "stack-boundaries-multiscene-v1"}, "plan_source": {"const": "model_planned"}}},
+          {"properties": {"batch": {"const": "stack-boundaries-fixed-outline-v1"}, "plan_source": {"const": "fixed_outline"}}}
+        ],
         "properties": {
           "origin": {"const": "stack_boundaries_model_generation"},
-          "batch": {"const": "stack-boundaries-multiscene-v1"},
+          "batch": {"enum": ["stack-boundaries-multiscene-v1", "stack-boundaries-fixed-outline-v1"]},
           "model": {"const": "deepseek-flash"},
           "prompt_version": {"const": "stack-boundaries-scene-v1"},
           "parent_digest": {"type": "null"},
           "evidence_kind": {"enum": ["actual_provider_response", "offline_fixture"]},
           "scene_key": {"enum": ["normal", "rejections"]},
-          "plan_source": {"const": "model_planned"},
+          "plan_source": {"enum": ["model_planned", "fixed_outline"]},
           "candidate_digest": {"$ref": "#/components/schemas/StackCourseSource/properties/candidate_digest"},
           "materials_digest": {"$ref": "#/components/schemas/StackCourseSource/properties/materials_digest"},
           "plan_digest": {"$ref": "#/components/schemas/StackCourseSource/properties/plan_digest"},

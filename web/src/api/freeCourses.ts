@@ -112,6 +112,7 @@ export interface FixedCourseSource extends Omit<GenerationSource, "origin" | "ev
 }
 export interface StackBoundariesSource extends Omit<FixedCourseSource, "origin"> {
   origin: "stack_boundaries_model_generation"
+  plan_source: "model_planned" | "fixed_outline"
   scene_key: "normal" | "rejections"
   review_sha256: string
   source_request_sha256: string

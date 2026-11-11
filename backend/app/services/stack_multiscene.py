@@ -81,6 +81,71 @@ def validate_plan(raw: Any, inputs: dict[str, Any]) -> dict[str, Any]:
     return value
 
 
+
+def fixed_outline(inputs: dict[str, Any]) -> dict[str, Any]:
+    """Derive the reviewed plan from the sole supported goal, without model output."""
+    snapshot = planning.snapshot_input(inputs)
+    source = snapshot["request_sources"].get("request_1")
+    if (
+        snapshot.get("stack_boundaries") != basis.FIXED_BATCH
+        or set(snapshot["request_sources"]) != {"request_1"}
+        or source != dict(request_id=snapshot["request_id"], version=1, text=basis.GOAL)
+        or snapshot["learner_evidence"]
+        or snapshot["profile_id"] is not None
+        or snapshot["profile_version"] is not None
+    ):
+        raise SnapshotError("STACK_FIXED_OUTLINE_SCOPE")
+    descriptions = {
+        "normal": (
+            "追踪从空栈执行 push(3)、push(8)、pop、push(5)，"
+            "用有效元素、栈顶和出栈值解释后进先出。",
+        ),
+        "rejections": (
+            "解释 count == CAP 时 push 在写入前返回 false，并核对有效元素和计数。",
+            "解释 count == 0 时 pop 在修改计数和写出参数前返回 false。"
+            "核对拒绝前后状态，区分保留的旧 value 和本步出栈值。",
+        ),
+    }
+    purposes = {
+        "normal": ("正常入栈与出栈", "用五帧追踪成功操作，练习区分出栈值与当前栈顶。"),
+        "rejections": ("满栈与空栈的拒绝", "用九帧对照两次守卫及返回值，练习判断拒绝后的状态。"),
+    }
+    objectives = []
+    scenes = []
+    for scene_key, excerpts in basis.SCENE_GOALS.items():
+        ids = []
+        for index, (excerpt, description) in enumerate(
+            zip(excerpts, descriptions[scene_key], strict=True), 1,
+        ):
+            objective_id = f"{scene_key}-{index}"
+            ids.append(objective_id)
+            objectives.append(dict(
+                id=objective_id, description=description, source="user_requirement",
+                source_key="request_1", source_excerpt=excerpt,
+            ))
+        title, purpose = purposes[scene_key]
+        scenes.append(dict(
+            scene_key=scene_key, title=title, purpose=purpose, forms=list(basis.FORMS),
+            objective_ids=ids, depends_on=[] if scene_key == "normal" else ["normal"],
+        ))
+    plan = dict(
+        title="固定容量数组栈：正常操作与拒绝边界",
+        shared_example=basis.VERSION, objectives=objectives, scenes=scenes,
+        terminology=[
+            dict(term="有效前缀", meaning="data 的前 count 个元素；count 是有效元素个数。"),
+            dict(term="栈顶", meaning="count 大于 0 时，栈顶为 data[count - 1]。空栈没有栈顶。"),
+            dict(term="后进先出", meaning="成功出栈取出当前栈顶元素。"),
+        ],
+        conventions=[
+            "CAP 为 3，演示使用有效指针，底层数组不扩容。",
+            "拒绝场景中，两次失败都保留有效元素、计数、底层槽位和调用者的旧 value。",
+            "底层残留值由 count 划定是否有效，旧 value 不代表本步有新的出栈值。",
+        ],
+    )
+    return validate_plan(dict(
+        needs_clarification=False, plan=plan, questions=[], reason=None, source_keys=[],
+    ), snapshot)["plan"]
+
 def scene_request(inputs: dict[str, Any]) -> StructuredRequest:
     snapshot = scenes.snapshot_input(inputs)
     validate_plan(
@@ -242,13 +307,19 @@ def wire_plan_response(raw: dict[str, Any], inputs: dict[str, Any]) -> dict[str,
 
 def bound_scene_request(inputs: dict[str, Any]) -> StructuredRequest:
     """Only the transaction-local lease is omitted from the outbound snapshot."""
-    if inputs["request"].get("stack_boundaries") != basis.VERSION:
+    batch = inputs["request"].get("stack_boundaries")
+    if batch not in (basis.VERSION, basis.FIXED_BATCH):
         raise SnapshotError("STACK_SCENE_SCOPE")
+    fixed = batch == basis.FIXED_BATCH
+    if fixed and inputs["plan"]["candidate"] != fixed_outline(inputs["request"]):
+        raise SnapshotError("STACK_FIXED_OUTLINE_BINDING")
     request = scene_request(inputs)
     system, user = request.prompt.messages
     payload = json.loads(user.content)
     payload.pop("lease_epoch")
     payload["wire_protocol"] = SCENE_WIRE
+    if fixed:
+        payload["plan_source"] = "fixed_outline"
     return replace(request, prompt=replace(
         request.prompt, messages=(system, ChatMessage("user", canonical(payload).decode())),
     ))
@@ -271,10 +342,10 @@ def checked_scene(value: dict[str, Any], inputs: dict[str, Any]) -> dict[str, An
             "parent_digest", "source_request_sha256", "source_response_sha256",
         }
         or source["origin"] != "stack_boundaries_model_generation"
-        or source["batch"] != basis.VERSION
+        or source["batch"] != inputs["request"]["stack_boundaries"]
         or source["model"] != "deepseek-flash"
         or source["prompt_version"] != SCENE_PROMPT
-        or source["plan_source"] != "model_planned"
+        or source["plan_source"] != payload.get("plan_source", "model_planned")
         or source["plan_digest"] != inputs["plan"]["digest"]
         or source["materials_digest"] != payload["materials_digest"]
         or source["scene_key"] != scene["scene_key"]

@@ -26,6 +26,7 @@ from app.services.free_course_snapshots import (
     canonical,
     digest,
 )
+from app.services.stack_multiscene_materials import FIXED_BATCH as STACK_FIXED_OUTLINE
 from app.services.stack_multiscene_materials import VERSION as STACK_BOUNDARIES
 
 
@@ -85,8 +86,9 @@ async def load_inputs(
         from app.services.head_course_materials import support_for_goal
 
         capability = dict(head_support=support_for_goal(course["original_goal"]))
-    if current["nonsecret_config_snapshot"].get("prompt_version") == STACK_BOUNDARIES:
-        capability = dict(stack_boundaries=STACK_BOUNDARIES)
+    prompt_version = current["nonsecret_config_snapshot"].get("prompt_version")
+    if prompt_version in (STACK_BOUNDARIES, STACK_FIXED_OUTLINE):
+        capability = dict(stack_boundaries=prompt_version)
     return snapshot_input(
         dict(
             course_id=str(course_id),
@@ -121,6 +123,8 @@ async def persist_outcome(
     identity = digest("planning-input", snapshot=snapshot)
     schema_version = SCHEMA_VERSION
     validate = validate_response
+    if snapshot.get("stack_boundaries") == STACK_FIXED_OUTLINE:
+        raise SnapshotError("STACK_FIXED_OUTLINE_NO_MODEL_PLAN")
     if "stack_boundaries" in snapshot:
         from app.services import stack_multiscene as stack
 

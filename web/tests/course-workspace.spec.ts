@@ -94,6 +94,9 @@ if (stackProjections) {
     try {
       await flushPromises();
       expect(first.text()).toContain('步骤 1 / 5');
+      expect(first.text()).toContain(
+        normal.generation_source?.plan_source === 'fixed_outline' ? '程序固定大纲' : '模型规划',
+      );
       expect(first.text()).toContain('练习代码（practice-code）');
       await first.get('nav button:nth-child(2)').trigger('click');
       await flushPromises();

@@ -730,7 +730,9 @@ def serve(
         from app.core.database import get_database_url
         from scripts.stack_multiscene_trial import require_database
 
-        require_database(get_database_url(), fixture=False)
+        require_database(
+            get_database_url(), fixture=False, fixed=stack_boundaries == "fixed_outline",
+        )
     elif live_reuse:
         from app.services.course_trial_publication import LIVE_REUSE, require_database
 

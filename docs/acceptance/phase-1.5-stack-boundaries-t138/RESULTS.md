@@ -132,3 +132,32 @@ pnpm --dir web typecheck
 | 停止与课程 | `plan.failure.json` 和 `STOP` 存在，`ACTIVE` 已清除。使用既有恢复服务将隔离库内唯一操作从 `cancel_requested` 收尾至 `cancelled`。私有 API 读回 HTTP 200、`head=null`；两个场景均无发送预约，未产生课程版本或学习入口，实际浏览器验收未运行。 |
 
 本批结束，T140 记为 blocked。冻结请求、原件与失败证据保留。
+
+## T141 程序固定大纲双场景准备
+
+本轮范围调整为**程序固定大纲＋两场景模型正文**，验证给定教学顺序下的正文、真实上游衔接和完整课程。结果不纳入模型规划能力。T140 仍为 blocked。已核对旧清单、请求和响应原件摘要以及 STOP，旧失败规划未修补、未导入。
+
+[固定大纲](fixed-outline.json)由 T138 三条目标映射生成。材料 ID 继续使用 `stack-boundaries-multiscene-v1`，场景键为 `normal`、`rejections`，后者依赖前者。每条目标引用实际 `request_1` 原文。程序通过现有规划业务校验、`store_plan` 和 `commit_outline` 保存私有大纲 v1，并登记 `fixed_outline` 来源；启动时生成的大纲须和冻结字节一致。
+
+[大纲事实核对](fixed-outline-review.json)只覆盖目标与程序材料。正常五帧核对成功出栈得到 8、随后栈顶变为 5，拒绝九帧核对 `size_t count`、`data[CAP]`、两处提前返回与原状态。f4、f8 各自返回 `false`，调用者的 `value` 分别保留 `-99`、`3`，两帧均无本步出栈值。两道正常练习和四道边界练习沿用程序答案。离线正文和审核夹具仅用于验证接线。
+
+| 准入顺序 | 绑定与验收 |
+| --- | --- |
+| v1 固定大纲 | 从实际原目标生成，与冻结大纲及事实核对摘要绑定。此时两个场景均无可学正文。 |
+| v2 正常场景 | 发送一次 `normal` 正文，独立审核五帧、两题、LIFO 解释及事实引用后准入。 |
+| v3 双场景课程 | 从同一课程 v2 读取已审核的正常场景完整私有快照，核对场景版本、内容和候选摘要后发送一次 `rejections`。整课审核覆盖正常场景与拒绝场景衔接、两次拒绝和六题解析。通过后验收 v3 阅读、十四帧高亮、播放、作答反馈、答案隔离和刷新。 |
+
+[新批执行清单](fixed-execution-manifest.json) SHA-256 为 `6b2cbcdd918acf034efdac7569d0b2caad433f5be95c1363406d81118f56676a`。拟使用新 30 分钟窗口，**0 次规划、2 次场景正文、0 次修订**。沿用 DeepSeek Responses `deepseek-flash`、闭合场景 Schema、每次 8000 输出 token 上限和 90 秒 I/O 超时。请求包含同版代码、轨迹、事实及私有练习材料，第二次还包含已审核正常场景的完整快照。预览内的示例 UUID 和正文夹具用于复现字节构造；真实请求的 ID 和上游快照在运行时绑定。
+
+```sh
+export PYTHONPATH=backend:.
+pack=docs/acceptance/phase-1.5-stack-boundaries-t138
+backend/.venv/bin/python -m scripts.stack_multiscene_trial --fixed-outline preview normal "$pack/fixed-normal-input.fixture.json"
+backend/.venv/bin/python -m scripts.stack_multiscene_trial --fixed-outline preview rejections "$pack/fixed-rejections-input.fixture.json"
+```
+
+获准后仍用上述模块及 `--fixed-outline`，依次运行 `start APPROVAL.json`、`send normal`、`inspect normal`、`review normal REVIEW.json`，再对 `rejections` 执行发送、检查和整课审核。实际环境使用专用库 `edumind_catalog_p15_t141`、新私有目录 `~/.local/share/edumind/stack-boundaries-fixed-outline-v1/` 和既有本机隔离服务 `serve(..., stack_boundaries="fixed_outline")`。旧批准和旧余额均不适用。失败或结果未知即封存停止，无重试；本批 C2、实际费用未知和停止后可能继续计费等边界按新清单另获接受。
+
+**定向验证**。固定大纲目标、事实和错大纲拒绝 1 项通过。隔离 PostgreSQL 加禁外网 MockTransport 2 项通过，验证 v1 无正文、无模型规划记录、禁发规划、旧批准拒绝、未审核上游阻断、成功时恰好两次模拟正文且第二次读取真实保存的 v2 快照。同版私有 API 投影为 5＋9 帧与 2＋4 题，来源为 `fixed_outline` 和 `offline_fixture`。从实际隔离投影运行的前端 2 项通过，核对高亮、来源标签、场景切换和刷新；TypeScript、Ruff、任务账本及 Git 检查通过。三份旧请求预览摘要也仍与旧清单一致。
+
+本准备任务实际 Provider 调用 **0 次**，新真实窗口和原件目录尚未建立。真实正文、独立教学审核及浏览器学习验收留待本批授权后执行，结果继续写入本记录。

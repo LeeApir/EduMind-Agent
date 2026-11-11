@@ -34,9 +34,12 @@ from scripts.head_course_goal import raw_io
 
 ROOT = Path(__file__).resolve().parents[1]
 PACK = ROOT / "docs/acceptance/phase-1.5-stack-boundaries-t138"
-VAULT = Path.home() / ".local/share/edumind/stack-boundaries-multiscene-v1"
+VAULT = Path.home() / ".local/share/edumind" / basis.VERSION
+FIXED_VAULT = VAULT.with_name(basis.FIXED_BATCH)
 DATABASE = "edumind_catalog_p15_t139"
-STAGES = ("plan", "normal", "rejections")
+FIXED_DATABASE = "edumind_catalog_p15_t141"
+FIXED_STAGES = ("normal", "rejections")
+STAGES = ("plan", *FIXED_STAGES)
 WINDOW = 1800
 CHECKS = {
     "plan": ["goal_sources", "scene_allocation", "normal_before_rejections", "grounded_plan"],
@@ -61,8 +64,8 @@ def save(vault, name, value):
     raw_io.exclusive(vault / name, canonical(value))
 
 
-def manifest_sha():
-    path = PACK / "execution-manifest.json"
+def manifest_sha(*, fixed=False):
+    path = PACK / ("fixed-execution-manifest.json" if fixed else "execution-manifest.json")
     manifest = read(path)
     if any(sha((ROOT / name).read_bytes()) != expected
            for name, expected in manifest["files"].items()):
@@ -72,19 +75,22 @@ def manifest_sha():
     return sha(path.read_bytes())
 
 
-def approval_values(owner, manifest, *, fixture=False):
+def approval_values(owner, manifest, *, fixture=False, fixed=False):
     return dict(
-        batch=basis.VERSION, owner=str(owner), manifest_sha256=manifest,
+        batch=basis.FIXED_BATCH if fixed else basis.VERSION,
+        owner=str(owner), manifest_sha256=manifest,
         mode="offline_fixture" if fixture else "actual_provider_response",
         approved=True, accept_batch_c2=not fixture, window_seconds=WINDOW,
-        stage_budgets={stage: 1 for stage in STAGES}, revision_budget=0,
+        stage_budgets={stage: int(stage != "plan" or not fixed) for stage in STAGES},
+        revision_budget=0,
     )
 
 
-def require_database(url, *, fixture):
+def require_database(url, *, fixture, fixed=False):
     parsed = make_url(url)
+    database = FIXED_DATABASE if fixed else DATABASE
     if (parsed.drivername, parsed.host, parsed.port, parsed.database) != (
-        "postgresql+asyncpg", "127.0.0.1", 15437, DATABASE + ("_test" if fixture else ""),
+        "postgresql+asyncpg", "127.0.0.1", 15437, database + ("_test" if fixture else ""),
     ):
         raise SnapshotError("STACK_DEVELOPMENT_DATABASE_REQUIRED")
 
@@ -112,14 +118,25 @@ def body_for(stage, inputs):
 
 
 class Trial:
-    def __init__(self, vault, url, *, transport=None):
+    def __init__(self, vault, url, *, transport=None, fixed=False):
         if transport is not None and not isinstance(transport, httpx.MockTransport):
             raise SnapshotError("STACK_OFFLINE_TRANSPORT_REQUIRED")
         self.fixture = transport is not None
-        require_database(url, fixture=self.fixture)
-        if not self.fixture and vault != VAULT:
+        require_database(url, fixture=self.fixture, fixed=fixed)
+        if not self.fixture and vault != (FIXED_VAULT if fixed else VAULT):
             raise SnapshotError("STACK_VAULT_REQUIRED")
+        self.fixed = fixed
+        self.batch = basis.FIXED_BATCH if fixed else basis.VERSION
+        self.plan_source = "fixed_outline" if fixed else "model_planned"
+        self.policy_snapshot = {"finite_stack_foreground": True}
+        if fixed:
+            self.policy_snapshot["plan_source"] = self.plan_source
+        self.stages = FIXED_STAGES if fixed else STAGES
         self.vault, self.url, self.transport = vault, url, transport
+
+    def require_stage(self, stage):
+        if stage not in self.stages:
+            raise SnapshotError("STACK_STAGE_NOT_AUTHORIZED")
 
     def db(self, action):
         async def run():
@@ -134,7 +151,9 @@ class Trial:
 
     def approval(self, value):
         owner = UUID(value["owner"])
-        if value != approval_values(owner, manifest_sha(), fixture=self.fixture):
+        if value != approval_values(
+            owner, manifest_sha(fixed=self.fixed), fixture=self.fixture, fixed=self.fixed,
+        ):
             raise SnapshotError("STACK_EXACT_AUTHORIZATION_REQUIRED")
         return owner
 
@@ -148,22 +167,55 @@ class Trial:
                 raise SnapshotError("STACK_GUEST_REQUIRED")
             repo = SnapshotRepository(db, owner)
             created = await repo.create_course(
-                basis.GOAL, key=basis.VERSION, operation_window_seconds=WINDOW,
-                config=dict(prompt_version=basis.VERSION, policy_version=basis.VERSION),
-                policy_snapshot=dict(finite_stack_foreground=True),
+                basis.GOAL, key=self.batch, operation_window_seconds=WINDOW,
+                config=dict(prompt_version=self.batch, policy_version=self.batch),
+                policy_snapshot=self.policy_snapshot,
             )
-            op = await repo._operation(UUID(created["course_id"]), UUID(created["operation_id"]))
+            cid, oid = UUID(created["course_id"]), UUID(created["operation_id"])
+            outline = await self.store_fixed_outline(db, repo, cid, oid) if self.fixed else None
+            op = await repo._operation(cid, oid)
             return dict(**created, starts_at=op.created_at.isoformat(),
-                        expires_at=op.deadline_at.isoformat())
+                        expires_at=op.deadline_at.isoformat()), outline
 
         try:
-            created = self.db(prepare)
+            created, outline = self.db(prepare)
             save(self.vault, "run.json", dict(approval=approval, **created))
+            if outline is not None:
+                save(self.vault, "plan.admitted.json", outline)
             raw_io.exclusive(self.vault / "raw.key", Fernet.generate_key())
             return created
         except BaseException:
             self.halt()
             raise
+
+    async def store_fixed_outline(self, db, repo, cid, oid):
+        inputs = await plans.load_inputs(db, repo.owner, cid, oid)
+        candidate = stack.fixed_outline(inputs)
+        outline_bytes = (PACK / "fixed-outline.json").read_bytes()
+        audit = read(PACK / "fixed-outline-review.json")
+        if (
+            canonical(candidate) != outline_bytes
+            or audit["outline_sha256"] != sha(outline_bytes)
+            or audit["materials_digest"] != basis.materials()["materials_digest"]
+            or audit["verdict"] != "pass"
+        ):
+            raise SnapshotError("STACK_FIXED_OUTLINE_BINDING")
+        fence = await repo.acquire_write_fence(cid, oid)
+        plan = await repo.store_plan(
+            cid, fence, expected_head=None, key=self.batch + "-plan", candidate=candidate,
+        )
+        pid = UUID(plan["plan_id"])
+        ready = await availability.commit_outline(
+            db, repo.owner, cid, fence, plan_id=pid, key=self.batch + "-outline",
+        )
+        op = await repo._fence(cid, fence)
+        op.lease_token = op.lease_expires_at = None
+        return dict(
+            **ready, plan_id=str(pid), plan_digest=(await repo.get_plan(cid, pid))["digest"],
+            plan_source=self.plan_source,
+            outline_sha256=audit["outline_sha256"],
+            outline_review_sha256=sha((PACK / "fixed-outline-review.json").read_bytes()),
+        )
 
     def context(self):
         if self.vault.is_symlink() or self.vault.stat().st_mode & 0o077:
@@ -176,6 +228,7 @@ class Trial:
             raise SnapshotError("STACK_BATCH_STOPPED")
 
     async def inputs(self, db, stage, *, minimum=0):
+        self.require_stage(stage)
         self.active()
         owner, cid, oid = self.context()
         repo = SnapshotRepository(db, owner)
@@ -190,8 +243,8 @@ class Trial:
             or op.deadline_at - op.created_at != timedelta(seconds=WINDOW)
             or not op.created_at <= now < op.deadline_at
             or op.deadline_at - now < timedelta(seconds=minimum)
-            or op.config_snapshot.get("policy_version") != basis.VERSION
-            or op.policy_snapshot != {"finite_stack_foreground": True}
+            or op.config_snapshot.get("policy_version") != self.batch
+            or op.policy_snapshot != self.policy_snapshot
         ):
             raise SnapshotError("STACK_WINDOW_OR_OPERATION")
         course = await repo.get_course(cid)
@@ -202,7 +255,15 @@ class Trial:
             return await plans.load_inputs(db, owner, cid, oid)
         approved = read(self.vault / "plan.admitted.json")
         plan = await repo.get_plan(cid, UUID(approved["plan_id"]))
-        if plan["digest"] != approved["plan_digest"]:
+        if plan["digest"] != approved["plan_digest"] or (
+            self.fixed and (
+                approved["plan_source"] != self.plan_source
+                or approved["outline_sha256"] != sha(canonical(plan["candidate"]))
+                or approved["outline_review_sha256"] != sha(
+                    (PACK / "fixed-outline-review.json").read_bytes()
+                )
+            )
+        ):
             raise SnapshotError("STACK_PLAN_BINDING")
         selected = next(s for s in plan["scenes"] if s["scene_key"] == stage)
         data = await scenes.load_inputs(
@@ -212,10 +273,12 @@ class Trial:
         if stage == "rejections":
             prior = read(self.vault / "normal.admitted.json")
             upstream, = data["upstream"]
+            source = upstream["content"]["generation_source"]
             if (
                 (upstream["scene_version_id"], upstream["digest"])
                 != (prior["scene_version_id"], prior["scene_digest"])
-                or upstream["content"]["generation_source"]["candidate_digest"] != prior["candidate_digest"]
+                or source["candidate_digest"] != prior["candidate_digest"]
+                or (source["batch"], source["plan_source"]) != (self.batch, self.plan_source)
             ):
                 raise SnapshotError("STACK_UPSTREAM_BINDING")
         return data
@@ -234,7 +297,7 @@ class Trial:
         async def cancel():
             engine = create_database_engine(self.url)
             try:
-                await Recovery(async_sessionmaker(engine)).cancel(owner, cid, oid, key=basis.VERSION)
+                await Recovery(async_sessionmaker(engine)).cancel(owner, cid, oid, key=self.batch)
             finally:
                 await engine.dispose()
         asyncio.run(cancel())
@@ -262,9 +325,12 @@ class Trial:
                 for row in inputs["upstream"]
             ]) if stage != "plan" else {}),
         )
+        if self.fixed:
+            record["plan_source"] = self.plan_source
         return dict(**record, candidate_digest=digest("stack-boundaries-candidate", record=record))
 
     def send(self, stage, *, key=None):
+        self.require_stage(stage)
         self.active()
         if (self.vault / f"{stage}.attempt.json").exists():
             raise SnapshotError("STACK_STAGE_ALREADY_SENT")
@@ -326,6 +392,7 @@ class Trial:
             ))
 
     def review(self, stage, review):
+        self.require_stage(stage)
         self.active()
         if (self.vault / f"{stage}.admitted.json").exists():
             raise SnapshotError("STACK_ALREADY_ADMITTED")
@@ -404,8 +471,9 @@ class Trial:
             ready.update(plan_id=str(pid), plan_digest=(await repo.get_plan(cid, pid))["digest"])
         else:
             source = dict(
-                origin="stack_boundaries_model_generation", batch=basis.VERSION,
-                model="deepseek-flash", prompt_version=stack.SCENE_PROMPT, plan_source="model_planned",
+                origin="stack_boundaries_model_generation", batch=self.batch,
+                model="deepseek-flash", prompt_version=stack.SCENE_PROMPT,
+                plan_source=self.plan_source,
                 plan_digest=candidate["plan_digest"], materials_digest=candidate["materials_digest"],
                 candidate_digest=candidate["candidate_digest"], review_sha256=sha(canonical(review)),
                 evidence_kind=candidate["evidence_kind"], scene_key=stage, parent_digest=None,
@@ -440,23 +508,29 @@ class Trial:
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("action", choices=("preview", "start", "send", "inspect", "review", "stop"))
+    parser.add_argument("--fixed-outline", action="store_true")
     parser.add_argument("value", nargs="?")
     parser.add_argument("path", nargs="?", type=Path)
     args = parser.parse_args()
+    stages = FIXED_STAGES if args.fixed_outline else STAGES
     try:
         if args.action == "preview":
-            if args.value not in STAGES or args.path is None:
-                parser.error("preview requires stage and input snapshot")
-            value = body_for(args.value, read(args.path))
+            if args.value not in stages or args.path is None:
+                parser.error("preview requires an authorized stage and input snapshot")
+            inputs = read(args.path)
+            if args.fixed_outline and inputs["request"].get("stack_boundaries") != basis.FIXED_BATCH:
+                raise SnapshotError("STACK_FIXED_OUTLINE_BINDING")
+            value = body_for(args.value, inputs)
         else:
-            trial = Trial(VAULT, os.environ["EDUMIND_DATABASE_URL"])
+            vault = FIXED_VAULT if args.fixed_outline else VAULT
+            trial = Trial(vault, os.environ["EDUMIND_DATABASE_URL"], fixed=args.fixed_outline)
             if args.action == "start":
                 value = trial.start(read(Path(args.value)))
             elif args.action == "stop":
                 value = trial.stop()
             else:
-                if args.value not in STAGES:
-                    parser.error("send/inspect/review requires plan, normal or rejections")
+                if args.value not in stages:
+                    parser.error("send/inspect/review requires an authorized stage")
                 if args.action == "send":
                     value = trial.send(args.value)
                 elif args.action == "inspect":

@@ -158,3 +158,37 @@ def test_exact_plan_request_and_scene_bindings():
     visual = next(block for block in blocks if block["kind"] == "visualization")
     assert "满栈拒绝 · 返回 false · count=3，value=-99" in visual["steps"][4]["caption"]
     assert "空栈拒绝 · 返回 false · count=0，value=3" in visual["steps"][8]["caption"]
+
+
+def test_fixed_outline_covers_exact_goals_and_reviewed_materials():
+    inputs = dict(PLANNING_INPUT, stack_boundaries=basis.FIXED_BATCH)
+    plan = course.fixed_outline(inputs)
+    objective_map = {o["id"]: o for o in plan["objectives"]}
+    assert [
+        (s["scene_key"], [objective_map[k]["source_excerpt"] for k in s["objective_ids"]],
+         s["depends_on"])
+        for s in plan["scenes"]
+    ] == [
+        ("normal", ["追踪正常入栈和出栈，解释栈顶与后进先出"], []),
+        (
+            "rejections",
+            ["解释满栈为什么拒绝入栈", "解释空栈为什么拒绝出栈，以及拒绝后哪些状态保持不变"],
+            ["normal"],
+        ),
+    ]
+    assert plan["shared_example"] == basis.VERSION
+    assert {o["source_key"] for o in plan["objectives"]} == {"request_1"}
+    data = basis.materials()
+    normal, rejections = [data["scenes"][s["scene_key"]] for s in plan["scenes"]]
+    assert (data["capacity"], len(normal["frames"]), len(rejections["frames"])) == (3, 5, 9)
+    assert [f["popped"] for f in normal["frames"]] == [None, None, None, 8, None]
+    assert "int data[CAP]; size_t count;" in rejections["source"]
+    for index, condition in ((4, "s->count == CAP"), (8, "s->count == 0")):
+        prev, refused = rejections["frames"][index - 1:index + 1]
+        assert f"if ({condition}) return false;" in rejections["source"]
+        assert refused["success"] is False and refused["popped"] is None
+        assert all(refused[key] == prev[key] for key in ("values", "count", "storage", "output"))
+    fake = scene_input(example_plan(), "s1", [])
+    fake["request"] = inputs
+    with pytest.raises(SnapshotError, match="STACK_FIXED_OUTLINE_BINDING"):
+        course.bound_scene_request(fake)
