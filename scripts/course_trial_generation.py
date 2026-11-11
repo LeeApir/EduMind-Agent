@@ -102,7 +102,7 @@ def approval_values(profile=STACK, *, fixture=False):
             explicit_user_authorization=not fixture,
             offline_fixture=fixture,
         )
-    if profile is publication.BINARY_SEARCH_FRAMES:
+    if profile is publication.BINARY_SEARCH_FRAMES or profile.learner_case is not None:
         approval.update(
             request_sha256=sha(canonical(profile.request())),
             stage_budgets=dict(plan=0, generate=1, revise=0),
@@ -139,7 +139,7 @@ def check_live_context(ctx, profile, *, minimum=0):
             raise profile.error("LIVE_WINDOW_OR_BINDING")
 
 
-async def prepare(vault, owner, approval, *, fixture=False, profile=STACK):
+async def prepare(vault, owner, approval, *, fixture=False, profile=STACK, profile_id=None):
     binding = None
     if profile.live_reuse:
         if fixture:
@@ -154,7 +154,7 @@ async def prepare(vault, owner, approval, *, fixture=False, profile=STACK):
     try:
         ctx = await database(
             lambda db: publication.prepare(
-                db, owner, fixture=fixture, profile=profile, live_run=binding,
+                db, owner, fixture=fixture, profile=profile, live_run=binding, profile_id=profile_id,
             ),
             fixture=fixture,
             profile=profile,
@@ -335,6 +335,8 @@ def revision_source(vault, profile):
 
 
 def check_stage(stage, profile, fixture):
+    if profile.learner_case is not None and stage != "generate":
+        raise profile.error("STAGE_REQUIRED")
     if profile.live_reuse and fixture:
         raise profile.error("LIVE_FIXTURE_FORBIDDEN")
     if stage == "revise":

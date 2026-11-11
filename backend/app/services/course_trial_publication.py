@@ -19,6 +19,7 @@ from app.services import (
     queue_course_materials,
     queue_course_revision,
     stack_course_materials,
+    stack_course_profile_pair,
 )
 from app.services import (
     course_trial_revision as revision,
@@ -43,9 +44,12 @@ class FixedCourse:
     new_batch: bool = False
     offline_only: bool = False
     live_reuse: bool = False
+    learner_case: str | None = None
 
     @property
     def batch(self) -> str:
+        if self.learner_case is not None:
+            return f"stack-profile-{self.learner_case}-r01"
         if self.offline_only:
             return f"{self.topic}-revision-fixture-r01"
         if self.live_reuse:
@@ -62,6 +66,8 @@ class FixedCourse:
 
     @property
     def prompt_version(self) -> str:
+        if self.learner_case is not None:
+            return stack_course_profile_pair.VERSION
         return head_course_materials.FIXED_VERSION if self.model_planned else self.materials.VERSION
 
     @property
@@ -69,6 +75,16 @@ class FixedCourse:
         return "head-empty-course-trial-v1" if self.model_planned else self.materials.VERSION
 
     def request(self, ctx=None):
+        if self.learner_case is not None:
+            evidence = stack_course_profile_pair.evidence(self.learner_case)
+            if ctx is not None and (
+                ctx.get("learner_case") != self.learner_case
+                or ctx.get("learner_evidence") != evidence
+                or ctx.get("profile_version") != 1
+                or not ctx.get("profile_id")
+            ):
+                raise self.error("PROFILE_BINDING")
+            return stack_course_profile_pair.request(self.learner_case)
         if self.model_planned:
             return self.materials.body(ctx["head_payload"], stem_prompt_version=STEM_PROMPT_VERSION)
         if self.new_batch:
@@ -143,6 +159,18 @@ BINARY_SEARCH_FRAMES = FixedCourse(
     "accept_T130_scope_and_batch_C2",
     BINARY_SEARCH.checks | {"lesson_prose_matches_program_iterations"},
 )
+STACK_PROFILE_CASES = {
+    case: replace(
+        STACK,
+        database="edumind_catalog_p15_t132_stack_profiles",
+        package=f"phase-1.5-stack-profile-pair-t132/{case}",
+        approval_key="accept_T132_fixture_scope",
+        checks=STACK.checks | {"learner_evidence_respected", "teaching_depth_matches_profile"},
+        offline_only=True,
+        learner_case=case,
+    )
+    for case in stack_course_profile_pair.CASES
+}
 PROFILES = {
     profile.materials.VERSION: profile
     for profile in (
@@ -220,17 +248,20 @@ def check_bind(db: AsyncSession, *, fixture: bool, profile: FixedCourse) -> None
 
 async def prepare(
     db: AsyncSession, owner: UUID, *, fixture: bool = False, profile: FixedCourse = STACK,
-    live_run: dict | None = None,
+    live_run: dict | None = None, profile_id: UUID | None = None,
 ) -> dict[str, Any]:
     from app.services.free_scene_availability import commit_outline
 
     check_bind(db, fixture=fixture, profile=profile)
     if profile.live_reuse != (live_run is not None):
         raise profile.error("LIVE_AUTHORIZATION_REQUIRED")
+    if (profile.learner_case is None) != (profile_id is None):
+        raise profile.error("PROFILE_BINDING")
     repo = SnapshotRepository(db, owner)
     created = await repo.create_course(
         profile.goal,
         key=profile.batch,
+        profile_id=profile_id,
         config={
             "prompt_version": profile.prompt_version,
             "policy_version": profile.batch,
@@ -330,6 +361,15 @@ async def context(
     )
     if inputs["plan"]["candidate"] != profile.materials.outline():
         raise profile.error("PLAN_BINDING")
+    if profile.learner_case is not None:
+        request = inputs["request"]
+        common.update(
+            learner_case=profile.learner_case,
+            learner_evidence=request["learner_evidence"],
+            profile_id=request["profile_id"],
+            profile_version=request["profile_version"],
+        )
+        profile.request(common)
     if profile in (QUEUE_REVISION, BINARY_SEARCH_REVISION) and not fixture:
         if profile is QUEUE_REVISION:
             parent, _, _ = queue_course_revision.sealed_parent()
@@ -380,8 +420,8 @@ def candidate(
     elif profile is BINARY_SEARCH_REVISION:
         binary_search_course_revision.validate_immutable(output)
         data["source_response_sha256"] = binary_search_course_revision.SOURCE_RESPONSE
-    elif profile is BINARY_SEARCH_FRAMES:
-        if receipt.get("request_sha256") != revision.checksum(profile.request()):
+    elif profile is BINARY_SEARCH_FRAMES or profile.learner_case is not None:
+        if receipt.get("request_sha256") != revision.checksum(profile.request(ctx)):
             raise profile.error("REQUEST_BINDING")
     return {**data, "candidate_digest": digest(f"{profile.topic}-course-candidate", data=data)}
 
@@ -401,7 +441,10 @@ def assembly(
         or (not profile.model_planned and checks != dict.fromkeys(profile.checks, True))
         or any(type(v) is not bool for v in checks.values())
         or (
-            (profile.live_reuse or profile is BINARY_SEARCH_FRAMES or "revision" in c)
+            (
+                profile.live_reuse or profile is BINARY_SEARCH_FRAMES
+                or profile.learner_case is not None or "revision" in c
+            )
             and (review.get("parent_digest") != c.get("parent_digest")
                  or review.get("full_lesson_reviewed") is not True)
         )
@@ -561,6 +604,8 @@ async def publish(db, c, review, *, profile: FixedCourse = STACK) -> dict[str, A
     from app.services.free_scene_generation import load_inputs
     from app.services.free_scene_validation import validate_candidate
 
+    if profile.learner_case is not None:
+        raise profile.error("PROFILE_PREPARATION_ONLY")
     ctx = c["context"]
     owner, cid, oid, pid, sid = (
         UUID(ctx[k])

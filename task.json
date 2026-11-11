@@ -6965,6 +6965,46 @@
           "evidence": "docs/acceptance/phase-1.5-binary-search-program-frames-t130/browser-verification.json"
         }
       ]
+    },
+    {
+      "id": "PHASE-1.5-T132",
+      "phase": "Phase 1.5",
+      "title": "固定栈课程最小画像对照准备",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T123",
+        "PHASE-1.5-T125"
+      ],
+      "scope": [
+        "限定一对合成画像与同一栈目标、提纲、代码及程序材料。",
+        "复用画像快照、规划输入与共用课程入口，验证画像到实际请求、候选和全文审核绑定。"
+      ],
+      "prd_source": "PRD §0.5；T123 M06；用户限定零调用准备",
+      "acceptance_criteria": [
+        "两份准确测试画像和请求可复现，未提供字段不推断。",
+        "同一程序材料绑定两份候选，拒绝错画像、错请求和交叉审核。",
+        "冻结可核查的教学差异并交回统一记录；真实预算和课程交付另行决定。"
+      ],
+      "verification": [
+        "实际 MockTransport 请求捕获、隔离 PostgreSQL 快照与严格回放。",
+        "精确输入和请求摘要、审核反例及现有栈请求兼容检查。"
+      ],
+      "started_at": "2026-11-11T14:37:42+08:00",
+      "completed_at": "2026-11-11T14:42:49+08:00",
+      "commit_lookup": "Task-Completed: PHASE-1.5-T132",
+      "verification_results": [
+        {
+          "command": "隔离 PostgreSQL 与禁外网 pytest -q backend/tests/test_stack_course_profile_pair.py",
+          "result": "2 passed，0 skipped。两份实际 MockTransport 请求仅画像不同，错画像、错请求和交叉审核均拒；真实发送与准入关闭。",
+          "evidence": "docs/acceptance/phase-1.5-stack-profile-pair-t132/RESULTS.md"
+        },
+        {
+          "command": "Ruff、check_catalog_workflow.py、git diff --check",
+          "result": "通过。旧栈请求字节一致；真实 Provider 0，实际教学差异尚待批准验证。",
+          "evidence": "docs/acceptance/phase-1.5-stack-profile-pair-t132/RESULTS.md"
+        }
+      ]
     }
   ],
   "planning_inputs": {
