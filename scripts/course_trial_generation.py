@@ -18,6 +18,7 @@ from app.services.free_course_snapshots import canonical, digest
 from cryptography.fernet import Fernet
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from scripts import course_trial_live as live
 from scripts import course_trial_transport as transport_io
 from scripts import head_course_deepseek_wire as direct
 from scripts.head_course_goal import ROOT, plan_wire, planning_body, raw_io, save_plan
@@ -30,6 +31,8 @@ def package_path(profile):
 
 
 def vault_path(profile):
+    if profile.live_reuse:
+        return live.root() / profile.topic
     return Path.home() / ".local/share/edumind" / profile.batch
 
 
@@ -82,6 +85,8 @@ def package_digest(profile=STACK) -> str:
 def approval_values(profile=STACK, *, fixture=False):
     if profile.offline_only and not fixture:
         raise profile.error("OFFLINE_ONLY")
+    if profile.live_reuse:
+        raise profile.error("LIVE_AUTHORIZATION_REQUIRED")
     approval = dict(
         manifest_sha256=package_digest(profile),
         batch=profile.batch,
@@ -115,14 +120,35 @@ async def database(action, *, fixture, profile=STACK):
         await engine.dispose()
 
 
+def live_binding(profile, *, active=False, minimum=0):
+    run = live.load(package_digest(profile), active=active, profile=profile, minimum=minimum)
+    return run["approval"], live.binding(run)
+
+
+def check_live_context(ctx, profile, *, minimum=0):
+    if profile.live_reuse:
+        _, binding = live_binding(profile, active=True, minimum=minimum)
+        if ctx["live_run"] != binding:
+            raise profile.error("LIVE_WINDOW_OR_BINDING")
+
+
 async def prepare(vault, owner, approval, *, fixture=False, profile=STACK):
-    check_approval(approval, fixture=fixture, profile=profile)
+    binding = None
+    if profile.live_reuse:
+        if fixture:
+            raise profile.error("LIVE_FIXTURE_FORBIDDEN")
+        approval, binding = live_binding(profile, active=True)
+        owner = UUID(approval["owner"])
+    else:
+        check_approval(approval, fixture=fixture, profile=profile)
     if not fixture and vault != vault_path(profile):
         raise profile.error("VAULT_REQUIRED")
     vault.mkdir(mode=0o700)
     try:
         ctx = await database(
-            lambda db: publication.prepare(db, owner, fixture=fixture, profile=profile),
+            lambda db: publication.prepare(
+                db, owner, fixture=fixture, profile=profile, live_run=binding,
+            ),
             fixture=fixture,
             profile=profile,
         )
@@ -136,6 +162,8 @@ async def prepare(vault, owner, approval, *, fixture=False, profile=STACK):
         return ctx
     except BaseException:
         raw_io.exclusive(vault / "STOP", b"preparation failed; no send\n")
+        if profile.live_reuse:
+            live.halt()
         raise
 
 
@@ -154,7 +182,15 @@ def local_gate(vault, *, fixture, profile=STACK):
         raise profile.error("RAW_KEY")
     ctx = read(vault / "context.json")
     approval = read(vault / "approval.bound.json")
-    check_approval(approval["approval"], fixture=fixture, profile=profile)
+    if profile.live_reuse:
+        expected, binding = live_binding(profile)
+        if fixture or (
+            approval["approval"] != expected or ctx.get("live_run") != binding
+            or ctx.get("owner") != expected["owner"]
+        ):
+            raise profile.error("LIVE_WINDOW_OR_BINDING")
+    else:
+        check_approval(approval["approval"], fixture=fixture, profile=profile)
     if approval["context_sha256"] != sha(canonical(ctx)) or ctx["evidence_kind"] != (
         "offline_fixture" if fixture else "actual_provider_response"
     ):
@@ -186,6 +222,7 @@ def current_context(ctx, *, fixture, profile, planning=False):
 
 
 def check_context(ctx, *, fixture, minimum=0, profile=STACK, planning=False):
+    check_live_context(ctx, profile, minimum=minimum)
     require_time(ctx, minimum, profile=profile)
     current = asyncio.run(current_context(ctx, fixture=fixture, profile=profile, planning=planning))
     if current != ctx:
@@ -260,9 +297,9 @@ def approved_head_context(vault, ctx, cipher, profile):
 
 
 def revision_inputs(vault, profile):
-    if not profile.offline_only:
+    if not (profile.offline_only or profile.live_reuse):
         raise profile.error("OFFLINE_ONLY")
-    parent = replay(vault, fixture=True, profile=profile)
+    parent = replay(vault, fixture=profile.offline_only, profile=profile)
     if not (vault / "review.json").is_file():
         raise profile.error("REVIEW_REQUIRED")
     return parent, read(vault / "review.json")
@@ -273,7 +310,7 @@ def prepare_revision(vault, record, *, profile):
         raise profile.error("BATCH_STOPPED")
     parent, review = revision_inputs(vault, profile)
     request = revision.approved_request(profile, parent, review, record)
-    check_context(parent["context"], fixture=True, profile=profile)
+    check_context(parent["context"], fixture=profile.offline_only, profile=profile)
     save(vault, "revision.prepared.json", dict(approval=record, review=review))
     return request
 
@@ -291,8 +328,10 @@ def revision_source(vault, profile):
 
 
 def check_stage(stage, profile, fixture):
+    if profile.live_reuse and fixture:
+        raise profile.error("LIVE_FIXTURE_FORBIDDEN")
     if stage == "revise":
-        if not profile.offline_only or not fixture:
+        if not ((profile.offline_only and fixture) or (profile.live_reuse and not fixture)):
             raise profile.error("OFFLINE_ONLY")
     elif stage != "generate" and not (stage == "plan" and profile.model_planned):
         raise profile.error("STAGE_REQUIRED")
@@ -304,6 +343,7 @@ def send(vault, *, transport=None, key=None, profile=STACK, stage="generate"):
     fixture = transport is not None
     check_stage(stage, profile, fixture)
     ctx, cipher = local_gate(vault, fixture=fixture, profile=profile)
+    check_live_context(ctx, profile, minimum=direct.IO_TIMEOUT)
     markers = ["HALT", f"{stage}.attempt.json"]
     if stage != "revise":
         markers.append("STOP")
@@ -392,6 +432,8 @@ def send(vault, *, transport=None, key=None, profile=STACK, stage="generate"):
         (vault / "ACTIVE").unlink()
         return c
     except BaseException as error:
+        if profile.live_reuse:
+            live.halt()
         if not (vault / "STOP").exists():
             raw_io.exclusive(
                 vault / "STOP", b"failed or unknown; preserve original; no retry\n"
@@ -470,11 +512,14 @@ def publish(vault, *, fixture=False, profile=STACK, stage="generate"):
     async def admit(db):
         if (vault / "HALT").exists():
             raise profile.error("BATCH_STOPPED")
+        check_live_context(c["context"], profile)
         return await publication.publish(db, c, review, profile=profile)
 
     result = asyncio.run(
         database(admit, fixture=fixture, profile=profile)
     )
+    if profile.live_reuse:
+        result.update(topic=profile.topic, run_sha256=c["context"]["live_run"]["run_sha256"])
     save(vault, "published.json", result)
     return result
 
@@ -483,6 +528,12 @@ async def stop(vault, *, fixture=False, profile=STACK):
     from app.services.free_course_recovery import Recovery
     from sqlalchemy.ext.asyncio import async_sessionmaker
 
+    if profile.live_reuse:
+        if fixture:
+            raise profile.error("LIVE_FIXTURE_FORBIDDEN")
+        live.halt()
+        if not (vault / "context.json").exists():
+            return dict(batch=publication.LIVE_BATCH, halted=True)
     ctx, _ = local_gate(vault, fixture=fixture, profile=profile)
     if not (vault / "HALT").exists():
         raw_io.exclusive(vault / "HALT", b"operator stopped batch; block publication\n")
@@ -534,7 +585,12 @@ def run(parser, args, profile):
                         batch=profile.batch,
                         request_sha256=None if profile.model_planned
                         else sha(canonical(profile.request())),
-                        max_http_requests=2 if profile.model_planned else 1,
+                        max_http_requests=(2 if profile.model_planned else 1)
+                        + int(profile.live_reuse),
+                        **({"shared_batch": publication.LIVE_BATCH,
+                            "stage_budgets": publication.LIVE_REQUESTS,
+                            "shared_window_seconds": publication.LIVE_WINDOW_SECONDS}
+                           if profile.live_reuse else {}),
                         **({"stem_prompt_version": publication.STEM_PROMPT_VERSION,
                             "plan_source": "model_planned" if profile.model_planned
                             else "fixed_outline"} if profile.new_batch else {}),
@@ -543,12 +599,13 @@ def run(parser, args, profile):
                 ).decode()
             )
         elif args.action == "prepare":
-            if not args.owner or not args.approval:
+            if not profile.live_reuse and (not args.owner or not args.approval):
                 parser.error("prepare requires --owner and --approval")
             print(
                 canonical(
                     asyncio.run(
-                        prepare(vault, args.owner, read(args.approval), **options)
+                        prepare(vault, args.owner, read(args.approval) if args.approval else None,
+                                **options)
                     )
                 ).decode()
             )

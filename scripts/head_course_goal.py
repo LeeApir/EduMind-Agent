@@ -717,13 +717,20 @@ def forbidden(*args, **kwargs):
     raise RuntimeError("HEAD_GOAL_NO_BACKGROUND_PROVIDER")
 
 
-def serve(port=8178, *, stack_only=False, replay_only=False, queue_only=False, binary_search_only=False):
+def serve(
+    port=8178, *, stack_only=False, replay_only=False, queue_only=False,
+    binary_search_only=False, live_reuse=False,
+):
     import uvicorn
     from app.core import provider_factory
     from fastapi.responses import JSONResponse
     from app.main import app
 
-    if replay_only:
+    if live_reuse:
+        from app.services.course_trial_publication import LIVE_REUSE, require_database
+
+        require_database(profile=LIVE_REUSE["head"])
+    elif replay_only:
         from app.services.course_trial_replay import require_database
 
         require_database()
@@ -747,7 +754,7 @@ def serve(port=8178, *, stack_only=False, replay_only=False, queue_only=False, b
         if request.method == "POST" and (
             path.endswith(("/operations", "/tutor-turns"))
             or (
-                (stack_only or queue_only or binary_search_only or replay_only)
+                (stack_only or queue_only or binary_search_only or replay_only or live_reuse)
                 and path.endswith("/free-courses")
             )
         ):

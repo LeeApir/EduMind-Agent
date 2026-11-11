@@ -1,6 +1,7 @@
 """Bounded trial admission through the existing private course repository."""
 
 from dataclasses import dataclass, replace
+from datetime import datetime
 from types import ModuleType
 from typing import Any
 from uuid import UUID
@@ -25,6 +26,9 @@ from app.services.course_question_stem import PROMPT_VERSION as STEM_PROMPT_VERS
 from app.services.free_course_snapshots import SnapshotError, SnapshotRepository, digest
 
 WINDOW_SECONDS = 1800
+LIVE_BATCH = "four-topic-live-reuse-r01"
+LIVE_WINDOW_SECONDS = 5400
+LIVE_REQUESTS = {"plan": 1, "generate": 4, "revise": 4}
 
 
 @dataclass(frozen=True)
@@ -37,11 +41,14 @@ class FixedCourse:
     checks: frozenset[str]
     new_batch: bool = False
     offline_only: bool = False
+    live_reuse: bool = False
 
     @property
     def batch(self) -> str:
         if self.offline_only:
             return f"{self.topic}-revision-fixture-r01"
+        if self.live_reuse:
+            return f"{LIVE_BATCH}-{self.topic}"
         return f"{self.topic}-stem-v2-r01" if self.new_batch else self.materials.BATCH
 
     @property
@@ -156,8 +163,19 @@ REVISION_FIXTURES = {
     )
     for topic, profile in NEW_BATCHES.items()
 }
+LIVE_REUSE = {
+    topic: replace(
+        profile,
+        package="phase-1.5-shared-live-reuse-t127",
+        database="edumind_catalog_p15_t127_reuse",
+        approval_key="accept_T127_scope_and_batch_C2",
+        live_reuse=True,
+    )
+    for topic, profile in NEW_BATCHES.items()
+}
 FOREGROUND_BATCHES = {
-    profile.batch: profile for profile in (*NEW_BATCHES.values(), *REVISION_FIXTURES.values())
+    profile.batch: profile
+    for profile in (*NEW_BATCHES.values(), *REVISION_FIXTURES.values(), *LIVE_REUSE.values())
 }
 
 
@@ -166,6 +184,8 @@ def require_database(
 ) -> None:
     if profile.offline_only and not fixture:
         raise profile.error("OFFLINE_ONLY")
+    if profile.live_reuse and fixture:
+        raise profile.error("LIVE_FIXTURE_FORBIDDEN")
     value = make_url(url or get_database_url())
     if (
         value.drivername != "postgresql+asyncpg"
@@ -188,11 +208,14 @@ def check_bind(db: AsyncSession, *, fixture: bool, profile: FixedCourse) -> None
 
 
 async def prepare(
-    db: AsyncSession, owner: UUID, *, fixture: bool = False, profile: FixedCourse = STACK
+    db: AsyncSession, owner: UUID, *, fixture: bool = False, profile: FixedCourse = STACK,
+    live_run: dict | None = None,
 ) -> dict[str, Any]:
     from app.services.free_scene_availability import commit_outline
 
     check_bind(db, fixture=fixture, profile=profile)
+    if profile.live_reuse != (live_run is not None):
+        raise profile.error("LIVE_AUTHORIZATION_REQUIRED")
     repo = SnapshotRepository(db, owner)
     created = await repo.create_course(
         profile.goal,
@@ -201,6 +224,7 @@ async def prepare(
             "prompt_version": profile.prompt_version,
             "policy_version": profile.batch,
         },
+        policy_snapshot={"course_trial_run": live_run} if live_run is not None else None,
         operation_window_seconds=WINDOW_SECONDS,
     )
     cid, oid = UUID(created["course_id"]), UUID(created["operation_id"])
@@ -267,6 +291,15 @@ async def context(
             stem_prompt_version=STEM_PROMPT_VERSION,
             plan_source="model_planned" if profile.model_planned else "fixed_outline",
         )
+    if profile.live_reuse:
+        run = op.policy_snapshot.get("course_trial_run")
+        if (
+            not isinstance(run, dict)
+            or set(run) != {"run_sha256", "expires_at"}
+            or datetime.fromisoformat(run["expires_at"]) <= await repo._now()
+        ):
+            raise profile.error("LIVE_WINDOW_OR_BINDING")
+        common["live_run"] = run
     if planning:
         from app.services.free_course_planning import load_inputs as load_planning_inputs
 
@@ -354,10 +387,9 @@ def assembly(
         or (not profile.model_planned and checks != dict.fromkeys(profile.checks, True))
         or any(type(v) is not bool for v in checks.values())
         or (
-            "revision" in c and (
-                review.get("parent_digest") != c["parent_digest"]
-                or review.get("full_lesson_reviewed") is not True
-            )
+            (profile.live_reuse or "revision" in c)
+            and (review.get("parent_digest") != c.get("parent_digest")
+                 or review.get("full_lesson_reviewed") is not True)
         )
     ):
         raise profile.error("REVIEW_REQUIRED")

@@ -1,4 +1,4 @@
-"""Build a bounded first-draft revision from an exact offline approval record."""
+"""Build a bounded first-draft revision from an exact approval record."""
 
 from copy import deepcopy
 from hashlib import sha256
@@ -27,18 +27,26 @@ def checksum(value):
 def contract(profile, parent, review, record):
     raw = parent["raw_output"]
     ctx = parent["context"]
+    live = profile.live_reuse and not profile.offline_only
+    fixture = profile.offline_only and not profile.live_reuse
+    if not (live or fixture):
+        raise profile.error("OFFLINE_ONLY")
     if (
-        not profile.offline_only
-        or ctx.get("evidence_kind") != "offline_fixture"
+        ctx.get("evidence_kind") != ("offline_fixture" if fixture else "actual_provider_response")
         or ctx.get("topic") != profile.topic
         or ctx.get("batch") != profile.batch
         or parent.get("parent_digest") is not None
-        or set(record) != RECORD_KEYS
+        or set(record) != (RECORD_KEYS | {"run_sha256"} if live else RECORD_KEYS)
         or record["version"] != VERSION
         or record["topic"] != profile.topic
         or record["batch"] != profile.batch
         or record["parent_digest"] != parent["candidate_digest"]
-        or record["offline_fixture"] is not True
+        or record["offline_fixture"] is not fixture
+        or (
+            live and (not isinstance(record["run_sha256"], str)
+                      or len(record["run_sha256"]) != 64
+                      or record["run_sha256"] != ctx.get("live_run", {}).get("run_sha256"))
+        )
     ):
         raise profile.error("REVISION_PARENT_BINDING")
     if (

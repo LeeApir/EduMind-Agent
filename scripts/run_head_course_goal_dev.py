@@ -48,7 +48,10 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument(
         "--profile",
-        choices=["t108", "fixed", "archive", "direct", "aiapi", "empty", "empty-r02", "stack", "trial-replay", "queue", "binary-search"],
+        choices=[
+            "t108", "fixed", "archive", "direct", "aiapi", "empty", "empty-r02", "stack",
+            "trial-replay", "queue", "binary-search", "live-reuse",
+        ],
         default="t108",
     )
     p.add_argument("--prepare", action="store_true")
@@ -110,6 +113,13 @@ def main():
 
         WORK = Path("/tmp/edumind-t122")
         database_name, api_port, web_port = BINARY_SEARCH.database, 8196, 5216
+    elif a.profile == "live-reuse":
+        if a.check_migration or a.test:
+            p.error("Use the targeted T127 checks")
+        from app.services.course_trial_publication import LIVE_REUSE
+
+        WORK = Path("/tmp/edumind-t127")
+        database_name, api_port, web_port = LIVE_REUSE["head"].database, 8197, 5217
     elif a.profile == "trial-replay":
         if a.check_migration or a.test:
             p.error("Use the targeted T120 checks")
@@ -153,7 +163,8 @@ def main():
                         "from scripts.head_course_goal import serve; "
                         f"serve({api_port}, stack_only={a.profile == 'stack'}, "
                         f"replay_only={a.profile == 'trial-replay'}, queue_only={a.profile == 'queue'}, "
-                        f"binary_search_only={a.profile == 'binary-search'})"
+                        f"binary_search_only={a.profile == 'binary-search'}, "
+                        f"live_reuse={a.profile == 'live-reuse'})"
                     ),
                 ],
                 ROOT,

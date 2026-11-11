@@ -6769,6 +6769,47 @@
           "evidence": "docs/acceptance/phase-1.5-shared-revision-t126/README.md"
         }
       ]
+    },
+    {
+      "id": "PHASE-1.5-T127",
+      "phase": "Phase 1.5",
+      "title": "四主题共用流程的有限真实复用批次准备",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T124",
+        "PHASE-1.5-T125",
+        "PHASE-1.5-T126"
+      ],
+      "scope": [
+        "固定四个开发输入，复用共用发送、封存和准入，仅接线真实批次和有限修订授权。",
+        "零真实调用准备与定向离线检查；实际执行另获准确批准。"
+      ],
+      "prd_source": "PRD §0.5；T123 V06；T124–T126；用户本轮授权",
+      "acceptance_criteria": [
+        "四主题共用一个冻结包与准确授权，保持离线夹具隔离。",
+        "头插规划1次、四课首稿各1次、每课最多一次窄范围修订，总计不超过9次；无自动重试。",
+        "真实父稿修订重放、审核与准入绑定通过必要离线反例检查。",
+        "交付准确请求、版本、窗口、费用、停止与课程验收方案；未启动真实批次。"
+      ],
+      "verification": [
+        "T127 定向单测和隔离库接线验证；冻结请求和清单核验；工作流与 diff 检查。"
+      ],
+      "started_at": "2026-11-11T10:40:16+08:00",
+      "commit_lookup": "Task-Completed: PHASE-1.5-T127",
+      "completed_at": "2026-11-11T11:20:04+08:00",
+      "verification_results": [
+        {
+          "command": "VERIFICATION.md 中的禁外网定向 pytest 与隔离 PostgreSQL alembic current",
+          "result": "3 passed，0 skipped。准确授权、窗口、夹具隔离、真实父稿模式模拟修订、私有读取和失败停整批通过。真实 Provider 0。",
+          "evidence": "docs/acceptance/phase-1.5-shared-live-reuse-t127/VERIFICATION.md"
+        },
+        {
+          "command": "四主题 inspect；模板启动与夹具选项拒绝；定向 Ruff；check_catalog_workflow.py；git diff --check",
+          "result": "通过。四主题单次槽合计最多9。准确 manifest 摘要已记录，未建立真实批次或窗口。",
+          "evidence": "docs/acceptance/phase-1.5-shared-live-reuse-t127/README.md"
+        }
+      ]
     }
   ],
   "planning_inputs": {

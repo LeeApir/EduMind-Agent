@@ -15,6 +15,7 @@ from app.core.database import create_database_engine
 from app.services.course_trial_publication import (
     BINARY_SEARCH,
     BINARY_SEARCH_REVISION,
+    LIVE_REUSE,
     NEW_BATCHES,
     QUEUE,
     REVISION_FIXTURES,
@@ -24,6 +25,7 @@ from app.services.course_trial_sources import ARCHIVES
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from scripts import course_trial_generation as generation
+from scripts import course_trial_live as live
 from scripts.head_course_goal import ROOT, raw_io_audit
 
 # Run each unchanged reader from its original commit. Its full manifest still validates even
@@ -110,11 +112,11 @@ def main():
         "action", choices=(
             "inspect", "prepare", "send", "replay", "publish", "stop",
             "inspect-revision", "prepare-revision",
+            "start-batch",
         )
     )
     parser.add_argument(
         "--topic",
-        required=True,
         choices=(
             *ARCHIVES,
             *QUEUE_ARCHIVES,
@@ -129,12 +131,41 @@ def main():
         "--new-batch", action="store_true", help="select the T125 first-draft batch"
     )
     mode.add_argument("--offline-vault", type=Path, help="select a T126 test-only vault")
+    mode.add_argument("--live-reuse", action="store_true", help="select the T127 four-topic run")
     parser.add_argument("--stage", choices=("plan", "generate", "revise"))
     parser.add_argument("--record", type=Path, help="exact revision approval record")
     parser.add_argument("--mock-response", type=Path, help="complete fixture Responses envelope")
     args = parser.parse_args()
     if args.action != "send" or args.offline_vault:
         sys.addaudithook(raw_io_audit)
+    if args.action == "start-batch":
+        if not args.live_reuse or not args.approval or any(
+            (args.topic, args.owner, args.stage, args.record, args.mock_response)
+        ):
+            parser.error("start-batch requires only --live-reuse and --approval")
+        try:
+            manifests = {generation.package_digest(p) for p in LIVE_REUSE.values()}
+            (manifest,) = manifests
+            print(json.dumps(live.start(generation.read(args.approval), manifest)))
+        except (Exception, KeyboardInterrupt) as error:
+            print("Batch refused.", type(error).__name__, generation.failure_code(error),
+                  file=sys.stderr)
+            return 1
+        return 0
+    if args.topic is None:
+        parser.error("--topic is required for this action")
+    if args.live_reuse:
+        profile = LIVE_REUSE.get(args.topic)
+        if profile is None or any((args.owner, args.approval, args.mock_response)):
+            parser.error("use a T127 topic and the shared batch authorization")
+        if (args.action in {"inspect-revision", "prepare-revision"}) != (args.record is not None):
+            parser.error("revision inspection and preparation require --record")
+        if args.stage and (
+            args.action not in {"send", "replay", "publish"}
+            or (args.stage == "plan" and (not profile.model_planned or args.action == "publish"))
+        ):
+            parser.error("invalid stage for the selected T127 action")
+        return generation.run(parser, args, profile)
     if args.offline_vault:
         profile = REVISION_FIXTURES.get(args.topic)
         if profile is None:
