@@ -7187,6 +7187,39 @@
           "evidence": "docs/acceptance/phase-1.5-stack-profile-pair-t132/RESULTS.md"
         }
       ]
+    },
+    {
+      "id": "PHASE-1.5-T138",
+      "phase": "Phase 1.5",
+      "title": "栈正常操作与拒绝边界多场景准备",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T137"
+      ],
+      "scope": [
+        "复用栈材料与原规划、场景输入，补齐两种拒绝的可运行轨迹。",
+        "绑定两场景的目标、代码、讲解和练习，准确请求只作零调用准备。"
+      ],
+      "prd_source": "PRD §0.5；课程生成方向 §3；用户明确范围",
+      "acceptance_criteria": [
+        "正常操作和两种拒绝由程序各自提供可核对材料。",
+        "规划目标、场景与准确前置绑定；场景响应只生成教学字段。",
+        "真实调用为 0，后续批次另定。"
+      ],
+      "verification": [
+        "Clang 独立期望、规划及场景绑定测试、旧请求差异、Ruff 和账本检查。"
+      ],
+      "started_at": "2026-11-11T20:57:24+08:00",
+      "completed_at": "2026-11-11T20:57:24+08:00",
+      "commit_lookup": "Task-Completed: PHASE-1.5-T138",
+      "verification_results": [
+        {
+          "command": "pytest -q backend/tests/test_stack_multiscene.py backend/tests/test_stack_course_profile_prompt_v2.py；Ruff、CLI 预览、工作流、Git 差异",
+          "result": "5 项通过。C 轨迹与独立期望一致；双场景请求、依赖及练习绑定通过；Provider 0。",
+          "evidence": "docs/acceptance/phase-1.5-stack-boundaries-t138/RESULTS.md"
+        }
+      ]
     }
   ],
   "planning_inputs": {

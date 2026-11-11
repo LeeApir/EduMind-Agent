@@ -109,9 +109,16 @@ SCHEMA = closed(
 VALIDATOR = Draft202012Validator(SCHEMA)
 
 
-def example(operations: tuple[int | None, ...]) -> dict[str, Any]:
+def example(
+    operations: tuple[int | None, ...], *, observe_rejections: bool = False
+) -> dict[str, Any]:
     lines = CODE.splitlines()
     stack: list[int] = []
+    storage = [0] * CAPACITY
+    output = -99
+    if observe_rejections:
+        lines.insert(2, "#include <stdio.h>")
+        lines[-1] = f"    int value = {output};"
     frames: list[dict[str, Any]] = [
         dict(
             frame_id="f0",
@@ -122,19 +129,36 @@ def example(operations: tuple[int | None, ...]) -> dict[str, Any]:
             popped=None,
         )
     ]
+    if observe_rejections:
+        frames[0].update(
+            success=None, rejection=None, guard_line=None, count=0,
+            storage=storage.copy(), output=output,
+        )
     for i, op in enumerate(operations, 1):
+        rejection = None
+        popped = None
         if op is None:
-            if not stack:
-                raise SnapshotError("STACK_UNSUPPORTED_UNDERFLOW")
             action, call = "pop()", "pop(&s, &value)"
-            popped = stack.pop()
+            if not stack:
+                rejection = "empty"
+                if not observe_rejections:
+                    raise SnapshotError("STACK_UNSUPPORTED_UNDERFLOW")
+            else:
+                popped = stack.pop()
+                output = popped
         else:
-            if len(stack) >= CAPACITY:
-                raise SnapshotError("STACK_UNSUPPORTED_OVERFLOW")
             action, call = f"push({op})", f"push(&s, {op})"
-            stack.append(op)
-            popped = None
-        lines.append(f"    if (!{call}) return 1;")
+            if len(stack) >= CAPACITY:
+                rejection = "full"
+                if not observe_rejections:
+                    raise SnapshotError("STACK_UNSUPPORTED_OVERFLOW")
+            else:
+                storage[len(stack)] = op
+                stack.append(op)
+        if observe_rejections:
+            lines.append(f"    const bool ok_{i} = {call};")
+        else:
+            lines.append(f"    if (!{call}) return 1;")
         frames.append(
             dict(
                 frame_id=f"f{i}",
@@ -145,6 +169,19 @@ def example(operations: tuple[int | None, ...]) -> dict[str, Any]:
                 popped=popped,
             )
         )
+        if observe_rejections:
+            guard = "s->count == 0" if op is None else "s->count == CAP"
+            frames[-1].update(
+                success=rejection is None, rejection=rejection, count=len(stack),
+                storage=storage.copy(), output=output,
+                guard_line=next(
+                    n for n, line in enumerate(lines, 1) if f"if ({guard})" in line
+                ),
+            )
+            lines.append(
+                f'    printf("%d %zu %d %d %d %d\\n", ok_{i}, s.count, '
+                "s.data[0], s.data[1], s.data[2], value);"
+            )
     return dict(source="\n".join([*lines, "    return 0;", "}", ""]), frames=frames)
 
 
