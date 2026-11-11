@@ -205,3 +205,9 @@ A/B 使用 T135 两份冻结请求，进入独立 r02 槽。离线接线已验�
 ## T137 v2 真实批次登记
 
 用户已批准 `6b6be6f` 对应共同清单、两份 v2 准确请求及本批 C2。登记 [A 授权](prompt-v2/array-first.execution-approval.json) 与 [B 授权](prompt-v2/operations-known.execution-approval.json)。每槽仅一条正文，登记时窗口未启动，Provider 0。
+
+### T137 A 槽真实结果
+
+北京时间 2026-11-11 20:28:54–20:58:54。一次正文 HTTP 200，Provider 回报 3,302 输入、1,762 输出 token。原响应 SHA-256 `81a552c81a83bd3f3db13a449f04d985b7d2774d75a4b76cab10671c58271f8b`，严格回放候选 `a7d66cb8b515d12a98b6106a45236ac61efd23b6c75eb255b0d21f8248d11f49`。独立全文审核九项通过，确认正文说明了非空栈顶、先写后增、先减后读及守卫在修改之前返回的原因。审核 SHA-256 `dc0b97b5a12b2e397f446287b8bd77cda42402c0e69a4e299eac0f56772ec424`。[A 独立审核](prompt-v2/array-first.review.json)
+
+北京时间 20:32:28 准入回执，私有 v2 课程 `0bdfa2f6-e93e-45f7-8c5b-0ee7f1cf43a6`，场景版本 `eb3c6c15-c5c2-4e5c-a1f3-0392f7c21430`。Chromium 验证五段正文和总结、五帧高亮和播放控制、四题 0%／100% 反馈、答案隔离和跨访客 404。刷新恢复同版与作答，新增提交 0。终端入口 `sh /tmp/edumind-t137/open.sh A`。[A 浏览器记录](prompt-v2/array-first.browser.json)
