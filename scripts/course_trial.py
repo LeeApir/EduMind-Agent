@@ -17,6 +17,7 @@ from app.services.course_trial_publication import (
     BINARY_SEARCH_REVISION,
     NEW_BATCHES,
     QUEUE,
+    REVISION_FIXTURES,
 )
 from app.services.course_trial_replay import import_course, projection, require_database
 from app.services.course_trial_sources import ARCHIVES
@@ -106,7 +107,10 @@ async def publish(owner, topic, record, review):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "action", choices=("inspect", "prepare", "send", "replay", "publish", "stop")
+        "action", choices=(
+            "inspect", "prepare", "send", "replay", "publish", "stop",
+            "inspect-revision", "prepare-revision",
+        )
     )
     parser.add_argument(
         "--topic",
@@ -120,13 +124,38 @@ def main():
     )
     parser.add_argument("--owner", type=UUID)
     parser.add_argument("--approval", type=Path)
-    parser.add_argument(
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument(
         "--new-batch", action="store_true", help="select the T125 first-draft batch"
     )
-    parser.add_argument("--stage", choices=("plan", "generate"))
+    mode.add_argument("--offline-vault", type=Path, help="select a T126 test-only vault")
+    parser.add_argument("--stage", choices=("plan", "generate", "revise"))
+    parser.add_argument("--record", type=Path, help="exact revision approval record")
+    parser.add_argument("--mock-response", type=Path, help="complete fixture Responses envelope")
     args = parser.parse_args()
-    if args.action != "send":
+    if args.action != "send" or args.offline_vault:
         sys.addaudithook(raw_io_audit)
+    if args.offline_vault:
+        profile = REVISION_FIXTURES.get(args.topic)
+        if profile is None:
+            parser.error("offline vaults support only the four first-draft topics")
+        if (args.action == "send") != (args.mock_response is not None):
+            parser.error("offline send requires --mock-response")
+        if (args.action in {"inspect-revision", "prepare-revision"}) != (args.record is not None):
+            parser.error("revision inspection and preparation require --record")
+        if args.action != "prepare" and (args.owner is not None or args.approval is not None):
+            parser.error("--owner and --approval are only used by prepare")
+        if args.stage and (
+            args.action not in {"send", "replay", "publish"}
+            or (args.stage == "plan" and (not profile.model_planned or args.action == "publish"))
+        ):
+            parser.error("invalid stage for the selected offline action")
+        return generation.run(parser, args, profile)
+    if (
+        args.action in {"inspect-revision", "prepare-revision"}
+        or args.stage == "revise" or args.record is not None or args.mock_response is not None
+    ):
+        parser.error("revision and mock response options require --offline-vault")
     if args.new_batch:
         profile = NEW_BATCHES.get(args.topic)
         if profile is None:

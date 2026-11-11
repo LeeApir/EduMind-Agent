@@ -6725,6 +6725,50 @@
           "evidence": "docs/acceptance/phase-1.5-shared-first-draft-t125/README.md"
         }
       ]
+    },
+    {
+      "id": "PHASE-1.5-T126",
+      "phase": "Phase 1.5",
+      "title": "四主题首稿的记录驱动有限修订",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T125"
+      ],
+      "scope": [
+        "复用 T125 共用入口、严格回放、有限合并与私有准入，按主题白名单限制修订字段。",
+        "MockTransport 和隔离库验证，真实 Provider 0。"
+      ],
+      "prd_source": "PRD §0.5；T123 M02/V06；T125；用户本轮授权",
+      "acceptance_criteria": [
+        "从准确父稿、审核、批准路径和一次请求预算构造闭合修订请求，两个父稿无需修改源码。",
+        "拒绝不合格父稿、错父稿、错审核、越界路径、越界响应与未授权发送。",
+        "合并保留其余字段、失败原件和父子关系，全稿重评通过后才准入并验收播放器。"
+      ],
+      "verification": [
+        "四主题路径边界单测；两个父稿的 MockTransport 和专用 PostgreSQL 集成测试",
+        "真实准入投影播放器、定向 Ruff、工作流及 git diff --check"
+      ],
+      "started_at": "2026-11-11T10:07:42+08:00",
+      "commit_lookup": "Task-Completed: PHASE-1.5-T126",
+      "completed_at": "2026-11-11T10:23:15+08:00",
+      "verification_results": [
+        {
+          "command": "README 中的定向 pytest，使用专用 PostgreSQL 0050 和 MockTransport",
+          "result": "24 passed。四主题允许路径、两个父稿的动态闭合 Schema 与共用 CLI、范围和批准拒绝、Schema 失败保留、全文重评及私有准入均通过。Provider 0。",
+          "evidence": "docs/acceptance/phase-1.5-shared-revision-t126/README.md"
+        },
+        {
+          "command": "EDUMIND_T126_PLAYER_PROJECTIONS=/tmp/edumind-t126-player pnpm --dir web exec vitest run tests/course-visualization.spec.ts tests/head-course-status.spec.ts；pnpm --dir web typecheck",
+          "result": "16 passed。现有播放器对两份实际修订投影核对头插 13 帧和栈 5 帧、高亮、前后步、重置和父稿来源，类型检查通过。",
+          "evidence": "docs/acceptance/phase-1.5-shared-revision-t126/README.md"
+        },
+        {
+          "command": "定向 Ruff；离线清单摘要核对；python3 scripts/check_catalog_workflow.py；git diff --check",
+          "result": "通过。原账本条目及 T125 冻结清单原字节保留。",
+          "evidence": "docs/acceptance/phase-1.5-shared-revision-t126/README.md"
+        }
+      ]
     }
   ],
   "planning_inputs": {

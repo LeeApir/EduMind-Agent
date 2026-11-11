@@ -13,6 +13,7 @@ from uuid import UUID
 import httpx
 from app.core.database import create_database_engine
 from app.services import course_trial_publication as publication
+from app.services import course_trial_revision as revision
 from app.services.free_course_snapshots import canonical, digest
 from cryptography.fernet import Fernet
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -79,6 +80,8 @@ def package_digest(profile=STACK) -> str:
 
 
 def approval_values(profile=STACK, *, fixture=False):
+    if profile.offline_only and not fixture:
+        raise profile.error("OFFLINE_ONLY")
     approval = dict(
         manifest_sha256=package_digest(profile),
         batch=profile.batch,
@@ -137,6 +140,8 @@ async def prepare(vault, owner, approval, *, fixture=False, profile=STACK):
 
 
 def local_gate(vault, *, fixture, profile=STACK):
+    if profile.offline_only and not fixture:
+        raise profile.error("OFFLINE_ONLY")
     if (
         (not fixture and vault != vault_path(profile))
         or vault.is_symlink()
@@ -187,11 +192,15 @@ def check_context(ctx, *, fixture, minimum=0, profile=STACK, planning=False):
         raise profile.error("CONTEXT_BINDING")
 
 
-def request_for(ctx, profile, stage):
+def request_for(ctx, profile, stage, source=None):
+    if stage == "revise":
+        return revision.approved_request(
+            profile, source["parent"], source["review"], source["approval"]
+        )
     return planning_body(ctx["planning_inputs"]) if stage == "plan" else profile.request(ctx)
 
 
-def observe(ctx, raw, body_receipt, *, profile=STACK, stage="generate"):
+def observe(ctx, raw, body_receipt, *, profile=STACK, stage="generate", source=None):
     if body_receipt != dict(
         http_status=200,
         encoding="identity",
@@ -200,7 +209,7 @@ def observe(ctx, raw, body_receipt, *, profile=STACK, stage="generate"):
         complete=True,
     ):
         raise profile.error("HTTP_OR_EVIDENCE")
-    request = request_for(ctx, profile, stage)
+    request = request_for(ctx, profile, stage, source)
     result, observation = direct.observe_generation(request, raw)
     receipt = dict(
         request_sha256=sha(canonical(request)),
@@ -212,6 +221,8 @@ def observe(ctx, raw, body_receipt, *, profile=STACK, stage="generate"):
         ),
     )
     output = dict(result.value)
+    if stage == "revise":
+        return publication.revised_candidate(ctx, output, receipt, source, profile=profile)
     if stage == "plan":
         local = plan_wire.to_local(output, ctx["planning_inputs"])
         if local["needs_clarification"]:
@@ -248,19 +259,64 @@ def approved_head_context(vault, ctx, cipher, profile):
     return ready
 
 
+def revision_inputs(vault, profile):
+    if not profile.offline_only:
+        raise profile.error("OFFLINE_ONLY")
+    parent = replay(vault, fixture=True, profile=profile)
+    if not (vault / "review.json").is_file():
+        raise profile.error("REVIEW_REQUIRED")
+    return parent, read(vault / "review.json")
+
+
+def prepare_revision(vault, record, *, profile):
+    if (vault / "HALT").exists() or (vault / "published.json").exists():
+        raise profile.error("BATCH_STOPPED")
+    parent, review = revision_inputs(vault, profile)
+    request = revision.approved_request(profile, parent, review, record)
+    check_context(parent["context"], fixture=True, profile=profile)
+    save(vault, "revision.prepared.json", dict(approval=record, review=review))
+    return request
+
+
+def revision_source(vault, profile):
+    prepared = vault / "revision.prepared.json"
+    if not prepared.is_file():
+        raise profile.error("REVISION_AUTHORIZATION_REQUIRED")
+    parent, review = revision_inputs(vault, profile)
+    record = read(prepared)
+    if record["review"] != review:
+        raise profile.error("REVISION_REVIEW_BINDING")
+    revision.approved_request(profile, parent, review, record["approval"])
+    return dict(parent=parent, review=review, approval=record["approval"])
+
+
+def check_stage(stage, profile, fixture):
+    if stage == "revise":
+        if not profile.offline_only or not fixture:
+            raise profile.error("OFFLINE_ONLY")
+    elif stage != "generate" and not (stage == "plan" and profile.model_planned):
+        raise profile.error("STAGE_REQUIRED")
+
+
 def send(vault, *, transport=None, key=None, profile=STACK, stage="generate"):
     if transport is not None and not isinstance(transport, httpx.MockTransport):
         raise profile.error("OFFLINE_TRANSPORT")
     fixture = transport is not None
-    if stage not in ({"plan", "generate"} if profile.model_planned else {"generate"}):
-        raise profile.error("STAGE_REQUIRED")
+    check_stage(stage, profile, fixture)
     ctx, cipher = local_gate(vault, fixture=fixture, profile=profile)
+    markers = ["HALT", f"{stage}.attempt.json"]
+    if stage != "revise":
+        markers.append("STOP")
     if any(
-        (vault / name).exists() for name in ("STOP", "HALT", f"{stage}.attempt.json")
+        (vault / name).exists() for name in markers
     ):
         raise profile.error("BATCH_STOPPED")
     planning = stage == "plan"
-    if profile.model_planned and not planning:
+    source = None
+    if stage == "revise":
+        source = revision_source(vault, profile)
+        ctx = source["parent"]["context"]
+    elif profile.model_planned and not planning:
         ctx = approved_head_context(vault, ctx, cipher, profile)
     raw_io.exclusive(vault / "ACTIVE", b"one foreground request; stale means unknown\n")
     try:
@@ -268,7 +324,7 @@ def send(vault, *, transport=None, key=None, profile=STACK, stage="generate"):
             ctx, fixture=fixture, minimum=direct.IO_TIMEOUT, profile=profile, planning=planning
         )
         req = (
-            canonical(request_for(ctx, profile, stage)) if profile.new_batch
+            canonical(request_for(ctx, profile, stage, source)) if profile.new_batch
             else (package_path(profile) / "request.json").read_bytes()
         )
         if len(req) > 131072:
@@ -283,7 +339,7 @@ def send(vault, *, transport=None, key=None, profile=STACK, stage="generate"):
         check_context(
             ctx, fixture=fixture, minimum=direct.IO_TIMEOUT, profile=profile, planning=planning
         )
-        if (vault / "STOP").exists() or (vault / "HALT").exists():
+        if any((vault / name).exists() for name in markers):
             raise profile.error("BATCH_STOPPED")
         raw_io.exclusive(vault / f"{stage}.request.json", req)
         save(
@@ -317,10 +373,10 @@ def send(vault, *, transport=None, key=None, profile=STACK, stage="generate"):
         save(vault, f"{stage}.body.json", body_receipt)
         if key in raw.decode(errors="replace"):
             raise profile.error("KEY_ECHO")
-        if (vault / "STOP").exists() or (vault / "HALT").exists():
+        if (vault / "HALT").exists() or (stage != "revise" and (vault / "STOP").exists()):
             raise profile.error("BATCH_STOPPED")
         check_context(ctx, fixture=fixture, profile=profile, planning=planning)
-        c = observe(ctx, raw, body_receipt, profile=profile, stage=stage)
+        c = observe(ctx, raw, body_receipt, profile=profile, stage=stage, source=source)
         if planning:
             asyncio.run(save_plan(
                 ctx, c["raw_output"],
@@ -331,7 +387,7 @@ def send(vault, *, transport=None, key=None, profile=STACK, stage="generate"):
                 raise profile.error("PLAN_BINDING")
             save(vault, "plan.ready.json", ready)
         save(vault, f"{stage}.candidate.json", c)
-        if not planning:
+        if stage == "generate":
             raw_io.exclusive(vault / "STOP", SUCCESS_STOP)
         (vault / "ACTIVE").unlink()
         return c
@@ -352,8 +408,8 @@ def send(vault, *, transport=None, key=None, profile=STACK, stage="generate"):
         raise
 
 
-def replay_stage(vault, ctx, cipher, *, profile, stage):
-    request = canonical(request_for(ctx, profile, stage))
+def replay_stage(vault, ctx, cipher, *, profile, stage, source=None):
+    request = canonical(request_for(ctx, profile, stage, source))
     expected_attempt = dict(
         request_sha256=sha(request),
         context_sha256=sha(canonical(ctx)),
@@ -379,6 +435,7 @@ def replay_stage(vault, ctx, cipher, *, profile, stage):
         receipt,
         profile=profile,
         stage=stage,
+        source=source,
     )
     if c != read(vault / f"{stage}.candidate.json"):
         raise profile.error("SAVED_BINDING")
@@ -386,21 +443,29 @@ def replay_stage(vault, ctx, cipher, *, profile, stage):
 
 
 def replay(vault, *, fixture=False, profile=STACK, stage="generate"):
+    check_stage(stage, profile, fixture)
     ctx, cipher = local_gate(vault, fixture=fixture, profile=profile)
-    if stage not in ({"plan", "generate"} if profile.model_planned else {"generate"}):
-        raise profile.error("STAGE_REQUIRED")
+    if stage == "revise":
+        source = revision_source(vault, profile)
+        return replay_stage(vault, source["parent"]["context"], cipher,
+                            profile=profile, stage=stage, source=source)
     if profile.model_planned and stage == "generate":
         ctx = approved_head_context(vault, ctx, cipher, profile)
     return replay_stage(vault, ctx, cipher, profile=profile, stage=stage)
 
 
-def publish(vault, *, fixture=False, profile=STACK):
+def publish(vault, *, fixture=False, profile=STACK, stage="generate"):
     if (vault / "HALT").exists():
         raise profile.error("BATCH_STOPPED")
-    c = replay(vault, fixture=fixture, profile=profile)
-    if not (vault / "review.json").is_file():
+    if stage not in ("generate", "revise"):
+        raise profile.error("STAGE_REQUIRED")
+    if stage == "generate" and (vault / "revision.prepared.json").exists():
+        raise profile.error("REVISION_REVIEW_REQUIRED")
+    c = replay(vault, fixture=fixture, profile=profile, stage=stage)
+    review_path = vault / ("revision-review.json" if stage == "revise" else "review.json")
+    if not review_path.is_file():
         raise profile.error("REVIEW_REQUIRED")
-    review = read(vault / "review.json")
+    review = read(review_path)
 
     async def admit(db):
         if (vault / "HALT").exists():
@@ -445,10 +510,23 @@ def legacy_main():
 
 
 def run(parser, args, profile):
-    vault = vault_path(profile)
+    offline = getattr(args, "offline_vault", None)
+    vault = offline or vault_path(profile)
+    fixture = offline is not None
     stage = getattr(args, "stage", None) or "generate"
+    options = dict(profile=profile, fixture=fixture)
     try:
-        if args.action == "inspect":
+        if args.action == "inspect-revision":
+            parent, review = revision_inputs(vault, profile)
+            request = revision.request(profile, parent, review, read(args.record))
+            preview = dict(request=request, request_sha256=revision.checksum(request))
+            print(canonical(preview).decode())
+        elif args.action == "prepare-revision":
+            request = prepare_revision(vault, read(args.record), profile=profile)
+            print(canonical(dict(request_sha256=revision.checksum(request))).decode())
+        elif args.action == "inspect" and fixture:
+            print(canonical(approval_values(profile, fixture=True)).decode())
+        elif args.action == "inspect":
             print(
                 canonical(
                     dict(
@@ -470,18 +548,27 @@ def run(parser, args, profile):
             print(
                 canonical(
                     asyncio.run(
-                        prepare(vault, args.owner, read(args.approval), profile=profile)
+                        prepare(vault, args.owner, read(args.approval), **options)
                     )
                 ).decode()
             )
         elif args.action == "send":
-            print(send(vault, profile=profile, stage=stage)["candidate_digest"])
+            transport, key = None, None
+            if fixture:
+                raw = args.mock_response.read_bytes()
+                transport = httpx.MockTransport(
+                    lambda _request: httpx.Response(200, stream=httpx.ByteStream(raw))
+                )
+                key = "t126-offline-fixture-key"
+            print(send(vault, profile=profile, stage=stage, transport=transport, key=key)[
+                "candidate_digest"
+            ])
         elif args.action == "replay":
-            print(replay(vault, profile=profile, stage=stage)["candidate_digest"])
+            print(replay(vault, stage=stage, **options)["candidate_digest"])
         elif args.action == "stop":
-            print(canonical(asyncio.run(stop(vault, profile=profile))).decode())
+            print(canonical(asyncio.run(stop(vault, **options))).decode())
         else:
-            print(canonical(publish(vault, profile=profile)).decode())
+            print(canonical(publish(vault, stage=stage, **options)).decode())
     except (Exception, KeyboardInterrupt) as error:
         print(
             "Stopped or refused; preserve evidence.",

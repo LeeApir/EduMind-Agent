@@ -18,6 +18,9 @@ from app.services import (
     queue_course_revision,
     stack_course_materials,
 )
+from app.services import (
+    course_trial_revision as revision,
+)
 from app.services.course_question_stem import PROMPT_VERSION as STEM_PROMPT_VERSION
 from app.services.free_course_snapshots import SnapshotError, SnapshotRepository, digest
 
@@ -33,9 +36,12 @@ class FixedCourse:
     approval_key: str
     checks: frozenset[str]
     new_batch: bool = False
+    offline_only: bool = False
 
     @property
     def batch(self) -> str:
+        if self.offline_only:
+            return f"{self.topic}-revision-fixture-r01"
         return f"{self.topic}-stem-v2-r01" if self.new_batch else self.materials.BATCH
 
     @property
@@ -140,11 +146,26 @@ NEW_BATCHES = {
         BINARY_SEARCH,
     )
 }
+REVISION_FIXTURES = {
+    topic: replace(
+        profile,
+        package="phase-1.5-shared-revision-t126",
+        database="edumind_catalog_p15_t126_trials",
+        approval_key="accept_T126_fixture_scope",
+        offline_only=True,
+    )
+    for topic, profile in NEW_BATCHES.items()
+}
+FOREGROUND_BATCHES = {
+    profile.batch: profile for profile in (*NEW_BATCHES.values(), *REVISION_FIXTURES.values())
+}
 
 
 def require_database(
     url: str | None = None, *, fixture: bool = False, profile: FixedCourse = STACK
 ) -> None:
+    if profile.offline_only and not fixture:
+        raise profile.error("OFFLINE_ONLY")
     value = make_url(url or get_database_url())
     if (
         value.drivername != "postgresql+asyncpg"
@@ -332,6 +353,12 @@ def assembly(
         or not isinstance(checks, dict)
         or (not profile.model_planned and checks != dict.fromkeys(profile.checks, True))
         or any(type(v) is not bool for v in checks.values())
+        or (
+            "revision" in c and (
+                review.get("parent_digest") != c["parent_digest"]
+                or review.get("full_lesson_reviewed") is not True
+            )
+        )
     ):
         raise profile.error("REVIEW_REQUIRED")
     evidence_kind = c["context"]["evidence_kind"]
@@ -358,13 +385,15 @@ def assembly(
         source.update(
             plan_source=c["context"]["plan_source"], stem_prompt_version=STEM_PROMPT_VERSION
         )
+    if "revision" in c:
+        source["revision_version"] = revision.VERSION
     if profile.model_planned:
         from app.services import head_course_reuse as reuse
 
         payload = c["context"]["head_payload"]
         # The outer review is bound to the new receipt-bearing candidate above.
         # Reuse the original head-specific teaching and evidence checks on its inner lesson.
-        lesson = reuse.candidate(payload, c["raw_output"])
+        lesson = reuse.candidate(payload, c["raw_output"], parent=c.get("parent_digest"))
         reuse.require_full_review(dict(review, candidate_digest=lesson["candidate_digest"]), lesson)
         evidence = payload["teaching_evidence"]
         source.update(
@@ -373,6 +402,42 @@ def assembly(
         )
         return profile.materials.assemble(payload, c["raw_output"], source)
     return profile.materials.assemble(c["raw_output"], source)
+
+
+def revised_candidate(ctx, replacements, receipt, source, *, profile):
+    parent, review, approval = (source[key] for key in ("parent", "review", "approval"))
+    if (
+        parent != candidate(ctx, parent["raw_output"], parent["receipt"], profile=profile)
+        or parent["receipt"]["request_sha256"] != revision.checksum(profile.request(ctx))
+    ):
+        raise profile.error("REVISION_PARENT_BINDING")
+    request = revision.approved_request(profile, parent, review, approval)
+    if receipt["request_sha256"] != revision.checksum(request):
+        raise profile.error("REVISION_REQUEST_BINDING")
+    merged = revision.merge(profile, parent, review, approval, replacements)
+    data = candidate(ctx, merged, receipt, profile=profile)
+    del data["candidate_digest"]
+    data.update(parent_digest=parent["candidate_digest"], revision=dict(
+        parent=parent, review=review, approval=approval, replacements=replacements,
+    ))
+    return {**data, "candidate_digest": digest(f"{profile.topic}-course-candidate", data=data)}
+
+
+def verify_candidate(ctx, c, profile):
+    if "revision" in c:
+        source = c["revision"]
+        expected = revised_candidate(
+            ctx, source["replacements"], c["receipt"], source, profile=profile
+        )
+        request = revision.approved_request(
+            profile, source["parent"], source["review"], source["approval"]
+        )
+    else:
+        expected = candidate(ctx, c["raw_output"], c["receipt"], profile=profile)
+        request = profile.request(ctx)
+    if c != expected:
+        raise profile.error("PUBLICATION_BINDING")
+    return request
 
 
 def fingerprint(row: FreeSceneGenerationResult, *, profile: FixedCourse = STACK) -> str:
@@ -388,7 +453,7 @@ def fingerprint(row: FreeSceneGenerationResult, *, profile: FixedCourse = STACK)
 
 
 async def validate_publication(db, row, actual, operation) -> dict[str, Any]:
-    profile = next((p for p in NEW_BATCHES.values() if p.batch == row.call_key), None)
+    profile = FOREGROUND_BATCHES.get(row.call_key)
     profile = profile or PROFILES[row.schema_version]
     snapshot = row.input_snapshot
     c = snapshot["candidate"]
@@ -401,6 +466,7 @@ async def validate_publication(db, row, actual, operation) -> dict[str, Any]:
         fixture=ctx["evidence_kind"] == "offline_fixture",
         profile=profile,
     )
+    request = verify_candidate(expected, c, profile)
     raw = assembly(c, snapshot["review"], profile=profile)
     if (
         operation.id != row.operation_id
@@ -413,13 +479,12 @@ async def validate_publication(db, row, actual, operation) -> dict[str, Any]:
         or row.prompt_version != profile.prompt_version
         or ctx != expected
         or row.input_snapshot["inputs"] != actual
-        or c != candidate(expected, c["raw_output"], c["receipt"], profile=profile)
         or str(row.request_id) != ctx["request_id"]
         or str(row.scene_id) != ctx["scene_id"]
         or str(row.plan_id) != ctx["plan_id"]
         or row.input_digest != digest(f"{profile.topic}-generation-input", snapshot=snapshot)
         or row.request_digest
-        != digest(f"{profile.topic}-http-request", body=profile.request(ctx))
+        != digest(f"{profile.topic}-http-request", body=request)
         or row.usage_json != c["receipt"]["usage"]
         or row.response_digest != fingerprint(row, profile=profile)
         or row.response_json != raw
@@ -456,8 +521,7 @@ async def publish(db, c, review, *, profile: FixedCourse = STACK) -> dict[str, A
     expected = await context(
         db, owner, cid, oid, fixture=ctx["evidence_kind"] == "offline_fixture", profile=profile
     )
-    if c != candidate(expected, c["raw_output"], c["receipt"], profile=profile):
-        raise profile.error("PUBLICATION_BINDING")
+    request = verify_candidate(expected, c, profile)
     raw = assembly(c, review, profile=profile)
     repo = SnapshotRepository(db, owner)
     fence = await repo.acquire_write_fence(cid, oid)
@@ -474,7 +538,7 @@ async def publish(db, c, review, *, profile: FixedCourse = STACK) -> dict[str, A
         plan_id=pid,
         scene_id=sid,
         input_digest=digest(f"{profile.topic}-generation-input", snapshot=snapshot),
-        request_digest=digest(f"{profile.topic}-http-request", body=profile.request(ctx)),
+        request_digest=digest(f"{profile.topic}-http-request", body=request),
         input_snapshot=snapshot,
         response_json=raw,
         usage_json=c["receipt"]["usage"],

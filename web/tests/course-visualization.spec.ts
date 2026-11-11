@@ -7,19 +7,28 @@ function scene(kind='linked_list'):SceneProjection{return{course_id:'c',course_v
 afterEach(()=>{vi.useRealTimers();vi.restoreAllMocks();vi.unstubAllGlobals();});
 async function button(w:ReturnType<typeof mount>,name:string){await w.findAll('button').find(b=>b.text()===name)!.trigger('click');}
 
-const sharedTrialProjections = process.env.EDUMIND_T125_PLAYER_PROJECTIONS;
+const revisionProjections = process.env.EDUMIND_T126_PLAYER_PROJECTIONS;
+const sharedTrialProjections = revisionProjections ?? process.env.EDUMIND_T125_PLAYER_PROJECTIONS;
 if (sharedTrialProjections) {
-  it.each([
+  const scenes = [
     ['head', 'head_frame', 13],
     ['stack', 'stack_frame', 5],
     ['queue', 'queue_frame', 5],
     ['binary-search', 'binary_search_frame', 6],
-  ] as const)('plays the admitted %s scene from PostgreSQL', async (topic, frameKey, count) => {
+  ] as const;
+  const checkedScenes = revisionProjections
+    ? scenes.filter(([topic]) => topic === 'head' || topic === 'stack')
+    : scenes;
+  it.each(checkedScenes)('plays the admitted %s scene from PostgreSQL', async (topic, frameKey, count) => {
     const value: SceneProjection = JSON.parse(readFileSync(`${sharedTrialProjections}/${topic}.json`, 'utf8'));
     const visual = value.blocks.find(block => block.kind === 'visualization');
     if (!visual || visual.kind !== 'visualization') throw new Error('Missing admitted visualization');
     expect(visual.steps).toHaveLength(count);
     expect(value.generation_source?.evidence_kind).toBe('offline_fixture');
+    if (revisionProjections) {
+      expect(value.generation_source?.revision_version).toBe('shared-trial-limited-revision-v1');
+      expect(value.generation_source?.parent_digest).toMatch(/^[0-9a-f]{64}$/);
+    }
     const w = mount(Presentation, { props: { scene: value } });
     try {
       for (const [index, step] of visual.steps.entries()) {

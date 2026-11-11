@@ -175,16 +175,23 @@ def revision_body(parent, review):
     return request
 
 
+def merge_replacements(original, contract, replacements):
+    m.Draft202012Validator(contract["schema"]).validate(replacements)
+    raw = deepcopy(original)
+    for key, path in contract["targets"].items():
+        container = raw
+        for component in path[:-1]:
+            container = container[component]
+        container[path[-1]] = deepcopy(replacements[key])
+    return raw
+
+
 def merge(parent, review, replacements):
     contract = revision_contract(parent, review)
-    m.Draft202012Validator(contract["schema"]).validate(replacements)
-    raw = deepcopy(parent["raw_output"])
+    raw = merge_replacements(parent["raw_output"], contract, replacements)
     for key, path in contract["targets"].items():
-        if len(path) == 1:
-            raw[path[0]] = replacements[key]
-        else:
+        if len(path) == 2:
             i = path[1]
-            raw["paragraphs"][i] = deepcopy(replacements[key])
             # Exact adjacent copying is mechanically rejectable. Paraphrase/omission is reviewed.
             text = replacements[key]["text"].strip()
             adjacent = [
