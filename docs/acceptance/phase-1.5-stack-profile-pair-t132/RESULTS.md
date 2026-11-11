@@ -201,3 +201,7 @@ A/B 使用 T135 两份冻结请求，进入独立 r02 槽。离线接线已验�
 两槽独立审核核对事实和「为什么」，通过后分别验收实际阅读、五帧及高亮、四题反馈、答案隔离和刷新。最后只用两份 v2 课按 T132 原三项比较，保留正确课程，单独记录画像对照结论。T134 的 A 和 B 保留原判定和原件。
 
 使用既有专用回环 PostgreSQL 和禁外网入口运行 `pytest -q backend/tests/test_stack_course_profile_v2_live.py`，**2 项通过，0 跳过**。实测两个槽都发送冻结字节、拒绝旧版授权及同槽重复发送，严格回放后将对应 v2 来源准入测试库；作答前无答案泄露。T135 的请求差异及绑定检查 **3 项通过**。CLI 摘要、Ruff、Vue 类型、工作流和 Git 差异检查通过。
+
+## T137 v2 真实批次登记
+
+用户已批准 `6b6be6f` 对应共同清单、两份 v2 准确请求及本批 C2。登记 [A 授权](prompt-v2/array-first.execution-approval.json) 与 [B 授权](prompt-v2/operations-known.execution-approval.json)。每槽仅一条正文，登记时窗口未启动，Provider 0。
