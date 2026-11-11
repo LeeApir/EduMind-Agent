@@ -1,6 +1,6 @@
-"""Fixed-outline trial admission through the existing private course repository."""
+"""Bounded trial admission through the existing private course repository."""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from types import ModuleType
 from typing import Any
 from uuid import UUID
@@ -13,10 +13,12 @@ from app.models.free_scene_generation import FreeSceneGenerationResult
 from app.services import (
     binary_search_course_materials,
     binary_search_course_revision,
+    head_course_materials,
     queue_course_materials,
     queue_course_revision,
     stack_course_materials,
 )
+from app.services.course_question_stem import PROMPT_VERSION as STEM_PROMPT_VERSION
 from app.services.free_course_snapshots import SnapshotError, SnapshotRepository, digest
 
 WINDOW_SECONDS = 1800
@@ -30,6 +32,34 @@ class FixedCourse:
     package: str
     approval_key: str
     checks: frozenset[str]
+    new_batch: bool = False
+
+    @property
+    def batch(self) -> str:
+        return f"{self.topic}-stem-v2-r01" if self.new_batch else self.materials.BATCH
+
+    @property
+    def model_planned(self) -> bool:
+        return self.topic == "head"
+
+    @property
+    def goal(self) -> str:
+        return head_course_materials.EMPTY_GOAL if self.model_planned else self.materials.GOAL
+
+    @property
+    def prompt_version(self) -> str:
+        return head_course_materials.FIXED_VERSION if self.model_planned else self.materials.VERSION
+
+    @property
+    def schema_version(self) -> str:
+        return "head-empty-course-trial-v1" if self.model_planned else self.materials.VERSION
+
+    def request(self, ctx=None):
+        if self.model_planned:
+            return self.materials.body(ctx["head_payload"], stem_prompt_version=STEM_PROMPT_VERSION)
+        if self.new_batch:
+            return self.materials.request(stem_prompt_version=STEM_PROMPT_VERSION)
+        return self.materials.request()
 
     def error(self, suffix: str) -> SnapshotError:
         return SnapshotError(f"{self.topic.upper()}_{suffix}")
@@ -95,6 +125,21 @@ PROFILES = {
     profile.materials.VERSION: profile
     for profile in (STACK, QUEUE, QUEUE_REVISION, BINARY_SEARCH, BINARY_SEARCH_REVISION)
 }
+NEW_BATCHES = {
+    profile.topic: replace(
+        profile,
+        database="edumind_catalog_p15_t125_trials",
+        package="phase-1.5-shared-first-draft-t125",
+        approval_key="accept_T125_scope_and_batch_C2",
+        new_batch=True,
+    )
+    for profile in (
+        FixedCourse("head", head_course_materials, "", "", "", frozenset()),
+        STACK,
+        QUEUE,
+        BINARY_SEARCH,
+    )
+}
 
 
 def require_database(
@@ -129,15 +174,17 @@ async def prepare(
     check_bind(db, fixture=fixture, profile=profile)
     repo = SnapshotRepository(db, owner)
     created = await repo.create_course(
-        profile.materials.GOAL,
-        key=profile.materials.BATCH,
+        profile.goal,
+        key=profile.batch,
         config={
-            "prompt_version": profile.materials.VERSION,
-            "policy_version": profile.materials.BATCH,
+            "prompt_version": profile.prompt_version,
+            "policy_version": profile.batch,
         },
         operation_window_seconds=WINDOW_SECONDS,
     )
     cid, oid = UUID(created["course_id"]), UUID(created["operation_id"])
+    if profile.model_planned:
+        return await context(db, owner, cid, oid, fixture=fixture, profile=profile, planning=True)
     if (await repo.get_course(cid))["head_version"] is None:
         fence = await repo.acquire_write_fence(cid, oid)
         plan = await repo.store_plan(
@@ -163,6 +210,7 @@ async def context(
     *,
     fixture: bool = False,
     profile: FixedCourse = STACK,
+    planning: bool = False,
 ) -> dict[str, Any]:
     from app.services.free_scene_generation import load_inputs
 
@@ -171,10 +219,10 @@ async def context(
     op = await repo._operation(cid, oid)
     course = await repo.get_course(cid)
     if (
-        course["original_goal"] != profile.materials.GOAL
-        or course["head_version"] != 1
-        or op.config_snapshot.get("prompt_version") != profile.materials.VERSION
-        or op.config_snapshot.get("policy_version") != profile.materials.BATCH
+        course["original_goal"] != profile.goal
+        or course["head_version"] != (None if planning else 1)
+        or op.config_snapshot.get("prompt_version") != profile.prompt_version
+        or op.config_snapshot.get("policy_version") != profile.batch
         or op.kind != "create"
         or op.state not in {"queued", "running"}
         or op.cancel_requested_at is not None
@@ -182,6 +230,34 @@ async def context(
         or (op.deadline_at - op.created_at).total_seconds() != WINDOW_SECONDS
     ):
         raise profile.error("OPERATION_STOPPED_OR_MISMATCH")
+    common = dict(
+        owner=str(owner),
+        course_id=str(cid),
+        operation_id=str(oid),
+        request_id=str(op.request_id),
+        starts_at=op.created_at.isoformat(),
+        expires_at=op.deadline_at.isoformat(),
+        evidence_kind="offline_fixture" if fixture else "actual_provider_response",
+    )
+    if profile.new_batch:
+        common.update(
+            topic=profile.topic,
+            batch=profile.batch,
+            stem_prompt_version=STEM_PROMPT_VERSION,
+            plan_source="model_planned" if profile.model_planned else "fixed_outline",
+        )
+    if planning:
+        from app.services.free_course_planning import load_inputs as load_planning_inputs
+
+        return dict(**common, planning_inputs=await load_planning_inputs(db, owner, cid, oid))
+    if profile.model_planned:
+        from app.services.head_course_generation import generation_context
+
+        head = await generation_context(db, owner, cid, oid)
+        return dict(
+            **common, plan_id=head["plan_id"], scene_id=head["scene_id"],
+            head_payload=head["payload"], planning_result_id=head["planning_result_id"],
+        )
     version = await repo.get_version(cid, 1)
     pid, sid = version["plan_id"], version["scenes"][0]["scene_id"]
     inputs = await load_inputs(
@@ -205,16 +281,10 @@ async def context(
     # checks the current epoch against its own write fence and snapshot.
     del inputs["lease_epoch"]
     return dict(
-        owner=str(owner),
-        course_id=str(cid),
-        operation_id=str(oid),
+        **common,
         plan_id=pid,
         scene_id=sid,
-        request_id=str(op.request_id),
-        starts_at=op.created_at.isoformat(),
-        expires_at=op.deadline_at.isoformat(),
         binding=digest(f"{profile.topic}-course-context", inputs=inputs),
-        evidence_kind="offline_fixture" if fixture else "actual_provider_response",
     )
 
 
@@ -225,13 +295,18 @@ def candidate(
     *,
     profile: FixedCourse = STACK,
 ) -> dict[str, Any]:
-    mat = profile.materials.materials()
-    profile.materials.validate_content(output, mat)
+    if profile.model_planned:
+        payload = ctx["head_payload"]
+        profile.materials.validate_content(payload, output)
+        mat, plan = payload["materials"], payload["plan"]
+    else:
+        mat, plan = profile.materials.materials(), profile.materials.outline()
+        profile.materials.validate_content(output, mat)
     data = dict(
         context=ctx,
         raw_output=output,
         receipt=receipt,
-        plan_digest=digest(f"{profile.topic}-plan", plan=profile.materials.outline()),
+        plan_digest=digest(f"{profile.topic}-plan", plan=plan),
         materials_digest=mat["materials_digest"],
     )
     if profile is QUEUE_REVISION:
@@ -247,14 +322,16 @@ def assembly(
     c: dict[str, Any], review: dict[str, Any], *, profile: FixedCourse = STACK
 ) -> dict[str, Any]:
     evaluator = review.get("independent_evaluator")
+    checks = review.get("checks")
     if (
         review.get("candidate_digest") != c["candidate_digest"]
         or review.get("verdict") != "pass"
         or not isinstance(evaluator, str)
         or not evaluator.strip()
         or review.get("blocking_findings") != []
-        or review.get("checks") != dict.fromkeys(profile.checks, True)
-        or any(type(v) is not bool for v in review["checks"].values())
+        or not isinstance(checks, dict)
+        or (not profile.model_planned and checks != dict.fromkeys(profile.checks, True))
+        or any(type(v) is not bool for v in checks.values())
     ):
         raise profile.error("REVIEW_REQUIRED")
     evidence_kind = c["context"]["evidence_kind"]
@@ -265,9 +342,9 @@ def assembly(
         evidence_kind = "evidence_bound_local_revision"
     source = dict(
         origin=profile.materials.ORIGIN,
-        batch=profile.materials.BATCH,
-        model=profile.materials.request()["model"],
-        prompt_version=profile.materials.VERSION,
+        batch=profile.batch,
+        model=profile.request(c["context"])["model"],
+        prompt_version=profile.prompt_version,
         parent_digest=c.get("parent_digest"),
         evidence_kind=evidence_kind,
         candidate_digest=c["candidate_digest"],
@@ -277,6 +354,24 @@ def assembly(
     )
     if profile is BINARY_SEARCH_REVISION:
         source["source_response_sha256"] = c["source_response_sha256"]
+    if profile.new_batch:
+        source.update(
+            plan_source=c["context"]["plan_source"], stem_prompt_version=STEM_PROMPT_VERSION
+        )
+    if profile.model_planned:
+        from app.services import head_course_reuse as reuse
+
+        payload = c["context"]["head_payload"]
+        # The outer review is bound to the new receipt-bearing candidate above.
+        # Reuse the original head-specific teaching and evidence checks on its inner lesson.
+        lesson = reuse.candidate(payload, c["raw_output"])
+        reuse.require_full_review(dict(review, candidate_digest=lesson["candidate_digest"]), lesson)
+        evidence = payload["teaching_evidence"]
+        source.update(
+            teaching_evidence_version=evidence["version"],
+            teaching_evidence_digest=evidence["evidence_digest"],
+        )
+        return profile.materials.assemble(payload, c["raw_output"], source)
     return profile.materials.assemble(c["raw_output"], source)
 
 
@@ -293,7 +388,8 @@ def fingerprint(row: FreeSceneGenerationResult, *, profile: FixedCourse = STACK)
 
 
 async def validate_publication(db, row, actual, operation) -> dict[str, Any]:
-    profile = PROFILES[row.schema_version]
+    profile = next((p for p in NEW_BATCHES.values() if p.batch == row.call_key), None)
+    profile = profile or PROFILES[row.schema_version]
     snapshot = row.input_snapshot
     c = snapshot["candidate"]
     ctx = c["context"]
@@ -313,7 +409,8 @@ async def validate_publication(db, row, actual, operation) -> dict[str, Any]:
         or row.reason_code is not None
         or row.sent_attempts != 1
         or row.expected_head != 1
-        or row.prompt_version != profile.materials.VERSION
+        or row.schema_version != profile.schema_version
+        or row.prompt_version != profile.prompt_version
         or ctx != expected
         or row.input_snapshot["inputs"] != actual
         or c != candidate(expected, c["raw_output"], c["receipt"], profile=profile)
@@ -322,7 +419,7 @@ async def validate_publication(db, row, actual, operation) -> dict[str, Any]:
         or str(row.plan_id) != ctx["plan_id"]
         or row.input_digest != digest(f"{profile.topic}-generation-input", snapshot=snapshot)
         or row.request_digest
-        != digest(f"{profile.topic}-http-request", body=profile.materials.request())
+        != digest(f"{profile.topic}-http-request", body=profile.request(ctx))
         or row.usage_json != c["receipt"]["usage"]
         or row.response_digest != fingerprint(row, profile=profile)
         or row.response_json != raw
@@ -373,17 +470,17 @@ async def publish(db, c, review, *, profile: FixedCourse = STACK) -> dict[str, A
         request_id=UUID(ctx["request_id"]),
         lease_epoch=fence.epoch,
         expected_head=1,
-        call_key=profile.materials.BATCH,
+        call_key=profile.batch,
         plan_id=pid,
         scene_id=sid,
         input_digest=digest(f"{profile.topic}-generation-input", snapshot=snapshot),
-        request_digest=digest(f"{profile.topic}-http-request", body=profile.materials.request()),
+        request_digest=digest(f"{profile.topic}-http-request", body=profile.request(ctx)),
         input_snapshot=snapshot,
         response_json=raw,
         usage_json=c["receipt"]["usage"],
         origin_type="model_generation",
-        prompt_version=profile.materials.VERSION,
-        schema_version=profile.materials.VERSION,
+        prompt_version=profile.prompt_version,
+        schema_version=profile.schema_version,
         sent_attempts=1,
         state="candidate",
         reason_code=None,

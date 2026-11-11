@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { mount } from '@vue/test-utils';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import Presentation from '../src/components/CoursePresentation.vue';
@@ -5,6 +6,41 @@ import type { BinarySearchFrame, SceneProjection } from '../src/api/freeCourses'
 function scene(kind='linked_list'):SceneProjection{return{course_id:'c',course_version:1,scene_id:'s',scene_version_id:'sv',blocks:[{kind:'code',anchor_id:'code',language:'c',source:'head=n;'},{kind:'visualization',anchor_id:'vis',visualization_type:kind,text_alternative:'先连接，再更新head。',steps:[{caption:'初始',elements:[{id:'old',label:'3',next_id:null}],highlight_ids:[]},{caption:'新结点连接原链表',elements:[{id:'new',label:'8',next_id:'old'},{id:'old',label:'3',next_id:null}],highlight_ids:['new']}]}],actions:[{type:'highlight_block',anchor_id:'code',step_index:null},{type:'show_step',anchor_id:'vis',step_index:1},{type:'pause',anchor_id:'vis',step_index:null}]};}
 afterEach(()=>{vi.useRealTimers();vi.restoreAllMocks();vi.unstubAllGlobals();});
 async function button(w:ReturnType<typeof mount>,name:string){await w.findAll('button').find(b=>b.text()===name)!.trigger('click');}
+
+const sharedTrialProjections = process.env.EDUMIND_T125_PLAYER_PROJECTIONS;
+if (sharedTrialProjections) {
+  it.each([
+    ['head', 'head_frame', 13],
+    ['stack', 'stack_frame', 5],
+    ['queue', 'queue_frame', 5],
+    ['binary-search', 'binary_search_frame', 6],
+  ] as const)('plays the admitted %s scene from PostgreSQL', async (topic, frameKey, count) => {
+    const value: SceneProjection = JSON.parse(readFileSync(`${sharedTrialProjections}/${topic}.json`, 'utf8'));
+    const visual = value.blocks.find(block => block.kind === 'visualization');
+    if (!visual || visual.kind !== 'visualization') throw new Error('Missing admitted visualization');
+    expect(visual.steps).toHaveLength(count);
+    expect(value.generation_source?.evidence_kind).toBe('offline_fixture');
+    const w = mount(Presentation, { props: { scene: value } });
+    try {
+      for (const [index, step] of visual.steps.entries()) {
+        const frame = step[frameKey]!;
+        if (index) await button(w, '下一步');
+        expect(w.find('[data-frame]').attributes('data-frame')).toBe(frame.frame_id);
+        expect(w.text()).toContain(frame.note);
+        if (frame.line !== null) {
+          expect(w.find('.active-code-line').attributes('data-line')).toBe(String(frame.line));
+        }
+      }
+      await button(w, '上一步');
+      expect(w.find('[data-frame]').attributes('data-frame')).toBe(visual.steps[count - 2]![frameKey]!.frame_id);
+      await button(w, '重置');
+      expect(w.find('[data-frame]').attributes('data-frame')).toBe(visual.steps[0]![frameKey]!.frame_id);
+    } finally {
+      w.unmount();
+    }
+  });
+}
+
 describe('bounded scene presentation',()=>{
   it.each(['array','linked_list','stack','queue'])('renders real %s elements and bounded manual steps',async kind=>{
     const w=mount(Presentation,{props:{scene:scene(kind)}});expect(w.text()).toContain('先连接');expect(w.text()).toContain('非代码执行');

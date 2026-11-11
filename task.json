@@ -6681,6 +6681,50 @@
           "evidence": "docs/acceptance/phase-1.5-question-stem-t124/README.md"
         }
       ]
+    },
+    {
+      "id": "PHASE-1.5-T125",
+      "phase": "Phase 1.5",
+      "title": "四主题共用新批首稿入口",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T124"
+      ],
+      "scope": [
+        "复用 course_trial_generation、现有头插规划和私有课程准入，限定四主题单场景首稿。",
+        "MockTransport、隔离库与播放器验证，Provider 0。"
+      ],
+      "prd_source": "PRD §0.5；T123 M01/M08；T124；用户本轮授权",
+      "acceptance_criteria": [
+        "同一命令可准备、发送、重放、审核后准入和停止四主题新批，明确模型规划与固定提纲。",
+        "实际请求显式选择题干 v2，沿用各主题 Schema、材料及审核项，旧回放保留原版本。",
+        "隔离库及播放器四主题通过，拒绝错主题、旧批准、错审核、重复发送和停止后准入。"
+      ],
+      "verification": [
+        "四主题 MockTransport 与隔离 PostgreSQL 集成验证",
+        "现有播放器读取四主题实际准入投影；历史回放、Ruff、工作流及 diff"
+      ],
+      "started_at": "2026-11-11T09:46:31+08:00",
+      "commit_lookup": "Task-Completed: PHASE-1.5-T125",
+      "completed_at": "2026-11-11T10:02:54+08:00",
+      "verification_results": [
+        {
+          "command": "README 中的四主题定向 pytest（专用 PostgreSQL alembic upgrade head 后执行）",
+          "result": "20 passed。四主题发送字节与原 Schema/材料一致，私有 v2 与来源绑定通过，错主题、旧批准、缺失或错配审核、重复发送和停止后准入拒绝。Provider 0。",
+          "evidence": "docs/acceptance/phase-1.5-shared-first-draft-t125/README.md"
+        },
+        {
+          "command": "EDUMIND_T125_PLAYER_PROJECTIONS=/tmp/edumind-t125-player pnpm --dir web exec vitest run tests/course-visualization.spec.ts tests/head-course-status.spec.ts；pnpm --dir web typecheck",
+          "result": "18 passed。四份实际准入投影 13/5/5/6 帧逐步播放、逐行高亮、说明与重置通过，类型检查通过。",
+          "evidence": "docs/acceptance/phase-1.5-shared-first-draft-t125/README.md"
+        },
+        {
+          "command": "四主题 inspect --new-batch；五份历史 replay 与二分失败首稿拒绝；定向 Ruff/ESLint、check_catalog_workflow.py、git diff --check",
+          "result": "通过。旧入口 Ruff 诊断与基线一致，ESLint 0 错误。旧包使用原冻结提交。",
+          "evidence": "docs/acceptance/phase-1.5-shared-first-draft-t125/README.md"
+        }
+      ]
     }
   ],
   "planning_inputs": {

@@ -154,7 +154,7 @@ async def prepare(owner, cid, oid):
     return await database(load)
 
 
-async def save_plan(context, value):
+async def save_plan(context, value, *, database_call=None):
     from app.agents.free_course_planning import (
         PlanningOutcome,
         request_digest,
@@ -206,7 +206,7 @@ async def save_plan(context, value):
         op.lease_expires_at = None
         return result
 
-    result = await database(saved)
+    result = await (database_call or database)(saved)
     if value["needs_clarification"]:
         raise SnapshotError("HEAD_PLANNING_CLARIFICATION_STOP")
     return result

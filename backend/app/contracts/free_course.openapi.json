@@ -3369,7 +3369,8 @@
               {"$ref": "#/components/schemas/HeadGenerationSource"},
               {"$ref": "#/components/schemas/StackCourseSource"},
               {"$ref": "#/components/schemas/QueueCourseSource"},
-              {"$ref": "#/components/schemas/BinarySearchCourseSource"}
+              {"$ref": "#/components/schemas/BinarySearchCourseSource"},
+              {"$ref": "#/components/schemas/SharedTrialGenerationSource"}
             ]
           }
         },
@@ -5805,6 +5806,33 @@
           }
         },
         "required": ["kind", "anchor_id", "visualization_type", "text_alternative", "steps"]
+      },
+      "SharedTrialGenerationSource": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "origin": {"enum": ["head_goal_model_generation", "stack_lifo_model_generation", "queue_fifo_model_generation", "binary_search_model_generation"]},
+          "batch": {"enum": ["head-stem-v2-r01", "stack-stem-v2-r01", "queue-stem-v2-r01", "binary-search-stem-v2-r01"]},
+          "model": {"const": "deepseek-flash"},
+          "prompt_version": {"type": "string"},
+          "stem_prompt_version": {"const": "course-question-stem-v2"},
+          "plan_source": {"enum": ["model_planned", "fixed_outline"]},
+          "parent_digest": {"type": "null"},
+          "evidence_kind": {"enum": ["actual_provider_response", "offline_fixture"]},
+          "candidate_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "materials_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "plan_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "teaching_evidence_version": {"const": "head-teaching-evidence-v1"},
+          "teaching_evidence_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "teaching_review": {"$ref": "#/components/schemas/StackCourseSource/properties/teaching_review"}
+        },
+        "oneOf": [
+          {"properties": {"origin": {"const": "head_goal_model_generation"}, "batch": {"const": "head-stem-v2-r01"}, "prompt_version": {"const": "head-fixed-course-v1"}, "plan_source": {"const": "model_planned"}}, "required": ["teaching_evidence_version", "teaching_evidence_digest"]},
+          {"properties": {"origin": {"const": "stack_lifo_model_generation"}, "batch": {"const": "stack-stem-v2-r01"}, "prompt_version": {"const": "stack-lifo-course-v1"}, "plan_source": {"const": "fixed_outline"}}},
+          {"properties": {"origin": {"const": "queue_fifo_model_generation"}, "batch": {"const": "queue-stem-v2-r01"}, "prompt_version": {"const": "queue-fifo-course-v1"}, "plan_source": {"const": "fixed_outline"}}},
+          {"properties": {"origin": {"const": "binary_search_model_generation"}, "batch": {"const": "binary-search-stem-v2-r01"}, "prompt_version": {"const": "binary-search-course-v1"}, "plan_source": {"const": "fixed_outline"}}}
+        ],
+        "required": ["origin", "batch", "model", "prompt_version", "stem_prompt_version", "plan_source", "parent_digest", "evidence_kind", "candidate_digest", "materials_digest", "plan_digest", "teaching_review"]
       },
       "BinarySearchCourseSource": {
         "type": "object",

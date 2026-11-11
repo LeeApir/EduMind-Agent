@@ -182,6 +182,7 @@ async def validate_candidate(
             "stack-lifo-course-v1", "queue-fifo-course-v1", "queue-fifo-q01-revision-v1",
             "binary-search-course-v1",
             "binary-search-revision-v1",
+            "head-empty-course-trial-v1",
         ):
             from app.services.course_trial_publication import validate_publication
 
