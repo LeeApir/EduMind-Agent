@@ -107,3 +107,28 @@ backend/.venv/bin/pytest -q backend/tests/test_stack_multiscene.py backend/tests
 pnpm --dir web exec vitest run tests/course-visualization.spec.ts tests/course-workspace.spec.ts tests/head-course-status.spec.ts
 pnpm --dir web typecheck
 ```
+
+## T140 有限真实批次
+
+北京时间 2026-11-11 23:14:11 登记用户对准备提交 `aef13d5` 及准确清单 `7eecb70f8896e4d7faf394def80618c350db7847e9fa1b8e469a144593ec3646` 的批准，接受该清单列明的本批 C2。独立隔离库迁移与应用访客已验证，普通生成入口返回 409。批准额度为 1 次规划、2 次场景正文、0 次修订，登记时实际 Provider 调用 0，窗口尚未启动。
+
+### 本批停止结果
+
+北京时间窗口为 **2026-11-11 23:14:35 至 23:44:35**。仅发送 `plan`，DeepSeek 返回 HTTP 200。用已封存响应重放响应外层校验和规划 wire Schema，通过后在本地场景约束处触发 `STACK_PLAN_SCOPE`。
+
+| 字段 | 本批要求 | 封存原文 |
+| --- | --- | --- |
+| `plans[0].shared_example` | 精确 ID `stack-boundaries-multiscene-v1` | 以「固定容量 CAP = 3 的 C 栈，底层数组 slots[3]」开头的整段示例描述。 |
+| `plans[0].scenes[*].scene_key` | 依次为 `normal`、`rejections` | 依次为 `scene_normal`、`scene_rejections`。 |
+| `plans[0].scenes[1].depends_on` | `["normal"]` | `["scene_normal"]`，与模型自己的键一致，未绑定到本批指定键。 |
+
+三条原目标引文与场景主题分配可以在原件中核对。原件还使用了 `slots`，而 T138 C 代码的字段为 `data[CAP]`，并把 `count` 称为指针，实际为 `size_t` 计数。以上为停止后的只读诊断，原文及本地门禁均保留。机械门禁已阻断本批，未启动独立语义审核。
+
+| 证据 | 结果 |
+| --- | --- |
+| 请求／用量 | 实际 **1 次规划、0 次正文、0 次修订**。回执输入 **2560**、输出 **1027** token，共 **3587** token，实际账单未知。剩余两次额度随 STOP 失效。 |
+| 准确请求 | `plan.request.json`，SHA-256 `e8b84b1d7fb8db3f816188e2a5b27e3e50966114762368419d833e7a68c95797`，与 `plan.attempt.json` 匹配。 |
+| 响应原件 | `plan.raw.enc` 可完整解封，明文 8026 字节，SHA-256 `b1a9f0bd8e90d72c2b3eceb88aa259a696cfe794d53283b0716e8c0b64fc7b69`，与 `plan.body.json` 匹配。封存位置为本机私有目录 `~/.local/share/edumind/stack-boundaries-multiscene-v1/`。 |
+| 停止与课程 | `plan.failure.json` 和 `STOP` 存在，`ACTIVE` 已清除。使用既有恢复服务将隔离库内唯一操作从 `cancel_requested` 收尾至 `cancelled`。私有 API 读回 HTTP 200、`head=null`；两个场景均无发送预约，未产生课程版本或学习入口，实际浏览器验收未运行。 |
+
+本批结束，T140 记为 blocked。冻结请求、原件与失败证据保留。
