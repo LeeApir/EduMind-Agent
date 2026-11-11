@@ -182,3 +182,22 @@ A 用数组槽位和逐步状态解释这些关系，保留有帮助的实现说
 `PYTHONPATH=backend:. backend/.venv/bin/pytest -q backend/tests/test_stack_course_profile_prompt_v2.py` 定向 **3 项通过**。逐字节核对 v1 与 v2，确认各槽只变更系统提示；移除 `learner_evidence` 后，两份 v2 请求完全一致。用共用请求构造、响应校验和候选绑定的离线夹具验证 v2 正常绑定，以及拒绝 v1 请求、对方槽请求和互换的画像证据。夹具只用于检查接线，Provider 调用 0。Ruff、工作流和 Git 差异检查通过。
 
 拟下一批同版 A/B 各生成一次正文，合计 **2 次正文、0 次规划、0 次修订**。此处仅冻结请求和检查，尚未登记 v2 真实发送入口、窗口或授权。后续另行确定准确执行包，A 与 B 一并使用 v2；T134 的 A 保留为已交付课程，B 保留为失败诊断。旧批复现沿用其冻结运行提交 `a98e3e2`。
+
+## T136 v2 准确执行包待批准
+
+A/B 使用 T135 两份冻结请求，进入独立 r02 槽。离线接线已验证，Provider **0 次**，未登记真实窗口。拟议范围及费用例外见 [ADR0065 v2 补充](../../ADR/0065-stack-profile-pair-prompt-v2.md)。
+
+| 项目 | 冻结值 |
+| --- | --- |
+| [共同清单](prompt-v2/manifest.json) SHA-256 | `de148d78ffa49917294a21c65d32dfa91007a7432f8f4680c5d516be92abdd14` |
+| A · `stack-profile-array-first-v2` | [原请求](prompt-v2/array-first.request.json) `cb5b0e4863f7fa973beef1922451fe7ec04fcbabc1b49e696e0f4bcb335c11df` · [批准模板](prompt-v2/array-first.approval.template.json) |
+| B · `stack-profile-operations-known-v2` | [原请求](prompt-v2/operations-known.request.json) `278a86dd2e546b4f0b072409c2ba46939da1b4f1a1f7ec1a9c1e139e84352abd` · [批准模板](prompt-v2/operations-known.approval.template.json) |
+| 调用 | 0 规划、2 正文、0 修订，各槽各一次。DeepSeek 官方 Responses `deepseek-flash`，`temperature=0.2`，`reasoning.effort=none`，`stream=false`，`store=false`，`max_output_tokens=4000` |
+| 窗口 | 建议 A 后 B，各槽 `prepare` 创建操作起 30 分钟。发送前预留 90 秒 I/O 限制，审核及准入在各槽窗口内。两窗口满额合计 60 分钟，间隔按实际登记 |
+| C2 | 最多两次 HTTP；实际费用未知，无可验证硬上限，停止后仍可能迟发或计费，本机原件无独立抗回滚保护，服务端留存未独立验证 |
+
+两份批准模板保留 `explicit_user_authorization=false` 和 `accept_T136_scope_and_batch_C2=false`。待准确授权后按 T133 相同流程在专用本机开发库为两槽建立新合成访客和画像，重载本提交的 API。共用命令参数仅替换为表中的 v2 topic，继续使用 `inspect → prepare --owner ... --profile-id ... --approval ... → send → replay → publish`，失败用 `stop`。发送密钥只在本机终端隐藏提示输入。各槽使用 `~/.local/share/edumind/stack-profile-pair-live-array-first-r02/` 或 `~/.local/share/edumind/stack-profile-pair-live-operations-known-r02/` 保存原件。一槽失败即封存并停止该槽，无重试或回退，另一槽独立执行。
+
+两槽独立审核核对事实和「为什么」，通过后分别验收实际阅读、五帧及高亮、四题反馈、答案隔离和刷新。最后只用两份 v2 课按 T132 原三项比较，保留正确课程，单独记录画像对照结论。T134 的 A 和 B 保留原判定和原件。
+
+使用既有专用回环 PostgreSQL 和禁外网入口运行 `pytest -q backend/tests/test_stack_course_profile_v2_live.py`，**2 项通过，0 跳过**。实测两个槽都发送冻结字节、拒绝旧版授权及同槽重复发送，严格回放后将对应 v2 来源准入测试库；作答前无答案泄露。T135 的请求差异及绑定检查 **3 项通过**。CLI 摘要、Ruff、Vue 类型、工作流和 Git 差异检查通过。

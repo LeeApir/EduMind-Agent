@@ -31,6 +31,8 @@ def package_path(profile):
 
 
 def request_path(profile):
+    if profile in publication.STACK_PROFILE_V2_LIVE.values():
+        return package_path(profile) / f"{profile.learner_case}.request.json"
     if profile.learner_case is not None and not profile.offline_only:
         profile = publication.STACK_PROFILE_CASES[profile.learner_case]
     return package_path(profile) / "request.json"

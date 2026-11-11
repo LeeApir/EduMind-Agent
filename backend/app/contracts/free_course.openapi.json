@@ -6164,7 +6164,7 @@
           "origin": {"const": "stack_lifo_model_generation"},
           "batch": {"type": "string"},
           "model": {"const": "deepseek-flash"},
-          "prompt_version": {"const": "stack-learner-evidence-v1"},
+          "prompt_version": {"enum": ["stack-learner-evidence-v1", "stack-learner-evidence-v2"]},
           "parent_digest": {"type": "null"},
           "evidence_kind": {"enum": ["actual_provider_response", "offline_fixture"]},
           "learner_case": {"enum": ["array-first", "operations-known"]},
@@ -6179,8 +6179,10 @@
           "teaching_review": {"$ref": "#/components/schemas/StackCourseSource/properties/teaching_review"}
         },
         "oneOf": [
-          {"properties": {"learner_case": {"const": "array-first"}, "batch": {"const": "stack-profile-pair-live-array-first-r01"}}},
-          {"properties": {"learner_case": {"const": "operations-known"}, "batch": {"const": "stack-profile-pair-live-operations-known-r01"}}}
+          {"properties": {"learner_case": {"const": "array-first"}, "batch": {"const": "stack-profile-pair-live-array-first-r01"}, "prompt_version": {"const": "stack-learner-evidence-v1"}}},
+          {"properties": {"learner_case": {"const": "operations-known"}, "batch": {"const": "stack-profile-pair-live-operations-known-r01"}, "prompt_version": {"const": "stack-learner-evidence-v1"}}},
+          {"properties": {"learner_case": {"const": "array-first"}, "batch": {"const": "stack-profile-pair-live-array-first-r02"}, "prompt_version": {"const": "stack-learner-evidence-v2"}}},
+          {"properties": {"learner_case": {"const": "operations-known"}, "batch": {"const": "stack-profile-pair-live-operations-known-r02"}, "prompt_version": {"const": "stack-learner-evidence-v2"}}}
         ],
         "required": [
           "origin", "batch", "model", "prompt_version", "parent_digest", "evidence_kind",

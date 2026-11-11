@@ -7115,6 +7115,39 @@
           "evidence": "docs/acceptance/phase-1.5-stack-profile-pair-t132/RESULTS.md"
         }
       ]
+    },
+    {
+      "id": "PHASE-1.5-T136",
+      "phase": "Phase 1.5",
+      "title": "栈画像 v2 准确执行包准备",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T135"
+      ],
+      "scope": [
+        "沿用共用入口将两份冻结 v2 请求接入独立 r02 槽。",
+        "冻结准确授权、窗口、费用边界和失败处置；Provider 0。"
+      ],
+      "prd_source": "PRD §0.5；ADR0065 v2 补充；T135",
+      "acceptance_criteria": [
+        "两槽准确发送各自 v2 请求，版本及原件与 r01 隔离。",
+        "隔离库验证一次性门禁、严格回放和私有 v2 来源。",
+        "交回准确共同清单及 C2，待另行准确授权。"
+      ],
+      "verification": [
+        "禁外网隔离库 MockTransport、T135 请求绑定、CLI、Vue 类型、Ruff 和差异检查。"
+      ],
+      "started_at": "2026-11-11T20:11:56+08:00",
+      "completed_at": "2026-11-11T20:11:56+08:00",
+      "commit_lookup": "Task-Completed: PHASE-1.5-T136",
+      "verification_results": [
+        {
+          "command": "隔离库 pytest -q backend/tests/test_stack_course_profile_v2_live.py；T135 绑定测试；CLI、Ruff、Vue 类型及工作流",
+          "result": "2 项双槽接线与 3 项绑定通过。Provider 0，真实窗口待准确批准。",
+          "evidence": "docs/acceptance/phase-1.5-stack-profile-pair-t132/RESULTS.md"
+        }
+      ]
     }
   ],
   "planning_inputs": {
