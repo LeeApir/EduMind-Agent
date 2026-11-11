@@ -161,3 +161,29 @@ backend/.venv/bin/python -m scripts.stack_multiscene_trial --fixed-outline previ
 **定向验证**。固定大纲目标、事实和错大纲拒绝 1 项通过。隔离 PostgreSQL 加禁外网 MockTransport 2 项通过，验证 v1 无正文、无模型规划记录、禁发规划、旧批准拒绝、未审核上游阻断、成功时恰好两次模拟正文且第二次读取真实保存的 v2 快照。同版私有 API 投影为 5＋9 帧与 2＋4 题，来源为 `fixed_outline` 和 `offline_fixture`。从实际隔离投影运行的前端 2 项通过，核对高亮、来源标签、场景切换和刷新；TypeScript、Ruff、任务账本及 Git 检查通过。三份旧请求预览摘要也仍与旧清单一致。
 
 本准备任务实际 Provider 调用 **0 次**，新真实窗口和原件目录尚未建立。真实正文、独立教学审核及浏览器学习验收留待本批授权后执行，结果继续写入本记录。
+
+## T142 固定大纲有限真实批次
+
+北京时间 2026-11-11 23:38:03 登记用户对准备提交 `da8f840` 及清单 `6b2cbcdd918acf034efdac7569d0b2caad433f5be95c1363406d81118f56676a` 的批准，接受清单中的本批 C2。授权为 0 次规划、2 次场景正文、0 次修订。登记时 Provider 调用 0，窗口尚未启动。
+
+### 真实执行与停止
+
+北京时间窗口为 **2026-11-11 23:38:36 至 2026-11-12 00:08:36**。程序按准确材料生成并保存大纲 v1，来源为 `fixed_outline`，其数据库计划摘要为 `7c4ed568a1727b11a1557879aa4f366724a0ddf6ad510f1897db4a2d5b3e6690`。仅发送 `normal`，DeepSeek 返回 HTTP 200。机械校验及原件重放通过，候选摘要为 `498dd784b9d854e074ba958685aee1ce358a425b825f135d73f9e59443e2ddd2`。
+
+独立审核助手确认 `normal_five_frames`、`lifo_explanation` 和正文 `fact_support` 通过。五帧为 `[] → [3] → [3,8] → [3] → [3,5]`，演示出栈值 8。两题都要求按 `practice-code` 作答，模型解析引用了演示代码，`two_exercises` 未通过。
+
+| 练习 | 模型原解析的结论 | 独立参考与程序答案 |
+| --- | --- | --- |
+| `first_pop` | 「第一次 pop 时栈为 [3,8]」并答写入 `8`。 | 练习首次出栈前为 `[-4,6,2]`，写入 `2`。 |
+| `final_top` | 「本场景最后一次操作是 push(5)」并答栈顶 `5`。 | 练习依次弹出 `2、9、6`，最后剩 `[-4]`，栈顶为 `-4`。 |
+
+审核还给出一项非阻断意见，将「新元素总被放在」限定为「成功入栈时」。练习预期与 [T119 独立参考](../phase-1.5-stack-lifo-t119/independent-reference.json) 一致。
+
+| 证据 | 结果 |
+| --- | --- |
+| 实际请求与用量 | **0 次规划、1 次正常场景正文、0 次拒绝场景、0 次修订**。输入 **2760**、输出 **539** token，共 **3299** token，实际账单未知。 |
+| 请求与原件 | `normal.request.json` SHA-256 `920fac197bf31bc6fcac111be7499c1e7ead02a8d15b94ff4e63b3a96587a16d` 与出站预约一致。`normal.raw.enc` 解封后 3705 字节，SHA-256 `fcb6992cd4232df5526bec33337b8b61b06e2fa66539e5b14077bb33a16ecefe` 与回执一致。 |
+| 审核与失败 | `normal.review.json` SHA-256 `ee186d9f25f9a14e1869364f1b41ab3afa029ed38257026d32daa9934cd1a6a5`，已绑定准确候选。准入拒绝 `STACK_REVIEW_REQUIRED`，保留 `normal.failure.json` 和 STOP；本机私有目录 `~/.local/share/edumind/stack-boundaries-fixed-outline-v1/` 保留原件。 |
+| 实际应用 | 专用库中操作已收尾为 `cancelled`。私有课程 API 返回 HTTP 200，当前版本为大纲 v1，两个场景均未准入。整课审核、十四帧和六题的实际浏览器验收未运行。 |
+
+T142 记为 blocked。本批结束，未用的一次正文额度随 STOP 失效。T140 旧失败和 STOP 保留。

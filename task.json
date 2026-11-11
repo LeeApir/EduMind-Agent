@@ -7318,6 +7318,38 @@
           "evidence": "docs/acceptance/phase-1.5-stack-boundaries-t138/RESULTS.md#t141-程序固定大纲双场景准备"
         }
       ]
+    },
+    {
+      "id": "PHASE-1.5-T142",
+      "phase": "Phase 1.5",
+      "title": "栈固定大纲双场景真实批次与学习验收",
+      "status": "blocked",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T141"
+      ],
+      "scope": [
+        "按批准的固定大纲清单执行 0 次规划、2 次场景正文、0 次修订，失败或结果未知即停。",
+        "逐关独立审核，实际验收 v3 双场景、十四帧和六题，写入统一记录。"
+      ],
+      "prd_source": "PRD §0.5；T141 准确执行清单；用户批准",
+      "acceptance_criteria": [
+        "程序固定大纲和新正文均按准确来源与版本绑定，第二场景读取已审核正常场景真实快照。",
+        "独立教学审核通过后，验收完整私有课程 5＋9 帧、六题、场景切换及刷新。",
+        "保留实际调用与失败证据，无重试和修订。"
+      ],
+      "verification": [
+        "清单与原件绑定、独立教学审核、专用开发应用浏览器验收。"
+      ],
+      "started_at": "2026-11-11T23:38:03+08:00",
+      "block_reason": "正常场景通过机械校验，独立审核确认两道解析错误使用演示代码的结果。按已批准规则封存 STOP、取消私有操作，仅保留固定大纲 v1；未发送拒绝场景。",
+      "verification_results": [
+        {
+          "command": "封存响应严格重放、独立逐项教学审核、私有操作取消及 API 读回",
+          "result": "实际 1 次正常场景正文，0 规划、0 拒绝场景、0 修订；输入 2760、输出 539 token。两题解析未通过，v1 无可学场景，实际浏览器未运行。",
+          "evidence": "docs/acceptance/phase-1.5-stack-boundaries-t138/RESULTS.md#t142-固定大纲有限真实批次"
+        }
+      ]
     }
   ],
   "planning_inputs": {
