@@ -281,7 +281,7 @@ onBeforeUnmount(()=>{save();epoch+=1;manifestEpoch+=1;versionsEpoch+=1;controlle
             >
               <strong v-if="scene.generation_source.origin === 'stack_boundaries_model_generation'"
               >
-                栈双场景 · {{ scene.generation_source.plan_source === 'fixed_outline' ? '程序固定大纲' : '模型规划' }} · {{ scene.generation_source.scene_key === 'normal' ? '正常操作' : '拒绝边界' }} · {{ scene.generation_source.evidence_kind === 'offline_fixture' ? '离线接线夹具' : '独立教学审核通过' }} · 未签核
+                {{ scene.generation_source.plan_source === 'goal_selected' ? '栈课程 · 按目标选择' : (scene.generation_source.plan_source === 'fixed_outline' ? '栈双场景 · 程序固定大纲' : '栈双场景 · 模型规划') }} · {{ scene.generation_source.scene_key === 'normal' ? '正常操作' : '拒绝边界' }} · {{ scene.generation_source.evidence_kind === 'offline_fixture' ? '离线接线夹具' : '独立教学审核通过' }} · 未签核
               </strong>
               <strong
                 v-else-if="scene.generation_source.prompt_version === 'binary-search-program-frames-v1'"

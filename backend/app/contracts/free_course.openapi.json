@@ -6209,17 +6209,18 @@
         "oneOf": [
           {"properties": {"batch": {"const": "stack-boundaries-multiscene-v1"}, "plan_source": {"const": "model_planned"}, "prompt_version": {"const": "stack-boundaries-scene-v1"}}},
           {"properties": {"batch": {"const": "stack-boundaries-fixed-outline-v1"}, "plan_source": {"const": "fixed_outline"}, "prompt_version": {"const": "stack-boundaries-scene-v1"}}},
-          {"properties": {"batch": {"const": "stack-boundaries-practice-evidence-v1"}, "plan_source": {"const": "fixed_outline"}, "prompt_version": {"const": "stack-boundaries-scene-evidence-v2"}}}
+          {"properties": {"batch": {"const": "stack-boundaries-practice-evidence-v1"}, "plan_source": {"const": "fixed_outline"}, "prompt_version": {"const": "stack-boundaries-scene-evidence-v2"}}},
+          {"properties": {"batch": {"const": "stack-goal-selection-v1"}, "plan_source": {"const": "goal_selected"}, "prompt_version": {"const": "stack-boundaries-scene-evidence-v2"}}}
         ],
         "properties": {
           "origin": {"const": "stack_boundaries_model_generation"},
-          "batch": {"enum": ["stack-boundaries-multiscene-v1", "stack-boundaries-fixed-outline-v1", "stack-boundaries-practice-evidence-v1"]},
+          "batch": {"enum": ["stack-boundaries-multiscene-v1", "stack-boundaries-fixed-outline-v1", "stack-boundaries-practice-evidence-v1", "stack-goal-selection-v1"]},
           "model": {"const": "deepseek-flash"},
           "prompt_version": {"enum": ["stack-boundaries-scene-v1", "stack-boundaries-scene-evidence-v2"]},
           "parent_digest": {"type": "null"},
           "evidence_kind": {"enum": ["actual_provider_response", "offline_fixture"]},
           "scene_key": {"enum": ["normal", "rejections"]},
-          "plan_source": {"enum": ["model_planned", "fixed_outline"]},
+          "plan_source": {"enum": ["model_planned", "fixed_outline", "goal_selected"]},
           "candidate_digest": {"$ref": "#/components/schemas/StackCourseSource/properties/candidate_digest"},
           "materials_digest": {"$ref": "#/components/schemas/StackCourseSource/properties/materials_digest"},
           "plan_digest": {"$ref": "#/components/schemas/StackCourseSource/properties/plan_digest"},

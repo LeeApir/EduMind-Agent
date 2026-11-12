@@ -9,6 +9,7 @@ from app.services.free_course_snapshots import SnapshotError, digest
 VERSION = "stack-boundaries-multiscene-v1"
 FIXED_BATCH = "stack-boundaries-fixed-outline-v1"
 EVIDENCE_BATCH = "stack-boundaries-practice-evidence-v1"
+SELECTION_BATCH = "stack-goal-selection-v1"
 FIXED_BATCHES = (FIXED_BATCH, EVIDENCE_BATCH)
 PRACTICE_VERSION = "stack-practice-checkpoints-v1"
 NORMAL_GOAL = "追踪正常入栈和出栈，解释栈顶与后进先出"
@@ -146,7 +147,7 @@ def practice_evidence(data: dict[str, Any]) -> dict[str, Any]:
 
 def materials_digest(batch: str) -> str:
     data = materials()
-    if batch != EVIDENCE_BATCH:
+    if batch not in (EVIDENCE_BATCH, SELECTION_BATCH):
         return data["materials_digest"]
     return digest(
         EVIDENCE_BATCH, base_materials_digest=data["materials_digest"],

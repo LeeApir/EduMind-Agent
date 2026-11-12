@@ -155,7 +155,7 @@ async def commit_outline(
         inputs = await load_request(db, owner, cid, fence.operation_id)
         if plan["request_id"] != inputs["request_id"]:
             raise SnapshotError("PLAN_BINDING_MISMATCH")
-        validate_plan(
+        validated_plan = validate_plan(
             dict(
                 needs_clarification=False,
                 plan=plan["candidate"],
@@ -165,6 +165,12 @@ async def commit_outline(
             ),
             inputs,
         )
+        from app.services.stack_multiscene_materials import SELECTION_BATCH
+
+        if inputs.get("stack_boundaries") == SELECTION_BATCH:
+            from app.services.stack_goal_selection import check_outline
+
+            check_outline(validated_plan, inputs)
         links = (
             (await suggest_node_links(db, owner, cid, plan_id, graph_version=graph_version))[
                 "links"

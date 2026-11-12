@@ -110,9 +110,9 @@ export interface FixedCourseSource extends Omit<GenerationSource, "origin" | "ev
   evidence_kind: "actual_provider_response" | "evidence_bound_local_revision" | "offline_fixture"
   learner_case?: "array-first" | "operations-known"
 }
-export interface StackBoundariesSource extends Omit<FixedCourseSource, "origin"> {
+export interface StackBoundariesSource extends Omit<FixedCourseSource, "origin" | "plan_source"> {
   origin: "stack_boundaries_model_generation"
-  plan_source: "model_planned" | "fixed_outline"
+  plan_source: "model_planned" | "fixed_outline" | "goal_selected"
   scene_key: "normal" | "rejections"
   review_sha256: string
   source_request_sha256: string

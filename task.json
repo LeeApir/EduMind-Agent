@@ -7416,6 +7416,39 @@
           "evidence": "docs/acceptance/phase-1.5-stack-boundaries-t138/RESULTS.md#t144-逐题证据有限真实批次"
         }
       ]
+    },
+    {
+      "id": "PHASE-1.5-T145",
+      "phase": "Phase 1.5",
+      "title": "栈课程最小目标选择准备",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T144"
+      ],
+      "scope": [
+        "限定目标选择及原文依据，程序生成一或两个 T144 场景。",
+        "交付准确请求及同义表达、超范围和既有准入的离线证据。"
+      ],
+      "prd_source": "PRD §0.5；T144 固定双场景基线；用户本轮范围",
+      "acceptance_criteria": [
+        "选正常或正常＋拒绝时，材料与依赖由程序持有。",
+        "超范围保留原文依据且无场景；同义表达经过离线验证。",
+        "零 Provider，真实执行预算另定，T144 和旧失败保留。"
+      ],
+      "verification": [
+        "离线请求和引用校验；隔离 PostgreSQL 规划、场景和准入。"
+      ],
+      "started_at": "2026-11-12T09:17:20+08:00",
+      "completed_at": "2026-11-12T09:23:24+08:00",
+      "commit_lookup": "Task-Completed: PHASE-1.5-T145",
+      "verification_results": [
+        {
+          "command": "10 项定向 pytest（隔离 PostgreSQL、禁外网）、Ruff、TypeScript、账本检查及旧请求预览摘要",
+          "result": "同义及超范围夹具通过；单场景 v2、双场景 v3 和超范围无版本通过；Provider 0。",
+          "evidence": "docs/acceptance/phase-1.5-stack-boundaries-t138/RESULTS.md#t145-最小目标选择准备"
+        }
+      ]
     }
   ],
   "planning_inputs": {

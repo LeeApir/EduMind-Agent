@@ -27,6 +27,7 @@ from app.services.free_course_snapshots import (
     digest,
 )
 from app.services.stack_multiscene_materials import FIXED_BATCHES as STACK_FIXED_OUTLINES
+from app.services.stack_multiscene_materials import SELECTION_BATCH as STACK_SELECTION
 from app.services.stack_multiscene_materials import VERSION as STACK_BOUNDARIES
 
 
@@ -87,7 +88,7 @@ async def load_inputs(
 
         capability = dict(head_support=support_for_goal(course["original_goal"]))
     prompt_version = current["nonsecret_config_snapshot"].get("prompt_version")
-    if prompt_version in (STACK_BOUNDARIES, *STACK_FIXED_OUTLINES):
+    if prompt_version in (STACK_BOUNDARIES, *STACK_FIXED_OUTLINES, STACK_SELECTION):
         capability = dict(stack_boundaries=prompt_version)
     return snapshot_input(
         dict(
@@ -125,7 +126,13 @@ async def persist_outcome(
     validate = validate_response
     if snapshot.get("stack_boundaries") in STACK_FIXED_OUTLINES:
         raise SnapshotError("STACK_FIXED_OUTLINE_NO_MODEL_PLAN")
-    if "stack_boundaries" in snapshot:
+    if snapshot.get("stack_boundaries") == STACK_SELECTION:
+        from app.services import stack_goal_selection as selector
+
+        request = selector.build_request(snapshot)
+        prompt_version, schema_version = selector.PROMPT_VERSION, selector.SCHEMA_VERSION
+        validate = selector.normalize
+    elif "stack_boundaries" in snapshot:
         from app.services import stack_multiscene as stack
 
         request = stack.wire_plan_request(snapshot)
@@ -144,6 +151,7 @@ async def persist_outcome(
         raise SnapshotError("PLANNING_INPUT_MISMATCH")
     if outcome.state not in {"ready", "needs_clarification", "failed"}:
         raise SnapshotError("PLANNING_RESULT_INVALID")
+    value = None
     if outcome.state == "failed":
         if outcome.reason_code not in {"SCHEMA_INVALID", "PROVIDER_REJECTED", "OUTCOME_UNKNOWN"}:
             raise SnapshotError("PLANNING_RESULT_INVALID")
@@ -195,7 +203,7 @@ async def persist_outcome(
         operation = await repo._fence(course_id, fence)
         plan_id = None
         if outcome.state == "ready":
-            assert response is not None
+            assert value is not None
             result = await repo.store_plan(
                 course_id,
                 fence,
@@ -204,7 +212,7 @@ async def persist_outcome(
                 + digest(
                     "planning-storage-key", operation_id=str(fence.operation_id), call_key=call_key
                 ),
-                candidate=response["plan"],
+                candidate=value["plan"],
             )
             plan_id = UUID(result["plan_id"])
         row = FreeCoursePlanningResult(
@@ -248,8 +256,8 @@ async def persist_outcome(
                 if outcome.state == "failed"
                 else "running",
                 reason_code=outcome.reason_code,
-                clarification_questions=response["questions"]
-                if outcome.state == "needs_clarification" and response is not None
+                clarification_questions=value["questions"]
+                if outcome.state == "needs_clarification" and value is not None
                 else [],
             )
             .returning(FreeCourseOperation.id)
