@@ -13,6 +13,9 @@ const busy = ref(false); const commandError = ref(''); const resumeConfirm = ref
 const running = computed(() => operation.value && !terminalOperation(operation.value.state));
 const unknown = computed(() => Boolean(operation.value?.budget?.usage_unknown || operation.value?.reason_code?.includes('UNKNOWN')));
 const firstReady = computed(() => course.value?.head?.scenes.find(s => s.scene_version_id !== null));
+const archivedScope = computed(() => operation.value?.execution_mode === 'finite_stack_foreground'
+  && operation.value.state === 'awaiting_clarification'
+  && operation.value.reason_code === 'STACK_SCOPE_ARCHIVED');
 const labels: Record<string,string> = { queued:'等待生成',running:'正在生成',cancel_requested:'正在停止，等待可靠收尾',succeeded:'生成已完成',partially_succeeded:'部分内容就绪',awaiting_clarification:'需要补充目标',failed:'生成未完成',cancelled:'已停止',timed_out:'本次操作已超时',pending:'等待生成',blocked_dependency:'等待前置场景',ready:'可学习',invalidated:'已失效' };
 const operationLabel = computed(() => operation.value?.execution_mode && operation.value.state === 'failed' ? '生成已停止' : operation.value ? labels[operation.value.state] : '只读恢复，未发现本机操作记录');
 watch(owner, id => {
@@ -81,9 +84,32 @@ function clarify(): void { if (supplement.value.trim() && operation.value?.state
     />
     <template v-if="course">
       <p class="page-eyebrow">
-        为这一次学习组织内容
-      </p><h1>{{ course.original_goal }}</h1><span class="badge warning">AI 生成草稿 · 未签核，内容可能有误</span>
-      <div class="outline-grid">
+        {{ archivedScope ? '已审核的目标范围' : '为这一次学习组织内容' }}
+      </p><h1>{{ course.original_goal }}</h1>
+      <span
+        v-if="!archivedScope"
+        class="badge warning"
+      >AI 生成草稿 · 未签核，内容可能有误</span>
+      <section
+        v-if="archivedScope"
+        class="surface"
+        aria-labelledby="archived-scope-title"
+      >
+        <h2 id="archived-scope-title">
+          当前支持范围
+        </h2>
+        <p
+          v-for="question in operation?.clarification_questions"
+          :key="question"
+        >
+          {{ question }}
+        </p>
+        <p>可返回学习目标修改输入。修改目标不会自动生成课程。</p>
+      </section>
+      <div
+        v-else
+        class="outline-grid"
+      >
         <section class="surface">
           <div class="section-heading">
             <h2>你的课程大纲</h2><button

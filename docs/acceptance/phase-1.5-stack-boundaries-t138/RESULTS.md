@@ -445,3 +445,20 @@ Chromium 读完两场景，核对 5＋9 帧的栈状态、出栈值和高亮，�
 实际 **0 次选择、2 次正文、0 次修订**。回执合计输入 **10065**（其中缓存命中 1536）、输出 **1864**，共 **11929** token，实际账单未知。原件、预约、回执、两次审核和准入记录封存在 `~/.local/share/edumind/stack-goal-b-retest-v1/`。
 
 使用 `sh /tmp/edumind-t151/run.sh inspect normal` 和 `inspect rejections` 重放原件，使用 `PYTHONPATH=backend:. backend/.venv/bin/python /tmp/edumind-t151/check-browser.py B` 和本机私有 API 完成验收。STOP 已封存，后续入口在读取密钥前返回 `STACK_BATCH_STOPPED`。T149 的 401、STOP 和 A v2 仍在，T147/T149/T038 历史任务状态保留。
+
+## T152 C 私有范围提示
+
+现有 `awaiting_clarification` 状态、私有课程和操作读取接口可承载范围提示。现有规划准入只接受当前请求的响应，T147 原规则拒绝 C 的两条引文。限定导入的最小差异是复用 T148 重放与独立审核，只接受这份 C 原件，在原访客的新私有目标记录中写入 `awaiting_clarification`，原因标记为 `STACK_SCOPE_ARCHIVED`。操作策略快照保存旧课程和操作 ID、原请求与响应摘要、证据规则、两条原文引证和独立审核。该操作仅提供范围提示，沿用限定操作的私有读取及后续生成拒绝规则。没有新增 API、表或模型执行入口。
+
+原样保留 `request_1` 的 `normal`「理解栈操作」及 `unsupported`「动态扩容」。已重验 T147 的加密响应、请求和 STOP，并逐字段核对 T148 审核派生结果。旧 C 操作仍为 `cancelled`，原失败仍为 `STACK_SELECTION_EVIDENCE`。[T148 原件和审核绑定](t148-scope-replay.json)
+
+新私有目标记录为 `9f428f9d-c6d6-4f69-8e43-8ff3b1785d55`，操作为 `017c9f3f-07db-477a-8072-5fbd50c2774f`。页面显示「当前支持固定容量栈的正常操作及满栈、空栈拒绝。动态扩容暂不支持。」原访客的两小时会话已过期，验收在同一专用库为该访客建立新的标准两小时本机会话，旧会话记录保留。在本机运行 `sh /tmp/edumind-t152/open.sh` 可打开提示，也可在该会话进入「学习记录」，选择最新的「理解栈操作和动态扩容」，再点击「查看生成进度与继续选项」。[本机开发应用](http://127.0.0.1:5222/)
+
+| 定向检查 | 实际结果 |
+| --- | --- |
+| 原访客从学习记录进入 | 私有课程及操作均为 HTTP 200，显示完整范围提示。 |
+| 刷新和调整目标 | 刷新返回同一操作和提示。返回目标页修改输入，浏览器发出 0 次 POST。提示页无继续生成入口，现有服务拒绝从该操作提交澄清（`OPERATION_KIND_INVALID`）。 |
+| 其他访客访问 | 课程及操作均为 HTTP 404。 |
+| 私有库和模型调用 | 重复导入返回同一操作。新记录仅有 1 个操作，规划、课程版本、场景正文版本和发送预约均为 0。Provider 0，A/B 未重跑。 |
+
+实际验证命令为 `PYTHONPATH=backend:. backend/.venv/bin/python /tmp/edumind-t152/check.py`，使用本机 Chromium 和专用 PostgreSQL，结果保存在 `/tmp/edumind-t152/verification.json`。变更文件通过定向 Ruff、ESLint 及 `git diff --check`。

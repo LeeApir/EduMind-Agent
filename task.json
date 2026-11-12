@@ -7651,6 +7651,40 @@
         }
       ],
       "execution_gate": "B v3 已交付，本批已 STOP。T149 401、STOP、A v2 及 T038 状态保留。"
+    },
+    {
+      "id": "PHASE-1.5-T152",
+      "phase": "Phase 1.5",
+      "title": "栈 C 封存范围提示私有应用交付",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T148"
+      ],
+      "scope": [
+        "仅导入 T148 独立审核的 C 范围结果，在原访客的新私有操作中只读展示。",
+        "保留 T147 的失败和 STOP，Provider 0，不重跑 A/B。"
+      ],
+      "prd_source": "PRD §0.5；T148 C 独立审核及用户限定导入范围",
+      "acceptance_criteria": [
+        "两条原引文、请求和响应摘要、新规则及审核绑定可核验。",
+        "原访客可读支持范围和动态扩容提示，刷新保留，其他访客不可读。",
+        "没有大纲或正文、发送预约或 Provider 调用，调整目标不自动生成。"
+      ],
+      "verification": [
+        "实际专用库、私有 API 和浏览器定向检查，只验证 C。"
+      ],
+      "started_at": "2026-11-12T14:50:09+08:00",
+      "completed_at": "2026-11-12T14:57:47+08:00",
+      "commit_lookup": "Task-Completed: PHASE-1.5-T152",
+      "verification_results": [
+        {
+          "command": "本机 Chromium /tmp/edumind-t152/check.py、专用库和私有 API、定向 Ruff 与 ESLint",
+          "result": "原访客 200、其他访客 404；刷新和编辑通过，服务拒绝后续澄清生成；正文、预约和 Provider 均 0。",
+          "evidence": "docs/acceptance/phase-1.5-stack-boundaries-t138/RESULTS.md#t152-c-私有范围提示"
+        }
+      ],
+      "execution_gate": "C 范围提示已交付，本次结束。T147 失败和 STOP 保留，A/B 未重跑。"
     }
   ],
   "planning_inputs": {
