@@ -93,3 +93,50 @@ Q11 的工程子项按原契约 §4 保留如下，避免“播放器已通过�
 集中待决定差异仅为：①将既有主题服务接到共用新生成动作，保留模型规划／固定提纲来源；②从准确记录驱动有限修订，取代下一批对旧父稿和题干常量的依赖；③显式补齐首稿格式约定，新版本严格校验不变；④批准本小批的固定域、最多9次及新的时间／费用边界。它们不是新的教学阈值。正式 T038 的四主题12槽重分配、画像／多场景能力、模型审核路线和前台运行契约差异**尚未就绪、尚未批准**，不夹带进本小批，不自动实施。
 
 本任务验证只做现有记录与源码对照、文档链接／计数、账本及 diff 检查；不运行历史回放、浏览器、数据库迁移、模型或 Provider 探测。交付物仅本清单，治理记录随任务提交。后续由评估者审查范围与优先级后再决定实施及准确执行包。
+
+## 五、T153 续记 · T124–T152 后的候选与剩余工作（2026-11-12）
+
+只读基线 `dd002c6`。以下选定的是下一步取证用的开发基线。**四主题已有可学交付，T128 共同批次仍是 3/4，T038 仍为 blocked。** 各批的首稿、修订、派生、失败和未运行保留原判，后续批次的成功不回填旧槽。T005/ADR0027 的分母、阈值、评估身份及停止口径继续适用。[根账本](../../../task.json) · [T005 批准登记](../../ADR/0027-approval-20261022.json) · [验收契约](../phase-1.5-acceptance-contract-r01/contract.md)
+
+### 5.1 当前四主题开发基线
+
+| 主题 | 生成与程序材料 | 审核、准入与已交付版本 |
+| --- | --- | --- |
+| 空链表头插 | 采用 T128。模型规划用 `head-goal-plan-grounded-v3`／`head-goal-planning-wire-v2`，正文用 `head-fixed-course-v1`／`head-empty-course-trial-v1` 和 `course-question-stem-v2`。程序持有 `head-new-empty` 空表插 4、7、13 帧、四题答案及 `head-teaching-evidence-v1`。 | 独立规划通过，首稿结构通过，首次教学有两处待修。按 `shared-trial-limited-revision-v1` 改两条允许路径并全文重评 12 项通过，子候选 `b823114e…` 通过共用有限入口和私有准入，交付 v2。T118 指定引用修订保留作历史证据。[T128 结果](../phase-1.5-shared-live-reuse-t127/RESULTS.md#头插课程交付) · [重评与材料绑定](../phase-1.5-shared-live-reuse-t127/head-revision-assessment.json) |
+| 栈 | 共用入口基线采用 T128 单场景，`stack-lifo-course-v1` 的固定提纲与正文 Schema，`course-question-stem-v2`、五帧及四题。多场景扩展采用 T151 B，使用 T147 已审的 `stack-goal-selector-v1`／`stack-goal-selector-response-v1` 选择，由程序装配大纲。正文用 `stack-boundaries-scene-evidence-v2`／`stack-boundaries-scene-wire-v2`，材料用 `stack-boundaries-multiscene-v1` 和逐题 `stack-practice-checkpoints-v1`，正常五帧、拒绝九帧。 | T128 栈首稿 `64e34811…` 经七项独立审核，通过共用有限入口保存 v2。T151 经 `stack_goal_b_retest` 专用入口，正常先审六项并保存 v2，拒绝绑定该快照再审十一项，两个首稿均通过，整课 v3、六题。T144 固定双场景及 T149 A 单场景分别是同材料的固定大纲和已审选择续接证据。T137 画像用 `stack-learner-evidence-v2`，两课可读，对照仍未通过。[T128 栈](../phase-1.5-shared-live-reuse-t127/RESULTS.md#栈首稿) · [T151 双场景清单](../phase-1.5-stack-boundaries-t138/selection-b-retest-manifest.json) · [T151 交付](../phase-1.5-stack-boundaries-t138/RESULTS.md#t151-b-双场景真实重测) · [T137 对照](../phase-1.5-stack-profile-pair-t132/RESULTS.md#t137-同版-v2-画像对照) |
+| 队列 | 采用 T128 首稿，`queue-fifo-course-v1` 固定提纲、正文 Schema 和程序材料，`course-question-stem-v2`。连续数组前移队列，五帧、四题及答案由程序绑定。 | 首稿 `713b4324…` 独立八项通过，经共用有限入口及私有准入交付 v2，浏览器通过。T121 Q01 修订是历史分支。当前证据覆盖连续数组前移，循环队列和取模未覆盖。[T128 队列及审核](../phase-1.5-shared-live-reuse-t127/RESULTS.md#队列首稿) |
+| 二分查找 | 采用 T131，使用 T130 的 `binary-search-program-frames-v1`、`course-question-stem-v2` 和程序固定提纲。程序按闭区间轨迹提供六帧、轮次和说明，闭合 Schema 要求模型返回段落、四题和总结，拒绝 `step_notes`。 | 本批新首稿 `8a50ff33…` 结构及九项独立全文审核通过，经 `scripts.course_trial --topic binary-search-program-frames` 的单次专用配置交付私有 v2。T129 是从 T128 失败首稿派生的程序帧说明课程。T122 四个回抄题干仍归程序指定。T128 f2/f4 失败不追认。[T131 请求与交付](../phase-1.5-binary-search-program-frames-t130/RESULTS.md#t131-真实执行结果) · [T129 派生](../phase-1.5-binary-search-frames-t129/RESULTS.md) · [T122 旧修订](../phase-1.5-binary-search-t122/RESULTS.md) |
+
+共用层已具备：T124 对齐实际题干提示与本地限制，T125 用 `scripts.course_trial` 分派四主题新批并共用请求发送、封存、重放和私有准入，T126 的闭合修订从父稿与审核记录生成，T128 真实验证了头插修订。原有私有快照、场景验证、课程可用性和服务端反馈可复用。多场景栈仍走 `stack_multiscene_trial` 及续接／重测配置，逐题证据、上游依赖和两场景审核已验证。T120 历史回放、T129 程序派生及 T152 C 的只读范围导入各有独立来源。C 保留两条引文和 `stack-goal-evidence-v2` 审核，没有大纲、正文或发送权限，新规则尚无真实发送入口。[T124](../phase-1.5-question-stem-t124/README.md) · [T125](../phase-1.5-shared-first-draft-t125/README.md) · [T126](../phase-1.5-shared-revision-t126/README.md) · [T127/128 冻结与结果](../phase-1.5-shared-live-reuse-t127/RESULTS.md) · [共用 CLI](../../../scripts/course_trial.py) · [栈双场景入口](../../../scripts/stack_multiscene_trial.py) · [T152 范围提示](../phase-1.5-stack-boundaries-t138/RESULTS.md#t152-c-私有范围提示)
+
+### 5.2 剩余缺口与证据适用范围
+
+| 原缺口 | 当前状态及已有证据 | 仍缺的完成证据 |
+| --- | --- | --- |
+| M01/M03/M04/M08 固定域生成、格式、来源 | **已具备（限定域）**。四主题已共用首稿入口，题干限制显式进入请求，必填解析仍严格校验。T129/T131 将查找帧说明交给程序，T128 的旧错误保留。可读版本和新生成、回放、派生来源可区分。 | 同一个冻结候选需覆盖正式槽、失败、未运行和来源核算。T131、T151 的独立成功只作为相应能力证据。[T125](../phase-1.5-shared-first-draft-t125/README.md) · [T128](../phase-1.5-shared-live-reuse-t127/RESULTS.md) · [T131](../phase-1.5-binary-search-program-frames-t130/RESULTS.md) |
+| M02 有限修订 | **已具备（有限字段）**。离线已有两个父稿实例，头插有真实首稿到修订重评证据。 | 先确定正式候选采用的结构修复／教学修订预算与权限。历史专批的补解析、题干回抄或帧修订资格不能继承，其他主题没有同版真实窄修订成绩。[T126](../phase-1.5-shared-revision-t126/README.md) · [ADR0063](../../ADR/0063-four-topic-live-reuse-trial.md) |
+| Q01–Q05 开发质量与完整课程 | **部分具备**。独立审核、私有版本、用户目标和播放证据存在。栈有固定双场景、按目标选择的一或两场景和真实依赖。T140 自由规划失败，T142 练习解析错用演示材料，T147 旧选择协议失败，T149 B 认证失败，分别保留。 | 一版候选完整运行 12 槽／6 对、至少四主题、已知与未知画像、0/1/多节点建议及 1–8 场景边界。首次主步骤全计，结构≥98%，完整草稿、需求兑现、可学性各≥95%（12 槽各需 12/12），完整草稿必须在单操作 600 秒内可读。T151 的 14 帧是两个场景。C 只证实限定的范围提示，不替代原预定负例。[栈结果](../phase-1.5-stack-boundaries-t138/RESULTS.md) · [原验收 §1–3](../phase-1.5-acceptance-contract-r01/contract.md) |
+| Q06/M06 画像对照 | **部分具备**。T132–T137 已验证有据画像进入请求和候选。T134 B 首稿结构失败，T137 两课均通过各自审核，术语铺垫及过程详略通过，边界与实现重心差异不足，画像对照未通过。 | 仍需按事前可判据证明实质适配，未知项不臆测。正式 6 对须 6/6。T149 A 与 T151 B 是不同目标，场景和练习也不同，不能用作同目标画像对。[T137 对照](../phase-1.5-stack-profile-pair-t132/RESULTS.md#t137-同版-v2-画像对照) |
+| Q07/Q08/Q10/Q13 原子事实、答案和真值身份 | **部分具备**。有独立程序预期、逐题代码及时点证据、全文助手审核、正确与错误反馈。**未具备**当前候选全部可见事实及答案匹配规则的真／假／未决清册。 | 逐块枚举实际可见正文、代码、图示／状态、帧说明、总结和逐题解析，保留首稿、修订及严重度。事实≥99%、答案与匹配 100%、自然严重错误 0、未决 0。逐题还需核对唯一性和可接受／拒绝输入。助手身份按实际记 `delegated_assistant`，不替代独立人类真值或产品核定。[T143 逐题证据](../phase-1.5-stack-boundaries-t138/RESULTS.md#t143-逐题练习证据版准备) · [ADR0037](../../ADR/0037-full-development-diagnostic-recovery.md) |
+| Q09 审核能力对照 | **未具备当前路线成绩**。真实课程由独立助手审核。历史 r05 有审核协议停机、准确意见和开发探针标签，20 个探针在该批均未运行。 | 先确定审核角色、准确版本及可发送的来源，再冻结 10 严重＋10 正确对照和真值。开发召回至少 9/10，精确率≥90%，正确对照误阻断 0。未运行严重例计 FN，无指控不能报 100%。全文审核通过不产生探针分子。[r05 实际结果](../phase-1.5-full-diagnostic-r05/RESULTS.md) · [开发槽和探针](../phase-1.5-full-diagnostic-r05/slots.json) |
+| Q11/Q12/M07 正式链、工程与时钟 | **部分具备**。既有 API 和调度器有预约、lease、预算、SSE、取消及恢复原语，T035/T036 有隔离工程和浏览器证据。有限应用关闭普通生成写入口，前台专用操作按阶段封存、人工审核后准入。 | 当前主题请求构造及绑定尚未在原正式调度链证明。逐项核对可复用工程证据，补影响到的预约、13/40、600 秒、并发、unknown 隔离、事件重放、取消和恢复等。工程矩阵全过且 0 skip。T038 只做性能诊断，T041 的独立冷暖门槛另计。[正式创建 API](../../../backend/app/api/free_courses.py) · [现有调度器](../../../backend/app/services/free_course_scheduler.py) · [隔离开发服务](../../../scripts/head_course_goal.py) · [T035](../phase-1.5-integration-t035/README.md) · [T036](../phase-1.5-browser-t036/README.md) |
+
+### 5.3 最小剩余任务顺序
+
+**下一项实施建议：用 T151 B 做一次原子事实与逐题证据取证。** 它是当前四主题基线中场景最多的已审候选，具备准确的两场景、14 帧、六题和上游快照，且无需新调用或先决定运行路线。缺口是已有审核布尔项和 fact IDs 无法给出完整分母。只在验收侧使用既有 `p15_full_review_r05.course_inventory` 的来源摘要、引文指针、`atomic_facts` 和 `answer_checks` 结构。必要时在 `scripts/acceptance_support` 增加窄的只读来源转换，把已准入的可见块、帧和受限参考答案对齐该结构。匹配规则沿用 `quiz_scoring`，复用 T151 的程序逐题检查点、独立审核和浏览器反馈。验收侧绑定候选、两个场景版本及审核摘要，答案仅在原有受限证据中核对。[既有取证校验](../../../scripts/isolated_diagnostics/p15_full_review_r05.py) · [匹配实现](../../../backend/app/services/quiz_scoring.py) · [T151 浏览器证据](../phase-1.5-stack-boundaries-t138/t151-browser-B.json)
+
+完成条件是两个场景的每个可见块均有人工或真实受委托助手的覆盖说明，所有可判事实有定位、依据和真／假／未决，六题有唯一答案、解析及合法和非法输入核对，汇总能追溯至每条记录。缺块、错版本或未决保持显式，逐块覆盖不等于语义正确。只补这一个取证接点，用现成 T128 f2/f4 错轮次片段核对失败能保留，无需全套回归。结果作为开发取证样例，正式分母仍从下一准确批次产生。此项本次仅细化。
+
+| 后续顺序（简述） | 缺口、模块、可复用证据与完成条件 |
+| --- | --- |
+| 2. 确认画像路线后做一个代表性对照 | 复用 `stack_course_profile_pair` 和原画像快照、规划、场景服务，基于 T137 第三项失败决定是否改教学输入职责。先约定实质差异及原目标、材料与题义控制，两个课程正确且预定差异均成立才可继续扩到正式六对。[画像适配](../../../backend/app/services/stack_course_profile_pair.py) · [T137 对照](../phase-1.5-stack-profile-pair-t132/RESULTS.md#t137-同版-v2-画像对照) |
+| 3. 确认正式链与审核路线，补受影响的接点 | 对现有 `free_course_scheduler`、`free_course_recovery`、`free_scene_generation` 及审核桥接逐项映射。复用 T035/T036 与有限候选的来源、上游和私有准入证据，先证明一条从 create 到完整持久场景的正式路径及必要失败边界。模型审核对照复用原 probe 记录结构，标签和路线需事前冻结。[场景服务](../../../backend/app/services/free_scene_generation.py) · [恢复服务](../../../backend/app/services/free_course_recovery.py) · [既有审核桥接](../../../scripts/isolated_diagnostics/p15_course_sol_bridge.py) |
+| 4. 就绪后准备一个准确 T038 开发批 | 将现有分母账、候选和下一项的原子事实结构合并到一次冻结。保持 12 槽／6 对、原负例范围和 10＋10 审核对照，按正式工程与全部门槛判定。未决和未运行留账。获准确预算和执行授权后才运行，T039–T042 依原门禁另行处理。[原验收契约](../phase-1.5-acceptance-contract-r01/contract.md) |
+
+### 5.4 必须决定的事项
+
+1. **T137 之后的画像路线。** 建议维持同目标、同基础事实和题义，改用有明确证据的学习需求决定教学重点或支架，例如同样学习固定容量栈，初学者追踪有效槽位，有操作经验者从状态不变量解释守卫为何保留输出。先冻结可区分的具体表现和原三项对照的达标口径。原 A 的有用解释仍保留。若选择暂缓画像，T038 继续 blocked，任何验收范围变化另提决策。固定题材上的第三轮提示词试跑未获授权。[T137 对照](../phase-1.5-stack-profile-pair-t132/RESULTS.md#t137-同版-v2-画像对照)
+2. **有限试验与 T038 正式运行差异。** 优先评估在现有持久调度中绑定受支持主题，保留单操作 600 秒、13/40 累计尝试、并发、预约、取消、unknown 隔离、恢复与 SSE 语义。有限批次的 1,800 秒操作、专用库和单前台封存、人工审核后准入、C2 尽力停止与费用未知均有准确边界。原契约将草稿硬门可读和语义质量分开计。若要继续用有限入口做 T038，须逐条决定时钟、工程保障、费用与审批等差异并更新准确契约。旧 C2 只适用原批，T102 仍 blocked。[ADR0063](../../ADR/0063-four-topic-live-reuse-trial.md) · [原验收 §4、§6](../phase-1.5-acceptance-contract-r01/contract.md)
+3. **样本与审核角色。** 决定保留原开发槽还是事前批准符合当前四主题支持域的整套新槽，12/6、1–8 场景、0/1/多节点和负例等边界维持。原槽含位置、栈队列对比、循环队列及图，当前支持域无法直接覆盖。决定准确审核模型／Provider、标签作者及独立裁决职责，核对旧探针的适用性和停机条件。T124–T152 全部用于开发或已暴露，不进入 T040 未见集，H 继续封存。换角色、路由、槽表或费用上限均在执行前决定。[开发槽表](../phase-1.5-full-diagnostic-r05/slots.json) · [ADR0037](../../ADR/0037-full-development-diagnostic-recovery.md) · [T005 批准登记](../../ADR/0027-approval-20261022.json)
+
+本次只读取证据与源码，新增 Provider 调用、应用写入和回归测试均为 **0**。追加内容没有执行权限。T038、T102、旧批停止和既有验收分母保留。

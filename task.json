@@ -7685,6 +7685,41 @@
         }
       ],
       "execution_gate": "C 范围提示已交付，本次结束。T147 失败和 STOP 保留，A/B 未重跑。"
+    },
+    {
+      "id": "PHASE-1.5-T153",
+      "phase": "Phase 1.5",
+      "title": "追加 T038 当前候选与最小剩余工作",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T123",
+        "PHASE-1.5-T152"
+      ],
+      "scope": [
+        "在 T123 GAPS.md 末尾追加四主题版本、剩余缺口、任务顺序和待决事项。",
+        "只读 T124–T152 和原验收契约，Provider 0、应用写入 0、回归 0。"
+      ],
+      "prd_source": "PRD §0.5；T005/ADR0027；课程生成方向 §5.4、§7",
+      "acceptance_criteria": [
+        "四主题准确版本与共用、专用、历史导入的范围分别可追溯。",
+        "对原门槛标明已具备、部分具备、未具备，保留 T137 未通过与 T038 blocked。",
+        "仅细化下一项实施任务，后续简述，集中列决策；原文原样保留。"
+      ],
+      "verification": [
+        "检查新增本地引用、版本和结论一致性，核对历史清单前缀和根账本既有任务不变。"
+      ],
+      "started_at": "2026-11-12T15:05:56+08:00",
+      "completed_at": "2026-11-12T15:10:39+08:00",
+      "commit_lookup": "Task-Completed: PHASE-1.5-T153",
+      "verification_results": [
+        {
+          "command": "仅检查新增 GAPS 引用、标题锚点、版本和结论，以及历史前缀、根账本和批准文件摘要",
+          "result": "52 个新增本地引用、11 个标题锚点、16 个版本标识通过。T123 历史正文和根账本既有任务原样保留，ADR0027 批准文件摘要一致。Provider、应用写入和回归测试均为 0。",
+          "evidence": "docs/acceptance/phase-1.5-t038-gap-review-t123/GAPS.md#五t153-续记--t124t152-后的候选与剩余工作2026-11-12"
+        }
+      ],
+      "execution_gate": "仅追加盘点。建议下一项用 T151 B 做原子事实和逐题取证，未领取。画像、正式运行和审核路线待决，T038/T102 保持 blocked。"
     }
   ],
   "planning_inputs": {
