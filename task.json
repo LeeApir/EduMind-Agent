@@ -7550,6 +7550,39 @@
         }
       ],
       "execution_gate": "续接清单已冻结，真实 0 选择、3 正文、0 修订与新 C2 待单独批准。T147/T038 保持 blocked，旧 STOP 与失效额度保留。"
+    },
+    {
+      "id": "PHASE-1.5-T149",
+      "phase": "Phase 1.5",
+      "title": "栈 A/B 已审选择续接真实正文与私有学习验收",
+      "status": "blocked",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T148"
+      ],
+      "scope": [
+        "按批准的 4132f9b 准确清单续接 A/B，0 选择、3 正文、0 修订，整批 30 分钟。",
+        "独立审核、私有准入、实际学习检查和用量原件记录。"
+      ],
+      "prd_source": "PRD §0.5；T148 准确续接清单及既有 A/B 审核",
+      "acceptance_criteria": [
+        "两位新访客的私有操作准确绑定 T147 A/B 已审核选择。旧 STOP 和状态保留。",
+        "按 A 正常、B 正常、B 拒绝发送，B 拒绝绑定本批 B 正常已审核版本。仅准入独立审核通过的候选。",
+        "交付 A v2、B v3 的阅读、播放高亮、逐题反馈、答案隔离和刷新。失败或结果未知则封存停止。"
+      ],
+      "verification": [
+        "冻结入口真实回执和独立审核；新旧操作和场景绑定检查；实际应用 5＋14 帧、2＋6 题。"
+      ],
+      "started_at": "2026-11-12T14:12:41+08:00",
+      "blocked_reason": "B 正常正文返回 DeepSeek HTTP 401 authentication_error，入口 STACK_BODY_RECEIPT 停止整批。A v2 独立审核与浏览器通过，B 无可学场景。",
+      "verification_results": [
+        {
+          "command": "冻结入口发送、A 独立审核和 Chromium 实际学习，B 原件、取消及停止后读回",
+          "result": "0 选择、2 正文 HTTP、0 修订。A 5 帧与 2 题验收通过，STOP 后可读。B 401、操作 cancelled，B 拒绝未发送。",
+          "evidence": "docs/acceptance/phase-1.5-stack-boundaries-t138/RESULTS.md#t149-ab-续接真实正文"
+        }
+      ],
+      "execution_gate": "本批已 STOP，余 1 失效，A v2 保留，B 不重试，历史批次不恢复。"
     }
   ],
   "planning_inputs": {

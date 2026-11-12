@@ -374,3 +374,37 @@ backend/.venv/bin/python -m scripts.stack_goal_continuation review A normal REVI
 - `PYTHONPATH=backend:. backend/.venv/bin/python -m scripts.stack_goal_continuation replay-c REVIEW.json` 重新解密并核对 C 的封存摘要，逐项通过独立审核，得到原样两条引文和仅范围提示的结果。审核取自上方派生记录。
 - `backend/.venv/bin/python -m pytest -q backend/tests/test_stack_goal_evidence.py backend/tests/test_stack_goal_selection_trial.py --tb=short` 在 `EDUMIND_T148_ARCHIVE_CHECK=1`、专用 PostgreSQL 和禁外网审计钩子下执行，**14 项通过**。覆盖伪造、重复、否定语义审核失败、错审核绑定、旧批准拒绝、跨槽大纲换绑、C 和规划无发送权限、乱序及停止拒绝。实际 A/B 旧原件经只读核验，新测试操作以 MockTransport 完成 A v2 和 B v3。
 - Ruff、工作流账本、`git diff --check` 及旧清单 SHA-256 检查通过。真实窗口和浏览器学习尚未启动。
+
+## T149 A/B 续接真实正文
+
+北京时间 2026-11-12 14:12:41 登记用户对准备提交 `4132f9b` 和本批 C2 的批准。准确清单 SHA-256 为 `e94374813efb3f4f1c05883469a5d153bcc7ffd73d1e6c369e01d65b6618cbb8`。额度为 0 次选择、3 次正文、0 次修订，整批 30 分钟。实际账单未知，无可验证费用硬上限，停止后仍可能计费，本机原件无独立抗回滚保障。登记时 Provider 0 次，窗口未启动。
+
+复用本机隔离开发应用，创建两位新访客并核对会话身份。新访客访问各自 T147 来源课程均返回 404，普通生成入口返回 409。T147 STOP 与已审选择原件通过完整摘要核验。
+
+实际整批窗口为北京时间 **2026-11-12 14:13:03 至 14:43:03**。A、B 已保存各自新大纲 v1，并分别绑定原 T147 审核。A 正常场景已封存，HTTP 200。
+
+A 正常候选 `0d97ff826244d3910936af8f475c4dd73dd89e5ca085e9411766893b9403c82a` 六项独立审核通过。五帧与演示 C 行 22、24、25、26、27 对齐。两题按各自代码和快照推出首次弹出 2，以及末次弹出 6 后栈顶为 -4。非阻断意见是将「新的 `data[count]`」表述为「递减 `count` 后读取 `data[count]`」，保留模型原文。
+
+A 私有课程 `74292fc7-a597-45c0-a5d7-035ae2fd421c` 已保存 v2。Chromium 读完四段，核对五帧状态和高亮，以及播放、暂停、前后步和重置。两题分别以一组全错和一组全对作答，服务端匹配率为 0% 和 100%。答前无答案键与解析，其他访客不能读课程或作答结果。刷新恢复同版、已填答案和反馈，未重发作答。[A 浏览器证据](t149-browser-A.json)
+
+### B 认证失败与终态
+
+B 正常场景请求已发送。原始响应为 DeepSeek **HTTP 401**，错误类型 `authentication_error`、错误码 `invalid_request_error`，正文指出所用 API Key 无效。入口要求完整的 HTTP 200 回执，因此返回 `STACK_BODY_RECEIPT` 并写入整批 STOP。加密响应已核对摘要。没有 B 正常候选或审核，B 拒绝场景未发送。
+
+| 样本 | 新私有课程和操作 | 新大纲摘要 | 私有应用读回 |
+| --- | --- | --- | --- |
+| A | `74292fc7-a597-45c0-a5d7-035ae2fd421c` / `0913bf4b-2693-4022-aaa9-9af63c5b50d9` | `1d0970a4005c481ddd7f7b041c30d98388bd8dc4bc0d2a84aa902f660bc62dff` | `succeeded`，完整 v2，五帧及两题。 |
+| B | `9437333d-2a2c-4ba2-86d7-a9318e8e85cf` / `eeb03ebe-8dd7-4cc2-9896-1eedfda5aad3` | `7d19cec62870ed367d31bb1e56785ce4351eab6f50f07c438a5dfe80bd72c783` | `cancelled`，v1 双场景大纲，0 个就绪场景。 |
+
+A、B 新操作分别保留 T147 已审选择及原件摘要。使用既有收尾服务处理 B 的取消，STOP 后仍可读回 A v2 及两组练习反馈。后续正文入口在读取密钥前返回 `STACK_BATCH_STOPPED`。A 可通过本机 [开发应用](http://127.0.0.1:5222/) 学习，运行 `sh /tmp/edumind-t149/open.sh A` 以该批私有访客身份打开。B 的浏览器学习验收未执行。
+
+### 用量与原件索引
+
+| 场景 | HTTP | 输入 / 输出 token | 请求 SHA-256 | 响应 SHA-256 | 审核 SHA-256 |
+| --- | ---: | --- | --- | --- | --- |
+| A 正常 | 200 | 3098 / 635 | `bcf0152725ff139c346911da3263a08e6a1abcc8f6c2b684099389c54736aa54` | `d22fec555e44020c2cf0c9752b9252c63b9da109c827880c46855dcf2c99c005` | `88d024d5315d126071f6c341398fafd6e7de2fef898b857dea2d1eab9d4a628f` |
+| B 正常 | 401 | 响应未回报 | `34f7efe00bbefd8f2a6427ceadbc400e67346408e0dbc565fabc0c6d7194a153` | `d3434b66aaebac9916f909cff3ba1d432f8b41dc54327ac015f7a1b599623fdd` | 无候选 |
+
+实际 **0 次选择、2 次正文 HTTP、0 次修订**。A 回执报告 3733 token，B 的 401 无用量回执。实际账单未知。请求、加密响应、回执、A 审核与准入及 B 失败记录保存在 `~/.local/share/edumind/stack-goal-continuation-v1/`。
+
+用 `sh /tmp/edumind-t149/run.sh inspect A normal` 核对 A 封存原件，再用绑定的审核文件准入。执行 `PYTHONPATH=backend:. backend/.venv/bin/python /tmp/edumind-t149/check-browser.py A` 完成浏览器验收。B 失败后用 `finish-stop.py` 和 `check-status.py` 核对取消与私有读回。T149 保持 blocked，未使用的第三次请求随 STOP 失效。T147 及 T038 的历史结果保留。
