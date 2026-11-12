@@ -418,3 +418,30 @@ T149 已 STOP，且准确清单的第一步为 A 正常。B 重测复用 T149 �
 获准确授权后，使用本机隔离库和新批准文件调用 `PYTHONPATH=backend:. backend/.venv/bin/python -m scripts.stack_goal_b_retest start APPROVAL.json`。后续使用同一模块的 `send normal`、`inspect normal`、`review normal REVIEW.json`，再处理 `rejections`。只在本机隐藏提示输入有效 DeepSeek Key。任何响应拒绝、未知、审核未通过或窗口不足均封存并停止，无重试与回退。新原件目录为 `~/.local/share/edumind/stack-goal-b-retest-v1/`。完成后验收同课 v3 的阅读、14 帧及高亮、播放、6 题反馈、答案隔离与刷新。
 
 `PYTHONPATH=backend:. backend/.venv/bin/python -m scripts.stack_goal_b_retest source` 重放已封存 B 请求和失败摘要，并核对原独立审核。专用 PostgreSQL、`EDUMIND_T150_ARCHIVE_CHECK=1` 和禁外网审计钩子下执行 `backend/.venv/bin/python -m pytest -q backend/tests/test_stack_goal_b_retest.py --tb=short`，两项通过。覆盖 B 两正文及本批上游绑定、同版正常请求模板、旧批准拒绝、乱序拒绝、401 停止和旧原件保留。Ruff、工作流和旧清单摘要通过。真实执行另行批准。
+
+## T151 B 双场景真实重测
+
+北京时间 2026-11-12 14:34:48 登记用户批准 `eabf812` 及本批 C2。准确清单 SHA-256 `4e511f25a9d38da951b31c170f25e318229a635129c6ab0e5cdad36f7953559c`。30 分钟内允许 0 次选择、2 次正文、0 次修订。已核对专用访客、旧课程访问隔离及原件绑定，登记时 Provider 0 次。
+
+实际窗口为北京时间 **2026-11-12 14:35:06 至 15:05:06**。新私有操作保存已审 T147 B 选择绑定的大纲 v1。正常场景已收到 HTTP 200，原件重放通过。
+
+正常候选 `7696cf40d0ebfb1b6848366adfc806e2a0ecf5c81c05f23d9d8169b8b8d45577` 六项独立审核通过并保存 v2。五帧展示空栈、入栈 3、入栈 8、弹出 8、再入栈 5。两题依据各自练习代码和时点分别得到 2 与 -4。非阻断措辞意见是末题可更明确写出先减 `count` 再通过 `*out` 写入，保留模型原文。
+
+拒绝候选 `4900be4d173786aecbba0f1a2f2b7c2d6a8ae136b348592685848e46d7d8a20d` 和完整双场景课程通过十一项独立审核，保存 v3。实际请求绑定本批正常场景版本 `57dd6df0-5691-4071-9e46-90e369743a76`、摘要 `b1d7441b2654037d32417ecebb2cfb3563a5eeee3d6dab4b759d8ee752fff63e` 及该版正文。拒绝演示 f4 与 f8 命中守卫行 9 与 16，均返回 `false`，逻辑栈、底层槽、计数和旧输出均保持。f8 保留的 3 来自上次成功出栈。四题使用各自练习证据，结果为 3、0、1、A。非阻断意见是第 3 段可明确「第 4 次调用返回 `false`，记录为 `ok_4`」，保留原文。
+
+### 实际私有学习验收
+
+课程 ID `f8750937-736e-427f-8eb3-5d60288ae314`，完整版本 v3，操作 `59aac7b5-1f71-48b4-9bbb-072698fd5342` 在 STOP 后读回为 `succeeded`。新大纲摘要 `c653bd406f5f5c33c6e9c6d291a968bc157daae380d01391aa82e14fae8ad780` 绑定 T147 已审核 B 选择。运行 `sh /tmp/edumind-t151/open.sh B` 可用本批私有访客打开本机开发应用。
+
+Chromium 读完两场景，核对 5＋9 帧的栈状态、出栈值和高亮，以及播放、暂停、前后步、重置。两组 2＋4 题均分别提交全错和全对作答，服务端匹配率为 0% 和 100%，共四次本机练习提交。答前无答案键或解析，其他访客无法读场景和作答记录。刷新保持 v3、场景、已填答案和反馈，切回正常场景仍可读取该组反馈。无重复提交或页面错误。[B 浏览器验收](t151-browser-B.json)
+
+### 用量与原件
+
+| 场景 | HTTP | 输入 / 输出 token | 请求 SHA-256 | 响应 SHA-256 | 审核 SHA-256 |
+| --- | ---: | --- | --- | --- | --- |
+| 正常 | 200 | 3470 / 660 | `d956501610a26bc62099f8036d5d3deb03acc5b73939661ca6f3275bf16e1824` | `62093cec6bdf52a13e5ddb62e588caf43366b17e915835917b8277026cb133de` | `354efe3b9f4fc680bc183be9451a8d48c2fc423956dc9e646cbb4fc48f86608c` |
+| 拒绝 | 200 | 6595 / 1204 | `bd79114c48773a5947e35ab7a4d41bcf0857c352ed93097bf55f90bf4ecf486d` | `9e46c99876705b14a39beb4542d7ecf0fcecde69c92291d46c9ee93bb35c512b` | `c0b5b153935b9d64dc26a1eff8f4912e5c50a277d8e8b52f2f49e512e1ebc996` |
+
+实际 **0 次选择、2 次正文、0 次修订**。回执合计输入 **10065**（其中缓存命中 1536）、输出 **1864**，共 **11929** token，实际账单未知。原件、预约、回执、两次审核和准入记录封存在 `~/.local/share/edumind/stack-goal-b-retest-v1/`。
+
+使用 `sh /tmp/edumind-t151/run.sh inspect normal` 和 `inspect rejections` 重放原件，使用 `PYTHONPATH=backend:. backend/.venv/bin/python /tmp/edumind-t151/check-browser.py B` 和本机私有 API 完成验收。STOP 已封存，后续入口在读取密钥前返回 `STACK_BATCH_STOPPED`。T149 的 401、STOP 和 A v2 仍在，T147/T149/T038 历史任务状态保留。

@@ -7617,6 +7617,40 @@
         }
       ],
       "execution_gate": "新 B-only 准确清单 30 分钟、0 选择、2 正文、0 修订与本批 C2 待批准。T149 STOP、A v2 和旧失败保留。"
+    },
+    {
+      "id": "PHASE-1.5-T151",
+      "phase": "Phase 1.5",
+      "title": "栈 B 双场景真实重测与学习验收",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T150"
+      ],
+      "scope": [
+        "按 eabf812 批准清单仅执行 B，0 选择、2 正文、0 修订，新窗口 30 分钟。",
+        "独立审核和私有准入，交付课程或实际失败及原件。"
+      ],
+      "prd_source": "PRD §0.5；T150 B 重测准确清单",
+      "acceptance_criteria": [
+        "本批 B 正常场景独立审核通过后方可发送拒绝场景，拒绝绑定准确上游。",
+        "完整私有 v3 通过阅读、14 帧高亮、播放、6 题反馈和刷新，或封存失败停止。",
+        "真实回执和用量可追溯，T149 STOP、401 和 A v2 保留。"
+      ],
+      "verification": [
+        "冻结入口回执及独立审核，应用实际浏览器学习与隔离验证。"
+      ],
+      "started_at": "2026-11-12T14:34:48+08:00",
+      "completed_at": "2026-11-12T14:42:31+08:00",
+      "commit_lookup": "Task-Completed: PHASE-1.5-T151",
+      "verification_results": [
+        {
+          "command": "真实 B 专用入口、两次独立审核、Chromium 双场景、STOP 与本机 API 读回",
+          "result": "两次正文 HTTP 200，准确上游和独立审核通过，B v3 的 14 帧、6 题、答案隔离、反馈与刷新通过。0 选择、2 正文、0 修订。",
+          "evidence": "docs/acceptance/phase-1.5-stack-boundaries-t138/RESULTS.md#t151-b-双场景真实重测"
+        }
+      ],
+      "execution_gate": "B v3 已交付，本批已 STOP。T149 401、STOP、A v2 及 T038 状态保留。"
     }
   ],
   "planning_inputs": {
