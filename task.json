@@ -7516,6 +7516,40 @@
         }
       ],
       "execution_gate": "已 STOP。余下正文额度失效，不重试、不改协议或补写，保留原件和 A/B 大纲；T038 保持 blocked。"
+    },
+    {
+      "id": "PHASE-1.5-T148",
+      "phase": "Phase 1.5",
+      "title": "栈范围外证据规则与已审选择续接准备",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T146"
+      ],
+      "scope": [
+        "新版规则独立审核并零调用重放 T147 C 的完整原件。",
+        "绑定 T147 已审核 A/B 到新私有操作，准备独立三正文批次。"
+      ],
+      "prd_source": "PRD §0.5；T147 封存原件；用户授权的范围外证据规则",
+      "acceptance_criteria": [
+        "正向范围外引文必需，允许准确的支持域引文，拒绝伪造、重复及否定误判。范围外无大纲及正文权限。",
+        "C 原始两条引文通过新版重放和独立审核，T147 失败及 STOP 保留。",
+        "A/B 从原件和审核绑定新操作，冻结 0 选择、3 正文、0 修订清单，Provider 0。"
+      ],
+      "verification": [
+        "新版规则定向反例、C 封存重放和独立审核、隔离库 A/B 原件续接与 MockTransport 三正文。"
+      ],
+      "started_at": "2026-11-12T13:06:56+08:00",
+      "completed_at": "2026-11-12T13:15:14+08:00",
+      "commit_lookup": "Task-Completed: PHASE-1.5-T148",
+      "verification_results": [
+        {
+          "command": "续接入口 parents / replay-c；专用 PostgreSQL、禁外网 pytest；Ruff、账本及旧清单摘要",
+          "result": "C 原件两条引文按 v2 独立审核通过且无正文权限；14 项通过，实际原件绑定的新操作可按 3 次 Mock 正文形成 A v2 和 B v3。Provider 0。",
+          "evidence": "docs/acceptance/phase-1.5-stack-boundaries-t138/RESULTS.md#t148-新版范围外证据与-ab-续接包"
+        }
+      ],
+      "execution_gate": "续接清单已冻结，真实 0 选择、3 正文、0 修订与新 C2 待单独批准。T147/T038 保持 blocked，旧 STOP 与失效额度保留。"
     }
   ],
   "planning_inputs": {

@@ -1,0 +1,103 @@
+{
+  "batch": "stack-goal-continuation-v1",
+  "status": "proposed_execution_not_authorized",
+  "source_commit": "7cd5b6c",
+  "source_manifest_sha256": "b4c58582b17dc7f8d0e034e20930d8a5bfdf85bd1a18d8b6eba49b537c76aee6",
+  "source_stop_sha256": "8bc598d195b3a8b9cf559a815e002123c576058785457fc26d6e83edf5c8df31",
+  "source_plan_kind": "reviewed_selection_replay",
+  "scope_rule": "stack-goal-evidence-v2",
+  "sequence": [
+    [
+      "A",
+      "normal"
+    ],
+    [
+      "B",
+      "normal"
+    ],
+    [
+      "B",
+      "rejections"
+    ]
+  ],
+  "budgets": {
+    "selection": 0,
+    "body": 3,
+    "revision": 0
+  },
+  "samples": {
+    "A": "想懂压栈、弹栈和后来压进去的先出来，不用讲动态扩容。",
+    "B": "先学压入弹出，再看塞满时压不进、一个也没有时弹不出的原因。"
+  },
+  "archives": {
+    "A": {
+      "request_sha256": "f57790fd191b1521bcb7bc8418ab09669a6912e73f0a05f125efddaaeef540fb",
+      "response_sha256": "e1628da2e45ef0d351b03a7201378bfa1042c47645ca656758906f8d4ac2f609",
+      "run_sha256": "019d5b5fc7f842ec2db801a67792316af85ec821c56443eb9bfb37f87efc6b35",
+      "plan_id": "326bb78b-16cc-42d3-b616-d169c78755d9",
+      "plan_digest": "1ef84407b0e39894530f8bb0ff64d388a859c3f3f0287e4b307580bc9911fdf7",
+      "candidate_digest": "8e809d89df000249d7f9771305fba9f9368a88a2b775f2a4cdf15c36a50a10df",
+      "review_sha256": "7187046cac41b83394ea3e10878b3aa0e2590c3e84db38597230118c52712d69",
+      "admission_sha256": "70465737acb2083cae7a230cb5c6ce227810bcd72a4866f0f42b9a017d79b01f"
+    },
+    "B": {
+      "request_sha256": "1c9dda6e1039d7a76335786b00edc286b22dc6ab2f7c55558a8a4e5c436a0e94",
+      "response_sha256": "cf3106f8f90a2168ece957baf59b2314231bdfbdc08b5fb302d20343e8016c50",
+      "run_sha256": "b3f22924223ec349cfc72612ff3e29fc7ce7993cfbaea71f7b3b67e3badd0375",
+      "plan_id": "d11cd775-a3e3-4e9a-b561-8756cff9ba40",
+      "plan_digest": "f1e4f88350cfeba4b4fadb5d491d99d9d2be6ebd163cfa91edf19d0a86d275cd",
+      "candidate_digest": "75bb0df22b92e874e939d227665cfc4aa987a6ada8ee8c55ec64de73d2c56f2f",
+      "review_sha256": "6c9faf205f24b7d2b0c23af40396935e0856851997261c72eada7cda1e46ebdc",
+      "admission_sha256": "dcb460a53986260de9c6c17dbd4c0e9c1fa347a830b998ae0fd686760ed82729"
+    },
+    "C": {
+      "request_sha256": "c81f9273069f2594c141071d6c2fe2a571e3e0a5a5e76edbfe5ffd44954bb2d8",
+      "response_sha256": "97bd062d11c4dbedc7ae529d5cbf9da764ea61cd052b6569f70943f313ac2eed",
+      "run_sha256": "49cc212c5cb2047a0df093ad06eb7f1f45c72c8b6ae7bd75946cfde0e6dbed26",
+      "failure_sha256": "4b04183e629de90a516e1e20ee30359a589758e519e685e227749a2be15d7c2a"
+    }
+  },
+  "endpoint": "https://api.deepseek.com/responses",
+  "model": "deepseek-flash",
+  "window_seconds": 1800,
+  "timeout_seconds": 90,
+  "max_request_bytes": 131072,
+  "max_response_bytes": 2097152,
+  "max_output_tokens_per_request": 8000,
+  "temperature": 0.2,
+  "store": false,
+  "stream": false,
+  "reasoning_effort": "none",
+  "materials_digest": "d93943193f111b68ae2bb70a40dacaa731c31ddc77b3d73e961d8262aa110456",
+  "scene_prompt_version": "stack-boundaries-scene-evidence-v2",
+  "scene_schema_version": "stack-boundaries-scene-wire-v2",
+  "scene_checks": {
+    "normal": [
+      "normal_five_frames",
+      "lifo_explanation",
+      "two_exercises",
+      "fact_support",
+      "first_pop_explanation",
+      "final_top_explanation"
+    ],
+    "rejections": [
+      "full_course_coherence",
+      "rejections_nine_frames",
+      "both_guards_and_returns",
+      "unchanged_logical_storage_and_output",
+      "old_output_is_not_new_pop",
+      "six_exercises_and_solutions",
+      "fact_support",
+      "full_count_explanation",
+      "empty_return_explanation",
+      "empty_output_explanation",
+      "guard_pair_explanation"
+    ]
+  },
+  "files": {
+    "scripts/stack_goal_continuation.py": "790ff39d7ef5b177f91d1d47cb7e720aa0ad7f46fdddf44b4ad19ab31c86f35f",
+    "backend/app/services/stack_goal_evidence.py": "ea56b6474ec50c1c84ec2f58d55046af20491dfae5640da6971206ac505b53e4",
+    "docs/acceptance/phase-1.5-stack-boundaries-t138/t148-scope-replay.json": "29a08152b6934a1bb5f1f5f7e57eaafcb2b642fbd9aec99389942e58c7ced1b2"
+  },
+  "scope_replay_digest": "76a8bd309003fcafc705729aef3a08fef107d3ab1f4403f50d6390076b5cefe9"
+}

@@ -340,3 +340,37 @@ C 的原件返回 HTTP 200 和 `completed`。以冻结请求和未修改的原�
 | C | `2178b88e-f9be-4209-b873-6f740bc519e8` | `c87de318-0d3a-46e6-98f9-628a0547ae0d` | `cancelled`，无课程版本、无已准入的范围提示。 |
 
 本机执行 `sh /tmp/edumind-t147/run.sh inspect A plan`、`inspect B plan` 后按独立审核准入。C 失败后，用只读原件重放核对失败，再运行 `PYTHONPATH=backend:. backend/.venv/bin/python /tmp/edumind-t147/finish-stop.py`，既有收尾服务处理了 3 个取消操作。通过 `backend/.venv/bin/python /tmp/edumind-t147/check-status.py` 读回上表。正文未发送，浏览器学习验收未执行。T147 保持 blocked，剩余三次正文额度随 STOP 失效。T144 固定双场景课程保留，T038 保持 blocked。
+
+## T148 新版范围外证据与 A/B 续接包
+
+`stack-goal-evidence-v2` 要求 `out_of_scope` 提供一条准确支持正向范围外要求的 `unsupported` 引文。可同时保留 `normal`、`full_push`、`empty_pop` 的有效正向引文，每类最多一条。程序核对来源键、逐字子串和重复，独立审核逐条核对完整原句的语义、否定和范围覆盖。未通过审核或审核与原件摘要错配时拒绝。只要存在正向范围外要求，审核通过的结果也只有范围提示，`plan=null`、`body_allowed=false`。
+
+C 的封存响应在新版中保留原顺序和两条引文。独立审核确认「理解」统摄「栈操作」和「动态扩容」两项正向要求。前者支持 `normal`，后者支持 `unsupported`，两条均来自 `request_1`。新版结果为「当前课程支持固定容量栈的正常操作和满栈、空栈拒绝。该目标超出支持范围。是否改为学习这些内容？」本步为离线派生诊断，未写入应用。[原件绑定及独立审核](t148-scope-replay.json)
+
+旧 T147 的 C 仍为 `STACK_SELECTION_EVIDENCE`。原请求、响应、失败、STOP、取消状态和失效额度保留。新规则及新批准备均实际调用 **0 次**，新版选择请求构造没有发送入口。
+
+### A/B 续接与执行边界
+
+隔离检查从 T147 读回 A/B 原始规划审计、已审候选及 v1 大纲，核对其与封存请求、响应、审核和准入摘要一致。新批为两个新访客创建新的课程、请求、操作和大纲版本。程序从各自已审核选择重新装配同一大纲内容，再用新快照绑定正文请求。新操作的策略快照和准入记录保存 `reviewed_selection_replay`、旧操作 ID 及原件和审核摘要。旧大纲无改动，新操作无选择调用记录。C 无续接操作。
+
+拟用 DeepSeek Responses `deepseek-flash`，整批新窗口 **30 分钟，0 次目标选择、3 次正文、0 次修订**。顺序为 **A 正常 → B 正常 → B 拒绝**。B 拒绝须读取本批 B 正常已审核并保存的版本及摘要。使用既有场景提示词、Schema、逐题证据和独立审核门槛。请求须待私有版本及 B 上游快照产生后构造，发送前封存实际字节。每请求最多 8,000 输出 token，I/O 限 90 秒，正文大小界线见清单。实际账单未知，无可验证费用硬上限，停止后仍可能计费，本机原件无独立抗回滚保障。
+
+先单独批准准确清单及新 C2 风险，再使用两个新访客及新批准文件启动。窗口内逐步执行，模型只负责正文。任何失败、结果未知或窗口不足时封存并停止，额度不结转，重试与回退均为零。通过后验收 A v2（5 帧、2 题）和 B v3（14 帧、6 题）的阅读、演示、高亮、播放、反馈、答案隔离及刷新。新批原件目录为 `~/.local/share/edumind/stack-goal-continuation-v1/`。[准确执行清单](selection-continuation-manifest.json)
+
+```sh
+export PYTHONPATH=backend:.
+backend/.venv/bin/python -m scripts.stack_goal_continuation parents
+backend/.venv/bin/python -m scripts.stack_goal_continuation replay-c REVIEW.json
+backend/.venv/bin/python -m scripts.stack_goal_continuation start APPROVAL.json
+backend/.venv/bin/python -m scripts.stack_goal_continuation send A normal
+backend/.venv/bin/python -m scripts.stack_goal_continuation inspect A normal
+backend/.venv/bin/python -m scripts.stack_goal_continuation review A normal REVIEW.json
+```
+
+前两条为只读原件核对。后续命令须在新授权下运行。新批准文件由 `approval_values` 绑定准确清单、两位新访客和额度，运行环境使用现有本机专用库 `edumind_catalog_p15_t146`。发送仍只在本机终端隐藏提示输入密钥。
+
+### 定向验证
+
+- `PYTHONPATH=backend:. backend/.venv/bin/python -m scripts.stack_goal_continuation replay-c REVIEW.json` 重新解密并核对 C 的封存摘要，逐项通过独立审核，得到原样两条引文和仅范围提示的结果。审核取自上方派生记录。
+- `backend/.venv/bin/python -m pytest -q backend/tests/test_stack_goal_evidence.py backend/tests/test_stack_goal_selection_trial.py --tb=short` 在 `EDUMIND_T148_ARCHIVE_CHECK=1`、专用 PostgreSQL 和禁外网审计钩子下执行，**14 项通过**。覆盖伪造、重复、否定语义审核失败、错审核绑定、旧批准拒绝、跨槽大纲换绑、C 和规划无发送权限、乱序及停止拒绝。实际 A/B 旧原件经只读核验，新测试操作以 MockTransport 完成 A v2 和 B v3。
+- Ruff、工作流账本、`git diff --check` 及旧清单 SHA-256 检查通过。真实窗口和浏览器学习尚未启动。
