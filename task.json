@@ -7720,6 +7720,41 @@
         }
       ],
       "execution_gate": "仅追加盘点。建议下一项用 T151 B 做原子事实和逐题取证，未领取。画像、正式运行和审核路线待决，T038/T102 保持 blocked。"
+    },
+    {
+      "id": "PHASE-1.5-T154",
+      "phase": "Phase 1.5",
+      "title": "T151 B v3 原子事实与逐题答案取证",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T151",
+        "PHASE-1.5-T153"
+      ],
+      "scope": [
+        "绑定两个准确私有场景的版本、可见块、真实候选与审核，只读取证。",
+        "逐块核对事实、十四帧、六题与实际判卷边界。Provider 0、应用写入 0、课程原文不变。"
+      ],
+      "prd_source": "T153 下一项建议；ADR0027 §2；T151 已交付 B v3",
+      "acceptance_criteria": [
+        "一份明细写明计数口径、位置、依据与正确/错误/未决。",
+        "六题分别核对题义、时点、答案、解析和实际判卷，保留发现及影响。",
+        "统一结果追加结论并提交，身份为受委托助手，仅开发取证。"
+      ],
+      "verification": [
+        "只读源版本与既有作答核对、独立 C 静态推演、必要的纯比较函数边界与统计检查。"
+      ],
+      "started_at": "2026-11-12T16:56:15+08:00",
+      "completed_at": "2026-11-12T17:08:15+08:00",
+      "commit_lookup": "Task-Completed: PHASE-1.5-T154",
+      "verification_results": [
+        {
+          "command": "只读 PostgreSQL 和原件绑定、静态手推 14 帧及六题、比较函数七个边界、明细和统计检查",
+          "result": "18 块、14 帧、六条解析，348 个教学事实均正确。六题答案和解析正确，实际短文本判卷六题均有边界偏差。Provider、应用写入、新作答均 0。",
+          "evidence": "docs/acceptance/phase-1.5-stack-boundaries-t138/t154-fact-answer-evidence.md"
+        }
+      ],
+      "execution_gate": "开发取证已交付，保持课程原文和 T151 历史。判卷偏差留证，T038 不新增正式结果。"
     }
   ],
   "planning_inputs": {

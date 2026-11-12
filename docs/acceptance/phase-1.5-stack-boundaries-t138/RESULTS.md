@@ -462,3 +462,11 @@ Chromium 读完两场景，核对 5＋9 帧的栈状态、出栈值和高亮，�
 | 私有库和模型调用 | 重复导入返回同一操作。新记录仅有 1 个操作，规划、课程版本、场景正文版本和发送预约均为 0。Provider 0，A/B 未重跑。 |
 
 实际验证命令为 `PYTHONPATH=backend:. backend/.venv/bin/python /tmp/edumind-t152/check.py`，使用本机 Chromium 和专用 PostgreSQL，结果保存在 `/tmp/edumind-t152/verification.json`。变更文件通过定向 Ruff、ESLint 及 `git diff --check`。
+
+## T154 B v3 事实与答案取证
+
+对 T151 私有 v3 的两个准确场景做只读取证。正常场景 v2 的场景版本由 v3 原样引用。封存候选、实际可见投影、两份独立审核和四份代码均有摘要绑定。实际受委托助手按块内同义合并、不同可见块及帧属性各记一项的口径，核对 18 个可见块、14 帧和六条反馈解析。事实 **348 项，正确 348、错误 0、未决 0**。该分母仅为本课可见事实，判卷边界单列。[取证明细](t154-fact-answer-evidence.md)
+
+**六题题义、唯一答案和解析均正确，完整判卷边界 0/6。** 只读复核既有四条标准正反作答，六题原反馈正确。实际服务使用 `short_text` 的 `quiz-exact-text-v1`，逐题纯函数复现五道整数题拒绝等值表示，且 `guard_pair` 接受题面明确排除的小写 `a`。准确题键、七个输入边界和匹配率影响见明细。保留原文和 T151 的原审核，本次新增的匹配结论不回写历史。
+
+Provider 调用、应用写入和新作答均为 **0**。本次是开发取证样例，评估身份为 `delegated_assistant`、`independent_human_truth=false`。T038 不新增正式分子或分母。
