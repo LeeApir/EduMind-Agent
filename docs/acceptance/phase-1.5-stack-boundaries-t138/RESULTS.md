@@ -408,3 +408,13 @@ A、B 新操作分别保留 T147 已审选择及原件摘要。使用既有收�
 实际 **0 次选择、2 次正文 HTTP、0 次修订**。A 回执报告 3733 token，B 的 401 无用量回执。实际账单未知。请求、加密响应、回执、A 审核与准入及 B 失败记录保存在 `~/.local/share/edumind/stack-goal-continuation-v1/`。
 
 用 `sh /tmp/edumind-t149/run.sh inspect A normal` 核对 A 封存原件，再用绑定的审核文件准入。执行 `PYTHONPATH=backend:. backend/.venv/bin/python /tmp/edumind-t149/check-browser.py A` 完成浏览器验收。B 失败后用 `finish-stop.py` 和 `check-status.py` 核对取消与私有读回。T149 保持 blocked，未使用的第三次请求随 STOP 失效。T147 及 T038 的历史结果保留。
+
+## T150 B 单独重测准备
+
+T149 已 STOP，且准确清单的第一步为 A 正常。B 重测复用 T149 的正文构造、DeepSeek Responses 传输、封存、独立审核及私有准入。新入口仅允许 B 正常和 B 拒绝，重新绑定 T147 已审核 B 选择到新访客和新私有操作。旧 T149 的 B HTTP 401 原件及 STOP 已重验。A v2 可继续学习。准备阶段 Provider 调用 **0 次**。
+
+[准确清单](selection-b-retest-manifest.json) SHA-256 为 `4e511f25a9d38da951b31c170f25e318229a635129c6ab0e5cdad36f7953559c`。拟用同一 DeepSeek `deepseek-flash`、同版提示词、Schema、材料和审核标准，**30 分钟，0 次目标选择、2 次正文、0 次修订或额外探测**。B 正常须独立审核并保存 v2 后才发送拒绝场景，实际请求绑定本批正常场景版本和摘要。新私有 UUID 与上游版本由实际运行产生，发送前封存请求字节。每请求 I/O 限 90 秒、输出上限 8000 token。实际金额未知、无可验证费用硬上限、停止后仍可能计费，本机原件无独立抗回滚保障。
+
+获准确授权后，使用本机隔离库和新批准文件调用 `PYTHONPATH=backend:. backend/.venv/bin/python -m scripts.stack_goal_b_retest start APPROVAL.json`。后续使用同一模块的 `send normal`、`inspect normal`、`review normal REVIEW.json`，再处理 `rejections`。只在本机隐藏提示输入有效 DeepSeek Key。任何响应拒绝、未知、审核未通过或窗口不足均封存并停止，无重试与回退。新原件目录为 `~/.local/share/edumind/stack-goal-b-retest-v1/`。完成后验收同课 v3 的阅读、14 帧及高亮、播放、6 题反馈、答案隔离与刷新。
+
+`PYTHONPATH=backend:. backend/.venv/bin/python -m scripts.stack_goal_b_retest source` 重放已封存 B 请求和失败摘要，并核对原独立审核。专用 PostgreSQL、`EDUMIND_T150_ARCHIVE_CHECK=1` 和禁外网审计钩子下执行 `backend/.venv/bin/python -m pytest -q backend/tests/test_stack_goal_b_retest.py --tb=short`，两项通过。覆盖 B 两正文及本批上游绑定、同版正常请求模板、旧批准拒绝、乱序拒绝、401 停止和旧原件保留。Ruff、工作流和旧清单摘要通过。真实执行另行批准。

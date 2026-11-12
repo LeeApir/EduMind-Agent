@@ -7583,6 +7583,40 @@
         }
       ],
       "execution_gate": "本批已 STOP，余 1 失效，A v2 保留，B 不重试，历史批次不恢复。"
+    },
+    {
+      "id": "PHASE-1.5-T150",
+      "phase": "Phase 1.5",
+      "title": "栈 B 双场景单独重测准备",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T148"
+      ],
+      "scope": [
+        "核对 T149 B 的 401 与 STOP，绑定已审核 T147 B 选择，冻结独立两正文批次。",
+        "复用已验证的正常和拒绝场景传输、审核、依赖及准入。"
+      ],
+      "prd_source": "PRD §0.5；T148 续接；用户要求单独重测 B",
+      "acceptance_criteria": [
+        "新批仅有 B 的正常和拒绝两场景，拒绝场景读取本批已审核并保存的正常场景。",
+        "零调用验证独立授权、双场景装配和停止。T149 STOP、失败原件和 A v2 保留。",
+        "冻结准确清单，真实调用待本批批准。"
+      ],
+      "verification": [
+        "T149 401 原件及 T147 审核重放、专用库禁外网 MockTransport 和旧清单摘要。"
+      ],
+      "started_at": "2026-11-12T14:21:30+08:00",
+      "completed_at": "2026-11-12T14:30:10+08:00",
+      "commit_lookup": "Task-Completed: PHASE-1.5-T150",
+      "verification_results": [
+        {
+          "command": "B 专用入口 source；隔离 PostgreSQL、禁外网 MockTransport pytest；Ruff 和账本",
+          "result": "两项通过，B 双场景依赖和 401 STOP 均验证，真实 Provider 0。",
+          "evidence": "docs/acceptance/phase-1.5-stack-boundaries-t138/RESULTS.md#t150-b-单独重测准备"
+        }
+      ],
+      "execution_gate": "新 B-only 准确清单 30 分钟、0 选择、2 正文、0 修订与本批 C2 待批准。T149 STOP、A v2 和旧失败保留。"
     }
   ],
   "planning_inputs": {
