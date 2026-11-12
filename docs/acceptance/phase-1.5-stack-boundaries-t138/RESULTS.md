@@ -300,3 +300,43 @@ backend/.venv/bin/python -m scripts.stack_goal_selection_trial preview C
 选择错误、审核失败、网络结果未知或窗口不足时，保留原件及预约并停止整批。无重试、回退或追加调用。实际账单未知，既有 C2 费用和在途请求边界随本清单提交执行授权。T144 基线、旧失败和 T038 状态保留。
 
 隔离 PostgreSQL 与禁外网 MockTransport **4 项通过**，覆盖全六步、错单元、审核失败和超时未知。验证未审核完三项时不能发送正文、C 无正文权限、B 绑定实际保存的上游、成功后 A v2 和 B v3 均完整、C 无版本。栈材料与装配 **5 项通过**，旧三批请求预览摘要一致。真实执行及浏览器验收尚未开始。
+
+## T147 三目标真实批次
+
+北京时间 2026-11-12 09:49:24 登记用户对准备提交 `6b40312` 及本批 C2 的批准。准确清单 SHA-256 为 `b4c58582b17dc7f8d0e034e20930d8a5bfdf85bd1a18d8b6eba49b537c76aee6`。额度为 3 次目标选择、3 次场景正文、0 次修订，整批 30 分钟。实际账单未知，没有可验证费用硬上限，停止后仍可能计费，本机原件没有独立抗回滚保障。登记时实际 Provider 调用 0 次，窗口尚未启动。
+
+已在专用数据库 `edumind_catalog_p15_t146` 建立三位独立访客。开发应用和后端仅监听本机，三位访客的普通课程生成入口均返回 409。
+
+实际整批窗口为北京时间 **2026-11-12 09:52:56 至 10:22:56**。A 选择已封存，实际 HTTP 200，实际请求摘要与冻结清单一致。
+
+### 选择与审核结果
+
+| 样本 | 模型选择及原文依据 | 独立审核与私有准入 |
+| --- | --- | --- |
+| A | `operations`，`normal` 引用「想懂压栈、弹栈和后来压进去的先出来」 | 三项独立审核通过。「不用讲动态扩容」是明确排除项。保存 v1 单场景大纲。候选 `8e809d89df000249d7f9771305fba9f9368a88a2b775f2a4cdf15c36a50a10df`。 |
+| B | `operations_and_rejections`，分别引用「先学压入弹出」「塞满时压不进」「一个也没有时弹不出」 | 三项独立审核通过。保存 v1 双场景大纲。候选 `75bb0df22b92e874e939d227665cfc4aa987a6ada8ee8c55ec64de73d2c56f2f`。 |
+| C | `out_of_scope`，`normal` 引用「理解栈操作」，`unsupported` 引用「动态扩容」 | 选择值符合预期，两条引文均可在原目标找到。该选择要求证据类型集合严格等于 `{unsupported}`，额外的 `normal` 触发 `STACK_SELECTION_EVIDENCE`。本地拒绝，未形成合格候选，未审核或准入澄清。 |
+
+C 的原件返回 HTTP 200 和 `completed`。以冻结请求和未修改的原始正文离线重放，复现同一错误。校验触发点为 [选择证据集合校验](../../../backend/app/services/stack_goal_selection.py#L97)。失败属于证据集合约定，语义上模型确实识别到动态扩容超出范围。
+
+### 用量与原件
+
+| 样本 | 输入 token | 缓存命中输入 token | 输出 token | 请求 SHA-256 | 响应 SHA-256 | 审核 SHA-256 |
+| --- | ---: | ---: | ---: | --- | --- | --- |
+| A | 512 | 0 | 39 | `f57790fd191b1521bcb7bc8418ab09669a6912e73f0a05f125efddaaeef540fb` | `e1628da2e45ef0d351b03a7201378bfa1042c47645ca656758906f8d4ac2f609` | `7187046cac41b83394ea3e10878b3aa0e2590c3e84db38597230118c52712d69` |
+| B | 516 | 256 | 81 | `1c9dda6e1039d7a76335786b00edc286b22dc6ab2f7c55558a8a4e5c436a0e94` | `cf3106f8f90a2168ece957baf59b2314231bdfbdc08b5fb302d20343e8016c50` | `6c9faf205f24b7d2b0c23af40396935e0856851997261c72eada7cda1e46ebdc` |
+| C | 486 | 256 | 52 | `c81f9273069f2594c141071d6c2fe2a571e3e0a5a5e76edbfe5ffd44954bb2d8` | `97bd062d11c4dbedc7ae529d5cbf9da764ea61cd052b6569f70943f313ac2eed` | 未到审核 |
+
+实际 **3 次选择、0 次正文、0 次修订**。回执合计输入 **1514**、输出 **172**，共 **1686** token。缓存命中输入为 512 token，包含在输入合计中。实际账单未知。三份实际请求摘要均与清单一致，响应解密摘要均与封存回执一致。
+
+封存目录为 `~/.local/share/edumind/stack-goal-selection-v1/`。各样本子目录保留 `plan.request.json`、`plan.raw.enc`、预约及回执。A/B 同时保留候选、审核与准入记录，C 保留 `plan.failure.json`。批次 STOP 已落盘，后续正文入口在读取密钥前返回 `STACK_BATCH_STOPPED`。
+
+### 私有应用终态
+
+| 样本 | 私有课程 ID | 操作 ID | API 读回 |
+| --- | --- | --- | --- |
+| A | `c4fc7fc6-19fd-466c-8d7b-1ce7c31957b0` | `f904a86f-ea92-4fae-a12b-2011e142357f` | `cancelled`，v1 单场景大纲，0 个就绪场景。 |
+| B | `89cad7f4-2c1b-4b9a-af13-589490cde19d` | `4ff41b38-1b3f-490f-8607-4f139f8ac23b` | `cancelled`，v1 双场景大纲，0 个就绪场景。 |
+| C | `2178b88e-f9be-4209-b873-6f740bc519e8` | `c87de318-0d3a-46e6-98f9-628a0547ae0d` | `cancelled`，无课程版本、无已准入的范围提示。 |
+
+本机执行 `sh /tmp/edumind-t147/run.sh inspect A plan`、`inspect B plan` 后按独立审核准入。C 失败后，用只读原件重放核对失败，再运行 `PYTHONPATH=backend:. backend/.venv/bin/python /tmp/edumind-t147/finish-stop.py`，既有收尾服务处理了 3 个取消操作。通过 `backend/.venv/bin/python /tmp/edumind-t147/check-status.py` 读回上表。正文未发送，浏览器学习验收未执行。T147 保持 blocked，剩余三次正文额度随 STOP 失效。T144 固定双场景课程保留，T038 保持 blocked。

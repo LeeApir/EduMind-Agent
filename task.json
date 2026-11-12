@@ -7482,6 +7482,40 @@
           "evidence": "docs/acceptance/phase-1.5-stack-boundaries-t138/RESULTS.md#t146-三目标真实执行清单"
         }
       ]
+    },
+    {
+      "id": "PHASE-1.5-T147",
+      "phase": "Phase 1.5",
+      "title": "栈三目标选择与单双场景课程真实验收",
+      "status": "blocked",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T146"
+      ],
+      "scope": [
+        "执行用户批准的 6b40312 准确包，三次目标选择、三次场景正文、零修订，整批 30 分钟。",
+        "按顺序独立审核和私有准入，保留真实请求、响应和停止证据。"
+      ],
+      "prd_source": "PRD §0.5；T144 教学基线；T146 准确清单",
+      "acceptance_criteria": [
+        "A 选择正常场景，B 选择正常及拒绝场景，C 返回范围说明且无计划或正文。三项逐项核对原文依据。",
+        "通过独立审核的 A 单场景与 B 双场景在实际应用完成阅读、高亮、播放、作答反馈、答案隔离及刷新。",
+        "统一交付候选与版本、用量和原件索引；失败或未知封存停止，不追加调用。"
+      ],
+      "verification": [
+        "运行 T146 冻结入口的真实步骤及独立审核，验证 A v2、B v3 和 C 范围状态。",
+        "在隔离开发应用验证 5 帧 2 题及 14 帧 6 题，逐题记录服务端反馈及刷新。"
+      ],
+      "started_at": "2026-11-12T09:49:24+08:00",
+      "blocked_reason": "C 选择返回 out_of_scope，证据同时包含 normal 与 unsupported。冻结校验只允许 unsupported，报 STACK_SELECTION_EVIDENCE 并停止；无正文或可学课程。",
+      "verification_results": [
+        {
+          "command": "T146 冻结入口真实发送、原件重放和独立 A/B 审核；隔离库停止收尾、私有 API 读回和停止后入口检查",
+          "result": "实际 3 次选择、0 次正文、0 次修订。A/B 大纲 v1 审核通过，C 拒绝；三项操作均 cancelled，STOP 后入口拒绝。浏览器学习未执行。",
+          "evidence": "docs/acceptance/phase-1.5-stack-boundaries-t138/RESULTS.md#t147-三目标真实批次"
+        }
+      ],
+      "execution_gate": "已 STOP。余下正文额度失效，不重试、不改协议或补写，保留原件和 A/B 大纲；T038 保持 blocked。"
     }
   ],
   "planning_inputs": {
