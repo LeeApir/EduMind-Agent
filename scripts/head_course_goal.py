@@ -726,7 +726,12 @@ def serve(
     from fastapi.responses import JSONResponse
     from app.main import app
 
-    if stack_boundaries:
+    if stack_boundaries == "goal_selection":
+        from app.core.database import get_database_url
+        from scripts.stack_goal_selection_trial import require_database
+
+        require_database(get_database_url())
+    elif stack_boundaries:
         from app.core.database import get_database_url
         from scripts.stack_multiscene_trial import require_database
 

@@ -273,3 +273,30 @@ T144 保留为已验收的固定双场景基线。新适配只增加目标选择
 定向检查 **10 项通过**。六个目标覆盖两种正例及其同义表达、明确不要求扩容、混合扩容要求和「容量翻倍」表述。反例拒绝伪造引文、漏项、重复依据、自定义材料或场景字段，以及被改写的依赖。三个隔离库用例核对原始响应保留、单场景 v2、双场景 v3、第二场景上游绑定，以及范围外仅返回澄清、无课程版本。TypeScript、Ruff、账本检查通过，旧三批请求预览摘要仍匹配各自清单。
 
 同义测试验证同义输入的接线和引文保留。真实模型是否正确理解同义、否定和混合范围，须在后续真实批次独立复核后再准入，并继续按 T144 的逐题与整课标准验收。真实路由、预算和执行窗口另定。T038 状态及旧失败记录保留。
+
+## T146 三目标真实执行清单
+
+用户确认三个样本和最多 **6 次请求**，含 **3 次目标选择、3 次场景正文、0 次修订**。本任务冻结执行包，实际 Provider 调用 **0 次**。真实窗口与专用访客在获本清单执行授权后创建。
+
+| 样本 | 固定输入 | 预期及验收 |
+| --- | --- | --- |
+| A | 想懂压栈、弹栈和后来压进去的先出来，不用讲动态扩容。 | `operations`，独立核对否定约束和 LIFO 引证。完成正常场景 v2，5 帧、2 题。 |
+| B | 先学压入弹出，再看塞满时压不进、一个也没有时弹不出的原因。 | `operations_and_rejections`，独立核对三类目标和同义表达。完成双场景 v3，14 帧、6 题。 |
+| C | 理解栈操作和动态扩容 | `out_of_scope`，证据应指向扩容要求。既有澄清状态报告范围，无课程版本、无正文。 |
+
+发送顺序为 A 选择 → B 选择 → C 选择 → A 正常 → B 正常 → B 拒绝。每一步先封存与严格校验，再独立审核后准入。选择审核检查语义、逐字原文引用和范围完整性；三项通过后才发送正文。B 正常两题解析均通过并保存后，拒绝场景才读取其准确版本、摘要和衔接段落。A、B 沿用 T144 的逐题、逐帧和整课审核，实际浏览器验收覆盖阅读、高亮、播放控制、每题反馈、答案隔离及刷新。C 只读回范围提示和无版本状态。
+
+[准确执行清单](selection-execution-manifest.json) SHA-256 为 `b4c58582b17dc7f8d0e034e20930d8a5bfdf85bd1a18d8b6eba49b537c76aee6`。包含三次选择的内部请求摘要及准确 HTTP 请求体摘要，均从 T145 原样构造。三次正文的实际请求取决于审核后的计划引证、私有版本和 B 的真实上游；程序文件、材料摘要和响应契约在本清单冻结。每份实际请求和响应按步封存。
+
+```sh
+export PYTHONPATH=backend:.
+backend/.venv/bin/python -m scripts.stack_goal_selection_trial preview A
+backend/.venv/bin/python -m scripts.stack_goal_selection_trial preview B
+backend/.venv/bin/python -m scripts.stack_goal_selection_trial preview C
+```
+
+拟沿用 DeepSeek Responses `deepseek-flash`，**全批 30 分钟**、每次 90 秒 I/O、最多 8000 输出 token。仅在隐藏提示中输入密钥。获清单执行授权后，以同一模块的 `start APPROVAL.json` 建立窗口和三个独立访客的课程操作，再按清单逐步执行 `send SLOT STAGE`、`inspect SLOT STAGE`、`review SLOT STAGE REVIEW.json`。选择步骤名为 `plan`，正文为 `normal` 或 `rejections`。开发库为 `edumind_catalog_p15_t146`，应用复用 `serve(..., stack_boundaries="goal_selection")`，新封存目录为 `~/.local/share/edumind/stack-goal-selection-v1/`。
+
+选择错误、审核失败、网络结果未知或窗口不足时，保留原件及预约并停止整批。无重试、回退或追加调用。实际账单未知，既有 C2 费用和在途请求边界随本清单提交执行授权。T144 基线、旧失败和 T038 状态保留。
+
+隔离 PostgreSQL 与禁外网 MockTransport **4 项通过**，覆盖全六步、错单元、审核失败和超时未知。验证未审核完三项时不能发送正文、C 无正文权限、B 绑定实际保存的上游、成功后 A v2 和 B v3 均完整、C 无版本。栈材料与装配 **5 项通过**，旧三批请求预览摘要一致。真实执行及浏览器验收尚未开始。

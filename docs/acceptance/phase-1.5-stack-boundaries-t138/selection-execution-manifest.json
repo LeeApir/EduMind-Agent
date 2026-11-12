@@ -1,0 +1,146 @@
+{
+  "batch": "stack-goal-selection-v1",
+  "status": "proposed_execution_not_authorized",
+  "endpoint": "https://api.deepseek.com/responses",
+  "model": "deepseek-flash",
+  "source": "goal_selected",
+  "sequence": [
+    [
+      "A",
+      "plan"
+    ],
+    [
+      "B",
+      "plan"
+    ],
+    [
+      "C",
+      "plan"
+    ],
+    [
+      "A",
+      "normal"
+    ],
+    [
+      "B",
+      "normal"
+    ],
+    [
+      "B",
+      "rejections"
+    ]
+  ],
+  "samples": {
+    "A": {
+      "goal": "想懂压栈、弹栈和后来压进去的先出来，不用讲动态扩容。",
+      "expected_selection": "operations",
+      "stages": [
+        "plan",
+        "normal"
+      ]
+    },
+    "B": {
+      "goal": "先学压入弹出，再看塞满时压不进、一个也没有时弹不出的原因。",
+      "expected_selection": "operations_and_rejections",
+      "stages": [
+        "plan",
+        "normal",
+        "rejections"
+      ]
+    },
+    "C": {
+      "goal": "理解栈操作和动态扩容",
+      "expected_selection": "out_of_scope",
+      "stages": [
+        "plan"
+      ]
+    }
+  },
+  "selection_budget": 3,
+  "body_budget": 3,
+  "revision_budget": 0,
+  "max_http_requests": 6,
+  "window_seconds": 1800,
+  "timeout_seconds": 90,
+  "max_request_bytes": 131072,
+  "max_response_bytes": 2097152,
+  "max_output_tokens_per_request": 8000,
+  "temperature": 0.2,
+  "store": false,
+  "stream": false,
+  "reasoning_effort": "none",
+  "materials_digest": "d93943193f111b68ae2bb70a40dacaa731c31ddc77b3d73e961d8262aa110456",
+  "selection_prompt_version": "stack-goal-selector-v1",
+  "selection_schema_version": "stack-goal-selector-response-v1",
+  "scene_prompt_version": "stack-boundaries-scene-evidence-v2",
+  "scene_schema_version": "stack-boundaries-scene-wire-v2",
+  "checks": {
+    "normal": [
+      "normal_five_frames",
+      "lifo_explanation",
+      "two_exercises",
+      "fact_support",
+      "first_pop_explanation",
+      "final_top_explanation"
+    ],
+    "rejections": [
+      "full_course_coherence",
+      "rejections_nine_frames",
+      "both_guards_and_returns",
+      "unchanged_logical_storage_and_output",
+      "old_output_is_not_new_pop",
+      "six_exercises_and_solutions",
+      "fact_support",
+      "full_count_explanation",
+      "empty_return_explanation",
+      "empty_output_explanation",
+      "guard_pair_explanation"
+    ],
+    "plan": [
+      "selection_semantics",
+      "original_evidence",
+      "scope_complete"
+    ]
+  },
+  "selection_request_digest": {
+    "A": "1732baf456459a2d5f76f7bd46ad9c86fa8c644683b1d69bfeb9724660304658",
+    "B": "8efe3baa86b0caf72067a99b8ff0ca7c4630112baf7855a98baa13a3d9888f2e",
+    "C": "787e2e89f9b92cb29c4bea9693c200b4ee3b3702ad00d3d944b33c7d7aa4bfe4"
+  },
+  "selection_http_sha256": {
+    "A": "f57790fd191b1521bcb7bc8418ab09669a6912e73f0a05f125efddaaeef540fb",
+    "B": "1c9dda6e1039d7a76335786b00edc286b22dc6ab2f7c55558a8a4e5c436a0e94",
+    "C": "c81f9273069f2594c141071d6c2fe2a571e3e0a5a5e76edbfe5ffd44954bb2d8"
+  },
+  "files": {
+    "backend/app/agents/free_course_planning.py": "924991b75efb43b5f9ba33b7e1d7010c71f96abd65adf3efb0f0d22fa8dd1faf",
+    "backend/app/contracts/free_course.openapi.json": "391da36d8e1a5735f331657c489595e8402a3a03531c05968c30085e6adf83e7",
+    "backend/app/agents/free_course_planning.schema.json": "ac0f1954d1a1affd5ee31066520823657d808d75503f1cfbb432919e954579aa",
+    "backend/app/agents/head_course_planning_wire.py": "d494637d99e2d2a12e818087b379aa62049462f81a1711626bc46d1cdb4b77e7",
+    "backend/app/agents/head_course_planning_wire.schema.json": "5f3452267c50e1496a490a198cb56d1ba49c5e97c9380e78ada64a95a2d750dd",
+    "backend/app/agents/free_scene_generation.py": "4f0a59807d7ad53920c8541053448c835f28237292a581032d938690e93ff171",
+    "backend/app/agents/free_scene_generation.schema.json": "770731b9e93a3b22bf828579b14cceca0fbfc1d0f474965c3bc7301638a1fe2d",
+    "backend/app/services/free_course_planning.py": "c6efb0b0173fc5982035a91771c39c570a93c7fb87a4db4c0ab51c0c1120965e",
+    "backend/app/services/free_course_recovery.py": "b559c249b927cf13c6543df62754186ca185f0afb30ec2c57c8565db2ae11a8c",
+    "backend/app/services/free_course_snapshots.py": "09852c19d2c45e8b40b70307deec4503239bad961e7dd03ad502938df19caf82",
+    "backend/app/services/free_scene_actions.py": "fced8a8e4a82d6539c3df4712ef1501bc6a2d4c66ed36f72cb78d93361b2660e",
+    "backend/app/services/free_scene_availability.py": "c6f510df591938dad1ae23c6647013fb8b7910552266f4ca6cd48f7736c08243",
+    "backend/app/services/free_scene_generation.py": "c2dd6431f8edd484a9cbb2741255916d7562aadd51eddfd8cecff67f40558e47",
+    "backend/app/services/free_scene_validation.py": "3aba51625ac5c5cfba0dbda0764efb41fab297276c47373b427c18a2a0c90606",
+    "backend/app/services/stack_course_materials.py": "72ec1bb3366ef377a0c3088cac112b39675deb51566ec338c11f27d9ec60638e",
+    "backend/app/services/stack_multiscene.py": "80df383f529a6e4ca92fb904f9dae5ae02f8d04a25f6046c57fe13984d4f3a71",
+    "backend/app/services/stack_multiscene_materials.py": "66b10db4c71ff0482a9115386d5cbd73af8cd2fa0662f9428e78ff2c7126c4df",
+    "docs/acceptance/phase-1.5-limited-c-preparation-t104/execute_once.py": "6c3672eefa35da22de1000611dead7e9e82503aa54add1c336dfb7a0234b02ea",
+    "scripts/course_trial_transport.py": "cc2102f297f14324945c95894c0fa57b0db3821dac01f18befb6300625878440",
+    "scripts/head_course_deepseek_wire.py": "90d005c0efd4e956499d05e08711f3f1393937a1d93607e4abeef26d8a85ad8a",
+    "scripts/head_course_goal.py": "0e4ead58261c929ccb23f6e4a9c6316ddca184f911575b50e9140f52993f8e25",
+    "scripts/isolated_diagnostics/p15_pilot_wire.py": "7df1804195e7d20cb7fc2c4638257507210e8188ac4bcb28db68cc1d584d0dec",
+    "scripts/stack_multiscene_trial.py": "cde42c1042dea3d3fe7fb156dc969df1ba596a393da1425c7d3811d6893dbd43",
+    "web/src/api/freeCourses.ts": "4c7a2304bc3864d1d8d8da7ce8e65a449cf3b53122d3a81a77762a6eb5877587",
+    "web/src/components/CoursePresentation.vue": "77914586e1c256661d6c65e703583dc98e01670d8b6c01e9c1bdf07aad6ba159",
+    "web/src/components/CourseWorkspace.vue": "3f7ce2465816a02478ebde864b948382d13378b8650d49eb532a971ef884d8f8",
+    "backend/app/services/stack_goal_selection.py": "cc163c516bcbb429bb7c8377bbeee54e7758e8024129f02671b9710371c87905",
+    "scripts/stack_goal_selection_trial.py": "b4f0fe349832ba7553777348dea6c4123b33ed605d5ddd29b1cfe443648570c2",
+    "docs/acceptance/phase-1.5-stack-boundaries-t138/t145-goal-selection-requests.json": "90465ed27d6bb8c1ebfe86d08f7621016bd4c23a459fa302aae653f16389f0b4"
+  }
+}

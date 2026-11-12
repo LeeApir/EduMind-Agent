@@ -7449,6 +7449,39 @@
           "evidence": "docs/acceptance/phase-1.5-stack-boundaries-t138/RESULTS.md#t145-最小目标选择准备"
         }
       ]
+    },
+    {
+      "id": "PHASE-1.5-T146",
+      "phase": "Phase 1.5",
+      "title": "栈目标选择真实批次执行清单冻结",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T145"
+      ],
+      "scope": [
+        "冻结三个已确认目标，最多三次选择、三次正文、零修订。",
+        "复用前台封存和私有准入，离线核对跨样本审核顺序。"
+      ],
+      "prd_source": "PRD §0.5；T145 准确请求；用户批准样本与上限",
+      "acceptance_criteria": [
+        "三项选择均审核通过后才允许正文；范围外无计划或正文。",
+        "严格核对六步上限、审核和停止，精确请求可预览。",
+        "Provider 0，冻结后等待真实执行授权。"
+      ],
+      "verification": [
+        "隔离 PostgreSQL、MockTransport、准确请求摘要及旧包回归。"
+      ],
+      "started_at": "2026-11-12T09:36:25+08:00",
+      "completed_at": "2026-11-12T09:41:37+08:00",
+      "commit_lookup": "Task-Completed: PHASE-1.5-T146",
+      "verification_results": [
+        {
+          "command": "隔离 PostgreSQL／禁外网 MockTransport、栈材料 pytest、Ruff、账本及新旧请求摘要",
+          "result": "4 项批次和 5 项材料装配通过；三选择门禁及错误停止通过，Provider 0。",
+          "evidence": "docs/acceptance/phase-1.5-stack-boundaries-t138/RESULTS.md#t146-三目标真实执行清单"
+        }
+      ]
     }
   ],
   "planning_inputs": {

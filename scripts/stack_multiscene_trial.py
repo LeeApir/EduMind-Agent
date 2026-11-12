@@ -113,9 +113,17 @@ def require_database(url, *, fixture, fixed=False, evidence=False):
         raise SnapshotError("STACK_DEVELOPMENT_DATABASE_REQUIRED")
 
 
+def plan_request(inputs):
+    if inputs.get("stack_boundaries") == basis.SELECTION_BATCH:
+        from app.services.stack_goal_selection import build_request
+
+        return build_request(inputs)
+    return stack.wire_plan_request(inputs)
+
+
 def body_for(stage, inputs):
     if stage == "plan":
-        request = stack.wire_plan_request(inputs)
+        request = plan_request(inputs)
     else:
         if stage not in STAGES or not any(
             scene["scene_id"] == inputs["scene_id"] and scene["scene_key"] == stage
@@ -144,6 +152,7 @@ class Trial:
         self.batch = batch_for(fixed=fixed, evidence=evidence)
         if not self.fixture and vault != VAULT.with_name(self.batch):
             raise SnapshotError("STACK_VAULT_REQUIRED")
+        self.goal = basis.GOAL
         self.fixed = fixed or evidence
         self.evidence = evidence
         self.checks = EVIDENCE_CHECKS if evidence else CHECKS
@@ -188,7 +197,7 @@ class Trial:
                 raise SnapshotError("STACK_GUEST_REQUIRED")
             repo = SnapshotRepository(db, owner)
             created = await repo.create_course(
-                basis.GOAL, key=self.batch, operation_window_seconds=WINDOW,
+                self.goal, key=self.batch, operation_window_seconds=WINDOW,
                 config=dict(prompt_version=self.batch, policy_version=self.batch),
                 policy_snapshot=self.policy_snapshot,
             )
@@ -323,6 +332,15 @@ class Trial:
                 await engine.dispose()
         asyncio.run(cancel())
 
+    def plan_result(self, raw, inputs):
+        response = stack.wire_plan_response(raw, inputs)
+        if response["needs_clarification"]:
+            raise SnapshotError("STACK_PLAN_CLARIFICATION")
+        return "ready", response
+
+    def is_final(self, stage):
+        return stage == "rejections"
+
     def record(self, stage, inputs, request_bytes, raw, receipt):
         if receipt != dict(http_status=200, encoding="identity", complete=True,
                            raw_sha256=sha(raw), raw_bytes=len(raw)):
@@ -333,8 +351,7 @@ class Trial:
         result, observation = direct.observe_generation(request, raw)
         raw_output = dict(result.value)
         if stage == "plan":
-            if stack.wire_plan_response(raw_output, inputs)["needs_clarification"]:
-                raise SnapshotError("STACK_PLAN_CLARIFICATION")
+            self.plan_result(raw_output, inputs)
         else:
             stack.assemble(raw_output, inputs)
         record = dict(
@@ -346,7 +363,7 @@ class Trial:
                 for row in inputs["upstream"]
             ]) if stage != "plan" else {}),
         )
-        if self.fixed:
+        if self.plan_source != "model_planned":
             record["plan_source"] = self.plan_source
         return dict(**record, candidate_digest=digest("stack-boundaries-candidate", record=record))
 
@@ -422,7 +439,7 @@ class Trial:
             save(self.vault, f"{stage}.review.json", review)
             result = self.db(lambda db: self.admit(db, stage, review))
             save(self.vault, f"{stage}.admitted.json", result)
-            if stage == "rejections":
+            if self.is_final(stage):
                 self.halt()
             return result
         except BaseException as error:
@@ -456,7 +473,7 @@ class Trial:
             upstream=[] if stage == "plan" else inputs["upstream"],
             required_checks=self.checks[stage],
             **({"exercise_evidence": basis.practice_evidence(material)["scenes"][stage]}
-               if self.evidence else {}),
+               if self.evidence and stage != "plan" else {}),
         )
 
     async def admit(self, db, stage, review):
@@ -478,15 +495,23 @@ class Trial:
             raise SnapshotError("STACK_REVIEW_REQUIRED")
         self.active()
         if stage == "plan":
+            state, response = self.plan_result(candidate["raw_output"], inputs)
             outcome = PlanningOutcome(
-                "ready", None, digest("planning-input", snapshot=inputs),
-                request_digest(stack.wire_plan_request(inputs)),
-                stack.wire_plan_response(candidate["raw_output"], inputs),
+                state, None, digest("planning-input", snapshot=inputs),
+                request_digest(plan_request(inputs)), response,
             )
             row = await plans.persist_outcome(
                 db, owner, cid, fence, expected_head=None, call_key=stage,
                 inputs=inputs, outcome=outcome,
             )
+            if state == "needs_clarification":
+                op = await repo._operation(cid, oid)
+                op.lease_token = op.lease_expires_at = None
+                self.active()
+                return dict(
+                    state=state, reason="out_of_scope",
+                    candidate_digest=candidate["candidate_digest"], plan_id=None,
+                )
             pid = UUID(row["plan_id"])
             ready = await availability.commit_outline(
                 db, owner, cid, fence, plan_id=pid, key="stack-boundaries-outline"
@@ -522,7 +547,7 @@ class Trial:
             ready.update(scene_id=inputs["scene_id"], scene_digest=scene["digest"])
         op = await repo._fence(cid, fence)
         op.lease_token = op.lease_expires_at = None
-        if stage == "rejections":
+        if self.is_final(stage):
             op.state = "succeeded"
         self.active()
         return dict(**ready, candidate_digest=candidate["candidate_digest"])
