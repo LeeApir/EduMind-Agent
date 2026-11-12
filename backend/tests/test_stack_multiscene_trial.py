@@ -11,6 +11,7 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import func, select
 from test_head_course_fixed import with_direct_echo
+from test_stack_multiscene import practice_fixture
 
 from app.main import app
 from app.models.free_course_planning import FreeCoursePlanningResult
@@ -56,10 +57,10 @@ def output(stage, payload):
     )
 
 
-def approval(stage, candidates):
+def approval(stage, candidates, *, checks=trial.CHECKS):
     return dict(
         verdict="pass", reviewer="offline fixture only", candidates=candidates,
-        checks=dict.fromkeys(trial.CHECKS[stage], "pass"), notes="仅验证接线。",
+        checks=dict.fromkeys(checks[stage], "pass"), notes="仅验证接线。",
     )
 
 
@@ -242,8 +243,9 @@ def test_stack_trial_stops_and_preserves_evidence(monkeypatch, tmp_path, failure
         assert not attempt.exists()
 
 
+@pytest.mark.parametrize("evidence", [False, True], ids=["v1", "practice-evidence"])
 @pytest.mark.parametrize("finish", [True, False], ids=["two-scenes", "unreviewed-upstream"])
-def test_stack_trial_fixed_outline(monkeypatch, tmp_path, finish):
+def test_stack_trial_fixed_outline(monkeypatch, tmp_path, finish, evidence):
     url = os.environ["EDUMIND_TEST_DATABASE_URL"]
     monkeypatch.setenv("EDUMIND_DATABASE_URL", url)
     monkeypatch.setenv("EDUMIND_PRODUCT_MODE", "dynamic")
@@ -258,23 +260,51 @@ def test_stack_trial_fixed_outline(monkeypatch, tmp_path, finish):
         assert payload["plan"]["digest"] == checkpoint["plan_digest"]
         assert payload["plan"]["candidate"] == stack.fixed_outline(payload["request"])
         assert body["text"]["format"]["name"].endswith(stage)
-        if stage == "normal":
-            assert payload["upstream"] == []
+        if evidence:
+            assert "scene_material" not in payload and "upstream" not in payload
+            assert payload["wire_protocol"] == stack.EVIDENCE_WIRE
+            if stage == "normal":
+                assert payload["upstream_context"] == []
+            else:
+                assert payload["upstream_context"] == [dict(
+                    scene_id=normal["scene_id"],
+                    scene_version_id=first_snapshot["scene_version_id"],
+                    digest=first_snapshot["digest"],
+                    continuity_only=[
+                        b["markdown"] for b in first_snapshot["content"]["blocks"]
+                        if b["kind"] == "text"
+                    ],
+                )]
+                assert set(payload["practice"]["questions"]) == {
+                    "full_count", "empty_return", "empty_output", "guard_pair",
+                }
+            value = practice_fixture(payload)
+            if not finish:
+                value["explanations"]["first_pop"]["text"] = "出栈写入演示值 8。"
         else:
-            assert payload["upstream"] == [dict(scene_id=normal["scene_id"], **first_snapshot)]
+            if stage == "normal":
+                assert payload["upstream"] == []
+            else:
+                assert payload["upstream"] == [dict(scene_id=normal["scene_id"], **first_snapshot)]
+            value = output(stage, payload)
         calls.append(stage)
-        raw = with_direct_echo(body, envelope(output(stage, payload)))
+        raw = with_direct_echo(body, envelope(value))
         return httpx.Response(200, stream=httpx.ByteStream(raw))
 
     with TestClient(app, base_url="https://testserver") as client:
         guest = client.post("/api/auth/guest").json()
         owner = UUID(guest["user"]["id"])
-        run = trial.Trial(tmp_path / "fixed", url, transport=httpx.MockTransport(mock), fixed=True)
-        manifest = trial.manifest_sha(fixed=True)
+        run = trial.Trial(
+            tmp_path / "fixed", url, transport=httpx.MockTransport(mock), fixed=True,
+            evidence=evidence,
+        )
+        manifest = trial.manifest_sha(fixed=True, evidence=evidence)
         with pytest.raises(SnapshotError, match="STACK_EXACT_AUTHORIZATION_REQUIRED"):
             run.start(trial.approval_values(owner, manifest, fixture=True))
         assert not run.vault.exists()
-        started = run.start(trial.approval_values(owner, manifest, fixture=True, fixed=True))
+        started = run.start(trial.approval_values(
+            owner, manifest, fixture=True, fixed=True, evidence=evidence,
+        ))
         checkpoint = trial.read(run.vault / "plan.admitted.json")
         assert checkpoint["version"] == 1
         assert checkpoint["plan_source"] == "fixed_outline"
@@ -286,13 +316,27 @@ def test_stack_trial_fixed_outline(monkeypatch, tmp_path, finish):
         with pytest.raises(SnapshotError, match="STACK_STAGE_NOT_AUTHORIZED"):
             run.send("plan", key="fixture-secret")
         d1 = run.send("normal", key="fixture-secret")
+        review = approval("normal", [d1], checks=run.checks)
+        if evidence:
+            inspected = run.inspect("normal")
+            assert "first_pop_explanation" in inspected["required_checks"]
+            first = inspected["exercise_evidence"]["questions"]["first_pop"]
+            assert first["reference_answer"] == "2"
         if not finish:
-            with pytest.raises(SnapshotError, match="STACK_STAGE_ORDER"):
-                run.send("rejections", key="fixture-secret")
+            if evidence:
+                # Well-formed IDs cannot certify text that reasoned from the wrong example.
+                review["checks"]["first_pop_explanation"] = "fail"
+                with pytest.raises(SnapshotError, match="STACK_REVIEW_REQUIRED"):
+                    run.review("normal", review)
+                with pytest.raises(SnapshotError, match="STACK_BATCH_STOPPED"):
+                    run.send("rejections", key="fixture-secret")
+            else:
+                with pytest.raises(SnapshotError, match="STACK_STAGE_ORDER"):
+                    run.send("rejections", key="fixture-secret")
             assert calls == ["normal"] and (run.vault / "STOP").exists()
             return
 
-        normal = run.review("normal", approval("normal", [d1]))
+        normal = run.review("normal", review)
 
         async def read_first(db):
             assert await db.scalar(select(func.count()).select_from(
@@ -304,7 +348,7 @@ def test_stack_trial_fixed_outline(monkeypatch, tmp_path, finish):
 
         first_snapshot = run.db(read_first)
         d2 = run.send("rejections", key="fixture-secret")
-        final = run.review("rejections", approval("rejections", [d1, d2]))
+        final = run.review("rejections", approval("rejections", [d1, d2], checks=run.checks))
         assert calls == ["normal", "rejections"]
         assert final["version"] == 3 and (run.vault / "STOP").exists()
         assert not (run.vault / "plan.attempt.json").exists()
@@ -315,7 +359,7 @@ def test_stack_trial_fixed_outline(monkeypatch, tmp_path, finish):
             response = client.get(path)
             assert response.status_code == 200, response.text
             scene = response.json()
-            assert scene["generation_source"]["batch"] == trial.basis.FIXED_BATCH
+            assert scene["generation_source"]["batch"] == run.batch
             assert scene["generation_source"]["plan_source"] == "fixed_outline"
             assert scene["generation_source"]["evidence_kind"] == "offline_fixture"
             assert scene["scene_version_id"] == saved["scene_version_id"]

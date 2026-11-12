@@ -732,6 +732,7 @@ def serve(
 
         require_database(
             get_database_url(), fixture=False, fixed=stack_boundaries == "fixed_outline",
+            evidence=stack_boundaries == "practice_evidence",
         )
     elif live_reuse:
         from app.services.course_trial_publication import LIVE_REUSE, require_database

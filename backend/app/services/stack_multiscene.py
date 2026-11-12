@@ -16,6 +16,7 @@ from app.services.provider_gateway import ChatMessage, StructuredRequest
 
 PLAN_PROMPT = "stack-boundaries-plan-v1"
 SCENE_PROMPT = "stack-boundaries-scene-v1"
+EVIDENCE_PROMPT = "stack-boundaries-scene-evidence-v2"
 
 
 def planning_request(inputs: dict[str, Any]) -> StructuredRequest:
@@ -87,7 +88,7 @@ def fixed_outline(inputs: dict[str, Any]) -> dict[str, Any]:
     snapshot = planning.snapshot_input(inputs)
     source = snapshot["request_sources"].get("request_1")
     if (
-        snapshot.get("stack_boundaries") != basis.FIXED_BATCH
+        snapshot.get("stack_boundaries") not in basis.FIXED_BATCHES
         or set(snapshot["request_sources"]) != {"request_1"}
         or source != dict(request_id=snapshot["request_id"], version=1, text=basis.GOAL)
         or snapshot["learner_evidence"]
@@ -203,15 +204,40 @@ execution. Return only the supplied closed schema."""
 
 
 def assemble(raw: dict[str, Any], inputs: dict[str, Any]) -> dict[str, Any]:
-    request = scene_request(inputs)
+    practice = inputs["request"].get("stack_boundaries") == basis.EVIDENCE_BATCH
+    request = bound_scene_request(inputs) if practice else scene_request(inputs)
     payload = json.loads(request.prompt.messages[1].content)
-    mat = payload["scene_material"]
+    mat = (
+        basis.materials()["scenes"][payload["scene_key"]]
+        if practice else payload["scene_material"]
+    )
+    facts = payload["demonstration"]["facts"] if practice else mat["facts"]
     if (
         not Draft202012Validator(request.json_schema).is_valid(raw)
-        or any(not p["text"].strip() or not set(p["fact_ids"]) <= mat["facts"].keys()
+        or any(not p["text"].strip() or not set(p["fact_ids"]) <= facts.keys()
                for p in raw["paragraphs"])
-        or any(not text.strip() for text in raw["explanations"].values())
     ):
+        raise SnapshotError("STACK_SCENE_CONTENT")
+    explanations = raw["explanations"]
+    if practice:
+        practice_block = payload["practice"]
+        if (
+            practice_block["code"] != mat["exercise_source"]
+            or any(q["practice_code_sha256"] != practice_block["code_sha256"]
+                   for q in practice_block["questions"].values())
+        ):
+            raise SnapshotError("STACK_PRACTICE_CODE_MISMATCH")
+        texts = {}
+        for key, evidence in payload["practice"]["questions"].items():
+            answer = explanations[key]
+            if (
+                answer["evidence_id"] != evidence["evidence_id"]
+                or answer["checkpoint_ids"] != [c["id"] for c in evidence["checkpoints"]]
+            ):
+                raise SnapshotError("STACK_EXERCISE_EVIDENCE_BINDING")
+            texts[key] = answer["text"]
+        explanations = texts
+    if any(not text.strip() for text in explanations.values()):
         raise SnapshotError("STACK_SCENE_CONTENT")
     blocks = [
         dict(kind="text", anchor_id=f"paragraph-{i}", markdown=p["text"])
@@ -248,7 +274,7 @@ def assemble(raw: dict[str, Any], inputs: dict[str, Any]) -> dict[str, Any]:
                  dict(question_id=q["key"], input_type="short_text",
                       question=f"根据 practice-code 中的代码，{q['checkpoint']}。"
                                f"只输入{q['domain']}，不加单位或解释。",
-                      answer_key=q["private_answer"], solution=raw["explanations"][q["key"]])
+                      answer_key=q["private_answer"], solution=explanations[q["key"]])
                  for q in mat["questions"]
              ]),
     ])
@@ -265,6 +291,14 @@ def assemble(raw: dict[str, Any], inputs: dict[str, Any]) -> dict[str, Any]:
 
 PLAN_WIRE = "stack-boundaries-planning-wire-v1"
 SCENE_WIRE = "stack-boundaries-scene-wire-v1"
+EVIDENCE_WIRE = "stack-boundaries-scene-wire-v2"
+
+
+def scene_versions(batch: str | None) -> tuple[str, str]:
+    return (
+        (EVIDENCE_PROMPT, EVIDENCE_WIRE) if batch == basis.EVIDENCE_BATCH
+        else (SCENE_PROMPT, SCENE_WIRE)
+    )
 
 
 def wire_plan_request(inputs: dict[str, Any]) -> StructuredRequest:
@@ -305,21 +339,80 @@ def wire_plan_response(raw: dict[str, Any], inputs: dict[str, Any]) -> dict[str,
     ), inputs)
 
 
+def _practice_request(request: StructuredRequest, payload: dict[str, Any]) -> StructuredRequest:
+    selected = next(s for s in payload["plan"]["scenes"] if s["scene_id"] == payload["scene_id"])
+    key = selected["scene_key"]
+    data = basis.materials()
+    practice = basis.practice_evidence(data)["scenes"][key]
+    material = payload.pop("scene_material")
+    payload.update(
+        scene_key=key,
+        materials_digest=basis.materials_digest(basis.EVIDENCE_BATCH),
+        demonstration={
+            **{k: material[k] for k in ("source", "frames", "demonstrated", "text_only")},
+            "facts": {f"demo.{key}.{k}": value for k, value in material["facts"].items()},
+        },
+        practice=dict(version=basis.PRACTICE_VERSION, **practice),
+        upstream_context=[
+            {
+                **{k: u[k] for k in ("scene_id", "scene_version_id", "digest")},
+                "continuity_only": [
+                    b["markdown"] for b in u["content"]["blocks"] if b["kind"] == "text"
+                ],
+            }
+            for u in payload.pop("upstream")
+        ],
+    )
+    schema = stack.closed(dict(
+        paragraphs=request.json_schema["properties"]["paragraphs"],
+        explanations=stack.closed({
+            key: stack.closed(dict(
+                text=stack.TEXT, evidence_id=stack.TEXT,
+                checkpoint_ids=dict(
+                    type="array", items=stack.TEXT,
+                    minItems=len(evidence["checkpoints"]), maxItems=len(evidence["checkpoints"]),
+                ),
+            ))
+            for key, evidence in practice["questions"].items()
+        }),
+    ))
+    instruction = """Write Chinese teaching paragraphs and one explanation for each practice key.
+[DEMONSTRATION] Use only this scene's demonstration source, frames and demo fact IDs in paragraphs.
+Explain the assigned objectives, changes and invariants. Never reveal practice answers there.
+[EXERCISES] Each explanation solves the corresponding question using practice.code and ONLY that
+key's practice.questions evidence. Read its asked field, checkpoints and reference_answer.
+Explain how the exact before/after states and code lead to that answer. The main demonstration
+has different inputs; never use its states to solve a practice question. Keep success, this
+call's popped value and the caller's preserved value distinct. The program owns all answers.
+Return the exact evidence_id and checkpoint_ids for that key, in order.
+[UPSTREAM] The saved upstream context is prior teaching for continuity only. It is not evidence
+for paragraphs or practice explanations. Do not cite it or use another question's evidence.
+Return only the closed schema. No HTML, links, tools, code execution, fences or invented examples.
+"""
+    return replace(request, json_schema=schema, prompt=replace(
+        request.prompt, messages=(
+            ChatMessage("system", instruction), ChatMessage("user", canonical(payload).decode()),
+        ),
+    ))
+
+
 def bound_scene_request(inputs: dict[str, Any]) -> StructuredRequest:
-    """Only the transaction-local lease is omitted from the outbound snapshot."""
     batch = inputs["request"].get("stack_boundaries")
-    if batch not in (basis.VERSION, basis.FIXED_BATCH):
+    if batch not in (basis.VERSION, *basis.FIXED_BATCHES):
         raise SnapshotError("STACK_SCENE_SCOPE")
-    fixed = batch == basis.FIXED_BATCH
+    fixed = batch in basis.FIXED_BATCHES
     if fixed and inputs["plan"]["candidate"] != fixed_outline(inputs["request"]):
         raise SnapshotError("STACK_FIXED_OUTLINE_BINDING")
     request = scene_request(inputs)
     system, user = request.prompt.messages
     payload = json.loads(user.content)
     payload.pop("lease_epoch")
-    payload["wire_protocol"] = SCENE_WIRE
+    prompt_version, wire_version = scene_versions(batch)
+    payload.update(prompt_version=prompt_version, wire_protocol=wire_version)
     if fixed:
         payload["plan_source"] = "fixed_outline"
+    if batch == basis.EVIDENCE_BATCH:
+        return _practice_request(request, payload)
     return replace(request, prompt=replace(
         request.prompt, messages=(system, ChatMessage("user", canonical(payload).decode())),
     ))
@@ -332,7 +425,7 @@ def checked_scene(value: dict[str, Any], inputs: dict[str, Any]) -> dict[str, An
     request = bound_scene_request(inputs)
     payload = json.loads(request.prompt.messages[1].content)
     scene = next(s for s in inputs["plan"]["scenes"] if s["scene_id"] == inputs["scene_id"])
-    mat = payload["scene_material"]
+    mat = basis.materials()["scenes"][scene["scene_key"]]
     source = value["generation_source"]
     if (
         not isinstance(source, dict)
@@ -344,7 +437,7 @@ def checked_scene(value: dict[str, Any], inputs: dict[str, Any]) -> dict[str, An
         or source["origin"] != "stack_boundaries_model_generation"
         or source["batch"] != inputs["request"]["stack_boundaries"]
         or source["model"] != "deepseek-flash"
-        or source["prompt_version"] != SCENE_PROMPT
+        or source["prompt_version"] != payload["prompt_version"]
         or source["plan_source"] != payload.get("plan_source", "model_planned")
         or source["plan_digest"] != inputs["plan"]["digest"]
         or source["materials_digest"] != payload["materials_digest"]

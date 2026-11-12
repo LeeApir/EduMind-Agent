@@ -36,8 +36,10 @@ ROOT = Path(__file__).resolve().parents[1]
 PACK = ROOT / "docs/acceptance/phase-1.5-stack-boundaries-t138"
 VAULT = Path.home() / ".local/share/edumind" / basis.VERSION
 FIXED_VAULT = VAULT.with_name(basis.FIXED_BATCH)
+EVIDENCE_VAULT = VAULT.with_name(basis.EVIDENCE_BATCH)
 DATABASE = "edumind_catalog_p15_t139"
 FIXED_DATABASE = "edumind_catalog_p15_t141"
+EVIDENCE_DATABASE = "edumind_catalog_p15_t143"
 FIXED_STAGES = ("normal", "rejections")
 STAGES = ("plan", *FIXED_STAGES)
 WINDOW = 1800
@@ -50,6 +52,20 @@ CHECKS = {
         "six_exercises_and_solutions", "fact_support",
     ],
 }
+
+EVIDENCE_CHECKS = {
+    "normal": [*CHECKS["normal"], "first_pop_explanation", "final_top_explanation"],
+    "rejections": [
+        *CHECKS["rejections"], "full_count_explanation", "empty_return_explanation",
+        "empty_output_explanation", "guard_pair_explanation",
+    ],
+}
+
+
+def batch_for(*, fixed, evidence):
+    if evidence:
+        return basis.EVIDENCE_BATCH
+    return basis.FIXED_BATCH if fixed else basis.VERSION
 
 
 def sha(value):
@@ -64,31 +80,33 @@ def save(vault, name, value):
     raw_io.exclusive(vault / name, canonical(value))
 
 
-def manifest_sha(*, fixed=False):
-    path = PACK / ("fixed-execution-manifest.json" if fixed else "execution-manifest.json")
+def manifest_sha(*, fixed=False, evidence=False):
+    name = "fixed-execution-manifest.json" if fixed else "execution-manifest.json"
+    path = PACK / ("evidence-execution-manifest.json" if evidence else name)
     manifest = read(path)
     if any(sha((ROOT / name).read_bytes()) != expected
            for name, expected in manifest["files"].items()):
         raise SnapshotError("STACK_PACKAGE_CHANGED")
-    if basis.materials()["materials_digest"] != manifest["materials_digest"]:
+    batch = batch_for(fixed=fixed, evidence=evidence)
+    if basis.materials_digest(batch) != manifest["materials_digest"]:
         raise SnapshotError("STACK_PACKAGE_CHANGED")
     return sha(path.read_bytes())
 
 
-def approval_values(owner, manifest, *, fixture=False, fixed=False):
+def approval_values(owner, manifest, *, fixture=False, fixed=False, evidence=False):
     return dict(
-        batch=basis.FIXED_BATCH if fixed else basis.VERSION,
+        batch=batch_for(fixed=fixed, evidence=evidence),
         owner=str(owner), manifest_sha256=manifest,
         mode="offline_fixture" if fixture else "actual_provider_response",
         approved=True, accept_batch_c2=not fixture, window_seconds=WINDOW,
-        stage_budgets={stage: int(stage != "plan" or not fixed) for stage in STAGES},
+        stage_budgets={stage: int(stage != "plan" or not (fixed or evidence)) for stage in STAGES},
         revision_budget=0,
     )
 
 
-def require_database(url, *, fixture, fixed=False):
+def require_database(url, *, fixture, fixed=False, evidence=False):
     parsed = make_url(url)
-    database = FIXED_DATABASE if fixed else DATABASE
+    database = EVIDENCE_DATABASE if evidence else FIXED_DATABASE if fixed else DATABASE
     if (parsed.drivername, parsed.host, parsed.port, parsed.database) != (
         "postgresql+asyncpg", "127.0.0.1", 15437, database + ("_test" if fixture else ""),
     ):
@@ -118,20 +136,22 @@ def body_for(stage, inputs):
 
 
 class Trial:
-    def __init__(self, vault, url, *, transport=None, fixed=False):
+    def __init__(self, vault, url, *, transport=None, fixed=False, evidence=False):
         if transport is not None and not isinstance(transport, httpx.MockTransport):
             raise SnapshotError("STACK_OFFLINE_TRANSPORT_REQUIRED")
         self.fixture = transport is not None
-        require_database(url, fixture=self.fixture, fixed=fixed)
-        if not self.fixture and vault != (FIXED_VAULT if fixed else VAULT):
+        require_database(url, fixture=self.fixture, fixed=fixed, evidence=evidence)
+        self.batch = batch_for(fixed=fixed, evidence=evidence)
+        if not self.fixture and vault != VAULT.with_name(self.batch):
             raise SnapshotError("STACK_VAULT_REQUIRED")
-        self.fixed = fixed
-        self.batch = basis.FIXED_BATCH if fixed else basis.VERSION
-        self.plan_source = "fixed_outline" if fixed else "model_planned"
+        self.fixed = fixed or evidence
+        self.evidence = evidence
+        self.checks = EVIDENCE_CHECKS if evidence else CHECKS
+        self.plan_source = "fixed_outline" if self.fixed else "model_planned"
         self.policy_snapshot = {"finite_stack_foreground": True}
-        if fixed:
+        if self.fixed:
             self.policy_snapshot["plan_source"] = self.plan_source
-        self.stages = FIXED_STAGES if fixed else STAGES
+        self.stages = FIXED_STAGES if self.fixed else STAGES
         self.vault, self.url, self.transport = vault, url, transport
 
     def require_stage(self, stage):
@@ -152,7 +172,8 @@ class Trial:
     def approval(self, value):
         owner = UUID(value["owner"])
         if value != approval_values(
-            owner, manifest_sha(fixed=self.fixed), fixture=self.fixture, fixed=self.fixed,
+            owner, manifest_sha(fixed=self.fixed, evidence=self.evidence),
+            fixture=self.fixture, fixed=self.fixed, evidence=self.evidence,
         ):
             raise SnapshotError("STACK_EXACT_AUTHORIZATION_REQUIRED")
         return owner
@@ -319,7 +340,7 @@ class Trial:
         record = dict(
             stage=stage, evidence_kind="offline_fixture" if self.fixture else "actual_provider_response",
             raw_output=raw_output, request_sha256=sha(request_bytes), raw_sha256=sha(raw),
-            materials_digest=basis.materials()["materials_digest"], observation=observation,
+            materials_digest=basis.materials_digest(self.batch), observation=observation,
             **(dict(plan_digest=inputs["plan"]["digest"], upstream=[
                 {k: row[k] for k in ("scene_id", "scene_version_id", "digest")}
                 for row in inputs["upstream"]
@@ -433,7 +454,9 @@ class Trial:
         return dict(
             candidate=record, materials=material, assembled=assembled,
             upstream=[] if stage == "plan" else inputs["upstream"],
-            required_checks=CHECKS[stage],
+            required_checks=self.checks[stage],
+            **({"exercise_evidence": basis.practice_evidence(material)["scenes"][stage]}
+               if self.evidence else {}),
         )
 
     async def admit(self, db, stage, review):
@@ -449,7 +472,7 @@ class Trial:
             set(review) != {"candidates", "verdict", "reviewer", "checks", "notes"}
             or review["candidates"] != binding or review["verdict"] != "pass"
             or not isinstance(review["reviewer"], str) or not review["reviewer"].strip()
-            or review["checks"] != dict.fromkeys(CHECKS[stage], "pass")
+            or review["checks"] != dict.fromkeys(self.checks[stage], "pass")
             or not isinstance(review["notes"], str) or not review["notes"].strip()
         ):
             raise SnapshotError("STACK_REVIEW_REQUIRED")
@@ -472,7 +495,7 @@ class Trial:
         else:
             source = dict(
                 origin="stack_boundaries_model_generation", batch=self.batch,
-                model="deepseek-flash", prompt_version=stack.SCENE_PROMPT,
+                model="deepseek-flash", prompt_version=stack.scene_versions(self.batch)[0],
                 plan_source=self.plan_source,
                 plan_digest=candidate["plan_digest"], materials_digest=candidate["materials_digest"],
                 candidate_digest=candidate["candidate_digest"], review_sha256=sha(canonical(review)),
@@ -508,22 +531,28 @@ class Trial:
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("action", choices=("preview", "start", "send", "inspect", "review", "stop"))
-    parser.add_argument("--fixed-outline", action="store_true")
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--fixed-outline", action="store_true")
+    mode.add_argument("--practice-evidence", action="store_true")
     parser.add_argument("value", nargs="?")
     parser.add_argument("path", nargs="?", type=Path)
     args = parser.parse_args()
-    stages = FIXED_STAGES if args.fixed_outline else STAGES
+    fixed = args.fixed_outline or args.practice_evidence
+    stages = FIXED_STAGES if fixed else STAGES
+    batch = batch_for(fixed=fixed, evidence=args.practice_evidence)
     try:
         if args.action == "preview":
             if args.value not in stages or args.path is None:
                 parser.error("preview requires an authorized stage and input snapshot")
             inputs = read(args.path)
-            if args.fixed_outline and inputs["request"].get("stack_boundaries") != basis.FIXED_BATCH:
+            if fixed and inputs["request"].get("stack_boundaries") != batch:
                 raise SnapshotError("STACK_FIXED_OUTLINE_BINDING")
             value = body_for(args.value, inputs)
         else:
-            vault = FIXED_VAULT if args.fixed_outline else VAULT
-            trial = Trial(vault, os.environ["EDUMIND_DATABASE_URL"], fixed=args.fixed_outline)
+            trial = Trial(
+                VAULT.with_name(batch), os.environ["EDUMIND_DATABASE_URL"],
+                fixed=fixed, evidence=args.practice_evidence,
+            )
             if args.action == "start":
                 value = trial.start(read(Path(args.value)))
             elif args.action == "stop":

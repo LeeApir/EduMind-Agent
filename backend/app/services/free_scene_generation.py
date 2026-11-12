@@ -140,7 +140,7 @@ def generation_contract(snapshot):
 
         return (
             stack.bound_scene_request(snapshot), stack.checked_scene,
-            stack.SCENE_PROMPT, stack.SCENE_WIRE,
+            *stack.scene_versions(snapshot["request"]["stack_boundaries"]),
         )
     return build_request(snapshot), validate_response, PROMPT_VERSION, SCHEMA_VERSION
 

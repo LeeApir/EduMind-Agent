@@ -187,3 +187,35 @@ backend/.venv/bin/python -m scripts.stack_multiscene_trial --fixed-outline previ
 | 实际应用 | 专用库中操作已收尾为 `cancelled`。私有课程 API 返回 HTTP 200，当前版本为大纲 v1，两个场景均未准入。整课审核、十四帧和六题的实际浏览器验收未运行。 |
 
 T142 记为 blocked。本批结束，未用的一次正文额度随 STOP 失效。T140 旧失败和 STOP 保留。
+
+## T143 逐题练习证据版准备
+
+T142 的请求、响应、审核、失败和 STOP 已核对并保留。新批次继续使用同一程序固定大纲、演示轨迹、练习代码、题干和答案。每道练习从该题代码的现有程序轨迹提取检查时点、前后状态和参考答案。
+
+| 场景与题键 | 练习检查时点 | 独立预期 |
+| --- | --- | --- |
+| `normal.first_pop` | 调用行 27，f3 → f4 | `[-4,6,2]` → `[-4,6]`，首次出栈写入 `2`。调用前 `value` 尚未初始化。 |
+| `normal.final_top` | 调用行 30，f6 → f7 | `[-4,6]` → `[-4]`，本次弹出 6，当前栈顶为 `-4`。 |
+| `rejections.full_count` | 调用行 31，f3 → f4 | 满栈拒绝 `push(7)`，有效元素仍为 `[1,2,4]`，计数为 `3`。 |
+| `rejections.empty_return` | 调用行 39，f7 → f8 | 空栈拒绝，布尔返回 `false`，按题意填 `0`。 |
+| `rejections.empty_output` | 调用行 39，f7 → f8 | f7 成功出栈写入 `1`，f8 保留旧输出 `1`，本步无新出栈值。 |
+| `rejections.guard_pair` | 两次检查，分别对应守卫行 9、16 | `push` 由 `count == CAP` 拒绝，`pop` 由 `count == 0` 拒绝，选 `A`。 |
+
+两份练习代码的 SHA-256 分别为 `fa5fa8572b522b0d75b5f4e2a463ab650bd1a1999fce5e42923537181db5b76d`、`18eb5919901d268eed773ac68b26e9c0446112fdb70fa256e2b7470bfefa4959`。正常练习逐帧对照 [T119 独立参考](../phase-1.5-stack-lifo-t119/independent-reference.json)；拒绝练习沿用 T138 的独立预期及实际 C 输出。证据中的检查点 ID 属于特定题键，即使两题观察同一次调用也分别绑定。
+
+- 发送正文时，`demonstration` 提供本场景的演示代码、帧和 `demo.<场景>.*` 事实。每个练习在 `practice.questions` 提供自己的 `practice.<场景>.<题键>` 证据、代码摘要、检查点和答案。模型返回自然语言解析、该题证据 ID 和有序时点 ID。程序集成解析原文，练习代码与参考答案仍由程序装配。
+- 拒绝场景从已审核正常场景的真实持久化快照读取上游。实际请求只带其场景版本、摘要和标为衔接背景的教学段落；上游练习、解析和事实表留在本机快照。拒绝场景的正文和练习各自引用本场景材料。
+- 机械校验用冻结的材料和原请求重建绑定，并核对证据 ID、代码版本和时点。独立审核逐题阅读解析，核对它是否从所列状态和准确代码推出答案，再复查整课衔接。正常场景的 `first_pop_explanation` 和 `final_top_explanation` 都须通过才保存 v2 并允许发送拒绝场景。第二场景审核逐项覆盖四题，同时核对正常与拒绝场景的衔接。沿用同一审核和准入流程。
+
+[新版准确执行清单](evidence-execution-manifest.json) SHA-256 为 `4ab260912e0a064278465b45a0e7f5c5536e1e164d20c1f1bbc67a7b728867cd`。提示词 `stack-boundaries-scene-evidence-v2`，输出 `stack-boundaries-scene-wire-v2`，证据 `stack-practice-checkpoints-v1`。新材料摘要同时覆盖原程序材料与逐题证据。下列离线请求预览带有明确的夹具身份，实际发送使用专用访客的请求与真实上游。
+
+```sh
+export PYTHONPATH=backend:.
+pack=docs/acceptance/phase-1.5-stack-boundaries-t138
+backend/.venv/bin/python -m scripts.stack_multiscene_trial --practice-evidence preview normal "$pack/evidence-normal-input.fixture.json"
+backend/.venv/bin/python -m scripts.stack_multiscene_trial --practice-evidence preview rejections "$pack/evidence-rejections-input.fixture.json"
+```
+
+拟议 **30 分钟、0 次规划、2 次场景正文、0 次修订**，沿用 DeepSeek Responses `deepseek-flash`、90 秒 I/O、每次最多 8000 输出 token 和既有 C2 条件。实际费用未知，失败或结果未知即封存停止。新批授权后使用 `--practice-evidence` 的同一入口，按 `start`、正常场景 `send / inspect / review`、拒绝场景 `send / inspect / review` 执行。新隔离库为 `edumind_catalog_p15_t143`，新封存目录为 `~/.local/share/edumind/stack-boundaries-practice-evidence-v1/`；私有隔离应用沿用 `serve(..., stack_boundaries="practice_evidence")`。新窗口和预算须另行批准。
+
+定向检查通过 3 项轨迹与装配、2 项禁外网 MockTransport 与隔离库检查。反例覆盖演示材料冒充练习、跨题和跨场景 ID、错时点、错练习代码，以及正确绑定却从演示得出错误解析时由独立审核拒绝准入。隔离库核对第二次请求精确绑定已保存上游、私有投影保持 5＋9 帧和 2＋4 题，答前无答案和解析。旧两批请求预览摘要仍匹配各自清单。准备阶段实际 Provider 调用 **0 次**。

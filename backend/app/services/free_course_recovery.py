@@ -334,6 +334,7 @@ class Recovery:
         elif prompt_version in (
             "stack-lifo-course-v1", "stack-learner-evidence-v1", "stack-learner-evidence-v2",
             "stack-boundaries-multiscene-v1", "stack-boundaries-fixed-outline-v1",
+            "stack-boundaries-practice-evidence-v1",
         ):
             execution_mode = "finite_stack_foreground"
         elif prompt_version in ("queue-fifo-course-v1", "queue-fifo-q01-revision-v1"):

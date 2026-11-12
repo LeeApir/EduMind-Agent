@@ -1,12 +1,16 @@
 """Program-owned scene materials for a fixed-capacity stack with rejected operations."""
 
+from hashlib import sha256
 from typing import Any
 
 from app.services import stack_course_materials as stack
-from app.services.free_course_snapshots import digest
+from app.services.free_course_snapshots import SnapshotError, digest
 
 VERSION = "stack-boundaries-multiscene-v1"
 FIXED_BATCH = "stack-boundaries-fixed-outline-v1"
+EVIDENCE_BATCH = "stack-boundaries-practice-evidence-v1"
+FIXED_BATCHES = (FIXED_BATCH, EVIDENCE_BATCH)
+PRACTICE_VERSION = "stack-practice-checkpoints-v1"
 NORMAL_GOAL = "追踪正常入栈和出栈，解释栈顶与后进先出"
 FULL_GOAL = "解释满栈为什么拒绝入栈"
 EMPTY_GOAL = "解释空栈为什么拒绝出栈，以及拒绝后哪些状态保持不变"
@@ -79,3 +83,72 @@ def materials() -> dict[str, Any]:
     }
     data = dict(version=VERSION, capacity=stack.CAPACITY, order="bottom_to_top", scenes=scenes)
     return {**data, "materials_digest": digest(VERSION, data=data)}
+
+
+def _practice_states(trace: dict[str, Any]) -> list[dict[str, Any]]:
+    states = []
+    value = None
+    for frame in trace["frames"]:
+        if frame["popped"] is not None:
+            value = frame["popped"]
+        initialized = "output" in frame or value is not None
+        states.append(dict(
+            frame_id=frame["frame_id"], operation=frame["operation"], call_line=frame["line"],
+            count=len(frame["values"]), values=frame["values"], top=frame["top"],
+            popped=frame["popped"], value=frame.get("output", value),
+            value_status="initialized" if initialized else "uninitialized",
+            success=frame.get("success", True if frame["frame_id"] != "f0" else None),
+            **({key: frame[key] for key in ("storage", "guard_line", "rejection")}
+               if "storage" in frame else {}),
+        ))
+    return states
+
+
+def practice_evidence(data: dict[str, Any]) -> dict[str, Any]:
+    """Build private per-question checkpoints from the existing, exact practice programs."""
+    programs = {
+        "normal": stack.example(stack.TRANSFER),
+        "rejections": stack.example(TRANSFER, observe_rejections=True),
+    }
+    targets = {
+        "normal": {"first_pop": (4,), "final_top": (7,)},
+        "rejections": {
+            "full_count": (4,), "empty_return": (8,), "empty_output": (8,), "guard_pair": (4, 8),
+        },
+    }
+    result = {}
+    for key, trace in programs.items():
+        mat = data["scenes"][key]
+        code = trace["source"]
+        if code != mat["exercise_source"]:
+            raise SnapshotError("STACK_PRACTICE_CODE_MISMATCH")
+        code_sha256 = sha256(code.encode()).hexdigest()
+        states = _practice_states(trace)
+        questions = {}
+        for q in mat["questions"]:
+            question_key = q["key"]
+            evidence_id = f"practice.{key}.{question_key}"
+            questions[question_key] = dict(
+                evidence_id=evidence_id, practice_code_sha256=code_sha256,
+                asked=q["checkpoint"], answer_domain=q["domain"],
+                reference_answer=q["private_answer"],
+                checkpoints=[
+                    dict(
+                        id=f"{evidence_id}.after-f{i}", observation="after_call",
+                        before=states[i - 1], after=states[i],
+                    )
+                    for i in targets[key][question_key]
+                ],
+            )
+        result[key] = dict(code=code, code_sha256=code_sha256, questions=questions)
+    return dict(version=PRACTICE_VERSION, scenes=result)
+
+
+def materials_digest(batch: str) -> str:
+    data = materials()
+    if batch != EVIDENCE_BATCH:
+        return data["materials_digest"]
+    return digest(
+        EVIDENCE_BATCH, base_materials_digest=data["materials_digest"],
+        practice_evidence=practice_evidence(data),
+    )

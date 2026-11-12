@@ -7350,6 +7350,39 @@
           "evidence": "docs/acceptance/phase-1.5-stack-boundaries-t138/RESULTS.md#t142-固定大纲有限真实批次"
         }
       ]
+    },
+    {
+      "id": "PHASE-1.5-T143",
+      "phase": "Phase 1.5",
+      "title": "栈双场景逐题练习证据与真实批次准备",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T141"
+      ],
+      "scope": [
+        "从现有栈轨迹派生并核对六题练习证据，与演示和上游隔离。",
+        "绑定解析与练习代码版本、时点及题键，保留独立语义审核，准备零调用准确包。"
+      ],
+      "prd_source": "PRD §0.5；T142 失败证据；用户本轮范围",
+      "acceptance_criteria": [
+        "每题提供准确练习代码摘要、前后状态、检查时点与程序答案，并有独立预期。",
+        "机械校验拒绝错题、错材料与错时点；正常两题独立审核通过才允许第二场景。",
+        "旧原件保留；新批 0 规划、2 正文、0 修订，准备阶段 Provider 0。"
+      ],
+      "verification": [
+        "定向轨迹预期与装配反例，隔离 PostgreSQL MockTransport 及新旧请求摘要。"
+      ],
+      "started_at": "2026-11-12T08:42:23+08:00",
+      "completed_at": "2026-11-12T08:50:29+08:00",
+      "commit_lookup": "Task-Completed: PHASE-1.5-T143",
+      "verification_results": [
+        {
+          "command": "定向 pytest、独立 C 输出、禁外网 MockTransport／隔离 PostgreSQL、清单和 T142 原件摘要",
+          "result": "3 项轨迹与装配、2 项隔离库通过。拒绝错配和语义失败；旧原件保留，实际 Provider 0。",
+          "evidence": "docs/acceptance/phase-1.5-stack-boundaries-t138/RESULTS.md#t143-逐题练习证据版准备"
+        }
+      ]
     }
   ],
   "planning_inputs": {

@@ -192,3 +192,117 @@ def test_fixed_outline_covers_exact_goals_and_reviewed_materials():
     fake["request"] = inputs
     with pytest.raises(SnapshotError, match="STACK_FIXED_OUTLINE_BINDING"):
         course.bound_scene_request(fake)
+
+
+def test_practice_checkpoints_from_independent_expectations():
+    from hashlib import sha256
+
+    data = basis.materials()
+    evidence = basis.practice_evidence(data)["scenes"]
+    reference = json.loads((Path(__file__).resolve().parents[2] /
+        "docs/acceptance/phase-1.5-stack-lifo-t119/independent-reference.json").read_bytes()
+    )["transfer"]
+    for scene in evidence.values():
+        assert scene["code_sha256"] == sha256(scene["code"].encode()).hexdigest()
+        for q in scene["questions"].values():
+            assert q["practice_code_sha256"] == scene["code_sha256"]
+            for checkpoint in q["checkpoints"]:
+                assert checkpoint["observation"] == "after_call"
+                line = checkpoint["after"]["call_line"]
+                assert checkpoint["after"]["operation"].split("(")[0] in (
+                    scene["code"].splitlines()[line - 1]
+                )
+
+    normal = evidence["normal"]["questions"]
+    for key, index in (("first_pop", 4), ("final_top", 7)):
+        q = normal[key]
+        assert q["reference_answer"] == str(reference["answers"][key])
+        check, = q["checkpoints"]
+        for state, frame in ((check["before"], index - 1), (check["after"], index)):
+            assert state["frame_id"] == f"f{frame}"
+            for field in ("values", "top", "popped"):
+                assert state[field] == reference[field][frame]
+    first = normal["first_pop"]["checkpoints"][0]
+    assert first["before"]["value_status"] == "uninitialized"
+    assert first["after"]["value"] == 2
+
+    boundary = evidence["rejections"]["questions"]
+    assert {k: q["reference_answer"] for k, q in boundary.items()} == {
+        "full_count": "3", "empty_return": "0", "empty_output": "1", "guard_pair": "A",
+    }
+    for key, indices in (
+        ("full_count", (4,)), ("empty_return", (8,)), ("empty_output", (8,)),
+        ("guard_pair", (4, 8)),
+    ):
+        for check, index in zip(boundary[key]["checkpoints"], indices, strict=True):
+            before, after = check["before"], check["after"]
+            assert (before["frame_id"], after["frame_id"]) == (f"f{index-1}", f"f{index}")
+            assert after["success"] is False and after["popped"] is None
+            assert (after["values"], after["count"], after["storage"], after["value"]) == (
+                ([1, 2, 4], 3, [1, 2, 4], -99) if index == 4 else ([], 0, [1, 2, 4], 1)
+            )
+            assert all(before[k] == after[k] for k in ("values", "count", "storage", "value"))
+            assert after["guard_line"] == (9 if index == 4 else 16)
+    wrong = deepcopy(data)
+    wrong["scenes"]["normal"]["exercise_source"] = data["scenes"]["normal"]["source"]
+    with pytest.raises(SnapshotError, match="STACK_PRACTICE_CODE_MISMATCH"):
+        basis.practice_evidence(wrong)
+
+
+def practice_fixture(payload):
+    fact_id = next(iter(payload["demonstration"]["facts"]))
+    return dict(
+        paragraphs=[
+            dict(text="仅检查装配。", fact_ids=[fact_id]),
+            dict(text="仅检查引用。", fact_ids=[fact_id]),
+        ],
+        explanations={
+            key: dict(
+                text="离线解析夹具。", evidence_id=q["evidence_id"],
+                checkpoint_ids=[c["id"] for c in q["checkpoints"]],
+            )
+            for key, q in payload["practice"]["questions"].items()
+        },
+    )
+
+
+def test_practice_assembly_rejects_mixed_evidence():
+    request = dict(PLANNING_INPUT, stack_boundaries=basis.EVIDENCE_BATCH)
+    plan = course.fixed_outline(request)
+    inputs = scene_input(plan, "s1", [])
+    inputs["request"] = request
+    payload = json.loads(course.bound_scene_request(inputs).prompt.messages[1].content)
+    assert "scene_material" not in payload and "upstream" not in payload
+    assert set(payload["demonstration"]) == {
+        "source", "frames", "demonstrated", "text_only", "facts",
+    }
+    assert payload["practice"]["code"] != payload["demonstration"]["source"]
+    raw = practice_fixture(payload)
+    blocks = course.assemble(raw, inputs)["blocks"]
+    assert next(b["source"] for b in blocks if b["anchor_id"] == "practice-code") == (
+        payload["practice"]["code"]
+    )
+    items = next(b["items"] for b in blocks if b["kind"] == "exercise")
+    assert [(q["answer_key"], q["solution"]) for q in items] == [
+        ("2", "离线解析夹具。"), ("-4", "离线解析夹具。"),
+    ]
+
+    for field, value in (
+        ("evidence_id", "demo.normal.f3"),
+        ("evidence_id", "practice.rejections.full_count"),
+        ("checkpoint_ids", ["practice.normal.first_pop.after-f7"]),
+    ):
+        bad = deepcopy(raw)
+        bad["explanations"]["first_pop"][field] = value
+        with pytest.raises(SnapshotError, match="STACK_EXERCISE_EVIDENCE_BINDING"):
+            course.assemble(bad, inputs)
+
+    bad = deepcopy(raw)
+    bad["explanations"]["first_pop"] = deepcopy(raw["explanations"]["final_top"])
+    with pytest.raises(SnapshotError, match="STACK_EXERCISE_EVIDENCE_BINDING"):
+        course.assemble(bad, inputs)
+
+    bad = deepcopy(raw)
+    bad["paragraphs"][0]["fact_ids"] = ["practice.normal.first_pop"]
+    with pytest.raises(SnapshotError, match="STACK_SCENE_CONTENT"):
+        course.assemble(bad, inputs)

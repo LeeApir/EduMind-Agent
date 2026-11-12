@@ -6207,14 +6207,15 @@
           "review_sha256", "source_request_sha256", "source_response_sha256"
         ],
         "oneOf": [
-          {"properties": {"batch": {"const": "stack-boundaries-multiscene-v1"}, "plan_source": {"const": "model_planned"}}},
-          {"properties": {"batch": {"const": "stack-boundaries-fixed-outline-v1"}, "plan_source": {"const": "fixed_outline"}}}
+          {"properties": {"batch": {"const": "stack-boundaries-multiscene-v1"}, "plan_source": {"const": "model_planned"}, "prompt_version": {"const": "stack-boundaries-scene-v1"}}},
+          {"properties": {"batch": {"const": "stack-boundaries-fixed-outline-v1"}, "plan_source": {"const": "fixed_outline"}, "prompt_version": {"const": "stack-boundaries-scene-v1"}}},
+          {"properties": {"batch": {"const": "stack-boundaries-practice-evidence-v1"}, "plan_source": {"const": "fixed_outline"}, "prompt_version": {"const": "stack-boundaries-scene-evidence-v2"}}}
         ],
         "properties": {
           "origin": {"const": "stack_boundaries_model_generation"},
-          "batch": {"enum": ["stack-boundaries-multiscene-v1", "stack-boundaries-fixed-outline-v1"]},
+          "batch": {"enum": ["stack-boundaries-multiscene-v1", "stack-boundaries-fixed-outline-v1", "stack-boundaries-practice-evidence-v1"]},
           "model": {"const": "deepseek-flash"},
-          "prompt_version": {"const": "stack-boundaries-scene-v1"},
+          "prompt_version": {"enum": ["stack-boundaries-scene-v1", "stack-boundaries-scene-evidence-v2"]},
           "parent_digest": {"type": "null"},
           "evidence_kind": {"enum": ["actual_provider_response", "offline_fixture"]},
           "scene_key": {"enum": ["normal", "rejections"]},
