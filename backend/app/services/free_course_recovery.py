@@ -333,6 +333,7 @@ class Recovery:
             execution_mode = "finite_head_foreground"
         elif prompt_version in (
             "stack-lifo-course-v1", "stack-learner-evidence-v1", "stack-learner-evidence-v2",
+            "stack-learner-evidence-v3",
             "stack-boundaries-multiscene-v1", "stack-boundaries-fixed-outline-v1",
             "stack-boundaries-practice-evidence-v1", "stack-goal-selection-v1",
         ):

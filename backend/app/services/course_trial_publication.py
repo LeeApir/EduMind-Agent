@@ -31,6 +31,11 @@ WINDOW_SECONDS = 1800
 LIVE_BATCH = "four-topic-live-reuse-r01"
 LIVE_WINDOW_SECONDS = 5400
 LIVE_REQUESTS = {"plan": 1, "generate": 4, "revise": 4}
+STACK_PROFILE_RUNS = {
+    stack_course_profile_pair.VERSION: "r01",
+    stack_course_profile_pair.PROMPT_V2: "r02",
+    stack_course_profile_pair.PROMPT_V3: "r03",
+}
 
 
 @dataclass(frozen=True)
@@ -51,9 +56,9 @@ class FixedCourse:
     def batch(self) -> str:
         if self.learner_case is not None:
             prefix = "stack-profile" if self.offline_only else "stack-profile-pair-live"
-            version = "r02" if not self.offline_only and (
-                self.learner_prompt_version == stack_course_profile_pair.PROMPT_V2
-            ) else "r01"
+            version = (
+                "r01" if self.offline_only else STACK_PROFILE_RUNS[self.learner_prompt_version]
+            )
             return f"{prefix}-{self.learner_case}-{version}"
         if self.offline_only:
             return f"{self.topic}-revision-fixture-r01"
@@ -197,6 +202,17 @@ STACK_PROFILE_V2_LIVE = {
     )
     for topic, profile in STACK_PROFILE_LIVE.items()
 }
+STACK_PROFILE_V3_LIVE = {
+    f"{topic}-v3": replace(
+        profile,
+        package="phase-1.5-stack-profile-pair-t132/prompt-v3",
+        approval_key="accept_T157_scope_and_batch_C2",
+        learner_prompt_version=stack_course_profile_pair.PROMPT_V3,
+    )
+    for topic, profile in STACK_PROFILE_LIVE.items()
+}
+STACK_PROFILE_VERSIONED_LIVE = STACK_PROFILE_V2_LIVE | STACK_PROFILE_V3_LIVE
+STACK_PROFILE_TOPICS = STACK_PROFILE_LIVE | STACK_PROFILE_VERSIONED_LIVE
 PROFILES = {
     profile.materials.VERSION: profile
     for profile in (
@@ -242,8 +258,7 @@ FOREGROUND_BATCHES = {
     profile.batch: profile
     for profile in (
         *NEW_BATCHES.values(), *REVISION_FIXTURES.values(), *LIVE_REUSE.values(),
-        *STACK_PROFILE_LIVE.values(),
-        *STACK_PROFILE_V2_LIVE.values(),
+        *STACK_PROFILE_TOPICS.values(),
     )
 }
 

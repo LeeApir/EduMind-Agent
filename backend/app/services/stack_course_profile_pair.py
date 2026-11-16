@@ -10,6 +10,7 @@ from app.services.free_course_snapshots import PROFILE_FIELDS, SnapshotError, ca
 
 VERSION = "stack-learner-evidence-v1"
 PROMPT_V2 = "stack-learner-evidence-v2"
+PROMPT_V3 = "stack-learner-evidence-v3"
 CASES = ("array-first", "operations-known")
 STATEMENTS = {
     "array-first": "我只掌握数组基础，这是第一次学习栈。",
@@ -56,6 +57,27 @@ all five frame notes accurate and distinct. Both lessons may share necessary exp
 retain useful explanations in the beginner lesson. Adapt emphasis and depth, not the goal,
 trace, code, question scenarios, or answers.
 """
+INSTRUCTION_V3 = INSTRUCTION_V2.split("[ADAPTATION]", 1)[0] + """[ADAPTATION]
+For the learner who knows only basic arrays and is new to stacks, introduce top, push, pop,
+and LIFO through familiar array slots and the empty active range at f0. Organize the main
+explanation around concrete snapshots before and after the four calls. At each transition,
+use the existing values to distinguish the active elements and current top. At f3, explain
+both the value written to the caller and the resulting top, then use f4 to complete the trace.
+Keep the shared implementation and boundary reasons in accessible language.
+For the learner who understands stack operations and requests implementation boundaries,
+recap the vocabulary briefly. From the active range before each successful push and pop,
+derive why the accessed index is valid and what stays true of the active range afterward.
+Use the existing trace to support the derivations. Give the two rejection paths an explicit
+place in the main explanation. For each, follow the guard condition and its location to the
+early return, which mutations or output writes are skipped, and what the caller can conclude.
+Explain which guarantee depends on checking the guard before writing or decrementing.
+Distinguish a preserved caller output from a new popped value. Use only the supplied code
+and facts for these paths, which the main trace does not enter.
+For both learners, keep all five frame notes accurate and distinct and cover the same shared
+teaching duties. Preserve useful explanations in both lessons. Keep the goal, trace, code,
+exercise scenarios, observation points, and answers fixed.
+"""
+INSTRUCTIONS = {VERSION: INSTRUCTION, PROMPT_V2: INSTRUCTION_V2, PROMPT_V3: INSTRUCTION_V3}
 
 
 def profile_snapshot(case: str) -> dict[str, Any]:
@@ -96,9 +118,9 @@ def learner_input(case: str) -> dict[str, Any]:
 
 
 def request(case: str, *, prompt_version: str = VERSION) -> dict[str, Any]:
-    if prompt_version not in (VERSION, PROMPT_V2):
+    if prompt_version not in INSTRUCTIONS:
         raise SnapshotError("STACK_PROFILE_PROMPT_VERSION")
-    instruction = INSTRUCTION_V2 if prompt_version == PROMPT_V2 else INSTRUCTION
+    instruction = INSTRUCTIONS[prompt_version]
     _, material_rules = stack.INSTRUCTION.split("[PROGRAM MATERIAL]", 1)
     body = stack.fixed_request(
         instruction + "[PROGRAM MATERIAL]" + material_rules,

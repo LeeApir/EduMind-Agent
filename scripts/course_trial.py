@@ -20,8 +20,7 @@ from app.services.course_trial_publication import (
     NEW_BATCHES,
     QUEUE,
     REVISION_FIXTURES,
-    STACK_PROFILE_LIVE,
-    STACK_PROFILE_V2_LIVE,
+    STACK_PROFILE_TOPICS,
 )
 from app.services.course_trial_replay import import_course, projection, require_database
 from app.services.course_trial_sources import ARCHIVES
@@ -126,8 +125,7 @@ def main():
             *QUEUE_ARCHIVES,
             BINARY_SEARCH.topic,
             BINARY_FRAMES_TOPIC,
-            *STACK_PROFILE_LIVE,
-            *STACK_PROFILE_V2_LIVE,
+            *STACK_PROFILE_TOPICS,
             "binary-search-revision",
         ),
     )
@@ -144,7 +142,7 @@ def main():
     parser.add_argument("--record", type=Path, help="exact revision approval record")
     parser.add_argument("--mock-response", type=Path, help="complete fixture Responses envelope")
     args = parser.parse_args()
-    paired = (STACK_PROFILE_LIVE | STACK_PROFILE_V2_LIVE).get(args.topic)
+    paired = STACK_PROFILE_TOPICS.get(args.topic)
     if (args.profile_id is not None) != (paired is not None and args.action == "prepare"):
         parser.error("--profile-id is required only for stack profile trial preparation")
     if args.action != "send" or args.offline_vault:

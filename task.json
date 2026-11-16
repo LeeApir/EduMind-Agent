@@ -7825,6 +7825,39 @@
         }
       ],
       "execution_gate": "仅离线接通新版固定双场景装配，保留旧课程与冻结包；无新真实批次。"
+    },
+    {
+      "id": "PHASE-1.5-T157",
+      "phase": "Phase 1.5",
+      "title": "固定材料栈画像单对决策验证",
+      "status": "in_progress",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T137"
+      ],
+      "scope": [
+        "复用 T137 同目标、提纲、代码、五帧、四题、两份画像与共用入口，只替换共同提示的适配段。",
+        "待准确批准后 A/B 各一次正文，合计最多 2 HTTP，规划、修订、重试和回退 0。",
+        "课程独立审核、实际学习验收与三项画像对照分别记录，落定后停止。"
+      ],
+      "prd_source": "PRD §0.5；课程生成方向 §5.4；T137 画像记录及代表性对照提案",
+      "acceptance_criteria": [
+        "两份准确请求除画像证据外一致，相对 T137 只调整共同适配段，旧版本仍可核对。",
+        "新槽、画像、原件、候选和审核绑定；符合各自门槛的课程完成实际学习验收。",
+        "统一记录保留两槽及三项对照和实际用量。两课合格且三项成立才算对照通过；接口/传输失败计对照未完成，按约停止。"
+      ],
+      "verification": [
+        "离线核对 CLI 发送所用请求、新版本及画像绑定；真实执行后只验收两份实际课程及对应教学差异。"
+      ],
+      "started_at": "2026-11-16T10:06:46+08:00",
+      "verification_results": [
+        {
+          "command": "pytest -q backend/tests/test_stack_course_profile_prompt_v3.py；共用 CLI inspect 两槽；Ruff；check_catalog_workflow.py；git diff --check",
+          "result": "定向 3 项通过；T137 原请求及 Schema/材料不变，新槽只差画像，拒绝旧批准、旧候选和错画像。新清单摘要 0b7dd4cd…，Provider 0。",
+          "evidence": "docs/acceptance/phase-1.5-stack-profile-pair-t132/RESULTS.md#t157-单对决策验证"
+        }
+      ],
+      "execution_gate": "等待新批窗口及 C2 明确确认。未创建正文操作或登记活跃窗口。"
     }
   ],
   "planning_inputs": {
