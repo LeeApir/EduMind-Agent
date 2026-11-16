@@ -51,9 +51,12 @@ class FixedCourse:
     live_reuse: bool = False
     learner_case: str | None = None
     learner_prompt_version: str = stack_course_profile_pair.VERSION
+    batch_override: str | None = None
 
     @property
     def batch(self) -> str:
+        if self.batch_override is not None:
+            return self.batch_override
         if self.learner_case is not None:
             prefix = "stack-profile" if self.offline_only else "stack-profile-pair-live"
             version = (
@@ -212,7 +215,16 @@ STACK_PROFILE_V3_LIVE = {
     for topic, profile in STACK_PROFILE_LIVE.items()
 }
 STACK_PROFILE_VERSIONED_LIVE = STACK_PROFILE_V2_LIVE | STACK_PROFILE_V3_LIVE
-STACK_PROFILE_TOPICS = STACK_PROFILE_LIVE | STACK_PROFILE_VERSIONED_LIVE
+STACK_PROFILE_B_COMPLETION_TOPIC = "stack-profile-operations-known-v3-completion"
+STACK_PROFILE_B_COMPLETION = replace(
+    STACK_PROFILE_V3_LIVE["stack-profile-operations-known-v3"],
+    package="phase-1.5-stack-profile-pair-t132/prompt-v3/b-completion",
+    approval_key="accept_T157_B_completion_and_C2",
+    batch_override="stack-profile-pair-live-operations-known-r03-completion",
+)
+STACK_PROFILE_TOPICS = STACK_PROFILE_LIVE | STACK_PROFILE_VERSIONED_LIVE | {
+    STACK_PROFILE_B_COMPLETION_TOPIC: STACK_PROFILE_B_COMPLETION,
+}
 PROFILES = {
     profile.materials.VERSION: profile
     for profile in (

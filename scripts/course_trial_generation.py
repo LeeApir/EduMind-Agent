@@ -31,6 +31,8 @@ def package_path(profile):
 
 
 def request_path(profile):
+    if profile is publication.STACK_PROFILE_B_COMPLETION:
+        return request_path(publication.STACK_PROFILE_V3_LIVE["stack-profile-operations-known-v3"])
     if profile in publication.STACK_PROFILE_VERSIONED_LIVE.values():
         return package_path(profile) / f"{profile.learner_case}.request.json"
     if profile.learner_case is not None and not profile.offline_only:
@@ -118,7 +120,9 @@ def approval_values(profile=STACK, *, fixture=False):
             offline_fixture=fixture,
         )
     if profile.learner_case is not None and not profile.offline_only:
-        approval.update(pair_max_http_requests=2, learner_case=profile.learner_case)
+        if profile is not publication.STACK_PROFILE_B_COMPLETION:
+            approval["pair_max_http_requests"] = 2
+        approval["learner_case"] = profile.learner_case
     return approval
 
 
