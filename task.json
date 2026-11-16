@@ -7755,6 +7755,41 @@
         }
       ],
       "execution_gate": "开发取证已交付，保持课程原文和 T151 历史。判卷偏差留证，T038 不新增正式结果。"
+    },
+    {
+      "id": "PHASE-1.5-T155",
+      "phase": "Phase 1.5",
+      "title": "T151 B 私有课程六题输入与判卷一致性",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T151",
+        "PHASE-1.5-T154"
+      ],
+      "scope": [
+        "以准确 v3 为父版本，新版仅调整两组六题的程序输入说明和输入类型。",
+        "保留模型原文、解析、程序材料、参考答案、旧题组与作答，Provider 0。"
+      ],
+      "prd_source": "PRD §0.5；T154 判卷边界取证；用户授权的 T151 B 程序练习版本变更",
+      "acceptance_criteria": [
+        "五题沿用 JSON 整数规则及格式反馈，守卫题允许 A/B 大小写。",
+        "新私有课程与练习版本可读可答，原 v3 与历史成绩隔离。",
+        "六个标准、T154 七个边界和必要的 JSON 错类型拒绝有实际证据，统一记录追加结果。"
+      ],
+      "verification": [
+        "定向判卷矩阵、专用 PostgreSQL 精确快照及作答历史检查、实际页面提示与反馈检查。"
+      ],
+      "started_at": "2026-11-16T09:19:27+08:00",
+      "completed_at": "2026-11-16T09:27:16+08:00",
+      "commit_lookup": "Task-Completed: PHASE-1.5-T155",
+      "verification_results": [
+        {
+          "command": "本机专用 PostgreSQL 精确快照、22 个实际比较函数用例及 Chromium 双场景练习验证",
+          "result": "六题标准、T154 七个边界、必要 JSON 类型和数值反例均符合新版。页面四组作答、提示、反馈、答案隔离、v4 刷新和 v3 历史只读通过。四条旧反馈摘要不变，Provider 0。",
+          "evidence": "docs/acceptance/phase-1.5-stack-boundaries-t138/t155-exercise-format-verification.json"
+        }
+      ],
+      "execution_gate": "仅交付 T151 B 程序练习格式 v4；保留 T154 及 T038 原结果，停止。"
     }
   ],
   "planning_inputs": {
