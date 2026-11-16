@@ -297,3 +297,11 @@ A 保存后初次读取返回 `PUBLIC_PROJECTION_INVALID`（503）。应用来�
 [A 本机开发应用](http://127.0.0.1:5217/) 可在原 A 合成会话读取。会话有效时可用 `sh /tmp/edumind-t157/open.sh` 直接打开。实际学习验证命令为 `backend/.venv/bin/python /tmp/edumind-t157/browser.py A` 及只读的 `backend/.venv/bin/python /tmp/edumind-t157/check-readback.py`。读取契约修复后的定向 pytest 3 项、Ruff 与差异检查通过，未跑数据库或播放器全套回归。
 
 收敛交接保留 A 课程、B 准确失败和 T137 的历史两课。对照三项无结论，本批停止，T038 保持 blocked。
+
+### B 认证问题的本地复核
+
+在禁联网审计钩子下，只读解封 A/B 回执并核对请求字节、归档摘要、原授权和停止标记。两槽共用冻结的 DeepSeek Responses 路径、`deepseek-flash`、请求配置和传输代码，正文载荷唯一差异是画像证据。A 收到 HTTP 200 并绑定原候选，B 按原请求到达服务端，返回 HTTP 401，类型 `authentication_error`，错误码 `invalid_request_error`，服务端报 API Key 无效。B 的准确请求 SHA-256 仍为 `aac539026313e792607d63b5bcfd4f59947b2d19946273c73e0b6684dc64be84`。
+
+实际入口在每槽的终端隐藏提示分别取值，临时放入 Bearer 认证头。传输固定目标并禁用环境代理，项目 `.env`、环境内的 Provider 配置和数据库资料均不参与该密钥选择。封存记录没有保存输入值或身份标识，可定位到 B 当次凭据被拒。本地证据无法区分输入有误、凭据已失效或其他账户侧原因，也无法确认有效替代凭据。
+
+按本次约定直接收尾。未登记补全授权、未建新操作、未发探测或正文，Provider 调用 0。原 B 的 401、STOP、HALT 和取消状态均保留。A 继续绑定候选 `3e9781271f63fe7ce0b43b91377807088bb4c2c57cbcf51044efc156ede6fc7c` 和已验收的私有 v2。三项画像判据保留未评，T157 对照未完成，T038 继续 blocked。提示词、课程材料和历史原件保持原样。
