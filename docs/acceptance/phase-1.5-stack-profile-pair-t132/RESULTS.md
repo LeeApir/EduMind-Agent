@@ -276,3 +276,24 @@ A/B 使用 T135 两份冻结请求，进入独立 r02 槽。离线接线已验�
 已运行 `PYTHONPATH=backend:. backend/.venv/bin/python -m pytest -q backend/tests/test_stack_course_profile_prompt_v3.py --tb=short`，定向 3 项通过。两份 T137 请求仍与原字节一致，新版只替换共同适配段，拒绝旧批准、旧版候选绑定和互换画像。实际 CLI 的两次 `inspect` 返回上表清单及请求摘要。定向 Ruff 和差异检查通过。两个新合成访客和准确画像已在原专用开发库建立，生成操作窗口尚未登记，Provider 调用 0。
 
 北京时间 2026-11-16 10:12:03，用户确认上述准确清单、两槽窗口和本批 C2。已登记 [A 槽批准](prompt-v3/array-first.execution-approval.json) 和 [B 槽批准](prompt-v3/operations-known.execution-approval.json)。登记时无生成操作窗口，Provider 0。A 先执行。
+
+### 实际结果
+
+**画像对照未完成。** A 首稿结构和独立全文审核通过，已交付实际可学课程。B 的请求在认证阶段返回 HTTP 401，未生成可审核正文。三个成对判据均记未评。本次无法据此判断画像适配能力或是否值得继续该路线，T137 原对照未通过的结论保持。
+
+| 槽 | 北京时间窗口 | HTTP 和可核验用量 | 候选及结果 |
+| --- | --- | --- | --- |
+| A | 2026-11-16 10:12:47–10:42:47 | HTTP 200，3,470 输入、1,730 输出 token | 候选 `3e9781271f63fe7ce0b43b91377807088bb4c2c57cbcf51044efc156ede6fc7c`，严格回放成功，独立审核九项通过。10:17:15 准入回执。 |
+| B | 2026-11-16 10:14:41–10:44:41 | HTTP 401，响应无用量字段 | DeepSeek 回报 `authentication_error` / `invalid_request_error`。入口记录 `STACK_HTTP_OR_EVIDENCE`，保留 STOP、HALT、失败回执及加密原件。私有操作 `2795fe95-9ca2-4f45-b020-0234480e9919` 已收尾为 `cancelled`，只有 v1 提纲。 |
+
+实际 **2 次 HTTP、0 次规划、0 次修订、0 次重试或回退**。可核验回报合计 5,200 token，均来自 A。B 用量和实际账单金额未知。A 原响应 SHA-256 `221ac0626cf5bf8af484f5209cc6068be63d86378c7e95863c448b810f0fbcae`，B 原响应 `82e2cc24b2c205a114ceab90195651601901e8227ebaadbda280da1a4a5a9f99`。按上方目录保存原件。B 原件只读解封核过摘要、HTTP、错误类型和原请求。冻结运行源码见本地检查点 `4829b80`，34 项源码散列均核对通过。
+
+A 课程 `4dc8ff54-dcfa-4358-8845-e6a080e58d81`，场景版本 `b85cda74-1e2b-40cb-af0f-149ba570345c`。独立受委托助手核对五段、总结、五帧及四题。第 2–4 段串起四次操作。第 3 段从 `count` 由 2 变 1 推出写入调用者变量的是 8，当前栈顶是 3。第 5 段从守卫位置解释失败时的状态并区分 `bool` 和 `*out`。四题题义与解析均支持程序答案。首段可补 LIFO 和容量直接引用，属非阻断意见。课程保留模型原文。[A 独立全文审核](prompt-v3/array-first.review.json)
+
+A 保存后初次读取返回 `PUBLIC_PROJECTION_INVALID`（503）。应用来源 Schema 当时只允许旧版画像。保留已经使用的准确请求包和审核，读取契约补入两个准确的 r03 槽、画像和 v3 提示词版本组合。定向测试确认两个新组合通过，交叉画像及错版本继续拒绝。修复只作用于读回，同一 v2 快照随后 HTTP 200，未重新生成、保存或修改课程正文。
+
+实际 Chromium 核对五段正文和总结、五帧状态与高亮、播放、暂停、步进、重置。四题全错和全对两次提交得到 0% 和 100%，答前无参考键和解析，刷新保留原场景版本及答案，新增提交 0。隔离检查换用已认证的 B 访客只读完成，A 的场景和两条作答均返回 404。用第一次浏览器操作留下的两条作答核对，未重交。[A 实际学习证据](prompt-v3/array-first.browser.json)
+
+[A 本机开发应用](http://127.0.0.1:5217/) 可在原 A 合成会话读取。会话有效时可用 `sh /tmp/edumind-t157/open.sh` 直接打开。实际学习验证命令为 `backend/.venv/bin/python /tmp/edumind-t157/browser.py A` 及只读的 `backend/.venv/bin/python /tmp/edumind-t157/check-readback.py`。读取契约修复后的定向 pytest 3 项、Ruff 与差异检查通过，未跑数据库或播放器全套回归。
+
+收敛交接保留 A 课程、B 准确失败和 T137 的历史两课。对照三项无结论，本批停止，T038 保持 blocked。

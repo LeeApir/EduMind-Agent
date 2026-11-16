@@ -9,6 +9,7 @@ from test_stack_course_trial import teaching_fixture
 
 from app.services import course_trial_publication as publication
 from app.services import stack_course_profile_pair as pair
+from app.services.free_course_contract import validate
 from app.services.free_course_snapshots import SnapshotError, canonical
 from scripts import course_trial_generation as trial
 from scripts.head_course_goal_fixture import envelope
@@ -24,7 +25,9 @@ def test_pair_wire_changes_only_the_adaptation():
         new = profile.request()
         assert canonical(new) == trial.request_path(profile).read_bytes()
         assert profile.batch.endswith("-r03") and profile.batch != previous.batch
-        assert trial.approval_values(profile)["request_sha256"] == trial.sha(canonical(new))
+        manifest = trial.read(trial.package_path(profile) / "manifest.json")
+        slot = manifest["slots"][profile.learner_case]
+        assert slot["request_sha256"] == trial.sha(canonical(new))
 
         before = old["input"][0]["content"]
         after = new["input"][0]["content"]
@@ -39,14 +42,14 @@ def test_pair_wire_changes_only_the_adaptation():
 
 
 @pytest.mark.parametrize("topic", publication.STACK_PROFILE_V3_LIVE)
-def test_new_slot_binds_exact_candidate_and_refuses_old_approval(topic):
+def test_new_slot_binds_candidate_and_exact_public_source(topic, monkeypatch):
     profile = publication.STACK_PROFILE_V3_LIVE[topic]
     previous = publication.STACK_PROFILE_V2_LIVE[topic.removesuffix("-v3") + "-v2"]
     case = profile.learner_case
     other = next(c for c in pair.CASES if c != case)
     ctx = dict(
         learner_case=case, learner_evidence=pair.evidence(case),
-        profile_version=1, profile_id=str(UUID(int=1)),
+        profile_version=1, profile_id=str(UUID(int=1)), evidence_kind="offline_fixture",
     )
     request = trial.request_for(ctx, profile, "generate")
     raw = with_direct_echo(request, envelope(teaching_fixture()))
@@ -60,9 +63,26 @@ def test_new_slot_binds_exact_candidate_and_refuses_old_approval(topic):
         publication.verify_candidate(ctx, candidate, previous)
     with pytest.raises(SnapshotError, match="PROFILE_BINDING"):
         profile.request(dict(ctx, learner_evidence=pair.evidence(other)))
+    # Live package byte verification is exercised at the frozen execution checkpoint.
+    monkeypatch.setattr(
+        trial, "package_digest", lambda p: trial.sha((trial.package_path(p) /
+                                                     "manifest.json").read_bytes()),
+    )
     with pytest.raises(SnapshotError, match="EXACT_AUTHORIZATION_REQUIRED"):
         trial.check_approval(
             json.loads((trial.package_path(previous) /
                         f"{case}.execution-approval.json").read_bytes()),
             profile=profile,
         )
+    review = dict(
+        candidate_digest=candidate["candidate_digest"], parent_digest=None, verdict="pass",
+        independent_evaluator="fixture-only", full_lesson_reviewed=True,
+        evidence_kind="offline_fixture", checks=dict.fromkeys(profile.checks, True),
+        blocking_findings=[],
+    )
+    source = publication.assembly(candidate, review, profile=profile)["generation_source"]
+    validate("StackProfileCourseSource", source)
+    with pytest.raises(SnapshotError, match="INVALID_API_INPUT"):
+        validate("StackProfileCourseSource", dict(source, learner_case=other))
+    with pytest.raises(SnapshotError, match="INVALID_API_INPUT"):
+        validate("StackProfileCourseSource", dict(source, prompt_version=pair.PROMPT_V2))
