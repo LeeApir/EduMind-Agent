@@ -106,3 +106,5 @@
 2026-10-27：[ADR-0036](0036-sol-known-difference-proposal.md)按用户保留sol方向准备窄兼容提案；准确37字符后缀/显式low与推理元数据/引用根v2，42项离线通过，无新增真实调用或生产接线，r02停止/T038 blocked保持。
 
 2026-10-27：ADR-0036窄兼容规则按用户“执行”限[一次纯合成p01](../acceptance/phase-1.5-sol-compatibility-once-p01/RESULTS.md)实际验证通过；1HTTP/正确引用/错误检出，对照无误报，非课程或独立质量准入，生产保持。
+
+2026-11-16：[ADR0066](0066-phase-1.5-contracted-closeout.md) Accepted，Phase 1.5 收敛归档；原质量和性能未通过，Phase 2 仅设计待办。
