@@ -495,3 +495,13 @@ Provider 调用、应用写入和新作答均为 **0**。本次是开发取证�
 实际检查运行 `PYTHONPATH=backend:. EDUMIND_CATALOG_TEST_PG_CONTAINER=edumind-phase1-t037-pg backend/.venv/bin/python /tmp/edumind-t155/env.py -m scripts.revise_stack_b_exercise_format` 与同一环境下的 `/tmp/edumind-t155/verify.py`，以及 `backend/.venv/bin/python /tmp/edumind-t155/browser.py`。命令的场景与练习标识、比较矩阵、出入参分类和四次浏览器作答均已归档。[定向检查证据](t155-exercise-format-verification.json)
 
 T154 缺陷和旧成绩仍属于 v3。此次是程序练习格式版本更新，T038 未新增正式质量结果。
+
+## T156 新栈课程的程序练习输入规则
+
+新固定双场景操作显式设置 `prompt_version=stack-boundaries-typed-practice-v1`。既有规划服务识别该固定大纲版本，正文生成和准入沿用现有栈场景入口。正文提示词标识为 `stack-boundaries-scene-typed-practice-v1`，沿用 `stack-boundaries-scene-wire-v2` 的闭合正文 Schema 与逐题证据绑定。新版材料摘要为 `f540004bc33ee0feff959ceb5de6cf32de8c673f0368b73ea3bc015a8fb256b6`。示例、场景顺序、检查时点和参考答案沿用原固定双场景。
+
+[程序材料](../../../backend/app/services/stack_multiscene_materials.py)声明每题的输入类型、题面指令及题组格式提示，格式和题义随原有计划、材料和逐题证据一起绑定。现有[装配器](../../../backend/app/services/stack_multiscene.py)在通用机械校验后将程序类型写入候选及准入快照。五道数值题为 `integer`，题面说明 JSON 整数及原有范围。题组给出 `12`、`-7` 格式示例，说明格式未通过时未比较数值。守卫题为 `short_text`，题面写明 A/B 大小写均可。两组沿用 `free-course-typed-json-v1`，守卫题在组内仍按现有文本逻辑比较。模型仍提供正文和解析。
+
+- `PYTHONPATH=backend:. backend/.venv/bin/python -m pytest -q backend/tests/test_stack_multiscene.py::test_typed_practice_assembly_uses_t155_input_rules --tb=short` 通过。用正常场景的装配结果作为拒绝场景的上游，核对六题的实际候选与准入快照一致，题面、类型及六个标准答案均正确。`+2`、`-04`、`−4`、`+3`、`+1` 返回格式提示，`-0` 与小写 `a` 匹配。
+- `PYTHONPATH=backend:. backend/.venv/bin/python /tmp/edumind-t156-archived-practice.py` 只读重建 T151 B 两个封存请求，逐字节一致。用原始响应及回执重放得到原候选，六题仍为 `short_text`，两组仍为 `quiz-exact-text-v1`。被冻结的 T151 源码校验继续在原冻结工作树运行，已核对基线 `d4c6411` 所含的 T147 源清单 29 项源码散列。新工作树中的两个装配源码已演进，旧清单继续校验冻结源码。
+- 旧固定大纲与目标选择批次继续沿用各自的原版标识。已有私有 v3/v4 课程、旧成绩和历史文件保持原样。复用 [T155 判卷与浏览器证据](t155-exercise-format-verification.json)；本次为离线装配验证，Provider 调用、应用写入、数据库全套和播放器回归均为 0。

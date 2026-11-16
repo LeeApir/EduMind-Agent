@@ -7790,6 +7790,41 @@
         }
       ],
       "execution_gate": "仅交付 T151 B 程序练习格式 v4；保留 T154 及 T038 原结果，停止。"
+    },
+    {
+      "id": "PHASE-1.5-T156",
+      "phase": "Phase 1.5",
+      "title": "栈多场景新版程序练习输入规则装配",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-1.5-T144",
+        "PHASE-1.5-T155"
+      ],
+      "scope": [
+        "为栈固定双场景正文启用显式新版程序材料，在现有装配与准入校验中投影输入类型和题面说明。",
+        "保留旧请求、封存及既有课程规则，复用现有判卷；Provider、数据库全套及播放器重验为 0。"
+      ],
+      "prd_source": "PRD §0.5；课程生成方向 §5.4；T155 练习格式与判卷",
+      "acceptance_criteria": [
+        "新版材料声明六题输入规则，现有课程装配读出五道 JSON 整数题和一道大小写均可的文本选择题。",
+        "实际双场景装配及机械准入输出符合六题标准答案与 T154 七个边界，旧版仍用原规则。",
+        "追加现有统一结果，说明新版适用范围和证据边界。"
+      ],
+      "verification": [
+        "只核对双场景新版请求、六题装配、T154 七个判卷边界及旧规则隔离。"
+      ],
+      "started_at": "2026-11-16T09:31:28+08:00",
+      "completed_at": "2026-11-16T09:35:47+08:00",
+      "commit_lookup": "Task-Completed: PHASE-1.5-T156",
+      "verification_results": [
+        {
+          "command": "pytest -q backend/tests/test_stack_multiscene.py::test_typed_practice_assembly_uses_t155_input_rules；T151 只读封存对照",
+          "result": "1 项通过。双场景六题题面与输入类型新旧隔离，6 个标准及 T154 7 个边界符合。两份 T151 请求逐字节一致，新旧候选规则正确，Provider 0。",
+          "evidence": "docs/acceptance/phase-1.5-stack-boundaries-t138/RESULTS.md#t156-新栈课程的程序练习输入规则"
+        }
+      ],
+      "execution_gate": "仅离线接通新版固定双场景装配，保留旧课程与冻结包；无新真实批次。"
     }
   ],
   "planning_inputs": {

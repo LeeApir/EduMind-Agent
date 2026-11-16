@@ -17,6 +17,7 @@ from app.services.provider_gateway import ChatMessage, StructuredRequest
 PLAN_PROMPT = "stack-boundaries-plan-v1"
 SCENE_PROMPT = "stack-boundaries-scene-v1"
 EVIDENCE_PROMPT = "stack-boundaries-scene-evidence-v2"
+TYPED_PRACTICE_PROMPT = "stack-boundaries-scene-typed-practice-v1"
 
 
 def planning_request(inputs: dict[str, Any]) -> StructuredRequest:
@@ -191,7 +192,7 @@ def scene_request(inputs: dict[str, Any]) -> StructuredRequest:
         or upstream != [ids.get(dep) for dep in planned["depends_on"]]
     ):
         raise SnapshotError("STACK_SCENE_DEPENDENCY")
-    data = basis.materials()
+    data = basis.materials(snapshot["request"].get("stack_boundaries"))
     mat = data["scenes"][key]
     request = scenes.build_request(snapshot)
     payload = dict(
@@ -222,14 +223,15 @@ execution. Return only the supplied closed schema."""
     ))
 
 
-def assemble(raw: dict[str, Any], inputs: dict[str, Any]) -> dict[str, Any]:
-    practice = inputs["request"].get("stack_boundaries") in (
-        basis.EVIDENCE_BATCH, basis.SELECTION_BATCH,
-    )
+def _assemble_checked(
+    raw: dict[str, Any], inputs: dict[str, Any]
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    batch = inputs["request"].get("stack_boundaries")
+    practice = batch in basis.PRACTICE_BATCHES
     request = bound_scene_request(inputs) if practice else scene_request(inputs)
     payload = json.loads(request.prompt.messages[1].content)
     mat = (
-        basis.materials()["scenes"][payload["scene_key"]]
+        basis.materials(batch)["scenes"][payload["scene_key"]]
         if practice else payload["scene_material"]
     )
     facts = payload["demonstration"]["facts"] if practice else mat["facts"]
@@ -284,20 +286,26 @@ def assemble(raw: dict[str, Any], inputs: dict[str, Any]) -> dict[str, Any]:
             caption=caption, elements=elements,
             highlight_ids=[elements[-1]["id"]] if elements else [],
         ))
+    items = [
+        dict(
+            question_id=q["key"], input_type="short_text",
+            question=f"根据 practice-code 中的代码，{q['checkpoint']}。"
+                     + (q["input_instruction"] if batch == basis.TYPED_PRACTICE_BATCH
+                        else f"只输入{q['domain']}，不加单位或解释。"),
+            answer_key=q["private_answer"], solution=explanations[q["key"]],
+        )
+        for q in mat["questions"]
+    ]
+    exercise_question = (
+        "阅读本场景 practice-code 中的 C 代码并作答。" + mat.get("exercise_guide", "")
+    )
     blocks.extend([
         dict(kind="code", anchor_id="demo-code", language="c", source=mat["source"]),
         dict(kind="visualization", anchor_id="stack-state", visualization_type="stack",
              text_alternative=mat["demonstrated"], steps=steps),
         dict(kind="code", anchor_id="practice-code", language="c", source=mat["exercise_source"]),
         dict(kind="exercise", anchor_id="practice", exercise_key="stack-practice",
-             question="阅读本场景 practice-code 中的 C 代码并作答。",
-             items=[
-                 dict(question_id=q["key"], input_type="short_text",
-                      question=f"根据 practice-code 中的代码，{q['checkpoint']}。"
-                               f"只输入{q['domain']}，不加单位或解释。",
-                      answer_key=q["private_answer"], solution=explanations[q["key"]])
-                 for q in mat["questions"]
-             ]),
+             question=exercise_question, items=items),
     ])
     candidate = dict(
         blocks=blocks,
@@ -307,6 +315,24 @@ def assemble(raw: dict[str, Any], inputs: dict[str, Any]) -> dict[str, Any]:
     checked = check_scene(candidate, inputs)
     if checked["state"] != "accepted":
         raise SnapshotError(checked["reason_code"])
+    if batch == basis.TYPED_PRACTICE_BATCH:
+        from app.services.free_course_answers import compare_answer
+
+        # The generic generation Schema accepts short text. Apply trusted runtime types
+        # to both views after that gate, without accepting any model-supplied type.
+        cleaned_items = checked["cleaned"]["content"]["blocks"][-1]["items"]
+        for item, cleaned, material in zip(items, cleaned_items, mat["questions"], strict=True):
+            input_type = material["input_type"]
+            if input_type not in ("integer", "short_text"):
+                raise SnapshotError("STACK_EXERCISE_INPUT_TYPE")
+            item["input_type"] = cleaned["input_type"] = input_type
+            if not compare_answer(item, item["answer_key"])[0]:
+                raise SnapshotError("STACK_EXERCISE_REFERENCE_FORMAT")
+    return candidate, checked
+
+
+def assemble(raw: dict[str, Any], inputs: dict[str, Any]) -> dict[str, Any]:
+    candidate, _ = _assemble_checked(raw, inputs)
     return candidate
 
 
@@ -316,8 +342,10 @@ EVIDENCE_WIRE = "stack-boundaries-scene-wire-v2"
 
 
 def scene_versions(batch: str | None) -> tuple[str, str]:
+    if batch == basis.TYPED_PRACTICE_BATCH:
+        return TYPED_PRACTICE_PROMPT, EVIDENCE_WIRE
     return (
-        (EVIDENCE_PROMPT, EVIDENCE_WIRE) if batch in (basis.EVIDENCE_BATCH, basis.SELECTION_BATCH)
+        (EVIDENCE_PROMPT, EVIDENCE_WIRE) if batch in basis.PRACTICE_BATCHES
         else (SCENE_PROMPT, SCENE_WIRE)
     )
 
@@ -363,12 +391,13 @@ def wire_plan_response(raw: dict[str, Any], inputs: dict[str, Any]) -> dict[str,
 def _practice_request(request: StructuredRequest, payload: dict[str, Any]) -> StructuredRequest:
     selected = next(s for s in payload["plan"]["scenes"] if s["scene_id"] == payload["scene_id"])
     key = selected["scene_key"]
-    data = basis.materials()
+    batch = payload["request"]["stack_boundaries"]
+    data = basis.materials(batch)
     practice = basis.practice_evidence(data)["scenes"][key]
     material = payload.pop("scene_material")
     payload.update(
         scene_key=key,
-        materials_digest=basis.materials_digest(payload["request"]["stack_boundaries"]),
+        materials_digest=basis.materials_digest(batch),
         demonstration={
             **{k: material[k] for k in ("source", "frames", "demonstrated", "text_only")},
             "facts": {f"demo.{key}.{k}": value for k, value in material["facts"].items()},
@@ -439,7 +468,7 @@ def bound_scene_request(inputs: dict[str, Any]) -> StructuredRequest:
         payload["plan_source"] = "fixed_outline"
     elif batch == basis.SELECTION_BATCH:
         payload["plan_source"] = "goal_selected"
-    if batch in (basis.EVIDENCE_BATCH, basis.SELECTION_BATCH):
+    if batch in basis.PRACTICE_BATCHES:
         return _practice_request(request, payload)
     return replace(request, prompt=replace(
         request.prompt, messages=(system, ChatMessage("user", canonical(payload).decode())),
@@ -453,7 +482,7 @@ def checked_scene(value: dict[str, Any], inputs: dict[str, Any]) -> dict[str, An
     request = bound_scene_request(inputs)
     payload = json.loads(request.prompt.messages[1].content)
     scene = next(s for s in inputs["plan"]["scenes"] if s["scene_id"] == inputs["scene_id"])
-    mat = basis.materials()["scenes"][scene["scene_key"]]
+    mat = basis.materials(inputs["request"]["stack_boundaries"])["scenes"][scene["scene_key"]]
     source = value["generation_source"]
     if (
         not isinstance(source, dict)
@@ -478,10 +507,7 @@ def checked_scene(value: dict[str, Any], inputs: dict[str, Any]) -> dict[str, An
                          "source_request_sha256", "source_response_sha256"))
     ):
         raise SnapshotError("STACK_SCENE_SCOPE")
-    assembled = assemble(value["raw_output"], inputs)
-    checked = check_scene(assembled, inputs)
-    if checked["state"] != "accepted":
-        raise SnapshotError(checked["reason_code"])
+    _, checked = _assemble_checked(value["raw_output"], inputs)
     blocks = checked["cleaned"]["content"]["blocks"]
     visual = next(block for block in blocks if block["kind"] == "visualization")
     lines = mat["source"].splitlines()

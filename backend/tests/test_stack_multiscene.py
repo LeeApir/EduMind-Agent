@@ -306,3 +306,84 @@ def test_practice_assembly_rejects_mixed_evidence():
     bad["paragraphs"][0]["fact_ids"] = ["practice.normal.first_pop"]
     with pytest.raises(SnapshotError, match="STACK_SCENE_CONTENT"):
         course.assemble(bad, inputs)
+
+
+def test_typed_practice_assembly_uses_t155_input_rules():
+    from app.services.free_course_answers import compare_answer, comparison_rule
+    from app.services.free_scene_generation import generation_contract
+
+    expected = {
+        "first_pop": ("integer", "[-4,9]", "2"),
+        "final_top": ("integer", "[-4,9]", "-4"),
+        "full_count": ("integer", "[0,3]", "3"),
+        "empty_return": ("integer", "0 或 1", "0"),
+        "empty_output": ("integer", "[-99,7]", "1"),
+        "guard_pair": ("short_text", "输入 A 或 B，大小写均可", "A"),
+    }
+
+    def assemble_both(batch):
+        planning_input = dict(PLANNING_INPUT, stack_boundaries=batch)
+        plan = course.fixed_outline(planning_input)
+        upstream = []
+        questions = {}
+        for scene_id, scene_key in (("s1", "normal"), ("s2", "rejections")):
+            inputs = scene_input(plan, scene_id, upstream)
+            inputs["request"] = planning_input
+            inputs["plan"]["digest"] = "0" * 64
+            request, check, prompt_version, wire_version = generation_contract(inputs)
+            payload = json.loads(request.prompt.messages[1].content)
+            assert payload["materials_digest"] == basis.materials_digest(batch)
+            assert payload["prompt_version"] == prompt_version
+            assert wire_version == course.EVIDENCE_WIRE
+            assert payload["plan_source"] == "fixed_outline"
+            raw = practice_fixture(payload)
+            source = dict(
+                origin="stack_boundaries_model_generation", batch=batch, model="deepseek-flash",
+                prompt_version=prompt_version, plan_source="fixed_outline",
+                plan_digest=inputs["plan"]["digest"], materials_digest=payload["materials_digest"],
+                candidate_digest="a" * 64, review_sha256="b" * 64, evidence_kind="offline_fixture",
+                scene_key=scene_key, parent_digest=None, source_request_sha256="c" * 64,
+                source_response_sha256="d" * 64,
+            )
+            checked = check(dict(raw_output=raw, generation_source=source), inputs)["cleaned"]
+            group = next(b for b in checked["content"]["blocks"] if b["kind"] == "exercise")
+            shown = next(b for b in course.assemble(raw, inputs)["blocks"]
+                         if b["kind"] == "exercise")
+            assert shown == group
+            if batch == basis.TYPED_PRACTICE_BATCH:
+                assert prompt_version == course.TYPED_PRACTICE_PROMPT
+                assert "整数题格式示例：12 或 -7" in group["question"]
+                assert "未参与数值比较" in group["question"]
+                assert comparison_rule(group) == "free-course-typed-json-v1"
+                for q in group["items"]:
+                    evidence = payload["practice"]["questions"][q["question_id"]]
+                    assert evidence["input_type"] == q["input_type"]
+                    assert q["question"].endswith(evidence["input_instruction"])
+            else:
+                assert "格式示例" not in group["question"]
+                assert comparison_rule(group) == "quiz-exact-text-v1"
+            questions.update((q["question_id"], q) for q in group["items"])
+            upstream = [dict(scene_id=scene_id, scene_version_id="v-normal",
+                             digest="fixture", **checked)]
+        return questions
+
+    typed = assemble_both(basis.TYPED_PRACTICE_BATCH)
+    old = assemble_both(basis.EVIDENCE_BATCH)
+    assert typed.keys() == old.keys() == expected.keys()
+    assert "一个大写字母" in old["guard_pair"]["question"]
+    for key, (kind, hint, answer) in expected.items():
+        q = typed[key]
+        assert q["input_type"] == kind and hint in q["question"]
+        assert ("JSON 整数" in q["question"]) == (kind == "integer")
+        assert old[key]["input_type"] == "short_text" and "JSON 整数" not in old[key]["question"]
+        assert q["answer_key"] == old[key]["answer_key"] == answer
+        assert compare_answer(q, answer) == (True, q["solution"])
+
+    for key, value in (
+        ("first_pop", "+2"), ("final_top", "-04"), ("final_top", "−4"),
+        ("full_count", "+3"), ("empty_output", "+1"),
+    ):
+        matched, feedback = compare_answer(typed[key], value)
+        assert not matched and feedback.startswith("请输入一个 JSON 整数，不附加文字。")
+    for key, value in (("empty_return", "-0"), ("guard_pair", "a")):
+        assert compare_answer(typed[key], value) == (True, typed[key]["solution"])

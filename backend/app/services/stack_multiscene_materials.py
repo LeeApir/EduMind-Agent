@@ -10,7 +10,9 @@ VERSION = "stack-boundaries-multiscene-v1"
 FIXED_BATCH = "stack-boundaries-fixed-outline-v1"
 EVIDENCE_BATCH = "stack-boundaries-practice-evidence-v1"
 SELECTION_BATCH = "stack-goal-selection-v1"
-FIXED_BATCHES = (FIXED_BATCH, EVIDENCE_BATCH)
+TYPED_PRACTICE_BATCH = "stack-boundaries-typed-practice-v1"
+FIXED_BATCHES = (FIXED_BATCH, EVIDENCE_BATCH, TYPED_PRACTICE_BATCH)
+PRACTICE_BATCHES = (EVIDENCE_BATCH, SELECTION_BATCH, TYPED_PRACTICE_BATCH)
 PRACTICE_VERSION = "stack-practice-checkpoints-v1"
 NORMAL_GOAL = "追踪正常入栈和出栈，解释栈顶与后进先出"
 FULL_GOAL = "解释满栈为什么拒绝入栈"
@@ -21,9 +23,14 @@ FORMS = ("text", "code", "visualization", "exercise")
 
 DEMO = (3, 8, 5, 9, None, None, None, None)
 TRANSFER = (1, 2, 4, 7, None, None, None, None)
+INTEGER_GUIDE = (
+    " 整数题格式示例：12 或 -7。负数使用半角减号，不加正号、前导零、小数点、"
+    "引号、单位或解释。反馈若提示输入格式，表示该输入未参与数值比较。"
+)
 
 
-def materials() -> dict[str, Any]:
+def materials(batch: str | None = None) -> dict[str, Any]:
+    typed = batch == TYPED_PRACTICE_BATCH
     existing = stack.materials()
     normal = existing["main"]
     normal_transfer = existing["transfer"]
@@ -32,8 +39,20 @@ def materials() -> dict[str, Any]:
     full = transfer["frames"][4]
     empty = transfer["frames"][8]
 
-    def question(key, checkpoint, domain, answer):
-        return dict(key=key, checkpoint=checkpoint, domain=domain, private_answer=str(answer))
+    def question(key, checkpoint, domain, answer, *, integer_domain):
+        result = dict(key=key, checkpoint=checkpoint, domain=domain, private_answer=str(answer))
+        if typed:
+            if integer_domain is None:
+                result.update(
+                    input_type="short_text", domain="A 或 B（大小写均可）",
+                    input_instruction="输入 A 或 B，大小写均可，不加其他文字。",
+                )
+            else:
+                result.update(
+                    input_type="integer", domain=f"{integer_domain}一个 JSON 整数",
+                    input_instruction=f"只输入{integer_domain}一个 JSON 整数。",
+                )
+        return result
 
     scenes = {
         "normal": dict(
@@ -46,6 +65,7 @@ def materials() -> dict[str, Any]:
                 question(
                     key, normal_transfer["questions"][key]["target"], "[-4,9] 内的一个整数",
                     normal_transfer["questions"][key]["private_answer"],
+                    integer_domain="[-4,9] 范围内的",
                 )
                 for key in ("first_pop", "final_top")
             ],
@@ -68,22 +88,30 @@ def materials() -> dict[str, Any]:
             exercise_source=transfer["source"],
             questions=[
                 question("full_count", "push(7) 被拒后有效元素数", "[0,3] 内的一个整数",
-                         full["count"]),
-                question("empty_return", "最后一次空栈 pop 的返回值（false=0，true=1）",
-                         "0 或 1 中的一个整数", int(empty["success"])),
-                question("empty_output", "最后一次空栈 pop 后调用者 value 的值",
-                         "[-99,7] 内的一个整数", empty["output"]),
+                         full["count"], integer_domain="[0,3] 范围内的"),
+                question(
+                    "empty_return", "最后一次空栈 pop 的返回值（false=0，true=1）",
+                    "0 或 1 中的一个整数", int(empty["success"]), integer_domain="值为 0 或 1 的",
+                ),
+                question(
+                    "empty_output", "最后一次空栈 pop 后调用者 value 的值",
+                    "[-99,7] 内的一个整数", empty["output"], integer_domain="[-99,7] 范围内的",
+                ),
                 question(
                     "guard_pair",
                     "两次拒绝各自触发的守卫是哪组，A 为 push 的 count == CAP 和 "
                     "pop 的 count == 0，B 为这两个条件对调",
-                    "A 或 B 中的一个大写字母", "A",
+                    "A 或 B 中的一个大写字母", "A", integer_domain=None,
                 ),
             ],
         ),
     }
-    data = dict(version=VERSION, capacity=stack.CAPACITY, order="bottom_to_top", scenes=scenes)
-    return {**data, "materials_digest": digest(VERSION, data=data)}
+    version = TYPED_PRACTICE_BATCH if typed else VERSION
+    if typed:
+        for scene in scenes.values():
+            scene["exercise_guide"] = INTEGER_GUIDE
+    data = dict(version=version, capacity=stack.CAPACITY, order="bottom_to_top", scenes=scenes)
+    return {**data, "materials_digest": digest(version, data=data)}
 
 
 def _practice_states(trace: dict[str, Any]) -> list[dict[str, Any]]:
@@ -133,6 +161,8 @@ def practice_evidence(data: dict[str, Any]) -> dict[str, Any]:
                 evidence_id=evidence_id, practice_code_sha256=code_sha256,
                 asked=q["checkpoint"], answer_domain=q["domain"],
                 reference_answer=q["private_answer"],
+                **({field: q[field] for field in ("input_type", "input_instruction")}
+                   if "input_type" in q else {}),
                 checkpoints=[
                     dict(
                         id=f"{evidence_id}.after-f{i}", observation="after_call",
@@ -146,10 +176,11 @@ def practice_evidence(data: dict[str, Any]) -> dict[str, Any]:
 
 
 def materials_digest(batch: str) -> str:
-    data = materials()
-    if batch not in (EVIDENCE_BATCH, SELECTION_BATCH):
+    data = materials(batch)
+    if batch not in PRACTICE_BATCHES:
         return data["materials_digest"]
     return digest(
-        EVIDENCE_BATCH, base_materials_digest=data["materials_digest"],
+        TYPED_PRACTICE_BATCH if batch == TYPED_PRACTICE_BATCH else EVIDENCE_BATCH,
+        base_materials_digest=data["materials_digest"],
         practice_evidence=practice_evidence(data),
     )
