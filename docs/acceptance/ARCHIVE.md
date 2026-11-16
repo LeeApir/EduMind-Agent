@@ -1,5 +1,13 @@
 # 已退役验收包索引
 
+## 退役批次导航
+
+- 2026-11-16：T102 九个旧过程包与专属消费者，共66文件；见本页末尾「T102 旧路线退役」。
+- 2026-10-21：以下32包、346文件；原清单和恢复路径保持。
+
+历史冻结文档里的旧路径按来源提交解释；通过本页或逐文件清单找回，不批量改写冻结文档。
+
+
 以下32包已迁入`local-materials/acceptance-archive-20261021/snapshot/docs/acceptance/`，346个文件逐字节保留，未删除历史失败或改分。它们不是当前执行入口。来源提交：`a59038ccc73ed372e74139bdf14521ff8655d818`。
 
 本地档案不随clone分发；可从已有Git历史离线恢复，不需要Provider或网络：
@@ -173,3 +181,32 @@ python3 scripts/manage_acceptance_archive.py check
 
 
 浅克隆若没有来源Git对象，需另行取得准确历史或由维护者提供本地档案；恢复工具不会自动联网取历史。
+
+## T102 旧路线退役（2026-11-16）
+
+按 ADR0066 停止路线及用户清理指令，以下九包从当前代码树退役，旧失败不改判。保留 `phase-1.5-manual-bc-redesign-t102` 的最终设计与独立复核、共享引擎和有效回归。不是删除 Git 历史。
+
+来源提交：`3e1e37e28d658d4d3a6aa27fb49abcc4f2807946`。完整逐文件路径、大小、SHA-256 和九个配套脚本/测试见[恢复清单](../maintenance/acceptance-retirement-t102-20261116.json)。本批共66文件，8,665,590字节；不自动复制到本地档案。
+
+- [phase-1.5-isolated-blockers-t102](https://github.com/LeeApir/EduMind-Agent/tree/3e1e37e28d658d4d3a6aa27fb49abcc4f2807946/docs/acceptance/phase-1.5-isolated-blockers-t102)
+- [phase-1.5-manual-bc-contract-diff-t102](https://github.com/LeeApir/EduMind-Agent/tree/3e1e37e28d658d4d3a6aa27fb49abcc4f2807946/docs/acceptance/phase-1.5-manual-bc-contract-diff-t102)
+- [phase-1.5-manual-bc-exploration-t102](https://github.com/LeeApir/EduMind-Agent/tree/3e1e37e28d658d4d3a6aa27fb49abcc4f2807946/docs/acceptance/phase-1.5-manual-bc-exploration-t102)
+- [phase-1.5-manual-bc-offline-t102](https://github.com/LeeApir/EduMind-Agent/tree/3e1e37e28d658d4d3a6aa27fb49abcc4f2807946/docs/acceptance/phase-1.5-manual-bc-offline-t102)
+- [phase-1.5-manual-bc-preparation-t102](https://github.com/LeeApir/EduMind-Agent/tree/3e1e37e28d658d4d3a6aa27fb49abcc4f2807946/docs/acceptance/phase-1.5-manual-bc-preparation-t102)
+- [phase-1.5-reference-player-t102](https://github.com/LeeApir/EduMind-Agent/tree/3e1e37e28d658d4d3a6aa27fb49abcc4f2807946/docs/acceptance/phase-1.5-reference-player-t102)
+- [phase-1.5-supervised-encrypted-t102](https://github.com/LeeApir/EduMind-Agent/tree/3e1e37e28d658d4d3a6aa27fb49abcc4f2807946/docs/acceptance/phase-1.5-supervised-encrypted-t102)
+- [phase-1.5-teaching-experiment-preparation-t102](https://github.com/LeeApir/EduMind-Agent/tree/3e1e37e28d658d4d3a6aa27fb49abcc4f2807946/docs/acceptance/phase-1.5-teaching-experiment-preparation-t102)
+- [phase-1.5-visible-migration-t102](https://github.com/LeeApir/EduMind-Agent/tree/3e1e37e28d658d4d3a6aa27fb49abcc4f2807946/docs/acceptance/phase-1.5-visible-migration-t102)
+
+复用原恢复工具，旧批默认行为不变：
+
+```bash
+# 只读核对 Git 来源，无须恢复全包
+python3 scripts/manage_acceptance_archive.py check-source --index docs/maintenance/acceptance-retirement-t102-20261116.json
+# 按需恢复一个准确旧文件；省略 --path 则恢复本批全部文件
+python3 scripts/manage_acceptance_archive.py restore --index docs/maintenance/acceptance-retirement-t102-20261116.json --path docs/acceptance/phase-1.5-manual-bc-offline-t102/BLOCKED.md
+# 核对该恢复文件
+python3 scripts/manage_acceptance_archive.py check --index docs/maintenance/acceptance-retirement-t102-20261116.json --path docs/acceptance/phase-1.5-manual-bc-offline-t102/BLOCKED.md
+```
+
+仅恢复到 Git 忽略的 `local-materials/acceptance-retired-t102-20261116/snapshot/`，不覆写工作源码、不执行历史脚本、不联网。浅克隆缺少准确来源对象时应明确报错，不自动拉取或使用替代版本。恢复脚本不提供恢复运行的授权。
