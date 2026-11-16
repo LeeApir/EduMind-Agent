@@ -1,12 +1,14 @@
-# 验收材料保留清单与开发入口 · T003
+# 验收材料保留清单与开发入口 · T003 / T004
 
-基线：`a4629602933d3966d479008a6208a6bc07640248`，2026-11-16。覆盖当前 **214 个目录、22 个非缓存顶层文件**；Finder 重新生成的 `.DS_Store` 不计入。这里只整理用途，未删除、移动或改写任何历史材料。
+T003盘点基线：`a4629602933d3966d479008a6208a6bc07640248`，2026-11-16；当时为214个目录、22个非缓存顶层文件。
 
-## 先看结论
+**T004已执行本轮清理：移除60目录、15顶层文档和61个专属脚本/测试；当前为154目录、7个非缓存顶层文件，共161项。** 434个退役文件（3,676,975字节）来自准确提交 `787436a2c3a1b7806dada148c702374f771f536e`，见[逐文件恢复清单](acceptance-retirement-trials-20261116.json)。现存材料仍有共享依赖，不等于161项都需要日常阅读或永久维护。Finder缓存不计入。
+
+## 清理前分类与本轮处置
 
 不需要把这236项作为后续开发的阅读或维护任务。真正需要继承的是产品边界、可复用能力、少量代表性课程和失败教训；其余旧批次停止维护。物理文件是否能删，还要与当前消费者一起处理。
 
-此前“149个退役候选、65个保留/保护”的划分偏粗：其中另有23个目录被后端测试或基础证据回归引用，本次单列，不能连有效回归一起删掉。余下126个仍是候选，不是已证明可直接删除的名单。
+此前“149个退役候选、65个保留/保护”的划分偏粗：其中另有23个目录被后端测试或基础证据回归引用，本次单列，不能连有效回归一起删掉。126个候选经消费者核对后，60个已退役，66个因共享代码、回归或保留材料引用暂留。复杂依赖本轮不重构，不再另开逐包清理任务。
 
 | 处置 | 目录数 | 后续责任 |
 | --- | ---: | --- |
@@ -45,7 +47,7 @@
 - 后续清理一次处理确认的范围，复杂共享依赖先留；不把清理拆成逐包审批、逐包复测或新的长期框架。只验证改变的引用/导入、恢复索引和确实受影响的回归。
 - 当前T001仍是待讨论的设计任务。无需先清空所有历史包才能讨论或实施获准的新设计。
 
-## 逐目录清单
+## 逐目录清单（保留清理前路径，标明实际处置）
 
 依据来自当前跟踪源码的目录字面量、Python绝对导入及保留清单引用，并人工核对上述关键动态路径。不是完整运行时依赖证明；未运行历史脚本、模型、数据库或浏览器。E类列出测试引用，不声称这些测试全部需要永久保留。表中引用取代表入口，其余消费者仍须随实际删除范围核对。
 
@@ -162,166 +164,178 @@
 | [phase-1.5-d02-recheck-d01](../acceptance/phase-1.5-d02-recheck-d01/) | backend/tests/test_p15_d02_recheck_d01.py |
 | [phase-1.5-d02-recheck-d02](../acceptance/phase-1.5-d02-recheck-d02/) | backend/tests/test_p15_d02_recheck_d02.py |
 
-### F 旧试验退役候选（126）
+### F 原126个候选：60已退役，66因依赖暂留
 
 | 目录 | 用途或定位依据 |
 | --- | --- |
-| [phase-1-coverage-r04-admission](../acceptance/phase-1-coverage-r04-admission/) | scripts/acceptance_support/coverage_v44.py；scripts/prepare_coverage_admission.py |
-| [phase-1-coverage-r05](../acceptance/phase-1-coverage-r05/) | scripts/prepare_review_config_comparison.py；scripts/run_coverage_v44.py |
-| [phase-1-defect-regression-r01](../acceptance/phase-1-defect-regression-r01/) | scripts/prepare_defect_regression.py；scripts/prepare_plan_admission.py |
-| [phase-1-distributed-budget-r01](../acceptance/phase-1-distributed-budget-r01/) | scripts/prepare_review_suite.py；scripts/run_distributed_budget.py |
-| [phase-1-distributed-diagnostic-r01](../acceptance/phase-1-distributed-diagnostic-r01/) | scripts/prepare_distributed_budget.py；scripts/run_distributed_diagnostic.py |
-| [phase-1-evidence-repair-proposal-r01](../acceptance/phase-1-evidence-repair-proposal-r01/) | scripts/prepare_evidence_repair_proposal.py；scripts/tests/test_evidence_repair_proposal.py |
-| [phase-1-evidence-v45-r01](../acceptance/phase-1-evidence-v45-r01/) | scripts/prepare_review_model_candidate.py；scripts/prepare_review_replacement.py |
-| [phase-1-five-hour-execution-r01](../acceptance/phase-1-five-hour-execution-r01/) | scripts/prepare_five_hour_environment.py；scripts/run_five_hour_acceptance.py |
-| [phase-1-fixed-c-design-r01](../acceptance/phase-1-fixed-c-design-r01/) | scripts/offline_c_fixtures.py；scripts/tests/test_offline_c_fixture_manifest.py |
-| [phase-1-generation-mini-r01](../acceptance/phase-1-generation-mini-r01/) | scripts/run_generation_mini.py；scripts/tests/test_plan_repair_boundary.py |
-| [phase-1-luna-process-calibration-r01](../acceptance/phase-1-luna-process-calibration-r01/) | scripts/prepare_last_review_candidate.py；scripts/prepare_luna_process_calibration.py |
-| [phase-1-luna-process-execution-r01](../acceptance/phase-1-luna-process-execution-r01/) | scripts/prepare_last_review_candidate.py；scripts/run_luna_process_calibration.py |
-| [phase-1-luna-schema-validation-r01](../acceptance/phase-1-luna-schema-validation-r01/) | scripts/prepare_luna_process_calibration.py；scripts/prepare_luna_schema_validation.py |
-| [phase-1-luna-v49-admission-r02](../acceptance/phase-1-luna-v49-admission-r02/) | scripts/acceptance_support/luna_admission_gate.py；scripts/prepare_last_review_candidate.py |
-| [phase-1-om-admission-r01](../acceptance/phase-1-om-admission-r01/) | scripts/acceptance_support/om_diagnostic.py；scripts/prepare_om_admission_r02.py |
-| [phase-1-om-admission-r03](../acceptance/phase-1-om-admission-r03/) | scripts/acceptance_support/coverage_standard.py；scripts/prepare_coverage_review.py |
-| [phase-1-om-implementation](../acceptance/phase-1-om-implementation/) | scripts/acceptance_support/om_preparation.py；scripts/prepare_om_admission.py |
-| [phase-1-plan-admission-authorization-r01](../acceptance/phase-1-plan-admission-authorization-r01/) | scripts/run_plan_admission.py |
-| [phase-1-plan-admission-execution-r01](../acceptance/phase-1-plan-admission-execution-r01/) | scripts/run_plan_admission.py |
-| [phase-1-plan-admission-execution-r02](../acceptance/phase-1-plan-admission-execution-r02/) | scripts/run_plan_admission.py；scripts/run_plan_p01_retest.py |
-| [phase-1-plan-admission-preparation-r01](../acceptance/phase-1-plan-admission-preparation-r01/) | scripts/prepare_plan_admission.py；scripts/prepare_plan_boundary_batch.py |
-| [phase-1-plan-admission-results-r02](../acceptance/phase-1-plan-admission-results-r02/) | scripts/run_plan_p01_retest.py |
-| [phase-1-plan-boundary-development-r01](../acceptance/phase-1-plan-boundary-development-r01/) | scripts/prepare_plan_boundary_batch.py；scripts/run_plan_boundary_batch.py |
-| [phase-1-plan-gap-contract-audit](../acceptance/phase-1-plan-gap-contract-audit/) | scripts/audit_plan_gap_contract.py；scripts/prepare_review_remaining.py |
-| [phase-1-plan-gap-location-r01](../acceptance/phase-1-plan-gap-location-r01/) | scripts/prepare_review_remaining.py；scripts/run_plan_gap_location.py |
-| [phase-1-plan-semantic-boundary-r01](../acceptance/phase-1-plan-semantic-boundary-r01/) | scripts/run_plan_boundary_batch.py |
-| [phase-1-provider-connection-v1](../acceptance/phase-1-provider-connection-v1/) | scripts/prepare_review_model_candidate.py；scripts/run_deepseek_connection.py |
-| [phase-1-provider-selection](../acceptance/phase-1-provider-selection/) | scripts/prepare_review_model_candidate.py |
-| [phase-1-qwen-compatibility-r01](../acceptance/phase-1-qwen-compatibility-r01/) | scripts/prepare_qwen_compatibility.py；scripts/prepare_qwen_continuation.py |
-| [phase-1-qwen-continuation-r01](../acceptance/phase-1-qwen-continuation-r01/) | scripts/run_qwen_continuation.py |
-| [phase-1-qwen-http400-r01](../acceptance/phase-1-qwen-http400-r01/) | scripts/diagnose_qwen_http400.py |
-| [phase-1-qwen-http400-r02](../acceptance/phase-1-qwen-http400-r02/) | scripts/diagnose_qwen_http400_r02.py |
-| [phase-1-qwen-review-execution-r01](../acceptance/phase-1-qwen-review-execution-r01/) | scripts/run_qwen_review.py |
-| [phase-1-review-config-r01](../acceptance/phase-1-review-config-r01/) | scripts/prepare_distributed_diagnostic.py；scripts/prepare_review_suite.py |
-| [phase-1-review-continuation-r01](../acceptance/phase-1-review-continuation-r01/) | scripts/run_review_continuation.py |
-| [phase-1-review-evidence-v45](../acceptance/phase-1-review-evidence-v45/) | scripts/prepare_evidence_v45.py |
-| [phase-1-review-final-execution-r01](../acceptance/phase-1-review-final-execution-r01/) | scripts/run_final_review_candidate.py |
-| [phase-1-review-input-v1](../acceptance/phase-1-review-input-v1/) | scripts/prepare_coverage_v44.py |
-| [phase-1-review-last-candidate-r01](../acceptance/phase-1-review-last-candidate-r01/) | scripts/prepare_last_review_candidate.py；scripts/run_final_review_candidate.py |
-| [phase-1-review-model-candidate-r01](../acceptance/phase-1-review-model-candidate-r01/) | scripts/prepare_review_model_candidate.py；scripts/run_qwen_review.py |
-| [phase-1-review-prerequisite-once-r01](../acceptance/phase-1-review-prerequisite-once-r01/) | scripts/run_prerequisite_once.py |
-| [phase-1-review-replacement-r01](../acceptance/phase-1-review-replacement-r01/) | scripts/prepare_review_model_candidate.py；scripts/run_review_replacement.py |
-| [phase-1-review-safety-retry-r01](../acceptance/phase-1-review-safety-retry-r01/) | scripts/run_safety_retry.py |
-| [phase-1-review-stack-recurrence-r01](../acceptance/phase-1-review-stack-recurrence-r01/) | scripts/run_stack_recurrence_once.py |
-| [phase-1-review-suite-r01](../acceptance/phase-1-review-suite-r01/) | scripts/audit_plan_gap_contract.py；scripts/prepare_evidence_repair_proposal.py |
-| [phase-1-separated-diagnostics-r01](../acceptance/phase-1-separated-diagnostics-r01/) | scripts/prepare_plan_admission.py；scripts/prepare_separated_diagnostics.py |
-| [phase-1-t040-deepseek-high-v2](../acceptance/phase-1-t040-deepseek-high-v2/) | scripts/t040_reasoning_check.py |
-| [phase-1-t040-derived-calibration-draft](../acceptance/phase-1-t040-derived-calibration-draft/) | scripts/prepare_t040_derived_calibration.py |
-| [phase-1-t040-focus-r11](../acceptance/phase-1-t040-focus-r11/) | scripts/acceptance_support/om_preparation.py；scripts/prepare_t040_final_focus.py |
-| [phase-1-t040-reasoning-check](../acceptance/phase-1-t040-reasoning-check/) | scripts/t040_high_diagnostics.py；scripts/t040_reasoning_check.py |
-| [phase-1-t040-span-review-offline](../acceptance/phase-1-t040-span-review-offline/) | scripts/prepare_t040_focus.py；scripts/prepare_t040_span_review.py |
-| [phase-1-v49-admission-r01](../acceptance/phase-1-v49-admission-r01/) | scripts/prepare_v49_admission.py；scripts/prepare_v49_materials.py |
-| [phase-1.5-aiapi-minimal-r01](../acceptance/phase-1.5-aiapi-minimal-r01/) | scripts/check_head_course_provider_review.py；scripts/run_p15_aiapi_minimal_r01.py |
-| [phase-1.5-aiapi-review-probe-r01](../acceptance/phase-1.5-aiapi-review-probe-r01/) | scripts/run_p15_aiapi_review_probe.py |
-| [phase-1.5-aiapi-s2-once](../acceptance/phase-1.5-aiapi-s2-once/) | scripts/check_head_course_provider_review.py；scripts/run_p15_aiapi_s2_once.py |
-| [phase-1.5-answer-contract-t061](../acceptance/phase-1.5-answer-contract-t061/) | 未发现外部跟踪源码目录字面量；仍需核对包内/动态依赖 |
-| [phase-1.5-archived-head-import-t112](../acceptance/phase-1.5-archived-head-import-t112/) | 未发现外部跟踪源码目录字面量；仍需核对包内/动态依赖 |
-| [phase-1.5-bound-course-sample-t093](../acceptance/phase-1.5-bound-course-sample-t093/) | scripts/isolated_diagnostics/generate_p15_bound_sample.py |
-| [phase-1.5-bound-pilot-t092](../acceptance/phase-1.5-bound-pilot-t092/) | 未发现外部跟踪源码目录字面量；仍需核对包内/动态依赖 |
-| [phase-1.5-candidate-compatibility-r01](../acceptance/phase-1.5-candidate-compatibility-r01/) | scripts/run_p15_candidate_compatibility.py |
-| [phase-1.5-combined-candidate-r01](../acceptance/phase-1.5-combined-candidate-r01/) | scripts/isolated_diagnostics/generate_p15_real_candidate_player.py；scripts/isolated_diagnostics/generate_p15_reference_player.py |
-| [phase-1.5-compatibility-probe-p01](../acceptance/phase-1.5-compatibility-probe-p01/) | scripts/check_p15_compatibility_probe_results.py；scripts/check_p15_replacement_compatibility_plan.py |
-| [phase-1.5-compatibility-probe-p01-results](../acceptance/phase-1.5-compatibility-probe-p01-results/) | scripts/check_p15_compatibility_probe_results.py；scripts/check_p15_replacement_compatibility_plan.py |
-| [phase-1.5-counter-probe-c01](../acceptance/phase-1.5-counter-probe-c01/) | scripts/check_p15_counter_probe_packet.py |
-| [phase-1.5-course-answers-t018](../acceptance/phase-1.5-course-answers-t018/) | 未发现外部跟踪源码目录字面量；仍需核对包内/动态依赖 |
-| [phase-1.5-course-api-t020](../acceptance/phase-1.5-course-api-t020/) | 未发现外部跟踪源码目录字面量；仍需核对包内/动态依赖 |
-| [phase-1.5-course-evidence-t019](../acceptance/phase-1.5-course-evidence-t019/) | 未发现外部跟踪源码目录字面量；仍需核对包内/动态依赖 |
-| [phase-1.5-course-feedback-t017](../acceptance/phase-1.5-course-feedback-t017/) | 未发现外部跟踪源码目录字面量；仍需核对包内/动态依赖 |
-| [phase-1.5-course-recheck-r03](../acceptance/phase-1.5-course-recheck-r03/) | scripts/run_p15_course_recheck_r03.py |
-| [phase-1.5-course-recovery-t015](../acceptance/phase-1.5-course-recovery-t015/) | 未发现外部跟踪源码目录字面量；仍需核对包内/动态依赖 |
-| [phase-1.5-course-review-once-r01](../acceptance/phase-1.5-course-review-once-r01/) | scripts/tests/test_p15_review_engineering.py |
-| [phase-1.5-course-revision-t016](../acceptance/phase-1.5-course-revision-t016/) | 未发现外部跟踪源码目录字面量；仍需核对包内/动态依赖 |
-| [phase-1.5-course-scheduler-t014](../acceptance/phase-1.5-course-scheduler-t014/) | 未发现外部跟踪源码目录字面量；仍需核对包内/动态依赖 |
-| [phase-1.5-d02-scene2-review-once-p01](../acceptance/phase-1.5-d02-scene2-review-once-p01/) | 未发现外部跟踪源码目录字面量；仍需核对包内/动态依赖 |
-| [phase-1.5-data-model-t006](../acceptance/phase-1.5-data-model-t006/) | 未发现外部跟踪源码目录字面量；仍需核对包内/动态依赖 |
-| [phase-1.5-deepseek-flash-preparation](../acceptance/phase-1.5-deepseek-flash-preparation/) | scripts/check_p15_deepseek_flash_preparation.py |
-| [phase-1.5-deepseek-flash-r01](../acceptance/phase-1.5-deepseek-flash-r01/) | scripts/run_p15_deepseek_flash_r01.py；scripts/tests/test_p15_deepseek_flash_r01.py |
-| [phase-1.5-development-diagnostic-results-r03](../acceptance/phase-1.5-development-diagnostic-results-r03/) | scripts/audit_p15_input_count.py；scripts/check_p15_r03_diagnostic_results.py |
-| [phase-1.5-direct-relay-once-d01](../acceptance/phase-1.5-direct-relay-once-d01/) | scripts/check_p15_direct_relay_once_results.py；scripts/run_p15_direct_relay_once.py |
-| [phase-1.5-free-planning-t008](../acceptance/phase-1.5-free-planning-t008/) | 未发现外部跟踪源码目录字面量；仍需核对包内/动态依赖 |
-| [phase-1.5-full-diagnostic-r04](../acceptance/phase-1.5-full-diagnostic-r04/) | scripts/run_p15_full_diagnostic_r04.py；scripts/tests/test_p15_full_diagnostic_r04.py |
-| [phase-1.5-full-diagnostic-r05](../acceptance/phase-1.5-full-diagnostic-r05/) | scripts/run_p15_full_diagnostic_r05.py；scripts/tests/test_p15_full_diagnostic_r05.py |
-| [phase-1.5-generation-semantics-t062](../acceptance/phase-1.5-generation-semantics-t062/) | 未发现外部跟踪源码目录字面量；仍需核对包内/动态依赖 |
-| [phase-1.5-graph-links-t009](../acceptance/phase-1.5-graph-links-t009/) | 未发现外部跟踪源码目录字面量；仍需核对包内/动态依赖 |
-| [phase-1.5-guarded-transport-t052](../acceptance/phase-1.5-guarded-transport-t052/) | 未发现外部跟踪源码目录字面量；仍需核对包内/动态依赖 |
-| [phase-1.5-head-b-local-live-r01](../acceptance/phase-1.5-head-b-local-live-r01/) | 未发现外部跟踪源码目录字面量；仍需核对包内/动态依赖 |
-| [phase-1.5-head-deepseek-diagnostic-t116](../acceptance/phase-1.5-head-deepseek-diagnostic-t116/) | 未发现外部跟踪源码目录字面量；仍需核对包内/动态依赖 |
-| [phase-1.5-head-deepseek-live-r01](../acceptance/phase-1.5-head-deepseek-live-r01/) | scripts/diagnose_head_course_t115.py |
-| [phase-1.5-head-fact-revision-r01](../acceptance/phase-1.5-head-fact-revision-r01/) | scripts/head_course_fact_revision.py；scripts/prepare_head_course_fact_revision.py |
-| [phase-1.5-head-fixed-repeat-r03](../acceptance/phase-1.5-head-fixed-repeat-r03/) | scripts/head_course_fixed_aiapi.py；scripts/head_course_fixed_repeat.py |
-| [phase-1.5-head-goal-live-r03](../acceptance/phase-1.5-head-goal-live-r03/) | scripts/prepare_head_course_recovery.py |
-| [phase-1.5-input-count-audit-t051](../acceptance/phase-1.5-input-count-audit-t051/) | scripts/audit_p15_input_count.py |
-| [phase-1.5-last-semantic-repair-t064](../acceptance/phase-1.5-last-semantic-repair-t064/) | 未发现外部跟踪源码目录字面量；仍需核对包内/动态依赖 |
-| [phase-1.5-markdown-cleaning-t059](../acceptance/phase-1.5-markdown-cleaning-t059/) | 未发现外部跟踪源码目录字面量；仍需核对包内/动态依赖 |
-| [phase-1.5-mastery-history-t048](../acceptance/phase-1.5-mastery-history-t048/) | 未发现外部跟踪源码目录字面量；仍需核对包内/动态依赖 |
-| [phase-1.5-minimal-live-r01](../acceptance/phase-1.5-minimal-live-r01/) | scripts/run_p15_minimal_probe.py |
-| [phase-1.5-minimal-output-adapter-r01](../acceptance/phase-1.5-minimal-output-adapter-r01/) | scripts/run_p15_minimal_probe.py；scripts/tests/test_p15_clean_pilot_prompts.py |
-| [phase-1.5-observability-answer-plan-r01](../acceptance/phase-1.5-observability-answer-plan-r01/) | 未发现外部跟踪源码目录字面量；仍需核对包内/动态依赖 |
-| [phase-1.5-pilot-candidate-cleanup-r01](../acceptance/phase-1.5-pilot-candidate-cleanup-r01/) | 未发现外部跟踪源码目录字面量；仍需核对包内/动态依赖 |
-| [phase-1.5-planning-objectives-t065](../acceptance/phase-1.5-planning-objectives-t065/) | 未发现外部跟踪源码目录字面量；仍需核对包内/动态依赖 |
-| [phase-1.5-profile-create-t049](../acceptance/phase-1.5-profile-create-t049/) | 未发现外部跟踪源码目录字面量；仍需核对包内/动态依赖 |
-| [phase-1.5-provider-handoff-t055](../acceptance/phase-1.5-provider-handoff-t055/) | scripts/check_p15_replacement_compatibility_plan.py |
-| [phase-1.5-question-stem-t124](../acceptance/phase-1.5-question-stem-t124/) | 未发现外部跟踪源码目录字面量；仍需核对包内/动态依赖 |
-| [phase-1.5-r0-once-r01](../acceptance/phase-1.5-r0-once-r01/) | scripts/run_p15_combined_candidate.py；scripts/run_p15_r0_once.py |
-| [phase-1.5-real-candidate-player-t098](../acceptance/phase-1.5-real-candidate-player-t098/) | scripts/isolated_diagnostics/generate_p15_real_candidate_player.py；scripts/isolated_diagnostics/generate_p15_reference_player.py |
-| [phase-1.5-record-index-t047](../acceptance/phase-1.5-record-index-t047/) | 未发现外部跟踪源码目录字面量；仍需核对包内/动态依赖 |
-| [phase-1.5-record-read-contract-r01](../acceptance/phase-1.5-record-read-contract-r01/) | 未发现外部跟踪源码目录字面量；仍需核对包内/动态依赖 |
-| [phase-1.5-relay-regression-r01](../acceptance/phase-1.5-relay-regression-r01/) | scripts/check_p15_relay_regression_results.py；scripts/run_p15_relay_regression.py |
-| [phase-1.5-relay-regression-r01-results](../acceptance/phase-1.5-relay-regression-r01-results/) | scripts/check_p15_relay_regression_results.py |
-| [phase-1.5-review-engineering-t097](../acceptance/phase-1.5-review-engineering-t097/) | 未发现外部跟踪源码目录字面量；仍需核对包内/动态依赖 |
-| [phase-1.5-review-observability-t060](../acceptance/phase-1.5-review-observability-t060/) | 未发现外部跟踪源码目录字面量；仍需核对包内/动态依赖 |
-| [phase-1.5-review-view-contract-r01](../acceptance/phase-1.5-review-view-contract-r01/) | 未发现外部跟踪源码目录字面量；仍需核对包内/动态依赖 |
-| [phase-1.5-scene-actions-t012](../acceptance/phase-1.5-scene-actions-t012/) | 未发现外部跟踪源码目录字面量；仍需核对包内/动态依赖 |
-| [phase-1.5-scene-availability-t013](../acceptance/phase-1.5-scene-availability-t013/) | 未发现外部跟踪源码目录字面量；仍需核对包内/动态依赖 |
-| [phase-1.5-scene-consistency-t063](../acceptance/phase-1.5-scene-consistency-t063/) | 未发现外部跟踪源码目录字面量；仍需核对包内/动态依赖 |
-| [phase-1.5-scene-form-contract-t058](../acceptance/phase-1.5-scene-form-contract-t058/) | 未发现外部跟踪源码目录字面量；仍需核对包内/动态依赖 |
-| [phase-1.5-scene-generation-t010](../acceptance/phase-1.5-scene-generation-t010/) | 未发现外部跟踪源码目录字面量；仍需核对包内/动态依赖 |
-| [phase-1.5-scene-validation-t011](../acceptance/phase-1.5-scene-validation-t011/) | 未发现外部跟踪源码目录字面量；仍需核对包内/动态依赖 |
-| [phase-1.5-separated-protocol-repair-r01](../acceptance/phase-1.5-separated-protocol-repair-r01/) | scripts/isolated_diagnostics/p15_separated_probe_contract.py；scripts/tests/test_p15_protocol_task_separation.py |
-| [phase-1.5-separated-validation-r01](../acceptance/phase-1.5-separated-validation-r01/) | scripts/isolated_diagnostics/p15_r0_once_contract.py；scripts/run_p15_separated_probe.py |
-| [phase-1.5-snapshot-repository-t007](../acceptance/phase-1.5-snapshot-repository-t007/) | 未发现外部跟踪源码目录字面量；仍需核对包内/动态依赖 |
-| [phase-1.5-sol-compatibility-once-p01](../acceptance/phase-1.5-sol-compatibility-once-p01/) | scripts/run_p15_sol_compatibility_once.py |
-| [phase-1.5-teaching-frozen-r01](../acceptance/phase-1.5-teaching-frozen-r01/) | 未发现外部跟踪源码目录字面量；仍需核对包内/动态依赖 |
-| [phase-1.5-teaching-revision-t100](../acceptance/phase-1.5-teaching-revision-t100/) | 未发现外部跟踪源码目录字面量；仍需核对包内/动态依赖 |
-| [phase-1.5-ui-design-r01](../acceptance/phase-1.5-ui-design-r01/) | 未发现外部跟踪源码目录字面量；仍需核对包内/动态依赖 |
-| [phase-1.5-unified-head-course-t103](../acceptance/phase-1.5-unified-head-course-t103/) | 未发现外部跟踪源码目录字面量；仍需核对包内/动态依赖 |
+| [phase-1-coverage-r04-admission](../acceptance/phase-1-coverage-r04-admission/) | 暂留：scripts/acceptance_support/coverage_v44.py；scripts/prepare_coverage_admission.py。停止旧试验，相关消费者替换时再处理。 |
+| [phase-1-coverage-r05](../acceptance/phase-1-coverage-r05/) | 暂留：scripts/prepare_review_config_comparison.py；scripts/run_coverage_v44.py。停止旧试验，相关消费者替换时再处理。 |
+| [phase-1-defect-regression-r01](../acceptance/phase-1-defect-regression-r01/) | 暂留：scripts/prepare_defect_regression.py；scripts/prepare_plan_admission.py。停止旧试验，相关消费者替换时再处理。 |
+| [phase-1-distributed-budget-r01](../acceptance/phase-1-distributed-budget-r01/) | 暂留：scripts/prepare_review_suite.py；scripts/run_distributed_budget.py。停止旧试验，相关消费者替换时再处理。 |
+| [phase-1-distributed-diagnostic-r01](../acceptance/phase-1-distributed-diagnostic-r01/) | 暂留：scripts/prepare_distributed_budget.py；scripts/run_distributed_diagnostic.py。停止旧试验，相关消费者替换时再处理。 |
+| [phase-1-evidence-repair-proposal-r01](../acceptance/phase-1-evidence-repair-proposal-r01/) | 暂留：scripts/prepare_evidence_repair_proposal.py；scripts/tests/test_evidence_repair_proposal.py。停止旧试验，相关消费者替换时再处理。 |
+| [phase-1-evidence-v45-r01](../acceptance/phase-1-evidence-v45-r01/) | 暂留：scripts/prepare_review_model_candidate.py；scripts/prepare_review_replacement.py。停止旧试验，相关消费者替换时再处理。 |
+| [phase-1-five-hour-execution-r01](../acceptance/phase-1-five-hour-execution-r01/) | 暂留：scripts/run_five_hour_acceptance.py。停止旧试验，相关消费者替换时再处理。 |
+| [phase-1-fixed-c-design-r01](../acceptance/phase-1-fixed-c-design-r01/) | 暂留：scripts/offline_c_fixtures.py；scripts/tests/test_offline_c_fixture_manifest.py。停止旧试验，相关消费者替换时再处理。 |
+| [phase-1-generation-mini-r01](../acceptance/phase-1-generation-mini-r01/) | 暂留：scripts/run_generation_mini.py；scripts/tests/test_plan_repair_boundary.py。停止旧试验，相关消费者替换时再处理。 |
+| [phase-1-luna-process-calibration-r01](../acceptance/phase-1-luna-process-calibration-r01/) | 暂留：scripts/prepare_last_review_candidate.py；scripts/prepare_luna_process_calibration.py。停止旧试验，相关消费者替换时再处理。 |
+| [phase-1-luna-process-execution-r01](../acceptance/phase-1-luna-process-execution-r01/) | 暂留：scripts/prepare_last_review_candidate.py；scripts/run_luna_process_calibration.py。停止旧试验，相关消费者替换时再处理。 |
+| [phase-1-luna-schema-validation-r01](../acceptance/phase-1-luna-schema-validation-r01/) | 暂留：scripts/prepare_luna_process_calibration.py；scripts/prepare_luna_schema_validation.py。停止旧试验，相关消费者替换时再处理。 |
+| [phase-1-luna-v49-admission-r02](../acceptance/phase-1-luna-v49-admission-r02/) | 暂留：scripts/acceptance_support/luna_admission_gate.py；scripts/prepare_last_review_candidate.py。停止旧试验，相关消费者替换时再处理。 |
+| [phase-1-om-admission-r01](../acceptance/phase-1-om-admission-r01/) | 暂留：scripts/acceptance_support/om_diagnostic.py；scripts/prepare_om_admission_r02.py。停止旧试验，相关消费者替换时再处理。 |
+| [phase-1-om-admission-r03](../acceptance/phase-1-om-admission-r03/) | 暂留：scripts/acceptance_support/coverage_standard.py；scripts/prepare_coverage_review.py。停止旧试验，相关消费者替换时再处理。 |
+| [phase-1-om-implementation](../acceptance/phase-1-om-implementation/) | 暂留：scripts/acceptance_support/om_preparation.py；scripts/prepare_om_admission.py。停止旧试验，相关消费者替换时再处理。 |
+| [phase-1-plan-admission-authorization-r01](../acceptance/phase-1-plan-admission-authorization-r01/) | 暂留：scripts/run_plan_admission.py。停止旧试验，相关消费者替换时再处理。 |
+| [phase-1-plan-admission-execution-r01](../acceptance/phase-1-plan-admission-execution-r01/) | 暂留：scripts/run_plan_admission.py。停止旧试验，相关消费者替换时再处理。 |
+| [phase-1-plan-admission-execution-r02](../acceptance/phase-1-plan-admission-execution-r02/) | 暂留：scripts/run_plan_admission.py；scripts/run_plan_p01_retest.py。停止旧试验，相关消费者替换时再处理。 |
+| [phase-1-plan-admission-preparation-r01](../acceptance/phase-1-plan-admission-preparation-r01/) | 暂留：scripts/prepare_plan_admission.py；scripts/prepare_plan_boundary_batch.py。停止旧试验，相关消费者替换时再处理。 |
+| [phase-1-plan-admission-results-r02](../acceptance/phase-1-plan-admission-results-r02/) | 暂留：scripts/run_plan_p01_retest.py。停止旧试验，相关消费者替换时再处理。 |
+| [phase-1-plan-boundary-development-r01](../acceptance/phase-1-plan-boundary-development-r01/) | 暂留：scripts/prepare_plan_boundary_batch.py；scripts/run_plan_boundary_batch.py。停止旧试验，相关消费者替换时再处理。 |
+| `phase-1-plan-gap-contract-audit` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| `phase-1-plan-gap-location-r01` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| [phase-1-plan-semantic-boundary-r01](../acceptance/phase-1-plan-semantic-boundary-r01/) | 暂留：scripts/run_plan_boundary_batch.py。停止旧试验，相关消费者替换时再处理。 |
+| [phase-1-provider-connection-v1](../acceptance/phase-1-provider-connection-v1/) | 暂留：scripts/prepare_review_model_candidate.py；scripts/run_deepseek_connection.py。停止旧试验，相关消费者替换时再处理。 |
+| [phase-1-provider-selection](../acceptance/phase-1-provider-selection/) | 暂留：scripts/prepare_review_model_candidate.py。停止旧试验，相关消费者替换时再处理。 |
+| [phase-1-qwen-compatibility-r01](../acceptance/phase-1-qwen-compatibility-r01/) | 暂留：scripts/run_qwen_compatibility.py。停止旧试验，相关消费者替换时再处理。 |
+| [phase-1-qwen-continuation-r01](../acceptance/phase-1-qwen-continuation-r01/) | 暂留：scripts/run_qwen_continuation.py。停止旧试验，相关消费者替换时再处理。 |
+| [phase-1-qwen-http400-r01](../acceptance/phase-1-qwen-http400-r01/) | 暂留：scripts/diagnose_qwen_http400.py。停止旧试验，相关消费者替换时再处理。 |
+| [phase-1-qwen-http400-r02](../acceptance/phase-1-qwen-http400-r02/) | 暂留：scripts/diagnose_qwen_http400_r02.py。停止旧试验，相关消费者替换时再处理。 |
+| [phase-1-qwen-review-execution-r01](../acceptance/phase-1-qwen-review-execution-r01/) | 暂留：scripts/run_qwen_review.py。停止旧试验，相关消费者替换时再处理。 |
+| [phase-1-review-config-r01](../acceptance/phase-1-review-config-r01/) | 暂留：scripts/prepare_distributed_diagnostic.py；scripts/prepare_review_suite.py。停止旧试验，相关消费者替换时再处理。 |
+| `phase-1-review-continuation-r01` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| [phase-1-review-evidence-v45](../acceptance/phase-1-review-evidence-v45/) | 暂留：scripts/prepare_evidence_v45.py。停止旧试验，相关消费者替换时再处理。 |
+| [phase-1-review-final-execution-r01](../acceptance/phase-1-review-final-execution-r01/) | 暂留：scripts/run_final_review_candidate.py。停止旧试验，相关消费者替换时再处理。 |
+| [phase-1-review-input-v1](../acceptance/phase-1-review-input-v1/) | 暂留：scripts/prepare_coverage_v44.py。停止旧试验，相关消费者替换时再处理。 |
+| [phase-1-review-last-candidate-r01](../acceptance/phase-1-review-last-candidate-r01/) | 暂留：scripts/prepare_last_review_candidate.py；scripts/run_final_review_candidate.py。停止旧试验，相关消费者替换时再处理。 |
+| [phase-1-review-model-candidate-r01](../acceptance/phase-1-review-model-candidate-r01/) | 暂留：scripts/prepare_review_model_candidate.py；scripts/run_qwen_review.py。停止旧试验，相关消费者替换时再处理。 |
+| `phase-1-review-prerequisite-once-r01` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| [phase-1-review-replacement-r01](../acceptance/phase-1-review-replacement-r01/) | 暂留：scripts/prepare_review_model_candidate.py；scripts/run_review_replacement.py。停止旧试验，相关消费者替换时再处理。 |
+| `phase-1-review-safety-retry-r01` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| `phase-1-review-stack-recurrence-r01` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| [phase-1-review-suite-r01](../acceptance/phase-1-review-suite-r01/) | 暂留：scripts/prepare_evidence_repair_proposal.py；scripts/run_review_suite.py。停止旧试验，相关消费者替换时再处理。 |
+| [phase-1-separated-diagnostics-r01](../acceptance/phase-1-separated-diagnostics-r01/) | 暂留：scripts/prepare_plan_admission.py；scripts/prepare_separated_diagnostics.py。停止旧试验，相关消费者替换时再处理。 |
+| [phase-1-t040-deepseek-high-v2](../acceptance/phase-1-t040-deepseek-high-v2/) | 暂留：scripts/t040_reasoning_check.py。停止旧试验，相关消费者替换时再处理。 |
+| [phase-1-t040-derived-calibration-draft](../acceptance/phase-1-t040-derived-calibration-draft/) | 暂留：scripts/prepare_t040_derived_calibration.py。停止旧试验，相关消费者替换时再处理。 |
+| [phase-1-t040-focus-r11](../acceptance/phase-1-t040-focus-r11/) | 暂留：scripts/acceptance_support/om_preparation.py；scripts/prepare_t040_final_focus.py。停止旧试验，相关消费者替换时再处理。 |
+| [phase-1-t040-reasoning-check](../acceptance/phase-1-t040-reasoning-check/) | 暂留：scripts/t040_high_diagnostics.py；scripts/t040_reasoning_check.py。停止旧试验，相关消费者替换时再处理。 |
+| [phase-1-t040-span-review-offline](../acceptance/phase-1-t040-span-review-offline/) | 暂留：scripts/prepare_t040_focus.py；scripts/prepare_t040_span_review.py。停止旧试验，相关消费者替换时再处理。 |
+| [phase-1-v49-admission-r01](../acceptance/phase-1-v49-admission-r01/) | 暂留：scripts/prepare_v49_materials.py。停止旧试验，相关消费者替换时再处理。 |
+| `phase-1.5-aiapi-minimal-r01` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| `phase-1.5-aiapi-review-probe-r01` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| `phase-1.5-aiapi-s2-once` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| `phase-1.5-answer-contract-t061` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| `phase-1.5-archived-head-import-t112` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| [phase-1.5-bound-course-sample-t093](../acceptance/phase-1.5-bound-course-sample-t093/) | 暂留：scripts/isolated_diagnostics/generate_p15_bound_sample.py。停止旧试验，相关消费者替换时再处理。 |
+| `phase-1.5-bound-pilot-t092` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| [phase-1.5-candidate-compatibility-r01](../acceptance/phase-1.5-candidate-compatibility-r01/) | 暂留：scripts/run_p15_candidate_compatibility.py。停止旧试验，相关消费者替换时再处理。 |
+| [phase-1.5-combined-candidate-r01](../acceptance/phase-1.5-combined-candidate-r01/) | 暂留：scripts/isolated_diagnostics/generate_p15_reference_player.py；scripts/isolated_diagnostics/p15_single_course_review.py。停止旧试验，相关消费者替换时再处理。 |
+| `phase-1.5-compatibility-probe-p01` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| `phase-1.5-compatibility-probe-p01-results` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| `phase-1.5-counter-probe-c01` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| `phase-1.5-course-answers-t018` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| `phase-1.5-course-api-t020` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| `phase-1.5-course-evidence-t019` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| `phase-1.5-course-feedback-t017` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| [phase-1.5-course-recheck-r03](../acceptance/phase-1.5-course-recheck-r03/) | 暂留：scripts/run_p15_course_recheck_r03.py。停止旧试验，相关消费者替换时再处理。 |
+| `phase-1.5-course-recovery-t015` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| [phase-1.5-course-review-once-r01](../acceptance/phase-1.5-course-review-once-r01/) | 暂留：scripts/tests/test_p15_review_engineering.py。停止旧试验，相关消费者替换时再处理。 |
+| `phase-1.5-course-revision-t016` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| `phase-1.5-course-scheduler-t014` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| `phase-1.5-d02-scene2-review-once-p01` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| `phase-1.5-data-model-t006` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| `phase-1.5-deepseek-flash-preparation` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| `phase-1.5-deepseek-flash-r01` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| [phase-1.5-development-diagnostic-results-r03](../acceptance/phase-1.5-development-diagnostic-results-r03/) | 暂留：scripts/audit_p15_input_count.py；scripts/check_p15_r03_diagnostic_results.py。停止旧试验，相关消费者替换时再处理。 |
+| `phase-1.5-direct-relay-once-d01` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| `phase-1.5-free-planning-t008` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| [phase-1.5-full-diagnostic-r04](../acceptance/phase-1.5-full-diagnostic-r04/) | 暂留：scripts/run_p15_full_diagnostic_r04.py；scripts/tests/test_p15_full_diagnostic_r04.py。停止旧试验，相关消费者替换时再处理。 |
+| [phase-1.5-full-diagnostic-r05](../acceptance/phase-1.5-full-diagnostic-r05/) | 暂留：scripts/run_p15_full_diagnostic_r05.py；scripts/tests/test_p15_full_diagnostic_r05.py。停止旧试验，相关消费者替换时再处理。 |
+| `phase-1.5-generation-semantics-t062` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| `phase-1.5-graph-links-t009` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| `phase-1.5-guarded-transport-t052` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| `phase-1.5-head-b-local-live-r01` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| `phase-1.5-head-deepseek-diagnostic-t116` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| [phase-1.5-head-deepseek-live-r01](../acceptance/phase-1.5-head-deepseek-live-r01/) | 暂留：scripts/diagnose_head_course_t115.py。停止旧试验，相关消费者替换时再处理。 |
+| [phase-1.5-head-fact-revision-r01](../acceptance/phase-1.5-head-fact-revision-r01/) | 暂留：docs/acceptance/phase-1.5-head-fact-live-r01/check_results.py；scripts/head_course_fact_revision.py。停止旧试验，相关消费者替换时再处理。 |
+| [phase-1.5-head-fixed-repeat-r03](../acceptance/phase-1.5-head-fixed-repeat-r03/) | 暂留：scripts/head_course_fixed_aiapi.py；scripts/head_course_fixed_repeat.py。停止旧试验，相关消费者替换时再处理。 |
+| [phase-1.5-head-goal-live-r03](../acceptance/phase-1.5-head-goal-live-r03/) | 暂留：scripts/prepare_head_course_recovery.py。停止旧试验，相关消费者替换时再处理。 |
+| [phase-1.5-input-count-audit-t051](../acceptance/phase-1.5-input-count-audit-t051/) | 暂留：scripts/audit_p15_input_count.py。停止旧试验，相关消费者替换时再处理。 |
+| `phase-1.5-last-semantic-repair-t064` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| `phase-1.5-markdown-cleaning-t059` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| `phase-1.5-mastery-history-t048` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| [phase-1.5-minimal-live-r01](../acceptance/phase-1.5-minimal-live-r01/) | 暂留：scripts/run_p15_minimal_probe.py。停止旧试验，相关消费者替换时再处理。 |
+| [phase-1.5-minimal-output-adapter-r01](../acceptance/phase-1.5-minimal-output-adapter-r01/) | 暂留：scripts/run_p15_minimal_probe.py；scripts/tests/test_p15_clean_pilot_prompts.py。停止旧试验，相关消费者替换时再处理。 |
+| `phase-1.5-observability-answer-plan-r01` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| `phase-1.5-pilot-candidate-cleanup-r01` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| `phase-1.5-planning-objectives-t065` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| `phase-1.5-profile-create-t049` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| `phase-1.5-provider-handoff-t055` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| `phase-1.5-question-stem-t124` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| [phase-1.5-r0-once-r01](../acceptance/phase-1.5-r0-once-r01/) | 暂留：scripts/run_p15_combined_candidate.py。停止旧试验，相关消费者替换时再处理。 |
+| [phase-1.5-real-candidate-player-t098](../acceptance/phase-1.5-real-candidate-player-t098/) | 暂留：scripts/isolated_diagnostics/generate_p15_reference_player.py。停止旧试验，相关消费者替换时再处理。 |
+| `phase-1.5-record-index-t047` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| `phase-1.5-record-read-contract-r01` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| `phase-1.5-relay-regression-r01` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| `phase-1.5-relay-regression-r01-results` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| `phase-1.5-review-engineering-t097` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| `phase-1.5-review-observability-t060` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| `phase-1.5-review-view-contract-r01` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| `phase-1.5-scene-actions-t012` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| `phase-1.5-scene-availability-t013` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| `phase-1.5-scene-consistency-t063` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| `phase-1.5-scene-form-contract-t058` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| `phase-1.5-scene-generation-t010` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| `phase-1.5-scene-validation-t011` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| [phase-1.5-separated-protocol-repair-r01](../acceptance/phase-1.5-separated-protocol-repair-r01/) | 暂留：scripts/isolated_diagnostics/p15_separated_probe_contract.py；scripts/tests/test_p15_protocol_task_separation.py。停止旧试验，相关消费者替换时再处理。 |
+| [phase-1.5-separated-validation-r01](../acceptance/phase-1.5-separated-validation-r01/) | 暂留：scripts/isolated_diagnostics/p15_r0_once_contract.py。停止旧试验，相关消费者替换时再处理。 |
+| `phase-1.5-snapshot-repository-t007` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| [phase-1.5-sol-compatibility-once-p01](../acceptance/phase-1.5-sol-compatibility-once-p01/) | 暂留：scripts/run_p15_sol_compatibility_once.py。停止旧试验，相关消费者替换时再处理。 |
+| `phase-1.5-teaching-frozen-r01` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| `phase-1.5-teaching-revision-t100` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| `phase-1.5-ui-design-r01` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| `phase-1.5-unified-head-course-t103` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
 
-## 顶层22个文件
+## 原顶层22个文件：15已退役，7保留
 
 | 文件 | 处置建议 |
 | --- | --- |
 | [ARCHIVE.md](../acceptance/ARCHIVE.md) | 恢复入口，保留；不通读历史清单 |
 | [README.md](../acceptance/README.md) | 日常导航，保留并只链接关键入口 |
-| [mvp-0.1-provider-acceptance.md](../acceptance/mvp-0.1-provider-acceptance.md) | 历史验收/计划，停止日常维护，可随对应旧消费者退役 |
-| [mvp-0.2-closed-loop.md](../acceptance/mvp-0.2-closed-loop.md) | 历史验收/计划，停止日常维护，可随对应旧消费者退役 |
+| `mvp-0.1-provider-acceptance.md` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| `mvp-0.2-closed-loop.md` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
 | [mvp-0.2-closeout-decision.md](../acceptance/mvp-0.2-closeout-decision.md) | 阶段退出依据，按需保留 |
-| [mvp-0.2-resource-quality.md](../acceptance/mvp-0.2-resource-quality.md) | 历史验收/计划，停止日常维护，可随对应旧消费者退役 |
-| [mvp-0.3-acceptance-plan.md](../acceptance/mvp-0.3-acceptance-plan.md) | 历史验收/计划，停止日常维护，可随对应旧消费者退役 |
-| [mvp-0.3-catalog-engineering-20261003.md](../acceptance/mvp-0.3-catalog-engineering-20261003.md) | 历史验收/计划，停止日常维护，可随对应旧消费者退役 |
+| `mvp-0.2-resource-quality.md` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| `mvp-0.3-acceptance-plan.md` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| `mvp-0.3-catalog-engineering-20261003.md` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
 | [mvp-0.3-catalog-exit-20261003.md](../acceptance/mvp-0.3-catalog-exit-20261003.md) | 目录退出边界，保留；当前源码引用：scripts/verify_catalog_exit.py，移除前需处理 |
 | [mvp-0.3-catalog-human-signoff-20261003.json](../acceptance/mvp-0.3-catalog-human-signoff-20261003.json) | 正式目录课程签核来源，保留；当前源码引用：backend/tests/test_catalog_release_preflight.py；scripts/verify_catalog_exit.py，移除前需处理 |
 | [mvp-0.3-catalog-signed-handoff-20261003.md](../acceptance/mvp-0.3-catalog-signed-handoff-20261003.md) | 签核课程交接，保留 |
-| [mvp-0.3-clean-checkout-20261003.md](../acceptance/mvp-0.3-clean-checkout-20261003.md) | 历史验收/计划，停止日常维护，可随对应旧消费者退役 |
-| [mvp-0.3-pr-review-20261003.md](../acceptance/mvp-0.3-pr-review-20261003.md) | 历史验收/计划，停止日常维护，可随对应旧消费者退役 |
-| [mvp-0.3-t006-insertion.md](../acceptance/mvp-0.3-t006-insertion.md) | 历史验收/计划，停止日常维护，可随对应旧消费者退役 |
-| [mvp-0.3-t007-deletion.md](../acceptance/mvp-0.3-t007-deletion.md) | 历史验收/计划，停止日常维护，可随对应旧消费者退役 |
-| [mvp-0.3-t031-compose-recovery.md](../acceptance/mvp-0.3-t031-compose-recovery.md) | 历史验收/计划，停止日常维护，可随对应旧消费者退役 |
-| [mvp-0.3-t032-animation-performance.md](../acceptance/mvp-0.3-t032-animation-performance.md) | 历史验收/计划，停止日常维护，可随对应旧消费者退役 |
-| [phase-1-acceptance-plan.md](../acceptance/phase-1-acceptance-plan.md) | 历史验收/计划，停止日常维护，可随对应旧消费者退役 |
-| [phase-1-graph-plan-v1.md](../acceptance/phase-1-graph-plan-v1.md) | 历史验收/计划，停止日常维护，可随对应旧消费者退役 |
-| [phase-1-review-binding-offline-plan.md](../acceptance/phase-1-review-binding-offline-plan.md) | 历史验收/计划，停止日常维护，可随对应旧消费者退役 |
+| `mvp-0.3-clean-checkout-20261003.md` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| `mvp-0.3-pr-review-20261003.md` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| `mvp-0.3-t006-insertion.md` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| `mvp-0.3-t007-deletion.md` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| `mvp-0.3-t031-compose-recovery.md` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| `mvp-0.3-t032-animation-performance.md` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| `phase-1-acceptance-plan.md` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| `phase-1-graph-plan-v1.md` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
+| `phase-1-review-binding-offline-plan.md` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
 | [phase-1.5-head-goal-t108-r02-review.md](../acceptance/phase-1.5-head-goal-t108-r02-review.md) | 历史验收/计划，停止日常维护，可随对应旧消费者退役；当前源码引用：scripts/prepare_head_course_goal_grounded_package.py，移除前需处理 |
-| [phase-1.5-head-goal-t108-r03-review.md](../acceptance/phase-1.5-head-goal-t108-r03-review.md) | 历史验收/计划，停止日常维护，可随对应旧消费者退役 |
+| `phase-1.5-head-goal-t108-r03-review.md` | 已退役；[来源与恢复](../acceptance/ARCHIVE.md#t004-集中退役2026-11-16) |
 
-## 本次验证与交接
+## 验证与最终交接
 
-实际完成：逐项覆盖214目录及22非缓存顶层文件、分类数量核对、本文与导航链接检查、根账本检查和`git diff --check`。本次仅新增清单、导航和任务日志；没有移动或删除历史目录，没有运行业务回归、Provider或写应用数据。此前T002的9项检查仍只是T002验证，不冒称本次运行。
+T003只做用途盘点，未执行删除；当时覆盖236项、链接、原任务不变、账本和diff检查通过。
 
-下一步：新设计讨论使用上述精简入口；若继续物理清理，按F类连同专属消费者集中处置，E类仅在能保留有效回归时缩减。无需再次新建盘点报告或复制执行框架。
+T004实际执行：
+
+- 来源检查：`python3 scripts/manage_acceptance_archive.py check-source --index docs/maintenance/acceptance-retirement-trials-20261116.json`，434文件SHA-256通过。退役前逐文件对比Git原字节，无用户未提交内容混入。
+- 删除358个目录内资料文件、15个顶层历史文档、38个专属脚本和23个专属测试；共434个跟踪文件。另移除目标目录内2个可重建缓存。没有删除backend/web实现、后端测试、共享support模块或历史账本。
+- `PYTHONPATH=backend:. backend/.venv/bin/python -m pytest -q scripts/tests/test_archive_paths.py scripts/tests/test_p15_reference_artifact_v1.py scripts/tests/test_diagnose_head_course_t115.py scripts/tests/test_offline_c_fixture_manifest.py::test_reviewed_package_reproduces_original_bytes_and_retains_failures scripts/tests/test_p15_candidate_compatibility.py::test_readonly_check_has_no_key_dns_or_output --tb=short`：20 passed，0.76秒。验证恢复路径、共享投影、末尾LF边界、基础C夹具和保留兼容入口，不运行旧真实批次。
+- 直接调用`head_course_replay.mapping("C01")`及`mapping("C02")`：T107清单、来源和T104依赖装配均通过；不读密钥或私有库，不导入应用。
+- 同一恢复工具对`docs/acceptance/phase-1.5-data-model-t006/README.md`执行`restore`和`check`：通过；只恢复一份文件到忽略的local-materials目录，不全量复制历史。
+- `/tmp/edumind-cleanup-t004/verify.py`：434路径已退役；剩余跟踪源码/历史材料（排除导航、任务日志及H封存正文）的事前事后摘要一致；剩余源码/CI无已发现的退役目录、模块名和顶层文件引用。静态引用核对不声称证明任意动态路径；H正文未读取，未改动。
+- 本文、验收首页和恢复导航的本地链接，剩余154目录/7文件数量，根账本与`git diff --check`核对通过。旧冻结文档、历史PRD时间记录或任务快照里的退役路径按恢复索引解释，不改写历史原件。
+
+原用户的P1报告修改、provider问题文档删除、OpenMAIC参考目录均未处理或纳入提交。Provider调用、数据库写入、浏览器验收、全套回归和部署均0；旧通过结论不冒称本次运行。
+
+**本轮清理结束。** 余下66个候选作为依赖暂留，不再追加清理前置。下一步讨论T001课程结构、界面、动画和习题重设计；获得设计执行授权前不自动领取。后续替换相关功能时顺带收敛对应依赖，继续使用本文件和现有恢复工具，不新增一轮盘点框架。

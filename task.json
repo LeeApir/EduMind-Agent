@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "T003用途清单已交付；T001重设计仍待讨论。未自动授权删除其余材料、真实调用或实施。"
+    "phase_gate": "T004集中清理完成，本轮结束；复杂共享依赖暂留，不再追加清理前置。T001重设计待讨论，无Provider或实施授权。"
   },
   "archive_policy": {
     "active_source": "根task.json是唯一活动任务状态来源；docs/tasks均只读历史。",
@@ -115,6 +115,40 @@
         {
           "command": "逐项覆盖/重复项/导航链接/原任务不变核对；python3 scripts/check_catalog_workflow.py；git diff --check",
           "result": "通过：214目录+22非缓存文件分类完整；没有删除、业务回归或Provider调用。",
+          "evidence": "docs/maintenance/acceptance-retention-20261116.md"
+        }
+      ]
+    },
+    {
+      "id": "PHASE-2-T004",
+      "phase": "Phase 2",
+      "title": "集中退役旧验收试验与专属消费者",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-2-T003"
+      ],
+      "scope": [
+        "按T003候选清理确认可退役的目录、顶层历史报告和专属脚本/测试；复杂共享依赖暂留，不为清理重构。",
+        "复用恢复索引与工具，更新导航及最终留存说明；完成本轮即停止清理。"
+      ],
+      "prd_source": "用户清理指令；ADR0066；课程方向§5.4",
+      "acceptance_criteria": [
+        "退役文件与准确Git来源逐字节一致且可按索引恢复，不改历史结论。",
+        "保留运行代码、共享支持模块、基础夹具和现有后端回归；未留下已发现的活动导入/文件依赖断裂。",
+        "根账本、导航和最终数量同步，用户已有改动不进入本次提交。"
+      ],
+      "verification": [
+        "核对Git来源摘要、消费者引用及导入、保留材料摘要；按实际影响运行恢复和共享依赖定向检查。",
+        "核对导航/恢复链接、账本、diff和暂存范围；不运行Provider、数据库或全套回归。"
+      ],
+      "started_at": "2026-11-16T23:48:43",
+      "completed_at": "2026-11-16T23:54:08",
+      "commit_lookup": "Task-Completed: PHASE-2-T004",
+      "verification_results": [
+        {
+          "command": "434个Git来源摘要、恢复抽查、剩余引用/导入及保护摘要；20项定向pytest；T107两课映射；清单/导航/账本/diff核对",
+          "result": "通过。退役60目录、15顶层文档、38专属脚本和23专属测试；现存154目录+7文件；66复杂依赖候选暂留。本轮结束，Provider/应用写入0。",
           "evidence": "docs/maintenance/acceptance-retention-20261116.md"
         }
       ]

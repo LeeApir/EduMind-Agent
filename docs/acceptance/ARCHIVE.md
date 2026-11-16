@@ -2,6 +2,8 @@
 
 ## 退役批次导航
 
+- 2026-11-16 T004：集中退役60目录、15顶层文档及61个专属脚本/测试，共434文件；见本页末尾「T004 集中退役」。
+
 - 2026-11-16：T102 九个旧过程包与专属消费者，共66文件；见本页末尾「T102 旧路线退役」。
 - 2026-10-21：以下32包、346文件；原清单和恢复路径保持。
 
@@ -210,3 +212,17 @@ python3 scripts/manage_acceptance_archive.py check --index docs/maintenance/acce
 ```
 
 仅恢复到 Git 忽略的 `local-materials/acceptance-retired-t102-20261116/snapshot/`，不覆写工作源码、不执行历史脚本、不联网。浅克隆缺少准确来源对象时应明确报错，不自动拉取或使用替代版本。恢复脚本不提供恢复运行的授权。
+
+## T004 集中退役（2026-11-16）
+
+用户授权在T003清单基础上集中清理。本批退役60目录、15顶层历史文档、38个专属脚本及23个专属测试，共434文件、3,676,975字节。共享代码、后端回归、现存课程依赖、基础夹具和用户改动保留；66个复杂依赖候选本轮暂留，清理到此结束。
+
+准确来源提交：`787436a2c3a1b7806dada148c702374f771f536e`（当前仅本地存在，不依赖远程链接恢复）。[逐文件路径、摘要与暂留理由](../maintenance/acceptance-retirement-trials-20261116.json)；[实际处置及验证](../maintenance/acceptance-retention-20261116.md)。原件和失败保留在Git；历史文件中的旧相对链接按该提交解释。
+
+```bash
+python3 scripts/manage_acceptance_archive.py check-source --index docs/maintenance/acceptance-retirement-trials-20261116.json
+python3 scripts/manage_acceptance_archive.py restore --index docs/maintenance/acceptance-retirement-trials-20261116.json --path docs/acceptance/phase-1.5-data-model-t006/README.md
+python3 scripts/manage_acceptance_archive.py check --index docs/maintenance/acceptance-retirement-trials-20261116.json --path docs/acceptance/phase-1.5-data-model-t006/README.md
+```
+
+只恢复到Git忽略的`local-materials/acceptance-retired-trials-20261116/snapshot/`，不覆写现行源码、不执行旧脚本或调用Provider。省略`--path`可恢复本批全部文件；日常开发不要求恢复。恢复历史文件不等于授权重新运行历史试验。
