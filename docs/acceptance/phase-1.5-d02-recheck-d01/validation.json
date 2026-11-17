@@ -1,0 +1,48 @@
+{
+  "distinct_tests": 78,
+  "groups": [
+    {
+      "group": "unit",
+      "xml": "/tmp/edumind-d02-d01-unit.xml",
+      "xml_sha256": "a76a9c5c22a42356707b7e2ade36db526541649c5ca9e0e28d34fb87a90c00fe",
+      "tests": 77,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "group": "t020",
+      "xml": "/tmp/edumind-d02-d01-t020.xml",
+      "xml_sha256": "b232fd60880961a41d708f30b1a04deda4ee8ed5850d25e2cc5001dcaf213882",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "commands": [
+    "backend/.venv/bin/python -m pytest scripts/tests/test_p15_d02_gate_d01.py scripts/tests/test_p15_d02_recheck_d01.py scripts/tests/test_p15_full_diagnostic_r05.py scripts/tests/test_p15_full_r05_observation.py -q --junitxml=/tmp/edumind-d02-d01-unit.xml",
+    "python3 docs/acceptance/phase-1.5-d02-recheck-d01/run_pg_offline.py",
+    "backend/.venv/bin/python scripts/run_p15_d02_recheck_d01.py --check",
+    "backend/.venv/bin/python scripts/run_p15_d02_recheck_d01.py --step",
+    "backend/.venv/bin/ruff check scripts/isolated_diagnostics/p15_d02* scripts/run_p15_d02_recheck_d01.py scripts/tests/test_p15_d02* backend/tests/test_p15_d02_recheck_d01.py",
+    "python3 scripts/check_catalog_workflow.py",
+    "git diff --check"
+  ],
+  "manifest_sha256": "6a624547335704f4d0da489f71d7e02230adc8b554e57f390641def904bcef6a",
+  "frozen_files": 476,
+  "real_provider_requests": 0,
+  "check": "passed",
+  "pending_step": "expected exit 2 EXACT_D02_AND_NEW_WINDOW_APPROVAL_REQUIRED; no key/db/output/DNS",
+  "ruff": "passed",
+  "self_review": "completed; no independent reviewer claimed",
+  "container_final_state": "exited",
+  "warnings": [
+    "Existing Starlette anyio BlockingPortal deprecation in PG/Mock run"
+  ],
+  "initial_checks": [
+    "Initial lint import/format issues fixed; final lint passed.",
+    "Immediate pg_isready after starting container returned no response; verified accepting connections before any test ran. No PG test failures."
+  ],
+  "scope": "one D02-known synthetic course / two scenes; not full diagnostic"
+}

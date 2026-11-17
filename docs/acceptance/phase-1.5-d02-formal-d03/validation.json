@@ -1,0 +1,43 @@
+{
+  "distinct_tests": 70,
+  "groups": [
+    {
+      "group": "unit",
+      "xml": "/tmp/edumind-formal-d03-unit.xml",
+      "xml_sha256": "0d7bdf0b9bc7c855990eeb51260b089881972f9890a0694fcbd5848c2d97993b",
+      "tests": 68,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0
+    },
+    {
+      "group": "t020",
+      "xml": "/tmp/edumind-formal-d03-t020.xml",
+      "xml_sha256": "770ff6e64ef64fb5e30f27c179a0865f0af609ad9740fb079d7800dd17768029",
+      "tests": 2,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0
+    }
+  ],
+  "manifest_sha256": "c7b0d71dc98f4b1be53ea4578825f5f8dab9c1fa34cb359abada2791d594e6cc",
+  "frozen_files": 510,
+  "real_provider_requests": 0,
+  "container_final_state": "exited",
+  "pending_entry": "actual expected exit2 EXACT_D02_AND_NEW_WINDOW_APPROVAL_REQUIRED; no key/db/DNS/real output",
+  "planning_patch": "fc5cfc6; 181 offline/isolated PG checks passed",
+  "review_policy": "ADR0040 A-B unchanged; exact d03 scope extension still pending",
+  "self_review": "completed; no independent reviewer claimed",
+  "commands": [
+    "backend/.venv/bin/python -m pytest scripts/tests/test_p15_d02_formal_d03_gate.py scripts/tests/test_p15_d02_formal_d03.py scripts/tests/test_p15_review_turn_metadata.py scripts/tests/test_p15_full_r05_observation.py -q --junitxml=/tmp/edumind-formal-d03-unit.xml",
+    "python3 docs/acceptance/phase-1.5-d02-formal-d03/run_pg_offline.py",
+    "backend/.venv/bin/python scripts/run_p15_d02_formal_d03.py --check",
+    "backend/.venv/bin/python scripts/run_p15_d02_formal_d03.py --step (expected exit2 while pending)",
+    "Ruff on new formal scripts/tests/backend PG test",
+    "python3 scripts/check_catalog_workflow.py",
+    "git diff --check"
+  ],
+  "warnings": [
+    "Existing Starlette anyio BlockingPortal deprecation"
+  ]
+}

@@ -1,0 +1,251 @@
+{
+  "scope": "Synthetic arithmetic/design examples only, not real results or human labels",
+  "rates": [
+    {
+      "id": "quality-38-of-40",
+      "ok": 38,
+      "total": 40,
+      "minimum": 0.95,
+      "pass": true
+    },
+    {
+      "id": "quality-37-of-40",
+      "ok": 37,
+      "total": 40,
+      "minimum": 0.95,
+      "pass": false
+    },
+    {
+      "id": "schema-98-of-100",
+      "ok": 98,
+      "total": 100,
+      "minimum": 0.98,
+      "pass": true
+    },
+    {
+      "id": "schema-repair-does-not-erase",
+      "ok": 97,
+      "total": 100,
+      "minimum": 0.98,
+      "pass": false
+    },
+    {
+      "id": "pair-9-of-10",
+      "ok": 9,
+      "total": 10,
+      "minimum": 0.9,
+      "pass": true
+    },
+    {
+      "id": "pair-missing-one",
+      "ok": 8,
+      "total": 10,
+      "minimum": 0.9,
+      "pass": false
+    },
+    {
+      "id": "fact-99-of-100",
+      "ok": 99,
+      "total": 100,
+      "minimum": 0.99,
+      "pass": true
+    },
+    {
+      "id": "answer-one-wrong",
+      "ok": 99,
+      "total": 100,
+      "minimum": 1,
+      "pass": false
+    },
+    {
+      "id": "recall-18-of-20",
+      "ok": 18,
+      "total": 20,
+      "minimum": 0.9,
+      "pass": true
+    },
+    {
+      "id": "precision-18-of-21",
+      "ok": 18,
+      "total": 21,
+      "minimum": 0.9,
+      "pass": false
+    },
+    {
+      "id": "precision-no-opinions",
+      "ok": 0,
+      "total": 0,
+      "minimum": 0.9,
+      "pass": false
+    },
+    {
+      "id": "small-stratum-one-failure",
+      "ok": 3,
+      "total": 4,
+      "minimum": 0.95,
+      "pass": false
+    },
+    {
+      "id": "development-one-failure",
+      "ok": 11,
+      "total": 12,
+      "minimum": 0.95,
+      "pass": false
+    },
+    {
+      "id": "unrun-stays-in-denominator",
+      "ok": 37,
+      "total": 40,
+      "minimum": 0.95,
+      "pass": false
+    }
+  ],
+  "latencies": [
+    {
+      "id": "cold-one-failure",
+      "seconds": [
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        null
+      ],
+      "limit": 10,
+      "pass": true,
+      "p95": 10
+    },
+    {
+      "id": "cold-two-failures",
+      "seconds": [
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        null,
+        null
+      ],
+      "limit": 10,
+      "pass": false,
+      "p95": null
+    },
+    {
+      "id": "all-unrun",
+      "seconds": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "limit": 10,
+      "pass": false,
+      "p95": null
+    },
+    {
+      "id": "empty-not-passed",
+      "seconds": [],
+      "limit": 10,
+      "pass": false,
+      "p95": null
+    },
+    {
+      "id": "threshold-inclusive",
+      "seconds": [
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30
+      ],
+      "limit": 30,
+      "pass": true,
+      "p95": 30
+    }
+  ],
+  "decisions": [
+    {
+      "id": "natural-severe",
+      "observed": "natural_severe_error",
+      "expected": "stop"
+    },
+    {
+      "id": "unknown-send",
+      "observed": "unknown_send_outcome",
+      "expected": "stop"
+    },
+    {
+      "id": "security",
+      "observed": "security_boundary_violation",
+      "expected": "stop"
+    },
+    {
+      "id": "budget-clock",
+      "observed": "budget_or_clock_anomaly",
+      "expected": "stop"
+    },
+    {
+      "id": "exposed",
+      "observed": "independence_contamination",
+      "expected": "stop"
+    }
+  ]
+}

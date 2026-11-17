@@ -1,0 +1,78 @@
+import json,subprocess,os,time,hashlib
+from pathlib import Path
+from playwright.sync_api import sync_playwright
+ROOT=Path('/Users/apir/Code/EduMind_Agent');OUT=ROOT/'docs/acceptance/phase-1.5-head-goal-r03-recovery'
+evidence={'evaluator':'/root/head_goal_independent','new_provider_calls':0,'teaching_verdict':'needs_revision','steps':[]}
+def save(): (OUT/'independent-browser-learning.json').write_text(json.dumps(evidence,ensure_ascii=False,indent=2)+'\n')
+try:
+ with sync_playwright() as p:
+  browser=p.chromium.launch(headless=True)
+  context=browser.new_context(viewport={'width':1440,'height':1000})
+  page=context.new_page();responses=[]
+  def note(response):
+   if '/api/free-courses/' in response.url and response.request.method in ['GET','POST']:
+    entry={'url':response.url.split('127.0.0.1:5198')[-1],'method':response.request.method,'status':response.status}
+    if response.status==200:
+     try:entry['body']=response.json()
+     except Exception:pass
+    responses.append(entry)
+  page.on('response',note)
+  page.goto('http://127.0.0.1:5198/',wait_until='networkidle')
+  print('INITIAL',page.locator('body').inner_text()[:4500],flush=True)
+  print('INITIAL BUTTONS',page.get_by_role('button').all_text_contents(),flush=True)
+  owner=page.evaluate("async () => {const r=await fetch('/api/auth/session');if(!r.ok)throw Error('session:'+r.status);return (await r.json()).user.id}");evidence['owner']=owner
+  task_env=json.loads(Path('/tmp/edumind-t108/env.json').read_text())
+  result=subprocess.run([str(ROOT/'backend/.venv/bin/python'),str(ROOT/'scripts/import_head_course_recovery.py'),'--import-preview','--owner',owner],cwd=ROOT,env=task_env,capture_output=True,text=True)
+  if result.returncode: raise RuntimeError('Local preview import failed; exit='+str(result.returncode))
+  imported=json.loads(result.stdout.strip().splitlines()[-1]);evidence['local_import']=imported;print('IMPORTED',json.dumps(imported),flush=True)
+  page.get_by_role('button',name='重新读取',exact=True).click()
+  page.get_by_role('button',name='继续学习 →',exact=True).click()
+  page.locator('.head-replay-frame').wait_for()
+  print('BUTTONS',page.get_by_role('button').all_text_contents(),flush=True)
+  print('PREVIEW',page.locator('body').inner_text()[:3800],flush=True)
+  # UI reconnaissance printed above before deterministic interactions
+  warning=page.get_by_role('alert').filter(has_text='教学评估未通过').inner_text();evidence['warning']=warning
+  assert '字段初始化顺序' in warning and 'NULL 检查' in warning
+  txt=page.locator('body').inner_text();assert imported['candidate_digest'] in txt and '新增模型调用为 0' in txt
+  # All thirteen actual rendered frames and code highlights.
+  page.get_by_role('button',name='重置',exact=True).click();frames=[]
+  expected=[None,4,5,6,7,8,15,4,5,6,7,8,16]
+  for i,line in enumerate(expected):
+   frame=page.locator('.head-replay-frame');assert frame.get_attribute('data-frame')==f'f{i:02d}'
+   active=frame.locator('.active-code-line').get_attribute('data-line') if frame.locator('.active-code-line').count() else None
+   assert active==(str(line) if line else None)
+   scope='inactive' if '不在作用域' in frame.inner_text() else 'active';assert scope==('inactive' if i in [0,6,12] else 'active')
+   frames.append({'frame':f'f{i:02d}','highlight_line':line,'scope':scope,'note':frame.locator('.head-step-note').inner_text(),'visible_state':frame.locator('.head-nodes').inner_text()})
+   if i<12:page.get_by_role('button',name='下一步',exact=True).first.click()
+  evidence['frames']=frames
+  page.get_by_role('button',name='上一步',exact=True).first.click();assert page.locator('.head-replay-frame').get_attribute('data-frame')=='f11'
+  page.get_by_role('button',name='重置',exact=True).click();assert page.locator('.head-replay-frame').get_attribute('data-frame')=='f00'
+  page.get_by_role('button',name='播放',exact=True).click();page.wait_for_timeout(1450);page.get_by_role('button',name='暂停',exact=True).click();paused=page.locator('.head-replay-frame').get_attribute('data-frame');assert paused!='f00';page.wait_for_timeout(1100);assert page.locator('.head-replay-frame').get_attribute('data-frame')==paused;evidence['play_pause_stable_frame']=paused
+  exercise=page.get_by_role('region',name='随堂练习');assert exercise.locator('textarea').count()==4
+  for vals,label,percentage in [(['i1','[0]','[0]','0'],'wrong','0%'),(['i0','[11, 30, 40]','[\n30,40\n]','1'],'correct','100%')]:
+   if label=='correct': exercise.get_by_role('button',name='继续完善或新作答',exact=True).click()
+   for field,value in zip(exercise.locator('textarea').all(),vals):field.fill(value)
+   exercise.get_by_role('button',name='提交本次作答',exact=True).click()
+   exercise.get_by_text('与暂定参考的匹配比例：'+percentage,exact=True).wait_for()
+   evidence[label+'_feedback']=exercise.inner_text()
+  before=exercise.inner_text();evidence['before_refresh']=before
+  page.reload(wait_until='networkidle');page.locator('.head-replay-frame').wait_for();exercise=page.get_by_role('region',name='随堂练习');exercise.get_by_text('与暂定参考的匹配比例：100%',exact=True).wait_for();after=exercise.inner_text();evidence['after_refresh']=after;save();
+  import difflib
+  print('REFRESH_DIFF',''.join(difflib.unified_diff(before.splitlines(True),after.splitlines(True))),flush=True)
+  assert after==before.replace('继续完善或新作答\n','')
+  evidence['refresh_dom_difference']='Only button 继续完善或新作答 disappears; source initialize restores answers/history but locked flag is intentionally not persisted.'
+  scenes=[x['body'] for x in responses if isinstance(x.get('body'),dict) and 'blocks' in x['body']]
+  attempts=[x for x in responses if '/attempts/' in x['url'] and x['method']=='GET' and x['status']==200]
+  assert len(scenes)>=2 and scenes[0]==scenes[-1]
+  assert 'answer_key' not in json.dumps(scenes[-1]) and 'solution' not in json.dumps(scenes[-1])
+  assert len(attempts)>=3 and attempts[-2]['url']==attempts[-1]['url'] and attempts[-2]['body']==attempts[-1]['body']
+  assert sum(x['method']=='POST' and x['url'].endswith('/attempts') for x in responses)==2
+  evidence['scene_before_after_equal']=True;evidence['attempt_before_after_equal']=True;evidence['private_answers_hidden']=True
+  evidence['refresh_feedback_identical']=True
+  assert page.get_by_role('alert').filter(has_text='教学评估未通过').count()==1
+  evidence['responses']=responses
+  page.screenshot(path=str(ROOT/'data/screenshots/t108-r03-recovery-independent.png'),full_page=True)
+  evidence['screenshot']='data/screenshots/t108-r03-recovery-independent.png';evidence['interaction_verdict']='pass_private_review_preview_only';save();print('PASS independent preview interactions',flush=True)
+  browser.close()
+except Exception as e:
+ evidence['failure']={'class':type(e).__name__,'message':str(e)};save();raise

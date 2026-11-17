@@ -8,6 +8,7 @@ import {
   type ProbeResult, type ProviderType,
 } from "../api/providers";
 
+const props=withDefaults(defineProps<{embedded?:boolean;visible?:boolean}>(),{embedded:false,visible:true});
 defineEmits<{ close: [] }>();
 const connections = ref<Connection[]>([]);
 const selectedId = ref("");
@@ -49,6 +50,7 @@ function erase(): void { key.value = ""; temporaryKey.value = ""; clearSecret.va
 function resetConfirmation(): void { consent.value = false; tested.value = null; deleteConfirmed.value = false; }
 watch([() => form.provider_type, () => form.base_url, () => form.credential_mode], () => { erase(); resetConfirmation(); });
 watch(modelId, resetConfirmation);
+watch(()=>props.visible,value=>{if(!value){erase();resetConfirmation();}});
 
 async function load(): Promise<void> {
   if (busy.value) return;
@@ -153,7 +155,8 @@ onBeforeUnmount(() => { active = false; ++revision; erase(); resetConfirmation()
 </script>
 
 <template>
-  <main
+  <component
+    :is="embedded?'section':'main'"
     class="provider-desk"
     :aria-busy="busy"
   >
@@ -161,7 +164,9 @@ onBeforeUnmount(() => { active = false; ++revision; erase(); resetConfirmation()
       <div>
         <p class="provider-eyebrow">
           启智学伴 · 连接管理
-        </p><h1>模型设置</h1><p>先选择服务，再确认数据发往哪里。</p>
+        </p><component :is="embedded?'h2':'h1'">
+          连接与凭据
+        </component><p>先选择服务，再确认数据发往哪里。</p>
       </div>
       <button
         type="button"
@@ -419,7 +424,7 @@ onBeforeUnmount(() => { active = false; ++revision; erase(); resetConfirmation()
         </section>
       </section>
     </div>
-  </main>
+  </component>
 </template>
 
 <style scoped>

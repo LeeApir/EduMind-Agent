@@ -1,0 +1,59 @@
+{
+  "schema_version": "course-quality-evidence-policy-v1",
+  "status": "proposed",
+  "quality_sources": {
+    "hard_failure": "block_by_versioned_rule",
+    "student_feedback": "pending_not_confirmed",
+    "model_opinion": "pending_not_confirmed",
+    "semantic_confirmation": "trusted_local_maintainer_with_exact_evidence"
+  },
+  "attestation_authority": "trusted_local_maintainer",
+  "automatic_semantic_attestation": false,
+  "required_admission_gates": [
+    "accurate_visible_version",
+    "answer_attestation_active_before_first_complete",
+    "mapping_attestation_single_node_active_before_first_complete",
+    "all_questions_nonblank",
+    "first_complete_for_owner_and_assessment_digest",
+    "no_prior_help_or_solution",
+    "server_exact_text_score",
+    "dependencies_valid",
+    "no_prior_question_stem_completion_or_help"
+  ],
+  "source_dispatch": {
+    "legacy_null": "existing_policy_unchanged",
+    "free-course-v1": "requires_active_admission_and_absence_of_revocation",
+    "free-course-correction-v1": "audit_only_never_score",
+    "unknown_nonnull": "reject"
+  },
+  "scoring_rule": "quiz-exact-text-v1",
+  "mastery_rule": "mastery-v1",
+  "question_group_size": [
+    2,
+    4
+  ],
+  "answer_chars_max": 500,
+  "feedback_chars_max": 2000,
+  "mentor": {
+    "operation_kind": "tutor_turn",
+    "event_type": "tutor_ready",
+    "attempts": 1,
+    "seconds": 90,
+    "input_tokens": 16000,
+    "output_tokens": 2000,
+    "automatic_retries": 0,
+    "format_repairs": 0,
+    "history_turns": 2,
+    "upstream_scenes": 2,
+    "reply_chars_max": 6000,
+    "shared_course_attempts": 40,
+    "shared_course_input_tokens": 600000,
+    "shared_course_output_tokens": 144000,
+    "parallel_with_generation": false,
+    "help_exposure_scope": "current_scene_and_upstream_or_history_context_question_sets_including_unattempted",
+    "ready_reply_recheck": "invalidate_public_body_when_any_recorded_source_becomes_unavailable"
+  },
+  "actual_provider_requests_authorized": 0,
+  "revoke_policy": "append_revocation_replay_effective_history_same_transaction_no_score_subtraction_no_auto_regrant",
+  "legacy_question_stem_policy": "derive_from_original_exact_snapshot; missing_or_ambiguous_means_course_only"
+}

@@ -2,6 +2,10 @@
 
 本索引汇总已有批准记录，不新增批准。产品范围以 [PRD](../PRD.md) 为准；现行接口见 [OpenAPI](../api/openapi.yaml)，实现与限制摘要见 [架构说明](../ARCHITECTURE.md)。
 
+## 2026-11-09：后续阶段重排
+
+[ADR0056](0056-phase-2-learning-ui-and-phase-3-consolidation.md)记录用户确认的新 P2 三标签学习界面与 OpenMAIC 基础演示迁移，以及原 P2/P3 合并为新 P3。先完成 OM 迁移设计，具体技术契约尚未确定；当前 P1.5 任务、验收与授权保持，本次仅规划。
+
 ## 当前新提案：OM式生成与混合审核
 
 2026-10-15用户选择参照OM重构生成、保留自动审核，并将无法可靠判断的内容交人工。[ADR-0015](0015-shared-plan-and-hybrid-review.md) A–D及[准确附件](../acceptance/phase-1-om-redesign/proposal-manifest.json)已按本次用户要求补齐契约/兼容并获A–D批准：共享计划/三个场景/受约束动作，语义审核及人工路由，计划与案件持久化/维护CLI/原子发布/API状态，以及分层验收和仅新链路的诊断补充。T043只交付设计，T044–T054按依赖零调用实施；准确批准见[登记](0015-approval-20261015.json)，真实预算0、catalog_only保持，T040旧路线及历史失败不恢复。
@@ -59,11 +63,11 @@
 
 2026-10-15：[ADR-0013：逐条声明审核与确定性汇总](0013-claim-level-resource-review.md)为T040连续漏项后的Proposed设计稿，仅设计授权；声明提取/独立覆盖/逐条及整体检查/本地汇总均未实施，真实请求0。内部原型实施、动态子请求冻结规则补充与真实预算需分别决定；不改变ADR-0011、原失败/验收标签或catalog_only。
 
-2026-10-15 后续：用户“继续”授权并完成[零调用原型](../acceptance/phase-1-t040-claim-review-prototype/README.md)，只在scripts实验层使用合成tape；不代表ADR-0013真实派生/生产接入条款Accepted。61原型+148相关回归通过，真实Provider0，动态预算补充与质量门禁仍待决定。
+2026-10-15 后续：用户“继续”授权并完成[零调用原型](../acceptance/ARCHIVE.md#phase-1-t040-claim-review-prototype)，只在scripts实验层使用合成tape；不代表ADR-0013真实派生/生产接入条款Accepted。61原型+148相关回归通过，真实Provider0，动态预算补充与质量门禁仍待决定。
 
-2026-10-15：[ADR-0014：T040有界子请求冻结与预算](0014-bounded-derived-review-requests.md)为Proposed补充，A–D待批准；[准确提案清单](../acceptance/phase-1-t040-derived-budget-proposal/manifest.json)只绑定规则/基线供设计审阅。批准仅授予独立机制实现与零Provider测试；不授权247次理论调用、任何金额、正式质量/DSL/T041或生产开放，旧v1与旧台账不改。
+2026-10-15：[ADR-0014：T040有界子请求冻结与预算](0014-bounded-derived-review-requests.md)为Proposed补充，A–D待批准；[准确提案清单](../acceptance/ARCHIVE.md#phase-1-t040-derived-budget-proposal)只绑定规则/基线供设计审阅。批准仅授予独立机制实现与零Provider测试；不授权247次理论调用、任何金额、正式质量/DSL/T041或生产开放，旧v1与旧台账不改。
 
-2026-10-15 后续：用户“yes”批准ADR-0014 A–D及准确manifest，状态以[批准登记](0014-derived-budget-approval-20261015.json)为Accepted，原Proposed提案保留历史字节。[独立预算机制](../acceptance/phase-1-t040-derived-budget-kernel/README.md)完成零调用实现与269项离线验证；未接入真实HTTP/出站鉴权，真实请求及费用授权仍0，T040质量门禁继续blocked。
+2026-10-15 后续：用户“yes”批准ADR-0014 A–D及准确manifest，状态以[批准登记](0014-derived-budget-approval-20261015.json)为Accepted，原Proposed提案保留历史字节。[独立预算机制](../acceptance/ARCHIVE.md#phase-1-t040-derived-budget-kernel)完成零调用实现与269项离线验证；未接入真实HTTP/出站鉴权，真实请求及费用授权仍0，T040质量门禁继续blocked。
 
 2026-10-15 后续：完成[派生发送组合离线验证](../acceptance/phase-1-t040-derived-calibration-draft/README.md)，311项离线通过，补齐模型可复制的块/身份摘要；两例最多38次草案仍DRAFT_NOT_EXECUTABLE，Token/费用证明、真实审批/当前凭据同意和事实签核组合待补，真实Provider0，未新增架构或付费批准。
 
@@ -88,3 +92,19 @@
 2026-10-20：[ADR-0021：计划检查与受限纠错](0021-plan-check-and-bounded-repair.md)已按[批准记录](0021-approval-20261020.json)接受方案A与PC-01–05（T081–T085）。早期计划问题先终止交人工，空验证器不自动重建；20次/180秒共享预算。真实请求/H调优/方案B/T040解除不在授权内，逐项实施状态见活动账本。
 
 2026-10-21：[ADR-0022](0022-phase-1-contracted-closeout-and-phase-1-5.md)按用户明确五项指令Accepted：P1按收敛范围结束，T040／T041 blocked，T042按交接条件完成；最终账本原样归档、同一治理提交切换Phase 1.5，仅规划todo未启动。默认catalog_only/H封存，无新真实调用或模型试错，不追认旧质量／性能，见[交接](../acceptance/phase-1-closeout-20261021/README.md)。
+
+2026-10-21：[ADR-0023](0023-free-course-learning-and-ui-direction.md)记录用户确认的P1.5自由课程学习及界面重构方向（A—F）。学生可直接学习AI草稿，节点不再是新流程生成门禁；程序安全与掌握度证据边界保留。仅需求及设计文档同步，具体实现契约未冻结，不拆task、不开发、不开放运行。
+
+2026-10-23：[ADR-0028](0028-owner-record-index-and-mastery-provenance.md)为T031/T032缺失的持久记录索引与掌握度追溯提出2个owner只读GET，A—C及准确manifest待批准；新API未实现，不改变旧已批准附件、评分算法、权限、运行模式或真实预算。任务拆分T046–T048，活动状态以根账本为准。
+
+2026-10-27：[ADR-0033](0033-split-provider-course-diagnostic.md) A—C、E 按[准确批准登记](0033-approval-20261027.json)接受并完成隔离实施；[交接](../acceptance/phase-1.5-split-provider-implementation-r01/README.md)记录47项离线/PG-Mock通过、真实调用0。D真实输入/输出边界保留，T038仍blocked，250HTTP/USD20仅提案，未授权生产或付费执行。
+
+2026-10-27：[ADR-0034](0034-user-directed-unbounded-exploration.md)登记用户“不考虑上界与费用，先完成项目”的直接指令；新隔离实验不要求token/金额上界，保留请求数、时间、教学与真人检查，生产SendPolicy仍false，旧冻结材料不改。
+
+2026-10-27：[ADR-0035](0035-delegated-development-review.md)登记用户委托助手复核与T058修复后的新r02；旧3次+剩247次、共用原截止，助手事件与human来源隔离，非独立质量验收或生产开放。
+
+2026-10-27：[ADR-0036](0036-sol-known-difference-proposal.md)按用户保留sol方向准备窄兼容提案；准确37字符后缀/显式low与推理元数据/引用根v2，42项离线通过，无新增真实调用或生产接线，r02停止/T038 blocked保持。
+
+2026-10-27：ADR-0036窄兼容规则按用户“执行”限[一次纯合成p01](../acceptance/phase-1.5-sol-compatibility-once-p01/RESULTS.md)实际验证通过；1HTTP/正确引用/错误检出，对照无误报，非课程或独立质量准入，生产保持。
+
+2026-11-16：[ADR0066](0066-phase-1.5-contracted-closeout.md) Accepted，Phase 1.5 收敛归档；原质量和性能未通过，Phase 2 仅设计待办。

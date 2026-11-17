@@ -6,6 +6,7 @@ import { DATA_LABELS, ERROR_LABELS, PROFILES, listPreferences, resolveConfigurat
   type Category, type FallbackError, type Preference, type Profile, type Route } from "../api/modelPreferences";
 import PreferenceRouteEditor, { type RouteDraft } from "./PreferenceRouteEditor.vue";
 
+withDefaults(defineProps<{embedded?:boolean}>(),{embedded:false});
 defineEmits<{ close: [] }>();
 const connections = ref<Connection[]>([]);
 const preferences = ref<Preference[]>([]);
@@ -90,12 +91,17 @@ onBeforeUnmount(() => { active = false; accepted.value = false; });
 </script>
 
 <template>
-  <main
+  <component
+    :is="embedded?'section':'main'"
     class="preferences-desk"
     :aria-busy="busy"
   >
     <header class="preferences-heading">
-      <div><p>启智学伴 · 模型分工</p><h1>档位与数据去向</h1><p>为不同任务选择模型，逐一确认允许发送的数据。</p></div><button
+      <div>
+        <p>启智学伴 · 模型分工</p><component :is="embedded?'h2':'h1'">
+          档位与数据去向
+        </component><p>为不同任务选择模型，逐一确认允许发送的数据。</p>
+      </div><button
         type="button"
         @click="$emit('close')"
       >
@@ -241,7 +247,7 @@ onBeforeUnmount(() => { active = false; accepted.value = false; });
         </p>
       </article>
     </section>
-  </main>
+  </component>
 </template>
 
 <style>

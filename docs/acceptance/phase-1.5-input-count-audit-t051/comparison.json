@@ -1,0 +1,139 @@
+{
+  "task_id": "PHASE-1.5-T051",
+  "new_provider_http_requests": 0,
+  "raw_evidence": [
+    {
+      "role": "ledger_snapshot",
+      "path": "/tmp/edumind-p15-t038-r03/ledger.snapshot.sqlite",
+      "sha256": "481b3058adc907048458543c622c1af05596f39ef6b8aeeebf1464cc4e5b232c",
+      "bytes": 61440
+    },
+    {
+      "role": "request_body",
+      "path": "/tmp/edumind-p15-t038-r03/wire/4bb3a6839aa1430596bb81ccee791a39-request.json",
+      "sha256": "7f8e56421d98920c9603c61d842839c1bbdcaa2b10c7239a34032233a55af34f",
+      "bytes": 10208
+    },
+    {
+      "role": "count_response",
+      "path": "/tmp/edumind-p15-t038-r03/wire/4bb3a6839aa1430596bb81ccee791a39-count.json",
+      "sha256": "15e245710b28c6459ecd69c2563547965129ca8bc8da3f640da8a95213b2c898",
+      "bytes": 54
+    },
+    {
+      "role": "model_response",
+      "path": "/tmp/edumind-p15-t038-r03/wire/4bb3a6839aa1430596bb81ccee791a39-response.json",
+      "sha256": "1dff515365f96ee1b2c9ba21fc77cf1ca380e09195599c853793ed719f5b792e",
+      "bytes": 34439
+    },
+    {
+      "role": "stop_receipt",
+      "path": "/tmp/edumind-p15-t038-r03/wire/4bb3a6839aa1430596bb81ccee791a39-stopped.json",
+      "sha256": "d7480d104c5139d352746906a3e31fb57852a8e5158a0d907101062f4fe03e31",
+      "bytes": 89
+    },
+    {
+      "role": "projection_audit",
+      "path": "/tmp/edumind-p15-t038-r03/wire/6dbdb3dfae2c452fa855c37212bada63-projection.json",
+      "sha256": "240d2dcced893c65f2c618898d813b2f30ad4d779ff9812f5a3b06036ee10928",
+      "bytes": 7648
+    },
+    {
+      "role": "slot_output",
+      "path": "/tmp/edumind-p15-t038-r03/D01-known.json",
+      "sha256": "5a93189efbb1fb98e33574973838eac0f2ab782c0acc3606bcd8ceb0735546fb",
+      "bytes": 17132
+    }
+  ],
+  "request_comparison": {
+    "count_endpoint": "POST /v1/responses/input_tokens",
+    "generation_endpoint": "POST /v1/responses",
+    "body_sha256_both_reconstructed_from_frozen_transport": "7f8e56421d98920c9603c61d842839c1bbdcaa2b10c7239a34032233a55af34f",
+    "body_bytes": 10208,
+    "body_equality_evidence": "Single saved body + frozen content=request.content path; independently replayed with explicit MockTransport. No separate historical count-body capture or packet trace.",
+    "headers_equality_evidence": "Frozen code forwards headers/extensions unchanged. Historical header/IP/TLS captures were not saved; no credentials read or exported.",
+    "messages": [
+      {
+        "role": "system",
+        "characters": 1542,
+        "bytes": 1546,
+        "sha256": "50763e612f1f15ce5ad81ebee049e56e87038c1d9e5934726f5516d1e0af90d3"
+      },
+      {
+        "role": "system",
+        "characters": 4088,
+        "bytes": 4088,
+        "sha256": "79f023251546af45552156f6ee0d5e7c444f9e303bd33ca1269e8e29b1ffa193"
+      },
+      {
+        "role": "user",
+        "characters": 960,
+        "bytes": 1112,
+        "sha256": "afc8c0fd102119d0518a3026a1beeede12bf179835240f1b882273695e22f095"
+      }
+    ],
+    "request_has_top_level_instructions": false,
+    "request_has_previous_response_or_conversation": false,
+    "request_max_output_tokens": 8000,
+    "response_max_output_tokens": null,
+    "request_schema_equals_response_schema": true,
+    "request_strict": true,
+    "response_strict": true,
+    "response_format_extra_keys": [
+      "description"
+    ]
+  },
+  "instructions_echo": {
+    "expected_joined_system": {
+      "characters": 5632,
+      "bytes": 5636,
+      "sha256": "726b5618cae3c1144e6889e655c4fd6af635c15f8602bcc7bf6951e4dbc892e6"
+    },
+    "response": {
+      "characters": 26968,
+      "bytes": 26984,
+      "sha256": "b03a7f82aa11ff086a420f967370f396fbe0b73b7df0d2e4584bc3329ea50dc5"
+    },
+    "expected_is_exact_prefix": true,
+    "unrequested_suffix": {
+      "characters": 21336,
+      "bytes": 21348,
+      "sha256": "405163336914c9b2b4342e94a5f53acab1ca31f491a9fea8d3755de4c1159225"
+    },
+    "suffix_classification": "Coding-agent identity, workspace collaboration and commentary instructions, not course-planning input; response-claimed text only, not independently verified model context."
+  },
+  "reported_accounting": {
+    "preflight_input_tokens": 1677,
+    "generation_input_tokens": 6507,
+    "input_delta": 4830,
+    "output_tokens": 480,
+    "reasoning_tokens": 0,
+    "cached_tokens": 0,
+    "request_field_attribution": {
+      "instructions": 5725,
+      "text.format": 456
+    },
+    "item_attribution": [
+      324,
+      2
+    ],
+    "attribution_sum": 6507,
+    "attribution_is_provider_report_only": true,
+    "delta_exactly_attributable_to_suffix": false,
+    "verified_model_settlement": null,
+    "actual_relay_fee": null
+  },
+  "proposed_offline_findings": [
+    "INPUT_COUNT_MISMATCH",
+    "INSTRUCTIONS_ECHO_DIFFERENT_OR_UNVERIFIED",
+    "OUTPUT_LIMIT_ECHO_DIFFERENT_OR_UNVERIFIED"
+  ],
+  "gate_judgment": {
+    "r03_stop_was_required": true,
+    "equality_is_universal_budget_bound_proof": false,
+    "equality_is_sufficient_context_integrity_proof": false,
+    "relaxation_justified_by_available_evidence": false,
+    "production_gate_changed": false,
+    "real_probe_required_for_this_audit": false
+  }
+}

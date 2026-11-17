@@ -1,0 +1,14 @@
+from pathlib import Path
+import asyncio,json
+from uuid import UUID
+from scripts import head_course_goal as entry
+from app.services.free_course_snapshots import SnapshotRepository
+async def seed(db):
+ repo=SnapshotRepository(db,UUID("0b1b71df-9b00-470e-abc4-ae41aeb20cf9"))
+ result=await repo.create_course("T110普通调度预算检查（零调用夹具）",key="t110-ordinary-budget-projection",config={"prompt_version":"free-course-plan-v2"})
+ op=await repo._operation(UUID(result["course_id"]),UUID(result["operation_id"]))
+ op.state,op.reason_code="failed","TEST_ONLY"
+ return dict(**result,fixture=True,provider_calls=0)
+result=asyncio.run(entry.database(seed))
+Path("/tmp/edumind-t110/ordinary-created.json").write_text(json.dumps(result)+"\n")
+print(json.dumps(result))

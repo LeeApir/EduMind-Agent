@@ -1,0 +1,54 @@
+{
+  "candidate_digest": "63323703659f109f164752680e95ca20870cda31dbe720f63aa32d7dcc05b3dd",
+  "parent_digest": null,
+  "verdict": "stop",
+  "independent_evaluator": "/root/head_goal_independent",
+  "planning_basis_binding": {
+    "basis_digest": "dbfa7a38e73cf8cb36df518485019556bce56a23fc7d25dd1f18fbe0f3a28899",
+    "example_basis_digest": "0360ade8fa9999d6bd2d2b5d8994c135c622ffbc0b4d4d0311ee281bdf9b6882",
+    "materials_digest": "9aeb6bcf2208528af1d5ed7c8b9906b47fdb8a5fa8247e7798eceed62a0e9012",
+    "selected_example": "head-new-B",
+    "version": "head-planning-example-basis-v1"
+  },
+  "evaluated_at": "2026-11-05T08:39:58+08:00",
+  "blocking_findings": [
+    {
+      "id": "S01",
+      "area": "teaching_scope",
+      "path": [
+        "failure_scope"
+      ],
+      "quote": "只通过 allocation_success 条件掩码演示“不分配”的分支",
+      "issue": "当前两次掩码均true、13帧全成功，仅代码静态含不分配分支。原文却称本课演示该分支，且只明确排除真实malloc失败动画，未明确掩码分支也未演示。将代码支持能力和已交付演示混同，至少造成失败路径范围声明不清，不能签范围/内容一致。",
+      "repairable": false,
+      "blocking": true,
+      "stop_reason": "failure_scope不可修改；禁止借允许段落或summary覆盖此句"
+    },
+    {
+      "id": "C01",
+      "area": "citation",
+      "path": [
+        "paragraphs",
+        5
+      ],
+      "quote": "如果调用者写成 insert(caller_head, value, 1) 而丢弃返回值，函数内部照样完成了分配和连接，新节点也确实指向了旧首节点，但 caller_head 这个变量从未被更新，仍然指向原来的首节点。于是从 caller_head 出发只能看到旧链表，新分配的节点虽然存在、却没有任何从入口可达的指针指向它，成为不可达节点。这不是分配失败，而是返回值被丢弃造成的入口未更新。",
+      "issue": "该段论丢弃返回值后的状态，fact_ids却仅列正常接收路径caller已为t0/t1的trace_step_05/10与主流程分配失败数0。忽略返回的结论虽可用planning_basis.ignore_return及代码独立手算核对，但所列fact_ids未逐项支撑这个反事实分支；不满足本批明确的逐项引用支持签署要求。",
+      "repairable": true,
+      "blocking": true,
+      "teaching_responsibility": "对比丢弃返回值与分配失败，说明caller保持旧入口、新分配节点不可达；使用准确同版证据且不引入迁移题答案"
+    }
+  ],
+  "checks": {
+    "full_lesson": false,
+    "fact_citations": false,
+    "paragraph_responsibilities": true,
+    "no_neighbour_copy": true,
+    "no_omitted_explanation": false,
+    "code_trace_answers": true,
+    "no_answer_hints": true
+  },
+  "teaching_pass": false,
+  "repair_allowed": false,
+  "new_provider_calls_by_evaluator": 0,
+  "scope": "complete_first_draft_static_review; no_browser_or_published_course_pass"
+}

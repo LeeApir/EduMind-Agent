@@ -34,6 +34,8 @@ def profile_behavior_gateway_factory() -> Callable[[], StructuredProfileGateway]
 
 def learning_evidence_summary(record: LearningEvidence) -> dict[str, object] | None:
     """Never forward raw answers, question text, hint text, or prior profile fields."""
+    if record.source_protocol is not None:
+        return None  # Free-course derived state comes from effective mastery, never a model update.
     summary: dict[str, object] = {
         "event_type": record.evidence_type,
         "knowledge_node_id": record.knowledge_node_id,

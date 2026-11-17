@@ -16,11 +16,15 @@
 | MVP 0.1 | 已结束 | [mvp-0.1.json](mvp-0.1.json) |
 | MVP 0.2 | 已结束，38项完成 | [mvp-0.2.json](mvp-0.2.json) |
 | MVP 0.3 | 课程目录版退出，45 done、T033 blocked | [mvp-0.3.json](mvp-0.3.json) |
-| Phase 1 | 已细化42项，初始全部todo | [根task.json](../../task.json) |
-| Phase 2/3 | 保留PRD目标，未拆任务 | [PRD路线图](../PRD.md) |
+| Phase 1 | 收敛结束，89 done、2 blocked | [phase-1.json](phase-1.json) |
+| Phase 1.5 | 收敛结束，141 done、13 blocked、4 todo | [phase-1.5.json](phase-1.5.json) |
+| Phase 2 | 当前活动阶段，仅 T001 todo，设计待讨论 | [根task.json](../../task.json) |
+| Phase 3 | 保留PRD目标，未启动 | [PRD路线图](../PRD.md) |
 
 MVP 0.2快照与收尾提交 `f7cacc2` 中的根账本相同。MVP 0.3快照与提交 `30fcd4e1f9384359a72b451bb40243a2095691cf` 中的根账本逐字节相同，SHA256：`0edbd007af6313235f94caaa536b8d60c4084f1472cfdaee9e0a2a41c3791a4f`。完整46任务、原T033状态/结果/阻塞原因/完成标记均未改写。
 
 课程目录版退出依据[ADR-0007](../ADR/0007-curated-course-catalog.md)和[退出报告](../acceptance/mvp-0.3-catalog-exit-20261003.md)。原动态质量/性能未通过的事实不因归档解除；历史Provider累计2033/2500不自动成为Phase 1预算。
 
 Phase 1采用`PHASE-1-T001`起的独立编号和依赖图，从范围与验收冻结开始。Provider/BYOK、持久化队列、DSL与约30节点图谱是本阶段核心；新ADR和动态恢复门禁按[PRD §0.1](../PRD.md)执行。教学正文首token P95≤2秒仍是单列的非阻塞遗留优化。此次仅规划，无任务领取或功能实施。
+
+2026-11-16：按 [ADR0066](../ADR/0066-phase-1.5-contracted-closeout.md) 归档 Phase 1.5。归档保留未执行的 todo，不要求伪造完成；本页较早的 Phase 1 规划描述为历史记录。最终旧根与归档 SHA-256：`fbd54c2ef856de6c25d090a55f917ddc4473fb0eff31c177245116e8e5291dc9`。

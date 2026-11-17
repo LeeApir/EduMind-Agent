@@ -1,0 +1,31 @@
+{
+  "plan_digest": "bcd627a2010322abd0d27d1342c6546ff46f3d0b9232e2a602629784941bc61f",
+  "verdict": "stop_planning_consistency",
+  "independent_evaluator": "/root/head_goal_independent",
+  "assessed_at": "2026-11-04T09:27:23+08:00",
+  "model_plan_modified": false,
+  "teaching_generation_allowed": false,
+  "findings": [
+    {
+      "path": [
+        "scenes",
+        0,
+        "purpose"
+      ],
+      "area": "scope_and_code_consistency",
+      "quote": "new_node->next = head; head = new_node;",
+      "reason": "该计划未区分函数局部head与调用者。固定示例函数不执行head=p，而以return p和调用者caller_head=insert更新入口；按此语句逐步呈现会混入未提供的操作/作用域解释。"
+    },
+    {
+      "path": [
+        "objectives",
+        1,
+        "description"
+      ],
+      "area": "return_value_consequence",
+      "quote": "调用者不接收返回值会丢失链表入口",
+      "reason": "本例初始链表非空，忽略返回值仍保留caller_head指向i0；新分配节点不可从该入口到达，不等于原链表入口消失。该表述未限定新头/新前缀，与关键目标的准确范围不一致。"
+    }
+  ],
+  "required_disposition": "Stop this batch, invalidate unused requests; no planning repair or teaching overwrite under approved package."
+}

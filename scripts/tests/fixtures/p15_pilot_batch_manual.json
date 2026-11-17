@@ -1,0 +1,1775 @@
+{
+  "version": "p15-pilot-batch-manual-v1",
+  "synthetic_only": true,
+  "author": {
+    "identity": "pilot_independent_evaluator",
+    "type": "assistant",
+    "human": false
+  },
+  "authored_after_user_authorization": "d82cb8e T071 limited offline task approved by user",
+  "derivation": "All event orders, epochs, expected states and rejection reasons were manually specified from the approved lifecycle. No Reducer, engine, provider, simulator or execution was used to generate expectations. Helpers only serialize fixed event dictionaries and repeated placeholder SHA strings.",
+  "context": {
+    "started_epoch": 1000,
+    "deadline_epoch": 11800,
+    "request_limit": 90,
+    "package_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "grant_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "order": [
+      {
+        "slot_id": "manual-head",
+        "arm": "B",
+        "kind": "supported"
+      },
+      {
+        "slot_id": "manual-head",
+        "arm": "C",
+        "kind": "supported"
+      }
+    ]
+  },
+  "hash_placeholders": {
+    "package": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "grant": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "b_gen_req": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    "b_review_req": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+    "c_plan_req": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "c_content_req": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+    "c_review_req": "0000000000000000000000000000000000000000000000000000000000000000",
+    "b_gen_reply": "1111111111111111111111111111111111111111111111111111111111111111",
+    "b_review_reply": "2222222222222222222222222222222222222222222222222222222222222222",
+    "c_plan_reply": "3333333333333333333333333333333333333333333333333333333333333333",
+    "c_content_reply": "4444444444444444444444444444444444444444444444444444444444444444",
+    "c_review_reply": "5555555555555555555555555555555555555555555555555555555555555555",
+    "status": "6666666666666666666666666666666666666666666666666666666666666666",
+    "b_result": "abababababababababababababababababababababababababababababababab",
+    "c_result": "cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd",
+    "b_stop_result": "efefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefef"
+  },
+  "event_pool": {
+    "start": {
+      "kind": "started",
+      "epoch": 1000,
+      "payload": {
+        "package_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "grant_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "status": "active",
+        "position": 0,
+        "started_epoch": 1000,
+        "deadline_epoch": 11800,
+        "order": [
+          {
+            "slot_id": "manual-head",
+            "arm": "B",
+            "kind": "supported"
+          },
+          {
+            "slot_id": "manual-head",
+            "arm": "C",
+            "kind": "supported"
+          }
+        ],
+        "pending": null
+      }
+    },
+    "b_gen_reserved": {
+      "kind": "reserved",
+      "epoch": 1010,
+      "payload": {
+        "ticket": "call-000",
+        "slot_id": "manual-head",
+        "arm": "B",
+        "stage": "pilot_baseline",
+        "request_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+      }
+    },
+    "b_gen_target": {
+      "kind": "target_pinned",
+      "epoch": 1011,
+      "payload": {
+        "ticket": "call-000",
+        "hostname": "api.deepseek.com",
+        "addresses": [
+          "8.8.8.8"
+        ]
+      }
+    },
+    "b_gen_transport": {
+      "kind": "transport_kind",
+      "epoch": 1012,
+      "payload": {
+        "ticket": "call-000",
+        "kind": "mock"
+      }
+    },
+    "b_gen_sent": {
+      "kind": "sent",
+      "epoch": 1013,
+      "payload": {
+        "ticket": "call-000"
+      }
+    },
+    "b_gen_wire": {
+      "kind": "wire_observed",
+      "epoch": 1014,
+      "payload": {
+        "ticket": "call-000",
+        "response_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+        "status_sha256": "6666666666666666666666666666666666666666666666666666666666666666"
+      }
+    },
+    "b_gen_settled": {
+      "kind": "settled",
+      "epoch": 1015,
+      "payload": {
+        "ticket": "call-000",
+        "response_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+        "observation": {
+          "policy": "pilot-responses-wire-v1",
+          "instruction_echo": "recognized",
+          "known_suffix_observed": false,
+          "instruction_delivery_verified": false,
+          "upstream_context_verified": false,
+          "summary_quarantined": false,
+          "opaque_turn_metadata_quarantined": false,
+          "opaque_identity_verified": false,
+          "actual_invoice_verified": false,
+          "reported_input_tokens": 10,
+          "reported_total_output_tokens": 20
+        }
+      }
+    },
+    "b_review_reserved": {
+      "kind": "reserved",
+      "epoch": 1020,
+      "payload": {
+        "ticket": "call-001",
+        "slot_id": "manual-head",
+        "arm": "B",
+        "stage": "pilot_review",
+        "request_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+      }
+    },
+    "b_review_target": {
+      "kind": "target_pinned",
+      "epoch": 1021,
+      "payload": {
+        "ticket": "call-001",
+        "hostname": "aiapi.world",
+        "addresses": [
+          "8.8.8.8"
+        ]
+      }
+    },
+    "b_review_transport": {
+      "kind": "transport_kind",
+      "epoch": 1022,
+      "payload": {
+        "ticket": "call-001",
+        "kind": "mock"
+      }
+    },
+    "b_review_sent": {
+      "kind": "sent",
+      "epoch": 1023,
+      "payload": {
+        "ticket": "call-001"
+      }
+    },
+    "b_review_wire": {
+      "kind": "wire_observed",
+      "epoch": 1024,
+      "payload": {
+        "ticket": "call-001",
+        "response_sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+        "status_sha256": "6666666666666666666666666666666666666666666666666666666666666666"
+      }
+    },
+    "b_review_settled": {
+      "kind": "settled",
+      "epoch": 1025,
+      "payload": {
+        "ticket": "call-001",
+        "response_sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+        "observation": {
+          "policy": "pilot-responses-wire-v1",
+          "instruction_echo": "recognized",
+          "known_suffix_observed": false,
+          "instruction_delivery_verified": false,
+          "upstream_context_verified": false,
+          "summary_quarantined": false,
+          "opaque_turn_metadata_quarantined": false,
+          "opaque_identity_verified": false,
+          "actual_invoice_verified": false,
+          "reported_input_tokens": 10,
+          "reported_total_output_tokens": 20
+        }
+      }
+    },
+    "b_result": {
+      "kind": "slot_result",
+      "epoch": 1030,
+      "payload": {
+        "slot_id": "manual-head",
+        "arm": "B",
+        "kind": "supported",
+        "name": "slot-00-B-result.json",
+        "result_sha256": "abababababababababababababababababababababababababababababababab",
+        "state": "model_advisory_pending_assistant"
+      }
+    },
+    "b_accept": {
+      "kind": "assistant_review",
+      "epoch": 1040,
+      "payload": {
+        "version": "pilot-slot-review-v1",
+        "reviewer": "pilot_independent_evaluator",
+        "reviewer_type": "assistant",
+        "package_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "slot_id": "manual-head",
+        "arm": "B",
+        "result_sha256": "abababababababababababababababababababababababababababababababab",
+        "decision": "accept",
+        "checks": {
+          "facts": true,
+          "answers": true,
+          "code": true,
+          "actions": true,
+          "teaching": true
+        },
+        "issues": [],
+        "version_reviews": [
+          {
+            "revision": 0,
+            "checks": {
+              "facts": true,
+              "answers": true,
+              "code": true,
+              "actions": true,
+              "teaching": true
+            },
+            "issues": []
+          }
+        ],
+        "evidence_ref": "MANUAL_FIXTURE_ONLY_NO_COURSE_OR_AUTHORITY"
+      }
+    },
+    "c_plan_reserved": {
+      "kind": "reserved",
+      "epoch": 1050,
+      "payload": {
+        "ticket": "call-002",
+        "slot_id": "manual-head",
+        "arm": "C",
+        "stage": "pilot_plan",
+        "request_sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+      }
+    },
+    "c_plan_target": {
+      "kind": "target_pinned",
+      "epoch": 1051,
+      "payload": {
+        "ticket": "call-002",
+        "hostname": "api.deepseek.com",
+        "addresses": [
+          "8.8.8.8"
+        ]
+      }
+    },
+    "c_plan_transport": {
+      "kind": "transport_kind",
+      "epoch": 1052,
+      "payload": {
+        "ticket": "call-002",
+        "kind": "mock"
+      }
+    },
+    "c_plan_sent": {
+      "kind": "sent",
+      "epoch": 1053,
+      "payload": {
+        "ticket": "call-002"
+      }
+    },
+    "c_plan_wire": {
+      "kind": "wire_observed",
+      "epoch": 1054,
+      "payload": {
+        "ticket": "call-002",
+        "response_sha256": "3333333333333333333333333333333333333333333333333333333333333333",
+        "status_sha256": "6666666666666666666666666666666666666666666666666666666666666666"
+      }
+    },
+    "c_plan_settled": {
+      "kind": "settled",
+      "epoch": 1055,
+      "payload": {
+        "ticket": "call-002",
+        "response_sha256": "3333333333333333333333333333333333333333333333333333333333333333",
+        "observation": {
+          "policy": "pilot-responses-wire-v1",
+          "instruction_echo": "recognized",
+          "known_suffix_observed": false,
+          "instruction_delivery_verified": false,
+          "upstream_context_verified": false,
+          "summary_quarantined": false,
+          "opaque_turn_metadata_quarantined": false,
+          "opaque_identity_verified": false,
+          "actual_invoice_verified": false,
+          "reported_input_tokens": 10,
+          "reported_total_output_tokens": 20
+        }
+      }
+    },
+    "c_content_reserved": {
+      "kind": "reserved",
+      "epoch": 1060,
+      "payload": {
+        "ticket": "call-003",
+        "slot_id": "manual-head",
+        "arm": "C",
+        "stage": "pilot_content",
+        "request_sha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+      }
+    },
+    "c_content_target": {
+      "kind": "target_pinned",
+      "epoch": 1061,
+      "payload": {
+        "ticket": "call-003",
+        "hostname": "api.deepseek.com",
+        "addresses": [
+          "8.8.8.8"
+        ]
+      }
+    },
+    "c_content_transport": {
+      "kind": "transport_kind",
+      "epoch": 1062,
+      "payload": {
+        "ticket": "call-003",
+        "kind": "mock"
+      }
+    },
+    "c_content_sent": {
+      "kind": "sent",
+      "epoch": 1063,
+      "payload": {
+        "ticket": "call-003"
+      }
+    },
+    "c_content_wire": {
+      "kind": "wire_observed",
+      "epoch": 1064,
+      "payload": {
+        "ticket": "call-003",
+        "response_sha256": "4444444444444444444444444444444444444444444444444444444444444444",
+        "status_sha256": "6666666666666666666666666666666666666666666666666666666666666666"
+      }
+    },
+    "c_content_settled": {
+      "kind": "settled",
+      "epoch": 1065,
+      "payload": {
+        "ticket": "call-003",
+        "response_sha256": "4444444444444444444444444444444444444444444444444444444444444444",
+        "observation": {
+          "policy": "pilot-responses-wire-v1",
+          "instruction_echo": "recognized",
+          "known_suffix_observed": false,
+          "instruction_delivery_verified": false,
+          "upstream_context_verified": false,
+          "summary_quarantined": false,
+          "opaque_turn_metadata_quarantined": false,
+          "opaque_identity_verified": false,
+          "actual_invoice_verified": false,
+          "reported_input_tokens": 10,
+          "reported_total_output_tokens": 20
+        }
+      }
+    },
+    "c_review_reserved": {
+      "kind": "reserved",
+      "epoch": 1070,
+      "payload": {
+        "ticket": "call-004",
+        "slot_id": "manual-head",
+        "arm": "C",
+        "stage": "pilot_review",
+        "request_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    },
+    "c_review_target": {
+      "kind": "target_pinned",
+      "epoch": 1071,
+      "payload": {
+        "ticket": "call-004",
+        "hostname": "aiapi.world",
+        "addresses": [
+          "8.8.8.8"
+        ]
+      }
+    },
+    "c_review_transport": {
+      "kind": "transport_kind",
+      "epoch": 1072,
+      "payload": {
+        "ticket": "call-004",
+        "kind": "mock"
+      }
+    },
+    "c_review_sent": {
+      "kind": "sent",
+      "epoch": 1073,
+      "payload": {
+        "ticket": "call-004"
+      }
+    },
+    "c_review_wire": {
+      "kind": "wire_observed",
+      "epoch": 1074,
+      "payload": {
+        "ticket": "call-004",
+        "response_sha256": "5555555555555555555555555555555555555555555555555555555555555555",
+        "status_sha256": "6666666666666666666666666666666666666666666666666666666666666666"
+      }
+    },
+    "c_review_settled": {
+      "kind": "settled",
+      "epoch": 1075,
+      "payload": {
+        "ticket": "call-004",
+        "response_sha256": "5555555555555555555555555555555555555555555555555555555555555555",
+        "observation": {
+          "policy": "pilot-responses-wire-v1",
+          "instruction_echo": "recognized",
+          "known_suffix_observed": false,
+          "instruction_delivery_verified": false,
+          "upstream_context_verified": false,
+          "summary_quarantined": false,
+          "opaque_turn_metadata_quarantined": false,
+          "opaque_identity_verified": false,
+          "actual_invoice_verified": false,
+          "reported_input_tokens": 10,
+          "reported_total_output_tokens": 20
+        }
+      }
+    },
+    "c_result": {
+      "kind": "slot_result",
+      "epoch": 1080,
+      "payload": {
+        "slot_id": "manual-head",
+        "arm": "C",
+        "kind": "supported",
+        "name": "slot-01-C-result.json",
+        "result_sha256": "cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd",
+        "state": "model_advisory_pending_assistant"
+      }
+    },
+    "c_accept": {
+      "kind": "assistant_review",
+      "epoch": 1090,
+      "payload": {
+        "version": "pilot-slot-review-v1",
+        "reviewer": "pilot_independent_evaluator",
+        "reviewer_type": "assistant",
+        "package_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "slot_id": "manual-head",
+        "arm": "C",
+        "result_sha256": "cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd",
+        "decision": "accept",
+        "checks": {
+          "facts": true,
+          "answers": true,
+          "code": true,
+          "actions": true,
+          "teaching": true
+        },
+        "issues": [],
+        "version_reviews": [
+          {
+            "revision": 0,
+            "checks": {
+              "facts": true,
+              "answers": true,
+              "code": true,
+              "actions": true,
+              "teaching": true
+            },
+            "issues": []
+          }
+        ],
+        "evidence_ref": "MANUAL_FIXTURE_ONLY_NO_COURSE_OR_AUTHORITY"
+      }
+    },
+    "b_independent_stop": {
+      "kind": "assistant_review",
+      "epoch": 1040,
+      "payload": {
+        "version": "pilot-slot-review-v1",
+        "reviewer": "pilot_independent_evaluator",
+        "reviewer_type": "assistant",
+        "package_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "slot_id": "manual-head",
+        "arm": "B",
+        "result_sha256": "abababababababababababababababababababababababababababababababab",
+        "decision": "stop",
+        "checks": {
+          "facts": true,
+          "answers": true,
+          "code": true,
+          "actions": true,
+          "teaching": true
+        },
+        "issues": [],
+        "version_reviews": [
+          {
+            "revision": 0,
+            "checks": {
+              "facts": true,
+              "answers": true,
+              "code": true,
+              "actions": true,
+              "teaching": true
+            },
+            "issues": []
+          }
+        ],
+        "evidence_ref": "MANUAL_FIXTURE_ONLY_INDEPENDENT_STOP_DECISION_NOT_AUTHORITY"
+      }
+    },
+    "confirm_independent_stop": {
+      "kind": "stopped",
+      "epoch": 1041,
+      "payload": {
+        "reason": "INDEPENDENT_ASSISTANT_STOP"
+      }
+    },
+    "transport_stop": {
+      "kind": "stopped",
+      "epoch": 1014,
+      "payload": {
+        "reason": "WIRE_UNKNOWN_OR_FAILURE"
+      }
+    },
+    "reserved_stop": {
+      "kind": "stopped",
+      "epoch": 1011,
+      "payload": {
+        "reason": "LOCAL_OR_PROVIDER_STOP"
+      }
+    },
+    "late_wire": {
+      "kind": "wire_observed",
+      "epoch": 11805,
+      "payload": {
+        "ticket": "call-000",
+        "response_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+        "status_sha256": "6666666666666666666666666666666666666666666666666666666666666666"
+      }
+    },
+    "wire_after_stop_in_window": {
+      "kind": "wire_observed",
+      "epoch": 1015,
+      "payload": {
+        "ticket": "call-000",
+        "response_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+        "status_sha256": "6666666666666666666666666666666666666666666666666666666666666666"
+      }
+    },
+    "window_stop": {
+      "kind": "stopped",
+      "epoch": 11800,
+      "payload": {
+        "reason": "BATCH_WINDOW"
+      }
+    },
+    "late_b_result": {
+      "kind": "late_slot_result",
+      "epoch": 11801,
+      "payload": {
+        "slot_id": "manual-head",
+        "arm": "B",
+        "kind": "supported",
+        "name": "slot-00-B-result.json",
+        "result_sha256": "abababababababababababababababababababababababababababababababab",
+        "state": "model_advisory_pending_assistant"
+      }
+    },
+    "b_workflow_stopped_result": {
+      "kind": "slot_result",
+      "epoch": 1030,
+      "payload": {
+        "slot_id": "manual-head",
+        "arm": "B",
+        "kind": "supported",
+        "name": "slot-00-B-result.json",
+        "result_sha256": "efefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefef",
+        "state": "stopped"
+      }
+    },
+    "confirm_workflow_stop": {
+      "kind": "stopped",
+      "epoch": 1031,
+      "payload": {
+        "reason": "REVIEW_UNKNOWN"
+      }
+    },
+    "bad_c_reserve_before_accept": {
+      "kind": "reserved",
+      "epoch": 1031,
+      "payload": {
+        "ticket": "call-002",
+        "slot_id": "manual-head",
+        "arm": "C",
+        "stage": "pilot_plan",
+        "request_sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+      }
+    },
+    "bad_c_reserve_after_stop": {
+      "kind": "reserved",
+      "epoch": 1042,
+      "payload": {
+        "ticket": "call-002",
+        "slot_id": "manual-head",
+        "arm": "C",
+        "stage": "pilot_plan",
+        "request_sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+      }
+    },
+    "bad_c_cross_slot_reserve": {
+      "kind": "reserved",
+      "epoch": 1010,
+      "payload": {
+        "ticket": "call-000",
+        "slot_id": "manual-head",
+        "arm": "C",
+        "stage": "pilot_plan",
+        "request_sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+      }
+    },
+    "bad_other_slot_reserve": {
+      "kind": "reserved",
+      "epoch": 1010,
+      "payload": {
+        "ticket": "call-000",
+        "slot_id": "different-head",
+        "arm": "B",
+        "stage": "pilot_baseline",
+        "request_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+      }
+    },
+    "bad_duplicate_settle": {
+      "kind": "settled",
+      "epoch": 1016,
+      "payload": {
+        "ticket": "call-000",
+        "response_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+        "observation": {
+          "policy": "pilot-responses-wire-v1",
+          "instruction_echo": "recognized",
+          "known_suffix_observed": false,
+          "instruction_delivery_verified": false,
+          "upstream_context_verified": false,
+          "summary_quarantined": false,
+          "opaque_turn_metadata_quarantined": false,
+          "opaque_identity_verified": false,
+          "actual_invoice_verified": false,
+          "reported_input_tokens": 10,
+          "reported_total_output_tokens": 20
+        }
+      }
+    },
+    "bad_reserve_before_window": {
+      "kind": "reserved",
+      "epoch": 999,
+      "payload": {
+        "ticket": "call-000",
+        "slot_id": "manual-head",
+        "arm": "B",
+        "stage": "pilot_baseline",
+        "request_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+      }
+    },
+    "bad_reserve_at_deadline": {
+      "kind": "reserved",
+      "epoch": 11800,
+      "payload": {
+        "ticket": "call-000",
+        "slot_id": "manual-head",
+        "arm": "B",
+        "stage": "pilot_baseline",
+        "request_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+      }
+    },
+    "bad_sent_at_deadline": {
+      "kind": "sent",
+      "epoch": 11800,
+      "payload": {
+        "ticket": "call-000"
+      }
+    },
+    "bad_settle_at_deadline": {
+      "kind": "settled",
+      "epoch": 11800,
+      "payload": {
+        "ticket": "call-000",
+        "response_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+        "observation": {
+          "policy": "pilot-responses-wire-v1",
+          "instruction_echo": "recognized",
+          "known_suffix_observed": false,
+          "instruction_delivery_verified": false,
+          "upstream_context_verified": false,
+          "summary_quarantined": false,
+          "opaque_turn_metadata_quarantined": false,
+          "opaque_identity_verified": false,
+          "actual_invoice_verified": false,
+          "reported_input_tokens": 10,
+          "reported_total_output_tokens": 20
+        }
+      }
+    },
+    "bad_accept_at_deadline": {
+      "kind": "assistant_review",
+      "epoch": 11800,
+      "payload": {
+        "version": "pilot-slot-review-v1",
+        "reviewer": "pilot_independent_evaluator",
+        "reviewer_type": "assistant",
+        "package_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "slot_id": "manual-head",
+        "arm": "B",
+        "result_sha256": "abababababababababababababababababababababababababababababababab",
+        "decision": "accept",
+        "checks": {
+          "facts": true,
+          "answers": true,
+          "code": true,
+          "actions": true,
+          "teaching": true
+        },
+        "issues": [],
+        "version_reviews": [
+          {
+            "revision": 0,
+            "checks": {
+              "facts": true,
+              "answers": true,
+              "code": true,
+              "actions": true,
+              "teaching": true
+            },
+            "issues": []
+          }
+        ],
+        "evidence_ref": "MANUAL_FIXTURE_ONLY_NO_COURSE_OR_AUTHORITY"
+      }
+    },
+    "bad_sent_before_window": {
+      "kind": "sent",
+      "epoch": 999,
+      "payload": {
+        "ticket": "call-000"
+      }
+    },
+    "bad_settle_before_window": {
+      "kind": "settled",
+      "epoch": 999,
+      "payload": {
+        "ticket": "call-000",
+        "response_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+        "observation": {
+          "policy": "pilot-responses-wire-v1",
+          "instruction_echo": "recognized",
+          "known_suffix_observed": false,
+          "instruction_delivery_verified": false,
+          "upstream_context_verified": false,
+          "summary_quarantined": false,
+          "opaque_turn_metadata_quarantined": false,
+          "opaque_identity_verified": false,
+          "actual_invoice_verified": false,
+          "reported_input_tokens": 10,
+          "reported_total_output_tokens": 20
+        }
+      }
+    },
+    "bad_accept_before_window": {
+      "kind": "assistant_review",
+      "epoch": 999,
+      "payload": {
+        "version": "pilot-slot-review-v1",
+        "reviewer": "pilot_independent_evaluator",
+        "reviewer_type": "assistant",
+        "package_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "slot_id": "manual-head",
+        "arm": "B",
+        "result_sha256": "abababababababababababababababababababababababababababababababab",
+        "decision": "accept",
+        "checks": {
+          "facts": true,
+          "answers": true,
+          "code": true,
+          "actions": true,
+          "teaching": true
+        },
+        "issues": [],
+        "version_reviews": [
+          {
+            "revision": 0,
+            "checks": {
+              "facts": true,
+              "answers": true,
+              "code": true,
+              "actions": true,
+              "teaching": true
+            },
+            "issues": []
+          }
+        ],
+        "evidence_ref": "MANUAL_FIXTURE_ONLY_NO_COURSE_OR_AUTHORITY"
+      }
+    },
+    "bad_c_result_without_checkpoint": {
+      "kind": "slot_result",
+      "epoch": 1031,
+      "payload": {
+        "slot_id": "manual-head",
+        "arm": "C",
+        "kind": "supported",
+        "name": "slot-01-C-result.json",
+        "result_sha256": "cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd",
+        "state": "model_advisory_pending_assistant"
+      }
+    },
+    "bad_report_result_binding": {
+      "kind": "assistant_review",
+      "epoch": 1040,
+      "payload": {
+        "version": "pilot-slot-review-v1",
+        "reviewer": "pilot_independent_evaluator",
+        "reviewer_type": "assistant",
+        "package_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "slot_id": "manual-head",
+        "arm": "B",
+        "result_sha256": "cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd",
+        "decision": "accept",
+        "checks": {
+          "facts": true,
+          "answers": true,
+          "code": true,
+          "actions": true,
+          "teaching": true
+        },
+        "issues": [],
+        "version_reviews": [
+          {
+            "revision": 0,
+            "checks": {
+              "facts": true,
+              "answers": true,
+              "code": true,
+              "actions": true,
+              "teaching": true
+            },
+            "issues": []
+          }
+        ],
+        "evidence_ref": "MANUAL_FIXTURE_WRONG_RESULT_NOT_AUTHORITY"
+      }
+    },
+    "bad_report_arm_binding": {
+      "kind": "assistant_review",
+      "epoch": 1040,
+      "payload": {
+        "version": "pilot-slot-review-v1",
+        "reviewer": "pilot_independent_evaluator",
+        "reviewer_type": "assistant",
+        "package_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "slot_id": "manual-head",
+        "arm": "C",
+        "result_sha256": "abababababababababababababababababababababababababababababababab",
+        "decision": "accept",
+        "checks": {
+          "facts": true,
+          "answers": true,
+          "code": true,
+          "actions": true,
+          "teaching": true
+        },
+        "issues": [],
+        "version_reviews": [
+          {
+            "revision": 0,
+            "checks": {
+              "facts": true,
+              "answers": true,
+              "code": true,
+              "actions": true,
+              "teaching": true
+            },
+            "issues": []
+          }
+        ],
+        "evidence_ref": "MANUAL_FIXTURE_WRONG_ARM_NOT_AUTHORITY"
+      }
+    },
+    "bad_request_after_transport_stop": {
+      "kind": "reserved",
+      "epoch": 1015,
+      "payload": {
+        "ticket": "call-001",
+        "slot_id": "manual-head",
+        "arm": "B",
+        "stage": "pilot_review",
+        "request_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+      }
+    },
+    "bad_send_after_stop": {
+      "kind": "sent",
+      "epoch": 1012,
+      "payload": {
+        "ticket": "call-000"
+      }
+    },
+    "bad_settle_after_stop": {
+      "kind": "settled",
+      "epoch": 1016,
+      "payload": {
+        "ticket": "call-000",
+        "response_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+        "observation": {
+          "policy": "pilot-responses-wire-v1",
+          "instruction_echo": "recognized",
+          "known_suffix_observed": false,
+          "instruction_delivery_verified": false,
+          "upstream_context_verified": false,
+          "summary_quarantined": false,
+          "opaque_turn_metadata_quarantined": false,
+          "opaque_identity_verified": false,
+          "actual_invoice_verified": false,
+          "reported_input_tokens": 10,
+          "reported_total_output_tokens": 20
+        }
+      }
+    },
+    "bad_accept_after_stop": {
+      "kind": "assistant_review",
+      "epoch": 1042,
+      "payload": {
+        "version": "pilot-slot-review-v1",
+        "reviewer": "pilot_independent_evaluator",
+        "reviewer_type": "assistant",
+        "package_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "slot_id": "manual-head",
+        "arm": "B",
+        "result_sha256": "abababababababababababababababababababababababababababababababab",
+        "decision": "accept",
+        "checks": {
+          "facts": true,
+          "answers": true,
+          "code": true,
+          "actions": true,
+          "teaching": true
+        },
+        "issues": [],
+        "version_reviews": [
+          {
+            "revision": 0,
+            "checks": {
+              "facts": true,
+              "answers": true,
+              "code": true,
+              "actions": true,
+              "teaching": true
+            },
+            "issues": []
+          }
+        ],
+        "evidence_ref": "MANUAL_FIXTURE_ONLY_NO_COURSE_OR_AUTHORITY"
+      }
+    },
+    "bad_c_reserve_after_workflow_stop": {
+      "kind": "reserved",
+      "epoch": 1032,
+      "payload": {
+        "ticket": "call-002",
+        "slot_id": "manual-head",
+        "arm": "C",
+        "stage": "pilot_plan",
+        "request_sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+      }
+    },
+    "bad_early_late_slot_result": {
+      "kind": "late_slot_result",
+      "epoch": 1030,
+      "payload": {
+        "slot_id": "manual-head",
+        "arm": "B",
+        "kind": "supported",
+        "name": "slot-00-B-result.json",
+        "result_sha256": "abababababababababababababababababababababababababababababababab",
+        "state": "model_advisory_pending_assistant"
+      }
+    },
+    "bad_ordinary_slot_at_deadline": {
+      "kind": "slot_result",
+      "epoch": 11800,
+      "payload": {
+        "slot_id": "manual-head",
+        "arm": "B",
+        "kind": "supported",
+        "name": "slot-00-B-result.json",
+        "result_sha256": "abababababababababababababababababababababababababababababababab",
+        "state": "model_advisory_pending_assistant"
+      }
+    },
+    "bad_late_other_arm_result": {
+      "kind": "late_slot_result",
+      "epoch": 11801,
+      "payload": {
+        "slot_id": "manual-head",
+        "arm": "C",
+        "kind": "supported",
+        "name": "slot-01-C-result.json",
+        "result_sha256": "cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd",
+        "state": "model_advisory_pending_assistant"
+      }
+    },
+    "bad_sent_time_regression": {
+      "kind": "sent",
+      "epoch": 1011,
+      "payload": {
+        "ticket": "call-000"
+      }
+    },
+    "bad_duplicate_sent": {
+      "kind": "sent",
+      "epoch": 1014,
+      "payload": {
+        "ticket": "call-000"
+      }
+    },
+    "bad_settle_without_sent": {
+      "kind": "settled",
+      "epoch": 1013,
+      "payload": {
+        "ticket": "call-000",
+        "response_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+        "observation": {
+          "policy": "pilot-responses-wire-v1",
+          "instruction_echo": "recognized",
+          "known_suffix_observed": false,
+          "instruction_delivery_verified": false,
+          "upstream_context_verified": false,
+          "summary_quarantined": false,
+          "opaque_turn_metadata_quarantined": false,
+          "opaque_identity_verified": false,
+          "actual_invoice_verified": false,
+          "reported_input_tokens": 10,
+          "reported_total_output_tokens": 20
+        }
+      }
+    },
+    "bad_unbound_late_wire": {
+      "kind": "wire_observed",
+      "epoch": 11805,
+      "payload": {
+        "ticket": "call-099",
+        "response_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+        "status_sha256": "6666666666666666666666666666666666666666666666666666666666666666"
+      }
+    },
+    "second_start": {
+      "kind": "started",
+      "epoch": 1020,
+      "payload": {
+        "package_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "grant_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "status": "active",
+        "position": 0,
+        "started_epoch": 1000,
+        "deadline_epoch": 11800,
+        "order": [
+          {
+            "slot_id": "manual-head",
+            "arm": "B",
+            "kind": "supported"
+          },
+          {
+            "slot_id": "manual-head",
+            "arm": "C",
+            "kind": "supported"
+          }
+        ],
+        "pending": null
+      }
+    },
+    "b_gen_sent_equal_epoch": {
+      "kind": "sent",
+      "epoch": 1012,
+      "payload": {
+        "ticket": "call-000"
+      }
+    },
+    "b_gen_reserved_at_start": {
+      "kind": "reserved",
+      "epoch": 1000,
+      "payload": {
+        "ticket": "call-000",
+        "slot_id": "manual-head",
+        "arm": "B",
+        "stage": "pilot_baseline",
+        "request_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+      }
+    }
+  },
+  "prefixes": {
+    "empty": [],
+    "started": [
+      "start"
+    ],
+    "b_reserved": [
+      "start",
+      "b_gen_reserved"
+    ],
+    "b_before_send": [
+      "start",
+      "b_gen_reserved",
+      "b_gen_target",
+      "b_gen_transport"
+    ],
+    "b_sent": [
+      "start",
+      "b_gen_reserved",
+      "b_gen_target",
+      "b_gen_transport",
+      "b_gen_sent"
+    ],
+    "b_observed": [
+      "start",
+      "b_gen_reserved",
+      "b_gen_target",
+      "b_gen_transport",
+      "b_gen_sent",
+      "b_gen_wire"
+    ],
+    "b_gen_complete": [
+      "start",
+      "b_gen_reserved",
+      "b_gen_target",
+      "b_gen_transport",
+      "b_gen_sent",
+      "b_gen_wire",
+      "b_gen_settled"
+    ],
+    "b_calls_complete": [
+      "start",
+      "b_gen_reserved",
+      "b_gen_target",
+      "b_gen_transport",
+      "b_gen_sent",
+      "b_gen_wire",
+      "b_gen_settled",
+      "b_review_reserved",
+      "b_review_target",
+      "b_review_transport",
+      "b_review_sent",
+      "b_review_wire",
+      "b_review_settled"
+    ],
+    "b_pending": [
+      "start",
+      "b_gen_reserved",
+      "b_gen_target",
+      "b_gen_transport",
+      "b_gen_sent",
+      "b_gen_wire",
+      "b_gen_settled",
+      "b_review_reserved",
+      "b_review_target",
+      "b_review_transport",
+      "b_review_sent",
+      "b_review_wire",
+      "b_review_settled",
+      "b_result"
+    ],
+    "b_accepted": [
+      "start",
+      "b_gen_reserved",
+      "b_gen_target",
+      "b_gen_transport",
+      "b_gen_sent",
+      "b_gen_wire",
+      "b_gen_settled",
+      "b_review_reserved",
+      "b_review_target",
+      "b_review_transport",
+      "b_review_sent",
+      "b_review_wire",
+      "b_review_settled",
+      "b_result",
+      "b_accept"
+    ]
+  },
+  "cases": [
+    {
+      "id": "ok_normal_b_accept_c",
+      "prefix": "b_accepted",
+      "append": [
+        "c_plan_reserved",
+        "c_plan_target",
+        "c_plan_transport",
+        "c_plan_sent",
+        "c_plan_wire",
+        "c_plan_settled",
+        "c_content_reserved",
+        "c_content_target",
+        "c_content_transport",
+        "c_content_sent",
+        "c_content_wire",
+        "c_content_settled",
+        "c_review_reserved",
+        "c_review_target",
+        "c_review_transport",
+        "c_review_sent",
+        "c_review_wire",
+        "c_review_settled",
+        "c_result",
+        "c_accept"
+      ],
+      "expected": {
+        "accept": true,
+        "status": "collected",
+        "position": 2,
+        "pending": null,
+        "reserved_calls": 5,
+        "trusted_settlements": 5,
+        "independent_accepts": 2,
+        "call_states": {
+          "call-000": "complete",
+          "call-001": "complete",
+          "call-002": "complete",
+          "call-003": "complete",
+          "call-004": "complete"
+        }
+      },
+      "reason": "Both arm-slots complete within the single fixed window. B exact-result accept precedes C reservation; C accept completes the order."
+    },
+    {
+      "id": "ok_b_must_pause",
+      "prefix": "b_pending",
+      "append": [],
+      "expected": {
+        "accept": true,
+        "status": "awaiting_assistant",
+        "position": 0,
+        "pending": {
+          "slot_id": "manual-head",
+          "arm": "B",
+          "kind": "supported",
+          "name": "slot-00-B-result.json",
+          "result_sha256": "abababababababababababababababababababababababababababababababab"
+        },
+        "reserved_calls": 2,
+        "trusted_settlements": 2,
+        "independent_accepts": 0
+      },
+      "reason": "A model advisory pass records the exact pending result but does not advance."
+    },
+    {
+      "id": "ok_independent_stop_is_terminal",
+      "prefix": "b_pending",
+      "append": [
+        "b_independent_stop",
+        "confirm_independent_stop"
+      ],
+      "expected": {
+        "accept": true,
+        "status": "stopped",
+        "position": 0,
+        "reserved_calls": 2,
+        "trusted_settlements": 2,
+        "independent_accepts": 0
+      },
+      "reason": "The independent stop decision is terminal. Retaining historical pending metadata is allowed but cannot authorize advancement."
+    },
+    {
+      "id": "ok_stopped_late_wire_observation",
+      "prefix": "b_sent",
+      "append": [
+        "transport_stop",
+        "late_wire"
+      ],
+      "expected": {
+        "accept": true,
+        "status": "stopped",
+        "position": 0,
+        "reserved_calls": 1,
+        "trusted_settlements": 0,
+        "independent_accepts": 0,
+        "call_states": {
+          "call-000": "unknown"
+        }
+      },
+      "reason": "A known already-sent request may receive raw late observation after stop/deadline; the request remains unknown and there is no trusted settlement or advancement."
+    },
+    {
+      "id": "ok_workflow_stop_is_terminal",
+      "prefix": "b_calls_complete",
+      "append": [
+        "b_workflow_stopped_result",
+        "confirm_workflow_stop"
+      ],
+      "expected": {
+        "accept": true,
+        "status": "stopped",
+        "position": 0,
+        "reserved_calls": 2,
+        "trusted_settlements": 2,
+        "independent_accepts": 0
+      },
+      "reason": "Workflow stopped result ends the batch; the following stopped receipt confirms the same terminal state rather than reactivating it."
+    },
+    {
+      "id": "ok_late_existing_candidate_observation",
+      "prefix": "b_calls_complete",
+      "append": [
+        "window_stop",
+        "late_b_result"
+      ],
+      "expected": {
+        "accept": true,
+        "status": "stopped",
+        "position": 0,
+        "reserved_calls": 2,
+        "trusted_settlements": 2,
+        "independent_accepts": 0,
+        "late_slot_observations": 1
+      },
+      "reason": "The two calls already completed before expiry. late_slot_result only preserves the existing candidate after expiry; no assistant checkpoint is opened and no success/advance is counted."
+    },
+    {
+      "id": "ok_equal_receipt_epochs",
+      "prefix": "b_before_send",
+      "append": [
+        "b_gen_sent_equal_epoch",
+        "b_gen_wire",
+        "b_gen_settled"
+      ],
+      "expected": {
+        "accept": true,
+        "status": "active",
+        "position": 0,
+        "reserved_calls": 1,
+        "trusted_settlements": 1,
+        "independent_accepts": 0,
+        "call_states": {
+          "call-000": "complete"
+        }
+      },
+      "reason": "Time is nondecreasing, not strictly increasing: two receipts may share the same wall-clock epoch."
+    },
+    {
+      "id": "ok_reserve_at_inclusive_start",
+      "prefix": "started",
+      "append": [
+        "b_gen_reserved_at_start"
+      ],
+      "expected": {
+        "accept": true,
+        "status": "active",
+        "position": 0,
+        "reserved_calls": 1,
+        "trusted_settlements": 0,
+        "independent_accepts": 0,
+        "call_states": {
+          "call-000": "reserved"
+        }
+      },
+      "reason": "The exact start epoch is included in [start,deadline)."
+    },
+    {
+      "id": "reject_next_arm_before_accept",
+      "prefix": "b_pending",
+      "append": [
+        "bad_c_reserve_before_accept"
+      ],
+      "expected": {
+        "accept": false,
+        "reject_at": "bad_c_reserve_before_accept"
+      },
+      "reason": "The batch is awaiting B independent acceptance, so C cannot reserve or dispatch."
+    },
+    {
+      "id": "reject_next_arm_after_independent_stop",
+      "prefix": "b_pending",
+      "append": [
+        "b_independent_stop",
+        "confirm_independent_stop",
+        "bad_c_reserve_after_stop"
+      ],
+      "expected": {
+        "accept": false,
+        "reject_at": "bad_c_reserve_after_stop"
+      },
+      "reason": "Independent stop is irreversible, even though the attempted C reservation is within the time window."
+    },
+    {
+      "id": "reject_cross_arm_at_start",
+      "prefix": "started",
+      "append": [
+        "bad_c_cross_slot_reserve"
+      ],
+      "expected": {
+        "accept": false,
+        "reject_at": "bad_c_cross_slot_reserve"
+      },
+      "reason": "Current order starts at B; C is not the current arm-slot."
+    },
+    {
+      "id": "reject_unknown_slot",
+      "prefix": "started",
+      "append": [
+        "bad_other_slot_reserve"
+      ],
+      "expected": {
+        "accept": false,
+        "reject_at": "bad_other_slot_reserve"
+      },
+      "reason": "A different slot identity cannot substitute for the frozen current slot."
+    },
+    {
+      "id": "reject_duplicate_trusted_settlement",
+      "prefix": "b_gen_complete",
+      "append": [
+        "bad_duplicate_settle"
+      ],
+      "expected": {
+        "accept": false,
+        "reject_at": "bad_duplicate_settle"
+      },
+      "reason": "An already completed ticket cannot settle twice."
+    },
+    {
+      "id": "reject_reserve_before_window",
+      "prefix": "started",
+      "append": [
+        "bad_reserve_before_window"
+      ],
+      "expected": {
+        "accept": false,
+        "reject_at": "bad_reserve_before_window"
+      },
+      "reason": "Reservation before start is forbidden; this also contradicts nondecreasing receipt order."
+    },
+    {
+      "id": "reject_reserve_at_deadline",
+      "prefix": "started",
+      "append": [
+        "bad_reserve_at_deadline"
+      ],
+      "expected": {
+        "accept": false,
+        "reject_at": "bad_reserve_at_deadline"
+      },
+      "reason": "The deadline endpoint is excluded for reservation."
+    },
+    {
+      "id": "reject_sent_at_deadline",
+      "prefix": "b_before_send",
+      "append": [
+        "bad_sent_at_deadline"
+      ],
+      "expected": {
+        "accept": false,
+        "reject_at": "bad_sent_at_deadline"
+      },
+      "reason": "A reservation made earlier cannot authorize dispatch at or after deadline."
+    },
+    {
+      "id": "reject_settle_at_deadline",
+      "prefix": "b_observed",
+      "append": [
+        "bad_settle_at_deadline"
+      ],
+      "expected": {
+        "accept": false,
+        "reject_at": "bad_settle_at_deadline"
+      },
+      "reason": "A reply may be retained late, but trusted settlement at deadline is forbidden."
+    },
+    {
+      "id": "reject_accept_at_deadline",
+      "prefix": "b_pending",
+      "append": [
+        "bad_accept_at_deadline"
+      ],
+      "expected": {
+        "accept": false,
+        "reject_at": "bad_accept_at_deadline"
+      },
+      "reason": "Assistant waiting consumes the same fixed window; acceptance cannot advance at deadline."
+    },
+    {
+      "id": "reject_sent_before_window",
+      "prefix": "b_before_send",
+      "append": [
+        "bad_sent_before_window"
+      ],
+      "expected": {
+        "accept": false,
+        "reject_at": "bad_sent_before_window"
+      },
+      "reason": "Dispatch before start is forbidden and cannot be explained by a valid earlier reservation."
+    },
+    {
+      "id": "reject_settle_before_window",
+      "prefix": "b_observed",
+      "append": [
+        "bad_settle_before_window"
+      ],
+      "expected": {
+        "accept": false,
+        "reject_at": "bad_settle_before_window"
+      },
+      "reason": "Trusted settlement before start is forbidden and time cannot run backwards."
+    },
+    {
+      "id": "reject_accept_before_window",
+      "prefix": "b_pending",
+      "append": [
+        "bad_accept_before_window"
+      ],
+      "expected": {
+        "accept": false,
+        "reject_at": "bad_accept_before_window"
+      },
+      "reason": "Acceptance before start is forbidden and cannot precede its result in receipt time."
+    },
+    {
+      "id": "reject_missing_checkpoint_before_next_result",
+      "prefix": "b_pending",
+      "append": [
+        "bad_c_result_without_checkpoint"
+      ],
+      "expected": {
+        "accept": false,
+        "reject_at": "bad_c_result_without_checkpoint"
+      },
+      "reason": "A C result cannot replace the pending B checkpoint or advance without its exact independent acceptance."
+    },
+    {
+      "id": "reject_report_wrong_result",
+      "prefix": "b_pending",
+      "append": [
+        "bad_report_result_binding"
+      ],
+      "expected": {
+        "accept": false,
+        "reject_at": "bad_report_result_binding"
+      },
+      "reason": "Acceptance must bind the exact pending result SHA, not a different valid-looking SHA."
+    },
+    {
+      "id": "reject_report_wrong_arm",
+      "prefix": "b_pending",
+      "append": [
+        "bad_report_arm_binding"
+      ],
+      "expected": {
+        "accept": false,
+        "reject_at": "bad_report_arm_binding"
+      },
+      "reason": "An independent report for C cannot satisfy B pending acceptance."
+    },
+    {
+      "id": "reject_new_request_after_transport_stop",
+      "prefix": "b_sent",
+      "append": [
+        "transport_stop",
+        "bad_request_after_transport_stop"
+      ],
+      "expected": {
+        "accept": false,
+        "reject_at": "bad_request_after_transport_stop"
+      },
+      "reason": "The unknown request remains counted and the stopped batch cannot reserve another request."
+    },
+    {
+      "id": "reject_dispatch_after_stop",
+      "prefix": "b_reserved",
+      "append": [
+        "reserved_stop",
+        "bad_send_after_stop"
+      ],
+      "expected": {
+        "accept": false,
+        "reject_at": "bad_send_after_stop"
+      },
+      "reason": "An existing unsent reservation does not grant permission to dispatch after stop."
+    },
+    {
+      "id": "reject_settle_after_stop_in_window",
+      "prefix": "b_sent",
+      "append": [
+        "transport_stop",
+        "wire_after_stop_in_window",
+        "bad_settle_after_stop"
+      ],
+      "expected": {
+        "accept": false,
+        "reject_at": "bad_settle_after_stop"
+      },
+      "reason": "Even a within-window late wire observation cannot reopen trusted settlement after stop."
+    },
+    {
+      "id": "reject_accept_after_independent_stop",
+      "prefix": "b_pending",
+      "append": [
+        "b_independent_stop",
+        "confirm_independent_stop",
+        "bad_accept_after_stop"
+      ],
+      "expected": {
+        "accept": false,
+        "reject_at": "bad_accept_after_stop"
+      },
+      "reason": "A later accept cannot reverse an earlier independent stop."
+    },
+    {
+      "id": "reject_next_arm_after_workflow_stop",
+      "prefix": "b_calls_complete",
+      "append": [
+        "b_workflow_stopped_result",
+        "confirm_workflow_stop",
+        "bad_c_reserve_after_workflow_stop"
+      ],
+      "expected": {
+        "accept": false,
+        "reject_at": "bad_c_reserve_after_workflow_stop"
+      },
+      "reason": "Workflow stop is a full-batch stop, not merely a failed local arm."
+    },
+    {
+      "id": "reject_late_kind_before_expiry",
+      "prefix": "b_calls_complete",
+      "append": [
+        "bad_early_late_slot_result"
+      ],
+      "expected": {
+        "accept": false,
+        "reject_at": "bad_early_late_slot_result"
+      },
+      "reason": "late_slot_result is limited to already-expired window evidence, not an alternate normal success path."
+    },
+    {
+      "id": "reject_normal_success_result_at_deadline",
+      "prefix": "b_calls_complete",
+      "append": [
+        "bad_ordinary_slot_at_deadline"
+      ],
+      "expected": {
+        "accept": false,
+        "reject_at": "bad_ordinary_slot_at_deadline"
+      },
+      "reason": "A normal advisory-pass slot_result at expiry cannot open a live checkpoint; preserve only through the explicit late observation path."
+    },
+    {
+      "id": "reject_late_result_for_other_arm",
+      "prefix": "b_calls_complete",
+      "append": [
+        "window_stop",
+        "bad_late_other_arm_result"
+      ],
+      "expected": {
+        "accept": false,
+        "reject_at": "bad_late_other_arm_result"
+      },
+      "reason": "Late evidence must concern the current already-existing candidate, not an unrun next arm."
+    },
+    {
+      "id": "reject_time_regression_inside_window",
+      "prefix": "b_before_send",
+      "append": [
+        "bad_sent_time_regression"
+      ],
+      "expected": {
+        "accept": false,
+        "reject_at": "bad_sent_time_regression"
+      },
+      "reason": "Both epochs are inside the window but sent epoch 1011 precedes transport receipt epoch 1012."
+    },
+    {
+      "id": "reject_duplicate_dispatch",
+      "prefix": "b_sent",
+      "append": [
+        "bad_duplicate_sent"
+      ],
+      "expected": {
+        "accept": false,
+        "reject_at": "bad_duplicate_sent"
+      },
+      "reason": "The same reserved ticket may dispatch only once."
+    },
+    {
+      "id": "reject_settlement_without_dispatch",
+      "prefix": "b_before_send",
+      "append": [
+        "bad_settle_without_sent"
+      ],
+      "expected": {
+        "accept": false,
+        "reject_at": "bad_settle_without_sent"
+      },
+      "reason": "An unsent reservation cannot produce trusted settlement."
+    },
+    {
+      "id": "reject_unbound_late_observation",
+      "prefix": "b_sent",
+      "append": [
+        "transport_stop",
+        "bad_unbound_late_wire"
+      ],
+      "expected": {
+        "accept": false,
+        "reject_at": "bad_unbound_late_wire"
+      },
+      "reason": "Late raw observation must bind a known dispatched ticket; call-099 was never reserved/sent."
+    },
+    {
+      "id": "reject_restart_same_batch_after_stop",
+      "prefix": "b_sent",
+      "append": [
+        "transport_stop",
+        "second_start"
+      ],
+      "expected": {
+        "accept": false,
+        "reject_at": "second_start"
+      },
+      "reason": "A second started receipt cannot reset a stopped batch or extend its original window."
+    },
+    {
+      "id": "reject_call_before_started",
+      "prefix": "empty",
+      "append": [
+        "b_gen_reserved"
+      ],
+      "expected": {
+        "accept": false,
+        "reject_at": "b_gen_reserved"
+      },
+      "reason": "No reservation is legal before the single batch-start receipt."
+    }
+  ],
+  "format_notes": [
+    "Expand prefix event IDs then append IDs, preserving listed order and literal epochs/payload.",
+    "The harness may add seq/previous/digest to envelopes; those are not expected-state calculations.",
+    "Expected fields describe semantic facts, not prescribed reducer attribute names. Map names explicitly in the test harness.",
+    "For stopped cases pending historical metadata need not be erased; no progression or new authorization is implied.",
+    "Receipt epochs are nondecreasing; equal epochs are legal. Window endpoints are start-inclusive/deadline-exclusive for active effects.",
+    "All SHA values, models/hosts, mock addresses and report checks are synthetic inert placeholders, not real evidence or quality decisions.",
+    "This fixture isolates batch lifecycle. Course payload, raw wire schemas, per-slot model FSM and actual digest/content checks remain covered elsewhere."
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "distinct_tests": 68,
+  "groups": [
+    {
+      "group": "unit",
+      "xml": "/tmp/edumind-d02-d02-unit.xml",
+      "xml_sha256": "548c12bc1d649d5287b2ebec952d995be813f19db7570f8d71f11374345a3359",
+      "tests": 66,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0
+    },
+    {
+      "group": "t020",
+      "xml": "/tmp/edumind-d02-d02-t020.xml",
+      "xml_sha256": "5e3e7420343d6aaeffbaf188bff0dc709f8a0d47f8e7089b14afa920eb9caa13",
+      "tests": 2,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0
+    }
+  ],
+  "real_provider_requests": 0,
+  "container_final_state": "exited",
+  "source_semantics_revision": "8b0cb8a; no additional production/Prompt changes",
+  "manifest_sha256": "53583b1fdd975d1c50772c2e6047436a86134af623d151436b669f9afda7496f",
+  "frozen_files": 497,
+  "pending_cli": {
+    "exit_code": 2,
+    "stdout": "EXACT_D02_AND_NEW_WINDOW_APPROVAL_REQUIRED",
+    "output_created": false
+  },
+  "replay": "old d01 exact bytes: original rejection preserved, new proposal accepts only bounded UUID pair; no old unknown settlement changed",
+  "commands": [
+    "backend/.venv/bin/python docs/acceptance/phase-1.5-d02-recheck-d02/replay_saved.py",
+    "backend/.venv/bin/python -m pytest scripts/tests/test_p15_review_turn_metadata.py scripts/tests/test_p15_d02_gate_d02.py scripts/tests/test_p15_d02_recheck_d02.py scripts/tests/test_p15_full_r05_observation.py -q --junitxml=/tmp/edumind-d02-d02-unit.xml",
+    "python3 docs/acceptance/phase-1.5-d02-recheck-d02/run_pg_offline.py",
+    "backend/.venv/bin/python scripts/run_p15_d02_recheck_d02.py --check",
+    "backend/.venv/bin/python scripts/run_p15_d02_recheck_d02.py --step (expected exit 2)",
+    "Ruff on new isolated scripts/tests and backend PG test",
+    "python3 scripts/check_catalog_workflow.py",
+    "git diff --check"
+  ],
+  "warnings": [
+    "Existing Starlette anyio BlockingPortal deprecation in PG/Mock run"
+  ],
+  "self_review": "completed; no independent reviewer claimed"
+}

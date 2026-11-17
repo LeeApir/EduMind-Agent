@@ -1,6 +1,8 @@
 # MAIC-UI — Prompt 模式
 
-> MAIC-UI 将所有 Prompt 集中在两个文件中管理，分为 Provider 通用 Prompt 和 Heavy Mode 专用 Prompt。这种集中管理模式值得 EduMind 参考。
+> 2026-10-29 源码复核：以下两个文件是核心 Prompt 入口，不是全部提示词所在地；`read.py` 等服务还有内嵌提示词。核对版本为 `aad58ddcc2103058b4c2deffc48a3c13e2c64dd6`。Heavy 主执行点实际跳过验证，见下文模式 D。与 DeepTutor 的对照见[提示词专题](../deeptutor/prompts.md)。
+>
+> 本文中的“EduMind 应用”保留为早期设计建议，不代表当前 PRD 或已批准契约；画像字段不得凭空补齐，具体角色与修复上限以当前项目批准文件为准。
 
 ## 1. Prompt 组织架构
 
@@ -19,8 +21,8 @@ backend/src/services/
 └── templates/
     └── heavy_mode_prompts.py   # Heavy Mode 专用 Prompt
         ├── STAGE1_ALIGNED_SIMULATION_PROMPT
-        ├── STAGE2_LAYOUT_POLISH_PROMPT
-        └── REFINEMENT_PROMPT
+        ├── STAGE2_POLISH_PROMPT
+        └── REFINEMENT_PROMPTS
 ```
 
 ### EduMind 可借鉴的结构
@@ -45,7 +47,7 @@ backend/app/agents/
 
 ### 模式 A: 结构化 JSON 输出
 
-MAIC-UI 要求 LLM 输出严格的 JSON 结构：
+MAIC-UI 的内容分析模板以自然语言要求 JSON 结构。下面是输出形状示例，不是提供商强制执行 JSON Schema 的证据：
 
 ```python
 # 内容分析 Prompt 的输出格式要求
@@ -72,7 +74,7 @@ Format your response as JSON:
 """
 ```
 
-**EduMind 应用**：每个 Agent 的输出应定义类似的 JSON Schema，便于 ReviewAgent 二审：
+**早期 EduMind 建议**：为各职责定义输出契约并配套程序校验；下面只是 JSON 形状示意，不是正式 JSON Schema，也不能单靠模型二审代替程序校验：
 
 ```python
 # DocAgent 输出 Schema
@@ -168,32 +170,25 @@ class LanguageConfig:
     }
 ```
 
-### 模式 D: 渐进式验证与精修
+### 模式 D: 两阶段生成与验证接线边界
 
-Heavy Mode 的分阶段生成 + 验证 + 精修模式：
+Heavy Mode 模板表达了分阶段生成与精修意图，但当前固定版本的主执行点没有运行传入验证器。实际流程可概括为：
 
 ```
-生成 → 验证 → (失败 → 精修 → 验证) × 3 → 降级/回退
+阶段生成 → 非空即按“验证通过”路径返回并缓存
+空结果 / 异常 → 最多三次尝试 → 降级/回退
+Stage 1 HTML → Stage 2 布局精修
 ```
 
 ```python
-# 从 heavy_generator.py 提取的验证循环
-async def _execute_stage(self, stage_name, context, stage_func, 
-                         validation_func, completed_stages, refinements):
-    max_refinements = 3
-    for attempt in range(max_refinements + 1):
-        content = await stage_func(context)
-        result = validation_func(content)
-        if result.passed:
-            return content
-        if attempt < max_refinements:
-            context['refinement_feedback'] = result.feedback
-            content = await refinement_func(context, result.feedback)
-        refinements[stage_name] += 1
-    return None  # 触发降级
+# heavy_generator.py::_execute_stage 的关键原文
+# is_valid, issues = validation_func(html)
+is_valid, issues = True, None
 ```
 
-**EduMind 应用**：这正好对应 ReviewAgent 的 `最多退修 2 次 → 拒绝 + 兜底` 的机制。
+函数使用 `range(max_refinements)`，其中 `max_refinements = 3`，不是首次加三次。`get_refinement_prompt` 在该生成器中仅导入，执行循环未调用，也未将验证问题注入下一轮 context。因此不能把旧笔记中的“生成→验证→反馈精修”伪代码当作当前实际实现。[固定源码](https://github.com/THU-MAIC/MAIC-UI/blob/aad58ddcc2103058b4c2deffc48a3c13e2c64dd6/backend/src/services/html_generation/heavy_generator.py#L180)
+
+**EduMind 应用建议**：可以参考阶段拆分，但真实校验和错误驱动修复必须另行实现并验证，不能从存在精修模板推断闭环已生效。
 
 ## 3. Heavy Mode Prompt 结构
 
@@ -213,7 +208,7 @@ async def _execute_stage(self, stage_name, context, stage_func,
    - Canvas/SVG 可视化
    - 控制面板（播放/暂停/重置/速度）
 4. 内容对齐：左侧步骤变化 → 右侧模拟同步更新
-5. 交互性：至少 3 个可控参数
+5. 交互性：至少 2 个可调参数（模板要求，未证明运行时已验证）
 ```
 
 ### Stage 2: 布局精修
@@ -232,10 +227,10 @@ async def _execute_stage(self, stage_name, context, stage_func,
 
 | 原则 | MAIC-UI 实现 | EduMind 可借鉴 |
 |------|-------------|---------------|
-| **集中管理** | 所有 Prompt 在 2 个 .py 文件中 | 按 Agent 拆分，但统一管理 |
-| **结构化输出** | 严格的 JSON Schema | 每个 Agent 定义输出契约 |
+| **集中管理** | 核心 Prompt 有集中入口，部分仍内嵌服务 | 按职责拆分并明确装配入口 |
+| **结构化输出** | 模板要求 JSON 形状，不等于服务方强制 Schema | 输出契约配套程序校验 |
 | **画像注入** | 年级/兴趣注入 Prompt | 6 维画像作为全局上下文 |
 | **多语言** | 中英文独立 Prompt + 排版规范 | 预留多语言接口 |
-| **验证闭环** | 生成 → 验证 → 精修 → 重验证 | 生成 → ReviewAgent → 退修/通过 |
-| **降级兜底** | 精修失败 → 降级到 Fast Mode | ReviewAgent 拒绝 → 兜底内容 |
+| **验证闭环** | 有验证器和精修模板，但当前 Heavy 主执行点跳过验证 | 需验证程序检查、模型审核和修复实际执行 |
+| **降级兜底** | 阶段生成失败 → 按实现降级/回退 | 拒绝与兜底应明确区分，并遵循批准契约 |
 | **缓存复用** | 成功生成结果缓存 | 高频资源预生成 + 缓存 |

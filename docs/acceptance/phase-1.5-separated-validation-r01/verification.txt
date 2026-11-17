@@ -1,0 +1,33 @@
+T087 verification — 2026-10-29T14:40:07+08:00
+Executor: Codex. Developer self-review only; independent package/semantic review not claimed.
+Package manifest SHA256: 0c74b3751bdfd1dfffe7cfc3aa56bd30257e4ec850f18d80041b78bea401a1e3
+Frozen files: 175. Runtime: Python3.11.16/httpx0.28.1/jsonschema4.25.1/mistune3.4.0/python-dotenv1.2.3.
+
+Actual commands:
+
+PYTHONPATH=backend:. backend/.venv/bin/python -m pytest scripts/tests/test_p15_separated_probe.py scripts/tests/test_p15_protocol_task_separation.py scripts/tests/test_p15_minimal_probe.py scripts/tests/test_p15_minimal_contract.py scripts/tests/test_p15_minimal_pilot.py scripts/tests/test_p15_head_insertion_engine.py scripts/tests/test_p15_agent_pilot.py scripts/tests/test_p15_pilot_baseline.py -q --tb=short --junitxml=/private/tmp/edumind-p15-t087.xml
+
+PYTHONPATH=backend:. backend/.venv/bin/python docs/acceptance/phase-1.5-separated-validation-r01/check_preparation.py
+
+MYPYPATH=backend:. backend/.venv/bin/mypy scripts/isolated_diagnostics/p15_separated_probe_contract.py scripts/isolated_diagnostics/p15_separated_probe.py scripts/run_p15_separated_probe.py --strict --explicit-package-bases --follow-imports=silent
+
+backend/.venv/bin/ruff check scripts/isolated_diagnostics/p15_separated_probe_contract.py scripts/isolated_diagnostics/p15_separated_probe.py scripts/run_p15_separated_probe.py scripts/tests/test_p15_separated_probe.py docs/acceptance/phase-1.5-separated-validation-r01/check_preparation.py
+
+python3 scripts/check_catalog_workflow.py
+
+git diff --check
+
+Results:
+- Pytest598 passed,0failed,0error,0skip,9.959seconds; new actual-controller tests157 + unchanged previous441. JUnit /private/tmp/edumind-p15-t087.xml.
+- P/W strict + exact expected_output. R0 two distinct wordings and deliberately false prose all remain pending independent semantic review, not success. No change, protected-value change, malformed original JSON, Schema-as-answer, extra/duplicate fields and every-slot protocol failure stop globally.
+- Controller/readonly/CLI cannot promote R0 repair_success; full network completion exits3 pending review, never automatic success. Scope/fees/time/publicIP/order/late/stop/restart/tamper attacks covered.
+- Guarded preparation checker passes: .env/API_KEY access and DNS/socket/credential hooks denied. Actual --check exit0; pending --run/--check-results exit2 before key, DNS and real directory. Live output absent, grant accepted:false, fees:false, window:null.
+- Seven request bytes equal approved T086 bytes: P0=4791/W0=4809/W1=4841/W2=5979/W3=5024/W4=8576/R0=11034; request index hashes and 8 relative links verified.
+- Readonly verification: 8 private Mock groups,48 simulated HTTP; full private file inventory/hash/mode/grant/event/summary verified, not Provider or independent semantic evidence. Indexed under mock-evidence.json; sources at /private/tmp/edumind-p15-separated-mock-r01 (0700/0600). Private fixtures use synthetic test-only grants/package IDs, not current execution authority.
+- Old T086:20 normative files/136 source pins/7 inputs/5 single-patch pairs/5 repair examples/3306 raw failure text/38 links unchanged. Original T085129 execution files and result/grant preserved; no old allowance, window, fee or restart inherited.
+- Strict mypy3 runtime sources pass; Ruff5 new files pass; workflow dependencies/catalog and diff whitespace pass.
+- Current Schema and wire/local strict validation unchanged. Pure protocol/wrapper and actual repair postconditions separated; no course Prompt, teaching threshold, baseline answer or production path changes.
+- Planned new package only:7HTTP/900s/HTTP60s/DNS9s/input57344/output28672/request65536/response262144. Public peak reference$0.0516096, actual account fee/currency/upstream bounds unverified. No actual monetary hard cap can be attested; new exact-package fee-risk acceptance required and pending. No previous exception inherited.
+- Real Provider HTTP0; no credential reads; no new window. T088 todo/unclaimed. R0 independent semantic review not performed. T038 blocked/catalog_only/H sealed unchanged.
+
+Handoff: review README.md, manifest.json, policy.json, pricing.json, requests.json, pending execution-approval.json and actual-controller tests. No real execution authorized by this task. Stop after local completion commit.

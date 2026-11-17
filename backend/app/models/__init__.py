@@ -1,5 +1,48 @@
 """Persistent ORM models."""
 
+from app.models.free_course import FreeCourse as FreeCourse
+from app.models.free_course import FreeCourseNodeLink as FreeCourseNodeLink
+from app.models.free_course import FreeCoursePlan as FreeCoursePlan
+from app.models.free_course import FreeCourseRequest as FreeCourseRequest
+from app.models.free_course import FreeCourseScene as FreeCourseScene
+from app.models.free_course import FreeCourseSceneVersion as FreeCourseSceneVersion
+from app.models.free_course import FreeCourseVersion as FreeCourseVersion
+from app.models.free_course_answers import FreeCourseAnswerAttempt as FreeCourseAnswerAttempt
+from app.models.free_course_answers import (
+    FreeCourseAssessmentExposure as FreeCourseAssessmentExposure,
+)
+from app.models.free_course_answers import FreeCourseExerciseVersion as FreeCourseExerciseVersion
+from app.models.free_course_evidence import FreeCourseAttestation as FreeCourseAttestation
+from app.models.free_course_evidence import (
+    FreeCourseAttestationRevocation as FreeCourseAttestationRevocation,
+)
+from app.models.free_course_evidence import (
+    FreeCourseEvidenceAdmission as FreeCourseEvidenceAdmission,
+)
+from app.models.free_course_evidence import (
+    FreeCourseEvidenceRevocation as FreeCourseEvidenceRevocation,
+)
+from app.models.free_course_planning import FreeCoursePlanningResult as FreeCoursePlanningResult
+from app.models.free_course_progress import FreeCourseEvent as FreeCourseEvent
+from app.models.free_course_progress import FreeCourseStep as FreeCourseStep
+from app.models.free_course_quality import FreeCourseFeedback as FreeCourseFeedback
+from app.models.free_course_quality import FreeCourseQualityDecision as FreeCourseQualityDecision
+from app.models.free_course_quality import FreeCourseVisibilityFact as FreeCourseVisibilityFact
+from app.models.free_course_recovery import FreeCourseOperationSource as FreeCourseOperationSource
+from app.models.free_course_revision import FreeCourseRevision as FreeCourseRevision
+from app.models.free_course_revision import FreeCourseRevisionPlan as FreeCourseRevisionPlan
+from app.models.free_course_revision import FreeCourseRevisionStage as FreeCourseRevisionStage
+from app.models.free_course_scheduler import FreeCourseAttempt as FreeCourseAttempt
+from app.models.free_course_scheduler import FreeCourseCapacity as FreeCourseCapacity
+from app.models.free_course_scheduler import FreeCourseDispatch as FreeCourseDispatch
+from app.models.free_course_scheduler import FreeCourseSettlement as FreeCourseSettlement
+from app.models.free_course_tutor import FreeCourseTutorReply as FreeCourseTutorReply
+from app.models.free_course_tutor import FreeCourseTutorTurn as FreeCourseTutorTurn
+from app.models.free_course_writes import FreeCourseOperation as FreeCourseOperation
+from app.models.free_course_writes import FreeCourseReceipt as FreeCourseReceipt
+from app.models.free_scene_actions import FreeScenePresentation as FreeScenePresentation
+from app.models.free_scene_generation import FreeSceneGenerationResult as FreeSceneGenerationResult
+from app.models.free_scene_validation import FreeSceneValidation as FreeSceneValidation
 from app.models.learning_budget import LearningCorrectionPermit as LearningCorrectionPermit
 from app.models.learning_budget import LearningGenerationAttempt as LearningGenerationAttempt
 from app.models.learning_plan import LearningPlanVersion as LearningPlanVersion

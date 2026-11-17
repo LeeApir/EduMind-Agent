@@ -1,0 +1,303 @@
+{
+  "slot_id": "D01-unknown",
+  "source_sha256": "5ee76c12eb59ac5c1db9bbde53cca5bf476f3ac979ea932252223783f34026c1",
+  "reviewer": "Codex assistant",
+  "review_type": "delegated_assistant",
+  "independent_human_truth": false,
+  "reviewed_at": "2026-10-27T22:10:03+08:00",
+  "model_opinion_seen_before_review": false,
+  "exhaustive_coverage_attested": true,
+  "natural_severe_errors": 0,
+  "atomic_facts": [
+    {
+      "source_sha256": "5ee76c12eb59ac5c1db9bbde53cca5bf476f3ac979ea932252223783f34026c1",
+      "anchor_id": "scene1-intro",
+      "source_pointer": "/scene/content/blocks/0/markdown",
+      "evidence_quote": "int a[6] = {10, 20, 30, 40, 50, 60};",
+      "statement": "长度6、初始10..60且下标0..5。",
+      "reason": "六个初始化项逐项核对，合法下标0起至长度-1。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "5ee76c12eb59ac5c1db9bbde53cca5bf476f3ac979ea932252223783f34026c1",
+      "anchor_id": "scene1-intro",
+      "source_pointer": "/scene/content/blocks/0/markdown",
+      "evidence_quote": "连续存放",
+      "statement": "同型数组元素连续，字节偏移为i*sizeof(int)。",
+      "reason": "sizeof包含元素对象大小，不硬编码4字节；公式为数学字节地址说明，不是错误C指针表达式。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "5ee76c12eb59ac5c1db9bbde53cca5bf476f3ac979ea932252223783f34026c1",
+      "anchor_id": "scene1-intro",
+      "source_pointer": "/scene/content/blocks/0/markdown",
+      "evidence_quote": "不需要从",
+      "statement": "已知合法下标定位为常数时间，不需依次检索。",
+      "reason": "此处分析数组寻址运算次数，不声称按值查找O(1)或CPU周期必定相同。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "5ee76c12eb59ac5c1db9bbde53cca5bf476f3ac979ea932252223783f34026c1",
+      "anchor_id": "scene1-intro",
+      "source_pointer": "/scene/content/blocks/0/markdown",
+      "evidence_quote": "一次乘法和一次加法",
+      "statement": "地址计算的单位成本模型只有常数个算术操作。",
+      "reason": "语境为随机访问复杂度；不把此数学模型当编译器实际指令序列或缓存延迟保证。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "5ee76c12eb59ac5c1db9bbde53cca5bf476f3ac979ea932252223783f34026c1",
+      "anchor_id": "scene1-layout",
+      "source_pointer": "/scene/content/blocks/1/steps/0/caption",
+      "evidence_quote": "初始状态：6 个整数连续存放，下标 0 到 5 依次对应 10 到 60。",
+      "statement": "可视化初始六元素/顺序及第二步a3=40高亮相符。",
+      "reason": "逐项核对六标签和相邻次序；未把next_id当C数组存储指针。第二步偏移3*sizeof(int)正确，无生成代码执行。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "5ee76c12eb59ac5c1db9bbde53cca5bf476f3ac979ea932252223783f34026c1",
+      "anchor_id": "scene1-layout",
+      "source_pointer": "/scene/content/blocks/1/steps/1/caption",
+      "evidence_quote": "按位置访问 a[3]：地址 = 基地址 + 3 × sizeof(int)，直接定位到 40，无需逐个查找。",
+      "statement": "可视化初始六元素/顺序及第二步a3=40高亮相符。",
+      "reason": "逐项核对六标签和相邻次序；未把next_id当C数组存储指针。第二步偏移3*sizeof(int)正确，无生成代码执行。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "5ee76c12eb59ac5c1db9bbde53cca5bf476f3ac979ea932252223783f34026c1",
+      "anchor_id": "scene1-layout",
+      "source_pointer": "/scene/content/blocks/1/text_alternative",
+      "evidence_quote": "相邻元素地址相差 sizeof(int)",
+      "statement": "替代文本完整描述连续步长及a3=40。",
+      "reason": "与六元素初始值和两步高亮一致，未假设具体地址或int字节数。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "5ee76c12eb59ac5c1db9bbde53cca5bf476f3ac979ea932252223783f34026c1",
+      "anchor_id": "scene1-code",
+      "source_pointer": "/scene/content/blocks/2/source",
+      "evidence_quote": "int i = 3;",
+      "statement": "第一行打印a[3]=40。",
+      "reason": "索引3合法，赋值99在打印之后。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "5ee76c12eb59ac5c1db9bbde53cca5bf476f3ac979ea932252223783f34026c1",
+      "anchor_id": "scene1-code",
+      "source_pointer": "/scene/content/blocks/2/source",
+      "evidence_quote": "a[i] = 99;",
+      "statement": "覆盖a3为99，第二行打印after write, a[3]=99。",
+      "reason": "未改其他位置，printf的%d均对应int，标准C可静态理解。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "5ee76c12eb59ac5c1db9bbde53cca5bf476f3ac979ea932252223783f34026c1",
+      "anchor_id": "scene1-code",
+      "source_pointer": "/scene/content/blocks/2/source",
+      "evidence_quote": "a[0], a[5]",
+      "statement": "最后打印a0=10、a5=60，均保持初值。",
+      "reason": "只有位置3写入，位置0和5合法，无越界/网络/任意文件操作；未编译运行。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "5ee76c12eb59ac5c1db9bbde53cca5bf476f3ac979ea932252223783f34026c1",
+      "anchor_id": "scene1-code-explain",
+      "source_pointer": "/scene/content/blocks/3/markdown",
+      "evidence_quote": "输出依次为",
+      "statement": "代码解说的三行输出、局部修改和合法下标0至5正确。",
+      "reason": "逐句与完整代码静态追踪对照，i一直3，不存在跨题状态继承。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "5ee76c12eb59ac5c1db9bbde53cca5bf476f3ac979ea932252223783f34026c1",
+      "anchor_id": "scene1-code-explain",
+      "source_pointer": "/scene/content/blocks/3/markdown",
+      "evidence_quote": "代价相同",
+      "statement": "下标0与3均为直接寻址的同阶成本。",
+      "reason": "上下文为常数复杂度，不以真实CPU/缓存时延相等作要求。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "5ee76c12eb59ac5c1db9bbde53cca5bf476f3ac979ea932252223783f34026c1",
+      "anchor_id": "scene1-exercise",
+      "source_pointer": "/scene/content/blocks/4/question",
+      "evidence_quote": "每题只填一个答案",
+      "statement": "四题均以六元素共享示例为准，状态单独说明，域和输出可核对。",
+      "reason": "前三题有独立初始化与改动，第四题枚举三个固定选项及大写单字母格式。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "5ee76c12eb59ac5c1db9bbde53cca5bf476f3ac979ea932252223783f34026c1",
+      "anchor_id": "scene1-exercise",
+      "source_pointer": "/scene/content/blocks/4/items/0/question",
+      "evidence_quote": "初始状态为 a[6] = {10, 20, 30, 40, 50, 60}，尚未发生任何写入。执行读取 a[4] 后得到的整数值是多少？答案范围是 10 到 60 之间的整数，只填数字本身（例如 10）。",
+      "statement": "q1题干或解析与参考键、独立状态一致。",
+      "reason": "单独初始下标4为50。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "5ee76c12eb59ac5c1db9bbde53cca5bf476f3ac979ea932252223783f34026c1",
+      "anchor_id": "scene1-exercise",
+      "source_pointer": "/scene/content/blocks/4/items/0/solution",
+      "evidence_quote": "a\\[4\\] 是下标 4 的元素，按顺序第 5 个，值为 50。地址 = 基地址 + 4 × sizeof(int)，一步定位。",
+      "statement": "q1题干或解析与参考键、独立状态一致。",
+      "reason": "单独初始下标4为50。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "5ee76c12eb59ac5c1db9bbde53cca5bf476f3ac979ea932252223783f34026c1",
+      "anchor_id": "scene1-exercise",
+      "source_pointer": "/scene/content/blocks/4/items/1/question",
+      "evidence_quote": "初始状态为 a[6] = {10, 20, 30, 40, 50, 60}。先执行 a[2] = 77; 再读取 a[2]。此时 a[2] 的值是多少？答案范围是 10 到 99 之间的整数，只填数字本身。",
+      "statement": "q2题干或解析与参考键、独立状态一致。",
+      "reason": "本题明确a2=77，随后读取同下标为77。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "5ee76c12eb59ac5c1db9bbde53cca5bf476f3ac979ea932252223783f34026c1",
+      "anchor_id": "scene1-exercise",
+      "source_pointer": "/scene/content/blocks/4/items/1/solution",
+      "evidence_quote": "写入 a\\[2\\] = 77 直接覆盖下标 2 原来的 30，随后读取 a\\[2\\] 得到 77，其它元素不受影响。",
+      "statement": "q2题干或解析与参考键、独立状态一致。",
+      "reason": "本题明确a2=77，随后读取同下标为77。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "5ee76c12eb59ac5c1db9bbde53cca5bf476f3ac979ea932252223783f34026c1",
+      "anchor_id": "scene1-exercise",
+      "source_pointer": "/scene/content/blocks/4/items/2/question",
+      "evidence_quote": "初始状态为 a[6] = {10, 20, 30, 40, 50, 60}。执行 a[3] = 99; 之后，a[0] 的值是多少？答案范围是 10 到 60 之间的整数，只填数字本身。",
+      "statement": "q3题干或解析与参考键、独立状态一致。",
+      "reason": "本题写a3=99不影响a0=10。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "5ee76c12eb59ac5c1db9bbde53cca5bf476f3ac979ea932252223783f34026c1",
+      "anchor_id": "scene1-exercise",
+      "source_pointer": "/scene/content/blocks/4/items/2/solution",
+      "evidence_quote": "按下标写入只修改下标 3 的元素，a\\[0\\] 仍为 10，说明按位置访问只影响目标位置。",
+      "statement": "q3题干或解析与参考键、独立状态一致。",
+      "reason": "本题写a3=99不影响a0=10。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "5ee76c12eb59ac5c1db9bbde53cca5bf476f3ac979ea932252223783f34026c1",
+      "anchor_id": "scene1-exercise",
+      "source_pointer": "/scene/content/blocks/4/items/3/question",
+      "evidence_quote": "关于共享数组 a[6] 的按位置访问，下列说法正确的是哪一个？选项：A. 访问 a[5] 需要先依次经过 a[0] 到 a[4]；B. 访问 a[i] 的地址可由基地址 + i × sizeof(int) 一步算出；C. 数组元素在内存中可以不连续存放。只填一个大写字母（A、B 或 C）。",
+      "statement": "q4题干或解析与参考键、独立状态一致。",
+      "reason": "A顺序经过前面元素错误，C非连续错误；B符合上文合法下标寻址模型。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "5ee76c12eb59ac5c1db9bbde53cca5bf476f3ac979ea932252223783f34026c1",
+      "anchor_id": "scene1-exercise",
+      "source_pointer": "/scene/content/blocks/4/items/3/solution",
+      "evidence_quote": "连续存放使 a\\[i\\] 的地址等于基地址 + i × sizeof(int)，可一步算出，故为常数时间；A 描述的是顺序查找，C 与连续存放的定义矛盾。",
+      "statement": "q4题干或解析与参考键、独立状态一致。",
+      "reason": "A顺序经过前面元素错误，C非连续错误；B符合上文合法下标寻址模型。",
+      "verdict": "pass"
+    }
+  ],
+  "answer_checks": [
+    {
+      "source_sha256": "5ee76c12eb59ac5c1db9bbde53cca5bf476f3ac979ea932252223783f34026c1",
+      "anchor_id": "scene1-exercise",
+      "question_id": "q1",
+      "answer_key": "50",
+      "verdict": "pass",
+      "reason": "单独初始下标4为50。",
+      "safe_for_exact_scoring": true,
+      "accepted_inputs": [
+        "50"
+      ],
+      "rejected_inputs": [
+        "40"
+      ]
+    },
+    {
+      "source_sha256": "5ee76c12eb59ac5c1db9bbde53cca5bf476f3ac979ea932252223783f34026c1",
+      "anchor_id": "scene1-exercise",
+      "question_id": "q2",
+      "answer_key": "77",
+      "verdict": "pass",
+      "reason": "本题明确a2=77，随后读取同下标为77。",
+      "safe_for_exact_scoring": true,
+      "accepted_inputs": [
+        "77"
+      ],
+      "rejected_inputs": [
+        "30"
+      ]
+    },
+    {
+      "source_sha256": "5ee76c12eb59ac5c1db9bbde53cca5bf476f3ac979ea932252223783f34026c1",
+      "anchor_id": "scene1-exercise",
+      "question_id": "q3",
+      "answer_key": "10",
+      "verdict": "pass",
+      "reason": "本题写a3=99不影响a0=10。",
+      "safe_for_exact_scoring": true,
+      "accepted_inputs": [
+        "10"
+      ],
+      "rejected_inputs": [
+        "99"
+      ]
+    },
+    {
+      "source_sha256": "5ee76c12eb59ac5c1db9bbde53cca5bf476f3ac979ea932252223783f34026c1",
+      "anchor_id": "scene1-exercise",
+      "question_id": "q4",
+      "answer_key": "B",
+      "verdict": "pass",
+      "reason": "A顺序经过前面元素错误，C非连续错误；B符合上文合法下标寻址模型。",
+      "safe_for_exact_scoring": true,
+      "accepted_inputs": [
+        "B"
+      ],
+      "rejected_inputs": [
+        "A"
+      ]
+    }
+  ],
+  "blind_items": [
+    {
+      "area": "requirements",
+      "location": "/scene",
+      "verdict": "pass",
+      "reason": "目标中的单场景、位置访问、C代码、练习全有；计划/清单保持1场景。"
+    },
+    {
+      "area": "learnability",
+      "location": "/scene",
+      "verdict": "pass",
+      "reason": "六元素统一例子，明确索引/字节步长，2步图和读取/写入静态输出、四道题均可追溯。"
+    },
+    {
+      "area": "facts",
+      "location": "/scene",
+      "verdict": "pass",
+      "reason": "逐块/逐题清单核对，无确认严重或其他事实错误；O(1)语境不按实际CPU等时误读。"
+    },
+    {
+      "area": "answers",
+      "location": "/scene",
+      "verdict": "pass",
+      "reason": "4题唯一参考50/77/10/B；每题独立状态、数值范围或显式选项，不能自动授予可靠评分权限。"
+    },
+    {
+      "area": "profile",
+      "location": "/scene",
+      "verdict": "pass",
+      "reason": "learner_evidence为空，未声称学生已有技能/专业/偏好或掌握度；只给通用入门说明。"
+    },
+    {
+      "area": "pair",
+      "location": "/scene",
+      "verdict": "pass",
+      "reason": "与已读D01-known相比：known以自述变量/循环为基础，用遍历5元素及范围检查演示，5步图覆盖边界并有循环计数题；unknown避免循环依赖，以6元素直接读取/写入及2步定位图和寻址选择题解释。教学例子/任务复杂度有实质差别，非仅称呼/数组长度变化；未知不臆测。先看代码偏好只以开头声明/后续熟悉循环表现，不声称完整代码块必须第一。"
+    }
+  ],
+  "c_execution_performed": false
+}

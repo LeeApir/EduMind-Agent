@@ -2,11 +2,13 @@
 
 from typing import Literal
 
-from fastapi import APIRouter, Depends, Header, Query, Response
+from fastapi import APIRouter, Depends, Header, Path, Query, Response
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+from app.api.free_courses import reply
 from app.api.knowledge_graph import knowledge_graph_repository
 from app.core.auth import AuthenticatedSession, AuthFailure, require_authenticated_session
 from app.core.database import database_session_factory
@@ -15,6 +17,7 @@ from app.services.catalog_package import CatalogError
 from app.services.knowledge_graph import KnowledgeGraphRepository, KnowledgeGraphValidationError
 from app.services.knowledge_graph_versions import graph_repository_for_version
 from app.services.learning_operations import IdempotencyConflict
+from app.services.mastery_history import read_revisions
 from app.services.path_availability import path_learning_availability
 from app.services.path_commands import (
     PathNotFound,
@@ -199,3 +202,18 @@ async def replan_path(
         key=key,
         expected_version=expected_version,
     )
+
+
+@router.get("/api/mastery/nodes/{node_id}/revisions", tags=["Assessment"])
+async def mastery_revisions(
+    node_id: str = Path(pattern=r"^[a-z][a-z0-9-]{1,63}$"),
+    current: AuthenticatedSession = Depends(require_authenticated_session),
+    sessions: async_sessionmaker[AsyncSession] = Depends(database_session_factory),
+    limit: int = Query(20, ge=1, le=50),
+    before_revision: int | None = Query(None, ge=1),
+) -> JSONResponse:
+    async with sessions() as db:
+        result = await read_revisions(
+            db, current.user.id, node_id, limit=limit, before_revision=before_revision
+        )
+    return reply("RevisionPage", result)

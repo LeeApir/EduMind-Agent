@@ -6,6 +6,14 @@
 
 `docs/PRD.md` v2.3 是产品范围、优先级和验收标准的唯一事实来源。实现与本文冲突时，以 PRD 和已通过的 ADR 为准。
 
+课程生成相关工作继续前，读取 [Phase 1.5 课程生成目标与推进约束](docs/phase-1.5-course-generation-direction.md)。保留 DeepTutor 提示词组织＋MAIC-UI 交互要求＋程序共享代码/轨迹方向，优先可学课程与真实教学证据，暂不移植 DeepTutor 完整运行框架；T102 保持 blocked，不自动追加执行器修补。该文档不替代根账本、已批准契约或真实调用授权。
+
+2026-11-12 用户明确要求收敛有限课程试验的准备、入口和离线验证：按实际改动及失败选择必要检查，复用仍适用的验证证据；不因换批次、凭据或窗口重跑全套测试或复制执行入口。必要检查通过后推进课程交付。开发与评估均遵守上述文档 §5.4，不以测试数量代替教学进展。
+
+2026-11-09 后续路线图调整：新 Phase 2 专门承接三标签学习界面与 OpenMAIC 基础演示课堂迁移，先完成迁移设计；原 Phase 2／Phase 3 合并为新 Phase 3。见 [PRD §9.1](docs/PRD.md) 与 [ADR0056](docs/ADR/0056-phase-2-learning-ui-and-phase-3-consolidation.md)。该条为当时路线决定；当前阶段以以下收敛记录及根账本为准；历史文档中的旧阶段编号按此映射理解，不改冻结原件。P0/P1/P2 优先级标签与 Phase 编号分别解释。
+
+2026-11-16 用户确认 [ADR0066](docs/ADR/0066-phase-1.5-contracted-closeout.md)：Phase 1.5 收敛归档，158项为141 done／13 blocked／4 todo，原质量与性能未通过。根账本仅 Phase 2 T001 todo；先归档及提 PR，再讨论重设计，不自动领取。旧路线停止，T102不修补，Provider授权0、catalog_only、H封存保持。后文旧阶段状态是历史记录。
+
 ## 产品主线
 
 EduMind 将学生画像、知识图谱、学习单元、多角色互动课堂和学习评估连接成闭环：
@@ -29,7 +37,7 @@ EduMind 将学生画像、知识图谱、学习单元、多角色互动课堂和
 | 模型 | Provider Gateway；P0 仅接一个服务端 OpenAI-compatible Provider |
 | P1 Provider | Ollama、BYOK、Anthropic、Google Gemini、讯飞星火、TTS/ASR |
 | 视频 | P0 预渲染/参数化 Manim 模板；P1 动画 DSL + 隔离 Worker + 可选 TTS |
-| iOS | SwiftUI（P2，可选，不阻塞 Web MVP） |
+| iOS | SwiftUI（Phase 3，可选，不阻塞 Web MVP） |
 | 部署 | Docker + docker-compose |
 | 包管理 | pnpm（前端） |
 
@@ -53,7 +61,7 @@ EduMind-Agent/
 │   ├── alembic/
 │   └── pyproject.toml
 ├── web/                     # Vue 3 Web 客户端
-├── ios/                     # P2 SwiftUI 客户端
+├── ios/                     # Phase 3 可选 SwiftUI 客户端
 ├── data/
 │   ├── knowledge_graph.yaml # P0 8-10 节点种子结构
 │   └── videos/cache/        # 预渲染动画（不提交生成媒体）
@@ -79,8 +87,9 @@ EduMind-Agent/
 | MVP 0.2 | 8-10 节点知识结构、渐进画像、掌握度与下一步推荐、正式资源审核 |
 | MVP 0.3 | 2-3 个 Manim 模板、专注/互动模式、一个多视角演示、Markdown 笔记 |
 | Phase 1 | Ollama/BYOK、多 Provider、完整 Manim DSL、持久化队列、扩展图谱 |
-| Phase 2 | 真并行辩论、更多角色策略、RAG、学习报告、更多课程 |
-| Phase 3 | iOS、PPTX/离线 HTML、更多课程、模板市场；由真实使用数据决定 |
+| Phase 1.5 | 已按 ADR0066 收敛归档；原质量／性能未通过，历史任务只读 |
+| Phase 2 | 当前活动阶段，设计待启动：三标签学习页（演示课堂／讲解详解／随堂练习）与 OpenMAIC 基础演示迁移；先设计后实施 |
+| Phase 3 | 原 P2/P3 合并：画像增强与动态分级练习优先细化；辩论、角色策略、RAG、学习报告、更多课程、教师创作、iOS、高级导出及模板市场；扩展项按真实需求分批 |
 
 阶段由 `docs/PRD.md` 的退出标准驱动，不绑定固定比赛日期。
 
@@ -165,13 +174,57 @@ EduMind-Agent/
 - 连续开发只推进用户授权的阶段/批次；阶段结束进行集成验收并报告，不自动跨阶段。用户要求暂停、预算耗尽或遇到人工阻塞时保存状态并停止。
 - 任务文件用于断点恢复，本身不负责后台调度或自动唤醒；被中断后继续执行仍需运行中的会话或另行配置的调度机制。
 
-## 当前状态（2026-10-21：Phase 1.5未启动）
+## 当前状态（2026-10-21：Phase 1.5已细化任务，未实施）
+
+用户已确认P1.5需求A—F，并授权继续需求文档同步：学生可直接学习AI生成草稿，目标驱动可变场景，节点辅助关联，先完成信息架构及主要页面设计再实施。当前方向以PRD§0.5、ADR-0023及docs/PRD-phase-1.5-draft.md为准。随后用户确认三页原型并要求“可以，准备task”，现已细化任务；本次仅规划，不领取任务或开发，不能据需求与任务规划批准自动启动实现。运行仍catalog_only，无新真实调用或部署授权。
 
 用户明确批准P1收敛退出／原样归档／Phase 1.5治理切换，依据PRD§0.4及ADR-0022。最终P1为91项、89 done／T040和T041 blocked，归档docs/tasks/phase-1.json只读；88项原完成任务逐项核对完成提交／验证证据，T042仅收尾交接完成，不追认原动态质量或性能。最新交接见docs/acceptance/phase-1-closeout-20261021/README.md。
 
-根task.json现为Phase 1.5活动账本，只有PHASE-1.5-T001契约／独立验收规划todo，未领取；阶段切换不授权自动开发。等待用户新指令后先确认新课程／待审草稿及新链质量／性能契约，再拆实现。旧88/89完成数不作为新阶段任务或质量分子，旧预算／冻结包／人工标签不自动继承。
+根task.json现为Phase 1.5唯一活动账本，共42项todo，未领取；规划说明见docs/phase-1.5-task-plan.md。后续获准执行后从PHASE-1.5-T001开始，按依赖串行推进；具体重大契约须批准，全部主要页面设计完成后才实施前端，真实验证另需准确执行包与预算授权。旧88/89完成数不作为新阶段任务或质量分子，旧预算／冻结包／人工标签不自动继承。
 
 正式产品限已有签核课程，动态生成为待审草稿且暂不承诺自动发布；默认catalog_only。Ollama／Anthropic／Gemini／星火真实接入仍延期未验，空独立验证器不提供真实自动计划纠错保证。H01–H08继续封存，按新课程契约另评适用性，禁止用来调优。用户明确停止继续模型试错及真实Provider调用；本次不启动1.5开发、不开放动态、不部署、不push/merge。
+
+2026-10-21后续：用户要求“领取T01”“开始开发”，已授权PHASE-1.5-T001具体契约设计，分支codex/phase-1.5-t001。ADR-0024及docs/acceptance/phase-1.5-course-contract-r01为待批准提案；具体数据/API/权限契约批准后才可完成T001，未授权自动推进其余任务。之前“未领取/本次不启动”描述规划时范围；当前状态以根task.json为准，Provider0/catalog_only及既有安全边界保持。
+
+2026-10-21 T001后续：用户已批准d9bd7a6的ADR0024 A—D及准确附件；批准登记docs/ADR/0024-approval-20261021.json。冻结提案保持原字节，当前接受状态以批准登记为准。T001完成设计验收后独立提交；其余41项仍todo，下一T002待明确执行授权。
+
+2026-10-21 T002：用户要求继续，已领取并准备ADR0025及docs/acceptance/phase-1.5-generation-contract-r01具体契约；待准确A—E批准，未实施。T001保持done且冻结文件不改；T002状态见根账本，其余40项todo，真实请求0/catalog_only。
+
+2026-10-21 T002后续：用户已批准8f9f21f的ADR0025 A—E及6份准确附件，登记docs/ADR/0025-approval-20261021.json；冻结文件不变，当前接受状态以登记为准。T002完成设计验收后独立提交，其余40项todo，下一T003待执行授权。Provider实际调用0，预算数值不等于真实授权。
+
+2026-10-22 T003：用户要求继续并在中断后恢复，已准备ADR0026及docs/acceptance/phase-1.5-quality-contract-r01具体质量/学习证据/导师契约，待准确A—E批准。T001/T002完成与冻结文件不变，T003活动状态见根账本，其余39项todo；Provider0/catalog_only/H封存，不自动推进T004。
+
+2026-10-22 T003后续：用户已批准78c95ce的ADR0026 A—E及6份准确附件，登记docs/ADR/0026-approval-20261022.json；冻结文件不变，当前接受状态以登记为准。T003完成设计验收后独立提交，其余39项todo，下一T004待执行授权；不是实际题组核定或Provider调用批准。
+
+2026-10-22 T004：用户要求继续，已复用原三页补齐七页静态设计、视觉/状态/移动端与键盘流程，准确包docs/acceptance/phase-1.5-ui-design-r01，待主要页面确认。T001–T003 done，T004状态见根账本，其余38项todo；未实施生产前端/后端/真实Provider，不自动推进T005。
+
+2026-10-22 T004后续：用户已确认13b5dd7的七页主要页面设计及8份准确附件，登记docs/design/phase-1.5-ui-approval-20261022.json；冻结文件保持原字节，当前接受状态以登记为准。T004静态设计验收后独立提交，其余38项todo，下一T005待执行授权；Provider0/catalog_only，无生产前端实施。
+
+2026-10-22 T005：用户要求继续，已准备ADR0027 A—E及docs/acceptance/phase-1.5-acceptance-contract-r01新链验收口径，具体阈值/样本/计时/停止与T038/T040门禁对象澄清待准确批准。T001–T004 done，T005状态见根账本，其余37项todo；Provider0/catalog_only/H封存，不自动推进T006。
+
+2026-10-22 T005后续：用户已批准3102c15的ADR0027 A—E与5份准确规范文件（含ADR），登记docs/ADR/0027-approval-20261022.json；冻结文件不变，当前接受状态以登记为准。T005完成设计验收后独立提交，其余37项todo，下一T006待执行授权；不是实际样本签核或真实质量/性能通过，Provider0/catalog_only/H封存保持。
+
+2026-10-22 T006：用户要求继续，已实现七个自由课程基础ORM与0034迁移，实际专用隔离PG新57项/旧回归16项共73 passed、0skip；空库升降、旧数据摘要一致、有数据拒绝回退及用户删除级联通过。交接docs/acceptance/phase-1.5-data-model-t006/README.md；下一T007仓储待执行授权。仅模型，不增加运行API或真实Provider，catalog_only/H封存保持。
+
+2026-10-22 T007：用户要求继续，已实现私有快照仓储/规范摘要/持久幂等和操作写入围栏，0035前向修复0034节点名单及SAVEPOINT事务身份，原0034字节不改。实际隔离PG仓储44/迁移57/旧16共117 passed、0skip；交接docs/acceptance/phase-1.5-snapshot-repository-t007/README.md。操作表只建存储原语，无调度/出站/完整取消或对外API；下一T008待执行授权，Provider0/catalog_only/H封存保持。
+
+2026-10-22 T008：用户要求继续，已实现原目标/准确画像证据驱动的可变场景私有规划、来源核对/澄清/失败及0036审计原子持久化，未接线API/Worker。Mock与实际隔离PG共182 passed/0skip，交接docs/acceptance/phase-1.5-free-planning-t008/README.md。真实预算/attempt/未知隔离留T014/T015；Provider0/catalog_only/H封存保持，下一T009待执行授权。
+
+2026-10-22 T009：用户要求继续，已实现非阻塞节点提及建议、准确图谱/原文依据及新清单绑定，路径以独立建议返回，不替换原目标或产生评分资格。实际隔离PG及回归259 passed/0skip，交接docs/acceptance/phase-1.5-graph-links-t009/README.md。无新增迁移/API/Worker或真实Provider，catalog_only/H封存保持；下一T010待执行授权。
+
+2026-10-22 T010：用户要求继续，已实现按准确可变大纲/原要求/共享约定/必要上游生成混合场景、生成epoch绑定及0037私有候选/失败审计；未写ready或切head。实际隔离PG/Mock及回归313 passed、0skip，交接docs/acceptance/phase-1.5-scene-generation-t010/README.md。完整准入/动作及可学习清单留T011–T013，预算/attempt留T014/T015；Provider0/catalog_only/H封存保持，下一T011待授权。
+
+2026-10-22 T011：用户要求继续，已实现机械准入/准确绑定/引用及Markdown清洗，0038独立保存只追加准入事实，不改原候选或旧reject/pass/签核/评分。实际隔离PG及回归353 passed/0skip，交接docs/acceptance/phase-1.5-scene-validation-t011/README.md；渲染必须禁raw HTML/autolink/plugins并转义纯文本，未做浏览器或语义质量验收。无ready/API/运行开放，Provider0/catalog_only/H保持；下一T012待授权。
+
+2026-10-22 T012：用户要求继续，已实现受约束动作/四类结构状态快照及纯播放状态切换、块级代码高亮与静态故障诊断，0039只追加持久化；不执行代码/媒体，不返回私有答案。实际PG及回归387 passed/0skip，交接docs/acceptance/phase-1.5-scene-actions-t012/README.md。未接线前端播放器/公开API/ready，Provider0/catalog_only/H保持；下一T013待授权。
+
+2026-10-22 T013：用户要求继续，已实现大纲/正文/清单head/ready步骤与持久事件原子提交、course唯一首章里程碑、依赖失败及准确历史读取；0040新增步骤/事件。实际PG及回归406 passed/0skip，交接docs/acceptance/phase-1.5-scene-availability-t013/README.md。私有后端接线，无公开API/SSE/前端或实际调度；预算/操作终态留T014/T015，Provider0/catalog_only/H保持；下一T014待授权。
+
+2026-10-22 T014：用户明确要求继续T14，已实现PG渐进调度、两槽租约、先预约后唯一dispatch出站、13/40累计及token/费用边界、分类重试和未知结果隔离；0041只追加审计，原收据兼容。实际PG/Mock及回归445 passed/0skip，交接docs/acceptance/phase-1.5-course-scheduler-t014/README.md。私有显式Worker循环，无生产Provider/HTTP/SSE/部署接线，Provider0/catalog_only/H保持；下一T015取消恢复待授权。
+
+2026-10-23 T015：用户要求继续并在中断后恢复，已实现取消epoch围栏/扫描收尾、在途尽力中断与迟到仅结算、显式resume/clarify新操作及只读刷新，0042只追加来源关系，保留ready版本及失败历史。实际PG/Mock回归474 passed/0skip，交接docs/acceptance/phase-1.5-course-recovery-t015/README.md。Provider0/catalog_only/H及旧签核保持，无公开HTTP/CSRF/SSE/生产Worker或真实调用；下一T016局部修订待授权。
+
+2026-10-23 T016：用户授权持续完成T016–T020。T016已实现结构影响确认、私有新计划/来源复制、完整替换集合原子发布、调整澄清/null基线及过期围栏，484 passed/0skip，交接docs/acceptance/phase-1.5-course-revision-t016/README.md。T019撤销接点尚空且API未开放，Provider0/catalog_only/H保持；完成提交后按既有授权领取T017，T020后停止。
 
 ### 以下为历史阶段上下文（状态以当前根账本及只读归档为准）
 

@@ -1,0 +1,39 @@
+{
+  "status": "prepared_pending_exact_approval",
+  "validated_at": "2026-10-27T17:22:40+08:00",
+  "source_baseline": "d9b3fa0c4e726d8385df3f9500deff84f0d93d05",
+  "real_provider_calls": 0,
+  "real_output_directory_created": false,
+  "real_database_created": false,
+  "distinct_tests_passed": 85,
+  "skipped": 0,
+  "offline": {
+    "command": "backend/.venv/bin/python -m pytest scripts/tests/test_p15_full_diagnostic_r04.py scripts/tests/test_p15_full_r04_gate.py scripts/tests/test_p15_sol_compatibility_proposal.py -q --junitxml=/tmp/edumind-p15-full-r04-offline.xml",
+    "passed": 83
+  },
+  "pg_mock": {
+    "command": "python3 /tmp/edumind-full-r04-pg.py",
+    "expanded_test": "backend/.venv/bin/python -m pytest backend/tests/test_p15_full_diagnostic_r04.py -q --junitxml=/tmp/edumind-p15-full-r04-pg.xml",
+    "passed": 2,
+    "database": "edumind_catalog_p15_t020_full_r04_offline",
+    "pg_container_restored": "exited"
+  },
+  "checks": {
+    "ruff": 0,
+    "workflow": 0,
+    "diff_check": 0,
+    "package_check": 0,
+    "pending_step_expected_exit": 2,
+    "pending_step_actual_exit": 2,
+    "pending_step_code": "EXACT_FULL_BATCH_AND_NEW_WINDOW_APPROVAL_REQUIRED"
+  },
+  "initial_pg_failures": "Negative fixture reason was incorrectly a Chinese explanation and then unsupported_scope. Both correctly rejected by original Schema; inspected exact enum and corrected fixture to out_of_scope. No Schema/assertion weakening or real calls.",
+  "warning": "Existing Starlette BlockingPortal deprecation (1)",
+  "junit_sha256": {
+    "/tmp/edumind-p15-full-r04-offline.xml": "006f389f673ea4c168b39f0716f0dc4491ebb9c2a0cf2cbe5ed62b2dd2bf65d3",
+    "/tmp/edumind-p15-full-r04-pg.xml": "b3abdf9c4cdb205a4936731cdb02214d58c7e06a05a6308d5c1523dbaa14b3f9"
+  },
+  "old_batches_restarted": false,
+  "production_mode": "catalog_only",
+  "T038_completed": false
+}

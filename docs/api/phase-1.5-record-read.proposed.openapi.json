@@ -1,0 +1,470 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Phase 1.5 owner read supplement",
+    "version": "r01-proposed",
+    "description": "ADR0028 proposed; no implementation or real execution authorization."
+  },
+  "paths": {
+    "/api/free-courses/{course_id}/records": {
+      "get": {
+        "x-status": "planned",
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "course_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "kind",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "enum": [
+                "attempt",
+                "operation",
+                "feedback",
+                "tutor"
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20
+            }
+          },
+          {
+            "name": "before_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Private no-store owner projection",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecordPage"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Session required"
+          },
+          "404": {
+            "description": "Uniform NOT_FOUND"
+          },
+          "422": {
+            "description": "Invalid parameters"
+          }
+        }
+      }
+    },
+    "/api/mastery/nodes/{node_id}/revisions": {
+      "get": {
+        "x-status": "planned",
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "node_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]{1,63}$"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20
+            }
+          },
+          {
+            "name": "before_revision",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Private no-store owner projection",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RevisionPage"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Session required"
+          },
+          "404": {
+            "description": "Uniform NOT_FOUND"
+          },
+          "422": {
+            "description": "Invalid parameters"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "session": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "edumind_session"
+      }
+    },
+    "schemas": {
+      "RecordRef": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "record_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "record_id",
+          "created_at"
+        ]
+      },
+      "RecordPage": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "course_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "enum": [
+              "attempt",
+              "operation",
+              "feedback",
+              "tutor"
+            ]
+          },
+          "items": {
+            "type": "array",
+            "maxItems": 50,
+            "items": {
+              "$ref": "#/components/schemas/RecordRef"
+            }
+          },
+          "next_before_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "course_id",
+          "kind",
+          "items",
+          "next_before_id"
+        ]
+      },
+      "FreeAttemptRef": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "const": "free_course_attempt"
+          },
+          "course_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "course_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "scene_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "scene_version_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "exercise_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "exercise_version_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "attempt_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "kind",
+          "course_id",
+          "course_version",
+          "scene_id",
+          "scene_version_id",
+          "exercise_id",
+          "exercise_version_id",
+          "attempt_id"
+        ]
+      },
+      "LegacyRef": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "const": "legacy_evidence"
+          },
+          "resource_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "resource_version": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "learning_unit_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "kind",
+          "resource_id",
+          "resource_version",
+          "learning_unit_id"
+        ]
+      },
+      "RevisionSource": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "protocol": {
+            "enum": [
+              "free-course-v1",
+              "free-course-correction-v1",
+              "legacy",
+              "unavailable"
+            ]
+          },
+          "evidence_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reference": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/FreeAttemptRef"
+              },
+              {
+                "$ref": "#/components/schemas/LegacyRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "protocol",
+          "evidence_id",
+          "reference"
+        ]
+      },
+      "MasteryRevision": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "previous_score": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "score": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "status": {
+            "enum": [
+              "unseen",
+              "weak",
+              "learning",
+              "mastered"
+            ]
+          },
+          "rule_version": {
+            "type": "string",
+            "maxLength": 64
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "evidence_summary": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "recomputed_from_revision": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "source": {
+            "$ref": "#/components/schemas/RevisionSource"
+          }
+        },
+        "required": [
+          "revision",
+          "previous_score",
+          "score",
+          "status",
+          "rule_version",
+          "created_at",
+          "evidence_summary",
+          "recomputed_from_revision",
+          "source"
+        ]
+      },
+      "RevisionPage": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "node_id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]{1,63}$"
+          },
+          "items": {
+            "type": "array",
+            "maxItems": 50,
+            "items": {
+              "$ref": "#/components/schemas/MasteryRevision"
+            }
+          },
+          "next_before_revision": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "node_id",
+          "items",
+          "next_before_revision"
+        ]
+      }
+    }
+  }
+}

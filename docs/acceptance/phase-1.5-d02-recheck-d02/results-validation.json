@@ -1,0 +1,20 @@
+{
+  "tests": 17,
+  "errors": 0,
+  "failures": 0,
+  "skipped": 0,
+  "xml": "/tmp/edumind-d02-d02-results.xml",
+  "xml_sha256": "686017950992ac069f110a6e13c38235da600ff26cf3a083f5c9a308478061eb",
+  "real_calls_after_stop": 0,
+  "container_final_state": "exited",
+  "exact_diagnostic_python_processes_running": [],
+  "commands": [
+    "backend/.venv/bin/python -m pytest scripts/tests/test_p15_d02_d02_results.py -q --junitxml=/tmp/edumind-d02-d02-results.xml",
+    "backend/.venv/bin/python scripts/check_p15_d02_d02_results.py --check (expected exit 2)",
+    "backend/.venv/bin/ruff check scripts/check_p15_d02_d02_results.py scripts/tests/test_p15_d02_d02_results.py",
+    "python3 scripts/check_catalog_workflow.py",
+    "git diff --check"
+  ],
+  "self_review": "completed; not independent human review",
+  "resume_notes": "User interruption occurred after actual batch and result regressions completed. Resumed only evidence/reassessment; no sender process active. Process inventory needed sandbox escalation and tolerant UTF8 decoding, then confirmed empty match."
+}

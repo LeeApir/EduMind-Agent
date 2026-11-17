@@ -1,0 +1,284 @@
+[
+  {
+    "path": "/$schema",
+    "action": "annotation_only",
+    "original": "https://json-schema.org/draft/2020-12/schema"
+  },
+  {
+    "path": "/properties/questions/items/minLength",
+    "action": "local_validation",
+    "original": 1
+  },
+  {
+    "path": "/properties/questions/items/maxLength",
+    "action": "local_validation",
+    "original": 300
+  },
+  {
+    "path": "/properties/source_keys/uniqueItems",
+    "action": "local_validation",
+    "original": true
+  },
+  {
+    "path": "/properties/source_keys/items/minLength",
+    "action": "local_validation",
+    "original": 1
+  },
+  {
+    "path": "/properties/source_keys/items/maxLength",
+    "action": "local_validation",
+    "original": 64
+  },
+  {
+    "path": "/allOf",
+    "action": "local_validation",
+    "original": [
+      {
+        "if": {
+          "properties": {
+            "needs_clarification": {
+              "const": true
+            }
+          },
+          "required": [
+            "needs_clarification"
+          ]
+        },
+        "then": {
+          "properties": {
+            "plan": {
+              "type": "null"
+            },
+            "questions": {
+              "minItems": 1
+            },
+            "reason": {
+              "type": "string"
+            },
+            "source_keys": {
+              "minItems": 1
+            }
+          }
+        },
+        "else": {
+          "properties": {
+            "plan": {
+              "$ref": "#/$defs/PlanCandidate"
+            },
+            "questions": {
+              "maxItems": 0
+            },
+            "reason": {
+              "type": "null"
+            },
+            "source_keys": {
+              "maxItems": 0
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "path": "/$defs/PlanCandidate/properties/title/minLength",
+    "action": "local_validation",
+    "original": 1
+  },
+  {
+    "path": "/$defs/PlanCandidate/properties/title/maxLength",
+    "action": "local_validation",
+    "original": 2000
+  },
+  {
+    "path": "/$defs/PlanCandidate/properties/shared_example/minLength",
+    "action": "local_validation",
+    "original": 1
+  },
+  {
+    "path": "/$defs/PlanCandidate/properties/shared_example/maxLength",
+    "action": "local_validation",
+    "original": 2000
+  },
+  {
+    "path": "/$defs/PlanCandidate/properties/conventions/items/minLength",
+    "action": "local_validation",
+    "original": 1
+  },
+  {
+    "path": "/$defs/PlanCandidate/properties/conventions/items/maxLength",
+    "action": "local_validation",
+    "original": 2000
+  },
+  {
+    "path": "/$defs/PlanCandidate/x-internal",
+    "action": "annotation_only",
+    "original": true
+  },
+  {
+    "path": "/$defs/PlanObjective/properties/id/minLength",
+    "action": "local_validation",
+    "original": 1
+  },
+  {
+    "path": "/$defs/PlanObjective/properties/id/maxLength",
+    "action": "local_validation",
+    "original": 64
+  },
+  {
+    "path": "/$defs/PlanObjective/properties/description/minLength",
+    "action": "local_validation",
+    "original": 1
+  },
+  {
+    "path": "/$defs/PlanObjective/properties/description/maxLength",
+    "action": "local_validation",
+    "original": 2000
+  },
+  {
+    "path": "/$defs/PlanObjective/properties/source_key/anyOf/0/minLength",
+    "action": "local_validation",
+    "original": 1
+  },
+  {
+    "path": "/$defs/PlanObjective/properties/source_key/anyOf/0/maxLength",
+    "action": "local_validation",
+    "original": 2000
+  },
+  {
+    "path": "/$defs/PlanObjective/properties/source_excerpt/anyOf/0/minLength",
+    "action": "local_validation",
+    "original": 1
+  },
+  {
+    "path": "/$defs/PlanObjective/properties/source_excerpt/anyOf/0/maxLength",
+    "action": "local_validation",
+    "original": 2000
+  },
+  {
+    "path": "/$defs/PlanObjective/allOf",
+    "action": "local_validation",
+    "original": [
+      {
+        "if": {
+          "properties": {
+            "source": {
+              "const": "user_requirement"
+            }
+          },
+          "required": [
+            "source"
+          ]
+        },
+        "then": {
+          "properties": {
+            "source_key": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            },
+            "source_excerpt": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2000
+            }
+          }
+        },
+        "else": {
+          "properties": {
+            "source_key": {
+              "type": "null"
+            },
+            "source_excerpt": {
+              "type": "null"
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "path": "/$defs/PlanScene/properties/scene_key/minLength",
+    "action": "local_validation",
+    "original": 1
+  },
+  {
+    "path": "/$defs/PlanScene/properties/scene_key/maxLength",
+    "action": "local_validation",
+    "original": 64
+  },
+  {
+    "path": "/$defs/PlanScene/properties/title/minLength",
+    "action": "local_validation",
+    "original": 1
+  },
+  {
+    "path": "/$defs/PlanScene/properties/title/maxLength",
+    "action": "local_validation",
+    "original": 2000
+  },
+  {
+    "path": "/$defs/PlanScene/properties/purpose/minLength",
+    "action": "local_validation",
+    "original": 1
+  },
+  {
+    "path": "/$defs/PlanScene/properties/purpose/maxLength",
+    "action": "local_validation",
+    "original": 2000
+  },
+  {
+    "path": "/$defs/PlanScene/properties/forms/uniqueItems",
+    "action": "local_validation",
+    "original": true
+  },
+  {
+    "path": "/$defs/PlanScene/properties/objective_ids/uniqueItems",
+    "action": "local_validation",
+    "original": true
+  },
+  {
+    "path": "/$defs/PlanScene/properties/objective_ids/items/minLength",
+    "action": "local_validation",
+    "original": 1
+  },
+  {
+    "path": "/$defs/PlanScene/properties/objective_ids/items/maxLength",
+    "action": "local_validation",
+    "original": 64
+  },
+  {
+    "path": "/$defs/PlanScene/properties/depends_on/uniqueItems",
+    "action": "local_validation",
+    "original": true
+  },
+  {
+    "path": "/$defs/PlanScene/properties/depends_on/items/minLength",
+    "action": "local_validation",
+    "original": 1
+  },
+  {
+    "path": "/$defs/PlanScene/properties/depends_on/items/maxLength",
+    "action": "local_validation",
+    "original": 64
+  },
+  {
+    "path": "/$defs/Term/properties/term/minLength",
+    "action": "local_validation",
+    "original": 1
+  },
+  {
+    "path": "/$defs/Term/properties/term/maxLength",
+    "action": "local_validation",
+    "original": 100
+  },
+  {
+    "path": "/$defs/Term/properties/meaning/minLength",
+    "action": "local_validation",
+    "original": 1
+  },
+  {
+    "path": "/$defs/Term/properties/meaning/maxLength",
+    "action": "local_validation",
+    "original": 2000
+  }
+]

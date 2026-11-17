@@ -1,0 +1,141 @@
+{
+  "origin": "already-exposed synthetic d02 rejected planning output; no holdout/real learner",
+  "raw": {
+    "needs_clarification": false,
+    "plan": {
+      "title": "单链表头插法：用 C 代码与练习掌握头插",
+      "objectives": [
+        {
+          "id": "obj_head_insert",
+          "description": "能说明单链表头插法的核心步骤：新结点指向原首结点，头指针指向新结点，并理解其 O(1) 时间与逆序特性。",
+          "source": "user_requirement",
+          "source_key": "request_1",
+          "source_excerpt": "学习单链表头插"
+        },
+        {
+          "id": "obj_c_code",
+          "description": "能读懂并写出 C 语言实现的头插函数，正确处理空表与非空表两种情况。",
+          "source": "user_requirement",
+          "source_key": "request_1",
+          "source_excerpt": "用C代码和练习组织2个场景"
+        },
+        {
+          "id": "obj_practice",
+          "description": "能通过练习独立完成头插操作并判断插入后的链表顺序。",
+          "source": "user_requirement",
+          "source_key": "request_1",
+          "source_excerpt": "用C代码和练习组织2个场景"
+        },
+        {
+          "id": "obj_two_scenes",
+          "description": "课程按 2 个场景组织内容。",
+          "source": "user_requirement",
+          "source_key": "request_1",
+          "source_excerpt": "组织2个场景"
+        }
+      ],
+      "shared_example": "统一使用整型单链表结点 struct Node { int data; struct Node *next; };，头指针 head 指向首结点，空表时 head == NULL。示例依次头插 1、2、3，最终链表为 3 -> 2 -> 1 -> NULL。",
+      "terminology": [
+        {
+          "term": "头指针 head",
+          "meaning": "指向单链表第一个结点的指针；空表时为 NULL。"
+        },
+        {
+          "term": "头插法",
+          "meaning": "每次把新结点插入到链表最前端，使其成为新的首结点。"
+        },
+        {
+          "term": "新结点",
+          "meaning": "由 malloc 分配、data 已赋值、next 待设置的结点。"
+        },
+        {
+          "term": "逆序特性",
+          "meaning": "按输入顺序依次头插，得到的链表顺序与输入顺序相反。"
+        }
+      ],
+      "conventions": [
+        "所有代码使用 C 语言，结点类型统一为 struct Node。",
+        "示例数据统一为整数 1、2、3，便于对照结果。",
+        "头插函数统一命名为 insert_head，返回新的头指针。",
+        "图示统一用 [data|next] 表示结点，NULL 表示链尾。"
+      ],
+      "scenes": [
+        {
+          "scene_key": "scene_1",
+          "title": "头插法原理与 C 代码实现",
+          "purpose": "讲清头插的两步指针操作，并给出可读的 C 实现，覆盖空表与非空表。",
+          "forms": [
+            "text",
+            "code",
+            "visualization"
+          ],
+          "objective_ids": [
+            "obj_head_insert",
+            "obj_c_code"
+          ],
+          "depends_on": []
+        },
+        {
+          "scene_key": "scene_2",
+          "title": "头插法练习与结果判断",
+          "purpose": "通过练习巩固头插操作，能写出插入代码并预测头插序列后的链表顺序。",
+          "forms": [
+            "exercise",
+            "code"
+          ],
+          "objective_ids": [
+            "obj_practice",
+            "obj_c_code",
+            "obj_head_insert"
+          ],
+          "depends_on": [
+            "scene_1"
+          ]
+        }
+      ]
+    },
+    "questions": [],
+    "reason": null,
+    "source_keys": []
+  },
+  "inputs": {
+    "code_language": "C",
+    "course_id": "d9a1047c-0b6f-4b71-9da6-02cd1205f7ca",
+    "learner_evidence": {
+      "cognitive_style": null,
+      "engineering_preference": {
+        "code_first": true,
+        "source": "learner_statement"
+      },
+      "error_preferences": null,
+      "evidence": {
+        "engineering_preference": {
+          "source": "learner_statement"
+        },
+        "knowledge_base": {
+          "source": "learner_statement"
+        }
+      },
+      "extended_dimensions": null,
+      "knowledge_base": {
+        "self_report": "会C变量和循环，尚未系统学习指针与数据结构",
+        "source": "learner_statement"
+      },
+      "learning_goals": null,
+      "professional_background": null
+    },
+    "operation_id": "14c20b67-cb4c-40c8-873e-dc7f04a5aabf",
+    "original_goal": "学习单链表头插，用C代码和练习组织2个场景。",
+    "profile_id": "229e62d7-d7aa-4175-bc80-3f38dc0fb637",
+    "profile_version": 1,
+    "request_id": "c08d598c-7163-49a8-9592-3b2e93571502",
+    "request_sources": {
+      "request_1": {
+        "request_id": "c08d598c-7163-49a8-9592-3b2e93571502",
+        "text": "学习单链表头插，用C代码和练习组织2个场景。",
+        "version": 1
+      }
+    },
+    "teaching_language": "zh-CN"
+  }
+}

@@ -1,0 +1,289 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "blocks": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 32,
+      "items": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/TextBlock"
+          },
+          {
+            "$ref": "#/$defs/CodeBlock"
+          },
+          {
+            "$ref": "#/$defs/PrivateExerciseBlock"
+          },
+          {
+            "$ref": "#/$defs/VisualizationBlock"
+          }
+        ]
+      }
+    },
+    "actions": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "$ref": "#/$defs/Action"
+      }
+    }
+  },
+  "required": [
+    "blocks",
+    "actions"
+  ],
+  "$defs": {
+    "TextBlock": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "text"
+          ]
+        },
+        "anchor_id": {
+          "type": "string"
+        },
+        "markdown": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "anchor_id",
+        "markdown"
+      ]
+    },
+    "CodeBlock": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "code"
+          ]
+        },
+        "anchor_id": {
+          "type": "string"
+        },
+        "language": {
+          "type": "string",
+          "enum": [
+            "c"
+          ]
+        },
+        "source": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "anchor_id",
+        "language",
+        "source"
+      ]
+    },
+    "VisualElement": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "next_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "label",
+        "next_id"
+      ]
+    },
+    "VisualStep": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "caption": {
+          "type": "string"
+        },
+        "elements": {
+          "type": "array",
+          "maxItems": 32,
+          "items": {
+            "$ref": "#/$defs/VisualElement"
+          }
+        },
+        "highlight_ids": {
+          "type": "array",
+          "maxItems": 32,
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "caption",
+        "elements",
+        "highlight_ids"
+      ]
+    },
+    "VisualizationBlock": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "visualization"
+          ]
+        },
+        "anchor_id": {
+          "type": "string"
+        },
+        "visualization_type": {
+          "enum": [
+            "array",
+            "linked_list",
+            "stack",
+            "queue"
+          ],
+          "type": "string"
+        },
+        "text_alternative": {
+          "type": "string"
+        },
+        "steps": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 50,
+          "items": {
+            "$ref": "#/$defs/VisualStep"
+          }
+        }
+      },
+      "required": [
+        "kind",
+        "anchor_id",
+        "visualization_type",
+        "text_alternative",
+        "steps"
+      ]
+    },
+    "Action": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "enum": [
+            "highlight_block",
+            "show_step",
+            "pause"
+          ],
+          "type": "string"
+        },
+        "anchor_id": {
+          "type": "string"
+        },
+        "step_index": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "type",
+        "anchor_id",
+        "step_index"
+      ]
+    },
+    "PrivateQuestion": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "question_id": {
+          "type": "string"
+        },
+        "question": {
+          "type": "string"
+        },
+        "input_type": {
+          "type": "string",
+          "enum": [
+            "short_text"
+          ]
+        },
+        "answer_key": {
+          "type": "string"
+        },
+        "solution": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "question_id",
+        "question",
+        "input_type",
+        "answer_key",
+        "solution"
+      ]
+    },
+    "PrivateExerciseBlock": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "exercise"
+          ]
+        },
+        "anchor_id": {
+          "type": "string"
+        },
+        "question": {
+          "type": "string"
+        },
+        "items": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 4,
+          "items": {
+            "$ref": "#/$defs/PrivateQuestion"
+          }
+        },
+        "exercise_key": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "anchor_id",
+        "question",
+        "items",
+        "exercise_key"
+      ]
+    }
+  }
+}

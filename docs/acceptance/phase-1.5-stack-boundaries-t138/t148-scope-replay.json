@@ -1,0 +1,52 @@
+{
+  "rule": "stack-goal-evidence-v2",
+  "request_sha256": "c81f9273069f2594c141071d6c2fe2a571e3e0a5a5e76edbfe5ffd44954bb2d8",
+  "response_sha256": "97bd062d11c4dbedc7ae529d5cbf9da764ea61cd052b6569f70943f313ac2eed",
+  "original_goal": "理解栈操作和动态扩容",
+  "request_sources": {
+    "request_1": "理解栈操作和动态扩容"
+  },
+  "raw_output": {
+    "selection": "out_of_scope",
+    "evidence": [
+      {
+        "kind": "normal",
+        "source_key": "request_1",
+        "source_excerpt": "理解栈操作"
+      },
+      {
+        "kind": "unsupported",
+        "source_key": "request_1",
+        "source_excerpt": "动态扩容"
+      }
+    ]
+  },
+  "replay_digest": "76a8bd309003fcafc705729aef3a08fef107d3ab1f4403f50d6390076b5cefe9",
+  "outcome": {
+    "needs_clarification": true,
+    "plan": null,
+    "questions": [
+      "当前课程支持固定容量栈的正常操作和满栈、空栈拒绝。该目标超出支持范围。是否改为学习这些内容？"
+    ],
+    "reason": "out_of_scope",
+    "source_keys": [
+      "request_1"
+    ]
+  },
+  "body_allowed": false,
+  "review": {
+    "replay_digest": "76a8bd309003fcafc705729aef3a08fef107d3ab1f4403f50d6390076b5cefe9",
+    "verdict": "pass",
+    "reviewer": "独立教学审核助手",
+    "checks": {
+      "selection_semantics": "pass",
+      "original_evidence": "pass",
+      "scope_complete": "pass"
+    },
+    "notes": "两条引文均为 request_1 的逐字连续子串。「理解」统摄「栈操作」和「动态扩容」两项正向目标，整句无否定或排除。栈操作受支持，动态扩容超出固定容量范围。保留两条引文，结果仅给范围提示，无大纲或正文权限。"
+  },
+  "source_batch": "stack-goal-selection-v1",
+  "original_verdict": "STACK_SELECTION_EVIDENCE",
+  "original_stop": true,
+  "new_provider_calls": 0
+}

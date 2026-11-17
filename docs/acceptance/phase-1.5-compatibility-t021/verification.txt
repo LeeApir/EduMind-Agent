@@ -1,0 +1,9 @@
+backend/.venv/bin/python docs/acceptance/phase-1.5-compatibility-t021/run_checks.py --run-id r03 --output /tmp/edumind-p15-t021-r03
+PASS:697,46 actual isolated PostgreSQL groups,0 failure/error/skip;12new+573previous+112additionallegacy
+Ruff2 changed Python files PASS
+Strict mypy --config-file backend/pyproject.toml:7 compatibility service modules PASS (no runtime source edits)
+python3 docs/acceptance/phase-1.5-course-api-t020/build_contract.py --check PASS
+python3 scripts/check_catalog_workflow.py PASS; git diff --check PASS
+50 archived-ledger/migration files exactly match b0c9a08;30 approved files/5 manifests SHA256 intact
+Original unrelated README bytes preserved; holdouts not read; actual Provider0/production catalog_only
+r01:3passed9failed,synthetic catalog ID too long; r02:10passed2failed5teardownerrors,legacy key too short and RESTRICT audit cleanup; r03 all697PASS,corrected fixture protocol only

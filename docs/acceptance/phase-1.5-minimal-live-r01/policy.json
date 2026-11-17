@@ -1,0 +1,103 @@
+{
+  "version": "minimal-seven-protocol-v1",
+  "scope": "PHASE-1.5-T085",
+  "limits": {
+    "requests": 7,
+    "input_reservation": 57344,
+    "output_reservation": 16896,
+    "fee_cap": null,
+    "wall_seconds": 900,
+    "per_request_seconds": 60,
+    "dns_seconds": 9,
+    "request_bytes": 65536,
+    "response_bytes": 262144
+  },
+  "requests": [
+    {
+      "name": "S1",
+      "stage": "C_plan",
+      "role": "generation",
+      "url": "https://api.deepseek.com/responses",
+      "model": "deepseek-flash",
+      "reasoning": "none",
+      "input_reservation": 8192,
+      "max_output_tokens": 512
+    },
+    {
+      "name": "S2",
+      "stage": "C_content",
+      "role": "generation",
+      "url": "https://api.deepseek.com/responses",
+      "model": "deepseek-flash",
+      "reasoning": "none",
+      "input_reservation": 8192,
+      "max_output_tokens": 2048
+    },
+    {
+      "name": "S3",
+      "stage": "C_repair",
+      "role": "generation",
+      "url": "https://api.deepseek.com/responses",
+      "model": "deepseek-flash",
+      "reasoning": "none",
+      "input_reservation": 8192,
+      "max_output_tokens": 2048
+    },
+    {
+      "name": "S4",
+      "stage": "B_generate",
+      "role": "generation",
+      "url": "https://api.deepseek.com/responses",
+      "model": "deepseek-flash",
+      "reasoning": "none",
+      "input_reservation": 8192,
+      "max_output_tokens": 4096
+    },
+    {
+      "name": "S5",
+      "stage": "B_repair",
+      "role": "generation",
+      "url": "https://api.deepseek.com/responses",
+      "model": "deepseek-flash",
+      "reasoning": "none",
+      "input_reservation": 8192,
+      "max_output_tokens": 4096
+    },
+    {
+      "name": "S6",
+      "stage": "review_B",
+      "role": "review",
+      "url": "https://aiapi.world/v1/responses",
+      "model": "gpt-6.1-sol",
+      "reasoning": "low",
+      "input_reservation": 8192,
+      "max_output_tokens": 2048
+    },
+    {
+      "name": "S7",
+      "stage": "review_C",
+      "role": "review",
+      "url": "https://aiapi.world/v1/responses",
+      "model": "gpt-6.1-sol",
+      "reasoning": "low",
+      "input_reservation": 8192,
+      "max_output_tokens": 2048
+    }
+  ],
+  "response_policy": {
+    "schema_echo_required": true,
+    "no_future_enforcement_claim": true,
+    "message_phase": [
+      "absent",
+      "final_answer"
+    ],
+    "review_instruction_suffix": "\n\nYou are a helpful coding assistant.",
+    "review_reasoning_summary_max_chars": 4096,
+    "paired_uuid_metadata_only": true
+  },
+  "course_calls": false,
+  "no_retry": true,
+  "no_redirect": true,
+  "no_fallback": true,
+  "no_restart": true
+}

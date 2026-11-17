@@ -1,0 +1,343 @@
+{
+  "slot_id": "D01-known",
+  "source_sha256": "2c2cd66a24543cc80529dc88140f9a3ceb3cac307ab5daa818bcb4055090864e",
+  "reviewer": "Codex assistant",
+  "review_type": "delegated_assistant",
+  "independent_human_truth": false,
+  "reviewed_at": "2026-10-27T22:06:12+08:00",
+  "model_opinion_seen_before_review": false,
+  "exhaustive_coverage_attested": true,
+  "natural_severe_errors": 0,
+  "atomic_facts": [
+    {
+      "source_sha256": "2c2cd66a24543cc80529dc88140f9a3ceb3cac307ab5daa818bcb4055090864e",
+      "anchor_id": "scene_intro",
+      "source_pointer": "/scene/content/blocks/0/markdown",
+      "evidence_quote": "int a[5] = {10, 20, 30, 40, 50};",
+      "statement": "共享C数组初始长度5，合法下标0至4，初值依序10到50。",
+      "reason": "逐项核对声明及正文，五个int元素，下标0起，a0=10/a4=50。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "2c2cd66a24543cc80529dc88140f9a3ceb3cac307ab5daa818bcb4055090864e",
+      "anchor_id": "scene_intro",
+      "source_pointer": "/scene/content/blocks/0/markdown",
+      "evidence_quote": "一个接一个排列",
+      "statement": "数组元素按sizeof(int)连续存放，无元素间间隙。",
+      "reason": "C数组同型元素连续，sizeof包含元素对象大小；正文未假定int固定4字节。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "2c2cd66a24543cc80529dc88140f9a3ceb3cac307ab5daa818bcb4055090864e",
+      "anchor_id": "scene_concept",
+      "source_pointer": "/scene/content/blocks/1/markdown",
+      "evidence_quote": "base + i * s",
+      "statement": "给定首地址与每元素字节大小s，位置i偏移i*s。",
+      "reason": "按字节地址的数学模型解释；未输出错误的C指针算术表达式，不假定s=4。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "2c2cd66a24543cc80529dc88140f9a3ceb3cac307ab5daa818bcb4055090864e",
+      "anchor_id": "scene_concept",
+      "source_pointer": "/scene/content/blocks/1/markdown",
+      "evidence_quote": "不需要从头逐个查找",
+      "statement": "已知合法下标可直接定位，不是按值逐个搜索。",
+      "reason": "数组索引寻址模型，已知i直接计算；不是声称按值搜索O(1)。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "2c2cd66a24543cc80529dc88140f9a3ceb3cac307ab5daa818bcb4055090864e",
+      "anchor_id": "scene_concept",
+      "source_pointer": "/scene/content/blocks/1/markdown",
+      "evidence_quote": "0` 到 `长度-1",
+      "statement": "本例5元素下标0..4；负下标和读取下标5越界。",
+      "reason": "长度5；代码只在范围检查后访问，未把声明a[5]当成第6个元素。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "2c2cd66a24543cc80529dc88140f9a3ceb3cac307ab5daa818bcb4055090864e",
+      "anchor_id": "scene_concept",
+      "source_pointer": "/scene/content/blocks/1/markdown",
+      "evidence_quote": "未定义行为",
+      "statement": "越界访问没有可依赖结果，可能垃圾值或崩溃。",
+      "reason": "此处列可能性而非保证结果，未把UB当固定异常或返回值。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "2c2cd66a24543cc80529dc88140f9a3ceb3cac307ab5daa818bcb4055090864e",
+      "anchor_id": "scene_array_vis",
+      "source_pointer": "/scene/content/blocks/2/steps/0/caption",
+      "evidence_quote": "初始状态：5 个整数连续存放，下标 0–4 依次为 10、20、30、40、50。",
+      "statement": "可视化步骤0的数组值/顺序/指向和访问说明一致。",
+      "reason": "步骤0初始无高亮；步骤1/2/3分别读0/2/4得10/30/50；步骤4文字清楚说明5越界，仍高亮最后合法e4，未创造第6个元素。图中文字已说明next关系为相邻位置，非运行指针。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "2c2cd66a24543cc80529dc88140f9a3ceb3cac307ab5daa818bcb4055090864e",
+      "anchor_id": "scene_array_vis",
+      "source_pointer": "/scene/content/blocks/2/steps/1/caption",
+      "evidence_quote": "访问 a[0]：偏移 0×s，直接定位到首元素，得到 10。",
+      "statement": "可视化步骤1的数组值/顺序/指向和访问说明一致。",
+      "reason": "步骤0初始无高亮；步骤1/2/3分别读0/2/4得10/30/50；步骤4文字清楚说明5越界，仍高亮最后合法e4，未创造第6个元素。图中文字已说明next关系为相邻位置，非运行指针。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "2c2cd66a24543cc80529dc88140f9a3ceb3cac307ab5daa818bcb4055090864e",
+      "anchor_id": "scene_array_vis",
+      "source_pointer": "/scene/content/blocks/2/steps/2/caption",
+      "evidence_quote": "访问 a[2]：偏移 2×s，一步定位到第 3 个元素，得到 30。",
+      "statement": "可视化步骤2的数组值/顺序/指向和访问说明一致。",
+      "reason": "步骤0初始无高亮；步骤1/2/3分别读0/2/4得10/30/50；步骤4文字清楚说明5越界，仍高亮最后合法e4，未创造第6个元素。图中文字已说明next关系为相邻位置，非运行指针。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "2c2cd66a24543cc80529dc88140f9a3ceb3cac307ab5daa818bcb4055090864e",
+      "anchor_id": "scene_array_vis",
+      "source_pointer": "/scene/content/blocks/2/steps/3/caption",
+      "evidence_quote": "访问 a[4]：偏移 4×s，定位到最后一个合法元素，得到 50。",
+      "statement": "可视化步骤3的数组值/顺序/指向和访问说明一致。",
+      "reason": "步骤0初始无高亮；步骤1/2/3分别读0/2/4得10/30/50；步骤4文字清楚说明5越界，仍高亮最后合法e4，未创造第6个元素。图中文字已说明next关系为相邻位置，非运行指针。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "2c2cd66a24543cc80529dc88140f9a3ceb3cac307ab5daa818bcb4055090864e",
+      "anchor_id": "scene_array_vis",
+      "source_pointer": "/scene/content/blocks/2/steps/4/caption",
+      "evidence_quote": "下标 5 越界：数组只有 0–4 这 5 个位置，a[5] 不属于数组，是未定义行为。",
+      "statement": "可视化步骤4的数组值/顺序/指向和访问说明一致。",
+      "reason": "步骤0初始无高亮；步骤1/2/3分别读0/2/4得10/30/50；步骤4文字清楚说明5越界，仍高亮最后合法e4，未创造第6个元素。图中文字已说明next关系为相邻位置，非运行指针。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "2c2cd66a24543cc80529dc88140f9a3ceb3cac307ab5daa818bcb4055090864e",
+      "anchor_id": "scene_array_vis",
+      "source_pointer": "/scene/content/blocks/2/text_alternative",
+      "evidence_quote": "下标 0 到 4",
+      "statement": "替代文本完整说明5个元素及越界边界。",
+      "reason": "逐项与全部五步/五个元素标签及高亮核对；未执行任何动画代码。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "2c2cd66a24543cc80529dc88140f9a3ceb3cac307ab5daa818bcb4055090864e",
+      "anchor_id": "scene_code",
+      "source_pointer": "/scene/content/blocks/3/source",
+      "evidence_quote": "for (i = 0; i < 5; i++)",
+      "statement": "C循环对i=0..4依次打印初始数组全部元素，共5次。",
+      "reason": "初始化0、每次+1、条件i<5，退出i=5，printf格式%d匹配int，未越界。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "2c2cd66a24543cc80529dc88140f9a3ceb3cac307ab5daa818bcb4055090864e",
+      "anchor_id": "scene_code",
+      "source_pointer": "/scene/content/blocks/3/source",
+      "evidence_quote": "a[2] = 99;",
+      "statement": "写入仅修改下标2为99，随后打印99。",
+      "reason": "赋值在前述遍历之后，合法下标2；不是改初始数组其他值。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "2c2cd66a24543cc80529dc88140f9a3ceb3cac307ab5daa818bcb4055090864e",
+      "anchor_id": "scene_code",
+      "source_pointer": "/scene/content/blocks/3/source",
+      "evidence_quote": "idx >= 0 && idx < 5",
+      "statement": "idx为5时范围检查失败，只打印越界提示，不求值a[idx]。",
+      "reason": "短路与if/else分支静态追踪；标准C99及以后支持声明位置，无非法执行/网络/任意文件操作。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "2c2cd66a24543cc80529dc88140f9a3ceb3cac307ab5daa818bcb4055090864e",
+      "anchor_id": "scene_code_note",
+      "source_pointer": "/scene/content/blocks/4/markdown",
+      "evidence_quote": "`< 5` 而不是 `<= 5`",
+      "statement": "代码要点说明循环边界、索引寻址、独立赋值和检查。",
+      "reason": "逐条与完整代码对照，四点均一致；偏移公式是字节模型，不是编写指针运算。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "2c2cd66a24543cc80529dc88140f9a3ceb3cac307ab5daa818bcb4055090864e",
+      "anchor_id": "scene_exercise",
+      "source_pointer": "/scene/content/blocks/5/question",
+      "evidence_quote": "每题只填一个规范答案",
+      "statement": "题组要求每题一个规范答案，选择题只填字母。",
+      "reason": "4个小题均有单独初始状态/有限数值域或显式选项域及输出格式。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "2c2cd66a24543cc80529dc88140f9a3ceb3cac307ab5daa818bcb4055090864e",
+      "anchor_id": "scene_exercise",
+      "source_pointer": "/scene/content/blocks/5/items/0/question",
+      "evidence_quote": "初始状态：int a[5] = {10, 20, 30, 40, 50};，尚未做任何修改。求表达式 a[3] 的值。答案是一个整数，范围 10–50，按十进制规范写法填写（例如 10）。",
+      "statement": "练习q1_read_value状态前提与单值答题要求明确。",
+      "reason": "单独初始a[3]=40，不继承代码a[2]=99。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "2c2cd66a24543cc80529dc88140f9a3ceb3cac307ab5daa818bcb4055090864e",
+      "anchor_id": "scene_exercise",
+      "source_pointer": "/scene/content/blocks/5/items/0/solution",
+      "evidence_quote": "下标 3 对应位置 3，即第 4 个元素。数组依次为 10、20、30、40、50，所以 a\\[3\\] = 40。",
+      "statement": "练习q1_read_value的私有解析与题干和参考键一致。",
+      "reason": "0基第4个元素40。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "2c2cd66a24543cc80529dc88140f9a3ceb3cac307ab5daa818bcb4055090864e",
+      "anchor_id": "scene_exercise",
+      "source_pointer": "/scene/content/blocks/5/items/1/question",
+      "evidence_quote": "初始状态：int a[5] = {10, 20, 30, 40, 50};。已执行一次赋值 a[1] = 77;，其他元素未改动。此时 a[1] 的值是多少？答案是一个整数，范围 10–99，按十进制规范写法填写。",
+      "statement": "练习q2_after_write状态前提与单值答题要求明确。",
+      "reason": "本题单独初始并明确a[1]=77，不继承其他题。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "2c2cd66a24543cc80529dc88140f9a3ceb3cac307ab5daa818bcb4055090864e",
+      "anchor_id": "scene_exercise",
+      "source_pointer": "/scene/content/blocks/5/items/1/solution",
+      "evidence_quote": "a\\[1\\] = 77; 把位置 1 的元素改写为 77，其他元素不变，所以 a\\[1\\] 的值是 77。",
+      "statement": "练习q2_after_write的私有解析与题干和参考键一致。",
+      "reason": "赋值位置1的值是77。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "2c2cd66a24543cc80529dc88140f9a3ceb3cac307ab5daa818bcb4055090864e",
+      "anchor_id": "scene_exercise",
+      "source_pointer": "/scene/content/blocks/5/items/2/question",
+      "evidence_quote": "初始状态：int a[5] = {10, 20, 30, 40, 50};，合法下标为 0–4。下列哪个下标访问属于越界访问？只填一个选项字母。选项：A. 0；B. 2；C. 4；D. 5。",
+      "statement": "练习q3_out_of_range状态前提与单值答题要求明确。",
+      "reason": "枚举A0/B2/C4/D5，唯一越界下标5对应D。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "2c2cd66a24543cc80529dc88140f9a3ceb3cac307ab5daa818bcb4055090864e",
+      "anchor_id": "scene_exercise",
+      "source_pointer": "/scene/content/blocks/5/items/2/solution",
+      "evidence_quote": "合法下标范围是 0 到 4。0、2、4 都在范围内；5 不小于数组长度 5，因此 a\\[5\\] 越界，属于未定义行为。选 D。",
+      "statement": "练习q3_out_of_range的私有解析与题干和参考键一致。",
+      "reason": "合法下标0..4，5越界且不可依赖结果。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "2c2cd66a24543cc80529dc88140f9a3ceb3cac307ab5daa818bcb4055090864e",
+      "anchor_id": "scene_exercise",
+      "source_pointer": "/scene/content/blocks/5/items/3/question",
+      "evidence_quote": "初始状态：int a[5] = {10, 20, 30, 40, 50};。执行循环 for (i = 0; i < 5; i++) { printf(\"%d\\n\", a[i]); }，循环体一共执行多少次？答案是一个整数，范围 0–10，按十进制规范写法填写。",
+      "statement": "练习q4_loop_count状态前提与单值答题要求明确。",
+      "reason": "独立初始状态，i=0..4循环5次，无其他循环体。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "2c2cd66a24543cc80529dc88140f9a3ceb3cac307ab5daa818bcb4055090864e",
+      "anchor_id": "scene_exercise",
+      "source_pointer": "/scene/content/blocks/5/items/3/solution",
+      "evidence_quote": "i 依次取 0、1、2、3、4，共 5 个值，每次条件 i &lt; 5 都成立；i 变为 5 时条件不成立，循环结束。因此循环体执行 5 次。",
+      "statement": "练习q4_loop_count的私有解析与题干和参考键一致。",
+      "reason": "五次合法访问，到i=5退出；清洗的&lt;仍可明确识别比较意义。",
+      "verdict": "pass"
+    },
+    {
+      "source_sha256": "2c2cd66a24543cc80529dc88140f9a3ceb3cac307ab5daa818bcb4055090864e",
+      "anchor_id": "scene_summary",
+      "source_pointer": "/scene/content/blocks/6/markdown",
+      "evidence_quote": "base + i * s",
+      "statement": "小结复述连续存储、随机访问、下标范围与循环检查习惯。",
+      "reason": "与正文/代码逐条一致，无新增未支持事实；未把地址公式误当可直接运行的C代码。",
+      "verdict": "pass"
+    }
+  ],
+  "answer_checks": [
+    {
+      "source_sha256": "2c2cd66a24543cc80529dc88140f9a3ceb3cac307ab5daa818bcb4055090864e",
+      "anchor_id": "scene_exercise",
+      "question_id": "q1_read_value",
+      "answer_key": "40",
+      "verdict": "pass",
+      "reason": "初始数组下标3是40；非第3个元素30。",
+      "safe_for_exact_scoring": true,
+      "accepted_inputs": [
+        "40"
+      ],
+      "rejected_inputs": [
+        "30"
+      ]
+    },
+    {
+      "source_sha256": "2c2cd66a24543cc80529dc88140f9a3ceb3cac307ab5daa818bcb4055090864e",
+      "anchor_id": "scene_exercise",
+      "question_id": "q2_after_write",
+      "answer_key": "77",
+      "verdict": "pass",
+      "reason": "单题明确执行a[1]=77，读同位置得77。",
+      "safe_for_exact_scoring": true,
+      "accepted_inputs": [
+        "77"
+      ],
+      "rejected_inputs": [
+        "20"
+      ]
+    },
+    {
+      "source_sha256": "2c2cd66a24543cc80529dc88140f9a3ceb3cac307ab5daa818bcb4055090864e",
+      "anchor_id": "scene_exercise",
+      "question_id": "q3_out_of_range",
+      "answer_key": "D",
+      "verdict": "pass",
+      "reason": "仅D的下标5不在0..4内。",
+      "safe_for_exact_scoring": true,
+      "accepted_inputs": [
+        "D"
+      ],
+      "rejected_inputs": [
+        "A"
+      ]
+    },
+    {
+      "source_sha256": "2c2cd66a24543cc80529dc88140f9a3ceb3cac307ab5daa818bcb4055090864e",
+      "anchor_id": "scene_exercise",
+      "question_id": "q4_loop_count",
+      "answer_key": "5",
+      "verdict": "pass",
+      "reason": "i从0到4共五次，i=5不执行。",
+      "safe_for_exact_scoring": true,
+      "accepted_inputs": [
+        "5"
+      ],
+      "rejected_inputs": [
+        "4"
+      ]
+    }
+  ],
+  "blind_items": [
+    {
+      "area": "requirements",
+      "location": "/scene",
+      "verdict": "pass",
+      "reason": "原目标单场景/C代码/练习/位置访问均覆盖；原计划1场景并含分配可视化。"
+    },
+    {
+      "area": "learnability",
+      "location": "/scene",
+      "verdict": "pass",
+      "reason": "声明/定位公式/五步静态图/完整C示例/4题与小结构成单场景，代码可静态追踪，无执行。"
+    },
+    {
+      "area": "facts",
+      "location": "/scene",
+      "verdict": "pass",
+      "reason": "逐块及逐题事实核对如原子清单；无已确认事实错误。"
+    },
+    {
+      "area": "answers",
+      "location": "/scene",
+      "verdict": "pass",
+      "reason": "四个单值参考键40/77/D/5，分别明确状态与域/格式，没有开放解释句精确评分键。"
+    },
+    {
+      "area": "profile",
+      "location": "/scene",
+      "verdict": "pass",
+      "reason": "画像仍作为自述；首段即给C数组声明，示例使用已自述变量/循环，不要求指针运算；未臆测已掌握数据结构。"
+    }
+  ],
+  "pair_comparison": "pending D01-unknown; do not claim pair success",
+  "c_execution_performed": false
+}

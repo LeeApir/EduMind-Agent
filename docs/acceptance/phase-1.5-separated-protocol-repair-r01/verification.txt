@@ -1,0 +1,27 @@
+T086 — 2026-10-29 Asia/Shanghai. Developer offline design/self-review only.
+
+The exact S5 message text was extracted read-only from the preserved private response after verifying its SHA256 23e31386e8ef1c49068a2992539f5f1c354742e85357c2620510d8804ee7a2ba. Kept exactly 3306 UTF-8 bytes/chars, no final newline, text SHA256 fb558f5f285d786a539462fdeaa36697e83a3be9792dbc62bb69c7e07e023156. No transport metadata/IDs or credentials copied to Git. Valid Schema and parsed prefix are explicitly derived negative controls, not repaired responses.
+
+First new regression run: 29 passed. Input-matrix refinement replaced generic context keys with the actual role_input/protocol_stage names and fixed original_input block from T085, improving relevance; no runtime Schema/validator changed. The new tests retained all expectations and again passed. Initial Ruff found two unused imports in the new checker/test; removed those imports, no assertions weakened. Final results appended below.
+
+This is a design/example package, not a runnable live package. No --run, key loading, DNS, Provider or C execution. Current Schema/strict parser/wire/local checks and T085 raw/frozen sources unchanged. Repair mechanical acceptance explicitly remains pending independent semantic review, including a deliberately false but structurally valid explanation.
+
+Final actual verification:
+- PYTHONPATH=backend:. backend/.venv/bin/python -m pytest scripts/tests/test_p15_protocol_task_separation.py scripts/tests/test_p15_minimal_probe.py scripts/tests/test_p15_minimal_contract.py scripts/tests/test_p15_minimal_pilot.py scripts/tests/test_p15_head_insertion_engine.py scripts/tests/test_p15_agent_pilot.py scripts/tests/test_p15_pilot_baseline.py -q --tb=short --junitxml=/private/tmp/edumind-p15-t086.xml
+  441 passed / 0 failed / 0 skipped in 7.38s: 29 new + 412 existing. Mock traffic only.
+- PYTHONPATH=backend:. backend/.venv/bin/python docs/acceptance/phase-1.5-separated-protocol-repair-r01/check_design.py
+  passed: seven exact inputs / five one-patch pairs / five repair-output examples / original3306-char text; 20 frozen proposal files, 136 source pins, all129 original execution files and original result/grant digests unchanged, 38 relative links. This is design consistency, not independent semantic grading or new package approval.
+- MYPYPATH=backend:. backend/.venv/bin/mypy --strict --explicit-package-bases --follow-imports=silent docs/acceptance/phase-1.5-separated-protocol-repair-r01/check_design.py
+  Success, one new design-check source.
+- backend/.venv/bin/ruff check docs/acceptance/phase-1.5-separated-protocol-repair-r01/check_design.py scripts/tests/test_p15_protocol_task_separation.py
+  Passed after removal of two unused imports.
+- Inline runpy of the final design checker with .env reads, API_KEY lookup, DNS/socket operations forbidden.
+  All guarded checks passed. No new credentials or outbound requests.
+- python3 scripts/check_catalog_workflow.py / git diff --check
+  Passed. Only new proposal/tests and scope governance changed. No existing validator, Schema, Prompt, T085 package, grant or result file modified.
+
+Developer self-review: P/W have one echo goal and identical target/system/configuration; each patch matches the frozen parent independently. R has no expected_output and no exact reference rewrite in its request; the original is handwritten, not evidence of model baseline generation. Mechanical repair acceptance requires exactly one changed paragraph and leaves both good-looking and deliberately wrong text pending independent review. Raw invalid JSON, valid Schema-as-answer and parsed prefix all stay rejected under the old strict observer; the full fifth-slot Mock regression stops before S6/S7. No changed assertions or JSON salvage.
+
+Pending decisions: ADR0048 A-D and matrix scope/causal limits need the evaluation assistant's review. No independent evaluation or live approval is recorded. Only after review should a new exact validation package/rates/currency/budget/window be prepared and requested. Current proposed seven examples are NOT the old seven slots, do not inherit T085's unused two calls or fee exception, and do not establish full-role/course admission. Stop at this offline design handoff.
+
+Proposal manifest SHA256: abe3f498b662c526f6a85c569fbfbbb63f448af2b30689168cb050e03984ebea

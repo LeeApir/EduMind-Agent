@@ -31,6 +31,7 @@ class StudentProfile(Base):
     __tablename__ = "student_profiles"
     __table_args__ = (
         UniqueConstraint("user_id", "version", name="uq_student_profiles_user_version"),
+        UniqueConstraint("user_id", "id", "version", name="uq_student_profiles_owner_id_version"),
         UniqueConstraint(
             "user_id", "idempotency_key", name="uq_student_profiles_user_idempotency_key"
         ),

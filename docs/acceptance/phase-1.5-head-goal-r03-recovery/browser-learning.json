@@ -1,0 +1,779 @@
+{
+  "scene": {
+    "course_id": "88004ec4-7a7e-42a3-aeda-b2afda4a89c5",
+    "course_version": 2,
+    "scene_id": "1fba7567-c4b2-4538-8d8d-8f9950f93839",
+    "scene_version_id": "db7315e9-eae7-40fb-af17-9c8bf6c67d1b",
+    "blocks": [
+      {
+        "kind": "text",
+        "markdown": "你自述已了解 C 指针、struct、NULL 和函数返回值。本课把这些当作起点，但不会假定你已经掌握按值传参的细节、局部变量的作用域与生存期、动态分配与自动存储的区别。若某处感到跳跃，请回到对应段落重读变量身份与箭头方向。",
+        "anchor_id": "text-0"
+      },
+      {
+        "kind": "text",
+        "markdown": "先固定示例中的身份：main 里声明了自动存储的节点 i0，i0.data 为 12，i0.next 为 NULL；caller_head 是 main 的局部指针，初值为 &i0。insert 的形参 head 是另一个变量，调用时只是把 caller_head 的指针值复制进去。因此 insert 内部改 head 不会改 caller_head，二者作用域不同：head 只在 insert 内存在，caller_head 只在 main 内存在。",
+        "anchor_id": "text-1"
+      },
+      {
+        "kind": "text",
+        "markdown": "第一次调用时，allocation_success 为 1，第 4 行让局部指针 p 指向新分配的动态节点 t0。此时 t0 的 data 与 next 都还是未初始化字段，不能读它们；只有先写 data，再写 next，节点才处于可遍历的完整状态。第 5 行的 if (p == NULL) 检查在分配成功时不成立，所以不会提前 return head，程序继续执行第 6、7 行。",
+        "anchor_id": "text-2"
+      },
+      {
+        "kind": "text",
+        "markdown": "第 6 行 p->data = value 把 4 写入 t0.data。第 7 行 p->next = head 是关键：右边的 head 此刻仍保存旧链表头 i0 的地址，于是 t0.next 指向 i0。这一步并没有修改 i0，也没有修改 caller_head；它只是让新节点 t0 的 next 保存旧头指针，从而把 t0 接到旧链表前面。第 8 行 return p 返回的是 t0 的地址，而不是 head。",
+        "anchor_id": "text-3"
+      },
+      {
+        "kind": "text",
+        "markdown": "回到 main 的第 15 行，调用写成 caller_head = insert(caller_head, 4, 1)。赋值把返回值 t0 存回 caller_head，于是 caller_head 从 i0 变为 t0，链表头更新为 t0，可达顺序是 t0→i0。若这里丢弃返回值，caller_head 仍是 i0，t0 虽然已分配且 t0.next 指向 i0，但从 caller_head 出发无法到达 t0，新节点就不可达了。",
+        "anchor_id": "text-4"
+      },
+      {
+        "kind": "text",
+        "markdown": "第二次调用时，传入的 head 副本是 t0，所以 insert 内的 head 与 caller_head 此刻值相同但仍是不同变量。第 4 行分配 t1，第 6 行写入 7，第 7 行 p->next = head 让 t1.next 指向 t0，第 8 行返回 t1。第 16 行 caller_head = insert(...) 把 t1 存回 caller_head，最终可达顺序为 t1→t0→i0，数据依次是 7、4、12，遍历在 i0.next 为 NULL 处终止。",
+        "anchor_id": "text-5"
+      },
+      {
+        "kind": "text",
+        "markdown": "关于 NULL 检查：第 5 行的 if (p == NULL) return head 在分配成功时被跳过，这正是本例两次调用的情况。它的意义是分配失败时直接返回旧头，让调用者保持原链表不变；但本课的动画只覆盖成功分配，不演示真实 malloc 失败，也不演示失败分支的执行。理解这一点即可，不要把“检查通过”误解为“检查不存在”。",
+        "anchor_id": "text-6"
+      },
+      {
+        "kind": "text",
+        "markdown": "关于未初始化字段：t0 刚分配时 data 与 next 都是不确定值，必须先写 data 再写 next，才能安全遍历。若在写 next 之前就遍历，next 的垃圾值会导致未定义行为。本例的追踪显示写 data 后 next 仍不确定，写 next 后才完整，这说明字段初始化顺序与节点可用性是两件事。",
+        "anchor_id": "text-7"
+      },
+      {
+        "kind": "code",
+        "source": "#include <stdlib.h>\ntypedef struct Node { int data; struct Node *next; } Node;\nNode *insert(Node *head, int value, int allocation_success) {\n    Node *p = allocation_success ? malloc(sizeof *p) : NULL;\n    if (p == NULL) return head;\n    p->data = value;\n    p->next = head;\n    return p;\n}\nint main(void) {\n    Node i0;\n    i0.data = 12;\n    i0.next = NULL;\n    Node *caller_head = &i0;\n    caller_head = insert(caller_head, 4, 1);\n    caller_head = insert(caller_head, 7, 1);\n    (void)caller_head;\n    return 0;\n}\n",
+        "language": "c",
+        "anchor_id": "head-code"
+      },
+      {
+        "kind": "visualization",
+        "steps": [
+          {
+            "caption": "初始状态：只有自动节点 i0",
+            "head_frame": {
+              "kind": "initial",
+              "line": null,
+              "note": "main 中 i0.data=12、i0.next=NULL，caller_head 指向 i0。insert 尚未调用，局部 head 与 p 都不存在，作用域仅在 main。",
+              "state": {
+                "p": null,
+                "nodes": {
+                  "i0": {
+                    "data": 12,
+                    "next": null
+                  }
+                },
+                "phase": "initial",
+                "attempt": null,
+                "returned": null,
+                "code_line": null,
+                "local_head": null,
+                "caller_head": "i0"
+              },
+              "title": "初始状态：只有自动节点 i0",
+              "fact_id": "trace_step_00",
+              "frame_id": "f00",
+              "code_anchor": "head-code",
+              "state_index": 0,
+              "locals_scope": "inactive"
+            }
+          },
+          {
+            "caption": "第 4 行：分配 t0，p 指向它",
+            "head_frame": {
+              "kind": "allocate",
+              "line": 4,
+              "note": "allocation_success 为 1，malloc 返回新动态节点 t0，局部 p 指向 t0。t0 的 data 与 next 仍是未初始化字段，不能读取。head 副本仍为 i0。",
+              "state": {
+                "p": "t0",
+                "nodes": {
+                  "i0": {
+                    "data": 12,
+                    "next": null
+                  },
+                  "t0": {
+                    "data": "indeterminate",
+                    "next": "indeterminate"
+                  }
+                },
+                "phase": "allocate",
+                "attempt": 0,
+                "returned": null,
+                "code_line": 4,
+                "local_head": "i0",
+                "caller_head": "i0"
+              },
+              "title": "第 4 行：分配 t0，p 指向它",
+              "fact_id": "trace_step_01",
+              "frame_id": "f01",
+              "code_anchor": "head-code",
+              "state_index": 1,
+              "locals_scope": "active"
+            }
+          },
+          {
+            "caption": "第 5 行：NULL 检查通过",
+            "head_frame": {
+              "kind": "success_null_check",
+              "line": 5,
+              "note": "p 不为 NULL，if (p == NULL) return head 不成立，不提前返回。此帧只表示检查通过，不表示发生过分配失败。",
+              "state": {
+                "p": "t0",
+                "nodes": {
+                  "i0": {
+                    "data": 12,
+                    "next": null
+                  },
+                  "t0": {
+                    "data": "indeterminate",
+                    "next": "indeterminate"
+                  }
+                },
+                "phase": "allocate",
+                "attempt": 0,
+                "returned": null,
+                "code_line": 4,
+                "local_head": "i0",
+                "caller_head": "i0"
+              },
+              "title": "第 5 行：NULL 检查通过",
+              "fact_id": "trace_step_01",
+              "frame_id": "f02",
+              "code_anchor": "head-code",
+              "state_index": 1,
+              "locals_scope": "active"
+            }
+          },
+          {
+            "caption": "第 6 行：写入 t0.data=4",
+            "head_frame": {
+              "kind": "data",
+              "line": 6,
+              "note": "p->data = value 把 4 写入 t0.data。t0.next 仍不确定，节点还不能安全遍历。caller_head 与 head 都仍指向 i0。",
+              "state": {
+                "p": "t0",
+                "nodes": {
+                  "i0": {
+                    "data": 12,
+                    "next": null
+                  },
+                  "t0": {
+                    "data": 4,
+                    "next": "indeterminate"
+                  }
+                },
+                "phase": "data",
+                "attempt": 0,
+                "returned": null,
+                "code_line": 6,
+                "local_head": "i0",
+                "caller_head": "i0"
+              },
+              "title": "第 6 行：写入 t0.data=4",
+              "fact_id": "trace_step_02",
+              "frame_id": "f03",
+              "code_anchor": "head-code",
+              "state_index": 2,
+              "locals_scope": "active"
+            }
+          },
+          {
+            "caption": "第 7 行：t0.next 指向旧头 i0",
+            "head_frame": {
+              "kind": "link",
+              "line": 7,
+              "note": "p->next = head 把旧头指针 i0 存入 t0.next，新节点接到旧链表前面。i0 与 caller_head 都未被修改。",
+              "state": {
+                "p": "t0",
+                "nodes": {
+                  "i0": {
+                    "data": 12,
+                    "next": null
+                  },
+                  "t0": {
+                    "data": 4,
+                    "next": "i0"
+                  }
+                },
+                "phase": "link",
+                "attempt": 0,
+                "returned": null,
+                "code_line": 7,
+                "local_head": "i0",
+                "caller_head": "i0"
+              },
+              "title": "第 7 行：t0.next 指向旧头 i0",
+              "fact_id": "trace_step_03",
+              "frame_id": "f04",
+              "code_anchor": "head-code",
+              "state_index": 3,
+              "locals_scope": "active"
+            }
+          },
+          {
+            "caption": "第 8 行：返回 t0",
+            "head_frame": {
+              "kind": "return",
+              "line": 8,
+              "note": "return p 返回 t0 的地址。insert 即将结束，局部 head 与 p 的作用域随之结束，但 t0 是动态存储，仍然存在。",
+              "state": {
+                "p": "t0",
+                "nodes": {
+                  "i0": {
+                    "data": 12,
+                    "next": null
+                  },
+                  "t0": {
+                    "data": 4,
+                    "next": "i0"
+                  }
+                },
+                "phase": "return",
+                "attempt": 0,
+                "returned": "t0",
+                "code_line": 8,
+                "local_head": "i0",
+                "caller_head": "i0"
+              },
+              "title": "第 8 行：返回 t0",
+              "fact_id": "trace_step_04",
+              "frame_id": "f05",
+              "code_anchor": "head-code",
+              "state_index": 4,
+              "locals_scope": "active"
+            }
+          },
+          {
+            "caption": "第 15 行：caller_head 接收返回值",
+            "head_frame": {
+              "kind": "caller",
+              "line": 15,
+              "note": "caller_head = insert(...) 把 t0 存回 caller_head，链表头从 i0 变为 t0。若丢弃返回值，caller_head 仍为 i0，t0 将不可达。",
+              "state": {
+                "p": "t0",
+                "nodes": {
+                  "i0": {
+                    "data": 12,
+                    "next": null
+                  },
+                  "t0": {
+                    "data": 4,
+                    "next": "i0"
+                  }
+                },
+                "phase": "caller",
+                "attempt": 0,
+                "returned": "t0",
+                "code_line": 15,
+                "local_head": "i0",
+                "caller_head": "t0"
+              },
+              "title": "第 15 行：caller_head 接收返回值",
+              "fact_id": "trace_step_05",
+              "frame_id": "f06",
+              "code_anchor": "head-code",
+              "state_index": 5,
+              "locals_scope": "inactive"
+            }
+          },
+          {
+            "caption": "第 4 行：第二次分配 t1",
+            "head_frame": {
+              "kind": "allocate",
+              "line": 4,
+              "note": "传入的 head 副本为 t0，malloc 返回 t1，局部 p 指向 t1。t1 的 data 与 next 未初始化，head 仍为 t0。",
+              "state": {
+                "p": "t1",
+                "nodes": {
+                  "i0": {
+                    "data": 12,
+                    "next": null
+                  },
+                  "t0": {
+                    "data": 4,
+                    "next": "i0"
+                  },
+                  "t1": {
+                    "data": "indeterminate",
+                    "next": "indeterminate"
+                  }
+                },
+                "phase": "allocate",
+                "attempt": 1,
+                "returned": null,
+                "code_line": 4,
+                "local_head": "t0",
+                "caller_head": "t0"
+              },
+              "title": "第 4 行：第二次分配 t1",
+              "fact_id": "trace_step_06",
+              "frame_id": "f07",
+              "code_anchor": "head-code",
+              "state_index": 6,
+              "locals_scope": "active"
+            }
+          },
+          {
+            "caption": "第 5 行：第二次 NULL 检查通过",
+            "head_frame": {
+              "kind": "success_null_check",
+              "line": 5,
+              "note": "p 不为 NULL，不提前返回 head。此帧同样只表示成功路径上的检查通过。",
+              "state": {
+                "p": "t1",
+                "nodes": {
+                  "i0": {
+                    "data": 12,
+                    "next": null
+                  },
+                  "t0": {
+                    "data": 4,
+                    "next": "i0"
+                  },
+                  "t1": {
+                    "data": "indeterminate",
+                    "next": "indeterminate"
+                  }
+                },
+                "phase": "allocate",
+                "attempt": 1,
+                "returned": null,
+                "code_line": 4,
+                "local_head": "t0",
+                "caller_head": "t0"
+              },
+              "title": "第 5 行：第二次 NULL 检查通过",
+              "fact_id": "trace_step_06",
+              "frame_id": "f08",
+              "code_anchor": "head-code",
+              "state_index": 6,
+              "locals_scope": "active"
+            }
+          },
+          {
+            "caption": "第 6 行：写入 t1.data=7",
+            "head_frame": {
+              "kind": "data",
+              "line": 6,
+              "note": "p->data = value 把 7 写入 t1.data。t1.next 仍不确定，尚未接入链表。",
+              "state": {
+                "p": "t1",
+                "nodes": {
+                  "i0": {
+                    "data": 12,
+                    "next": null
+                  },
+                  "t0": {
+                    "data": 4,
+                    "next": "i0"
+                  },
+                  "t1": {
+                    "data": 7,
+                    "next": "indeterminate"
+                  }
+                },
+                "phase": "data",
+                "attempt": 1,
+                "returned": null,
+                "code_line": 6,
+                "local_head": "t0",
+                "caller_head": "t0"
+              },
+              "title": "第 6 行：写入 t1.data=7",
+              "fact_id": "trace_step_07",
+              "frame_id": "f09",
+              "code_anchor": "head-code",
+              "state_index": 7,
+              "locals_scope": "active"
+            }
+          },
+          {
+            "caption": "第 7 行：t1.next 指向旧头 t0",
+            "head_frame": {
+              "kind": "link",
+              "line": 7,
+              "note": "p->next = head 把当前旧头 t0 存入 t1.next，t1 接到 t0 前面。caller_head 此刻仍为 t0，尚未更新。",
+              "state": {
+                "p": "t1",
+                "nodes": {
+                  "i0": {
+                    "data": 12,
+                    "next": null
+                  },
+                  "t0": {
+                    "data": 4,
+                    "next": "i0"
+                  },
+                  "t1": {
+                    "data": 7,
+                    "next": "t0"
+                  }
+                },
+                "phase": "link",
+                "attempt": 1,
+                "returned": null,
+                "code_line": 7,
+                "local_head": "t0",
+                "caller_head": "t0"
+              },
+              "title": "第 7 行：t1.next 指向旧头 t0",
+              "fact_id": "trace_step_08",
+              "frame_id": "f10",
+              "code_anchor": "head-code",
+              "state_index": 8,
+              "locals_scope": "active"
+            }
+          },
+          {
+            "caption": "第 8 行：返回 t1",
+            "head_frame": {
+              "kind": "return",
+              "line": 8,
+              "note": "return p 返回 t1。insert 结束，局部 head 与 p 失效；t1 是动态节点，继续存在。",
+              "state": {
+                "p": "t1",
+                "nodes": {
+                  "i0": {
+                    "data": 12,
+                    "next": null
+                  },
+                  "t0": {
+                    "data": 4,
+                    "next": "i0"
+                  },
+                  "t1": {
+                    "data": 7,
+                    "next": "t0"
+                  }
+                },
+                "phase": "return",
+                "attempt": 1,
+                "returned": "t1",
+                "code_line": 8,
+                "local_head": "t0",
+                "caller_head": "t0"
+              },
+              "title": "第 8 行：返回 t1",
+              "fact_id": "trace_step_09",
+              "frame_id": "f11",
+              "code_anchor": "head-code",
+              "state_index": 9,
+              "locals_scope": "active"
+            }
+          },
+          {
+            "caption": "第 16 行：caller_head 更新为 t1",
+            "head_frame": {
+              "kind": "caller",
+              "line": 16,
+              "note": "caller_head = insert(...) 把 t1 存回 caller_head，最终可达顺序 t1→t0→i0，数据 7、4、12，遍历在 NULL 处终止。",
+              "state": {
+                "p": "t1",
+                "nodes": {
+                  "i0": {
+                    "data": 12,
+                    "next": null
+                  },
+                  "t0": {
+                    "data": 4,
+                    "next": "i0"
+                  },
+                  "t1": {
+                    "data": 7,
+                    "next": "t0"
+                  }
+                },
+                "phase": "caller",
+                "attempt": 1,
+                "returned": "t1",
+                "code_line": 16,
+                "local_head": "t0",
+                "caller_head": "t1"
+              },
+              "title": "第 16 行：caller_head 更新为 t1",
+              "fact_id": "trace_step_10",
+              "frame_id": "f12",
+              "code_anchor": "head-code",
+              "state_index": 10,
+              "locals_scope": "inactive"
+            }
+          }
+        ],
+        "anchor_id": "head-state",
+        "text_alternative": "头插的核心是三步：分配新节点 p，写 p->data，再写 p->next = head，让新节点的 next 保存旧头指针，从而把新节点接到旧链表前面。insert 内的 head 只是按值传入的副本，作用域限于函数内；函数返回的是新头 p。调用者必须写成 caller_head = insert(...) 接收返回值，caller_head 才会更新为新头；若丢弃返回值，caller_head 仍指向旧头，新分配的动态节点不可达。NULL 检查在成功路径上被跳过，未初始化字段必须先写 data 再写 next 才能安全遍历。",
+        "visualization_type": "head_insertion_replay_v1"
+      },
+      {
+        "kind": "text",
+        "markdown": "本课假定 main 中的分配按给定掩码成功，动画只覆盖成功路径；条件掩码可以强制不分配，但真实 malloc 失败未被动画演示。第 5 行的 if (p == NULL) return head 在失败时会返回旧头，使调用者保持原链表不变，这一分支只作解释，不提供执行或清理动画。本课不证明任意 C 代码的内存安全，也不覆盖 free 的执行过程；关于释放的说明是规则性提醒，而非已演示的步骤。",
+        "anchor_id": "text-10"
+      },
+      {
+        "kind": "text",
+        "markdown": "i0 是 main 的自动存储节点，随 main 的作用域存在，不能 free。t0、t1 是 malloc 得到的动态节点，函数返回后仍然存在，需要由调用者管理。insert 的形参 head、value、allocation_success 与局部 p 都在函数返回后失效，但 p 所指的动态存储不随之消失。若要释放，只能对动态节点调用 free，并且应先保存 next 再 free 当前节点，避免 free 后继续读取该节点；绝不能对 i0 这类栈上节点调用 free。本课不提供清理动画或代码执行，遍历在 NULL 处终止，顺序由追踪给出。",
+        "anchor_id": "text-11"
+      },
+      {
+        "kind": "text",
+        "markdown": "头插的核心是三步：分配新节点 p，写 p->data，再写 p->next = head，让新节点的 next 保存旧头指针，从而把新节点接到旧链表前面。insert 内的 head 只是按值传入的副本，作用域限于函数内；函数返回的是新头 p。调用者必须写成 caller_head = insert(...) 接收返回值，caller_head 才会更新为新头；若丢弃返回值，caller_head 仍指向旧头，新分配的动态节点不可达。NULL 检查在成功路径上被跳过，未初始化字段必须先写 data 再写 next 才能安全遍历。",
+        "anchor_id": "text-12"
+      },
+      {
+        "kind": "exercise",
+        "anchor_id": "head-questions",
+        "exercise_id": "2126b685-b393-598c-aa6e-6ebf09cf9a47",
+        "exercise_version_id": "bd710a35-b4fd-51ee-892f-520d35f5da34",
+        "question": "迁移练习",
+        "items": [
+          {
+            "question_id": "link_target",
+            "question": "考虑如下 C 代码：\n\n#include <stdlib.h>\ntypedef struct Node { int data; struct Node *next; } Node;\nNode *insert(Node *head, int value, int allocation_success) {\n    Node *p = allocation_success ? malloc(sizeof *p) : NULL;\n    if (p == NULL) return head;\n    p->data = value;\n    p->next = head;\n    return p;\n}\nint main(void) {\n    Node i0;\n    Node i1;\n    i0.data = 30;\n    i0.next = &i1;\n    i1.data = 40;\n    i1.next = NULL;\n    Node *caller_head = &i0;\n    caller_head = insert(caller_head, 11, 1);\n    (void)caller_head;\n    return 0;\n}\n\n在正常代码路径下，insert 执行到 p->next = head 时，p->next 第一次被赋成的目标节点是哪一个？请只填写该初始节点的 C 变量名（不要加 & 或说明文字）。",
+            "input_type": "short_text"
+          },
+          {
+            "question_id": "normal_values",
+            "question": "考虑如下 C 代码：\n\n#include <stdlib.h>\ntypedef struct Node { int data; struct Node *next; } Node;\nNode *insert(Node *head, int value, int allocation_success) {\n    Node *p = allocation_success ? malloc(sizeof *p) : NULL;\n    if (p == NULL) return head;\n    p->data = value;\n    p->next = head;\n    return p;\n}\nint main(void) {\n    Node i0;\n    Node i1;\n    i0.data = 30;\n    i0.next = &i1;\n    i1.data = 40;\n    i1.next = NULL;\n    Node *caller_head = &i0;\n    caller_head = insert(caller_head, 11, 1);\n    (void)caller_head;\n    return 0;\n}\n\n在正常代码路径下，从 main 的 caller_head 出发沿 next 遍历直到 NULL，依次读到的 data 值是什么？请用一个 JSON 整数数组作答。",
+            "input_type": "json_integer_array"
+          },
+          {
+            "question_id": "discarded_values",
+            "question": "考虑如下 C 代码：\n\n#include <stdlib.h>\ntypedef struct Node { int data; struct Node *next; } Node;\nNode *insert(Node *head, int value, int allocation_success) {\n    Node *p = allocation_success ? malloc(sizeof *p) : NULL;\n    if (p == NULL) return head;\n    p->data = value;\n    p->next = head;\n    return p;\n}\nint main(void) {\n    Node i0;\n    Node i1;\n    i0.data = 30;\n    i0.next = &i1;\n    i1.data = 40;\n    i1.next = NULL;\n    Node *caller_head = &i0;\n    insert(caller_head, 11, 1);\n    (void)caller_head;\n    return 0;\n}\n\n若调用处丢弃返回值（如上写 insert(caller_head, 11, 1); 而不赋值），从 main 的 caller_head 出发沿 next 遍历直到 NULL，依次读到的 data 值是什么？请用一个 JSON 整数数组作答。",
+            "input_type": "json_integer_array"
+          },
+          {
+            "question_id": "unreachable_count",
+            "question": "考虑如下 C 代码：\n\n#include <stdlib.h>\ntypedef struct Node { int data; struct Node *next; } Node;\nNode *insert(Node *head, int value, int allocation_success) {\n    Node *p = allocation_success ? malloc(sizeof *p) : NULL;\n    if (p == NULL) return head;\n    p->data = value;\n    p->next = head;\n    return p;\n}\nint main(void) {\n    Node i0;\n    Node i1;\n    i0.data = 30;\n    i0.next = &i1;\n    i1.data = 40;\n    i1.next = NULL;\n    Node *caller_head = &i0;\n    insert(caller_head, 11, 1);\n    (void)caller_head;\n    return 0;\n}\n\n若调用处丢弃返回值（如上写 insert(caller_head, 11, 1); 而不赋值），从 main 的 caller_head 出发，有多少个动态分配的节点不可达？请用一个 JSON 整数作答。",
+            "input_type": "integer"
+          }
+        ]
+      }
+    ],
+    "generation_source": {
+      "batch": "head-goal-r03-derived",
+      "model": "deepseek-flash",
+      "origin": "head_goal_model_generation",
+      "plan_digest": "b6cc3d5304b87673c343a9cf31f11ae2cf8b44d4f12a07e852795ac71d4e4991",
+      "evidence_kind": "program_format_recovery",
+      "parent_digest": null,
+      "prompt_version": "head-goal-course-v1",
+      "format_recovery": {
+        "duplicates": [
+          {
+            "path": [
+              "questions",
+              "link_target"
+            ],
+            "occurrence": 2,
+            "value_sha256": "f15884d4db3fbfa167464458aaa7870e91dd69d8ef3488202b2b7cb6f8ef49bd",
+            "removed_member_index": 4
+          },
+          {
+            "path": [
+              "questions",
+              "normal_values"
+            ],
+            "occurrence": 2,
+            "value_sha256": "5936864c220d8d79a5456d1dfb76fd20ca50acf3f4a708ec3cb21323df6ce978",
+            "removed_member_index": 5
+          },
+          {
+            "path": [
+              "questions",
+              "discarded_values"
+            ],
+            "occurrence": 2,
+            "value_sha256": "4db9759abe350377f3f2184691e14c6b0b2dfc1e456b39e0f30915ea6c377ff1",
+            "removed_member_index": 6
+          },
+          {
+            "path": [
+              "questions",
+              "unreachable_count"
+            ],
+            "occurrence": 2,
+            "value_sha256": "46bac99ed0409a67c187815d97ab6c05cee1077428f0e119530bf37e852d1ce4",
+            "removed_member_index": 7
+          }
+        ],
+        "rule_version": "head-questions-identical-duplicate-v1",
+        "source_batch": "head-goal-r03",
+        "new_provider_calls": 0,
+        "original_raw_sha256": "4f05e35015c83b5660c3508e3b7e63671036ece326637ffeb56d5cf9d9f169ee",
+        "assistant_text_edits": 0,
+        "original_text_sha256": "3c070b9446b97a3bcf51120cdd2b2a05a72276c3c1857a1d567b9fd0d9547d17",
+        "derived_output_sha256": "2e9a95f36c6b68ecce520145238683551514cb7960025f2224754193da6ab4a4",
+        "original_request_sha256": "e646596ca6c49599f594613544b8d14f613493710f941d30e8e19da9f9bbbde1",
+        "model_first_structure_pass": false
+      },
+      "teaching_review": {
+        "verdict": "needs_revision",
+        "independent_evaluator": "/root/head_goal_independent"
+      },
+      "candidate_digest": "7fde0859549aef0e0e64415880ed67e541dbf3f0d302e7eeae6faf76090b0779",
+      "materials_digest": "a3fc33abf64a99528d9d2a94a66f9b0721e226e48084d18b384a788a8cf7ce1e"
+    },
+    "actions": [
+      {
+        "type": "show_step",
+        "anchor_id": "head-state",
+        "step_index": 0
+      },
+      {
+        "type": "show_step",
+        "anchor_id": "head-state",
+        "step_index": 1
+      },
+      {
+        "type": "show_step",
+        "anchor_id": "head-state",
+        "step_index": 2
+      },
+      {
+        "type": "show_step",
+        "anchor_id": "head-state",
+        "step_index": 3
+      },
+      {
+        "type": "show_step",
+        "anchor_id": "head-state",
+        "step_index": 4
+      },
+      {
+        "type": "show_step",
+        "anchor_id": "head-state",
+        "step_index": 5
+      },
+      {
+        "type": "show_step",
+        "anchor_id": "head-state",
+        "step_index": 6
+      },
+      {
+        "type": "show_step",
+        "anchor_id": "head-state",
+        "step_index": 7
+      },
+      {
+        "type": "show_step",
+        "anchor_id": "head-state",
+        "step_index": 8
+      },
+      {
+        "type": "show_step",
+        "anchor_id": "head-state",
+        "step_index": 9
+      },
+      {
+        "type": "show_step",
+        "anchor_id": "head-state",
+        "step_index": 10
+      },
+      {
+        "type": "show_step",
+        "anchor_id": "head-state",
+        "step_index": 11
+      },
+      {
+        "type": "show_step",
+        "anchor_id": "head-state",
+        "step_index": 12
+      }
+    ]
+  },
+  "frames": [
+    {
+      "frame": "f00",
+      "line": null,
+      "scope": "inactive"
+    },
+    {
+      "frame": "f01",
+      "line": 4,
+      "scope": "active"
+    },
+    {
+      "frame": "f02",
+      "line": 5,
+      "scope": "active"
+    },
+    {
+      "frame": "f03",
+      "line": 6,
+      "scope": "active"
+    },
+    {
+      "frame": "f04",
+      "line": 7,
+      "scope": "active"
+    },
+    {
+      "frame": "f05",
+      "line": 8,
+      "scope": "active"
+    },
+    {
+      "frame": "f06",
+      "line": 15,
+      "scope": "inactive"
+    },
+    {
+      "frame": "f07",
+      "line": 4,
+      "scope": "active"
+    },
+    {
+      "frame": "f08",
+      "line": 5,
+      "scope": "active"
+    },
+    {
+      "frame": "f09",
+      "line": 6,
+      "scope": "active"
+    },
+    {
+      "frame": "f10",
+      "line": 7,
+      "scope": "active"
+    },
+    {
+      "frame": "f11",
+      "line": 8,
+      "scope": "active"
+    },
+    {
+      "frame": "f12",
+      "line": 16,
+      "scope": "inactive"
+    }
+  ],
+  "played": "f02",
+  "paused": "f02",
+  "private_answers_hidden": true,
+  "source_label": "程序格式恢复 · r03 派生课程 · 未签核\n\n教学评估未通过 · 仅供审查预览：原文存在字段初始化顺序的错误因果，以及 NULL 检查的歧义。请勿据此学习这两项结论；原文保留供逐项复核。\n\ndeepseek-flash · head-goal-course-v1 · head-goal-r03-derived\n\n候选 7fde0859549aef0e0e64415880ed67e541dbf3f0d302e7eeae6faf76090b0779\n\n规划 b6cc3d5304b87673c343a9cf31f11ae2cf8b44d4f12a07e852795ac71d4e4991 · 共享材料 a3fc33abf64a99528d9d2a94a66f9b0721e226e48084d18b384a788a8cf7ce1e\n\n教学文字沿用 r03 模型原稿，仅删除四题完全相同的重复成员，未补写或改写。首稿结构不合格记录保留；代码、状态和答案由程序派生。新增模型调用为 0。",
+  "course_id": "88004ec4-7a7e-42a3-aeda-b2afda4a89c5",
+  "scene_id": "1fba7567-c4b2-4538-8d8d-8f9950f93839",
+  "attempt_requests": [
+    {
+      "url": "/api/free-courses/88004ec4-7a7e-42a3-aeda-b2afda4a89c5/attempts",
+      "status": 201
+    },
+    {
+      "url": "/api/free-courses/88004ec4-7a7e-42a3-aeda-b2afda4a89c5/attempts",
+      "status": 201
+    }
+  ],
+  "wrong_feedback": "随堂练习\n\n迁移练习\n\n题组版本 bd710a35-b4fd-51ee-892f-520d35f5da34 · 课程 v2\n\n1. 考虑如下 C 代码：\n\n#include <stdlib.h>\ntypedef struct Node { int data; struct Node *next; } Node;\nNode *insert(Node *head, int value, int allocation_success) {\n    Node *p = allocation_success ? malloc(sizeof *p) : NULL;\n    if (p == NULL) return head;\n    p->data = value;\n    p->next = head;\n    return p;\n}\nint main(void) {\n    Node i0;\n    Node i1;\n    i0.data = 30;\n    i0.next = &i1;\n    i1.data = 40;\n    i1.next = NULL;\n    Node *caller_head = &i0;\n    caller_head = insert(caller_head, 11, 1);\n    (void)caller_head;\n    return 0;\n}\n\n在正常代码路径下，insert 执行到 p->next = head 时，p->next 第一次被赋成的目标节点是哪一个？请只填写该初始节点的 C 变量名（不要加 & 或说明文字）。\n2. 考虑如下 C 代码：\n\n#include <stdlib.h>\ntypedef struct Node { int data; struct Node *next; } Node;\nNode *insert(Node *head, int value, int allocation_success) {\n    Node *p = allocation_success ? malloc(sizeof *p) : NULL;\n    if (p == NULL) return head;\n    p->data = value;\n    p->next = head;\n    return p;\n}\nint main(void) {\n    Node i0;\n    Node i1;\n    i0.data = 30;\n    i0.next = &i1;\n    i1.data = 40;\n    i1.next = NULL;\n    Node *caller_head = &i0;\n    caller_head = insert(caller_head, 11, 1);\n    (void)caller_head;\n    return 0;\n}\n\n在正常代码路径下，从 main 的 caller_head 出发沿 next 遍历直到 NULL，依次读到的 data 值是什么？请用一个 JSON 整数数组作答。\n输入 JSON 整数数组，不附加文字\n3. 考虑如下 C 代码：\n\n#include <stdlib.h>\ntypedef struct Node { int data; struct Node *next; } Node;\nNode *insert(Node *head, int value, int allocation_success) {\n    Node *p = allocation_success ? malloc(sizeof *p) : NULL;\n    if (p == NULL) return head;\n    p->data = value;\n    p->next = head;\n    return p;\n}\nint main(void) {\n    Node i0;\n    Node i1;\n    i0.data = 30;\n    i0.next = &i1;\n    i1.data = 40;\n    i1.next = NULL;\n    Node *caller_head = &i0;\n    insert(caller_head, 11, 1);\n    (void)caller_head;\n    return 0;\n}\n\n若调用处丢弃返回值（如上写 insert(caller_head, 11, 1); 而不赋值），从 main 的 caller_head 出发沿 next 遍历直到 NULL，依次读到的 data 值是什么？请用一个 JSON 整数数组作答。\n输入 JSON 整数数组，不附加文字\n4. 考虑如下 C 代码：\n\n#include <stdlib.h>\ntypedef struct Node { int data; struct Node *next; } Node;\nNode *insert(Node *head, int value, int allocation_success) {\n    Node *p = allocation_success ? malloc(sizeof *p) : NULL;\n    if (p == NULL) return head;\n    p->data = value;\n    p->next = head;\n    return p;\n}\nint main(void) {\n    Node i0;\n    Node i1;\n    i0.data = 30;\n    i0.next = &i1;\n    i1.data = 40;\n    i1.next = NULL;\n    Node *caller_head = &i0;\n    insert(caller_head, 11, 1);\n    (void)caller_head;\n    return 0;\n}\n\n若调用处丢弃返回值（如上写 insert(caller_head, 11, 1); 而不赋值），从 main 的 caller_head 出发，有多少个动态分配的节点不可达？请用一个 JSON 整数作答。\n输入一个 JSON 整数\n可先保存部分作答；全部作答后才显示比较。暂定结果不直接更新掌握度。\n提交本次作答\n继续完善或新作答\n原始作答记录\n选择已有记录\n第1次 · 课程 v2 · 题组 bd710a35-b4fd-51ee-892f-520d35f5da34\n刷新这份反馈\n暂定比较 · 答案尚未可靠核定\n\n作答对应课程 v2，场景版本 db7315e9-eae7-40fb-af17-9c8bf6c67d1b，题组版本 bd710a35-b4fd-51ee-892f-520d35f5da34。\n\n你的原始作答\nlink_target：i1\nnormal_values：[0]\ndiscarded_values：[0]\nunreachable_count：0\n\n仅保留课程内表现，未更新正式掌握度。\n\n与暂定参考的匹配比例：0%\n\nlink_target：与参考不同。调用时 head 副本保存的是 caller_head 的当前值 &i0，所以 p->next = head 让新节点 t0 的 next 指向 i0。i1 是 i0 的后继，不是这一步的直接目标。\nnormal_values：与参考不同。caller_head 被赋值为返回的新节点 t0，t0.data=11、t0.next=i0，i0.data=30、i0.next=&i1，i1.data=40、i1.next=NULL，因此顺序为 11、30、40。\ndiscarded_values：与参考不同。返回值被丢弃，caller_head 仍为 &i0，因此从 i0 出发只能读到 30、40；新分配的 t0 虽然存在且 t0.next=i0，但从 caller_head 不可达。\nunreachable_count：与参考不同。本次调用只分配了一个动态节点 t0；返回值被丢弃后 caller_head 仍为 &i0，t0 不在从 caller_head 出发的可达链上，因此不可达的动态节点数为 1。i0 与 i1 是自动存储节点，不计入动态分配节点。",
+  "correct_feedback": "随堂练习\n\n迁移练习\n\n题组版本 bd710a35-b4fd-51ee-892f-520d35f5da34 · 课程 v2\n\n1. 考虑如下 C 代码：\n\n#include <stdlib.h>\ntypedef struct Node { int data; struct Node *next; } Node;\nNode *insert(Node *head, int value, int allocation_success) {\n    Node *p = allocation_success ? malloc(sizeof *p) : NULL;\n    if (p == NULL) return head;\n    p->data = value;\n    p->next = head;\n    return p;\n}\nint main(void) {\n    Node i0;\n    Node i1;\n    i0.data = 30;\n    i0.next = &i1;\n    i1.data = 40;\n    i1.next = NULL;\n    Node *caller_head = &i0;\n    caller_head = insert(caller_head, 11, 1);\n    (void)caller_head;\n    return 0;\n}\n\n在正常代码路径下，insert 执行到 p->next = head 时，p->next 第一次被赋成的目标节点是哪一个？请只填写该初始节点的 C 变量名（不要加 & 或说明文字）。\n2. 考虑如下 C 代码：\n\n#include <stdlib.h>\ntypedef struct Node { int data; struct Node *next; } Node;\nNode *insert(Node *head, int value, int allocation_success) {\n    Node *p = allocation_success ? malloc(sizeof *p) : NULL;\n    if (p == NULL) return head;\n    p->data = value;\n    p->next = head;\n    return p;\n}\nint main(void) {\n    Node i0;\n    Node i1;\n    i0.data = 30;\n    i0.next = &i1;\n    i1.data = 40;\n    i1.next = NULL;\n    Node *caller_head = &i0;\n    caller_head = insert(caller_head, 11, 1);\n    (void)caller_head;\n    return 0;\n}\n\n在正常代码路径下，从 main 的 caller_head 出发沿 next 遍历直到 NULL，依次读到的 data 值是什么？请用一个 JSON 整数数组作答。\n输入 JSON 整数数组，不附加文字\n3. 考虑如下 C 代码：\n\n#include <stdlib.h>\ntypedef struct Node { int data; struct Node *next; } Node;\nNode *insert(Node *head, int value, int allocation_success) {\n    Node *p = allocation_success ? malloc(sizeof *p) : NULL;\n    if (p == NULL) return head;\n    p->data = value;\n    p->next = head;\n    return p;\n}\nint main(void) {\n    Node i0;\n    Node i1;\n    i0.data = 30;\n    i0.next = &i1;\n    i1.data = 40;\n    i1.next = NULL;\n    Node *caller_head = &i0;\n    insert(caller_head, 11, 1);\n    (void)caller_head;\n    return 0;\n}\n\n若调用处丢弃返回值（如上写 insert(caller_head, 11, 1); 而不赋值），从 main 的 caller_head 出发沿 next 遍历直到 NULL，依次读到的 data 值是什么？请用一个 JSON 整数数组作答。\n输入 JSON 整数数组，不附加文字\n4. 考虑如下 C 代码：\n\n#include <stdlib.h>\ntypedef struct Node { int data; struct Node *next; } Node;\nNode *insert(Node *head, int value, int allocation_success) {\n    Node *p = allocation_success ? malloc(sizeof *p) : NULL;\n    if (p == NULL) return head;\n    p->data = value;\n    p->next = head;\n    return p;\n}\nint main(void) {\n    Node i0;\n    Node i1;\n    i0.data = 30;\n    i0.next = &i1;\n    i1.data = 40;\n    i1.next = NULL;\n    Node *caller_head = &i0;\n    insert(caller_head, 11, 1);\n    (void)caller_head;\n    return 0;\n}\n\n若调用处丢弃返回值（如上写 insert(caller_head, 11, 1); 而不赋值），从 main 的 caller_head 出发，有多少个动态分配的节点不可达？请用一个 JSON 整数作答。\n输入一个 JSON 整数\n可先保存部分作答；全部作答后才显示比较。暂定结果不直接更新掌握度。\n提交本次作答\n继续完善或新作答\n原始作答记录\n选择已有记录\n第1次 · 课程 v2 · 题组 bd710a35-b4fd-51ee-892f-520d35f5da34\n第2次 · 课程 v2 · 题组 bd710a35-b4fd-51ee-892f-520d35f5da34\n刷新这份反馈\n暂定比较 · 答案尚未可靠核定\n\n作答对应课程 v2，场景版本 db7315e9-eae7-40fb-af17-9c8bf6c67d1b，题组版本 bd710a35-b4fd-51ee-892f-520d35f5da34。\n\n你的原始作答\nlink_target：i0\nnormal_values：[11, 30, 40]\ndiscarded_values：[\n30,40\n]\nunreachable_count：1\n\n仅保留课程内表现，未更新正式掌握度。\n\n与暂定参考的匹配比例：100%\n\nlink_target：匹配参考。调用时 head 副本保存的是 caller_head 的当前值 &i0，所以 p->next = head 让新节点 t0 的 next 指向 i0。i1 是 i0 的后继，不是这一步的直接目标。\nnormal_values：匹配参考。caller_head 被赋值为返回的新节点 t0，t0.data=11、t0.next=i0，i0.data=30、i0.next=&i1，i1.data=40、i1.next=NULL，因此顺序为 11、30、40。\ndiscarded_values：匹配参考。返回值被丢弃，caller_head 仍为 &i0，因此从 i0 出发只能读到 30、40；新分配的 t0 虽然存在且 t0.next=i0，但从 caller_head 不可达。\nunreachable_count：匹配参考。本次调用只分配了一个动态节点 t0；返回值被丢弃后 caller_head 仍为 &i0，t0 不在从 caller_head 出发的可达链上，因此不可达的动态节点数为 1。i0 与 i1 是自动存储节点，不计入动态分配节点。",
+  "status": "pass_interaction_only",
+  "teaching_verdict": "needs_revision",
+  "refresh_same_scene": true,
+  "refresh_correct_feedback": true,
+  "original_goal_visible": "今天，你想弄懂什么？",
+  "new_provider_calls": 0
+}

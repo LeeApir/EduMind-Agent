@@ -1,0 +1,14 @@
+PHASE-1.5-T094 验证记录（2026-10-29，Asia/Shanghai）
+
+PYTHONPATH=backend:. backend/.venv/bin/python -m pytest scripts/tests/test_p15_combined_candidate_runner.py scripts/tests/test_p15_combined_candidate_contract.py scripts/tests/test_p15_bound_pilot.py scripts/tests/test_p15_clean_pilot_prompts.py scripts/tests/test_p15_minimal_contract.py scripts/tests/test_p15_minimal_pilot.py scripts/tests/test_p15_head_insertion_engine.py -q --tb=short
+结果：347 passed、0 skipped，包含新两阶段状态机/真实入口的 Mock 模拟与原双臂、Schema、引擎回归。测试含每个角色失败即停、课程失败停止、普通修复、旧审核/父版本、超时重放、额外文件、假传输和凭据转义。
+
+backend/.venv/bin/ruff check scripts/isolated_diagnostics/p15_combined_candidate_contract.py scripts/isolated_diagnostics/p15_combined_candidate_runner.py scripts/run_p15_combined_candidate.py scripts/tests/test_p15_combined_candidate_contract.py scripts/tests/test_p15_combined_candidate_runner.py
+结果：通过。
+
+MYPYPATH=backend:. backend/.venv/bin/mypy scripts/isolated_diagnostics/p15_combined_candidate_contract.py scripts/isolated_diagnostics/p15_combined_candidate_runner.py scripts/run_p15_combined_candidate.py --strict --explicit-package-bases --follow-imports=silent
+结果：3 源文件通过。
+
+本包仍待冻结核对和用户准确授权；本次新真实调用0。测试使用 MockTransport 和合成凭据；哈希链和 transport_kind 属于可信采集器记录，不能独立证明传输真实性或提供商身份。旧 R0 语义待独立复核，T038 仍 blocked。
+
+独立代码审查发现超时重放、额外文件、伪造传输及转义密钥四处问题；已分别修复并通过针对性回归与复审。T088 和 T090 原件只读检查通过，新增真实调用0。

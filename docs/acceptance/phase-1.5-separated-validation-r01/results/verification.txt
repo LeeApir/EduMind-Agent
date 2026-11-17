@@ -1,0 +1,28 @@
+T088 verification — 2026-10-29T14:49:08+08:00
+Executor Codex. Evidence collection/self-review only; no independent semantic evaluation claimed.
+Preparation commit588b0ac; execution manifest SHA256 0c74b3751bdfd1dfffe7cfc3aa56bd30257e4ec850f18d80041b78bea401a1e3 (175 pinned files).
+
+Actual commands/results:
+1. PYTHONPATH=backend:. backend/.venv/bin/python scripts/run_p15_separated_probe.py --check
+   exit0;175 frozen files/runtime/seven request bytes unchanged, no HTTP.
+2. PYTHONPATH=backend:. backend/.venv/bin/python scripts/run_p15_separated_probe.py --run
+   Exactly once with approved network permission; exit2,6 real HTTP200,5 validated, W4 STRICT_JSON_INVALID, R0 not reserved/not sent. No retry/fallback/supplement/restart. Session44402 final exit2.
+3. PYTHONPATH=backend:. backend/.venv/bin/python scripts/run_p15_separated_probe.py --check-results
+   exit2; same terminal summary. Readonly full request/response/status/grant/31-event/sourceIP/window replay passed. Network phase incomplete, repair_success=false, R0 not_run.
+4. In-process readonly JSONDecodeError/raw_decode comparison against W4 request schema and expected instance.
+   Original text3306chars/bytes; strict Extra data at3305; first3305 decode to COMPLETE request Schema, remaining exactly one closing brace. Analysis not used for admission, no slicing/repair or re-send. Different bytes from T085 S5.
+5. In-process credential/DNS/socket denial hooks; CLI --run existing-output front gate only.
+   exit2 EXISTING_OR_SYMLINK_OUTPUT_NO_RESTART, before credential hook; all51 original file hashes unchanged. No HTTP. No actual executor restart attempted past gate.
+6. PYTHONPATH=backend:. backend/.venv/bin/python docs/acceptance/phase-1.5-separated-validation-r01/results/check_evidence.py
+   Final exit0: result/grant/original manifests and51 original files/31 events/6 full exported texts/usage/relative links checked with credentials/DNS/socket denied. Initial intermediate link check found missing verification.txt during preparation; artifact then supplied, final full check rerun.
+7. backend/.venv/bin/ruff check docs/acceptance/phase-1.5-separated-validation-r01/results/check_evidence.py
+   pass. python3 scripts/check_catalog_workflow.py / git diff --check / staged diff --check: pass.
+
+Budget/evidence:
+New window14:44:12.903292+08:00–14:59:12.903292+08:00 on2026-10-29, terminal14:44:26.504115+08:00; monotonic runtime11.852586seconds. Max7HTTP/900s/HTTP60s/DNS9s/input57344/output28672/request65536/response262144 unchanged.6 reserved/6 sent/6 responses/5validated/1unknown protocol/1unrun. Unknown W4 occupancy retained; unused1/remaining time invalid for carryover.
+All6 responses self-report input9546/output2356/cachedinput6144/total11902; valid5 input7269/output1325. Not invoice verification, no proven upstream hard token bound. Actual fee/currency unknown; current user specifically accepted this exact package's disclosed fee/limit risk, no old exception inherited.
+51 full raw files retained at /private/tmp/edumind-p15-separated-validation-r01,0700/0600; complete private paths/hashes/bytes in evidence-manifest.json.6 synthetic output texts exported verbatim to output-texts, transport IDs/envelopes remain private. No Key/Authorization saved.
+No runtime/Schema/strict validation/Prompt edits. Preparation598 offline tests remain preparation evidence, not new real quality/role admission. T085/frozen129/old grants retained unchanged under current175 closure check.
+No course/AIAPI/model switch/teaching acceptance changes; T038 blocked/catalog_only/H sealed. R0 not run, hence no real mechanical repair candidate or semantic review; cannot automatically count repair success.
+
+Handoff: RESULTS.md + result-manifest.json + complete raw originals. Finish local capture commit then stop; user/independent evaluator reviews evidence before any further work.

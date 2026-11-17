@@ -1,0 +1,2087 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "EduMind progressive course generation proposal",
+    "version": "0.1.0",
+    "description": "ADR-0025 Proposed; standalone supplement to frozen T001. No runtime or call authorization. SceneProjection is additive visualization/action design; exercise answer/input/feedback details await T003. Events contain IDs and fixed states, not model content."
+  },
+  "paths": {
+    "/api/free-courses/{course_id}/operations": {
+      "post": {
+        "operationId": "startFreeCourseOperation",
+        "x-runtime-status": "planned",
+        "x-implementation-task": "PHASE-1.5-T021",
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CourseId"
+          },
+          {
+            "$ref": "#/components/parameters/Csrf"
+          },
+          {
+            "$ref": "#/components/parameters/Key"
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Owner-scoped projection",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcceptedOperation"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHORIZED",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NOT_FOUND",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "State, baseline, budget, active operation or mode conflict",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "VALIDATION_ERROR",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "CSRF_FAILED",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/ClarifyRequest"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ResumeRequest"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ReviseRequest"
+                  },
+                  {
+                    "$ref": "#/components/schemas/AdjustRequest"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/free-courses/{course_id}/operations/{operation_id}": {
+      "get": {
+        "operationId": "readFreeCourseOperation",
+        "x-runtime-status": "planned",
+        "x-implementation-task": "PHASE-1.5-T021",
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CourseId"
+          },
+          {
+            "$ref": "#/components/parameters/OperationId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Owner-scoped projection",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Operation"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHORIZED",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NOT_FOUND",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "State, baseline, budget, active operation or mode conflict",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "VALIDATION_ERROR",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/free-courses/{course_id}/operations/{operation_id}/cancel": {
+      "post": {
+        "operationId": "cancelFreeCourseOperation",
+        "x-runtime-status": "planned",
+        "x-implementation-task": "PHASE-1.5-T021",
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CourseId"
+          },
+          {
+            "$ref": "#/components/parameters/OperationId"
+          },
+          {
+            "$ref": "#/components/parameters/Csrf"
+          },
+          {
+            "$ref": "#/components/parameters/Key"
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "UNAUTHORIZED",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NOT_FOUND",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "State, baseline, budget, active operation or mode conflict",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "VALIDATION_ERROR",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "CSRF_FAILED",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Owner-scoped projection",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Operation"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CancelRequest"
+              }
+            }
+          }
+        },
+        "summary": "Always 200, including already terminal; never starts provider calls"
+      }
+    },
+    "/api/free-courses/{course_id}/operations/{operation_id}/events": {
+      "get": {
+        "operationId": "streamFreeCourseEvents",
+        "x-runtime-status": "planned",
+        "x-implementation-task": "PHASE-1.5-T021",
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CourseId"
+          },
+          {
+            "$ref": "#/components/parameters/OperationId"
+          },
+          {
+            "$ref": "#/components/parameters/After"
+          },
+          {
+            "$ref": "#/components/parameters/LastId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "SSE id=seq, event=type, data=Event; persisted replay only",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "type": "string"
+                },
+                "x-event-schema": {
+                  "$ref": "#/components/schemas/Event"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHORIZED",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NOT_FOUND",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "State, baseline, budget, active operation or mode conflict",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "VALIDATION_ERROR",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "Terminal and cursor already at last_event_id; close without reconnect"
+          }
+        }
+      }
+    },
+    "/api/free-courses/{course_id}/impact": {
+      "get": {
+        "operationId": "previewFreeCourseImpact",
+        "x-runtime-status": "planned",
+        "x-implementation-task": "PHASE-1.5-T021",
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CourseId"
+          },
+          {
+            "name": "kind",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "enum": [
+                "revise_scene",
+                "adjust_outline"
+              ]
+            }
+          },
+          {
+            "name": "base_version",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "scene_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Owner-scoped projection",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Impact"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHORIZED",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NOT_FOUND",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "State, baseline, budget, active operation or mode conflict",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "VALIDATION_ERROR",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "description": "Absent base_version means null (only no-head courses); never latest fallback. revise_scene requires base_version and scene_id. adjust_outline affects all scenes. Local instruction cannot change global example/goal; server rejects OUTLINE_ADJUSTMENT_REQUIRED. Preview is structural only and never classifies instruction. requires_outline_adjustment equals kind==adjust_outline."
+      }
+    },
+    "/api/free-courses/{course_id}/versions/{version}/scenes/{scene_id}": {
+      "get": {
+        "operationId": "readFreeCourseScene",
+        "x-runtime-status": "planned",
+        "x-implementation-task": "PHASE-1.5-T021",
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CourseId"
+          },
+          {
+            "$ref": "#/components/parameters/Version"
+          },
+          {
+            "$ref": "#/components/parameters/SceneId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Owner-scoped projection",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SceneProjection"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHORIZED",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NOT_FOUND",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "SCENE_NOT_READY or CONTENT_UNAVAILABLE",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "VALIDATION_ERROR",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "description": "Additive projection extension of frozen T001 route, merged only at T021 after both approvals; no current runtime change."
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "sessionCookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "edumind_session"
+      }
+    },
+    "parameters": {
+      "CourseId": {
+        "name": "course_id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "OperationId": {
+        "name": "operation_id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "Csrf": {
+        "name": "X-CSRF-Token",
+        "in": "header",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "Key": {
+        "name": "Idempotency-Key",
+        "in": "header",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[ -~]+$"
+        }
+      },
+      "After": {
+        "name": "after",
+        "in": "query",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "LastId": {
+        "name": "Last-Event-ID",
+        "in": "header",
+        "schema": {
+          "type": "string",
+          "pattern": "^[0-9]+$"
+        }
+      },
+      "Version": {
+        "name": "version",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "SceneId": {
+        "name": "scene_id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    },
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "retryable": {
+            "const": false
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "retryable"
+        ]
+      },
+      "Budget": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "attempts_used": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 13
+          },
+          "attempts_remaining": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 13
+          },
+          "course_attempts_remaining": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 40
+          },
+          "input_tokens_charged": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "output_tokens_charged": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "usage_unknown": {
+            "type": "boolean"
+          },
+          "input_tokens_remaining": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 200000
+          },
+          "output_tokens_remaining": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 48000
+          },
+          "course_input_tokens_remaining": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 600000
+          },
+          "course_output_tokens_remaining": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 144000
+          }
+        },
+        "required": [
+          "attempts_used",
+          "attempts_remaining",
+          "course_attempts_remaining",
+          "input_tokens_charged",
+          "output_tokens_charged",
+          "usage_unknown",
+          "input_tokens_remaining",
+          "output_tokens_remaining",
+          "course_input_tokens_remaining",
+          "course_output_tokens_remaining"
+        ]
+      },
+      "Step": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "step_key": {
+            "type": "string"
+          },
+          "scene_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "state": {
+            "enum": [
+              "pending",
+              "blocked_dependency",
+              "running",
+              "ready",
+              "failed",
+              "invalidated",
+              "cancelled"
+            ]
+          },
+          "reason_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "step_key",
+          "scene_id",
+          "state",
+          "reason_code"
+        ]
+      },
+      "Operation": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "operation_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "course_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "enum": [
+              "create",
+              "clarify",
+              "resume",
+              "adjust_outline",
+              "revise_scene"
+            ]
+          },
+          "state": {
+            "enum": [
+              "queued",
+              "running",
+              "cancel_requested",
+              "succeeded",
+              "partially_succeeded",
+              "awaiting_clarification",
+              "failed",
+              "cancelled",
+              "timed_out"
+            ]
+          },
+          "base_head_version": {
+            "minimum": 1,
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "head_version": {
+            "minimum": 1,
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "last_event_id": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "deadline_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "reason_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "clarification_questions": {
+            "type": "array",
+            "maxItems": 3,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 300
+            }
+          },
+          "steps": {
+            "type": "array",
+            "maxItems": 9,
+            "items": {
+              "$ref": "#/components/schemas/Step"
+            }
+          },
+          "budget": {
+            "$ref": "#/components/schemas/Budget"
+          },
+          "request_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "operation_id",
+          "course_id",
+          "kind",
+          "state",
+          "base_head_version",
+          "head_version",
+          "last_event_id",
+          "deadline_at",
+          "reason_code",
+          "clarification_questions",
+          "steps",
+          "budget",
+          "request_id"
+        ]
+      },
+      "AcceptedOperation": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "course_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "operation_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "course_id",
+          "operation_id"
+        ]
+      },
+      "ClarifyRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "const": "clarify"
+          },
+          "expected_head_version": {
+            "minimum": 1,
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "source_operation_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "supplement": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4000
+          }
+        },
+        "required": [
+          "kind",
+          "expected_head_version",
+          "source_operation_id",
+          "supplement"
+        ]
+      },
+      "ResumeRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "const": "resume"
+          },
+          "expected_head_version": {
+            "minimum": 1,
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "source_operation_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "kind",
+          "expected_head_version",
+          "source_operation_id"
+        ]
+      },
+      "ReviseRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "const": "revise_scene"
+          },
+          "expected_head_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "scene_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "instruction": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4000
+          },
+          "impact_digest": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        },
+        "required": [
+          "kind",
+          "expected_head_version",
+          "scene_id",
+          "instruction",
+          "impact_digest"
+        ]
+      },
+      "AdjustRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "const": "adjust_outline"
+          },
+          "expected_head_version": {
+            "minimum": 1,
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "instruction": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4000
+          },
+          "impact_digest": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        },
+        "required": [
+          "kind",
+          "expected_head_version",
+          "instruction",
+          "impact_digest"
+        ]
+      },
+      "CancelRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {},
+        "required": []
+      },
+      "Impact": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "course_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "base_head_version": {
+            "minimum": 1,
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "kind": {
+            "enum": [
+              "revise_scene",
+              "adjust_outline"
+            ]
+          },
+          "affected_scene_ids": {
+            "type": "array",
+            "uniqueItems": true,
+            "maxItems": 8,
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "requires_outline_adjustment": {
+            "type": "boolean"
+          },
+          "max_attempts": {
+            "const": 13
+          },
+          "max_seconds": {
+            "const": 600
+          },
+          "impact_digest": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        },
+        "required": [
+          "course_id",
+          "base_head_version",
+          "kind",
+          "affected_scene_ids",
+          "requires_outline_adjustment",
+          "max_attempts",
+          "max_seconds",
+          "impact_digest"
+        ]
+      },
+      "TextBlock": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "const": "text"
+          },
+          "anchor_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4000
+          },
+          "markdown": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "kind",
+          "anchor_id",
+          "markdown"
+        ]
+      },
+      "CodeBlock": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "const": "code"
+          },
+          "anchor_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4000
+          },
+          "language": {
+            "const": "c"
+          },
+          "source": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "anchor_id",
+          "language",
+          "source"
+        ]
+      },
+      "ExerciseBlock": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "const": "exercise"
+          },
+          "anchor_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4000
+          },
+          "exercise_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "question": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "anchor_id",
+          "exercise_id",
+          "question"
+        ]
+      },
+      "VisualElement": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "maxLength": 64
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 128
+          },
+          "next_id": {
+            "maxLength": 64,
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "next_id"
+        ]
+      },
+      "VisualStep": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "caption": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "elements": {
+            "type": "array",
+            "maxItems": 32,
+            "items": {
+              "$ref": "#/components/schemas/VisualElement"
+            }
+          },
+          "highlight_ids": {
+            "type": "array",
+            "maxItems": 32,
+            "uniqueItems": true,
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "caption",
+          "elements",
+          "highlight_ids"
+        ]
+      },
+      "VisualizationBlock": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "const": "visualization"
+          },
+          "anchor_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4000
+          },
+          "visualization_type": {
+            "enum": [
+              "array",
+              "linked_list",
+              "stack",
+              "queue"
+            ]
+          },
+          "text_alternative": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4000
+          },
+          "steps": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 50,
+            "items": {
+              "$ref": "#/components/schemas/VisualStep"
+            }
+          }
+        },
+        "required": [
+          "kind",
+          "anchor_id",
+          "visualization_type",
+          "text_alternative",
+          "steps"
+        ]
+      },
+      "Action": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "type": {
+            "enum": [
+              "highlight_block",
+              "show_step",
+              "pause"
+            ]
+          },
+          "anchor_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4000
+          },
+          "step_index": {
+            "minimum": 0,
+            "maximum": 49,
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "type",
+          "anchor_id",
+          "step_index"
+        ],
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "show_step"
+                }
+              },
+              "required": [
+                "type"
+              ]
+            },
+            "then": {
+              "properties": {
+                "step_index": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 49
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "step_index": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "SceneProjection": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "course_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "course_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "scene_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "scene_version_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "blocks": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 32,
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/TextBlock"
+                },
+                {
+                  "$ref": "#/components/schemas/CodeBlock"
+                },
+                {
+                  "$ref": "#/components/schemas/ExerciseBlock"
+                },
+                {
+                  "$ref": "#/components/schemas/VisualizationBlock"
+                }
+              ]
+            },
+            "contains": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "const": "text"
+                }
+              },
+              "required": [
+                "kind"
+              ]
+            },
+            "minContains": 1
+          },
+          "actions": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/Action"
+            }
+          }
+        },
+        "required": [
+          "course_id",
+          "course_version",
+          "scene_id",
+          "scene_version_id",
+          "blocks",
+          "actions"
+        ],
+        "description": "Public additive projection for T001 readFreeCourseScene. Local checks require non-whitespace markdown, same-version anchors, actual step bounds and per-step element reference integrity."
+      },
+      "Event": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "schema_version": {
+            "const": "free-course-events-v1"
+          },
+          "operation_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "seq": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "type": {
+            "enum": [
+              "queued",
+              "started",
+              "clarification_required",
+              "outline_ready",
+              "scene_started",
+              "scene_ready",
+              "first_scene_ready",
+              "progress",
+              "cancel_requested",
+              "error",
+              "done"
+            ]
+          },
+          "course_version": {
+            "minimum": 1,
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "payload": {
+            "$ref": "#/components/schemas/EventPayload"
+          }
+        },
+        "required": [
+          "schema_version",
+          "operation_id",
+          "seq",
+          "type",
+          "course_version",
+          "payload"
+        ],
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "enum": [
+                    "scene_ready",
+                    "first_scene_ready"
+                  ]
+                }
+              },
+              "required": [
+                "type"
+              ]
+            },
+            "then": {
+              "properties": {
+                "course_version": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "payload": {
+                  "required": [
+                    "scene_id",
+                    "scene_version_id"
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "done"
+                }
+              },
+              "required": [
+                "type"
+              ]
+            },
+            "then": {
+              "properties": {
+                "payload": {
+                  "required": [
+                    "state"
+                  ],
+                  "properties": {
+                    "state": {
+                      "enum": [
+                        "succeeded",
+                        "partially_succeeded",
+                        "awaiting_clarification",
+                        "failed",
+                        "cancelled",
+                        "timed_out"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "clarification_required"
+                }
+              },
+              "required": [
+                "type"
+              ]
+            },
+            "then": {
+              "properties": {
+                "payload": {
+                  "required": [
+                    "questions"
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "error"
+                }
+              },
+              "required": [
+                "type"
+              ]
+            },
+            "then": {
+              "properties": {
+                "payload": {
+                  "required": [
+                    "reason_code"
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "outline_ready"
+                }
+              },
+              "required": [
+                "type"
+              ]
+            },
+            "then": {
+              "properties": {
+                "course_version": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            }
+          }
+        ]
+      },
+      "EventPayload": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "scene_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "scene_version_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "state": {
+            "enum": [
+              "queued",
+              "running",
+              "cancel_requested",
+              "succeeded",
+              "partially_succeeded",
+              "awaiting_clarification",
+              "failed",
+              "cancelled",
+              "timed_out",
+              "pending",
+              "blocked_dependency",
+              "ready",
+              "invalidated"
+            ]
+          },
+          "reason_code": {
+            "type": "string"
+          },
+          "questions": {
+            "type": "array",
+            "maxItems": 3,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 300
+            },
+            "minItems": 1
+          }
+        },
+        "required": []
+      },
+      "PlanObjective": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "source": {
+            "enum": [
+              "user_requirement",
+              "planner_suggestion"
+            ]
+          },
+          "source_key": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "source_excerpt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "description",
+          "source",
+          "source_key",
+          "source_excerpt"
+        ],
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "source": {
+                  "const": "user_requirement"
+                }
+              },
+              "required": [
+                "source"
+              ]
+            },
+            "then": {
+              "properties": {
+                "source_key": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64
+                },
+                "source_excerpt": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2000
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "source_key": {
+                  "type": "null"
+                },
+                "source_excerpt": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "PlanScene": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "scene_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "purpose": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "forms": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 4,
+            "uniqueItems": true,
+            "items": {
+              "enum": [
+                "text",
+                "code",
+                "exercise",
+                "visualization"
+              ]
+            }
+          },
+          "objective_ids": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 16,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            }
+          },
+          "depends_on": {
+            "type": "array",
+            "maxItems": 7,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            }
+          }
+        },
+        "required": [
+          "scene_key",
+          "title",
+          "purpose",
+          "forms",
+          "objective_ids",
+          "depends_on"
+        ]
+      },
+      "Term": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "term": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "meaning": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "term",
+          "meaning"
+        ]
+      },
+      "PlanCandidate": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "objectives": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 16,
+            "items": {
+              "$ref": "#/components/schemas/PlanObjective"
+            }
+          },
+          "shared_example": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "terminology": {
+            "type": "array",
+            "maxItems": 32,
+            "items": {
+              "$ref": "#/components/schemas/Term"
+            }
+          },
+          "conventions": {
+            "type": "array",
+            "maxItems": 16,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2000
+            }
+          },
+          "scenes": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 8,
+            "items": {
+              "$ref": "#/components/schemas/PlanScene"
+            }
+          }
+        },
+        "required": [
+          "title",
+          "objectives",
+          "shared_example",
+          "terminology",
+          "conventions",
+          "scenes"
+        ],
+        "x-internal": true,
+        "description": "Model structural candidate, not public REST body. Server binds actual request IDs/owner/scene UUIDs. Local checks verify source_key whitelist and real excerpts, unique IDs/terms/scene keys, preceding dependencies and objective references; size<=16KiB. Unknown graph links do not block."
+      }
+    }
+  }
+}

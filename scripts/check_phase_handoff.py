@@ -5,6 +5,8 @@ import json
 from pathlib import Path
 import subprocess
 
+from acceptance_support.archive_paths import evidence_path
+
 ROOT = Path(__file__).resolve().parents[1]
 BASE = ROOT / "docs/acceptance/phase-1-closeout-20261021"
 
@@ -18,7 +20,7 @@ def git(*args):
 
 
 def read(path):
-    return json.loads(path.read_bytes())
+    return json.loads(evidence_path(path).read_bytes())
 
 
 def require(value, reason):
@@ -44,13 +46,15 @@ def structure(phase1, active, archive_bytes, receipt):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--before-commit", action="store_true", help="Only T042 marker is expected in the pending governance commit.")
-    args = parser.parse_args()
+    parser.parse_args()
     phase1 = read(ROOT / "docs/tasks/phase-1.json")
-    active = read(ROOT / "task.json")
+    marker = "Task-Completed: PHASE-1-T042"
+    closing = [h for h in git("log", "--format=%H", "--fixed-strings", "--grep=" + marker).decode().splitlines() if marker in git("show", "-s", "--format=%B", h).decode().splitlines()][0]
+    active = json.loads(git("show", closing + ":task.json"))
+    current = read(ROOT / "task.json")
     receipt = read(BASE / "transition.json")
     structure(phase1, active, (ROOT / "docs/tasks/phase-1.json").read_bytes(), receipt)
-    require(sha((ROOT / "task.json").read_bytes()) == receipt["new_active_sha256"], "NEW_ROOT_CHANGED")
+    require(sha(git("show", closing + ":task.json")) == receipt["new_active_sha256"], "NEW_ROOT_CHANGED")
     audit = read(BASE / "completed-task-audit.json")
     expected = {t["id"] for t in phase1["tasks"] if t["status"] == "done"} - {"PHASE-1-T042"}
     require({r["task_id"] for r in audit["tasks"]} == expected and len(expected) == 88, "AUDIT_NOT_ALL_ORIGINAL_DONE")
@@ -66,7 +70,7 @@ def main():
             require(sha(git("show", h + ":" + item["path"])) == item["sha256"], "COMMIT_EVIDENCE_CHANGED")
         require(row["committed_evidence_and_tests"] or row["existing_evidence_references"], "NO_SURVIVING_EVIDENCE")
         for item in row["existing_evidence_references"]:
-            p = ROOT / item["path"]
+            p = evidence_path(ROOT / item["path"])
             require(p.is_file(), "EVIDENCE_PATH_MISSING")
             if sha(p.read_bytes()) != item["sha256"]:
                 # Scope docs are intentionally updated; their original Git bytes remain auditable.
@@ -76,18 +80,19 @@ def main():
     seals = read(BASE / "preservation-seals.json")
     for group in ("historical_and_H_seals", "all_sqlite_seals", "json_receipt_seals", "protected_uncommitted_files"):
         for path, h in seals[group].items():
-            require(sha((ROOT / path).read_bytes()) == h, "PRESERVED_FILE_CHANGED: " + path)
+            require(sha(evidence_path(ROOT / path).read_bytes()) == h, "PRESERVED_FILE_CHANGED: " + path)
     # The source guard is unchanged; execution is covered by the separate targeted pytest evidence.
     require(git("show", audit["source_commit"] + ":backend/app/core/product_mode.py") == (ROOT / "backend/app/core/product_mode.py").read_bytes(), "PRODUCT_GUARD_CHANGED")
     marker = "Task-Completed: PHASE-1-T042"
     matches = git("log", "--format=%H", "--fixed-strings", "--grep=" + marker).decode().splitlines()
-    if not args.before_commit:
-        exact = [h for h in matches if marker in git("show", "-s", "--format=%B", h).decode().splitlines()]
-        require(bool(exact), "CLOSEOUT_COMMIT_MISSING")
-        h = exact[0]
-        for path in ("task.json", "docs/tasks/phase-1.json", "process.txt"):
-            require(git("show", h + ":" + path) == (ROOT / path).read_bytes(), "ARCHIVE_AND_SWITCH_NOT_IN_SAME_COMMIT")
-    print(json.dumps(dict(original_done_verified=count,final_phase1="89 done / 2 blocked",archive_bytes="exact",active_phase="Phase 1.5",started_tasks=0,provider_requests_this_closeout=0,H="sealed",protected_user_files="unchanged",T042_commit="pending same governance commit" if args.before_commit else "verified with archive and switch")))
+    exact = [h for h in matches if marker in git("show", "-s", "--format=%B", h).decode().splitlines()]
+    require(bool(exact), "CLOSEOUT_COMMIT_MISSING")
+    h = exact[0]
+    require(git("show", h + ":docs/tasks/phase-1.json") == (ROOT / "docs/tasks/phase-1.json").read_bytes(), "ARCHIVE_NOT_IN_CLOSEOUT_COMMIT")
+    require(sha(git("show", h + ":task.json")) == receipt["new_active_sha256"], "SWITCH_NOT_IN_CLOSEOUT_COMMIT")
+    original_log = git("show", h + ":process.txt")
+    require(b"[PHASE-1-T042] VERIFIED" in original_log and (ROOT / "process.txt").read_bytes().startswith(original_log), "CLOSEOUT_LOG_OR_APPEND_ONLY_HISTORY_CHANGED")
+    print(json.dumps(dict(original_done_verified=count,final_phase1="89 done / 2 blocked",archive_bytes="exact",active_phase=current["active_phase"],started_tasks=sum(t["status"] == "in_progress" for t in current["tasks"]),provider_requests_this_closeout=0,H="sealed",protected_user_files="unchanged",T042_commit="verified with archive and switch")))
 
 
 if __name__ == "__main__":

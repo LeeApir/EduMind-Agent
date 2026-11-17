@@ -1,0 +1,270 @@
+{
+  "schema_version": "course-quality-examples-v1",
+  "status": "design_cases_not_runtime_results",
+  "cases": [
+    {
+      "id": "P01",
+      "title": "Feedback pending",
+      "given": "Student reports wrong code at exact old scene anchor",
+      "expected": "Store pending; no confirmation, no model request or full-course hide"
+    },
+    {
+      "id": "P02",
+      "title": "Model reject",
+      "given": "Hard-valid draft with model severe/reject opinion only",
+      "expected": "Keep learning; opinion not a confirmed defect"
+    },
+    {
+      "id": "P03",
+      "title": "Confirmed local answer bug",
+      "given": "Trusted maintainer confirms exact answer with reproducible evidence",
+      "expected": "Disable affected exercise feedback/submissions, invalidate dependent facts, retain unrelated text"
+    },
+    {
+      "id": "P04",
+      "title": "Provisional practice",
+      "given": "No attestations, first complete group submitted",
+      "expected": "Store tentative exact-text comparison, course_only mastery effect"
+    },
+    {
+      "id": "P05",
+      "title": "Reliable first complete",
+      "given": "Answer+single-node mapping attested before complete, no help/history",
+      "expected": "One group quiz_attempt admitted under mastery-v1"
+    },
+    {
+      "id": "P06",
+      "title": "Partial attempt",
+      "given": "One of three answers supplied, no help",
+      "expected": "Store incomplete, no solution/comparison, no first-complete consumption"
+    },
+    {
+      "id": "P07",
+      "title": "Revocation replay",
+      "given": "Admitted answer later confirmed wrong",
+      "expected": "Append revocation/correction, replay valid old/new evidence atomically, stale path"
+    },
+    {
+      "id": "P08",
+      "title": "No node mapping",
+      "given": "Valid draft/group with no reliable node",
+      "expected": "Learn and practice normally, no mastery evidence"
+    },
+    {
+      "id": "P09",
+      "title": "Tutor help",
+      "given": "Owner sends exact-scene message with assistance acknowledgement",
+      "expected": "Mark scene groups assisted before send, one bounded tutor operation"
+    },
+    {
+      "id": "P10",
+      "title": "Clarification only",
+      "given": "Tutor explains simpler without update-course request",
+      "expected": "Immutable turn only; no scene/head/question change"
+    },
+    {
+      "id": "P11",
+      "title": "Historical attempted answer",
+      "given": "Old scene is now disabled",
+      "expected": "Owner reads own original input; withdrawn score/results, no wrong solution"
+    },
+    {
+      "id": "P12",
+      "title": "Ordinary exercise replacement",
+      "given": "New version of question or mapping activated",
+      "expected": "Keep old raw attempt; revoke affected contribution at switch; no new-answer regrade"
+    },
+    {
+      "id": "N01",
+      "title": "Cross owner",
+      "given": "User B uses A feedback/attempt/turn ID",
+      "expected": "404 no existence details or content"
+    },
+    {
+      "id": "N02",
+      "title": "Forged confirmation",
+      "given": "Student POST contains confirmed/authority/score",
+      "expected": "422 unknown fields; no privilege escalation"
+    },
+    {
+      "id": "N03",
+      "title": "Weak attestation",
+      "given": "Only generator and reviewer agree answer",
+      "expected": "No reliable-answer grant; remains provisional"
+    },
+    {
+      "id": "N04",
+      "title": "Retroactive promotion",
+      "given": "Attestation created after provisional first-complete",
+      "expected": "No new evidence or later practice promotion"
+    },
+    {
+      "id": "N05",
+      "title": "Multi-node score",
+      "given": "Question group mapping proposed to two nodes",
+      "expected": "No duplicate or guessed contribution; course_only"
+    },
+    {
+      "id": "N06",
+      "title": "Repeat under new IDs",
+      "given": "Same normalized question/answer set moved/reordered/newcourse",
+      "expected": "Same assessment_digest; no second formal contribution"
+    },
+    {
+      "id": "N07",
+      "title": "Help race",
+      "given": "Tutor/solution exposure concurrent with submit",
+      "expected": "Owner lock orders both; help first disqualifies independence"
+    },
+    {
+      "id": "N08",
+      "title": "Revoked first attempt",
+      "given": "First contribution revoked, second practice exists",
+      "expected": "No automatic second-attempt promotion"
+    },
+    {
+      "id": "N09",
+      "title": "Client marks own score",
+      "given": "Answer POST includes node_id or score",
+      "expected": "422; node/score resolved by server"
+    },
+    {
+      "id": "N10",
+      "title": "Disabled question",
+      "given": "New attempt on confirmed-invalid exercise",
+      "expected": "409 EXERCISE_UNAVAILABLE, no saved new score"
+    },
+    {
+      "id": "N11",
+      "title": "Wrong version",
+      "given": "Exercise version not in supplied scene/manifest",
+      "expected": "404/409, no latest fallback"
+    },
+    {
+      "id": "N12",
+      "title": "Receipt leak",
+      "given": "Replay attempt key after old feedback withdrawn",
+      "expected": "Replay attempt_id only; GET returns withdrawn/null, not stale solution"
+    },
+    {
+      "id": "N13",
+      "title": "New source default trust",
+      "given": "Free-course evidence lacks valid admission",
+      "expected": "Reject; never inherit legacy no-catalog-assessment default true"
+    },
+    {
+      "id": "N14",
+      "title": "Later old quiz submit",
+      "given": "Legacy writer runs after new contribution revoked",
+      "expected": "Shared source-dispatch replay excludes revoked new facts"
+    },
+    {
+      "id": "N15",
+      "title": "Correction as gain",
+      "given": "evidence_correction audit has a score-looking field",
+      "expected": "Never reducer input; only trigger recomputation"
+    },
+    {
+      "id": "N16",
+      "title": "No valid facts remain",
+      "given": "Only valid new contribution revoked",
+      "expected": "Projection unseen; no residual mastered status"
+    },
+    {
+      "id": "N17",
+      "title": "Head changes during tutor",
+      "given": "Tutor output comes after bound head revision",
+      "expected": "Invalidated, no late response published or silent rebase"
+    },
+    {
+      "id": "N18",
+      "title": "Tutor contains private key",
+      "given": "Question context resolver sees hidden answer/config secrets",
+      "expected": "Exclude private fields; tutor cannot confirm or grant scores"
+    },
+    {
+      "id": "N19",
+      "title": "No acknowledgement",
+      "given": "Tutor POST lacks acknowledge_assisted_practice=true",
+      "expected": "422, no assistance state or send"
+    },
+    {
+      "id": "N20",
+      "title": "Tutor while generating",
+      "given": "Owner has active create/resume operation",
+      "expected": "409 OPERATION_ACTIVE; no automatic cancel/parallel second operation"
+    },
+    {
+      "id": "N21",
+      "title": "Tutor budget retry",
+      "given": "Tutor format fails, timeout or network uncertain",
+      "expected": "No auto repair/retry; counts shared40 pool; unknown outcome quarantines slot"
+    },
+    {
+      "id": "N22",
+      "title": "Unrequested course edit",
+      "given": "Tutor response asks to replace code",
+      "expected": "No head write; separate T002 preview and explicit revise needed"
+    },
+    {
+      "id": "N23",
+      "title": "Missing or duplicate answer IDs",
+      "given": "Submit group-outside or repeated question_id",
+      "expected": "422; no fake complete"
+    },
+    {
+      "id": "N24",
+      "title": "Incomplete solution exposure",
+      "given": "Partial group submit asks for correctness",
+      "expected": "No answers/correctness until complete; score null"
+    },
+    {
+      "id": "N25",
+      "title": "New answer used on old attempt",
+      "given": "Old question superseded by edited answer",
+      "expected": "Never regrade old answer using new key"
+    },
+    {
+      "id": "N26",
+      "title": "Atomic rollback",
+      "given": "Mastery recompute or required invalidation fails",
+      "expected": "No successful confirmation/head switch; transaction rolls back"
+    },
+    {
+      "id": "N27",
+      "title": "Old catalog compatibility",
+      "given": "Quality decision targets new free-course only",
+      "expected": "No old signature/status/evidence rewrite"
+    },
+    {
+      "id": "N28",
+      "title": "Restore old contribution",
+      "given": "Maintainer corrects a prior false confirmation",
+      "expected": "No automatic regrant; new restore applies content only with dependencies valid"
+    },
+    {
+      "id": "N29",
+      "title": "Tutor before any attempt",
+      "given": "Owner asks current-scene tutor before starting any question",
+      "expected": "Record help for all context-involved question sets, no unattempted loophole"
+    },
+    {
+      "id": "N30",
+      "title": "Answer edit reset",
+      "given": "Same normalized question statements get different corrected answer or IDs",
+      "expected": "question_stem_digest prevents first-complete/help eligibility reset"
+    },
+    {
+      "id": "N31",
+      "title": "Previously ready tutor invalidated",
+      "given": "A ready tutor reply depends on scene later disabled for confirmed error",
+      "expected": "GET keeps student question only; status invalidated, markdown null, anchors empty, no stale answer text"
+    },
+    {
+      "id": "N32",
+      "title": "Legacy catalog stem match",
+      "given": "Completed catalog group copied to free course with same statements but corrected answer",
+      "expected": "Derive stem from original accurate legacy snapshot and reject new formal contribution; unknown original means course_only PRIOR_ASSESSMENT_UNKNOWN"
+    }
+  ]
+}

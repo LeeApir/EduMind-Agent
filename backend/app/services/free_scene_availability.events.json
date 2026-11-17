@@ -1,0 +1,228 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "free-course-events-v1"
+    },
+    "operation_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "seq": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "type": {
+      "enum": [
+        "queued",
+        "started",
+        "clarification_required",
+        "outline_ready",
+        "scene_started",
+        "scene_ready",
+        "first_scene_ready",
+        "progress",
+        "cancel_requested",
+        "error",
+        "done"
+      ]
+    },
+    "course_version": {
+      "minimum": 1,
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "payload": {
+      "$ref": "#/$defs/EventPayload"
+    }
+  },
+  "required": [
+    "schema_version",
+    "operation_id",
+    "seq",
+    "type",
+    "course_version",
+    "payload"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "enum": [
+              "scene_ready",
+              "first_scene_ready"
+            ]
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "course_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "payload": {
+            "required": [
+              "scene_id",
+              "scene_version_id"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "done"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "required": [
+              "state"
+            ],
+            "properties": {
+              "state": {
+                "enum": [
+                  "succeeded",
+                  "partially_succeeded",
+                  "awaiting_clarification",
+                  "failed",
+                  "cancelled",
+                  "timed_out"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "clarification_required"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "required": [
+              "questions"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "error"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "required": [
+              "reason_code"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "outline_ready"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "course_version": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "EventPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "scene_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "scene_version_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "state": {
+          "enum": [
+            "queued",
+            "running",
+            "cancel_requested",
+            "succeeded",
+            "partially_succeeded",
+            "awaiting_clarification",
+            "failed",
+            "cancelled",
+            "timed_out",
+            "pending",
+            "blocked_dependency",
+            "ready",
+            "invalidated"
+          ]
+        },
+        "reason_code": {
+          "type": "string"
+        },
+        "questions": {
+          "type": "array",
+          "maxItems": 3,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "minItems": 1
+        }
+      },
+      "required": []
+    }
+  }
+}

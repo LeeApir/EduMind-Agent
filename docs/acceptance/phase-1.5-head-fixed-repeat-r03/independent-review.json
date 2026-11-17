@@ -1,0 +1,67 @@
+{
+  "verdict": "stop",
+  "candidate_digest": "c0206d4673b9277b4f80e2ed5308dd782d948c15de863439e307ca9a73e86324",
+  "parent_digest": null,
+  "planning_basis_binding": {
+    "basis_digest": "9dda78410bc3d515b7ff01c5de471aed74d92db305846cc88995082d72802775",
+    "example_basis_digest": "26735013a933ede26bf38bbcc620ec634b024ec7be9e7cbce0d53494a74d701d",
+    "materials_digest": "854939ffc212c5eafe2c20529e46152d4023d56f521d3cc57ed068be59087e5b",
+    "selected_example": "head-new-C",
+    "version": "head-planning-example-basis-v1"
+  },
+  "evidence_digest": "8a4c8b44ac01d0f72660c222ff849c45a014ee8157b3725031ad34f18a3d5553",
+  "independent_evaluator": "/root/head_goal_independent",
+  "evaluated_at": "2026-11-09T13:38:20+08:00",
+  "blocking_findings": [
+    {
+      "id": "R03-F01",
+      "area": "fact",
+      "path": [
+        "paragraphs",
+        1
+      ],
+      "quote": "必须先写 data，再写 next，才能让节点成为合法链表节点",
+      "issue": "本模板第6行写data、第7行写next。该顺序不是C语义的必要条件。在已分配的有效节点上，先写next再写data，等所读字段就绪后访问，同样成立。只沿next且不读data时也不要求data先写。",
+      "impact": "将一次代码执行顺序误教成形成合法链表节点的必要条件。trace_step_01/06只显示分配后字段未初始化，不支持这个必要顺序。",
+      "per_original_scope_repairable": true
+    },
+    {
+      "id": "R03-Q01",
+      "area": "answer_determinacy",
+      "path": [
+        "questions",
+        "unreachable_count",
+        "stem"
+      ],
+      "quote": "若调用者丢弃返回值，从 caller_head 出发无法到达的动态分配节点共有多少个？",
+      "issue": "题干只限定丢弃返回值，未限定本题的malloc成功。allocation_success=1允许调用malloc而不保证成功。成功时t0失去入口，答案1。失败时无动态节点，答案0。题干没有明示程序材料中的成功假设。",
+      "impact": "同一题面允许两种正确计数，服务端参考与模型解析只接受1。本题和主例是独立C代码，主例的两次成功设定不能补足这道题的前提。",
+      "per_original_scope_repairable": false
+    }
+  ],
+  "checks": {
+    "full_lesson": true,
+    "fact_citations": false,
+    "paragraph_responsibilities": true,
+    "no_neighbour_copy": true,
+    "no_omitted_explanation": false,
+    "code_trace_answers": false,
+    "no_answer_hints": true,
+    "display_scope": true,
+    "return_contrast": true,
+    "whole_lesson_consistency": false
+  },
+  "scope": "static_independent_review_of_complete_r03_repeat",
+  "first_structure_pass": true,
+  "repair_allowed_this_batch": false,
+  "nonblocking_findings": [
+    {
+      "id": "R03-N01",
+      "path": [
+        "paragraphs",
+        5
+      ],
+      "issue": "只列了第一次调用的丢弃写法，随后给出两次均丢弃的对照结果。准确引用明确是两次，建议读者按两次调用理解，不把单次写法当作足以推出两个节点不可达。"
+    }
+  ]
+}

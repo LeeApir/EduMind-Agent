@@ -1,0 +1,219 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "needs_clarification": {
+      "type": "boolean"
+    },
+    "plan": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/PlanCandidate"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "questions": {
+      "type": "array",
+      "maxItems": 3,
+      "items": {
+        "type": "string"
+      }
+    },
+    "reason": {
+      "enum": [
+        null,
+        "requirements_conflict",
+        "required_material_missing",
+        "out_of_scope"
+      ],
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "source_keys": {
+      "type": "array",
+      "maxItems": 16,
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "needs_clarification",
+    "plan",
+    "questions",
+    "reason",
+    "source_keys"
+  ],
+  "$defs": {
+    "PlanCandidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "objectives": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "items": {
+            "$ref": "#/$defs/PlanObjective"
+          }
+        },
+        "shared_example": {
+          "type": "string"
+        },
+        "terminology": {
+          "type": "array",
+          "maxItems": 32,
+          "items": {
+            "$ref": "#/$defs/Term"
+          }
+        },
+        "conventions": {
+          "type": "array",
+          "maxItems": 16,
+          "items": {
+            "type": "string"
+          }
+        },
+        "scenes": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "items": {
+            "$ref": "#/$defs/PlanScene"
+          }
+        }
+      },
+      "required": [
+        "title",
+        "objectives",
+        "shared_example",
+        "terminology",
+        "conventions",
+        "scenes"
+      ],
+      "description": "Model structural candidate, not public REST body. Server binds actual request IDs/owner/scene UUIDs. Local checks verify source_key whitelist and real excerpts, unique IDs/terms/scene keys, preceding dependencies and objective references; size<=16KiB. Unknown graph links do not block."
+    },
+    "PlanObjective": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "source": {
+          "enum": [
+            "user_requirement",
+            "planner_suggestion"
+          ],
+          "type": "string"
+        },
+        "source_key": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source_excerpt": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "description",
+        "source",
+        "source_key",
+        "source_excerpt"
+      ]
+    },
+    "PlanScene": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "scene_key": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "purpose": {
+          "type": "string"
+        },
+        "forms": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4,
+          "items": {
+            "enum": [
+              "text",
+              "code",
+              "exercise",
+              "visualization"
+            ],
+            "type": "string"
+          }
+        },
+        "objective_ids": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "items": {
+            "type": "string"
+          }
+        },
+        "depends_on": {
+          "type": "array",
+          "maxItems": 7,
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "scene_key",
+        "title",
+        "purpose",
+        "forms",
+        "objective_ids",
+        "depends_on"
+      ]
+    },
+    "Term": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "term": {
+          "type": "string"
+        },
+        "meaning": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "term",
+        "meaning"
+      ]
+    }
+  }
+}

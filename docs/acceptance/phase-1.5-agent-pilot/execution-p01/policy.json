@@ -1,0 +1,61 @@
+{
+  "version": "p15-agent-pilot-execution-v1",
+  "scope": "PHASE-1.5-T069",
+  "providers": {
+    "generation": {
+      "url": "https://api.deepseek.com/responses",
+      "model": "deepseek-flash",
+      "reasoning": "none",
+      "credential_env": "EDUMIND_DEEPSEEK_COMPAT_API_KEY"
+    },
+    "review": {
+      "url": "https://aiapi.world/v1/responses",
+      "model": "gpt-6.1-sol",
+      "reasoning": "low",
+      "credential_env": "EDUMIND_AIAPI_REVIEW_API_KEY"
+    }
+  },
+  "limits": {
+    "requests": 90,
+    "input_tokens": null,
+    "output_tokens": null,
+    "fee_cap": null,
+    "wall_seconds": 10800,
+    "per_request_seconds": 120,
+    "requested_max_output_tokens": 8000,
+    "request_bytes": 131072,
+    "response_bytes": 2097152
+  },
+  "arms": [
+    "B",
+    "C"
+  ],
+  "support_slots_each_arm": 10,
+  "refusal_slots_each_arm": 4,
+  "total_arm_slots": 28,
+  "order": "B then C for each slot, fixed independent input order",
+  "generation_requests_maximum": 50,
+  "review_requests_maximum": 40,
+  "repairs_each_support_slot": 1,
+  "transport_retries": 0,
+  "redirects": false,
+  "fallback": false,
+  "unknown_resend": false,
+  "per_slot_independent_assistant_checkpoint": true,
+  "reviewer": "pilot_independent_evaluator",
+  "reviewer_type": "assistant",
+  "independent_human_truth": false,
+  "production_admission": false,
+  "old_batches_resumed": false,
+  "old_budget_inherited": false,
+  "wire_policy": "pilot-responses-wire-v1",
+  "generation_prompt": "agent-pilot-v2",
+  "baseline_prompt": "agent-pilot-baseline-v2",
+  "engine": "head-insertion-engine-v2",
+  "template": "head-insertion-c-v1",
+  "review_context": "pilot-review-context-v1",
+  "actual_invoice_verified": false,
+  "token_and_fee_caps_unbounded_requires_exact_new_consent": true,
+  "concrete_wire_schema_supported_by_live_services": "not_yet_verified_stop_on_first_failure",
+  "batch_protocol": "pilot-batch-protocol-v1"
+}

@@ -1,0 +1,172 @@
+{
+  "task_id": "PHASE-1.5-T119",
+  "approved_commit": "d1d4c2d",
+  "batch": "stack-lifo-deepseek-r01",
+  "manifest_sha256": "3fc46db95e41139c354e2664526234160fe63d25ea63eda0275f1ad729a8a0ac",
+  "context_sha256": "3e99c53e5792e240d2200246fb89c2c5a16e1e6df34301032d5f0f8618ef3ab3",
+  "execution_window": {
+    "starts": "2026-11-10T16:47:30.875450+08:00",
+    "expires": "2026-11-10T17:17:30.875450+08:00"
+  },
+  "evidence_kind": "actual_provider_response",
+  "counts": {
+    "planning": 0,
+    "first_draft": 1,
+    "revision": 0,
+    "total": 1
+  },
+  "first_draft": {
+    "candidate_digest": "5ce963dc990e2d7e7dd93853fef3ff390ed26bdd145e15551d74ec426e3abd50",
+    "plan_digest": "b5a04d884e6b987dbbf017141074ab2e50dbaa37c47a40112688efd1bf8e0124",
+    "materials_digest": "05381e097f08e1c39d9747859d49c8cdb3a5df0dbb1c88f0e4a9f819077a2660",
+    "receipt": {
+      "complete": true,
+      "encoding": "identity",
+      "http_status": 200,
+      "observation": {
+        "actual_invoice_verified": false,
+        "direct_response_contract": "head-deepseek-responses-v1",
+        "instruction_delivery_verified": false,
+        "instruction_echo": "unavailable",
+        "known_suffix_observed": false,
+        "message_phase": "final_answer",
+        "opaque_identity_verified": false,
+        "opaque_turn_metadata_quarantined": false,
+        "phase_adapter_version": "limited-c-message-phase-v1",
+        "policy": "pilot-responses-wire-v1",
+        "reported_input_tokens": 2582,
+        "reported_total_output_tokens": 1246,
+        "summary_quarantined": false,
+        "upstream_context_verified": false
+      },
+      "raw_bytes": 7241,
+      "raw_sha256": "9135083cdab6fbcd598cb5e86e4cb56756e6bf47ec3b918cdfea6b6fe32f0c5b",
+      "request_sha256": "b2fb7641186f5153707e63d3e6d37824461573f8b77883c3aee7997dd512cafe",
+      "usage": {
+        "input_tokens": 2582,
+        "output_tokens": 1246
+      }
+    },
+    "strict_replay": "pass",
+    "teaching_review": {
+      "blocking_findings": [],
+      "candidate_digest": "5ce963dc990e2d7e7dd93853fef3ff390ed26bdd145e15551d74ec426e3abd50",
+      "checks": {
+        "all_five_frames_and_highlights": true,
+        "answers_and_explanations": true,
+        "four_transfer_questions_unique_no_hints": true,
+        "full_lesson_and_fact_citations": true,
+        "goal_and_beginner_level": true,
+        "implementation_and_display_boundary": true,
+        "lifo_and_distinct_top_vs_pop": true
+      },
+      "independent_evaluator": "/root/stack_teaching_review",
+      "nonblocking_findings": [
+        "四题的开头「在程序追加的同一完整转移场景中」偏向装配术语。",
+        "总结把最终状态 [3,5] 与后进先出相连，因果不如第 4 段与 f3 对取出 8 的说明直接。"
+      ],
+      "verdict": "pass"
+    },
+    "review_sha256": "496c17c6f6efc5d786cb5e04c0d4833c16f247801b7bd064222b0d9d4a02a9ef"
+  },
+  "sealed_vault": "~/.local/share/edumind/stack-lifo-deepseek-r01",
+  "stop": "one request consumed; independently reviewed publication only",
+  "delivery": {
+    "browser": {
+      "entry": "http://127.0.0.1:5212/",
+      "binding": {
+        "candidate_digest": "5ce963dc990e2d7e7dd93853fef3ff390ed26bdd145e15551d74ec426e3abd50",
+        "course_id": "b00893e7-d464-47e3-b6b5-3927a939d5de",
+        "operation_id": "17077f6f-4620-4a50-81d7-f12f3f8307ba",
+        "scene_id": "fd02ad69-e611-439c-b2eb-aadfa48fc437",
+        "scene_version_id": "f9f51b82-9125-49ec-a96b-bdc89a332540",
+        "version": 2
+      },
+      "candidate_digest": "5ce963dc990e2d7e7dd93853fef3ff390ed26bdd145e15551d74ec426e3abd50",
+      "exercise_version_id": "cea3afc3-45ae-59c1-abe9-83cb43278820",
+      "reading_blocks": 6,
+      "frames": [
+        {
+          "frame_id": "f0",
+          "operation": "初始化空栈",
+          "line": 22,
+          "values": [],
+          "top": null,
+          "popped": null,
+          "note_verified": true,
+          "highlighted_code_verified": true
+        },
+        {
+          "frame_id": "f1",
+          "operation": "push(3)",
+          "line": 24,
+          "values": [
+            3
+          ],
+          "top": 3,
+          "popped": null,
+          "note_verified": true,
+          "highlighted_code_verified": true
+        },
+        {
+          "frame_id": "f2",
+          "operation": "push(8)",
+          "line": 25,
+          "values": [
+            3,
+            8
+          ],
+          "top": 8,
+          "popped": null,
+          "note_verified": true,
+          "highlighted_code_verified": true
+        },
+        {
+          "frame_id": "f3",
+          "operation": "pop()",
+          "line": 26,
+          "values": [
+            3
+          ],
+          "top": 3,
+          "popped": 8,
+          "note_verified": true,
+          "highlighted_code_verified": true
+        },
+        {
+          "frame_id": "f4",
+          "operation": "push(5)",
+          "line": 27,
+          "values": [
+            3,
+            5
+          ],
+          "top": 5,
+          "popped": null,
+          "note_verified": true,
+          "highlighted_code_verified": true
+        }
+      ],
+      "playback_controls": true,
+      "feedback": [
+        {
+          "percent": 0,
+          "questions": 4,
+          "attempt_id": "7f6ee57d-2ee8-47b9-a7c4-48dc0bbba7fd"
+        },
+        {
+          "percent": 100,
+          "questions": 4,
+          "attempt_id": "3733e6e2-b38d-4659-bd99-15f6138ee8bf"
+        }
+      ],
+      "refresh_preserved_scene_attempt_and_inputs": true,
+      "refresh_post_requests": 0,
+      "cross_owner_scene_and_attempt_404": true,
+      "pre_submit_answers_absent": true,
+      "page_errors": 0
+    },
+    "verified_at": "2026-11-10T16:52:12+08:00",
+    "existing_guest_window_opened": true
+  }
+}

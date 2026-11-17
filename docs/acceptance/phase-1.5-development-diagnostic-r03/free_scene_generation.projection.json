@@ -1,0 +1,269 @@
+[
+  {
+    "path": "/$schema",
+    "action": "annotation_only",
+    "original": "https://json-schema.org/draft/2020-12/schema"
+  },
+  {
+    "path": "/properties/blocks/items/oneOf",
+    "action": "union_projection_local_oneOf",
+    "original": [
+      {
+        "$ref": "#/$defs/TextBlock"
+      },
+      {
+        "$ref": "#/$defs/CodeBlock"
+      },
+      {
+        "$ref": "#/$defs/PrivateExerciseBlock"
+      },
+      {
+        "$ref": "#/$defs/VisualizationBlock"
+      }
+    ]
+  },
+  {
+    "path": "/properties/blocks/contains",
+    "action": "local_validation",
+    "original": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "text"
+        }
+      },
+      "required": [
+        "kind"
+      ]
+    }
+  },
+  {
+    "path": "/properties/blocks/minContains",
+    "action": "local_validation",
+    "original": 1
+  },
+  {
+    "path": "/$defs/TextBlock/properties/kind/const",
+    "action": "equivalent_scalar_enum",
+    "original": "text"
+  },
+  {
+    "path": "/$defs/TextBlock/properties/anchor_id/minLength",
+    "action": "local_validation",
+    "original": 1
+  },
+  {
+    "path": "/$defs/TextBlock/properties/anchor_id/maxLength",
+    "action": "local_validation",
+    "original": 4000
+  },
+  {
+    "path": "/$defs/TextBlock/properties/markdown/minLength",
+    "action": "local_validation",
+    "original": 1
+  },
+  {
+    "path": "/$defs/CodeBlock/properties/kind/const",
+    "action": "equivalent_scalar_enum",
+    "original": "code"
+  },
+  {
+    "path": "/$defs/CodeBlock/properties/anchor_id/minLength",
+    "action": "local_validation",
+    "original": 1
+  },
+  {
+    "path": "/$defs/CodeBlock/properties/anchor_id/maxLength",
+    "action": "local_validation",
+    "original": 4000
+  },
+  {
+    "path": "/$defs/CodeBlock/properties/language/const",
+    "action": "equivalent_scalar_enum",
+    "original": "c"
+  },
+  {
+    "path": "/$defs/VisualElement/properties/id/maxLength",
+    "action": "local_validation",
+    "original": 64
+  },
+  {
+    "path": "/$defs/VisualElement/properties/label/maxLength",
+    "action": "local_validation",
+    "original": 128
+  },
+  {
+    "path": "/$defs/VisualElement/properties/next_id/maxLength",
+    "action": "local_validation",
+    "original": 64
+  },
+  {
+    "path": "/$defs/VisualStep/properties/caption/maxLength",
+    "action": "local_validation",
+    "original": 1000
+  },
+  {
+    "path": "/$defs/VisualStep/properties/highlight_ids/uniqueItems",
+    "action": "local_validation",
+    "original": true
+  },
+  {
+    "path": "/$defs/VisualizationBlock/properties/kind/const",
+    "action": "equivalent_scalar_enum",
+    "original": "visualization"
+  },
+  {
+    "path": "/$defs/VisualizationBlock/properties/anchor_id/minLength",
+    "action": "local_validation",
+    "original": 1
+  },
+  {
+    "path": "/$defs/VisualizationBlock/properties/anchor_id/maxLength",
+    "action": "local_validation",
+    "original": 4000
+  },
+  {
+    "path": "/$defs/VisualizationBlock/properties/text_alternative/minLength",
+    "action": "local_validation",
+    "original": 1
+  },
+  {
+    "path": "/$defs/VisualizationBlock/properties/text_alternative/maxLength",
+    "action": "local_validation",
+    "original": 4000
+  },
+  {
+    "path": "/$defs/Action/properties/anchor_id/minLength",
+    "action": "local_validation",
+    "original": 1
+  },
+  {
+    "path": "/$defs/Action/properties/anchor_id/maxLength",
+    "action": "local_validation",
+    "original": 4000
+  },
+  {
+    "path": "/$defs/Action/properties/step_index/minimum",
+    "action": "local_validation",
+    "original": 0
+  },
+  {
+    "path": "/$defs/Action/properties/step_index/maximum",
+    "action": "local_validation",
+    "original": 49
+  },
+  {
+    "path": "/$defs/Action/allOf",
+    "action": "local_validation",
+    "original": [
+      {
+        "if": {
+          "properties": {
+            "type": {
+              "const": "show_step"
+            }
+          },
+          "required": [
+            "type"
+          ]
+        },
+        "then": {
+          "properties": {
+            "step_index": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 49
+            }
+          }
+        },
+        "else": {
+          "properties": {
+            "step_index": {
+              "type": "null"
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "path": "/$defs/PrivateQuestion/properties/question_id/minLength",
+    "action": "local_validation",
+    "original": 1
+  },
+  {
+    "path": "/$defs/PrivateQuestion/properties/question_id/maxLength",
+    "action": "local_validation",
+    "original": 128
+  },
+  {
+    "path": "/$defs/PrivateQuestion/properties/question/minLength",
+    "action": "local_validation",
+    "original": 1
+  },
+  {
+    "path": "/$defs/PrivateQuestion/properties/question/maxLength",
+    "action": "local_validation",
+    "original": 2000
+  },
+  {
+    "path": "/$defs/PrivateQuestion/properties/input_type/const",
+    "action": "equivalent_scalar_enum",
+    "original": "short_text"
+  },
+  {
+    "path": "/$defs/PrivateQuestion/properties/answer_key/minLength",
+    "action": "local_validation",
+    "original": 1
+  },
+  {
+    "path": "/$defs/PrivateQuestion/properties/answer_key/maxLength",
+    "action": "local_validation",
+    "original": 500
+  },
+  {
+    "path": "/$defs/PrivateQuestion/properties/solution/minLength",
+    "action": "local_validation",
+    "original": 1
+  },
+  {
+    "path": "/$defs/PrivateQuestion/properties/solution/maxLength",
+    "action": "local_validation",
+    "original": 2000
+  },
+  {
+    "path": "/$defs/PrivateExerciseBlock/properties/kind/const",
+    "action": "equivalent_scalar_enum",
+    "original": "exercise"
+  },
+  {
+    "path": "/$defs/PrivateExerciseBlock/properties/anchor_id/minLength",
+    "action": "local_validation",
+    "original": 1
+  },
+  {
+    "path": "/$defs/PrivateExerciseBlock/properties/anchor_id/maxLength",
+    "action": "local_validation",
+    "original": 128
+  },
+  {
+    "path": "/$defs/PrivateExerciseBlock/properties/question/minLength",
+    "action": "local_validation",
+    "original": 1
+  },
+  {
+    "path": "/$defs/PrivateExerciseBlock/properties/question/maxLength",
+    "action": "local_validation",
+    "original": 2000
+  },
+  {
+    "path": "/$defs/PrivateExerciseBlock/properties/exercise_key/minLength",
+    "action": "local_validation",
+    "original": 1
+  },
+  {
+    "path": "/$defs/PrivateExerciseBlock/properties/exercise_key/maxLength",
+    "action": "local_validation",
+    "original": 64
+  }
+]

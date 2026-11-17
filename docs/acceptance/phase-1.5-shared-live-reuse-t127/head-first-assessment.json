@@ -1,0 +1,103 @@
+{
+  "review": {
+    "candidate_digest": "956d30a0e0be327e241f709ab909446771aa57e37b964faf47136548e7a53f3e",
+    "parent_digest": null,
+    "planning_basis_binding": {
+      "basis_digest": "110829e48817e31287db4bdc4d38ed528b087debb102156b34fd6e010f94d6ff",
+      "example_basis_digest": "52f7729942490e7ba9eef4e6a1f5e728b728b31db3166f47c3c4902b2907410f",
+      "materials_digest": "6521537455ce7e11d13c7e5b34f91826413057b93dafc2b63330c8c45653f0e1",
+      "selected_example": "head-new-empty",
+      "version": "head-planning-example-basis-v1"
+    },
+    "evidence_digest": "2eb56295c35ebe2378dbe4032381a7beafcbf9880cb7247c1d47afd15e89f261",
+    "verdict": "needs_revision",
+    "independent_evaluator": "t128_independent",
+    "full_lesson_reviewed": true,
+    "checks": {
+      "full_lesson": true,
+      "paragraph_responsibilities": true,
+      "no_neighbour_copy": true,
+      "no_omitted_explanation": true,
+      "code_trace_answers": true,
+      "no_answer_hints": true,
+      "display_scope": true,
+      "whole_lesson_consistency": true,
+      "empty_first_and_second_links": true,
+      "question_conditions_and_unique_answers": true,
+      "fact_citations": false,
+      "return_contrast": false
+    },
+    "findings": [
+      {
+        "path": [
+          "paragraphs",
+          4,
+          "text"
+        ],
+        "area": "teaching_expression",
+        "severity": "minor",
+        "repairable": true,
+        "quote": "如果调用者写成 insert(caller_head, 4, 1); 而丢弃返回值，情况就不同",
+        "issue": "只举第一次调用便给出两次新分配节点均不可达的结论。只忽略第一次而接收第二次时，第二个节点会成为调用者入口。明确本段对照是两次调用均不接收返回值。",
+        "teaching_responsibility": "保留接收与忽略返回值对照的职责，明确两次均忽略这一条件、入口仍为 NULL、两个已分配节点不可达且未被自动释放。"
+      },
+      {
+        "path": [
+          "paragraphs",
+          6,
+          "fact_ids"
+        ],
+        "area": "citation",
+        "severity": "minor",
+        "repairable": true,
+        "quote": "trace_step_04",
+        "issue": "现有 trace_step_04 与 trace_step_09 均定位到 return 当帧，尚不能显示调用者接收后节点依然存在。引用 trace_step_05 与 trace_step_10 作为紧随其后的调用者状态，保留正确的返回依据。",
+        "teaching_responsibility": "为局部指针和动态节点生命周期区分提供同版返回及调用者状态依据。保持原段教学文字及清理边界。"
+      }
+    ],
+    "blocking_findings": [
+      {
+        "path": [
+          "paragraphs",
+          4,
+          "text"
+        ],
+        "area": "teaching_expression",
+        "severity": "minor",
+        "repairable": true,
+        "quote": "如果调用者写成 insert(caller_head, 4, 1); 而丢弃返回值，情况就不同",
+        "issue": "只举第一次调用便给出两次新分配节点均不可达的结论。只忽略第一次而接收第二次时，第二个节点会成为调用者入口。明确本段对照是两次调用均不接收返回值。",
+        "teaching_responsibility": "保留接收与忽略返回值对照的职责，明确两次均忽略这一条件、入口仍为 NULL、两个已分配节点不可达且未被自动释放。"
+      },
+      {
+        "path": [
+          "paragraphs",
+          6,
+          "fact_ids"
+        ],
+        "area": "citation",
+        "severity": "minor",
+        "repairable": true,
+        "quote": "trace_step_04",
+        "issue": "现有 trace_step_04 与 trace_step_09 均定位到 return 当帧，尚不能显示调用者接收后节点依然存在。引用 trace_step_05 与 trace_step_10 作为紧随其后的调用者状态，保留正确的返回依据。",
+        "teaching_responsibility": "为局部指针和动态节点生命周期区分提供同版返回及调用者状态依据。保持原段教学文字及清理边界。"
+      }
+    ]
+  },
+  "summary": "逐段核对局部指针、未初始化、两次判空、两次链接、返回和 caller_head 赋值。13 帧和高亮与独立预期相符；四题答案 NULL、[8,6]、[]、2，条件充分、答案唯一、解析准确。仅有两处可修问题。题干末尾题键影响流畅度，属于非阻断意见。",
+  "frame_lines": [
+    null,
+    4,
+    5,
+    6,
+    7,
+    8,
+    12,
+    4,
+    5,
+    6,
+    7,
+    8,
+    13
+  ]
+}

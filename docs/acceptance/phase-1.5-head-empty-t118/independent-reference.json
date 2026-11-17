@@ -1,0 +1,24 @@
+{
+  "method": "从固定 C 函数和两处调用手推；不是引擎输出的副本",
+  "initial": [],
+  "insertions": [4, 7],
+  "receive_return": {"caller_head": "t1", "next": {"t0": null, "t1": "t0"}, "reachable": [7, 4], "unreachable": []},
+  "discard_return": {"caller_head": null, "next": {"t0": null, "t1": null}, "reachable": [], "unreachable": ["t0", "t1"]},
+  "frames": [
+    [null, "initial", null, null, null, null, {}, "inactive"],
+    [4, "allocate", null, null, "t0", null, {"t0": ["indeterminate", "indeterminate"]}, "active"],
+    [5, "success_null_check", null, null, "t0", null, {"t0": ["indeterminate", "indeterminate"]}, "active"],
+    [6, "data", null, null, "t0", null, {"t0": [4, "indeterminate"]}, "active"],
+    [7, "link", null, null, "t0", null, {"t0": [4, null]}, "active"],
+    [8, "return", null, null, "t0", "t0", {"t0": [4, null]}, "active"],
+    [12, "caller", "t0", null, "t0", "t0", {"t0": [4, null]}, "inactive"],
+    [4, "allocate", "t0", "t0", "t1", null, {"t0": [4, null], "t1": ["indeterminate", "indeterminate"]}, "active"],
+    [5, "success_null_check", "t0", "t0", "t1", null, {"t0": [4, null], "t1": ["indeterminate", "indeterminate"]}, "active"],
+    [6, "data", "t0", "t0", "t1", null, {"t0": [4, null], "t1": [7, "indeterminate"]}, "active"],
+    [7, "link", "t0", "t0", "t1", null, {"t0": [4, null], "t1": [7, "t0"]}, "active"],
+    [8, "return", "t0", "t0", "t1", "t1", {"t0": [4, null], "t1": [7, "t0"]}, "active"],
+    [13, "caller", "t1", "t0", "t1", "t1", {"t0": [4, null], "t1": [7, "t0"]}, "inactive"]
+  ],
+  "frame_columns": ["line", "kind", "caller_head", "last_recorded_local_head", "last_recorded_p", "returned", "nodes_as_data_and_next", "local_scope"],
+  "transfer": {"initial": [], "insertions": [6, 8], "answers": {"link_target": "NULL", "normal_values": "[8,6]", "discarded_values": "[]", "unreachable_count": "2"}}
+}

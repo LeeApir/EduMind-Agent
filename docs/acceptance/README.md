@@ -1,48 +1,33 @@
-# 验收报告与本地材料
+# 验收资料入口
 
-当前交付是 PRD §0 / ADR-0007 的课程目录版。T033 保持 `blocked`，动态生成、重解释和实时 AI 暂缓；累计 Provider 请求仍为 **2033/2500**。整理不改变旧成绩、协议、阈值或付费授权。
+Phase 1.5 已按 ADR0066 收敛退出，**原开发质量、独立质量与性能没有通过**。当前 Phase 2 先讨论课程、界面、动画与习题重设计；历史试验不再执行。当前任务以[根账本](../../task.json)为准，正式产品保持 `catalog_only`。
 
-## Phase 1活动计划
+**后续开发不必通读本目录。** 从当前任务、PRD 对应范围和本页相关能力入口开始；只有修改涉及来源或旧缺陷时才查对应证据，不默认重跑旧批次。[保留清单与开发入口](../maintenance/acceptance-retention-20261116.md)记录全部处置：本轮退役60目录、15顶层历史文档及61个专属脚本/测试，剩余154目录和7个非缓存顶层文件。原候选中的66目录因共享依赖暂留，不再追加清理任务；清空历史资料不作为重设计前置。
 
-[Phase 1范围与验收计划](phase-1-acceptance-plan.md)映射42项活动任务、离线/集成/真实验证、沿用指标和独立预算规则。计划不授予真实调用或动态开放；旧T033与目录成绩保持原判定。
+## 当前交接与可复用成果
 
-## Git 中保留
+| 要了解什么 | 入口 |
+| --- | --- |
+| 阶段结束原因、缺口和保留范围 | [Phase 1.5 收敛交接](phase-1.5-t038-gap-review-t123/GAPS.md)、[ADR0066](../ADR/0066-phase-1.5-contracted-closeout.md)、[只读任务归档](../tasks/phase-1.5.json) |
+| 四主题课程的已有能力 | [四主题共用流程](phase-1.5-shared-live-reuse-t127/RESULTS.md)、[二分查找程序帧](phase-1.5-binary-search-program-frames-t130/RESULTS.md) |
+| 栈的目标选择、多场景与判卷 | [栈统一结果](phase-1.5-stack-boundaries-t138/RESULTS.md)；不同批次和版本的成绩不能合并 |
+| 画像适配的实际局限 | [A/B 课程及对照](phase-1.5-stack-profile-pair-t132/RESULTS.md)：两课合格，最后跨批对照仅 1/3，不通过 |
+| 私有课程与兼容能力 | [四主题封存回放](phase-1.5-course-trial-replay-t120/RESULTS.md)、[已有头插导入](phase-1.5-archived-head-import-t117/README.md)、[兼容检查](phase-1.5-compatibility-t021/README.md) |
+| 核心工程的原验证范围 | [集成记录](phase-1.5-integration-t035/README.md)、[浏览器记录](phase-1.5-browser-t036/README.md)；历史检查不自动证明新设计通过 |
 
-- [目录版退出报告](mvp-0.3-catalog-exit-20261003.md)、[工程验收](mvp-0.3-catalog-engineering-20261003.md)、[实际签核验证](mvp-0.3-catalog-signed-handoff-20261003.md)及[Lee 原始批准](mvp-0.3-catalog-human-signoff-20261003.json)。批准 JSON 原样保留，是课程 approval/allowlist 的受信依据。
-- [已提交版本安装/构建/运行验证](mvp-0.3-clean-checkout-20261003.md)、[合并前审查](mvp-0.3-pr-review-20261003.md)。本地自查不替代 GitHub 独立批准。
-- [验收口径](mvp-0.3-acceptance-plan.md)、[插入模板](mvp-0.3-t006-insertion.md)、[删除模板](mvp-0.3-t007-deletion.md)、[容器恢复](mvp-0.3-t031-compose-recovery.md)、[动画性能](mvp-0.3-t032-animation-performance.md)。两个模板报告仍是注册表引用的批准证据。
-- [MVP 0.2 收尾决定](mvp-0.2-closeout-decision.md)、[闭环](mvp-0.2-closed-loop.md)、[质量](mvp-0.2-resource-quality.md)、[MVP 0.1 历史报告](mvp-0.1-provider-acceptance.md)。不同模型/配置的成绩不拼接。
+## 保留的契约与历史
 
-## 原始材料的位置
+- [课程契约](phase-1.5-course-contract-r01/README.md)、[生成契约](phase-1.5-generation-contract-r01/README.md)、[质量契约](phase-1.5-quality-contract-r01/README.md)、[验收契约](phase-1.5-acceptance-contract-r01/README.md)：原指标和失败不回填，新设计如需调整另作决定。
+- [T102 最终重设计与独立复核](phase-1.5-manual-bc-redesign-t102/DESIGN.md)：保留代表性失败，不恢复执行器路线。其历史相对链接可通过下述归档索引定位原提交。
+- [Phase 1 交接](phase-1-closeout-20261021/README.md)、[原目录课程签核](mvp-0.3-catalog-human-signoff-20261003.json)、[目录退出](mvp-0.3-catalog-exit-20261003.md)：保留正式课程来源与历史限制。
+- H01–H08 继续封存，不作为新阶段开发材料，不继承样本资格。
 
-2026-10-03 整理前快照为 `2537e4ccffd1f986e0aa4408a744bf8bcde7407e`。254 个原验收文件均先逐字节备份、校验 SHA-256；其中15份报告/签核保留，239份移出验收目录。239份中14个工具及4份原样夹具因回归测试依赖保留在下述工程目录，其余221份只保存在本地材料。另保存先前已独立归档的169份 T033 失败/诊断证据。
+## 退役资料与恢复
 
-维护者本地位置为仓库根目录 `local-materials/acceptance-20261003/`：`snapshot/`、`t033-evidence/` 均沿用原仓库相对路径，`manifest.json` 记录来源、哈希和新位置。该目录被 Git 忽略，不随 PR 或拉取分发；报告中的“本地材料”是档案标识，不是当前 checkout 的文件链接。其他贡献者可运行当前离线回归，复核课程签核与报告结论；详细历史材料需维护者另行提供，或从已有 Git 提交恢复到本地。
+[ARCHIVE.md](ARCHIVE.md) 列出已退役的资料批次、准确 Git 来源和恢复方法。只需日常开发时阅读本页及当前任务，不必逐个打开历史包。
 
-已跟踪历史文件可用 `git show 2537e4ccffd1f986e0aa4408a744bf8bcde7407e:docs/acceptance/<文件名>` 读取。此整理仅精简当前文件树，旧提交历史保留；未重写历史。T033 未上传的证据仍在本地归档提交 `588f5dc90680ab551b70f13c5f8a77c8cece6b60`，其代码归档为 `29d5bf5e17975d57865cea5afa9b176dafe84382`，两者都未合入 PR。
+- 2026-10-21：32 包、346 文件，原恢复清单保留。
+- 2026-11-16 T004：集中退役434文件，准确来源、恢复及定向验证见[最终清单](../maintenance/acceptance-retention-20261116.md)。本轮清理结束。
+- 2026-11-16 T002：退役九个 T102 过程包及专属消费者，共 66 文件；未删除 Git 历史，不在工作区复制完整档案。见[本次清理记录](../maintenance/acceptance-cleanup-20261116.md)。
 
-## 回归与历史执行器
-
-离线回归依赖保留在 `scripts/acceptance_support/`、`backend/tests/fixtures/acceptance/`、`web/tests/fixtures/`；只调整路径，不删断言，不把失败夹具换成成功样本。课程审阅 HTML 今后由 `scripts/prepare_catalog_review.py` 生成到 `local-materials/`，不写入验收目录。
-
-`task.json`、`docs/tasks/` 和 `process.txt` 的历史证据路径仍按当时快照解释，不回填历史。`verify_catalog_exit.py`、`verify_catalog_acceptance.py` 及旧冻结/运行脚本依赖历史协议、源文件哈希和原工作树，不能作为当前干净 checkout 的入口；需要复核时恢复准确历史源码与材料，不能改哈希强行通过。当前入口是 `scripts/check_catalog_workflow.py`、`scripts/verify_catalog_release.py` 和后端/前端离线回归。保留工具不意味着授权运行 Provider、重跑基准或自动推进阶段。
-
-## 整理后的离线核验（2026-10-03）
-
-后端完整离线回归 **548 passed、177 skipped**，前端 **136 passed**；Ruff（后端 app/tests 及迁移工具）、课程签核和任务依赖检查通过。后端执行器移除 Provider/数据库配置并阻断外部连接；未启用数据库/Docker的跳过项不计为通过。生产代码、迁移、签核内容、锁文件、`task.json` 和原批准 JSON 不变，沿用已验证的构建与实际数据库/浏览器证据，未重新运行它们。
-
-254 个验收原件和169份 T033 原证据逐文件哈希一致；4份回归 JSON 字节不变，14个工具的 AST 除导入排序外不变，74个当前验收文档链接可解析。440份本地原件（包含被修改的外部文档/测试原件）全数校验通过。验收目录由约2.57MB减至约74KB（15份报告/签核＋本索引），不含移至测试目录的依赖。
-
-检查命令及完整输出只存于本地材料的 `checks/`，包括首次 Ruff 导入分类失败、文件计数发现旧字节码缓存的失败及后续修正结果；没有把失败改为通过。工具导入排序由独立 Ruff 配置固定，无检查逻辑或断言变更。Provider请求 **0**，累计 **2033/2500**，T033仍 `blocked`。已有 PR #4 等待其他账号批准，未管理员绕过或合并；此推送需要审核新的 HEAD。
-
-## 原工作区后续清理（2026-10-03）
-
-PR #4已合并到main `a836ab4`。原工作目录也已同步该版本并清理到上述16份必要文件；T033的12处实验覆盖已还原、52个未跟踪实验文件及169份证据已从原路径移除。完整历史树已实际恢复，236份原件哈希一致。详情见[工作区清理记录](../maintenance/worktree-cleanup-20261003.md)。
-
-`verify_legacy_archives.py` 现在默认只读核验本地Git归档，也可通过 `--restored-root` 核对独立恢复目录，当前checkout无需再保留旧实验原件。历史分支及两批本地材料保留，T033仍blocked，Provider请求0。旧冻结协议和成绩不回写。
-
-## Phase 1 动态恢复提案
-
-[T035 固定集合与离线门禁](phase-1-dynamic-v1/README.md)及[ADR-0011](../ADR/0011-independent-dynamic-acceptance.md)等待批准；当前额度 0，旧 T033 保持 blocked，动态入口未开放。
-
-2026-10-08：用户已[全部批准 T035 设计与附件](../ADR/0011-dynamic-approval-20261008.json)。提案原字节不改，正式执行前仍须逐阶段绑定实际配置、预算与批准；真实调用和动态开放未授权。
+保留材料仍可能被课程导入、准入或有效回归按准确路径读取，不能按目录日期批量删除。历史文件中的 pending、旧任务数和旧阶段名称保留当时含义，不构成执行授权。密钥、私有数据库与加密原件继续本机保管。

@@ -1,0 +1,884 @@
+{
+  "examples": [
+    {
+      "id": "valid_a",
+      "value": {
+        "paragraphs": [
+          {
+            "key": "intro",
+            "text": "新结点 p 的 next 指向原来的 head，所以原链仍接在新结点后面。函数返回 p 后，调用者把它赋给 caller_head，才真正更新调用者保存的头指针。"
+          }
+        ],
+        "code": "#include <stdlib.h>\ntypedef struct Node { int data; struct Node *next; } Node;\nNode *insert(Node *head, int value, int allocation_success) {\n    Node *p = allocation_success ? malloc(sizeof *p) : NULL;\n    if (p == NULL) return head;\n    p->data = value;\n    p->next = head;\n    return p;\n}\nint main(void) {\n    Node *caller_head = NULL;\n    caller_head = insert(caller_head, 7, 1);\n    (void)caller_head;\n    return 0;\n}\n",
+        "questions": {
+          "caller_head": {
+            "stem": "最后调用者保存的头指针 caller_head 指向哪个节点？",
+            "explanation": "调用者接回返回的 p，所以最终指向 t0。"
+          },
+          "traversal_status": {
+            "stem": "从 caller_head 开始的遍历如何结束？",
+            "explanation": "新节点的 next 为空，所以遍历到空指针结束。"
+          },
+          "reachable_prefix": {
+            "stem": "从调用者头开始，首次重复或不确定指针前的可知值前缀是什么？",
+            "explanation": "唯一可达节点的数据为 7，之后到达空指针。"
+          },
+          "allocation_failures": {
+            "stem": "这个合成分配掩码下，分配失败几次？",
+            "explanation": "唯一一次分配被给定为成功，所以失败次数为 0。"
+          }
+        },
+        "answers": {
+          "caller_head": "t0",
+          "traversal_status": "terminated",
+          "reachable_prefix": [
+            7
+          ],
+          "allocation_failures": 0
+        },
+        "actions": {
+          "states": [
+            {
+              "order": 0,
+              "step": 0,
+              "caller_head": "none",
+              "local_head": "none",
+              "p": "none",
+              "nodes": []
+            },
+            {
+              "order": 2,
+              "step": 1,
+              "caller_head": "none",
+              "local_head": "none",
+              "p": "t0",
+              "nodes": [
+                {
+                  "id": "t0",
+                  "data_status": "indeterminate",
+                  "data": 0,
+                  "next": "indeterminate"
+                }
+              ]
+            },
+            {
+              "order": 5,
+              "step": 2,
+              "caller_head": "none",
+              "local_head": "none",
+              "p": "t0",
+              "nodes": [
+                {
+                  "id": "t0",
+                  "data_status": "known",
+                  "data": 7,
+                  "next": "indeterminate"
+                }
+              ]
+            },
+            {
+              "order": 8,
+              "step": 3,
+              "caller_head": "none",
+              "local_head": "none",
+              "p": "t0",
+              "nodes": [
+                {
+                  "id": "t0",
+                  "data_status": "known",
+                  "data": 7,
+                  "next": "none"
+                }
+              ]
+            },
+            {
+              "order": 11,
+              "step": 4,
+              "caller_head": "none",
+              "local_head": "none",
+              "p": "t0",
+              "nodes": [
+                {
+                  "id": "t0",
+                  "data_status": "known",
+                  "data": 7,
+                  "next": "none"
+                }
+              ]
+            },
+            {
+              "order": 14,
+              "step": 5,
+              "caller_head": "t0",
+              "local_head": "none",
+              "p": "t0",
+              "nodes": [
+                {
+                  "id": "t0",
+                  "data_status": "known",
+                  "data": 7,
+                  "next": "none"
+                }
+              ]
+            }
+          ],
+          "highlights": [
+            {
+              "order": 3,
+              "step": 1,
+              "line": 4
+            },
+            {
+              "order": 6,
+              "step": 2,
+              "line": 6
+            },
+            {
+              "order": 9,
+              "step": 3,
+              "line": 7
+            },
+            {
+              "order": 12,
+              "step": 4,
+              "line": 8
+            },
+            {
+              "order": 15,
+              "step": 5,
+              "line": 12
+            }
+          ],
+          "advances": [
+            {
+              "order": 1,
+              "step": 1
+            },
+            {
+              "order": 4,
+              "step": 2
+            },
+            {
+              "order": 7,
+              "step": 3
+            },
+            {
+              "order": 10,
+              "step": 4
+            },
+            {
+              "order": 13,
+              "step": 5
+            }
+          ]
+        }
+      },
+      "mechanical_expected": "pending_independent_semantic_review",
+      "developer_label": "handwritten_expected_good_not_independently_rated"
+    },
+    {
+      "id": "valid_b",
+      "value": {
+        "paragraphs": [
+          {
+            "key": "intro",
+            "text": "在函数内部，p->next = head 只是把新结点连到旧链上，并没有改写调用者的头指针。调用者执行 caller_head = insert(...)，接住返回的 p 后，头指针才指向新结点。"
+          }
+        ],
+        "code": "#include <stdlib.h>\ntypedef struct Node { int data; struct Node *next; } Node;\nNode *insert(Node *head, int value, int allocation_success) {\n    Node *p = allocation_success ? malloc(sizeof *p) : NULL;\n    if (p == NULL) return head;\n    p->data = value;\n    p->next = head;\n    return p;\n}\nint main(void) {\n    Node *caller_head = NULL;\n    caller_head = insert(caller_head, 7, 1);\n    (void)caller_head;\n    return 0;\n}\n",
+        "questions": {
+          "caller_head": {
+            "stem": "最后调用者保存的头指针 caller_head 指向哪个节点？",
+            "explanation": "调用者接回返回的 p，所以最终指向 t0。"
+          },
+          "traversal_status": {
+            "stem": "从 caller_head 开始的遍历如何结束？",
+            "explanation": "新节点的 next 为空，所以遍历到空指针结束。"
+          },
+          "reachable_prefix": {
+            "stem": "从调用者头开始，首次重复或不确定指针前的可知值前缀是什么？",
+            "explanation": "唯一可达节点的数据为 7，之后到达空指针。"
+          },
+          "allocation_failures": {
+            "stem": "这个合成分配掩码下，分配失败几次？",
+            "explanation": "唯一一次分配被给定为成功，所以失败次数为 0。"
+          }
+        },
+        "answers": {
+          "caller_head": "t0",
+          "traversal_status": "terminated",
+          "reachable_prefix": [
+            7
+          ],
+          "allocation_failures": 0
+        },
+        "actions": {
+          "states": [
+            {
+              "order": 0,
+              "step": 0,
+              "caller_head": "none",
+              "local_head": "none",
+              "p": "none",
+              "nodes": []
+            },
+            {
+              "order": 2,
+              "step": 1,
+              "caller_head": "none",
+              "local_head": "none",
+              "p": "t0",
+              "nodes": [
+                {
+                  "id": "t0",
+                  "data_status": "indeterminate",
+                  "data": 0,
+                  "next": "indeterminate"
+                }
+              ]
+            },
+            {
+              "order": 5,
+              "step": 2,
+              "caller_head": "none",
+              "local_head": "none",
+              "p": "t0",
+              "nodes": [
+                {
+                  "id": "t0",
+                  "data_status": "known",
+                  "data": 7,
+                  "next": "indeterminate"
+                }
+              ]
+            },
+            {
+              "order": 8,
+              "step": 3,
+              "caller_head": "none",
+              "local_head": "none",
+              "p": "t0",
+              "nodes": [
+                {
+                  "id": "t0",
+                  "data_status": "known",
+                  "data": 7,
+                  "next": "none"
+                }
+              ]
+            },
+            {
+              "order": 11,
+              "step": 4,
+              "caller_head": "none",
+              "local_head": "none",
+              "p": "t0",
+              "nodes": [
+                {
+                  "id": "t0",
+                  "data_status": "known",
+                  "data": 7,
+                  "next": "none"
+                }
+              ]
+            },
+            {
+              "order": 14,
+              "step": 5,
+              "caller_head": "t0",
+              "local_head": "none",
+              "p": "t0",
+              "nodes": [
+                {
+                  "id": "t0",
+                  "data_status": "known",
+                  "data": 7,
+                  "next": "none"
+                }
+              ]
+            }
+          ],
+          "highlights": [
+            {
+              "order": 3,
+              "step": 1,
+              "line": 4
+            },
+            {
+              "order": 6,
+              "step": 2,
+              "line": 6
+            },
+            {
+              "order": 9,
+              "step": 3,
+              "line": 7
+            },
+            {
+              "order": 12,
+              "step": 4,
+              "line": 8
+            },
+            {
+              "order": 15,
+              "step": 5,
+              "line": 12
+            }
+          ],
+          "advances": [
+            {
+              "order": 1,
+              "step": 1
+            },
+            {
+              "order": 4,
+              "step": 2
+            },
+            {
+              "order": 7,
+              "step": 3
+            },
+            {
+              "order": 10,
+              "step": 4
+            },
+            {
+              "order": 13,
+              "step": 5
+            }
+          ]
+        }
+      },
+      "mechanical_expected": "pending_independent_semantic_review",
+      "developer_label": "handwritten_expected_good_not_independently_rated"
+    },
+    {
+      "id": "wrong_prose_requires_review",
+      "value": {
+        "paragraphs": [
+          {
+            "key": "intro",
+            "text": "新结点 p 已经接上原链，所以 caller_head 不需要接收返回值。函数返回后，调用者的头指针会自动指向新结点。"
+          }
+        ],
+        "code": "#include <stdlib.h>\ntypedef struct Node { int data; struct Node *next; } Node;\nNode *insert(Node *head, int value, int allocation_success) {\n    Node *p = allocation_success ? malloc(sizeof *p) : NULL;\n    if (p == NULL) return head;\n    p->data = value;\n    p->next = head;\n    return p;\n}\nint main(void) {\n    Node *caller_head = NULL;\n    caller_head = insert(caller_head, 7, 1);\n    (void)caller_head;\n    return 0;\n}\n",
+        "questions": {
+          "caller_head": {
+            "stem": "最后调用者保存的头指针 caller_head 指向哪个节点？",
+            "explanation": "调用者接回返回的 p，所以最终指向 t0。"
+          },
+          "traversal_status": {
+            "stem": "从 caller_head 开始的遍历如何结束？",
+            "explanation": "新节点的 next 为空，所以遍历到空指针结束。"
+          },
+          "reachable_prefix": {
+            "stem": "从调用者头开始，首次重复或不确定指针前的可知值前缀是什么？",
+            "explanation": "唯一可达节点的数据为 7，之后到达空指针。"
+          },
+          "allocation_failures": {
+            "stem": "这个合成分配掩码下，分配失败几次？",
+            "explanation": "唯一一次分配被给定为成功，所以失败次数为 0。"
+          }
+        },
+        "answers": {
+          "caller_head": "t0",
+          "traversal_status": "terminated",
+          "reachable_prefix": [
+            7
+          ],
+          "allocation_failures": 0
+        },
+        "actions": {
+          "states": [
+            {
+              "order": 0,
+              "step": 0,
+              "caller_head": "none",
+              "local_head": "none",
+              "p": "none",
+              "nodes": []
+            },
+            {
+              "order": 2,
+              "step": 1,
+              "caller_head": "none",
+              "local_head": "none",
+              "p": "t0",
+              "nodes": [
+                {
+                  "id": "t0",
+                  "data_status": "indeterminate",
+                  "data": 0,
+                  "next": "indeterminate"
+                }
+              ]
+            },
+            {
+              "order": 5,
+              "step": 2,
+              "caller_head": "none",
+              "local_head": "none",
+              "p": "t0",
+              "nodes": [
+                {
+                  "id": "t0",
+                  "data_status": "known",
+                  "data": 7,
+                  "next": "indeterminate"
+                }
+              ]
+            },
+            {
+              "order": 8,
+              "step": 3,
+              "caller_head": "none",
+              "local_head": "none",
+              "p": "t0",
+              "nodes": [
+                {
+                  "id": "t0",
+                  "data_status": "known",
+                  "data": 7,
+                  "next": "none"
+                }
+              ]
+            },
+            {
+              "order": 11,
+              "step": 4,
+              "caller_head": "none",
+              "local_head": "none",
+              "p": "t0",
+              "nodes": [
+                {
+                  "id": "t0",
+                  "data_status": "known",
+                  "data": 7,
+                  "next": "none"
+                }
+              ]
+            },
+            {
+              "order": 14,
+              "step": 5,
+              "caller_head": "t0",
+              "local_head": "none",
+              "p": "t0",
+              "nodes": [
+                {
+                  "id": "t0",
+                  "data_status": "known",
+                  "data": 7,
+                  "next": "none"
+                }
+              ]
+            }
+          ],
+          "highlights": [
+            {
+              "order": 3,
+              "step": 1,
+              "line": 4
+            },
+            {
+              "order": 6,
+              "step": 2,
+              "line": 6
+            },
+            {
+              "order": 9,
+              "step": 3,
+              "line": 7
+            },
+            {
+              "order": 12,
+              "step": 4,
+              "line": 8
+            },
+            {
+              "order": 15,
+              "step": 5,
+              "line": 12
+            }
+          ],
+          "advances": [
+            {
+              "order": 1,
+              "step": 1
+            },
+            {
+              "order": 4,
+              "step": 2
+            },
+            {
+              "order": 7,
+              "step": 3
+            },
+            {
+              "order": 10,
+              "step": 4
+            },
+            {
+              "order": 13,
+              "step": 5
+            }
+          ]
+        }
+      },
+      "mechanical_expected": "pending_independent_semantic_review",
+      "developer_label": "deliberately_wrong"
+    },
+    {
+      "id": "answer_changed",
+      "value": {
+        "paragraphs": [
+          {
+            "key": "intro",
+            "text": "新结点 p 的 next 指向原来的 head，所以原链仍接在新结点后面。函数返回 p 后，调用者把它赋给 caller_head，才真正更新调用者保存的头指针。"
+          }
+        ],
+        "code": "#include <stdlib.h>\ntypedef struct Node { int data; struct Node *next; } Node;\nNode *insert(Node *head, int value, int allocation_success) {\n    Node *p = allocation_success ? malloc(sizeof *p) : NULL;\n    if (p == NULL) return head;\n    p->data = value;\n    p->next = head;\n    return p;\n}\nint main(void) {\n    Node *caller_head = NULL;\n    caller_head = insert(caller_head, 7, 1);\n    (void)caller_head;\n    return 0;\n}\n",
+        "questions": {
+          "caller_head": {
+            "stem": "最后调用者保存的头指针 caller_head 指向哪个节点？",
+            "explanation": "调用者接回返回的 p，所以最终指向 t0。"
+          },
+          "traversal_status": {
+            "stem": "从 caller_head 开始的遍历如何结束？",
+            "explanation": "新节点的 next 为空，所以遍历到空指针结束。"
+          },
+          "reachable_prefix": {
+            "stem": "从调用者头开始，首次重复或不确定指针前的可知值前缀是什么？",
+            "explanation": "唯一可达节点的数据为 7，之后到达空指针。"
+          },
+          "allocation_failures": {
+            "stem": "这个合成分配掩码下，分配失败几次？",
+            "explanation": "唯一一次分配被给定为成功，所以失败次数为 0。"
+          }
+        },
+        "answers": {
+          "caller_head": "none",
+          "traversal_status": "terminated",
+          "reachable_prefix": [
+            7
+          ],
+          "allocation_failures": 0
+        },
+        "actions": {
+          "states": [
+            {
+              "order": 0,
+              "step": 0,
+              "caller_head": "none",
+              "local_head": "none",
+              "p": "none",
+              "nodes": []
+            },
+            {
+              "order": 2,
+              "step": 1,
+              "caller_head": "none",
+              "local_head": "none",
+              "p": "t0",
+              "nodes": [
+                {
+                  "id": "t0",
+                  "data_status": "indeterminate",
+                  "data": 0,
+                  "next": "indeterminate"
+                }
+              ]
+            },
+            {
+              "order": 5,
+              "step": 2,
+              "caller_head": "none",
+              "local_head": "none",
+              "p": "t0",
+              "nodes": [
+                {
+                  "id": "t0",
+                  "data_status": "known",
+                  "data": 7,
+                  "next": "indeterminate"
+                }
+              ]
+            },
+            {
+              "order": 8,
+              "step": 3,
+              "caller_head": "none",
+              "local_head": "none",
+              "p": "t0",
+              "nodes": [
+                {
+                  "id": "t0",
+                  "data_status": "known",
+                  "data": 7,
+                  "next": "none"
+                }
+              ]
+            },
+            {
+              "order": 11,
+              "step": 4,
+              "caller_head": "none",
+              "local_head": "none",
+              "p": "t0",
+              "nodes": [
+                {
+                  "id": "t0",
+                  "data_status": "known",
+                  "data": 7,
+                  "next": "none"
+                }
+              ]
+            },
+            {
+              "order": 14,
+              "step": 5,
+              "caller_head": "t0",
+              "local_head": "none",
+              "p": "t0",
+              "nodes": [
+                {
+                  "id": "t0",
+                  "data_status": "known",
+                  "data": 7,
+                  "next": "none"
+                }
+              ]
+            }
+          ],
+          "highlights": [
+            {
+              "order": 3,
+              "step": 1,
+              "line": 4
+            },
+            {
+              "order": 6,
+              "step": 2,
+              "line": 6
+            },
+            {
+              "order": 9,
+              "step": 3,
+              "line": 7
+            },
+            {
+              "order": 12,
+              "step": 4,
+              "line": 8
+            },
+            {
+              "order": 15,
+              "step": 5,
+              "line": 12
+            }
+          ],
+          "advances": [
+            {
+              "order": 1,
+              "step": 1
+            },
+            {
+              "order": 4,
+              "step": 2
+            },
+            {
+              "order": 7,
+              "step": 3
+            },
+            {
+              "order": 10,
+              "step": 4
+            },
+            {
+              "order": 13,
+              "step": 5
+            }
+          ]
+        }
+      },
+      "mechanical_expected": "reject_unauthorized_delta"
+    },
+    {
+      "id": "unchanged_original",
+      "value": {
+        "paragraphs": [
+          {
+            "key": "intro",
+            "text": "p 接旧 head，调用者接回 p。"
+          }
+        ],
+        "code": "#include <stdlib.h>\ntypedef struct Node { int data; struct Node *next; } Node;\nNode *insert(Node *head, int value, int allocation_success) {\n    Node *p = allocation_success ? malloc(sizeof *p) : NULL;\n    if (p == NULL) return head;\n    p->data = value;\n    p->next = head;\n    return p;\n}\nint main(void) {\n    Node *caller_head = NULL;\n    caller_head = insert(caller_head, 7, 1);\n    (void)caller_head;\n    return 0;\n}\n",
+        "questions": {
+          "caller_head": {
+            "stem": "最后调用者保存的头指针 caller_head 指向哪个节点？",
+            "explanation": "调用者接回返回的 p，所以最终指向 t0。"
+          },
+          "traversal_status": {
+            "stem": "从 caller_head 开始的遍历如何结束？",
+            "explanation": "新节点的 next 为空，所以遍历到空指针结束。"
+          },
+          "reachable_prefix": {
+            "stem": "从调用者头开始，首次重复或不确定指针前的可知值前缀是什么？",
+            "explanation": "唯一可达节点的数据为 7，之后到达空指针。"
+          },
+          "allocation_failures": {
+            "stem": "这个合成分配掩码下，分配失败几次？",
+            "explanation": "唯一一次分配被给定为成功，所以失败次数为 0。"
+          }
+        },
+        "answers": {
+          "caller_head": "t0",
+          "traversal_status": "terminated",
+          "reachable_prefix": [
+            7
+          ],
+          "allocation_failures": 0
+        },
+        "actions": {
+          "states": [
+            {
+              "order": 0,
+              "step": 0,
+              "caller_head": "none",
+              "local_head": "none",
+              "p": "none",
+              "nodes": []
+            },
+            {
+              "order": 2,
+              "step": 1,
+              "caller_head": "none",
+              "local_head": "none",
+              "p": "t0",
+              "nodes": [
+                {
+                  "id": "t0",
+                  "data_status": "indeterminate",
+                  "data": 0,
+                  "next": "indeterminate"
+                }
+              ]
+            },
+            {
+              "order": 5,
+              "step": 2,
+              "caller_head": "none",
+              "local_head": "none",
+              "p": "t0",
+              "nodes": [
+                {
+                  "id": "t0",
+                  "data_status": "known",
+                  "data": 7,
+                  "next": "indeterminate"
+                }
+              ]
+            },
+            {
+              "order": 8,
+              "step": 3,
+              "caller_head": "none",
+              "local_head": "none",
+              "p": "t0",
+              "nodes": [
+                {
+                  "id": "t0",
+                  "data_status": "known",
+                  "data": 7,
+                  "next": "none"
+                }
+              ]
+            },
+            {
+              "order": 11,
+              "step": 4,
+              "caller_head": "none",
+              "local_head": "none",
+              "p": "t0",
+              "nodes": [
+                {
+                  "id": "t0",
+                  "data_status": "known",
+                  "data": 7,
+                  "next": "none"
+                }
+              ]
+            },
+            {
+              "order": 14,
+              "step": 5,
+              "caller_head": "t0",
+              "local_head": "none",
+              "p": "t0",
+              "nodes": [
+                {
+                  "id": "t0",
+                  "data_status": "known",
+                  "data": 7,
+                  "next": "none"
+                }
+              ]
+            }
+          ],
+          "highlights": [
+            {
+              "order": 3,
+              "step": 1,
+              "line": 4
+            },
+            {
+              "order": 6,
+              "step": 2,
+              "line": 6
+            },
+            {
+              "order": 9,
+              "step": 3,
+              "line": 7
+            },
+            {
+              "order": 12,
+              "step": 4,
+              "line": 8
+            },
+            {
+              "order": 15,
+              "step": 5,
+              "line": 12
+            }
+          ],
+          "advances": [
+            {
+              "order": 1,
+              "step": 1
+            },
+            {
+              "order": 4,
+              "step": 2
+            },
+            {
+              "order": 7,
+              "step": 3
+            },
+            {
+              "order": 10,
+              "step": 4
+            },
+            {
+              "order": 13,
+              "step": 5
+            }
+          ]
+        }
+      },
+      "mechanical_expected": "reject_no_repair"
+    }
+  ],
+  "not_to_be_sent_to_model": true,
+  "no_exact_answer_string_required_for_real_repair": true
+}

@@ -1,0 +1,53 @@
+{
+  "batch_id": "p15-split-experiment-r01",
+  "providers": {
+    "generation": {
+      "url": "https://api.deepseek.com/responses",
+      "model": "deepseek-flash",
+      "credential_env": "EDUMIND_DEEPSEEK_COMPAT_API_KEY",
+      "reasoning": "none"
+    },
+    "review": {
+      "url": "https://aiapi.world/v1/responses",
+      "model": "gpt-6.1-sol",
+      "credential_env": "EDUMIND_AIAPI_REVIEW_API_KEY",
+      "reasoning": "none"
+    }
+  },
+  "stages": {
+    "free_course_plan_generation": {
+      "provider": "generation",
+      "schema_sha256": "edda4fcae5bf2e8f24faa7a264d20ccfb6039f009272aea4a2961377bb105acd"
+    },
+    "free_scene_generation": {
+      "provider": "generation",
+      "schema_sha256": "4884a6b17f9650afffa6623c3284974de6d733ef7f59021860c6f1c385b68dbb"
+    },
+    "development_scene_review": {
+      "provider": "review",
+      "schema_sha256": "ce930aa1fc50acd68f30d04e2503dd91e80c2c2a448756a846b8fedbe082b458"
+    },
+    "development_review_probe": {
+      "provider": "review",
+      "schema_sha256": "5dd4734a2cd9b2910dd3a56f643cd3dc2dc8cae44bf77b909c041895dc6802a3"
+    }
+  },
+  "limits": {
+    "requests": 250,
+    "input_tokens": null,
+    "output_tokens": null,
+    "fee_micros": null,
+    "wall_seconds": 10800
+  },
+  "generation_calls": 182,
+  "review_calls": 68,
+  "scene_reviews": 48,
+  "per_course_requests": 13,
+  "per_course_seconds": 600,
+  "per_request_seconds": 120,
+  "requested_max_output_tokens": 8000,
+  "bounded_output_verified": false,
+  "human_review_waived": false,
+  "actual_invoice_usd": null,
+  "production_mode_changed": false
+}

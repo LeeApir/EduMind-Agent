@@ -1,0 +1,59 @@
+{
+  "real_provider_calls": 0,
+  "passing_runs": [
+    {
+      "xml": "/tmp/edumind-p15-t037-r09-offline.xml",
+      "sha256": "8b37c9f499689f916ae28cf017611d499af2dd7234bf9fe0a5710977118bf20f",
+      "counts": {
+        "tests": 49,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "xml": "/tmp/edumind-p15-t037-r08-pg.xml",
+      "sha256": "0f11aee2884c435e68a27e53bda1230bac43d04f5881dfa331e67a92af8a67e6",
+      "counts": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  ],
+  "pg_database": "edumind_catalog_p15_t020_t037_r08",
+  "pg_log": {
+    "path": "/tmp/edumind-p15-t037-r08-pg.log",
+    "sha256": "fe3f9a98799a30159039f4ed29c59c839c7c572deb1acdad64ff26d5dd180fa8"
+  },
+  "earlier_failure": {
+    "xml": "/tmp/edumind-p15-t037-r03-pg.xml",
+    "sha256": "9caf1eb13654ff2becb36e7cfdbe14814ba954856759b600f4873ece37b76a44",
+    "reason": "Mock fixture used conflicting_requirements instead of the actual requirements_conflict enum; fixed fixture, fresh database rerun passed; assertions retained"
+  },
+  "coverage": [
+    "budget/auth/concurrency/clock/unknown/late settlement",
+    "exact real Responses wire and same-body token counting via HTTPX Mock",
+    "serial checkpoints, no duplicate start/resend, interrupted state, immutable output, human probe thresholds",
+    "actual PG scheduler known/unknown profile, conflict clarification, label-free probe",
+    "actual PG first-schema failures: repair does not restore primary numerator; second invalid primary stops at 18 counted Mock HTTP requests"
+  ],
+  "limitations": [
+    "Mock is not real model quality or relay capability verification",
+    "No T038 execution approval or live request",
+    "Existing Starlette anyio alias deprecation warning; no failing or skipped checks"
+  ],
+  "historical_integrity_read_only": {
+    "T035_original_251_evidence": "PASS; not a fresh rerun",
+    "T036_original_browser_evidence": "PASS; not a fresh rerun",
+    "approved_files": 41,
+    "historical_files": 50
+  },
+  "actual_cli_gate": {
+    "command": "backend/.venv/bin/python scripts/run_p15_development_diagnostic.py --start",
+    "exit_code": 1,
+    "expected": "REFUSED before credentials/DNS/Docker/PG/output; output directory absent before and after",
+    "real_provider_calls": 0
+  }
+}

@@ -1,0 +1,96 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "source_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "scope_status": {
+      "type": "string",
+      "enum": [
+        "complete",
+        "insufficient_evidence"
+      ]
+    },
+    "uncertain_reason": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        }
+      ]
+    },
+    "verdict": {
+      "type": "string",
+      "enum": [
+        "pass",
+        "revise",
+        "reject",
+        "uncertain"
+      ]
+    },
+    "issues": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "area": {
+            "type": "string",
+            "enum": [
+              "fact",
+              "difficulty",
+              "misconception",
+              "code_safety"
+            ]
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "minor",
+              "major",
+              "severe"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "source_pointer": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512,
+            "pattern": "^/(original_goal$|scene/|plan_constraints/|upstream/)",
+            "description": "RFC6901 pointer relative to payload.source, never payload root. Use /scene/... not /source/scene/.... Escape ~ and / as ~0 and ~1."
+          },
+          "evidence_quote": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4000
+          }
+        },
+        "required": [
+          "area",
+          "severity",
+          "message",
+          "source_pointer",
+          "evidence_quote"
+        ]
+      }
+    }
+  },
+  "required": [
+    "source_sha256",
+    "scope_status",
+    "uncertain_reason",
+    "verdict",
+    "issues"
+  ]
+}

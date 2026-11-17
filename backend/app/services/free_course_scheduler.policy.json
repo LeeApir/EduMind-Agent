@@ -1,0 +1,128 @@
+{
+  "schema_version": "progressive-course-policy-v1",
+  "status": "proposed_not_authorized_runtime",
+  "operation_states": {
+    "active": [
+      "queued",
+      "running",
+      "cancel_requested"
+    ],
+    "terminal": [
+      "succeeded",
+      "partially_succeeded",
+      "awaiting_clarification",
+      "failed",
+      "cancelled",
+      "timed_out"
+    ],
+    "transitions": {
+      "queued": [
+        "running",
+        "cancel_requested",
+        "timed_out",
+        "failed"
+      ],
+      "running": [
+        "cancel_requested",
+        "succeeded",
+        "partially_succeeded",
+        "awaiting_clarification",
+        "failed",
+        "timed_out"
+      ],
+      "cancel_requested": [
+        "cancelled"
+      ]
+    }
+  },
+  "scene_states": [
+    "pending",
+    "blocked_dependency",
+    "running",
+    "ready",
+    "failed",
+    "invalidated",
+    "cancelled"
+  ],
+  "limits": {
+    "scenes_min": 1,
+    "scenes_max": 8,
+    "default_learning_minutes": 15,
+    "operation_attempts": 13,
+    "primary_plan_calls": 1,
+    "primary_scene_calls": 8,
+    "transport_retry_pool": 2,
+    "format_repair_pool": 2,
+    "per_step_transport_retries": 1,
+    "per_step_format_repairs": 1,
+    "operation_seconds": 600,
+    "call_seconds": 120,
+    "call_input_tokens": 32000,
+    "call_output_tokens": 8000,
+    "operation_input_tokens": 200000,
+    "operation_output_tokens": 48000,
+    "course_attempts": 40,
+    "course_input_tokens": 600000,
+    "course_output_tokens": 144000,
+    "owner_active_operations": 1,
+    "course_active_operations": 1,
+    "global_worker_slots": 2,
+    "lease_seconds": 45,
+    "heartbeat_seconds": 10,
+    "poll_seconds": 1,
+    "sse_heartbeat_seconds": 15,
+    "retry_backoff_seconds": 2,
+    "retry_after_max_seconds": 30,
+    "plan_bytes": 16384,
+    "scene_bytes": 65536,
+    "events_per_operation": 256,
+    "event_bytes": 4096,
+    "visualization_steps": 50,
+    "elements_per_step": 32
+  },
+  "automatic_retry_statuses": [
+    429,
+    502,
+    503,
+    504
+  ],
+  "unknown_outcome_policy": "stop_no_resend_quarantine_capacity_until_verified_settlement",
+  "format_repair_policy": "structural_only_no_hard_safety_bypass",
+  "actual_provider_requests_authorized": 0,
+  "operation_kinds": [
+    "create",
+    "clarify",
+    "resume",
+    "adjust_outline",
+    "revise_scene"
+  ],
+  "plan_required_fields": [
+    "title",
+    "objectives",
+    "shared_example",
+    "terminology",
+    "conventions",
+    "scenes"
+  ],
+  "scene_plan_required_fields": [
+    "scene_key",
+    "title",
+    "purpose",
+    "forms",
+    "depends_on"
+  ],
+  "event_types": [
+    "queued",
+    "started",
+    "clarification_required",
+    "outline_ready",
+    "scene_started",
+    "scene_ready",
+    "first_scene_ready",
+    "progress",
+    "cancel_requested",
+    "error",
+    "done"
+  ],
+  "automatic_retry_evidence_required": "verified_provider_contract_proves_not_executed_or_stopped; gateway_status_alone_insufficient"
+}

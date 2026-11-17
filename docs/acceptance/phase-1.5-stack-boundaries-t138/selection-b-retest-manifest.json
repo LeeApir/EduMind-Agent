@@ -1,0 +1,77 @@
+{
+  "batch": "stack-goal-b-retest-v1",
+  "status": "proposed_execution_not_authorized",
+  "source_manifest_sha256": "e94374813efb3f4f1c05883469a5d153bcc7ffd73d1e6c369e01d65b6618cbb8",
+  "source_result_commit": "b540551",
+  "slot": "B",
+  "stages": [
+    "normal",
+    "rejections"
+  ],
+  "budgets": {
+    "selection": 0,
+    "body": 2,
+    "revision": 0
+  },
+  "sample": "先学压入弹出，再看塞满时压不进、一个也没有时弹不出的原因。",
+  "reviewed_choice": {
+    "kind": "reviewed_selection_replay",
+    "batch": "stack-goal-selection-v1",
+    "slot": "B",
+    "course_id": "89cad7f4-2c1b-4b9a-af13-589490cde19d",
+    "operation_id": "4ff41b38-1b3f-490f-8607-4f139f8ac23b",
+    "request_sha256": "1c9dda6e1039d7a76335786b00edc286b22dc6ab2f7c55558a8a4e5c436a0e94",
+    "response_sha256": "cf3106f8f90a2168ece957baf59b2314231bdfbdc08b5fb302d20343e8016c50",
+    "review_sha256": "6c9faf205f24b7d2b0c23af40396935e0856851997261c72eada7cda1e46ebdc",
+    "candidate_digest": "75bb0df22b92e874e939d227665cfc4aa987a6ada8ee8c55ec64de73d2c56f2f",
+    "plan_id": "d11cd775-a3e3-4e9a-b561-8756cff9ba40",
+    "plan_digest": "f1e4f88350cfeba4b4fadb5d491d99d9d2be6ebd163cfa91edf19d0a86d275cd"
+  },
+  "previous_failure": {
+    "stop_sha256": "8bc598d195b3a8b9cf559a815e002123c576058785457fc26d6e83edf5c8df31",
+    "request_sha256": "34f7efe00bbefd8f2a6427ceadbc400e67346408e0dbc565fabc0c6d7194a153",
+    "response_sha256": "d3434b66aaebac9916f909cff3ba1d432f8b41dc54327ac015f7a1b599623fdd",
+    "http_status": 401,
+    "code": "STACK_BODY_RECEIPT"
+  },
+  "endpoint": "https://api.deepseek.com/responses",
+  "model": "deepseek-flash",
+  "window_seconds": 1800,
+  "timeout_seconds": 90,
+  "max_request_bytes": 131072,
+  "max_response_bytes": 2097152,
+  "max_output_tokens_per_request": 8000,
+  "temperature": 0.2,
+  "store": false,
+  "stream": false,
+  "reasoning_effort": "none",
+  "materials_digest": "d93943193f111b68ae2bb70a40dacaa731c31ddc77b3d73e961d8262aa110456",
+  "scene_prompt_version": "stack-boundaries-scene-evidence-v2",
+  "scene_schema_version": "stack-boundaries-scene-wire-v2",
+  "scene_checks": {
+    "normal": [
+      "normal_five_frames",
+      "lifo_explanation",
+      "two_exercises",
+      "fact_support",
+      "first_pop_explanation",
+      "final_top_explanation"
+    ],
+    "rejections": [
+      "full_course_coherence",
+      "rejections_nine_frames",
+      "both_guards_and_returns",
+      "unchanged_logical_storage_and_output",
+      "old_output_is_not_new_pop",
+      "six_exercises_and_solutions",
+      "fact_support",
+      "full_count_explanation",
+      "empty_return_explanation",
+      "empty_output_explanation",
+      "guard_pair_explanation"
+    ]
+  },
+  "files": {
+    "scripts/stack_goal_b_retest.py": "64142839f245b41d38117ed38be2ae001c7c96cb181b4ba9ad21298641e9eda8"
+  }
+}

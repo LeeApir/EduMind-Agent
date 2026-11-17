@@ -13,7 +13,6 @@ from app.models.learning_state import (
     NodeMasteryCurrent,
     NodeMasteryRevision,
 )
-from app.services.catalog_assessment import mastery_eligible
 from app.services.learning_owner_lock import lock_learning_owner
 from app.services.mastery_rules import MASTERY_RULE_VERSION, MasteryFact, reduce_mastery
 
@@ -30,7 +29,13 @@ async def apply_mastery_evidence(
     db: AsyncSession, record: LearningEvidence
 ) -> tuple[dict[str, object] | None, bool]:
     """Rebuild owner facts and write revision, current state, and stale flag atomically."""
-    if not mastery_eligible(record.payload):
+    from app.services.free_course_evidence import effective_evidence
+
+    correction = (
+        record.source_protocol == "free-course-correction-v1"
+        and record.evidence_type == "evidence_correction"
+    )
+    if not correction and not await effective_evidence(db, record):
         return None, False
     await db.flush()
     rows = (
@@ -43,8 +48,12 @@ async def apply_mastery_evidence(
             .order_by(LearningEvidence.created_at, LearningEvidence.id)
         )
     ).all()
-    decision = reduce_mastery([MasteryFact(row.evidence_type, row.payload) for row in rows
-                              if mastery_eligible(row.payload)])
+    facts = [
+        MasteryFact(row.evidence_type, row.payload)
+        for row in rows
+        if await effective_evidence(db, row)
+    ]
+    decision = reduce_mastery(facts)
     current = await db.scalar(
         select(NodeMasteryCurrent)
         .where(
@@ -56,7 +65,8 @@ async def apply_mastery_evidence(
     previous_score = current.score if current is not None else 0.0
     change: dict[str, object] | None = None
     if (
-        current is None
+        correction
+        or current is None
         or current.score != decision.score
         or current.status != decision.status
         or current.rule_version != MASTERY_RULE_VERSION
@@ -72,6 +82,7 @@ async def apply_mastery_evidence(
             rule_version=MASTERY_RULE_VERSION,
             evidence_id=record.id,
             evidence_summary=list(decision.evidence_summary),
+            recomputed_from_id=current.revision_id if correction and current is not None else None,
         )
         db.add(revision)
         await db.flush()
