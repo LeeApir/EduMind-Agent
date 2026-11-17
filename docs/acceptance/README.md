@@ -1,36 +1,33 @@
-# 验收资料：当前入口与回归依赖
+# 验收资料入口
 
-当前阶段为Phase 1.5，42项任务均todo，尚未领取。正式运行仍catalog_only，T040／T041历史blocked不变，整理不授权模型调用、动态开放或开发。
+Phase 1.5 已按 ADR0066 收敛退出，**原开发质量、独立质量与性能没有通过**。当前 Phase 2 先讨论课程、界面、动画与习题重设计；历史试验不再执行。当前任务以[根账本](../../task.json)为准，正式产品保持 `catalog_only`。
 
-## 后续开发先看这些
+**后续开发不必通读本目录。** 从当前任务、PRD 对应范围和本页相关能力入口开始；只有修改涉及来源或旧缺陷时才查对应证据，不默认重跑旧批次。[保留清单与开发入口](../maintenance/acceptance-retention-20261116.md)记录全部处置：本轮退役60目录、15顶层历史文档及61个专属脚本/测试，剩余154目录和7个非缓存顶层文件。原候选中的66目录因共享依赖暂留，不再追加清理任务；清空历史资料不作为重设计前置。
 
-- [Phase 1.5需求](../PRD-phase-1.5-draft.md)、[任务规划](../phase-1.5-task-plan.md)、[活动账本](../../task.json)：当前开发依据。页面原型和设计说明位于docs/design/，不是旧验收包。
-- [P1最终交接](phase-1-closeout-20261021/README.md)：已交付能力、限制、89 done／2 blocked、真实运行已知用量及退出决定。完成任务不等于原质量／性能通过。
-- [目录课程原始签核](mvp-0.3-catalog-human-signoff-20261003.json)、[目录退出](mvp-0.3-catalog-exit-20261003.md)：当前正式课程的来源，必须保留；不能替换成模型生成成绩。
-- [H01–H08封存状态](phase-1-holdout-reserve-r01/CURRENT-STATUS.md)：按新课程契约另评适用性，禁止当作开发材料或自动继承资格。
-- [旧验收包归档索引](ARCHIVE.md)：查旧失败、未运行、性能及修复历史，从此进入；不是新执行授权。
+## 当前交接与可复用成果
 
-## 为什么还有78个目录保留
+| 要了解什么 | 入口 |
+| --- | --- |
+| 阶段结束原因、缺口和保留范围 | [Phase 1.5 收敛交接](phase-1.5-t038-gap-review-t123/GAPS.md)、[ADR0066](../ADR/0066-phase-1.5-contracted-closeout.md)、[只读任务归档](../tasks/phase-1.5.json) |
+| 四主题课程的已有能力 | [四主题共用流程](phase-1.5-shared-live-reuse-t127/RESULTS.md)、[二分查找程序帧](phase-1.5-binary-search-program-frames-t130/RESULTS.md) |
+| 栈的目标选择、多场景与判卷 | [栈统一结果](phase-1.5-stack-boundaries-t138/RESULTS.md)；不同批次和版本的成绩不能合并 |
+| 画像适配的实际局限 | [A/B 课程及对照](phase-1.5-stack-profile-pair-t132/RESULTS.md)：两课合格，最后跨批对照仅 1/3，不通过 |
+| 私有课程与兼容能力 | [四主题封存回放](phase-1.5-course-trial-replay-t120/RESULTS.md)、[已有头插导入](phase-1.5-archived-head-import-t117/README.md)、[兼容检查](phase-1.5-compatibility-t021/README.md) |
+| 核心工程的原验证范围 | [集成记录](phase-1.5-integration-t035/README.md)、[浏览器记录](phase-1.5-browser-t036/README.md)；历史检查不自动证明新设计通过 |
 
-对backend/tests、scripts/tests及其本地导入依赖作静态追踪，共检查574个Python模块。75个包名仍被回归／工具读取，加上最终交接、H和用户未提交报告的保护目录，保留78个目录；它们不是当前阶段的新验收计划。
+## 保留的契约与历史
 
-主要用途：共享计划／资源和单元审核、节点绑定、预算和Schema兼容、固定C样本与容器、队列／DSL故障、安全及历史缺陷回放。完整的“目录→实际消费模块”清单在[保留与迁出清单](../maintenance/acceptance-archive-20261021.json)的kept_directories字段。不将这些回归材料充当泛化证明，也不为了目录更少删掉测试依赖。
+- [课程契约](phase-1.5-course-contract-r01/README.md)、[生成契约](phase-1.5-generation-contract-r01/README.md)、[质量契约](phase-1.5-quality-contract-r01/README.md)、[验收契约](phase-1.5-acceptance-contract-r01/README.md)：原指标和失败不回填，新设计如需调整另作决定。
+- [T102 最终重设计与独立复核](phase-1.5-manual-bc-redesign-t102/DESIGN.md)：保留代表性失败，不恢复执行器路线。其历史相对链接可通过下述归档索引定位原提交。
+- [Phase 1 交接](phase-1-closeout-20261021/README.md)、[原目录课程签核](mvp-0.3-catalog-human-signoff-20261003.json)、[目录退出](mvp-0.3-catalog-exit-20261003.md)：保留正式课程来源与历史限制。
+- H01–H08 继续封存，不作为新阶段开发材料，不继承样本资格。
 
-当前日常入口是本页及活动账本，不必逐个阅读旧包。旧包的pending／Proposed／旧任务数按当时快照解释，不作为当前状态。
+## 退役资料与恢复
 
-## 已迁出与恢复
+[ARCHIVE.md](ARCHIVE.md) 列出已退役的资料批次、准确 Git 来源和恢复方法。只需日常开发时阅读本页及当前任务，不必逐个打开历史包。
 
-32个无上述依赖的旧验收包、346个文件移至local-materials/acceptance-archive-20261021/snapshot/，按原仓库相对路径保存，逐文件SHA256一致。另将根目录和backend的检查缓存、Finder元数据移到同一整理区的rebuildable-cache/；它们可由工具重建，不含虚拟环境、凭据、数据库或生成媒体。
+- 2026-10-21：32 包、346 文件，原恢复清单保留。
+- 2026-11-16 T004：集中退役434文件，准确来源、恢复及定向验证见[最终清单](../maintenance/acceptance-retention-20261116.md)。本轮清理结束。
+- 2026-11-16 T002：退役九个 T102 过程包及专属消费者，共 66 文件；未删除 Git 历史，不在工作区复制完整档案。见[本次清理记录](../maintenance/acceptance-cleanup-20261116.md)。
 
-```bash
-python3 scripts/manage_acceptance_archive.py check
-# 本地Git包含来源提交、但缺历史材料时，离线恢复到local-materials：
-python3 scripts/manage_acceptance_archive.py restore
-python3 scripts/check_phase_handoff.py
-```
-
-原Git历史与阶段账本/process.txt不改路径、不回填成绩。现行入口链接转向ARCHIVE.md；冻结历史文件保持原字节，其旧链接经归档清单定位。阶段交接检查器同时接受明确登记的归档位置和此前已迁移的本地证据位置，摘要验证不放宽；P1切换回执与初始根账本按对应历史提交核验，不要求Phase 1.5永远停留在初始化的一条任务。
-
-本地档案被Git忽略，不随clone分发；来源Git提交和逐文件清单随仓库保存。恢复仅取回资料，不加载.env、不调用Provider或启动旧执行器。详细操作与检查见[本次整理记录](../maintenance/acceptance-cleanup-20261021.md)。
-
-浅克隆若没有来源Git对象，需另行取得准确历史或由维护者提供本地档案；恢复工具不会自动联网取历史。
+保留材料仍可能被课程导入、准入或有效回归按准确路径读取，不能按目录日期批量删除。历史文件中的 pending、旧任务数和旧阶段名称保留当时含义，不构成执行授权。密钥、私有数据库与加密原件继续本机保管。

@@ -12,7 +12,6 @@ from scripts.isolated_diagnostics.p15_combined_candidate_contract import SPEC
 from scripts.isolated_diagnostics.p15_head_insertion_engine import canonical
 
 ROOT = Path(__file__).resolve().parents[2]
-OUT = ROOT / "docs/acceptance/phase-1.5-reference-player-t102"
 OLD = ROOT / "docs/acceptance/phase-1.5-combined-candidate-r01/results/candidate.json"
 TEMPLATE = ROOT / "docs/acceptance/phase-1.5-real-candidate-player-t098/template.html"
 
@@ -237,5 +236,4 @@ def build(course=None, catalog=None):
 
 
 if __name__ == "__main__":
-    OUT.mkdir(parents=True, exist_ok=True)
-    (OUT / "course.html").write_text(build())
+    raise SystemExit("T102 preview generation retired; build() remains for shared regression tests. See docs/acceptance/ARCHIVE.md.")

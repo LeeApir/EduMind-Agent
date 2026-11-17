@@ -7,7 +7,7 @@
     "auto_commit": true,
     "auto_push": false,
     "auto_merge": false,
-    "phase_gate": "仅设计待办，用户要求归档及 PR 后再讨论重设计；不得自动领取。"
+    "phase_gate": "T004集中清理完成，本轮结束；复杂共享依赖暂留，不再追加清理前置。T001重设计待讨论，无Provider或实施授权。"
   },
   "archive_policy": {
     "active_source": "根task.json是唯一活动任务状态来源；docs/tasks均只读历史。",
@@ -53,6 +53,105 @@
       "completed_at": null,
       "commit_lookup": "Task-Completed: PHASE-2-T001",
       "execution_gate": "待归档与 PR 完成后讨论；本次未授权领取或设计实施。"
+    },
+    {
+      "id": "PHASE-2-T002",
+      "phase": "Phase 2",
+      "title": "清理 T102 退役过程包与更新验收导航",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [],
+      "scope": [
+        "退役九个已停止T102过程包及专属消费者，保留Git来源和逐文件恢复索引。",
+        "删除可重建缓存，更新验收入口；保留共享引擎、代表性结论、课程依赖和用户改动。"
+      ],
+      "prd_source": "用户清理授权；ADR0066旧路线停止与证据保留；课程方向§5.4",
+      "acceptance_criteria": [
+        "所有退役文件可从准确Git来源按摘要恢复，旧历史不改。",
+        "无剩余活动代码引用被移除的专属模块或材料；共享回归仍通过。",
+        "导航反映Phase 2待设计状态，根账本及交接同步。"
+      ],
+      "verification": [
+        "python3 scripts/manage_acceptance_archive.py check-source --index docs/maintenance/acceptance-retirement-t102-20261116.json",
+        "定向共享引用投影测试、恢复抽查、剩余引用检查、账本检查及git diff --check。"
+      ],
+      "started_at": "2026-11-16T23:18:03",
+      "completed_at": "2026-11-16T23:21:48",
+      "commit_lookup": "Task-Completed: PHASE-2-T002",
+      "verification_results": [
+        {
+          "command": "来源66文件摘要、单文件restore/check、共享测试9项、定向静态/链接/保留摘要核对、账本和diff检查",
+          "result": "全部通过；57材料文件+8专属脚本+1专属测试退役，11缓存删除；Provider0。",
+          "evidence": "docs/maintenance/acceptance-cleanup-20261116.md"
+        }
+      ]
+    },
+    {
+      "id": "PHASE-2-T003",
+      "phase": "Phase 2",
+      "title": "整理验收资料保留范围与开发入口",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-2-T002"
+      ],
+      "scope": [
+        "逐项整理现存验收目录和顶层文档，区分代码依赖、回归夹具、关键交接与退役候选。",
+        "提供精简开发入口及后续清理边界，不实施删除或运行历史试验。"
+      ],
+      "prd_source": "用户要求确定仍需材料、减少开发负担；ADR0066；课程方向§5.4",
+      "acceptance_criteria": [
+        "现存214目录及22个非缓存顶层文件均有处置建议和依据。",
+        "明确开发必读入口与按需材料，说明静态检查边界，不能把候选当成可直接删除清单。",
+        "用户改动、封存样本、历史材料和运行代码保持不变。"
+      ],
+      "verification": [
+        "核对目录覆盖、引用、根账本和 git diff --check；文档整理不运行业务回归或 Provider。"
+      ],
+      "started_at": "2026-11-16T23:40:37",
+      "completed_at": "2026-11-16T23:42:48",
+      "commit_lookup": "Task-Completed: PHASE-2-T003",
+      "verification_results": [
+        {
+          "command": "逐项覆盖/重复项/导航链接/原任务不变核对；python3 scripts/check_catalog_workflow.py；git diff --check",
+          "result": "通过：214目录+22非缓存文件分类完整；没有删除、业务回归或Provider调用。",
+          "evidence": "docs/maintenance/acceptance-retention-20261116.md"
+        }
+      ]
+    },
+    {
+      "id": "PHASE-2-T004",
+      "phase": "Phase 2",
+      "title": "集中退役旧验收试验与专属消费者",
+      "status": "done",
+      "priority": "P0",
+      "depends_on": [
+        "PHASE-2-T003"
+      ],
+      "scope": [
+        "按T003候选清理确认可退役的目录、顶层历史报告和专属脚本/测试；复杂共享依赖暂留，不为清理重构。",
+        "复用恢复索引与工具，更新导航及最终留存说明；完成本轮即停止清理。"
+      ],
+      "prd_source": "用户清理指令；ADR0066；课程方向§5.4",
+      "acceptance_criteria": [
+        "退役文件与准确Git来源逐字节一致且可按索引恢复，不改历史结论。",
+        "保留运行代码、共享支持模块、基础夹具和现有后端回归；未留下已发现的活动导入/文件依赖断裂。",
+        "根账本、导航和最终数量同步，用户已有改动不进入本次提交。"
+      ],
+      "verification": [
+        "核对Git来源摘要、消费者引用及导入、保留材料摘要；按实际影响运行恢复和共享依赖定向检查。",
+        "核对导航/恢复链接、账本、diff和暂存范围；不运行Provider、数据库或全套回归。"
+      ],
+      "started_at": "2026-11-16T23:48:43",
+      "completed_at": "2026-11-16T23:54:08",
+      "commit_lookup": "Task-Completed: PHASE-2-T004",
+      "verification_results": [
+        {
+          "command": "434个Git来源摘要、恢复抽查、剩余引用/导入及保护摘要；20项定向pytest；T107两课映射；清单/导航/账本/diff核对",
+          "result": "通过。退役60目录、15顶层文档、38专属脚本和23专属测试；现存154目录+7文件；66复杂依赖候选暂留。本轮结束，Provider/应用写入0。",
+          "evidence": "docs/maintenance/acceptance-retention-20261116.md"
+        }
+      ]
     }
   ]
 }
